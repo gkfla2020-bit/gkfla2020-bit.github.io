@@ -1,10 +1,7 @@
 ---
-layout: single
+layout: default
 title: "Reading List"
 permalink: /reading/
-author_profile: true
-toc: true
-toc_sticky: true
 ---
 
 퀀트/금융공학 관련 읽을만한 글 모음

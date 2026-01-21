@@ -1,10 +1,7 @@
 ---
-layout: single
+layout: default
 title: "Projects"
 permalink: /projects/
-author_profile: true
-toc: true
-toc_sticky: true
 ---
 
 ## Quantitative Finance

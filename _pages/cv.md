@@ -1,8 +1,7 @@
 ---
-layout: single
+layout: default
 title: "Curriculum Vitae"
 permalink: /cv/
-author_profile: true
 ---
 
 # Ha Rim Jung

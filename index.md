@@ -1,7 +1,6 @@
 ---
-layout: single
-author_profile: true
-title: ""
+layout: default
+title: Home
 ---
 
 # Ha Rim Jung 정하림
@@ -12,8 +11,6 @@ Sogang University, Seoul, Korea
 ---
 
 ## Research Interests
-
-My research focuses on **quantitative finance** and **financial engineering**, with particular emphasis on:
 
 - Portfolio Optimization & Risk Management
 - Quantitative Trading Strategies
@@ -26,14 +23,14 @@ My research focuses on **quantitative finance** and **financial engineering**, w
 
 | Year | Degree | Institution | Field |
 |:-----|:-------|:------------|:------|
-| 2026 - | **M.S./Ph.D. Integrated** | Sogang University | Computer Science |
-| 2023 - 2025 | **B.A.** | Hanyang University | Economics |
+| 2026 - | M.S./Ph.D. Integrated | Sogang University | Computer Science |
+| 2023 - 2025 | B.A. | Hanyang University | Economics |
 
 ---
 
 ## Selected Awards
 
-- **3rd Place**, BANKIS Mock Investment Competition (National), Korea Investment & Securities, 2025
+- **3rd Place**, BANKIS Mock Investment Competition (National), 2025
 - **Grand Prize**, Investment Portfolio Idea Contest, KCGI Asset Management, 2025
 - **Top 100 STEM Scholarship**, Lotte Foundation, 2025
 
@@ -41,11 +38,15 @@ My research focuses on **quantitative finance** and **financial engineering**, w
 
 ## Publications
 
-**Jung, H.R.**, & Kwon, J.H. (2025). *Determinants of Interest Rate Spreads in Korean ABS: Interaction Effects between Macro Stress Indicators and Issuance Structure*. Working Paper.
+**Jung, H.R.**, & Kwon, J.H. (2025). *Determinants of Interest Rate Spreads in Korean ABS*. Working Paper.
 
 ---
 
 ## Contact
 
-**Email**: gkfla2020@gmail.com  
-**GitHub**: [github.com/gkfla2020-bit](https://github.com/gkfla2020-bit)
+- Email: gkfla2020@gmail.com
+- GitHub: [github.com/gkfla2020-bit](https://github.com/gkfla2020-bit)
+
+---
+
+[CV](/cv/) | [Research](/research/) | [Projects](/projects/) | [Reading](/reading/)
