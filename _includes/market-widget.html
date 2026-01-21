@@ -1,0 +1,112 @@
+<!-- TradingView Ticker Tape Widget -->
+<div class="tradingview-widget-container" style="margin: 20px 0;">
+  <div class="tradingview-widget-container__widget"></div>
+  <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-ticker-tape.js" async>
+  {
+    "symbols": [
+      {"proName": "BITSTAMP:BTCUSD", "title": "Bitcoin"},
+      {"proName": "BITSTAMP:ETHUSD", "title": "Ethereum"},
+      {"proName": "NASDAQ:AAPL", "title": "Apple"},
+      {"proName": "NASDAQ:NVDA", "title": "NVIDIA"},
+      {"proName": "FX_IDC:USDKRW", "title": "USD/KRW"},
+      {"proName": "FOREXCOM:SPXUSD", "title": "S&P 500"},
+      {"proName": "KRX:005930", "title": "삼성전자"}
+    ],
+    "showSymbolLogo": true,
+    "colorTheme": "dark",
+    "isTransparent": false,
+    "displayMode": "adaptive",
+    "locale": "kr"
+  }
+  </script>
+</div>
+
+<!-- Real-time Crypto Prices (CoinGecko API) -->
+<div id="crypto-prices" style="margin: 30px 0; padding: 20px; background: #1a1a2e; border-radius: 10px;">
+  <h3 style="color: #fff; margin-bottom: 15px;">📊 Real-time Crypto Prices</h3>
+  <div id="price-container" style="display: flex; flex-wrap: wrap; gap: 15px;">
+    <div class="price-card" id="btc-card">
+      <span class="coin-name">BTC</span>
+      <span class="coin-price" id="btc-price">Loading...</span>
+      <span class="coin-change" id="btc-change"></span>
+    </div>
+    <div class="price-card" id="eth-card">
+      <span class="coin-name">ETH</span>
+      <span class="coin-price" id="eth-price">Loading...</span>
+      <span class="coin-change" id="eth-change"></span>
+    </div>
+    <div class="price-card" id="sol-card">
+      <span class="coin-name">SOL</span>
+      <span class="coin-price" id="sol-price">Loading...</span>
+      <span class="coin-change" id="sol-change"></span>
+    </div>
+  </div>
+  <p style="color: #666; font-size: 12px; margin-top: 10px;">Data from CoinGecko API • Updates every 60s</p>
+</div>
+
+<style>
+.price-card {
+  background: #16213e;
+  padding: 15px 25px;
+  border-radius: 8px;
+  display: flex;
+  flex-direction: column;
+  min-width: 120px;
+}
+.coin-name {
+  color: #888;
+  font-size: 14px;
+  font-weight: bold;
+}
+.coin-price {
+  color: #fff;
+  font-size: 20px;
+  font-weight: bold;
+  margin: 5px 0;
+}
+.coin-change {
+  font-size: 14px;
+  font-weight: bold;
+}
+.coin-change.positive { color: #00d26a; }
+.coin-change.negative { color: #ff4757; }
+</style>
+
+<script>
+async function fetchCryptoPrices() {
+  try {
+    const response = await fetch('https://api.coingecko.com/api/v3/simple/price?ids=bitcoin,ethereum,solana&vs_currencies=usd&include_24hr_change=true');
+    const data = await response.json();
+    
+    // Bitcoin
+    document.getElementById('btc-price').textContent = '$' + data.bitcoin.usd.toLocaleString();
+    const btcChange = data.bitcoin.usd_24h_change.toFixed(2);
+    const btcChangeEl = document.getElementById('btc-change');
+    btcChangeEl.textContent = (btcChange >= 0 ? '+' : '') + btcChange + '%';
+    btcChangeEl.className = 'coin-change ' + (btcChange >= 0 ? 'positive' : 'negative');
+    
+    // Ethereum
+    document.getElementById('eth-price').textContent = '$' + data.ethereum.usd.toLocaleString();
+    const ethChange = data.ethereum.usd_24h_change.toFixed(2);
+    const ethChangeEl = document.getElementById('eth-change');
+    ethChangeEl.textContent = (ethChange >= 0 ? '+' : '') + ethChange + '%';
+    ethChangeEl.className = 'coin-change ' + (ethChange >= 0 ? 'positive' : 'negative');
+    
+    // Solana
+    document.getElementById('sol-price').textContent = '$' + data.solana.usd.toLocaleString();
+    const solChange = data.solana.usd_24h_change.toFixed(2);
+    const solChangeEl = document.getElementById('sol-change');
+    solChangeEl.textContent = (solChange >= 0 ? '+' : '') + solChange + '%';
+    solChangeEl.className = 'coin-change ' + (solChange >= 0 ? 'positive' : 'negative');
+    
+  } catch (error) {
+    console.error('Error fetching prices:', error);
+  }
+}
+
+// Initial fetch
+fetchCryptoPrices();
+
+// Update every 60 seconds
+setInterval(fetchCryptoPrices, 60000);
+</script>

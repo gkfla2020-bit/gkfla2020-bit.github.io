@@ -4,6 +4,8 @@ author_profile: true
 title: ""
 ---
 
+{% include market-widget.html %}
+
 # Ha Rim Jung 정하림
 
 **M.S./Ph.D. Integrated Program in Computer Science**  
