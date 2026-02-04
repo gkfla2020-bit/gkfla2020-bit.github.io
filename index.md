@@ -49,4 +49,12 @@ Sogang University, Seoul, Korea
 
 ---
 
+## Recent Posts
+
+{% for post in site.posts limit:5 %}
+- **[{{ post.title }}]({{ post.url }})** - {{ post.date | date: "%Y-%m-%d" }}
+{% endfor %}
+
+---
+
 [CV](/cv/) | [Research](/research/) | [Projects](/projects/) | [Reading](/reading/)
