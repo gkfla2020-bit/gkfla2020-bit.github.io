@@ -1,74 +1,123 @@
 ---
 layout: null
-title: "MOVE-Vasicek Model Evaluation Report"
-date: 2026-02-05
+permalink: /research/move-vasicek-kr/
 ---
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ko">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>바시첵/블랙숄즈 합성 모델 평가보고서</title>
+    <title>MOVE-Vasicek 모델 평가보고서 | Ha Rim Jung</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;500;600&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
     <script src="https://cdn.plot.ly/plotly-2.27.0.min.js"></script>
     <style>
         :root {
-            --wsj-black: #111111;
-            --wsj-gray: #666666;
-            --wsj-light: #f5f5f5;
-            --wsj-cream: #faf9f6;
-            --wsj-accent: #0080c6;
-            --wsj-red: #c41200;
-            --wsj-green: #00843d;
+            --black: #1a1a1a;
+            --gray: #666666;
+            --light: #f5f5f5;
+            --accent: #0080c6;
+            --red: #c41200;
+            --green: #00843d;
             --serif: 'Georgia', 'Times New Roman', serif;
-            --sans: 'Helvetica Neue', Arial, sans-serif;
+            --sans: 'Inter', 'Helvetica Neue', Arial, sans-serif;
         }
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: var(--sans); background: #ffffff; color: var(--wsj-black); line-height: 1.7; }
-        .container { max-width: 1100px; margin: 0 auto; padding: 40px 40px; }
-        .masthead { border-bottom: 3px solid var(--wsj-black); padding: 15px 0; margin-bottom: 40px; display: flex; justify-content: space-between; }
-        .section-label { font-size: 11px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; color: var(--wsj-accent); }
-        .date-line { font-size: 13px; color: var(--wsj-gray); }
-        .headline { font-family: var(--serif); font-size: 42px; font-weight: 700; line-height: 1.15; margin-bottom: 20px; text-align: center; }
-        .deck { font-family: var(--serif); font-size: 20px; color: var(--wsj-gray); text-align: center; font-style: italic; margin-bottom: 40px; }
-        .abstract { background: var(--wsj-light); padding: 25px; margin: 30px 0; border-left: 4px solid var(--wsj-accent); }
-        .abstract-title { font-size: 12px; font-weight: 700; text-transform: uppercase; color: var(--wsj-accent); margin-bottom: 10px; }
-        .key-stats { display: grid; grid-template-columns: repeat(4, 1fr); border: 1px solid var(--wsj-black); margin: 40px 0; }
-        .stat-item { padding: 20px; text-align: center; border-right: 1px solid #ddd; }
-        .stat-item:last-child { border-right: none; }
-        .stat-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: var(--wsj-gray); }
-        .stat-value { font-family: var(--serif); font-size: 28px; font-weight: 700; }
-        .stat-value.positive { color: var(--wsj-green); }
-        .section-header { font-family: var(--serif); font-size: 26px; font-weight: 700; margin: 50px 0 20px; padding-bottom: 10px; border-bottom: 2px solid var(--wsj-black); }
-        .subsection { font-family: var(--serif); font-size: 18px; font-weight: 700; margin: 30px 0 15px; color: var(--wsj-gray); }
-        .body-text { font-family: var(--serif); font-size: 17px; line-height: 1.9; margin-bottom: 18px; text-align: justify; }
-        .chart-section { margin: 40px 0; padding: 25px; background: white; border: 1px solid #e0e0e0; }
-        .chart-title { font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 5px; }
-        .chart-subtitle { font-size: 12px; color: var(--wsj-gray); margin-bottom: 15px; }
-        .chart-container { height: 380px; }
-        .data-table { width: 100%; border-collapse: collapse; font-size: 14px; margin: 20px 0; }
-        .data-table th { font-weight: 700; text-transform: uppercase; font-size: 11px; padding: 12px; text-align: left; border-bottom: 2px solid var(--wsj-black); background: var(--wsj-light); }
-        .data-table td { padding: 12px; border-bottom: 1px solid #e0e0e0; }
-        .data-table .num { text-align: right; font-family: monospace; }
-        .winner-badge { background: var(--wsj-green); color: white; font-size: 9px; font-weight: 700; padding: 2px 8px; border-radius: 2px; }
-        .formula-box { background: var(--wsj-light); border-left: 4px solid var(--wsj-accent); padding: 20px 25px; margin: 25px 0; }
-        .formula-label { font-size: 11px; font-weight: 700; text-transform: uppercase; color: var(--wsj-accent); margin-bottom: 10px; }
-        .formula-content { font-family: 'Times New Roman', serif; font-size: 17px; line-height: 2.2; }
-        .formula-note { font-size: 13px; color: var(--wsj-gray); margin-top: 10px; font-style: italic; }
-        .callout { border: 1px solid var(--wsj-black); padding: 20px; margin: 30px 0; }
-        .callout-header { font-weight: 700; font-size: 12px; text-transform: uppercase; margin-bottom: 10px; }
-        .limitation-box { background: #fff8e1; border: 1px solid #ffcc02; padding: 20px; margin: 30px 0; }
-        .limitation-header { color: #f57c00; font-weight: 700; font-size: 14px; margin-bottom: 10px; }
-        .conclusion-box { background: var(--wsj-black); color: white; padding: 35px; margin: 50px 0; }
-        .conclusion-box .section-header { color: white; border-bottom-color: #444; }
-        .conclusion-box .body-text { color: #ccc; }
-        .highlight { color: #4ecdc4; font-weight: 700; }
-        .footer { border-top: 3px solid var(--wsj-black); padding: 25px 0; margin-top: 50px; text-align: center; font-size: 12px; color: var(--wsj-gray); }
-        .ref-list { font-size: 14px; line-height: 1.8; }
-        .ref-item { margin-bottom: 8px; }
-        @media (max-width: 768px) { .headline { font-size: 28px; } .key-stats { grid-template-columns: repeat(2, 1fr); } }
-    </style>
+        body { font-family: var(--sans); background: #ffffff; color: var(--black); line-height: 1.7; }
+        
+        /* Navigation - 메인페이지와 동일 */
+        nav {
+            position: fixed;
+            top: 0; left: 0; right: 0;
+            padding: 25px 50px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(255,255,255,0.95);
+            backdrop-filter: blur(8px);
+            z-index: 100;
+            border-bottom: 1px solid rgba(0,0,0,0.05);
+        }
+        .nav-logo {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 1.3rem;
+            color: #1a1a1a;
+            text-decoration: none;
+            letter-spacing: 0.08em;
+        }
+        .nav-links { display: flex; gap: 40px; }
+        .nav-links a {
+            font-size: 0.72rem;
+            color: #666;
+            text-decoration: none;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            transition: color 0.2s;
+        }
+        .nav-links a:hover { color: #1a1a1a; }
+</style>
 </head>
 <body>
+    <nav>
+        <a href="/" class="nav-logo">Ha Rim Jung</a>
+        <div class="nav-links">
+            <a href="/">Home</a>
+            <a href="/research/">Research</a>
+            <a href="/cv/">CV</a>
+        </div>
+    </nav>
+
+    <style>
+        .container { max-width: 1100px; margin: 0 auto; padding: 100px 40px 60px; }
+        .masthead { border-bottom: 2px solid var(--black); padding: 15px 0; margin-bottom: 40px; display: flex; justify-content: space-between; }
+        .section-label { font-size: 11px; font-weight: 600; letter-spacing: 1.5px; text-transform: uppercase; color: var(--accent); }
+        .date-line { font-size: 13px; color: var(--gray); }
+        .headline { font-family: 'Cormorant Garamond', serif; font-size: 38px; font-weight: 400; line-height: 1.2; margin-bottom: 20px; text-align: center; }
+        .deck { font-family: var(--serif); font-size: 18px; color: var(--gray); text-align: center; font-style: italic; margin-bottom: 40px; }
+        .abstract { background: var(--light); padding: 25px; margin: 30px 0; border-left: 4px solid var(--accent); }
+        .abstract-title { font-size: 12px; font-weight: 600; text-transform: uppercase; color: var(--accent); margin-bottom: 10px; }
+        .key-stats { display: grid; grid-template-columns: repeat(4, 1fr); border: 1px solid var(--black); margin: 40px 0; }
+        .stat-item { padding: 20px; text-align: center; border-right: 1px solid #ddd; }
+        .stat-item:last-child { border-right: none; }
+        .stat-label { font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; color: var(--gray); }
+        .stat-value { font-family: 'Cormorant Garamond', serif; font-size: 26px; font-weight: 500; }
+        .stat-value.positive { color: var(--green); }
+        .section-header { font-family: 'Cormorant Garamond', serif; font-size: 24px; font-weight: 500; margin: 50px 0 20px; padding-bottom: 10px; border-bottom: 1px solid var(--black); }
+        .subsection { font-family: 'Cormorant Garamond', serif; font-size: 17px; font-weight: 500; margin: 30px 0 15px; color: var(--gray); }
+        .body-text { font-family: var(--serif); font-size: 16px; line-height: 1.9; margin-bottom: 18px; text-align: justify; }
+        .chart-section { margin: 40px 0; padding: 25px; background: white; border: 1px solid #e0e0e0; }
+        .chart-title { font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 5px; }
+        .chart-subtitle { font-size: 11px; color: var(--gray); margin-bottom: 15px; }
+        .chart-container { height: 350px; }
+        .data-table { width: 100%; border-collapse: collapse; font-size: 13px; margin: 20px 0; }
+        .data-table th { font-weight: 600; text-transform: uppercase; font-size: 10px; padding: 12px; text-align: left; border-bottom: 2px solid var(--black); background: var(--light); }
+        .data-table td { padding: 12px; border-bottom: 1px solid #e0e0e0; }
+        .data-table .num { text-align: right; font-family: monospace; }
+        .winner-badge { background: var(--green); color: white; font-size: 9px; font-weight: 600; padding: 2px 8px; border-radius: 2px; }
+        .formula-box { background: var(--light); border-left: 4px solid var(--accent); padding: 20px 25px; margin: 25px 0; }
+        .formula-label { font-size: 10px; font-weight: 600; text-transform: uppercase; color: var(--accent); margin-bottom: 10px; }
+        .formula-content { font-family: 'Times New Roman', serif; font-size: 16px; line-height: 2.2; }
+        .formula-note { font-size: 12px; color: var(--gray); margin-top: 10px; font-style: italic; }
+        .callout { border: 1px solid var(--black); padding: 20px; margin: 30px 0; }
+        .callout-header { font-weight: 600; font-size: 11px; text-transform: uppercase; margin-bottom: 10px; }
+        .limitation-box { background: #fff8e1; border: 1px solid #ffcc02; padding: 20px; margin: 30px 0; }
+        .limitation-header { color: #f57c00; font-weight: 600; font-size: 13px; margin-bottom: 10px; }
+        .conclusion-box { background: var(--black); color: white; padding: 35px; margin: 50px 0; }
+        .conclusion-box .section-header { color: white; border-bottom-color: #444; }
+        .conclusion-box .body-text { color: #ccc; }
+        .ref-list { font-size: 13px; line-height: 1.8; }
+        .ref-item { margin-bottom: 8px; }
+        .site-footer { border-top: 1px solid #e0e0e0; padding: 40px 0; margin-top: 60px; text-align: center; font-size: 12px; color: var(--gray); }
+        .site-footer a { color: var(--gray); text-decoration: none; }
+        .site-footer a:hover { color: var(--black); }
+        @media (max-width: 768px) { 
+            nav { padding: 20px 25px; }
+            .nav-links { gap: 25px; }
+            .container { padding: 90px 20px 40px; }
+            .headline { font-size: 26px; } 
+            .key-stats { grid-template-columns: repeat(2, 1fr); } 
+        }
+    </style>
+
 <div class="container">
     <div class="masthead">
         <span class="section-label">Quantitative Finance Research</span>
@@ -107,9 +156,7 @@ date: 2026-02-05
         <div class="formula-content">
             dS<sub>t</sub> = μS<sub>t</sub>dt + σS<sub>t</sub>dW<sub>t</sub>
         </div>
-        <div class="formula-note">
-            기하 브라운 운동(GBM), 상수 변동성 가정, 옵션 가격결정의 기초
-        </div>
+        <div class="formula-note">기하 브라운 운동(GBM), 상수 변동성 가정, 옵션 가격결정의 기초</div>
     </div>
     
     <div class="formula-box">
@@ -117,17 +164,13 @@ date: 2026-02-05
         <div class="formula-content">
             dr<sub>t</sub> = κ(θ − r<sub>t</sub>)dt + σdW<sub>t</sub>
         </div>
-        <div class="formula-note">
-            Ornstein-Uhlenbeck 과정, 평균회귀 특성, 채권 가격결정의 기초
-        </div>
+        <div class="formula-note">Ornstein-Uhlenbeck 과정, 평균회귀 특성, 채권 가격결정의 기초</div>
     </div>
     
-    <p class="body-text">블랙숄즈 모델과 바시첵 모델의 이론적 연결고리는 현대 금융공학의 발전 과정에서 중요한 의미를 갖는 것으로 관찰된다. Black and Scholes(1973)가 제시한 주식 옵션 가격결정 모델은 기하 브라운 운동을 통해 주가의 확률적 변동을 모형화하였으며, 이후 Vasicek(1977)이 도입한 채권 가격결정 모델은 평균회귀 확률과정을 통해 금리의 장기균형 특성을 반영하려 시도한 것으로 해석된다. 두 모델 모두 확률미분방정식을 기반으로 하며 위험중립 가격결정 원리를 공유한다는 점에서, 현대 파생상품 가격이론의 공통된 수학적 토대를 제공하는 것으로 평가될 수 있다.</p>
+    <p class="body-text">블랙숄즈 모델과 바시첵 모델의 이론적 연결고리는 현대 금융공학의 발전 과정에서 중요한 의미를 갖는 것으로 관찰된다. Black and Scholes(1973)가 제시한 주식 옵션 가격결정 모델은 기하 브라운 운동을 통해 주가의 확률적 변동을 모형화하였으며, 이후 Vasicek(1977)이 도입한 채권 가격결정 모델은 평균회귀 확률과정을 통해 금리의 장기균형 특성을 반영하려 시도한 것으로 해석된다.</p>
 
     <p class="body-text">바시첵 모델이 블랙숄즈 모델로부터 차용한 핵심 요소들을 살펴보면, 먼저 확산 과정의 무작위 성분인 위너 과정 dW_t가 두 모델에서 동일한 역할을 수행하는 것으로 나타난다. 또한 변동성 파라미터 σ의 개념적 기여도 중요한 연결고리로 작용하는데, 블랙숄즈 모델에서 발전한 옵션 내재변동성의 개념은 현재 MOVE 지수와 같은 채권 시장 변동성 지표로 확장 적용될 가능성을 시사한다.</p>
 
-    <p class="body-text">바시첵 모델의 핵심 기여는 평균회귀 특성 κ(θ - r_t)의 도입에 있다고 볼 수 있다. 이는 금리가 장기 균형수준 θ로 수렴하려는 경향을 모형화함으로써, 블랙숄즈 모델의 기하 브라운 운동이 갖는 비현실적인 발산 특성을 보완하는 것으로 평가된다. 본 연구에서 제안하는 합성 모델은 이러한 두 모델의 장점을 결합하려는 시도로 해석될 수 있다.</p>
-    
     <div class="subsection">1.2 본 연구의 합성 모델: 블랙숄즈 내재변동성의 활용</div>
     
     <div class="callout">
@@ -144,9 +187,7 @@ date: 2026-02-05
     
     <div class="formula-box">
         <div class="formula-label">확률미분방정식 (SDE)</div>
-        <div class="formula-content">
-            dr<sub>t</sub> = κ(θ − r<sub>t</sub>)dt + σdW<sub>t</sub>
-        </div>
+        <div class="formula-content">dr<sub>t</sub> = κ(θ − r<sub>t</sub>)dt + σdW<sub>t</sub></div>
     </div>
     
     <table class="data-table">
@@ -168,9 +209,7 @@ date: 2026-02-05
             θ(M) = θ<sub>0</sub> + θ<sub>1</sub> · ln(M) &nbsp;&nbsp;← 상태 조건부 균형금리<br>
             σ(M) = σ<sub>0</sub> + σ<sub>1</sub> · M &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;← 상태 조건부 변동성
         </div>
-        <div class="formula-note">
-            M<sub>t</sub>: MOVE 지수 (채권시장 내재변동성), 상태변수(state indicator)로 활용
-        </div>
+        <div class="formula-note">M<sub>t</sub>: MOVE 지수 (채권시장 내재변동성), 상태변수(state indicator)로 활용</div>
     </div>
     
     <table class="data-table">
@@ -182,9 +221,7 @@ date: 2026-02-05
         <tr><td>σ<sub>1</sub></td><td>MOVE→σ 민감도</td><td>MOVE 1단위 증가 시 σ 변화</td><td class="num">0.000032</td></tr>
     </table>
     
-    <p class="body-text">표준 Vasicek 모델에서 각 파라미터는 금리 동학의 핵심 특성을 나타내는 것으로 해석될 수 있다. 평균회귀 속도 κ=0.7208은 금리가 장기 균형수준에서 벗어났을 때 연간 약 72%의 속도로 회귀하려는 경향을 의미하는 것으로 이해된다. MOVE-Vasicek 확장 모델에서는 시장의 불확실성 지수인 MOVE가 금리 동학의 구조적 파라미터들에 영향을 미치는 것으로 설정하였다.</p>
-
-    <p class="body-text">추정 결과에서 θ₁ > 0이 관찰되는 것은 위험 프리미엄 가설과 정합적인 패턴으로 해석될 수 있다. 시장 불확실성이 증가할 때 투자자들이 더 높은 위험 프리미엄을 요구하게 되고, 이는 균형금리 수준의 상승으로 나타날 수 있다는 논리와 일관된다. 또한 σ₁ > 0이 관찰되는 것은 변동성 전이 가설을 뒷받침하는 것으로 보인다.</p>
+    <p class="body-text">표준 Vasicek 모델에서 각 파라미터는 금리 동학의 핵심 특성을 나타내는 것으로 해석될 수 있다. 평균회귀 속도 κ=0.7208은 금리가 장기 균형수준에서 벗어났을 때 연간 약 72%의 속도로 회귀하려는 경향을 의미하는 것으로 이해된다.</p>
 
     <h2 class="section-header">III. 표본 기간 분석 (2010-2025)</h2>
     
@@ -205,9 +242,7 @@ date: 2026-02-05
         <tr><td>2024-2025</td><td>금리 정점, 완화 기대</td><td>하락 추세</td><td>고점 유지</td></tr>
     </table>
     
-    <p class="body-text">2010-2012년 유럽 재정위기 기간에는 MOVE 지수가 상당한 변동성을 보이며 상승하는 패턴이 관찰되었다. 2013년 테이퍼 탠트럼은 MOVE-금리 관계에서 특별히 주목할 만한 사례로 여겨진다. 버냉키 연준 의장의 양적완화 축소 시사 발언 이후 MOVE 지수는 급격히 상승하였고, 동시에 장기 국채 금리 역시 단기간에 크게 오르는 현상이 관찰되었다.</p>
-
-    <p class="body-text">2018년 미중 무역전쟁과 2020년 코로나19 팬데믹 시기는 MOVE-금리 관계에서 극단적인 패턴을 보인 대표적인 사례로 분석된다. 특히 팬데믹 초기에는 안전자산으로 여겨지던 미국 국채마저 매도 압력을 받으면서 MOVE 상승과 금리 급등이 동시에 나타나는 이례적인 현상이 관찰되었다.</p>
+    <p class="body-text">2013년 테이퍼 탠트럼은 MOVE-금리 관계에서 특별히 주목할 만한 사례로 여겨진다. 버냉키 연준 의장의 양적완화 축소 시사 발언 이후 MOVE 지수는 급격히 상승하였고, 동시에 장기 국채 금리 역시 단기간에 크게 오르는 현상이 관찰되었다.</p>
 
     <h2 class="section-header">IV. 실증 분석 결과</h2>
     
@@ -224,7 +259,7 @@ date: 2026-02-05
     <div class="chart-section">
         <div class="chart-title">모델 비교: Standard Vasicek vs MOVE-Vasicek</div>
         <div class="chart-subtitle">정보 기준 및 로그우도 비교</div>
-        <div id="modelCompareChart" class="chart-container" style="height:320px;"></div>
+        <div id="modelCompareChart" class="chart-container" style="height:300px;"></div>
     </div>
     
     <div class="subsection">4.2 우도비 검정 (Likelihood Ratio Test)</div>
@@ -238,13 +273,11 @@ date: 2026-02-05
     <div class="chart-section">
         <div class="chart-title">우도비 검정 시각화</div>
         <div class="chart-subtitle">χ² 분포 (자유도 2)</div>
-        <div id="lrTestChart" class="chart-container" style="height:320px;"></div>
+        <div id="lrTestChart" class="chart-container" style="height:300px;"></div>
     </div>
     
-    <p class="body-text">우도비 검정 결과는 MOVE-Vasicek 모델이 표준 모델 대비 통계적으로 유의한 추가 설명력을 보인다는 것을 의미한다. LR 통계량 17.52가 임계값 5.99를 크게 상회한다는 것은, 두 모델 간의 성능 차이가 단순한 우연이 아니라 실질적이고 의미 있는 개선임을 시사한다. 구체적으로 MOVE-Vasicek 모델에 추가된 2개 파라미터가 데이터를 설명하는 능력을 상당히 향상시켰으며, 이러한 개선이 모델 복잡성 증가로 인한 비용을 충분히 상쇄한다고 해석될 수 있다.</p>
+    <p class="body-text">우도비 검정 결과는 MOVE-Vasicek 모델이 표준 모델 대비 통계적으로 유의한 추가 설명력을 보인다는 것을 의미한다. LR 통계량 17.52가 임계값 5.99를 크게 상회한다는 것은, 두 모델 간의 성능 차이가 단순한 우연이 아니라 실질적이고 의미 있는 개선임을 시사한다.</p>
 
-    <p class="body-text">"통계적으로 유의미하다"는 것은 실제 상황에서 95% 신뢰도로 MOVE-Vasicek 모델을 채택하는 것이 합리적이라는 뜻이다. LR 통계량이 임계값을 거의 3배 가까이 상회한다는 것은 이 결론에 대한 확신의 정도가 매우 높음을 보여준다.</p>
-    
     <div class="subsection">4.3 Granger 인과검정</div>
     
     <table class="data-table">
@@ -265,7 +298,7 @@ date: 2026-02-05
     <div class="chart-section">
         <div class="chart-title">Granger Causality Test Results</div>
         <div class="chart-subtitle">H₀: No Granger causality | α = 0.05</div>
-        <div id="grangerChart" class="chart-container" style="height:300px;"></div>
+        <div id="grangerChart" class="chart-container" style="height:280px;"></div>
     </div>
     
     <div class="subsection">4.4 VAR 분석 및 분산분해</div>
@@ -273,10 +306,10 @@ date: 2026-02-05
     <div class="chart-section">
         <div class="chart-title">Forecast Error Variance Decomposition</div>
         <div class="chart-subtitle">MOVE contribution to interest rate variance</div>
-        <div id="fevdChart" class="chart-container" style="height:300px;"></div>
+        <div id="fevdChart" class="chart-container" style="height:280px;"></div>
     </div>
     
-    <p class="body-text">VAR 분산분해 결과에 따르면 MOVE가 금리 변동의 2.20%를 설명하는 것으로 나타났다. 이는 MOVE가 금리 변동성에 비중요한(non-negligible) 기여를 하고 있음을 보여주지만, 동시에 그 기여도가 상대적으로 제한적임도 나타낸다. 종합적으로, 본 실증 분석 결과들은 MOVE 지표가 Vasicek 모델의 설명력 개선에 기여할 수 있다는 증거와 정합적이나, 그 효과의 크기는 온건한 수준이다.</p>
+    <p class="body-text">VAR 분산분해 결과에 따르면 MOVE가 금리 변동의 2.20%를 설명하는 것으로 나타났다. 이는 MOVE가 금리 변동성에 비중요한(non-negligible) 기여를 하고 있음을 보여주지만, 동시에 그 기여도가 상대적으로 제한적임도 나타낸다.</p>
 
     <h2 class="section-header">V. 해석 가이드라인</h2>
     
@@ -286,7 +319,6 @@ date: 2026-02-05
         대신, 시장 변동성 체제에 따라 금리 역학이 달라지는 패턴이 관찰된다는 
         기술적(descriptive) 발견을 보고한다.</p>
     </div>
-    
     
     <div class="formula-box">
         <div class="formula-label">핵심 해석 프레임</div>
@@ -303,7 +335,7 @@ date: 2026-02-05
 
         <p class="body-text">MOVE 지수의 외생성 검증을 위한 Granger 인과관계 분석에서는 강한 양방향 동시성의 증거가 발견되지 않았으나, 이러한 결과가 구조적 외생성을 완전히 보장한다고 단정할 수는 없다. 따라서 본 연구의 핵심 기여는 "MOVE가 금리를 움직인다"는 인과적 관계의 규명이 아니라, "시장 변동성 체제에 따라 금리 역학이 달라지는 패턴이 존재한다"는 기술적 사실의 발견에 있다.</p>
 
-        <p class="body-text">본 연구의 학술적 기여는 상태의존적 금리 모델링 프레임워크에 대한 경험적 정당화를 제공한 점에서 찾을 수 있다. 향후 연구에서는 도구변수나 외부 식별 제약을 활용한 보다 엄격한 인과관계 분석, 다양한 만기 구조를 동시에 고려한 다변량 모델로의 확장, 다른 국가의 국채 시장이나 회사채 시장으로 분석 대상 확장 등이 필요할 것으로 보인다.</p>
+        <p class="body-text">본 연구의 학술적 기여는 상태의존적 금리 모델링 프레임워크에 대한 경험적 정당화를 제공한 점에서 찾을 수 있다. 향후 연구에서는 도구변수나 외부 식별 제약을 활용한 보다 엄격한 인과관계 분석, 다양한 만기 구조를 동시에 고려한 다변량 모델로의 확장 등이 필요할 것으로 보인다.</p>
     </div>
     
     <h2 class="section-header">VII. 참고문헌</h2>
@@ -316,14 +348,14 @@ date: 2026-02-05
         <div class="ref-item">Hamilton, J. D. (1989). A new approach to the economic analysis of nonstationary time series and the business cycle. Econometrica, 57(2), 357-384.</div>
     </div>
 
-    <div class="footer">
-            작성자 - 블로그 gkfla2020-bit
+    <div class="site-footer">
+        © 2026 Ha Rim Jung · <a href="mailto:gkfla2020@gmail.com">gkfla2020@gmail.com</a> · <a href="https://github.com/gkfla2020-bit">GitHub</a>
     </div>
 </div>
 
 <script>
 const colors = { primary: '#0080c6', accent: '#c41200', green: '#00843d', gray: '#666' };
-const layout = { font: {family: 'Helvetica Neue'}, paper_bgcolor: 'white', plot_bgcolor: 'white', margin: {t:30,r:30,b:50,l:60} };
+const layout = { font: {family: 'Inter, Helvetica Neue'}, paper_bgcolor: 'white', plot_bgcolor: 'white', margin: {t:30,r:30,b:50,l:60} };
 
 // Time Series Chart
 const months = [];
@@ -380,14 +412,7 @@ Plotly.newPlot('modelCompareChart', [{
     x: ['RMSE', 'AIC', 'BIC', 'Log-Likelihood'],
     y: [0.002972, -487.93, -477.71, 248.96],
     name: 'MOVE-Vasicek', type: 'bar', marker: {color: colors.primary}
-}], {...layout, barmode: 'group', legend: {orientation:'h', y:1.1},
-    annotations: [
-        {x: 'RMSE', y: 0.0032, text: '<b>MOVE wins</b><br>낮을수록 좋음', showarrow: false, font: {size: 9, color: colors.green}},
-        {x: 'AIC', y: -440, text: '<b>MOVE wins</b><br>Δ=13.5', showarrow: false, font: {size: 9, color: colors.green}},
-        {x: 'BIC', y: -440, text: '<b>MOVE wins</b><br>Δ=9.4', showarrow: false, font: {size: 9, color: colors.green}},
-        {x: 'Log-Likelihood', y: 260, text: '<b>MOVE wins</b><br>높을수록 좋음', showarrow: false, font: {size: 9, color: colors.green}}
-    ]
-}, {responsive: true});
+}], {...layout, barmode: 'group', legend: {orientation:'h', y:1.1}}, {responsive: true});
 
 // LR Test Visualization
 const xv = [], yv = [];
@@ -434,8 +459,7 @@ Plotly.newPlot('fevdChart', [{
     x: fevd_months, y: move_contrib, name: 'MOVE 기여', type: 'bar', marker: {color: colors.primary}
 }], {...layout, barmode: 'stack', xaxis: {title: '예측 기간 (월)'}, 
     yaxis: {title: '분산 기여도 (%)', range: [0, 100]},
-    legend: {orientation: 'h', y: 1.1},
-    annotations: [{x: 12, y: 50, text: 'MOVE 기여: 2.2%', showarrow: true, arrowhead: 2, ax: 40, ay: 0, font: {size: 11, color: colors.primary}}]
+    legend: {orientation: 'h', y: 1.1}
 }, {responsive: true});
 </script>
 </body>

@@ -1,194 +1,226 @@
 ---
-layout: default
+layout: null
 ---
-<style>
-    .post-hero {
-        text-align: center;
-        padding: 60px 0 80px;
-        position: relative;
-    }
-    .post-hero::after {
-        content: '';
-        position: absolute;
-        bottom: 0; left: 50%;
-        transform: translateX(-50%);
-        width: 100px; height: 3px;
-        background: var(--gradient-1);
-        border-radius: 2px;
-    }
-    .post-category {
-        display: inline-block;
-        padding: 8px 20px;
-        background: rgba(99, 102, 241, 0.15);
-        border: 1px solid rgba(99, 102, 241, 0.3);
-        border-radius: 30px;
-        font-size: 0.85rem;
-        font-weight: 600;
-        color: var(--accent);
-        text-transform: uppercase;
-        letter-spacing: 1px;
-        margin-bottom: 25px;
-    }
-    .post-title {
-        font-size: 3rem;
-        font-weight: 700;
-        line-height: 1.2;
-        margin-bottom: 20px;
-        background: linear-gradient(135deg, #fff 0%, #a0a0b0 100%);
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-        background-clip: text;
-    }
-    .post-meta {
-        display: flex;
-        justify-content: center;
-        gap: 30px;
-        color: var(--text-secondary);
-        font-size: 0.95rem;
-    }
-    .post-meta span { display: flex; align-items: center; gap: 8px; }
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ page.title }} | {{ site.title }}</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;500;600&family=Inter:wght@300;400;500&family=Georgia&display=swap" rel="stylesheet">
+    <script src="https://cdn.plot.ly/plotly-2.27.0.min.js"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { 
+            font-family: 'Inter', sans-serif; 
+            background: #ffffff; 
+            color: #1a1a1a; 
+            line-height: 1.7;
+        }
 
-    .post-content {
-        max-width: 900px;
-        margin: 60px auto 0;
-        padding: 50px;
-        background: var(--bg-card);
-        border-radius: 24px;
-        border: 1px solid rgba(255,255,255,0.05);
-    }
-    .post-content h1, .post-content h2, .post-content h3 {
-        color: var(--text-primary);
-        margin-top: 2.5rem;
-    }
-    .post-content h2 {
-        font-size: 1.8rem;
-        padding-bottom: 15px;
-        border-bottom: 1px solid rgba(255,255,255,0.1);
-    }
-    .post-content p {
-        font-size: 1.1rem;
-        line-height: 1.9;
-        color: var(--text-secondary);
-    }
-    .post-content ul, .post-content ol {
-        margin: 1.5rem 0;
-        padding-left: 1.5rem;
-        color: var(--text-secondary);
-    }
-    .post-content li { margin-bottom: 0.8rem; }
-    .post-content code {
-        font-family: 'JetBrains Mono', monospace;
-        background: rgba(99, 102, 241, 0.1);
-        padding: 3px 8px;
-        border-radius: 6px;
-        font-size: 0.9em;
-        color: #a5b4fc;
-    }
-    .post-content pre {
-        background: var(--bg-secondary);
-        padding: 25px;
-        border-radius: 16px;
-        overflow-x: auto;
-        margin: 2rem 0;
-        border: 1px solid rgba(255,255,255,0.05);
-    }
-    .post-content pre code {
-        background: none;
-        padding: 0;
-    }
-    .post-content blockquote {
-        border-left: 4px solid var(--accent);
-        padding: 20px 30px;
-        margin: 2rem 0;
-        background: rgba(99, 102, 241, 0.05);
-        border-radius: 0 12px 12px 0;
-        font-style: italic;
-    }
-    .post-content table {
-        width: 100%;
-        border-collapse: collapse;
-        margin: 2rem 0;
-    }
-    .post-content th, .post-content td {
-        padding: 15px;
-        text-align: left;
-        border-bottom: 1px solid rgba(255,255,255,0.1);
-    }
-    .post-content th {
-        background: rgba(99, 102, 241, 0.1);
-        font-weight: 600;
-        color: var(--text-primary);
-    }
-    .post-content img {
-        max-width: 100%;
-        border-radius: 16px;
-        margin: 2rem 0;
-    }
+        /* Navigation */
+        nav {
+            position: fixed;
+            top: 0; left: 0; right: 0;
+            padding: 25px 50px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(255,255,255,0.95);
+            backdrop-filter: blur(8px);
+            z-index: 100;
+            border-bottom: 1px solid rgba(0,0,0,0.05);
+        }
+        .nav-logo {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 1.3rem;
+            color: #1a1a1a;
+            text-decoration: none;
+            letter-spacing: 0.08em;
+        }
+        .nav-links { display: flex; gap: 40px; }
+        .nav-links a {
+            font-size: 0.72rem;
+            color: #666;
+            text-decoration: none;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            transition: color 0.2s;
+        }
+        .nav-links a:hover { color: #1a1a1a; }
 
-    /* Custom Report Styles Override */
-    .post-content .report-container { max-width: 100%; padding: 0; }
-    .post-content .chart-section { 
-        background: var(--bg-secondary); 
-        border-color: rgba(255,255,255,0.1);
-        border-radius: 16px;
-    }
-    .post-content .data-table th { 
-        background: rgba(99, 102, 241, 0.15); 
-        color: var(--text-primary);
-    }
-    .post-content .data-table td { 
-        color: var(--text-secondary);
-        border-color: rgba(255,255,255,0.1);
-    }
-    .post-content .formula-box {
-        background: var(--bg-secondary);
-        border-left-color: var(--accent);
-    }
-    .post-content .callout {
-        background: var(--bg-secondary);
-        border-color: rgba(255,255,255,0.1);
-    }
-    .post-content .conclusion-box {
-        background: linear-gradient(135deg, rgba(99, 102, 241, 0.2) 0%, rgba(139, 92, 246, 0.1) 100%);
-        border: 1px solid rgba(99, 102, 241, 0.3);
-        border-radius: 16px;
-    }
-    .post-content .conclusion-box .section-header { color: var(--text-primary); }
-    .post-content .conclusion-box .body-text { color: var(--text-secondary); }
+        /* Post Container */
+        .post-container {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 100px 40px 60px;
+        }
 
-    /* Back Button */
-    .back-link {
-        display: inline-flex;
-        align-items: center;
-        gap: 8px;
-        margin-top: 50px;
-        padding: 12px 24px;
-        background: rgba(255,255,255,0.05);
-        border-radius: 12px;
-        color: var(--text-secondary);
-        transition: all 0.3s;
-    }
-    .back-link:hover {
-        background: rgba(99, 102, 241, 0.15);
-        color: var(--accent);
-    }
-</style>
+        /* Post Header */
+        .post-header {
+            text-align: center;
+            padding: 40px 0 50px;
+            border-bottom: 1px solid #e0e0e0;
+            margin-bottom: 50px;
+        }
+        .post-date {
+            font-size: 0.7rem;
+            color: #999;
+            letter-spacing: 0.15em;
+            text-transform: uppercase;
+            margin-bottom: 15px;
+        }
+        .post-title {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: clamp(2rem, 4vw, 2.8rem);
+            font-weight: 400;
+            line-height: 1.25;
+            color: #1a1a1a;
+        }
 
-<article>
-    <header class="post-hero">
-        {% if page.categories %}
-        <span class="post-category">{{ page.categories | first }}</span>
-        {% endif %}
-        <h1 class="post-title">{{ page.title }}</h1>
-        <div class="post-meta">
-            <span>📅 {{ page.date | date: "%B %d, %Y" }}</span>
-            <span>✍️ Ha Rim Jung</span>
+        /* Post Content */
+        .post-content {
+            font-family: 'Georgia', serif;
+            font-size: 17px;
+            line-height: 1.9;
+            color: #333;
+        }
+        .post-content h1, .post-content h2, .post-content h3 {
+            font-family: 'Cormorant Garamond', serif;
+            font-weight: 500;
+            color: #1a1a1a;
+            margin-top: 50px;
+            margin-bottom: 20px;
+        }
+        .post-content h2 {
+            font-size: 1.8rem;
+            padding-bottom: 12px;
+            border-bottom: 1px solid #e0e0e0;
+        }
+        .post-content h3 {
+            font-size: 1.3rem;
+            color: #666;
+        }
+        .post-content p {
+            margin-bottom: 1.5rem;
+            text-align: justify;
+        }
+        .post-content ul, .post-content ol {
+            margin: 1.5rem 0;
+            padding-left: 1.5rem;
+        }
+        .post-content li { margin-bottom: 0.6rem; }
+        .post-content blockquote {
+            border-left: 3px solid #1a1a1a;
+            padding: 15px 25px;
+            margin: 2rem 0;
+            background: #f8f8f8;
+            font-style: italic;
+            color: #555;
+        }
+        .post-content table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 2rem 0;
+            font-size: 14px;
+        }
+        .post-content th {
+            font-weight: 600;
+            text-transform: uppercase;
+            font-size: 11px;
+            padding: 12px;
+            text-align: left;
+            border-bottom: 2px solid #1a1a1a;
+            background: #f5f5f5;
+        }
+        .post-content td {
+            padding: 12px;
+            border-bottom: 1px solid #e0e0e0;
+        }
+        .post-content code {
+            font-family: 'Consolas', monospace;
+            background: #f5f5f5;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-size: 0.9em;
+        }
+        .post-content pre {
+            background: #f5f5f5;
+            padding: 20px;
+            border-radius: 4px;
+            overflow-x: auto;
+            margin: 2rem 0;
+            border: 1px solid #e0e0e0;
+        }
+        .post-content img {
+            max-width: 100%;
+            margin: 2rem 0;
+        }
+
+        /* Back Link */
+        .back-link {
+            display: inline-block;
+            margin-top: 50px;
+            padding: 12px 0;
+            font-size: 0.8rem;
+            color: #666;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            text-decoration: none;
+            border-bottom: 1px solid transparent;
+            transition: all 0.2s;
+        }
+        .back-link:hover {
+            color: #1a1a1a;
+            border-bottom-color: #1a1a1a;
+        }
+
+        /* Footer */
+        footer {
+            padding: 50px 40px;
+            text-align: center;
+            border-top: 1px solid #e0e0e0;
+            font-size: 0.75rem;
+            color: #999;
+            margin-top: 80px;
+        }
+        footer a { color: #666; text-decoration: none; }
+        footer a:hover { color: #1a1a1a; }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            nav { padding: 20px 25px; }
+            .nav-links { gap: 25px; }
+            .post-container { padding: 90px 20px 40px; }
+            .post-title { font-size: 1.8rem; }
+        }
+    </style>
+</head>
+<body>
+    <nav>
+        <a href="/" class="nav-logo">Ha Rim Jung</a>
+        <div class="nav-links">
+            <a href="/">Home</a>
+            <a href="/research/">Research</a>
+            <a href="/cv/">CV</a>
         </div>
-    </header>
+    </nav>
 
-    <div class="post-content">
-        {{ content }}
+    <div class="post-container">
+        <header class="post-header">
+            <div class="post-date">{{ page.date | date: "%B %d, %Y" }}</div>
+            <h1 class="post-title">{{ page.title }}</h1>
+        </header>
+
+        <article class="post-content">
+            {{ content }}
+        </article>
+
+        <a href="/" class="back-link">← Back to Home</a>
     </div>
 
-    <a href="/" class="back-link">← Back to Home</a>
-</article>
+    <footer>
+        <p>© 2026 Ha Rim Jung · <a href="mailto:gkfla2020@gmail.com">gkfla2020@gmail.com</a> · <a href="https://github.com/gkfla2020-bit">GitHub</a></p>
+    </footer>
+</body>
+</html>
