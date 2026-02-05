@@ -1,0 +1,356 @@
+---
+layout: default
+title: Home
+---
+<style>
+    /* Hero Section */
+    .hero {
+        min-height: 80vh;
+        display: flex;
+        align-items: center;
+        padding: 60px 0;
+    }
+    .hero-content { max-width: 700px; }
+    .hero-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        padding: 10px 20px;
+        background: rgba(99, 102, 241, 0.1);
+        border: 1px solid rgba(99, 102, 241, 0.3);
+        border-radius: 30px;
+        font-size: 0.9rem;
+        color: var(--accent);
+        margin-bottom: 30px;
+        animation: fadeInUp 0.8s ease;
+    }
+    .hero-badge::before {
+        content: '';
+        width: 8px; height: 8px;
+        background: var(--accent);
+        border-radius: 50%;
+        animation: pulse 2s infinite;
+    }
+    @keyframes pulse {
+        0%, 100% { opacity: 1; transform: scale(1); }
+        50% { opacity: 0.5; transform: scale(1.2); }
+    }
+    .hero h1 {
+        font-size: 4rem;
+        font-weight: 700;
+        line-height: 1.1;
+        margin-bottom: 25px;
+        animation: fadeInUp 0.8s ease 0.1s both;
+    }
+    .hero h1 span {
+        background: var(--gradient-1);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+    }
+    .hero-desc {
+        font-size: 1.3rem;
+        color: var(--text-secondary);
+        margin-bottom: 40px;
+        animation: fadeInUp 0.8s ease 0.2s both;
+    }
+    .hero-buttons {
+        display: flex;
+        gap: 15px;
+        animation: fadeInUp 0.8s ease 0.3s both;
+    }
+    @keyframes fadeInUp {
+        from { opacity: 0; transform: translateY(30px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Stats Section */
+    .stats {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 20px;
+        margin: 80px 0;
+    }
+    .stat-card {
+        background: var(--bg-card);
+        padding: 30px;
+        border-radius: 20px;
+        text-align: center;
+        border: 1px solid rgba(255,255,255,0.05);
+        transition: all 0.4s ease;
+    }
+    .stat-card:hover {
+        transform: translateY(-5px);
+        border-color: rgba(99, 102, 241, 0.3);
+    }
+    .stat-number {
+        font-size: 2.5rem;
+        font-weight: 700;
+        background: var(--gradient-1);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+    }
+    .stat-label {
+        color: var(--text-secondary);
+        font-size: 0.95rem;
+        margin-top: 8px;
+    }
+
+    /* Section Headers */
+    .section-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 40px;
+    }
+    .section-title {
+        font-size: 2rem;
+        font-weight: 600;
+    }
+    .section-title span {
+        background: var(--gradient-1);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+    }
+
+    /* Posts Grid */
+    .posts-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 30px;
+        margin-bottom: 80px;
+    }
+    .post-card {
+        background: var(--bg-card);
+        border-radius: 24px;
+        overflow: hidden;
+        border: 1px solid rgba(255,255,255,0.05);
+        transition: all 0.4s ease;
+        text-decoration: none;
+    }
+    .post-card:hover {
+        transform: translateY(-8px);
+        border-color: rgba(99, 102, 241, 0.4);
+        box-shadow: 0 30px 80px rgba(99, 102, 241, 0.2);
+    }
+    .post-card-header {
+        height: 200px;
+        background: linear-gradient(135deg, rgba(99, 102, 241, 0.3) 0%, rgba(139, 92, 246, 0.2) 100%);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        position: relative;
+        overflow: hidden;
+    }
+    .post-card-header::before {
+        content: '📊';
+        font-size: 4rem;
+        opacity: 0.8;
+    }
+    .post-card-header.en::before { content: '📈'; }
+    .post-card-body { padding: 30px; }
+    .post-card-category {
+        display: inline-block;
+        padding: 6px 14px;
+        background: rgba(99, 102, 241, 0.15);
+        border-radius: 20px;
+        font-size: 0.8rem;
+        font-weight: 600;
+        color: var(--accent);
+        margin-bottom: 15px;
+    }
+    .post-card-title {
+        font-size: 1.4rem;
+        font-weight: 600;
+        color: var(--text-primary);
+        margin-bottom: 12px;
+        line-height: 1.4;
+    }
+    .post-card-excerpt {
+        color: var(--text-secondary);
+        font-size: 0.95rem;
+        line-height: 1.7;
+        margin-bottom: 20px;
+    }
+    .post-card-meta {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        color: var(--text-secondary);
+        font-size: 0.85rem;
+    }
+    .read-more {
+        color: var(--accent);
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+        gap: 5px;
+    }
+
+    /* About Section */
+    .about-section {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 60px;
+        margin: 100px 0;
+        padding: 60px;
+        background: var(--bg-card);
+        border-radius: 30px;
+        border: 1px solid rgba(255,255,255,0.05);
+    }
+    .about-content h2 {
+        font-size: 2.5rem;
+        margin-bottom: 25px;
+    }
+    .about-content h2 span {
+        background: var(--gradient-1);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+    }
+    .about-content p {
+        font-size: 1.1rem;
+        line-height: 1.9;
+    }
+    .skills-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 20px;
+    }
+    .skill-item {
+        padding: 20px;
+        background: var(--bg-secondary);
+        border-radius: 16px;
+        border: 1px solid rgba(255,255,255,0.05);
+    }
+    .skill-item h4 {
+        color: var(--accent);
+        font-size: 0.9rem;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        margin-bottom: 10px;
+    }
+    .skill-item p {
+        color: var(--text-secondary);
+        font-size: 0.95rem;
+        margin: 0;
+    }
+
+    /* Responsive */
+    @media (max-width: 1024px) {
+        .stats { grid-template-columns: repeat(2, 1fr); }
+        .posts-grid { grid-template-columns: 1fr; }
+        .about-section { grid-template-columns: 1fr; }
+    }
+    @media (max-width: 768px) {
+        .hero h1 { font-size: 2.5rem; }
+        .hero-desc { font-size: 1.1rem; }
+        .hero-buttons { flex-direction: column; }
+        .stats { grid-template-columns: repeat(2, 1fr); }
+    }
+</style>
+
+<!-- Hero Section -->
+<section class="hero">
+    <div class="hero-content">
+        <div class="hero-badge">M.S./Ph.D. Candidate @ Sogang University</div>
+        <h1>Hi, I'm <span>Ha Rim Jung</span></h1>
+        <p class="hero-desc">
+            Quantitative researcher exploring the intersection of stochastic modeling, 
+            machine learning, and financial markets. Passionate about building 
+            data-driven investment strategies.
+        </p>
+        <div class="hero-buttons">
+            <a href="/research/" class="btn btn-primary">View Research →</a>
+            <a href="/cv/" class="btn btn-secondary">Download CV</a>
+        </div>
+    </div>
+</section>
+
+<!-- Stats -->
+<section class="stats">
+    <div class="stat-card">
+        <div class="stat-number">3+</div>
+        <div class="stat-label">Research Projects</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-number">5</div>
+        <div class="stat-label">Awards Won</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-number">2</div>
+        <div class="stat-label">Publications</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-number">∞</div>
+        <div class="stat-label">Curiosity</div>
+    </div>
+</section>
+
+<!-- Recent Posts -->
+<section>
+    <div class="section-header">
+        <h2 class="section-title">Recent <span>Research</span></h2>
+        <a href="/research/" class="btn btn-secondary">View All →</a>
+    </div>
+    
+    <div class="posts-grid">
+        {% for post in site.posts limit:2 %}
+        <a href="{{ post.url }}" class="post-card">
+            <div class="post-card-header {% if post.title contains 'English' or post.title contains 'Evaluation' %}en{% endif %}"></div>
+            <div class="post-card-body">
+                <span class="post-card-category">{{ post.categories | first | default: "Research" }}</span>
+                <h3 class="post-card-title">{{ post.title }}</h3>
+                <p class="post-card-excerpt">
+                    {% if post.title contains '바시첵' %}
+                    MOVE 지수를 상태변수로 활용한 확장 Vasicek 모델의 실증 분석. 우도비 검정 결과 LR=17.52로 통계적 유의성 확인.
+                    {% else %}
+                    Empirical analysis of extended Vasicek model using MOVE index as state variable. LR test confirms statistical significance.
+                    {% endif %}
+                </p>
+                <div class="post-card-meta">
+                    <span>{{ post.date | date: "%B %d, %Y" }}</span>
+                    <span class="read-more">Read More →</span>
+                </div>
+            </div>
+        </a>
+        {% endfor %}
+    </div>
+</section>
+
+<!-- About Section -->
+<section class="about-section">
+    <div class="about-content">
+        <h2>About <span>Me</span></h2>
+        <p>
+            I'm a quantitative researcher pursuing an integrated M.S./Ph.D. program in Computer Science 
+            at Sogang University. My research focuses on developing sophisticated financial models 
+            that bridge theoretical rigor with practical applicability.
+        </p>
+        <p>
+            With a background in Economics from Hanyang University and multiple awards in 
+            investment competitions, I bring both academic depth and real-world perspective 
+            to quantitative finance research.
+        </p>
+    </div>
+    <div class="skills-grid">
+        <div class="skill-item">
+            <h4>Modeling</h4>
+            <p>Stochastic Calculus, Vasicek, Black-Scholes, Monte Carlo</p>
+        </div>
+        <div class="skill-item">
+            <h4>Programming</h4>
+            <p>Python, R, SQL, JavaScript</p>
+        </div>
+        <div class="skill-item">
+            <h4>ML/Stats</h4>
+            <p>Time Series, VAR, Granger Causality, Deep Learning</p>
+        </div>
+        <div class="skill-item">
+            <h4>Finance</h4>
+            <p>Portfolio Optimization, Risk Management, Derivatives</p>
+        </div>
+    </div>
+</section>
