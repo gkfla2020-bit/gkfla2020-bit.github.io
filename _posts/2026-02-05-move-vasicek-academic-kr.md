@@ -23,8 +23,8 @@ date: 2026-02-05
             --sans: 'Helvetica Neue', Arial, sans-serif;
         }
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: var(--sans); background: var(--wsj-cream); color: var(--wsj-black); line-height: 1.7; }
-        .container { max-width: 900px; margin: 0 auto; padding: 40px 24px; }
+        body { font-family: var(--sans); background: #ffffff; color: var(--wsj-black); line-height: 1.7; }
+        .container { max-width: 1100px; margin: 0 auto; padding: 40px 40px; }
         .masthead { border-bottom: 3px solid var(--wsj-black); padding: 15px 0; margin-bottom: 40px; display: flex; justify-content: space-between; }
         .section-label { font-size: 11px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; color: var(--wsj-accent); }
         .date-line { font-size: 13px; color: var(--wsj-gray); }
