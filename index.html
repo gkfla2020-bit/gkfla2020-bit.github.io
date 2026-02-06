@@ -29,7 +29,7 @@ layout: null
     <script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-83LKVW7412');</script>
     <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;500&family=Space+Mono:wght@400&family=Inter:wght@300;400&display=swap" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
-    <script src="/assets/matter.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/matter-js/0.19.0/matter.min.js"></script>
 </head>
 <body>
 <img src="/assets/og-card.png" alt="" style="position:absolute;width:1px;height:1px;opacity:0;pointer-events:none;" aria-hidden="true">
@@ -168,8 +168,46 @@ section{padding:80px 50px;max-width:900px;margin:0 auto}
 .stat-card{background:#fff;border:1px solid #e8e8e8;padding:15px 25px;min-width:80px;text-align:center}
 .stat-number{font-family:'Cormorant Garamond',serif;font-size:1.8rem;font-weight:500;color:#1a1a1a;line-height:1}
 .stat-label{font-size:.6rem;color:#888;letter-spacing:.1em;text-transform:uppercase;margin-top:5px}
-.basket-container{width:100%;max-width:500px;height:150px;margin:0 auto;position:relative;border:2px solid #e0e0e0;border-radius:0 0 12px 12px;overflow:hidden;background:#fefefe}
-#skillsCanvas{width:100%;height:100%;display:block;touch-action:none}
+
+.skills-physics-container{
+    position:relative;
+    width:100%;
+    max-width:500px;
+    height:180px;
+    margin:0 auto;
+    border:2px solid #e0e0e0;
+    border-radius:12px;
+    overflow:hidden;
+    background:linear-gradient(180deg, #fefefe 0%, #f8f8f8 100%);
+}
+.physics-ball{
+    position:absolute;
+    width:48px;
+    height:48px;
+    background:#fff;
+    border:2px solid #e8e8e8;
+    border-radius:50%;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    cursor:grab;
+    user-select:none;
+    -webkit-user-select:none;
+    box-shadow:0 2px 8px rgba(0,0,0,.08);
+    transition:box-shadow .2s;
+    will-change:transform;
+}
+.physics-ball:hover{
+    box-shadow:0 6px 16px rgba(0,0,0,.15);
+    z-index:10;
+}
+.physics-ball:active{cursor:grabbing}
+.physics-ball img{
+    width:26px;
+    height:26px;
+    pointer-events:none;
+    -webkit-user-drag:none;
+}
 
 .two-col-section{display:grid;grid-template-columns:1fr 1fr;gap:30px;padding:30px 50px 50px;max-width:900px;margin:0 auto}
 .two-col-section .col{min-width:0}
@@ -190,8 +228,49 @@ section{padding:80px 50px;max-width:900px;margin:0 auto}
     .two-col-section{grid-template-columns:1fr;gap:30px;padding:40px 25px}
     .right-sidebar{display:none}
     .hero,section{padding-left:25px;padding-right:25px}
+    
+    /* 모바일 버튼 스타일 강화 */
+    .hero-btns{flex-direction:column;gap:12px}
+    .hero-btns a{padding:16px 30px;font-size:.8rem;text-align:center;border-radius:8px}
+    .btn-dark{background:#1a1a1a;color:#fff;font-weight:600}
+    .btn-outline{border:2px solid #1a1a1a;color:#1a1a1a;font-weight:600;background:#fff}
+    
+    /* 모바일 네비게이션 버튼화 */
+    .nav-list a{
+        padding:10px 16px;
+        background:#f5f5f5;
+        border-radius:6px;
+        font-weight:500;
+        border:1px solid #e0e0e0;
+    }
+    .nav-list a.active{
+        background:#1a1a1a;
+        color:#fff;
+        border-color:#1a1a1a;
+    }
+    .nav-list a:hover{padding-left:16px}
+    
+    /* 모바일 포스트 아이템 */
+    .post-item{
+        background:#fff;
+        padding:20px;
+        border-radius:10px;
+        border:1px solid #e8e8e8;
+        margin-bottom:15px;
+        box-shadow:0 2px 8px rgba(0,0,0,.04);
+    }
+    .post-item:hover{padding-left:20px;transform:translateY(-2px);box-shadow:0 4px 12px rgba(0,0,0,.08)}
+    .post-title{font-size:1.2rem}
+    
+    /* 스킬 바스켓 모바일 */
+    .skills-physics-container{height:140px}
+    .physics-ball{width:40px;height:40px}
+    .physics-ball img{width:22px;height:22px}
 }
 </style>
+
+<!-- 모바일용 스킬 태그 (Matter.js 대체) -->
+
 
 <div id="main">
 <aside class="sidebar">
@@ -343,9 +422,9 @@ section{padding:80px 50px;max-width:900px;margin:0 auto}
             </div>
         </div>
     </div>
-    <p style="text-align:center;color:#888;font-size:.8rem;margin:25px 0 15px;">Skills & Tools — drag them!</p>
-    <div class="basket-container">
-        <canvas id="skillsCanvas"></canvas>
+    <p style="text-align:center;color:#888;font-size:.8rem;margin:25px 0 15px;">Skills & Tools</p>
+    <div class="skills-physics-container" id="skillsContainer">
+        <!-- Physics balls will be created by JavaScript -->
     </div>
 </section>
 
@@ -540,100 +619,281 @@ async function updateMarketData() {
 setTimeout(updateMarketData, 500);
 setInterval(updateMarketData, 60000);
 
-// Skills Basket Physics Engine - Optimized
-function initSkillsBasket() {
-    const canvas = document.getElementById('skillsCanvas');
-    if (!canvas || typeof Matter === 'undefined') return;
-    
-    const container = canvas.parentElement;
-    const width = container.offsetWidth;
-    const height = container.offsetHeight;
-    const dpr = Math.min(window.devicePixelRatio || 1, 2);
-    canvas.width = width * dpr;
-    canvas.height = height * dpr;
-    canvas.style.width = width + 'px';
-    canvas.style.height = height + 'px';
-    
-    const { Engine, Bodies, Composite, Mouse, MouseConstraint, Runner } = Matter;
-    const engine = Engine.create();
-    engine.world.gravity.y = 0.6;
-    
-    // Walls
-    const walls = [
-        Bodies.rectangle(width/2, height + 25, width, 50, { isStatic: true }),
-        Bodies.rectangle(-25, height/2, 50, height, { isStatic: true }),
-        Bodies.rectangle(width + 25, height/2, 50, height, { isStatic: true }),
-        Bodies.rectangle(width/2, -25, width, 50, { isStatic: true })
-    ];
-    Composite.add(engine.world, walls);
-    
-    // Skills - bigger radius for mobile
-    const skills = ['Python','R','SQL','MATLAB','Git','LaTeX','Pandas','NumPy'];
-    const icons = {
-        Python: 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/python/python-original.svg',
-        R: 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/r/r-original.svg',
-        SQL: 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/mysql/mysql-original.svg',
-        MATLAB: 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/matlab/matlab-original.svg',
-        Git: 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/git/git-original.svg',
-        LaTeX: 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/latex/latex-original.svg',
-        Pandas: 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/pandas/pandas-original.svg',
-        NumPy: 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/numpy/numpy-original.svg'
-    };
-    
-    const images = {};
-    skills.forEach(s => {
-        const img = new Image();
-        img.crossOrigin = 'anonymous';
-        img.src = icons[s];
-        images[s] = img;
-    });
-    
-    const radius = Math.max(22, width / 18);
-    const balls = skills.map((skill, i) => {
-        const x = 40 + (i % 4) * (width - 80) / 3;
-        const y = 30 + Math.floor(i / 4) * 50;
-        return Bodies.circle(x, y, radius, {
-            restitution: 0.4, friction: 0.3, frictionAir: 0.02, label: skill
-        });
-    });
-    Composite.add(engine.world, balls);
-    
-    const ctx = canvas.getContext('2d');
-    ctx.scale(dpr, dpr);
-    
-    function render() {
-        ctx.clearRect(0, 0, width, height);
-        balls.forEach((ball, i) => {
-            const { x, y } = ball.position;
-            const img = images[skills[i]];
-            ctx.save();
-            ctx.translate(x, y);
-            ctx.rotate(ball.angle);
-            ctx.beginPath();
-            ctx.arc(0, 0, radius, 0, Math.PI * 2);
-            ctx.fillStyle = '#fff';
-            ctx.fill();
-            ctx.strokeStyle = '#ddd';
-            ctx.lineWidth = 1.5;
-            ctx.stroke();
-            if (img.complete) ctx.drawImage(img, -radius * 0.7, -radius * 0.7, radius * 1.4, radius * 1.4);
-            ctx.restore();
-        });
-        requestAnimationFrame(render);
+// ============================================
+// Matter.js Physics Skills Basket
+// Cross-browser compatible (Chrome, Safari, Firefox)
+// ============================================
+(function initSkillsPhysics() {
+    // Check if Matter.js loaded
+    if (typeof Matter === 'undefined') {
+        console.warn('Matter.js not loaded, using fallback');
+        createFallbackAnimation();
+        return;
     }
+
+    const container = document.getElementById('skillsContainer');
+    if (!container) return;
+
+    const skills = [
+        { icon: 'python/python-original.svg', name: 'Python' },
+        { icon: 'r/r-original.svg', name: 'R' },
+        { icon: 'mysql/mysql-original.svg', name: 'SQL' },
+        { icon: 'matlab/matlab-original.svg', name: 'MATLAB' },
+        { icon: 'git/git-original.svg', name: 'Git' },
+        { icon: 'latex/latex-original.svg', name: 'LaTeX' },
+        { icon: 'pandas/pandas-original.svg', name: 'Pandas' },
+        { icon: 'numpy/numpy-original.svg', name: 'NumPy' }
+    ];
+
+    const { Engine, World, Bodies, Body, Mouse, MouseConstraint, Events } = Matter;
+
+    // Get container dimensions
+    const rect = container.getBoundingClientRect();
+    const width = rect.width || 500;
+    const height = rect.height || 180;
+    const ballRadius = window.innerWidth <= 768 ? 20 : 24;
+
+    // Create engine with custom settings for better cross-browser support
+    const engine = Engine.create({
+        enableSleeping: false,
+        constraintIterations: 2,
+        positionIterations: 6,
+        velocityIterations: 4
+    });
     
-    // Mouse/Touch
-    const mouse = Mouse.create(canvas);
-    mouse.pixelRatio = dpr;
-    Composite.add(engine.world, MouseConstraint.create(engine, {
-        mouse, constraint: { stiffness: 0.2, render: { visible: false } }
-    }));
+    // Reduce gravity for floaty feel
+    engine.world.gravity.y = 0.3;
+
+    // Create walls (invisible boundaries)
+    const wallOptions = { isStatic: true, restitution: 0.6, friction: 0.1 };
+    const walls = [
+        Bodies.rectangle(width / 2, height + 25, width + 100, 50, wallOptions), // bottom
+        Bodies.rectangle(width / 2, -25, width + 100, 50, wallOptions), // top
+        Bodies.rectangle(-25, height / 2, 50, height + 100, wallOptions), // left
+        Bodies.rectangle(width + 25, height / 2, 50, height + 100, wallOptions) // right
+    ];
+    World.add(engine.world, walls);
+
+    // Create DOM elements and physics bodies
+    const ballBodies = [];
+    const ballElements = [];
+
+    skills.forEach((skill, i) => {
+        // Create DOM element
+        const el = document.createElement('div');
+        el.className = 'physics-ball';
+        el.innerHTML = `<img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/${skill.icon}" alt="${skill.name}" draggable="false">`;
+        el.title = skill.name;
+        container.appendChild(el);
+        ballElements.push(el);
+
+        // Create physics body - spread out initial positions
+        const x = 50 + (i % 4) * ((width - 100) / 3);
+        const y = 30 + Math.floor(i / 4) * 60 + Math.random() * 20;
+        
+        const body = Bodies.circle(x, y, ballRadius, {
+            restitution: 0.7,
+            friction: 0.05,
+            frictionAir: 0.02,
+            density: 0.001,
+            label: skill.name
+        });
+        
+        // Give initial random velocity
+        Body.setVelocity(body, {
+            x: (Math.random() - 0.5) * 2,
+            y: (Math.random() - 0.5) * 2
+        });
+        
+        ballBodies.push(body);
+        World.add(engine.world, body);
+    });
+
+    // Mouse interaction - works across browsers
+    let isDragging = false;
+    let draggedBody = null;
+    let dragOffset = { x: 0, y: 0 };
+
+    container.addEventListener('mousedown', handleDragStart);
+    container.addEventListener('touchstart', handleDragStart, { passive: false });
     
-    Runner.run(engine);
-    render();
+    document.addEventListener('mousemove', handleDragMove);
+    document.addEventListener('touchmove', handleDragMove, { passive: false });
+    
+    document.addEventListener('mouseup', handleDragEnd);
+    document.addEventListener('touchend', handleDragEnd);
+
+    function getEventPos(e) {
+        const containerRect = container.getBoundingClientRect();
+        if (e.touches && e.touches[0]) {
+            return {
+                x: e.touches[0].clientX - containerRect.left,
+                y: e.touches[0].clientY - containerRect.top
+            };
+        }
+        return {
+            x: e.clientX - containerRect.left,
+            y: e.clientY - containerRect.top
+        };
+    }
+
+    function handleDragStart(e) {
+        const pos = getEventPos(e);
+        
+        // Find which ball was clicked
+        for (let i = 0; i < ballBodies.length; i++) {
+            const body = ballBodies[i];
+            const dx = pos.x - body.position.x;
+            const dy = pos.y - body.position.y;
+            const dist = Math.sqrt(dx * dx + dy * dy);
+            
+            if (dist < ballRadius + 5) {
+                isDragging = true;
+                draggedBody = body;
+                dragOffset = { x: dx, y: dy };
+                Body.setStatic(body, true);
+                ballElements[i].style.cursor = 'grabbing';
+                e.preventDefault();
+                break;
+            }
+        }
+    }
+
+    function handleDragMove(e) {
+        if (!isDragging || !draggedBody) return;
+        e.preventDefault();
+        
+        const pos = getEventPos(e);
+        const newX = Math.max(ballRadius, Math.min(width - ballRadius, pos.x - dragOffset.x));
+        const newY = Math.max(ballRadius, Math.min(height - ballRadius, pos.y - dragOffset.y));
+        
+        Body.setPosition(draggedBody, { x: newX, y: newY });
+    }
+
+    function handleDragEnd(e) {
+        if (draggedBody) {
+            Body.setStatic(draggedBody, false);
+            // Give a little push when released
+            Body.setVelocity(draggedBody, {
+                x: (Math.random() - 0.5) * 3,
+                y: -2
+            });
+            
+            const idx = ballBodies.indexOf(draggedBody);
+            if (idx >= 0) ballElements[idx].style.cursor = 'grab';
+        }
+        isDragging = false;
+        draggedBody = null;
+    }
+
+    // Animation loop - cross-browser compatible
+    let lastTime = 0;
+    const targetFPS = 60;
+    const frameTime = 1000 / targetFPS;
+
+    function animate(currentTime) {
+        requestAnimationFrame(animate);
+        
+        // Throttle to ~60fps
+        if (currentTime - lastTime < frameTime * 0.8) return;
+        lastTime = currentTime;
+
+        // Update physics
+        Engine.update(engine, frameTime);
+
+        // Sync DOM elements with physics bodies
+        for (let i = 0; i < ballBodies.length; i++) {
+            const body = ballBodies[i];
+            const el = ballElements[i];
+            
+            // Use transform for better performance
+            const x = body.position.x - ballRadius;
+            const y = body.position.y - ballRadius;
+            const angle = body.angle * (180 / Math.PI);
+            
+            el.style.transform = `translate(${x}px, ${y}px) rotate(${angle}deg)`;
+        }
+
+        // Add subtle random forces for liveliness
+        if (Math.random() < 0.02) {
+            const randomBody = ballBodies[Math.floor(Math.random() * ballBodies.length)];
+            if (!randomBody.isStatic) {
+                Body.applyForce(randomBody, randomBody.position, {
+                    x: (Math.random() - 0.5) * 0.0005,
+                    y: (Math.random() - 0.5) * 0.0005
+                });
+            }
+        }
+    }
+
+    // Start animation
+    requestAnimationFrame(animate);
+
+    // Handle container resize
+    let resizeTimeout;
+    window.addEventListener('resize', function() {
+        clearTimeout(resizeTimeout);
+        resizeTimeout = setTimeout(function() {
+            // Reinitialize on significant resize
+            const newRect = container.getBoundingClientRect();
+            if (Math.abs(newRect.width - width) > 50) {
+                location.reload();
+            }
+        }, 500);
+    });
+
+})();
+
+// Fallback for browsers without Matter.js support
+function createFallbackAnimation() {
+    const container = document.getElementById('skillsContainer');
+    if (!container) return;
+
+    const skills = [
+        { icon: 'python/python-original.svg', name: 'Python' },
+        { icon: 'r/r-original.svg', name: 'R' },
+        { icon: 'mysql/mysql-original.svg', name: 'SQL' },
+        { icon: 'matlab/matlab-original.svg', name: 'MATLAB' },
+        { icon: 'git/git-original.svg', name: 'Git' },
+        { icon: 'latex/latex-original.svg', name: 'LaTeX' },
+        { icon: 'pandas/pandas-original.svg', name: 'Pandas' },
+        { icon: 'numpy/numpy-original.svg', name: 'NumPy' }
+    ];
+
+    const width = container.offsetWidth || 500;
+    const height = container.offsetHeight || 180;
+
+    skills.forEach((skill, i) => {
+        const el = document.createElement('div');
+        el.className = 'physics-ball';
+        el.innerHTML = `<img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/${skill.icon}" alt="${skill.name}">`;
+        el.title = skill.name;
+        
+        // Position in a nice grid
+        const cols = 4;
+        const col = i % cols;
+        const row = Math.floor(i / cols);
+        const x = 40 + col * ((width - 80) / (cols - 1));
+        const y = 40 + row * 70;
+        
+        el.style.transform = `translate(${x - 24}px, ${y - 24}px)`;
+        el.style.animation = `gentleFloat 3s ease-in-out infinite`;
+        el.style.animationDelay = `${i * 0.2}s`;
+        
+        container.appendChild(el);
+    });
+
+    // Add fallback animation keyframes
+    const style = document.createElement('style');
+    style.textContent = `
+        @keyframes gentleFloat {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-8px); }
+        }
+    `;
+    document.head.appendChild(style);
 }
 
-document.getElementById('enterBtn').addEventListener('click', () => setTimeout(initSkillsBasket, 600));
 </script>
 </body>
 </html>
