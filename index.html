@@ -377,14 +377,26 @@ const fLayer = document.getElementById('fLayer');
 const mouse = { x: W/2, y: H/2 };
 const items = [];
 
-// 수식 50개 생성
-for (let i = 0; i < 50; i++) {
+// 모바일 감지 - 화면 너비 768px 이하면 모바일
+const isMobile = W <= 768;
+
+// 모바일: 15개, 데스크탑: 50개
+const symbolCount = isMobile ? 15 : 50;
+
+// 모바일용 핵심 수식만 선별
+const mobileSyms = ['∫', '∂', 'Σ', 'π', 'σ', 'μ', 'β', 'α', 'dW', 'E[X]', '√', '∞', 'Δ', 'θ', 'λ'];
+
+for (let i = 0; i < symbolCount; i++) {
     const el = document.createElement('div');
     el.className = 'f';
-    el.textContent = syms[Math.floor(Math.random() * syms.length)];
+    
+    // 모바일은 선별된 수식, 데스크탑은 전체
+    const symbolSet = isMobile ? mobileSyms : syms;
+    el.textContent = symbolSet[Math.floor(Math.random() * symbolSet.length)];
 
-    const size = 18 + Math.random() * 30;
-    const opacity = 0.15 + Math.random() * 0.25;
+    // 모바일: 더 크고 선명하게, 데스크탑: 기존 유지
+    const size = isMobile ? (28 + Math.random() * 24) : (18 + Math.random() * 30);
+    const opacity = isMobile ? (0.25 + Math.random() * 0.2) : (0.15 + Math.random() * 0.25);
     el.style.fontSize = size + 'px';
     el.style.color = `rgba(255,255,255,${opacity})`;
 
@@ -395,10 +407,12 @@ for (let i = 0; i < 50; i++) {
 
     fLayer.appendChild(el);
 
+    // 모바일: 더 느리게 움직임
+    const speed = isMobile ? 0.2 : 0.4;
     items.push({
         el, x, y, ox: x, oy: y,
-        vx: (Math.random() - 0.5) * 0.4,
-        vy: (Math.random() - 0.5) * 0.4,
+        vx: (Math.random() - 0.5) * speed,
+        vy: (Math.random() - 0.5) * speed,
         size
     });
 }
