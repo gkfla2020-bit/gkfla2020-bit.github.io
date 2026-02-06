@@ -1,0 +1,600 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Weekly Investment Report</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@400;500;600;700&family=Playfair+Display:wght@400;600;700&family=Roboto+Mono:wght@400;500&display=swap');
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: 'Noto Serif KR', Georgia, serif; background: #f5f5f5; color: #222; line-height: 1.7; font-size: 14px; }
+.container { max-width: 1200px; margin: 0 auto; padding: 40px 60px; background: #fff; min-height: 100vh; box-shadow: 0 0 20px rgba(0,0,0,0.05); }
+.masthead { text-align: center; border-bottom: 3px double #222; padding-bottom: 15px; margin-bottom: 25px; }
+.masthead-title { font-family: 'Playfair Display', serif; font-size: 28px; font-weight: 700; letter-spacing: 3px; text-transform: uppercase; }
+.masthead-date { font-size: 12px; color: #666; margin-top: 6px; letter-spacing: 1px; }
+.headline { font-family: 'Playfair Display', 'Noto Serif KR', serif; font-size: 32px; font-weight: 700; line-height: 1.2; margin: 25px 0 12px; text-align: center; }
+.subheadline { font-size: 16px; color: #444; text-align: center; margin-bottom: 25px; font-style: italic; }
+.byline { text-align: center; font-size: 11px; color: #888; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 25px; padding-bottom: 15px; border-bottom: 1px solid #ddd; }
+.section { margin-bottom: 35px; }
+.section-title { font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 2px; color: #222; margin-bottom: 15px; padding-bottom: 8px; border-bottom: 1px solid #222; }
+.lead { font-size: 16px; line-height: 1.8; margin-bottom: 20px; }
+.body-text { margin-bottom: 12px; text-align: justify; }
+.two-column { display: grid; grid-template-columns: 1fr 1fr; gap: 25px; }
+.three-column { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 20px; }
+.four-column { display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; }
+.five-column { display: grid; grid-template-columns: repeat(5, 1fr); gap: 15px; }
+.data-table { width: 100%; border-collapse: collapse; margin: 15px 0; font-size: 13px; }
+.data-table th { text-align: left; padding: 8px 10px; border-bottom: 2px solid #222; font-weight: 600; text-transform: uppercase; font-size: 10px; letter-spacing: 1px; }
+.data-table td { padding: 8px 10px; border-bottom: 1px solid #e0e0e0; }
+.data-table tr:hover { background: #fafafa; }
+.number { font-family: 'Roboto Mono', monospace; font-size: 13px; }
+.positive { color: #1a5f2a; }
+.negative { color: #b71c1c; }
+.highlight-box { background: #f8f8f8; padding: 20px; margin: 20px 0; border-left: 3px solid #222; }
+.highlight-title { font-weight: 700; margin-bottom: 8px; text-transform: uppercase; font-size: 11px; letter-spacing: 1px; }
+.stat-box { text-align: center; padding: 15px 10px; border: 1px solid #e0e0e0; background: #fff; }
+.stat-value { font-size: 18px; font-weight: 700; font-family: 'Playfair Display', serif; }
+.stat-label { font-size: 10px; text-transform: uppercase; letter-spacing: 1px; color: #666; margin-top: 4px; }
+.stat-change { font-size: 11px; margin-top: 3px; }
+.macro-card { background: #fafafa; padding: 18px; border-left: 3px solid #222; margin-bottom: 15px; }
+.macro-title { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: #666; margin-bottom: 8px; }
+.macro-value { font-size: 24px; font-weight: 700; font-family: 'Playfair Display', serif; }
+.macro-detail { font-size: 12px; color: #666; margin-top: 5px; }
+.calendar-item { padding: 8px 0; border-bottom: 1px solid #eee; font-size: 13px; }
+.calendar-date { font-weight: 600; color: #222; }
+.importance-high { color: #b71c1c; font-weight: 600; }
+.sector-item { padding: 10px; border: 1px solid #e0e0e0; text-align: center; }
+.sector-name { font-size: 11px; font-weight: 600; margin-bottom: 4px; }
+.sector-perf { font-size: 13px; font-weight: 700; }
+.allocation-bar { display: flex; height: 6px; margin: 12px 0; background: #eee; }
+.allocation-segment { height: 100%; }
+.footer { margin-top: 35px; padding-top: 15px; border-top: 1px solid #ddd; font-size: 10px; color: #888; }
+.disclaimer { font-size: 10px; color: #888; line-height: 1.5; margin-top: 15px; padding: 12px; background: #fafafa; }
+.mini-table { font-size: 12px; }
+.mini-table td { padding: 5px 8px; }
+.cycle-chart { position: relative; width: 100%; height: 280px; margin: 20px 0; }
+.cycle-circle { position: relative; width: 240px; height: 240px; margin: 0 auto; border: 2px solid #ddd; border-radius: 50%; }
+.cycle-phase { position: absolute; width: 80px; text-align: center; font-size: 11px; }
+.cycle-phase-name { font-weight: 700; margin-bottom: 3px; }
+.cycle-phase-desc { font-size: 10px; color: #666; }
+.cycle-indicator { position: absolute; width: 12px; height: 12px; background: #222; border-radius: 50%; transform: translate(-50%, -50%); }
+.cycle-arrow { position: absolute; font-size: 20px; color: #999; }
+.signal-box { display: inline-block; padding: 3px 8px; font-size: 10px; font-weight: 600; border-radius: 2px; text-transform: uppercase; }
+.signal-bullish { background: #e8f5e9; color: #1a5f2a; }
+.signal-bearish { background: #ffebee; color: #b71c1c; }
+.signal-neutral { background: #f5f5f5; color: #666; }
+.indicator-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; }
+.indicator-item { padding: 12px; background: #fafafa; border-left: 3px solid #ddd; }
+.indicator-item.bullish { border-left-color: #1a5f2a; }
+.indicator-item.bearish { border-left-color: #b71c1c; }
+.indicator-name { font-size: 10px; text-transform: uppercase; letter-spacing: 1px; color: #888; margin-bottom: 5px; }
+.indicator-value { font-size: 18px; font-weight: 700; font-family: 'Roboto Mono', monospace; }
+.indicator-signal { font-size: 11px; margin-top: 5px; }
+</style>
+</head>
+<body>
+<div class="container">
+
+<div class="masthead">
+    <div class="masthead-title">Weekly Investment Report</div>
+    <div class="masthead-date">Week of February 02 - 06, 2026 | Seoul</div>
+</div>
+<div class="headline">Risk-Off: 방어적 포지션 전환 권고</div>
+<div class="subheadline">Score 25/100 · SELL</div>
+<div class="byline">AI Investment Research · Macro + QuantLib Analysis</div>
+
+<div class="section">
+    <div class="section-title">Executive Summary</div>
+    <p class="lead">방어적 포지션, 현금 및 채권 비중 확대 권고</p>
+    <p class="body-text"><strong>Market Cycle:</strong> EARLY EXPANSION. 월간 기준 대부분 업종이 두 자릿수 상승률을 기록하며 경기 회복 초기 신호를 보이고 있습니다. 특히 자동차(+36.6%), 유통(+34.1%) 등 내수 관련 섹터의 강한 반등이 경기 저점 통과를 시사합니다.</p>
+    <p class="body-text">자동차 업종의 주간 조정(-1.4%)을 매수 기회로 활용하되, 유통 업종의 강한 모멘텀을 추가 활용할 것을 권장합니다. 금융주는 배당락 이전 매수 포지션 구축이 유효할 것으로 판단됩니다.</p>
+    <p class="body-text">한국은행의 기준금리 동결 기조가 지속되면서 금융주에 긍정적 영향을 미치고 있습니다. 정부의 내수 진작 정책과 소비 활성화 조치들이 유통, 자동차 등 내수 관련 업종에 직접적인 수혜를 주고 있습니다.</p>
+</div>
+
+<div class="section">
+    <div class="section-title">Macro Dashboard</div>
+    <div class="five-column">
+        <div class="stat-box">
+            <div class="stat-value">4,963</div>
+            <div class="stat-label">KOSPI</div>
+            <div class="stat-change"><span class="negative">-5.01%</span></div>
+        </div>
+        <div class="stat-box">
+            <div class="stat-value">6,798</div>
+            <div class="stat-label">S&P 500</div>
+            <div class="stat-change"><span class="negative">-2.03%</span></div>
+        </div>
+        <div class="stat-box">
+            <div class="stat-value">3.00%</div>
+            <div class="stat-label">한은 기준금리</div>
+            <div class="stat-change">0.00%p</div>
+        </div>
+        <div class="stat-box">
+            <div class="stat-value">3.05%</div>
+            <div class="stat-label">국고채 10Y</div>
+            <div class="stat-change"><span class="negative">-0.05%p</span></div>
+        </div>
+        <div class="stat-box">
+            <div class="stat-value">-1.16%p</div>
+            <div class="stat-label">한미 금리차</div>
+            <div class="stat-change"><span class="negative">역전</span></div>
+        </div>
+    </div>
+    <div class="five-column" style="margin-top: 12px;">
+        <div class="stat-box">
+            <div class="stat-value">4.21%</div>
+            <div class="stat-label">US 10Y</div>
+            <div class="stat-change"><span class="negative">-1.52%</span></div>
+        </div>
+        <div class="stat-box">
+            <div class="stat-value">1,472</div>
+            <div class="stat-label">USD/KRW</div>
+            <div class="stat-change"><span class="positive">+3.00%</span></div>
+        </div>
+        <div class="stat-box">
+            <div class="stat-value">98.0</div>
+            <div class="stat-label">DXY</div>
+            <div class="stat-change"><span class="positive">+1.01%</span></div>
+        </div>
+        <div class="stat-box">
+            <div class="stat-value">21.8</div>
+            <div class="stat-label">VIX</div>
+            <div class="stat-change"><span class="positive">+24.83%</span></div>
+        </div>
+        <div class="stat-box">
+            <div class="stat-value">$4,770</div>
+            <div class="stat-label">Gold</div>
+            <div class="stat-change"><span class="positive">+1.18%</span></div>
+        </div>
+    </div>
+</div>
+
+<div class="section">
+    <div class="section-title">Macro Indicators Analysis</div>
+    
+    <div class="two-column">
+        <div>
+            <div class="macro-card">
+                <div class="macro-title">Interest Rates (Korea)</div>
+                <table class="mini-table" style="width: 100%;">
+                    <tr><td>한은 기준금리</td><td class="number">3.00%</td><td>0.00%p</td></tr>
+                    <tr><td>국고채 3년</td><td class="number">2.85%</td><td><span class="negative">-0.05%p</span></td></tr>
+                    <tr><td>국고채 10년</td><td class="number">3.05%</td><td><span class="negative">-0.05%p</span></td></tr>
+                    <tr><td>10Y-3Y 스프레드</td><td class="number">0.20%</td><td><span class="positive">정상</span></td></tr>
+                    <tr><td><strong>한미 금리차 (10Y)</strong></td><td class="number"><strong>-1.16%p</strong></td><td><span class="negative">역전</span></td></tr>
+                </table>
+                <div class="macro-detail" style="margin-top: 10px;">
+                    <span class="signal-box signal-bearish">BEARISH</span> 한미 금리 역전 → 외인 이탈 압력
+                </div>
+            </div>
+            
+            <div class="macro-card">
+                <div class="macro-title">Interest Rates (US Treasury)</div>
+                <table class="mini-table" style="width: 100%;">
+                    <tr><td>2Y Yield</td><td class="number">3.58%</td><td><span class="negative">-0.47%</span></td></tr>
+                    <tr><td>10Y Yield</td><td class="number">4.21%</td><td><span class="negative">-1.52%</span></td></tr>
+                    <tr><td>30Y Yield</td><td class="number">4.86%</td><td><span class="negative">-1.08%</span></td></tr>
+                    <tr><td>10Y-2Y Spread</td><td class="number">0.63%</td><td><span class="positive">정상</span></td></tr>
+                </table>
+                <div class="macro-detail" style="margin-top: 10px;">
+                    <span class="signal-box signal-neutral">NEUTRAL</span> 금리 중립
+                </div>
+            </div>
+        </div>
+        
+        <div>
+            <div class="macro-card">
+                <div class="macro-title">Currency & Dollar Index</div>
+                <table class="mini-table" style="width: 100%;">
+                    <tr><td>DXY (Dollar Index)</td><td class="number">97.97</td><td><span class="positive">+1.01%</span></td></tr>
+                    <tr><td>USD/KRW</td><td class="number">1,472</td><td><span class="positive">+3.00%</span></td></tr>
+                    <tr><td>EUR/USD</td><td class="number">1.1781</td><td><span class="negative">-0.57%</span></td></tr>
+                    <tr><td>USD/JPY</td><td class="number">156.72</td><td><span class="positive">+0.98%</span></td></tr>
+                </table>
+                <div class="macro-detail" style="margin-top: 10px;">
+                    <span class="signal-box signal-bullish">BULLISH</span> 달러 약세 → EM 자금 유입<br>
+                    <span class="signal-box signal-neutral">MIXED</span> 원화 약세 → 수출 유리, 외인 이탈
+                </div>
+            </div>
+            
+            <div class="macro-card">
+                <div class="macro-title">Volatility & Risk Sentiment</div>
+                <table class="mini-table" style="width: 100%;">
+                    <tr><td>VIX (Fear Index)</td><td class="number">21.77</td><td><span class="positive">+24.83%</span></td></tr>
+                    <tr><td>MOVE (Bond Vol)</td><td class="number">119.7</td><td>-</td></tr>
+                    <tr><td>1M Range (KOSPI)</td><td class="number" colspan="2">4,395 - 5,377</td></tr>
+                </table>
+                <div class="macro-detail" style="margin-top: 10px;">
+                    <span class="signal-box signal-neutral">NEUTRAL</span> 변동성 보통
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="two-column" style="margin-top: 15px;">
+        <div class="macro-card">
+            <div class="macro-title">Commodities & Crypto</div>
+            <table class="mini-table" style="width: 100%;">
+                <tr><td>Gold</td><td class="number">$4,769.50</td><td><span class="positive">+1.18%</span></td></tr>
+                <tr><td>WTI Crude</td><td class="number">$62.95</td><td><span class="negative">-3.47%</span></td></tr>
+                <tr><td>Copper</td><td class="number">$5.68</td><td><span class="negative">-3.65%</span></td></tr>
+                <tr><td>Bitcoin</td><td class="number">$62,743</td><td><span class="negative">-18.49%</span></td></tr>
+            </table>
+            <div class="macro-detail" style="margin-top: 10px;">
+                <span class="signal-box signal-neutral">NEUTRAL</span> Gold: 중립<br>
+                <span class="signal-box signal-neutral">NEUTRAL</span> Oil: 유가 안정
+            </div>
+        </div>
+        <div class="macro-card">
+            <div class="macro-title">Market Breadth</div>
+            <table class="mini-table" style="width: 100%;">
+                <tr><td>KOSPI 52주 신고가</td><td class="number">-</td><td>-</td></tr>
+                <tr><td>KOSPI 52주 신저가</td><td class="number">-</td><td>-</td></tr>
+                <tr><td>외국인 순매수</td><td class="number">-</td><td>-</td></tr>
+                <tr><td>기관 순매수</td><td class="number">-</td><td>-</td></tr>
+            </table>
+            <div class="macro-detail" style="margin-top: 10px;">
+                <span class="signal-box signal-neutral">NEUTRAL</span> 시장 폭 중립
+            </div>
+        </div>
+    </div>
+    
+    <div class="highlight-box" style="margin-top: 20px;">
+        <div class="highlight-title">Macro Signal Summary</div>
+        <div class="indicator-grid">
+            <div class="indicator-item bearish">
+                <div class="indicator-name">한미 금리차</div>
+                <div class="indicator-value">-1.16%p</div>
+                <div class="indicator-signal">한미 금리 역전 → 외인 이탈 압력</div>
+            </div>
+            <div class="indicator-item ">
+                <div class="indicator-name">US 10Y</div>
+                <div class="indicator-value">4.21%</div>
+                <div class="indicator-signal">금리 중립</div>
+            </div>
+            <div class="indicator-item bullish">
+                <div class="indicator-name">Dollar (DXY)</div>
+                <div class="indicator-value">98.0</div>
+                <div class="indicator-signal">달러 약세 → EM 자금 유입</div>
+            </div>
+            <div class="indicator-item ">
+                <div class="indicator-name">USD/KRW</div>
+                <div class="indicator-value">1,472</div>
+                <div class="indicator-signal">원화 약세 → 수출 유리, 외인 이탈</div>
+            </div>
+            <div class="indicator-item ">
+                <div class="indicator-name">Volatility (VIX)</div>
+                <div class="indicator-value">21.8</div>
+                <div class="indicator-signal">변동성 보통</div>
+            </div>
+            <div class="indicator-item ">
+                <div class="indicator-name">Gold</div>
+                <div class="indicator-value">$4,770</div>
+                <div class="indicator-signal">중립</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="section">
+    <div class="section-title">Business Cycle Analysis</div>
+    
+    <div class="two-column">
+        <div>
+            <div style="position: relative; width: 260px; height: 260px; margin: 0 auto;">
+                <!-- 사이클 원 -->
+                <svg width="260" height="260" style="position: absolute; top: 0; left: 0;">
+                    <circle cx="130" cy="130" r="100" fill="none" stroke="#ddd" stroke-width="2"/>
+                    <circle cx="130" cy="130" r="60" fill="none" stroke="#eee" stroke-width="1"/>
+                    
+                    <!-- 사분면 라인 -->
+                    <line x1="130" y1="30" x2="130" y2="230" stroke="#eee" stroke-width="1"/>
+                    <line x1="30" y1="130" x2="230" y2="130" stroke="#eee" stroke-width="1"/>
+                    
+                    <!-- 화살표 (시계방향) -->
+                    <path d="M 130 35 L 135 45 L 125 45 Z" fill="#999"/>
+                    <path d="M 225 130 L 215 135 L 215 125 Z" fill="#999"/>
+                    <path d="M 130 225 L 125 215 L 135 215 Z" fill="#999"/>
+                    <path d="M 35 130 L 45 125 L 45 135 Z" fill="#999"/>
+                    
+                    <!-- 현재 위치 표시 -->
+                    <circle cx="120" cy="20" r="8" fill="#222"/>
+                    <circle cx="120" cy="20" r="12" fill="none" stroke="#222" stroke-width="2"/>
+                </svg>
+                
+                <!-- 라벨 -->
+                <div style="position: absolute; top: 5px; left: 50%; transform: translateX(-50%); font-size: 10px; font-weight: 600; text-align: center;">
+                    EARLY<br>EXPANSION
+                </div>
+                <div style="position: absolute; top: 50%; right: 0; transform: translateY(-50%); font-size: 10px; font-weight: 600; text-align: center;">
+                    LATE<br>EXPANSION
+                </div>
+                <div style="position: absolute; bottom: 5px; left: 50%; transform: translateX(-50%); font-size: 10px; font-weight: 600; text-align: center;">
+                    CONTRACTION
+                </div>
+                <div style="position: absolute; top: 50%; left: 0; transform: translateY(-50%); font-size: 10px; font-weight: 600; text-align: center;">
+                    RECOVERY
+                </div>
+                
+                <!-- 중앙 텍스트 -->
+                <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); text-align: center;">
+                    <div style="font-size: 11px; font-weight: 700; color: #222;">CURRENT</div>
+                    <div style="font-size: 14px; font-weight: 700; color: #222; margin-top: 3px;">EARLY EXPANSION</div>
+                </div>
+            </div>
+        </div>
+        
+        <div>
+            <div class="macro-card">
+                <div class="macro-title">Current Cycle Position</div>
+                <div class="macro-value" style="font-size: 18px;">EARLY EXPANSION</div>
+                <div class="macro-detail" style="margin-top: 10px;">
+                    <strong>Rotation Signal:</strong> 
+                    <span class="signal-box signal-bullish">RISK_ON</span>
+                </div>
+            </div>
+            
+            <div class="macro-card">
+                <div class="macro-title">Recommended Sectors</div>
+                <div class="macro-detail">기술주, 소비재, 금융</div>
+            </div>
+            
+            <div class="macro-card">
+                <div class="macro-title">Cycle Characteristics</div>
+                <div class="macro-detail" style="font-size: 12px; line-height: 1.6;">
+                    • GDP 성장 가속<br>• 기업이익 개선<br>• 금리 상승 초기<br>• 주식 > 채권
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="section">
+    <div class="section-title">Economic Calendar</div>
+    <div class="three-column">
+        <div>
+            <p class="body-text"><strong>US Events</strong></p>
+            <div class="calendar-item"><span class="calendar-date">02/03</span> <span class="calendar-event importance-high">ISM 제조업 PMI</span></div><div class="calendar-item"><span class="calendar-date">02/04</span> <span class="calendar-event ">ADP 고용보고서</span></div><div class="calendar-item"><span class="calendar-date">02/05</span> <span class="calendar-event importance-high">ISM 서비스업 PMI</span></div><div class="calendar-item"><span class="calendar-date">02/06</span> <span class="calendar-event importance-high">비농업 고용지표 (NFP)</span></div><div class="calendar-item"><span class="calendar-date">02/06</span> <span class="calendar-event importance-high">실업률</span></div>
+        </div>
+        <div>
+            <p class="body-text"><strong>Korea Events</strong></p>
+            <div class="calendar-item"><span class="calendar-date">02/02</span> <span class="calendar-event importance-high">수출입 동향</span></div><div class="calendar-item"><span class="calendar-date">02/04</span> <span class="calendar-event importance-high">소비자물가지수 (CPI)</span></div><div class="calendar-item"><span class="calendar-date">02/05</span> <span class="calendar-event importance-high">금융통화위원회</span></div>
+        </div>
+        <div>
+            <p class="body-text"><strong>Earnings</strong></p>
+            <div class="calendar-item"><span class="calendar-date">02/03</span> 삼성전자 (KR)</div><div class="calendar-item"><span class="calendar-date">02/04</span> Apple (US)</div><div class="calendar-item"><span class="calendar-date">02/04</span> Amazon (US)</div><div class="calendar-item"><span class="calendar-date">02/05</span> SK하이닉스 (KR)</div>
+        </div>
+    </div>
+</div>
+
+<div class="section">
+    <div class="section-title">Sector Analysis</div>
+    <p class="body-text"><strong>Monthly Performance</strong></p>
+    <div class="four-column" style="margin-bottom: 20px;">
+        
+            <div class="sector-item">
+                <div class="sector-name">자동차</div>
+                <div class="sector-perf positive">+36.6%</div>
+            </div>
+            <div class="sector-item">
+                <div class="sector-name">유통</div>
+                <div class="sector-perf positive">+34.1%</div>
+            </div>
+            <div class="sector-item">
+                <div class="sector-name">통신</div>
+                <div class="sector-perf positive">+18.1%</div>
+            </div>
+            <div class="sector-item">
+                <div class="sector-name">2차전지</div>
+                <div class="sector-perf positive">+16.8%</div>
+            </div>
+            <div class="sector-item">
+                <div class="sector-name">철강</div>
+                <div class="sector-perf positive">+16.3%</div>
+            </div>
+            <div class="sector-item">
+                <div class="sector-name">금융</div>
+                <div class="sector-perf positive">+13.2%</div>
+            </div>
+            <div class="sector-item">
+                <div class="sector-name">반도체</div>
+                <div class="sector-perf positive">+11.2%</div>
+            </div>
+            <div class="sector-item">
+                <div class="sector-name">게임</div>
+                <div class="sector-perf positive">+5.0%</div>
+            </div>
+            <div class="sector-item">
+                <div class="sector-name">화학</div>
+                <div class="sector-perf positive">+1.8%</div>
+            </div>
+            <div class="sector-item">
+                <div class="sector-name">조선</div>
+                <div class="sector-perf positive">+1.3%</div>
+            </div>
+            <div class="sector-item">
+                <div class="sector-name">바이오</div>
+                <div class="sector-perf negative">-2.3%</div>
+            </div>
+            <div class="sector-item">
+                <div class="sector-name">엔터</div>
+                <div class="sector-perf negative">-2.3%</div>
+            </div>
+    </div>
+    
+    <div class="two-column">
+        <div>
+            <p class="body-text"><strong>Overweight</strong></p>
+            <table class="data-table">
+                <tr><th>Sector</th><th>Score</th><th>Rationale</th></tr>
+                
+            <tr>
+                <td><strong>유통</strong></td>
+                <td class="number">92</td>
+                <td style="font-size: 12px;">주간 +14.1%, 월간 +34.1%로 최강 모멘텀을 보이며, 소비 심리 개선과 연말 쇼핑 시즌 효과가 중첩되고 있습니다. 인...</td>
+            </tr>
+            <tr>
+                <td><strong>자동차</strong></td>
+                <td class="number">88</td>
+                <td style="font-size: 12px;">월간 +36.6%의 압도적 성과로 글로벌 공급망 정상화와 중국 경기부양 기대감이 반영되었습니다. 주간 조정(-1.4%)은 매수...</td>
+            </tr>
+            <tr>
+                <td><strong>금융</strong></td>
+                <td class="number">85</td>
+                <td style="font-size: 12px;">주간 +8.7%로 강한 상승세를 보이며, 미국 대비 상대적으로 양호한 성과(미국 금융 -5.5%)를 기록했습니다. 금리 인상 ...</td>
+            </tr>
+            </table>
+        </div>
+        <div>
+            <p class="body-text"><strong>Underweight</strong></p>
+            <table class="data-table">
+                <tr><th>Sector</th><th>Score</th><th>Risk</th></tr>
+                
+            <tr>
+                <td><strong>엔터테인먼트</strong></td>
+                <td class="number">25</td>
+                <td style="font-size: 12px;">주간 -5.0%, 월간 -2.3%로 유일하게 큰 폭 하락세를 보이며, 중국 한한령과 콘텐츠...</td>
+            </tr>
+            <tr>
+                <td><strong>바이오</strong></td>
+                <td class="number">30</td>
+                <td style="font-size: 12px;">월간 -2.3%로 부진하며, 미국 헬스케어 섹터 약세(-2.1%)와 동조화되고 있어 글로벌...</td>
+            </tr>
+            </table>
+        </div>
+    </div>
+    
+    <p class="body-text" style="margin-top: 15px;"><strong>Key Themes:</strong> 내수 소비 회복 · 중국 리오프닝 · 금리 정점 기대감</p>
+</div>
+
+<div class="section">
+    <div class="section-title">Quantitative Analysis (QuantLib)</div>
+    
+    <div class="three-column">
+        <div class="macro-card">
+            <div class="macro-title">Vasicek Rate Model</div>
+            <table class="mini-table" style="width: 100%;">
+                <tr><td>Current (r₀)</td><td class="number">4.21%</td></tr>
+                <tr><td>Long-term (θ)</td><td class="number">3.5%</td></tr>
+                <tr><td>Mean Rev. (κ)</td><td class="number">0.25</td></tr>
+                <tr><td>Half-life</td><td class="number">2.77Y</td></tr>
+            </table>
+        </div>
+        
+        <div class="macro-card">
+            <div class="macro-title">Yield Curve</div>
+            <table class="mini-table" style="width: 100%;">
+                <tr><td>Shape</td><td><strong>NORMAL</strong></td></tr>
+                <tr><td>Slope</td><td class="number">36 bps</td></tr>
+                <tr><td>Short Rate</td><td class="number">4.5%</td></tr>
+                <tr><td>Long Rate</td><td class="number">4.862%</td></tr>
+            </table>
+            <div class="macro-detail" style="margin-top: 8px; font-size: 11px;">정상적 경기 환경</div>
+        </div>
+        
+        <div class="macro-card">
+            <div class="macro-title">Volatility Surface</div>
+            <table class="mini-table" style="width: 100%;">
+                <tr><td>ATM Vol</td><td class="number">21.77%</td></tr>
+                <tr><td>Skew</td><td class="number">4.35%</td></tr>
+                <tr><td>Risk Rev.</td><td class="number">-4.35%</td></tr>
+                <tr><td>Term</td><td>BACKWARDATION</td></tr>
+            </table>
+            <div class="macro-detail" style="margin-top: 8px; font-size: 11px;">강한 하방 리스크 프리미엄 - 시장 불안 신호</div>
+        </div>
+    </div>
+    
+    <div class="highlight-box" style="margin-top: 15px;">
+        <div class="highlight-title">Rate Path Forecast (Vasicek)</div>
+        <p class="body-text" style="font-size: 12px;">
+            0.25Y: 4.167% → 0.5Y: 4.127% → 1.0Y: 4.053% → 2.0Y: 3.931% → 3.0Y: 3.835%
+        </p>
+        <p class="body-text" style="font-size: 11px; color: #666; margin-top: 5px;">
+            10Y Bond: Price 9,830 | Duration 8.15 | Convexity 78.5
+        </p>
+    </div>
+</div>
+
+<div class="section">
+    <div class="section-title">Risk Assessment</div>
+    <div class="two-column">
+        <div>
+            <table class="data-table">
+                <tr><td>Risk Level</td><td><strong>HIGH</strong></td></tr>
+                <tr><td>Risk Score</td><td class="number">70/100</td></tr>
+                <tr><td>VIX</td><td class="number">21.8</td></tr>
+                <tr><td>MOVE (est.)</td><td class="number">119.7</td></tr>
+                <tr><td>Vol Multiplier</td><td class="number">1.303x</td></tr>
+            </table>
+        </div>
+        <div>
+            <div class="highlight-box">
+                <div class="highlight-title">Risk Commentary</div>
+                <p class="body-text" style="font-size: 12px;">
+                    현재 시장 변동성이 높습니다. 포지션 규모를 축소하고 손절 라인을 타이트하게 설정하십시오.
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="section">
+    <div class="section-title">Investment Recommendation</div>
+    
+    <div class="highlight-box" style="text-align: center; padding: 25px;">
+        <div style="font-size: 14px; font-weight: 700; text-transform: uppercase; letter-spacing: 2px; color: #666; margin-bottom: 10px;">Composite Score</div>
+        <div style="font-size: 48px; font-weight: 700; font-family: 'Playfair Display', serif;">25<span style="font-size: 24px; color: #888;">/100</span></div>
+        <div style="font-size: 20px; font-weight: 700; margin-top: 10px;" class="negative">SELL</div>
+        <div style="font-size: 14px; color: #666; margin-top: 8px;">위험자산 대폭 축소</div>
+    </div>
+    
+    <div style="margin-top: 20px;">
+        <p class="body-text"><strong>Signal Summary</strong></p>
+        <div style="margin: 10px 0;"><span class="signal-box signal-bearish" style="margin-right: 8px;">Macro: BEARISH</span><span class="signal-box signal-bearish" style="margin-right: 8px;">Risk: HIGH</span><span class="signal-box signal-neutral" style="margin-right: 8px;">Sentiment: NEUTRAL</span><span class="signal-box signal-bullish" style="margin-right: 8px;">Rotation: RISK_ON</span></div>
+    </div>
+    
+    <div style="margin-top: 20px;">
+        <p class="body-text"><strong>Recommended Allocation</strong></p>
+        <div class="allocation-bar"><div class="allocation-segment" style="width: 20%; background: #222;"></div><div class="allocation-segment" style="width: 50%; background: #666;"></div><div class="allocation-segment" style="width: 30%; background: #bbb;"></div></div>
+        <p style="font-size: 12px; color: #666; text-align: center;">주식 20% · 채권 50% · 현금 30%</p>
+    </div>
+    
+    <div class="two-column" style="margin-top: 20px;">
+        <div>
+            <p class="body-text"><strong>Primary Sector</strong></p>
+            <p style="font-size: 16px; font-weight: 600;">유통</p>
+            <p style="font-size: 12px; color: #666; margin-top: 5px;">Position Size: 7.0%</p>
+        </div>
+        <div>
+            <p class="body-text"><strong>Key Catalysts</strong></p>
+            <ul style="font-size: 12px; color: #444; padding-left: 18px; margin-top: 5px;">
+                <li>연말 쇼핑시즌</li><li>실질소득 증가</li><li>중국 리오프닝 효과</li>
+            </ul>
+        </div>
+    </div>
+    
+    
+</div>
+
+<div class="footer">
+    <div class="two-column">
+        <div>
+            <p>Generated: 2026-02-06 09:54:00 KST</p>
+            <p>AI Investment Research System v2.0</p>
+        </div>
+        <div style="text-align: right;">
+            <p>Powered by QuantLib + Claude Sonnet 4</p>
+            <p>Data: yfinance, BigKinds</p>
+        </div>
+    </div>
+    
+    <div class="disclaimer">
+        <strong>Disclaimer:</strong> 본 리포트는 AI 기반 자동화 시스템에 의해 생성되었으며, 투자 권유가 아닌 참고 자료입니다. 
+        모든 투자 결정은 투자자 본인의 판단과 책임 하에 이루어져야 합니다. 
+        과거 성과가 미래 수익을 보장하지 않으며, 투자에는 원금 손실의 위험이 있습니다.
+        본 자료에 포함된 정보의 정확성이나 완전성을 보장하지 않습니다.
+    </div>
+</div>
+</div>
+</body>
+</html>
