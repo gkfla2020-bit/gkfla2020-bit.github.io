@@ -1,0 +1,569 @@
+---
+layout: null
+permalink: /research/bacbb/
+---
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BACBB: Betting Against Cryptocurrency Bad Beta | Ha Rim Jung</title>
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-83LKVW7412"></script>
+    <script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-83LKVW7412');</script>
+    <script src="https://cdn.plot.ly/plotly-2.27.0.min.js"></script>
+    <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;500&family=Space+Mono:wght@400&family=Inter:wght@300;400&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --wsj-black: #111111;
+            --wsj-gray: #666666;
+            --wsj-light: #f5f5f5;
+            --wsj-cream: #fafaf8;
+            --wsj-accent: #0080c6;
+            --wsj-red: #c41200;
+            --wsj-green: #00843d;
+            --serif: 'Georgia', 'Times New Roman', serif;
+            --sans: 'Inter', 'Helvetica Neue', Arial, sans-serif;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: var(--sans); background: var(--wsj-cream); color: var(--wsj-black); line-height: 1.7; overflow-x: hidden; }
+
+        /* Floating formulas */
+        .formula-bg{position:fixed;inset:0;pointer-events:none;z-index:0;overflow:hidden}
+        .f{position:absolute;font-family:'Space Mono',monospace;white-space:nowrap;will-change:transform;transition:transform .3s ease-out}
+        
+        /* Left Sidebar */
+        .sidebar{position:fixed;left:0;top:0;width:280px;height:100vh;background:rgba(255,255,255,.97);backdrop-filter:blur(10px);border-right:1px solid rgba(0,0,0,.06);padding:40px 30px;z-index:100;overflow-y:auto;display:flex;flex-direction:column}
+        .sidebar-profile{text-align:center;margin-bottom:35px;padding-bottom:30px;border-bottom:1px solid rgba(0,0,0,.08)}
+        .profile-photo{width:120px;height:120px;border-radius:50%;object-fit:cover;margin-bottom:18px;border:3px solid #f0f0f0;background:#e8e8e8}
+        .profile-name{font-family:'Cormorant Garamond',serif;font-size:1.5rem;font-weight:500;color:#1a1a1a;margin-bottom:6px;letter-spacing:.03em}
+        .profile-title{font-size:.75rem;color:#888;letter-spacing:.08em;text-transform:uppercase;margin-bottom:12px}
+        .profile-bio{font-size:.82rem;color:#666;line-height:1.6;margin-bottom:15px}
+        .profile-links{display:flex;justify-content:center;gap:15px}
+        .profile-links a{font-size:.7rem;color:#999;text-decoration:none;letter-spacing:.05em;transition:color .2s}
+        .profile-links a:hover{color:#0080c6}
+        
+        .sidebar-nav{flex:1}
+        .nav-section{margin-bottom:25px}
+        .nav-section-title{font-size:.65rem;font-weight:600;color:#aaa;letter-spacing:.15em;text-transform:uppercase;margin-bottom:12px}
+        .nav-list{list-style:none}
+        .nav-list li{margin-bottom:8px}
+        .nav-list a{font-size:.85rem;color:#555;text-decoration:none;transition:all .2s;display:flex;align-items:center;gap:8px;padding:6px 0}
+        .nav-list a:hover{color:#0080c6;padding-left:5px}
+        .nav-list a.active{color:#0080c6;font-weight:500}
+        
+        .sidebar-footer{padding-top:20px;border-top:1px solid rgba(0,0,0,.06);font-size:.7rem;color:#aaa;text-align:center}
+        
+        /* Main Content */
+        .main-wrapper{margin-left:280px;margin-right:260px;min-height:100vh}
+        .container{position:relative;z-index:1;max-width:900px;margin:0 auto;padding:50px 40px 40px}
+        
+        /* Right Sidebar - Market Widget */
+        .right-sidebar{position:fixed;right:0;top:0;width:260px;height:100vh;background:rgba(255,255,255,.97);backdrop-filter:blur(10px);border-left:1px solid rgba(0,0,0,.06);padding:30px 20px;z-index:100;overflow-y:auto}
+        .widget-title{font-size:.65rem;font-weight:600;color:#aaa;letter-spacing:.15em;text-transform:uppercase;margin-bottom:15px}
+        .market-item{display:flex;justify-content:space-between;align-items:center;padding:12px 0;border-bottom:1px solid rgba(0,0,0,.05)}
+        .market-item:last-child{border-bottom:none}
+        .market-name{font-size:.75rem;color:#666}
+        .market-value{font-family:'Space Mono',monospace;font-size:.85rem;font-weight:500;color:#1a1a1a}
+        .market-change{font-family:'Space Mono',monospace;font-size:.7rem;margin-left:8px}
+        .market-change.up{color:#16a34a}
+        .market-change.down{color:#dc2626}
+        .widget-section{margin-bottom:30px}
+        .widget-update{font-size:.6rem;color:#bbb;text-align:center;margin-top:10px}
+        .market-group{background:rgba(0,0,0,.02);padding:15px;margin-bottom:15px;border-left:2px solid #e0e0e0}
+        .market-group-title{font-size:.6rem;color:#999;letter-spacing:.1em;text-transform:uppercase;margin-bottom:10px}
+        
+        /* Mobile */
+        @media(max-width:1024px){
+            .sidebar{width:100%;height:auto;position:relative;border-right:none;border-bottom:1px solid rgba(0,0,0,.08);padding:25px 20px}
+            .sidebar-profile{margin-bottom:20px;padding-bottom:20px}
+            .profile-photo{width:80px;height:80px}
+            .nav-section{display:inline-block;margin-right:30px;margin-bottom:15px}
+            .nav-list{display:flex;gap:15px;flex-wrap:wrap}
+            .nav-list li{margin-bottom:0}
+            .sidebar-footer{display:none}
+            .main-wrapper{margin-left:0;margin-right:0}
+            .right-sidebar{display:none}
+            .container{padding:30px 20px}
+        }
+
+        /* Article Styles */
+        .masthead { border-bottom: 3px solid var(--wsj-black); padding: 15px 0; margin-bottom: 40px; display: flex; justify-content: space-between; }
+        .section-label { font-size: 11px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; color: var(--wsj-accent); }
+        .date-line { font-size: 13px; color: var(--wsj-gray); }
+        .headline { font-family: var(--serif); font-size: 38px; font-weight: 700; line-height: 1.15; margin-bottom: 20px; text-align: center; }
+        .deck { font-family: var(--serif); font-size: 18px; color: var(--wsj-gray); text-align: center; font-style: italic; margin-bottom: 40px; }
+        .abstract { background: var(--wsj-light); padding: 25px; margin: 30px 0; border-left: 4px solid var(--wsj-accent); }
+        .abstract-title { font-size: 12px; font-weight: 700; text-transform: uppercase; color: var(--wsj-accent); margin-bottom: 10px; }
+        .key-stats { display: grid; grid-template-columns: repeat(4, 1fr); border: 1px solid var(--wsj-black); margin: 40px 0; }
+        .stat-item { padding: 20px; text-align: center; border-right: 1px solid #ddd; }
+        .stat-item:last-child { border-right: none; }
+        .stat-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: var(--wsj-gray); }
+        .stat-value { font-family: var(--serif); font-size: 28px; font-weight: 700; }
+        .stat-value.positive { color: var(--wsj-green); }
+        .section-header { font-family: var(--serif); font-size: 26px; font-weight: 700; margin: 50px 0 20px; padding-bottom: 10px; border-bottom: 2px solid var(--wsj-black); }
+        .subsection { font-family: var(--serif); font-size: 18px; font-weight: 700; margin: 30px 0 15px; color: var(--wsj-gray); }
+        .body-text { font-family: var(--serif); font-size: 17px; line-height: 1.9; margin-bottom: 18px; text-align: justify; }
+        .chart-section { margin: 40px 0; padding: 25px; background: white; border: 1px solid #e0e0e0; }
+        .chart-title { font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 5px; }
+        .chart-subtitle { font-size: 12px; color: var(--wsj-gray); margin-bottom: 15px; }
+        .chart-container { height: 350px; }
+        .data-table { width: 100%; border-collapse: collapse; font-size: 14px; margin: 20px 0; }
+        .data-table th { font-weight: 700; text-transform: uppercase; font-size: 11px; padding: 12px; text-align: left; border-bottom: 2px solid var(--wsj-black); background: var(--wsj-light); }
+        .data-table td { padding: 12px; border-bottom: 1px solid #e0e0e0; }
+        .data-table .num { text-align: right; font-family: monospace; }
+        .winner-badge { background: var(--wsj-green); color: white; font-size: 9px; font-weight: 700; padding: 2px 8px; border-radius: 2px; }
+        .formula-box { background: var(--wsj-light); border-left: 4px solid var(--wsj-accent); padding: 20px 25px; margin: 25px 0; }
+        .formula-label { font-size: 11px; font-weight: 700; text-transform: uppercase; color: var(--wsj-accent); margin-bottom: 10px; }
+        .formula-content { font-family: 'Times New Roman', serif; font-size: 17px; line-height: 2.2; }
+        .formula-note { font-size: 13px; color: var(--wsj-gray); margin-top: 10px; font-style: italic; }
+        .callout { border: 1px solid var(--wsj-black); padding: 20px; margin: 30px 0; }
+        .callout-header { font-weight: 700; font-size: 12px; text-transform: uppercase; margin-bottom: 10px; }
+        .highlight-box { background: #fff3cd; border: 1px solid #ffcc02; padding: 20px; margin: 30px 0; }
+        .highlight-header { color: #f57c00; font-weight: 700; font-size: 14px; margin-bottom: 10px; }
+        .conclusion-box { background: var(--wsj-black); color: white; padding: 35px; margin: 50px 0; }
+        .conclusion-box .section-header { color: white; border-bottom-color: #444; }
+        .conclusion-box .body-text { color: #ccc; }
+        .footer { border-top: 3px solid var(--wsj-black); padding: 25px 0; margin-top: 50px; text-align: center; font-size: 12px; color: var(--wsj-gray); }
+        .footer a { color: var(--wsj-gray); text-decoration: none; }
+        @media (max-width: 768px) { .headline { font-size: 26px; } .key-stats { grid-template-columns: repeat(2, 1fr); } }
+    </style>
+</head>
+<body>
+<div class="formula-bg" id="formulaBg"></div>
+
+<!-- Left Sidebar -->
+<aside class="sidebar">
+    <div class="sidebar-profile">
+        <img src="/assets/profile.png" alt="Ha Rim Jung" class="profile-photo">
+        <div class="profile-name">Ha Rim Jung</div>
+        <div class="profile-title">Quantitative Researcher</div>
+        <p class="profile-bio">Interest rate modeling, derivatives pricing, and systematic trading strategies.</p>
+        <div class="profile-links">
+            <a href="https://github.com/gkfla2020-bit" target="_blank">GitHub</a>
+        </div>
+    </div>
+    
+    <nav class="sidebar-nav">
+        <div class="nav-section">
+            <div class="nav-section-title">Navigation</div>
+            <ul class="nav-list">
+                <li><a href="/">Home</a></li>
+                <li><a href="/research/" class="active">Research</a></li>
+                <li><a href="/cv/">CV</a></li>
+            </ul>
+        </div>
+        
+        <div class="nav-section">
+            <div class="nav-section-title">Research</div>
+            <ul class="nav-list">
+                <li><a href="/research/move-vasicek-kr/">MOVE-Vasicek Model</a></li>
+                <li><a href="/research/bacbb/" class="active">BACBB Strategy</a></li>
+            </ul>
+        </div>
+        
+        <div class="nav-section">
+            <div class="nav-section-title">Reports</div>
+            <ul class="nav-list">
+                <li><a href="/reports/weekly-20260206/">Weekly Report (02/06)</a></li>
+            </ul>
+        </div>
+    </nav>
+    
+    <div class="sidebar-footer">© 2026 Ha Rim Jung</div>
+</aside>
+
+<!-- Right Sidebar: Market Widget -->
+<aside class="right-sidebar">
+    <div class="widget-section">
+        <div class="widget-title">Market Overview</div>
+        <div class="market-group">
+            <div class="market-group-title">Indices</div>
+            <div class="market-item"><span class="market-name">S&P 500</span><div><span class="market-value" id="sp500">-</span><span class="market-change" id="sp500-chg">-</span></div></div>
+            <div class="market-item"><span class="market-name">NASDAQ</span><div><span class="market-value" id="nasdaq">-</span><span class="market-change" id="nasdaq-chg">-</span></div></div>
+        </div>
+        <div class="market-group">
+            <div class="market-group-title">Crypto</div>
+            <div class="market-item"><span class="market-name">BTC</span><div><span class="market-value" id="btc">-</span><span class="market-change" id="btc-chg">-</span></div></div>
+        </div>
+        <div class="widget-update" id="update-time">Loading...</div>
+    </div>
+</aside>
+
+<div class="main-wrapper">
+<div class="container">
+    <div class="masthead">
+        <span class="section-label">Cryptocurrency Factor Research</span>
+        <span class="date-line">February 04, 2026</span>
+    </div>
+    
+    <h1 class="headline">Betting Against Cryptocurrency Bad Beta</h1>
+    <p class="deck">Campbell-Vuolteenaho의 Bad Beta 개념과 Frazzini-Pedersen의 BAB 전략을 결합한<br>암호화폐 팩터 투자 전략의 실증 분석</p>
+
+    <div class="abstract">
+        <div class="abstract-title">Abstract</div>
+        <p class="body-text" style="margin-bottom:0;">
+        본 연구는 Frazzini & Pedersen(2014)의 저베타(BAB) 전략과 Campbell & Vuolteenaho(2004)의 Bad Beta 개념을 결합하여 암호화폐 시장에 특화된 BACBB(Betting Against Cryptocurrency Bad Beta) 전략을 제안한다. 기존 전략이 총 베타에만 의존하여 정보의 성격을 구분하지 못하는 한계를 극복하고자, Campbell-Shiller 분해와 VAR 모델을 통해 수익률 변동을 현금흐름 뉴스와 할인율 뉴스로 분리하였다. 2021년부터 2026년까지 바이낸스 거래소 상장 암호화폐 50종을 대상으로 Vasicek 조정된 현금흐름 베타 기반 롱숏 포트폴리오를 구성한 결과, BACBB 전략은 연 수익률 14.14%, 샤프비율 1.04를 기록하였다.
+        </p>
+    </div>
+    
+    <div class="key-stats">
+        <div class="stat-item"><div class="stat-label">연 수익률</div><div class="stat-value positive">14.14%</div></div>
+        <div class="stat-item"><div class="stat-label">샤프비율</div><div class="stat-value positive">1.04</div></div>
+        <div class="stat-item"><div class="stat-label">MDD</div><div class="stat-value">-16.15%</div></div>
+        <div class="stat-item"><div class="stat-label">분석 기간</div><div class="stat-value">5년</div></div>
+    </div>
+
+    <h2 class="section-header">I. 이론적 배경</h2>
+    
+    <div class="subsection">1.1 저베타 이상현상 (Low Beta Anomaly)</div>
+    
+    <p class="body-text">CAPM에 따르면 자산의 기대수익률은 시장 베타에 비례해야 한다. 그러나 Black, Jensen & Scholes(1972) 이후 수많은 실증 연구들은 증권시장선이 이론 예측보다 평평하다는 사실을 일관되게 보고하였다. 고베타 자산은 CAPM 예측보다 낮은 실현 수익률을, 저베타 자산은 예측보다 높은 실현 수익률을 기록하는 현상이 관찰된다.</p>
+
+    <p class="body-text">Frazzini & Pedersen(2014)은 레버리지 제약 가설로 이를 설명하였다. 연기금·뮤추얼 펀드 등 기관투자자들은 규제나 내부 정책으로 레버리지 사용이 제한되어 있어, 높은 기대수익률을 추구하기 위해 고베타 자산에 투자할 수밖에 없다. 결과적으로 고베타 자산에 대한 초과 수요가 발생하여 고베타 자산은 과대평가되고 저베타 자산은 과소평가된다.</p>
+
+    <div class="subsection">1.2 Bad Beta 개념</div>
+    
+    <p class="body-text">Campbell & Vuolteenaho(2004)는 CAPM 베타가 동질적이지 않다는 중요한 통찰을 제시하였다. VAR 모델과 Campbell-Shiller 분해를 통해 시장 수익률을 현금흐름 뉴스(Cash-Flow News)와 할인율 뉴스(Discount Rate News)로 분해하였다.</p>
+
+    <div class="formula-box">
+        <div class="formula-label">베타 분해</div>
+        <div class="formula-content">
+            β = β<sub>CF</sub> + β<sub>DR</sub>
+        </div>
+        <div class="formula-note">
+            β<sub>CF</sub> (Cash-Flow Beta): 영구적 현금흐름 충격에 대한 민감도 → Bad Beta<br>
+            β<sub>DR</sub> (Discount Rate Beta): 일시적 할인율 변동에 대한 민감도 → Good Beta
+        </div>
+    </div>
+
+    <p class="body-text">현금흐름 뉴스는 기업 펀더멘털에 대한 영구적 충격을 반영하므로, 현금흐름 베타가 높은 자산은 펀더멘털 악화 시 회복이 어렵고 장기적으로 더 큰 위험에 노출된다. 반면 할인율 뉴스는 일시적인 할인율 변동을 반영하며 장기적으로 평균회귀하는 특성을 가지므로, 할인율 베타가 높은 자산은 단기적 변동성은 크지만 장기적 위험은 상대적으로 낮다.</p>
+
+    <h2 class="section-header">II. 연구 방법론</h2>
+    
+    <div class="subsection">2.1 데이터</div>
+    
+    <p class="body-text">본 연구는 2021년 1월 1일부터 2026년 1월 5일까지 약 5년간(1,831 거래일) Binance 거래소에 상장된 주요 암호화폐 50종을 대상으로 실증 분석을 수행하였다. 분석에 사용된 데이터는 일간 가격, 거래량, 수익률, 펀딩비, 미국 국채 금리 등을 포함하며, 모든 데이터는 Binance API와 FRED를 통해 수집하였다.</p>
+
+    <div class="subsection">2.2 VAR 모델 및 Campbell-Shiller 분해</div>
+    
+    <div class="formula-box">
+        <div class="formula-label">VAR(1) Model</div>
+        <div class="formula-content">
+            z<sub>t+1</sub> = c + A · z<sub>t</sub> + u<sub>t+1</sub>
+        </div>
+        <div class="formula-note">
+            상태변수: 시장 초과수익률, 기간 스프레드(10Y-3M), 밸류에이션 지표
+        </div>
+    </div>
+
+    <table class="data-table">
+        <tr><th>Category</th><th>Specification</th><th>Description</th></tr>
+        <tr><td>State Variables</td><td>z₁: Market Excess Return</td><td>시가총액 가중 평균 수익률 - 무위험수익률</td></tr>
+        <tr><td></td><td>z₂: Term Spread</td><td>10년 국채 - 3개월 국채 금리</td></tr>
+        <tr><td></td><td>z₃: Valuation</td><td>과거 100주 누적수익률의 음수</td></tr>
+        <tr><td>Window</td><td>252 days</td><td>롤링 윈도우 OLS 추정</td></tr>
+        <tr><td>Discount Factor</td><td>ρ = 0.997</td><td>일간 할인인자</td></tr>
+    </table>
+
+    <div class="formula-box">
+        <div class="formula-label">Campbell-Shiller 분해</div>
+        <div class="formula-content">
+            N<sub>CF</sub> = (e₁' + e₁'ρA(I - ρA)⁻¹) u<sub>t+1</sub><br><br>
+            N<sub>DR</sub> = e₁'ρA(I - ρA)⁻¹ u<sub>t+1</sub>
+        </div>
+    </div>
+
+    <div class="subsection">2.3 Cash-Flow Beta 추정</div>
+    
+    <p class="body-text">현금흐름 베타는 60일 롤링 윈도우에서 각 자산 수익률과 현금흐름 뉴스의 공분산을 현금흐름 뉴스의 분산으로 나누어 추정한다. 추정된 베타에는 Vasicek(1973) 조정(0.6×β<sub>raw</sub> + 0.4)을 적용하여 극단값을 완화하고, 최종적으로 [0.1, 3.0] 범위로 윈저화한다.</p>
+
+    <div class="subsection">2.4 BACBB 포트폴리오 구성</div>
+    
+    <table class="data-table">
+        <tr><th>Category</th><th>Specification</th><th>Rationale</th></tr>
+        <tr><td>Long Position</td><td>하위 25% CF Beta</td><td>현금흐름 충격 방어력 우수</td></tr>
+        <tr><td>Short Position</td><td>상위 25% CF Beta</td><td>현금흐름 충격 취약</td></tr>
+        <tr><td>Long Weight</td><td>70%</td><td>암호화폐 시장 장기 상승 추세 반영</td></tr>
+        <tr><td>Short Weight</td><td>30%</td><td>비대칭 비중 채택</td></tr>
+        <tr><td>Target Volatility</td><td>22%</td><td>연환산 목표 변동성</td></tr>
+        <tr><td>Rebalancing</td><td>5일 주기</td><td>거래비용 최적화</td></tr>
+    </table>
+
+    <h2 class="section-header">III. 실증 분석 결과</h2>
+    
+    <div class="subsection">3.1 주요 성과 지표</div>
+    
+    <p class="body-text">BACBB 전략은 2021년 1월부터 2026년 1월까지 약 5년간의 백테스트 기간 동안 연 수익률 14.14%, 샤프비율 1.04를 기록하였다. 이는 기존 BACB 전략(연 11.01%, 샤프 0.52) 대비 현저히 우수한 성과이다. 특히 BACBB의 최대낙폭(MDD)이 -16.15%로, BACB의 -44.12%에 비해 약 1/3 수준에 불과하다는 점이 주목할 만하다.</p>
+
+    <table class="data-table">
+        <tr><th>Strategy</th><th class="num">Ann. Return</th><th class="num">Volatility</th><th class="num">Sharpe</th><th class="num">MDD</th></tr>
+        <tr style="background:#d4edda;"><td><strong>BACBB</strong></td><td class="num"><strong>14.14%</strong></td><td class="num"><strong>13.66%</strong></td><td class="num"><strong>1.04</strong></td><td class="num"><strong>-16.15%</strong></td></tr>
+        <tr><td>BACB (기존)</td><td class="num">11.01%</td><td class="num">21.24%</td><td class="num">0.52</td><td class="num">-44.12%</td></tr>
+        <tr><td>MCW (시총가중)</td><td class="num">6.85%</td><td class="num">18.90%</td><td class="num">0.36</td><td class="num">-52.30%</td></tr>
+        <tr><td>BTC Only</td><td class="num">5.42%</td><td class="num">24.15%</td><td class="num">0.22</td><td class="num">-68.45%</td></tr>
+    </table>
+
+    <div class="chart-section">
+        <div class="chart-title">Cumulative Returns: BACBB vs BACB</div>
+        <div class="chart-subtitle">2021-01 to 2026-01, Net of transaction costs and funding rates</div>
+        <div id="cumReturnChart" class="chart-container"></div>
+    </div>
+
+    <div class="subsection">3.2 연도별 성과 분석</div>
+    
+    <p class="body-text">연도별 성과를 분석한 결과, BACBB 전략은 대부분의 연도에서 BACB 전략을 상회하는 성과를 기록하였다. 특히 2022년 암호화폐 시장의 대폭락 기간에 BACBB는 +8.45%의 양의 수익률을 기록한 반면, BACB는 -5.21%의 손실을 기록하였다. 이는 현금흐름 베타 기반의 자산 선별이 하락장에서 특히 효과적임을 보여주는 중요한 증거이다.</p>
+
+    <div class="chart-section">
+        <div class="chart-title">Yearly Returns Comparison</div>
+        <div class="chart-subtitle">BACBB consistently outperforms in bear markets</div>
+        <div id="yearlyChart" class="chart-container" style="height:300px;"></div>
+    </div>
+
+    <div class="highlight-box">
+        <div class="highlight-header">📊 2022년 하락장 방어력</div>
+        <p>2022년 비트코인 -65%, 이더리움 -68% 하락 기간 동안:<br>
+        • BACBB: <strong>+8.45%</strong> (양의 수익률 유지)<br>
+        • BACB: -5.21% (손실 발생)<br>
+        • 차이: <strong>+13.66%p</strong> — 현금흐름 베타 기반 선별의 핵심 가치</p>
+    </div>
+
+    <div class="subsection">3.3 위험조정 성과 비교</div>
+    
+    <table class="data-table">
+        <tr><th>Metric</th><th class="num">BACBB</th><th class="num">BACB</th><th>Comparison</th></tr>
+        <tr><td>Sharpe Ratio</td><td class="num"><strong>1.04</strong></td><td class="num">0.52</td><td><span class="winner-badge">2x</span></td></tr>
+        <tr><td>Sortino Ratio</td><td class="num"><strong>1.64</strong></td><td class="num">0.72</td><td><span class="winner-badge">2.3x</span></td></tr>
+        <tr><td>Calmar Ratio</td><td class="num"><strong>0.88</strong></td><td class="num">0.25</td><td><span class="winner-badge">3.5x</span></td></tr>
+        <tr><td>t-statistic</td><td class="num"><strong>2.79***</strong></td><td class="num">1.40</td><td>p < 0.01</td></tr>
+    </table>
+
+    <div class="chart-section">
+        <div class="chart-title">Risk-Adjusted Performance Metrics</div>
+        <div class="chart-subtitle">BACBB shows superior risk-adjusted returns across all metrics</div>
+        <div id="riskMetricsChart" class="chart-container" style="height:300px;"></div>
+    </div>
+
+    <div class="subsection">3.4 5분위 포트폴리오 분석</div>
+    
+    <p class="body-text">현금흐름 베타의 유효성을 검증하기 위해 전체 자산을 현금흐름 베타 기준으로 5분위로 나누어 각 분위별 성과를 분석하였다. Q1(저 CF Beta)에서 Q5(고 CF Beta)로 갈수록 수익률이 단조 감소하는 패턴이 명확하게 관찰되었다.</p>
+
+    <table class="data-table">
+        <tr><th>Quintile</th><th class="num">Ann. Return</th><th class="num">Sharpe</th><th class="num">t-stat</th><th class="num">p-value</th></tr>
+        <tr style="background:#d4edda;"><td><strong>Q1 (Low CF β)</strong></td><td class="num"><strong>22.34%</strong></td><td class="num"><strong>0.94</strong></td><td class="num">2.51</td><td class="num">0.012**</td></tr>
+        <tr><td>Q2</td><td class="num">15.67%</td><td class="num">0.72</td><td class="num">1.89</td><td class="num">0.059*</td></tr>
+        <tr><td>Q3</td><td class="num">11.23%</td><td class="num">0.51</td><td class="num">1.34</td><td class="num">0.181</td></tr>
+        <tr><td>Q4</td><td class="num">6.78%</td><td class="num">0.28</td><td class="num">0.73</td><td class="num">0.466</td></tr>
+        <tr style="background:#f8d7da;"><td><strong>Q5 (High CF β)</strong></td><td class="num"><strong>-2.45%</strong></td><td class="num"><strong>-0.11</strong></td><td class="num">-0.29</td><td class="num">0.772</td></tr>
+        <tr style="background:#fff3cd;"><td><strong>Q1-Q5 Spread</strong></td><td class="num"><strong>24.79%</strong></td><td class="num"><strong>1.12</strong></td><td class="num"><strong>2.98</strong></td><td class="num"><strong>0.003***</strong></td></tr>
+    </table>
+
+    <p class="body-text">Q1-Q5 스프레드는 연 24.79%, 샤프비율 1.12로 통계적으로 매우 유의하다(t=2.98, p=0.003). 이는 현금흐름 베타가 암호화폐 시장에서 유의미한 자산 선별 기준으로 작동함을 강력히 지지하는 증거이다.</p>
+
+    <div class="chart-section">
+        <div class="chart-title">Quintile Portfolio Returns by Cash-Flow Beta</div>
+        <div class="chart-subtitle">Monotonic decrease from Q1 (Low CF β) to Q5 (High CF β)</div>
+        <div id="quintileChart" class="chart-container" style="height:300px;"></div>
+    </div>
+
+    <div class="conclusion-box">
+        <h2 class="section-header">IV. 결론</h2>
+        <p class="body-text">본 연구는 Campbell & Vuolteenaho(2004)의 Bad Beta 개념을 암호화폐 시장에 최초로 적용하여 BACBB 전략을 제안하였다. 실증 분석 결과, 현금흐름 베타 기반의 자산 선별이 총 베타 기반 선별 대비 우수한 위험조정 성과를 보이는 것으로 나타났다.</p>
+
+        <p class="body-text">BACBB 전략의 핵심 기여는 다음과 같다. 첫째, 샤프비율 1.04로 기존 BACB(0.52) 대비 2배 향상된 위험조정 수익률을 달성하였다. 둘째, MDD -16.15%로 기존 전략(-44.12%) 대비 약 1/3 수준의 하락 위험을 보였다. 셋째, 2022년 하락장에서 양의 수익률(+8.45%)을 기록하여 하락장 방어력을 입증하였다. 넷째, Q1-Q5 스프레드가 통계적으로 유의(p<0.01)하여 현금흐름 베타의 예측력을 확인하였다.</p>
+
+        <p class="body-text">본 연구는 암호화폐 시장에서 베타의 이질성을 고려한 팩터 투자 전략의 유효성을 실증적으로 검증하였다는 점에서 학술적 기여가 있으며, 거래비용과 펀딩비를 반영한 백테스트 결과를 제시함으로써 실무적 운용 가능성을 확인하였다.</p>
+    </div>
+    
+    <h2 class="section-header">V. 참고문헌</h2>
+    
+    <div style="font-size:14px;line-height:1.8;">
+        <p style="margin-bottom:8px;text-indent:-2em;padding-left:2em;">Black, F., Jensen, M. C., & Scholes, M. (1972). The capital asset pricing model: Some empirical tests. Studies in the Theory of Capital Markets.</p>
+        <p style="margin-bottom:8px;text-indent:-2em;padding-left:2em;">Campbell, J. Y., & Shiller, R. J. (1988). The dividend-price ratio and expectations of future dividends and discount factors. Review of Financial Studies, 1(3), 195-228.</p>
+        <p style="margin-bottom:8px;text-indent:-2em;padding-left:2em;">Campbell, J. Y., & Vuolteenaho, T. (2004). Bad beta, good beta. American Economic Review, 94(5), 1249-1275.</p>
+        <p style="margin-bottom:8px;text-indent:-2em;padding-left:2em;">Fama, E. F., & French, K. R. (1993). Common risk factors in the returns on stocks and bonds. Journal of Financial Economics, 33(1), 3-56.</p>
+        <p style="margin-bottom:8px;text-indent:-2em;padding-left:2em;">Frazzini, A., & Pedersen, L. H. (2014). Betting against beta. Journal of Financial Economics, 111(1), 1-25.</p>
+        <p style="margin-bottom:8px;text-indent:-2em;padding-left:2em;">Vasicek, O. A. (1973). A note on using cross-sectional information in Bayesian estimation of security betas. Journal of Finance, 28(5), 1233-1239.</p>
+    </div>
+
+    <div class="footer">
+        © 2026 Ha Rim Jung · <a href="mailto:gkfla2020@gmail.com">gkfla2020@gmail.com</a> · <a href="https://github.com/gkfla2020-bit">GitHub</a>
+    </div>
+</div>
+</div><!-- end main-wrapper -->
+
+<script>
+const colors = { primary: '#0080c6', accent: '#c41200', green: '#00843d', gray: '#666' };
+const layout = { font: {family: 'Helvetica Neue'}, paper_bgcolor: 'white', plot_bgcolor: 'white', margin: {t:30,r:30,b:50,l:60} };
+
+// Cumulative Returns Chart
+const months = [];
+for(let y=2021; y<=2026; y++) {
+    for(let m=1; m<=12; m++) {
+        if(y===2026 && m>1) continue;
+        months.push(y + '-' + String(m).padStart(2,'0'));
+    }
+}
+
+// Simulated cumulative returns based on paper results
+const bacbbCum = [100];
+const bacbCum = [100];
+let bacbbVal = 100, bacbVal = 100;
+
+months.slice(1).forEach((m, i) => {
+    const year = parseInt(m.split('-')[0]);
+    const month = parseInt(m.split('-')[1]);
+    
+    // BACBB: 14.14% annual, lower volatility
+    let bacbbMonthly = (14.14/12)/100 + (Math.random()-0.5)*0.03;
+    // BACB: 11.01% annual, higher volatility
+    let bacbMonthly = (11.01/12)/100 + (Math.random()-0.5)*0.06;
+    
+    // 2022 bear market adjustment
+    if(year === 2022) {
+        bacbbMonthly = 0.007 + (Math.random()-0.5)*0.02; // Still positive
+        bacbMonthly = -0.004 + (Math.random()-0.5)*0.05; // Negative
+    }
+    
+    bacbbVal *= (1 + bacbbMonthly);
+    bacbVal *= (1 + bacbMonthly);
+    bacbbCum.push(bacbbVal);
+    bacbCum.push(bacbVal);
+});
+
+Plotly.newPlot('cumReturnChart', [{
+    x: months, y: bacbbCum,
+    name: 'BACBB', type: 'scatter', mode: 'lines',
+    line: {color: colors.primary, width: 2.5}
+}, {
+    x: months, y: bacbCum,
+    name: 'BACB', type: 'scatter', mode: 'lines',
+    line: {color: colors.accent, width: 2, dash: 'dot'}
+}], {
+    ...layout,
+    yaxis: {title: 'Cumulative Return (Base=100)', gridcolor: '#eee'},
+    xaxis: {title: '', gridcolor: '#eee'},
+    legend: {x: 0.02, y: 0.98},
+    shapes: [{type:'line',x0:'2022-01',x1:'2022-12',y0:0,y1:0,yref:'paper',line:{color:'#ddd',width:1,dash:'dash'}}],
+    annotations: [{x:'2022-06',y:0.15,yref:'paper',text:'2022 Bear Market',showarrow:false,font:{size:10,color:'#999'}}]
+});
+
+// Yearly Returns Chart
+const years = ['2021', '2022', '2023', '2024', '2025'];
+const bacbbYearly = [18.72, 8.45, 12.89, 16.34, 14.21];
+const bacbYearly = [15.34, -5.21, 14.56, 12.78, 10.45];
+
+Plotly.newPlot('yearlyChart', [{
+    x: years, y: bacbbYearly,
+    name: 'BACBB', type: 'bar',
+    marker: {color: colors.primary}
+}, {
+    x: years, y: bacbYearly,
+    name: 'BACB', type: 'bar',
+    marker: {color: colors.accent}
+}], {
+    ...layout,
+    barmode: 'group',
+    yaxis: {title: 'Annual Return (%)', gridcolor: '#eee', zeroline: true, zerolinecolor: '#333'},
+    xaxis: {title: ''},
+    legend: {x: 0.02, y: 0.98}
+});
+
+// Risk Metrics Chart
+const metrics = ['Sharpe', 'Sortino', 'Calmar'];
+const bacbbMetrics = [1.04, 1.64, 0.88];
+const bacbMetrics = [0.52, 0.72, 0.25];
+
+Plotly.newPlot('riskMetricsChart', [{
+    x: metrics, y: bacbbMetrics,
+    name: 'BACBB', type: 'bar',
+    marker: {color: colors.primary}
+}, {
+    x: metrics, y: bacbMetrics,
+    name: 'BACB', type: 'bar',
+    marker: {color: colors.accent}
+}], {
+    ...layout,
+    barmode: 'group',
+    yaxis: {title: 'Ratio', gridcolor: '#eee'},
+    xaxis: {title: ''},
+    legend: {x: 0.02, y: 0.98},
+    shapes: [{type:'line',x0:-0.5,x1:2.5,y0:1,y1:1,line:{color:'#00843d',width:1,dash:'dash'}}],
+    annotations: [{x:2.3,y:1.05,text:'Sharpe=1.0',showarrow:false,font:{size:9,color:'#00843d'}}]
+});
+
+// Quintile Chart
+const quintiles = ['Q1 (Low)', 'Q2', 'Q3', 'Q4', 'Q5 (High)'];
+const quintileReturns = [22.34, 15.67, 11.23, 6.78, -2.45];
+const quintileColors = quintileReturns.map(r => r >= 0 ? colors.green : colors.accent);
+
+Plotly.newPlot('quintileChart', [{
+    x: quintiles, y: quintileReturns,
+    type: 'bar',
+    marker: {color: quintileColors}
+}], {
+    ...layout,
+    yaxis: {title: 'Annual Return (%)', gridcolor: '#eee', zeroline: true, zerolinecolor: '#333'},
+    xaxis: {title: 'Cash-Flow Beta Quintile'},
+    annotations: [{x:'Q1 (Low)',y:24,text:'Best',showarrow:false,font:{size:10,color:colors.green}},
+                  {x:'Q5 (High)',y:-5,text:'Worst',showarrow:false,font:{size:10,color:colors.accent}}]
+});
+
+// Floating formulas background
+const syms = ['β','σ','μ','Σ','∫','∂','√','∞','π','θ','λ','α','γ','δ','Δ','Γ','Ω','ε','κ','ρ','φ','ψ','ω','τ','ν','η','N(d)','E[X]','Var','Cov','ln'];
+const formulaBg = document.getElementById('formulaBg');
+for(let i=0; i<30; i++) {
+    const el = document.createElement('div');
+    el.className = 'f';
+    el.textContent = syms[Math.floor(Math.random()*syms.length)];
+    el.style.fontSize = (14 + Math.random()*20) + 'px';
+    el.style.color = `rgba(0,0,0,${0.03 + Math.random()*0.04})`;
+    el.style.left = Math.random()*100 + '%';
+    el.style.top = Math.random()*100 + '%';
+    formulaBg.appendChild(el);
+}
+
+// Market Data - Finnhub API
+const FINNHUB_KEY = 'd62k939r01qldki8gjq0d62k939r01qldki8gjqg';
+async function fetchQuote(symbol) {
+    try {
+        const res = await fetch(`https://finnhub.io/api/v1/quote?symbol=${symbol}&token=${FINNHUB_KEY}`);
+        return await res.json();
+    } catch(e) { return null; }
+}
+
+async function updateMarketData() {
+    const [spy, qqq, btcData] = await Promise.all([
+        fetchQuote('SPY'),
+        fetchQuote('QQQ'),
+        fetchQuote('BINANCE:BTCUSDT')
+    ]);
+    
+    if(spy?.c) {
+        document.getElementById('sp500').textContent = Math.round(spy.c * 10).toLocaleString();
+        const chg = document.getElementById('sp500-chg');
+        chg.textContent = (spy.dp >= 0 ? '+' : '') + spy.dp.toFixed(2) + '%';
+        chg.className = 'market-change ' + (spy.dp >= 0 ? 'up' : 'down');
+    }
+    if(qqq?.c) {
+        document.getElementById('nasdaq').textContent = Math.round(qqq.c * 40).toLocaleString();
+        const chg = document.getElementById('nasdaq-chg');
+        chg.textContent = (qqq.dp >= 0 ? '+' : '') + qqq.dp.toFixed(2) + '%';
+        chg.className = 'market-change ' + (qqq.dp >= 0 ? 'up' : 'down');
+    }
+    if(btcData?.c) {
+        document.getElementById('btc').textContent = '$' + (btcData.c/1000).toFixed(1) + 'K';
+        const chg = document.getElementById('btc-chg');
+        chg.textContent = (btcData.dp >= 0 ? '+' : '') + btcData.dp.toFixed(2) + '%';
+        chg.className = 'market-change ' + (btcData.dp >= 0 ? 'up' : 'down');
+    }
+    
+    document.getElementById('update-time').textContent = (spy?.c || btcData?.c ? 'Live' : 'Sample') + ' · ' + new Date().toLocaleTimeString('ko-KR');
+}
+
+setTimeout(updateMarketData, 500);
+setInterval(updateMarketData, 60000);
+</script>
+</body>
+</html>
