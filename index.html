@@ -11,6 +11,7 @@ layout: null
     <script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-83LKVW7412');</script>
     <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;500&family=Space+Mono:wght@400&family=Inter:wght@300;400&display=swap" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/matter-js/0.19.0/matter.min.js"></script>
 </head>
 <body>
 <style>
@@ -147,6 +148,10 @@ section{padding:80px 50px;max-width:900px;margin:0 auto}
 .two-col-section .section-title{margin-bottom:25px}
 .two-col-section .post-item{padding:20px 0}
 
+.skills-basket-section{padding:40px 50px;max-width:900px;margin:0 auto}
+.basket-container{width:100%;max-width:600px;height:300px;margin:0 auto;position:relative;background:linear-gradient(180deg,transparent 0%,rgba(0,0,0,.02) 100%);border-radius:0 0 20px 20px;overflow:hidden}
+#skillsCanvas{width:100%;height:100%;display:block}
+
 @media(max-width:1024px){
     .sidebar{width:100%;height:auto;position:relative;border-right:none;border-bottom:1px solid rgba(0,0,0,.08);padding:25px 20px}
     .sidebar-profile{margin-bottom:20px;padding-bottom:20px;display:flex;align-items:center;gap:20px;text-align:left}
@@ -269,6 +274,15 @@ section{padding:80px 50px;max-width:900px;margin:0 auto}
 <p>M.S./Ph.D. Candidate in Computer Science at Sogang University. Focused on interest rate modeling, portfolio optimization, and quantitative trading strategies.</p>
 <div class="hero-btns"><a href="/research/" class="btn-dark">View Research</a><a href="/cv/" class="btn-outline">About Me</a></div>
 </div></section>
+
+<!-- Skills Basket with Physics -->
+<section class="skills-basket-section">
+    <h2 class="section-title" style="text-align:center;border:none;padding:0;margin-bottom:20px;">Skills & Tools</h2>
+    <p style="text-align:center;color:#888;font-size:.85rem;margin-bottom:20px;">Drag and throw the balls!</p>
+    <div class="basket-container">
+        <canvas id="skillsCanvas"></canvas>
+    </div>
+</section>
 
 <section class="two-col-section">
     <div class="col">
@@ -445,6 +459,123 @@ async function updateMarketData() {
 
 setTimeout(updateMarketData, 500);
 setInterval(updateMarketData, 60000);
+
+// Skills Basket Physics Engine
+function initSkillsBasket() {
+    const canvas = document.getElementById('skillsCanvas');
+    if (!canvas) return;
+    
+    const container = canvas.parentElement;
+    const width = container.offsetWidth;
+    const height = container.offsetHeight;
+    canvas.width = width * 2;
+    canvas.height = height * 2;
+    canvas.style.width = width + 'px';
+    canvas.style.height = height + 'px';
+    
+    const Engine = Matter.Engine,
+          Render = Matter.Render,
+          Runner = Matter.Runner,
+          Bodies = Matter.Bodies,
+          Composite = Matter.Composite,
+          Mouse = Matter.Mouse,
+          MouseConstraint = Matter.MouseConstraint;
+    
+    const engine = Engine.create();
+    engine.world.gravity.y = 1;
+    
+    // Walls (basket shape)
+    const wallThickness = 20;
+    const walls = [
+        Bodies.rectangle(width, height + wallThickness/2, width * 2, wallThickness, { isStatic: true, render: { fillStyle: '#ddd' } }),
+        Bodies.rectangle(-wallThickness/2, height/2, wallThickness, height, { isStatic: true, render: { fillStyle: '#ddd' } }),
+        Bodies.rectangle(width + wallThickness/2, height/2, wallThickness, height, { isStatic: true, render: { fillStyle: '#ddd' } })
+    ];
+    Composite.add(engine.world, walls);
+    
+    // Skills as balls
+    const skills = ['Python', 'R', 'SQL', 'MATLAB', 'Git', 'LaTeX', 'VBA', 'Monte Carlo', 'VaR', 'ML'];
+    const colors = ['#3776ab', '#276dc3', '#f29111', '#e16737', '#f05032', '#008080', '#217346', '#6b5b95', '#d64161', '#ff6f61'];
+    const balls = [];
+    
+    skills.forEach((skill, i) => {
+        const radius = 28 + Math.random() * 12;
+        const x = 50 + Math.random() * (width - 100);
+        const y = -50 - i * 40;
+        const ball = Bodies.circle(x, y, radius, {
+            restitution: 0.6,
+            friction: 0.1,
+            render: { fillStyle: colors[i % colors.length] },
+            label: skill
+        });
+        balls.push(ball);
+    });
+    Composite.add(engine.world, balls);
+    
+    // Custom renderer
+    const ctx = canvas.getContext('2d');
+    ctx.scale(2, 2);
+    
+    function render() {
+        ctx.clearRect(0, 0, width, height);
+        
+        // Draw basket outline
+        ctx.strokeStyle = '#e0e0e0';
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.moveTo(0, 0);
+        ctx.lineTo(0, height);
+        ctx.lineTo(width, height);
+        ctx.lineTo(width, 0);
+        ctx.stroke();
+        
+        // Draw balls with labels
+        balls.forEach((ball, i) => {
+            const pos = ball.position;
+            const radius = ball.circleRadius;
+            
+            // Ball
+            ctx.beginPath();
+            ctx.arc(pos.x, pos.y, radius, 0, Math.PI * 2);
+            ctx.fillStyle = colors[i % colors.length];
+            ctx.fill();
+            
+            // Label
+            ctx.fillStyle = '#fff';
+            ctx.font = `bold ${Math.max(10, radius * 0.4)}px Inter, sans-serif`;
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText(skills[i], pos.x, pos.y);
+        });
+        
+        requestAnimationFrame(render);
+    }
+    
+    // Mouse interaction
+    const mouse = Mouse.create(canvas);
+    mouse.pixelRatio = 2;
+    const mouseConstraint = MouseConstraint.create(engine, {
+        mouse: mouse,
+        constraint: { stiffness: 0.2, render: { visible: false } }
+    });
+    Composite.add(engine.world, mouseConstraint);
+    
+    // Fix mouse position for scaled canvas
+    canvas.addEventListener('mousemove', (e) => {
+        const rect = canvas.getBoundingClientRect();
+        mouse.position.x = (e.clientX - rect.left) * 2;
+        mouse.position.y = (e.clientY - rect.top) * 2;
+    });
+    
+    Runner.run(engine);
+    render();
+}
+
+// Initialize after entering main page
+const origEnterHandler = document.getElementById('enterBtn').onclick;
+document.getElementById('enterBtn').addEventListener('click', () => {
+    setTimeout(initSkillsBasket, 600);
+});
 </script>
 </body>
 </html>
