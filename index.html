@@ -2,7 +2,7 @@
 layout: null
 ---
 <!DOCTYPE html>
-<html lang="ko">
+<html lang="ko" style="overscroll-behavior:none;">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -35,8 +35,9 @@ layout: null
 <img src="/assets/og-card.png" alt="" style="position:absolute;width:1px;height:1px;opacity:0;pointer-events:none;" aria-hidden="true">
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
-body{font-family:'Inter',sans-serif;background:#08080c;color:#fff;overflow:hidden}
-body.entered{overflow:auto;background:#fafaf8;overscroll-behavior-y:contain}
+html,body{overscroll-behavior:none;-webkit-overflow-scrolling:touch}
+body{font-family:'Inter',sans-serif;background:#08080c;color:#fff;overflow:hidden;position:fixed;width:100%;height:100%}
+body.entered{overflow:auto;background:#fafaf8;overscroll-behavior-y:none;position:relative;height:auto}
 #intro{position:fixed;inset:0;z-index:9999;background:#08080c}
 
 .f{
@@ -559,6 +560,23 @@ document.getElementById('enterBtn').addEventListener('click', () => {
             document.getElementById('intro').style.display = 'none';
             document.getElementById('main').classList.add('show');
             document.body.classList.add('entered');
+            
+            // iOS Safari pull-to-refresh 방지
+            let lastY = 0;
+            document.addEventListener('touchstart', function(e) {
+                lastY = e.touches[0].clientY;
+            }, { passive: true });
+            
+            document.addEventListener('touchmove', function(e) {
+                const y = e.touches[0].clientY;
+                const scrollTop = window.scrollY || document.documentElement.scrollTop;
+                
+                // 맨 위에서 아래로 당기는 경우만 막음
+                if (scrollTop <= 0 && y > lastY) {
+                    e.preventDefault();
+                }
+            }, { passive: false });
+            
             gsap.to('.hero-content', { opacity: 1, y: 0, duration: 0.5 });
             gsap.to('.section-title', { opacity: 1, y: 0, duration: 0.4, delay: 0.1 });
             gsap.to('.post-item', { opacity: 1, y: 0, duration: 0.4, delay: 0.15 });
