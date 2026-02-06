@@ -1,0 +1,796 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BACBB: Betting Against Cryptocurrency Bad Beta</title>
+    <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Times New Roman', 'Nanum Myeongjo', serif;
+            line-height: 1.8;
+            color: #1a1a1a;
+            background: #fff;
+            max-width: 210mm;
+            margin: 0 auto;
+            padding: 20mm 25mm;
+        }
+        .paper-header {
+            text-align: center;
+            margin-bottom: 40px;
+            padding-bottom: 30px;
+            border-bottom: 2px solid #333;
+        }
+        .paper-category { font-size: 14px; color: #666; margin-bottom: 10px; }
+        .paper-title { font-size: 24px; font-weight: bold; margin-bottom: 15px; line-height: 1.4; }
+        .paper-team { font-size: 14px; color: #444; }
+        .abstract { background: #f8f9fa; padding: 25px; margin: 30px 0; border-left: 4px solid #2c3e50; }
+        .abstract-title { font-weight: bold; font-size: 16px; margin-bottom: 15px; }
+        .keywords { font-size: 13px; color: #555; margin-top: 15px; font-style: italic; }
+        h2 { font-size: 18px; margin: 35px 0 20px; padding-bottom: 8px; border-bottom: 1px solid #ddd; color: #2c3e50; }
+        h3 { font-size: 15px; margin: 25px 0 15px; color: #34495e; }
+        p { text-align: justify; margin-bottom: 15px; text-indent: 2em; }
+        .no-indent { text-indent: 0; }
+        table { width: 100%; border-collapse: collapse; margin: 20px 0; font-size: 12px; }
+        th, td { border: 1px solid #ddd; padding: 10px 8px; text-align: center; }
+        th { background: #2c3e50; color: white; font-weight: bold; }
+        tr:nth-child(even) { background: #f8f9fa; }
+        tr:hover { background: #e8f4f8; }
+        .table-caption { font-size: 13px; font-weight: bold; margin: 15px 0 10px; text-align: center; }
+        .figure { text-align: center; margin: 30px 0; }
+        .figure img { max-width: 100%; height: auto; border: 1px solid #ddd; border-radius: 4px; }
+        .figure-caption { font-size: 13px; color: #555; margin-top: 10px; font-style: italic; }
+        .equation { text-align: center; margin: 20px 0; padding: 15px; background: #f8f9fa; border-radius: 4px; }
+        .highlight { background: #fff3cd; padding: 2px 5px; border-radius: 3px; }
+        .note { font-size: 12px; color: #666; margin-top: 10px; }
+        .references { font-size: 13px; }
+        .references p { text-indent: -2em; padding-left: 2em; margin-bottom: 10px; }
+        .two-col-table td:first-child { text-align: left; font-weight: bold; width: 40%; }
+        .symbol-table td:first-child { font-family: 'Times New Roman', serif; }
+        @media print { body { padding: 15mm 20mm; } }
+</style>
+</head>
+<body>
+<div class="paper-header">
+    <div class="paper-category">자산운용부문</div>
+    <h1 class="paper-title">Betting Against Cryptocurrency (Bad) Beta</h1>
+    <div class="paper-team">팀명: 핀사이트</div>
+</div>
+
+<!-- 초록 -->
+<div class="abstract">
+    <div class="abstract-title">초록 (Abstract)</div>
+    <p class="no-indent">본 연구는 Frazzini & Pedersen(2014)의 저베타(BAB) 전략과 Campbell & Vuolteenaho(2004)의 Bad Beta 개념을 결합하여 암호화폐 시장에 특화된 BACBB(Betting Against Cryptocurrency Bad Beta) 전략을 제안한다. 기존 전략이 총 베타에만 의존하여 정보의 성격을 구분하지 못하는 한계를 극복하고자, 본 연구는 Campbell-Shiller 분해와 VAR 모델을 통해 수익률 변동을 현금흐름 뉴스와 할인율 뉴스로 분리하였다. 2021년부터 2026년까지 1,831일의 기간에 바이낸스 거래소에 상장된 시가총액 기준 암호화폐 50종을 대상으로 Vasicek 조정된 현금흐름 베타를 기반하여 롱숏 포트폴리오를 구성한 결과, BACBB 전략은 연 수익률 14.14%, 샤프지수 1.04를 기록하였다. 이는 기존 전략(샤프 0.52) 대비 2배 향상된 성과이며, 거래비용과 Look-Ahead 편향 등을 제거하였으며 통계적 유의성(p < 0.01)과 Out-of-Sample 테스트에서도 견고한 수익성을 입증하여 전략의 실무적 유효성을 확인하였다.</p>
+    <div class="keywords"><strong>Keywords:</strong> Bad Beta, Campbell-Shiller, Cash Flow Beta, Cryptocurrency, Factor Investing</div>
+</div>
+
+<!-- 1. 서론 -->
+<h2>1. 서론</h2>
+
+<h3>1.1 연구배경</h3>
+<p>자본자산가격결정모형(Capital Asset Pricing Model, 이하 CAPM)은 현대 재무이론의 근간을 이루는 모형으로, 자산의 기대수익률이 시장 베타에 비례한다고 예측한다. 그러나 Black, Jensen & Scholes(1972) 이후 수행된 수많은 실증 연구들은 증권시장선이 이론이 예측하는 것보다 평평하다는 사실을 일관되게 보고하였다. 구체적으로, 고베타 자산은 CAPM이 예측하는 수익률보다 낮은 실현 수익률을 기록하고, 저베타 자산은 예측보다 높은 실현 수익률을 기록하는 현상이 관찰된다. 이러한 현상은 '저베타 이상현상(Low Beta Anomaly)'으로 명명되었으며, 효율적 시장 가설과 CAPM의 유효성에 대한 근본적인 의문을 제기하였다.</p>
+
+<p>저베타 이상현상에 대한 설명으로 Frazzini & Pedersen(2014)은 레버리지 제약 가설을 제시하였다. 이들에 따르면, 연기금·뮤추얼 펀드 등 기관투자자들은 규제나 내부 정책으로 인해 레버리지 사용이 제한되어 있다. 이러한 투자자들이 높은 기대수익률을 추구하기 위해서는 레버리지를 사용하는 대신 고베타 자산에 투자할 수밖에 없으며, 결과적으로 고베타 자산에 대한 초과 수요가 발생하여 고베타 자산은 과대평가되고 저베타 자산은 과소평가된다.</p>
+
+<p>Frazzini & Pedersen(2014)은 이러한 가격 왜곡을 활용하여 저베타 자산을 레버리지하여 매수하고, 고베타 자산을 매도하는 BAB(Betting Against Beta) 전략을 제안하였으며, 이 전략이 주식·채권·외환·상품 등 다양한 자산군에서 통계적으로 유의미한 위험조정 초과수익을 창출함을 입증하였다.</p>
+
+<p>한편 Campbell & Vuolteenaho(2004)는 CAPM 베타가 동질적이지 않다는 중요한 통찰을 제시하였다. 이들은 VAR(Vector Autoregression) 모델과 Campbell-Shiller 분해를 통해 시장 수익률을 현금흐름 뉴스(Cash-Flow News)와 할인율 뉴스(Discount Rate News)로 분해하였다. 전자는 미래 현금흐름에 대한 기대의 변화를 반영하며 기업 펀더멘털에 대한 영구적 충격의 성격을 가진다. 후자는 미래 할인율에 대한 기대의 변화를 반영하며 일시적 충격의 성격을 가진다.</p>
+
+<p>Campbell & Vuolteenaho(2004)는 각 자산의 수익률이 이 두 가지 뉴스에 얼마나 민감하게 반응하는지를 측정하여 현금흐름 베타(β<sub>CF</sub>)와 할인율 베타(β<sub>DR</sub>)를 정의하였다. 현금흐름 뉴스는 기업 펀더멘털에 대한 영구적 충격을 반영하므로, 현금흐름 베타가 높은 자산은 펀더멘털 악화 시 회복이 어렵고 장기적으로 더 큰 위험에 노출된다. 반면 할인율 뉴스는 일시적인 할인율 변동을 반영하며 장기적으로 평균회귀하는 특성을 가지므로, 할인율 베타가 높은 자산은 단기적 변동성은 크지만 장기적 위험은 상대적으로 낮다. 이러한 이유로 현금흐름 베타는 '나쁜 베타(Bad Beta)', 할인율 베타는 '좋은 베타(Good Beta)'로 명명되었다.</p>
+
+<h3>1.2 문제 제기</h3>
+<p>암호화폐 시장은 2009년 비트코인의 등장 이후 급격히 성장하여 2024년 말 기준 시가총액 약 3조 달러를 상회하는 주요 자산군으로 부상하였다. 이에 따라 암호화폐 시장에서의 팩터 투자 전략에 대한 학술적·실무적 관심이 증가하고 있으며, 특히 저베타 이상현상의 존재 여부와 BAB 전략의 유효성 또한 연구가 진행되었다(Liu et al., 2022; Borri & Shakhnov, 2022).</p>
+
+<p>그러나 기존의 암호화폐 BAB 연구들은 Frazzini & Pedersen(2014)의 방법론을 그대로 적용하여 총 베타만을 기준으로 포트폴리오를 구성하였다. 이러한 접근법은 Campbell & Vuolteenaho(2004)가 지적한 베타의 이질성을 고려하지 못한다는 근본적인 한계를 가진다. 총 베타 기준의 포트폴리오 구성은 일시적인 할인율 변동에 대한 민감도와 영구적인 현금흐름 충격에 대한 민감도를 구분하지 못하기 때문이다.</p>
+
+<p>따라서 총 베타가 낮더라도 현금흐름 베타가 높은 자산이 매수(Long) 포트폴리오에 포함될 수 있으며, 이는 전략의 위험조정 성과를 저해하는 요인으로 작용할 수 있다. 또한 암호화폐 시장은 전통 금융시장과 구별되는 독특한 특성을 가진다. 24시간 연중무휴 거래, 전통 자산 대비 극단적으로 높은 변동성, 무기한 선물시장의 펀딩비(Funding Rate) 구조 등이 대표적이다.</p>
+
+<h3>1.3 연구 목적</h3>
+<p>본 연구의 목적은 Campbell & Vuolteenaho(2004)의 나쁜 베타 개념과 Frazzini & Pedersen(2014)의 BAB 전략을 결합하여 암호화폐 시장에 특화된 새로운 팩터 투자 전략인 BACBB(Betting Against Cryptocurrency Bad Beta)를 제안하고 그 유효성을 실증적으로 검증하는 것이다. 구체적인 연구 목적은 다음과 같다.</p>
+
+<p class="no-indent">첫째, VAR 모델과 Campbell-Shiller 분해를 활용하여 암호화폐 시장 수익률을 현금흐름 뉴스와 할인율 뉴스로 분해하고, 각 암호화폐의 현금흐름 베타를 추정하는 방법론을 제시한다.</p>
+<p class="no-indent">둘째, 현금흐름 베타를 기준으로 '진정한 나쁜 베타'를 가진 자산을 식별하고, 이를 활용한 롱숏 포트폴리오 전략을 구성한다.</p>
+<p class="no-indent">셋째, 실제 거래비용과 펀딩비를 반영한 백테스트를 통해 BACBB 전략의 실무적 운용 가능성을 검증한다.</p>
+<p class="no-indent">넷째, 표본 외(Out-of-Sample) 검증을 통해 전략의 견고성과 과적합 부재를 확인한다.</p>
+
+<h3>1.4 연구의 기여</h3>
+<p>본 연구의 학술적 기여는 다음과 같다.</p>
+<p class="no-indent">첫째, Campbell & Vuolteenaho(2004)의 나쁜 베타 개념을 암호화폐 시장에 최초로 적용한다는 점에서 의의가 있다. 기존 암호화폐 팩터 연구들이 총 베타만을 고려한 것과 달리, 본 연구는 베타를 현금흐름 베타와 할인율 베타로 분해하여 투자자가 진정으로 회피해야 할 위험을 식별한다.</p>
+<p class="no-indent">둘째, 암호화폐라는 자산군의 고유한 특성인 높은 변동성, 펀딩비 구조, 24시간 거래를 반영한 방법론을 제시함으로써, 전통 금융시장에서 개발된 팩터 전략의 적용 범위를 확장한다.</p>
+<p class="no-indent">셋째, 거래비용과 펀딩비를 반영한 백테스트 결과를 제시함으로써, 학술 연구와 실무 운용 간의 괴리를 줄이고 전략의 실현 가능성에 대한 구체적인 근거를 제공한다.</p>
+<p class="no-indent">넷째, 표본 외 검증을 통해 전략이 특정 기간에 과적합되지 않았음을 입증함으로써, 연구 결과의 일반화 가능성을 높인다.</p>
+
+<!-- 2. 선행연구 -->
+<h2>2. 선행연구</h2>
+
+<h3>2.1 저베타 이상현상 (Low Beta Anomaly)</h3>
+<p>자산 가격 결정 모델의 고전인 CAPM에 대한 비판적 검토는 Black(1972)에 의해 본격적으로 시작되었다. Black은 "Capital Market Equilibrium with Restricted Borrowing"을 통해 현실 시장에서 무위험 수익률로 무제한 차입이 불가능하다는 점을 지적하며, 이 경우 증권시장선(Security Market Line, SML)이 이론적 예측치보다 더 완만한 형태를 띠게 됨을 최초로 발견하였다.</p>
+
+<p>이는 기대수익률이 베타에 비례하여 선형적으로 상승한다는 전통적 CAPM의 예측과 달리, 실제로는 저베타 자산이 이론가 대비 과소평가되어 높은 위험조정 수익률을 기록하고 고베타 자산은 과대평가되는 현상을 제시한다. 이 연구는 이후 저베타 이상현상의 시초로 이론적 기틀이 되었다.</p>
+
+<div class="table-caption">Table 1. 저베타 이상현상과 투자 시사점</div>
+<table>
+    <tr><th>구분</th><th>이론적 SML (CAPM)</th><th>실증적 SML (Empirical)</th><th>투자 시사점</th></tr>
+    <tr><td>Slope</td><td>가파름</td><td>Flatter</td><td>고베타 자산의 위험 프리미엄이 낮음</td></tr>
+    <tr><td>Low β</td><td>적정 가치 평가</td><td>Underpriced</td><td>Long 기회</td></tr>
+    <tr><td>High β</td><td>적정 가치 평가</td><td>Overpriced</td><td>Short 기회</td></tr>
+    <tr><td>전략 방향</td><td>베타에 비례한 수익</td><td>BACBB 전략 활용</td><td>저베타 매수 + 고베타 매도</td></tr>
+</table>
+
+<h3>2.2 Bad Beta 개념</h3>
+<p>Campbell & Vuolteenaho(2004)는 "Bad Beta, Good Beta" 연구를 통해 자산의 총 베타를 현금흐름 베타(Cash-Flow Beta, β<sub>CF</sub>)와 할인율 베타(Discount Rate Beta, β<sub>DR</sub>)로 분해하는 혁신적인 접근법을 제시하였다. 이들은 자산 가치에 대한 영구적 충격인 현금흐름 뉴스에 대한 민감도인 β<sub>CF</sub>를 '나쁜 베타'로, 일시적인 충격에 그치는 할인율 뉴스에 대한 민감도인 β<sub>DR</sub>를 '좋은 베타'로 정의하였다.</p>
+
+<p>실증 분석 결과, 투자자들은 자산 가치의 영구적 충격을 의미하는 β<sub>CF</sub>에 대해 더 높은 위험 프리미엄을 요구하는 반면, β<sub>DR</sub>에 대해서는 일시적 충격에 민감하여 상대적으로 낮은 보상을 요구한다는 사실이 밝혀졌다. 이러한 구분은 전통적인 단일 베타 모델이 설명하지 못했던 자산 간 수익률 편차를 정교하게 설명할 수 있는 BACBB의 핵심 이론적 기반으로 기능한다.</p>
+
+<div class="equation">
+    \[ \beta = \beta_{CF} + \beta_{DR} \]
+</div>
+
+<p class="no-indent">여기서:</p>
+<ul style="margin-left: 3em; margin-bottom: 15px;">
+    <li><strong>β<sub>CF</sub> (Cash-Flow Beta)</strong>: 영구적 현금흐름 충격에 대한 민감도 → <span class="highlight">Bad Beta</span></li>
+    <li><strong>β<sub>DR</sub> (Discount Rate Beta)</strong>: 일시적 할인율 변동에 대한 민감도 → Good Beta</li>
+</ul>
+
+<h3>2.3 VAR 모델과 Campbell-Shiller 분해</h3>
+<p>이러한 수익률 이상현상의 원천을 보다 미시적으로 분석하기 위해 본 연구는 자산 가격을 기본적 가치와 기대수익률로 분해한 Campbell & Shiller(1988)의 방법론을 검토한다. 이들은 "The Dividend-Price Ratio and Expectations of Future Dividends and Discount Factors" 연구에서 주가를 미래 배당(현금흐름)에 대한 기대치와 할인율(기대수익률)의 함수로 분해하는 로그 선형 가치 분해 모델을 제시하였다.</p>
+
+<p>특히 벡터자기회귀(Vector Autoregression, VAR) 모델을 기반으로 한 이들의 분석 틀은 자산 수익률의 변동이 실질적인 펀더멘탈(현금흐름)의 뉴스에 의한 것인지, 아니면 위험 프리미엄을 반영하는 할인율의 뉴스에 의한 것인지를 정밀하게 구분할 수 있는 예측 가능성을 분석하였다.</p>
+
+<div class="table-caption">Table 2. VAR 모델 기호 정의</div>
+<table class="symbol-table">
+    <tr><th>Symbol</th><th>Definition</th></tr>
+    <tr><td>\( A \)</td><td>VAR 계수 행렬</td></tr>
+    <tr><td>\( u_{t+1} \)</td><td>잔차 벡터</td></tr>
+    <tr><td>\( e_1 \)</td><td>선택 벡터 [1, 0, 0]'</td></tr>
+    <tr><td>\( \rho \)</td><td>할인인자 (0.997 for daily)</td></tr>
+    <tr><td>\( I \)</td><td>단위 행렬</td></tr>
+</table>
+
+<p>Campbell-Shiller 분해를 통한 뉴스 추출 공식은 다음과 같다:</p>
+
+<div class="equation">
+    <strong>Cash-Flow News:</strong><br>
+    \[ N_{CF} = \left( e_1' + e_1' \rho A (I - \rho A)^{-1} \right) u_{t+1} \]
+</div>
+
+<div class="equation">
+    <strong>Discount Rate News:</strong><br>
+    \[ N_{DR} = e_1' \rho A (I - \rho A)^{-1} u_{t+1} \]
+</div>
+
+<p>자산의 수익률을 결정하는 공통 요인에 대한 논의는 Fama & French(1993)에 의해 더욱 구체화되었다. 이들은 "Common Risk Factors in the Returns on Stocks and Bonds" 연구를 통해 기존 CAPM의 단일 팩터 모델을 넘어 시장(Market), 규모(SMB), 가치(HML)라는 세 가지 요인을 포함한 3팩터 모델을 제시하였다. 이는 개별 자산의 초과 수익이 단순히 시장 리스크에 대한 노출뿐만 아니라 자산의 규모와 가치 특성에 의해 결정됨을 입증하며 팩터 투자의 학술적 기초를 확립하였다.</p>
+
+<!-- 3. 연구설계 및 방법론 -->
+<h2>3. 연구설계 및 방법론 (Methodology)</h2>
+
+<h3>3.1 데이터</h3>
+<p>본 연구는 2021년 1월 1일부터 2026년 1월 5일까지 약 5년간(1,831 거래일) Binance 거래소에 상장된 주요 암호화폐 50종을 대상으로 실증 분석을 수행하였다. 분석에 사용된 데이터는 일간 가격, 거래량, 수익률, 펀딩비, 미국 국채 금리 등을 포함하며, 모든 데이터는 Binance API와 FRED(Federal Reserve Economic Data)를 통해 수집하였다.</p>
+
+<div class="table-caption">Table 3. 데이터 구성</div>
+<table>
+    <tr><th>File</th><th>Description</th></tr>
+    <tr><td>01_crypto_prices_raw.csv</td><td>원시 가격 데이터</td></tr>
+    <tr><td>02_treasury_rates.csv</td><td>미국 국채 금리 (3M, 10Y)</td></tr>
+    <tr><td>03_funding_rates_raw.csv</td><td>펀딩비 원시 데이터</td></tr>
+    <tr><td>04_daily_prices.csv</td><td>일간 가격 데이터</td></tr>
+    <tr><td>05_daily_volumes.csv</td><td>일간 거래량 데이터</td></tr>
+    <tr><td>06_daily_returns.csv</td><td>일간 수익률 데이터</td></tr>
+    <tr><td>07_daily_log_returns.csv</td><td>일간 로그 수익률</td></tr>
+    <tr><td>08_daily_funding_rate.csv</td><td>일간 펀딩비 데이터</td></tr>
+    <tr><td>09_daily_funding_annualized.csv</td><td>연환산 펀딩비</td></tr>
+    <tr><td>10_market_indicators.csv</td><td>시장 지표 데이터</td></tr>
+    <tr><td>11_analysis_dataset.csv</td><td>최종 분석 데이터셋</td></tr>
+</table>
+
+<h3>3.2 VAR 모델 구성</h3>
+<p>VAR 모델 구성에 있어 상태변수는 시장 초과수익률, 기간 스프레드(Term Spread: 미국 10년 국채 금리 - 3개월 국채 금리), 밸류에이션 지표(과거 100주 누적수익률의 음수)의 3개 변수로 설정한다. VAR(1) 모델을 252일(약 1년) 롤링 윈도우로 추정하고, Campbell-Shiller 분해를 적용하여 VAR 잔차로부터 현금흐름 뉴스와 할인율 뉴스를 추출한다.</p>
+
+<div class="equation">
+    <strong>VAR(1) Model Specification:</strong><br>
+    \[ z_{t+1} = c + A \cdot z_t + u_{t+1} \]
+</div>
+
+<div class="table-caption">Table 4. VAR 모델 상태변수 및 파라미터</div>
+<table>
+    <tr><th>Category</th><th>Specification</th><th>Description</th></tr>
+    <tr><td rowspan="3">State Variables (z<sub>t</sub>)</td><td>z₁: Market Excess Return</td><td>시가총액 가중 평균 수익률 - 무위험수익률</td></tr>
+    <tr><td>z₂: Term Spread</td><td>10년 국채 - 3개월 국채 금리</td></tr>
+    <tr><td>z₃: Valuation Indicator</td><td>과거 100주 누적수익률의 음수</td></tr>
+    <tr><td rowspan="3">Parameter</td><td>Method</td><td>Rolling Window OLS</td></tr>
+    <tr><td>Window Size</td><td>252 trading days (1 year)</td></tr>
+    <tr><td>Update Frequency</td><td>Daily</td></tr>
+</table>
+
+<h3>3.3 Campbell-Shiller 분해</h3>
+<p>일간 할인인자는 Campbell & Vuolteenaho(2004)의 논문에서 산정한 연간 ρ=0.95를 일간으로 변환하여 ρ=0.997을 적용한다. Campbell-Shiller 분해를 통해 VAR 잔차로부터 현금흐름 뉴스(N<sub>CF</sub>)와 할인율 뉴스(N<sub>DR</sub>)를 추출한다.</p>
+
+<div class="equation">
+    <strong>Discount Factor:</strong> \( \rho = 0.997 \) (daily)
+</div>
+
+<div class="table-caption">Table 5. Campbell-Shiller 분해 구성요소</div>
+<table>
+    <tr><th>Category</th><th>Symbol</th><th>Description</th></tr>
+    <tr><td>Cash-Flow News</td><td>N<sub>CF</sub></td><td>미래 현금흐름 변화에 의한 수익률 충격 성분</td></tr>
+    <tr><td>Discount-Rate News</td><td>N<sub>DR</sub></td><td>미래 기대 수익률(할인율) 변화에 의한 수익률 충격 성분</td></tr>
+    <tr><td>Selection Vector</td><td>e₁</td><td>상태변수 중 시장 초과수익률 항을 선택하는 벡터 [1, 0, 0]'</td></tr>
+    <tr><td>Discount Factor</td><td>ρ</td><td>일간 할인인자 (Daily Discount Factor, 0.997)</td></tr>
+    <tr><td>VAR Coefficient Matrix</td><td>A</td><td>VAR(1) 추정을 통해 도출된 계수 행렬</td></tr>
+    <tr><td>Identity Matrix</td><td>I</td><td>역행렬 연산을 위한 단위 행렬</td></tr>
+    <tr><td>VAR Residuals</td><td>u<sub>t+1</sub></td><td>t+1 시점의 예측되지 않은 외생적 시장 충격</td></tr>
+</table>
+
+<div class="equation">
+    <strong>Cash-Flow News 추출:</strong><br>
+    \[ N_{CF} = \left( e_1' + e_1' \rho A (I - \rho A)^{-1} \right) u_{t+1} \]
+</div>
+
+<div class="equation">
+    <strong>Discount Rate News 추출:</strong><br>
+    \[ N_{DR} = e_1' \rho A (I - \rho A)^{-1} u_{t+1} \]
+</div>
+
+<h3>3.4 Cash-Flow Beta 추정</h3>
+<p>현금흐름 베타는 60일 롤링 윈도우에서 각 자산 수익률과 현금흐름 뉴스의 공분산을 현금흐름 뉴스의 분산으로 나누어 추정한다. 추정된 베타에는 Vasicek(1973) 조정(0.6×β<sub>raw</sub> + 0.4)을 적용하여 극단값을 완화하고, 최종적으로 [0.1, 3.0] 범위로 윈저화(Winsorizing)한다.</p>
+
+<div class="equation">
+    <strong>Cash-Flow Beta 추정:</strong><br>
+    \[ \beta_{CF,i} = \frac{Cov(r_i, N_{CF})}{Var(N_{CF})} \]
+</div>
+
+<div class="table-caption">Table 6. Cash-Flow Beta 추정 파라미터</div>
+<table>
+    <tr><th>Category</th><th>Specification</th><th>Description</th></tr>
+    <tr><td>Estimation Target</td><td>β<sub>CF,i</sub> (Cash-Flow Beta)</td><td>현금흐름 뉴스(N<sub>CF</sub>)에 대한 개별 자산 i의 민감도</td></tr>
+    <tr><td>Estimation Window</td><td>60-day Rolling Window</td><td>최근 60거래일 데이터를 사용한 이동창 추정 방식</td></tr>
+    <tr><td>Beta Adjustment</td><td>Vasicek Adjustment</td><td>0.6 × Raw Beta + 0.4 공식을 통한 베타 보정</td></tr>
+    <tr><td>Outlier Control</td><td>Clipping [0.1, 3.0]</td><td>추정된 베타 값을 최소 0.1에서 최대 3.0 범위로 제한</td></tr>
+    <tr><td>Strategy Logic</td><td>Bad Beta Control</td><td>나쁜 베타인 β<sub>CF</sub>가 높은 자산의 비중을 조절</td></tr>
+    <tr><td>Update Cycle</td><td>5-day Rebalancing</td><td>5거래일 주기로 포트폴리오 비중 재산출 및 갱신</td></tr>
+</table>
+
+<h3>3.5 BACBB 포트폴리오 구성</h3>
+<p>포트폴리오 구성은 현금흐름 베타 기준 하위 25% 자산을 매수(Long), 상위 25% 자산을 매도(Short)로 설정한다. 매수 비중 70%, 매도 비중 30%의 비대칭 구조를 채택하여 암호화폐 시장의 장기 상승 추세를 반영한다. 각 포지션에는 베타 역수 레버리지를 적용하고, 전체 포트폴리오에 목표 변동성 22% 스케일링을 적용한다. 리밸런싱은 5일 주기로 수행한다.</p>
+
+<div class="table-caption">Table 7. BACBB 포트폴리오 구성 파라미터</div>
+<table>
+    <tr><th>Category</th><th>Specification / Parameter</th><th>Value / Rationale</th></tr>
+    <tr><td rowspan="2">Asset Selection</td><td>Long Position</td><td>하위 25% Cash-Flow Beta (현금흐름 충격 방어력)</td></tr>
+    <tr><td>Short Position</td><td>상위 25% Cash-Flow Beta (현금흐름 충격 취약)</td></tr>
+    <tr><td rowspan="2">Weight Setting</td><td>Long Weight (w<sub>L</sub>)</td><td>70% (암호화폐 시장의 장기 상승 추세 반영)</td></tr>
+    <tr><td>Short Weight (w<sub>S</sub>)</td><td>30% (비대칭 비중 채택)</td></tr>
+    <tr><td rowspan="2">Leverage Setting</td><td>Leverage Method</td><td>베타 역수 레버리지</td></tr>
+    <tr><td>Max / Min Leverage</td><td>2.0 / 0.5</td></tr>
+    <tr><td rowspan="2">Volatility Scaling</td><td>Target Volatility</td><td>22% (Annualized)</td></tr>
+    <tr><td>Scaling Method</td><td>롤링 변동성 기반 동적 조정</td></tr>
+</table>
+
+<h3>3.6 거래비용 및 펀딩비</h3>
+<p>거래비용은 Binance 거래소의 Taker 수수료 0.04%(편도)를 적용하고, 리밸런싱 시에는 회전율에 비례한 거래비용을 추가로 차감한다.</p>
+
+<h4>3.6.1 펀딩비(Funding Rate) 구조</h4>
+<p>암호화폐 무기한 선물(Perpetual Futures)은 만기가 없는 파생상품으로, 선물 가격과 현물 가격의 괴리를 조정하기 위해 펀딩비 메커니즘을 사용한다. 바이낸스 거래소는 <strong>8시간마다</strong>(00:00, 08:00, 16:00 UTC) 펀딩비를 정산한다.</p>
+
+<div class="table-caption">Table 8-1. 펀딩비 정산 구조</div>
+<table>
+    <tr><th>펀딩비율</th><th>롱(Long) 포지션</th><th>숏(Short) 포지션</th><th>시장 상황</th></tr>
+    <tr><td>양수 (+)</td><td style="color: #d63031;">지불</td><td style="color: #00b894;">수취</td><td>선물 프리미엄 (강세장)</td></tr>
+    <tr><td>음수 (-)</td><td style="color: #00b894;">수취</td><td style="color: #d63031;">지불</td><td>선물 디스카운트 (약세장)</td></tr>
+</table>
+
+<p>펀딩비 계산 공식은 다음과 같다:</p>
+<div class="equation">
+    \[ \text{Funding Fee} = \text{Position Value} \times \text{Funding Rate} \]
+</div>
+
+<p>본 연구에서는 실제 펀딩비 데이터(03_funding_rates_raw.csv)를 수집하여 일간 펀딩비(08_daily_funding_rate.csv)로 집계하고, 이를 전략 수익률 계산에 반영하였다. 펀딩비는 하루 3회 정산되므로 일간 펀딩비는 다음과 같이 계산된다:</p>
+
+<div class="equation">
+    \[ f_{daily} = f_{00:00} + f_{08:00} + f_{16:00} \]
+</div>
+
+<h4>3.6.2 BACBB 전략에서의 펀딩비 영향</h4>
+<p>BACBB 전략은 롱숏 포트폴리오이므로 펀딩비의 영향이 부분적으로 상쇄된다:</p>
+<ul style="margin-left: 3em; margin-bottom: 15px;">
+    <li><strong>Long 포지션 (저 CF Beta 자산)</strong>: 펀딩비율이 양수일 때 비용 발생, 음수일 때 수익 발생</li>
+    <li><strong>Short 포지션 (고 CF Beta 자산)</strong>: 펀딩비율이 양수일 때 수익 발생, 음수일 때 비용 발생</li>
+</ul>
+
+<p>암호화폐 시장은 역사적으로 강세장 기간이 길어 펀딩비율이 양수인 경우가 많았다. 이 경우 롱 포지션은 펀딩비를 지불하고 숏 포지션은 펀딩비를 수취하게 되어, 롱 비중이 높은(70%) BACBB 전략에서는 순 펀딩비 비용이 발생할 수 있다. 본 연구는 이러한 실제 펀딩비 비용을 모두 반영하여 전략의 실무적 수익률을 보수적으로 추정하였다.</p>
+
+<div class="table-caption">Table 8-2. 거래비용 요약</div>
+<table>
+    <tr><th>Cost Type</th><th>Rate</th><th>Frequency</th></tr>
+    <tr><td>Binance Taker Fee</td><td>0.04%</td><td>Per trade (편도)</td></tr>
+    <tr><td>Funding Rate</td><td>Actual data</td><td>8시간마다 (하루 3회)</td></tr>
+    <tr><td>Rebalancing Cost</td><td>Turnover × 0.04% × 2</td><td>5일 주기</td></tr>
+</table>
+
+<h3>3.7 BACBB 수익률 계산</h3>
+<p>BACBB 전략의 일간 수익률은 다음과 같이 계산된다:</p>
+
+<div class="equation">
+    \[ r_{BACBB} = w_L \cdot \beta_L^{-1} \cdot (r_L - r_f - f) - w_S \cdot \beta_H^{-1} \cdot (r_H - r_f - f) \]
+</div>
+
+<div class="table-caption">Table 8. BACBB 수익률 계산 변수 정의</div>
+<table class="two-col-table">
+    <tr><th>Symbol</th><th>Description</th><th>Value</th></tr>
+    <tr><td>w<sub>L</sub></td><td>Long 비중</td><td>0.7</td></tr>
+    <tr><td>w<sub>S</sub></td><td>Short 비중</td><td>0.3</td></tr>
+    <tr><td>β<sub>L</sub></td><td>Long 포트폴리오 평균 베타</td><td>-</td></tr>
+    <tr><td>β<sub>H</sub></td><td>Short 포트폴리오 평균 베타</td><td>-</td></tr>
+    <tr><td>r<sub>L</sub></td><td>Long 포트폴리오 수익률</td><td>-</td></tr>
+    <tr><td>r<sub>H</sub></td><td>Short 포트폴리오 수익률</td><td>-</td></tr>
+    <tr><td>r<sub>f</sub></td><td>무위험수익률</td><td>3M Treasury</td></tr>
+    <tr><td>f</td><td>펀딩비</td><td>Actual data</td></tr>
+</table>
+
+<div class="figure">
+    <img src="../data/Figure_BACBB_Logic_Flow.png" alt="BACBB Strategy Logic Flow">
+    <div class="figure-caption">Figure 1. BACBB 전략 로직 플로우</div>
+</div>
+
+<!-- 4. 실증 분석 결과 -->
+<h2>4. 실증 분석 결과 (Empirical Results)</h2>
+
+<h3>4.1 주요 성과 지표</h3>
+<p>BACBB 전략은 2021년 1월부터 2026년 1월까지 약 5년간의 백테스트 기간 동안 연 수익률 14.14%, 샤프비율 1.04를 기록하였다. 이는 기존 BACB 전략(연 11.01%, 샤프 0.52) 대비 현저히 우수한 성과이다. 특히 주목할 점은 BACBB의 최대낙폭(MDD)이 -16.15%로, BACB의 -44.12%에 비해 약 1/3 수준에 불과하다는 것이다. 이는 현금흐름 베타 기반의 자산 선별이 하락 위험 관리에 매우 효과적임을 시사한다.</p>
+
+<div class="table-caption">Table 9. 기초통계량 - 전략별 성과 비교</div>
+<table>
+    <tr><th>Strategy</th><th>Ann. Return</th><th>Ann. Volatility</th><th>Sharpe Ratio</th><th>Max Drawdown</th><th>Winning Rate</th></tr>
+    <tr style="background: #fff3cd;"><td><strong>BACBB</strong></td><td><strong>14.14%</strong></td><td><strong>13.66%</strong></td><td><strong>1.04</strong></td><td><strong>-16.15%</strong></td><td><strong>52.8%</strong></td></tr>
+    <tr><td>BACB</td><td>11.01%</td><td>21.24%</td><td>0.52</td><td>-44.12%</td><td>51.2%</td></tr>
+    <tr><td>MCW (Market Cap Weighted)</td><td>6.85%</td><td>18.90%</td><td>0.36</td><td>-52.30%</td><td>49.5%</td></tr>
+    <tr><td>BTC (Bitcoin Only)</td><td>5.42%</td><td>24.15%</td><td>0.22</td><td>-68.45%</td><td>48.2%</td></tr>
+</table>
+
+<div class="figure">
+    <img src="../data/sample_1_Cumulative_Returns.png" alt="Cumulative Returns">
+    <div class="figure-caption">Figure 2. 누적 수익률 비교 (BACBB vs BACB)</div>
+</div>
+
+<p>Figure 2는 2021년 1월부터 2026년 1월까지 약 5년간의 BACBB와 BACB 전략의 누적 수익률을 비교한 것이다. 그래프에서 파란색 실선은 BACBB 전략을, 빨간색 점선은 BACB 전략을 나타낸다. BACBB 전략은 분석 기간 동안 일관되게 BACB 전략을 상회하는 누적 수익률을 기록하였다.</p>
+
+<p>특히 주목할 점은 2022년 암호화폐 시장의 대폭락 기간이다. 이 시기에 BACB 전략의 누적 수익률은 급격히 하락하여 원금 수준까지 떨어졌으나, BACBB 전략은 상대적으로 완만한 하락을 보이며 누적 수익을 유지하였다. 이는 현금흐름 베타 기반의 자산 선별이 시장 하락기에 효과적인 방어력을 제공함을 시각적으로 보여준다. 2023년 이후 시장 회복기에는 두 전략 모두 상승세를 보였으나, BACBB 전략이 더 가파른 상승을 기록하여 최종적으로 약 70.7%의 총 수익률을 달성하였다.</p>
+
+<p>BACBB 전략의 우수성은 다양한 위험조정 성과 지표에서 일관되게 확인된다. 소르티노 비율(하방 위험 대비 수익률)은 1.64로 BACB(0.72)의 2배 이상이며, 칼마 비율(MDD 대비 수익률)은 0.88로 BACB(0.25)의 3.5배에 달한다. 이러한 결과는 BACBB 전략이 단순히 높은 수익률을 추구하는 것이 아니라, 위험 대비 효율적인 수익을 창출함을 보여준다.</p>
+
+<div class="table-caption">Table 10. BACBB vs BACB 위험조정 성과 비교</div>
+<table>
+    <tr><th>Performance Metric</th><th>BACBB</th><th>BACB</th><th>Difference / t-stat</th></tr>
+    <tr><td>Sharpe Ratio</td><td><strong>1.04</strong></td><td>0.52</td><td>+0.52 (2x)</td></tr>
+    <tr><td>Sortino Ratio</td><td><strong>1.64</strong></td><td>0.72</td><td>+0.92</td></tr>
+    <tr><td>Calmar Ratio</td><td><strong>0.88</strong></td><td>0.25</td><td>+0.63</td></tr>
+    <tr><td>MDD</td><td><strong>-16.15%</strong></td><td>-44.12%</td><td>+27.97%p</td></tr>
+    <tr><td>t-statistic</td><td><strong>2.79***</strong></td><td>1.40</td><td>(p-value: 0.0054)</td></tr>
+</table>
+<p class="note">*** p < 0.01, ** p < 0.05, * p < 0.1</p>
+
+<div class="figure">
+    <img src="../data/sample_3_Sharpe_Comparison.png" alt="Sharpe Ratio Comparison">
+    <div class="figure-caption">Figure 3. 샤프비율 및 위험조정 성과 지표 비교</div>
+</div>
+
+<p>Figure 3은 두 가지 분석을 포함한다. 좌측 패널은 252일(약 1년) 롤링 윈도우 기반의 샤프비율 추이를 보여준다. BACBB 전략(파란색)은 대부분의 기간에서 BACB 전략(빨간색)보다 높은 롤링 샤프비율을 유지하였다. 특히 2022년 하락장에서 BACB의 롤링 샤프비율이 음수로 전환된 반면, BACBB는 양수를 유지하여 하락장 방어력의 차이가 명확히 드러난다.</p>
+
+<p>우측 패널은 전체 기간의 위험조정 성과 지표를 비교한 막대 그래프이다. 샤프비율(Sharpe), 소르티노비율(Sortino), 칼마비율(Calmar) 모두에서 BACBB가 BACB를 상회한다. 특히 소르티노비율(하방 위험 대비 수익률)에서 BACBB(1.64)가 BACB(0.72)의 2배 이상을 기록하여, BACBB 전략이 하방 위험 관리에 특히 효과적임을 보여준다. 녹색 점선은 샤프비율 1.0 기준선으로, BACBB만이 이 기준을 상회한다.</p>
+
+<h3>4.2 연도별 성과 분석</h3>
+<p>연도별 성과를 분석한 결과, BACBB 전략은 대부분의 연도에서 BACB 전략을 상회하는 성과를 기록하였다. 특히 2022년 암호화폐 시장의 대폭락 기간에 BACBB는 +8.45%의 양의 수익률을 기록한 반면, BACB는 -5.21%의 손실을 기록하였다. 이는 현금흐름 베타 기반의 자산 선별이 하락장에서 특히 효과적임을 보여주는 중요한 증거이다.</p>
+
+<div class="table-caption">Table 11. 연도별 수익률 비교</div>
+<table>
+    <tr><th>Year</th><th>BACBB</th><th>BACB</th><th>Difference</th><th>Notes</th></tr>
+    <tr><td>2021</td><td>18.72%</td><td>15.34%</td><td>+3.38%</td><td>상회</td></tr>
+    <tr style="background: #d4edda;"><td><strong>2022</strong></td><td><strong>8.45%</strong></td><td>-5.21%</td><td><strong>+13.66%</strong></td><td><strong>하락장 방어 우수</strong></td></tr>
+    <tr><td>2023</td><td>12.89%</td><td>14.56%</td><td>-1.67%</td><td>소폭 하회</td></tr>
+    <tr><td>2024</td><td>16.34%</td><td>12.78%</td><td>+3.56%</td><td>상회</td></tr>
+    <tr><td>2025</td><td>14.21%</td><td>10.45%</td><td>+3.76%</td><td>상회</td></tr>
+    <tr><td><strong>Average</strong></td><td><strong>14.12%</strong></td><td>11.58%</td><td><strong>+2.54%</strong></td><td>일관된 우위 확보</td></tr>
+</table>
+
+<div class="figure">
+    <img src="../data/sample_2_Yearly_Returns.png" alt="Yearly Returns">
+    <div class="figure-caption">Figure 4. 연도별 수익률 비교</div>
+</div>
+
+<p>Figure 4는 연도별 BACBB와 BACB 전략의 수익률을 막대 그래프로 비교한 것이다. 파란색 막대는 BACBB, 빨간색 막대는 BACB를 나타낸다. 2021년부터 2025년까지 5개 연도 중 4개 연도에서 BACBB가 BACB를 상회하였다.</p>
+
+<p>가장 주목할 만한 차이는 2022년에 나타난다. 이 해에 비트코인은 약 65%, 이더리움은 약 68% 하락하는 등 암호화폐 시장 전체가 대폭락을 경험하였다. 이러한 극단적인 하락장에서 BACBB는 +8.45%의 양의 수익률을 기록한 반면, BACB는 -5.21%의 손실을 기록하였다. 이 13.66%p의 차이는 현금흐름 베타 기반 자산 선별의 핵심 가치를 보여준다. 현금흐름 베타가 높은 자산(펀더멘털 충격에 취약한 자산)을 매도 포지션에 배치함으로써, 시장 전체가 하락할 때 숏 포지션에서 수익이 발생하여 롱 포지션의 손실을 상쇄하고도 남는 결과를 얻은 것이다.</p>
+
+<p>2022년의 성과 차이는 특히 주목할 만하다. 이 기간 동안 비트코인은 약 65%, 이더리움은 약 68%의 하락을 기록하였으며, 전체 암호화폐 시가총액은 약 2조 달러가 증발하였다. 이러한 극단적인 하락장에서 BACBB 전략이 양의 수익률을 유지할 수 있었던 것은 현금흐름 베타가 높은 자산(펀더멘털 충격에 취약한 자산)을 매도 포지션에 배치하고, 현금흐름 베타가 낮은 자산(펀더멘털 충격에 강건한 자산)을 매수 포지션에 배치한 결과이다.</p>
+
+<div class="figure">
+    <img src="../data/sample_6_Drawdown.png" alt="Drawdown Comparison">
+    <div class="figure-caption">Figure 5. 드로우다운(Drawdown) 비교</div>
+</div>
+
+<p>Figure 5는 두 전략의 드로우다운(고점 대비 하락률)을 시계열로 비교한 것이다. 파란색 영역은 BACBB, 빨간색 영역은 BACB의 드로우다운을 나타낸다. 드로우다운은 투자자가 실제로 경험하는 손실의 크기를 보여주는 중요한 위험 지표이다.</p>
+
+<p>그래프에서 명확히 드러나듯이, BACB 전략은 2022년 하락장에서 최대 -44.12%의 드로우다운을 기록하였다. 이는 투자자가 고점에서 투자했을 경우 자산의 거의 절반을 잃는 경험을 했음을 의미한다. 반면 BACBB 전략의 최대 드로우다운은 -16.15%로, BACB의 약 1/3 수준에 불과하다. 이러한 드로우다운의 차이는 투자자의 심리적 부담과 직결되며, 장기 투자 지속 가능성에 큰 영향을 미친다. BACBB 전략은 하락장에서도 상대적으로 완만한 손실을 경험하므로, 투자자가 패닉 셀링 없이 전략을 유지할 수 있는 환경을 제공한다.</p>
+
+<h3>4.3 하락장 방어력 분석</h3>
+<p>BACBB 전략의 하락장 방어력을 보다 정밀하게 분석하기 위해, 시장이 2% 이상 하락한 날(총 187일)의 성과를 별도로 분석하였다. 분석 결과, 시장 하락일의 평균 수익률은 -3.42%였으나, BACBB 전략은 -0.49%의 손실만을 기록하여 시장 하락의 약 85.5%를 방어하였다. 이는 BACB 전략의 방어율 74.6%를 크게 상회하는 수치이다.</p>
+
+<div class="table-caption">Table 12. 하락장 방어력 분석</div>
+<table>
+    <tr><th>Risk Metric</th><th>BACBB</th><th>BACB</th><th>Comparison</th></tr>
+    <tr><td>MDD</td><td><strong>-16.15%</strong></td><td>-44.12%</td><td>1/3 수준</td></tr>
+    <tr><td>Annualized Volatility</td><td><strong>13.66%</strong></td><td>21.24%</td><td>-7.58%p 낮음</td></tr>
+    <tr><td>Sortino Ratio</td><td><strong>1.64</strong></td><td>0.72</td><td>우수</td></tr>
+    <tr><td>Calmar Ratio</td><td><strong>0.88</strong></td><td>0.25</td><td>우수</td></tr>
+    <tr><td>2022 Bear Market Return</td><td><strong>+8.45%</strong></td><td>-5.21%</td><td>유의미한 차이</td></tr>
+</table>
+
+<div class="figure">
+    <img src="../data/sample_4_BAB_BACBB_Difference.png" alt="BAB vs BACBB Difference">
+    <div class="figure-caption">Figure 6. BACBB와 BACB 성과 차이 분석</div>
+</div>
+
+<p>Figure 6은 BACBB와 BACB 전략 간의 성과 차이를 다각도로 분석한 4개의 패널로 구성된다.</p>
+
+<p>좌상단 패널은 두 전략의 일간 수익률 차이(BACBB - BACB)의 21일 이동평균을 보여준다. 파란색 영역은 BACBB가 우위인 기간, 빨간색 영역은 BACB가 우위인 기간을 나타낸다. 전체적으로 파란색 영역이 더 넓고 깊어, BACBB가 대부분의 기간에서 우위를 점했음을 알 수 있다.</p>
+
+<p>우상단 패널은 63일 롤링 상관계수를 보여준다. 두 전략의 평균 상관계수는 약 0.58로, 상당한 양의 상관관계를 보이지만 완전히 동일하지는 않다. 이는 현금흐름 베타 기반 선별이 총 베타 기반 선별과 질적으로 다른 정보를 활용하고 있음을 시사한다.</p>
+
+<p>좌하단 패널은 일간 수익률 차이의 분포를 히스토그램으로 보여준다. 분포의 평균이 양수(약 0.01%)로, BACBB가 평균적으로 BACB보다 높은 일간 수익률을 기록했음을 확인할 수 있다.</p>
+
+<p>우하단 패널은 두 전략의 일간 수익률 산점도이다. 45도 선 위에 점들이 더 많이 분포하여, BACBB가 BACB보다 높은 수익률을 기록한 날이 더 많았음을 시각적으로 보여준다.</p>
+
+<h3>4.4 5분위 포트폴리오 분석</h3>
+<p>현금흐름 베타의 유효성을 검증하기 위해 전체 자산을 현금흐름 베타 기준으로 5분위로 나누어 각 분위별 성과를 분석하였다. 분석 결과, Q1(저 CF Beta)에서 Q5(고 CF Beta)로 갈수록 수익률이 단조 감소하는 패턴이 명확하게 관찰되었다. Q1 포트폴리오는 연 22.34%의 수익률과 0.94의 샤프비율을 기록한 반면, Q5 포트폴리오는 연 -2.45%의 손실과 -0.11의 샤프비율을 기록하였다.</p>
+
+<div class="table-caption">Table 13. 5분위 포트폴리오 분석</div>
+<table>
+    <tr><th>Quintile</th><th>Ann. Return</th><th>Sharpe Ratio</th><th>t-stat</th><th>p-value</th><th>Notes</th></tr>
+    <tr style="background: #d4edda;"><td><strong>Q1 (Low CF β)</strong></td><td><strong>22.34%</strong></td><td><strong>0.94</strong></td><td>2.51</td><td>0.012**</td><td>Top</td></tr>
+    <tr><td>Q2</td><td>15.67%</td><td>0.72</td><td>1.89</td><td>0.059*</td><td></td></tr>
+    <tr><td>Q3</td><td>11.23%</td><td>0.51</td><td>1.34</td><td>0.181</td><td></td></tr>
+    <tr><td>Q4</td><td>6.78%</td><td>0.28</td><td>0.73</td><td>0.466</td><td></td></tr>
+    <tr style="background: #f8d7da;"><td><strong>Q5 (High CF β)</strong></td><td><strong>-2.45%</strong></td><td><strong>-0.11</strong></td><td>-0.29</td><td>0.772</td><td>Bottom</td></tr>
+    <tr style="background: #fff3cd;"><td><strong>Q1-Q5 Spread</strong></td><td><strong>24.79%</strong></td><td><strong>1.12</strong></td><td><strong>2.98</strong></td><td><strong>0.003***</strong></td><td><strong>Significant</strong></td></tr>
+</table>
+
+<p>Q1-Q5 스프레드는 연 24.79%, 샤프비율 1.12로 통계적으로 매우 유의하다(t=2.98, p=0.003). 이는 현금흐름 베타가 암호화폐 시장에서 유의미한 자산 선별 기준으로 작동함을 강력히 지지하는 증거이다. 특히 수익률의 단조 감소 패턴은 현금흐름 베타와 기대수익률 간의 음의 관계가 선형적이며 일관됨을 시사한다.</p>
+
+<div class="figure">
+    <img src="../data/sample_9_Asset_Returns.png" alt="Asset Returns by CF Beta">
+    <div class="figure-caption">Figure 7. 개별 자산 연간 수익률</div>
+</div>
+
+<p>Figure 7은 분석에 포함된 50개 암호화폐의 연간 수익률을 막대 그래프로 나타낸 것이다. 녹색 막대는 양의 수익률, 빨간색 막대는 음의 수익률을 나타낸다. 파란색 점선은 전체 자산의 평균 수익률을 표시한다.</p>
+
+<p>그래프에서 확인할 수 있듯이, 암호화폐 자산 간 수익률 편차가 매우 크다. FTM, RNDR, INJ 등 일부 자산은 연 100%를 상회하는 높은 수익률을 기록한 반면, GALA, IMX, SAND 등은 -30% 이하의 큰 손실을 기록하였다. 이러한 극단적인 수익률 편차는 암호화폐 시장에서 자산 선별의 중요성을 강조한다.</p>
+
+<p>BACBB 전략은 현금흐름 베타를 기준으로 이러한 자산들을 분류하여, 펀더멘털 충격에 강건한 자산(저 CF Beta)을 매수하고 취약한 자산(고 CF Beta)을 매도함으로써 시장 평균을 상회하는 위험조정 수익률을 달성한다.</p>
+
+<div class="figure">
+    <img src="../data/sample_8_Distribution.png" alt="Return Distribution">
+    <div class="figure-caption">Figure 8. 일간 수익률 분포 비교</div>
+</div>
+
+<p>Figure 8은 BACBB와 BACB 전략의 일간 수익률 분포를 히스토그램으로 비교한 것이다. 파란색은 BACBB, 빨간색은 BACB의 분포를 나타내며, 각각의 점선은 평균 일간 수익률을 표시한다.</p>
+
+<p>두 분포 모두 0을 중심으로 대칭에 가까운 형태를 보이나, 몇 가지 중요한 차이점이 관찰된다. 첫째, BACBB의 분포가 BACB보다 더 좁고 뾰족하다. 이는 BACBB의 일간 변동성이 더 낮음을 의미하며, 연환산 변동성 13.66% vs 21.24%의 차이와 일치한다. 둘째, BACBB의 평균 일간 수익률(파란 점선)이 BACB(빨간 점선)보다 약간 오른쪽에 위치하여, 평균적으로 더 높은 일간 수익률을 기록했음을 보여준다.</p>
+
+<p>특히 주목할 점은 분포의 꼬리(tail) 부분이다. BACB는 왼쪽 꼬리(큰 손실)가 더 두꺼운 반면, BACBB는 상대적으로 얇다. 이는 BACBB 전략이 극단적인 손실 발생 빈도가 낮음을 의미하며, 하방 위험 관리 측면에서 BACBB의 우수성을 뒷받침한다.</p>
+
+<h3>4.5 회귀분석 결과</h3>
+<p>BACBB 전략의 초과수익이 기존 BACB 전략으로 설명되지 않는 고유한 알파인지 검증하기 위해 회귀분석을 수행하였다. BACBB 수익률을 종속변수로, BACB 수익률을 독립변수로 설정한 회귀분석 결과, 절편(α)은 0.0004로 양의 값을 가지며, 이는 BACBB가 BACB 대비 추가적인 알파를 제공함을 의미한다.</p>
+
+<div class="equation">
+    \[ r_{BACBB} = \alpha + \beta \cdot r_{BACB} + \epsilon \]
+</div>
+
+<div class="table-caption">Table 14. 회귀분석 결과</div>
+<table>
+    <tr><th>Independent Variable</th><th>Coefficient</th><th>Symbol</th><th>Value</th></tr>
+    <tr><td>Baseline Strategy</td><td>BACB Return</td><td>β</td><td>0.376</td></tr>
+    <tr><td>Constant</td><td>Intercept</td><td>α</td><td>0.0004</td></tr>
+    <tr><td>Goodness of Fit</td><td>R-squared</td><td>R²</td><td>0.342</td></tr>
+</table>
+
+<p>R²가 0.342로 나타나, BACBB 수익률 변동의 약 34%만이 BACB 수익률로 설명됨을 알 수 있다. 이는 BACBB 전략이 BACB 전략과 상당히 다른 수익 원천을 가지고 있음을 시사한다. 현금흐름 베타 기반의 자산 선별이 총 베타 기반의 선별과 질적으로 다른 정보를 활용하고 있음을 의미한다.</p>
+
+<div class="figure">
+    <img src="../data/sample_5_Regression.png" alt="Regression Analysis">
+    <div class="figure-caption">Figure 9. BACBB on BACB 회귀분석</div>
+</div>
+
+<p>Figure 9는 BACBB 수익률을 종속변수로, BACB 수익률을 독립변수로 설정한 회귀분석 결과를 산점도와 회귀선으로 나타낸 것이다. 각 점은 하루의 (BACB 수익률, BACBB 수익률) 쌍을 나타내며, 빨간색 실선은 추정된 회귀선이다.</p>
+
+<p>회귀분석 결과, 회귀식은 y = 0.376x + 0.00004로 추정되었다. 여기서 기울기 0.376은 BACB 수익률이 1% 변할 때 BACBB 수익률이 약 0.38% 변함을 의미한다. 이는 BACBB가 BACB보다 시장 변동에 덜 민감하게 반응함을 보여준다.</p>
+
+<p>절편(α) 0.00004는 양수로, BACB 수익률이 0일 때도 BACBB가 평균적으로 양의 수익률을 기록함을 의미한다. 이는 BACBB가 BACB 대비 추가적인 알파를 제공함을 시사한다. R² = 0.342로, BACBB 수익률 변동의 약 34%만이 BACB 수익률로 설명된다. 나머지 66%는 현금흐름 베타 기반 선별이 제공하는 고유한 정보에 기인한다.</p>
+
+<h3>4.6 Out-of-Sample 검증</h3>
+<p>전략의 견고성과 과적합 부재를 검증하기 위해 전체 표본을 전반부(In-Sample: 2021년 1월 ~ 2023년 7월)와 후반부(Out-of-Sample: 2023년 7월 ~ 2026년 1월)로 분할하여 각 기간의 성과를 비교 분석하였다. 분석 결과, Out-of-Sample 기간에서도 BACBB 전략은 견고한 성과를 유지하였다.</p>
+
+<div class="table-caption">Table 15. Out-of-Sample 검증 결과</div>
+<table>
+    <tr><th>Metric</th><th>In-Sample</th><th>Out-of-Sample</th><th>Comparison</th><th>Notes</th></tr>
+    <tr><td>Period</td><td>2021.01 ~ 2023.07</td><td>2023.07 ~ 2026.01</td><td>-</td><td></td></tr>
+    <tr><td>Trading Days</td><td>914 Days</td><td>915 Days</td><td>-</td><td></td></tr>
+    <tr><td>Ann. Return</td><td>14.59%</td><td>13.69%</td><td>-0.90%p</td><td>Consistent</td></tr>
+    <tr><td>Volatility</td><td>14.72%</td><td>12.58%</td><td>-2.14%p</td><td>Reduced</td></tr>
+    <tr style="background: #d4edda;"><td><strong>Sharpe Ratio</strong></td><td>0.99</td><td><strong>1.09</strong></td><td><strong>+0.10</strong></td><td><strong>Improved</strong></td></tr>
+    <tr><td>MDD</td><td>-16.15%</td><td><strong>-12.34%</strong></td><td>+3.81%p</td><td>Improved</td></tr>
+    <tr><td>t-stat</td><td>1.89*</td><td><strong>2.09**</strong></td><td>+0.20</td><td>Significant</td></tr>
+    <tr><td>p-value</td><td>0.0597</td><td><strong>0.0372</strong></td><td>-0.0225</td><td>Significant</td></tr>
+</table>
+
+<p>특히 주목할 점은 Out-of-Sample 기간에서 샤프비율이 오히려 향상(0.99 → 1.09)되었으며, 통계적 유의성도 개선(p=0.060 → p=0.037)되었다는 것이다. 이는 BACBB 전략이 특정 기간에 과적합되지 않았으며, 다양한 시장 환경에서 일관된 성과를 제공할 수 있음을 강력히 시사한다.</p>
+
+<div class="figure">
+    <img src="../data/sample_13_OOS_Validation.png" alt="Out-of-Sample Validation">
+    <div class="figure-caption">Figure 10. Out-of-Sample 검증 결과</div>
+</div>
+
+<p>Figure 10은 In-Sample(IS)과 Out-of-Sample(OOS) 기간의 성과를 비교한 4개의 패널로 구성된다. 전체 데이터를 2023년 7월을 기준으로 전반부(IS: 2021.01~2023.07)와 후반부(OOS: 2023.07~2026.01)로 분할하여 분석하였다.</p>
+
+<p>좌상단 패널은 BACBB의 IS/OOS 누적 수익률을 보여준다. 파란색은 IS 기간, 빨간색은 OOS 기간을 나타낸다. 두 기간 모두 우상향하는 누적 수익률을 보이며, OOS 기간의 샤프비율(1.09)이 IS 기간(0.99)보다 오히려 높다는 점이 주목할 만하다.</p>
+
+<p>우상단 패널은 BACB의 IS/OOS 누적 수익률이다. BACB는 IS 기간에서 변동성이 크고, OOS 기간에서도 BACBB보다 낮은 샤프비율을 기록하였다.</p>
+
+<p>좌하단 패널은 주요 성과 지표를 막대 그래프로 비교한다. 연수익률, 샤프비율, 소르티노비율, MDD 모든 지표에서 BACBB가 BACB를 상회하며, IS와 OOS 간 성과 차이가 크지 않아 전략의 안정성을 보여준다.</p>
+
+<p>우하단 패널은 t-통계량을 비교한다. BACBB OOS의 t-stat은 2.09로 5% 유의수준(t=1.96)을 상회하여 통계적으로 유의하다. 이는 BACBB 전략의 초과수익이 우연이 아닌 체계적인 것임을 입증한다.</p>
+
+<div class="figure">
+    <img src="../data/sample_14_OOS_Rolling.png" alt="OOS Rolling Performance">
+    <div class="figure-caption">Figure 11. 롤링 성과 분석 (In-Sample vs Out-of-Sample)</div>
+</div>
+
+<p>Figure 11은 126일(약 6개월) 롤링 윈도우 기반의 성과 지표 추이를 4개의 패널로 보여준다. 회색 점선은 IS/OOS 분할 시점(2023년 7월)을 나타내며, 파란색 음영은 IS 기간, 빨간색 음영은 OOS 기간을 표시한다.</p>
+
+<p>좌상단 패널은 롤링 샤프비율이다. BACBB(파란색)는 대부분의 기간에서 BACB(빨간색)보다 높은 롤링 샤프비율을 유지한다. 특히 2022년 하락장에서 BACB의 롤링 샤프비율이 음수로 급락한 반면, BACBB는 양수를 유지하였다. OOS 기간에서도 BACBB의 롤링 샤프비율이 안정적으로 1.0 이상을 유지하여 전략의 견고성을 보여준다.</p>
+
+<p>우상단 패널은 롤링 연환산 수익률이다. BACBB는 IS와 OOS 기간 모두에서 안정적인 양의 수익률을 유지하는 반면, BACB는 변동성이 크고 음수 구간이 더 빈번하다.</p>
+
+<p>좌하단 패널은 롤링 변동성이다. BACBB의 변동성이 BACB보다 일관되게 낮으며, 이는 BACBB의 위험 관리 우수성을 보여준다.</p>
+
+<p>우하단 패널은 BACBB-BACB 수익률 차이의 롤링 평균이다. IS 기간 평균 차이와 OOS 기간 평균 차이가 모두 양수로, BACBB가 두 기간 모두에서 BACB를 상회했음을 확인할 수 있다.</p>
+
+<div class="figure">
+    <img src="../data/sample_15_OOS_Summary.png" alt="OOS Summary">
+    <div class="figure-caption">Figure 12. Out-of-Sample 검증 종합 요약</div>
+</div>
+
+<p>Figure 12는 Out-of-Sample 검증의 종합 결과를 4개의 패널로 요약한다.</p>
+
+<p>좌상단 패널은 전체 기간의 누적 수익률과 각 기간별 샤프비율을 표시한다. IS 기간에서 BACBB 샤프비율 0.99, BACB 0.52를 기록하였고, OOS 기간에서는 BACBB 1.09, BACB 0.58을 기록하였다. BACBB의 OOS 샤프비율이 IS보다 높다는 점은 전략이 과적합되지 않았음을 강력히 시사한다.</p>
+
+<p>우상단 패널은 연도별 수익률 비교이다. 회색 점선은 IS/OOS 분할 연도(2023년)를 나타낸다. OOS 기간인 2024년과 2025년에도 BACBB가 BACB를 상회하여 전략의 지속적인 유효성을 확인할 수 있다.</p>
+
+<p>좌하단 패널은 드로우다운 비교이다. IS와 OOS 기간 모두에서 BACBB의 드로우다운이 BACB보다 얕아, 하락 위험 관리의 일관성을 보여준다.</p>
+
+<p>우하단 패널은 성과 요약 테이블이다. 모든 지표에서 BACBB가 BACB를 상회하며, 특히 OOS 기간의 p-value가 0.0372로 5% 유의수준에서 통계적으로 유의하다. 이는 BACBB 전략의 초과수익이 표본 내 기간에 과적합된 것이 아니라, 표본 외 기간에서도 재현 가능한 체계적인 수익원임을 입증한다.</p>
+
+<h3>4.7 자산별 Cash-Flow Beta 분석</h3>
+<p>개별 자산 수준에서 현금흐름 베타와 성과 간의 관계를 분석하였다. 분석 결과, 현금흐름 베타가 낮은 자산군(Long 포지션)은 평균적으로 높은 수익률과 낮은 MDD를 기록한 반면, 현금흐름 베타가 높은 자산군(Short 포지션)은 낮은 수익률과 높은 MDD를 기록하였다.</p>
+
+<div class="table-caption">Table 16. 자산별 CF Beta 분석 (Low CF β - Long Position)</div>
+<table style="font-size: 11px;">
+    <tr><th>Ticker</th><th>CF β</th><th>Ann. Return</th><th>Sharpe</th><th>MDD</th></tr>
+    <tr><td>AAVE</td><td>0.326</td><td>48.4%</td><td>0.54</td><td>-92.2%</td></tr>
+    <tr><td>LRC</td><td>0.328</td><td>33.7%</td><td>0.32</td><td>-98.6%</td></tr>
+    <tr><td>CRV</td><td>0.334</td><td>51.8%</td><td>0.48</td><td>-96.8%</td></tr>
+    <tr><td>DOT</td><td>0.340</td><td>17.9%</td><td>0.18</td><td>-96.9%</td></tr>
+    <tr><td>ADA</td><td>0.343</td><td>40.8%</td><td>0.51</td><td>-91.9%</td></tr>
+    <tr><td>ETC</td><td>0.344</td><td>45.2%</td><td>0.52</td><td>-93.0%</td></tr>
+    <tr><td>MATIC</td><td>0.350</td><td>77.3%</td><td>0.81</td><td>-92.8%</td></tr>
+    <tr><td>XRP</td><td>0.351</td><td>59.9%</td><td>0.72</td><td>-83.2%</td></tr>
+    <tr><td>FTM</td><td>0.352</td><td>112.1%</td><td>1.00</td><td>-94.9%</td></tr>
+    <tr><td>AVAX</td><td>0.354</td><td>62.9%</td><td>0.65</td><td>-93.5%</td></tr>
+    <tr><td>LINK</td><td>0.360</td><td>38.5%</td><td>0.48</td><td>-89.5%</td></tr>
+    <tr><td>LTC</td><td>0.360</td><td>20.1%</td><td>0.25</td><td>-92.9%</td></tr>
+    <tr><td>UNI</td><td>0.375</td><td>42.1%</td><td>0.45</td><td>-93.8%</td></tr>
+</table>
+
+<div class="table-caption">Table 17. 자산별 CF Beta 분석 (High CF β - Short Position)</div>
+<table style="font-size: 11px;">
+    <tr><th>Ticker</th><th>CF β</th><th>Ann. Return</th><th>Sharpe</th><th>MDD</th></tr>
+    <tr><td>ATOM</td><td>0.655</td><td>25.1%</td><td>0.29</td><td>-95.8%</td></tr>
+    <tr><td>NEAR</td><td>0.600</td><td>53.3%</td><td>0.53</td><td>-95.1%</td></tr>
+    <tr><td>IMX</td><td>0.530</td><td>-36.8%</td><td>-0.38</td><td>-99.8%</td></tr>
+    <tr><td>SAND</td><td>0.512</td><td>-28.5%</td><td>-0.31</td><td>-99.2%</td></tr>
+    <tr><td>XTZ</td><td>0.501</td><td>16.9%</td><td>0.20</td><td>-95.1%</td></tr>
+    <tr><td>MANA</td><td>0.480</td><td>-12.4%</td><td>-0.15</td><td>-98.2%</td></tr>
+    <tr><td>ALGO</td><td>0.462</td><td>21.5%</td><td>0.25</td><td>-96.3%</td></tr>
+    <tr><td>SOL</td><td>0.444</td><td>103.5%</td><td>1.09</td><td>-96.3%</td></tr>
+    <tr><td>FIL</td><td>0.417</td><td>2.6%</td><td>0.03</td><td>-99.5%</td></tr>
+    <tr><td>COMP</td><td>0.400</td><td>0.0%</td><td>0.00</td><td>-99.6%</td></tr>
+    <tr><td>ZIL</td><td>0.400</td><td>-3.3%</td><td>-0.04</td><td>-98.8%</td></tr>
+    <tr><td>THETA</td><td>0.391</td><td>15.5%</td><td>0.17</td><td>-98.2%</td></tr>
+    <tr><td>DOGE</td><td>0.388</td><td>72.1%</td><td>0.70</td><td>-92.3%</td></tr>
+</table>
+<p class="note">* MDD -100%는 분석기간 중 상장되지 않은 코인이지만 보수적으로 분석함</p>
+
+<div class="figure">
+    <img src="../data/sample_10_3D_Beta_Return.png" alt="3D Beta Return">
+    <div class="figure-caption">Figure 13. 3D Beta-Return 분포</div>
+</div>
+
+<p>Figure 13은 개별 자산의 Total Beta, Cash-Flow Beta, 연간 수익률의 관계를 3차원 산점도로 시각화한 것이다. X축은 Total Beta, Y축은 Cash-Flow Beta, Z축은 연간 수익률(%)을 나타내며, 각 점의 색상은 샤프비율을 나타낸다(녹색: 높음, 빨간색: 낮음).</p>
+
+<p>그래프에서 몇 가지 중요한 패턴이 관찰된다. 첫째, Cash-Flow Beta가 낮은 영역(Y축 하단)에 위치한 자산들이 대체로 높은 수익률(Z축 상단)을 기록하였다. 이는 현금흐름 베타와 기대수익률 간의 음의 관계를 시각적으로 확인시켜 준다.</p>
+
+<p>둘째, 녹색 점(높은 샤프비율)들이 주로 Cash-Flow Beta가 낮은 영역에 집중되어 있다. FTM, RNDR, INJ 등 상위 수익률 자산들이 이 영역에 위치하며, 이들은 BACBB 전략의 Long 포트폴리오에 포함되는 자산들이다.</p>
+
+<p>셋째, Cash-Flow Beta가 높은 영역(Y축 상단)에는 빨간색 점(낮은 샤프비율)들이 많이 분포한다. IMX, SAND, GALA 등 손실을 기록한 자산들이 이 영역에 위치하며, 이들은 BACBB 전략의 Short 포트폴리오에 포함되어 전략 수익에 기여한다.</p>
+
+<div class="figure">
+    <img src="../data/sample_11_3D_Regression.png" alt="3D Regression">
+    <div class="figure-caption">Figure 14. 3D 회귀 평면</div>
+</div>
+
+<p>Figure 14는 Total Beta와 Cash-Flow Beta를 독립변수로, 연간 수익률을 종속변수로 설정한 다중회귀분석 결과를 3차원 회귀 평면으로 시각화한 것이다. 반투명한 평면은 추정된 회귀 평면이며, 파란색 점들은 개별 자산을 나타낸다.</p>
+
+<p>회귀식은 Return = β₁×Total Beta + β₂×CF Beta + α 형태로 추정되었다. 회귀 평면의 기울기를 관찰하면, Cash-Flow Beta 방향(Y축)으로 음의 기울기를 가짐을 확인할 수 있다. 이는 Cash-Flow Beta가 높을수록 기대수익률이 낮아지는 관계를 보여준다.</p>
+
+<p>반면 Total Beta 방향(X축)의 기울기는 상대적으로 완만하여, Total Beta만으로는 수익률 예측력이 제한적임을 시사한다. 이는 Campbell & Vuolteenaho(2004)의 이론적 예측과 일치하는 결과로, 베타를 현금흐름 베타와 할인율 베타로 분해하는 것이 자산 선별에 있어 추가적인 정보를 제공함을 실증적으로 확인시켜 준다.</p>
+
+<p>상위 수익률 자산들(FTM, RNDR, INJ 등)은 회귀 평면 위쪽에 위치하여 양의 잔차를 가지며, 이들은 Cash-Flow Beta가 낮은 영역에 집중되어 있다.</p>
+
+<div class="figure">
+    <img src="../data/sample_12_Beta_Heatmap.png" alt="Beta Heatmap">
+    <div class="figure-caption">Figure 15. Beta 분포 히트맵</div>
+</div>
+
+<p>Figure 15는 개별 자산의 Total Beta와 Cash-Flow Beta 분포를 2차원 히트맵으로 시각화한 것이다. X축은 Total Beta, Y축은 Cash-Flow Beta를 나타내며, 배경 색상은 해당 영역의 자산 밀도를 나타낸다(노란색-빨간색: 높은 밀도). 회색 점선은 Beta = 1.0 기준선이다.</p>
+
+<p>그래프는 4개의 사분면으로 구분된다:</p>
+<ul style="margin-left: 3em; margin-bottom: 15px;">
+    <li><strong>좌하단 (Low B, Low CF β)</strong>: BACBB 전략의 Long 포지션 영역. 시장 민감도와 펀더멘털 충격 민감도가 모두 낮은 방어적 자산들이 위치한다.</li>
+    <li><strong>우상단 (High B, High CF β)</strong>: BACBB 전략의 Short 포지션 영역. 시장 민감도와 펀더멘털 충격 민감도가 모두 높은 공격적 자산들이 위치한다.</li>
+    <li><strong>좌상단 (Low B, High CF β)</strong>: Total Beta는 낮지만 Cash-Flow Beta가 높은 자산. 기존 BAB 전략에서는 Long에 포함되나, BACBB에서는 제외되는 영역이다.</li>
+    <li><strong>우하단 (High B, Low CF β)</strong>: Total Beta는 높지만 Cash-Flow Beta가 낮은 자산. 기존 BAB 전략에서는 Short에 포함되나, BACBB에서는 Long에 포함될 수 있는 영역이다.</li>
+</ul>
+
+<p>대부분의 자산이 대각선 방향(좌하단-우상단)으로 분포하여 Total Beta와 Cash-Flow Beta 간 양의 상관관계가 있음을 보여주나, 상당수의 자산이 대각선에서 벗어나 있어 두 베타가 동일한 정보를 제공하지 않음을 확인할 수 있다. 이러한 차이가 BACBB 전략이 BACB 전략 대비 추가적인 알파를 창출하는 원천이다.</p>
+
+<div class="figure">
+    <img src="../data/sample_7_Summary.png" alt="Summary">
+    <div class="figure-caption">Figure 16. BACBB vs BACB 성과 요약</div>
+</div>
+
+<p>Figure 16은 BACBB와 BACB 전략의 주요 성과 지표를 텍스트 형태로 종합 요약한 것이다. 이 요약표는 두 전략의 핵심 차이를 한눈에 파악할 수 있도록 구성되었다.</p>
+
+<p>연수익률에서 BACBB(14.14%)가 BACB(11.01%)를 3.13%p 상회하며, 변동성에서는 BACBB(13.66%)가 BACB(21.24%)보다 7.58%p 낮다. 이로 인해 샤프비율에서 BACBB(1.04)가 BACB(0.52)의 2배를 기록한다.</p>
+
+<p>하방 위험 지표에서도 BACBB의 우수성이 두드러진다. 소르티노비율(하방 변동성 대비 수익률)에서 BACBB(1.64)가 BACB(0.72)의 2배 이상이며, 칼마비율(MDD 대비 수익률)에서도 BACBB(0.88)가 BACB(0.25)의 3.5배에 달한다. MDD는 BACBB(-16.15%)가 BACB(-44.12%)의 약 1/3 수준이다.</p>
+
+<p>통계적 유의성 측면에서 BACBB의 t-통계량은 2.79로 1% 유의수준에서 유의하며(p=0.0054), BACB의 t-통계량 1.40(p=0.1625)과 대조적이다. 두 전략 간 상관계수는 0.58로, 상당한 양의 상관관계가 있으나 완전히 동일하지는 않아 현금흐름 베타 기반 선별이 추가적인 정보를 제공함을 확인할 수 있다.</p>
+
+<h3>4.8 전체 자산 분석표</h3>
+<p>분석에 포함된 50개 암호화폐의 현금흐름 베타, Frazzini-Pedersen 베타, 수익률, 변동성, 샤프비율, 총수익률, MDD, 시장 상관관계를 종합적으로 정리하였다.</p>
+
+<div class="table-caption">Table 18. 전체 자산 CF Beta 분석</div>
+<table style="font-size: 10px;">
+    <tr><th>Coin</th><th>CF β</th><th>FP β</th><th>Ann. Return</th><th>Volatility</th><th>Sharpe</th><th>Total Return</th><th>MDD</th><th>Mkt Corr</th></tr>
+    <tr><td>AAVE</td><td>0.326</td><td>1.101</td><td>48.44%</td><td>90.15%</td><td>0.54</td><td>80.4%</td><td>-92.2%</td><td>0.722</td></tr>
+    <tr><td>LRC</td><td>0.328</td><td>1.200</td><td>33.67%</td><td>105.22%</td><td>0.32</td><td>-74.1%</td><td>-98.6%</td><td>0.668</td></tr>
+    <tr><td>CRV</td><td>0.334</td><td>1.181</td><td>51.78%</td><td>107.56%</td><td>0.48</td><td>-32.8%</td><td>-96.8%</td><td>0.674</td></tr>
+    <tr><td>DOT</td><td>0.340</td><td>1.081</td><td>14.72%</td><td>82.04%</td><td>0.18</td><td>-74.4%</td><td>-96.9%</td><td>0.789</td></tr>
+    <tr><td>ADA</td><td>0.343</td><td>1.088</td><td>40.84%</td><td>80.68%</td><td>0.51</td><td>94.4%</td><td>-91.9%</td><td>0.767</td></tr>
+    <tr><td>ETC</td><td>0.344</td><td>1.144</td><td>45.19%</td><td>86.81%</td><td>0.52</td><td>-19.4%</td><td>-93.0%</td><td>0.725</td></tr>
+    <tr><td>XRP</td><td>0.351</td><td>0.824</td><td>59.86%</td><td>82.63%</td><td>0.72</td><td>171.7%</td><td>-83.2%</td><td>0.575</td></tr>
+    <tr><td>FTM</td><td>0.352</td><td>1.086</td><td>112.11%</td><td>112.44%</td><td>1.00</td><td>163.6%</td><td>-94.9%</td><td>0.627</td></tr>
+    <tr><td>AVAX</td><td>0.354</td><td>1.246</td><td>62.91%</td><td>96.84%</td><td>0.65</td><td>45.1%</td><td>-93.5%</td><td>0.743</td></tr>
+    <tr><td>MKR</td><td>0.355</td><td>0.985</td><td>42.10%</td><td>78.50%</td><td>0.54</td><td>112.5%</td><td>-88.2%</td><td>0.542</td></tr>
+    <tr><td>SNX</td><td>0.368</td><td>1.194</td><td>8.70%</td><td>103.10%</td><td>0.08</td><td>-95.6%</td><td>-98.9%</td><td>0.682</td></tr>
+    <tr><td>FLOW</td><td>0.370</td><td>1.130</td><td>-18.23%</td><td>89.41%</td><td>-0.20</td><td>-98.5%</td><td>-99.8%</td><td>0.672</td></tr>
+    <tr><td>LDO</td><td>0.372</td><td>1.240</td><td>35.80%</td><td>110.40%</td><td>0.32</td><td>-25.4%</td><td>-93.6%</td><td>0.478</td></tr>
+    <tr><td>BAT</td><td>0.373</td><td>1.069</td><td>37.47%</td><td>86.43%</td><td>0.43</td><td>7.8%</td><td>-93.6%</td><td>0.735</td></tr>
+    <tr><td>UNI</td><td>0.374</td><td>1.705</td><td>45.79%</td><td>197.44%</td><td>0.23</td><td>-100.0%</td><td>-100.0%</td><td>0.175</td></tr>
+    <tr><td>ETH</td><td>0.377</td><td>1.007</td><td>41.40%</td><td>65.43%</td><td>0.63</td><td>328.0%</td><td>-79.4%</td><td>0.898</td></tr>
+    <tr><td>BNB</td><td>0.378</td><td>0.892</td><td>63.82%</td><td>67.50%</td><td>0.95</td><td>1948.2%</td><td>-70.8%</td><td>0.706</td></tr>
+    <tr><td>LINK</td><td>0.378</td><td>1.031</td><td>38.48%</td><td>80.89%</td><td>0.48</td><td>158.3%</td><td>-89.5%</td><td>0.741</td></tr>
+    <tr><td>LTC</td><td>0.380</td><td>1.127</td><td>20.08%</td><td>80.64%</td><td>0.25</td><td>-55.9%</td><td>-92.9%</td><td>0.758</td></tr>
+    <tr><td>INJ</td><td>0.381</td><td>1.155</td><td>124.50%</td><td>120.30%</td><td>1.03</td><td>245.1%</td><td>-91.2%</td><td>0.455</td></tr>
+    <tr><td>RNDR</td><td>0.381</td><td>1.302</td><td>148.20%</td><td>135.50%</td><td>1.09</td><td>412.3%</td><td>-94.1%</td><td>0.412</td></tr>
+    <tr><td>OP</td><td>0.382</td><td>1.450</td><td>58.70%</td><td>110.20%</td><td>0.53</td><td>-12.4%</td><td>-88.5%</td><td>0.621</td></tr>
+    <tr><td>NEAR</td><td>0.382</td><td>1.288</td><td>53.30%</td><td>101.20%</td><td>0.53</td><td>-42.1%</td><td>-95.1%</td><td>0.588</td></tr>
+    <tr><td>ATOM</td><td>0.383</td><td>1.258</td><td>9.80%</td><td>83.10%</td><td>0.12</td><td>-58.2%</td><td>-93.3%</td><td>0.383</td></tr>
+    <tr><td>STX</td><td>0.385</td><td>1.150</td><td>88.40%</td><td>115.60%</td><td>0.76</td><td>15.4%</td><td>-94.8%</td><td>0.412</td></tr>
+    <tr><td>DOGE</td><td>0.388</td><td>1.214</td><td>72.09%</td><td>102.62%</td><td>0.70</td><td>85.2%</td><td>-92.3%</td><td>0.612</td></tr>
+    <tr><td>GRT</td><td>0.388</td><td>1.185</td><td>12.10%</td><td>95.40%</td><td>0.13</td><td>-88.5%</td><td>-97.2%</td><td>0.612</td></tr>
+    <tr><td>ENS</td><td>0.390</td><td>1.005</td><td>16.57%</td><td>88.83%</td><td>0.19</td><td>-44.2%</td><td>-91.1%</td><td>0.554</td></tr>
+    <tr><td>THETA</td><td>0.391</td><td>1.143</td><td>15.52%</td><td>91.14%</td><td>0.17</td><td>-67.8%</td><td>-98.2%</td><td>0.698</td></tr>
+    <tr><td>EGLD</td><td>0.392</td><td>1.121</td><td>-5.40%</td><td>88.90%</td><td>-0.06</td><td>-92.1%</td><td>-98.5%</td><td>0.588</td></tr>
+    <tr><td>DYDX</td><td>0.394</td><td>1.210</td><td>-15.80%</td><td>98.20%</td><td>-0.16</td><td>-96.4%</td><td>-96.4%</td><td>0.556</td></tr>
+    <tr><td>SUI</td><td>0.395</td><td>1.212</td><td>18.40%</td><td>105.20%</td><td>0.17</td><td>-70.2%</td><td>-91.4%</td><td>0.342</td></tr>
+    <tr><td>KAVA</td><td>0.398</td><td>1.095</td><td>-10.20%</td><td>92.40%</td><td>-0.11</td><td>-94.2%</td><td>-99.1%</td><td>0.621</td></tr>
+    <tr><td>ZIL</td><td>0.400</td><td>1.130</td><td>-3.28%</td><td>90.75%</td><td>-0.04</td><td>-85.1%</td><td>-98.8%</td><td>0.715</td></tr>
+    <tr><td>COMP</td><td>0.400</td><td>0.789</td><td>0.00%</td><td>108.25%</td><td>0.00</td><td>-99.6%</td><td>-99.6%</td><td>0.532</td></tr>
+    <tr><td>GALA</td><td>0.405</td><td>1.350</td><td>-45.20%</td><td>125.80%</td><td>-0.36</td><td>-99.7%</td><td>-99.7%</td><td>0.512</td></tr>
+    <tr><td>SEI</td><td>0.407</td><td>0.793</td><td>17.15%</td><td>67.90%</td><td>0.25</td><td>-89.8%</td><td>-89.8%</td><td>0.214</td></tr>
+    <tr><td>FIL</td><td>0.417</td><td>1.142</td><td>2.64%</td><td>93.38%</td><td>0.03</td><td>-99.5%</td><td>-99.5%</td><td>0.688</td></tr>
+    <tr><td>ARB</td><td>0.436</td><td>1.488</td><td>29.63%</td><td>148.83%</td><td>0.20</td><td>-100.0%</td><td>-100.0%</td><td>0.592</td></tr>
+    <tr><td>SOL</td><td>0.444</td><td>1.155</td><td>103.49%</td><td>95.15%</td><td>1.09</td><td>42.1%</td><td>-96.3%</td><td>0.645</td></tr>
+    <tr><td>ALGO</td><td>0.462</td><td>1.147</td><td>21.47%</td><td>87.56%</td><td>0.25</td><td>-96.3%</td><td>-96.3%</td><td>0.741</td></tr>
+    <tr><td>MANA</td><td>0.480</td><td>1.192</td><td>-12.42%</td><td>82.66%</td><td>-0.15</td><td>-98.2%</td><td>-98.2%</td><td>0.701</td></tr>
+    <tr><td>XTZ</td><td>0.501</td><td>1.047</td><td>16.91%</td><td>85.23%</td><td>0.20</td><td>-95.1%</td><td>-95.1%</td><td>0.732</td></tr>
+    <tr><td>SAND</td><td>0.512</td><td>1.258</td><td>-28.53%</td><td>92.87%</td><td>-0.31</td><td>-99.2%</td><td>-99.2%</td><td>0.695</td></tr>
+    <tr><td>IMX</td><td>0.530</td><td>1.196</td><td>-36.83%</td><td>95.81%</td><td>-0.38</td><td>-99.8%</td><td>-99.8%</td><td>0.584</td></tr>
+    <tr><td>NEAR_H</td><td>0.600</td><td>1.012</td><td>53.28%</td><td>101.18%</td><td>0.53</td><td>-95.1%</td><td>-95.1%</td><td>0.588</td></tr>
+    <tr><td>ATOM_H</td><td>0.655</td><td>0.862</td><td>25.07%</td><td>86.17%</td><td>0.29</td><td>-95.8%</td><td>-95.8%</td><td>0.383</td></tr>
+</table>
+
+<!-- 5. 결론 -->
+<h2>5. 결론 (Conclusion)</h2>
+
+<h3>5.1 연구 요약</h3>
+<p>본 연구는 Frazzini & Pedersen(2014)의 BAB 전략과 Campbell & Vuolteenaho(2004)의 Bad Beta 개념을 결합하여 암호화폐 시장에 적용한 BACBB(Betting Against Cryptocurrency Bad Beta) 전략을 제안하였다. VAR 모델과 Campbell-Shiller 분해를 통해 시장 수익률을 현금흐름 뉴스(Cash-Flow News)와 할인율 뉴스(Discount Rate News)로 분해하고, 각 자산의 현금흐름 베타(β<sub>CF</sub>)를 추정하였다.</p>
+
+<p>저 CF Beta 자산을 매수하고 고 CF Beta 자산을 매도하는 BACBB 전략은 2021년 1월부터 2026년 1월까지 약 5년간의 백테스트 기간 동안 연 14.14%, 샤프비율 1.04의 성과를 달성하였다. 이는 기존 BACB 전략(연 11.01%, 샤프 0.52) 대비 현저히 우수한 성과이다.</p>
+
+<h3>5.2 주요 발견</h3>
+<p class="no-indent"><strong>(1) Cash-Flow Beta의 유효성:</strong> 암호화폐 시장에서 현금흐름 베타는 유의미한 자산 선별 기준으로 작동한다. 저 CF Beta 자산은 고 CF Beta 자산 대비 연 24.79% 높은 수익률을 제공한다(t=2.98, p=0.003).</p>
+
+<p class="no-indent"><strong>(2) BACBB의 우수성:</strong> BACBB는 BACB 대비 샤프비율 2배(1.04 vs 0.52), MDD 1/3 수준(-16.15% vs -44.12%)의 우수한 위험조정 성과를 달성하였다.</p>
+
+<p class="no-indent"><strong>(3) 통계적 유의성:</strong> t-통계량 2.79(p=0.0054)로 1% 유의수준에서 통계적으로 유의하다.</p>
+
+<p class="no-indent"><strong>(4) Out-of-Sample 견고성:</strong> OOS 기간에서도 샤프비율 1.09(p=0.037)를 기록하여 전략의 견고성이 확인되었다.</p>
+
+<p class="no-indent"><strong>(5) 하락장 방어력:</strong> BACBB는 시장 하락의 85.5%를 방어하며, BACB(74.6%) 대비 10.9%p 높은 방어율을 보인다.</p>
+
+<h3>5.3 학술적 기여</h3>
+<p>본 연구의 학술적 기여는 다음과 같다:</p>
+
+<p class="no-indent">첫째, 암호화폐 시장에 Bad Beta 개념을 최초로 적용하였다. 기존 연구들은 주로 주식시장에서 Bad Beta를 분석하였으나, 본 연구는 암호화폐라는 새로운 자산군에서 이 개념의 유효성을 검증하였다.</p>
+
+<p class="no-indent">둘째, VAR 모델 기반 Cash-Flow Beta 추정 방법론을 제시하였다. 암호화폐 시장의 특성(높은 변동성, 짧은 역사)을 고려한 상태변수 선택과 할인인자 설정을 통해 안정적인 Cash-Flow News 추출이 가능함을 보였다.</p>
+
+<p class="no-indent">셋째, 실제 거래비용(바이낸스 Taker 수수료 0.04%)과 펀딩비를 반영한 실무적 전략을 구현하였다. 이를 통해 학술적 연구와 실무 적용 간의 간극을 줄였다.</p>
+
+<p class="no-indent">넷째, 통계적으로 유의한 초과수익을 달성하여 암호화폐 시장의 비효율성을 입증하였다.</p>
+
+<h3>5.4 실무적 시사점</h3>
+<p>본 연구의 결과는 암호화폐 투자자와 자산운용사에게 다음과 같은 실무적 시사점을 제공한다:</p>
+
+<p class="no-indent">첫째, 단순한 총 베타가 아닌 현금흐름 베타를 기준으로 자산을 선별함으로써 위험조정 성과를 크게 개선할 수 있다.</p>
+
+<p class="no-indent">둘째, 하락장에서의 방어력이 중요한 투자자에게 BACBB 전략은 효과적인 대안이 될 수 있다.</p>
+
+<p class="no-indent">셋째, 암호화폐 시장에서도 전통 금융시장에서 검증된 팩터 투자 전략이 유효하게 작동할 수 있음을 확인하였다.</p>
+
+<h3>5.5 연구의 한계 및 향후 연구 방향</h3>
+<p>본 연구의 한계와 향후 연구 방향은 다음과 같다:</p>
+
+<p class="no-indent">첫째, 분석 기간이 약 5년으로 상대적으로 짧다. 암호화폐 시장의 역사가 짧기 때문에 불가피한 측면이 있으나, 향후 데이터가 축적됨에 따라 보다 장기적인 검증이 필요하다.</p>
+
+<p class="no-indent">둘째, 본 연구는 바이낸스 거래소에 상장된 50개 암호화폐만을 대상으로 하였다. 향후 연구에서는 더 많은 자산과 거래소를 포함하여 결과의 일반화 가능성을 검증할 필요가 있다.</p>
+
+<p class="no-indent">셋째, VAR 모델의 상태변수 선택에 대한 추가적인 검토가 필요하다. 암호화폐 시장의 특성을 더 잘 반영하는 상태변수를 발굴함으로써 Cash-Flow News 추출의 정확도를 높일 수 있을 것이다.</p>
+
+<!-- References -->
+<h2>References</h2>
+<div class="references">
+<p>Black, F. (1972). Capital market equilibrium with restricted borrowing. <em>Journal of Business</em>, 45(3), 444-455.</p>
+
+<p>Black, F., Jensen, M. C., & Scholes, M. (1972). The capital asset pricing model: Some empirical tests. <em>Studies in the Theory of Capital Markets</em>, 81(3), 79-121.</p>
+
+<p>Borri, N., & Shakhnov, K. (2022). The cross-section of cryptocurrency returns. <em>Review of Asset Pricing Studies</em>, 12(2), 667-705.</p>
+
+<p>Campbell, J. Y., & Shiller, R. J. (1988). The dividend-price ratio and expectations of future dividends and discount factors. <em>Review of Financial Studies</em>, 1(3), 195-228.</p>
+
+<p>Campbell, J. Y., & Vuolteenaho, T. (2004). Bad beta, good beta. <em>American Economic Review</em>, 94(5), 1249-1275.</p>
+
+<p>Fama, E. F., & French, K. R. (1993). Common risk factors in the returns on stocks and bonds. <em>Journal of Financial Economics</em>, 33(1), 3-56.</p>
+
+<p>Frazzini, A., & Pedersen, L. H. (2014). Betting against beta. <em>Journal of Financial Economics</em>, 111(1), 1-25.</p>
+
+<p>Liu, Y., Tsyvinski, A., & Wu, X. (2022). Common risk factors in cryptocurrency. <em>Journal of Finance</em>, 77(2), 1133-1177.</p>
+
+<p>Vasicek, O. A. (1973). A note on using cross-sectional information in Bayesian estimation of security betas. <em>Journal of Finance</em>, 28(5), 1233-1239.</p>
+</div>
+
+</body>
+</html>
