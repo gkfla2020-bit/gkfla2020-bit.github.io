@@ -148,8 +148,13 @@ section{padding:80px 50px;max-width:900px;margin:0 auto}
 .two-col-section .section-title{margin-bottom:25px}
 .two-col-section .post-item{padding:20px 0}
 
-.skills-basket-section{padding:40px 50px;max-width:900px;margin:0 auto}
-.basket-container{width:100%;max-width:600px;height:300px;margin:0 auto;position:relative;background:linear-gradient(180deg,transparent 0%,rgba(0,0,0,.02) 100%);border-radius:0 0 20px 20px;overflow:hidden}
+.skills-basket-section{padding:40px 50px;max-width:700px;margin:0 auto}
+.research-highlights{text-align:center;margin-bottom:10px}
+.stats-row{display:flex;justify-content:center;gap:30px}
+.stat-card{background:#fff;border:1px solid #e8e8e8;padding:25px 35px;min-width:100px;text-align:center}
+.stat-number{font-family:'Cormorant Garamond',serif;font-size:2.5rem;font-weight:500;color:#1a1a1a;line-height:1}
+.stat-label{font-size:.7rem;color:#888;letter-spacing:.1em;text-transform:uppercase;margin-top:8px}
+.basket-container{width:100%;max-width:500px;height:200px;margin:0 auto;position:relative;border:2px solid #e0e0e0;border-top:2px solid #e0e0e0;border-radius:0 0 15px 15px;overflow:hidden;background:#fefefe}
 #skillsCanvas{width:100%;height:100%;display:block}
 
 @media(max-width:1024px){
@@ -277,8 +282,24 @@ section{padding:80px 50px;max-width:900px;margin:0 auto}
 
 <!-- Skills Basket with Physics -->
 <section class="skills-basket-section">
-    <h2 class="section-title" style="text-align:center;border:none;padding:0;margin-bottom:20px;">Skills & Tools</h2>
-    <p style="text-align:center;color:#888;font-size:.85rem;margin-bottom:20px;">Drag and throw the balls!</p>
+    <div class="research-highlights">
+        <h2 class="section-title" style="text-align:center;border:none;padding:0;margin-bottom:30px;">Research Highlights</h2>
+        <div class="stats-row">
+            <div class="stat-card">
+                <div class="stat-number">1</div>
+                <div class="stat-label">Paper</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number">3</div>
+                <div class="stat-label">Awards</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number">2+</div>
+                <div class="stat-label">Years</div>
+            </div>
+        </div>
+    </div>
+    <p style="text-align:center;color:#888;font-size:.75rem;margin:25px 0 15px;">Skills & Tools — drag them!</p>
     <div class="basket-container">
         <canvas id="skillsCanvas"></canvas>
     </div>
@@ -482,70 +503,87 @@ function initSkillsBasket() {
           MouseConstraint = Matter.MouseConstraint;
     
     const engine = Engine.create();
-    engine.world.gravity.y = 1;
+    engine.world.gravity.y = 0.8;
     
-    // Walls (basket shape)
-    const wallThickness = 20;
+    // Walls (closed box - top included)
+    const wallThickness = 30;
     const walls = [
-        Bodies.rectangle(width, height + wallThickness/2, width * 2, wallThickness, { isStatic: true, render: { fillStyle: '#ddd' } }),
-        Bodies.rectangle(-wallThickness/2, height/2, wallThickness, height, { isStatic: true, render: { fillStyle: '#ddd' } }),
-        Bodies.rectangle(width + wallThickness/2, height/2, wallThickness, height, { isStatic: true, render: { fillStyle: '#ddd' } })
+        Bodies.rectangle(width, height + wallThickness/2, width * 2, wallThickness, { isStatic: true }),
+        Bodies.rectangle(-wallThickness/2, height/2, wallThickness, height * 2, { isStatic: true }),
+        Bodies.rectangle(width + wallThickness/2, height/2, wallThickness, height * 2, { isStatic: true }),
+        Bodies.rectangle(width/2, -wallThickness/2, width * 2, wallThickness, { isStatic: true })
     ];
     Composite.add(engine.world, walls);
     
-    // Skills as balls
-    const skills = ['Python', 'R', 'SQL', 'MATLAB', 'Git', 'LaTeX', 'VBA', 'Monte Carlo', 'VaR', 'ML'];
-    const colors = ['#3776ab', '#276dc3', '#f29111', '#e16737', '#f05032', '#008080', '#217346', '#6b5b95', '#d64161', '#ff6f61'];
+    // Skills with real icon URLs (using devicon CDN)
+    const skills = [
+        { name: 'Python', icon: 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/python/python-original.svg' },
+        { name: 'R', icon: 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/r/r-original.svg' },
+        { name: 'SQL', icon: 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/mysql/mysql-original.svg' },
+        { name: 'MATLAB', icon: 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/matlab/matlab-original.svg' },
+        { name: 'Git', icon: 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/git/git-original.svg' },
+        { name: 'LaTeX', icon: 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/latex/latex-original.svg' },
+        { name: 'Pandas', icon: 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/pandas/pandas-original.svg' },
+        { name: 'NumPy', icon: 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/numpy/numpy-original.svg' }
+    ];
+    
+    // Load images
+    const images = {};
+    let loadedCount = 0;
+    skills.forEach(s => {
+        const img = new Image();
+        img.crossOrigin = 'anonymous';
+        img.onload = () => { loadedCount++; };
+        img.src = s.icon;
+        images[s.name] = img;
+    });
+    
     const balls = [];
+    const radius = 22;
     
     skills.forEach((skill, i) => {
-        const radius = 28 + Math.random() * 12;
-        const x = 50 + Math.random() * (width - 100);
-        const y = -50 - i * 40;
+        const x = 40 + (i % 4) * 110 + Math.random() * 20;
+        const y = 30 + Math.floor(i / 4) * 50 + Math.random() * 20;
         const ball = Bodies.circle(x, y, radius, {
-            restitution: 0.6,
-            friction: 0.1,
-            render: { fillStyle: colors[i % colors.length] },
-            label: skill
+            restitution: 0.3,
+            friction: 0.3,
+            frictionAir: 0.02,
+            label: skill.name
         });
         balls.push(ball);
     });
     Composite.add(engine.world, balls);
     
-    // Custom renderer
     const ctx = canvas.getContext('2d');
     ctx.scale(2, 2);
     
     function render() {
         ctx.clearRect(0, 0, width, height);
         
-        // Draw basket outline
-        ctx.strokeStyle = '#e0e0e0';
-        ctx.lineWidth = 2;
-        ctx.beginPath();
-        ctx.moveTo(0, 0);
-        ctx.lineTo(0, height);
-        ctx.lineTo(width, height);
-        ctx.lineTo(width, 0);
-        ctx.stroke();
-        
-        // Draw balls with labels
         balls.forEach((ball, i) => {
             const pos = ball.position;
-            const radius = ball.circleRadius;
+            const angle = ball.angle;
+            const img = images[skills[i].name];
             
-            // Ball
+            ctx.save();
+            ctx.translate(pos.x, pos.y);
+            ctx.rotate(angle);
+            
+            // Draw circle background
             ctx.beginPath();
-            ctx.arc(pos.x, pos.y, radius, 0, Math.PI * 2);
-            ctx.fillStyle = colors[i % colors.length];
-            ctx.fill();
-            
-            // Label
+            ctx.arc(0, 0, radius, 0, Math.PI * 2);
             ctx.fillStyle = '#fff';
-            ctx.font = `bold ${Math.max(10, radius * 0.4)}px Inter, sans-serif`;
-            ctx.textAlign = 'center';
-            ctx.textBaseline = 'middle';
-            ctx.fillText(skills[i], pos.x, pos.y);
+            ctx.fill();
+            ctx.strokeStyle = '#e0e0e0';
+            ctx.lineWidth = 1;
+            ctx.stroke();
+            
+            // Draw icon
+            if (img && img.complete) {
+                ctx.drawImage(img, -radius * 0.7, -radius * 0.7, radius * 1.4, radius * 1.4);
+            }
+            
+            ctx.restore();
         });
         
         requestAnimationFrame(render);
@@ -559,13 +597,6 @@ function initSkillsBasket() {
         constraint: { stiffness: 0.2, render: { visible: false } }
     });
     Composite.add(engine.world, mouseConstraint);
-    
-    // Fix mouse position for scaled canvas
-    canvas.addEventListener('mousemove', (e) => {
-        const rect = canvas.getBoundingClientRect();
-        mouse.position.x = (e.clientX - rect.left) * 2;
-        mouse.position.y = (e.clientY - rect.top) * 2;
-    });
     
     Runner.run(engine);
     render();
