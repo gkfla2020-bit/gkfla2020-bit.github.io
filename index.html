@@ -29,7 +29,7 @@ layout: null
     <script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-83LKVW7412');</script>
     <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;500&family=Space+Mono:wght@400&family=Inter:wght@300;400&display=swap" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/matter-js/0.19.0/matter.min.js"></script>
+    <script src="/assets/matter.min.js"></script>
 </head>
 <body>
 <img src="/assets/og-card.png" alt="" style="position:absolute;width:1px;height:1px;opacity:0;pointer-events:none;" aria-hidden="true">
@@ -580,6 +580,9 @@ document.getElementById('enterBtn').addEventListener('click', () => {
             gsap.to('.hero-content', { opacity: 1, y: 0, duration: 0.5 });
             gsap.to('.section-title', { opacity: 1, y: 0, duration: 0.4, delay: 0.1 });
             gsap.to('.post-item', { opacity: 1, y: 0, duration: 0.4, delay: 0.15 });
+            
+            // Initialize Matter.js after main page is visible
+            setTimeout(initSkillsPhysics, 300);
         });
 });
 
@@ -641,226 +644,117 @@ setInterval(updateMarketData, 60000);
 // Matter.js Physics Skills Basket
 // Cross-browser compatible (Chrome, Safari, Firefox)
 // ============================================
-(function initSkillsPhysics() {
-    // Check if Matter.js loaded
-    if (typeof Matter === 'undefined') {
-        console.warn('Matter.js not loaded, using fallback');
-        createFallbackAnimation();
-        return;
-    }
-
-    const container = document.getElementById('skillsContainer');
-    if (!container) return;
-
-    const skills = [
-        { icon: 'python/python-original.svg', name: 'Python' },
-        { icon: 'r/r-original.svg', name: 'R' },
-        { icon: 'mysql/mysql-original.svg', name: 'SQL' },
-        { icon: 'matlab/matlab-original.svg', name: 'MATLAB' },
-        { icon: 'git/git-original.svg', name: 'Git' },
-        { icon: 'latex/latex-original.svg', name: 'LaTeX' },
-        { icon: 'pandas/pandas-original.svg', name: 'Pandas' },
-        { icon: 'numpy/numpy-original.svg', name: 'NumPy' }
-    ];
-
-    const { Engine, World, Bodies, Body, Mouse, MouseConstraint, Events } = Matter;
-
-    // Get container dimensions
-    const rect = container.getBoundingClientRect();
-    const width = rect.width || 500;
-    const height = rect.height || 180;
-    const ballRadius = window.innerWidth <= 768 ? 20 : 24;
-
-    // Create engine with custom settings for better cross-browser support
-    const engine = Engine.create({
-        enableSleeping: false,
-        constraintIterations: 2,
-        positionIterations: 6,
-        velocityIterations: 4
-    });
-    
-    // Reduce gravity for floaty feel
-    engine.world.gravity.y = 0.3;
-
-    // Create walls (invisible boundaries)
-    const wallOptions = { isStatic: true, restitution: 0.6, friction: 0.1 };
-    const walls = [
-        Bodies.rectangle(width / 2, height + 25, width + 100, 50, wallOptions), // bottom
-        Bodies.rectangle(width / 2, -25, width + 100, 50, wallOptions), // top
-        Bodies.rectangle(-25, height / 2, 50, height + 100, wallOptions), // left
-        Bodies.rectangle(width + 25, height / 2, 50, height + 100, wallOptions) // right
-    ];
-    World.add(engine.world, walls);
-
-    // Create DOM elements and physics bodies
-    const ballBodies = [];
-    const ballElements = [];
-
-    skills.forEach((skill, i) => {
-        // Create DOM element
-        const el = document.createElement('div');
-        el.className = 'physics-ball';
-        el.innerHTML = `<img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/${skill.icon}" alt="${skill.name}" draggable="false">`;
-        el.title = skill.name;
-        container.appendChild(el);
-        ballElements.push(el);
-
-        // Create physics body - spread out initial positions
-        const x = 50 + (i % 4) * ((width - 100) / 3);
-        const y = 30 + Math.floor(i / 4) * 60 + Math.random() * 20;
-        
-        const body = Bodies.circle(x, y, ballRadius, {
-            restitution: 0.7,
-            friction: 0.05,
-            frictionAir: 0.02,
-            density: 0.001,
-            label: skill.name
-        });
-        
-        // Give initial random velocity
-        Body.setVelocity(body, {
-            x: (Math.random() - 0.5) * 2,
-            y: (Math.random() - 0.5) * 2
-        });
-        
-        ballBodies.push(body);
-        World.add(engine.world, body);
-    });
-
-    // Mouse interaction - works across browsers
-    let isDragging = false;
-    let draggedBody = null;
-    let dragOffset = { x: 0, y: 0 };
-
-    container.addEventListener('mousedown', handleDragStart);
-    container.addEventListener('touchstart', handleDragStart, { passive: true });
-    
-    document.addEventListener('mousemove', handleDragMove);
-    document.addEventListener('touchmove', handleDragMove, { passive: true });
-    
-    document.addEventListener('mouseup', handleDragEnd);
-    document.addEventListener('touchend', handleDragEnd);
-
-    function getEventPos(e) {
-        const containerRect = container.getBoundingClientRect();
-        if (e.touches && e.touches[0]) {
-            return {
-                x: e.touches[0].clientX - containerRect.left,
-                y: e.touches[0].clientY - containerRect.top
-            };
+function initSkillsPhysics() {
+    try {
+        // Check if Matter.js loaded
+        if (typeof Matter === 'undefined') {
+            console.warn('Matter.js not loaded, using fallback');
+            createFallbackAnimation();
+            return;
         }
-        return {
-            x: e.clientX - containerRect.left,
-            y: e.clientY - containerRect.top
-        };
-    }
 
-    function handleDragStart(e) {
-        const pos = getEventPos(e);
+        const container = document.getElementById('skillsContainer');
+        if (!container) return;
+
+        const skills = [
+            { icon: 'python/python-original.svg', name: 'Python' },
+            { icon: 'r/r-original.svg', name: 'R' },
+            { icon: 'mysql/mysql-original.svg', name: 'SQL' },
+            { icon: 'matlab/matlab-original.svg', name: 'MATLAB' },
+            { icon: 'git/git-original.svg', name: 'Git' },
+            { icon: 'latex/latex-original.svg', name: 'LaTeX' },
+            { icon: 'pandas/pandas-original.svg', name: 'Pandas' },
+            { icon: 'numpy/numpy-original.svg', name: 'NumPy' }
+        ];
+
+        const { Engine, World, Bodies, Body } = Matter;
+
+        // Get container dimensions
+        const rect = container.getBoundingClientRect();
+        const width = rect.width || 500;
+        const height = rect.height || 180;
+        const ballRadius = window.innerWidth <= 768 ? 20 : 24;
+
+        // Create engine
+        const engine = Engine.create({
+            enableSleeping: false
+        });
         
-        // Find which ball was clicked
-        for (let i = 0; i < ballBodies.length; i++) {
-            const body = ballBodies[i];
-            const dx = pos.x - body.position.x;
-            const dy = pos.y - body.position.y;
-            const dist = Math.sqrt(dx * dx + dy * dy);
+        engine.world.gravity.y = 0.3;
+
+        // Create walls
+        const wallOptions = { isStatic: true, restitution: 0.6, friction: 0.1 };
+        const walls = [
+            Bodies.rectangle(width / 2, height + 25, width + 100, 50, wallOptions),
+            Bodies.rectangle(width / 2, -25, width + 100, 50, wallOptions),
+            Bodies.rectangle(-25, height / 2, 50, height + 100, wallOptions),
+            Bodies.rectangle(width + 25, height / 2, 50, height + 100, wallOptions)
+        ];
+        World.add(engine.world, walls);
+
+        // Create balls
+        const ballBodies = [];
+        const ballElements = [];
+
+        skills.forEach((skill, i) => {
+            const el = document.createElement('div');
+            el.className = 'physics-ball';
+            el.innerHTML = `<img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/${skill.icon}" alt="${skill.name}" draggable="false">`;
+            el.title = skill.name;
+            container.appendChild(el);
+            ballElements.push(el);
+
+            const x = 50 + (i % 4) * ((width - 100) / 3);
+            const y = 30 + Math.floor(i / 4) * 60 + Math.random() * 20;
             
-            if (dist < ballRadius + 5) {
-                isDragging = true;
-                draggedBody = body;
-                dragOffset = { x: dx, y: dy };
-                Body.setStatic(body, true);
-                ballElements[i].style.cursor = 'grabbing';
-                e.preventDefault();
-                break;
-            }
-        }
-    }
-
-    function handleDragMove(e) {
-        if (!isDragging || !draggedBody) return;
-        // Don't prevent default - allow normal scrolling
-        
-        const pos = getEventPos(e);
-        const newX = Math.max(ballRadius, Math.min(width - ballRadius, pos.x - dragOffset.x));
-        const newY = Math.max(ballRadius, Math.min(height - ballRadius, pos.y - dragOffset.y));
-        
-        Body.setPosition(draggedBody, { x: newX, y: newY });
-    }
-
-    function handleDragEnd(e) {
-        if (draggedBody) {
-            Body.setStatic(draggedBody, false);
-            // Give a little push when released
-            Body.setVelocity(draggedBody, {
-                x: (Math.random() - 0.5) * 3,
-                y: -2
+            const body = Bodies.circle(x, y, ballRadius, {
+                restitution: 0.7,
+                friction: 0.05,
+                frictionAir: 0.02,
+                density: 0.001
             });
             
-            const idx = ballBodies.indexOf(draggedBody);
-            if (idx >= 0) ballElements[idx].style.cursor = 'grab';
-        }
-        isDragging = false;
-        draggedBody = null;
-    }
-
-    // Animation loop - cross-browser compatible
-    let lastTime = 0;
-    const targetFPS = 60;
-    const frameTime = 1000 / targetFPS;
-
-    function animate(currentTime) {
-        requestAnimationFrame(animate);
-        
-        // Throttle to ~60fps
-        if (currentTime - lastTime < frameTime * 0.8) return;
-        lastTime = currentTime;
-
-        // Update physics
-        Engine.update(engine, frameTime);
-
-        // Sync DOM elements with physics bodies
-        for (let i = 0; i < ballBodies.length; i++) {
-            const body = ballBodies[i];
-            const el = ballElements[i];
+            Body.setVelocity(body, {
+                x: (Math.random() - 0.5) * 2,
+                y: (Math.random() - 0.5) * 2
+            });
             
-            // Use transform for better performance
-            const x = body.position.x - ballRadius;
-            const y = body.position.y - ballRadius;
-            const angle = body.angle * (180 / Math.PI);
-            
-            el.style.transform = `translate(${x}px, ${y}px) rotate(${angle}deg)`;
-        }
+            ballBodies.push(body);
+            World.add(engine.world, body);
+        });
 
-        // Add subtle random forces for liveliness
-        if (Math.random() < 0.02) {
-            const randomBody = ballBodies[Math.floor(Math.random() * ballBodies.length)];
-            if (!randomBody.isStatic) {
-                Body.applyForce(randomBody, randomBody.position, {
+        // Simple animation loop
+        function animate() {
+            Engine.update(engine, 16.67);
+
+            for (let i = 0; i < ballBodies.length; i++) {
+                const body = ballBodies[i];
+                const el = ballElements[i];
+                const x = body.position.x - ballRadius;
+                const y = body.position.y - ballRadius;
+                el.style.transform = `translate(${x}px, ${y}px)`;
+            }
+
+            // Random nudge
+            if (Math.random() < 0.02) {
+                const rb = ballBodies[Math.floor(Math.random() * ballBodies.length)];
+                Body.applyForce(rb, rb.position, {
                     x: (Math.random() - 0.5) * 0.0005,
                     y: (Math.random() - 0.5) * 0.0005
                 });
             }
+
+            requestAnimationFrame(animate);
         }
+
+        requestAnimationFrame(animate);
+        console.log('Matter.js initialized successfully');
+
+    } catch (err) {
+        console.error('Matter.js error:', err);
+        createFallbackAnimation();
     }
-
-    // Start animation
-    requestAnimationFrame(animate);
-
-    // Handle container resize
-    let resizeTimeout;
-    window.addEventListener('resize', function() {
-        clearTimeout(resizeTimeout);
-        resizeTimeout = setTimeout(function() {
-            // Reinitialize on significant resize
-            const newRect = container.getBoundingClientRect();
-            if (Math.abs(newRect.width - width) > 50) {
-                location.reload();
-            }
-        }, 500);
-    });
-
-})();
+};
 
 // Fallback for browsers without Matter.js support
 function createFallbackAnimation() {
