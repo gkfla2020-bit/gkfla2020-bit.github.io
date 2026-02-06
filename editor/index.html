@@ -1,0 +1,277 @@
+---
+layout: null
+---
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Blog Post Editor | Ha Rim Jung</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;500;700&family=Space+Mono:wght@400&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: 'Inter', sans-serif; background: #1a1a1a; color: #fff; height: 100vh; overflow: hidden; }
+
+.editor-container { display: grid; grid-template-columns: 1fr 1fr; height: 100vh; }
+
+/* Left: Editor */
+.editor-panel { background: #1e1e1e; display: flex; flex-direction: column; border-right: 1px solid #333; }
+.editor-header { padding: 15px 20px; background: #252525; border-bottom: 1px solid #333; }
+.editor-header h2 { font-size: .8rem; color: #888; letter-spacing: .1em; text-transform: uppercase; margin-bottom: 10px; }
+.meta-inputs { display: flex; gap: 10px; flex-wrap: wrap; }
+.meta-inputs input { background: #333; border: 1px solid #444; color: #fff; padding: 8px 12px; font-size: .85rem; border-radius: 4px; }
+.meta-inputs input:focus { outline: none; border-color: #0080c6; }
+#postTitle { flex: 2; min-width: 200px; }
+#postDate { width: 130px; }
+#postCategory { width: 120px; }
+
+.editor-body { flex: 1; padding: 0; }
+#markdownInput { 
+    width: 100%; height: 100%; background: #1e1e1e; border: none; color: #e0e0e0; 
+    font-family: 'Space Mono', monospace; font-size: 14px; line-height: 1.8; 
+    padding: 20px; resize: none; 
+}
+#markdownInput:focus { outline: none; }
+#markdownInput::placeholder { color: #555; }
+
+/* Right: Preview */
+.preview-panel { background: #fafaf8; overflow-y: auto; }
+.preview-header { 
+    padding: 15px 20px; background: rgba(255,255,255,.95); border-bottom: 1px solid #e0e0e0; 
+    position: sticky; top: 0; z-index: 10; display: flex; justify-content: space-between; align-items: center;
+}
+.preview-header h2 { font-size: .8rem; color: #888; letter-spacing: .1em; text-transform: uppercase; }
+.preview-actions { display: flex; gap: 10px; }
+.btn { padding: 8px 16px; font-size: .75rem; border: none; border-radius: 4px; cursor: pointer; transition: all .2s; }
+.btn-primary { background: #1a1a1a; color: #fff; }
+.btn-primary:hover { background: #333; }
+.btn-secondary { background: #e8e8e8; color: #333; }
+.btn-secondary:hover { background: #ddd; }
+
+/* Preview Content - Blog Style */
+.preview-content { padding: 40px; max-width: 800px; margin: 0 auto; color: #1a1a1a; }
+.preview-content .post-header { margin-bottom: 40px; padding-bottom: 30px; border-bottom: 1px solid #e0e0e0; }
+.preview-content .post-date { font-size: .7rem; color: #888; letter-spacing: .15em; text-transform: uppercase; margin-bottom: 15px; }
+.preview-content .post-title { font-family: 'Cormorant Garamond', serif; font-size: 2.5rem; font-weight: 500; line-height: 1.2; margin-bottom: 15px; }
+.preview-content .post-category { display: inline-block; font-size: .65rem; color: #0080c6; letter-spacing: .1em; text-transform: uppercase; padding: 4px 10px; background: rgba(0,128,198,.08); border-radius: 3px; }
+
+.preview-content .post-body { font-family: 'Georgia', serif; font-size: 17px; line-height: 1.9; }
+.preview-content .post-body h1 { font-family: 'Cormorant Garamond', serif; font-size: 2rem; font-weight: 500; margin: 50px 0 20px; padding-bottom: 10px; border-bottom: 1px solid #e0e0e0; }
+.preview-content .post-body h2 { font-family: 'Cormorant Garamond', serif; font-size: 1.6rem; font-weight: 500; margin: 40px 0 15px; color: #333; }
+.preview-content .post-body h3 { font-size: 1.2rem; font-weight: 600; margin: 30px 0 12px; color: #444; }
+.preview-content .post-body p { margin-bottom: 20px; text-align: justify; }
+.preview-content .post-body ul, .preview-content .post-body ol { margin: 20px 0 20px 25px; }
+.preview-content .post-body li { margin-bottom: 8px; }
+.preview-content .post-body blockquote { border-left: 3px solid #0080c6; padding: 15px 20px; margin: 25px 0; background: #f8f8f8; font-style: italic; color: #555; }
+.preview-content .post-body code { font-family: 'Space Mono', monospace; background: #f0f0f0; padding: 2px 6px; border-radius: 3px; font-size: .9em; }
+.preview-content .post-body pre { background: #1e1e1e; color: #e0e0e0; padding: 20px; border-radius: 5px; overflow-x: auto; margin: 25px 0; }
+.preview-content .post-body pre code { background: none; padding: 0; color: inherit; }
+.preview-content .post-body strong { font-weight: 600; }
+.preview-content .post-body a { color: #0080c6; text-decoration: none; border-bottom: 1px solid rgba(0,128,198,.3); }
+.preview-content .post-body a:hover { border-bottom-color: #0080c6; }
+.preview-content .post-body img { max-width: 100%; height: auto; margin: 25px 0; border-radius: 5px; }
+.preview-content .post-body table { width: 100%; border-collapse: collapse; margin: 25px 0; font-size: .9rem; }
+.preview-content .post-body th, .preview-content .post-body td { padding: 12px; border: 1px solid #e0e0e0; text-align: left; }
+.preview-content .post-body th { background: #f5f5f5; font-weight: 600; }
+
+/* Toast notification */
+.toast { position: fixed; bottom: 20px; right: 20px; background: #1a1a1a; color: #fff; padding: 12px 20px; border-radius: 5px; font-size: .85rem; opacity: 0; transition: opacity .3s; z-index: 1000; }
+.toast.show { opacity: 1; }
+
+@media (max-width: 900px) {
+    .editor-container { grid-template-columns: 1fr; }
+    .preview-panel { display: none; }
+}
+    </style>
+</head>
+<body>
+<div class="editor-container">
+    <div class="editor-panel">
+        <div class="editor-header">
+            <h2>Post Editor</h2>
+            <div class="meta-inputs">
+                <input type="text" id="postTitle" placeholder="Post Title">
+                <input type="date" id="postDate">
+                <input type="text" id="postCategory" placeholder="Category">
+            </div>
+        </div>
+        <div class="editor-body">
+            <textarea id="markdownInput" placeholder="Write your post in Markdown...
+
+# Heading 1
+## Heading 2
+
+This is a paragraph with **bold** and *italic* text.
+
+- List item 1
+- List item 2
+
+> This is a blockquote
+
+```python
+def hello():
+    print('Hello, World!')
+```
+"></textarea>
+        </div>
+    </div>
+    
+    <div class="preview-panel">
+        <div class="preview-header">
+            <h2>Preview</h2>
+            <div class="preview-actions">
+                <button class="btn btn-secondary" onclick="copyHTML()">Copy HTML</button>
+                <button class="btn btn-primary" onclick="downloadPost()">Download</button>
+            </div>
+        </div>
+        <div class="preview-content">
+            <div class="post-header">
+                <div class="post-date" id="previewDate">February 06, 2026</div>
+                <h1 class="post-title" id="previewTitle">Untitled Post</h1>
+                <span class="post-category" id="previewCategory">Research</span>
+            </div>
+            <div class="post-body" id="previewBody">
+                <p>Start writing to see the preview...</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const titleInput = document.getElementById('postTitle');
+const dateInput = document.getElementById('postDate');
+const categoryInput = document.getElementById('postCategory');
+const markdownInput = document.getElementById('markdownInput');
+const previewTitle = document.getElementById('previewTitle');
+const previewDate = document.getElementById('previewDate');
+const previewCategory = document.getElementById('previewCategory');
+const previewBody = document.getElementById('previewBody');
+
+// Set default date
+dateInput.valueAsDate = new Date();
+
+// Update preview on input
+function updatePreview() {
+    previewTitle.textContent = titleInput.value || 'Untitled Post';
+    previewCategory.textContent = categoryInput.value || 'Research';
+    
+    if (dateInput.value) {
+        const date = new Date(dateInput.value);
+        previewDate.textContent = date.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: '2-digit' });
+    }
+    
+    const markdown = markdownInput.value;
+    if (markdown.trim()) {
+        previewBody.innerHTML = marked.parse(markdown);
+    } else {
+        previewBody.innerHTML = '<p>Start writing to see the preview...</p>';
+    }
+}
+
+titleInput.addEventListener('input', updatePreview);
+dateInput.addEventListener('input', updatePreview);
+categoryInput.addEventListener('input', updatePreview);
+markdownInput.addEventListener('input', updatePreview);
+
+// Show toast
+function showToast(message) {
+    const toast = document.getElementById('toast');
+    toast.textContent = message;
+    toast.classList.add('show');
+    setTimeout(() => toast.classList.remove('show'), 2000);
+}
+
+// Copy HTML
+function copyHTML() {
+    const html = generateFullHTML();
+    navigator.clipboard.writeText(html).then(() => {
+        showToast('HTML copied to clipboard!');
+    });
+}
+
+// Download post
+function downloadPost() {
+    const html = generateFullHTML();
+    const blob = new Blob([html], { type: 'text/html' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    const filename = titleInput.value.toLowerCase().replace(/[^a-z0-9]+/g, '-') || 'post';
+    a.href = url;
+    a.download = `${filename}.html`;
+    a.click();
+    URL.revokeObjectURL(url);
+    showToast('Post downloaded!');
+}
+
+// Generate full HTML with blog template
+function generateFullHTML() {
+    const title = titleInput.value || 'Untitled Post';
+    const date = dateInput.value;
+    const category = categoryInput.value || 'Research';
+    const content = marked.parse(markdownInput.value);
+    const dateFormatted = date ? new Date(date).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: '2-digit' }) : '';
+    
+    return `---
+layout: null
+---
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>${title} | Ha Rim Jung</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;500;700&family=Space+Mono:wght@400&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+    <style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: 'Inter', sans-serif; background: #fafaf8; color: #1a1a1a; line-height: 1.7; }
+.container { max-width: 800px; margin: 0 auto; padding: 60px 40px; }
+.post-header { margin-bottom: 40px; padding-bottom: 30px; border-bottom: 1px solid #e0e0e0; }
+.post-date { font-size: .7rem; color: #888; letter-spacing: .15em; text-transform: uppercase; margin-bottom: 15px; }
+.post-title { font-family: 'Cormorant Garamond', serif; font-size: 2.5rem; font-weight: 500; line-height: 1.2; margin-bottom: 15px; }
+.post-category { display: inline-block; font-size: .65rem; color: #0080c6; letter-spacing: .1em; text-transform: uppercase; padding: 4px 10px; background: rgba(0,128,198,.08); border-radius: 3px; }
+.post-body { font-family: 'Georgia', serif; font-size: 17px; line-height: 1.9; }
+.post-body h1 { font-family: 'Cormorant Garamond', serif; font-size: 2rem; font-weight: 500; margin: 50px 0 20px; padding-bottom: 10px; border-bottom: 1px solid #e0e0e0; }
+.post-body h2 { font-family: 'Cormorant Garamond', serif; font-size: 1.6rem; font-weight: 500; margin: 40px 0 15px; color: #333; }
+.post-body h3 { font-size: 1.2rem; font-weight: 600; margin: 30px 0 12px; color: #444; }
+.post-body p { margin-bottom: 20px; text-align: justify; }
+.post-body ul, .post-body ol { margin: 20px 0 20px 25px; }
+.post-body li { margin-bottom: 8px; }
+.post-body blockquote { border-left: 3px solid #0080c6; padding: 15px 20px; margin: 25px 0; background: #f8f8f8; font-style: italic; color: #555; }
+.post-body code { font-family: 'Space Mono', monospace; background: #f0f0f0; padding: 2px 6px; border-radius: 3px; font-size: .9em; }
+.post-body pre { background: #1e1e1e; color: #e0e0e0; padding: 20px; border-radius: 5px; overflow-x: auto; margin: 25px 0; }
+.post-body pre code { background: none; padding: 0; color: inherit; }
+.post-body strong { font-weight: 600; }
+.post-body a { color: #0080c6; text-decoration: none; border-bottom: 1px solid rgba(0,128,198,.3); }
+.post-body a:hover { border-bottom-color: #0080c6; }
+.post-body img { max-width: 100%; height: auto; margin: 25px 0; border-radius: 5px; }
+.post-body table { width: 100%; border-collapse: collapse; margin: 25px 0; font-size: .9rem; }
+.post-body th, .post-body td { padding: 12px; border: 1px solid #e0e0e0; text-align: left; }
+.post-body th { background: #f5f5f5; font-weight: 600; }
+.back-link { display: inline-block; margin-top: 40px; font-size: .85rem; color: #888; text-decoration: none; }
+.back-link:hover { color: #0080c6; }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="post-header">
+        <div class="post-date">${dateFormatted}</div>
+        <h1 class="post-title">${title}</h1>
+        <span class="post-category">${category}</span>
+    </div>
+    <div class="post-body">
+${content}
+    </div>
+    <a href="/" class="back-link">← Back to Home</a>
+</div>
+</body>
+</html>`;
+}
+
+// Initial preview
+updatePreview();
+</script>
+</body>
+</html>
