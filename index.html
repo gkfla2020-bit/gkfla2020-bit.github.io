@@ -36,7 +36,7 @@ layout: null
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
 body{font-family:'Inter',sans-serif;background:#08080c;color:#fff;overflow:hidden}
-body.entered{overflow:auto;background:#fafaf8}
+body.entered{overflow:auto;background:#fafaf8;overscroll-behavior-y:contain}
 #intro{position:fixed;inset:0;z-index:9999;background:#08080c}
 
 .f{
@@ -129,7 +129,7 @@ body.entered{overflow:auto;background:#fafaf8}
 
 .sidebar-footer{padding-top:20px;border-top:1px solid rgba(0,0,0,.06);font-size:.7rem;color:#aaa;text-align:center}
 
-.main-wrapper{margin-left:280px;margin-right:260px;min-height:100vh}
+.main-wrapper{margin-left:280px;margin-right:260px;min-height:100vh;overscroll-behavior:contain}
 
 /* Right Sidebar - Market Widget */
 .right-sidebar{position:fixed;right:0;top:0;width:260px;height:100vh;background:rgba(255,255,255,.97);backdrop-filter:blur(10px);border-left:1px solid rgba(0,0,0,.06);padding:30px 20px;z-index:100;overflow-y:auto}
@@ -715,10 +715,10 @@ setInterval(updateMarketData, 60000);
     let dragOffset = { x: 0, y: 0 };
 
     container.addEventListener('mousedown', handleDragStart);
-    container.addEventListener('touchstart', handleDragStart, { passive: false });
+    container.addEventListener('touchstart', handleDragStart, { passive: true });
     
     document.addEventListener('mousemove', handleDragMove);
-    document.addEventListener('touchmove', handleDragMove, { passive: false });
+    document.addEventListener('touchmove', handleDragMove, { passive: true });
     
     document.addEventListener('mouseup', handleDragEnd);
     document.addEventListener('touchend', handleDragEnd);
@@ -761,7 +761,7 @@ setInterval(updateMarketData, 60000);
 
     function handleDragMove(e) {
         if (!isDragging || !draggedBody) return;
-        e.preventDefault();
+        // Don't prevent default - allow normal scrolling
         
         const pos = getEventPos(e);
         const newX = Math.max(ballRadius, Math.min(width - ballRadius, pos.x - dragOffset.x));
