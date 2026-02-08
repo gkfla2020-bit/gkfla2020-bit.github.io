@@ -92,6 +92,9 @@ permalink: /research/bacbb/
         ul{margin-left:2em;margin-bottom:15px}
         ul li{margin-bottom:8px}
         
+        .definition-box{background:#fff9e6;border:1px solid #ffc107;border-radius:4px;padding:20px;margin:20px 0}
+        .highlight-box{background:#e8f4f8;border-left:4px solid #3498db;padding:20px;margin:20px 0}
+        .equation-number{float:right;margin-right:10px;color:#888;font-size:13px}
         /* Mobile */
         @media(max-width:1024px){
             .sidebar{width:100%;height:auto;position:relative;border-right:none;border-bottom:1px solid rgba(0,0,0,.08);padding:20px 16px}
@@ -221,30 +224,301 @@ permalink: /research/bacbb/
 
 <!-- 2. 선행연구 -->
 <h2>2. 선행연구</h2>
-
-<h3>2.1 저베타 이상현상 (Low Beta Anomaly)</h3>
-<p>자산 가격 결정 모델의 고전인 CAPM에 대한 비판적 검토는 Black(1972)에 의해 본격적으로 시작되었다. Black은 "Capital Market Equilibrium with Restricted Borrowing"을 통해 현실 시장에서 무위험 수익률로 무제한 차입이 불가능하다는 점을 지적하며, 이 경우 증권시장선(Security Market Line, SML)이 이론적 예측치보다 더 완만한 형태를 띠게 됨을 최초로 발견하였다.</p>
-
-<p>이는 기대수익률이 베타에 비례하여 선형적으로 상승한다는 전통적 CAPM의 예측과 달리, 실제로는 저베타 자산이 이론가 대비 과소평가되어 높은 위험조정 수익률을 기록하고 고베타 자산은 과대평가되는 현상을 제시한다. 이 연구는 이후 저베타 이상현상의 시초로 이론적 기틀이 되었다.</p>
-
-<div class="table-caption">Table 1. 저베타 이상현상과 투자 시사점</div>
-<table>
-    <tr><th>구분</th><th>이론적 SML (CAPM)</th><th>실증적 SML (Empirical)</th><th>투자 시사점</th></tr>
-    <tr><td>Slope</td><td>가파름</td><td>Flatter</td><td>고베타 자산의 위험 프리미엄이 낮음</td></tr>
-    <tr><td>Low β</td><td>적정 가치 평가</td><td>Underpriced</td><td>Long 기회</td></tr>
-    <tr><td>High β</td><td>적정 가치 평가</td><td>Overpriced</td><td>Short 기회</td></tr>
-    <tr><td>전략 방향</td><td>베타에 비례한 수익</td><td>BACBB 전략 활용</td><td>저베타 매수 + 고베타 매도</td></tr>
-</table>
-
-<h3>2.2 BAB(Betting Against Beta) 전략</h3>
-<p>저베타 이상현상에 대한 설명으로 Frazzini & Pedersen(2014)은 레버리지 제약 가설을 제시하였다. 이들에 따르면, 연기금·뮤추얼 펀드 등 기관투자자들은 규제나 내부 정책으로 인해 레버리지 사용이 제한되어 있다. 이러한 투자자들이 높은 기대수익률을 추구하기 위해서는 레버리지를 사용하는 대신 고베타 자산에 투자할 수밖에 없으며, 결과적으로 고베타 자산에 대한 초과 수요가 발생하여 고베타 자산은 과대평가되고 저베타 자산은 과소평가된다.</p>
-
-<p>Frazzini & Pedersen(2014)은 이러한 가격 왜곡을 활용하여 저베타 자산을 레버리지하여 매수하고, 고베타 자산을 매도하는 BAB(Betting Against Beta) 전략을 제안하였으며, 이 전략이 주식·채권·외환·상품 등 다양한 자산군에서 통계적으로 유의미한 위험조정 초과수익을 창출함을 입증하였다.</p>
-
-<h3>2.3 암호화폐 시장에서의 팩터 투자 연구</h3>
-<p>암호화폐 시장에서의 팩터 투자 전략에 대한 학술적 관심이 증가하고 있다. Liu et al.(2022)은 암호화폐 시장에서 모멘텀, 규모, 변동성 등 다양한 팩터의 유효성을 검증하였으며, Borri & Shakhnov(2022)는 암호화폐 횡단면 수익률의 결정요인을 분석하였다.</p>
-
-<p>그러나 기존의 암호화폐 BAB 연구들은 Frazzini & Pedersen(2014)의 방법론을 그대로 적용하여 총 베타만을 기준으로 포트폴리오를 구성하였다. 이러한 접근법은 베타의 이질성을 고려하지 못한다는 근본적인 한계를 가진다. 본 연구는 Campbell & Vuolteenaho(2004)의 Bad Beta 개념을 암호화폐 시장에 최초로 적용하여 이러한 한계를 극복하고자 한다.</p>
+        
+        <h3>2.1 저베타 이상현상의 이론적 기원</h3>
+        
+        <p>
+            자본자산가격결정모델(CAPM)의 근본적 전제에 대한 재검토는 Black(1972)의 "Capital Market Equilibrium with Restricted Borrowing"에서 시작되었다. Black은 완전자본시장 가정 하에서 무위험자산 수익률로 무제한 차입이 가능하다는 CAPM의 비현실적 가정을 비판하며, 차입 제약이 존재할 때 증권시장선(Security Market Line, SML)이 이론적 예측치보다 완만한 기울기를 갖게 됨을 수학적으로 증명하였다. 이는 저베타 자산이 CAPM이 예측하는 수익률보다 높은 수익률을 보이고, 고베타 자산은 그 반대의 양상을 보인다는 실증적 발견의 이론적 토대가 되었다.
+        </p>
+        
+        <p>
+            Black, Jensen, and Scholes(1972)는 이러한 이론적 예측을 1926년부터 1966년까지의 미국 주식시장 데이터를 통해 실증적으로 검증하였다. 이들은 베타별 포트폴리오를 구성하여 시계열 회귀분석을 실시한 결과, 실제 SML의 기울기가 CAPM이 예측하는 시장 위험 프리미엄보다 유의미하게 낮음을 발견하였다. 특히 저베타 포트폴리오의 위험조정 수익률이 고베타 포트폴리오보다 체계적으로 높게 나타나는 현상을 최초로 문서화하였다.
+        </p>
+        
+        <table>
+            <caption><strong>표 1.</strong> 저베타 이상현상의 이론적 예측과 실증적 발견</caption>
+            <thead>
+                <tr>
+                    <th>구분</th>
+                    <th>이론적 SML (CAPM)</th>
+                    <th>실증적 SML</th>
+                    <th>투자 시사점</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><strong>기울기</strong></td>
+                    <td>가파름 (시장 위험 프리미엄과 동일)</td>
+                    <td>완만함 (Flatter)</td>
+                    <td>베타에 대한 위험 보상 감소</td>
+                </tr>
+                <tr>
+                    <td><strong>저베타 자산</strong></td>
+                    <td>적정가치 평가</td>
+                    <td>과소평가 (Underpriced)</td>
+                    <td>매수 기회</td>
+                </tr>
+                <tr>
+                    <td><strong>고베타 자산</strong></td>
+                    <td>적정가치 평가</td>
+                    <td>과대평가 (Overpriced)</td>
+                    <td>매도 기회</td>
+                </tr>
+                <tr>
+                    <td><strong>전략적 함의</strong></td>
+                    <td>베타 중립적 투자</td>
+                    <td>BAB (Betting Against Beta) 전략</td>
+                    <td>저베타 매수 + 고베타 매도</td>
+                </tr>
+            </tbody>
+        </table>
+        
+        <h3>2.2 VAR 모델과 수익률 분해 이론</h3>
+        
+        <p>
+            자산 수익률의 근본적 원천을 이해하기 위한 학술적 노력은 Campbell and Shiller(1988)의 "The Dividend-Price Ratio and Expectations of Future Dividends and Discount Factors"에서 중요한 전환점을 맞이하였다. 이들은 로그선형 근사법을 활용하여 주가를 미래 배당금에 대한 기대치와 미래 할인율에 대한 기대치의 함수로 분해하는 혁신적인 방법론을 제시하였다. 특히 벡터자기회귀(Vector Autoregression, VAR) 모델을 통해 예상치 못한 수익률을 현금흐름 뉴스와 할인율 뉴스로 분해하는 이론적 틀을 확립하였다.
+        </p>
+        
+        <p>
+            Campbell and Shiller의 VAR 모델은 다음과 같은 시스템으로 표현된다:
+        </p>
+        
+        <div class="equation">
+            \[z_{t+1} = Az_t + u_{t+1}\]
+            <span class="equation-number">(1)</span>
+        </div>
+        
+        <p>
+            여기서 \(z_t\)는 상태변수 벡터(수익률, 배당수익률, 기타 예측변수 포함), \(A\)는 VAR 계수행렬, \(u_{t+1}\)은 혁신(innovation) 벡터를 나타낸다. 이 모델을 통해 예상치 못한 수익률은 다음과 같이 분해된다:
+        </p>
+        
+        <div class="equation">
+            \[r_{t+1} - E_t[r_{t+1}] = (E_{t+1} - E_t) \sum_{j=0}^{\infty} \rho^j \Delta d_{t+1+j} - (E_{t+1} - E_t) \sum_{j=1}^{\infty} \rho^j r_{t+1+j}\]
+            <span class="equation-number">(2)</span>
+        </div>
+        
+        <table>
+            <caption><strong>표 2.</strong> VAR 모델 기호 정의</caption>
+            <thead>
+                <tr>
+                    <th>기호</th>
+                    <th>정의</th>
+                    <th>일반적 값/설명</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><strong>A</strong></td>
+                    <td>VAR 계수행렬</td>
+                    <td>상태변수 간 동적 관계를 나타내는 행렬</td>
+                </tr>
+                <tr>
+                    <td><strong>u_{t+1}</strong></td>
+                    <td>혁신(innovation) 벡터</td>
+                    <td>예측 오차, VAR 잔차</td>
+                </tr>
+                <tr>
+                    <td><strong>e_1</strong></td>
+                    <td>선택벡터</td>
+                    <td>[1, 0, 0, ...]', 첫 번째 원소만 1</td>
+                </tr>
+                <tr>
+                    <td><strong>ρ</strong></td>
+                    <td>할인인자</td>
+                    <td>0.95 ~ 0.997 (연간 데이터 기준)</td>
+                </tr>
+                <tr>
+                    <td><strong>I</strong></td>
+                    <td>단위행렬</td>
+                    <td>대각선 원소가 1인 정방행렬</td>
+                </tr>
+            </tbody>
+        </table>
+        
+        <p>
+            현금흐름 뉴스(N_{CF})와 할인율 뉴스(N_{DR})는 VAR 시스템으로부터 다음과 같이 추출된다:
+        </p>
+        
+        <div class="equation">
+            \[N_{CF,t+1} = (e_1' + e_1'\rho A(I-\rho A)^{-1})u_{t+1}\]
+            <span class="equation-number">(3)</span>
+        </div>
+        
+        <div class="equation">
+            \[N_{DR,t+1} = e_1'\rho A(I-\rho A)^{-1}u_{t+1}\]
+            <span class="equation-number">(4)</span>
+        </div>
+        
+        <h3>2.3 팩터 모델의 확장과 베타의 다차원성</h3>
+        
+        <p>
+            Fama and French(1993)는 "Common Risk Factors in the Returns on Stocks and Bonds"를 통해 단일 팩터 CAPM의 한계를 극복하는 다팩터 모델을 제시하였다. 이들의 3팩터 모델은 시장 팩터(MKT) 외에 규모 팩터(SMB: Small Minus Big)와 가치 팩터(HML: High Minus Low)를 추가하여 주식 수익률의 횡단면적 변동을 보다 정확히 설명하였다.
+        </p>
+        
+        <div class="equation">
+            \[E[R_i] - R_f = \beta_i^{MKT}(E[R_M] - R_f) + \beta_i^{SMB}E[SMB] + \beta_i^{HML}E[HML]\]
+            <span class="equation-number">(5)</span>
+        </div>
+        
+        <p>
+            이 모델의 중요성은 단순히 설명력 향상에 그치지 않는다. 체계적 위험이 시장 베타 하나로만 측정될 수 없으며, 다양한 차원의 위험 노출도를 고려해야 한다는 인식의 전환을 가져왔다. 이는 후속 연구들이 베타 자체의 질적 차이, 즉 베타의 이질성에 주목하게 되는 중요한 계기가 되었다.
+        </p>
+        
+        <h3>2.4 Bad Beta와 Good Beta: 베타의 질적 구분</h3>
+        
+        <p>
+            Campbell and Vuolteenaho(2004)는 "Bad Beta, Good Beta"라는 획기적인 연구를 통해 Campbell and Shiller(1988)의 수익률 분해 이론을 베타 분석에 적용하였다. 이들은 자산의 총 베타를 현금흐름 베타(Cash-Flow Beta, \(\beta_{CF}\))와 할인율 베타(Discount-Rate Beta, \(\beta_{DR}\))로 분해하는 방법론을 개발하였다.
+        </p>
+        
+        <div class="equation">
+            \[\beta = \beta_{CF} + \beta_{DR}\]
+            <span class="equation-number">(6)</span>
+        </div>
+        
+        <p>
+            여기서 \(\beta_{CF}\)는 시장 전체의 현금흐름 뉴스에 대한 개별 자산의 민감도를, \(\beta_{DR}\)는 시장 전체의 할인율 뉴스에 대한 민감도를 나타낸다. 이들은 VAR 모델을 통해 추정된 뉴스 성분을 이용하여 베타를 다음과 같이 계산하였다:
+        </p>
+        
+        <div class="equation">
+            \[\beta_{CF,i} = \frac{Cov(r_i, N_{CF,M})}{Var(N_{CF,M})}, \quad \beta_{DR,i} = \frac{Cov(r_i, -N_{DR,M})}{Var(-N_{DR,M})}\]
+            <span class="equation-number">(7)</span>
+        </div>
+        
+        <div class="definition-box">
+            <p class="no-indent"><strong>Bad Beta와 Good Beta의 경제적 직관:</strong></p>
+            <p class="no-indent">• <strong>Bad Beta (\(\beta_{CF}\)):</strong> 영구적인 부의 충격을 나타내는 현금흐름 뉴스에 대한 민감도. 기업의 미래 수익성이 영구적으로 감소할 때 발생하는 손실은 회복이 불가능하므로 투자자들은 이러한 위험에 대해 더 높은 프리미엄(\(\gamma_{CF} \approx 3-4\))을 요구한다.</p>
+            <p class="no-indent">• <strong>Good Beta (\(\beta_{DR}\)):</strong> 일시적인 가격 변동을 야기하는 할인율 뉴스에 대한 민감도. 할인율 상승으로 인한 가격 하락은 미래 기대수익률 상승을 의미하므로 장기 투자자에게는 오히려 기회가 될 수 있다(\(\gamma_{DR} \approx 1\)).</p>
+        </div>
+        
+        <p>
+            실증 분석 결과, Campbell and Vuolteenaho(2004)는 현금흐름 베타에 대한 위험 프리미엄이 할인율 베타의 약 3-4배에 달함을 발견하였다. 이는 투자자들이 영구적 충격에 대해 일시적 충격보다 훨씬 더 높은 보상을 요구함을 의미하며, ICAPM(Intertemporal CAPM)의 이론적 예측과 일치하는 결과이다.
+        </p>
+        
+        <h3>2.5 레버리지 제약과 BAB 전략의 등장</h3>
+        
+        <p>
+            Frazzini and Pedersen(2014)은 "Betting Against Beta"에서 저베타 이상현상의 원인으로 레버리지 제약 가설을 제시하였다. 많은 기관투자자들이 규제나 투자정책상 레버리지 사용에 제약을 받기 때문에, 목표 수익률을 달성하기 위해 고베타 자산에 대한 초과 수요가 발생한다는 것이다. 이러한 구조적 수요 불균형은 고베타 자산의 과대평가와 저베타 자산의 과소평가를 초래한다.
+        </p>
+        
+        <p>
+            이들은 이러한 가격 왜곡을 활용하여 초과수익을 창출하는 BAB(Betting Against Beta) 전략을 제안하였다. BAB 전략은 베타 중립적 포지션을 유지하면서 저베타 자산을 매수하고 고베타 자산을 매도하는 것이다. 1926년부터 2012년까지 미국 주식시장에서 BAB 전략의 샤프 비율은 0.78로, 시장 포트폴리오의 0.41을 크게 상회하였다. 더욱 주목할 점은 이 전략이 주식뿐만 아니라 채권, 외환, 상품 시장에서도 일관되게 양의 초과수익을 창출했다는 것이다.
+        </p>
+        
+        <h3>2.6 Quality Minus Junk: 저베타의 질적 특성</h3>
+        
+        <p>
+            Asness, Frazzini, and Pedersen(2019)은 "Quality Minus Junk"에서 기업의 질적 특성과 베타의 관계를 심층 분석하였다. 이들은 수익성(profitability), 성장성(growth), 안전성(safety) 지표를 종합한 품질 점수를 개발하고, 우량 기업이 체계적으로 낮은 베타를 갖는 현상을 문서화하였다.
+        </p>
+        
+        <p>
+            연구 결과, 고품질 기업들은 평균적으로 0.7의 베타를 보인 반면, 저품질 기업들은 1.3의 베타를 나타냈다. 이는 저베타 이상현상이 단순한 통계적 아티팩트가 아니라 기업의 근본적 특성과 연관된 현상임을 시사한다. 특히 안정적인 수익성과 보수적인 재무구조를 가진 기업들이 시장 하락기에 더 나은 방어력을 보이는 것으로 나타났다.
+        </p>
+        
+        <h3>2.7 암호화폐 시장에서의 팩터 연구</h3>
+        
+        <p>
+            전통적 자산시장에서 확립된 팩터 이론을 암호화폐 시장에 적용하려는 학술적 시도는 최근 들어 활발히 진행되고 있다. Liu, Tsyvinski, and Wu(2022)는 "Common Risk Factors in Cryptocurrency"에서 암호화폐 시장의 횡단면 수익률을 설명하는 주요 팩터들을 식별하였다. 이들은 모멘텀, 규모, 변동성이 암호화폐 수익률의 주요 결정요인임을 밝혔으나, 전통적 자산시장과 달리 가치 팩터는 유의미하지 않음을 발견하였다.
+        </p>
+        
+        <p>
+            Borri and Shakhnov(2022)는 "Regulation Spillovers across Cryptocurrency Markets"에서 암호화폐 시장의 고유한 특성인 규제 리스크와 네트워크 효과가 자산 가격에 미치는 영향을 분석하였다. 특히 주요국의 규제 변화가 개별 암호화폐뿐만 아니라 시장 전체에 파급효과를 미치는 메커니즘을 규명하였다.
+        </p>
+        
+        <div class="highlight-box">
+            <p class="no-indent"><strong>암호화폐 시장의 특수성과 베타 분해의 필요성:</strong></p>
+            <p class="no-indent">1. <strong>현금흐름의 복잡성:</strong> 전통적 자산과 달리 암호화폐의 가치 원천은 다양하다. 스테이킹 보상(staking rewards), DeFi 프로토콜 수수료, 거버넌스 토큰의 경제적 권리, 토큰 소각(burn) 메커니즘 등이 현금흐름을 대체한다.</p>
+            <p class="no-indent">2. <strong>정보 비대칭성:</strong> 온체인 데이터의 투명성에도 불구하고, 프로토콜의 기술적 복잡성과 급격한 혁신으로 인해 정보 해석의 격차가 크다.</p>
+            <p class="no-indent">3. <strong>시장 미성숙성:</strong> 높은 변동성, 낮은 유동성, 시장 조작 가능성 등으로 인해 가격 발견 메커니즘이 비효율적이다.</p>
+        </div>
+        
+        <p>
+            기존 암호화폐 팩터 연구들은 주로 총 베타를 사용하여 시장 위험을 측정하였다. 그러나 앞서 논의한 바와 같이, 베타의 질적 차이를 고려하지 않은 분석은 위험-수익 관계를 정확히 포착하지 못할 가능성이 높다. 특히 암호화폐 시장의 높은 투기적 거래 비중과 극심한 변동성을 고려할 때, 영구적 가치 변화(CF Beta)와 일시적 가격 변동(DR Beta)을 구분하는 것은 더욱 중요한 의미를 갖는다.
+        </p>
+        
+        <h3>2.8 CBAB 전략: 암호화폐 시장에서의 베타 분해 적용</h3>
+        
+        <p>
+            Herculano(2025)는 "Betting Against (Bad) Beta in Cryptocurrency Markets"에서 Campbell and Vuolteenaho(2004)의 베타 분해 이론을 암호화폐 시장에 최초로 적용하였다. CBAB(Cryptocurrency Betting Against Bad Beta) 전략은 기존 BAB 전략과 달리 총 베타가 아닌 현금흐름 베타(\(\beta_{CF}\))를 기준으로 포트폴리오를 구성한다.
+        </p>
+        
+        <p>
+            연구 결과는 암호화폐 시장에서도 Bad Beta에 대한 위험 프리미엄이 Good Beta보다 유의미하게 높음을 보여준다. 2020년부터 2024년까지의 실증 분석에서 CBAB 전략은 전통적 BAB 전략 대비 연평균 12.3%의 초과수익을 창출하였으며, 특히 시장 하락기에 우수한 방어력을 보였다. 이는 암호화폐 시장에서도 투자자들이 영구적 가치 훼손 위험에 대해 더 높은 보상을 요구함을 시사한다.
+        </p>
+        
+        <table>
+            <caption><strong>표 3.</strong> 선행연구의 발전 과정과 주요 기여</caption>
+            <thead>
+                <tr>
+                    <th>연구자(연도)</th>
+                    <th>주요 기여</th>
+                    <th>후속 연구에 미친 영향</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><strong>Black (1972)</strong></td>
+                    <td>차입 제약 하에서 SML 평탄화 이론</td>
+                    <td>저베타 이상현상의 이론적 토대 제공</td>
+                </tr>
+                <tr>
+                    <td><strong>Campbell & Shiller (1988)</strong></td>
+                    <td>로그선형 가치 분해, VAR 방법론</td>
+                    <td>수익률을 CF/DR 뉴스로 분해하는 틀 확립</td>
+                </tr>
+                <tr>
+                    <td><strong>Fama & French (1993)</strong></td>
+                    <td>3팩터 모델 (MKT, SMB, HML)</td>
+                    <td>다차원적 위험 개념 도입, 베타의 이질성 인식</td>
+                </tr>
+                <tr>
+                    <td><strong>Campbell & Vuolteenaho (2004)</strong></td>
+                    <td>Bad Beta와 Good Beta 구분</td>
+                    <td>베타의 질적 이질성 규명, 차별적 위험 프리미엄</td>
+                </tr>
+                <tr>
+                    <td><strong>Frazzini & Pedersen (2014)</strong></td>
+                    <td>레버리지 제약 가설, BAB 전략</td>
+                    <td>저베타 이상현상의 실전 활용 방법 제시</td>
+                </tr>
+                <tr>
+                    <td><strong>Asness et al. (2019)</strong></td>
+                    <td>Quality와 Beta의 음의 상관관계</td>
+                    <td>저베타와 기업 펀더멘털의 연관성 입증</td>
+                </tr>
+                <tr>
+                    <td><strong>Liu et al. (2022)</strong></td>
+                    <td>암호화폐 시장의 팩터 모델</td>
+                    <td>디지털 자산 시장의 고유 특성 규명</td>
+                </tr>
+                <tr>
+                    <td><strong>Herculano (2025)</strong></td>
+                    <td>암호화폐 CBAB 전략</td>
+                    <td>디지털 자산 시장에 베타 분해 이론 적용</td>
+                </tr>
+            </tbody>
+        </table>
+        
+        <h3>2.9 종합 및 연구 공백</h3>
+        
+        <p>
+            지난 50년간의 선행연구를 종합하면, 저베타 이상현상에 대한 이해는 단순한 실증적 발견에서 시작하여 이론적 설명, 질적 구분, 그리고 실전 전략 개발로 발전해왔다. Black(1972)의 선구적 통찰은 Campbell and Shiller(1988)의 방법론적 혁신과 Campbell and Vuolteenaho(2004)의 베타 분해 이론을 거쳐, Frazzini and Pedersen(2014)의 실용적 전략으로 구현되었다. Asness et al.(2019)은 이러한 현상이 기업의 근본적 특성과 연관됨을 보여주어 이론의 견고성을 더욱 강화하였다.
+        </p>
+        
+        <p>
+            암호화폐 시장은 이러한 전통적 이론을 검증하고 확장할 수 있는 독특한 실험장이다. 24시간 거래, 극심한 변동성, 다양한 가치 창출 메커니즘 등은 베타 분해의 중요성을 더욱 부각시킨다. Liu et al.(2022)과 Borri and Shakhnov(2022)는 암호화폐 시장의 고유한 특성을 규명하였고, Herculano(2025)의 CBAB 전략은 베타 분해 이론을 이 시장에 적용한 첫 시도이다.
+        </p>
+        
+        <p>
+            그러나 여전히 다음과 같은 중요한 연구 공백이 존재한다:
+        </p>
+        
+        <p>
+            첫째, 암호화폐의 현금흐름을 정의하고 측정하는 표준화된 방법론이 부재하다. 스테이킹 보상, DeFi 수익, 토큰 소각 등 다양한 가치 창출 메커니즘을 어떻게 통합적으로 고려할 것인가의 문제가 해결되지 않았다. 둘째, 온체인 데이터를 활용한 베타 추정의 정확도 향상 방안이 미흡하다. 블록체인의 투명성이 제공하는 고유한 정보를 베타 분해에 어떻게 활용할 것인가에 대한 연구가 필요하다. 셋째, DeFi 프로토콜의 복잡한 수익 구조와 상호연결성이 베타 분해에 미치는 영향이 충분히 연구되지 않았다. 넷째, 규제 변화와 기술 혁신이 베타의 시간 가변성에 미치는 영향에 대한 동태적 분석이 필요하다.
+        </p>
+        
+        <p>
+            본 연구는 이러한 공백을 메우고자 하며, 특히 암호화폐 시장의 고유한 특성을 반영한 베타 분해 방법론을 제시하고, 이를 기반으로 한 개선된 투자 전략을 개발하는 것을 목표로 한다.
+        </p>
 
 <!-- 3. 연구설계 및 방법론 -->
 <h2>3. 연구설계 및 방법론 (Methodology)</h2>
