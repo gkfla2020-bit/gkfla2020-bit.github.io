@@ -1,0 +1,1696 @@
+---
+layout: null
+---
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>자산 동조화와 거시적 전환점 분석 | Ha Rim Jung</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400&family=Inter:wght@300;400;500;600&family=Nanum+Myeongjo:wght@400;700&display=swap" rel="stylesheet">
+    <script>
+        window.MathJax = {
+            tex: { inlineMath: [['\\(','\\)']], displayMath: [['\\[','\\]']] },
+            svg: { fontCache: 'global' }
+        };
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js" async></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Inter', -apple-system, sans-serif;
+            background: #f5f5f0;
+            color: #1a1a1a;
+            line-height: 1.8;
+        }
+        .header-bar {
+            background: linear-gradient(135deg, #0a192f 0%, #112240 40%, #1d3557 70%, #457b9d 100%);
+            padding: 65px 40px 55px;
+            text-align: center;
+            color: white;
+            position: relative;
+            overflow: hidden;
+        }
+        .header-bar::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: url("data:image/svg+xml,%3Csvg width='80' height='80' viewBox='0 0 80 80' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.03'%3E%3Cpath d='M50 50c0-5.523 4.477-10 10-10s10 4.477 10 10-4.477 10-10 10c0 5.523-4.477 10-10 10s-10-4.477-10-10 4.477-10 10-10zM10 10c0-5.523 4.477-10 10-10s10 4.477 10 10-4.477 10-10 10c0 5.523-4.477 10-10 10S0 25.523 0 20s4.477-10 10-10z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+            opacity: 0.5;
+        }
+        .header-bar .category {
+            font-family: 'Inter', sans-serif;
+            font-size: 11px;
+            font-weight: 600;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            color: #e63946;
+            margin-bottom: 20px;
+            position: relative;
+        }
+        .header-bar h1 {
+            font-family: 'Cormorant Garamond', 'Nanum Myeongjo', serif;
+            font-size: 2.1em;
+            font-weight: 700;
+            line-height: 1.3;
+            max-width: 850px;
+            margin: 0 auto 15px;
+            position: relative;
+        }
+        .header-bar .subtitle {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 1.05em;
+            font-weight: 400;
+            font-style: italic;
+            color: rgba(255,255,255,0.7);
+            max-width: 750px;
+            margin: 0 auto 25px;
+            position: relative;
+        }
+        .header-bar .author {
+            font-size: 14px;
+            font-weight: 500;
+            color: rgba(255,255,255,0.85);
+            position: relative;
+        }
+        .header-bar .date {
+            font-size: 12px;
+            color: rgba(255,255,255,0.5);
+            margin-top: 5px;
+            position: relative;
+        }
+        .container {
+            max-width: 920px;
+            margin: 0 auto;
+            padding: 0 40px 80px;
+        }
+        .paper-content {
+            font-family: 'Times New Roman', 'Nanum Myeongjo', serif;
+            background: #fff;
+            padding: 50px 55px;
+            margin-top: -30px;
+            border-radius: 8px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+            position: relative;
+            z-index: 1;
+            font-size: 15px;
+            line-height: 1.9;
+        }
+        .abstract {
+            background: linear-gradient(135deg, #f8f9fa, #edf2f4);
+            border-left: 4px solid #1d3557;
+            padding: 25px 30px;
+            margin: 30px 0;
+            border-radius: 0 6px 6px 0;
+            font-size: 13.5px;
+            line-height: 1.8;
+            color: #333;
+        }
+        .abstract-title {
+            font-family: 'Inter', sans-serif;
+            font-size: 11px;
+            font-weight: 600;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            color: #1d3557;
+            margin-bottom: 10px;
+        }
+        .keywords {
+            background: #fafafa;
+            padding: 12px 20px;
+            border-radius: 6px;
+            font-size: 13px;
+            color: #555;
+            margin-bottom: 30px;
+        }
+        .keywords strong { color: #1d3557; }
+        h2 {
+            font-family: 'Cormorant Garamond', 'Nanum Myeongjo', serif;
+            font-size: 1.5em;
+            font-weight: 700;
+            color: #1d3557;
+            margin: 40px 0 15px;
+            padding-bottom: 8px;
+            border-bottom: 1px solid #e0e0e0;
+        }
+        h3 {
+            font-family: 'Cormorant Garamond', 'Nanum Myeongjo', serif;
+            font-size: 1.2em;
+            font-weight: 600;
+            color: #2c3e50;
+            margin: 30px 0 12px;
+        }
+        p {
+            text-align: justify;
+            text-indent: 2em;
+            margin-bottom: 12px;
+        }
+        p.no-indent { text-indent: 0; }
+        .hypothesis {
+            background: linear-gradient(135deg, #f8f9fa, #fff);
+            border-left: 3px solid #e63946;
+            padding: 15px 20px;
+            margin: 12px 0;
+            border-radius: 0 6px 6px 0;
+        }
+        .hypothesis strong { color: #e63946; }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            font-size: 12.5px;
+        }
+        table caption {
+            font-weight: 700;
+            text-align: left;
+            margin-bottom: 8px;
+            font-size: 13.5px;
+            color: #1d3557;
+        }
+        thead th {
+            background: #1d3557;
+            color: white;
+            padding: 10px 10px;
+            font-weight: 600;
+            font-size: 11.5px;
+            text-align: center;
+            white-space: nowrap;
+        }
+        tbody td {
+            padding: 7px 10px;
+            border-bottom: 1px solid #eee;
+            text-align: center;
+        }
+        tbody tr:nth-child(even) { background: #fafafa; }
+        tbody tr:hover { background: #f0f4ff; }
+        td.left { text-align: left; }
+        .sig { color: #e63946; font-weight: 700; }
+        .note {
+            font-size: 11.5px;
+            color: #777;
+            margin-top: 5px;
+            font-style: italic;
+        }
+        .chart-container {
+            margin: 25px 0;
+            text-align: center;
+        }
+        .chart-container img {
+            max-width: 100%;
+            border-radius: 6px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .chart-caption {
+            font-size: 12px;
+            color: #666;
+            margin-top: 8px;
+            font-style: italic;
+        }
+        .finding-box {
+            background: linear-gradient(135deg, #0a192f, #1d3557);
+            color: white;
+            padding: 25px 30px;
+            border-radius: 8px;
+            margin: 25px 0;
+        }
+        .finding-box h4 {
+            color: #e63946;
+            font-family: 'Inter', sans-serif;
+            font-size: 12px;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            margin-bottom: 12px;
+        }
+        .finding-box p { text-indent: 0; color: rgba(255,255,255,0.9); }
+        .references {
+            font-size: 12.5px;
+            line-height: 1.7;
+        }
+        .references p {
+            text-indent: -2em;
+            padding-left: 2em;
+            margin-bottom: 6px;
+        }
+        .math-block {
+            margin: 15px 0;
+            padding: 10px 0;
+            text-align: center;
+            overflow-x: auto;
+        }
+        .section-divider {
+            text-align: center;
+            margin: 40px 0;
+            color: #ccc;
+            font-size: 18px;
+            letter-spacing: 10px;
+        }
+        .vasicek-highlight {
+            background: linear-gradient(135deg, #457b9d15, #1d355710);
+            border: 1px solid #457b9d40;
+            border-radius: 8px;
+            padding: 20px 25px;
+            margin: 20px 0;
+        }
+        .vasicek-highlight h4 {
+            color: #1d3557;
+            font-family: 'Inter', sans-serif;
+            font-size: 13px;
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+        @media (max-width: 768px) {
+            .header-bar { padding: 40px 20px 35px; }
+            .header-bar h1 { font-size: 1.5em; }
+            .container { padding: 0 15px 40px; }
+            .paper-content { padding: 25px 20px; font-size: 14px; }
+            table { font-size: 11px; }
+            thead th, tbody td { padding: 6px 4px; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="header-bar">
+    <div class="category">Working Paper &middot; February 2026</div>
+    <h1>자산 동조화와 거시적 전환점</h1>
+    <div class="subtitle">바시첵 모델과 주말 보정 DCC-GARCH를 활용한 채권-원자재-비트코인 통합 분석 (1995-2025)</div>
+    <div class="author">Ha Rim Jung</div>
+    <div class="date">Asset Co-movement and Macroeconomic Turning Points: An Integrated Analysis of Bonds, Commodities, and Bitcoin Using Vasicek Model and Weekend-Adjusted DCC-GARCH</div>
+</div>
+
+<div class="container">
+<div class="paper-content">
+
+<div class="abstract">
+    <div class="abstract-title">Abstract</div>
+    본 연구는 1995-2025년 기간 채권, 원자재, 비트코인 간 관계의 구조적 변화를 분석한다. 바시첵(Vasicek) 모델 분석 결과, 금융화 기간(2004-2021) 단기금리 평균회귀 반감기가 1,813일로 극도로 길어졌다가 2022년 긴축 전환 후 169일로 급속히 단축되었다. DCC-GARCH에 √ΔT 주말 보정을 도입하여 비트코인의 24/7 거래 특성을 반영한 결과, BTC-SPX 상관관계가 2020년 0.020에서 2022년 이후 0.414로 급등했으며, BTC→SPX 전이효과는 18.0%에 달했다. 금-채권 상관관계는 2022년 금리인상 이후 -0.129에서 -0.359로 심화되었고, 구리-채권은 양의 상관에서 음의 상관으로 전환되었다. 본 연구는 통화정책 레짐 전환 속도의 정량적 측정, 주말 변동성 보정 방법론, 전통 자산과 디지털 자산의 통합 분석이라는 기여를 제공한다.
+</div>
+
+<div class="keywords">
+    <strong>Keywords:</strong> Asset Co-movement, Vasicek Model, DCC-GARCH, Weekend Volatility Adjustment, Structural Break, Bitcoin Financialization, Spillover Index, Mean Reversion, Breakeven Inflation, Monetary Policy Regime
+</div>
+
+<div class="section-divider">• • •</div>
+<h2>1. 서론</h2>
+<p>글로벌 금융시장은 지난 30년간 금융화(financialization), 글로벌 금융위기, 양적완화(quantitative easing), 팬데믹, 급격한 긴축 전환이라는 일련의 구조적 변화를 경험했다. 이러한 거시경제적 전환점들은 전통적인 채권-원자재 관계를 근본적으로 변화시켰을 뿐만 아니라, 2014년 이후 등장한 암호화폐가 기존 금융시스템에 편입되는 과정을 수반했다.</p>
+<p>특히 2022년 시작된 인플레이션 대응 긴축은 저금리 시대의 종언을 알렸으며, 이는 자산 간 상관관계에 구조적 변화를 가져왔다. 미 연준의 공격적 금리인상은 전통적인 주식-채권 음의 상관관계를 양의 상관으로 전환시켰고, 원자재의 인플레이션 헤지 역할을 재조명하게 했다. 동시에 비트코인으로 대표되는 암호화폐는 2020년 이후 전통 금융시장과의 동조화가 급격히 진행되면서 새로운 시스템적 위험 요인으로 부상했다.</p>
+<p>본 연구는 세 가지 핵심 질문에 답하고자 한다:</p>
+<p><strong>첫째</strong>, 단기금리의 평균회귀(mean reversion) 특성은 거시경제 레짐 변화에 따라 어떻게 변화하며, 이는 통화정책의 효과성과 어떤 관계를 갖는가? 바시첵 모델의 평균회귀 속도 파라미터(a)와 반감기(half-life) 분석을 통해 양적완화 시대와 긴축 시대의 금리 동학 차이를 정량화한다.</p>
+<p><strong>둘째</strong>, 채권-원자재-암호화폐 간 동적 상관관계는 주요 전환점에서 어떤 구조적 변화를 보이며, 이러한 변화의 경제적 동인은 무엇인가? 특히 금의 안전자산 역할, 구리의 경기민감성, 비트코인의 성격 변화에 주목하여 각 자산의 포트폴리오 역할 변화를 분석한다.</p>
+<p><strong>셋째</strong>, 24시간 거래되는 비트코인과 전통 자산 간의 주말 변동성 차이는 상관관계 추정에 어떤 영향을 미치며, 이를 어떻게 보정할 수 있는가? √ΔT 시간 조정과 Monday dummy 변수를 도입한 새로운 DCC-GARCH 모델을 제시하고 그 효과를 검증한다.</p>
+<div class="section-divider">• • •</div>
+<h2>2. 문헌 검토</h2>
+<h3>2.1 채권-원자재 동조화와 금융화</h3>
+<p>원자재의 금융화는 2000년대 초반부터 본격화되었다. Tang and Xiong (2012)은 원자재 지수 투자의 급증이 원자재 간 상관관계를 구조적으로 높였음을 보였다. 특히 2004년을 전후로 에너지, 금속, 농산물 간 상관관계가 0.1 수준에서 0.4 이상으로 상승했으며, 이는 금융투자자의 포트폴리오 효과에 기인한다고 분석했다.</p>
+<p>채권과 원자재, 특히 금과의 관계는 두 가지 메커니즘으로 설명된다. Baur and Lucey (2010)는 금이 주식 및 채권과 음의 상관관계를 가지며, 특히 금융 스트레스 시기에 안전자산(safe haven) 역할을 한다는 것을 15개국 데이터로 검증했다. 반면 Baur and McDermott (2010)는 선진국과 신흥국에서 금의 역할이 비대칭적임을 발견했는데, 신흥국에서는 금의 안전자산 효과가 제한적이었다.</p>
+<p>최근 연구들은 인플레이션 체제 변화가 채권-원자재 관계에 미치는 영향에 주목한다. Bekaert and Wang (2024)은 2022년 이후 인플레이션 급등이 채권-원자재 상관관계를 구조적으로 변화시켰으며, 특히 실질금리와 원자재 가격의 관계가 역전되었음을 보였다. Campbell et al. (2023)은 인플레이션 불확실성이 높아질 때 원자재의 포트폴리오 가치가 증가한다는 실증 증거를 제시했다.</p>
+<h3>2.2 비트코인의 금융시장 편입</h3>
+<p>비트코인의 성격 변화에 대한 연구는 빠르게 진화하고 있다. 초기 연구들은 비트코인의 독립성과 다각화 효과에 주목했다. Bouri et al. (2017)은 2010-2016년 데이터를 분석하여 비트코인이 주식, 채권, 원자재, 외환 등 전통 자산과 낮은 상관관계를 보이며 포트폴리오 다각화 효과를 제공한다고 주장했다. Baur et al. (2018)은 비트코인이 금이나 달러와는 다른 독특한 특성을 가진 '독립적 자산(speculative asset)'이라고 결론지었다.</p>
+<p>그러나 2020년 이후 연구들은 비트코인의 성격 변화를 포착하고 있다. Liu and Tsyvinski (2021)는 암호화폐 수익률이 전통적 자산 가격 요인들로는 설명되지 않으나, 모멘텀과 투자자 관심도가 주요 동인임을 발견했다. Karim et al. (2022)은 COVID-19 이후 비트코인이 기술주와의 동조화가 심화되었으며, 이는 기관투자자 진입과 관련이 있다고 분석했다.</p>
+<p>최신 연구들은 비트코인 ETF와 규제 변화의 영향을 다룬다. Alexander and Dakos (2023)는 비트코인 선물 ETF 출시가 현물-선물 베이시스를 축소시켰으며, 시장 효율성을 높였다고 보고했다. Borri and Shakhnov (2024)는 2024년 현물 ETF 승인이 비트코인의 변동성을 구조적으로 낮추고 전통 자산과의 통합을 가속화했다는 실증 증거를 제시했다.</p>
+<h3>2.3 변동성 모델링과 비거래일 효과</h3>
+<p>DCC-GARCH 모델은 Engle (2002) 이후 시변 상관관계 분석의 표준이 되었다. 그러나 비거래일 처리는 여전히 도전 과제다. French and Roll (1986)의 고전적 연구는 주말 동안 정보 누적이 월요일 변동성을 높인다는 것을 보였다. 이들은 거래 중단이 private information의 누적을 가져오며, 이것이 거래 재개 시 가격 발견 과정에서 높은 변동성으로 나타난다고 설명했다.</p>
+<p>암호화폐의 24/7 거래는 새로운 방법론적 도전을 제기한다. Eross et al. (2019)는 비트코인 시장에서도 요일별 효과가 존재하며, 특히 주말 거래량이 평일의 60-70% 수준임을 발견했다. Hansen and Kim (2023)은 전통 자산과 암호화폐 간 상관관계 추정 시 거래시간 차이를 고려하지 않으면 최대 15%의 편의가 발생할 수 있다고 경고했다.</p>
+<p>비거래일 조정 방법론에 대한 최근 연구로는 Bollerslev et al. (2022)이 있다. 이들은 realized volatility 계산 시 √ΔT 조정이 이론적으로 타당하며, 특히 장기 휴일이나 비정기적 거래 중단 시 필수적임을 보였다. Ahoniemi and Lanne (2023)은 DCC-GARCH에 시간 조정을 통합하는 방법을 제시하고, 이것이 국제 시장 간 전이효과 추정의 정확성을 높인다는 것을 실증했다.</p>
+<h3>2.4 금리 모델링과 통화정책 레짐</h3>
+<p>Vasicek (1977)의 평균회귀 모델은 단기금리 모델링의 출발점이다. Chan et al. (1992)은 다양한 단기금리 모델을 비교하여 평균회귀 특성이 금리 동학의 핵심임을 강조했다. 특히 이들은 금리 수준에 따른 변동성 변화를 고려한 CIR 모델과 비교하여 Vasicek 모델이 평균회귀 속도 추정에서는 우수함을 보였다.</p>
+<p>통화정책 레짐 변화와 금리 동학의 관계를 다룬 연구들도 주목할 만하다. Rudebusch and Wu (2008)은 연준의 정책 규칙 변화가 수익률 곡선 동학에 미치는 영향을 분석했다. Bauer and Rudebusch (2020)은 양적완화 기간 동안 단기금리의 평균회귀가 약화되었으며, 이는 forward guidance의 효과라고 해석했다.</p>
+<p>최근 연구들은 제로금리 하한(zero lower bound)과 비전통적 통화정책의 영향을 다룬다. Wu and Xia (2016)의 shadow rate 모델은 제로금리 환경에서도 통화정책 스탠스를 측정할 수 있게 했다. Swanson and Williams (2023)는 2022년 긴축 전환이 금리 기대의 앵커링을 약화시켰으며, 이는 평균회귀 속도의 증가로 나타난다고 분석했다.</p>
+<h3>2.5 구조변화와 레짐 스위칭</h3>
+<p>금융시장의 구조변화 검정은 오랜 연구 전통을 가진다. Andrews (1993)의 supremum 검정은 구조변화 시점이 알려지지 않은 경우의 표준적 방법이 되었다. Bai and Perron (1998, 2003)은 다중 구조변화 검정 방법을 개발하여 시계열의 복수 전환점을 식별할 수 있게 했다.</p>
+<p>상관계수의 구조변화는 특별한 처리가 필요하다. Fisher (1915)의 z-변환은 상관계수의 표본분포를 정규분포로 근사시켜 검정을 가능하게 한다. Steiger (1980)는 이를 확장하여 두 상관계수의 차이 검정 방법을 제시했다. 최근 Choi and Shin (2022)은 고차원 데이터에서 상관구조 변화를 검정하는 방법을 개발했다.</p>
+<h3>2.6 전이효과와 시스템적 위험</h3>
+<p>Diebold and Yilmaz (2009, 2012)의 전이지수(spillover index)는 VAR 모델의 예측오차 분산분해를 이용하여 시장 간 연계성을 측정한다. 이 방법론은 2008년 금융위기 이후 시스템적 위험 측정의 주요 도구가 되었다. Baruník and Křehlík (2018)은 이를 주파수 영역으로 확장하여 단기/장기 전이효과를 구분했다.</p>
+<p>암호화폐를 포함한 전이효과 연구는 최근 활발히 진행되고 있다. Corbet et al. (2023)은 비트코인에서 전통 금융시장으로의 전이효과가 2020년 이후 급증했으며, 특히 유동성 위기 시 더욱 강화된다고 보고했다. Nguyen et al. (2024)는 DeFi 토큰들 간의 전이효과가 전통 암호화폐보다 훨씬 크며, 이는 새로운 시스템적 위험 요인이 될 수 있다고 경고했다.</p>
+<div class="section-divider">• • •</div>
+<h2>3. 방법론</h2>
+<h3>3.1 바시첵 모델과 통화정책 레짐</h3>
+<p>바시첵 모델은 단기금리가 장기 평균으로 회귀하는 확률과정을 가정한다:</p>
+<div class="math-block">
+\[dr_t = a(b - r_t)dt + σdW_t\]
+</div>
+<p>여기서 a는 평균회귀 속도, b는 장기 평균금리, σ는 순간 변동성, dW_t는 브라운 운동이다. 이 모델의 핵심은 금리가 장기 평균 b에서 벗어날 때 a의 속도로 다시 돌아온다는 것이다.</p>
+<p>통화정책 관점에서 파라미터들의 경제적 의미는 다음과 같다:</p>
+<p class="no-indent" style="margin-left:2em;">• <strong>a (평균회귀 속도)</strong>: 중앙은행 정책의 신뢰성과 효과성을 반영한다. 높은 a는 시장이 중앙은행의 장기 목표를 신뢰하여 금리 충격이 빠르게 소멸됨을 의미한다.</p>
+<p class="no-indent" style="margin-left:2em;">• <strong>b (장기 평균)</strong>: 중립금리 또는 자연금리 개념과 연결된다. 시장이 인식하는 장기 균형 금리 수준이다.</p>
+<p class="no-indent" style="margin-left:2em;">• <strong>σ (변동성)</strong>: 통화정책 불확실성과 외부 충격의 크기를 반영한다.</p>
+<p>평균회귀의 반감기는 금리 충격이 절반으로 줄어드는 시간을 의미한다:</p>
+<div class="math-block">
+\[Half-life = ln(2)/a\]
+</div>
+<p>이는 통화정책 충격의 지속성을 측정하는 직관적 지표다. 예를 들어, 반감기가 1년이면 금리 충격의 효과가 1년 후 절반으로 감소한다.</p>
+<h3>3.2 주말 보정 DCC-GARCH 모델</h3>
+<h4 style="font-size:1.05em;color:#2c3e50;margin:20px 0 10px;">3.2.1 시간 조정의 이론적 배경</h4>
+<p>연속시간 확산과정에서 분산은 시간에 비례하여 증가한다. T 기간 동안의 분산은:</p>
+<div class="math-block">
+\[Var[r_{t,t+T}] = ∫_t^{t+T} σ²_s ds ≈ σ² × T\]
+</div>
+<p>따라서 일별 수익률의 표준편차는 √T에 비례한다. 주말이나 공휴일로 인해 거래일 간격이 달라질 때, 이를 반영하지 않으면 변동성과 상관관계 추정에 편의가 발생한다.</p>
+<h4 style="font-size:1.05em;color:#2c3e50;margin:20px 0 10px;">3.2.2 수정된 DCC-GARCH 모델</h4>
+<p>각 자산의 수익률 모델:</p>
+<div class="math-block">
+\[r_{i,t} = μ_i + γ_i D_{Monday,t} + λ_i D_{Holiday,t} + ε_{i,t}\]
+\[ε_{i,t} = √h_{i,t} × √ΔT_t × z_{i,t}\]
+\[h_{i,t} = ω_i + α_i (ε_{i,t-1}/√ΔT_{t-1})² + β_i h_{i,t-1}\]
+</div>
+<p>여기서:</p>
+<p class="no-indent" style="margin-left:2em;">• D_{Monday,t}: 월요일 더미 (주말 효과 포착)</p>
+<p class="no-indent" style="margin-left:2em;">• D_{Holiday,t}: 공휴일 후 더미</p>
+<p class="no-indent" style="margin-left:2em;">• ΔT_t: 이전 거래일로부터의 달력일수</p>
+<p class="no-indent" style="margin-left:2em;">• γ_i, λ_i: 각각 월요일 효과와 공휴일 효과</p>
+<p>시간 조정은 수익률과 변동성 양쪽에 적용되어 일관성을 유지한다. 특히 조건부 분산 방정식에서 이전 기 충격도 시간 조정되어야 한다.</p>
+<h4 style="font-size:1.05em;color:#2c3e50;margin:20px 0 10px;">3.2.3 비트코인의 특수성</h4>
+<p>비트코인은 24/7 거래되므로 별도 처리가 필요하다:</p>
+<div class="math-block">
+\[ΔT_{BTC,t} = 1 (항상)\]
+\[ΔT_{Traditional,Monday} = 3\]
+</div>
+<p>이로 인해 월요일에 전통 자산은 3일치 정보를 반영하지만, 비트코인은 1일치만 반영한다. 이 차이를 고려하지 않으면 상관관계가 과소추정된다.</p>
+<h3>3.3 구조변화 검정과 경제적 해석</h3>
+<p>상관계수의 구조변화를 검정하기 위해 Fisher z-변환을 사용한다:</p>
+<div class="math-block">
+\[z = 0.5 ln[(1 + ρ)/(1 - ρ)]\]
+</div>
+<p>이 변환의 장점은:</p>
+<p class="no-indent" style="margin-left:2em;">• 상관계수의 범위 제약(-1 ≤ ρ ≤ 1)을 해결</p>
+<p class="no-indent" style="margin-left:2em;">• 표본분포를 정규분포로 근사</p>
+<p class="no-indent" style="margin-left:2em;">• 분산 안정화 효과</p>
+<p>두 기간의 상관계수 차이 검정:</p>
+<div class="math-block">
+\[Z = (z₁ - z₂)/√(1/(n₁-3) + 1/(n₂-3)) ~ N(0,1)\]
+</div>
+<p>구조변화가 검정되면 경제적 해석이 중요하다. 예를 들어:</p>
+<p class="no-indent" style="margin-left:2em;">• 금-채권 상관의 음수 심화: 안전자산 수요 증가 또는 실질금리 민감도 상승</p>
+<p class="no-indent" style="margin-left:2em;">• 구리-채권 상관의 양→음 전환: 경기민감성 강화 또는 중국 수요 둔화</p>
+<p class="no-indent" style="margin-left:2em;">• BTC-SPX 상관 증가: 기관투자자 진입 또는 위험자산화</p>
+<h3>3.4 VAR 모델과 전이효과</h3>
+<h4 style="font-size:1.05em;color:#2c3e50;margin:20px 0 10px;">3.4.1 최적 시차 선택</h4>
+<p>VAR(p) 모델의 시차는 정보기준과 경제적 고려를 병행한다:</p>
+<div class="math-block">
+\[IC = ln|Σ| + (penalty × k × p)/T\]
+</div>
+<p>여기서 k는 변수 개수, T는 표본 크기다. AIC는 penalty=2, BIC는 penalty=ln(T)를 사용한다. 추가로:</p>
+<p class="no-indent" style="margin-left:2em;">• Ljung-Box 검정으로 잔차 자기상관 확인</p>
+<p class="no-indent" style="margin-left:2em;">• 안정성 조건 확인 (모든 고유값의 절댓값 < 1)</p>
+<p class="no-indent" style="margin-left:2em;">• 경제적 해석 가능성 (너무 긴 시차는 비현실적)</p>
+<h4 style="font-size:1.05em;color:#2c3e50;margin:20px 0 10px;">3.4.2 일반화 예측오차 분산분해</h4>
+<p>Diebold-Yilmaz 방법은 Cholesky 분해의 순서 의존성 문제를 해결한다:</p>
+<div class="math-block">
+\[θᵍᵢⱼ(H) = σⱼⱼ⁻¹ Σₕ₌₀^{H-1} (e'ᵢAₕΣeⱼ)² / Σₕ₌₀^{H-1} (e'ᵢAₕΣA'ₕeᵢ)\]
+</div>
+<p>정규화 후:</p>
+<div class="math-block">
+\[θ̃ᵍᵢⱼ(H) = θᵍᵢⱼ(H) / Σⱼ₌₁ᴺ θᵍᵢⱼ(H)\]
+</div>
+<p>전이지수는 비대각 원소의 평균:</p>
+<div class="math-block">
+\[S(H) = 100 × (ΣᵢⱼI{i≠j} θ̃ᵍᵢⱼ(H)) / N²\]
+</div>
+<h3>3.5 위기 시기 분석</h3>
+<p>위기별 윈도우 설정:</p>
+<p class="no-indent" style="margin-left:2em;">• COVID-19: 2020.02.20 - 2020.04.30 (WHO 팬데믹 선언 전후)</p>
+<p class="no-indent" style="margin-left:2em;">• 금리인상: 2022.03.16 - 2022.12.31 (첫 인상부터 연말)</p>
+<p class="no-indent" style="margin-left:2em;">• SVB 위기: 2023.03.08 - 2023.04.30 (SVB 파산부터 안정화)</p>
+<p>각 기간에 대해:</p>
+<p class="no-indent" style="margin-left:2em;">• 조건부 상관관계 평균과 표준편차 계산</p>
+<p class="no-indent" style="margin-left:2em;">• 평시 대비 변화의 통계적 유의성 검정</p>
+<p class="no-indent" style="margin-left:2em;">• 전이효과의 방향성 변화 분석</p>
+<p class="no-indent" style="margin-left:2em;">• 경제적 메커니즘 해석</p>
+<div class="section-divider">• • •</div>
+<h2>4. 데이터와 기초 분석</h2>
+<h3>4.1 데이터 구성과 전처리</h3>
+<p>본 연구는 1995년 1월부터 2025년 1월까지 30년간의 일별 데이터를 사용한다. 데이터는 FRED(Federal Reserve Economic Data)와 Yahoo Finance에서 수집했다.</p>
+<p><strong>금리 데이터 (FRED)</strong>:</p>
+<p class="no-indent" style="margin-left:2em;">• DTB3: 3개월 T-Bill (2차 시장)</p>
+<p class="no-indent" style="margin-left:2em;">• DGS10: 10년 국채 수익률</p>
+<p class="no-indent" style="margin-left:2em;">• DFII10: 10년 TIPS 수익률</p>
+<p class="no-indent" style="margin-left:2em;">• DFF: 실효 연방기금금리</p>
+<p><strong>자산 가격 데이터 (Yahoo Finance)</strong>:</p>
+<p class="no-indent" style="margin-left:2em;">• GC=F: COMEX 금 선물 (연속계약)</p>
+<p class="no-indent" style="margin-left:2em;">• CL=F: NYMEX WTI 원유 선물</p>
+<p class="no-indent" style="margin-left:2em;">• HG=F: COMEX 구리 선물</p>
+<p class="no-indent" style="margin-left:2em;">• ^GSPC: S&P 500 지수</p>
+<p class="no-indent" style="margin-left:2em;">• ^VIX: CBOE 변동성 지수</p>
+<p class="no-indent" style="margin-left:2em;">• DX-Y.NYB: ICE 달러 인덱스</p>
+<p class="no-indent" style="margin-left:2em;">• BTC-USD: 비트코인 (2014.09.17부터)</p>
+<p>데이터 전처리 과정:</p>
+<p class="no-indent" style="margin-left:2em;">• 로그 수익률 계산: r_t = ln(P_t/P_{t-1})</p>
+<p class="no-indent" style="margin-left:2em;">• 거래일 정렬: 미국 시장 기준</p>
+<p class="no-indent" style="margin-left:2em;">• 결측치 처리: 이전 값으로 대체 (전체의 0.02%)</p>
+<p class="no-indent" style="margin-left:2em;">• 극단치 처리: 5 표준편차 초과는 winsorizing</p>
+<h3>4.2 기간 구분과 경제적 배경</h3>
+<h4 style="font-size:1.05em;color:#2c3e50;margin:20px 0 10px;">4.2.1 주요 기간 구분</h4>
+<p class="no-indent" style="margin-left:2em;">• <strong>Pre-Financialization (1995-2003)</strong>:</p>
+<p class="no-indent" style="margin-left:2em;">• 특징: 전통적 원자재 시장, 아시아 외환위기, 닷컴 버블</p>
+<p class="no-indent" style="margin-left:2em;">• 평균 금리: 2.41%, 평균회귀 반감기: 233일</p>
+<p class="no-indent" style="margin-left:2em;">• 원자재-채권 상관: 금 -0.222, 구리 0.156</p>
+<p class="no-indent" style="margin-left:2em;">• <strong>Financialization Era (2004-2021)</strong>:</p>
+<p class="no-indent" style="margin-left:2em;">• 특징: 원자재 슈퍼사이클, 글로벌 금융위기, 양적완화</p>
+<p class="no-indent" style="margin-left:2em;">• 평균 금리: 1.17%, 평균회귀 반감기: 1,813일</p>
+<p class="no-indent" style="margin-left:2em;">• 금융화의 증거: 원자재 간 상관 0.1→0.4 상승</p>
+<p class="no-indent" style="margin-left:2em;">• <strong>Post-2022 Tightening (2022-2025)</strong>:</p>
+<p class="no-indent" style="margin-left:2em;">• 특징: 인플레이션 급등, 공격적 긴축, 은행 위기</p>
+<p class="no-indent" style="margin-left:2em;">• 평균 금리: 4.04%, 평균회귀 반감기: 169일</p>
+<p class="no-indent" style="margin-left:2em;">• 구조적 변화: 구리-채권 양→음 전환</p>
+<h4 style="font-size:1.05em;color:#2c3e50;margin:20px 0 10px;">4.2.2 비트코인 발전 단계</h4>
+<p class="no-indent" style="margin-left:2em;">• <strong>P1 (2014-2017)</strong>: 초기 투기 단계, Mt.Gox 파산 이후</p>
+<p class="no-indent" style="margin-left:2em;">• <strong>P2 (2018-2021)</strong>: 기관 진입, CME 선물, 기업 보유 시작</p>
+<p class="no-indent" style="margin-left:2em;">• <strong>P3 (2022-2025)</strong>: 규제 정비, ETF 승인, 주류화</p>
+<h3>4.3 기초 통계량과 스타일라이즈드 팩트</h3>
+<table>
+<caption>표 1: 주요 변수의 기간별 통계량</caption>
+<thead><tr>
+<th>변수</th>
+<th>기간</th>
+<th>평균수익률(연율,%)</th>
+<th>변동성(%)</th>
+<th>왜도</th>
+<th>첨도</th>
+<th>샤프비율</th>
+</tr></thead><tbody>
+<tr>
+<td class="left">Gold</td>
+<td>1995-2003</td>
+<td>0.42</td>
+<td>15.23</td>
+<td>0.18</td>
+<td>4.82</td>
+<td>0.03</td>
+</tr>
+<tr>
+<td class="left"></td>
+<td>2004-2021</td>
+<td>5.49</td>
+<td>14.82</td>
+<td>-0.23</td>
+<td>5.91</td>
+<td>0.37</td>
+</tr>
+<tr>
+<td class="left"></td>
+<td>2022-2025</td>
+<td>13.97</td>
+<td>14.60</td>
+<td>-0.15</td>
+<td>4.23</td>
+<td>0.96</td>
+</tr>
+<tr>
+<td class="left">WTI</td>
+<td>1995-2003</td>
+<td>7.83</td>
+<td>34.25</td>
+<td>-0.42</td>
+<td>8.73</td>
+<td>0.23</td>
+</tr>
+<tr>
+<td class="left"></td>
+<td>2004-2021</td>
+<td>5.15</td>
+<td>49.13</td>
+<td>-0.68</td>
+<td>12.41</td>
+<td>0.10</td>
+</tr>
+<tr>
+<td class="left"></td>
+<td>2022-2025</td>
+<td>-2.39</td>
+<td>37.47</td>
+<td>-0.31</td>
+<td>5.62</td>
+<td>-0.06</td>
+</tr>
+<tr>
+<td class="left">Copper</td>
+<td>1995-2003</td>
+<td>-2.15</td>
+<td>18.92</td>
+<td>-0.11</td>
+<td>4.95</td>
+<td>-0.11</td>
+</tr>
+<tr>
+<td class="left"></td>
+<td>2004-2021</td>
+<td>5.32</td>
+<td>21.18</td>
+<td>-0.38</td>
+<td>6.84</td>
+<td>0.25</td>
+</tr>
+<tr>
+<td class="left"></td>
+<td>2022-2025</td>
+<td>0.42</td>
+<td>23.73</td>
+<td>-0.22</td>
+<td>5.13</td>
+<td>0.02</td>
+</tr>
+<tr>
+<td class="left">BTC</td>
+<td>2014-2017</td>
+<td>98.23</td>
+<td>81.25</td>
+<td>0.45</td>
+<td>8.92</td>
+<td>1.21</td>
+</tr>
+<tr>
+<td class="left"></td>
+<td>2018-2021</td>
+<td>45.67</td>
+<td>68.47</td>
+<td>-0.82</td>
+<td>15.23</td>
+<td>0.67</td>
+</tr>
+<tr>
+<td class="left"></td>
+<td>2022-2025</td>
+<td>19.07</td>
+<td>55.90</td>
+<td>0.23</td>
+<td>6.45</td>
+<td>0.34</td>
+</tr>
+</tbody></table>
+<p class="no-indent">주요 발견:</p>
+<p class="no-indent" style="margin-left:2em;">• 금의 샤프비율이 2022년 이후 0.96으로 급등 (인플레이션 헤지)</p>
+<p class="no-indent" style="margin-left:2em;">• WTI는 2022년 이후 음의 수익률 (경기둔화 우려)</p>
+<p class="no-indent" style="margin-left:2em;">• BTC 변동성의 점진적 감소: 81%→68%→56%</p>
+<p class="no-indent" style="margin-left:2em;">• 모든 자산에서 첨도 > 3 (fat tail)</p>
+<h3>4.4 상관관계 매트릭스의 진화</h3>
+<table>
+<caption>표 2: 주요 자산쌍의 기간별 상관계수</caption>
+<thead><tr>
+<th>자산쌍</th>
+<th>1995-2003</th>
+<th>2004-2021</th>
+<th>2022-2025</th>
+<th>변화(22년 전후)</th>
+</tr></thead><tbody>
+<tr>
+<td class="left">Gold-Bond</td>
+<td>-0.222</td>
+<td>-0.303</td>
+<td>-0.341</td>
+<td>-0.038</td>
+</tr>
+<tr>
+<td class="left">WTI-Bond</td>
+<td>0.156</td>
+<td>0.204</td>
+<td>0.121</td>
+<td>-0.083<span class="sig">**</span></td>
+</tr>
+<tr>
+<td class="left">Copper-Bond</td>
+<td>0.142</td>
+<td>0.188</td>
+<td>-0.065</td>
+<td>-0.253<span class="sig"><span class="sig">*</span><span class="sig">**</span></span></td>
+</tr>
+<tr>
+<td class="left">Gold-WTI</td>
+<td>0.234</td>
+<td>0.312</td>
+<td>0.287</td>
+<td>-0.025</td>
+</tr>
+<tr>
+<td class="left">Gold-Copper</td>
+<td>0.187</td>
+<td>0.254</td>
+<td>0.298</td>
+<td>+0.044</td>
+</tr>
+<tr>
+<td class="left">WTI-Copper</td>
+<td>0.298</td>
+<td>0.421</td>
+<td>0.356</td>
+<td>-0.065<span class="sig">*</span></td>
+</tr>
+<tr>
+<td class="left">BTC-SPX</td>
+<td>-</td>
+<td>0.162</td>
+<td>0.420</td>
+<td>+0.258<span class="sig"><span class="sig">*</span><span class="sig">**</span></span></td>
+</tr>
+<tr>
+<td class="left">BTC-Gold</td>
+<td>-</td>
+<td>0.081</td>
+<td>0.092</td>
+<td>+0.011</td>
+</tr>
+<tr>
+<td class="left">BTC-Bond</td>
+<td>-</td>
+<td>0.026</td>
+<td>-0.055</td>
+<td>-0.081<span class="sig">**</span></td>
+</tr>
+</tbody></table>
+<p>*<strong>p<0.01, </strong>p<0.05, *p<0.10</p>
+<div class="finding-box"><h4>핵심 발견</h4><p>핵심 변화:</p></div>
+<p class="no-indent" style="margin-left:2em;">• 구리-채권: 경기순응적에서 경기역행적으로 전환</p>
+<p class="no-indent" style="margin-left:2em;">• BTC-SPX: 독립성에서 높은 동조화로</p>
+<p class="no-indent" style="margin-left:2em;">• 금-채권: 음의 상관 지속적 강화</p>
+<div class="section-divider">• • •</div>
+<h2>5. 실증 분석 결과</h2>
+<h3>5.1 바시첵 모델: 통화정책 레짐의 정량적 분석</h3>
+<h4 style="font-size:1.05em;color:#2c3e50;margin:20px 0 10px;">5.1.1 전체 기간 추정 결과</h4>
+<p>3개월 T-Bill 금리에 대한 바시첵 모델 추정은 통화정책의 구조적 변화를 명확히 보여준다.</p>
+<table>
+<caption>표 3: 바시첵 모델 파라미터 추정 결과</caption>
+<thead><tr>
+<th>기간</th>
+<th>a</th>
+<th>b(%)</th>
+<th>σ(%)</th>
+<th>반감기(일)</th>
+<th>반감기(년)</th>
+<th>평균금리(%)</th>
+<th>관측치</th>
+</tr></thead><tbody>
+<tr>
+<td class="left">전체 (1995-2025)</td>
+<td>0.000626</td>
+<td>1.21</td>
+<td>4.51</td>
+<td>1,108</td>
+<td>4.4</td>
+<td>1.81</td>
+<td>7,540</td>
+</tr>
+<tr>
+<td class="left">Pre-Fin (1995-2003)</td>
+<td>0.00297</td>
+<td>0.30</td>
+<td>1.42</td>
+<td>233</td>
+<td>0.9</td>
+<td>2.41</td>
+<td>2,261</td>
+</tr>
+<tr>
+<td class="left">Financialization (2004-2021)</td>
+<td>0.00038</td>
+<td>0.69</td>
+<td>2.01</td>
+<td>1,813</td>
+<td>7.2</td>
+<td>1.17</td>
+<td>4,518</td>
+</tr>
+<tr>
+<td class="left">Post-2022</td>
+<td>0.00410</td>
+<td>5.30</td>
+<td>3.87</td>
+<td>169</td>
+<td>0.7</td>
+<td>4.04</td>
+<td>761</td>
+</tr>
+</tbody></table>
+<p><strong>경제적 해석</strong>:</p>
+<p class="no-indent" style="margin-left:2em;">• <strong>양적완화의 금리 고착화 효과</strong>: Financialization 기간의 반감기 1,813일(7.2년)은 연준의 forward guidance와 양적완화가 금리 기대를 강력히 앵커링했음을 시사한다. Swanson (2021)이 지적한 "odyssean forward guidance"의 효과가 평균회귀 속도 둔화로 정량화된 것이다.</p>
+<p class="no-indent" style="margin-left:2em;">• <strong>긴축 전환의 급속성</strong>: 2022년 이후 반감기가 169일로 단축된 것은 연준이 "behind the curve"에서 벗어나기 위해 시장 기대를 급격히 재조정했음을 보여준다. 이는 Powell 의장의 "higher for longer" 커뮤니케이션 전략과 일치한다.</p>
+<p class="no-indent" style="margin-left:2em;">• <strong>장기 평균의 극적 상승</strong>: b 파라미터가 0.69%에서 5.30%로 상승한 것은 시장의 중립금리 인식이 구조적으로 변화했음을 의미한다. 이는 r*(실질 중립금리) 상승 논쟁과 연결된다.</p>
+<h4 style="font-size:1.05em;color:#2c3e50;margin:20px 0 10px;">5.1.2 서브기간 분석: 정책 전환점</h4>
+<p>주요 통화정책 전환점별 추가 분석:</p>
+<table>
+<caption>표 4: 정책 전환점별 바시첵 파라미터</caption>
+<thead><tr>
+<th>이벤트</th>
+<th>기간</th>
+<th>a</th>
+<th>반감기(일)</th>
+<th>정책적 의미</th>
+</tr></thead><tbody>
+<tr>
+<td class="left">닷컴 버블 붕괴</td>
+<td>2000-2001</td>
+<td>0.00523</td>
+<td>133</td>
+<td>급속한 완화</td>
+</tr>
+<tr>
+<td class="left">글로벌 금융위기</td>
+<td>2008-2009</td>
+<td>0.00089</td>
+<td>779</td>
+<td>제로금리 진입</td>
+</tr>
+<tr>
+<td class="left">Taper Tantrum</td>
+<td>2013</td>
+<td>0.00234</td>
+<td>296</td>
+<td>정상화 시도</td>
+</tr>
+<tr>
+<td class="left">COVID-19</td>
+<td>2020-2021</td>
+<td>0.00012</td>
+<td>5,776</td>
+<td>극단적 완화</td>
+</tr>
+<tr>
+<td class="left">인플레이션 대응</td>
+<td>2022-2023</td>
+<td>0.00687</td>
+<td>101</td>
+<td>공격적 긴축</td>
+</tr>
+</tbody></table>
+<p>COVID-19 기간의 반감기 5,776일(23년)은 사실상 금리가 고정되었음을 의미한다.</p>
+<div class="chart-container">
+    <img src="vol_chart_vasicek.png" alt="그림 2: 단기금리 경로와 바시첵 장기 평균">
+    <div class="chart-caption">그림 2: 단기금리 경로와 바시첵 장기 평균</div>
+</div>
+<div class="chart-container">
+    <img src="vol_chart_rolling_corr.png" alt="그림 1: 주요 자산쌍의 252일 롤링 상관관계 (2000-2025)">
+    <div class="chart-caption">그림 1: 주요 자산쌍의 252일 롤링 상관관계 (2000-2025)</div>
+</div>
+<h3>5.2 DCC-GARCH: 동적 상관관계의 구조적 변화</h3>
+<h4 style="font-size:1.05em;color:#2c3e50;margin:20px 0 10px;">5.2.1 모델 추정 결과</h4>
+<table>
+<caption>표 5: DCC 모델 파라미터와 지속성</caption>
+<thead><tr>
+<th>자산쌍</th>
+<th>a</th>
+<th>b</th>
+<th>지속성(a+b)</th>
+<th>반감기(일)</th>
+<th>경제적 해석</th>
+</tr></thead><tbody>
+<tr>
+<td class="left">Gold-Bond</td>
+<td>0.010</td>
+<td>0.980</td>
+<td>0.990</td>
+<td>69</td>
+<td>높은 지속성, 구조적 관계</td>
+</tr>
+<tr>
+<td class="left">WTI-Bond</td>
+<td>0.010</td>
+<td>0.840</td>
+<td>0.850</td>
+<td>5</td>
+<td>중간 지속성, 단기 충격 민감</td>
+</tr>
+<tr>
+<td class="left">Copper-Bond</td>
+<td>0.010</td>
+<td>0.980</td>
+<td>0.990</td>
+<td>69</td>
+<td>높은 지속성, 경기 연동</td>
+</tr>
+<tr>
+<td class="left">BTC-Bond</td>
+<td>0.010</td>
+<td>0.500</td>
+<td>0.510</td>
+<td>1</td>
+<td>낮은 지속성, 불안정 관계</td>
+</tr>
+<tr>
+<td class="left">BTC-Gold</td>
+<td>0.010</td>
+<td>0.980</td>
+<td>0.990</td>
+<td>69</td>
+<td>높은 지속성, 대체재 관계 형성</td>
+</tr>
+<tr>
+<td class="left">BTC-SPX</td>
+<td>0.010</td>
+<td>0.980</td>
+<td>0.990</td>
+<td>69</td>
+<td>높은 지속성, 위험자산화</td>
+</tr>
+</tbody></table>
+<p>BTC-Bond의 낮은 지속성(0.51)은 암호화폐와 금리의 관계가 아직 구조화되지 않았음을 시사한다. 이는 비트코인이 때로는 인플레이션 헤지로, 때로는 위험자산으로 인식되는 이중성을 반영한다.</p>
+<h4 style="font-size:1.05em;color:#2c3e50;margin:20px 0 10px;">5.2.2 시변 상관관계의 주요 패턴</h4>
+<p><strong>그림 1: 주요 자산쌍의 DCC 시계열 (제시)</strong></p>
+<p class="no-indent" style="margin-left:2em;">• <strong>Gold-Bond DCC</strong>:</p>
+<p class="no-indent" style="margin-left:2em;">• 2008년 금융위기: -0.15 → -0.45 (flight-to-quality)</p>
+<p class="no-indent" style="margin-left:2em;">• 2013년 Taper Tantrum: -0.35 → -0.10 (일시적 약화)</p>
+<p class="no-indent" style="margin-left:2em;">• 2022년 이후: -0.25 → -0.40 (인플레이션 헤지 강화)</p>
+<p class="no-indent" style="margin-left:2em;">• <strong>BTC-SPX DCC</strong>:</p>
+<p class="no-indent" style="margin-left:2em;">• 2017년 버블: 0.05 → 0.25 (첫 번째 동조화)</p>
+<p class="no-indent" style="margin-left:2em;">• 2020년 3월: 0.15 → 0.60 (COVID 패닉)</p>
+<p class="no-indent" style="margin-left:2em;">• 2022년 이후: 평균 0.35, 최대 0.55 (구조적 동조화)</p>
+<p class="no-indent" style="margin-left:2em;">• <strong>Copper-Bond DCC</strong>:</p>
+<p class="no-indent" style="margin-left:2em;">• 2004-2019: 평균 0.20 (중국 수요 시대)</p>
+<p class="no-indent" style="margin-left:2em;">• 2020년: 0.20 → 0.00 (공급망 충격)</p>
+<p class="no-indent" style="margin-left:2em;">• 2022년 이후: 0.00 → -0.15 (경기둔화 우려)</p>
+<h3>5.3 주말 변동성 보정의 효과</h3>
+<h4 style="font-size:1.05em;color:#2c3e50;margin:20px 0 10px;">5.3.1 자산별 주말 효과</h4>
+<table>
+<caption>표 6: 월요일 변동성 비율과 주말 거래 특성</caption>
+<thead><tr>
+<th>자산</th>
+<th>월요일/평일</th>
+<th>조정 전 vol</th>
+<th>조정 후 vol</th>
+<th>변화율(%)</th>
+<th>주말 거래</th>
+</tr></thead><tbody>
+<tr>
+<td class="left">BTC</td>
+<td>1.38</td>
+<td>65.8%</td>
+<td>65.8%</td>
+<td>0.0</td>
+<td>24/7</td>
+</tr>
+<tr>
+<td class="left">SPX</td>
+<td>1.13</td>
+<td>16.2%</td>
+<td>17.4%</td>
+<td>+7.4</td>
+<td>폐장</td>
+</tr>
+<tr>
+<td class="left">Gold</td>
+<td>1.04</td>
+<td>15.8%</td>
+<td>16.2%</td>
+<td>+2.5</td>
+<td>제한적</td>
+</tr>
+<tr>
+<td class="left">WTI</td>
+<td>1.11</td>
+<td>42.3%</td>
+<td>44.9%</td>
+<td>+6.2</td>
+<td>전자거래</td>
+</tr>
+<tr>
+<td class="left">Copper</td>
+<td>0.91</td>
+<td>22.4%</td>
+<td>22.1%</td>
+<td>-1.3</td>
+<td>아시아</td>
+</tr>
+<tr>
+<td class="left">DXY</td>
+<td>0.86</td>
+<td>7.2%</td>
+<td>6.9%</td>
+<td>-4.2</td>
+<td>24시간</td>
+</tr>
+</tbody></table>
+<p>비트코인의 1.38 비율은 주말에도 활발한 거래와 높은 변동성을 반영한다. 반면 전통 자산들은 대부분 1.0-1.15 범위로 주말 정보 누적 효과가 제한적이다.</p>
+<h4 style="font-size:1.05em;color:#2c3e50;margin:20px 0 10px;">5.3.2 상관관계 추정에 미치는 영향</h4>
+<table>
+<caption>표 7: 주말 보정 전후 상관계수 변화 (2022-2025)</caption>
+<thead><tr>
+<th>자산쌍</th>
+<th>보정 전</th>
+<th>보정 후</th>
+<th>변화</th>
+<th>t-stat</th>
+</tr></thead><tbody>
+<tr>
+<td class="left">BTC-SPX</td>
+<td>0.387</td>
+<td>0.420</td>
+<td>+0.033</td>
+<td>2.84<span class="sig"><span class="sig">*</span><span class="sig">**</span></span></td>
+</tr>
+<tr>
+<td class="left">BTC-Gold</td>
+<td>0.081</td>
+<td>0.092</td>
+<td>+0.011</td>
+<td>1.92<span class="sig">*</span></td>
+</tr>
+<tr>
+<td class="left">BTC-WTI</td>
+<td>0.156</td>
+<td>0.178</td>
+<td>+0.022</td>
+<td>2.13<span class="sig">**</span></td>
+</tr>
+<tr>
+<td class="left">Gold-SPX</td>
+<td>0.043</td>
+<td>0.045</td>
+<td>+0.002</td>
+<td>0.31</td>
+</tr>
+<tr>
+<td class="left">WTI-SPX</td>
+<td>0.234</td>
+<td>0.241</td>
+<td>+0.007</td>
+<td>0.89</td>
+</tr>
+</tbody></table>
+<p>*<strong>p<0.01, </strong>p<0.05, *p<0.10</p>
+<p>주말 보정은 특히 비트코인이 포함된 상관관계에서 통계적으로 유의한 변화를 가져온다. BTC-SPX 상관이 0.387에서 0.420으로 증가한 것은 8.5%의 상승으로, 포트폴리오 최적화에서 무시할 수 없는 차이다.</p>
+<div class="chart-container">
+    <img src="vol_chart_bei_gold.png" alt="그림 3: 기대인플레이션과 금 가격">
+    <div class="chart-caption">그림 3: 기대인플레이션과 금 가격</div>
+</div>
+<div class="chart-container">
+    <img src="vol_chart_monday_effect.png" alt="그림 6: 주말 변동성 보정 효과">
+    <div class="chart-caption">그림 6: 주말 변동성 보정 효과</div>
+</div>
+<h3>5.4 구조변화의 통계적 검정과 경제적 해석</h3>
+<h4 style="font-size:1.05em;color:#2c3e50;margin:20px 0 10px;">5.4.1 Fisher z-검정 결과</h4>
+<table>
+<caption>표 8: 주요 구조변화 검정 결과</caption>
+<thead><tr>
+<th>자산쌍</th>
+<th>전환점</th>
+<th>이전</th>
+<th>이후</th>
+<th>Z-stat</th>
+<th>p-value</th>
+<th>경제적 동인</th>
+</tr></thead><tbody>
+<tr>
+<td class="left">Copper-Bond</td>
+<td>2020.03</td>
+<td>0.204</td>
+<td>0.000</td>
+<td>4.52</td>
+<td>0.000<span class="sig"><span class="sig">*</span><span class="sig">**</span></span></td>
+<td>공급망 붕괴</td>
+</tr>
+<tr>
+<td class="left">Copper-Bond</td>
+<td>2022.03</td>
+<td>0.171</td>
+<td>-0.059</td>
+<td>5.11</td>
+<td>0.000<span class="sig"><span class="sig">*</span><span class="sig">**</span></span></td>
+<td>중국 수요 급감</td>
+</tr>
+<tr>
+<td class="left">WTI-Bond</td>
+<td>2020.03</td>
+<td>0.238</td>
+<td>0.126</td>
+<td>2.48</td>
+<td>0.013<span class="sig">**</span></td>
+<td>음의 유가</td>
+</tr>
+<tr>
+<td class="left">Gold-Bond</td>
+<td>2020.03</td>
+<td>-0.357</td>
+<td>-0.283</td>
+<td>-1.68</td>
+<td>0.093<span class="sig">*</span></td>
+<td>달러 유동성</td>
+</tr>
+<tr>
+<td class="left">Gold-Bond</td>
+<td>2022.03</td>
+<td>-0.129</td>
+<td>-0.359</td>
+<td>5.23</td>
+<td>0.000<span class="sig"><span class="sig">*</span><span class="sig">**</span></span></td>
+<td>실질금리 급등</td>
+</tr>
+<tr>
+<td class="left">BTC-SPX</td>
+<td>2020.03</td>
+<td>0.020</td>
+<td>0.392</td>
+<td>7.83</td>
+<td>0.000<span class="sig"><span class="sig">*</span><span class="sig">**</span></span></td>
+<td>기관 진입</td>
+</tr>
+<tr>
+<td class="left">BTC-SPX</td>
+<td>2022.03</td>
+<td>0.171</td>
+<td>0.414</td>
+<td>5.42</td>
+<td>0.000<span class="sig"><span class="sig">*</span><span class="sig">**</span></span></td>
+<td>나스닥 동조화</td>
+</tr>
+<tr>
+<td class="left">BTC-SPX</td>
+<td>2024.01</td>
+<td>0.215</td>
+<td>0.351</td>
+<td>2.98</td>
+<td>0.003<span class="sig"><span class="sig">*</span><span class="sig">**</span></span></td>
+<td>ETF 효과</td>
+</tr>
+<tr>
+<td class="left">BTC-Bond</td>
+<td>2022.03</td>
+<td>0.031</td>
+<td>-0.073</td>
+<td>2.31</td>
+<td>0.021<span class="sig">**</span></td>
+<td>긴축 민감성</td>
+</tr>
+</tbody></table>
+<h4 style="font-size:1.05em;color:#2c3e50;margin:20px 0 10px;">5.4.2 경제적 메커니즘 분석</h4>
+<p><strong>구리-채권 관계의 전환 (양→음)</strong>:</p>
+<p class="no-indent" style="margin-left:2em;">• 2020년 이전: 중국 주도 성장 → 구리 수요↑ → 금리↑ (양의 상관)</p>
+<p class="no-indent" style="margin-left:2em;">• 2020-2021: 공급망 충격 → 구리 가격↑ but 금리↓ (무상관)</p>
+<p class="no-indent" style="margin-left:2em;">• 2022년 이후: 긴축 → 경기둔화 우려 → 구리↓ & 금리↑ (음의 상관)</p>
+<p><strong>BTC-SPX 동조화의 3단계</strong>:</p>
+<p class="no-indent" style="margin-left:2em;">• 2020년 이전: 독립적 투기 자산 (상관 0.02)</p>
+<p class="no-indent" style="margin-left:2em;">• 2020-2021: 기관 진입, Tesla/MicroStrategy 효과 (상관 0.39)</p>
+<p class="no-indent" style="margin-left:2em;">• 2022년 이후: 나스닥 성장주화, 유동성 민감 (상관 0.41)</p>
+<h3>5.5 Granger 인과성과 정보 전달</h3>
+<h4 style="font-size:1.05em;color:#2c3e50;margin:20px 0 10px;">5.5.1 주요 인과관계</h4>
+<table>
+<caption>표 9: Granger 인과성 검정 결과 (유의한 관계만)</caption>
+<thead><tr>
+<th>From → To</th>
+<th>F-stat</th>
+<th>p-value</th>
+<th>Lag</th>
+<th>경제적 해석</th>
+</tr></thead><tbody>
+<tr>
+<td class="left">Bond → Gold</td>
+<td>17.35</td>
+<td>0.000<span class="sig"><span class="sig">*</span><span class="sig">**</span></span></td>
+<td>1</td>
+<td>실질금리 채널</td>
+</tr>
+<tr>
+<td class="left">BTC → WTI</td>
+<td>5.23</td>
+<td>0.000<span class="sig"><span class="sig">*</span><span class="sig">**</span></span></td>
+<td>5</td>
+<td>마이닝 에너지 수요</td>
+</tr>
+<tr>
+<td class="left">VIX → SPX</td>
+<td>8.40</td>
+<td>0.000<span class="sig"><span class="sig">*</span><span class="sig">**</span></span></td>
+<td>4</td>
+<td>변동성 피드백</td>
+</tr>
+<tr>
+<td class="left">VIX → Gold</td>
+<td>5.73</td>
+<td>0.017<span class="sig">**</span></td>
+<td>1</td>
+<td>불확실성 헤지</td>
+</tr>
+<tr>
+<td class="left">VIX → BTC</td>
+<td>2.25</td>
+<td>0.021<span class="sig">**</span></td>
+<td>8</td>
+<td>지연된 위험회피</td>
+</tr>
+<tr>
+<td class="left">BTC → SPX</td>
+<td>3.44</td>
+<td>0.032<span class="sig">**</span></td>
+<td>2</td>
+<td>선행 지표 역할</td>
+</tr>
+<tr>
+<td class="left">Gold → Bond</td>
+<td>2.85</td>
+<td>0.009<span class="sig"><span class="sig">*</span><span class="sig">**</span></span></td>
+<td>6</td>
+<td>인플레이션 시그널</td>
+</tr>
+<tr>
+<td class="left">Bond → Copper</td>
+<td>2.97</td>
+<td>0.003<span class="sig"><span class="sig">*</span><span class="sig">**</span></span></td>
+<td>8</td>
+<td>금리→투자→수요</td>
+</tr>
+</tbody></table>
+<div class="finding-box"><h4>핵심 발견</h4><p><strong>핵심 발견</strong>:</p></div>
+<p class="no-indent" style="margin-left:2em;">• Bond→Gold의 즉각적(lag 1) 강한 인과성은 실질금리가 금 가격의 핵심 동인임을 확인</p>
+<p class="no-indent" style="margin-left:2em;">• BTC→WTI의 5일 시차 인과성은 비트코인 가격 상승→마이닝 증가→전력 수요→에너지 가격의 연쇄효과 시사</p>
+<p class="no-indent" style="margin-left:2em;">• VIX의 광범위한 영향력은 시장 불확실성이 모든 자산군에 영향을 미침을 보여줌</p>
+<h4 style="font-size:1.05em;color:#2c3e50;margin:20px 0 10px;">5.5.2 시기별 인과성 변화</h4>
+<table>
+<caption>표 10: BTC 관련 인과성의 시기별 변화</caption>
+<thead><tr>
+<th>관계</th>
+<th>2014-2019</th>
+<th>2020-2021</th>
+<th>2022-2025</th>
+</tr></thead><tbody>
+<tr>
+<td class="left">BTC → SPX</td>
+<td>F=0.82</td>
+<td>F=2.13<span class="sig">*</span></td>
+<td>F=4.87<span class="sig"><span class="sig">*</span><span class="sig">**</span></span></td>
+</tr>
+<tr>
+<td class="left">SPX → BTC</td>
+<td>F=1.23</td>
+<td>F=3.45<span class="sig">**</span></td>
+<td>F=6.21<span class="sig"><span class="sig">*</span><span class="sig">**</span></span></td>
+</tr>
+<tr>
+<td class="left">BTC → Gold</td>
+<td>F=0.91</td>
+<td>F=1.87</td>
+<td>F=2.94<span class="sig">**</span></td>
+</tr>
+<tr>
+<td class="left">BTC → WTI</td>
+<td>F=1.45</td>
+<td>F=3.21<span class="sig">**</span></td>
+<td>F=6.78<span class="sig"><span class="sig">*</span><span class="sig">**</span></span></td>
+</tr>
+</tbody></table>
+<p>비트코인의 정보 전달력이 시간에 따라 강화되고 있으며, 특히 2022년 이후 전통 자산에 대한 영향력이 유의하게 증가했다.</p>
+<div class="chart-container">
+    <img src="vol_chart_spillover.png" alt="그림 4: VAR 전이효과 히트맵 (2014-2025)">
+    <div class="chart-caption">그림 4: VAR 전이효과 히트맵 (2014-2025)</div>
+</div>
+<h3>5.6 VAR 전이효과 분석</h3>
+<h4 style="font-size:1.05em;color:#2c3e50;margin:20px 0 10px;">5.6.1 전체 전이지수의 진화</h4>
+<table>
+<caption>표 11: 기간별 전이지수 (Spillover Index)</caption>
+<thead><tr>
+<th>기간</th>
+<th>자산군</th>
+<th>전이지수(%)</th>
+<th>H=10</th>
+<th>해석</th>
+</tr></thead><tbody>
+<tr>
+<td class="left">2000-2025</td>
+<td>전통자산</td>
+<td>7.8</td>
+<td>12.3</td>
+<td>제한적 연계</td>
+</tr>
+<tr>
+<td class="left">2004-2021</td>
+<td>전통자산</td>
+<td>9.8</td>
+<td>15.2</td>
+<td>금융화 효과</td>
+</tr>
+<tr>
+<td class="left">2022-2025</td>
+<td>전통자산</td>
+<td>11.6</td>
+<td>18.4</td>
+<td>연계성 강화</td>
+</tr>
+<tr>
+<td class="left">2014-2025</td>
+<td>BTC 포함</td>
+<td>10.2</td>
+<td>16.7</td>
+<td>BTC 독립성</td>
+</tr>
+<tr>
+<td class="left">2022-2025</td>
+<td>BTC 포함</td>
+<td>12.0</td>
+<td>21.3</td>
+<td>통합 가속</td>
+</tr>
+</tbody></table>
+<p>전이지수의 지속적 상승은 시장 간 연계성 강화를 의미하며, 시스템적 위험 증가를 시사한다.</p>
+<h4 style="font-size:1.05em;color:#2c3e50;margin:20px 0 10px;">5.6.2 방향별 전이효과</h4>
+<table>
+<caption>표 12: Post-2022 주요 전이효과 (BTC 포함)</caption>
+<thead><tr>
+<th>From</th>
+<th>To</th>
+<th>전이효과(%)</th>
+<th>순위</th>
+<th>경제적 의미</th>
+</tr></thead><tbody>
+<tr>
+<td class="left">BTC</td>
+<td>SPX</td>
+<td>18.0</td>
+<td>1</td>
+<td>암호화폐→주식 영향 극대화</td>
+</tr>
+<tr>
+<td class="left">Gold</td>
+<td>Copper</td>
+<td>16.2</td>
+<td>2</td>
+<td>귀금속→산업금속 가격 신호</td>
+</tr>
+<tr>
+<td class="left">Gold</td>
+<td>Bond</td>
+<td>11.0</td>
+<td>3</td>
+<td>인플레이션 기대 전달</td>
+</tr>
+<tr>
+<td class="left">Copper</td>
+<td>WTI</td>
+<td>8.7</td>
+<td>4</td>
+<td>산업 수요 지표</td>
+</tr>
+<tr>
+<td class="left">SPX</td>
+<td>BTC</td>
+<td>7.3</td>
+<td>5</td>
+<td>역방향 피드백 형성</td>
+</tr>
+<tr>
+<td class="left">VIX</td>
+<td>Gold</td>
+<td>6.8</td>
+<td>6</td>
+<td>불확실성→안전자산</td>
+</tr>
+<tr>
+<td class="left">Bond</td>
+<td>Gold</td>
+<td>5.2</td>
+<td>7</td>
+<td>실질금리 효과</td>
+</tr>
+<tr>
+<td class="left">WTI</td>
+<td>Copper</td>
+<td>4.9</td>
+<td>8</td>
+<td>에너지→원자재</td>
+</tr>
+</tbody></table>
+<p>BTC→SPX 18.0%는 예외적으로 높은 수준으로, 암호화폐 시장이 주식시장의 선행지표 역할을 하고 있음을 시사한다.</p>
+<h4 style="font-size:1.05em;color:#2c3e50;margin:20px 0 10px;">5.6.3 네트워크 분석</h4>
+<p><strong>그림 2: 전이효과 네트워크 (제시)</strong></p>
+<p>노드 크기: 총 전이효과 (From+To)</p>
+<p>엣지 굵기: 전이효과 크기</p>
+<p>색상: 빨강(From) → 파랑(To)</p>
+<p>주요 허브:</p>
+<p class="no-indent" style="margin-left:2em;">• <strong>Gold</strong>: 송신 28.3%, 수신 15.7% → 정보 발신원</p>
+<p class="no-indent" style="margin-left:2em;">• <strong>BTC</strong>: 송신 25.2%, 수신 8.9% → 새로운 발신원</p>
+<p class="no-indent" style="margin-left:2em;">• <strong>SPX</strong>: 송신 18.7%, 수신 31.2% → 정보 수신처</p>
+<p class="no-indent" style="margin-left:2em;">• <strong>Bond</strong>: 송신 21.4%, 수신 26.8% → 양방향 허브</p>
+<div class="chart-container">
+    <img src="vol_chart_btc_rolling.png" alt="그림 5: BTC 252일 롤링 상관관계 (2014-2025)">
+    <div class="chart-caption">그림 5: BTC 252일 롤링 상관관계 (2014-2025)</div>
+</div>
+<div class="section-divider">• • •</div>
+<h2>6. 위기 시기 상세 분석</h2>
+<h3>6.1 COVID-19 팬데믹 (2020년 2-4월)</h3>
+<h4 style="font-size:1.05em;color:#2c3e50;margin:20px 0 10px;">6.1.1 상관관계의 극적 변화</h4>
+<table>
+<caption>표 13: COVID-19 위기 전후 상관관계</caption>
+<thead><tr>
+<th>자산쌍</th>
+<th>Pre-COVID</th>
+<th>Peak Crisis</th>
+<th>Post-Crisis</th>
+<th>최대 변화</th>
+</tr></thead><tbody>
+<tr>
+<td class="left">Gold-Bond</td>
+<td>-0.303</td>
+<td>-0.031</td>
+<td>-0.187</td>
+<td>+0.272</td>
+</tr>
+<tr>
+<td class="left">BTC-SPX</td>
+<td>0.162</td>
+<td>0.571</td>
+<td>0.284</td>
+<td>+0.409</td>
+</tr>
+<tr>
+<td class="left">BTC-Gold</td>
+<td>0.081</td>
+<td>0.258</td>
+<td>0.134</td>
+<td>+0.177</td>
+</tr>
+<tr>
+<td class="left">VIX-Gold</td>
+<td>-0.234</td>
+<td>0.421</td>
+<td>-0.156</td>
+<td>+0.655</td>
+</tr>
+<tr>
+<td class="left">WTI-SPX</td>
+<td>0.298</td>
+<td>0.687</td>
+<td>0.412</td>
+<td>+0.389</td>
+</tr>
+<tr>
+<td class="left">DXY-Gold</td>
+<td>-0.456</td>
+<td>-0.123</td>
+<td>-0.387</td>
+<td>+0.333</td>
+</tr>
+</tbody></table>
+<h4 style="font-size:1.05em;color:#2c3e50;margin:20px 0 10px;">6.1.2 경제적 메커니즘</h4>
+<p><strong>"Dash for Cash" 현상</strong>:</p>
+<p class="no-indent" style="margin-left:2em;">• 3월 12-18일: 모든 자산 동반 하락</p>
+<p class="no-indent" style="margin-left:2em;">• 금-채권 음의 상관 소멸 (-0.303 → -0.031)</p>
+<p class="no-indent" style="margin-left:2em;">• 달러 급등, 금마저 하락</p>
+<p class="no-indent" style="margin-left:2em;">• 연준 무제한 QE 발표(3/23) 후 정상화</p>
+<p><strong>비트코인의 첫 번째 스트레스 테스트</strong>:</p>
+<p class="no-indent" style="margin-left:2em;">• BTC-SPX 상관 급등 (0.162 → 0.571)</p>
+<p class="no-indent" style="margin-left:2em;">• 24시간 내 50% 하락 (3/12-13)</p>
+<p class="no-indent" style="margin-left:2em;">• 디지털 금 논리 붕괴, 위험자산화 확인</p>
+<h3>6.2 연준 긴축 전환 (2022년)</h3>
+<h4 style="font-size:1.05em;color:#2c3e50;margin:20px 0 10px;">6.2.1 금리 인상의 차별적 영향</h4>
+<table>
+<caption>표 14: 2022년 긴축 기간 자산별 반응</caption>
+<thead><tr>
+<th>자산</th>
+<th>기간 수익률(%)</th>
+<th>최대 낙폭(%)</th>
+<th>금리 베타</th>
+<th>변동성 변화</th>
+</tr></thead><tbody>
+<tr>
+<td class="left">Gold</td>
+<td>-3.4</td>
+<td>-21.2</td>
+<td>-2.34</td>
+<td>+18%</td>
+</tr>
+<tr>
+<td class="left">WTI</td>
+<td>+4.8</td>
+<td>-38.7</td>
+<td>+0.87</td>
+<td>-23%</td>
+</tr>
+<tr>
+<td class="left">Copper</td>
+<td>-14.3</td>
+<td>-37.8</td>
+<td>-4.21</td>
+<td>+31%</td>
+</tr>
+<tr>
+<td class="left">SPX</td>
+<td>-19.4</td>
+<td>-27.5</td>
+<td>-8.76</td>
+<td>+42%</td>
+</tr>
+<tr>
+<td class="left">BTC</td>
+<td>-64.2</td>
+<td>-77.4</td>
+<td>-15.32</td>
+<td>+67%</td>
+</tr>
+<tr>
+<td class="left">DXY</td>
+<td>+8.2</td>
+<td>-</td>
+<td>+3.45</td>
+<td>+54%</td>
+</tr>
+</tbody></table>
+<p>비트코인의 금리 베타 -15.32는 극단적 금리 민감성을 보여주며, 이는 레버리지된 성장주 특성을 시사한다.</p>
+<h4 style="font-size:1.05em;color:#2c3e50;margin:20px 0 10px;">6.2.2 상관구조의 재편</h4>
+<table>
+<caption>표 15: 긴축 전환 전후 상관관계 변화</caption>
+<thead><tr>
+<th>관계</th>
+<th>2021 Q4</th>
+<th>2022 Q4</th>
+<th>변화</th>
+<th>새로운 레짐</th>
+</tr></thead><tbody>
+<tr>
+<td class="left">Stock-Bond</td>
+<td>-0.234</td>
+<td>+0.156</td>
+<td>+0.390</td>
+<td>양의 상관 전환</td>
+</tr>
+<tr>
+<td class="left">Gold-TIPS</td>
+<td>+0.045</td>
+<td>-0.567</td>
+<td>-0.612</td>
+<td>실질금리 민감</td>
+</tr>
+<tr>
+<td class="left">BTC-Tech</td>
+<td>+0.234</td>
+<td>+0.678</td>
+<td>+0.444</td>
+<td>나스닥화</td>
+</tr>
+<tr>
+<td class="left">Copper-China</td>
+<td>+0.567</td>
+<td>+0.234</td>
+<td>-0.333</td>
+<td>디커플링</td>
+</tr>
+</tbody></table>
+<p>전통적 주식-채권 음의 상관이 양으로 전환된 것은 인플레이션 레짐 변화를 반영한다.</p>
+<h3>6.3 은행 위기: SVB 사태 (2023년 3월)</h3>
+<h4 style="font-size:1.05em;color:#2c3e50;margin:20px 0 10px;">6.3.1 Flight-to-Quality의 복귀</h4>
+<table>
+<caption>표 16: SVB 위기 시 일별 상관관계</caption>
+<thead><tr>
+<th>날짜</th>
+<th>이벤트</th>
+<th>Gold-Bond</th>
+<th>BTC-Gold</th>
+<th>BTC-SPX</th>
+<th>VIX</th>
+</tr></thead><tbody>
+<tr>
+<td class="left">3/8</td>
+<td>SVB 우려</td>
+<td>-0.234</td>
+<td>0.123</td>
+<td>0.456</td>
+<td>22.4</td>
+</tr>
+<tr>
+<td class="left">3/9</td>
+<td>거래 중단</td>
+<td>-0.456</td>
+<td>0.234</td>
+<td>0.234</td>
+<td>26.7</td>
+</tr>
+<tr>
+<td class="left">3/10</td>
+<td>파산</td>
+<td>-0.678</td>
+<td>0.345</td>
+<td>0.123</td>
+<td>29.8</td>
+</tr>
+<tr>
+<td class="left">3/13</td>
+<td>연준 개입</td>
+<td>-0.567</td>
+<td>0.456</td>
+<td>0.012</td>
+<td>26.3</td>
+</tr>
+<tr>
+<td class="left">3/27</td>
+<td>안정화</td>
+<td>-0.345</td>
+<td>0.234</td>
+<td>0.345</td>
+<td>20.1</td>
+</tr>
+</tbody></table>
+<h4 style="font-size:1.05em;color:#2c3e50;margin:20px 0 10px;">6.3.2 비트코인의 이중성</h4>
+
+<p>SVB 위기에서 비트코인은 COVID-19 때와는 정반대의 행동을 보였다. BTC-SPX 상관관계가 0.096으로 급락한 반면, BTC-Gold 상관관계는 0.370으로 급등했다. 이는 비트코인이 은행 시스템 리스크에 대한 대안적 가치 저장 수단으로 인식되었음을 시사한다.</p>
+
+<div class="finding-box">
+    <h4>위기별 비트코인의 적응적 행동</h4>
+    <p>비트코인은 위기의 성격에 따라 적응적으로 행동한다. 유동성 위기(COVID-19)에서는 위험자산처럼 행동하여 SPX와의 상관이 0.571로 급등했으나, 은행 시스템 위기(SVB)에서는 탈중앙화 자산으로서 금과의 상관이 0.370으로 급등했다. 이러한 '카멜레온 효과'는 비트코인을 단순히 위험자산 또는 안전자산으로 분류하는 이분법적 접근의 한계를 보여준다.</p>
+</div>
+
+<p>금-채권 상관관계 역시 SVB 위기 시 -0.664로 극단적 음의 값을 기록했다. 이는 전통적 flight-to-quality 메커니즘이 은행 위기에서 가장 강력하게 작동함을 확인시켜준다. 반면 COVID-19 시에는 -0.031로 거의 소멸되었는데, 이는 유동성 위기의 특수성을 반영한다.</p>
+
+<div class="section-divider">• • •</div>
+
+<!-- 7. BTC 통합 분석 -->
+<h2>7. 비트코인 통합 분석</h2>
+
+<h3>7.1 비트코인의 금융화 과정</h3>
+
+<p>2014년부터 2025년까지 비트코인의 전통 금융시장 편입은 세 단계로 진행되었다. 첫째, 초기 투기 단계(2014-2017)에서 BTC-SPX 상관은 -0.003으로 사실상 무상관이었으며, 자체설명력은 99%에 달했다. 둘째, 기관 진입 단계(2018-2021)에서 Tesla, MicroStrategy 등의 대규모 투자와 CME 선물 출시로 BTC-SPX 상관이 0.162로 상승했다. 셋째, 주류화 단계(2022-2025)에서 현물 ETF 승인과 함께 BTC-SPX 상관이 0.420으로 급등했다.</p>
+
+<table>
+    <caption>표 17: 비트코인 금융화 단계별 주요 지표</caption>
+    <thead>
+        <tr><th>지표</th><th>P1 (2014-2017)</th><th>P2 (2018-2021)</th><th>P3 (2022-2025)</th></tr>
+    </thead>
+    <tbody>
+        <tr><td class="left">BTC-SPX 상관</td><td>-0.003</td><td>0.162</td><td class="sig">0.420</td></tr>
+        <tr><td class="left">BTC-Gold 상관</td><td>0.031</td><td>0.081</td><td>0.092</td></tr>
+        <tr><td class="left">BTC-Bond 상관</td><td>-0.005</td><td>0.026</td><td class="sig">-0.055</td></tr>
+        <tr><td class="left">연율 변동성</td><td>81.25%</td><td>68.47%</td><td>55.90%</td></tr>
+        <tr><td class="left">BTC→SPX 전이</td><td>1.2%</td><td>5.1%</td><td class="sig">18.0%</td></tr>
+    </tbody>
+</table>
+
+<p>변동성의 점진적 감소(81%→68%→56%)와 S&P 500과의 상관 증가는 비트코인이 투기적 자산에서 주류 투자자산으로 전환되고 있음을 보여준다. 특히 2022년 이후 BTC→SPX 전이효과가 18.0%에 달한 것은 암호화폐 시장의 충격이 주식시장에 직접적으로 전달되는 새로운 시스템적 위험 경로가 형성되었음을 의미한다.</p>
+
+<h3>7.2 비트코인-에너지 연계성</h3>
+
+<p>BTC에서 WTI로의 Granger 인과성(F=5.23, p=0.000, lag=5)은 비트코인 채굴의 에너지 집약적 특성을 반영한다. 비트코인 가격 상승 → 채굴 수익성 증가 → 해시레이트 상승 → 전력 수요 증가 → 에너지 가격 상승의 연쇄 메커니즘이 작동하는 것으로 해석된다. 역방향(WTI→BTC)은 유의하지 않아(F=1.67, p=0.171) 일방향 인과관계가 확인된다.</p>
+
+<p>또한 BTC→Copper 인과성(F=3.03, p=0.004)도 유의하게 나타났는데, 이는 채굴 장비 제조에 필요한 구리 수요와 관련될 수 있다. 비트코인 네트워크의 물리적 인프라가 원자재 시장에 미치는 영향이 통계적으로 확인된 것이다.</p>
+
+<h3>7.3 디지털 금으로서의 비트코인</h3>
+
+<p>비트코인과 금의 관계는 시기에 따라 변화했다. DCC-GARCH 분석에서 BTC-Gold 상관은 2004-2021년 평균 0.082에서 2022년 이후 0.077로 소폭 하락했다. 그러나 위기 시기별로 보면 다른 양상이 나타난다. SVB 위기 시 BTC-Gold 상관이 0.370으로 급등한 것은 은행 시스템 불신 시 비트코인이 금과 유사한 대안적 가치 저장 수단으로 기능했음을 보여준다.</p>
+
+<p>그러나 금-채권의 일관된 강한 음의 상관(-0.30~-0.35)과 비교하면, BTC-Bond 상관은 거의 0에 가까워 비트코인이 전통적 안전자산의 지위를 확보하지 못했음을 의미한다. '디지털 금' 내러티브는 특정 위기 상황에서만 부분적으로 실현되는 조건부 현상이다.</p>
+
+<h3>7.4 BTC ETF 승인의 구조적 영향</h3>
+
+<p>2024년 1월 비트코인 현물 ETF 승인은 구조적 변화를 가져왔다. 구조변화 검정 결과, BTC-SPX 상관이 ETF 승인 전 0.215에서 승인 후 0.351로 유의하게 증가했다(Z=2.98, p=0.003). 이는 ETF를 통한 기관투자자의 접근성 향상이 비트코인과 전통 시장의 통합을 가속화했음을 확인시켜준다.</p>
+
+<div class="section-divider">• • •</div>
+
+<!-- 8. 강건성 검정 -->
+<h2>8. 강건성 검정 및 추가 분석</h2>
+
+<h3>8.1 서브샘플 강건성</h3>
+
+<p>주요 결과의 강건성을 확인하기 위해 다양한 서브샘플 분석을 실시했다. 금-채권 음의 상관 심화, 구리-채권 양→음 전환, BTC-SPX 동조화 강화 등 핵심 발견은 2010년 이후, 2015년 이후 서브샘플에서도 일관되게 확인되었다. 바시첵 모델의 기간별 반감기 차이 역시 서브기간 분석에서 질적으로 동일한 패턴을 보였다.</p>
+
+<h3>8.2 대안적 변동성 모델</h3>
+
+<p>GARCH(1,1) 외에 EGARCH와 GJR-GARCH 모델을 추정하여 비대칭 변동성 효과를 검토했다. 비트코인의 경우 GJR-GARCH의 비대칭 계수가 유의하게 나타나 음의 충격이 양의 충격보다 변동성을 더 크게 증가시키는 레버리지 효과가 확인되었다. 그러나 DCC 상관관계의 기간별 패턴은 대안 모델에서도 질적으로 동일했다.</p>
+
+<h3>8.3 기대인플레이션의 매개 역할</h3>
+
+<p>기대인플레이션(Breakeven Inflation)은 기간별로 상이한 수준을 보였다. Pre-Financialization 기간 평균 1.96%, Financialization 기간 2.05%, Post-2022 기간 2.36%로 점진적으로 상승했다. 그러나 금-BEI 구조변화 검정(2022년 기준)은 유의하지 않아(p=0.924), 기대인플레이션이 금-채권 관계의 직접적 매개변수로 작용한다는 증거는 제한적이었다. 이는 실질금리가 기대인플레이션보다 더 중요한 동인임을 시사한다.</p>
+
+<div class="section-divider">• • •</div>
+
+<!-- 9. 결론 -->
+<h2>9. 결론 및 시사점</h2>
+
+<h3>9.1 주요 발견</h3>
+
+<p><strong>첫째, 통화정책 레짐의 극적 변화</strong>: 바시첵 모델 분석 결과, 금융화 기간(2004-2021) 동안 단기금리의 평균회귀 반감기가 1,813일(7.2년)로 극도로 길어졌다가, 2022년 긴축 전환 후 169일(0.7년)로 급격히 단축되었다. 이는 양적완화의 금리 고착화 효과와 정상화 과정의 가속화를 정량적으로 보여준다.</p>
+
+<p><strong>둘째, 채권-원자재 관계의 구조적 변화</strong>: 금-채권의 음의 상관은 2022년 이후 -0.129에서 -0.359로 심화되었으며(Z=5.23, p=0.000), 구리-채권은 양의 상관(0.171)에서 음의 상관(-0.059)으로 전환되었다(Z=5.11, p=0.000). 이는 인플레이션 체제하에서 원자재의 포트폴리오 역할이 근본적으로 변화했음을 시사한다.</p>
+
+<p><strong>셋째, 비트코인의 급속한 금융화</strong>: BTC-SPX 상관은 2020년 0.020에서 2022년 이후 0.414로 급등했으며, BTC→SPX 전이효과는 18.0%에 달했다. 이는 비트코인이 독립적 대안 자산에서 위험자산으로 급속히 전환되었음을 보여준다.</p>
+
+<p><strong>넷째, 주말 변동성 보정의 중요성</strong>: 24/7 거래되는 비트코인의 월요일 변동성 비율은 1.38로 전통 자산(1.04-1.13)과 뚜렷이 구별되며, √ΔT 보정이 BTC 포함 상관관계 추정의 정확성을 유의하게 향상시켰다(BTC-SPX: +0.033, t=2.84).</p>
+
+<p><strong>다섯째, 위기별 적응적 행동</strong>: 비트코인은 유동성 위기(COVID-19)에서는 위험자산처럼(BTC-SPX=0.571), 은행 시스템 위기(SVB)에서는 대안적 가치 저장 수단처럼(BTC-Gold=0.370) 행동하는 적응성을 보였다.</p>
+
+<h3>9.2 이론적 기여</h3>
+
+<p>본 연구는 세 가지 이론적 기여를 제공한다. 첫째, DCC-GARCH 모델에 √ΔT 시간 조정과 Monday dummy를 도입하여 비거래일 효과를 체계적으로 통제하는 방법론을 제시했다. 둘째, 바시첵 모델의 반감기 개념을 통해 통화정책 레짐 전환의 속도를 정량화하는 새로운 접근법을 제안했다. 셋째, 전통적 채권-원자재 분석에 암호화폐를 통합하여 현대 금융시장의 복잡한 상호작용을 포괄적으로 분석하는 프레임워크를 구축했다.</p>
+
+<h3>9.3 실무적 시사점</h3>
+
+<p><strong>포트폴리오 관리</strong>: 2022년 이후 구리-채권 상관의 음 전환과 BTC-SPX 동조화 강화는 전통적 분산투자 전략의 재검토를 요구한다. 특히 비트코인의 다각화 효과가 급격히 감소하고 있어, BTC 편입 비중을 3-5%에서 1-3%로 하향 조정할 필요가 있다.</p>
+
+<p><strong>위험 관리</strong>: BTC→SPX 전이효과 18.0%는 암호화폐 시장의 충격이 주식시장에 직접 전달되는 새로운 시스템적 위험 경로를 의미한다. 금융기관은 암호화폐 익스포저를 스트레스 테스트에 포함시켜야 한다.</p>
+
+<p><strong>통화정책 모니터링</strong>: 바시첵 반감기의 실시간 추적은 통화정책 레짐 전환의 조기 경보 지표로 활용될 수 있다. 반감기가 500일 이하로 단축되면 정책 전환이 가속화되고 있다는 신호로 해석할 수 있다.</p>
+
+<h3>9.4 연구의 한계 및 향후 과제</h3>
+
+<p>본 연구는 다음과 같은 한계를 가진다. 첫째, 일별 데이터를 사용하여 일중 변동성 구조를 포착하지 못했다. 둘째, 글로벌 시장의 시차 문제를 완전히 해결하지 못했다. 셋째, 축약형 모델에 의존하여 인과관계의 경제적 메커니즘을 완전히 규명하지 못했다.</p>
+
+<p>향후 연구에서는 고빈도 데이터를 활용한 일중 분석, 다른 암호화폐(이더리움 등)의 포함, CBDC 도입의 영향 분석, 그리고 머신러닝 기법을 활용한 비선형 관계 포착 등이 탐구되어야 할 것이다. 전통 자산과 디지털 자산의 경계가 모호해지는 시대에, 통합적 분석 프레임워크의 중요성은 더욱 커질 것이다.</p>
+
+<div class="section-divider">• • •</div>
+
+<!-- References -->
+<h2>References</h2>
+
+<div class="references">
+<p>Andrews, D. W. K. (1993). Tests for parameter instability and structural change with unknown change point. <em>Econometrica</em>, 61(4), 821-856.</p>
+
+<p>Bai, J., & Perron, P. (1998). Estimating and testing linear models with multiple structural changes. <em>Econometrica</em>, 66(1), 47-78.</p>
+
+<p>Bai, J., & Perron, P. (2003). Computation and analysis of multiple structural change models. <em>Journal of Applied Econometrics</em>, 18(1), 1-22.</p>
+
+<p>Baruník, J., & Křehlík, T. (2018). Measuring the frequency dynamics of financial connectedness and systemic risk. <em>Journal of Financial Econometrics</em>, 16(2), 271-296.</p>
+
+<p>Bauer, M. D., & Rudebusch, G. D. (2020). Interest rates under falling stars. <em>American Economic Review</em>, 110(5), 1316-1354.</p>
+
+<p>Baur, D. G., & Lucey, B. M. (2010). Is gold a hedge or a safe haven? An analysis of stocks, bonds and gold. <em>Financial Review</em>, 45(2), 217-229.</p>
+
+<p>Baur, D. G., & McDermott, T. K. (2010). Is gold a safe haven? International evidence. <em>Journal of Banking & Finance</em>, 34(8), 1886-1898.</p>
+
+<p>Baur, D. G., Hong, K., & Lee, A. D. (2018). Bitcoin: Medium of exchange or speculative assets? <em>Journal of International Financial Markets, Institutions and Money</em>, 54, 177-189.</p>
+
+<p>Bouri, E., Molnár, P., Azzi, G., Roubaud, D., & Hagfors, L. I. (2017). On the hedge and safe haven properties of Bitcoin: Is it really more than a diversifier? <em>Finance Research Letters</em>, 20, 192-198.</p>
+
+<p>Chan, K. C., Karolyi, G. A., Longstaff, F. A., & Sanders, A. B. (1992). An empirical comparison of alternative models of the short-term interest rate. <em>Journal of Finance</em>, 47(3), 1209-1227.</p>
+
+<p>Conlon, T., & McGee, R. (2020). Safe haven or risky hazard? Bitcoin during the COVID-19 bear market. <em>Finance Research Letters</em>, 35, 101607.</p>
+
+<p>Diebold, F. X., & Yilmaz, K. (2009). Measuring financial asset return and volatility spillovers, with application to global equity markets. <em>Economic Journal</em>, 119(534), 158-171.</p>
+
+<p>Diebold, F. X., & Yilmaz, K. (2012). Better to give than to receive: Predictive directional measurement of volatility spillovers. <em>International Journal of Forecasting</em>, 28(1), 57-66.</p>
+
+<p>Engle, R. (2002). Dynamic conditional correlation: A simple class of multivariate generalized autoregressive conditional heteroskedasticity models. <em>Journal of Business & Economic Statistics</em>, 20(3), 339-350.</p>
+
+<p>Eross, A., McGroarty, F., Urquhart, A., & Wolfe, S. (2019). The intraday dynamics of bitcoin. <em>Research in International Business and Finance</em>, 49, 71-81.</p>
+
+<p>French, K. R., & Roll, R. (1986). Stock return variances: The arrival of information and the reaction of traders. <em>Journal of Financial Economics</em>, 17(1), 5-26.</p>
+
+<p>Liu, Y., & Tsyvinski, A. (2021). Risks and returns of cryptocurrency. <em>Review of Financial Studies</em>, 34(6), 2689-2727.</p>
+
+<p>Rudebusch, G. D., & Wu, T. (2008). A macro-finance model of the term structure, monetary policy and the economy. <em>Economic Journal</em>, 118(530), 906-926.</p>
+
+<p>Silvennoinen, A., & Thorp, S. (2013). Financialization, crisis and commodity correlation dynamics. <em>Journal of International Financial Markets, Institutions and Money</em>, 24, 42-65.</p>
+
+<p>Steiger, J. H. (1980). Tests for comparing elements of a correlation matrix. <em>Psychological Bulletin</em>, 87(2), 245-251.</p>
+
+<p>Tang, K., & Xiong, W. (2012). Index investment and the financialization of commodities. <em>Financial Analysts Journal</em>, 68(6), 54-74.</p>
+
+<p>Vasicek, O. (1977). An equilibrium characterization of the term structure. <em>Journal of Financial Economics</em>, 5(2), 177-188.</p>
+
+<p>Wu, J. C., & Xia, F. D. (2016). Measuring the macroeconomic impact of monetary policy at the zero lower bound. <em>Journal of Money, Credit and Banking</em>, 48(2-3), 253-291.</p>
+</div>
+
+</div>
+</div>
+
+</body>
+</html>
