@@ -1,5 +1,6 @@
 ---
 layout: null
+permalink: /research/vol-integrated-kr/
 ---
 <!DOCTYPE html>
 <html lang="ko">
@@ -7,7 +8,31 @@ layout: null
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>자산 동조화와 거시적 전환점 분석 | Ha Rim Jung</title>
-    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400&family=Inter:wght@300;400;500;600&family=Nanum+Myeongjo:wght@400;700&display=swap" rel="stylesheet">
+    
+    <!-- Open Graph / 카톡·메신저 미리보기 -->
+    <meta property="og:type" content="article">
+    <meta property="og:title" content="자산 동조화와 거시적 전환점: 채권-원자재-비트코인 통합 분석">
+    <meta property="og:description" content="바시첵 모델과 주말 보정 DCC-GARCH를 활용한 30년간(1995-2025) 채권-원자재-비트코인 관계의 구조적 변화 분석. BTC→SPX 전이효과 18.0% 확인.">
+    <meta property="og:url" content="https://gkfla2020-bit.github.io/research/vol-integrated-kr/">
+    <meta property="og:image" content="https://gkfla2020-bit.github.io/assets/og-card.png">
+    <meta property="og:image:secure_url" content="https://gkfla2020-bit.github.io/assets/og-card.png">
+    <meta property="og:image:type" content="image/png">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+    <meta property="og:site_name" content="Ha Rim Jung">
+    <meta property="og:locale" content="ko_KR">
+    
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="자산 동조화와 거시적 전환점: 채권-원자재-비트코인 통합 분석">
+    <meta name="twitter:description" content="Vasicek + DCC-GARCH + Spillover Index를 활용한 통합 분석">
+    <meta name="twitter:image" content="https://gkfla2020-bit.github.io/assets/og-card.png">
+    
+    <!-- 카카오톡 전용 -->
+    <meta property="kakao:image" content="https://gkfla2020-bit.github.io/assets/og-card.png">
+    
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-83LKVW7412"></script>
+    <script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-83LKVW7412');</script>
     <script>
         window.MathJax = {
             tex: { inlineMath: [['\\(','\\)']], displayMath: [['\\[','\\]']] },
@@ -15,271 +40,217 @@ layout: null
         };
     </script>
     <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js" async></script>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;500&family=Space+Mono:wght@400&family=Inter:wght@300;400&family=Nanum+Myeongjo:wght@400;700&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body {
-            font-family: 'Inter', -apple-system, sans-serif;
-            background: #f5f5f0;
-            color: #1a1a1a;
-            line-height: 1.8;
+        body { font-family: 'Inter', sans-serif; background: #fafaf8; color: #1a1a1a; line-height: 1.7; overflow-x: hidden; }
+        
+        /* Floating formulas */
+        .formula-bg{position:fixed;inset:0;pointer-events:none;z-index:0;overflow:hidden}
+        .f{position:absolute;font-family:'Space Mono',monospace;white-space:nowrap;will-change:transform;transition:transform .3s ease-out}
+        
+        /* Left Sidebar */
+        .sidebar{position:fixed;left:0;top:0;width:280px;height:100vh;background:rgba(255,255,255,.97);backdrop-filter:blur(10px);border-right:1px solid rgba(0,0,0,.06);padding:40px 30px;z-index:100;overflow-y:auto;display:flex;flex-direction:column}
+        .sidebar-profile{text-align:center;margin-bottom:35px;padding-bottom:30px;border-bottom:1px solid rgba(0,0,0,.08)}
+        .profile-photo{width:120px;height:120px;border-radius:50%;object-fit:cover;margin-bottom:18px;border:3px solid #f0f0f0;background:#e8e8e8}
+        .profile-name{font-family:'Cormorant Garamond',serif;font-size:1.5rem;font-weight:500;color:#1a1a1a;margin-bottom:6px;letter-spacing:.03em}
+        .profile-title{font-size:.75rem;color:#888;letter-spacing:.08em;text-transform:uppercase;margin-bottom:12px}
+        .profile-bio{font-size:.82rem;color:#666;line-height:1.6;margin-bottom:15px}
+        .profile-links{display:flex;justify-content:center;gap:15px}
+        .profile-links a{font-size:.7rem;color:#999;text-decoration:none;letter-spacing:.05em;transition:color .2s}
+        .profile-links a:hover{color:#0080c6}
+        .sidebar-nav{flex:1}
+        .nav-section{margin-bottom:25px}
+        .nav-section-title{font-size:.65rem;font-weight:600;color:#aaa;letter-spacing:.15em;text-transform:uppercase;margin-bottom:12px}
+        .nav-list{list-style:none}
+        .nav-list li{margin-bottom:8px}
+        .nav-list a{font-size:.85rem;color:#555;text-decoration:none;transition:all .2s;display:flex;align-items:center;gap:8px;padding:6px 0}
+        .nav-list a:hover{color:#0080c6;padding-left:5px}
+        .nav-list a.active{color:#0080c6;font-weight:500}
+        .sidebar-footer{padding-top:20px;border-top:1px solid rgba(0,0,0,.06);font-size:.7rem;color:#aaa;text-align:center}
+        
+        /* Main Content */
+        .main-wrapper{margin-left:280px;margin-right:260px;min-height:100vh}
+        .container{position:relative;z-index:1;max-width:900px;margin:0 auto;padding:50px 40px 80px}
+        
+        /* Right Sidebar - Market Widget */
+        .right-sidebar{position:fixed;right:0;top:0;width:260px;height:100vh;background:rgba(255,255,255,.97);backdrop-filter:blur(10px);border-left:1px solid rgba(0,0,0,.06);padding:30px 20px;z-index:100;overflow-y:auto}
+        .widget-title{font-size:.65rem;font-weight:600;color:#aaa;letter-spacing:.15em;text-transform:uppercase;margin-bottom:15px}
+        .market-item{display:flex;justify-content:space-between;align-items:center;padding:12px 0;border-bottom:1px solid rgba(0,0,0,.05)}
+        .market-item:last-child{border-bottom:none}
+        .market-name{font-size:.75rem;color:#666}
+        .market-value{font-family:'Space Mono',monospace;font-size:.85rem;font-weight:500;color:#1a1a1a}
+        .market-change{font-family:'Space Mono',monospace;font-size:.7rem;margin-left:8px}
+        .market-change.up{color:#16a34a}
+        .market-change.down{color:#dc2626}
+        .widget-section{margin-bottom:30px}
+        .widget-update{font-size:.6rem;color:#bbb;text-align:center;margin-top:10px}
+        .market-group{background:rgba(0,0,0,.02);padding:15px;margin-bottom:15px;border-left:2px solid #e0e0e0}
+        .market-group-title{font-size:.6rem;color:#999;letter-spacing:.1em;text-transform:uppercase;margin-bottom:10px}
+        
+        /* Paper Content */
+        .paper-content{font-family:'Times New Roman','Nanum Myeongjo',serif;line-height:1.9;background:#fff;padding:45px 50px;border-radius:8px;box-shadow:0 2px 20px rgba(0,0,0,.05);font-size:15px}
+        .paper-header{text-align:center;margin-bottom:40px;padding-bottom:30px;border-bottom:2px solid #333}
+        .paper-category{font-size:11px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:#0080c6;margin-bottom:15px}
+        .paper-title{font-family:'Cormorant Garamond','Nanum Myeongjo',serif;font-size:26px;font-weight:700;margin-bottom:12px;line-height:1.35}
+        .paper-subtitle{font-family:'Cormorant Garamond',serif;font-size:15px;color:#666;font-style:italic;margin-bottom:15px}
+        .paper-author{font-size:14px;color:#444;margin-bottom:5px}
+        .paper-date{font-size:12px;color:#999}
+        
+        .abstract{background:linear-gradient(135deg,#f8f9fa,#edf2f4);border-left:4px solid #1d3557;padding:25px 30px;margin:30px 0;border-radius:0 6px 6px 0;font-size:13.5px;line-height:1.8;color:#333}
+        .abstract-title{font-family:'Inter',sans-serif;font-size:11px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:#1d3557;margin-bottom:10px}
+        .keywords{background:#fafafa;padding:12px 20px;border-radius:6px;font-size:13px;color:#555;margin-bottom:30px}
+        .keywords strong{color:#1d3557}
+        
+        h2{font-family:'Cormorant Garamond','Nanum Myeongjo',serif;font-size:1.5em;font-weight:700;color:#1d3557;margin:40px 0 15px;padding-bottom:8px;border-bottom:1px solid #e0e0e0}
+        h3{font-family:'Cormorant Garamond','Nanum Myeongjo',serif;font-size:1.2em;font-weight:600;color:#2c3e50;margin:30px 0 12px}
+        h4{font-size:1.05em;color:#2c3e50;margin:20px 0 10px}
+        p{text-align:justify;text-indent:2em;margin-bottom:12px}
+        p.no-indent{text-indent:0}
+        
+        .hypothesis{background:linear-gradient(135deg,#f8f9fa,#fff);border-left:3px solid #e63946;padding:15px 20px;margin:12px 0;border-radius:0 6px 6px 0}
+        .hypothesis strong{color:#e63946}
+        
+        table{width:100%;border-collapse:collapse;margin:20px 0;font-size:12.5px}
+        table caption{font-weight:700;text-align:left;margin-bottom:8px;font-size:13.5px;color:#1d3557}
+        thead th{background:#1d3557;color:white;padding:10px;font-weight:600;font-size:11.5px;text-align:center;white-space:nowrap}
+        tbody td{padding:7px 10px;border-bottom:1px solid #eee;text-align:center}
+        tbody tr:nth-child(even){background:#fafafa}
+        tbody tr:hover{background:#f0f4ff}
+        td.left{text-align:left}
+        .sig{color:#e63946;font-weight:700}
+        .note{font-size:11.5px;color:#777;margin-top:5px;font-style:italic}
+        
+        .chart-container{margin:25px 0;text-align:center}
+        .chart-container img{max-width:100%;border-radius:6px;box-shadow:0 2px 10px rgba(0,0,0,.1)}
+        .chart-caption{font-size:12px;color:#666;margin-top:8px;font-style:italic}
+        
+        .finding-box{background:linear-gradient(135deg,#0a192f,#1d3557);color:white;padding:25px 30px;border-radius:8px;margin:25px 0}
+        .finding-box h4{color:#e63946;font-family:'Inter',sans-serif;font-size:12px;letter-spacing:2px;text-transform:uppercase;margin-bottom:12px}
+        .finding-box p{text-indent:0;color:rgba(255,255,255,.9)}
+        
+        .references{font-size:12.5px;line-height:1.7}
+        .references p{text-indent:-2em;padding-left:2em;margin-bottom:6px}
+        
+        .math-block{margin:15px 0;padding:10px 0;text-align:center;overflow-x:auto}
+        .section-divider{text-align:center;margin:40px 0;color:#ccc;font-size:18px;letter-spacing:10px}
+        
+        .vasicek-highlight{background:linear-gradient(135deg,#457b9d15,#1d355710);border:1px solid #457b9d40;border-radius:8px;padding:20px 25px;margin:20px 0}
+        .vasicek-highlight h4{color:#1d3557;font-family:'Inter',sans-serif;font-size:13px;font-weight:600;margin-bottom:10px}
+        
+        /* Mobile */
+        @media(max-width:1024px){
+            .sidebar{width:100%;height:auto;position:relative;border-right:none;border-bottom:1px solid rgba(0,0,0,.08);padding:25px 20px}
+            .sidebar-profile{margin-bottom:20px;padding-bottom:20px;display:flex;align-items:center;gap:15px;text-align:left}
+            .profile-photo{width:60px;height:60px;margin-bottom:0}
+            .profile-bio{display:none}
+            .nav-section{display:inline-block;margin-right:20px;margin-bottom:10px}
+            .nav-list{display:flex;gap:12px;flex-wrap:wrap}
+            .nav-list li{margin-bottom:0}
+            .sidebar-footer{display:none}
+            .main-wrapper{margin-left:0;margin-right:0}
+            .right-sidebar{display:none}
+            .container{padding:20px 0}
+            .paper-content{padding:25px 18px;border-radius:0;box-shadow:none;font-size:14px}
+            .paper-title{font-size:20px}
+            h2{font-size:1.3em;margin:30px 0 12px}
+            h3{font-size:1.1em}
+            p{text-indent:1.5em;text-align:left;font-size:14px}
+            table{font-size:10px;display:block;overflow-x:auto;-webkit-overflow-scrolling:touch}
+            thead th,tbody td{padding:6px 4px;white-space:nowrap}
+            .chart-container img{border-radius:0}
+            .abstract{padding:16px;margin:20px 0}
+            .finding-box{padding:18px 20px}
+            .references p{font-size:11px}
         }
-        .header-bar {
-            background: linear-gradient(135deg, #0a192f 0%, #112240 40%, #1d3557 70%, #457b9d 100%);
-            padding: 65px 40px 55px;
-            text-align: center;
-            color: white;
-            position: relative;
-            overflow: hidden;
-        }
-        .header-bar::before {
-            content: '';
-            position: absolute;
-            top: 0; left: 0; right: 0; bottom: 0;
-            background: url("data:image/svg+xml,%3Csvg width='80' height='80' viewBox='0 0 80 80' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.03'%3E%3Cpath d='M50 50c0-5.523 4.477-10 10-10s10 4.477 10 10-4.477 10-10 10c0 5.523-4.477 10-10 10s-10-4.477-10-10 4.477-10 10-10zM10 10c0-5.523 4.477-10 10-10s10 4.477 10 10-4.477 10-10 10c0 5.523-4.477 10-10 10S0 25.523 0 20s4.477-10 10-10z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
-            opacity: 0.5;
-        }
-        .header-bar .category {
-            font-family: 'Inter', sans-serif;
-            font-size: 11px;
-            font-weight: 600;
-            letter-spacing: 3px;
-            text-transform: uppercase;
-            color: #e63946;
-            margin-bottom: 20px;
-            position: relative;
-        }
-        .header-bar h1 {
-            font-family: 'Cormorant Garamond', 'Nanum Myeongjo', serif;
-            font-size: 2.1em;
-            font-weight: 700;
-            line-height: 1.3;
-            max-width: 850px;
-            margin: 0 auto 15px;
-            position: relative;
-        }
-        .header-bar .subtitle {
-            font-family: 'Cormorant Garamond', serif;
-            font-size: 1.05em;
-            font-weight: 400;
-            font-style: italic;
-            color: rgba(255,255,255,0.7);
-            max-width: 750px;
-            margin: 0 auto 25px;
-            position: relative;
-        }
-        .header-bar .author {
-            font-size: 14px;
-            font-weight: 500;
-            color: rgba(255,255,255,0.85);
-            position: relative;
-        }
-        .header-bar .date {
-            font-size: 12px;
-            color: rgba(255,255,255,0.5);
-            margin-top: 5px;
-            position: relative;
-        }
-        .container {
-            max-width: 920px;
-            margin: 0 auto;
-            padding: 0 40px 80px;
-        }
-        .paper-content {
-            font-family: 'Times New Roman', 'Nanum Myeongjo', serif;
-            background: #fff;
-            padding: 50px 55px;
-            margin-top: -30px;
-            border-radius: 8px;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
-            position: relative;
-            z-index: 1;
-            font-size: 15px;
-            line-height: 1.9;
-        }
-        .abstract {
-            background: linear-gradient(135deg, #f8f9fa, #edf2f4);
-            border-left: 4px solid #1d3557;
-            padding: 25px 30px;
-            margin: 30px 0;
-            border-radius: 0 6px 6px 0;
-            font-size: 13.5px;
-            line-height: 1.8;
-            color: #333;
-        }
-        .abstract-title {
-            font-family: 'Inter', sans-serif;
-            font-size: 11px;
-            font-weight: 600;
-            letter-spacing: 2px;
-            text-transform: uppercase;
-            color: #1d3557;
-            margin-bottom: 10px;
-        }
-        .keywords {
-            background: #fafafa;
-            padding: 12px 20px;
-            border-radius: 6px;
-            font-size: 13px;
-            color: #555;
-            margin-bottom: 30px;
-        }
-        .keywords strong { color: #1d3557; }
-        h2 {
-            font-family: 'Cormorant Garamond', 'Nanum Myeongjo', serif;
-            font-size: 1.5em;
-            font-weight: 700;
-            color: #1d3557;
-            margin: 40px 0 15px;
-            padding-bottom: 8px;
-            border-bottom: 1px solid #e0e0e0;
-        }
-        h3 {
-            font-family: 'Cormorant Garamond', 'Nanum Myeongjo', serif;
-            font-size: 1.2em;
-            font-weight: 600;
-            color: #2c3e50;
-            margin: 30px 0 12px;
-        }
-        p {
-            text-align: justify;
-            text-indent: 2em;
-            margin-bottom: 12px;
-        }
-        p.no-indent { text-indent: 0; }
-        .hypothesis {
-            background: linear-gradient(135deg, #f8f9fa, #fff);
-            border-left: 3px solid #e63946;
-            padding: 15px 20px;
-            margin: 12px 0;
-            border-radius: 0 6px 6px 0;
-        }
-        .hypothesis strong { color: #e63946; }
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin: 20px 0;
-            font-size: 12.5px;
-        }
-        table caption {
-            font-weight: 700;
-            text-align: left;
-            margin-bottom: 8px;
-            font-size: 13.5px;
-            color: #1d3557;
-        }
-        thead th {
-            background: #1d3557;
-            color: white;
-            padding: 10px 10px;
-            font-weight: 600;
-            font-size: 11.5px;
-            text-align: center;
-            white-space: nowrap;
-        }
-        tbody td {
-            padding: 7px 10px;
-            border-bottom: 1px solid #eee;
-            text-align: center;
-        }
-        tbody tr:nth-child(even) { background: #fafafa; }
-        tbody tr:hover { background: #f0f4ff; }
-        td.left { text-align: left; }
-        .sig { color: #e63946; font-weight: 700; }
-        .note {
-            font-size: 11.5px;
-            color: #777;
-            margin-top: 5px;
-            font-style: italic;
-        }
-        .chart-container {
-            margin: 25px 0;
-            text-align: center;
-        }
-        .chart-container img {
-            max-width: 100%;
-            border-radius: 6px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-        }
-        .chart-caption {
-            font-size: 12px;
-            color: #666;
-            margin-top: 8px;
-            font-style: italic;
-        }
-        .finding-box {
-            background: linear-gradient(135deg, #0a192f, #1d3557);
-            color: white;
-            padding: 25px 30px;
-            border-radius: 8px;
-            margin: 25px 0;
-        }
-        .finding-box h4 {
-            color: #e63946;
-            font-family: 'Inter', sans-serif;
-            font-size: 12px;
-            letter-spacing: 2px;
-            text-transform: uppercase;
-            margin-bottom: 12px;
-        }
-        .finding-box p { text-indent: 0; color: rgba(255,255,255,0.9); }
-        .references {
-            font-size: 12.5px;
-            line-height: 1.7;
-        }
-        .references p {
-            text-indent: -2em;
-            padding-left: 2em;
-            margin-bottom: 6px;
-        }
-        .math-block {
-            margin: 15px 0;
-            padding: 10px 0;
-            text-align: center;
-            overflow-x: auto;
-        }
-        .section-divider {
-            text-align: center;
-            margin: 40px 0;
-            color: #ccc;
-            font-size: 18px;
-            letter-spacing: 10px;
-        }
-        .vasicek-highlight {
-            background: linear-gradient(135deg, #457b9d15, #1d355710);
-            border: 1px solid #457b9d40;
-            border-radius: 8px;
-            padding: 20px 25px;
-            margin: 20px 0;
-        }
-        .vasicek-highlight h4 {
-            color: #1d3557;
-            font-family: 'Inter', sans-serif;
-            font-size: 13px;
-            font-weight: 600;
-            margin-bottom: 10px;
-        }
-        @media (max-width: 768px) {
-            .header-bar { padding: 40px 20px 35px; }
-            .header-bar h1 { font-size: 1.5em; }
-            .container { padding: 0 15px 40px; }
-            .paper-content { padding: 25px 20px; font-size: 14px; }
-            table { font-size: 11px; }
-            thead th, tbody td { padding: 6px 4px; }
-        }
+        @media print{.sidebar{display:none}.right-sidebar{display:none}.main-wrapper{margin:0}.paper-content{box-shadow:none;padding:15mm 20mm}}
     </style>
 </head>
 <body>
+<img src="/assets/og-card.png" alt="" style="position:absolute;width:1px;height:1px;opacity:0;pointer-events:none;" aria-hidden="true">
+<div class="formula-bg" id="formulaBg"></div>
 
-<div class="header-bar">
-    <div class="category">Working Paper &middot; February 2026</div>
-    <h1>자산 동조화와 거시적 전환점</h1>
-    <div class="subtitle">바시첵 모델과 주말 보정 DCC-GARCH를 활용한 채권-원자재-비트코인 통합 분석 (1995-2025)</div>
-    <div class="author">Ha Rim Jung</div>
-    <div class="date">Asset Co-movement and Macroeconomic Turning Points: An Integrated Analysis of Bonds, Commodities, and Bitcoin Using Vasicek Model and Weekend-Adjusted DCC-GARCH</div>
-</div>
+<!-- Left Sidebar -->
+<aside class="sidebar">
+    <div class="sidebar-profile">
+        <img src="/assets/profile.png" alt="Ha Rim Jung" class="profile-photo" data-nosnippet>
+        <div class="profile-info">
+            <div class="profile-name">Ha Rim Jung</div>
+            <div class="profile-title">Quantitative Researcher</div>
+            <p class="profile-bio">Interest rate modeling, derivatives pricing, and systematic trading strategies.</p>
+            <div class="profile-links">
+                <a href="https://github.com/gkfla2020-bit" target="_blank">GitHub</a>
+            </div>
+        </div>
+    </div>
+    <nav class="sidebar-nav">
+        <div class="nav-section">
+            <div class="nav-section-title">Navigation</div>
+            <ul class="nav-list">
+                <li><a href="/">Home</a></li>
+                <li><a href="/research/" class="active">Research</a></li>
+                <li><a href="/cv/">CV</a></li>
+            </ul>
+        </div>
+        <div class="nav-section">
+            <div class="nav-section-title">Research</div>
+            <ul class="nav-list">
+                <li><a href="/research/vol-integrated-kr/" class="active">Asset Co-movement</a></li>
+                <li><a href="/research/move-vasicek-kr/">MOVE-Vasicek Model</a></li>
+                <li><a href="/research/bacbb/">BACBB Strategy</a></li>
+            </ul>
+        </div>
+        <div class="nav-section">
+            <div class="nav-section-title">Reports</div>
+            <ul class="nav-list">
+                <li><a href="/reports/weekly-20260206/">Weekly Report (02/06)</a></li>
+            </ul>
+        </div>
+    </nav>
+    <div class="sidebar-footer">© 2026 Ha Rim Jung</div>
+</aside>
 
+<!-- Right Sidebar: Market Widget -->
+<aside class="right-sidebar">
+    <div class="widget-section">
+        <div class="widget-title">Market Overview</div>
+        <div class="market-group">
+            <div class="market-group-title">Indices</div>
+            <div class="market-item"><span class="market-name">KOSPI</span><div><span class="market-value" id="kospi">-</span><span class="market-change" id="kospi-chg">-</span></div></div>
+            <div class="market-item"><span class="market-name">S&P 500</span><div><span class="market-value" id="sp500">-</span><span class="market-change" id="sp500-chg">-</span></div></div>
+            <div class="market-item"><span class="market-name">NASDAQ</span><div><span class="market-value" id="nasdaq">-</span><span class="market-change" id="nasdaq-chg">-</span></div></div>
+        </div>
+        <div class="market-group">
+            <div class="market-group-title">Rates & FX</div>
+            <div class="market-item"><span class="market-name">US 10Y</span><div><span class="market-value" id="us10y">-</span><span class="market-change" id="us10y-chg">-</span></div></div>
+            <div class="market-item"><span class="market-name">USD/KRW</span><div><span class="market-value" id="usdkrw">-</span><span class="market-change" id="usdkrw-chg">-</span></div></div>
+        </div>
+        <div class="market-group">
+            <div class="market-group-title">Volatility</div>
+            <div class="market-item"><span class="market-name">VIX</span><div><span class="market-value" id="vix">-</span><span class="market-change" id="vix-chg">-</span></div></div>
+            <div class="market-item"><span class="market-name">MOVE</span><div><span class="market-value" id="move">-</span><span class="market-change" id="move-chg">-</span></div></div>
+        </div>
+        <div class="market-group">
+            <div class="market-group-title">Crypto</div>
+            <div class="market-item"><span class="market-name">BTC</span><div><span class="market-value" id="btc">-</span><span class="market-change" id="btc-chg">-</span></div></div>
+        </div>
+        <div class="widget-update" id="update-time">Loading...</div>
+    </div>
+</aside>
+
+<div class="main-wrapper">
 <div class="container">
 <div class="paper-content">
+
+<div class="paper-header">
+    <div class="paper-category">Quantitative Finance Research</div>
+    <h1 class="paper-title">자산 동조화와 거시적 전환점</h1>
+    <div class="paper-subtitle">바시첵 모델과 주말 보정 DCC-GARCH를 활용한 채권-원자재-비트코인 통합 분석 (1995-2025)</div>
+    <div class="paper-author">Ha Rim Jung</div>
+    <div class="paper-date">February 08, 2026</div>
+</div>
+
 
 <div class="abstract">
     <div class="abstract-title">Abstract</div>
@@ -1689,8 +1660,86 @@ layout: null
 <p>Wu, J. C., & Xia, F. D. (2016). Measuring the macroeconomic impact of monetary policy at the zero lower bound. <em>Journal of Money, Credit and Banking</em>, 48(2-3), 253-291.</p>
 </div>
 
+
+</div>
 </div>
 </div>
 
+<script>
+const syms = ['Σ','∫','∂','√','∞','π','θ','σ','μ','λ','α','β','γ','δ','Δ','Γ','κ','ρ','φ','ψ','dx','dt','dW','E[X]','Var','ln','exp'];
+const bg = document.getElementById('formulaBg');
+const items = [];
+for(let i = 0; i < 30; i++) {
+    const el = document.createElement('div');
+    el.className = 'f';
+    el.textContent = syms[Math.floor(Math.random() * syms.length)];
+    el.style.fontSize = (14 + Math.random() * 20) + 'px';
+    el.style.color = `rgba(0,0,0,${0.03 + Math.random() * 0.04})`;
+    el.style.left = Math.random() * 100 + '%';
+    el.style.top = Math.random() * 100 + '%';
+    bg.appendChild(el);
+    items.push({el, x: parseFloat(el.style.left), y: parseFloat(el.style.top), vx: (Math.random()-.5)*.02, vy: (Math.random()-.5)*.02});
+}
+let mx = -1000, my = -1000;
+document.addEventListener('mousemove', e => { mx = (e.clientX/window.innerWidth)*100; my = (e.clientY/window.innerHeight)*100; });
+function tick() {
+    for(const it of items) {
+        it.x += it.vx; it.y += it.vy;
+        if(it.x < 0 || it.x > 100) it.vx *= -1;
+        if(it.y < 0 || it.y > 100) it.vy *= -1;
+        const dx = it.x - mx, dy = it.y - my, dist = Math.sqrt(dx*dx + dy*dy);
+        let px = 0, py = 0;
+        if(dist < 12) { const f = (12-dist)/12*3; px = (dx/dist)*f; py = (dy/dist)*f; }
+        it.el.style.left = (it.x + px) + '%';
+        it.el.style.top = (it.y + py) + '%';
+    }
+    requestAnimationFrame(tick);
+}
+tick();
+
+// Market Data - Finnhub API
+const FINNHUB_KEY = 'd62k939r01qldki8gjq0d62k939r01qldki8gjqg';
+async function fetchQuote(symbol) {
+    try {
+        const res = await fetch(`https://finnhub.io/api/v1/quote?symbol=${symbol}&token=${FINNHUB_KEY}`);
+        return await res.json();
+    } catch(e) { return null; }
+}
+async function updateMarketData() {
+    const [spy, qqq, btcData] = await Promise.all([
+        fetchQuote('SPY'),
+        fetchQuote('QQQ'),
+        fetchQuote('BINANCE:BTCUSDT')
+    ]);
+    const data = {
+        kospi: { value: 2650, change: -1.2 },
+        sp500: spy?.c ? { value: Math.round(spy.c * 10), change: spy.dp || 0 } : { value: 6050, change: 0.8 },
+        nasdaq: qqq?.c ? { value: Math.round(qqq.c * 40), change: qqq.dp || 0 } : { value: 19800, change: 1.1 },
+        us10y: { value: 4.21, change: -0.05 },
+        usdkrw: { value: 1472, change: 0.3 },
+        vix: { value: 21.8, change: 2.5 },
+        move: { value: 119.7, change: -1.2 },
+        btc: btcData?.c ? { value: btcData.c, change: btcData.dp || 0 } : { value: 97500, change: -2.1 }
+    };
+    for (const [key, d] of Object.entries(data)) {
+        const el = document.getElementById(key);
+        const chgEl = document.getElementById(key + '-chg');
+        if (el) {
+            if (key === 'usdkrw') el.textContent = d.value.toLocaleString();
+            else if (key === 'us10y') el.textContent = d.value.toFixed(2) + '%';
+            else if (key === 'btc') el.textContent = '$' + (d.value/1000).toFixed(1) + 'K';
+            else if (key === 'vix' || key === 'move') el.textContent = d.value.toFixed(1);
+            else el.textContent = d.value.toLocaleString();
+        }
+        if (chgEl) {
+            chgEl.textContent = (d.change >= 0 ? '+' : '') + d.change.toFixed(2) + '%';
+            chgEl.className = 'market-change ' + (d.change >= 0 ? 'up' : 'down');
+        }
+    }
+    document.getElementById('update-time').textContent = (spy?.c || btcData?.c ? 'Live' : 'Sample') + ' · ' + new Date().toLocaleTimeString('ko-KR');
+}
+setTimeout(updateMarketData, 500);
+setInterval(updateMarketData, 60000);
+</script>
 </body>
 </html>
