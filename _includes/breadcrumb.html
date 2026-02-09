@@ -1,0 +1,24 @@
+{% unless page.url == '/' or page.url == '/index.html' %}
+<nav class="breadcrumb" aria-label="Breadcrumb">
+    <a href="/">Home</a>
+    {% assign parts = page.url | split: '/' %}
+    {% assign path = '' %}
+    {% for part in parts %}
+        {% if part != '' %}
+            {% assign path = path | append: '/' | append: part %}
+            {% if forloop.last %}
+                <span class="bc-sep">/</span>
+                <span class="bc-current">{% if page.title %}{{ page.title }}{% else %}{{ part | replace: '-', ' ' | capitalize }}{% endif %}</span>
+            {% else %}
+                {% assign segment = part | replace: '-', ' ' | capitalize %}
+                {% if part == 'research' %}{% assign segment = 'Research' %}
+                {% elsif part == 'reports' %}{% assign segment = 'Reports' %}
+                {% elsif part == 'cv' %}{% assign segment = 'CV' %}
+                {% endif %}
+                <span class="bc-sep">/</span>
+                <a href="{{ path }}/">{{ segment }}</a>
+            {% endif %}
+        {% endif %}
+    {% endfor %}
+</nav>
+{% endunless %}

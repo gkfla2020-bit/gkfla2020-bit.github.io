@@ -1,6 +1,7 @@
 ﻿---
 layout: null
 permalink: /research/
+title: "Research"
 ---
 <!DOCTYPE html>
 <html lang="ko">
@@ -55,6 +56,7 @@ body{font-family:'Inter',sans-serif;background:#fafaf8;color:#1a1a1a;line-height
 .nav-list a.active{color:#0080c6;font-weight:500}
 
 .sidebar-footer{padding-top:20px;border-top:1px solid rgba(0,0,0,.06);font-size:.7rem;color:#aaa;text-align:center}
+.nav-toggle{display:none}
 
 .main-wrapper{margin-left:280px;margin-right:260px;min-height:100vh}
 
@@ -98,6 +100,8 @@ body{font-family:'Inter',sans-serif;background:#fafaf8;color:#1a1a1a;line-height
     .nav-list{display:flex;gap:15px;flex-wrap:wrap}
     .nav-list li{margin-bottom:0}
     .sidebar-footer{display:none}
+    .nav-extra{display:none}.sidebar-nav.expanded .nav-extra{display:inline-block}
+    .nav-toggle{display:inline-block;padding:8px 14px;background:none;border:1px solid #ddd;border-radius:6px;font-size:.75rem;color:#888;cursor:pointer;letter-spacing:.05em;margin-bottom:10px;font-family:'Inter',sans-serif}
     .main-wrapper{margin-left:0;margin-right:0}
     .right-sidebar{display:none}
     .container{padding:30px 20px 50px}
@@ -111,6 +115,12 @@ body{font-family:'Inter',sans-serif;background:#fafaf8;color:#1a1a1a;line-height
     .tag{font-size:.55rem;padding:4px 10px}
     .page-subtitle{margin-bottom:40px}
 }
+/* Breadcrumb */
+.breadcrumb{font-size:.7rem;color:#999;letter-spacing:.06em;margin-bottom:30px;padding-bottom:15px;border-bottom:1px solid rgba(0,0,0,.05)}
+.breadcrumb a{color:#888;text-decoration:none;transition:color .2s}
+.breadcrumb a:hover{color:#0080c6}
+.bc-sep{margin:0 6px;color:#ccc}
+.bc-current{color:#555;font-weight:500}
     </style>
 </head>
 <body>
@@ -124,6 +134,7 @@ body{font-family:'Inter',sans-serif;background:#fafaf8;color:#1a1a1a;line-height
 
 <div class="main-wrapper">
     <div class="container">
+        {% include breadcrumb.html %}
         <h1 class="page-title">Research</h1>
         <p class="page-subtitle">Quantitative Finance & Stochastic Modeling</p>
         
@@ -165,6 +176,20 @@ body{font-family:'Inter',sans-serif;background:#fafaf8;color:#1a1a1a;line-height
                 </div>
             </a>
         </div>
+
+        {% assign research_posts = site.posts | where_exp: "post", "post.categories contains 'research'" %}
+        {% if research_posts.size > 0 %}
+        <div style="margin-top:60px;">
+            <h2 style="font-family:'Cormorant Garamond',serif;font-size:1.4rem;font-weight:300;margin-bottom:25px;padding-bottom:12px;border-bottom:1px solid #e0e0e0;color:#1a1a1a;">Related Posts</h2>
+            {% for post in research_posts limit:5 %}
+            <a href="{{ post.url }}" style="display:block;padding:18px 0;border-bottom:1px solid rgba(0,0,0,.05);text-decoration:none;transition:all .2s;">
+                <div style="font-size:.65rem;color:#999;letter-spacing:.1em;text-transform:uppercase;margin-bottom:4px;">{{ post.date | date: "%B %d, %Y" }}</div>
+                <div style="font-family:'Cormorant Garamond',serif;font-size:1.15rem;color:#1a1a1a;">{{ post.title }}</div>
+                {% if post.tags.size > 0 %}<div style="margin-top:8px;display:flex;gap:6px;flex-wrap:wrap;">{% for tag in post.tags limit:3 %}<span class="tag">{{ tag }}</span>{% endfor %}</div>{% endif %}
+            </a>
+            {% endfor %}
+        </div>
+        {% endif %}
     </div>
 </div>
 

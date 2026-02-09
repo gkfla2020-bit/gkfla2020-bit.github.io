@@ -1,226 +1,68 @@
 ---
-layout: null
+layout: default
 ---
-<!DOCTYPE html>
-<html lang="ko">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{{ page.title }} | {{ site.title }}</title>
-    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;500;600&family=Inter:wght@300;400;500&family=Georgia&display=swap" rel="stylesheet">
-    <script src="https://cdn.plot.ly/plotly-2.27.0.min.js"></script>
-    <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { 
-            font-family: 'Inter', sans-serif; 
-            background: #ffffff; 
-            color: #1a1a1a; 
-            line-height: 1.7;
-        }
+<style>
+    /* ─── Post Header ─── */
+    .post-header{text-align:center;padding:40px 0 50px;border-bottom:1px solid #e0e0e0;margin-bottom:50px}
+    .post-date{font-size:.7rem;color:#999;letter-spacing:.15em;text-transform:uppercase;margin-bottom:15px}
+    .post-title{font-family:'Cormorant Garamond',serif;font-size:clamp(1.8rem,4vw,2.5rem);font-weight:400;line-height:1.25;color:#1a1a1a;opacity:0}
+    .post-categories{margin-top:15px;display:flex;justify-content:center;gap:8px;flex-wrap:wrap}
+    .post-categories span{font-size:.6rem;padding:4px 12px;background:#f0f0f0;color:#666;letter-spacing:.05em;text-transform:uppercase}
 
-        /* Navigation */
-        nav {
-            position: fixed;
-            top: 0; left: 0; right: 0;
-            padding: 25px 50px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            background: rgba(255,255,255,0.95);
-            backdrop-filter: blur(8px);
-            z-index: 100;
-            border-bottom: 1px solid rgba(0,0,0,0.05);
-        }
-        .nav-logo {
-            font-family: 'Cormorant Garamond', serif;
-            font-size: 1.3rem;
-            color: #1a1a1a;
-            text-decoration: none;
-            letter-spacing: 0.08em;
-        }
-        .nav-links { display: flex; gap: 40px; }
-        .nav-links a {
-            font-size: 0.72rem;
-            color: #666;
-            text-decoration: none;
-            letter-spacing: 0.12em;
-            text-transform: uppercase;
-            transition: color 0.2s;
-        }
-        .nav-links a:hover { color: #1a1a1a; }
+    /* ─── Post Content ─── */
+    .post-content{font-family:'Georgia',serif;font-size:17px;line-height:1.9;color:#333}
+    .post-content h1,.post-content h2,.post-content h3{font-family:'Cormorant Garamond',serif;font-weight:500;color:#1a1a1a;margin-top:50px;margin-bottom:20px}
+    .post-content h2{font-size:1.8rem;padding-bottom:12px;border-bottom:1px solid #e0e0e0}
+    .post-content h3{font-size:1.3rem;color:#666}
+    .post-content p{margin-bottom:1.5rem;text-align:justify}
+    .post-content ul,.post-content ol{margin:1.5rem 0;padding-left:1.5rem}
+    .post-content li{margin-bottom:.6rem}
+    .post-content blockquote{border-left:3px solid #1a1a1a;padding:15px 25px;margin:2rem 0;background:#f8f8f8;font-style:italic;color:#555}
+    .post-content table{width:100%;border-collapse:collapse;margin:2rem 0;font-size:14px}
+    .post-content th{font-weight:600;text-transform:uppercase;font-size:11px;padding:12px;text-align:left;border-bottom:2px solid #1a1a1a;background:#f5f5f5}
+    .post-content td{padding:12px;border-bottom:1px solid #e0e0e0}
+    .post-content code{font-family:'Consolas',monospace;background:#f5f5f5;padding:2px 6px;border-radius:3px;font-size:.9em}
+    .post-content pre{background:#f5f5f5;padding:20px;border-radius:4px;overflow-x:auto;margin:2rem 0;border:1px solid #e0e0e0}
+    .post-content pre code{background:none;padding:0}
+    .post-content img{max-width:100%;margin:2rem 0}
+    .post-content a{color:#1a1a1a;border-bottom:1px solid #ddd;transition:border-color .2s}
+    .post-content a:hover{border-color:#1a1a1a;color:#1a1a1a}
 
-        /* Post Container */
-        .post-container {
-            max-width: 1100px;
-            margin: 0 auto;
-            padding: 100px 40px 60px;
-        }
+    /* ─── Back Link ─── */
+    .back-link{display:inline-block;margin-top:50px;padding:12px 0;font-size:.8rem;color:#666;letter-spacing:.1em;text-transform:uppercase;text-decoration:none;border-bottom:1px solid transparent;transition:all .2s}
+    .back-link:hover{color:#1a1a1a;border-bottom-color:#1a1a1a}
 
-        /* Post Header */
-        .post-header {
-            text-align: center;
-            padding: 40px 0 50px;
-            border-bottom: 1px solid #e0e0e0;
-            margin-bottom: 50px;
-        }
-        .post-date {
-            font-size: 0.7rem;
-            color: #999;
-            letter-spacing: 0.15em;
-            text-transform: uppercase;
-            margin-bottom: 15px;
-        }
-        .post-title {
-            font-family: 'Cormorant Garamond', serif;
-            font-size: clamp(2rem, 4vw, 2.8rem);
-            font-weight: 400;
-            line-height: 1.25;
-            color: #1a1a1a;
-        }
+    @media(max-width:1024px){
+        .post-header{padding:25px 0 35px;margin-bottom:35px}
+        .post-content{font-size:15px}
+    }
+</style>
 
-        /* Post Content */
-        .post-content {
-            font-family: 'Georgia', serif;
-            font-size: 17px;
-            line-height: 1.9;
-            color: #333;
-        }
-        .post-content h1, .post-content h2, .post-content h3 {
-            font-family: 'Cormorant Garamond', serif;
-            font-weight: 500;
-            color: #1a1a1a;
-            margin-top: 50px;
-            margin-bottom: 20px;
-        }
-        .post-content h2 {
-            font-size: 1.8rem;
-            padding-bottom: 12px;
-            border-bottom: 1px solid #e0e0e0;
-        }
-        .post-content h3 {
-            font-size: 1.3rem;
-            color: #666;
-        }
-        .post-content p {
-            margin-bottom: 1.5rem;
-            text-align: justify;
-        }
-        .post-content ul, .post-content ol {
-            margin: 1.5rem 0;
-            padding-left: 1.5rem;
-        }
-        .post-content li { margin-bottom: 0.6rem; }
-        .post-content blockquote {
-            border-left: 3px solid #1a1a1a;
-            padding: 15px 25px;
-            margin: 2rem 0;
-            background: #f8f8f8;
-            font-style: italic;
-            color: #555;
-        }
-        .post-content table {
-            width: 100%;
-            border-collapse: collapse;
-            margin: 2rem 0;
-            font-size: 14px;
-        }
-        .post-content th {
-            font-weight: 600;
-            text-transform: uppercase;
-            font-size: 11px;
-            padding: 12px;
-            text-align: left;
-            border-bottom: 2px solid #1a1a1a;
-            background: #f5f5f5;
-        }
-        .post-content td {
-            padding: 12px;
-            border-bottom: 1px solid #e0e0e0;
-        }
-        .post-content code {
-            font-family: 'Consolas', monospace;
-            background: #f5f5f5;
-            padding: 2px 6px;
-            border-radius: 3px;
-            font-size: 0.9em;
-        }
-        .post-content pre {
-            background: #f5f5f5;
-            padding: 20px;
-            border-radius: 4px;
-            overflow-x: auto;
-            margin: 2rem 0;
-            border: 1px solid #e0e0e0;
-        }
-        .post-content img {
-            max-width: 100%;
-            margin: 2rem 0;
-        }
-
-        /* Back Link */
-        .back-link {
-            display: inline-block;
-            margin-top: 50px;
-            padding: 12px 0;
-            font-size: 0.8rem;
-            color: #666;
-            letter-spacing: 0.1em;
-            text-transform: uppercase;
-            text-decoration: none;
-            border-bottom: 1px solid transparent;
-            transition: all 0.2s;
-        }
-        .back-link:hover {
-            color: #1a1a1a;
-            border-bottom-color: #1a1a1a;
-        }
-
-        /* Footer */
-        footer {
-            padding: 50px 40px;
-            text-align: center;
-            border-top: 1px solid #e0e0e0;
-            font-size: 0.75rem;
-            color: #999;
-            margin-top: 80px;
-        }
-        footer a { color: #666; text-decoration: none; }
-        footer a:hover { color: #1a1a1a; }
-
-        /* Responsive */
-        @media (max-width: 768px) {
-            nav { padding: 20px 25px; }
-            .nav-links { gap: 25px; }
-            .post-container { padding: 90px 20px 40px; }
-            .post-title { font-size: 1.8rem; }
-        }
-    </style>
-</head>
-<body>
-    <nav>
-        <a href="/" class="nav-logo">Ha Rim Jung</a>
-        <div class="nav-links">
-            <a href="/">Home</a>
-            <a href="/research/">Research</a>
-            <a href="/cv/">CV</a>
-        </div>
-    </nav>
-
-    <div class="post-container">
-        <header class="post-header">
-            <div class="post-date">{{ page.date | date: "%B %d, %Y" }}</div>
-            <h1 class="post-title">{{ page.title }}</h1>
-        </header>
-
-        <article class="post-content">
-            {{ content }}
-        </article>
-
-        <a href="/" class="back-link">← Back to Home</a>
+<header class="post-header">
+    <div class="post-date">{{ page.date | date: "%B %d, %Y" }}</div>
+    <h1 class="post-title">{{ page.title }}</h1>
+    {% if page.tags %}
+    <div class="post-categories">
+        {% for tag in page.tags %}<span>{{ tag }}</span>{% endfor %}
     </div>
+    {% endif %}
+</header>
 
-    <footer>
-        <p>© 2026 Ha Rim Jung · <a href="mailto:gkfla2020@gmail.com">gkfla2020@gmail.com</a> · <a href="https://github.com/gkfla2020-bit">GitHub</a></p>
-    </footer>
-</body>
-</html>
+<article class="post-content">
+    {{ content }}
+</article>
+
+<a href="/" class="back-link">&larr; Back to Home</a>
+{% if page.categories contains 'research' %}
+<a href="/research/" class="back-link" style="margin-left:20px">&larr; Research</a>
+{% endif %}
+
+<script>
+document.addEventListener('DOMContentLoaded', function(){
+    if(typeof gsap !== 'undefined'){
+        gsap.to('.post-title',{opacity:1,duration:.6,delay:.2});
+    } else {
+        document.querySelector('.post-title').style.opacity='1';
+    }
+});
+</script>

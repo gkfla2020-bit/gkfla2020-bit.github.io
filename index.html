@@ -395,6 +395,7 @@ body.entered{overflow:auto;background:#fafaf8;overscroll-behavior-y:none;positio
 .nav-list a:hover{color:#0080c6;padding-left:5px}
 .nav-list a.active{color:#0080c6;font-weight:500}
 .sidebar-footer{padding-top:20px;border-top:1px solid rgba(0,0,0,.06);font-size:.7rem;color:#aaa;text-align:center}
+.nav-toggle{display:none}
 .main-wrapper{margin-left:280px;margin-right:260px;min-height:100vh;overscroll-behavior:contain}
 .right-sidebar{position:fixed;right:0;top:0;width:260px;height:100vh;background:rgba(255,255,255,.97);backdrop-filter:blur(10px);border-left:1px solid rgba(0,0,0,.06);padding:30px 20px;z-index:100;overflow-y:auto}
 .widget-title{font-size:.65rem;font-weight:600;color:#aaa;letter-spacing:.15em;text-transform:uppercase;margin-bottom:15px}
@@ -445,7 +446,10 @@ section{padding:80px 50px;max-width:900px;margin:0 auto}
 .profile-photo{width:70px;height:70px;margin-bottom:0}.profile-info{flex:1}.profile-bio{display:none}
 .nav-section{display:inline-block;margin-right:30px;margin-bottom:15px}
 .nav-list{display:flex;gap:15px;flex-wrap:wrap}.nav-list li{margin-bottom:0}
-.sidebar-footer{display:none}.main-wrapper{margin-left:0;margin-right:0}
+.sidebar-footer{display:none}
+.nav-extra{display:none}.sidebar-nav.expanded .nav-extra{display:inline-block}
+.nav-toggle{display:inline-block;padding:8px 14px;background:none;border:1px solid #ddd;border-radius:6px;font-size:.75rem;color:#888;cursor:pointer;letter-spacing:.05em;margin-bottom:10px;font-family:'Inter',sans-serif}
+.main-wrapper{margin-left:0;margin-right:0}
 .two-col-section{grid-template-columns:1fr;gap:30px;padding:40px 25px}
 .right-sidebar{display:none}.hero,section{padding-left:25px;padding-right:25px}
 .hero-btns{flex-direction:column;gap:12px}
@@ -462,6 +466,16 @@ section{padding:80px 50px;max-width:900px;margin:0 auto}
 .two-col-section .section-title{font-size:1.4rem;margin-bottom:25px;padding-bottom:12px}
 .skills-container{height:auto;gap:10px;padding:15px}.skill-ball{width:44px;height:44px}.skill-ball img{width:24px;height:24px}
 .mobile-guestbook{display:block}}
+/* Blog Posts Section */
+.posts-section{padding:40px 0;max-width:700px;margin:0 auto}
+.posts-list{display:flex;flex-direction:column;gap:15px}
+.post-card{display:block;padding:20px 25px;background:rgba(255,255,255,.8);border:1px solid #e8e8e8;text-decoration:none;transition:all .2s}
+.post-card:hover{border-color:#1a1a1a;transform:translateX(5px);box-shadow:0 2px 12px rgba(0,0,0,.04)}
+.post-card-date{font-size:.65rem;color:#999;letter-spacing:.1em;text-transform:uppercase;margin-bottom:6px}
+.post-card-title{font-family:'Cormorant Garamond',serif;font-size:1.2rem;color:#1a1a1a;font-weight:400;margin-bottom:8px}
+.post-card-tags{display:flex;gap:6px;flex-wrap:wrap}
+.post-card-tags span{font-size:.55rem;padding:3px 8px;background:#f0f0f0;color:#666;letter-spacing:.05em;text-transform:uppercase}
+@media(max-width:1024px){.posts-section{padding:25px 0}.post-card{padding:16px 18px}.post-card:hover{transform:none}}
 .mobile-guestbook{display:none;padding:40px 20px 60px;max-width:600px;margin:0 auto}
 .mobile-guestbook-title{font-family:'Cormorant Garamond',serif;font-size:1.4rem;font-weight:400;color:#1a1a1a;text-align:center;margin-bottom:8px}
 .mobile-guestbook-sub{font-size:.75rem;color:#999;text-align:center;margin-bottom:25px;letter-spacing:.05em}
@@ -498,6 +512,22 @@ section{padding:80px 50px;max-width:900px;margin:0 auto}
     <div class="col"><h2 class="section-title">Recent Reports</h2>
         <a href="/reports/weekly-20260207/" class="post-item"><div class="post-date">February 07, 2026</div><h3 class="post-title">Weekly Market Report</h3><p class="post-excerpt">AI 湲곕컲 二쇨컙 留ㅽ겕濡??쒖옣 遺꾩꽍 諛??ъ옄 ?몄궗?댄듃.</p></a>
         <a href="/reports/weekly-20260206/" class="post-item"><div class="post-date">February 06, 2026</div><h3 class="post-title">Weekly Market Report</h3><p class="post-excerpt">二쇨컙 留ㅽ겕濡??쒖옣 遺꾩꽍 諛??ъ옄 ?몄궗?댄듃.</p></a></div></section>
+{% if site.posts.size > 0 %}
+<section class="posts-section">
+    <h2 class="section-title" style="text-align:center;border:none;padding:0;margin-bottom:30px;">Blog Posts</h2>
+    <div class="posts-list">
+        {% for post in site.posts limit:4 %}
+        <a href="{{ post.url }}" class="post-card">
+            <div class="post-card-date">{{ post.date | date: "%b %d, %Y" }}</div>
+            <h3 class="post-card-title">{{ post.title }}</h3>
+            {% if post.tags.size > 0 %}
+            <div class="post-card-tags">{% for tag in post.tags limit:3 %}<span>{{ tag }}</span>{% endfor %}</div>
+            {% endif %}
+        </a>
+        {% endfor %}
+    </div>
+</section>
+{% endif %}
 <section class="mobile-guestbook"><h2 class="mobile-guestbook-title">Guestbook &#x1F4DD;</h2><p class="mobile-guestbook-sub">Leave a message or say hello</p>
     <div class="mobile-guestbook-box"><script src="https://giscus.app/client.js" data-repo="gkfla2020-bit/gkfla2020-bit.github.io" data-repo-id="R_kgDONqJqYQ" data-category="General" data-category-id="DIC_kwDONqJqYc4CmVvM" data-mapping="specific" data-term="guestbook" data-strict="0" data-reactions-enabled="1" data-emit-metadata="0" data-input-position="top" data-theme="light" data-lang="ko" data-loading="lazy" crossorigin="anonymous" async></script></div></section>
 </div></div>

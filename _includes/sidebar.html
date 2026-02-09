@@ -13,11 +13,13 @@
             <div class="nav-section-title">Navigation</div>
             <ul class="nav-list">
                 <li><a href="/"{% if page.url == '/' or page.url == '/index.html' %} class="active"{% endif %}>Home</a></li>
-                <li><a href="/research/"{% if page.url == '/research/' %} class="active"{% endif %}>Research</a></li>
+                <li><a href="/research/"{% if page.url contains '/research' %} class="active"{% endif %}>Research</a></li>
+                <li><a href="/projects/"{% if page.url == '/projects/' %} class="active"{% endif %}>Projects</a></li>
                 <li><a href="/cv/"{% if page.url == '/cv/' %} class="active"{% endif %}>CV</a></li>
+                <li><a href="/reading/"{% if page.url == '/reading/' %} class="active"{% endif %}>Reading</a></li>
             </ul>
         </div>
-        <div class="nav-section">
+        <div class="nav-section nav-extra">
             <div class="nav-section-title">Research</div>
             <ul class="nav-list">
                 <li><a href="/research/vol-integrated-kr/"{% if page.url == '/research/vol-integrated-kr/' %} class="active"{% endif %}>Regime Shift &amp; Spillover</a></li>
@@ -25,13 +27,24 @@
                 <li><a href="/research/bacbb/"{% if page.url == '/research/bacbb/' %} class="active"{% endif %}>BACBB Strategy</a></li>
             </ul>
         </div>
-        <div class="nav-section">
+        <div class="nav-section nav-extra">
             <div class="nav-section-title">Reports</div>
             <ul class="nav-list">
                 <li><a href="/reports/weekly-20260207/"{% if page.url == '/reports/weekly-20260207/' %} class="active"{% endif %}>Weekly Report (02/07)</a></li>
                 <li><a href="/reports/weekly-20260206/"{% if page.url == '/reports/weekly-20260206/' %} class="active"{% endif %}>Weekly Report (02/06)</a></li>
             </ul>
         </div>
+        {% if site.posts.size > 0 %}
+        <div class="nav-section nav-extra">
+            <div class="nav-section-title">Recent Posts</div>
+            <ul class="nav-list">
+                {% for post in site.posts limit:5 %}
+                <li><a href="{{ post.url }}"{% if page.url == post.url %} class="active"{% endif %}>{{ post.title | truncate: 30 }}</a></li>
+                {% endfor %}
+            </ul>
+        </div>
+        {% endif %}
+        <button class="nav-toggle" onclick="this.parentElement.classList.toggle('expanded');this.textContent=this.parentElement.classList.contains('expanded')?'Less ▴':'More ▾'" aria-label="Toggle navigation sections">More ▾</button>
     </nav>
     <div class="sidebar-footer">&copy; 2026 Ha Rim Jung</div>
 </aside>
