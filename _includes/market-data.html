@@ -1,0 +1,12 @@
+<script>
+const FINNHUB_KEY='d62k939r01qldki8gjq0d62k939r01qldki8gjqg';
+async function fetchQuote(s){try{const r=await fetch('https://finnhub.io/api/v1/quote?symbol='+s+'&token='+FINNHUB_KEY);return await r.json();}catch(e){return null;}}
+async function updateMarketData(){
+const[spy,qqq,btc]=await Promise.all([fetchQuote('SPY'),fetchQuote('QQQ'),fetchQuote('BINANCE:BTCUSDT')]);
+const d={kospi:{v:2650,c:-1.2},sp500:spy?.c?{v:Math.round(spy.c*10),c:spy.dp||0}:{v:6050,c:.8},nasdaq:qqq?.c?{v:Math.round(qqq.c*40),c:qqq.dp||0}:{v:19800,c:1.1},us10y:{v:4.21,c:-.05},usdkrw:{v:1472,c:.3},vix:{v:21.8,c:2.5},move:{v:119.7,c:-1.2},btc:btc?.c?{v:btc.c,c:btc.dp||0}:{v:97500,c:-2.1}};
+for(const[k,o]of Object.entries(d)){const el=document.getElementById(k),ch=document.getElementById(k+'-chg');
+if(el){if(k==='usdkrw')el.textContent=o.v.toLocaleString();else if(k==='us10y')el.textContent=o.v.toFixed(2)+'%';else if(k==='btc')el.textContent='$'+(o.v/1000).toFixed(1)+'K';else if(k==='vix'||k==='move')el.textContent=o.v.toFixed(1);else el.textContent=o.v.toLocaleString();}
+if(ch){ch.textContent=(o.c>=0?'+':'')+o.c.toFixed(2)+'%';ch.className='market-change '+(o.c>=0?'up':'down');}}
+document.getElementById('update-time').textContent=(spy?.c||btc?.c?'Live':'Sample')+' · '+new Date().toLocaleTimeString('ko-KR');}
+setTimeout(updateMarketData,2000);setInterval(updateMarketData,60000);
+</script>

@@ -107,75 +107,8 @@ body{font-family:'Inter',sans-serif;background:#fafaf8;color:#1a1a1a;line-height
 <body>
 <div class="formula-bg" id="formulaBg"></div>
 
-<aside class="sidebar">
-    <div class="sidebar-profile">
-        <img src="/assets/profile.png" alt="Ha Rim Jung" class="profile-photo">
-        <div class="profile-info">
-            <div class="profile-name">Ha Rim Jung</div>
-            <div class="profile-title">Quantitative Researcher</div>
-            <p class="profile-bio">Interest rate modeling, derivatives pricing, and systematic trading strategies.</p>
-            <div class="profile-links">
-                <a href="https://github.com/gkfla2020-bit" target="_blank">GitHub</a>
-            </div>
-        </div>
-    </div>
-    
-    <nav class="sidebar-nav">
-        <div class="nav-section">
-            <div class="nav-section-title">Navigation</div>
-            <ul class="nav-list">
-                <li><a href="/">Home</a></li>
-                <li><a href="/research/">Research</a></li>
-                <li><a href="/cv/" class="active">CV</a></li>
-            </ul>
-        </div>
-        
-        <div class="nav-section">
-            <div class="nav-section-title">Research</div>
-            <ul class="nav-list">
-                <li><a href="/research/vol-integrated-kr/">Regime Shift & Spillover</a></li>
-                <li><a href="/research/move-vasicek-kr/">MOVE-Vasicek Model</a></li>
-            </ul>
-        </div>
-        
-        <div class="nav-section">
-            <div class="nav-section-title">Reports</div>
-            <ul class="nav-list">
-                <li><a href="/reports/weekly-20260206/">Weekly Report (02/06)</a></li>
-            </ul>
-        </div>
-    </nav>
-    
-    <div class="sidebar-footer">© 2026 Ha Rim Jung</div>
-</aside>
-
-<!-- Right Sidebar: Market Widget -->
-<aside class="right-sidebar">
-    <div class="widget-section">
-        <div class="widget-title">Market Overview</div>
-        <div class="market-group">
-            <div class="market-group-title">Indices</div>
-            <div class="market-item"><span class="market-name">KOSPI</span><div><span class="market-value" id="kospi">-</span><span class="market-change" id="kospi-chg">-</span></div></div>
-            <div class="market-item"><span class="market-name">S&P 500</span><div><span class="market-value" id="sp500">-</span><span class="market-change" id="sp500-chg">-</span></div></div>
-            <div class="market-item"><span class="market-name">NASDAQ</span><div><span class="market-value" id="nasdaq">-</span><span class="market-change" id="nasdaq-chg">-</span></div></div>
-        </div>
-        <div class="market-group">
-            <div class="market-group-title">Rates & FX</div>
-            <div class="market-item"><span class="market-name">US 10Y</span><div><span class="market-value" id="us10y">-</span><span class="market-change" id="us10y-chg">-</span></div></div>
-            <div class="market-item"><span class="market-name">USD/KRW</span><div><span class="market-value" id="usdkrw">-</span><span class="market-change" id="usdkrw-chg">-</span></div></div>
-        </div>
-        <div class="market-group">
-            <div class="market-group-title">Volatility</div>
-            <div class="market-item"><span class="market-name">VIX</span><div><span class="market-value" id="vix">-</span><span class="market-change" id="vix-chg">-</span></div></div>
-            <div class="market-item"><span class="market-name">MOVE</span><div><span class="market-value" id="move">-</span><span class="market-change" id="move-chg">-</span></div></div>
-        </div>
-        <div class="market-group">
-            <div class="market-group-title">Crypto</div>
-            <div class="market-item"><span class="market-name">BTC</span><div><span class="market-value" id="btc">-</span><span class="market-change" id="btc-chg">-</span></div></div>
-        </div>
-        <div class="widget-update" id="update-time">Loading...</div>
-    </div>
-</aside>
+{% include sidebar.html %}
+{% include market-widget.html %}
 
 <div class="main-wrapper">
     <div class="container">
@@ -327,56 +260,7 @@ tick();
 gsap.to('.cv-header', {opacity:1, duration:.6, delay:.2});
 gsap.to('.cv-section', {opacity:1, y:0, duration:.5, delay:.4, stagger:.1});
 
-// Market Data - Finnhub API
-const FINNHUB_KEY = 'd62k939r01qldki8gjq0d62k939r01qldki8gjqg';
-
-async function fetchQuote(symbol) {
-    try {
-        const res = await fetch(`https://finnhub.io/api/v1/quote?symbol=${symbol}&token=${FINNHUB_KEY}`);
-        return await res.json();
-    } catch(e) { return null; }
-}
-
-async function updateMarketData() {
-    const [spy, qqq, btcData] = await Promise.all([
-        fetchQuote('SPY'),
-        fetchQuote('QQQ'),
-        fetchQuote('BINANCE:BTCUSDT')
-    ]);
-    
-    const data = {
-        kospi: { value: 2650, change: -1.2 },
-        sp500: spy?.c ? { value: Math.round(spy.c * 10), change: spy.dp || 0 } : { value: 6050, change: 0.8 },
-        nasdaq: qqq?.c ? { value: Math.round(qqq.c * 40), change: qqq.dp || 0 } : { value: 19800, change: 1.1 },
-        us10y: { value: 4.21, change: -0.05 },
-        usdkrw: { value: 1472, change: 0.3 },
-        vix: { value: 21.8, change: 2.5 },
-        move: { value: 119.7, change: -1.2 },
-        btc: btcData?.c ? { value: btcData.c, change: btcData.dp || 0 } : { value: 97500, change: -2.1 }
-    };
-    
-    for (const [key, d] of Object.entries(data)) {
-        const el = document.getElementById(key);
-        const chgEl = document.getElementById(key + '-chg');
-        
-        if (el) {
-            if (key === 'usdkrw') el.textContent = d.value.toLocaleString();
-            else if (key === 'us10y') el.textContent = d.value.toFixed(2) + '%';
-            else if (key === 'btc') el.textContent = '$' + (d.value/1000).toFixed(1) + 'K';
-            else if (key === 'vix' || key === 'move') el.textContent = d.value.toFixed(1);
-            else el.textContent = d.value.toLocaleString();
-        }
-        if (chgEl) {
-            chgEl.textContent = (d.change >= 0 ? '+' : '') + d.change.toFixed(2) + '%';
-            chgEl.className = 'market-change ' + (d.change >= 0 ? 'up' : 'down');
-        }
-    }
-    
-    document.getElementById('update-time').textContent = (spy?.c || btcData?.c ? 'Live' : 'Sample') + ' · ' + new Date().toLocaleTimeString('ko-KR');
-}
-
-setTimeout(updateMarketData, 500);
-setInterval(updateMarketData, 60000);
 </script>
+{% include market-data.html %}
 </body>
 </html>
