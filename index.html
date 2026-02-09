@@ -788,43 +788,21 @@ function enterSite(){
     if(entered)return;
     entered=true;eqRunning=false;
 
-    /* ?? Phase 1: Button pulse feedback ?? */
     const btn=document.getElementById('enterBtn');
-    gsap.to(btn,{scale:1.06,duration:.12,yoyo:true,repeat:1,ease:'power2.out'});
+    gsap.to(btn,{scale:1.04,duration:.08,yoyo:true,repeat:1,ease:'power2.out'});
 
-    const ex=gsap.timeline({delay:.15});
+    const ex=gsap.timeline({delay:.05});
 
-    /* ?? Phase 2: Peripherals dissolve (edges ??center order) ?? */
+    /* Fast unified fade */
     ex
-    .to('.intro-page',{opacity:0,y:8,duration:.3,ease:'power2.in'})
-    .to('.intro-side',{opacity:0,duration:.3,ease:'power1.in'},'-=.2')
-    .to(['.intro-vol','.intro-date'],{opacity:0,y:-4,duration:.25,ease:'power2.in'},'-=.2')
-    .to('.intro-rule',{scaleX:0,duration:.4,ease:'power3.inOut'},'-=.15')
+    .to(['.intro-page','.intro-side','.intro-vol','.intro-date','.intro-rule','.intro-enter-hint','.intro-enter','.intro-eq','.intro-kw','.intro-diamond-div','.intro-epigraph','.intro-affil','.intro-accent-rule'],{opacity:0,duration:.25,ease:'power2.in'})
+    .to('.intro-name .char',{opacity:0,y:-8,stagger:{each:.015,from:'center'},duration:.2,ease:'power2.in'},'-=.1')
+    .to(['#genCanvas','.ambient-glow'],{opacity:0,duration:.3,ease:'power1.in'},'-=.15')
+    .to('#intro',{opacity:0,duration:.25,ease:'power2.in'},'-=.1')
 
-    /* ?? Phase 3: Content recedes ??bottom-up, gentle lift ?? */
-    .to('.intro-enter-hint',{opacity:0,duration:.15},'-=.1')
-    .to('.intro-enter',{opacity:0,y:10,scale:.97,duration:.3,ease:'power2.in'},'-=.1')
-    .to('.intro-eq',{opacity:0,y:-8,duration:.3,ease:'power2.in'},'-=.15')
-    .to('.intro-kw',{opacity:0,y:-5,duration:.2,stagger:{each:.025,from:'edges'},ease:'power2.in'},'-=.15')
-    .to('.intro-diamond-div',{opacity:0,scaleX:0,duration:.3,ease:'power3.in'},'-=.15')
-    .to('.intro-epigraph',{opacity:0,y:-10,duration:.35,ease:'power2.in'},'-=.15')
-    .to('.intro-affil',{opacity:0,y:-4,duration:.25,ease:'power2.in'},'-=.15')
-
-    /* ?? Phase 4: Name ??characters scatter upward with stagger from center ?? */
-    .to('.intro-name .char',{opacity:0,y:-14,stagger:{each:.025,from:'center'},duration:.35,ease:'power2.in'},'-=.1')
-    .to('.intro-accent-rule',{width:0,opacity:0,duration:.35,ease:'power3.in'},'-=.2')
-
-    /* ?? Phase 5: Lissajous contracts + fades ??canvas scales up slightly as it dissolves ?? */
-    .to('#genCanvas',{opacity:0,scale:1.08,duration:.7,ease:'power1.in',transformOrigin:'center center'},'-=.25')
-    .to('.ambient-glow',{opacity:0,duration:.5},'-=.5')
-
-    /* ?? Phase 6: Warm background shift ??longer, more cinematic ?? */
-    .to('#intro',{backgroundColor:'#14120d',duration:.5,ease:'power1.in'},'-=.4')
-    .add(()=>{running=false;}) // stop draw loop after canvas faded
-    .to('#intro',{opacity:0,duration:.5,ease:'power2.in'})
-
-    /* ?? Phase 7: Main content reveal ?? */
+    /* Main content reveal */
     .add(()=>{
+        running=false;
         document.getElementById('intro').style.display='none';
         document.getElementById('main').classList.add('show');
         document.body.classList.add('entered');
@@ -835,14 +813,11 @@ function enterSite(){
             if((window.scrollY||0)<=0&&e.touches[0].clientY>lastY)e.preventDefault();
         },{passive:false});
 
-        const m=gsap.timeline({defaults:{ease:'power3.out'},delay:.05});
+        const m=gsap.timeline({defaults:{ease:'power3.out'},delay:.02});
         m
-        /* Hero ??subtle scale-in from 98% + fade */
-        .to('.hero-content',{opacity:1,y:0,scale:1,duration:.8,ease:'power2.out'})
-        /* Section titles ??staggered reveal */
-        .to('.section-title',{opacity:1,y:0,duration:.6,stagger:.12,ease:'power2.out'},'-=.4')
-        /* Posts ??cascade in with slightly longer stagger for rhythm */
-        .to('.post-item',{opacity:1,y:0,duration:.5,stagger:.08,ease:'power2.out'},'-=.3');
+        .to('.hero-content',{opacity:1,y:0,scale:1,duration:.5,ease:'power2.out'})
+        .to('.section-title',{opacity:1,y:0,duration:.35,stagger:.08,ease:'power2.out'},'-=.25')
+        .to('.post-item',{opacity:1,y:0,duration:.3,stagger:.05,ease:'power2.out'},'-=.15');
     });
 }
 
