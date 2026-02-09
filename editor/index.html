@@ -217,6 +217,7 @@ function addSection(type) {
     div.id = 'sec-' + id;
     div.innerHTML = getSectionHTML(id, type);
     container.appendChild(div);
+    livePreview();
 }
 
 function getSectionHTML(id, type) {
@@ -274,6 +275,7 @@ function removeSection(id) {
     sections = sections.filter(s => s.id !== id);
     const el = document.getElementById('sec-' + id);
     if (el) el.remove();
+    livePreview();
 }
 
 // ── Preview ──
@@ -310,7 +312,6 @@ function updatePreview() {
     }
 
     document.getElementById('previewContent').innerHTML = html;
-    toast('Preview updated');
 }
 
 function renderSection(sec) {
@@ -411,6 +412,23 @@ function formatDate(d) {
 
 // ── Set default date ──
 document.getElementById('paperDate').valueAsDate = new Date();
+
+// ── Live Preview ──
+let liveTimer = null;
+function livePreview() {
+    clearTimeout(liveTimer);
+    liveTimer = setTimeout(updatePreview, 300);
+}
+
+// Listen on all meta inputs
+document.querySelectorAll('#tab-meta input, #tab-meta textarea, #tab-meta select').forEach(el => {
+    el.addEventListener('input', livePreview);
+    el.addEventListener('change', livePreview);
+});
+
+// Listen on dynamically added section inputs via event delegation
+document.getElementById('sections').addEventListener('input', livePreview);
+document.getElementById('sections').addEventListener('change', livePreview);
 
 // ── Download Complete HTML ──
 function downloadHTML() {
