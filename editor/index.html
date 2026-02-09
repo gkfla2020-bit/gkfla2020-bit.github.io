@@ -1,277 +1,716 @@
----
-layout: null
----
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Blog Post Editor | Ha Rim Jung</title>
-    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;500;700&family=Space+Mono:wght@400&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
-    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
-    <style>
-* { margin: 0; padding: 0; box-sizing: border-box; }
-body { font-family: 'Inter', sans-serif; background: #1a1a1a; color: #fff; height: 100vh; overflow: hidden; }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Research Paper Editor | Ha Rim Jung</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Cormorant+Garamond:wght@300;400;500;700&family=Space+Mono:wght@400&family=Nanum+Myeongjo:wght@400;700&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Inter',sans-serif;background:#f5f5f0;color:#1a1a1a;min-height:100vh}
 
-.editor-container { display: grid; grid-template-columns: 1fr 1fr; height: 100vh; }
+/* Layout */
+.editor-layout{display:grid;grid-template-columns:1fr 1fr;height:100vh}
+.editor-panel{overflow-y:auto;padding:30px;background:#fff;border-right:1px solid #e0e0e0}
+.preview-panel{overflow-y:auto;padding:30px;background:#fafaf8}
 
-/* Left: Editor */
-.editor-panel { background: #1e1e1e; display: flex; flex-direction: column; border-right: 1px solid #333; }
-.editor-header { padding: 15px 20px; background: #252525; border-bottom: 1px solid #333; }
-.editor-header h2 { font-size: .8rem; color: #888; letter-spacing: .1em; text-transform: uppercase; margin-bottom: 10px; }
-.meta-inputs { display: flex; gap: 10px; flex-wrap: wrap; }
-.meta-inputs input { background: #333; border: 1px solid #444; color: #fff; padding: 8px 12px; font-size: .85rem; border-radius: 4px; }
-.meta-inputs input:focus { outline: none; border-color: #0080c6; }
-#postTitle { flex: 2; min-width: 200px; }
-#postDate { width: 130px; }
-#postCategory { width: 120px; }
+/* Header */
+.editor-header{display:flex;align-items:center;justify-content:space-between;padding:15px 30px;background:#1a1a1a;color:#fff;position:sticky;top:0;z-index:100;grid-column:1/-1}
+.editor-header h1{font-family:'Cormorant Garamond',serif;font-size:1.3rem;font-weight:400;letter-spacing:.05em}
+.header-actions{display:flex;gap:10px}
+.header-actions button{padding:8px 20px;border:1px solid rgba(255,255,255,.3);background:none;color:#fff;font-size:.75rem;letter-spacing:.08em;text-transform:uppercase;cursor:pointer;font-family:'Inter',sans-serif;transition:all .2s}
+.header-actions button:hover{background:rgba(255,255,255,.1);border-color:rgba(255,255,255,.6)}
+.header-actions button.primary{background:#0080c6;border-color:#0080c6}
+.header-actions button.primary:hover{background:#006da8}
 
-.editor-body { flex: 1; padding: 0; }
-#markdownInput { 
-    width: 100%; height: 100%; background: #1e1e1e; border: none; color: #e0e0e0; 
-    font-family: 'Space Mono', monospace; font-size: 14px; line-height: 1.8; 
-    padding: 20px; resize: none; 
+/* Form */
+.form-group{margin-bottom:20px}
+.form-group label{display:block;font-size:.7rem;font-weight:600;color:#888;letter-spacing:.12em;text-transform:uppercase;margin-bottom:6px}
+.form-group input,.form-group textarea,.form-group select{width:100%;padding:10px 14px;border:1px solid #e0e0e0;font-family:'Inter',sans-serif;font-size:.9rem;color:#1a1a1a;background:#fafaf8;transition:border-color .2s}
+.form-group input:focus,.form-group textarea:focus{outline:none;border-color:#0080c6}
+.form-group textarea{min-height:100px;resize:vertical;line-height:1.7}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:15px}
+
+/* Sections */
+.section-editor{background:#f8f8f5;border:1px solid #e8e8e8;padding:20px;margin-bottom:15px;position:relative}
+.section-editor .remove-btn{position:absolute;top:10px;right:10px;background:none;border:none;color:#ccc;cursor:pointer;font-size:1.2rem;transition:color .2s}
+.section-editor .remove-btn:hover{color:#dc2626}
+.section-type-bar{display:flex;gap:6px;margin-bottom:12px;flex-wrap:wrap}
+.section-type-bar button{padding:5px 12px;border:1px solid #ddd;background:#fff;font-size:.7rem;cursor:pointer;font-family:'Inter',sans-serif;color:#666;transition:all .2s}
+.section-type-bar button:hover{border-color:#0080c6;color:#0080c6}
+.section-type-bar button.active{background:#0080c6;color:#fff;border-color:#0080c6}
+
+/* Add section */
+.add-section{display:flex;gap:8px;flex-wrap:wrap;padding:15px;border:2px dashed #ddd;margin-bottom:20px;justify-content:center}
+.add-section button{padding:8px 16px;border:1px solid #ddd;background:#fff;font-size:.75rem;cursor:pointer;font-family:'Inter',sans-serif;color:#555;transition:all .2s}
+.add-section button:hover{border-color:#0080c6;color:#0080c6;background:#f0f8ff}
+
+/* Preview styles */
+.preview-paper{font-family:'Times New Roman','Nanum Myeongjo',serif;line-height:1.9;background:#fff;padding:45px 50px;box-shadow:0 2px 20px rgba(0,0,0,.05);font-size:15px;max-width:900px;margin:0 auto}
+.preview-paper .paper-header{text-align:center;margin-bottom:40px;padding-bottom:30px;border-bottom:2px solid #333}
+.preview-paper .paper-category{font-size:11px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:#0080c6;margin-bottom:15px;font-family:'Inter',sans-serif}
+.preview-paper .paper-title{font-family:'Cormorant Garamond','Nanum Myeongjo',serif;font-size:26px;font-weight:700;margin-bottom:12px;line-height:1.35}
+.preview-paper .paper-subtitle{font-family:'Cormorant Garamond',serif;font-size:15px;color:#666;font-style:italic;margin-bottom:15px}
+.preview-paper .paper-author{font-size:14px;color:#444;margin-bottom:5px}
+.preview-paper .paper-date{font-size:12px;color:#999}
+.preview-paper .abstract{background:linear-gradient(135deg,#f8f9fa,#edf2f4);border-left:4px solid #1d3557;padding:25px 30px;margin:30px 0;border-radius:0 6px 6px 0;font-size:13.5px;line-height:1.8;color:#333}
+.preview-paper .abstract-title{font-family:'Inter',sans-serif;font-size:11px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:#1d3557;margin-bottom:10px}
+.preview-paper .keywords{background:#fafafa;padding:12px 20px;border-radius:6px;font-size:13px;color:#555;margin-bottom:30px}
+.preview-paper .keywords strong{color:#1d3557}
+.preview-paper h2{font-family:'Cormorant Garamond','Nanum Myeongjo',serif;font-size:1.5em;font-weight:700;color:#1d3557;margin:40px 0 15px;padding-bottom:8px;border-bottom:1px solid #e0e0e0}
+.preview-paper h3{font-family:'Cormorant Garamond','Nanum Myeongjo',serif;font-size:1.2em;font-weight:600;color:#2c3e50;margin:30px 0 12px}
+.preview-paper p{text-align:justify;text-indent:2em;margin-bottom:12px}
+.preview-paper .chart-container{margin:25px 0;text-align:center}
+.preview-paper .chart-container img{max-width:100%;border-radius:6px;box-shadow:0 2px 10px rgba(0,0,0,.1)}
+.preview-paper .chart-caption{font-size:12px;color:#666;margin-top:8px;font-style:italic}
+.preview-paper .math-block{margin:15px 0;padding:10px 0;text-align:center;overflow-x:auto}
+.preview-paper table{width:100%;border-collapse:collapse;margin:20px 0;font-size:12.5px}
+.preview-paper table caption{font-weight:700;text-align:left;margin-bottom:8px;font-size:13.5px;color:#1d3557}
+.preview-paper thead th{background:#1d3557;color:white;padding:10px;font-weight:600;font-size:11.5px;text-align:center}
+.preview-paper tbody td{padding:7px 10px;border-bottom:1px solid #eee;text-align:center}
+.preview-paper tbody tr:nth-child(even){background:#fafafa}
+.preview-paper .hypothesis{background:linear-gradient(135deg,#f8f9fa,#fff);border-left:3px solid #e63946;padding:15px 20px;margin:12px 0;border-radius:0 6px 6px 0}
+.preview-paper .hypothesis strong{color:#e63946}
+.preview-paper code{background:#f4f4f4;padding:2px 6px;border-radius:3px;font-family:'Space Mono',monospace;font-size:13px}
+.preview-paper pre{background:#1a1a2e;color:#e8e8e8;padding:20px;border-radius:6px;overflow-x:auto;margin:15px 0;font-family:'Space Mono',monospace;font-size:13px;line-height:1.6}
+.preview-paper .section-divider{text-align:center;margin:40px 0;color:#ccc;font-size:18px;letter-spacing:10px}
+.preview-paper .references{font-size:12.5px;line-height:1.7}
+.preview-paper .references p{text-indent:-2em;padding-left:2em;margin-bottom:6px}
+.preview-paper .note{font-size:11.5px;color:#777;margin-top:5px;font-style:italic}
+
+/* Plotly container */
+.preview-paper .plotly-chart{width:100%;min-height:400px;margin:20px 0}
+
+/* Tabs */
+.tab-bar{display:flex;gap:0;margin-bottom:20px;border-bottom:2px solid #e0e0e0}
+.tab-bar button{padding:10px 20px;border:none;background:none;font-size:.8rem;cursor:pointer;font-family:'Inter',sans-serif;color:#888;border-bottom:2px solid transparent;margin-bottom:-2px;transition:all .2s}
+.tab-bar button.active{color:#0080c6;border-bottom-color:#0080c6;font-weight:500}
+
+/* Toast */
+.toast{position:fixed;bottom:30px;right:30px;background:#1a1a1a;color:#fff;padding:12px 24px;font-size:.85rem;border-radius:6px;opacity:0;transform:translateY(10px);transition:all .3s;z-index:999;pointer-events:none}
+.toast.show{opacity:1;transform:translateY(0)}
+
+@media(max-width:900px){
+    .editor-layout{grid-template-columns:1fr}
+    .preview-panel{display:none}
+    .preview-panel.mobile-show{display:block;position:fixed;inset:0;z-index:200;padding:20px}
 }
-#markdownInput:focus { outline: none; }
-#markdownInput::placeholder { color: #555; }
-
-/* Right: Preview */
-.preview-panel { background: #fafaf8; overflow-y: auto; }
-.preview-header { 
-    padding: 15px 20px; background: rgba(255,255,255,.95); border-bottom: 1px solid #e0e0e0; 
-    position: sticky; top: 0; z-index: 10; display: flex; justify-content: space-between; align-items: center;
-}
-.preview-header h2 { font-size: .8rem; color: #888; letter-spacing: .1em; text-transform: uppercase; }
-.preview-actions { display: flex; gap: 10px; }
-.btn { padding: 8px 16px; font-size: .75rem; border: none; border-radius: 4px; cursor: pointer; transition: all .2s; }
-.btn-primary { background: #1a1a1a; color: #fff; }
-.btn-primary:hover { background: #333; }
-.btn-secondary { background: #e8e8e8; color: #333; }
-.btn-secondary:hover { background: #ddd; }
-
-/* Preview Content - Blog Style */
-.preview-content { padding: 40px; max-width: 800px; margin: 0 auto; color: #1a1a1a; }
-.preview-content .post-header { margin-bottom: 40px; padding-bottom: 30px; border-bottom: 1px solid #e0e0e0; }
-.preview-content .post-date { font-size: .7rem; color: #888; letter-spacing: .15em; text-transform: uppercase; margin-bottom: 15px; }
-.preview-content .post-title { font-family: 'Cormorant Garamond', serif; font-size: 2.5rem; font-weight: 500; line-height: 1.2; margin-bottom: 15px; }
-.preview-content .post-category { display: inline-block; font-size: .65rem; color: #0080c6; letter-spacing: .1em; text-transform: uppercase; padding: 4px 10px; background: rgba(0,128,198,.08); border-radius: 3px; }
-
-.preview-content .post-body { font-family: 'Georgia', serif; font-size: 17px; line-height: 1.9; }
-.preview-content .post-body h1 { font-family: 'Cormorant Garamond', serif; font-size: 2rem; font-weight: 500; margin: 50px 0 20px; padding-bottom: 10px; border-bottom: 1px solid #e0e0e0; }
-.preview-content .post-body h2 { font-family: 'Cormorant Garamond', serif; font-size: 1.6rem; font-weight: 500; margin: 40px 0 15px; color: #333; }
-.preview-content .post-body h3 { font-size: 1.2rem; font-weight: 600; margin: 30px 0 12px; color: #444; }
-.preview-content .post-body p { margin-bottom: 20px; text-align: justify; }
-.preview-content .post-body ul, .preview-content .post-body ol { margin: 20px 0 20px 25px; }
-.preview-content .post-body li { margin-bottom: 8px; }
-.preview-content .post-body blockquote { border-left: 3px solid #0080c6; padding: 15px 20px; margin: 25px 0; background: #f8f8f8; font-style: italic; color: #555; }
-.preview-content .post-body code { font-family: 'Space Mono', monospace; background: #f0f0f0; padding: 2px 6px; border-radius: 3px; font-size: .9em; }
-.preview-content .post-body pre { background: #1e1e1e; color: #e0e0e0; padding: 20px; border-radius: 5px; overflow-x: auto; margin: 25px 0; }
-.preview-content .post-body pre code { background: none; padding: 0; color: inherit; }
-.preview-content .post-body strong { font-weight: 600; }
-.preview-content .post-body a { color: #0080c6; text-decoration: none; border-bottom: 1px solid rgba(0,128,198,.3); }
-.preview-content .post-body a:hover { border-bottom-color: #0080c6; }
-.preview-content .post-body img { max-width: 100%; height: auto; margin: 25px 0; border-radius: 5px; }
-.preview-content .post-body table { width: 100%; border-collapse: collapse; margin: 25px 0; font-size: .9rem; }
-.preview-content .post-body th, .preview-content .post-body td { padding: 12px; border: 1px solid #e0e0e0; text-align: left; }
-.preview-content .post-body th { background: #f5f5f5; font-weight: 600; }
-
-/* Toast notification */
-.toast { position: fixed; bottom: 20px; right: 20px; background: #1a1a1a; color: #fff; padding: 12px 20px; border-radius: 5px; font-size: .85rem; opacity: 0; transition: opacity .3s; z-index: 1000; }
-.toast.show { opacity: 1; }
-
-@media (max-width: 900px) {
-    .editor-container { grid-template-columns: 1fr; }
-    .preview-panel { display: none; }
-}
-    </style>
+</style>
 </head>
 <body>
-<div class="editor-container">
-    <div class="editor-panel">
-        <div class="editor-header">
-            <h2>Post Editor</h2>
-            <div class="meta-inputs">
-                <input type="text" id="postTitle" placeholder="Post Title">
-                <input type="date" id="postDate">
-                <input type="text" id="postCategory" placeholder="Category">
-            </div>
+
+<div class="editor-layout">
+<div class="editor-header">
+    <h1>Research Paper Editor</h1>
+    <div class="header-actions">
+        <button onclick="updatePreview()">Preview</button>
+        <button onclick="downloadHTML()" class="primary">Download HTML</button>
+    </div>
+</div>
+
+<!-- EDITOR PANEL -->
+<div class="editor-panel">
+<div class="tab-bar">
+    <button class="active" onclick="showTab('meta',this)">Metadata</button>
+    <button onclick="showTab('content',this)">Content</button>
+</div>
+
+<div id="tab-meta">
+    <div class="form-group">
+        <label>Paper Title</label>
+        <input type="text" id="paperTitle" placeholder="When Correlations Break: Regime Shifts in...">
+    </div>
+    <div class="form-group">
+        <label>Subtitle</label>
+        <input type="text" id="paperSubtitle" placeholder="Evidence from Vasicek Dynamics and...">
+    </div>
+    <div class="form-row">
+        <div class="form-group">
+            <label>Date</label>
+            <input type="date" id="paperDate">
         </div>
-        <div class="editor-body">
-            <textarea id="markdownInput" placeholder="Write your post in Markdown...
-
-# Heading 1
-## Heading 2
-
-This is a paragraph with **bold** and *italic* text.
-
-- List item 1
-- List item 2
-
-> This is a blockquote
-
-```python
-def hello():
-    print('Hello, World!')
-```
-"></textarea>
+        <div class="form-group">
+            <label>Category</label>
+            <input type="text" id="paperCategory" value="Quantitative Finance Research">
         </div>
     </div>
-    
-    <div class="preview-panel">
-        <div class="preview-header">
-            <h2>Preview</h2>
-            <div class="preview-actions">
-                <button class="btn btn-secondary" onclick="copyHTML()">Copy HTML</button>
-                <button class="btn btn-primary" onclick="downloadPost()">Download</button>
-            </div>
+    <div class="form-row">
+        <div class="form-group">
+            <label>Folder Name (URL slug)</label>
+            <input type="text" id="paperSlug" placeholder="my-research-topic">
         </div>
-        <div class="preview-content">
-            <div class="post-header">
-                <div class="post-date" id="previewDate">February 06, 2026</div>
-                <h1 class="post-title" id="previewTitle">Untitled Post</h1>
-                <span class="post-category" id="previewCategory">Research</span>
-            </div>
-            <div class="post-body" id="previewBody">
-                <p>Start writing to see the preview...</p>
-            </div>
+        <div class="form-group">
+            <label>Language</label>
+            <select id="paperLang">
+                <option value="ko">Korean</option>
+                <option value="en">English</option>
+            </select>
         </div>
     </div>
+    <div class="form-group">
+        <label>Keywords (comma separated)</label>
+        <input type="text" id="paperKeywords" placeholder="Vasicek, DCC-GARCH, Bitcoin, Spillover">
+    </div>
+    <div class="form-group">
+        <label>Abstract</label>
+        <textarea id="paperAbstract" rows="6" placeholder="본 연구는..."></textarea>
+    </div>
+</div>
+
+<div id="tab-content" style="display:none">
+    <div id="sections"></div>
+    <div class="add-section">
+        <button onclick="addSection('heading')">+ Heading</button>
+        <button onclick="addSection('paragraph')">+ Paragraph</button>
+        <button onclick="addSection('math')">+ Math Equation</button>
+        <button onclick="addSection('chart-img')">+ Chart (Image)</button>
+        <button onclick="addSection('plotly')">+ Plotly Chart</button>
+        <button onclick="addSection('table')">+ Table</button>
+        <button onclick="addSection('code')">+ Code Block</button>
+        <button onclick="addSection('hypothesis')">+ Hypothesis Box</button>
+        <button onclick="addSection('highlight')">+ Highlight Box</button>
+        <button onclick="addSection('divider')">+ Divider</button>
+        <button onclick="addSection('references')">+ References</button>
+    </div>
+</div>
+</div>
+
+<!-- PREVIEW PANEL -->
+<div class="preview-panel" id="previewPanel">
+    <div class="preview-paper" id="previewContent">
+        <p style="color:#999;text-align:center;font-family:Inter,sans-serif;font-size:.9rem;">Fill in metadata and add content sections, then click Preview</p>
+    </div>
+</div>
 </div>
 
 <div class="toast" id="toast"></div>
 
 <script>
-const titleInput = document.getElementById('postTitle');
-const dateInput = document.getElementById('postDate');
-const categoryInput = document.getElementById('postCategory');
-const markdownInput = document.getElementById('markdownInput');
-const previewTitle = document.getElementById('previewTitle');
-const previewDate = document.getElementById('previewDate');
-const previewCategory = document.getElementById('previewCategory');
-const previewBody = document.getElementById('previewBody');
 
-// Set default date
-dateInput.valueAsDate = new Date();
+// ── State ──
+let sections = [];
+let sectionId = 0;
 
-// Update preview on input
+// ── Tabs ──
+function showTab(tab, btn) {
+    document.getElementById('tab-meta').style.display = tab === 'meta' ? 'block' : 'none';
+    document.getElementById('tab-content').style.display = tab === 'content' ? 'block' : 'none';
+    document.querySelectorAll('.tab-bar button').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+}
+
+// ── Toast ──
+function toast(msg) {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.classList.add('show');
+    setTimeout(() => t.classList.remove('show'), 2500);
+}
+
+// ── Add Section ──
+function addSection(type) {
+    const id = ++sectionId;
+    sections.push({ id, type });
+    const container = document.getElementById('sections');
+    const div = document.createElement('div');
+    div.className = 'section-editor';
+    div.id = 'sec-' + id;
+    div.innerHTML = getSectionHTML(id, type);
+    container.appendChild(div);
+}
+
+function getSectionHTML(id, type) {
+    const rm = `<button class="remove-btn" onclick="removeSection(${id})">&times;</button>`;
+    const typeLabel = `<div style="font-size:.65rem;color:#aaa;letter-spacing:.1em;text-transform:uppercase;margin-bottom:8px">${type}</div>`;
+    switch (type) {
+        case 'heading':
+            return rm + typeLabel +
+                `<select id="hlevel-${id}" style="margin-bottom:8px;padding:4px 8px;font-size:.8rem;border:1px solid #ddd">
+                    <option value="2">H2 - Section</option><option value="3">H3 - Subsection</option>
+                </select>
+                <input type="text" id="htext-${id}" placeholder="Section title" style="width:100%;padding:8px;border:1px solid #ddd;font-size:.9rem">`;
+        case 'paragraph':
+            return rm + typeLabel +
+                `<textarea id="ptext-${id}" rows="5" placeholder="Paragraph text. Use \\( ... \\) for inline math." style="width:100%;padding:8px;border:1px solid #ddd;font-size:.85rem;line-height:1.7;font-family:inherit"></textarea>`;
+        case 'math':
+            return rm + typeLabel +
+                `<textarea id="mtext-${id}" rows="3" placeholder="LaTeX: e.g. dr(t) = \\kappa(\\theta - r)dt + \\sigma dW(t)" style="width:100%;padding:8px;border:1px solid #ddd;font-family:'Space Mono',monospace;font-size:.85rem"></textarea>`;
+        case 'chart-img':
+            return rm + typeLabel +
+                `<input type="text" id="cimg-${id}" placeholder="Image URL or relative path (e.g. vol_chart_bei_gold.png)" style="width:100%;padding:8px;border:1px solid #ddd;font-size:.85rem;margin-bottom:8px">
+                <input type="text" id="ccap-${id}" placeholder="Caption (optional)" style="width:100%;padding:8px;border:1px solid #ddd;font-size:.85rem">`;
+        case 'plotly':
+            return rm + typeLabel +
+                `<input type="text" id="pid-${id}" placeholder="Chart div ID (e.g. chart1)" style="width:100%;padding:8px;border:1px solid #ddd;font-size:.85rem;margin-bottom:8px">
+                <textarea id="pcode-${id}" rows="8" placeholder="Plotly.newPlot('chart1', [{x:[1,2,3],y:[4,5,6],type:'scatter'}], {title:'My Chart'});" style="width:100%;padding:8px;border:1px solid #ddd;font-family:'Space Mono',monospace;font-size:.8rem"></textarea>`;
+        case 'table':
+            return rm + typeLabel +
+                `<input type="text" id="tcap-${id}" placeholder="Table caption" style="width:100%;padding:8px;border:1px solid #ddd;font-size:.85rem;margin-bottom:8px">
+                <textarea id="tdata-${id}" rows="6" placeholder="Header1 | Header2 | Header3\nRow1Col1 | Row1Col2 | Row1Col3\nRow2Col1 | Row2Col2 | Row2Col3" style="width:100%;padding:8px;border:1px solid #ddd;font-family:'Space Mono',monospace;font-size:.8rem"></textarea>
+                <div style="font-size:.65rem;color:#aaa;margin-top:4px">Pipe-separated. First row = headers. Use ** for bold, *** for red+bold (sig).</div>`;
+        case 'code':
+            return rm + typeLabel +
+                `<input type="text" id="clang-${id}" placeholder="Language (python, r, sql...)" style="width:100%;padding:8px;border:1px solid #ddd;font-size:.85rem;margin-bottom:8px">
+                <textarea id="ccode-${id}" rows="8" placeholder="import pandas as pd\ndf = pd.read_csv('data.csv')" style="width:100%;padding:8px;border:1px solid #ddd;font-family:'Space Mono',monospace;font-size:.8rem"></textarea>`;
+        case 'hypothesis':
+            return rm + typeLabel +
+                `<input type="text" id="hlabel-${id}" placeholder="Hypothesis label (e.g. H1)" style="width:48%;padding:8px;border:1px solid #ddd;font-size:.85rem;margin-bottom:8px">
+                <textarea id="hbody-${id}" rows="3" placeholder="Hypothesis text..." style="width:100%;padding:8px;border:1px solid #ddd;font-size:.85rem"></textarea>`;
+        case 'highlight':
+            return rm + typeLabel +
+                `<input type="text" id="htitle-${id}" placeholder="Box title" style="width:100%;padding:8px;border:1px solid #ddd;font-size:.85rem;margin-bottom:8px">
+                <textarea id="hcontent-${id}" rows="4" placeholder="Highlight content..." style="width:100%;padding:8px;border:1px solid #ddd;font-size:.85rem"></textarea>`;
+        case 'divider':
+            return rm + typeLabel + `<div style="text-align:center;color:#ccc;font-size:1.2rem;letter-spacing:8px;padding:10px">· · · · ·</div>`;
+        case 'references':
+            return rm + typeLabel +
+                `<textarea id="refs-${id}" rows="8" placeholder="One reference per line:\nFrazzini, A., & Pedersen, L. H. (2014). Betting against beta. JFE, 111(1), 1-25." style="width:100%;padding:8px;border:1px solid #ddd;font-size:.8rem;line-height:1.7"></textarea>`;
+        default:
+            return '';
+    }
+}
+
+function removeSection(id) {
+    sections = sections.filter(s => s.id !== id);
+    const el = document.getElementById('sec-' + id);
+    if (el) el.remove();
+}
+
+// ── Preview ──
 function updatePreview() {
-    previewTitle.textContent = titleInput.value || 'Untitled Post';
-    previewCategory.textContent = categoryInput.value || 'Research';
-    
-    if (dateInput.value) {
-        const date = new Date(dateInput.value);
-        previewDate.textContent = date.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: '2-digit' });
+    const title = document.getElementById('paperTitle').value;
+    const subtitle = document.getElementById('paperSubtitle').value;
+    const date = document.getElementById('paperDate').value;
+    const category = document.getElementById('paperCategory').value;
+    const keywords = document.getElementById('paperKeywords').value;
+    const abstract = document.getElementById('paperAbstract').value;
+
+    let html = '';
+
+    // Header
+    html += `<div class="paper-header">`;
+    html += `<div class="paper-category">${esc(category)}</div>`;
+    html += `<h1 class="paper-title">${esc(title)}</h1>`;
+    if (subtitle) html += `<div class="paper-subtitle">${esc(subtitle)}</div>`;
+    html += `<div class="paper-author">Ha Rim Jung</div>`;
+    html += `<div class="paper-date">${formatDate(date)}</div>`;
+    html += `</div>`;
+
+    // Abstract
+    if (abstract) {
+        html += `<div class="abstract"><div class="abstract-title">Abstract</div>${esc(abstract)}</div>`;
     }
-    
-    const markdown = markdownInput.value;
-    if (markdown.trim()) {
-        previewBody.innerHTML = marked.parse(markdown);
-    } else {
-        previewBody.innerHTML = '<p>Start writing to see the preview...</p>';
+    if (keywords) {
+        html += `<div class="keywords"><strong>Keywords:</strong> ${esc(keywords)}</div>`;
+    }
+
+    // Sections
+    for (const sec of sections) {
+        html += renderSection(sec);
+    }
+
+    document.getElementById('previewContent').innerHTML = html;
+    toast('Preview updated');
+}
+
+function renderSection(sec) {
+    const { id, type } = sec;
+    switch (type) {
+        case 'heading': {
+            const level = val(`hlevel-${id}`) || '2';
+            const text = val(`htext-${id}`);
+            return `<h${level}>${esc(text)}</h${level}>`;
+        }
+        case 'paragraph': {
+            const text = val(`ptext-${id}`);
+            return text.split('\n\n').map(p => `<p>${esc(p.trim())}</p>`).join('');
+        }
+        case 'math': {
+            const tex = val(`mtext-${id}`);
+            return `<div class="math-block">\\[${tex}\\]</div>`;
+        }
+        case 'chart-img': {
+            const src = val(`cimg-${id}`);
+            const cap = val(`ccap-${id}`);
+            let h = `<div class="chart-container"><img src="${esc(src)}" alt="${esc(cap || 'Chart')}" loading="lazy">`;
+            if (cap) h += `<div class="chart-caption">${esc(cap)}</div>`;
+            return h + `</div>`;
+        }
+        case 'plotly': {
+            const divId = val(`pid-${id}`) || 'chart' + id;
+            return `<div id="${esc(divId)}" class="plotly-chart"></div>`;
+        }
+        case 'table': {
+            const cap = val(`tcap-${id}`);
+            const data = val(`tdata-${id}`);
+            return buildTable(cap, data);
+        }
+        case 'code': {
+            const code = val(`ccode-${id}`);
+            return `<pre><code>${esc(code)}</code></pre>`;
+        }
+        case 'hypothesis': {
+            const label = val(`hlabel-${id}`);
+            const body = val(`hbody-${id}`);
+            return `<div class="hypothesis"><strong>${esc(label)}:</strong> ${esc(body)}</div>`;
+        }
+        case 'highlight': {
+            const t = val(`htitle-${id}`);
+            const c = val(`hcontent-${id}`);
+            return `<div class="vasicek-highlight"><h4>${esc(t)}</h4><p class="no-indent">${esc(c)}</p></div>`;
+        }
+        case 'divider':
+            return `<div class="section-divider">· · · · ·</div>`;
+        case 'references': {
+            const refs = val(`refs-${id}`);
+            let h = `<h2>References</h2><div class="references">`;
+            refs.split('\n').filter(r => r.trim()).forEach(r => { h += `<p>${esc(r.trim())}</p>`; });
+            return h + `</div>`;
+        }
+        default: return '';
     }
 }
 
-titleInput.addEventListener('input', updatePreview);
-dateInput.addEventListener('input', updatePreview);
-categoryInput.addEventListener('input', updatePreview);
-markdownInput.addEventListener('input', updatePreview);
-
-// Show toast
-function showToast(message) {
-    const toast = document.getElementById('toast');
-    toast.textContent = message;
-    toast.classList.add('show');
-    setTimeout(() => toast.classList.remove('show'), 2000);
-}
-
-// Copy HTML
-function copyHTML() {
-    const html = generateFullHTML();
-    navigator.clipboard.writeText(html).then(() => {
-        showToast('HTML copied to clipboard!');
+function buildTable(caption, data) {
+    if (!data) return '';
+    const rows = data.split('\n').filter(r => r.trim());
+    if (rows.length === 0) return '';
+    let h = `<table>`;
+    if (caption) h += `<caption>${esc(caption)}</caption>`;
+    rows.forEach((row, i) => {
+        const cells = row.split('|').map(c => c.trim());
+        if (i === 0) {
+            h += `<thead><tr>${cells.map(c => `<th>${esc(c)}</th>`).join('')}</tr></thead><tbody>`;
+        } else {
+            h += `<tr>${cells.map(c => {
+                let cls = '';
+                let text = c;
+                if (text.startsWith('***') && text.endsWith('***')) {
+                    text = text.slice(3, -3);
+                    return `<td class="sig">${esc(text)}</td>`;
+                }
+                if (text.startsWith('**') && text.endsWith('**')) {
+                    text = text.slice(2, -2);
+                    return `<td><strong>${esc(text)}</strong></td>`;
+                }
+                return `<td>${esc(text)}</td>`;
+            }).join('')}</tr>`;
+        }
     });
+    return h + `</tbody></table>`;
 }
 
-// Download post
-function downloadPost() {
-    const html = generateFullHTML();
-    const blob = new Blob([html], { type: 'text/html' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    const filename = titleInput.value.toLowerCase().replace(/[^a-z0-9]+/g, '-') || 'post';
-    a.href = url;
-    a.download = `${filename}.html`;
-    a.click();
-    URL.revokeObjectURL(url);
-    showToast('Post downloaded!');
+// ── Helpers ──
+function val(id) { const el = document.getElementById(id); return el ? el.value : ''; }
+function esc(s) { if (!s) return ''; return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+function formatDate(d) {
+    if (!d) return '';
+    const dt = new Date(d + 'T00:00:00');
+    return dt.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: '2-digit' });
 }
 
-// Generate full HTML with blog template
-function generateFullHTML() {
-    const title = titleInput.value || 'Untitled Post';
-    const date = dateInput.value;
-    const category = categoryInput.value || 'Research';
-    const content = marked.parse(markdownInput.value);
-    const dateFormatted = date ? new Date(date).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: '2-digit' }) : '';
-    
-    return `---
+// ── Set default date ──
+document.getElementById('paperDate').valueAsDate = new Date();
+
+// ── Download Complete HTML ──
+function downloadHTML() {
+    const title = document.getElementById('paperTitle').value || 'Untitled';
+    const subtitle = document.getElementById('paperSubtitle').value;
+    const date = document.getElementById('paperDate').value;
+    const category = document.getElementById('paperCategory').value;
+    const keywords = document.getElementById('paperKeywords').value;
+    const abstract = document.getElementById('paperAbstract').value;
+    const slug = document.getElementById('paperSlug').value || 'untitled';
+    const lang = document.getElementById('paperLang').value;
+    const dateFormatted = formatDate(date);
+
+    // Collect plotly scripts
+    let plotlyScripts = '';
+    let needsPlotly = false;
+    for (const sec of sections) {
+        if (sec.type === 'plotly') {
+            needsPlotly = true;
+            const code = val(`pcode-${sec.id}`);
+            if (code) plotlyScripts += code + '\n';
+        }
+    }
+
+    // Build content HTML (unescaped for download)
+    let contentHTML = '';
+    for (const sec of sections) {
+        contentHTML += renderSectionRaw(sec);
+    }
+
+    const fullHTML = `---
 layout: null
+permalink: /research/${slug}/
+title: "${title.replace(/"/g, '\\"')}"
 ---
 <!DOCTYPE html>
-<html lang="ko">
+<html lang="${lang}">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>${title} | Ha Rim Jung</title>
-    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;500;700&family=Space+Mono:wght@400&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+    <title>${escHTML(title)} | Ha Rim Jung</title>
+    <meta property="og:type" content="article">
+    <meta property="og:title" content="${escHTML(title)}">
+    <meta property="og:description" content="${escHTML(subtitle || abstract?.substring(0, 150) || '')}">
+    <meta property="og:url" content="https://gkfla2020-bit.github.io/research/${slug}/">
+    <meta property="og:image" content="https://gkfla2020-bit.github.io/assets/og-card.png">
+    <meta property="og:site_name" content="Ha Rim Jung">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="${escHTML(title)}">
+    <meta name="twitter:image" content="https://gkfla2020-bit.github.io/assets/og-card.png">
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-83LKVW7412"><\/script>
+    <script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-83LKVW7412');<\/script>
+    <script>window.MathJax={tex:{inlineMath:[['\\\\(','\\\\)']],displayMath:[['\\\\[','\\\\]']]},svg:{fontCache:'global'}};<\/script>
+    <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js" async><\/script>
+    ${needsPlotly ? '<script src="https://cdn.plot.ly/plotly-2.27.0.min.js"><\/script>' : ''}
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;500;700&family=Space+Mono:wght@400&family=Inter:wght@300;400&family=Nanum+Myeongjo:wght@400;700&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"><\/script>
     <style>
-* { margin: 0; padding: 0; box-sizing: border-box; }
-body { font-family: 'Inter', sans-serif; background: #fafaf8; color: #1a1a1a; line-height: 1.7; }
-.container { max-width: 800px; margin: 0 auto; padding: 60px 40px; }
-.post-header { margin-bottom: 40px; padding-bottom: 30px; border-bottom: 1px solid #e0e0e0; }
-.post-date { font-size: .7rem; color: #888; letter-spacing: .15em; text-transform: uppercase; margin-bottom: 15px; }
-.post-title { font-family: 'Cormorant Garamond', serif; font-size: 2.5rem; font-weight: 500; line-height: 1.2; margin-bottom: 15px; }
-.post-category { display: inline-block; font-size: .65rem; color: #0080c6; letter-spacing: .1em; text-transform: uppercase; padding: 4px 10px; background: rgba(0,128,198,.08); border-radius: 3px; }
-.post-body { font-family: 'Georgia', serif; font-size: 17px; line-height: 1.9; }
-.post-body h1 { font-family: 'Cormorant Garamond', serif; font-size: 2rem; font-weight: 500; margin: 50px 0 20px; padding-bottom: 10px; border-bottom: 1px solid #e0e0e0; }
-.post-body h2 { font-family: 'Cormorant Garamond', serif; font-size: 1.6rem; font-weight: 500; margin: 40px 0 15px; color: #333; }
-.post-body h3 { font-size: 1.2rem; font-weight: 600; margin: 30px 0 12px; color: #444; }
-.post-body p { margin-bottom: 20px; text-align: justify; }
-.post-body ul, .post-body ol { margin: 20px 0 20px 25px; }
-.post-body li { margin-bottom: 8px; }
-.post-body blockquote { border-left: 3px solid #0080c6; padding: 15px 20px; margin: 25px 0; background: #f8f8f8; font-style: italic; color: #555; }
-.post-body code { font-family: 'Space Mono', monospace; background: #f0f0f0; padding: 2px 6px; border-radius: 3px; font-size: .9em; }
-.post-body pre { background: #1e1e1e; color: #e0e0e0; padding: 20px; border-radius: 5px; overflow-x: auto; margin: 25px 0; }
-.post-body pre code { background: none; padding: 0; color: inherit; }
-.post-body strong { font-weight: 600; }
-.post-body a { color: #0080c6; text-decoration: none; border-bottom: 1px solid rgba(0,128,198,.3); }
-.post-body a:hover { border-bottom-color: #0080c6; }
-.post-body img { max-width: 100%; height: auto; margin: 25px 0; border-radius: 5px; }
-.post-body table { width: 100%; border-collapse: collapse; margin: 25px 0; font-size: .9rem; }
-.post-body th, .post-body td { padding: 12px; border: 1px solid #e0e0e0; text-align: left; }
-.post-body th { background: #f5f5f5; font-weight: 600; }
-.back-link { display: inline-block; margin-top: 40px; font-size: .85rem; color: #888; text-decoration: none; }
-.back-link:hover { color: #0080c6; }
+        *{margin:0;padding:0;box-sizing:border-box}
+        body{font-family:'Inter',sans-serif;background:#fafaf8;color:#1a1a1a;line-height:1.7;overflow-x:hidden}
+        .formula-bg{position:fixed;inset:0;pointer-events:none;z-index:0;overflow:hidden}
+        .f{position:absolute;font-family:'Space Mono',monospace;white-space:nowrap;will-change:transform;transition:transform .3s ease-out}
+        .sidebar{position:fixed;left:0;top:0;width:280px;height:100vh;background:rgba(255,255,255,.97);backdrop-filter:blur(10px);border-right:1px solid rgba(0,0,0,.06);padding:40px 30px;z-index:100;overflow-y:auto;display:flex;flex-direction:column}
+        .sidebar-profile{text-align:center;margin-bottom:35px;padding-bottom:30px;border-bottom:1px solid rgba(0,0,0,.08)}
+        .profile-photo{width:120px;height:120px;border-radius:50%;object-fit:cover;margin-bottom:18px;border:3px solid #f0f0f0;background:#e8e8e8}
+        .profile-name{font-family:'Cormorant Garamond',serif;font-size:1.5rem;font-weight:500;color:#1a1a1a;margin-bottom:6px;letter-spacing:.03em}
+        .profile-title{font-size:.75rem;color:#888;letter-spacing:.08em;text-transform:uppercase;margin-bottom:12px}
+        .profile-bio{font-size:.82rem;color:#666;line-height:1.6;margin-bottom:15px}
+        .profile-links{display:flex;justify-content:center;gap:15px}
+        .profile-links a{font-size:.7rem;color:#999;text-decoration:none;letter-spacing:.05em;transition:color .2s}
+        .profile-links a:hover{color:#0080c6}
+        .sidebar-nav{flex:1}
+        .nav-section{margin-bottom:25px}
+        .nav-section-title{font-size:.65rem;font-weight:600;color:#aaa;letter-spacing:.15em;text-transform:uppercase;margin-bottom:12px}
+        .nav-list{list-style:none}
+        .nav-list li{margin-bottom:8px}
+        .nav-list a{font-size:.85rem;color:#555;text-decoration:none;transition:all .2s;display:flex;align-items:center;gap:8px;padding:6px 0}
+        .nav-list a:hover{color:#0080c6;padding-left:5px}
+        .nav-list a.active{color:#0080c6;font-weight:500;padding-left:8px;border-left:2px solid #0080c6}
+        .sidebar-footer{padding-top:20px;border-top:1px solid rgba(0,0,0,.06);font-size:.7rem;color:#aaa;text-align:center}
+        .nav-toggle{display:none}
+        .main-wrapper{margin-left:280px;margin-right:260px;min-height:100vh}
+        .container{position:relative;z-index:1;max-width:900px;margin:0 auto;padding:50px 40px 80px}
+        .right-sidebar{position:fixed;right:0;top:0;width:260px;height:100vh;background:rgba(255,255,255,.97);backdrop-filter:blur(10px);border-left:1px solid rgba(0,0,0,.06);padding:30px 20px;z-index:100;overflow-y:auto}
+        .widget-title{font-size:.65rem;font-weight:600;color:#aaa;letter-spacing:.15em;text-transform:uppercase;margin-bottom:15px}
+        .market-item{display:flex;justify-content:space-between;align-items:center;padding:12px 0;border-bottom:1px solid rgba(0,0,0,.05)}
+        .market-item:last-child{border-bottom:none}
+        .market-name{font-size:.75rem;color:#666}
+        .market-value{font-family:'Space Mono',monospace;font-size:.85rem;font-weight:500;color:#1a1a1a}
+        .market-change{font-family:'Space Mono',monospace;font-size:.7rem;margin-left:8px}
+        .market-change.up{color:#16a34a}
+        .market-change.down{color:#dc2626}
+        .widget-section{margin-bottom:30px}
+        .widget-update{font-size:.6rem;color:#bbb;text-align:center;margin-top:10px}
+        .market-group{background:rgba(0,0,0,.02);padding:15px;margin-bottom:15px;border-left:2px solid #e0e0e0}
+        .market-group-title{font-size:.6rem;color:#999;letter-spacing:.1em;text-transform:uppercase;margin-bottom:10px}
+        .breadcrumb{font-size:.7rem;color:#999;letter-spacing:.06em;margin-bottom:30px;padding-bottom:15px;border-bottom:1px solid rgba(0,0,0,.05)}
+        .breadcrumb a{color:#888;text-decoration:none;transition:color .2s}
+        .breadcrumb a:hover{color:#0080c6}
+        .bc-sep{margin:0 6px;color:#ccc}
+        .bc-current{color:#555;font-weight:500}
+        .paper-content{font-family:'Times New Roman','Nanum Myeongjo',serif;line-height:1.9;background:#fff;padding:45px 50px;border-radius:8px;box-shadow:0 2px 20px rgba(0,0,0,.05);font-size:15px}
+        .paper-header{text-align:center;margin-bottom:40px;padding-bottom:30px;border-bottom:2px solid #333}
+        .paper-category{font-size:11px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:#0080c6;margin-bottom:15px;font-family:'Inter',sans-serif}
+        .paper-title{font-family:'Cormorant Garamond','Nanum Myeongjo',serif;font-size:26px;font-weight:700;margin-bottom:12px;line-height:1.35}
+        .paper-subtitle{font-family:'Cormorant Garamond',serif;font-size:15px;color:#666;font-style:italic;margin-bottom:15px}
+        .paper-author{font-size:14px;color:#444;margin-bottom:5px}
+        .paper-date{font-size:12px;color:#999}
+        .abstract{background:linear-gradient(135deg,#f8f9fa,#edf2f4);border-left:4px solid #1d3557;padding:25px 30px;margin:30px 0;border-radius:0 6px 6px 0;font-size:13.5px;line-height:1.8;color:#333}
+        .abstract-title{font-family:'Inter',sans-serif;font-size:11px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:#1d3557;margin-bottom:10px}
+        .keywords{background:#fafafa;padding:12px 20px;border-radius:6px;font-size:13px;color:#555;margin-bottom:30px}
+        .keywords strong{color:#1d3557}
+        h2{font-family:'Cormorant Garamond','Nanum Myeongjo',serif;font-size:1.5em;font-weight:700;color:#1d3557;margin:40px 0 15px;padding-bottom:8px;border-bottom:1px solid #e0e0e0}
+        h3{font-family:'Cormorant Garamond','Nanum Myeongjo',serif;font-size:1.2em;font-weight:600;color:#2c3e50;margin:30px 0 12px}
+        p{text-align:justify;text-indent:2em;margin-bottom:12px}
+        p.no-indent{text-indent:0}
+        .hypothesis{background:linear-gradient(135deg,#f8f9fa,#fff);border-left:3px solid #e63946;padding:15px 20px;margin:12px 0;border-radius:0 6px 6px 0}
+        .hypothesis strong{color:#e63946}
+        .vasicek-highlight{background:linear-gradient(135deg,#457b9d15,#1d355710);border:1px solid #457b9d40;border-radius:8px;padding:20px 25px;margin:20px 0}
+        .vasicek-highlight h4{color:#1d3557;font-family:'Inter',sans-serif;font-size:13px;font-weight:600;margin-bottom:10px}
+        table{width:100%;border-collapse:collapse;margin:20px 0;font-size:12.5px}
+        table caption{font-weight:700;text-align:left;margin-bottom:8px;font-size:13.5px;color:#1d3557}
+        thead th{background:#1d3557;color:white;padding:10px;font-weight:600;font-size:11.5px;text-align:center;white-space:nowrap}
+        tbody td{padding:7px 10px;border-bottom:1px solid #eee;text-align:center}
+        tbody tr:nth-child(even){background:#fafafa}
+        tbody tr:hover{background:#f0f4ff}
+        .sig{color:#e63946;font-weight:700}
+        .note{font-size:11.5px;color:#777;margin-top:5px;font-style:italic}
+        .chart-container{margin:25px 0;text-align:center}
+        .chart-container img{max-width:100%;border-radius:6px;box-shadow:0 2px 10px rgba(0,0,0,.1)}
+        .chart-caption{font-size:12px;color:#666;margin-top:8px;font-style:italic}
+        .plotly-chart{width:100%;min-height:400px;margin:20px 0}
+        .math-block{margin:15px 0;padding:10px 0;text-align:center;overflow-x:auto}
+        .section-divider{text-align:center;margin:40px 0;color:#ccc;font-size:18px;letter-spacing:10px}
+        .references{font-size:12.5px;line-height:1.7}
+        .references p{text-indent:-2em;padding-left:2em;margin-bottom:6px}
+        code{background:#f4f4f4;padding:2px 6px;border-radius:3px;font-family:'Space Mono',monospace;font-size:13px}
+        pre{background:#1a1a2e;color:#e8e8e8;padding:20px;border-radius:6px;overflow-x:auto;margin:15px 0;font-family:'Space Mono',monospace;font-size:13px;line-height:1.6}
+        @media(max-width:1024px){
+            .sidebar{width:100%;height:auto;position:relative;border-right:none;border-bottom:1px solid rgba(0,0,0,.08);padding:25px 20px}
+            .sidebar-profile{margin-bottom:20px;padding-bottom:20px;display:flex;align-items:center;gap:15px;text-align:left}
+            .profile-photo{width:60px;height:60px;margin-bottom:0}
+            .profile-bio{display:none}
+            .nav-section{display:inline-block;margin-right:20px;margin-bottom:10px}
+            .nav-list{display:flex;gap:12px;flex-wrap:wrap}.nav-list li{margin-bottom:0}
+            .sidebar-footer{display:none}
+            .nav-extra{display:none}.sidebar-nav.expanded .nav-extra{display:inline-block}
+            .nav-toggle{display:inline-block;padding:8px 14px;background:none;border:1px solid #ddd;border-radius:6px;font-size:.75rem;color:#888;cursor:pointer;letter-spacing:.05em;margin-bottom:10px;font-family:'Inter',sans-serif}
+            .main-wrapper{margin-left:0;margin-right:0}
+            .right-sidebar{display:none}
+            .container{padding:20px 0}
+            .paper-content{padding:25px 18px;border-radius:0;box-shadow:none;font-size:14px}
+            .paper-title{font-size:20px}
+            h2{font-size:1.3em;margin:30px 0 12px}
+            p{text-indent:1.5em;text-align:left;font-size:14px}
+            table{font-size:10px;display:block;overflow-x:auto}
+            .chart-container img{border-radius:0}
+            .breadcrumb{margin-bottom:20px;padding-bottom:10px;font-size:.65rem}
+            .nav-list a{padding:8px 14px;background:#f5f5f5;border-radius:6px;font-weight:500;border:1px solid #e0e0e0;font-size:.8rem}
+            .nav-list a.active{background:#1a1a1a;color:#fff;border-color:#1a1a1a;border-left:none;padding-left:14px}
+            .nav-list a:hover{padding-left:14px}
+        }
+        @media print{.sidebar{display:none}.right-sidebar{display:none}.main-wrapper{margin:0}.paper-content{box-shadow:none;padding:15mm 20mm}}
     </style>
 </head>
 <body>
+<img src="/assets/og-card.png" alt="" style="position:absolute;width:1px;height:1px;opacity:0;pointer-events:none;" aria-hidden="true">
+<div class="formula-bg" id="formulaBg"></div>
+
+{% include sidebar.html %}
+{% include market-widget.html %}
+
+<div class="main-wrapper">
 <div class="container">
-    <div class="post-header">
-        <div class="post-date">${dateFormatted}</div>
-        <h1 class="post-title">${title}</h1>
-        <span class="post-category">${category}</span>
-    </div>
-    <div class="post-body">
-${content}
-    </div>
-    <a href="/" class="back-link">← Back to Home</a>
+{% include breadcrumb.html %}
+<div class="paper-content">
+
+<div class="paper-header">
+    <div class="paper-category">${escHTML(category)}</div>
+    <h1 class="paper-title">${escHTML(title)}</h1>
+    ${subtitle ? `<div class="paper-subtitle">${escHTML(subtitle)}</div>` : ''}
+    <div class="paper-author">Ha Rim Jung</div>
+    <div class="paper-date">${dateFormatted}</div>
 </div>
+
+${abstract ? `<div class="abstract"><div class="abstract-title">Abstract</div>${escHTML(abstract)}</div>` : ''}
+${keywords ? `<div class="keywords"><strong>Keywords:</strong> ${escHTML(keywords)}</div>` : ''}
+
+${contentHTML}
+
+</div>
+</div>
+</div>
+
+<!-- Floating Formulas -->
+<script>
+(function(){const f=document.getElementById('formulaBg');if(!f)return;const formulas=['dr(t)=\\u03BA(\\u03B8-r)dt+\\u03C3dW','\\u0394S=\\u03BCdt+\\u03C3dW','E[r]=\\u03B8','\\u03C3\\u00B2=var(dW)','P(t,T)=e^{-r(T-t)}','\\u03B2=Cov/Var','Sharpe=(\\u03BC-r)/\\u03C3','VaR_{95}','\\u03C1_{ij}','H: \\u03B1=0','R\\u00B2','\\u2202V/\\u2202t','N(d1)','\\u222Bf(x)dx','\\u03A3w_i=1'];const n=window.innerWidth<768?8:15;for(let i=0;i<n;i++){const el=document.createElement('div');el.className='f';el.textContent=formulas[Math.floor(Math.random()*formulas.length)];const size=8+Math.random()*10;el.style.cssText='font-size:'+size+'px;color:rgba(0,0,0,'+(0.02+Math.random()*0.03)+');left:'+Math.random()*100+'%;top:'+Math.random()*100+'%;transform:rotate('+(Math.random()*20-10)+'deg)';f.appendChild(el)}})();
+<\/script>
+
+${needsPlotly ? `<script>\n${plotlyScripts}<\/script>` : ''}
+
+{% include market-data.html %}
 </body>
 </html>`;
+
+    // Download
+    const blob = new Blob([fullHTML], { type: 'text/html;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'index.html';
+    a.click();
+    URL.revokeObjectURL(url);
+    toast('HTML downloaded! Place in research/' + slug + '/');
 }
 
-// Initial preview
-updatePreview();
+function escHTML(s) {
+    if (!s) return '';
+    return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+// Raw render (for download - no escaping of user HTML)
+function renderSectionRaw(sec) {
+    const { id, type } = sec;
+    switch (type) {
+        case 'heading': {
+            const level = val(`hlevel-${id}`) || '2';
+            const text = val(`htext-${id}`);
+            return `\n<h${level}>${text}</h${level}>\n`;
+        }
+        case 'paragraph': {
+            const text = val(`ptext-${id}`);
+            return text.split('\n\n').map(p => `<p>${p.trim()}</p>`).join('\n') + '\n';
+        }
+        case 'math': {
+            const tex = val(`mtext-${id}`);
+            return `\n<div class="math-block">\\[${tex}\\]</div>\n`;
+        }
+        case 'chart-img': {
+            const src = val(`cimg-${id}`);
+            const cap = val(`ccap-${id}`);
+            let h = `\n<div class="chart-container"><img src="${src}" alt="${cap || 'Chart'}" loading="lazy">`;
+            if (cap) h += `<div class="chart-caption">${cap}</div>`;
+            return h + `</div>\n`;
+        }
+        case 'plotly': {
+            const divId = val(`pid-${id}`) || 'chart' + id;
+            return `\n<div id="${divId}" class="plotly-chart"></div>\n`;
+        }
+        case 'table': {
+            const cap = val(`tcap-${id}`);
+            const data = val(`tdata-${id}`);
+            return '\n' + buildTableRaw(cap, data) + '\n';
+        }
+        case 'code': {
+            const code = val(`ccode-${id}`);
+            return `\n<pre><code>${escHTML(code)}</code></pre>\n`;
+        }
+        case 'hypothesis': {
+            const label = val(`hlabel-${id}`);
+            const body = val(`hbody-${id}`);
+            return `\n<div class="hypothesis"><strong>${label}:</strong> ${body}</div>\n`;
+        }
+        case 'highlight': {
+            const t = val(`htitle-${id}`);
+            const c = val(`hcontent-${id}`);
+            return `\n<div class="vasicek-highlight"><h4>${t}</h4><p class="no-indent">${c}</p></div>\n`;
+        }
+        case 'divider':
+            return `\n<div class="section-divider">&middot; &middot; &middot; &middot; &middot;</div>\n`;
+        case 'references': {
+            const refs = val(`refs-${id}`);
+            let h = `\n<h2>References</h2>\n<div class="references">\n`;
+            refs.split('\n').filter(r => r.trim()).forEach(r => { h += `<p>${r.trim()}</p>\n`; });
+            return h + `</div>\n`;
+        }
+        default: return '';
+    }
+}
+
+function buildTableRaw(caption, data) {
+    if (!data) return '';
+    const rows = data.split('\n').filter(r => r.trim());
+    if (rows.length === 0) return '';
+    let h = `<table>`;
+    if (caption) h += `\n<caption>${caption}</caption>`;
+    rows.forEach((row, i) => {
+        const cells = row.split('|').map(c => c.trim());
+        if (i === 0) {
+            h += `\n<thead><tr>${cells.map(c => `<th>${c}</th>`).join('')}</tr></thead>\n<tbody>`;
+        } else {
+            h += `\n<tr>${cells.map(c => {
+                if (c.startsWith('***') && c.endsWith('***')) return `<td class="sig">${c.slice(3,-3)}</td>`;
+                if (c.startsWith('**') && c.endsWith('**')) return `<td><strong>${c.slice(2,-2)}</strong></td>`;
+                return `<td>${c}</td>`;
+            }).join('')}</tr>`;
+        }
+    });
+    return h + `\n</tbody></table>`;
+}
 </script>
 </body>
 </html>
