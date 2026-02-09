@@ -41,17 +41,54 @@ layout: null
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
 html,body{overscroll-behavior:none;-webkit-overflow-scrolling:touch}
-body{font-family:'Inter',sans-serif;background:#08080c;color:#fff;overflow:hidden;position:fixed;width:100%;height:100%}
+body{font-family:'Inter',sans-serif;background:#06060a;color:#fff;overflow:hidden;position:fixed;width:100%;height:100%}
 body.entered{overflow:auto;background:#fafaf8;overscroll-behavior-y:none;position:relative;height:auto}
-#intro{position:fixed;inset:0;z-index:9999;background:#08080c}
+#intro{position:fixed;inset:0;z-index:9999;background:#06060a}
 
+/* Vignette overlay for depth */
+#intro::after{
+    content:'';
+    position:absolute;
+    inset:0;
+    background:radial-gradient(ellipse at center,transparent 40%,rgba(4,4,8,.6) 100%);
+    pointer-events:none;
+    z-index:2;
+}
+
+/* Subtle radial glow behind center */
+#intro::before{
+    content:'';
+    position:absolute;
+    top:50%;left:50%;
+    width:600px;height:600px;
+    transform:translate(-50%,-50%);
+    background:radial-gradient(circle,rgba(100,140,255,.06) 0%,transparent 70%);
+    pointer-events:none;
+    z-index:1;
+    animation:glowPulse 6s ease-in-out infinite;
+}
+@keyframes glowPulse{
+    0%,100%{opacity:.6;transform:translate(-50%,-50%) scale(1)}
+    50%{opacity:1;transform:translate(-50%,-50%) scale(1.15)}
+}
+
+/* Floating formula symbols */
 .f{
     position:absolute;
     font-family:'Space Mono',monospace;
     white-space:nowrap;
     pointer-events:none;
-    will-change:transform;
-    transition:transform .3s ease-out;
+    will-change:transform,opacity;
+    transition:transform .4s cubic-bezier(.25,.46,.45,.94), color .6s ease, text-shadow .6s ease;
+}
+
+/* Thin horizontal rule accent */
+.intro-line{
+    width:0;
+    height:1px;
+    background:linear-gradient(90deg,transparent,rgba(255,255,255,.3),transparent);
+    margin:0 auto 28px;
+    opacity:0;
 }
 
 #introCenter{
@@ -65,48 +102,93 @@ body.entered{overflow:auto;background:#fafaf8;overscroll-behavior-y:none;positio
     font-family:'Cormorant Garamond',serif;
     font-size:clamp(2.8rem,7vw,5.5rem);
     font-weight:300;
-    letter-spacing:.18em;
+    letter-spacing:.22em;
     color:#fff;
     opacity:0;
-    margin-bottom:20px;
+    margin-bottom:8px;
+    text-shadow:0 0 60px rgba(140,170,255,.08);
+    animation:nameBreathe 8s ease-in-out infinite;
+    animation-delay:2s;
+}
+@keyframes nameBreathe{
+    0%,100%{letter-spacing:.22em;text-shadow:0 0 60px rgba(140,170,255,.08)}
+    50%{letter-spacing:.24em;text-shadow:0 0 80px rgba(140,170,255,.12)}
 }
 .intro-sub{
     font-family:'Space Mono',monospace;
     font-size:11px;
-    color:rgba(255,255,255,.4);
-    letter-spacing:.25em;
+    color:rgba(255,255,255,.35);
+    letter-spacing:.3em;
     text-transform:uppercase;
     opacity:0;
     margin-bottom:40px;
 }
 .enter-btn{
-    padding:14px 42px;
+    padding:14px 48px;
     background:transparent;
-    border:1px solid rgba(255,255,255,.25);
+    border:1px solid rgba(255,255,255,.15);
+    border-radius:2px;
     cursor:pointer;
     pointer-events:auto;
-    transition:all .3s;
+    transition:all .4s cubic-bezier(.25,.46,.45,.94);
     opacity:0;
+    position:relative;
+    overflow:hidden;
+}
+.enter-btn::before{
+    content:'';
+    position:absolute;
+    inset:0;
+    background:linear-gradient(120deg,transparent 30%,rgba(255,255,255,.04) 50%,transparent 70%);
+    transform:translateX(-100%);
+    transition:transform .6s;
+}
+.enter-btn:hover::before{
+    transform:translateX(100%);
 }
 .enter-btn:hover{
-    border-color:rgba(255,255,255,.6);
-    background:rgba(255,255,255,.05);
+    border-color:rgba(255,255,255,.45);
+    box-shadow:0 0 30px rgba(140,170,255,.08),0 0 60px rgba(140,170,255,.03);
+    transform:scale(1.03);
 }
 .enter-text{
     font-family:'Space Mono',monospace;
     font-size:10px;
-    color:rgba(255,255,255,.8);
-    letter-spacing:.2em;
+    color:rgba(255,255,255,.7);
+    letter-spacing:.25em;
+}
+
+/* Scroll hint at bottom */
+.intro-hint{
+    position:absolute;
+    bottom:40px;
+    left:50%;
+    transform:translateX(-50%);
+    font-family:'Space Mono',monospace;
+    font-size:9px;
+    color:rgba(255,255,255,.15);
+    letter-spacing:.15em;
+    opacity:0;
+    z-index:10;
+    animation:hintFade 3s ease-in-out infinite;
+    animation-delay:2.5s;
+}
+@keyframes hintFade{
+    0%,100%{opacity:0;transform:translateX(-50%) translateY(0)}
+    50%{opacity:1;transform:translateX(-50%) translateY(-4px)}
 }
 </style>
 
 <div id="intro">
+    <canvas id="gridCanvas"></canvas>
     <div id="fLayer"></div>
     <div id="introCenter">
         <h1 class="intro-name">HA RIM JUNG</h1>
+        <div class="intro-line"></div>
         <p class="intro-sub">Quantitative Finance Researcher</p>
         <button class="enter-btn" id="enterBtn"><span class="enter-text">ENTER</span></button>
     </div>
+    <div class="intro-hint">click enter to continue</div>
 </div>
 
 <style>
@@ -538,6 +620,65 @@ section{padding:80px 50px;max-width:900px;margin:0 auto}
 </div>
 
 <script>
+/* ── Grid Canvas Background with Interactive Nodes ── */
+const gridCanvas = document.getElementById('gridCanvas');
+gridCanvas.style.cssText = 'position:absolute;inset:0;z-index:0;pointer-events:none;';
+const gCtx = gridCanvas.getContext('2d');
+function resizeGrid(){gridCanvas.width=window.innerWidth;gridCanvas.height=window.innerHeight;}
+resizeGrid();
+window.addEventListener('resize',resizeGrid);
+
+function drawGrid(){
+    const w=gridCanvas.width, h=gridCanvas.height;
+    gCtx.clearRect(0,0,w,h);
+    const gap=80;
+
+    // Base grid lines
+    gCtx.strokeStyle='rgba(255,255,255,.015)';
+    gCtx.lineWidth=1;
+    for(let x=0;x<w;x+=gap){gCtx.beginPath();gCtx.moveTo(x,0);gCtx.lineTo(x,h);gCtx.stroke();}
+    for(let y=0;y<h;y+=gap){gCtx.beginPath();gCtx.moveTo(0,y);gCtx.lineTo(w,y);gCtx.stroke();}
+
+    // Interactive node glow near mouse
+    for(let x=0;x<w;x+=gap){
+        for(let y=0;y<h;y+=gap){
+            const dx=x-mouse.x, dy=y-mouse.y;
+            const dist=Math.sqrt(dx*dx+dy*dy);
+            if(dist<250){
+                const intensity=1-dist/250;
+                gCtx.beginPath();
+                gCtx.arc(x,y,2+intensity*2,0,Math.PI*2);
+                gCtx.fillStyle=`rgba(140,180,255,${intensity*0.25})`;
+                gCtx.fill();
+                // Connection lines between nearby lit nodes
+                if(dist<180){
+                    gCtx.strokeStyle=`rgba(140,180,255,${intensity*0.06})`;
+                    gCtx.lineWidth=1;
+                    gCtx.beginPath();
+                    gCtx.moveTo(x,y);
+                    gCtx.lineTo(x+gap,y);
+                    gCtx.stroke();
+                    gCtx.beginPath();
+                    gCtx.moveTo(x,y);
+                    gCtx.lineTo(x,y+gap);
+                    gCtx.stroke();
+                }
+            }
+        }
+    }
+}
+
+let gridRunning = true;
+function gridLoop(){
+    if(!gridRunning) return;
+    drawGrid();
+    requestAnimationFrame(gridLoop);
+}
+// Skip animated grid on mobile for performance
+// (isMobile defined below, defer this call)
+let gridStarted = false;
+
+/* ── Floating Symbols ── */
 const syms = [
     'Σ','∫','∂','√','∞','π','θ','σ','μ','λ','α','β','γ','δ','Δ','Γ','Ω','ε',
     'dx','dt','dW','dS','dr','κ','ρ','φ','ψ','ω','τ','ν','η',
@@ -550,29 +691,23 @@ const W = window.innerWidth, H = window.innerHeight;
 const fLayer = document.getElementById('fLayer');
 const mouse = { x: W/2, y: H/2 };
 const items = [];
-
-// 모바일 감지 - 화면 너비 768px 이하면 모바일
 const isMobile = W <= 768;
 
-// 모바일: 15개, 데스크탑: 50개
-const symbolCount = isMobile ? 15 : 50;
-
-// 모바일용 핵심 수식만 선별
-const mobileSyms = ['∫', '∂', 'Σ', 'π', 'σ', 'μ', 'β', 'α', 'dW', 'E[X]', '√', '∞', 'Δ', 'θ', 'λ'];
+// Now start grid (deferred until isMobile is defined)
+if(!gridStarted){ gridStarted=true; if(!isMobile) gridLoop(); else drawGrid(); }
+const symbolCount = isMobile ? 18 : 55;
+const mobileSyms = ['∫','∂','Σ','π','σ','μ','β','α','dW','E[X]','√','∞','Δ','θ','λ','dx','Ω','ε'];
 
 for (let i = 0; i < symbolCount; i++) {
     const el = document.createElement('div');
     el.className = 'f';
-    
-    // 모바일은 선별된 수식, 데스크탑은 전체
     const symbolSet = isMobile ? mobileSyms : syms;
     el.textContent = symbolSet[Math.floor(Math.random() * symbolSet.length)];
 
-    // 모바일: 더 크고 선명하게, 데스크탑: 기존 유지
-    const size = isMobile ? (28 + Math.random() * 24) : (18 + Math.random() * 30);
-    const opacity = isMobile ? (0.25 + Math.random() * 0.2) : (0.15 + Math.random() * 0.25);
+    const size = isMobile ? (26 + Math.random() * 22) : (16 + Math.random() * 28);
+    const opacity = isMobile ? (0.12 + Math.random() * 0.18) : (0.06 + Math.random() * 0.18);
     el.style.fontSize = size + 'px';
-    el.style.color = `rgba(255,255,255,${opacity})`;
+    el.style.color = `rgba(180,200,255,${opacity})`;
 
     const x = Math.random() * W;
     const y = Math.random() * H;
@@ -581,48 +716,61 @@ for (let i = 0; i < symbolCount; i++) {
 
     fLayer.appendChild(el);
 
-    // 모바일: 더 느리게 움직임
-    const speed = isMobile ? 0.2 : 0.4;
+    const speed = isMobile ? 0.15 : 0.3;
+    // Start invisible for staggered entrance
+    el.style.opacity = '0';
     items.push({
         el, x, y, ox: x, oy: y,
         vx: (Math.random() - 0.5) * speed,
         vy: (Math.random() - 0.5) * speed,
+        baseOpacity: opacity,
         size
     });
 }
 
-// 마우스 트래킹
+// Staggered symbol entrance
+items.forEach((it, i) => {
+    gsap.to(it.el, {
+        opacity: 1,
+        duration: 0.6,
+        delay: 0.1 + i * 0.03,
+        ease: 'power1.out'
+    });
+});
+
 document.addEventListener('mousemove', e => {
     mouse.x = e.clientX;
     mouse.y = e.clientY;
 });
 
-// 애니메이션 루프 - 둥둥 떠다니기 + 마우스 밀어내기
 let running = true;
 function tick() {
     if (!running) return;
     for (const it of items) {
-        // 기본 떠다니기
         it.x += it.vx;
         it.y += it.vy;
 
-        // 벽 바운스
-        if (it.x < -50) it.x = W + 50;
-        if (it.x > W + 50) it.x = -50;
-        if (it.y < -50) it.y = H + 50;
-        if (it.y > H + 50) it.y = -50;
+        if (it.x < -60) it.x = W + 60;
+        if (it.x > W + 60) it.x = -60;
+        if (it.y < -60) it.y = H + 60;
+        if (it.y > H + 60) it.y = -60;
 
-        // 마우스 인터랙션 - 밀어내기
         const dx = it.x - mouse.x;
         const dy = it.y - mouse.y;
         const dist = Math.sqrt(dx * dx + dy * dy);
-        const radius = 150;
+        const radius = 180;
 
         let pushX = 0, pushY = 0;
         if (dist < radius && dist > 0) {
-            const force = (radius - dist) / radius * 40;
+            const force = (radius - dist) / radius * 50;
             pushX = (dx / dist) * force;
             pushY = (dy / dist) * force;
+            // Glow up symbols near cursor
+            it.el.style.color = `rgba(180,210,255,${Math.min(it.baseOpacity * 3, 0.5)})`;
+            it.el.style.textShadow = `0 0 12px rgba(140,180,255,.3)`;
+        } else {
+            it.el.style.color = `rgba(180,200,255,${it.baseOpacity})`;
+            it.el.style.textShadow = 'none';
         }
 
         it.el.style.transform = `translate(${pushX}px, ${pushY}px)`;
@@ -633,47 +781,54 @@ function tick() {
 }
 tick();
 
-// 인트로 애니메이션
-gsap.set('.intro-name', { opacity: 0, y: 15 });
-gsap.set('.intro-sub', { opacity: 0 });
-gsap.set('.enter-btn', { opacity: 0, y: 10 });
+/* ── Intro Timeline ── */
+gsap.set('.intro-name', { opacity: 0, y: 20, scale: 0.97 });
+gsap.set('.intro-line', { opacity: 0, width: 0 });
+gsap.set('.intro-sub', { opacity: 0, y: 8 });
+gsap.set('.enter-btn', { opacity: 0, y: 12 });
 
-gsap.timeline({ delay: 0.3 })
-    .to('.intro-name', { opacity: 1, y: 0, duration: 0.8, ease: 'power2.out' })
-    .to('.intro-sub', { opacity: 1, duration: 0.5 }, '-=0.3')
-    .to('.enter-btn', { opacity: 1, y: 0, duration: 0.4 }, '-=0.2');
+gsap.timeline({ delay: 0.5 })
+    .to('.intro-name', { opacity: 1, y: 0, scale: 1, duration: 1, ease: 'power3.out' })
+    .to('.intro-line', { opacity: 1, width: '80px', duration: 0.6, ease: 'power2.inOut' }, '-=0.4')
+    .to('.intro-sub', { opacity: 1, y: 0, duration: 0.6, ease: 'power2.out' }, '-=0.3')
+    .to('.enter-btn', { opacity: 1, y: 0, duration: 0.5, ease: 'power2.out' }, '-=0.2')
+    .to('.intro-hint', { opacity: 1, duration: 0.4 }, '-=0.1');
 
-// 엔터
+/* ── Enter Transition ── */
 document.getElementById('enterBtn').addEventListener('click', () => {
     running = false;
+    gridRunning = false;
+
     gsap.timeline()
-        .to('.f', { opacity: 0, duration: 0.3 })
-        .to(['.intro-name','.intro-sub','.enter-btn'], { opacity: 0, y: -15, duration: 0.25, stagger: 0.03 }, '-=0.2')
-        .to('#intro', { opacity: 0, duration: 0.3 })
+        .to('.intro-hint', { opacity: 0, duration: 0.15 })
+        .to('.f', { opacity: 0, scale: 0.8, duration: 0.5, stagger: { amount: 0.25, from: 'random' }, ease: 'power2.in' })
+        .to('.intro-line', { width: 0, opacity: 0, duration: 0.3 }, '-=0.35')
+        .to('.intro-name', { opacity: 0, y: -25, scale: 0.96, duration: 0.4, ease: 'power2.in' }, '-=0.25')
+        .to(['.intro-sub','.enter-btn'], {
+            opacity: 0, y: -18, duration: 0.3, stagger: 0.05, ease: 'power2.in'
+        }, '-=0.2')
+        .to('#gridCanvas', { opacity: 0, duration: 0.35 }, '-=0.25')
+        .to('#intro', { opacity: 0, duration: 0.4, ease: 'power1.in' })
         .add(() => {
             document.getElementById('intro').style.display = 'none';
             document.getElementById('main').classList.add('show');
             document.body.classList.add('entered');
-            
-            // iOS Safari pull-to-refresh 방지
+
             let lastY = 0;
             document.addEventListener('touchstart', function(e) {
                 lastY = e.touches[0].clientY;
             }, { passive: true });
-            
             document.addEventListener('touchmove', function(e) {
                 const y = e.touches[0].clientY;
                 const scrollTop = window.scrollY || document.documentElement.scrollTop;
-                
-                // 맨 위에서 아래로 당기는 경우만 막음
-                if (scrollTop <= 0 && y > lastY) {
-                    e.preventDefault();
-                }
+                if (scrollTop <= 0 && y > lastY) e.preventDefault();
             }, { passive: false });
-            
-            gsap.to('.hero-content', { opacity: 1, y: 0, duration: 0.5 });
-            gsap.to('.section-title', { opacity: 1, y: 0, duration: 0.4, delay: 0.1 });
-            gsap.to('.post-item', { opacity: 1, y: 0, duration: 0.4, delay: 0.15 });
+
+            // Cascading entrance for main content
+            const tl = gsap.timeline({ defaults: { ease: 'power3.out' } });
+            tl.to('.hero-content', { opacity: 1, y: 0, duration: 0.7 })
+              .to('.section-title', { opacity: 1, y: 0, duration: 0.5, stagger: 0.1 }, '-=0.3')
+              .to('.post-item', { opacity: 1, y: 0, duration: 0.45, stagger: 0.07 }, '-=0.2');
         });
 });
 
