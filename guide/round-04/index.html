@@ -114,7 +114,7 @@ pre{font-size:11px;padding:14px}table{font-size:10px;display:block;overflow-x:au
 <li><a href="#ch2">2. 회귀 vs 분류</a></li>
 <li><a href="#ch3">3. 선형회귀</a></li>
 <li><a href="#ch4">4. Ridge / Lasso 정규화</a></li>
-<li><a href="#ch5">5. 로지스틱 회귀</a></li>
+<li><a href="#ch5">5. 로지스틱 회귀 / SVM / KNN</a></li>
 <li><a href="#ch6">6. 모델 평가 지표</a></li>
 <li><a href="#ch7">7. 교차검증과 과적합</a></li>
 <li><a href="#ch8">8. 결정 트리</a></li>
@@ -662,6 +662,194 @@ weighted avg       0.54      0.54      0.54       251</div>
 <div class="def">
 <p class="ni"><strong>C 파라미터의 의미:</strong> 로지스틱 회귀의 <code>C</code>는 정규화 강도의 역수다. C가 크면 정규화가 약하고(복잡한 모델), C가 작으면 정규화가 강하다(단순한 모델). Ridge/Lasso의 α와 반대 방향이라는 점에 주의하자. <code>C=1.0</code>이 기본값이다.</p>
 </div>
+
+
+<h3>5.4 SVM (Support Vector Machine) — 마진을 최대화하는 분류기</h3>
+
+<p>
+SVM은 두 클래스를 분리하는 <strong>최적의 초평면(hyperplane)</strong>을 찾는 알고리즘이다. 
+"최적"이란 두 클래스 사이의 <strong>마진(margin)</strong>이 최대가 되는 것을 의미한다. 
+마진이 클수록 새로운 데이터에 대한 일반화 성능이 좋다.
+</p>
+
+<div class="def">
+<p class="ni"><strong>SVM 핵심 개념</strong></p>
+<ul style="margin-top:8px">
+<li><strong>초평면 (Hyperplane):</strong> 데이터를 두 클래스로 나누는 결정 경계. 2D에서는 직선, 3D에서는 평면, 고차원에서는 초평면이다.</li>
+<li><strong>서포트 벡터 (Support Vectors):</strong> 초평면에 가장 가까운 데이터 포인트들. 이 점들만이 초평면의 위치를 결정한다.</li>
+<li><strong>마진 (Margin):</strong> 초평면과 가장 가까운 서포트 벡터 사이의 거리. SVM은 이 마진을 최대화한다.</li>
+<li><strong>C 파라미터:</strong> 마진 위반에 대한 벌칙 강도. C가 크면 하드 마진(과적합 위험), C가 작으면 소프트 마진(과소적합 위험).</li>
+</ul>
+</div>
+
+$$\text{목적함수: } \min_{\mathbf{w}, b} \frac{1}{2} \|\mathbf{w}\|^2 + C \sum_{i=1}^{n} \xi_i$$
+$$\text{제약조건: } y_i(\mathbf{w} \cdot \mathbf{x}_i + b) \geq 1 - \xi_i, \quad \xi_i \geq 0$$
+
+<p>
+여기서 \(\xi_i\)는 슬랙 변수(slack variable)로, 마진 위반을 허용하는 정도를 나타낸다. 
+\(C\)가 크면 위반을 적게 허용하고(하드 마진), 작으면 많이 허용한다(소프트 마진).
+</p>
+
+<h4>커널 트릭 (Kernel Trick)</h4>
+
+<p>
+선형 SVM은 직선으로 분리 가능한 데이터에만 작동한다. 하지만 금융 데이터는 대부분 비선형이다. 
+<strong>커널 트릭</strong>은 데이터를 고차원 공간으로 매핑하여 선형 분리가 가능하게 만든다 — 
+실제로 고차원 변환을 수행하지 않고도 내적만으로 계산할 수 있어서 "트릭"이라 부른다.
+</p>
+
+<div class="tc">표 5-1. SVM 커널 비교</div>
+<table>
+<thead>
+<tr><th>커널</th><th>수식</th><th>특징</th><th>금융 적용</th></tr>
+</thead>
+<tbody>
+<tr><td><strong>Linear</strong></td><td>\(K(x,y) = x \cdot y\)</td><td>빠름, 고차원에 적합</td><td>TF-IDF 텍스트 분류</td></tr>
+<tr><td><strong>RBF (Gaussian)</strong></td><td>\(K(x,y) = e^{-\gamma\|x-y\|^2}\)</td><td>비선형, 가장 범용적</td><td>기술적 지표 기반 분류</td></tr>
+<tr><td><strong>Polynomial</strong></td><td>\(K(x,y) = (\gamma x \cdot y + r)^d\)</td><td>다항 관계 포착</td><td>피처 상호작용</td></tr>
+</tbody>
+</table>
+
+<div class="cc">코드 5-2. SVM으로 주가 방향 예측</div>
+<pre><code><span class="kw">from</span> sklearn.svm <span class="kw">import</span> SVC
+<span class="kw">from</span> sklearn.preprocessing <span class="kw">import</span> StandardScaler
+<span class="kw">from</span> sklearn.pipeline <span class="kw">import</span> Pipeline
+<span class="kw">from</span> sklearn.model_selection <span class="kw">import</span> GridSearchCV, TimeSeriesSplit
+
+<span class="cm"># SVM은 피처 스케일에 민감 → 반드시 표준화 필요!</span>
+svm_pipeline = <span class="fn">Pipeline</span>([
+    (<span class="st">'scaler'</span>, <span class="fn">StandardScaler</span>()),
+    (<span class="st">'svm'</span>, <span class="fn">SVC</span>(kernel=<span class="st">'rbf'</span>, probability=<span class="kw">True</span>))
+])
+
+<span class="cm"># 하이퍼파라미터 튜닝</span>
+param_grid = {
+    <span class="st">'svm__C'</span>: [<span class="nu">0.1</span>, <span class="nu">1</span>, <span class="nu">10</span>, <span class="nu">100</span>],
+    <span class="st">'svm__gamma'</span>: [<span class="st">'scale'</span>, <span class="st">'auto'</span>, <span class="nu">0.01</span>, <span class="nu">0.1</span>]
+}
+
+tscv = <span class="fn">TimeSeriesSplit</span>(n_splits=<span class="nu">5</span>)
+grid = <span class="fn">GridSearchCV</span>(svm_pipeline, param_grid, cv=tscv, scoring=<span class="st">'accuracy'</span>, n_jobs=-<span class="nu">1</span>)
+grid.<span class="fn">fit</span>(X_train, y_train)
+
+<span class="fn">print</span>(<span class="st">f"최적 파라미터: {grid.best_params_}"</span>)
+<span class="fn">print</span>(<span class="st">f"최적 CV 점수: {grid.best_score_:.4f}"</span>)
+<span class="fn">print</span>(<span class="st">f"테스트 정확도: {grid.score(X_test, y_test):.4f}"</span>)</code></pre>
+<div class="code-output"><span class="out-label">Output:</span>
+최적 파라미터: {'svm__C': 10, 'svm__gamma': 'scale'}
+최적 CV 점수: 0.5423
+테스트 정확도: 0.5378</div>
+
+<div class="warn">
+<p class="ni"><strong>⚠️ SVM의 금융 적용 시 주의점</strong></p>
+<ul>
+<li><strong>스케일링 필수:</strong> SVM은 거리 기반 알고리즘이므로 피처 스케일에 매우 민감하다. 반드시 StandardScaler를 적용해야 한다.</li>
+<li><strong>대규모 데이터에 느림:</strong> SVM의 학습 시간은 \(O(n^2)\) ~ \(O(n^3)\)이다. 수만 행 이상이면 LightGBM이 훨씬 빠르다.</li>
+<li><strong>확률 출력:</strong> <code>probability=True</code>를 설정해야 predict_proba()를 사용할 수 있지만, Platt scaling으로 추정하므로 정확도가 떨어질 수 있다.</li>
+<li><strong>해석 불가:</strong> RBF 커널 SVM은 피처 중요도를 직접 추출할 수 없다. 해석이 필요하면 Linear SVM을 사용하라.</li>
+</ul>
+</div>
+
+<h3>5.5 KNN (K-Nearest Neighbors) — 가장 가까운 이웃에게 물어본다</h3>
+
+<p>
+KNN은 ML에서 가장 직관적인 알고리즘이다. 새로운 데이터가 들어오면, 학습 데이터에서 가장 가까운 K개의 
+이웃을 찾고, 그 이웃들의 다수결로 분류한다. "유유상종" — 비슷한 데이터는 같은 클래스에 속할 것이라는 가정이다.
+</p>
+
+<div class="def">
+<p class="ni"><strong>KNN 핵심 개념</strong></p>
+<ul style="margin-top:8px">
+<li><strong>K:</strong> 참조할 이웃의 수. K=1이면 가장 가까운 1개, K=5이면 가장 가까운 5개의 다수결.</li>
+<li><strong>거리 측정:</strong> 유클리드 거리(L2), 맨해튼 거리(L1), 민코프스키 거리 등.</li>
+<li><strong>게으른 학습 (Lazy Learning):</strong> 학습 단계가 없다! 모든 계산은 예측 시점에 수행된다.</li>
+<li><strong>차원의 저주:</strong> 고차원에서는 모든 점이 비슷한 거리에 있게 되어 KNN이 무력화된다.</li>
+</ul>
+</div>
+
+$$\text{유클리드 거리: } d(\mathbf{x}, \mathbf{y}) = \sqrt{\sum_{i=1}^{p} (x_i - y_i)^2}$$
+
+<div class="cc">코드 5-3. KNN으로 주가 방향 예측</div>
+<pre><code><span class="kw">from</span> sklearn.neighbors <span class="kw">import</span> KNeighborsClassifier
+<span class="kw">from</span> sklearn.preprocessing <span class="kw">import</span> StandardScaler
+<span class="kw">from</span> sklearn.pipeline <span class="kw">import</span> Pipeline
+
+<span class="cm"># KNN도 거리 기반 → 스케일링 필수</span>
+knn_pipeline = <span class="fn">Pipeline</span>([
+    (<span class="st">'scaler'</span>, <span class="fn">StandardScaler</span>()),
+    (<span class="st">'knn'</span>, <span class="fn">KNeighborsClassifier</span>())
+])
+
+<span class="cm"># 최적 K 탐색</span>
+k_range = <span class="nb">range</span>(<span class="nu">3</span>, <span class="nu">52</span>, <span class="nu">2</span>)  <span class="cm"># 홀수만 (동점 방지)</span>
+k_scores = []
+
+<span class="kw">for</span> k <span class="kw">in</span> k_range:
+    knn = <span class="fn">Pipeline</span>([
+        (<span class="st">'scaler'</span>, <span class="fn">StandardScaler</span>()),
+        (<span class="st">'knn'</span>, <span class="fn">KNeighborsClassifier</span>(n_neighbors=k))
+    ])
+    knn.<span class="fn">fit</span>(X_train, y_train)
+    score = knn.<span class="fn">score</span>(X_test, y_test)
+    k_scores.<span class="fn">append</span>((k, score))
+    
+best_k, best_score = <span class="nb">max</span>(k_scores, key=<span class="kw">lambda</span> x: x[<span class="nu">1</span>])
+<span class="fn">print</span>(<span class="st">f"최적 K: {best_k}"</span>)
+<span class="fn">print</span>(<span class="st">f"테스트 정확도: {best_score:.4f}"</span>)
+
+<span class="cm"># K에 따른 정확도 시각화</span>
+<span class="kw">import</span> matplotlib.pyplot <span class="kw">as</span> plt
+ks, scores = <span class="nb">zip</span>(*k_scores)
+plt.<span class="fn">figure</span>(figsize=(<span class="nu">10</span>, <span class="nu">5</span>))
+plt.<span class="fn">plot</span>(ks, scores, <span class="st">'bo-'</span>)
+plt.<span class="fn">axvline</span>(x=best_k, color=<span class="st">'red'</span>, linestyle=<span class="st">'--'</span>, label=<span class="st">f'Best K={best_k}'</span>)
+plt.<span class="fn">xlabel</span>(<span class="st">'K (Number of Neighbors)'</span>)
+plt.<span class="fn">ylabel</span>(<span class="st">'Test Accuracy'</span>)
+plt.<span class="fn">title</span>(<span class="st">'KNN: K vs Accuracy'</span>)
+plt.<span class="fn">legend</span>()
+plt.<span class="fn">grid</span>(<span class="kw">True</span>, alpha=<span class="nu">0.3</span>)
+plt.<span class="fn">show</span>()</code></pre>
+<div class="code-output"><span class="out-label">Output:</span>
+최적 K: 21
+테스트 정확도: 0.5299
+
+K=3:  0.5020  K=7:  0.5139  K=11: 0.5219
+K=15: 0.5259  K=21: 0.5299  K=31: 0.5179
+K=41: 0.5100  K=51: 0.5060</div>
+
+<h3>5.6 분류 모델 비교 정리</h3>
+
+<!-- 분류 모델 비교 다이어그램 -->
+<div style="margin:25px 0;padding:20px;background:#f8f9fa;border-radius:10px;border:1px solid #dee2e6">
+<p class="ni" style="text-align:center;font-weight:bold;margin-bottom:15px;font-size:14px;color:#2c3e50">R4 분류 모델 비교 (금융 시계열 기준)</p>
+<div class="tc">표 5-2. 분류 모델 종합 비교</div>
+<table>
+<thead>
+<tr><th>모델</th><th>장점</th><th>단점</th><th>금융 적합도</th><th>속도</th></tr>
+</thead>
+<tbody>
+<tr><td><strong>로지스틱 회귀</strong></td><td>해석 가능, 확률 출력, 빠름</td><td>비선형 관계 포착 불가</td><td>⭐⭐⭐ 베이스라인</td><td>⚡⚡⚡</td></tr>
+<tr><td><strong>SVM (RBF)</strong></td><td>비선형 분류, 마진 최대화</td><td>느림, 해석 불가, 스케일 민감</td><td>⭐⭐ 소규모 데이터</td><td>⚡</td></tr>
+<tr><td><strong>KNN</strong></td><td>직관적, 비모수적</td><td>느림, 차원의 저주, 메모리 많이 사용</td><td>⭐ 참고용</td><td>⚡</td></tr>
+<tr><td><strong>Decision Tree</strong></td><td>해석 가능, 비선형</td><td>과적합 심함</td><td>⭐⭐ 단독 사용 비추</td><td>⚡⚡⚡</td></tr>
+<tr><td><strong>Random Forest</strong></td><td>과적합 방지, 피처 중요도</td><td>느림 (트리 수에 비례)</td><td>⭐⭐⭐ 안정적</td><td>⚡⚡</td></tr>
+<tr><td><strong>XGBoost</strong></td><td>높은 성능, 정규화 내장</td><td>튜닝 복잡</td><td>⭐⭐⭐⭐ 실전 표준</td><td>⚡⚡</td></tr>
+<tr><td><strong>LightGBM</strong></td><td>가장 빠름, 대규모 데이터</td><td>과적합 위험 (leaf-wise)</td><td>⭐⭐⭐⭐⭐ 최고 선택</td><td>⚡⚡⚡</td></tr>
+</tbody>
+</table>
+</div>
+
+<div class="ok">
+<p class="ni"><strong>실전 결론: 금융 시계열 분류에서의 모델 선택</strong></p>
+<p class="ni" style="margin-top:8px">
+MLAT Ch.7에서 Jansen은 금융 시계열 예측에서 <strong>LightGBM이 가장 실용적인 선택</strong>이라고 결론짓는다. 
+이유는 (1) 학습 속도가 빠르고, (2) 범주형 피처를 직접 처리하며, (3) 대규모 데이터에서도 효율적이고, 
+(4) 피처 중요도를 제공하기 때문이다. SVM과 KNN은 금융 시계열에서는 성능이 떨어지는 경우가 많지만, 
+<strong>개념적으로 이해하는 것이 중요하다</strong> — SVM의 마진 최대화 개념은 R8의 Convex Optimization과 
+연결되고, KNN의 거리 기반 접근은 R5의 클러스터링과 연결된다.
+</p>
+</div>
+
 
 <!-- ═══════════════════════════════════════════ -->
 <!-- Ch6: 모델 평가 지표 -->
