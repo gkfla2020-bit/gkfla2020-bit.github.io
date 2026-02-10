@@ -1,4 +1,4 @@
-﻿---
+---
 layout: null
 permalink: /research/
 title: "Research"
@@ -138,43 +138,8 @@ body{font-family:'Inter',sans-serif;background:#fafaf8;color:#1a1a1a;line-height
         <h1 class="page-title">Research</h1>
         <p class="page-subtitle">Quantitative Finance & Stochastic Modeling</p>
         
-        <div class="research-list">
-            <a href="/research/vol-integrated-kr/" class="research-item">
-                <div class="research-date">February 08, 2026</div>
-                <h2 class="research-title">When Correlations Break: Regime Shifts in Bond-Commodity-Bitcoin Nexus</h2>
-                <p class="research-desc">30?꾧컙(1995-2025) ?듯솕?뺤콉 ?덉쭚 ?꾪솚??梨꾧텒-?먯옄??鍮꾪듃肄붿씤 ?곴?援ъ“瑜??대뼸寃?遺뺢눼?쒗궎?붿? ?ㅼ쬆 遺꾩꽍. ?묒쟻?꾪솕 ?쒕? 湲덈━ 諛섍컧湲?1,813?쇱뿉??湲댁텞 ?꾪솚 ??169?쇰줈 湲됱냽 ?⑥텞. BTC?뭆PX ?꾩씠?④낵 18.0%濡??덈줈???쒖뒪?쒖쟻 ?꾪뿕 寃쎈줈 ?뺤씤.</p>
-                <div class="research-tags">
-                    <span class="tag">DCC-GARCH</span>
-                    <span class="tag">Vasicek</span>
-                    <span class="tag">Bitcoin</span>
-                    <span class="tag">Spillover</span>
-                    <span class="tag">Structural Break</span>
-                </div>
-            </a>
-            
-            <a href="/research/move-vasicek-kr/" class="research-item">
-                <div class="research-date">February 05, 2026</div>
-                <h2 class="research-title">MOVE-Vasicek 紐⑤뜽 ?됯?蹂닿퀬??/h2>
-                <p class="research-desc">MOVE 吏?섎? ?곹깭蹂?섎줈 ?쒖슜???뺤옣 Vasicek 紐⑤뜽???ㅼ쬆 遺꾩꽍. ?곕룄鍮?寃??寃곌낵 LR=17.52濡??듦퀎???좎쓽???뺤씤. 怨?MOVE 泥댁젣?먯꽌 洹좏삎湲덈━? 蹂?숈꽦???믨쾶 ?섑??섎뒗 ?⑦꽩 愿李?</p>
-                <div class="research-tags">
-                    <span class="tag">Interest Rate</span>
-                    <span class="tag">Vasicek</span>
-                    <span class="tag">MOVE Index</span>
-                    <span class="tag">State-Dependent</span>
-                </div>
-            </a>
-            
-            <a href="/research/bacbb/" class="research-item">
-                <div class="research-date">February 04, 2026</div>
-                <h2 class="research-title">Betting Against Cryptocurrency Bad Beta</h2>
-                <p class="research-desc">Campbell-Vuolteenaho??Bad Beta 媛쒕뀗怨?Frazzini-Pedersen??BAB ?꾨왂??寃고빀???뷀샇?뷀룓 ?⑺꽣 ?ъ옄 ?꾨왂. ???섏씡瑜?14.14%, ?ㅽ봽鍮꾩쑉 1.04 ?ъ꽦. 2022???섎씫?μ뿉???묒쓽 ?섏씡瑜?湲곕줉.</p>
-                <div class="research-tags">
-                    <span class="tag">Cryptocurrency</span>
-                    <span class="tag">Factor Investing</span>
-                    <span class="tag">Bad Beta</span>
-                    <span class="tag">Long-Short</span>
-                </div>
-            </a>
+        <div class="research-list" id="research-card-list">
+            <!-- Fallback content, replaced by JS -->
         </div>
 
         {% assign research_posts = site.posts | where_exp: "post", "post.categories contains 'research'" %}
@@ -232,6 +197,26 @@ gsap.to('.page-title', {opacity:1, y:0, duration:.6, delay:.2});
 gsap.to('.page-subtitle', {opacity:1, duration:.5, delay:.35});
 gsap.to('.research-item', {opacity:1, y:0, duration:.5, delay:.5, stagger:.1});
 gsap.set('.page-title', {y:15});
+</script>
+<script>
+// Dynamic research cards from posts.json
+fetch('/data/posts.json').then(function(r){return r.json()}).then(function(posts){
+  var research = posts.filter(function(p){return p.category==='research'}).sort(function(a,b){return b.date.localeCompare(a.date)});
+  var el = document.getElementById('research-card-list');
+  if(!el || !research.length) return;
+  el.innerHTML = '';
+  research.forEach(function(p){
+    var d = new Date(p.date+'T00:00:00');
+    var ds = d.toLocaleDateString('en-US',{year:'numeric',month:'long',day:'2-digit'});
+    var tags = (p.tags||[]).map(function(t){return '<span class="tag">'+t+'</span>'}).join('');
+    el.innerHTML += '<a href="/research/'+p.slug+'/" class="research-item" style="opacity:1;transform:none;">' +
+      '<div class="research-date">'+ds+'</div>' +
+      '<h2 class="research-title">'+p.title+'</h2>' +
+      '<p class="research-desc">'+p.description+'</p>' +
+      '<div class="research-tags">'+tags+'</div></a>';
+  });
+  gsap.fromTo('.research-item',{opacity:0,y:20},{opacity:1,y:0,duration:.5,stagger:.1});
+}).catch(function(e){console.log('posts.json error:',e)});
 </script>
 {% include market-data.html %}
 </body>

@@ -1,0 +1,45 @@
+<script>
+(function(){
+  var currentPath = window.location.pathname.replace(/\/$/,'') + '/';
+  fetch('/data/posts.json').then(function(r){return r.json()}).then(function(posts){
+    posts.sort(function(a,b){return b.date.localeCompare(a.date)});
+    var research = posts.filter(function(p){return p.category==='research'});
+    var reports = posts.filter(function(p){return p.category==='reports'});
+    var recent = posts.slice(0,5);
+
+    // Research section
+    var rEl = document.getElementById('nav-research-list');
+    if(rEl){
+      rEl.innerHTML = '';
+      research.forEach(function(p){
+        var href = '/research/'+p.slug+'/';
+        var cls = currentPath===href?' class="active"':'';
+        rEl.innerHTML += '<li><a href="'+href+'"'+cls+'>'+p.shortTitle+'</a></li>';
+      });
+    }
+
+    // Reports section
+    var rpEl = document.getElementById('nav-reports-list');
+    if(rpEl){
+      rpEl.innerHTML = '';
+      reports.forEach(function(p){
+        var href = '/reports/'+p.slug+'/';
+        var cls = currentPath===href?' class="active"':'';
+        rpEl.innerHTML += '<li><a href="'+href+'"'+cls+'>'+p.shortTitle+'</a></li>';
+      });
+    }
+
+    // Recent posts
+    var rcEl = document.getElementById('nav-recent-list');
+    if(rcEl){
+      rcEl.innerHTML = '';
+      recent.forEach(function(p){
+        var href = '/'+p.category+'/'+p.slug+'/';
+        var cls = currentPath===href?' class="active"':'';
+        var title = p.shortTitle.length>30?p.shortTitle.substring(0,27)+'...':p.shortTitle;
+        rcEl.innerHTML += '<li><a href="'+href+'"'+cls+'>'+title+'</a></li>';
+      });
+    }
+  }).catch(function(e){console.log('posts.json load error:',e)});
+})();
+</script>
