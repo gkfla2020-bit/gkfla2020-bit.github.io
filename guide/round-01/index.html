@@ -1112,6 +1112,93 @@ plt.show()</code></pre>
 <p class="ni"><strong>Round 3 미리보기:</strong> 이동평균, 볼린저 밴드, RSI, MACD 등 기술적 지표를 직접 구현하고 백테스팅하는 것은 Round 3의 핵심 내용이다. 여기서는 맛보기만 한다.</p>
 </div>
 
+
+<h3>12.6 캔들차트 — 트레이더의 눈으로 주가를 본다</h3>
+
+<p>
+캔들차트(Candlestick Chart)는 주가의 시가(Open), 고가(High), 저가(Low), 종가(Close)를 하나의 "캔들"로 
+표현하는 차트다. 1700년대 일본의 쌀 거래상 혼마 무네히사가 고안했다고 전해진다. 
+현대 트레이딩에서 가장 널리 사용되는 차트 유형이다.
+</p>
+
+<!-- 캔들 구조 다이어그램 -->
+<div style="margin:25px 0;display:flex;gap:30px;justify-content:center;flex-wrap:wrap">
+<div style="text-align:center;padding:16px;background:#fff;border-radius:10px;border:2px solid #2e7d32">
+<p class="ni" style="font-weight:bold;color:#2e7d32;margin-bottom:10px">양봉 (상승)</p>
+<div style="display:flex;flex-direction:column;align-items:center;gap:2px">
+<div style="font-size:10px;color:#888">고가 (High)</div>
+<div style="width:2px;height:20px;background:#2e7d32"></div>
+<div style="width:30px;height:40px;background:#2e7d32;border-radius:2px;display:flex;flex-direction:column;justify-content:space-between;padding:2px">
+<div style="font-size:8px;color:#fff;text-align:center">종가</div>
+<div style="font-size:8px;color:#fff;text-align:center">시가</div>
+</div>
+<div style="width:2px;height:20px;background:#2e7d32"></div>
+<div style="font-size:10px;color:#888">저가 (Low)</div>
+</div>
+<p class="ni" style="font-size:10px;color:#666;margin-top:6px">종가 > 시가</p>
+</div>
+<div style="text-align:center;padding:16px;background:#fff;border-radius:10px;border:2px solid #c62828">
+<p class="ni" style="font-weight:bold;color:#c62828;margin-bottom:10px">음봉 (하락)</p>
+<div style="display:flex;flex-direction:column;align-items:center;gap:2px">
+<div style="font-size:10px;color:#888">고가 (High)</div>
+<div style="width:2px;height:20px;background:#c62828"></div>
+<div style="width:30px;height:40px;background:#c62828;border-radius:2px;display:flex;flex-direction:column;justify-content:space-between;padding:2px">
+<div style="font-size:8px;color:#fff;text-align:center">시가</div>
+<div style="font-size:8px;color:#fff;text-align:center">종가</div>
+</div>
+<div style="width:2px;height:20px;background:#c62828"></div>
+<div style="font-size:10px;color:#888">저가 (Low)</div>
+</div>
+<p class="ni" style="font-size:10px;color:#666;margin-top:6px">종가 < 시가</p>
+</div>
+</div>
+
+<div class="cc">코드 12-5. mplfinance로 캔들차트 그리기</div>
+<pre><code><span class="cm"># mplfinance 설치: pip install mplfinance</span>
+<span class="kw">import</span> mplfinance <span class="kw">as</span> mpf
+<span class="kw">import</span> yfinance <span class="kw">as</span> yf
+
+<span class="cm"># 삼성전자 최근 3개월 데이터</span>
+samsung = yf.<span class="fn">download</span>(<span class="st">'005930.KS'</span>, period=<span class="st">'3mo'</span>)
+
+<span class="cm"># 기본 캔들차트</span>
+mpf.<span class="fn">plot</span>(samsung, type=<span class="st">'candle'</span>, style=<span class="st">'charles'</span>,
+        title=<span class="st">'삼성전자 캔들차트'</span>,
+        ylabel=<span class="st">'Price (KRW)'</span>,
+        volume=<span class="kw">True</span>,          <span class="cm"># 거래량 표시</span>
+        mav=(<span class="nu">5</span>, <span class="nu">20</span>),           <span class="cm"># 5일, 20일 이동평균선</span>
+        figsize=(<span class="nu">12</span>, <span class="nu">8</span>))
+
+<span class="cm"># 커스텀 스타일 캔들차트</span>
+mc = mpf.<span class="fn">make_marketcolors</span>(
+    up=<span class="st">'#2e7d32'</span>,     <span class="cm"># 양봉 색상 (초록)</span>
+    down=<span class="st">'#c62828'</span>,   <span class="cm"># 음봉 색상 (빨강)</span>
+    edge=<span class="st">'inherit'</span>,
+    wick=<span class="st">'inherit'</span>,
+    volume=<span class="st">'in'</span>
+)
+s = mpf.<span class="fn">make_mpf_style</span>(marketcolors=mc, gridstyle=<span class="st">':'</span>)
+
+mpf.<span class="fn">plot</span>(samsung, type=<span class="st">'candle'</span>, style=s,
+        title=<span class="st">'Samsung Electronics'</span>,
+        ylabel=<span class="st">'Price (KRW)'</span>,
+        volume=<span class="kw">True</span>,
+        mav=(<span class="nu">5</span>, <span class="nu">20</span>, <span class="nu">60</span>),
+        figsize=(<span class="nu">14</span>, <span class="nu">8</span>),
+        savefig=<span class="st">'samsung_candle.png'</span>)
+
+<span class="fn">print</span>(<span class="st">"✅ 캔들차트 저장 완료: samsung_candle.png"</span>)</code></pre>
+<div class="code-output"><span class="out-label">Output:</span>
+[*********************100%%**********************]  1 of 1 completed
+✅ 캔들차트 저장 완료: samsung_candle.png</div>
+
+<div class="info">
+<p class="ni"><strong>교재 연동:</strong> MLAT Ch.2에서 Jansen은 시장 데이터의 시각화를 다루며, 
+캔들차트가 OHLCV 데이터를 가장 효과적으로 표현하는 방법이라고 설명한다. 
+R7에서 배울 CNN은 캔들차트 이미지를 입력으로 받아 패턴을 인식하는 데 사용될 수 있다.</p>
+</div>
+
+
 <!-- ═══════════════════════════════════════════ -->
 <!-- Ch13: Mini Project + Quiz -->
 <!-- ═══════════════════════════════════════════ -->
