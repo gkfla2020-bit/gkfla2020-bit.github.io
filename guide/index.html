@@ -1,0 +1,243 @@
+---
+layout: null
+permalink: /guide/
+title: "HFT ML Guide"
+---
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HFT ML Guide | Ha Rim Jung</title>
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="HFT ML Guide | Ha Rim Jung">
+    <meta property="og:description" content="Convex Optimization + Deep Learning 기반 HFT 시스템 트레이딩 학습 가이드. 10라운드 커리큘럼.">
+    <meta property="og:url" content="https://gkfla2020-bit.github.io/guide/">
+    <meta property="og:image" content="https://gkfla2020-bit.github.io/assets/og-card.png">
+    <meta property="og:site_name" content="Ha Rim Jung">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="HFT ML Guide | Ha Rim Jung">
+    <meta name="twitter:description" content="Convex Optimization + Deep Learning 기반 HFT 시스템 트레이딩 학습 가이드">
+    <meta name="twitter:image" content="https://gkfla2020-bit.github.io/assets/og-card.png">
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-83LKVW7412"></script>
+    <script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-83LKVW7412');</script>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300&family=Space+Mono:wght@400&family=Inter:wght@300;400&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Inter',sans-serif;background:#fafaf8;color:#1a1a1a;line-height:1.7;overflow-x:hidden}
+
+{% include sidebar-styles.html %}
+
+.container{position:relative;z-index:1;max-width:800px;margin:0 auto;padding:60px 50px 80px}
+.page-title{font-family:'Cormorant Garamond',serif;font-size:clamp(2rem,5vw,2.8rem);font-weight:300;margin-bottom:8px;opacity:0}
+.page-subtitle{font-family:'Space Mono',monospace;font-size:11px;color:#888;letter-spacing:.2em;text-transform:uppercase;margin-bottom:15px;opacity:0}
+.page-desc{font-size:.92rem;color:#666;line-height:1.8;margin-bottom:50px;max-width:650px;opacity:0}
+
+/* Progress Overview */
+.progress-overview{display:flex;align-items:center;gap:16px;margin-bottom:50px;padding:20px 25px;background:#fff;border:1px solid #e8e8e8;opacity:0}
+.progress-label{font-size:.7rem;color:#999;letter-spacing:.1em;text-transform:uppercase;white-space:nowrap}
+.progress-bar{flex:1;height:6px;background:#f0f0f0;border-radius:3px;overflow:hidden}
+.progress-fill{height:100%;background:linear-gradient(90deg,#0080c6,#00b4d8);border-radius:3px;transition:width .8s ease}
+.progress-text{font-family:'Space Mono',monospace;font-size:.8rem;color:#1a1a1a;white-space:nowrap}
+
+/* Round Cards */
+.round-list{display:flex;flex-direction:column;gap:20px}
+.round-card{display:block;padding:30px 35px;background:rgba(255,255,255,.9);border:1px solid #e8e8e8;text-decoration:none;transition:all .25s ease;opacity:0;transform:translateY(20px);position:relative;overflow:hidden}
+.round-card:hover{border-color:#1a1a1a;transform:translateX(8px) translateY(0);box-shadow:0 4px 20px rgba(0,0,0,.05)}
+.round-card.completed{border-left:3px solid #28a745}
+.round-card.current{border-left:3px solid #0080c6}
+.round-card.locked{border-left:3px solid #ddd;opacity:.6;pointer-events:none}
+.round-number{font-family:'Space Mono',monospace;font-size:.65rem;color:#999;letter-spacing:.15em;text-transform:uppercase;margin-bottom:8px;display:flex;align-items:center;gap:10px}
+.round-status{font-size:.55rem;padding:2px 8px;border-radius:10px;letter-spacing:.08em}
+.status-done{background:#e8f5e9;color:#2e7d32}
+.status-current{background:#e3f2fd;color:#1565c0}
+.status-locked{background:#f5f5f5;color:#999}
+.round-title{font-family:'Cormorant Garamond',serif;font-size:1.4rem;color:#1a1a1a;margin-bottom:10px;font-weight:400}
+.round-desc{font-size:.88rem;color:#666;line-height:1.7;margin-bottom:14px}
+.round-topics{display:flex;gap:6px;flex-wrap:wrap}
+.topic-tag{font-size:.58rem;padding:4px 10px;background:#f0f0f0;color:#666;letter-spacing:.04em;text-transform:uppercase;transition:all .2s}
+.round-card:hover .topic-tag{background:#1a1a1a;color:#fff}
+
+/* Curriculum Info */
+.curriculum-info{margin-top:60px;padding:30px;background:#fff;border:1px solid #e8e8e8;opacity:0}
+.curriculum-title{font-family:'Cormorant Garamond',serif;font-size:1.2rem;font-weight:400;margin-bottom:15px;padding-bottom:10px;border-bottom:1px solid #eee}
+.curriculum-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px 30px}
+.curriculum-item{font-size:.82rem;color:#555;display:flex;align-items:baseline;gap:8px}
+.curriculum-item .label{font-size:.65rem;color:#999;letter-spacing:.08em;text-transform:uppercase;min-width:70px}
+
+@media(max-width:1024px){
+    .container{padding:30px 20px 50px}
+    .round-card{padding:22px 20px;border-radius:12px}
+    .round-card:hover{transform:none}
+    .round-title{font-size:1.2rem}
+    .round-desc{font-size:.84rem}
+    .curriculum-grid{grid-template-columns:1fr}
+    .progress-overview{flex-direction:column;align-items:stretch;gap:10px}
+    .page-desc{font-size:.85rem}
+}
+    </style>
+</head>
+<body>
+<img src="/assets/og-card.png" alt="" style="position:absolute;width:1px;height:1px;opacity:0;pointer-events:none;" aria-hidden="true">
+
+{% include sidebar.html %}
+{% include market-widget.html %}
+
+<div class="main-wrapper">
+<div class="container">
+    {% include breadcrumb.html %}
+    <h1 class="page-title">HFT ML Guide</h1>
+    <p class="page-subtitle">Convex Optimization + Deep Learning</p>
+    <p class="page-desc">Python 기초부터 시작하여 Convex Optimization과 Deep Learning을 결합한 고빈도 시스템 트레이딩까지. 10라운드 커리큘럼으로 구성된 올인원 학습 가이드입니다.</p>
+
+    <div class="progress-overview">
+        <span class="progress-label">Overall Progress</span>
+        <div class="progress-bar"><div class="progress-fill" style="width:50%"></div></div>
+        <span class="progress-text">5 / 10 Rounds</span>
+    </div>
+
+    <div class="round-list">
+        <a href="/guide/round-01/" class="round-card completed">
+            <div class="round-number">Round 01 <span class="round-status status-done">✓ Complete</span></div>
+            <h2 class="round-title">Python + Finance Data Fundamentals</h2>
+            <p class="round-desc">Python 기초 문법, 자료구조, yfinance를 활용한 금융 데이터 수집, 수익률 계산과 기초 시각화까지.</p>
+            <div class="round-topics">
+                <span class="topic-tag">Python Basics</span>
+                <span class="topic-tag">yfinance</span>
+                <span class="topic-tag">Returns</span>
+                <span class="topic-tag">Visualization</span>
+            </div>
+        </a>
+
+        <a href="/guide/round-02/" class="round-card completed">
+            <div class="round-number">Round 02 <span class="round-status status-done">✓ Complete</span></div>
+            <h2 class="round-title">Linear Algebra + Statistics for Finance</h2>
+            <p class="round-desc">벡터·행렬 연산, 공분산 행렬, 확률분포, 가설검정 — 퀀트 분석의 수학적 기초.</p>
+            <div class="round-topics">
+                <span class="topic-tag">Linear Algebra</span>
+                <span class="topic-tag">Statistics</span>
+                <span class="topic-tag">Covariance</span>
+                <span class="topic-tag">Hypothesis Testing</span>
+            </div>
+        </a>
+
+        <a href="/guide/round-03/" class="round-card completed">
+            <div class="round-number">Round 03 <span class="round-status status-done">✓ Complete</span></div>
+            <h2 class="round-title">Data Engineering + Feature Engineering</h2>
+            <p class="round-desc">데이터 파이프라인 구축, 결측치 처리, 기술적 지표 생성, 피처 선택과 정규화.</p>
+            <div class="round-topics">
+                <span class="topic-tag">Pipeline</span>
+                <span class="topic-tag">Feature Engineering</span>
+                <span class="topic-tag">Technical Indicators</span>
+                <span class="topic-tag">Normalization</span>
+            </div>
+        </a>
+
+        <a href="/guide/round-04/" class="round-card completed">
+            <div class="round-number">Round 04 <span class="round-status status-done">✓ Complete</span></div>
+            <h2 class="round-title">Supervised Learning for Finance</h2>
+            <p class="round-desc">회귀·분류 모델, 트리 앙상블, XGBoost, 교차검증과 하이퍼파라미터 튜닝.</p>
+            <div class="round-topics">
+                <span class="topic-tag">Regression</span>
+                <span class="topic-tag">Classification</span>
+                <span class="topic-tag">XGBoost</span>
+                <span class="topic-tag">Cross-Validation</span>
+            </div>
+        </a>
+
+        <a href="/guide/round-05/" class="round-card current">
+            <div class="round-number">Round 05 <span class="round-status status-current">● Now</span></div>
+            <h2 class="round-title">Unsupervised Learning + Time Series</h2>
+            <p class="round-desc">PCA, t-SNE, K-Means, DBSCAN 클러스터링과 ARIMA, GARCH 시계열 모델링.</p>
+            <div class="round-topics">
+                <span class="topic-tag">PCA</span>
+                <span class="topic-tag">Clustering</span>
+                <span class="topic-tag">ARIMA</span>
+                <span class="topic-tag">GARCH</span>
+            </div>
+        </a>
+
+        <div class="round-card locked">
+            <div class="round-number">Round 06 <span class="round-status status-locked">Locked</span></div>
+            <h2 class="round-title">Deep Learning Foundations</h2>
+            <p class="round-desc">신경망 기초, 역전파, CNN/RNN 아키텍처, PyTorch 기반 금융 시계열 예측.</p>
+            <div class="round-topics">
+                <span class="topic-tag">Neural Networks</span>
+                <span class="topic-tag">PyTorch</span>
+                <span class="topic-tag">LSTM</span>
+            </div>
+        </div>
+
+        <div class="round-card locked">
+            <div class="round-number">Round 07 <span class="round-status status-locked">Locked</span></div>
+            <h2 class="round-title">Convex Optimization</h2>
+            <p class="round-desc">볼록 최적화 이론, 포트폴리오 최적화, CVXPY를 활용한 제약 조건 최적화.</p>
+            <div class="round-topics">
+                <span class="topic-tag">Convex Optimization</span>
+                <span class="topic-tag">CVXPY</span>
+                <span class="topic-tag">Portfolio</span>
+            </div>
+        </div>
+
+        <div class="round-card locked">
+            <div class="round-number">Round 08 <span class="round-status status-locked">Locked</span></div>
+            <h2 class="round-title">Reinforcement Learning for Trading</h2>
+            <p class="round-desc">강화학습 기초, Q-Learning, DQN 기반 트레이딩 에이전트 구현.</p>
+            <div class="round-topics">
+                <span class="topic-tag">RL</span>
+                <span class="topic-tag">DQN</span>
+                <span class="topic-tag">Trading Agent</span>
+            </div>
+        </div>
+
+        <div class="round-card locked">
+            <div class="round-number">Round 09 <span class="round-status status-locked">Locked</span></div>
+            <h2 class="round-title">HFT System Architecture</h2>
+            <p class="round-desc">고빈도 트레이딩 시스템 설계, 주문 실행 최적화, 레이턴시 관리.</p>
+            <div class="round-topics">
+                <span class="topic-tag">HFT</span>
+                <span class="topic-tag">Execution</span>
+                <span class="topic-tag">Latency</span>
+            </div>
+        </div>
+
+        <div class="round-card locked">
+            <div class="round-number">Round 10 <span class="round-status status-locked">Locked</span></div>
+            <h2 class="round-title">Integration + Live Trading</h2>
+            <p class="round-desc">전체 파이프라인 통합, 백테스팅 프레임워크, 리스크 관리, 실전 배포.</p>
+            <div class="round-topics">
+                <span class="topic-tag">Backtesting</span>
+                <span class="topic-tag">Risk Management</span>
+                <span class="topic-tag">Deployment</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="curriculum-info">
+        <h3 class="curriculum-title">Curriculum Overview</h3>
+        <div class="curriculum-grid">
+            <div class="curriculum-item"><span class="label">Level</span> Python 초급 → HFT 시스템</div>
+            <div class="curriculum-item"><span class="label">Rounds</span> 10 Rounds (현재 5/10)</div>
+            <div class="curriculum-item"><span class="label">Focus</span> Convex Optimization + DL</div>
+            <div class="curriculum-item"><span class="label">Style</span> 올인원 자기완결형 강의</div>
+            <div class="curriculum-item"><span class="label">Math</span> MathJax 수식 포함</div>
+            <div class="curriculum-item"><span class="label">Code</span> Python 실습 코드 내장</div>
+        </div>
+    </div>
+</div>
+</div>
+
+<script>
+gsap.to('.page-title',{opacity:1,y:0,duration:.6,delay:.2});
+gsap.to('.page-subtitle',{opacity:1,duration:.5,delay:.35});
+gsap.to('.page-desc',{opacity:1,duration:.5,delay:.45});
+gsap.to('.progress-overview',{opacity:1,duration:.5,delay:.55});
+gsap.to('.round-card',{opacity:1,y:0,duration:.5,delay:.6,stagger:.08});
+gsap.to('.curriculum-info',{opacity:1,duration:.5,delay:1.2});
+gsap.set('.page-title',{y:15});
+gsap.set('.round-card',{y:20});
+</script>
+{% include market-data.html %}
+</body>
+</html>

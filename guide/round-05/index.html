@@ -1,0 +1,2943 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Round 5 - Unsupervised Learning + Time Series Analysis</title>
+<script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;500&family=Space+Mono:wght@400&family=Inter:wght@300;400&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Inter',sans-serif;background:#fafaf8;color:#1a1a1a;line-height:1.7;overflow-x:hidden}
+.sidebar{position:fixed;left:0;top:0;width:260px;height:100vh;background:rgba(255,255,255,.97);border-right:1px solid rgba(0,0,0,.06);padding:32px 24px;z-index:100;overflow-y:auto;display:flex;flex-direction:column}
+.sidebar-profile{text-align:center;margin-bottom:28px;padding-bottom:24px;border-bottom:1px solid rgba(0,0,0,.08)}
+.profile-icon{font-size:48px;margin-bottom:8px}
+.profile-name{font-family:'Cormorant Garamond',serif;font-size:1.3rem;font-weight:500;margin-bottom:4px}
+.profile-title{font-size:.68rem;color:#888;letter-spacing:.08em;text-transform:uppercase;margin-bottom:8px}
+.profile-bio{font-size:.78rem;color:#666;line-height:1.5}
+.sidebar-nav{flex:1;margin-top:16px}
+.nav-section{margin-bottom:20px}
+.nav-section-title{font-size:.6rem;font-weight:600;color:#aaa;letter-spacing:.15em;text-transform:uppercase;margin-bottom:10px}
+.nav-list{list-style:none}
+.nav-list li{margin-bottom:5px}
+.nav-list a{font-size:.78rem;color:#555;text-decoration:none;transition:all .2s;display:block;padding:3px 0}
+.nav-list a:hover{color:#0080c6;padding-left:4px}
+.nav-list a.active{color:#0080c6;font-weight:500}
+.nav-list a.done{color:#28a745}
+.badge{display:inline-block;font-size:.5rem;background:#0080c6;color:#fff;padding:1px 5px;border-radius:8px;margin-left:3px;vertical-align:middle}
+.badge-done{background:#28a745}
+.sidebar-footer{padding-top:16px;border-top:1px solid rgba(0,0,0,.06);font-size:.65rem;color:#aaa;text-align:center}
+.main-wrapper{margin-left:260px;min-height:100vh}
+.container{max-width:1100px;margin:0 auto;padding:50px 40px 80px}
+.paper-content{font-family:'Times New Roman','Nanum Myeongjo',serif;line-height:1.8;background:#fff;padding:40px;border-radius:8px;box-shadow:0 2px 20px rgba(0,0,0,.05)}
+.paper-header{text-align:center;margin-bottom:40px;padding-bottom:30px;border-bottom:2px solid #333}
+.paper-category{font-size:14px;color:#666;margin-bottom:10px}
+.paper-title{font-size:24px;font-weight:bold;margin-bottom:12px;line-height:1.4}
+.paper-subtitle{font-size:14px;color:#555;margin-bottom:8px}
+.paper-team{font-size:13px;color:#444}
+</style>
+<style>
+.abstract{background:#f8f9fa;padding:25px;margin:30px 0;border-left:4px solid #2c3e50}
+.abstract-title{font-weight:bold;font-size:16px;margin-bottom:15px}
+h2{font-size:18px;margin:35px 0 20px;padding-bottom:8px;border-bottom:1px solid #ddd;color:#2c3e50}
+h3{font-size:15px;margin:25px 0 15px;color:#34495e}
+h4{font-size:14px;margin:20px 0 12px;color:#34495e}
+p{text-align:justify;margin-bottom:15px;text-indent:2em}
+p.ni{text-indent:0}
+table{width:100%;border-collapse:collapse;margin:20px 0;font-size:12px}
+th,td{border:1px solid #ddd;padding:10px 8px;text-align:center}
+th{background:#2c3e50;color:white;font-weight:bold}
+tr:nth-child(even){background:#f8f9fa}
+tr:hover{background:#e8f4f8}
+.tc{font-size:13px;font-weight:bold;margin:15px 0 10px;text-align:center}
+.eq{text-align:center;margin:20px 0;padding:15px;background:#f8f9fa;border-radius:4px;overflow-x:auto}
+ul,ol{margin-left:2em;margin-bottom:15px}
+li{margin-bottom:6px}
+.def{background:#fff9e6;border:1px solid #ffc107;border-radius:4px;padding:20px;margin:20px 0}
+.info{background:#e8f4f8;border-left:4px solid #3498db;padding:20px;margin:20px 0}
+.warn{background:#fff3cd;border-left:4px solid #f39c12;padding:20px;margin:20px 0}
+.ok{background:#d4edda;border-left:4px solid #28a745;padding:20px;margin:20px 0}
+pre{background:#1e1e1e;color:#d4d4d4;padding:20px;border-radius:6px;overflow-x:auto;margin:20px 0;font-family:'Space Mono','Consolas',monospace;font-size:13px;line-height:1.6}
+code{font-family:'Space Mono','Consolas',monospace;font-size:13px}
+p code,li code,td code{background:#f0f0f0;padding:2px 6px;border-radius:3px;color:#c7254e;font-size:12px}
+.cc{font-size:12px;font-weight:bold;color:#2c3e50;margin-top:15px;margin-bottom:4px}
+.cm{color:#6a9955}.kw{color:#569cd6}.st{color:#ce9178}.fn{color:#dcdcaa}.nb{color:#4ec9b0}.nu{color:#b5cea8}
+.progress-bar{width:100%;height:6px;background:#e0e0e0;border-radius:3px;margin-top:16px}
+.progress-fill{height:100%;background:linear-gradient(90deg,#0080c6,#00b894);border-radius:3px;width:50%}
+.progress-label{font-size:11px;color:#888;margin-top:4px;text-align:center}
+@media(max-width:1024px){
+.sidebar{width:100%;height:auto;position:relative;border-right:none;border-bottom:1px solid rgba(0,0,0,.08);padding:16px}
+.sidebar-profile{margin-bottom:10px;padding-bottom:10px;display:flex;align-items:center;gap:12px;text-align:left}
+.profile-icon{font-size:32px;margin-bottom:0}.profile-bio{display:none}
+.nav-section{display:inline-block;margin-right:16px;margin-bottom:8px}
+.nav-list{display:flex;gap:10px;flex-wrap:wrap}.nav-list li{margin-bottom:0}
+.sidebar-footer{display:none}
+.main-wrapper{margin-left:0}
+.container{padding:0}.paper-content{padding:20px 16px;border-radius:0;box-shadow:none}
+.paper-title{font-size:18px}p{font-size:14px;text-indent:1.5em;text-align:left}
+pre{font-size:11px;padding:14px}table{font-size:10px;display:block;overflow-x:auto}
+}
+</style>
+</head>
+<body>
+
+<div class="sidebar">
+<div class="sidebar-profile">
+<div class="profile-icon">&#x1F680;</div>
+<div class="profile-name">HFT ML Master Plan</div>
+<div class="profile-title">Convex Opt + DL + HFT</div>
+<div class="profile-bio">10 Rounds: Zero to HFT System Trading</div>
+</div>
+<div class="sidebar-nav">
+<div class="nav-section">
+<div class="nav-section-title">Curriculum</div>
+<ul class="nav-list">
+<li><a class="done" href="../round_01/lecture_01.html">R1. Python + Finance <span class="badge badge-done">DONE</span></a></li>
+<li><a class="done" href="../round_02/lecture_02.html">R2. Linear Algebra + Stats <span class="badge badge-done">DONE</span></a></li>
+<li><a class="done" href="../round_03/lecture_03.html">R3. Data / Feature Eng. <span class="badge badge-done">DONE</span></a></li>
+<li><a class="done" href="../round_04/lecture_04.html">R4. Supervised Learning <span class="badge badge-done">DONE</span></a></li>
+<li><a class="active" href="#">R5. Unsupervised + TS <span class="badge">NOW</span></a></li>
+<li><a href="#">R6. NLP + Sentiment</a></li>
+<li><a href="#">R7. Deep Learning</a></li>
+<li><a href="#">R8. Convex Opt + Transformer</a></li>
+<li><a href="#">R9. HFT + RL</a></li>
+<li><a href="#">R10. Final Project</a></li>
+</ul>
+</div>
+<div class="nav-section">
+<div class="nav-section-title">This Lecture</div>
+<ul class="nav-list">
+<li><a href="#ch1">1. 비지도학습이란</a></li>
+<li><a href="#ch2">2. PCA 심화</a></li>
+<li><a href="#ch3">3. PCA 실전 코드</a></li>
+<li><a href="#ch4">4. t-SNE 시각화</a></li>
+<li><a href="#ch5">5. K-Means 클러스터링</a></li>
+<li><a href="#ch6">6. K-Means 금융 적용</a></li>
+<li><a href="#ch7">7. DBSCAN</a></li>
+<li><a href="#ch8">8. 계층적 클러스터링</a></li>
+<li><a href="#ch9">9. 시계열 기초</a></li>
+<li><a href="#ch10">10. ACF/PACF + ARIMA</a></li>
+<li><a href="#ch11">11. GARCH 변동성</a></li>
+<li><a href="#ch12">12. 실전 통합 파이프라인</a></li>
+<li><a href="#ch13">13. Quiz + 미니 프로젝트</a></li>
+</ul>
+</div>
+</div>
+<div class="sidebar-footer">Round 5 of 10 · 🔍 Unsupervised + Time Series</div>
+</div>
+
+<div class="main-wrapper">
+<div class="container">
+<div class="paper-content">
+
+<div class="paper-header">
+<div class="paper-category">Round 5 / 10 · ML 핵심 무기 확장</div>
+<h1 class="paper-title">Unsupervised Learning &amp; Time Series Analysis for Algorithmic Trading</h1>
+<div class="paper-subtitle">정답 없이 데이터의 숨겨진 구조를 발견하고, 시간의 흐름 속 패턴을 예측한다</div>
+<div class="paper-team">Textbooks: MLAT Ch.9, 13 / MLDSF Ch.7~10 / 파라활 sklearn 참고</div>
+<div class="progress-bar"><div class="progress-fill"></div></div>
+<div class="progress-label">Overall Progress: 50%</div>
+</div>
+
+<div class="abstract">
+<div class="abstract-title">Abstract</div>
+<p class="ni">
+라운드 4에서 우리는 "정답(label)이 있는" 지도학습을 배웠다. 주가가 오를지 내릴지, 수익률이 얼마일지 — 모델에게 정답을 알려주고 학습시켰다. 하지만 현실 금융 데이터의 대부분은 정답이 없다. 수백 개 종목 중 어떤 것들이 비슷한 움직임을 보이는지, 수십 개의 피처 중 진짜 중요한 축은 무엇인지, 시장이 지금 어떤 "레짐(regime)"에 있는지 — 이런 질문에는 라벨이 존재하지 않는다.
+</p>
+<p class="ni" style="margin-top:10px">
+이번 라운드에서는 두 가지 큰 축을 다룬다. 첫째, <strong>비지도학습(Unsupervised Learning)</strong>: PCA로 고차원 데이터를 압축하고, t-SNE로 시각화하며, K-Means/DBSCAN/계층적 클러스터링으로 종목을 군집화한다. 둘째, <strong>시계열 분석(Time Series Analysis)</strong>: 정상성 검정, ACF/PACF, ARIMA 모델, 그리고 GARCH로 변동성을 예측한다. 마지막으로 이 모든 것을 하나의 파이프라인으로 통합한다.
+</p>
+<p class="ni" style="margin-top:10px">
+<strong>교재 연동:</strong> MLAT Ch.13 "Data-Driven Risk Factors and Asset Allocation with Unsupervised Learning" + Ch.9 "Time-Series Models for Volatility Forecasts and Statistical Arbitrage" / MLDSF Ch.7~10 (비지도학습 케이스스터디: 포트폴리오, 클러스터링, 차원축소, 시계열)
+</p>
+</div>
+
+<!-- ==================== Ch.1 ==================== -->
+<h2 id="ch1">Chapter 1. 비지도학습이란 — 정답 없이 구조를 발견하다</h2>
+
+<h3>1.1 지도학습 vs 비지도학습: 근본적 차이</h3>
+
+<p>
+라운드 4에서 배운 지도학습(Supervised Learning)을 떠올려보자. 우리는 모델에게 "이 피처 조합일 때 주가가 올랐어(label=1)" 또는 "내렸어(label=0)"라고 알려줬다. 모델은 이 정답을 보고 패턴을 학습했다. 마치 선생님이 문제와 정답을 함께 주고 "이걸 외워"라고 하는 것과 같다.
+</p>
+
+<p>
+비지도학습(Unsupervised Learning)은 완전히 다르다. 정답이 없다. 모델에게 데이터만 던져주고 "여기서 뭔가 의미 있는 구조를 찾아봐"라고 한다. 마치 외국 도시에 지도 없이 떨어져서 "비슷한 동네끼리 묶어봐"라고 하는 것과 같다. 아무도 정답을 알려주지 않지만, 걸어 다니다 보면 번화가, 주택가, 공업지대 같은 패턴이 보이기 시작한다.
+</p>
+
+<!-- 지도 vs 비지도 비교 다이어그램 -->
+<div style="margin:25px 0;display:flex;gap:20px;flex-wrap:wrap;justify-content:center">
+<div style="flex:1;min-width:280px;background:linear-gradient(135deg,#e3f2fd,#bbdefb);padding:20px;border-radius:10px;border:2px solid #1976d2">
+<p class="ni" style="text-align:center;font-weight:bold;font-size:14px;color:#1565c0;margin-bottom:10px">🎓 지도학습 (Supervised)</p>
+<p class="ni" style="font-size:12px;margin-bottom:8px">📥 입력: 피처(X) + 정답(y)</p>
+<p class="ni" style="font-size:12px;margin-bottom:8px">🎯 목표: X → y 매핑 함수 학습</p>
+<p class="ni" style="font-size:12px;margin-bottom:8px">📊 평가: 정확도, AUC, MSE 등</p>
+<p class="ni" style="font-size:12px;margin-bottom:8px">💰 금융 예시: "내일 주가 방향 예측"</p>
+<p class="ni" style="font-size:11px;color:#555;margin-top:10px;border-top:1px solid #90caf9;padding-top:8px">R4에서 배운 것: 선형회귀, 로지스틱, RF, XGBoost...</p>
+</div>
+<div style="flex:1;min-width:280px;background:linear-gradient(135deg,#f3e5f5,#e1bee7);padding:20px;border-radius:10px;border:2px solid #7b1fa2">
+<p class="ni" style="text-align:center;font-weight:bold;font-size:14px;color:#6a1b9a;margin-bottom:10px">🔍 비지도학습 (Unsupervised)</p>
+<p class="ni" style="font-size:12px;margin-bottom:8px">📥 입력: 피처(X)만 — 정답 없음!</p>
+<p class="ni" style="font-size:12px;margin-bottom:8px">🎯 목표: 데이터의 숨겨진 구조 발견</p>
+<p class="ni" style="font-size:12px;margin-bottom:8px">📊 평가: 실루엣 점수, 분산 설명 비율 등</p>
+<p class="ni" style="font-size:12px;margin-bottom:8px">💰 금융 예시: "비슷한 종목끼리 묶기"</p>
+<p class="ni" style="font-size:11px;color:#555;margin-top:10px;border-top:1px solid #ce93d8;padding-top:8px">R5에서 배울 것: PCA, t-SNE, K-Means, DBSCAN...</p>
+</div>
+</div>
+
+<h3>1.2 비지도학습의 세 가지 핵심 과제</h3>
+
+<p>
+비지도학습이 해결하는 문제는 크게 세 가지로 나뉜다. 각각이 금융에서 어떤 역할을 하는지 이해하는 것이 중요하다.
+</p>
+
+<div class="tc">표 1-1. 비지도학습의 세 가지 핵심 과제</div>
+<table>
+<thead>
+<tr><th>과제</th><th>핵심 질문</th><th>대표 알고리즘</th><th>금융 적용</th></tr>
+</thead>
+<tbody>
+<tr><td><strong>차원 축소</strong><br>(Dimensionality Reduction)</td><td>수십 개 피처 중 진짜 중요한 축은?</td><td>PCA, t-SNE</td><td>팩터 추출, 노이즈 제거, 시각화</td></tr>
+<tr><td><strong>클러스터링</strong><br>(Clustering)</td><td>비슷한 데이터끼리 묶으면?</td><td>K-Means, DBSCAN, 계층적</td><td>종목 군집화, 섹터 자동 분류, 이상치 탐지</td></tr>
+<tr><td><strong>밀도 추정</strong><br>(Density Estimation)</td><td>데이터의 확률 분포는?</td><td>GMM, KDE</td><td>시장 레짐 탐지, VaR 추정</td></tr>
+</tbody>
+</table>
+
+<h3>1.3 왜 금융에서 비지도학습이 중요한가</h3>
+
+<p>
+"정답이 없는데 왜 배워야 하지?" — 이 질문은 자연스럽다. 하지만 금융에서 비지도학습이 중요한 이유는 명확하다.
+</p>
+
+<div class="def">
+<p class="ni"><strong>금융에서 비지도학습이 필수인 4가지 이유</strong></p>
+<ol>
+<li><strong>차원의 저주(Curse of Dimensionality):</strong> R3에서 만든 피처가 20개, 50개, 100개로 늘어나면 모델이 과적합에 빠진다. PCA로 핵심 축만 추출하면 노이즈를 제거하고 모델 성능을 높일 수 있다.</li>
+<li><strong>라벨의 부재:</strong> "이 종목은 성장주다/가치주다"라는 라벨은 주관적이다. 클러스터링은 데이터가 스스로 말하게 한다 — 수익률 패턴이 비슷한 종목끼리 자동으로 묶인다.</li>
+<li><strong>시장 레짐 탐지:</strong> 상승장, 하락장, 횡보장은 사후에야 알 수 있다. 비지도학습은 실시간으로 "지금 시장이 어떤 상태인지" 추정할 수 있다.</li>
+<li><strong>전처리 파이프라인:</strong> 비지도학습은 그 자체로 끝이 아니라, 지도학습의 입력을 개선하는 전처리 단계로 쓰인다. PCA로 압축한 피처를 XGBoost에 넣으면 성능이 올라가는 경우가 많다.</li>
+</ol>
+</div>
+
+<h3>1.4 이번 라운드의 로드맵</h3>
+
+<!-- 로드맵 다이어그램 (카드 스타일) -->
+<div style="margin:25px 0;padding:25px;background:linear-gradient(135deg,#f8f9fa,#e8eaf6);border-radius:12px;border:1px solid #c5cae9">
+<p class="ni" style="text-align:center;font-weight:bold;margin-bottom:20px;font-size:15px;color:#283593">🗺️ Round 5 학습 로드맵</p>
+<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px">
+<div style="background:#fff;padding:16px;border-radius:10px;box-shadow:0 2px 8px rgba(0,0,0,.08);border-left:5px solid #1976d2">
+<div style="font-size:11px;color:#1976d2;font-weight:bold;margin-bottom:4px">PART 1 · Ch.1~4</div>
+<div style="font-size:14px;font-weight:bold;color:#1a1a1a;margin-bottom:6px">🔬 차원 축소</div>
+<div style="font-size:11px;color:#666;line-height:1.5">PCA로 핵심 팩터를 추출하고<br>t-SNE로 고차원을 시각화한다</div>
+<div style="margin-top:8px;display:flex;gap:4px;flex-wrap:wrap">
+<span style="background:#e3f2fd;color:#1565c0;padding:2px 8px;border-radius:10px;font-size:10px">PCA</span>
+<span style="background:#e3f2fd;color:#1565c0;padding:2px 8px;border-radius:10px;font-size:10px">t-SNE</span>
+<span style="background:#e3f2fd;color:#1565c0;padding:2px 8px;border-radius:10px;font-size:10px">스크리 플롯</span>
+</div>
+</div>
+<div style="background:#fff;padding:16px;border-radius:10px;box-shadow:0 2px 8px rgba(0,0,0,.08);border-left:5px solid #7b1fa2">
+<div style="font-size:11px;color:#7b1fa2;font-weight:bold;margin-bottom:4px">PART 2 · Ch.5~8</div>
+<div style="font-size:14px;font-weight:bold;color:#1a1a1a;margin-bottom:6px">🎯 클러스터링</div>
+<div style="font-size:11px;color:#666;line-height:1.5">비슷한 종목끼리 묶고<br>이상치를 탐지한다</div>
+<div style="margin-top:8px;display:flex;gap:4px;flex-wrap:wrap">
+<span style="background:#f3e5f5;color:#6a1b9a;padding:2px 8px;border-radius:10px;font-size:10px">K-Means</span>
+<span style="background:#f3e5f5;color:#6a1b9a;padding:2px 8px;border-radius:10px;font-size:10px">DBSCAN</span>
+<span style="background:#f3e5f5;color:#6a1b9a;padding:2px 8px;border-radius:10px;font-size:10px">덴드로그램</span>
+</div>
+</div>
+<div style="background:#fff;padding:16px;border-radius:10px;box-shadow:0 2px 8px rgba(0,0,0,.08);border-left:5px solid #2e7d32">
+<div style="font-size:11px;color:#2e7d32;font-weight:bold;margin-bottom:4px">PART 3 · Ch.9~11</div>
+<div style="font-size:14px;font-weight:bold;color:#1a1a1a;margin-bottom:6px">📈 시계열 분석</div>
+<div style="font-size:11px;color:#666;line-height:1.5">정상성을 검정하고<br>변동성을 예측한다</div>
+<div style="margin-top:8px;display:flex;gap:4px;flex-wrap:wrap">
+<span style="background:#e8f5e9;color:#1b5e20;padding:2px 8px;border-radius:10px;font-size:10px">ADF</span>
+<span style="background:#e8f5e9;color:#1b5e20;padding:2px 8px;border-radius:10px;font-size:10px">ARIMA</span>
+<span style="background:#e8f5e9;color:#1b5e20;padding:2px 8px;border-radius:10px;font-size:10px">GARCH</span>
+</div>
+</div>
+<div style="background:#fff;padding:16px;border-radius:10px;box-shadow:0 2px 8px rgba(0,0,0,.08);border-left:5px solid #e65100">
+<div style="font-size:11px;color:#e65100;font-weight:bold;margin-bottom:4px">PART 4 · Ch.12~13</div>
+<div style="font-size:14px;font-weight:bold;color:#1a1a1a;margin-bottom:6px">🔧 통합 + 프로젝트</div>
+<div style="font-size:11px;color:#666;line-height:1.5">모든 것을 하나의 파이프라인으로<br>결합하여 포트폴리오를 구성한다</div>
+<div style="margin-top:8px;display:flex;gap:4px;flex-wrap:wrap">
+<span style="background:#fff3e0;color:#e65100;padding:2px 8px;border-radius:10px;font-size:10px">파이프라인</span>
+<span style="background:#fff3e0;color:#e65100;padding:2px 8px;border-radius:10px;font-size:10px">역변동성</span>
+<span style="background:#fff3e0;color:#e65100;padding:2px 8px;border-radius:10px;font-size:10px">미니 프로젝트</span>
+</div>
+</div>
+</div>
+<div style="text-align:center;margin-top:14px;font-size:11px;color:#666">
+<span style="display:inline-block;width:10px;height:10px;background:#1976d2;border-radius:50%;margin-right:3px;vertical-align:middle"></span> 차원 축소
+<span style="margin:0 8px">→</span>
+<span style="display:inline-block;width:10px;height:10px;background:#7b1fa2;border-radius:50%;margin-right:3px;vertical-align:middle"></span> 클러스터링
+<span style="margin:0 8px">→</span>
+<span style="display:inline-block;width:10px;height:10px;background:#2e7d32;border-radius:50%;margin-right:3px;vertical-align:middle"></span> 시계열
+<span style="margin:0 8px">→</span>
+<span style="display:inline-block;width:10px;height:10px;background:#e65100;border-radius:50%;margin-right:3px;vertical-align:middle"></span> 통합
+</div>
+</div>
+
+<div class="info">
+<p class="ni"><strong>교재 연동:</strong> MLAT Ch.13의 제목은 "Data-Driven Risk Factors and Asset Allocation with Unsupervised Learning"이다. 제목 자체가 말해준다 — 비지도학습으로 리스크 팩터를 추출하고 자산 배분에 활용한다. Ch.9는 "Time-Series Models for Volatility Forecasts and Statistical Arbitrage"로, 변동성 예측과 통계적 차익거래를 다룬다.</p>
+</div>
+
+
+<!-- ==================== Ch.2 ==================== -->
+<h2 id="ch2">Chapter 2. PCA 심화 — 고차원의 본질을 꿰뚫는 눈</h2>
+
+<h3>2.1 R2 복습: 고유값과 고유벡터</h3>
+
+<p>
+라운드 2에서 우리는 고유값(eigenvalue)과 고유벡터(eigenvector)를 배웠다. 행렬 \(A\)에 대해 \(A\mathbf{v} = \lambda\mathbf{v}\)를 만족하는 벡터 \(\mathbf{v}\)가 고유벡터, 스칼라 \(\lambda\)가 고유값이었다. 그때는 "행렬을 곱해도 방향이 안 변하는 특별한 벡터"라고 배웠다.
+</p>
+
+<p>
+PCA는 바로 이 고유값/고유벡터를 활용한다. 데이터의 공분산 행렬(Covariance Matrix)을 구하고, 그 행렬의 고유벡터를 찾으면 — 그것이 바로 데이터가 가장 많이 퍼져 있는 방향, 즉 <strong>주성분(Principal Component)</strong>이 된다.
+</p>
+
+<div class="def">
+<p class="ni"><strong>PCA의 핵심 아이디어 (한 문장 요약)</strong></p>
+<p class="ni" style="margin-top:8px">고차원 데이터에서 <strong>분산이 가장 큰 방향</strong>을 찾아 그 축으로 데이터를 투영(projection)한다. 분산이 크다 = 정보가 많다.</p>
+</div>
+
+<h3>2.2 직관: 왜 분산이 큰 방향이 중요한가</h3>
+
+<p>
+비유를 들어보자. 당신이 100명의 학생 데이터를 갖고 있다. 피처가 "키, 몸무게, 허리둘레, 가슴둘레, 팔 길이, 다리 길이..." 등 20개라고 하자. 이 20개 피처를 2개로 줄여야 한다면 어떤 축을 선택할 것인가?
+</p>
+
+<p>
+만약 "키"와 "몸무게"를 선택하면, 이 두 축만으로도 학생들을 꽤 잘 구분할 수 있다. 왜? 키가 크면 대체로 몸무게도 많이 나가고, 팔다리도 길고, 허리둘레도 크기 때문이다. 즉, "키"라는 하나의 축이 여러 피처의 정보를 동시에 담고 있다. 이것이 PCA가 하는 일이다 — 여러 피처의 정보를 최대한 보존하는 새로운 축을 만든다.
+</p>
+
+<!-- PCA 직관 다이어그램 -->
+<div style="margin:25px 0;padding:20px;background:#f0f4f8;border-radius:10px;text-align:center">
+<p class="ni" style="font-weight:bold;margin-bottom:15px;font-size:13px">PCA 직관: 2D 데이터를 1D로 압축</p>
+<div style="display:inline-block;position:relative;width:300px;height:200px;border:1px solid #ccc;background:#fff;border-radius:6px">
+<!-- 데이터 포인트들 (타원형 분포) -->
+<div style="position:absolute;left:40px;top:130px;width:6px;height:6px;background:#3498db;border-radius:50%"></div>
+<div style="position:absolute;left:70px;top:115px;width:6px;height:6px;background:#3498db;border-radius:50%"></div>
+<div style="position:absolute;left:90px;top:105px;width:6px;height:6px;background:#3498db;border-radius:50%"></div>
+<div style="position:absolute;left:110px;top:100px;width:6px;height:6px;background:#3498db;border-radius:50%"></div>
+<div style="position:absolute;left:130px;top:90px;width:6px;height:6px;background:#3498db;border-radius:50%"></div>
+<div style="position:absolute;left:150px;top:85px;width:6px;height:6px;background:#3498db;border-radius:50%"></div>
+<div style="position:absolute;left:170px;top:75px;width:6px;height:6px;background:#3498db;border-radius:50%"></div>
+<div style="position:absolute;left:200px;top:65px;width:6px;height:6px;background:#3498db;border-radius:50%"></div>
+<div style="position:absolute;left:230px;top:50px;width:6px;height:6px;background:#3498db;border-radius:50%"></div>
+<div style="position:absolute;left:250px;top:40px;width:6px;height:6px;background:#3498db;border-radius:50%"></div>
+<!-- PC1 화살표 (대각선) -->
+<div style="position:absolute;left:30px;top:140px;width:240px;height:2px;background:#e74c3c;transform:rotate(-25deg);transform-origin:left center"></div>
+<div style="position:absolute;left:260px;top:45px;font-size:11px;color:#e74c3c;font-weight:bold">PC1</div>
+<!-- PC2 화살표 (수직) -->
+<div style="position:absolute;left:140px;top:30px;width:80px;height:2px;background:#27ae60;transform:rotate(65deg);transform-origin:left center"></div>
+<div style="position:absolute;left:175px;top:20px;font-size:11px;color:#27ae60;font-weight:bold">PC2</div>
+</div>
+<p class="ni" style="font-size:11px;color:#666;margin-top:10px">빨간 축(PC1): 데이터가 가장 많이 퍼진 방향 → 정보량 최대<br>초록 축(PC2): PC1에 수직인 방향 → 남은 정보</p>
+</div>
+
+<h3>2.3 NumPy로 PCA를 밑바닥부터 구현하기</h3>
+
+<p>
+sklearn의 <code>PCA()</code>를 쓰면 한 줄이면 끝이지만, 내부에서 무슨 일이 벌어지는지 모르면 "마법의 블랙박스"가 된다. MLAT Ch.13에서도 강조하듯, PCA의 수학을 직접 구현해봐야 진짜 이해할 수 있다. R2에서 배운 고유값 분해를 직접 써보자.
+</p>
+
+<div class="cc">코드 2-1. NumPy로 PCA 밑바닥 구현</div>
+<pre><code><span class="kw">import</span> numpy <span class="kw">as</span> np
+<span class="kw">from</span> sklearn.datasets <span class="kw">import</span> load_iris
+<span class="kw">from</span> sklearn.preprocessing <span class="kw">import</span> StandardScaler
+
+<span class="cm"># 1. 데이터 로드 + 표준화</span>
+iris = <span class="fn">load_iris</span>()
+X = iris.data  <span class="cm"># (150, 4)</span>
+X_std = <span class="fn">StandardScaler</span>().<span class="fn">fit_transform</span>(X)
+
+<span class="cm"># 2. 공분산 행렬 계산 (R2 복습!)</span>
+<span class="cm">#    C = (1/(N-1)) * X^T X</span>
+cov_matrix = np.<span class="fn">cov</span>(X_std, rowvar=<span class="kw">False</span>)
+<span class="fn">print</span>(<span class="st">"공분산 행렬 (4×4):"</span>)
+<span class="fn">print</span>(np.<span class="fn">round</span>(cov_matrix, <span class="nu">3</span>))
+
+<span class="cm"># 3. 고유값 분해 (R2에서 배운 np.linalg.eigh)</span>
+eigenvalues, eigenvectors = np.linalg.<span class="fn">eigh</span>(cov_matrix)
+
+<span class="cm"># eigh는 오름차순 → 내림차순으로 정렬</span>
+idx = eigenvalues.<span class="fn">argsort</span>()[::-<span class="nu">1</span>]
+eigenvalues = eigenvalues[idx]
+eigenvectors = eigenvectors[:, idx]
+
+<span class="fn">print</span>(<span class="st">f"\n고유값: {eigenvalues.round(3)}"</span>)
+<span class="fn">print</span>(<span class="st">f"분산 설명 비율: {(eigenvalues / eigenvalues.sum()).round(3)}"</span>)
+
+<span class="cm"># 4. 상위 2개 고유벡터로 투영 (4D → 2D)</span>
+W = eigenvectors[:, :<span class="nu">2</span>]  <span class="cm"># (4, 2) 투영 행렬</span>
+X_pca_manual = X_std @ W  <span class="cm"># (150, 4) × (4, 2) = (150, 2)</span>
+
+<span class="fn">print</span>(<span class="st">f"\n투영 결과 shape: {X_pca_manual.shape}"</span>)
+<span class="fn">print</span>(<span class="st">f"PC1 분산 설명: {eigenvalues[0]/eigenvalues.sum():.1%}"</span>)
+<span class="fn">print</span>(<span class="st">f"PC1+PC2 누적: {eigenvalues[:2].sum()/eigenvalues.sum():.1%}"</span>)
+
+<span class="cm"># 5. sklearn PCA와 결과 비교 (부호만 다를 수 있음)</span>
+<span class="kw">from</span> sklearn.decomposition <span class="kw">import</span> PCA
+pca_sk = <span class="fn">PCA</span>(n_components=<span class="nu">2</span>).<span class="fn">fit_transform</span>(X_std)
+
+<span class="fn">print</span>(<span class="st">f"\n수동 PCA 첫 5행:\n{X_pca_manual[:5].round(3)}"</span>)
+<span class="fn">print</span>(<span class="st">f"sklearn PCA 첫 5행:\n{pca_sk[:5].round(3)}"</span>)
+<span class="fn">print</span>(<span class="st">"→ 값이 같거나 부호만 반대 (고유벡터 방향은 ±가 모두 유효)"</span>)</code></pre>
+
+<div class="ok">
+<p class="ni"><strong>핵심 포인트:</strong> PCA는 결국 (1) 표준화 → (2) 공분산 행렬 → (3) 고유값 분해 → (4) 상위 k개 고유벡터로 투영, 이 4단계가 전부다. sklearn은 이것을 한 줄로 해주지만, 내부 원리를 알아야 결과를 올바르게 해석할 수 있다. 특히 금융에서 "PC1 로딩이 모두 양수"라는 것이 왜 "시장 팩터"를 의미하는지는, 고유벡터의 의미를 알아야 이해할 수 있다.</p>
+</div>
+
+<h3>2.4 PCA의 수학적 원리 — 4단계 정리</h3>
+
+<p>
+위 코드를 수학적으로 정리하면 다음과 같다. PCA의 수학은 라운드 2에서 배운 선형대수의 직접적인 응용이다.
+</p>
+
+<p class="ni"><strong>Step 1: 데이터 표준화</strong></p>
+<p>
+각 피처의 스케일이 다르면 분산이 큰 피처가 PCA를 지배한다. 예를 들어 "주가(만 원 단위)"와 "수익률(소수점 단위)"을 함께 쓰면, 주가의 분산이 압도적으로 커서 PCA가 주가 방향만 잡는다. 따라서 반드시 표준화(StandardScaler)를 먼저 한다.
+</p>
+
+<div class="eq">
+$$z_{ij} = \frac{x_{ij} - \bar{x}_j}{\sigma_j}$$
+</div>
+
+<p class="ni"><strong>Step 2: 공분산 행렬 계산</strong></p>
+<p>
+표준화된 데이터의 공분산 행렬 \(C\)를 구한다. \(n\)개의 피처가 있으면 \(C\)는 \(n \times n\) 정방행렬이다.
+</p>
+
+<div class="eq">
+$$C = \frac{1}{N-1} Z^T Z$$
+</div>
+
+<p>
+여기서 \(Z\)는 표준화된 데이터 행렬(N개 샘플 × n개 피처)이다. 공분산 행렬의 대각 원소는 각 피처의 분산, 비대각 원소는 피처 간 공분산이다. R2에서 배운 포트폴리오 공분산 행렬과 정확히 같은 개념이다.
+</p>
+
+<p class="ni"><strong>Step 3: 고유값 분해 (Eigendecomposition)</strong></p>
+<p>
+공분산 행렬 \(C\)의 고유값과 고유벡터를 구한다:
+</p>
+
+<div class="eq">
+$$C \mathbf{w}_i = \lambda_i \mathbf{w}_i$$
+</div>
+
+<p>
+고유벡터 \(\mathbf{w}_i\)가 \(i\)번째 주성분의 방향, 고유값 \(\lambda_i\)가 그 방향의 분산(= 정보량)이다. 고유값이 클수록 그 주성분이 더 많은 정보를 담고 있다.
+</p>
+
+<p class="ni"><strong>Step 4: 주성분 선택 및 투영</strong></p>
+<p>
+고유값을 내림차순으로 정렬하고, 상위 \(k\)개의 고유벡터를 선택한다. 원본 데이터를 이 \(k\)개 축에 투영하면 차원이 \(n\)에서 \(k\)로 줄어든다.
+</p>
+
+<div class="eq">
+$$Z_{\text{reduced}} = Z \cdot W_k \quad (N \times k \text{ 행렬})$$
+</div>
+
+<p>
+여기서 \(W_k\)는 상위 \(k\)개 고유벡터를 열로 쌓은 \(n \times k\) 행렬이다.
+</p>
+
+<div class="warn">
+<p class="ni"><strong>⚠️ PCA의 핵심 가정 (MLAT Ch.13)</strong></p>
+<ul>
+<li><strong>높은 분산 = 높은 신호 대 잡음비(SNR):</strong> 분산이 큰 방향에 유용한 정보가 있다고 가정한다.</li>
+<li><strong>선형 변환:</strong> PCA는 선형 변환만 수행한다. 비선형 관계는 포착하지 못한다 (→ t-SNE가 필요한 이유).</li>
+<li><strong>정규분포 가정:</strong> 1차, 2차 모멘트(평균, 분산)만 고려한다. 금융 데이터의 꼬리 위험(fat tail)은 반영하지 못한다.</li>
+<li><strong>데이터 표준화 필수:</strong> 스케일이 다르면 결과가 왜곡된다.</li>
+</ul>
+</div>
+
+<h3>2.5 분산 설명 비율 (Explained Variance Ratio)</h3>
+
+<p>
+"주성분을 몇 개 선택해야 하는가?" — 이 질문에 답하는 것이 분산 설명 비율이다. 각 주성분이 전체 분산의 몇 퍼센트를 설명하는지 계산한다.
+</p>
+
+<div class="eq">
+$$\text{Explained Variance Ratio}_i = \frac{\lambda_i}{\sum_{j=1}^{n} \lambda_j}$$
+</div>
+
+<p>
+예를 들어 고유값이 [5.2, 2.1, 0.8, 0.5, 0.4]이면, 전체 합은 9.0이고:
+</p>
+<ul>
+<li>PC1: 5.2/9.0 = 57.8% — 첫 번째 주성분만으로 전체 정보의 58%를 설명</li>
+<li>PC2: 2.1/9.0 = 23.3% — 두 번째까지 합치면 81.1%</li>
+<li>PC3: 0.8/9.0 = 8.9% — 세 번째까지 합치면 90.0%</li>
+</ul>
+
+<p>
+보통 누적 분산 설명 비율이 <strong>90~95%</strong>에 도달하는 지점에서 주성분 개수를 결정한다. 이것을 시각화한 것이 <strong>스크리 플롯(Scree Plot)</strong>이다.
+</p>
+
+<h3>2.6 금융에서의 PCA: 팩터 추출</h3>
+
+<p>
+금융에서 PCA의 가장 중요한 응용은 <strong>리스크 팩터 추출</strong>이다. MLAT Ch.13에서 Stefan Jansen은 S&P 500 종목의 일간 수익률에 PCA를 적용한다. 결과는 놀랍다:
+</p>
+
+<div class="ok">
+<p class="ni"><strong>MLAT의 핵심 발견 (Ch.13)</strong></p>
+<ul>
+<li><strong>PC1 (첫 번째 주성분):</strong> 전체 수익률 변동의 약 55%를 설명한다. 이것은 "시장 팩터(Market Factor)"로 해석된다 — 모든 종목이 함께 오르내리는 공통 움직임이다.</li>
+<li><strong>PC2~PC5:</strong> 산업별/스타일별 팩터로 해석된다 (예: 기술주 vs 금융주, 성장주 vs 가치주).</li>
+<li><strong>나머지 PC들:</strong> 개별 종목의 고유한 노이즈 — 버려도 된다.</li>
+</ul>
+<p class="ni" style="margin-top:8px">즉, 수백 개 종목의 수익률을 5~10개의 주성분으로 압축해도 대부분의 정보가 보존된다!</p>
+</div>
+
+<p>
+이것은 R2에서 배운 포트폴리오 이론과 직결된다. 마코위츠의 평균-분산 최적화에서 공분산 행렬을 직접 쓰면 추정 오차가 크다(종목이 500개면 공분산 행렬 원소가 125,000개!). PCA로 5~10개 팩터로 압축하면 추정 오차가 극적으로 줄어든다.
+</p>
+
+<div class="info">
+<p class="ni"><strong>교재 연동:</strong> MLDSF Ch.9 "Dimensionality Reduction"에서는 수익률 곡선(Yield Curve)에 PCA를 적용하여 Level(수준), Slope(기울기), Curvature(곡률) 세 가지 팩터를 추출하는 사례를 다룬다. 채권 시장에서 PCA는 거의 표준 도구이다.</p>
+</div>
+
+
+<!-- ==================== Ch.3 ==================== -->
+<h2 id="ch3">Chapter 3. PCA 실전 코드 — sklearn으로 종목 수익률 분석</h2>
+
+<h3>3.1 기본 PCA: 붓꽃 데이터로 워밍업</h3>
+
+<p>
+금융 데이터에 바로 들어가기 전에, 먼저 유명한 붓꽃(Iris) 데이터셋으로 PCA의 기본 사용법을 익히자. 4차원 데이터를 2차원으로 압축하는 과정이다.
+</p>
+
+<div class="cc">코드 3-1. Iris 데이터 PCA (4D → 2D)</div>
+<pre><code><span class="kw">import</span> numpy <span class="kw">as</span> np
+<span class="kw">import</span> pandas <span class="kw">as</span> pd
+<span class="kw">import</span> matplotlib.pyplot <span class="kw">as</span> plt
+<span class="kw">from</span> sklearn.datasets <span class="kw">import</span> load_iris
+<span class="kw">from</span> sklearn.preprocessing <span class="kw">import</span> StandardScaler
+<span class="kw">from</span> sklearn.decomposition <span class="kw">import</span> PCA
+
+<span class="cm"># 1. 데이터 로드</span>
+iris = <span class="fn">load_iris</span>()
+X = iris.data          <span class="cm"># (150, 4) — 4개 피처</span>
+y = iris.target        <span class="cm"># 0, 1, 2 — 3개 품종</span>
+feature_names = iris.feature_names
+
+<span class="fn">print</span>(<span class="st">f"원본 데이터 shape: {X.shape}"</span>)
+<span class="fn">print</span>(<span class="st">f"피처: {feature_names}"</span>)
+
+<span class="cm"># 2. 표준화 (PCA 전 필수!)</span>
+scaler = <span class="fn">StandardScaler</span>()
+X_scaled = scaler.<span class="fn">fit_transform</span>(X)
+
+<span class="cm"># 3. PCA 적용 (4D → 2D)</span>
+pca = <span class="fn">PCA</span>(n_components=<span class="nu">2</span>)
+X_pca = pca.<span class="fn">fit_transform</span>(X_scaled)
+
+<span class="fn">print</span>(<span class="st">f"\nPCA 후 shape: {X_pca.shape}"</span>)
+<span class="fn">print</span>(<span class="st">f"분산 설명 비율: {pca.explained_variance_ratio_}"</span>)
+<span class="fn">print</span>(<span class="st">f"누적 설명 비율: {pca.explained_variance_ratio_.sum():.1%}"</span>)
+
+<span class="cm"># 4. 시각화</span>
+fig, axes = plt.<span class="fn">subplots</span>(<span class="nu">1</span>, <span class="nu">2</span>, figsize=(<span class="nu">14</span>, <span class="nu">5</span>))
+
+<span class="cm"># 왼쪽: PCA 산점도</span>
+colors = [<span class="st">'#e74c3c'</span>, <span class="st">'#3498db'</span>, <span class="st">'#2ecc71'</span>]
+<span class="kw">for</span> i, name <span class="kw">in</span> <span class="fn">enumerate</span>(iris.target_names):
+    mask = y == i
+    axes[<span class="nu">0</span>].<span class="fn">scatter</span>(X_pca[mask, <span class="nu">0</span>], X_pca[mask, <span class="nu">1</span>],
+                    c=colors[i], label=name, alpha=<span class="nu">0.7</span>, s=<span class="nu">50</span>)
+axes[<span class="nu">0</span>].<span class="fn">set_xlabel</span>(<span class="st">'PC1 (72.8%)'</span>)
+axes[<span class="nu">0</span>].<span class="fn">set_ylabel</span>(<span class="st">'PC2 (22.9%)'</span>)
+axes[<span class="nu">0</span>].<span class="fn">set_title</span>(<span class="st">'PCA: 4D → 2D (95.7% 정보 보존)'</span>)
+axes[<span class="nu">0</span>].<span class="fn">legend</span>()
+axes[<span class="nu">0</span>].<span class="fn">grid</span>(<span class="kw">True</span>, alpha=<span class="nu">0.3</span>)
+
+<span class="cm"># 오른쪽: 스크리 플롯</span>
+pca_full = <span class="fn">PCA</span>().<span class="fn">fit</span>(X_scaled)
+axes[<span class="nu">1</span>].<span class="fn">bar</span>(<span class="fn">range</span>(<span class="nu">1</span>, <span class="nu">5</span>), pca_full.explained_variance_ratio_,
+         color=<span class="st">'#3498db'</span>, alpha=<span class="nu">0.7</span>, label=<span class="st">'개별'</span>)
+axes[<span class="nu">1</span>].<span class="fn">plot</span>(<span class="fn">range</span>(<span class="nu">1</span>, <span class="nu">5</span>), np.<span class="fn">cumsum</span>(pca_full.explained_variance_ratio_),
+          <span class="st">'ro-'</span>, label=<span class="st">'누적'</span>)
+axes[<span class="nu">1</span>].<span class="fn">axhline</span>(y=<span class="nu">0.95</span>, color=<span class="st">'gray'</span>, linestyle=<span class="st">'--'</span>, alpha=<span class="nu">0.5</span>)
+axes[<span class="nu">1</span>].<span class="fn">set_xlabel</span>(<span class="st">'주성분 번호'</span>)
+axes[<span class="nu">1</span>].<span class="fn">set_ylabel</span>(<span class="st">'분산 설명 비율'</span>)
+axes[<span class="nu">1</span>].<span class="fn">set_title</span>(<span class="st">'스크리 플롯 (Scree Plot)'</span>)
+axes[<span class="nu">1</span>].<span class="fn">legend</span>()
+axes[<span class="nu">1</span>].<span class="fn">grid</span>(<span class="kw">True</span>, alpha=<span class="nu">0.3</span>)
+
+plt.<span class="fn">tight_layout</span>()
+plt.<span class="fn">show</span>()</code></pre>
+
+<div class="info">
+<p class="ni"><strong>코드 해석:</strong> 4개 피처(꽃받침 길이/너비, 꽃잎 길이/너비)를 2개 주성분으로 압축했다. PC1이 72.8%, PC2가 22.9%를 설명하여 총 95.7%의 정보가 보존된다. 산점도를 보면 3개 품종이 2D에서도 잘 분리된다 — PCA가 핵심 정보를 잘 추출한 것이다.</p>
+</div>
+
+<h3>3.2 금융 PCA: 종목 수익률에서 팩터 추출</h3>
+
+<p>
+이제 진짜 금융 데이터에 PCA를 적용하자. 여러 종목의 일간 수익률에서 공통 팩터를 추출한다. MLAT Ch.13의 접근법을 따른다.
+</p>
+
+<div class="cc">코드 3-2. 종목 수익률 PCA — 팩터 추출</div>
+<pre><code><span class="kw">import</span> yfinance <span class="kw">as</span> yf
+<span class="kw">from</span> sklearn.preprocessing <span class="kw">import</span> StandardScaler
+<span class="kw">from</span> sklearn.decomposition <span class="kw">import</span> PCA
+
+<span class="cm"># 1. 다양한 섹터의 종목 수집</span>
+tickers = {
+    <span class="st">'Tech'</span>:    [<span class="st">'AAPL'</span>, <span class="st">'MSFT'</span>, <span class="st">'GOOGL'</span>, <span class="st">'NVDA'</span>],
+    <span class="st">'Finance'</span>: [<span class="st">'JPM'</span>, <span class="st">'BAC'</span>, <span class="st">'GS'</span>, <span class="st">'MS'</span>],
+    <span class="st">'Energy'</span>:  [<span class="st">'XOM'</span>, <span class="st">'CVX'</span>, <span class="st">'COP'</span>, <span class="st">'SLB'</span>],
+    <span class="st">'Health'</span>:  [<span class="st">'JNJ'</span>, <span class="st">'PFE'</span>, <span class="st">'UNH'</span>, <span class="st">'MRK'</span>],
+    <span class="st">'Consumer'</span>:[<span class="st">'WMT'</span>, <span class="st">'PG'</span>, <span class="st">'KO'</span>, <span class="st">'MCD'</span>]
+}
+all_tickers = [t <span class="kw">for</span> lst <span class="kw">in</span> tickers.values() <span class="kw">for</span> t <span class="kw">in</span> lst]
+
+<span class="cm"># 2. 2년간 일간 수익률 계산</span>
+prices = yf.<span class="fn">download</span>(all_tickers, start=<span class="st">'2023-01-01'</span>,
+                     end=<span class="st">'2025-01-01'</span>)[<span class="st">'Close'</span>]
+returns = prices.<span class="fn">pct_change</span>().<span class="fn">dropna</span>()
+
+<span class="fn">print</span>(<span class="st">f"수익률 행렬: {returns.shape}"</span>)
+<span class="fn">print</span>(<span class="st">f"  → {returns.shape[0]}일 × {returns.shape[1]}종목"</span>)
+
+<span class="cm"># 3. 표준화 + PCA</span>
+scaler = <span class="fn">StandardScaler</span>()
+returns_scaled = scaler.<span class="fn">fit_transform</span>(returns)
+
+pca = <span class="fn">PCA</span>()
+pca.<span class="fn">fit</span>(returns_scaled)
+
+<span class="cm"># 4. 스크리 플롯 — 몇 개의 팩터가 필요한가?</span>
+fig, axes = plt.<span class="fn">subplots</span>(<span class="nu">1</span>, <span class="nu">2</span>, figsize=(<span class="nu">14</span>, <span class="nu">5</span>))
+
+<span class="cm"># 개별 + 누적 분산 설명 비율</span>
+n_comp = <span class="fn">len</span>(pca.explained_variance_ratio_)
+axes[<span class="nu">0</span>].<span class="fn">bar</span>(<span class="fn">range</span>(<span class="nu">1</span>, n_comp+<span class="nu">1</span>), pca.explained_variance_ratio_,
+         color=<span class="st">'#3498db'</span>, alpha=<span class="nu">0.7</span>)
+axes[<span class="nu">0</span>].<span class="fn">set_xlabel</span>(<span class="st">'주성분 번호'</span>)
+axes[<span class="nu">0</span>].<span class="fn">set_ylabel</span>(<span class="st">'분산 설명 비율'</span>)
+axes[<span class="nu">0</span>].<span class="fn">set_title</span>(<span class="st">'개별 분산 설명 비율'</span>)
+
+cumsum = np.<span class="fn">cumsum</span>(pca.explained_variance_ratio_)
+axes[<span class="nu">1</span>].<span class="fn">plot</span>(<span class="fn">range</span>(<span class="nu">1</span>, n_comp+<span class="nu">1</span>), cumsum, <span class="st">'bo-'</span>)
+axes[<span class="nu">1</span>].<span class="fn">axhline</span>(y=<span class="nu">0.90</span>, color=<span class="st">'red'</span>, linestyle=<span class="st">'--'</span>, label=<span class="st">'90% 기준선'</span>)
+axes[<span class="nu">1</span>].<span class="fn">axhline</span>(y=<span class="nu">0.95</span>, color=<span class="st">'orange'</span>, linestyle=<span class="st">'--'</span>, label=<span class="st">'95% 기준선'</span>)
+axes[<span class="nu">1</span>].<span class="fn">set_xlabel</span>(<span class="st">'주성분 개수'</span>)
+axes[<span class="nu">1</span>].<span class="fn">set_ylabel</span>(<span class="st">'누적 분산 설명 비율'</span>)
+axes[<span class="nu">1</span>].<span class="fn">set_title</span>(<span class="st">'누적 스크리 플롯'</span>)
+axes[<span class="nu">1</span>].<span class="fn">legend</span>()
+
+plt.<span class="fn">tight_layout</span>()
+plt.<span class="fn">show</span>()
+
+<span class="cm"># 5. 주성분 로딩(loading) 분석 — 각 PC가 어떤 종목과 관련되는가</span>
+loadings = pd.<span class="fn">DataFrame</span>(
+    pca.components_[:<span class="nu">5</span>].T,  <span class="cm"># 상위 5개 PC</span>
+    index=returns.columns,
+    columns=[<span class="st">f'PC{i+1}'</span> <span class="kw">for</span> i <span class="kw">in</span> <span class="fn">range</span>(<span class="nu">5</span>)]
+)
+
+<span class="fn">print</span>(<span class="st">"\n=== 주성분 로딩 (상위 5개 PC) ==="</span>)
+<span class="fn">print</span>(loadings.<span class="fn">round</span>(<span class="nu">3</span>))
+
+<span class="cm"># 6. PC1 로딩 히트맵 — "시장 팩터" 확인</span>
+fig, ax = plt.<span class="fn">subplots</span>(figsize=(<span class="nu">10</span>, <span class="nu">6</span>))
+loadings.<span class="fn">plot</span>(kind=<span class="st">'bar'</span>, ax=ax)
+ax.<span class="fn">set_title</span>(<span class="st">'주성분 로딩: 각 종목이 어떤 PC에 기여하는가'</span>)
+ax.<span class="fn">set_ylabel</span>(<span class="st">'로딩 값'</span>)
+ax.<span class="fn">legend</span>(bbox_to_anchor=(<span class="nu">1.05</span>, <span class="nu">1</span>))
+plt.<span class="fn">xticks</span>(rotation=<span class="nu">45</span>)
+plt.<span class="fn">tight_layout</span>()
+plt.<span class="fn">show</span>()</code></pre>
+
+<div class="ok">
+<p class="ni"><strong>기대 결과 해석</strong></p>
+<ul>
+<li><strong>PC1 (시장 팩터):</strong> 모든 종목의 로딩이 비슷한 크기로 양수 → 시장 전체가 함께 움직이는 공통 요인</li>
+<li><strong>PC2 (섹터 팩터):</strong> 기술주는 양수, 에너지주는 음수 등 → 섹터 간 차이를 포착</li>
+<li><strong>PC3~5:</strong> 더 세부적인 스타일/산업 팩터</li>
+</ul>
+<p class="ni" style="margin-top:8px">이것이 MLAT에서 말하는 "Data-Driven Risk Factors" — 데이터가 스스로 말해주는 리스크 팩터이다.</p>
+</div>
+
+<h3>3.3 PCA를 지도학습 전처리로 활용</h3>
+
+<p>
+PCA의 또 다른 강력한 용도는 R4에서 배운 지도학습 모델의 입력을 개선하는 것이다. 피처가 너무 많으면 과적합이 발생하는데, PCA로 차원을 줄이면 노이즈가 제거되어 모델 성능이 올라갈 수 있다.
+</p>
+
+<div class="cc">코드 3-3. PCA + XGBoost 파이프라인</div>
+<pre><code><span class="kw">from</span> sklearn.pipeline <span class="kw">import</span> Pipeline
+<span class="kw">from</span> sklearn.decomposition <span class="kw">import</span> PCA
+<span class="kw">from</span> sklearn.preprocessing <span class="kw">import</span> StandardScaler
+<span class="kw">from</span> sklearn.model_selection <span class="kw">import</span> TimeSeriesSplit, cross_val_score
+<span class="kw">from</span> xgboost <span class="kw">import</span> XGBClassifier
+
+<span class="cm"># PCA 없이 vs PCA 있을 때 비교</span>
+pipe_no_pca = <span class="fn">Pipeline</span>([
+    (<span class="st">'scaler'</span>, <span class="fn">StandardScaler</span>()),
+    (<span class="st">'xgb'</span>, <span class="fn">XGBClassifier</span>(n_estimators=<span class="nu">100</span>, max_depth=<span class="nu">3</span>,
+                          eval_metric=<span class="st">'logloss'</span>))
+])
+
+pipe_with_pca = <span class="fn">Pipeline</span>([
+    (<span class="st">'scaler'</span>, <span class="fn">StandardScaler</span>()),
+    (<span class="st">'pca'</span>, <span class="fn">PCA</span>(n_components=<span class="nu">0.95</span>)),  <span class="cm"># 95% 분산 보존</span>
+    (<span class="st">'xgb'</span>, <span class="fn">XGBClassifier</span>(n_estimators=<span class="nu">100</span>, max_depth=<span class="nu">3</span>,
+                          eval_metric=<span class="st">'logloss'</span>))
+])
+
+<span class="cm"># TimeSeriesSplit으로 교차검증 (R4 복습)</span>
+tscv = <span class="fn">TimeSeriesSplit</span>(n_splits=<span class="nu">5</span>)
+
+<span class="cm"># X_features, y_target은 R4에서 만든 피처/타겟이라고 가정</span>
+<span class="cm"># scores_no = cross_val_score(pipe_no_pca, X_features, y_target,</span>
+<span class="cm">#                            cv=tscv, scoring='roc_auc')</span>
+<span class="cm"># scores_pca = cross_val_score(pipe_with_pca, X_features, y_target,</span>
+<span class="cm">#                             cv=tscv, scoring='roc_auc')</span>
+<span class="cm"># print(f"PCA 없이: {scores_no.mean():.4f}")</span>
+<span class="cm"># print(f"PCA 있을 때: {scores_pca.mean():.4f}")</span></code></pre>
+
+<div class="warn">
+<p class="ni"><strong>⚠️ PCA + 지도학습 주의사항</strong></p>
+<ul>
+<li><strong>PCA는 항상 성능을 올리지 않는다.</strong> 트리 기반 모델(RF, XGBoost)은 자체적으로 피처 선택을 하므로 PCA가 오히려 해로울 수 있다.</li>
+<li><strong>PCA는 선형 모델(로지스틱, SVM)에 더 효과적이다.</strong> 다중공선성을 제거하기 때문이다.</li>
+<li><strong>n_components=0.95:</strong> 숫자 대신 비율을 넣으면 95% 분산을 보존하는 최소 주성분 수를 자동 선택한다.</li>
+</ul>
+</div>
+
+
+<!-- ==================== Ch.4 ==================== -->
+<h2 id="ch4">Chapter 4. t-SNE — 비선형 차원 축소와 고차원 시각화</h2>
+
+<h3>4.1 PCA의 한계: 왜 t-SNE가 필요한가</h3>
+
+<p>
+PCA는 강력하지만 치명적인 한계가 있다 — <strong>선형 변환만 수행한다</strong>. 데이터의 관계가 비선형이면 PCA는 그 구조를 포착하지 못한다. 비유하자면, PCA는 종이를 접지 않고 평평하게 펼치는 것이다. 하지만 데이터가 스위스 롤(Swiss Roll)처럼 말려 있다면? 평평하게 펼치면 구조가 깨진다.
+</p>
+
+<p>
+t-SNE(t-distributed Stochastic Neighbor Embedding)는 이 문제를 해결한다. 고차원에서 가까운 점들은 저차원에서도 가까이, 먼 점들은 멀리 배치하는 비선형 방법이다. 특히 <strong>시각화(2D/3D)</strong>에 탁월하다.
+</p>
+
+<div class="def">
+<p class="ni"><strong>PCA vs t-SNE 핵심 차이</strong></p>
+<table>
+<thead>
+<tr><th>특성</th><th>PCA</th><th>t-SNE</th></tr>
+</thead>
+<tbody>
+<tr><td>변환 유형</td><td>선형</td><td>비선형</td></tr>
+<tr><td>보존하는 것</td><td>전역 구조 (분산)</td><td>지역 구조 (이웃 관계)</td></tr>
+<tr><td>주 용도</td><td>차원 축소 + 전처리</td><td>시각화 (2D/3D)</td></tr>
+<tr><td>속도</td><td>빠름 (O(n²) 이하)</td><td>느림 (O(n²))</td></tr>
+<tr><td>재현성</td><td>결정적 (항상 같은 결과)</td><td>확률적 (random_state 필요)</td></tr>
+<tr><td>역변환</td><td>가능 (inverse_transform)</td><td>불가능</td></tr>
+<tr><td>새 데이터 적용</td><td>가능 (transform)</td><td>불가능 (전체 재계산 필요)</td></tr>
+</tbody>
+</table>
+</div>
+
+<h3>4.2 t-SNE의 직관적 원리</h3>
+
+<p>
+t-SNE의 아이디어를 비유로 설명하자. 당신이 100명의 사람들 사이의 "친밀도"를 알고 있다고 하자. 이 100명을 2D 평면에 배치하되, 친한 사람끼리는 가까이, 안 친한 사람끼리는 멀리 놓고 싶다. t-SNE가 정확히 이 일을 한다.
+</p>
+
+<p class="ni"><strong>Step 1: 고차원에서 "유사도" 계산</strong></p>
+<p>
+고차원 공간에서 각 점 쌍의 유사도를 가우시안 분포로 계산한다. 가까운 점은 높은 확률, 먼 점은 낮은 확률을 부여한다.
+</p>
+
+<div class="eq">
+$$p_{j|i} = \frac{\exp(-\|x_i - x_j\|^2 / 2\sigma_i^2)}{\sum_{k \neq i} \exp(-\|x_i - x_k\|^2 / 2\sigma_i^2)}$$
+</div>
+
+<p class="ni"><strong>Step 2: 저차원에서 "유사도" 계산</strong></p>
+<p>
+저차원(2D)에 랜덤으로 점을 배치하고, t-분포(Student's t-distribution)로 유사도를 계산한다. t-분포를 쓰는 이유는 꼬리가 두꺼워서 먼 점들을 더 잘 분리하기 때문이다.
+</p>
+
+<div class="eq">
+$$q_{ij} = \frac{(1 + \|y_i - y_j\|^2)^{-1}}{\sum_{k \neq l} (1 + \|y_k - y_l\|^2)^{-1}}$$
+</div>
+
+<p class="ni"><strong>Step 3: 두 분포의 차이를 최소화</strong></p>
+<p>
+고차원 유사도(p)와 저차원 유사도(q)의 차이를 KL-divergence로 측정하고, 경사하강법으로 최소화한다. 즉, 저차원 배치를 조금씩 조정하여 고차원의 이웃 관계를 최대한 보존한다.
+</p>
+
+<h3>4.3 perplexity 파라미터의 이해</h3>
+
+<p>
+t-SNE에서 가장 중요한 하이퍼파라미터는 <strong>perplexity</strong>이다. 직관적으로 "각 점이 몇 개의 이웃을 고려할 것인가"를 결정한다.
+</p>
+
+<div class="info">
+<p class="ni"><strong>perplexity 가이드</strong></p>
+<ul>
+<li><strong>perplexity = 5~10:</strong> 매우 가까운 이웃만 고려 → 작은 클러스터가 많이 생김</li>
+<li><strong>perplexity = 30 (기본값):</strong> 적당한 범위의 이웃 → 대부분의 경우 잘 작동</li>
+<li><strong>perplexity = 50~100:</strong> 넓은 범위의 이웃 → 큰 구조가 보임</li>
+<li><strong>경험 법칙:</strong> 데이터 크기의 1/3 이하로 설정. 데이터가 1000개면 perplexity ≤ 300</li>
+</ul>
+</div>
+
+<h3>4.4 perplexity에 따른 결과 변화 — 직접 비교</h3>
+
+<p>
+perplexity가 결과에 얼마나 큰 영향을 미치는지 직접 눈으로 확인해보자. 같은 데이터에 perplexity를 5, 15, 30, 50으로 바꿔가며 t-SNE를 적용한다. 이것은 t-SNE를 쓸 때 반드시 해봐야 하는 실험이다.
+</p>
+
+<div class="cc">코드 4-0. perplexity 비교 실험</div>
+<pre><code><span class="kw">from</span> sklearn.manifold <span class="kw">import</span> TSNE
+<span class="kw">from</span> sklearn.datasets <span class="kw">import</span> load_digits
+<span class="kw">import</span> matplotlib.pyplot <span class="kw">as</span> plt
+
+<span class="cm"># 손글씨 숫자 데이터 (64차원 → 2차원)</span>
+digits = <span class="fn">load_digits</span>()
+X_digits = digits.data     <span class="cm"># (1797, 64)</span>
+y_digits = digits.target   <span class="cm"># 0~9</span>
+
+perplexities = [<span class="nu">5</span>, <span class="nu">15</span>, <span class="nu">30</span>, <span class="nu">50</span>]
+fig, axes = plt.<span class="fn">subplots</span>(<span class="nu">1</span>, <span class="nu">4</span>, figsize=(<span class="nu">24</span>, <span class="nu">5</span>))
+
+<span class="kw">for</span> ax, perp <span class="kw">in</span> <span class="fn">zip</span>(axes, perplexities):
+    tsne = <span class="fn">TSNE</span>(n_components=<span class="nu">2</span>, perplexity=perp,
+                random_state=<span class="nu">42</span>, n_iter=<span class="nu">1000</span>)
+    X_2d = tsne.<span class="fn">fit_transform</span>(X_digits)
+
+    scatter = ax.<span class="fn">scatter</span>(X_2d[:, <span class="nu">0</span>], X_2d[:, <span class="nu">1</span>],
+                         c=y_digits, cmap=<span class="st">'tab10'</span>,
+                         s=<span class="nu">5</span>, alpha=<span class="nu">0.7</span>)
+    ax.<span class="fn">set_title</span>(<span class="st">f'perplexity = {perp}'</span>, fontsize=<span class="nu">13</span>)
+    ax.<span class="fn">set_xticks</span>([])
+    ax.<span class="fn">set_yticks</span>([])
+
+plt.<span class="fn">suptitle</span>(<span class="st">'t-SNE: perplexity에 따른 클러스터 변화 (64D → 2D)'</span>,
+            fontsize=<span class="nu">14</span>, fontweight=<span class="st">'bold'</span>)
+plt.<span class="fn">tight_layout</span>()
+plt.<span class="fn">show</span>()</code></pre>
+
+<div class="warn">
+<p class="ni"><strong>⚠️ 결과 해석 가이드</strong></p>
+<ul>
+<li><strong>perplexity=5:</strong> 아주 가까운 이웃만 고려 → 작은 조각들이 흩어져 보인다. 전역 구조가 깨질 수 있다.</li>
+<li><strong>perplexity=15:</strong> 적당히 좁은 범위 → 클러스터가 형성되기 시작하지만 일부 숫자가 섞일 수 있다.</li>
+<li><strong>perplexity=30 (기본값):</strong> 대부분의 경우 가장 깔끔한 클러스터. 0~9 숫자가 잘 분리된다.</li>
+<li><strong>perplexity=50:</strong> 넓은 범위 → 클러스터가 뭉개지기 시작. 전역 구조는 보이지만 세부 분리가 약해진다.</li>
+</ul>
+<p class="ni" style="margin-top:8px"><strong>교훈:</strong> t-SNE 결과를 하나만 보고 판단하지 마라. 반드시 여러 perplexity로 실험하고, 일관되게 나타나는 패턴만 신뢰하라.</p>
+</div>
+
+<h3>4.5 t-SNE 실전: 종목 수익률 시각화</h3>
+
+<div class="cc">코드 4-1. t-SNE로 종목 클러스터 시각화</div>
+<pre><code><span class="kw">from</span> sklearn.manifold <span class="kw">import</span> TSNE
+
+<span class="cm"># returns_scaled는 코드 3-2에서 만든 표준화된 수익률</span>
+<span class="cm"># 종목별 평균 수익률 패턴을 t-SNE로 시각화</span>
+
+<span class="cm"># 1. 종목별 통계 피처 생성 (수익률의 요약 통계)</span>
+stock_features = pd.<span class="fn">DataFrame</span>({
+    <span class="st">'mean_ret'</span>: returns.<span class="fn">mean</span>(),
+    <span class="st">'std_ret'</span>: returns.<span class="fn">std</span>(),
+    <span class="st">'skew'</span>: returns.<span class="fn">skew</span>(),
+    <span class="st">'kurt'</span>: returns.<span class="fn">kurtosis</span>(),
+    <span class="st">'sharpe'</span>: returns.<span class="fn">mean</span>() / returns.<span class="fn">std</span>() * np.<span class="fn">sqrt</span>(<span class="nu">252</span>)
+})
+
+<span class="cm"># 상관행렬을 피처로 사용 (종목 간 상관관계 패턴)</span>
+corr_matrix = returns.<span class="fn">corr</span>()
+
+<span class="cm"># 2. t-SNE 적용 (상관행렬 기반)</span>
+tsne = <span class="fn">TSNE</span>(n_components=<span class="nu">2</span>, perplexity=<span class="nu">5</span>, random_state=<span class="nu">42</span>,
+             n_iter=<span class="nu">1000</span>)
+tsne_result = tsne.<span class="fn">fit_transform</span>(corr_matrix.values)
+
+<span class="cm"># 3. 섹터별 색상 매핑</span>
+sector_map = {}
+sector_colors = {<span class="st">'Tech'</span>:<span class="st">'#e74c3c'</span>, <span class="st">'Finance'</span>:<span class="st">'#3498db'</span>,
+                 <span class="st">'Energy'</span>:<span class="st">'#2ecc71'</span>, <span class="st">'Health'</span>:<span class="st">'#9b59b6'</span>,
+                 <span class="st">'Consumer'</span>:<span class="st">'#f39c12'</span>}
+<span class="kw">for</span> sector, ticker_list <span class="kw">in</span> tickers.items():
+    <span class="kw">for</span> t <span class="kw">in</span> ticker_list:
+        sector_map[t] = sector
+
+<span class="cm"># 4. 시각화</span>
+fig, ax = plt.<span class="fn">subplots</span>(figsize=(<span class="nu">10</span>, <span class="nu">8</span>))
+<span class="kw">for</span> i, ticker <span class="kw">in</span> <span class="fn">enumerate</span>(returns.columns):
+    sector = sector_map.<span class="fn">get</span>(ticker, <span class="st">'Unknown'</span>)
+    color = sector_colors.<span class="fn">get</span>(sector, <span class="st">'gray'</span>)
+    ax.<span class="fn">scatter</span>(tsne_result[i, <span class="nu">0</span>], tsne_result[i, <span class="nu">1</span>],
+              c=color, s=<span class="nu">100</span>, alpha=<span class="nu">0.8</span>, edgecolors=<span class="st">'white'</span>)
+    ax.<span class="fn">annotate</span>(ticker, (tsne_result[i, <span class="nu">0</span>]+<span class="nu">0.5</span>, tsne_result[i, <span class="nu">1</span>]+<span class="nu">0.5</span>),
+               fontsize=<span class="nu">9</span>)
+
+<span class="cm"># 범례</span>
+<span class="kw">for</span> sector, color <span class="kw">in</span> sector_colors.items():
+    ax.<span class="fn">scatter</span>([], [], c=color, s=<span class="nu">80</span>, label=sector)
+ax.<span class="fn">legend</span>(title=<span class="st">'Sector'</span>, fontsize=<span class="nu">10</span>)
+ax.<span class="fn">set_title</span>(<span class="st">'t-SNE: 종목 수익률 상관관계 기반 2D 시각화'</span>, fontsize=<span class="nu">14</span>)
+ax.<span class="fn">set_xlabel</span>(<span class="st">'t-SNE 1'</span>)
+ax.<span class="fn">set_ylabel</span>(<span class="st">'t-SNE 2'</span>)
+ax.<span class="fn">grid</span>(<span class="kw">True</span>, alpha=<span class="nu">0.3</span>)
+plt.<span class="fn">tight_layout</span>()
+plt.<span class="fn">show</span>()</code></pre>
+
+<div class="ok">
+<p class="ni"><strong>기대 결과:</strong> 같은 섹터의 종목들이 2D 평면에서 가까이 모여 있는 것을 볼 수 있다. 기술주(빨강)끼리, 금융주(파랑)끼리, 에너지주(초록)끼리 클러스터를 형성한다. 이것은 수익률 상관관계가 같은 섹터 내에서 높기 때문이다. t-SNE가 이 비선형 구조를 잘 포착한 것이다.</p>
+</div>
+
+<div class="warn">
+<p class="ni"><strong>⚠️ t-SNE 사용 시 주의사항</strong></p>
+<ol>
+<li><strong>시각화 전용:</strong> t-SNE 결과를 다른 모델의 입력으로 쓰지 마라. 역변환이 불가능하고, 새 데이터에 적용할 수 없다.</li>
+<li><strong>거리 해석 금지:</strong> t-SNE 2D 좌표의 절대 거리는 의미가 없다. 클러스터의 "상대적 위치"만 해석하라.</li>
+<li><strong>클러스터 크기 해석 금지:</strong> t-SNE는 클러스터의 크기를 왜곡할 수 있다. 큰 클러스터가 실제로 더 큰 것은 아니다.</li>
+<li><strong>여러 perplexity로 실험:</strong> perplexity에 따라 결과가 크게 달라진다. 반드시 여러 값으로 시도하라.</li>
+<li><strong>random_state 고정:</strong> 매번 다른 결과가 나오므로 재현성을 위해 고정한다.</li>
+</ol>
+</div>
+
+<div class="info">
+<p class="ni"><strong>UMAP이라는 대안:</strong> 최근에는 t-SNE보다 UMAP(Uniform Manifold Approximation and Projection)이 더 많이 쓰인다. 속도가 빠르고, 전역 구조도 더 잘 보존한다. <code>pip install umap-learn</code>으로 설치하고 <code>umap.UMAP(n_components=2)</code>로 사용한다. 문법이 sklearn과 동일하다.</p>
+</div>
+
+
+<!-- ==================== Ch.5 ==================== -->
+<h2 id="ch5">Chapter 5. K-Means 클러스터링 — 비슷한 것끼리 묶는 기술</h2>
+
+<h3>5.1 클러스터링이란: 직관적 이해</h3>
+
+<p>
+클러스터링은 비지도학습의 가장 직관적인 형태이다. "비슷한 데이터끼리 묶어라" — 이것이 전부다. 마치 세탁물을 색깔별로 분류하는 것과 같다. 아무도 "이건 흰색 그룹, 이건 어두운 색 그룹"이라고 알려주지 않았지만, 우리는 자연스럽게 비슷한 것끼리 묶는다.
+</p>
+
+<p>
+금융에서 클러스터링은 매우 실용적이다. 수백 개 종목을 수익률 패턴이 비슷한 그룹으로 나누면, 포트폴리오 분산 투자, 페어 트레이딩 후보 발굴, 섹터 자동 분류 등에 활용할 수 있다.
+</p>
+
+<h3>5.2 K-Means 알고리즘: 단계별 이해</h3>
+
+<p>
+K-Means는 가장 유명하고 가장 많이 쓰이는 클러스터링 알고리즘이다. MLAT Ch.13에 따르면, 1957년 Bell Labs의 Stuart Lloyd가 처음 제안했다. 알고리즘은 놀라울 정도로 단순하다.
+</p>
+
+<div class="def">
+<p class="ni"><strong>K-Means 알고리즘 (4단계)</strong></p>
+<ol>
+<li><strong>초기화:</strong> K개의 중심점(centroid)을 랜덤으로 선택한다.</li>
+<li><strong>할당(Assignment):</strong> 각 데이터 포인트를 가장 가까운 중심점의 클러스터에 배정한다.</li>
+<li><strong>업데이트(Update):</strong> 각 클러스터의 중심점을 해당 클러스터 멤버들의 평균으로 재계산한다.</li>
+<li><strong>반복:</strong> 2~3단계를 중심점이 더 이상 변하지 않을 때까지 반복한다.</li>
+</ol>
+</div>
+
+<p>
+비유하자면, 학교에서 반 배정을 하는 것과 같다. 처음에 선생님 3명(중심점)이 교실 아무 곳에나 선다. 학생들은 가장 가까운 선생님에게 간다(할당). 선생님은 자기 학생들의 중앙으로 이동한다(업데이트). 이것을 반복하면 자연스럽게 3개 그룹이 형성된다.
+</p>
+
+<!-- K-Means 알고리즘 시각화 (카드 스타일) -->
+<div style="margin:25px 0;padding:20px;background:linear-gradient(135deg,#f8f9fa,#e8eaf6);border-radius:12px;border:1px solid #c5cae9">
+<p class="ni" style="text-align:center;font-weight:bold;margin-bottom:15px;font-size:14px;color:#283593">K-Means 알고리즘 진행 과정 (K=3)</p>
+<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px">
+<div style="background:#fff;padding:14px;border-radius:10px;box-shadow:0 2px 8px rgba(0,0,0,.08);border-left:4px solid #e74c3c;text-align:center">
+<div style="font-size:28px;margin-bottom:5px">🎲</div>
+<div style="font-weight:bold;font-size:12px;color:#2c3e50">Step 1: 초기화</div>
+<div style="font-size:10px;color:#777;margin-top:4px">K개 중심점을<br>랜덤으로 배치</div>
+</div>
+<div style="background:#fff;padding:14px;border-radius:10px;box-shadow:0 2px 8px rgba(0,0,0,.08);border-left:4px solid #3498db;text-align:center">
+<div style="font-size:28px;margin-bottom:5px">📏</div>
+<div style="font-weight:bold;font-size:12px;color:#2c3e50">Step 2: 할당</div>
+<div style="font-size:10px;color:#777;margin-top:4px">각 점을 가장 가까운<br>중심에 배정</div>
+</div>
+<div style="background:#fff;padding:14px;border-radius:10px;box-shadow:0 2px 8px rgba(0,0,0,.08);border-left:4px solid #2ecc71;text-align:center">
+<div style="font-size:28px;margin-bottom:5px">🎯</div>
+<div style="font-weight:bold;font-size:12px;color:#2c3e50">Step 3: 업데이트</div>
+<div style="font-size:10px;color:#777;margin-top:4px">중심점 = 멤버들의<br>평균 위치</div>
+</div>
+<div style="background:#fff;padding:14px;border-radius:10px;box-shadow:0 2px 8px rgba(0,0,0,.08);border-left:4px solid #9b59b6;text-align:center">
+<div style="font-size:28px;margin-bottom:5px">🔄</div>
+<div style="font-weight:bold;font-size:12px;color:#2c3e50">Step 4: 반복</div>
+<div style="font-size:10px;color:#777;margin-top:4px">수렴할 때까지<br>2→3 반복</div>
+</div>
+</div>
+</div>
+
+<h3>5.3 K-Means를 밑바닥부터 구현하기</h3>
+
+<p>
+sklearn의 <code>KMeans()</code>를 쓰기 전에, 알고리즘을 직접 구현해보자. PCA를 NumPy로 구현했던 것처럼, K-Means도 밑바닥부터 만들어봐야 "왜 구형 클러스터만 잘 찾는지", "왜 초기값에 민감한지" 체감할 수 있다.
+</p>
+
+<div class="cc">코드 5-0. K-Means 밑바닥 구현 (NumPy only)</div>
+<pre><code><span class="kw">import</span> numpy <span class="kw">as</span> np
+<span class="kw">import</span> matplotlib.pyplot <span class="kw">as</span> plt
+<span class="kw">from</span> sklearn.datasets <span class="kw">import</span> make_blobs
+
+<span class="cm"># 샘플 데이터</span>
+X, y_true = <span class="fn">make_blobs</span>(n_samples=<span class="nu">300</span>, centers=<span class="nu">3</span>,
+                       cluster_std=<span class="nu">1.0</span>, random_state=<span class="nu">42</span>)
+
+<span class="kw">def</span> <span class="fn">kmeans_manual</span>(X, K, max_iter=<span class="nu">100</span>, seed=<span class="nu">42</span>):
+    <span class="st">"""K-Means를 NumPy만으로 구현"""</span>
+    np.random.<span class="fn">seed</span>(seed)
+    N, D = X.shape
+
+    <span class="cm"># Step 1: 랜덤 초기화 — 데이터 중에서 K개 선택</span>
+    indices = np.random.<span class="fn">choice</span>(N, K, replace=<span class="kw">False</span>)
+    centroids = X[indices].<span class="fn">copy</span>()
+
+    history = [centroids.<span class="fn">copy</span>()]  <span class="cm"># 중심점 이동 기록</span>
+
+    <span class="kw">for</span> iteration <span class="kw">in</span> <span class="fn">range</span>(max_iter):
+        <span class="cm"># Step 2: 할당 — 각 점을 가장 가까운 중심에 배정</span>
+        <span class="cm"># 거리 계산: (N, 1, D) - (1, K, D) → (N, K, D) → sum → (N, K)</span>
+        distances = np.<span class="fn">sqrt</span>(((X[:, np.newaxis] - centroids[np.newaxis])**<span class="nu">2</span>).<span class="fn">sum</span>(axis=<span class="nu">2</span>))
+        labels = distances.<span class="fn">argmin</span>(axis=<span class="nu">1</span>)
+
+        <span class="cm"># Step 3: 업데이트 — 각 클러스터의 평균으로 중심 이동</span>
+        new_centroids = np.<span class="fn">array</span>([X[labels == k].<span class="fn">mean</span>(axis=<span class="nu">0</span>)
+                                   <span class="kw">for</span> k <span class="kw">in</span> <span class="fn">range</span>(K)])
+
+        <span class="cm"># Step 4: 수렴 확인 — 중심이 안 움직이면 종료</span>
+        shift = np.<span class="fn">sqrt</span>(((new_centroids - centroids)**<span class="nu">2</span>).<span class="fn">sum</span>())
+        centroids = new_centroids
+        history.<span class="fn">append</span>(centroids.<span class="fn">copy</span>())
+
+        <span class="kw">if</span> shift < <span class="nu">1e-6</span>:
+            <span class="fn">print</span>(<span class="st">f"수렴! (iteration {iteration+1})"</span>)
+            <span class="kw">break</span>
+
+    <span class="cm"># Inertia 계산</span>
+    inertia = <span class="fn">sum</span>(((X[labels == k] - centroids[k])**<span class="nu">2</span>).<span class="fn">sum</span>()
+                   <span class="kw">for</span> k <span class="kw">in</span> <span class="fn">range</span>(K))
+    <span class="kw">return</span> labels, centroids, inertia, history
+
+<span class="cm"># 실행</span>
+labels, centroids, inertia, history = <span class="fn">kmeans_manual</span>(X, K=<span class="nu">3</span>)
+<span class="fn">print</span>(<span class="st">f"Inertia: {inertia:.1f}"</span>)
+
+<span class="cm"># 중심점 이동 과정 시각화</span>
+fig, axes = plt.<span class="fn">subplots</span>(<span class="nu">1</span>, <span class="nu">3</span>, figsize=(<span class="nu">18</span>, <span class="nu">5</span>))
+steps = [<span class="nu">0</span>, <span class="fn">len</span>(history)//<span class="nu">2</span>, -<span class="nu">1</span>]
+titles = [<span class="st">'초기 상태'</span>, <span class="st">'중간 과정'</span>, <span class="st">'최종 수렴'</span>]
+
+<span class="kw">for</span> ax, step, title <span class="kw">in</span> <span class="fn">zip</span>(axes, steps, titles):
+    ax.<span class="fn">scatter</span>(X[:, <span class="nu">0</span>], X[:, <span class="nu">1</span>], c=<span class="st">'lightgray'</span>, s=<span class="nu">20</span>, alpha=<span class="nu">0.5</span>)
+    c = history[step]
+    ax.<span class="fn">scatter</span>(c[:, <span class="nu">0</span>], c[:, <span class="nu">1</span>], c=[<span class="st">'red'</span>,<span class="st">'blue'</span>,<span class="st">'green'</span>],
+              marker=<span class="st">'X'</span>, s=<span class="nu">200</span>, edgecolors=<span class="st">'black'</span>, linewidth=<span class="nu">2</span>)
+    ax.<span class="fn">set_title</span>(title, fontsize=<span class="nu">13</span>)
+    ax.<span class="fn">grid</span>(<span class="kw">True</span>, alpha=<span class="nu">0.3</span>)
+
+plt.<span class="fn">suptitle</span>(<span class="st">'K-Means 중심점 이동 과정'</span>, fontsize=<span class="nu">14</span>, fontweight=<span class="st">'bold'</span>)
+plt.<span class="fn">tight_layout</span>()
+plt.<span class="fn">show</span>()</code></pre>
+
+<div class="info">
+<p class="ni"><strong>밑바닥 구현에서 배우는 것:</strong></p>
+<ul>
+<li><strong>거리 계산이 핵심:</strong> 유클리드 거리를 쓰기 때문에 구형 클러스터만 잘 찾는다. 만약 코사인 거리를 쓰면 다른 결과가 나온다.</li>
+<li><strong>초기값 의존성:</strong> <code>seed</code>를 바꿔보면 결과가 달라진다. sklearn의 <code>n_init=10</code>은 10번 시도해서 가장 좋은 결과를 선택하는 것이다.</li>
+<li><strong>수렴 속도:</strong> 보통 10~20번 반복이면 수렴한다. 데이터가 클수록 느려진다.</li>
+</ul>
+</div>
+
+<h3>5.4 K-Means의 목적 함수: Inertia</h3>
+
+<p>
+K-Means가 최소화하려는 것은 <strong>Inertia(관성)</strong> — 각 데이터 포인트와 자신이 속한 클러스터 중심점 사이의 거리 제곱합이다.
+</p>
+
+<div class="eq">
+$$\text{Inertia} = \sum_{i=1}^{N} \|x_i - \mu_{c(i)}\|^2$$
+</div>
+
+<p>
+여기서 \(\mu_{c(i)}\)는 데이터 포인트 \(x_i\)가 속한 클러스터의 중심점이다. Inertia가 작을수록 클러스터 내부가 촘촘하다는 뜻이다. 하지만 K를 늘리면 Inertia는 항상 줄어든다(극단적으로 K=N이면 Inertia=0). 따라서 적절한 K를 찾는 것이 핵심이다.
+</p>
+
+<h3>5.5 최적 K 찾기: 엘보우 방법과 실루엣 점수</h3>
+
+<p>
+"클러스터를 몇 개로 나눌 것인가?" — K-Means의 가장 중요한 질문이다. 두 가지 방법이 있다.
+</p>
+
+<p class="ni"><strong>방법 1: 엘보우 방법 (Elbow Method)</strong></p>
+<p>
+K를 1부터 늘려가며 Inertia를 그래프로 그린다. Inertia가 급격히 감소하다가 완만해지는 지점 — 팔꿈치(elbow) 모양이 되는 지점 — 이 최적 K이다. 비유하자면, 방을 1개에서 2개로 늘리면 혼잡도가 크게 줄지만, 10개에서 11개로 늘리면 별 차이가 없는 것과 같다.
+</p>
+
+<p class="ni"><strong>방법 2: 실루엣 점수 (Silhouette Score)</strong></p>
+<p>
+각 데이터 포인트에 대해 "자기 클러스터 내 평균 거리(a)"와 "가장 가까운 다른 클러스터까지의 평균 거리(b)"를 비교한다.
+</p>
+
+<div class="eq">
+$$s(i) = \frac{b(i) - a(i)}{\max(a(i), b(i))}$$
+</div>
+
+<ul>
+<li>\(s(i) \approx 1\): 잘 분류됨 (자기 클러스터에 딱 맞음)</li>
+<li>\(s(i) \approx 0\): 경계에 있음 (두 클러스터 사이)</li>
+<li>\(s(i) < 0\): 잘못 분류됨 (다른 클러스터에 더 가까움)</li>
+</ul>
+
+<p>
+전체 데이터의 평균 실루엣 점수가 가장 높은 K를 선택한다.
+</p>
+
+<h3>5.6 K-Means 기본 코드</h3>
+
+<div class="cc">코드 5-1. K-Means + 엘보우 + 실루엣</div>
+<pre><code><span class="kw">from</span> sklearn.cluster <span class="kw">import</span> KMeans
+<span class="kw">from</span> sklearn.metrics <span class="kw">import</span> silhouette_score
+<span class="kw">from</span> sklearn.datasets <span class="kw">import</span> make_blobs
+
+<span class="cm"># 1. 샘플 데이터 생성 (3개 클러스터)</span>
+X, y_true = <span class="fn">make_blobs</span>(n_samples=<span class="nu">300</span>, centers=<span class="nu">3</span>,
+                       cluster_std=<span class="nu">1.0</span>, random_state=<span class="nu">42</span>)
+
+<span class="cm"># 2. 엘보우 방법 + 실루엣 점수</span>
+K_range = <span class="fn">range</span>(<span class="nu">2</span>, <span class="nu">11</span>)
+inertias = []
+silhouettes = []
+
+<span class="kw">for</span> k <span class="kw">in</span> K_range:
+    km = <span class="fn">KMeans</span>(n_clusters=k, random_state=<span class="nu">42</span>, n_init=<span class="nu">10</span>)
+    labels = km.<span class="fn">fit_predict</span>(X)
+    inertias.<span class="fn">append</span>(km.inertia_)
+    silhouettes.<span class="fn">append</span>(<span class="fn">silhouette_score</span>(X, labels))
+
+<span class="cm"># 3. 시각화</span>
+fig, axes = plt.<span class="fn">subplots</span>(<span class="nu">1</span>, <span class="nu">3</span>, figsize=(<span class="nu">18</span>, <span class="nu">5</span>))
+
+<span class="cm"># 엘보우 플롯</span>
+axes[<span class="nu">0</span>].<span class="fn">plot</span>(<span class="fn">list</span>(K_range), inertias, <span class="st">'bo-'</span>)
+axes[<span class="nu">0</span>].<span class="fn">axvline</span>(x=<span class="nu">3</span>, color=<span class="st">'red'</span>, linestyle=<span class="st">'--'</span>, alpha=<span class="nu">0.5</span>)
+axes[<span class="nu">0</span>].<span class="fn">set_xlabel</span>(<span class="st">'K (클러스터 수)'</span>)
+axes[<span class="nu">0</span>].<span class="fn">set_ylabel</span>(<span class="st">'Inertia'</span>)
+axes[<span class="nu">0</span>].<span class="fn">set_title</span>(<span class="st">'엘보우 방법'</span>)
+axes[<span class="nu">0</span>].<span class="fn">grid</span>(<span class="kw">True</span>, alpha=<span class="nu">0.3</span>)
+
+<span class="cm"># 실루엣 점수</span>
+axes[<span class="nu">1</span>].<span class="fn">plot</span>(<span class="fn">list</span>(K_range), silhouettes, <span class="st">'go-'</span>)
+axes[<span class="nu">1</span>].<span class="fn">axvline</span>(x=<span class="nu">3</span>, color=<span class="st">'red'</span>, linestyle=<span class="st">'--'</span>, alpha=<span class="nu">0.5</span>)
+axes[<span class="nu">1</span>].<span class="fn">set_xlabel</span>(<span class="st">'K (클러스터 수)'</span>)
+axes[<span class="nu">1</span>].<span class="fn">set_ylabel</span>(<span class="st">'실루엣 점수'</span>)
+axes[<span class="nu">1</span>].<span class="fn">set_title</span>(<span class="st">'실루엣 분석'</span>)
+axes[<span class="nu">1</span>].<span class="fn">grid</span>(<span class="kw">True</span>, alpha=<span class="nu">0.3</span>)
+
+<span class="cm"># K=3 클러스터링 결과</span>
+km_best = <span class="fn">KMeans</span>(n_clusters=<span class="nu">3</span>, random_state=<span class="nu">42</span>, n_init=<span class="nu">10</span>)
+labels_best = km_best.<span class="fn">fit_predict</span>(X)
+axes[<span class="nu">2</span>].<span class="fn">scatter</span>(X[:, <span class="nu">0</span>], X[:, <span class="nu">1</span>], c=labels_best, cmap=<span class="st">'viridis'</span>,
+               alpha=<span class="nu">0.6</span>, s=<span class="nu">40</span>)
+axes[<span class="nu">2</span>].<span class="fn">scatter</span>(km_best.cluster_centers_[:, <span class="nu">0</span>],
+               km_best.cluster_centers_[:, <span class="nu">1</span>],
+               c=<span class="st">'red'</span>, marker=<span class="st">'X'</span>, s=<span class="nu">200</span>, edgecolors=<span class="st">'black'</span>,
+               label=<span class="st">'중심점'</span>)
+axes[<span class="nu">2</span>].<span class="fn">set_title</span>(<span class="st">'K=3 클러스터링 결과'</span>)
+axes[<span class="nu">2</span>].<span class="fn">legend</span>()
+axes[<span class="nu">2</span>].<span class="fn">grid</span>(<span class="kw">True</span>, alpha=<span class="nu">0.3</span>)
+
+plt.<span class="fn">tight_layout</span>()
+plt.<span class="fn">show</span>()</code></pre>
+
+<h3>5.7 K-Means의 가정과 한계</h3>
+
+<div class="warn">
+<p class="ni"><strong>⚠️ K-Means의 핵심 가정 (MLAT Ch.13)</strong></p>
+<ul>
+<li><strong>구형(Spherical) 클러스터:</strong> K-Means는 클러스터가 구 모양이라고 가정한다. 길쭉하거나 불규칙한 모양의 클러스터는 잘 못 찾는다.</li>
+<li><strong>동일 크기:</strong> 모든 클러스터의 크기가 비슷하다고 가정한다. 한 클러스터가 압도적으로 크면 문제가 생긴다.</li>
+<li><strong>유클리드 거리:</strong> 기본적으로 유클리드 거리를 사용한다. 피처 간 공분산을 무시한다.</li>
+<li><strong>K를 미리 지정:</strong> 클러스터 수를 사전에 알아야 한다 (→ 엘보우/실루엣으로 추정).</li>
+<li><strong>초기값 민감:</strong> 초기 중심점 위치에 따라 결과가 달라진다 (→ <code>n_init=10</code>으로 여러 번 시도).</li>
+</ul>
+<p class="ni" style="margin-top:8px">이런 한계를 극복하는 것이 Ch.7의 DBSCAN과 Ch.8의 계층적 클러스터링이다.</p>
+</div>
+
+
+<!-- ==================== Ch.6 ==================== -->
+<h2 id="ch6">Chapter 6. K-Means 금융 적용 — 종목 군집화와 섹터 자동 분류</h2>
+
+<h3>6.1 왜 종목을 클러스터링하는가</h3>
+
+<p>
+주식 시장에는 수천 개의 종목이 있다. 이 종목들을 "비슷한 움직임"을 보이는 그룹으로 나눌 수 있다면 여러 가지 이점이 있다:
+</p>
+
+<ul>
+<li><strong>포트폴리오 분산:</strong> 같은 클러스터에서 한 종목씩만 선택하면 자연스럽게 분산 투자가 된다.</li>
+<li><strong>페어 트레이딩:</strong> 같은 클러스터 내 종목 쌍은 함께 움직이므로, 일시적 괴리가 생기면 차익거래 기회가 된다.</li>
+<li><strong>섹터 자동 분류:</strong> GICS 섹터 분류는 인위적이다. 데이터 기반 클러스터링은 실제 수익률 패턴에 기반한 "진짜 섹터"를 발견한다.</li>
+<li><strong>리스크 관리:</strong> 같은 클러스터의 종목들은 동시에 하락할 가능성이 높다. 이를 인지하면 리스크를 줄일 수 있다.</li>
+</ul>
+
+<h3>6.2 실전: 종목 수익률 기반 K-Means 클러스터링</h3>
+
+<div class="cc">코드 6-1. 종목 클러스터링 전체 파이프라인</div>
+<pre><code><span class="kw">import</span> yfinance <span class="kw">as</span> yf
+<span class="kw">import</span> numpy <span class="kw">as</span> np
+<span class="kw">import</span> pandas <span class="kw">as</span> pd
+<span class="kw">import</span> matplotlib.pyplot <span class="kw">as</span> plt
+<span class="kw">from</span> sklearn.cluster <span class="kw">import</span> KMeans
+<span class="kw">from</span> sklearn.preprocessing <span class="kw">import</span> StandardScaler
+<span class="kw">from</span> sklearn.metrics <span class="kw">import</span> silhouette_score
+<span class="kw">from</span> sklearn.decomposition <span class="kw">import</span> PCA
+
+<span class="cm"># 1. 20개 종목 수익률 데이터</span>
+tickers = {
+    <span class="st">'Tech'</span>:    [<span class="st">'AAPL'</span>, <span class="st">'MSFT'</span>, <span class="st">'GOOGL'</span>, <span class="st">'NVDA'</span>],
+    <span class="st">'Finance'</span>: [<span class="st">'JPM'</span>, <span class="st">'BAC'</span>, <span class="st">'GS'</span>, <span class="st">'MS'</span>],
+    <span class="st">'Energy'</span>:  [<span class="st">'XOM'</span>, <span class="st">'CVX'</span>, <span class="st">'COP'</span>, <span class="st">'SLB'</span>],
+    <span class="st">'Health'</span>:  [<span class="st">'JNJ'</span>, <span class="st">'PFE'</span>, <span class="st">'UNH'</span>, <span class="st">'MRK'</span>],
+    <span class="st">'Consumer'</span>:[<span class="st">'WMT'</span>, <span class="st">'PG'</span>, <span class="st">'KO'</span>, <span class="st">'MCD'</span>]
+}
+all_tickers = [t <span class="kw">for</span> lst <span class="kw">in</span> tickers.values() <span class="kw">for</span> t <span class="kw">in</span> lst]
+
+prices = yf.<span class="fn">download</span>(all_tickers, start=<span class="st">'2023-01-01'</span>,
+                     end=<span class="st">'2025-01-01'</span>)[<span class="st">'Close'</span>]
+returns = prices.<span class="fn">pct_change</span>().<span class="fn">dropna</span>()
+
+<span class="cm"># 2. 종목별 피처 생성 (수익률 통계)</span>
+stock_features = pd.<span class="fn">DataFrame</span>(index=returns.columns)
+stock_features[<span class="st">'mean_ret'</span>] = returns.<span class="fn">mean</span>()
+stock_features[<span class="st">'std_ret'</span>] = returns.<span class="fn">std</span>()
+stock_features[<span class="st">'sharpe'</span>] = stock_features[<span class="st">'mean_ret'</span>] / stock_features[<span class="st">'std_ret'</span>]
+stock_features[<span class="st">'skew'</span>] = returns.<span class="fn">skew</span>()
+stock_features[<span class="st">'kurt'</span>] = returns.<span class="fn">kurtosis</span>()
+stock_features[<span class="st">'max_dd'</span>] = (prices / prices.<span class="fn">cummax</span>() - <span class="nu">1</span>).<span class="fn">min</span>()
+
+<span class="fn">print</span>(<span class="st">"=== 종목별 피처 ==="</span>)
+<span class="fn">print</span>(stock_features.<span class="fn">round</span>(<span class="nu">4</span>))
+
+<span class="cm"># 3. 표준화 + K-Means</span>
+scaler = <span class="fn">StandardScaler</span>()
+features_scaled = scaler.<span class="fn">fit_transform</span>(stock_features)
+
+<span class="cm"># 엘보우 + 실루엣으로 최적 K 탐색</span>
+results = []
+<span class="kw">for</span> k <span class="kw">in</span> <span class="fn">range</span>(<span class="nu">2</span>, <span class="nu">8</span>):
+    km = <span class="fn">KMeans</span>(n_clusters=k, random_state=<span class="nu">42</span>, n_init=<span class="nu">10</span>)
+    labels = km.<span class="fn">fit_predict</span>(features_scaled)
+    sil = <span class="fn">silhouette_score</span>(features_scaled, labels)
+    results.<span class="fn">append</span>({<span class="st">'K'</span>: k, <span class="st">'inertia'</span>: km.inertia_, <span class="st">'silhouette'</span>: sil})
+    <span class="fn">print</span>(<span class="st">f"K={k}: Inertia={km.inertia_:.1f}, Silhouette={sil:.3f}"</span>)
+
+<span class="cm"># 4. 최적 K로 클러스터링 (예: K=5)</span>
+best_k = <span class="nu">5</span>
+km_final = <span class="fn">KMeans</span>(n_clusters=best_k, random_state=<span class="nu">42</span>, n_init=<span class="nu">10</span>)
+stock_features[<span class="st">'cluster'</span>] = km_final.<span class="fn">fit_predict</span>(features_scaled)
+
+<span class="cm"># 5. 클러스터별 종목 확인</span>
+<span class="fn">print</span>(<span class="st">"\n=== 클러스터별 종목 ==="</span>)
+<span class="kw">for</span> c <span class="kw">in</span> <span class="fn">range</span>(best_k):
+    members = stock_features[stock_features[<span class="st">'cluster'</span>] == c].index.<span class="fn">tolist</span>()
+    <span class="fn">print</span>(<span class="st">f"Cluster {c}: {members}"</span>)
+
+<span class="cm"># 6. PCA 2D로 시각화</span>
+pca = <span class="fn">PCA</span>(n_components=<span class="nu">2</span>)
+features_2d = pca.<span class="fn">fit_transform</span>(features_scaled)
+
+fig, ax = plt.<span class="fn">subplots</span>(figsize=(<span class="nu">10</span>, <span class="nu">8</span>))
+colors = [<span class="st">'#e74c3c'</span>, <span class="st">'#3498db'</span>, <span class="st">'#2ecc71'</span>, <span class="st">'#9b59b6'</span>, <span class="st">'#f39c12'</span>]
+<span class="kw">for</span> c <span class="kw">in</span> <span class="fn">range</span>(best_k):
+    mask = stock_features[<span class="st">'cluster'</span>] == c
+    ax.<span class="fn">scatter</span>(features_2d[mask, <span class="nu">0</span>], features_2d[mask, <span class="nu">1</span>],
+              c=colors[c], s=<span class="nu">120</span>, alpha=<span class="nu">0.8</span>, label=<span class="st">f'Cluster {c}'</span>,
+              edgecolors=<span class="st">'white'</span>, linewidth=<span class="nu">1.5</span>)
+    <span class="kw">for</span> ticker, (x, y) <span class="kw">in</span> <span class="fn">zip</span>(
+        stock_features[mask].index, features_2d[mask]):
+        ax.<span class="fn">annotate</span>(ticker, (x+<span class="nu">0.1</span>, y+<span class="nu">0.1</span>), fontsize=<span class="nu">9</span>,
+                   fontweight=<span class="st">'bold'</span>)
+
+ax.<span class="fn">set_xlabel</span>(<span class="st">f'PC1 ({pca.explained_variance_ratio_[0]:.1%})'</span>)
+ax.<span class="fn">set_ylabel</span>(<span class="st">f'PC2 ({pca.explained_variance_ratio_[1]:.1%})'</span>)
+ax.<span class="fn">set_title</span>(<span class="st">'K-Means 종목 클러스터링 (PCA 2D 투영)'</span>)
+ax.<span class="fn">legend</span>()
+ax.<span class="fn">grid</span>(<span class="kw">True</span>, alpha=<span class="nu">0.3</span>)
+plt.<span class="fn">tight_layout</span>()
+plt.<span class="fn">show</span>()</code></pre>
+
+<h3>6.3 클러스터 해석: GICS 섹터와 비교</h3>
+
+<div class="info">
+<p class="ni"><strong>결과 해석 가이드</strong></p>
+<p class="ni" style="margin-top:8px">K-Means가 만든 클러스터와 실제 GICS 섹터를 비교해보면 흥미로운 발견을 할 수 있다:</p>
+<ul>
+<li><strong>일치하는 경우:</strong> 에너지주(XOM, CVX, COP, SLB)가 한 클러스터에 모이면 → 수익률 패턴이 실제로 섹터와 일치</li>
+<li><strong>불일치하는 경우:</strong> UNH(헬스케어)가 기술주 클러스터에 들어가면 → UNH의 수익률 패턴이 기술주와 더 비슷하다는 의미. GICS 분류보다 데이터 기반 분류가 더 정확할 수 있다.</li>
+<li><strong>금융 활용:</strong> 같은 클러스터 내 종목 쌍은 페어 트레이딩 후보가 된다. 다른 클러스터에서 한 종목씩 선택하면 분산 투자가 된다.</li>
+</ul>
+</div>
+
+<h3>6.4 클러스터별 수익률 비교</h3>
+
+<div class="cc">코드 6-2. 클러스터별 누적 수익률 시각화</div>
+<pre><code><span class="cm"># 클러스터별 평균 누적 수익률</span>
+fig, ax = plt.<span class="fn">subplots</span>(figsize=(<span class="nu">12</span>, <span class="nu">6</span>))
+
+<span class="kw">for</span> c <span class="kw">in</span> <span class="fn">range</span>(best_k):
+    members = stock_features[stock_features[<span class="st">'cluster'</span>] == c].index
+    cluster_ret = returns[members].<span class="fn">mean</span>(axis=<span class="nu">1</span>)  <span class="cm"># 클러스터 평균 수익률</span>
+    cum_ret = (<span class="nu">1</span> + cluster_ret).<span class="fn">cumprod</span>() - <span class="nu">1</span>
+    ax.<span class="fn">plot</span>(cum_ret, label=<span class="st">f'Cluster {c} ({", ".join(members[:3])}...)'</span>,
+           linewidth=<span class="nu">2</span>, color=colors[c])
+
+ax.<span class="fn">set_title</span>(<span class="st">'클러스터별 평균 누적 수익률'</span>)
+ax.<span class="fn">set_xlabel</span>(<span class="st">'날짜'</span>)
+ax.<span class="fn">set_ylabel</span>(<span class="st">'누적 수익률'</span>)
+ax.<span class="fn">legend</span>()
+ax.<span class="fn">grid</span>(<span class="kw">True</span>, alpha=<span class="nu">0.3</span>)
+ax.<span class="fn">axhline</span>(y=<span class="nu">0</span>, color=<span class="st">'black'</span>, linewidth=<span class="nu">0.5</span>)
+plt.<span class="fn">tight_layout</span>()
+plt.<span class="fn">show</span>()</code></pre>
+
+<div class="ok">
+<p class="ni"><strong>실전 인사이트:</strong> 클러스터별 누적 수익률 그래프를 보면, 어떤 클러스터가 상승장에서 강하고 어떤 클러스터가 하락장에서 방어적인지 한눈에 파악할 수 있다. 이것은 시장 레짐에 따라 포트폴리오 비중을 조절하는 전략의 기초가 된다.</p>
+</div>
+
+
+<!-- ==================== Ch.7 ==================== -->
+<h2 id="ch7">Chapter 7. DBSCAN — 밀도 기반 클러스터링과 이상치 탐지</h2>
+
+<h3>7.1 K-Means의 한계를 넘어서</h3>
+
+<p>
+K-Means는 클러스터가 구 모양이고 크기가 비슷할 때 잘 작동한다. 하지만 현실 데이터는 그렇지 않은 경우가 많다. 초승달 모양의 클러스터, 밀도가 다른 클러스터, 그리고 어디에도 속하지 않는 이상치(outlier) — K-Means는 이런 상황에서 실패한다.
+</p>
+
+<p>
+DBSCAN(Density-Based Spatial Clustering of Applications with Noise)은 이름 그대로 <strong>밀도(density)</strong>를 기반으로 클러스터를 찾는다. 데이터가 밀집된 영역을 클러스터로 인식하고, 밀도가 낮은 영역의 점들은 노이즈(이상치)로 분류한다.
+</p>
+
+<h3>7.2 DBSCAN의 핵심 개념</h3>
+
+<div class="def">
+<p class="ni"><strong>DBSCAN의 두 가지 파라미터</strong></p>
+<ul>
+<li><strong>eps (ε):</strong> 이웃의 반경. "이 거리 안에 있으면 이웃이다"</li>
+<li><strong>min_samples:</strong> 핵심 포인트가 되기 위한 최소 이웃 수. "이웃이 이만큼 있어야 핵심이다"</li>
+</ul>
+</div>
+
+<p>
+비유하자면, 도시에서 "번화가"를 찾는 것과 같다. eps는 "반경 500m 이내", min_samples는 "가게가 최소 10개"라고 설정하면, 반경 500m 안에 가게가 10개 이상인 지점이 번화가의 핵심이 된다. 그 핵심 지점들이 연결되면 하나의 번화가(클러스터)가 된다. 어떤 번화가에도 속하지 않는 외딴 가게는 이상치(noise)이다.
+</p>
+
+<p class="ni"><strong>세 가지 유형의 포인트:</strong></p>
+<ul>
+<li><strong>Core Point (핵심점):</strong> eps 반경 내에 min_samples 이상의 이웃이 있는 점</li>
+<li><strong>Border Point (경계점):</strong> 핵심점의 이웃이지만, 자신은 핵심점이 아닌 점</li>
+<li><strong>Noise Point (노이즈):</strong> 어떤 핵심점의 이웃도 아닌 점 → 클러스터 라벨 = -1</li>
+</ul>
+
+<!-- DBSCAN 개념 다이어그램 -->
+<div style="margin:25px 0;padding:20px;background:#f0f4f8;border-radius:10px;text-align:center">
+<p class="ni" style="font-weight:bold;margin-bottom:15px;font-size:13px">DBSCAN 포인트 유형 (eps=1.0, min_samples=4)</p>
+<div style="display:inline-flex;gap:30px;flex-wrap:wrap;justify-content:center">
+<div style="text-align:center">
+<div style="width:60px;height:60px;background:#e74c3c;border-radius:50%;display:flex;align-items:center;justify-content:center;color:white;font-weight:bold;font-size:12px;margin:0 auto 8px">Core</div>
+<div style="font-size:11px;color:#555">이웃 ≥ 4개<br>클러스터의 핵심</div>
+</div>
+<div style="text-align:center">
+<div style="width:60px;height:60px;background:#f39c12;border-radius:50%;display:flex;align-items:center;justify-content:center;color:white;font-weight:bold;font-size:12px;margin:0 auto 8px">Border</div>
+<div style="font-size:11px;color:#555">Core의 이웃이지만<br>자신은 Core 아님</div>
+</div>
+<div style="text-align:center">
+<div style="width:60px;height:60px;background:#95a5a6;border-radius:50%;display:flex;align-items:center;justify-content:center;color:white;font-weight:bold;font-size:12px;margin:0 auto 8px">Noise</div>
+<div style="font-size:11px;color:#555">어디에도 안 속함<br>label = -1</div>
+</div>
+</div>
+</div>
+
+<h3>7.3 DBSCAN vs K-Means 비교</h3>
+
+<div class="tc">표 7-1. DBSCAN vs K-Means 핵심 비교</div>
+<table>
+<thead>
+<tr><th>특성</th><th>K-Means</th><th>DBSCAN</th></tr>
+</thead>
+<tbody>
+<tr><td>클러스터 수</td><td>사전 지정 (K)</td><td>자동 결정</td></tr>
+<tr><td>클러스터 모양</td><td>구형만</td><td>임의의 모양</td></tr>
+<tr><td>이상치 처리</td><td>불가 (모든 점을 할당)</td><td>자동 탐지 (label=-1)</td></tr>
+<tr><td>밀도 차이</td><td>처리 불가</td><td>동일 밀도 가정 (한계)</td></tr>
+<tr><td>파라미터</td><td>K</td><td>eps, min_samples</td></tr>
+<tr><td>속도</td><td>빠름 O(nKt)</td><td>보통 O(n log n)</td></tr>
+<tr><td>결정성</td><td>초기값 의존</td><td>결정적 (Core 기준)</td></tr>
+</tbody>
+</table>
+
+<h3>7.4 DBSCAN 실전 코드</h3>
+
+<div class="cc">코드 7-1. DBSCAN으로 종목 클러스터링 + 이상치 탐지</div>
+<pre><code><span class="kw">from</span> sklearn.cluster <span class="kw">import</span> DBSCAN
+<span class="kw">from</span> sklearn.neighbors <span class="kw">import</span> NearestNeighbors
+
+<span class="cm"># features_scaled는 코드 6-1에서 만든 표준화된 종목 피처</span>
+
+<span class="cm"># 1. eps 추정: k-distance 그래프</span>
+<span class="cm"># min_samples의 2배 정도의 k로 k-distance를 계산</span>
+k = <span class="nu">4</span>  <span class="cm"># min_samples 후보</span>
+nn = <span class="fn">NearestNeighbors</span>(n_neighbors=k)
+nn.<span class="fn">fit</span>(features_scaled)
+distances, _ = nn.<span class="fn">kneighbors</span>(features_scaled)
+k_distances = np.<span class="fn">sort</span>(distances[:, -<span class="nu">1</span>])  <span class="cm"># k번째 이웃까지의 거리</span>
+
+fig, axes = plt.<span class="fn">subplots</span>(<span class="nu">1</span>, <span class="nu">2</span>, figsize=(<span class="nu">14</span>, <span class="nu">5</span>))
+
+<span class="cm"># k-distance 그래프 (eps 결정용)</span>
+axes[<span class="nu">0</span>].<span class="fn">plot</span>(k_distances, <span class="st">'b-'</span>)
+axes[<span class="nu">0</span>].<span class="fn">set_xlabel</span>(<span class="st">'포인트 (정렬됨)'</span>)
+axes[<span class="nu">0</span>].<span class="fn">set_ylabel</span>(<span class="st">f'{k}-distance'</span>)
+axes[<span class="nu">0</span>].<span class="fn">set_title</span>(<span class="st">'k-distance 그래프 (엘보우 지점 = eps)'</span>)
+axes[<span class="nu">0</span>].<span class="fn">grid</span>(<span class="kw">True</span>, alpha=<span class="nu">0.3</span>)
+
+<span class="cm"># 2. DBSCAN 적용</span>
+eps_val = <span class="nu">2.0</span>  <span class="cm"># k-distance 그래프의 엘보우 지점</span>
+db = <span class="fn">DBSCAN</span>(eps=eps_val, min_samples=<span class="nu">3</span>)
+db_labels = db.<span class="fn">fit_predict</span>(features_scaled)
+
+n_clusters = <span class="fn">len</span>(<span class="fn">set</span>(db_labels) - {-<span class="nu">1</span>})
+n_noise = (db_labels == -<span class="nu">1</span>).<span class="fn">sum</span>()
+<span class="fn">print</span>(<span class="st">f"클러스터 수: {n_clusters}"</span>)
+<span class="fn">print</span>(<span class="st">f"이상치 수: {n_noise}"</span>)
+
+<span class="cm"># 3. 결과 시각화 (PCA 2D)</span>
+pca_2d = <span class="fn">PCA</span>(n_components=<span class="nu">2</span>)
+features_2d = pca_2d.<span class="fn">fit_transform</span>(features_scaled)
+
+cmap_colors = [<span class="st">'#e74c3c'</span>, <span class="st">'#3498db'</span>, <span class="st">'#2ecc71'</span>, <span class="st">'#9b59b6'</span>, <span class="st">'#f39c12'</span>]
+<span class="kw">for</span> i, ticker <span class="kw">in</span> <span class="fn">enumerate</span>(stock_features.index):
+    label = db_labels[i]
+    <span class="kw">if</span> label == -<span class="nu">1</span>:
+        color, marker, size = <span class="st">'gray'</span>, <span class="st">'x'</span>, <span class="nu">100</span>  <span class="cm"># 이상치</span>
+    <span class="kw">else</span>:
+        color = cmap_colors[label % <span class="fn">len</span>(cmap_colors)]
+        marker, size = <span class="st">'o'</span>, <span class="nu">120</span>
+    axes[<span class="nu">1</span>].<span class="fn">scatter</span>(features_2d[i, <span class="nu">0</span>], features_2d[i, <span class="nu">1</span>],
+                  c=color, marker=marker, s=size, edgecolors=<span class="st">'white'</span>)
+    axes[<span class="nu">1</span>].<span class="fn">annotate</span>(ticker, (features_2d[i,<span class="nu">0</span>]+<span class="nu">0.1</span>, features_2d[i,<span class="nu">1</span>]+<span class="nu">0.1</span>),
+                   fontsize=<span class="nu">9</span>)
+
+axes[<span class="nu">1</span>].<span class="fn">set_title</span>(<span class="st">f'DBSCAN (eps={eps_val}, min_samples=3) — ×=이상치'</span>)
+axes[<span class="nu">1</span>].<span class="fn">grid</span>(<span class="kw">True</span>, alpha=<span class="nu">0.3</span>)
+plt.<span class="fn">tight_layout</span>()
+plt.<span class="fn">show</span>()
+
+<span class="cm"># 4. 이상치 종목 확인</span>
+outliers = stock_features.index[db_labels == -<span class="nu">1</span>]
+<span class="fn">print</span>(<span class="st">f"\n이상치 종목: {outliers.tolist()}"</span>)
+<span class="fn">print</span>(<span class="st">"→ 이 종목들은 다른 종목과 수익률 패턴이 크게 다르다!"</span>)</code></pre>
+
+<h3>7.5 eps 파라미터 튜닝: k-distance 그래프 심화</h3>
+
+<p>
+DBSCAN에서 가장 어려운 것이 eps 선택이다. 너무 작으면 모든 점이 노이즈가 되고, 너무 크면 모든 점이 하나의 클러스터가 된다. <strong>k-distance 그래프</strong>가 이 문제를 해결한다.
+</p>
+
+<div class="def">
+<p class="ni"><strong>k-distance 그래프 읽는 법</strong></p>
+<ol>
+<li>각 데이터 포인트에서 k번째로 가까운 이웃까지의 거리를 계산한다 (k = min_samples)</li>
+<li>이 거리를 오름차순으로 정렬하여 그래프를 그린다</li>
+<li>그래프에서 <strong>급격히 꺾이는 지점(엘보우)</strong>이 최적 eps이다</li>
+<li>엘보우 아래의 점들은 클러스터 내부, 위의 점들은 노이즈가 된다</li>
+</ol>
+</div>
+
+<!-- eps 선택 가이드 다이어그램 -->
+<div style="margin:25px 0;padding:20px;background:#f0f4f8;border-radius:10px">
+<p class="ni" style="text-align:center;font-weight:bold;margin-bottom:15px;font-size:13px">eps 선택에 따른 결과 변화</p>
+<div style="display:flex;flex-wrap:wrap;gap:12px;justify-content:center;font-size:11px">
+<div style="text-align:center;background:#fde8e8;padding:12px 16px;border-radius:8px;border:2px solid #e74c3c;min-width:150px">
+<div style="font-size:22px;margin-bottom:4px">🔴</div>
+<div style="font-weight:bold;color:#c0392b">eps 너무 작음</div>
+<div style="color:#777;margin-top:4px">대부분 노이즈 처리<br>클러스터 거의 없음</div>
+</div>
+<div style="text-align:center;background:#d4edda;padding:12px 16px;border-radius:8px;border:2px solid #28a745;min-width:150px">
+<div style="font-size:22px;margin-bottom:4px">🟢</div>
+<div style="font-weight:bold;color:#155724">eps 적절 (엘보우)</div>
+<div style="color:#777;margin-top:4px">의미 있는 클러스터<br>+ 적절한 노이즈</div>
+</div>
+<div style="text-align:center;background:#fde8e8;padding:12px 16px;border-radius:8px;border:2px solid #e74c3c;min-width:150px">
+<div style="font-size:22px;margin-bottom:4px">🔴</div>
+<div style="font-weight:bold;color:#c0392b">eps 너무 큼</div>
+<div style="color:#777;margin-top:4px">전부 하나의 클러스터<br>노이즈 없음</div>
+</div>
+</div>
+</div>
+
+<div class="warn">
+<p class="ni"><strong>⚠️ DBSCAN 실전 팁</strong></p>
+<ul>
+<li><strong>min_samples 경험 법칙:</strong> 데이터 차원 D에 대해 <code>min_samples ≥ D + 1</code>로 설정한다. 6차원 피처면 min_samples ≥ 7.</li>
+<li><strong>표준화 필수:</strong> K-Means와 마찬가지로, 피처 스케일이 다르면 거리 계산이 왜곡된다. 반드시 StandardScaler를 먼저 적용하라.</li>
+<li><strong>여러 eps로 실험:</strong> k-distance 엘보우가 명확하지 않으면, eps를 0.5, 1.0, 1.5, 2.0 등으로 바꿔가며 클러스터 수와 노이즈 비율을 관찰하라.</li>
+<li><strong>HDBSCAN 대안:</strong> eps 선택이 어려우면 HDBSCAN을 쓰라. eps 파라미터가 필요 없고, 밀도가 다른 클러스터도 찾는다.</li>
+</ul>
+</div>
+
+<h3>7.6 금융에서 DBSCAN의 활용</h3>
+
+<div class="ok">
+<p class="ni"><strong>DBSCAN이 빛나는 금융 시나리오</strong></p>
+<ul>
+<li><strong>이상 거래 탐지:</strong> 정상적인 거래 패턴에서 벗어난 이상 거래를 자동으로 탐지한다. 내부자 거래, 시세 조종 등의 단서가 될 수 있다.</li>
+<li><strong>시장 레짐 변화 감지:</strong> 평소와 다른 수익률 패턴이 나타나면 DBSCAN이 이상치로 분류한다 → 시장 레짐이 바뀌고 있다는 신호.</li>
+<li><strong>특이 종목 발견:</strong> 어떤 섹터에도 속하지 않는 독특한 수익률 패턴의 종목 → 알파 기회일 수 있다.</li>
+</ul>
+</div>
+
+<div class="info">
+<p class="ni"><strong>교재 연동:</strong> MLAT Ch.13에서는 HDBSCAN(Hierarchical DBSCAN)도 소개한다. HDBSCAN은 밀도가 다른 클러스터도 찾을 수 있어 DBSCAN의 한계를 극복한다. <code>pip install hdbscan</code>으로 설치하고 <code>hdbscan.HDBSCAN(min_cluster_size=5)</code>로 사용한다.</p>
+</div>
+
+
+<!-- ==================== Ch.8 ==================== -->
+<h2 id="ch8">Chapter 8. 계층적 클러스터링 — 덴드로그램과 상관행렬 기반 종목 트리</h2>
+
+<h3>8.1 계층적 클러스터링이란</h3>
+
+<p>
+K-Means와 DBSCAN은 "평면적" 클러스터링이다 — 각 데이터 포인트가 하나의 클러스터에 속한다. 계층적 클러스터링(Hierarchical Clustering)은 다르다. 이름 그대로 <strong>계층 구조(hierarchy)</strong>를 만든다. 마치 생물 분류학에서 "종 → 속 → 과 → 목 → 강 → 문 → 계"로 올라가는 것처럼, 데이터를 점점 큰 그룹으로 합쳐가는 트리 구조를 만든다.
+</p>
+
+<p>
+금융에서 이것이 특히 유용한 이유는, 종목 간의 관계를 <strong>트리(덴드로그램)</strong>로 시각화할 수 있기 때문이다. "삼성전자와 SK하이닉스는 가장 가까운 관계이고, 이 둘을 합친 반도체 그룹은 네이버/카카오의 인터넷 그룹과 합쳐져 IT 대그룹을 형성한다" — 이런 계층 구조를 한눈에 볼 수 있다.
+</p>
+
+<h3>8.2 병합(Agglomerative) vs 분할(Divisive)</h3>
+
+<div class="def">
+<p class="ni"><strong>두 가지 접근법</strong></p>
+<ul>
+<li><strong>병합(Agglomerative, Bottom-Up):</strong> 각 데이터 포인트를 개별 클러스터로 시작 → 가장 가까운 두 클러스터를 반복적으로 합침 → 하나의 큰 클러스터가 될 때까지. <strong>가장 많이 사용됨.</strong></li>
+<li><strong>분할(Divisive, Top-Down):</strong> 모든 데이터를 하나의 클러스터로 시작 → 반복적으로 분할. 계산 비용이 높아 잘 안 쓰임.</li>
+</ul>
+</div>
+
+<h3>8.3 연결 기준 (Linkage Criteria)</h3>
+
+<p>
+"가장 가까운 두 클러스터"를 어떻게 정의하는가? 이것이 연결 기준(linkage)이다. 선택에 따라 결과가 크게 달라진다.
+</p>
+
+<div class="tc">표 8-1. 연결 기준 비교</div>
+<table>
+<thead>
+<tr><th>연결 기준</th><th>거리 정의</th><th>특징</th><th>금융 적용</th></tr>
+</thead>
+<tbody>
+<tr><td><strong>Single</strong></td><td>두 클러스터의 가장 가까운 점 간 거리</td><td>체인 효과 발생 가능</td><td>잘 안 씀</td></tr>
+<tr><td><strong>Complete</strong></td><td>두 클러스터의 가장 먼 점 간 거리</td><td>컴팩트한 클러스터</td><td>보수적 분류</td></tr>
+<tr><td><strong>Average</strong></td><td>모든 점 쌍의 평균 거리</td><td>Single과 Complete의 절충</td><td>일반적 사용</td></tr>
+<tr><td><strong>Ward</strong></td><td>합칠 때 분산 증가량 최소화</td><td>K-Means와 유사한 결과</td><td>가장 많이 사용</td></tr>
+</tbody>
+</table>
+
+<h3>8.4 덴드로그램 (Dendrogram)</h3>
+
+<p>
+계층적 클러스터링의 가장 큰 장점은 <strong>덴드로그램</strong>이라는 트리 다이어그램으로 결과를 시각화할 수 있다는 것이다. 덴드로그램의 y축은 "거리(또는 비유사도)"를 나타내고, 아래에서 위로 올라갈수록 더 먼 클러스터가 합쳐진다. 특정 높이에서 수평으로 자르면 그 높이에서의 클러스터 수가 결정된다.
+</p>
+
+<h3>8.5 실전: 상관행렬 기반 종목 덴드로그램</h3>
+
+<div class="cc">코드 8-1. 종목 상관행렬 → 계층적 클러스터링 → 덴드로그램</div>
+<pre><code><span class="kw">from</span> scipy.cluster.hierarchy <span class="kw">import</span> dendrogram, linkage, fcluster
+<span class="kw">from</span> scipy.spatial.distance <span class="kw">import</span> squareform
+
+<span class="cm"># returns는 코드 6-1에서 만든 일간 수익률 DataFrame</span>
+
+<span class="cm"># 1. 상관행렬 → 거리행렬 변환</span>
+<span class="cm"># 상관계수가 높을수록 거리가 가까워야 한다</span>
+corr = returns.<span class="fn">corr</span>()
+distance_matrix = np.<span class="fn">sqrt</span>(<span class="nu">2</span> * (<span class="nu">1</span> - corr))  <span class="cm"># 상관 거리</span>
+
+<span class="cm"># 2. 계층적 클러스터링 (Ward 연결)</span>
+<span class="cm"># squareform: 정방행렬 → 압축 거리 벡터</span>
+dist_condensed = <span class="fn">squareform</span>(distance_matrix)
+Z = <span class="fn">linkage</span>(dist_condensed, method=<span class="st">'ward'</span>)
+
+<span class="cm"># 3. 덴드로그램 시각화</span>
+fig, ax = plt.<span class="fn">subplots</span>(figsize=(<span class="nu">14</span>, <span class="nu">8</span>))
+<span class="fn">dendrogram</span>(
+    Z,
+    labels=returns.columns.<span class="fn">tolist</span>(),
+    leaf_rotation=<span class="nu">90</span>,
+    leaf_font_size=<span class="nu">10</span>,
+    color_threshold=<span class="nu">1.2</span>,  <span class="cm"># 이 높이에서 색상 구분</span>
+    ax=ax
+)
+ax.<span class="fn">set_title</span>(<span class="st">'종목 상관관계 기반 덴드로그램 (Ward Linkage)'</span>, fontsize=<span class="nu">14</span>)
+ax.<span class="fn">set_ylabel</span>(<span class="st">'거리 (상관 거리)'</span>)
+ax.<span class="fn">axhline</span>(y=<span class="nu">1.2</span>, color=<span class="st">'red'</span>, linestyle=<span class="st">'--'</span>, alpha=<span class="nu">0.5</span>,
+          label=<span class="st">'클러스터 컷 라인'</span>)
+ax.<span class="fn">legend</span>()
+plt.<span class="fn">tight_layout</span>()
+plt.<span class="fn">show</span>()
+
+<span class="cm"># 4. 특정 클러스터 수로 자르기</span>
+n_clusters = <span class="nu">5</span>
+cluster_labels = <span class="fn">fcluster</span>(Z, n_clusters, criterion=<span class="st">'maxclust'</span>)
+
+<span class="fn">print</span>(<span class="st">"=== 계층적 클러스터링 결과 ==="</span>)
+<span class="kw">for</span> c <span class="kw">in</span> <span class="fn">range</span>(<span class="nu">1</span>, n_clusters+<span class="nu">1</span>):
+    members = returns.columns[cluster_labels == c].<span class="fn">tolist</span>()
+    <span class="fn">print</span>(<span class="st">f"Cluster {c}: {members}"</span>)</code></pre>
+
+<h3>8.6 상관행렬 히트맵 + 클러스터 정렬</h3>
+
+<p>
+덴드로그램의 순서대로 상관행렬을 재정렬하면, 같은 클러스터의 종목들이 블록 대각선에 모여 있는 것을 볼 수 있다. 이것은 포트폴리오 리스크를 시각적으로 파악하는 강력한 도구이다.
+</p>
+
+<div class="cc">코드 8-2. 클러스터 정렬된 상관행렬 히트맵</div>
+<pre><code><span class="kw">import</span> seaborn <span class="kw">as</span> sns
+<span class="kw">from</span> scipy.cluster.hierarchy <span class="kw">import</span> leaves_list
+
+<span class="cm"># 덴드로그램 순서로 종목 재정렬</span>
+order = <span class="fn">leaves_list</span>(Z)
+ordered_tickers = [returns.columns[i] <span class="kw">for</span> i <span class="kw">in</span> order]
+corr_ordered = corr.<span class="fn">loc</span>[ordered_tickers, ordered_tickers]
+
+<span class="cm"># 히트맵</span>
+fig, ax = plt.<span class="fn">subplots</span>(figsize=(<span class="nu">12</span>, <span class="nu">10</span>))
+sns.<span class="fn">heatmap</span>(corr_ordered, annot=<span class="kw">True</span>, fmt=<span class="st">'.2f'</span>,
+            cmap=<span class="st">'RdYlBu_r'</span>, center=<span class="nu">0</span>,
+            vmin=-<span class="nu">0.3</span>, vmax=<span class="nu">1.0</span>,
+            square=<span class="kw">True</span>, ax=ax,
+            linewidths=<span class="nu">0.5</span>)
+ax.<span class="fn">set_title</span>(<span class="st">'클러스터 정렬된 상관행렬 히트맵'</span>, fontsize=<span class="nu">14</span>)
+plt.<span class="fn">tight_layout</span>()
+plt.<span class="fn">show</span>()</code></pre>
+
+<div class="ok">
+<p class="ni"><strong>기대 결과:</strong> 같은 섹터 종목들이 블록 대각선에 빨간색(높은 상관관계) 블록을 형성한다. 예를 들어 에너지주(XOM, CVX, COP, SLB)가 한 블록, 기술주(AAPL, MSFT, GOOGL, NVDA)가 한 블록으로 나타난다. 블록 간에는 상관관계가 낮아 파란색/노란색이 된다.</p>
+</div>
+
+<div class="info">
+<p class="ni"><strong>교재 연동:</strong> MLAT Ch.13에서는 계층적 클러스터링을 HRP(Hierarchical Risk Parity) 포트폴리오 최적화에 활용한다. 마코위츠 최적화의 대안으로, 덴드로그램 구조를 이용하여 리스크를 계층적으로 분배한다. 이것은 R8에서 포트폴리오 최적화를 배울 때 다시 만나게 된다.</p>
+</div>
+
+<div class="def">
+<p class="ni"><strong>HRP (Hierarchical Risk Parity) — R8 미리보기</strong></p>
+<p class="ni" style="margin-top:8px">마코위츠 최적화의 가장 큰 문제는 공분산 행렬의 역행렬을 구해야 한다는 것이다. 종목이 많으면 역행렬이 불안정해져서 극단적인 비중이 나온다. HRP는 이 문제를 우회한다:</p>
+<ol>
+<li><strong>계층적 클러스터링</strong>으로 종목 간 트리 구조를 만든다 (위에서 배운 것!)</li>
+<li>트리를 따라 <strong>재귀적으로</strong> 리스크를 분배한다 — 역행렬이 필요 없다</li>
+<li>결과적으로 더 안정적이고 분산된 포트폴리오가 만들어진다</li>
+</ol>
+<p class="ni" style="margin-top:8px">Marcos López de Prado가 2016년 논문에서 제안한 이 방법은, 계층적 클러스터링이 단순한 시각화 도구가 아니라 <strong>실전 포트폴리오 구성의 핵심</strong>이 될 수 있음을 보여준다.</p>
+</div>
+
+<h3>8.7 세 가지 클러스터링 알고리즘 종합 비교</h3>
+
+<div class="tc">표 8-2. K-Means vs DBSCAN vs 계층적 클러스터링 종합 비교</div>
+<table>
+<thead>
+<tr><th>특성</th><th>K-Means</th><th>DBSCAN</th><th>계층적</th></tr>
+</thead>
+<tbody>
+<tr><td>클러스터 수</td><td>사전 지정</td><td>자동</td><td>사후 결정 (컷)</td></tr>
+<tr><td>클러스터 모양</td><td>구형</td><td>임의</td><td>다양</td></tr>
+<tr><td>이상치 처리</td><td>불가</td><td>자동</td><td>불가</td></tr>
+<tr><td>계층 구조</td><td>없음</td><td>없음</td><td>있음 (덴드로그램)</td></tr>
+<tr><td>대규모 데이터</td><td>빠름 ✅</td><td>보통</td><td>느림 ❌</td></tr>
+<tr><td>금융 주 용도</td><td>종목 군집화</td><td>이상치 탐지</td><td>포트폴리오 구조화</td></tr>
+<tr><td>추천 상황</td><td>빠른 탐색</td><td>이상치 중요</td><td>구조 시각화</td></tr>
+</tbody>
+</table>
+
+
+<!-- ==================== Ch.9 ==================== -->
+<h2 id="ch9">Chapter 9. 시계열 기초 — 정상성, ADF 검정, 차분</h2>
+
+<h3>9.1 왜 시계열 분석이 필요한가</h3>
+
+<p>
+지금까지 배운 ML 모델들(R4의 XGBoost, R5의 PCA/K-Means)은 데이터의 <strong>순서</strong>를 무시한다. 100개의 데이터 포인트를 섞어도 결과가 같다. 하지만 금융 데이터는 본질적으로 <strong>시간 순서</strong>가 중요하다. 오늘의 주가는 어제의 주가에 영향을 받고, 이번 달의 변동성은 지난달의 변동성과 관련이 있다.
+</p>
+
+<p>
+시계열 분석(Time Series Analysis)은 이 시간적 의존성을 명시적으로 모델링한다. MLAT Ch.9의 제목이 "Time-Series Models for Volatility Forecasts and Statistical Arbitrage"인 것처럼, 금융에서 시계열 분석의 두 가지 핵심 응용은 <strong>변동성 예측</strong>과 <strong>통계적 차익거래</strong>이다.
+</p>
+
+<h3>9.2 정상성 (Stationarity): 시계열 분석의 대전제</h3>
+
+<p>
+시계열 분석에서 가장 중요한 개념은 <strong>정상성(Stationarity)</strong>이다. 정상 시계열이란, 통계적 성질(평균, 분산, 자기상관)이 시간에 따라 변하지 않는 시계열이다.
+</p>
+
+<div class="def">
+<p class="ni"><strong>정상성의 조건 (약한 정상성, Weak Stationarity)</strong></p>
+<ol>
+<li><strong>평균이 일정:</strong> \(E[y_t] = \mu\) (시간에 무관)</li>
+<li><strong>분산이 일정:</strong> \(\text{Var}(y_t) = \sigma^2\) (시간에 무관)</li>
+<li><strong>자기공분산이 시차에만 의존:</strong> \(\text{Cov}(y_t, y_{t-k}) = \gamma_k\) (시점 t에 무관, 시차 k에만 의존)</li>
+</ol>
+</div>
+
+<p>
+비유하자면, 정상 시계열은 "안정된 강물"과 같다. 수위가 일정하고, 물결의 크기도 일정하다. 비정상 시계열은 "홍수가 나는 강"이다 — 수위가 계속 올라가고, 물결도 점점 거세진다.
+</p>
+
+<h3>9.3 주가는 정상적인가? — 랜덤 워크</h3>
+
+<p>
+결론부터 말하면, <strong>주가(price)는 비정상(non-stationary)</strong>이다. 주가는 랜덤 워크(Random Walk)를 따르는 것으로 알려져 있다:
+</p>
+
+<div class="eq">
+$$p_t = p_{t-1} + \epsilon_t$$
+</div>
+
+<p>
+여기서 \(\epsilon_t\)는 백색 잡음(white noise)이다. MLAT Ch.9에서 설명하듯, 랜덤 워크의 분산은 \(t\sigma^2\)으로 시간에 따라 무한히 증가한다 — 정상성 조건을 위반한다. 직관적으로, 주가는 100원에서 시작해서 10년 후에 10,000원이 될 수도, 1원이 될 수도 있다. "평균으로 돌아오는" 성질이 없다.
+</p>
+
+<h3>9.3 주가는 정상적인가? — 랜덤 워크 시뮬레이션</h3>
+
+<p>
+결론부터 말하면, <strong>주가(price)는 비정상(non-stationary)</strong>이다. 주가는 랜덤 워크(Random Walk)를 따르는 것으로 알려져 있다:
+</p>
+
+<div class="eq">
+$p_t = p_{t-1} + \epsilon_t$
+</div>
+
+<p>
+여기서 \(\epsilon_t\)는 백색 잡음(white noise)이다. MLAT Ch.9에서 설명하듯, 랜덤 워크의 분산은 \(t\sigma^2\)으로 시간에 따라 무한히 증가한다 — 정상성 조건을 위반한다. 직관적으로, 주가는 100원에서 시작해서 10년 후에 10,000원이 될 수도, 1원이 될 수도 있다. "평균으로 돌아오는" 성질이 없다.
+</p>
+
+<p>
+말로만 들으면 와닿지 않으니, 직접 시뮬레이션해보자. 랜덤 워크와 정상 시계열을 나란히 생성하면 차이가 극명하게 보인다.
+</p>
+
+<div class="cc">코드 9-0. 랜덤 워크 vs 정상 시계열 시뮬레이션</div>
+<pre><code><span class="kw">import</span> numpy <span class="kw">as</span> np
+<span class="kw">import</span> matplotlib.pyplot <span class="kw">as</span> plt
+
+np.random.<span class="fn">seed</span>(<span class="nu">42</span>)
+N = <span class="nu">1000</span>
+
+<span class="cm"># 1. 백색 잡음 (정상 시계열의 가장 순수한 형태)</span>
+white_noise = np.random.<span class="fn">normal</span>(<span class="nu">0</span>, <span class="nu">1</span>, N)
+
+<span class="cm"># 2. 랜덤 워크 (백색 잡음의 누적합 = 비정상)</span>
+random_walk = np.<span class="fn">cumsum</span>(white_noise)
+
+<span class="cm"># 3. 평균 회귀 과정 (AR(1), φ=0.9 — 정상)</span>
+ar1 = np.<span class="fn">zeros</span>(N)
+<span class="kw">for</span> t <span class="kw">in</span> <span class="fn">range</span>(<span class="nu">1</span>, N):
+    ar1[t] = <span class="nu">0.9</span> * ar1[t-<span class="nu">1</span>] + white_noise[t]
+
+<span class="cm"># 4. 여러 경로의 랜덤 워크 (분산이 시간에 따라 증가하는 것을 보여줌)</span>
+fig, axes = plt.<span class="fn">subplots</span>(<span class="nu">2</span>, <span class="nu">2</span>, figsize=(<span class="nu">14</span>, <span class="nu">10</span>))
+
+<span class="cm"># (1) 백색 잡음 — 평균 0, 분산 일정</span>
+axes[<span class="nu">0</span>,<span class="nu">0</span>].<span class="fn">plot</span>(white_noise, color=<span class="st">'#3498db'</span>, alpha=<span class="nu">0.7</span>, linewidth=<span class="nu">0.8</span>)
+axes[<span class="nu">0</span>,<span class="nu">0</span>].<span class="fn">axhline</span>(y=<span class="nu">0</span>, color=<span class="st">'red'</span>, linewidth=<span class="nu">1</span>)
+axes[<span class="nu">0</span>,<span class="nu">0</span>].<span class="fn">set_title</span>(<span class="st">'백색 잡음 (정상) — 평균 0 주위를 맴돈다'</span>)
+axes[<span class="nu">0</span>,<span class="nu">0</span>].<span class="fn">grid</span>(<span class="kw">True</span>, alpha=<span class="nu">0.3</span>)
+
+<span class="cm"># (2) 랜덤 워크 — 어디로 갈지 모른다</span>
+axes[<span class="nu">0</span>,<span class="nu">1</span>].<span class="fn">plot</span>(random_walk, color=<span class="st">'#e74c3c'</span>, linewidth=<span class="nu">1.2</span>)
+axes[<span class="nu">0</span>,<span class="nu">1</span>].<span class="fn">set_title</span>(<span class="st">'랜덤 워크 (비정상) — 돌아올 보장이 없다'</span>)
+axes[<span class="nu">0</span>,<span class="nu">1</span>].<span class="fn">grid</span>(<span class="kw">True</span>, alpha=<span class="nu">0.3</span>)
+
+<span class="cm"># (3) AR(1) — 평균으로 돌아오는 성질</span>
+axes[<span class="nu">1</span>,<span class="nu">0</span>].<span class="fn">plot</span>(ar1, color=<span class="st">'#2ecc71'</span>, linewidth=<span class="nu">0.8</span>)
+axes[<span class="nu">1</span>,<span class="nu">0</span>].<span class="fn">axhline</span>(y=<span class="nu">0</span>, color=<span class="st">'red'</span>, linewidth=<span class="nu">1</span>)
+axes[<span class="nu">1</span>,<span class="nu">0</span>].<span class="fn">set_title</span>(<span class="st">'AR(1) φ=0.9 (정상) — 평균 회귀'</span>)
+axes[<span class="nu">1</span>,<span class="nu">0</span>].<span class="fn">grid</span>(<span class="kw">True</span>, alpha=<span class="nu">0.3</span>)
+
+<span class="cm"># (4) 랜덤 워크 100개 경로 — 분산이 시간에 따라 팬(fan)처럼 퍼진다</span>
+<span class="kw">for</span> _ <span class="kw">in</span> <span class="fn">range</span>(<span class="nu">100</span>):
+    path = np.<span class="fn">cumsum</span>(np.random.<span class="fn">normal</span>(<span class="nu">0</span>, <span class="nu">1</span>, <span class="nu">500</span>))
+    axes[<span class="nu">1</span>,<span class="nu">1</span>].<span class="fn">plot</span>(path, alpha=<span class="nu">0.1</span>, color=<span class="st">'#e74c3c'</span>)
+axes[<span class="nu">1</span>,<span class="nu">1</span>].<span class="fn">set_title</span>(<span class="st">'랜덤 워크 100개 경로 — 분산이 시간에 따라 증가!'</span>)
+axes[<span class="nu">1</span>,<span class="nu">1</span>].<span class="fn">grid</span>(<span class="kw">True</span>, alpha=<span class="nu">0.3</span>)
+
+plt.<span class="fn">tight_layout</span>()
+plt.<span class="fn">show</span>()</code></pre>
+
+<div class="ok">
+<p class="ni"><strong>시뮬레이션에서 배우는 핵심 직관</strong></p>
+<ul>
+<li><strong>백색 잡음:</strong> 0 주위를 맴돈다. 위로 갔다가 아래로, 아래로 갔다가 위로. "평균 회귀" 성질이 있다.</li>
+<li><strong>랜덤 워크:</strong> 한번 올라가면 계속 올라갈 수도 있다. 돌아올 보장이 없다. 100개 경로를 그리면 시간이 지날수록 부채꼴처럼 퍼진다 — 이것이 "분산이 시간에 따라 증가"한다는 의미이다.</li>
+<li><strong>AR(1):</strong> 랜덤 워크와 비슷해 보이지만, 0으로 돌아오는 힘이 있다. φ=0.9는 "어제 값의 90%만 기억"한다는 뜻이다. φ=1.0이면 랜덤 워크가 된다.</li>
+</ul>
+<p class="ni" style="margin-top:8px"><strong>금융 비유:</strong> 주가는 랜덤 워크(비정상), 수익률은 백색 잡음에 가까움(정상), 금리 스프레드는 AR(1)에 가까움(평균 회귀 → 통계적 차익거래의 기초).</p>
+</div>
+
+<!-- 정상 vs 비정상 비교 다이어그램 -->
+<div style="margin:25px 0;display:flex;gap:15px;flex-wrap:wrap;justify-content:center">
+<div style="flex:1;min-width:260px;background:linear-gradient(135deg,#d4edda,#c3e6cb);padding:18px;border-radius:10px;border:2px solid #28a745">
+<p class="ni" style="text-align:center;font-weight:bold;font-size:13px;color:#155724;margin-bottom:10px">✅ 정상 시계열</p>
+<p class="ni" style="font-size:11px;margin-bottom:5px">📊 평균: 일정 (시간에 무관)</p>
+<p class="ni" style="font-size:11px;margin-bottom:5px">📊 분산: 일정 (시간에 무관)</p>
+<p class="ni" style="font-size:11px;margin-bottom:5px">🔄 평균 회귀: 있음</p>
+<p class="ni" style="font-size:11px;margin-bottom:5px">📈 ADF p-value: < 0.05</p>
+<p class="ni" style="font-size:11px;color:#155724;margin-top:8px;border-top:1px solid #28a745;padding-top:6px">예: 수익률, RSI, 금리 스프레드</p>
+</div>
+<div style="flex:1;min-width:260px;background:linear-gradient(135deg,#f8d7da,#f5c6cb);padding:18px;border-radius:10px;border:2px solid #dc3545">
+<p class="ni" style="text-align:center;font-weight:bold;font-size:13px;color:#721c24;margin-bottom:10px">❌ 비정상 시계열</p>
+<p class="ni" style="font-size:11px;margin-bottom:5px">📊 평균: 시간에 따라 변함 (추세)</p>
+<p class="ni" style="font-size:11px;margin-bottom:5px">📊 분산: 시간에 따라 증가</p>
+<p class="ni" style="font-size:11px;margin-bottom:5px">🔄 평균 회귀: 없음</p>
+<p class="ni" style="font-size:11px;margin-bottom:5px">📈 ADF p-value: > 0.05</p>
+<p class="ni" style="font-size:11px;color:#721c24;margin-top:8px;border-top:1px solid #dc3545;padding-top:6px">예: 주가, GDP, 인구수</p>
+</div>
+</div>
+
+<p>
+하지만 <strong>수익률(return)은 대체로 정상적</strong>이다:
+</p>
+
+<div class="eq">
+$$r_t = \frac{p_t - p_{t-1}}{p_{t-1}} = \frac{\Delta p_t}{p_{t-1}}$$
+</div>
+
+<p>
+수익률은 평균 주위를 오르내리고, 분산도 대체로 일정하다(변동성 클러스터링은 있지만). 이것이 금융에서 주가 대신 수익률을 분석하는 근본적인 이유이다.
+</p>
+
+<h3>9.4 차분 (Differencing): 비정상 → 정상 변환</h3>
+
+<p>
+비정상 시계열을 정상으로 만드는 가장 간단한 방법이 <strong>차분(differencing)</strong>이다. 1차 차분은 연속된 값의 차이를 구하는 것이다:
+</p>
+
+<div class="eq">
+$$\Delta y_t = y_t - y_{t-1}$$
+</div>
+
+<p>
+주가에 1차 차분을 적용하면 가격 변화량이 되고, 이것은 대체로 정상적이다. 만약 1차 차분으로도 정상이 안 되면 2차 차분(\(\Delta^2 y_t = \Delta y_t - \Delta y_{t-1}\))을 적용한다. 실무에서 2차 이상의 차분이 필요한 경우는 드물다.
+</p>
+
+<div class="info">
+<p class="ni"><strong>적분 차수 (Order of Integration):</strong> d번 차분해야 정상이 되는 시계열을 "I(d)"라고 표기한다. 주가는 I(1) — 1번 차분하면 정상. 수익률은 I(0) — 이미 정상. 이 "d"가 ARIMA의 I에 해당한다.</p>
+</div>
+
+<h3>9.5 ADF 검정: 정상성을 통계적으로 검증</h3>
+
+<p>
+"이 시계열이 정상인가?"를 눈으로 판단하는 것은 주관적이다. <strong>ADF 검정(Augmented Dickey-Fuller Test)</strong>은 이것을 통계적으로 검증한다.
+</p>
+
+<div class="def">
+<p class="ni"><strong>ADF 검정의 가설</strong></p>
+<ul>
+<li><strong>귀무가설 (H₀):</strong> 단위근(unit root)이 존재한다 → 비정상</li>
+<li><strong>대립가설 (H₁):</strong> 단위근이 없다 → 정상</li>
+</ul>
+<p class="ni" style="margin-top:8px"><strong>판단 기준:</strong> p-value < 0.05이면 귀무가설 기각 → 정상이라고 판단</p>
+</div>
+
+<div class="info">
+<p class="ni"><strong>"단위근"이 뭔데? — 직관적 이해</strong></p>
+<p class="ni" style="margin-top:8px">AR(1) 모델 \(y_t = \phi y_{t-1} + \epsilon_t\)에서 \(\phi\)의 값에 따라 시계열의 성격이 완전히 달라진다:</p>
+<ul>
+<li>\(|\phi| < 1\): 정상. 충격이 시간이 지나면 사라진다. (예: φ=0.9이면 충격이 0.9, 0.81, 0.73... 으로 감소)</li>
+<li>\(\phi = 1\): 단위근! 비정상. 충격이 영원히 남는다. (예: 오늘 +5% 충격 → 내일도, 모레도, 영원히 +5%가 반영됨)</li>
+<li>\(|\phi| > 1\): 폭발. 시계열이 무한대로 발산한다.</li>
+</ul>
+<p class="ni" style="margin-top:8px">ADF 검정은 "φ가 정확히 1인가?"를 통계적으로 검정하는 것이다. φ=1이면 랜덤 워크 → 비정상.</p>
+</div>
+
+<div class="cc">코드 9-1. ADF 검정: 주가 vs 수익률</div>
+<pre><code><span class="kw">import</span> yfinance <span class="kw">as</span> yf
+<span class="kw">import</span> numpy <span class="kw">as</span> np
+<span class="kw">import</span> pandas <span class="kw">as</span> pd
+<span class="kw">import</span> matplotlib.pyplot <span class="kw">as</span> plt
+<span class="kw">from</span> statsmodels.tsa.stattools <span class="kw">import</span> adfuller
+
+<span class="cm"># 1. 데이터 수집</span>
+data = yf.<span class="fn">download</span>(<span class="st">'AAPL'</span>, start=<span class="st">'2020-01-01'</span>, end=<span class="st">'2025-01-01'</span>)
+price = data[<span class="st">'Close'</span>].squeeze()  <span class="cm"># MultiIndex → Series</span>
+returns = price.<span class="fn">pct_change</span>().<span class="fn">dropna</span>()
+
+<span class="cm"># 2. ADF 검정 함수</span>
+<span class="kw">def</span> <span class="fn">adf_test</span>(series, name):
+    result = <span class="fn">adfuller</span>(series, autolag=<span class="st">'AIC'</span>)
+    <span class="fn">print</span>(<span class="st">f"\n=== ADF 검정: {name} ==="</span>)
+    <span class="fn">print</span>(<span class="st">f"검정 통계량: {result[0]:.4f}"</span>)
+    <span class="fn">print</span>(<span class="st">f"p-value:     {result[1]:.6f}"</span>)
+    <span class="fn">print</span>(<span class="st">f"사용된 시차: {result[2]}"</span>)
+    <span class="fn">print</span>(<span class="st">f"관측치 수:   {result[3]}"</span>)
+    <span class="kw">for</span> key, val <span class="kw">in</span> result[<span class="nu">4</span>].items():
+        <span class="fn">print</span>(<span class="st">f"  임계값 ({key}): {val:.4f}"</span>)
+    <span class="kw">if</span> result[<span class="nu">1</span>] < <span class="nu">0.05</span>:
+        <span class="fn">print</span>(<span class="st">f"→ ✅ 정상 (p < 0.05, 귀무가설 기각)"</span>)
+    <span class="kw">else</span>:
+        <span class="fn">print</span>(<span class="st">f"→ ❌ 비정상 (p ≥ 0.05, 귀무가설 채택)"</span>)
+
+<span class="cm"># 3. 주가 vs 수익률 ADF 검정</span>
+<span class="fn">adf_test</span>(price, <span class="st">'AAPL 주가'</span>)
+<span class="fn">adf_test</span>(returns, <span class="st">'AAPL 수익률'</span>)
+
+<span class="cm"># 4. 시각화: 주가 vs 수익률</span>
+fig, axes = plt.<span class="fn">subplots</span>(<span class="nu">2</span>, <span class="nu">1</span>, figsize=(<span class="nu">14</span>, <span class="nu">8</span>))
+
+axes[<span class="nu">0</span>].<span class="fn">plot</span>(price, color=<span class="st">'#2c3e50'</span>)
+axes[<span class="nu">0</span>].<span class="fn">set_title</span>(<span class="st">'AAPL 주가 (비정상 — 추세 존재)'</span>)
+axes[<span class="nu">0</span>].<span class="fn">set_ylabel</span>(<span class="st">'가격 ($)'</span>)
+axes[<span class="nu">0</span>].<span class="fn">grid</span>(<span class="kw">True</span>, alpha=<span class="nu">0.3</span>)
+
+axes[<span class="nu">1</span>].<span class="fn">plot</span>(returns, color=<span class="st">'#3498db'</span>, alpha=<span class="nu">0.7</span>)
+axes[<span class="nu">1</span>].<span class="fn">axhline</span>(y=<span class="nu">0</span>, color=<span class="st">'red'</span>, linewidth=<span class="nu">0.5</span>)
+axes[<span class="nu">1</span>].<span class="fn">set_title</span>(<span class="st">'AAPL 일간 수익률 (정상 — 평균 회귀)'</span>)
+axes[<span class="nu">1</span>].<span class="fn">set_ylabel</span>(<span class="st">'수익률'</span>)
+axes[<span class="nu">1</span>].<span class="fn">grid</span>(<span class="kw">True</span>, alpha=<span class="nu">0.3</span>)
+
+plt.<span class="fn">tight_layout</span>()
+plt.<span class="fn">show</span>()</code></pre>
+
+<div class="ok">
+<p class="ni"><strong>기대 결과:</strong></p>
+<ul>
+<li><strong>AAPL 주가:</strong> p-value ≈ 0.9 → 비정상 (추세가 있으므로 당연)</li>
+<li><strong>AAPL 수익률:</strong> p-value ≈ 0.0000 → 정상 (평균 0 주위를 오르내림)</li>
+</ul>
+<p class="ni" style="margin-top:8px">이것이 ARIMA에서 "I(d)"의 의미이다. 주가는 I(1)이므로 1차 차분(= 수익률)을 해야 정상이 된다.</p>
+</div>
+
+<h3>9.6 KPSS 검정: ADF의 보완</h3>
+
+<p>
+ADF 검정만으로는 부족할 수 있다. <strong>KPSS 검정</strong>은 ADF와 가설이 반대이다:
+</p>
+
+<ul>
+<li><strong>KPSS 귀무가설:</strong> 정상이다</li>
+<li><strong>KPSS 대립가설:</strong> 비정상이다</li>
+</ul>
+
+<p>
+실무에서는 ADF와 KPSS를 함께 사용하여 교차 검증한다. 둘 다 "정상"이라고 하면 확실히 정상, 둘 다 "비정상"이면 확실히 비정상이다.
+</p>
+
+<div class="warn">
+<p class="ni"><strong>⚠️ 정상성 검정 실전 팁</strong></p>
+<ul>
+<li>주가(price) → 거의 항상 비정상. 차분 또는 로그 수익률 사용.</li>
+<li>수익률(return) → 대체로 정상. 하지만 변동성은 시간에 따라 변한다 (→ GARCH).</li>
+<li>거래량(volume) → 종종 비정상. 로그 변환 + 차분이 필요할 수 있다.</li>
+<li>기술적 지표(RSI, MACD 등) → 대체로 정상 또는 약한 비정상.</li>
+</ul>
+</div>
+
+
+<!-- ==================== Ch.10 ==================== -->
+<h2 id="ch10">Chapter 10. ACF/PACF + ARIMA — 시계열 예측의 고전</h2>
+
+<h3>10.1 자기상관 (Autocorrelation): 과거가 미래를 말해주는가</h3>
+
+<p>
+자기상관(Autocorrelation)이란 시계열이 자기 자신의 과거 값과 얼마나 상관되어 있는지를 측정하는 것이다. 시차(lag) k에서의 자기상관 함수(ACF)는:
+</p>
+
+<div class="eq">
+$$\rho_k = \frac{\text{Cov}(y_t, y_{t-k})}{\text{Var}(y_t)} = \frac{\gamma_k}{\gamma_0}$$
+</div>
+
+<p>
+비유하자면, "오늘 비가 왔으면 내일도 비가 올 확률이 높은가?"를 측정하는 것이다. 금융에서는 "오늘 주가가 올랐으면 내일도 오를 확률이 높은가?" — 이것이 모멘텀(momentum) 효과이고, 자기상관으로 측정할 수 있다.
+</p>
+
+<h3>10.2 ACF와 PACF의 차이</h3>
+
+<div class="def">
+<p class="ni"><strong>ACF vs PACF</strong></p>
+<ul>
+<li><strong>ACF (Autocorrelation Function):</strong> 시차 k에서의 총 상관관계. 중간 시차의 영향을 포함한다. 예: lag-3 ACF는 lag-1, lag-2를 통한 간접 효과도 포함.</li>
+<li><strong>PACF (Partial Autocorrelation Function):</strong> 시차 k에서의 순수 상관관계. 중간 시차의 영향을 제거한 직접 효과만 측정. 예: lag-3 PACF는 lag-1, lag-2의 영향을 제거한 후 lag-3만의 효과.</li>
+</ul>
+</div>
+
+<p>
+ACF와 PACF의 패턴을 보면 어떤 시계열 모델을 써야 하는지 알 수 있다:
+</p>
+
+<div class="tc">표 10-1. ACF/PACF 패턴으로 모델 선택</div>
+<table>
+<thead>
+<tr><th>ACF 패턴</th><th>PACF 패턴</th><th>적합한 모델</th></tr>
+</thead>
+<tbody>
+<tr><td>지수적 감소 또는 사인파</td><td>lag p 이후 절단</td><td>AR(p)</td></tr>
+<tr><td>lag q 이후 절단</td><td>지수적 감소 또는 사인파</td><td>MA(q)</td></tr>
+<tr><td>지수적 감소</td><td>지수적 감소</td><td>ARMA(p,q)</td></tr>
+</tbody>
+</table>
+
+<h3>10.3 ACF/PACF 실전 코드</h3>
+
+<div class="cc">코드 10-1. ACF/PACF 플롯</div>
+<pre><code><span class="kw">from</span> statsmodels.graphics.tsaplots <span class="kw">import</span> plot_acf, plot_pacf
+
+<span class="cm"># returns는 AAPL 일간 수익률 (코드 9-1에서 생성)</span>
+
+fig, axes = plt.<span class="fn">subplots</span>(<span class="nu">2</span>, <span class="nu">2</span>, figsize=(<span class="nu">14</span>, <span class="nu">10</span>))
+
+<span class="cm"># 주가의 ACF/PACF (비정상이므로 참고용)</span>
+<span class="fn">plot_acf</span>(price.<span class="fn">dropna</span>(), lags=<span class="nu">40</span>, ax=axes[<span class="nu">0</span>,<span class="nu">0</span>], title=<span class="st">'주가 ACF (비정상)'</span>)
+<span class="fn">plot_pacf</span>(price.<span class="fn">dropna</span>(), lags=<span class="nu">40</span>, ax=axes[<span class="nu">0</span>,<span class="nu">1</span>], title=<span class="st">'주가 PACF (비정상)'</span>)
+
+<span class="cm"># 수익률의 ACF/PACF (정상)</span>
+<span class="fn">plot_acf</span>(returns, lags=<span class="nu">40</span>, ax=axes[<span class="nu">1</span>,<span class="nu">0</span>], title=<span class="st">'수익률 ACF (정상)'</span>)
+<span class="fn">plot_pacf</span>(returns, lags=<span class="nu">40</span>, ax=axes[<span class="nu">1</span>,<span class="nu">1</span>], title=<span class="st">'수익률 PACF (정상)'</span>)
+
+plt.<span class="fn">tight_layout</span>()
+plt.<span class="fn">show</span>()</code></pre>
+
+<div class="info">
+<p class="ni"><strong>결과 해석:</strong></p>
+<ul>
+<li><strong>주가 ACF:</strong> 모든 시차에서 높은 자기상관 → 비정상의 전형적 패턴 (어제 가격이 높으면 오늘도 높다)</li>
+<li><strong>수익률 ACF:</strong> 대부분의 시차에서 자기상관이 0에 가까움 → 수익률은 거의 예측 불가능 (효율적 시장 가설과 일치)</li>
+<li><strong>수익률 ACF에서 약간의 유의한 시차:</strong> 이것이 알파의 원천이 될 수 있다!</li>
+</ul>
+</div>
+
+<h3>10.4 ARIMA 모델: AR + I + MA</h3>
+
+<p>
+ARIMA(p, d, q)는 시계열 예측의 고전적 모델이다. 세 가지 요소의 조합이다:
+</p>
+
+<div class="def">
+<p class="ni"><strong>ARIMA(p, d, q)의 구성 요소</strong></p>
+<ul>
+<li><strong>AR(p) — 자기회귀:</strong> 과거 p개의 값으로 현재 값을 예측. "어제와 그제의 수익률로 오늘을 예측"</li>
+<li><strong>I(d) — 적분(차분):</strong> d번 차분하여 정상성 확보. 주가는 d=1, 수익률은 d=0</li>
+<li><strong>MA(q) — 이동평균:</strong> 과거 q개의 오차(잔차)로 현재 값을 예측. "어제의 예측 오차를 반영"</li>
+</ul>
+</div>
+
+<div class="eq">
+$$y_t = c + \phi_1 y_{t-1} + \cdots + \phi_p y_{t-p} + \theta_1 \epsilon_{t-1} + \cdots + \theta_q \epsilon_{t-q} + \epsilon_t$$
+</div>
+
+<p>
+여기서 \(\phi\)는 AR 계수, \(\theta\)는 MA 계수, \(\epsilon_t\)는 백색 잡음이다.
+</p>
+
+<h3>10.5 ARIMA 실전: 주가 수익률 예측</h3>
+
+<div class="cc">코드 10-2. ARIMA 모델 피팅 + 예측</div>
+<pre><code><span class="kw">from</span> statsmodels.tsa.arima.model <span class="kw">import</span> ARIMA
+<span class="kw">from</span> statsmodels.tsa.stattools <span class="kw">import</span> adfuller
+<span class="kw">import</span> warnings
+warnings.<span class="fn">filterwarnings</span>(<span class="st">'ignore'</span>)
+
+<span class="cm"># 1. 데이터 준비 (수익률 사용 — 이미 정상이므로 d=0)</span>
+train_size = <span class="fn">int</span>(<span class="fn">len</span>(returns) * <span class="nu">0.8</span>)
+train = returns[:train_size]
+test = returns[train_size:]
+
+<span class="fn">print</span>(<span class="st">f"학습 데이터: {len(train)}일"</span>)
+<span class="fn">print</span>(<span class="st">f"테스트 데이터: {len(test)}일"</span>)
+
+<span class="cm"># 2. auto_arima로 최적 (p,d,q) 탐색</span>
+<span class="cm"># pip install pmdarima</span>
+<span class="kw">from</span> pmdarima <span class="kw">import</span> auto_arima
+
+auto_model = <span class="fn">auto_arima</span>(
+    train,
+    start_p=<span class="nu">0</span>, max_p=<span class="nu">5</span>,
+    start_q=<span class="nu">0</span>, max_q=<span class="nu">5</span>,
+    d=<span class="nu">0</span>,              <span class="cm"># 수익률은 이미 정상</span>
+    seasonal=<span class="kw">False</span>,   <span class="cm"># 계절성 없음</span>
+    stepwise=<span class="kw">True</span>,
+    suppress_warnings=<span class="kw">True</span>,
+    information_criterion=<span class="st">'aic'</span>
+)
+<span class="fn">print</span>(<span class="st">f"\n최적 모델: {auto_model.summary()}"</span>)
+
+<span class="cm"># 3. 수동으로 ARIMA(1,0,1) 피팅</span>
+model = <span class="fn">ARIMA</span>(train, order=(<span class="nu">1</span>, <span class="nu">0</span>, <span class="nu">1</span>))
+fitted = model.<span class="fn">fit</span>()
+<span class="fn">print</span>(fitted.<span class="fn">summary</span>())
+
+<span class="cm"># 4. 잔차 진단</span>
+residuals = fitted.resid
+
+fig, axes = plt.<span class="fn">subplots</span>(<span class="nu">2</span>, <span class="nu">2</span>, figsize=(<span class="nu">14</span>, <span class="nu">8</span>))
+axes[<span class="nu">0</span>,<span class="nu">0</span>].<span class="fn">plot</span>(residuals)
+axes[<span class="nu">0</span>,<span class="nu">0</span>].<span class="fn">set_title</span>(<span class="st">'잔차 시계열'</span>)
+axes[<span class="nu">0</span>,<span class="nu">1</span>].<span class="fn">hist</span>(residuals, bins=<span class="nu">50</span>, density=<span class="kw">True</span>, alpha=<span class="nu">0.7</span>)
+axes[<span class="nu">0</span>,<span class="nu">1</span>].<span class="fn">set_title</span>(<span class="st">'잔차 분포'</span>)
+<span class="fn">plot_acf</span>(residuals, lags=<span class="nu">30</span>, ax=axes[<span class="nu">1</span>,<span class="nu">0</span>], title=<span class="st">'잔차 ACF'</span>)
+<span class="fn">plot_acf</span>(residuals**<span class="nu">2</span>, lags=<span class="nu">30</span>, ax=axes[<span class="nu">1</span>,<span class="nu">1</span>], title=<span class="st">'잔차² ACF (변동성 클러스터링)'</span>)
+plt.<span class="fn">tight_layout</span>()
+plt.<span class="fn">show</span>()
+
+<span class="cm"># 5. 예측</span>
+forecast = fitted.<span class="fn">forecast</span>(steps=<span class="fn">len</span>(test))
+
+fig, ax = plt.<span class="fn">subplots</span>(figsize=(<span class="nu">14</span>, <span class="nu">5</span>))
+ax.<span class="fn">plot</span>(test.index, test.values, label=<span class="st">'실제'</span>, alpha=<span class="nu">0.7</span>)
+ax.<span class="fn">plot</span>(test.index, forecast, label=<span class="st">'ARIMA 예측'</span>, color=<span class="st">'red'</span>, alpha=<span class="nu">0.7</span>)
+ax.<span class="fn">set_title</span>(<span class="st">'ARIMA 수익률 예측 vs 실제'</span>)
+ax.<span class="fn">legend</span>()
+ax.<span class="fn">grid</span>(<span class="kw">True</span>, alpha=<span class="nu">0.3</span>)
+plt.<span class="fn">tight_layout</span>()
+plt.<span class="fn">show</span>()</code></pre>
+
+<div class="warn">
+<p class="ni"><strong>⚠️ ARIMA의 현실적 한계 (매우 중요!)</strong></p>
+<ul>
+<li><strong>수익률 예측은 극도로 어렵다.</strong> ARIMA 예측이 거의 0에 수렴하는 것을 볼 수 있다 — 이것은 "수익률은 예측 불가능하다"는 효율적 시장 가설과 일치한다.</li>
+<li><strong>ARIMA는 평균(mean)을 예측한다.</strong> 하지만 금융에서 더 중요한 것은 <strong>변동성(variance)</strong>의 예측이다. 잔차²의 ACF를 보면 유의한 자기상관이 있다 — 이것이 변동성 클러스터링이고, GARCH가 필요한 이유이다.</li>
+<li><strong>선형 모델의 한계:</strong> ARIMA는 선형 관계만 포착한다. 비선형 패턴은 R7의 LSTM이 더 잘 잡는다.</li>
+</ul>
+</div>
+
+<h3>10.6 ARIMA 모델 선택: AIC와 BIC</h3>
+
+<p>
+(p, d, q)를 어떻게 선택하는가? ACF/PACF 패턴 외에, 정보 기준(Information Criterion)을 사용한다:
+</p>
+
+<ul>
+<li><strong>AIC (Akaike Information Criterion):</strong> 모델의 적합도와 복잡도의 균형. 작을수록 좋다.</li>
+<li><strong>BIC (Bayesian Information Criterion):</strong> AIC보다 복잡도에 더 큰 페널티. 더 간단한 모델을 선호한다.</li>
+</ul>
+
+<p>
+<code>pmdarima.auto_arima</code>는 여러 (p,d,q) 조합을 시도하고 AIC가 가장 낮은 모델을 자동으로 선택한다. 실무에서는 이 자동 선택을 먼저 하고, 결과를 ACF/PACF로 검증하는 것이 효율적이다.
+</p>
+
+<h3>10.7 롤링 예측 (Rolling Forecast) — 실전에서 ARIMA 쓰는 법</h3>
+
+<p>
+위의 코드 10-2에서 한 번에 전체 테스트 기간을 예측했다. 하지만 실전에서는 <strong>롤링 예측</strong>이 더 현실적이다. 매일 새로운 데이터가 들어오면 모델을 업데이트하고, 다음 1일만 예측한다. 이것이 실제 트레이딩에서 ARIMA를 쓰는 방식이다.
+</p>
+
+<div class="cc">코드 10-3. ARIMA 롤링 1-step 예측</div>
+<pre><code><span class="kw">from</span> statsmodels.tsa.arima.model <span class="kw">import</span> ARIMA
+<span class="kw">import</span> numpy <span class="kw">as</span> np
+<span class="kw">import</span> pandas <span class="kw">as</span> pd
+<span class="kw">import</span> matplotlib.pyplot <span class="kw">as</span> plt
+<span class="kw">import</span> warnings
+warnings.<span class="fn">filterwarnings</span>(<span class="st">'ignore'</span>)
+
+<span class="cm"># returns는 AAPL 일간 수익률</span>
+train_size = <span class="fn">int</span>(<span class="fn">len</span>(returns) * <span class="nu">0.8</span>)
+
+<span class="cm"># 롤링 예측: 매일 모델을 재학습하고 1일 예측</span>
+rolling_preds = []
+actuals = []
+
+<span class="kw">for</span> i <span class="kw">in</span> <span class="fn">range</span>(train_size, <span class="fn">min</span>(train_size + <span class="nu">60</span>, <span class="fn">len</span>(returns))):
+    <span class="cm"># i번째까지의 데이터로 학습</span>
+    train_window = returns[:i]
+
+    <span class="cm"># ARIMA(1,0,1) 피팅</span>
+    model = <span class="fn">ARIMA</span>(train_window, order=(<span class="nu">1</span>, <span class="nu">0</span>, <span class="nu">1</span>))
+    fitted = model.<span class="fn">fit</span>()
+
+    <span class="cm"># 1일 예측</span>
+    pred = fitted.<span class="fn">forecast</span>(steps=<span class="nu">1</span>).values[<span class="nu">0</span>]
+    rolling_preds.<span class="fn">append</span>(pred)
+    actuals.<span class="fn">append</span>(returns.iloc[i])
+
+<span class="cm"># 결과 시각화</span>
+fig, axes = plt.<span class="fn">subplots</span>(<span class="nu">2</span>, <span class="nu">1</span>, figsize=(<span class="nu">14</span>, <span class="nu">8</span>))
+
+axes[<span class="nu">0</span>].<span class="fn">plot</span>(actuals, label=<span class="st">'실제 수익률'</span>, alpha=<span class="nu">0.7</span>)
+axes[<span class="nu">0</span>].<span class="fn">plot</span>(rolling_preds, label=<span class="st">'ARIMA 롤링 예측'</span>,
+          color=<span class="st">'red'</span>, alpha=<span class="nu">0.7</span>)
+axes[<span class="nu">0</span>].<span class="fn">set_title</span>(<span class="st">'ARIMA 롤링 1-step 예측 (60일)'</span>)
+axes[<span class="nu">0</span>].<span class="fn">legend</span>()
+axes[<span class="nu">0</span>].<span class="fn">grid</span>(<span class="kw">True</span>, alpha=<span class="nu">0.3</span>)
+
+<span class="cm"># 예측 오차 분포</span>
+errors = np.<span class="fn">array</span>(actuals) - np.<span class="fn">array</span>(rolling_preds)
+axes[<span class="nu">1</span>].<span class="fn">hist</span>(errors, bins=<span class="nu">20</span>, color=<span class="st">'#3498db'</span>, alpha=<span class="nu">0.7</span>,
+          edgecolor=<span class="st">'white'</span>)
+axes[<span class="nu">1</span>].<span class="fn">axvline</span>(x=<span class="nu">0</span>, color=<span class="st">'red'</span>, linewidth=<span class="nu">1.5</span>)
+axes[<span class="nu">1</span>].<span class="fn">set_title</span>(<span class="st">f'예측 오차 분포 (RMSE={np.sqrt((errors**2).mean()):.4f})'</span>)
+axes[<span class="nu">1</span>].<span class="fn">grid</span>(<span class="kw">True</span>, alpha=<span class="nu">0.3</span>)
+
+plt.<span class="fn">tight_layout</span>()
+plt.<span class="fn">show</span>()</code></pre>
+
+<div class="info">
+<p class="ni"><strong>롤링 예측의 교훈:</strong> ARIMA의 롤링 예측을 보면, 예측값이 거의 0에 가깝다는 것을 알 수 있다. 이것은 "수익률은 예측 불가능하다"는 효율적 시장 가설(EMH)과 일치한다. ARIMA는 수익률의 평균을 예측하는 데는 한계가 있지만, 잔차의 패턴(변동성 클러스터링)을 발견하는 데는 유용하다 — 이것이 Ch.11 GARCH로 이어지는 이유이다.</p>
+</div>
+
+<div class="warn">
+<p class="ni"><strong>⚠️ SARIMAX — 계절성이 있는 경우</strong></p>
+<p class="ni" style="margin-top:8px">일부 금융 데이터에는 계절성(seasonality)이 있다. 예를 들어 소매업 매출은 12월에 급증하고, 전력 수요는 여름/겨울에 높다. 이런 경우 SARIMAX(Seasonal ARIMA with eXogenous variables)를 사용한다:</p>
+<ul>
+<li><code>auto_arima(data, seasonal=True, m=12)</code> — m은 계절 주기 (월간 데이터면 12)</li>
+<li>주식 수익률에는 보통 계절성이 약하므로 <code>seasonal=False</code>로 충분하다</li>
+<li>하지만 "1월 효과", "월말 효과" 같은 캘린더 이상 현상은 외생 변수(X)로 추가할 수 있다</li>
+</ul>
+</div>
+
+
+<!-- ==================== Ch.11 ==================== -->
+<h2 id="ch11">Chapter 11. GARCH — 변동성 클러스터링과 변동성 예측</h2>
+
+<h3>11.1 왜 변동성 예측이 중요한가</h3>
+
+<p>
+R4에서 우리는 수익률의 <strong>방향</strong>(상승/하락)을 예측했다. 하지만 금융에서 방향만큼 중요한 것이 <strong>변동성(volatility)</strong>이다. 변동성은 "가격이 얼마나 크게 흔들리는가"를 측정한다.
+</p>
+
+<p>
+왜 변동성 예측이 중요한가? 세 가지 이유가 있다:
+</p>
+
+<ul>
+<li><strong>리스크 관리:</strong> VaR(Value at Risk), CVaR 등 리스크 지표는 모두 변동성에 기반한다. 내일의 변동성을 예측해야 적절한 포지션 크기를 결정할 수 있다.</li>
+<li><strong>옵션 가격:</strong> 블랙-숄즈 모델의 핵심 입력이 변동성이다. 변동성을 잘 예측하면 옵션 미스프라이싱을 찾을 수 있다.</li>
+<li><strong>포트폴리오 최적화:</strong> R8에서 배울 마코위츠 최적화의 핵심 입력이 공분산 행렬이다. 변동성 예측이 정확해야 최적화 결과도 좋다.</li>
+</ul>
+
+<h3>11.2 변동성 클러스터링 (Volatility Clustering)</h3>
+
+<p>
+금융 수익률의 가장 유명한 특성 중 하나가 <strong>변동성 클러스터링</strong>이다. "큰 변동 뒤에는 큰 변동이, 작은 변동 뒤에는 작은 변동이 따라온다." 2008년 금융위기 때 매일 5~10%씩 움직이던 시장이, 2017년에는 매일 0.1~0.3%만 움직였다. 변동성은 뭉쳐서(cluster) 나타난다.
+</p>
+
+<p>
+이것은 수익률 자체는 자기상관이 거의 없지만, 수익률의 <strong>제곱</strong>(또는 절대값)은 강한 자기상관을 보인다는 것을 의미한다. Ch.10의 코드에서 "잔차² ACF"에 유의한 자기상관이 있었던 것이 바로 이것이다.
+</p>
+
+<div class="cc">코드 11-1. 변동성 클러스터링 시각화</div>
+<pre><code><span class="cm"># returns는 AAPL 일간 수익률</span>
+
+fig, axes = plt.<span class="fn">subplots</span>(<span class="nu">3</span>, <span class="nu">1</span>, figsize=(<span class="nu">14</span>, <span class="nu">10</span>))
+
+<span class="cm"># 수익률</span>
+axes[<span class="nu">0</span>].<span class="fn">plot</span>(returns, color=<span class="st">'#2c3e50'</span>, alpha=<span class="nu">0.7</span>)
+axes[<span class="nu">0</span>].<span class="fn">set_title</span>(<span class="st">'일간 수익률'</span>)
+axes[<span class="nu">0</span>].<span class="fn">set_ylabel</span>(<span class="st">'수익률'</span>)
+axes[<span class="nu">0</span>].<span class="fn">grid</span>(<span class="kw">True</span>, alpha=<span class="nu">0.3</span>)
+
+<span class="cm"># 수익률의 절대값 (변동성 프록시)</span>
+axes[<span class="nu">1</span>].<span class="fn">plot</span>(returns.<span class="fn">abs</span>(), color=<span class="st">'#e74c3c'</span>, alpha=<span class="nu">0.7</span>)
+axes[<span class="nu">1</span>].<span class="fn">set_title</span>(<span class="st">'|수익률| — 변동성 클러스터링이 보인다!'</span>)
+axes[<span class="nu">1</span>].<span class="fn">set_ylabel</span>(<span class="st">'|수익률|'</span>)
+axes[<span class="nu">1</span>].<span class="fn">grid</span>(<span class="kw">True</span>, alpha=<span class="nu">0.3</span>)
+
+<span class="cm"># 20일 롤링 변동성</span>
+rolling_vol = returns.<span class="fn">rolling</span>(<span class="nu">20</span>).<span class="fn">std</span>() * np.<span class="fn">sqrt</span>(<span class="nu">252</span>)
+axes[<span class="nu">2</span>].<span class="fn">plot</span>(rolling_vol, color=<span class="st">'#9b59b6'</span>, linewidth=<span class="nu">1.5</span>)
+axes[<span class="nu">2</span>].<span class="fn">set_title</span>(<span class="st">'20일 롤링 연환산 변동성'</span>)
+axes[<span class="nu">2</span>].<span class="fn">set_ylabel</span>(<span class="st">'변동성 (연환산)'</span>)
+axes[<span class="nu">2</span>].<span class="fn">grid</span>(<span class="kw">True</span>, alpha=<span class="nu">0.3</span>)
+
+plt.<span class="fn">tight_layout</span>()
+plt.<span class="fn">show</span>()</code></pre>
+
+<h3>11.3 ARCH 모델: 변동성의 자기회귀</h3>
+
+<p>
+ARCH(Autoregressive Conditional Heteroskedasticity)는 Robert Engle이 1982년에 제안한 모델로, 2003년 노벨 경제학상을 수상했다. MLAT Ch.9에서 자세히 다룬다.
+</p>
+
+<p>
+ARCH(p)는 현재의 분산이 과거 p개의 오차 제곱에 의존한다고 모델링한다:
+</p>
+
+<div class="eq">
+$$\sigma_t^2 = \omega + \alpha_1 \epsilon_{t-1}^2 + \alpha_2 \epsilon_{t-2}^2 + \cdots + \alpha_p \epsilon_{t-p}^2$$
+</div>
+
+<p>
+직관: "어제 큰 충격(큰 오차)이 있었으면, 오늘의 변동성도 크다." 이것이 변동성 클러스터링을 수학적으로 표현한 것이다.
+</p>
+
+<h3>11.4 GARCH(1,1): 실무의 표준</h3>
+
+<p>
+GARCH(Generalized ARCH)는 ARCH를 확장하여, 분산이 과거 오차뿐만 아니라 <strong>과거 분산 자체</strong>에도 의존하게 한다. GARCH(1,1)이 실무에서 가장 많이 쓰이는 모델이다:
+</p>
+
+<div class="eq">
+$$\sigma_t^2 = \omega + \alpha \epsilon_{t-1}^2 + \beta \sigma_{t-1}^2$$
+</div>
+
+<div class="def">
+<p class="ni"><strong>GARCH(1,1) 파라미터 해석</strong></p>
+<ul>
+<li><strong>ω (omega):</strong> 장기 평균 분산의 기여분. 항상 양수.</li>
+<li><strong>α (alpha):</strong> 어제의 충격(오차²)이 오늘 변동성에 미치는 영향. "뉴스 반응 속도"</li>
+<li><strong>β (beta):</strong> 어제의 변동성이 오늘 변동성에 미치는 영향. "변동성의 지속성"</li>
+<li><strong>α + β:</strong> 1에 가까울수록 변동성 충격이 오래 지속된다. 보통 0.95~0.99 범위.</li>
+</ul>
+<p class="ni" style="margin-top:8px"><strong>장기 분산:</strong> \(\bar{\sigma}^2 = \frac{\omega}{1 - \alpha - \beta}\) (α + β < 1일 때)</p>
+</div>
+
+<p>
+비유하자면, GARCH(1,1)은 "온도계"와 같다. α는 "방금 들어온 뜨거운 물(새로운 충격)"의 영향, β는 "이미 데워진 물(기존 변동성)"의 영향이다. β가 크면 한번 뜨거워진 물이 천천히 식는다 — 변동성이 오래 지속된다.
+</p>
+
+<h3>11.5 GARCH 실전 코드</h3>
+
+<div class="cc">코드 11-2. GARCH(1,1) 변동성 예측</div>
+<pre><code><span class="cm"># pip install arch</span>
+<span class="kw">from</span> arch <span class="kw">import</span> arch_model
+
+<span class="cm"># 1. 수익률을 퍼센트로 변환 (arch 라이브러리 관례)</span>
+returns_pct = returns * <span class="nu">100</span>
+
+<span class="cm"># 2. GARCH(1,1) 모델 피팅</span>
+model = <span class="fn">arch_model</span>(
+    returns_pct,
+    vol=<span class="st">'Garch'</span>,      <span class="cm"># 변동성 모델</span>
+    p=<span class="nu">1</span>,               <span class="cm"># GARCH의 p (과거 분산 시차)</span>
+    q=<span class="nu">1</span>,               <span class="cm"># ARCH의 q (과거 오차² 시차)</span>
+    mean=<span class="st">'Constant'</span>,   <span class="cm"># 평균 모델</span>
+    dist=<span class="st">'Normal'</span>      <span class="cm"># 오차 분포</span>
+)
+
+result = model.<span class="fn">fit</span>(disp=<span class="st">'off'</span>)
+<span class="fn">print</span>(result.<span class="fn">summary</span>())
+
+<span class="cm"># 3. 파라미터 해석</span>
+omega = result.params[<span class="st">'omega'</span>]
+alpha = result.params[<span class="st">'alpha[1]'</span>]
+beta = result.params[<span class="st">'beta[1]'</span>]
+
+<span class="fn">print</span>(<span class="st">f"\n=== GARCH(1,1) 파라미터 ==="</span>)
+<span class="fn">print</span>(<span class="st">f"ω (omega): {omega:.6f}"</span>)
+<span class="fn">print</span>(<span class="st">f"α (alpha): {alpha:.4f} — 뉴스 반응"</span>)
+<span class="fn">print</span>(<span class="st">f"β (beta):  {beta:.4f} — 변동성 지속"</span>)
+<span class="fn">print</span>(<span class="st">f"α + β:    {alpha + beta:.4f} — 지속성"</span>)
+
+<span class="cm"># 장기 변동성</span>
+long_run_var = omega / (<span class="nu">1</span> - alpha - beta)
+long_run_vol = np.<span class="fn">sqrt</span>(long_run_var) * np.<span class="fn">sqrt</span>(<span class="nu">252</span>) / <span class="nu">100</span>
+<span class="fn">print</span>(<span class="st">f"장기 연환산 변동성: {long_run_vol:.1%}"</span>)
+
+<span class="cm"># 4. 조건부 변동성 시각화</span>
+cond_vol = result.conditional_volatility / <span class="nu">100</span> * np.<span class="fn">sqrt</span>(<span class="nu">252</span>)
+
+fig, axes = plt.<span class="fn">subplots</span>(<span class="nu">2</span>, <span class="nu">1</span>, figsize=(<span class="nu">14</span>, <span class="nu">8</span>))
+
+axes[<span class="nu">0</span>].<span class="fn">plot</span>(returns, alpha=<span class="nu">0.5</span>, color=<span class="st">'#2c3e50'</span>)
+axes[<span class="nu">0</span>].<span class="fn">set_title</span>(<span class="st">'일간 수익률'</span>)
+axes[<span class="nu">0</span>].<span class="fn">grid</span>(<span class="kw">True</span>, alpha=<span class="nu">0.3</span>)
+
+axes[<span class="nu">1</span>].<span class="fn">plot</span>(cond_vol, color=<span class="st">'#e74c3c'</span>, linewidth=<span class="nu">1.5</span>,
+          label=<span class="st">'GARCH 조건부 변동성'</span>)
+rolling_vol = returns.<span class="fn">rolling</span>(<span class="nu">20</span>).<span class="fn">std</span>() * np.<span class="fn">sqrt</span>(<span class="nu">252</span>)
+axes[<span class="nu">1</span>].<span class="fn">plot</span>(rolling_vol, color=<span class="st">'#3498db'</span>, alpha=<span class="nu">0.5</span>,
+          label=<span class="st">'20일 롤링 변동성'</span>)
+axes[<span class="nu">1</span>].<span class="fn">set_title</span>(<span class="st">'GARCH(1,1) 조건부 변동성 vs 롤링 변동성'</span>)
+axes[<span class="nu">1</span>].<span class="fn">set_ylabel</span>(<span class="st">'연환산 변동성'</span>)
+axes[<span class="nu">1</span>].<span class="fn">legend</span>()
+axes[<span class="nu">1</span>].<span class="fn">grid</span>(<span class="kw">True</span>, alpha=<span class="nu">0.3</span>)
+
+plt.<span class="fn">tight_layout</span>()
+plt.<span class="fn">show</span>()</code></pre>
+
+<h3>11.6 GARCH 변동성 예측 활용</h3>
+
+<div class="cc">코드 11-3. 미래 변동성 예측 + VaR 계산</div>
+<pre><code><span class="cm"># 5일 앞 변동성 예측</span>
+forecast = result.<span class="fn">forecast</span>(horizon=<span class="nu">5</span>)
+forecast_var = forecast.variance.values[-<span class="nu">1</span>]  <span class="cm"># 마지막 관측치 기준</span>
+forecast_vol = np.<span class="fn">sqrt</span>(forecast_var) / <span class="nu">100</span>  <span class="cm"># 일간 변동성</span>
+
+<span class="fn">print</span>(<span class="st">"=== 5일 변동성 예측 ==="</span>)
+<span class="kw">for</span> i, vol <span class="kw">in</span> <span class="fn">enumerate</span>(forecast_vol):
+    <span class="fn">print</span>(<span class="st">f"Day {i+1}: 일간 σ = {vol:.4f} ({vol*np.sqrt(252):.1%} 연환산)"</span>)
+
+<span class="cm"># VaR 계산 (95% 신뢰수준)</span>
+z_95 = <span class="nu">1.645</span>  <span class="cm"># 정규분포 95% 분위수</span>
+portfolio_value = <span class="nu">100_000_000</span>  <span class="cm"># 1억 원</span>
+
+daily_vol = forecast_vol[<span class="nu">0</span>]
+var_95 = portfolio_value * z_95 * daily_vol
+
+<span class="fn">print</span>(<span class="st">f"\n=== VaR (95%, 1일) ==="</span>)
+<span class="fn">print</span>(<span class="st">f"포트폴리오: {portfolio_value:,.0f}원"</span>)
+<span class="fn">print</span>(<span class="st">f"일간 변동성: {daily_vol:.4f}"</span>)
+<span class="fn">print</span>(<span class="st">f"95% VaR: {var_95:,.0f}원"</span>)
+<span class="fn">print</span>(<span class="st">f"→ 내일 하루 동안 95% 확률로 최대 {var_95:,.0f}원 손실"</span>)</code></pre>
+
+<div class="ok">
+<p class="ni"><strong>GARCH의 실전 가치</strong></p>
+<ul>
+<li><strong>ARIMA는 수익률(평균)을 예측하지만 거의 쓸모없다</strong> — 수익률은 예측이 극도로 어렵다.</li>
+<li><strong>GARCH는 변동성(분산)을 예측하고 매우 유용하다</strong> — 변동성은 예측 가능하고, 리스크 관리에 직접 활용된다.</li>
+<li><strong>실무 조합:</strong> ARIMA(평균) + GARCH(분산)를 결합하여 수익률의 평균과 분산을 동시에 모델링한다.</li>
+</ul>
+</div>
+
+<h3>11.7 GARCH 변형 모델</h3>
+
+<div class="tc">표 11-1. GARCH 변형 모델 비교</div>
+<table>
+<thead>
+<tr><th>모델</th><th>특징</th><th>금융 적용</th></tr>
+</thead>
+<tbody>
+<tr><td><strong>GARCH(1,1)</strong></td><td>기본 모델. 대칭적 충격 반응</td><td>일반적 변동성 예측</td></tr>
+<tr><td><strong>EGARCH</strong></td><td>비대칭 효과 (하락 충격 > 상승 충격)</td><td>레버리지 효과 모델링</td></tr>
+<tr><td><strong>GJR-GARCH</strong></td><td>음의 충격에 추가 가중치</td><td>주식 시장 (하락 시 변동성 급등)</td></tr>
+<tr><td><strong>TGARCH</strong></td><td>임계값 기반 비대칭</td><td>레짐 전환 변동성</td></tr>
+</tbody>
+</table>
+
+<div class="info">
+<p class="ni"><strong>레버리지 효과:</strong> 주가가 하락하면 변동성이 상승보다 더 크게 증가하는 현상이다. 이유는 주가 하락 → 부채비율(레버리지) 증가 → 기업 리스크 증가 → 변동성 증가. EGARCH나 GJR-GARCH는 이 비대칭성을 포착한다. <code>arch_model(returns, vol='EGARCH')</code>로 간단히 사용할 수 있다.</p>
+</div>
+
+<h3>11.8 EGARCH 실전 코드 — 비대칭 변동성 모델링</h3>
+
+<p>
+GARCH(1,1)은 +5% 충격과 -5% 충격을 동일하게 취급한다. 하지만 현실에서는 -5% 하락이 +5% 상승보다 변동성을 훨씬 더 크게 올린다. 이것이 <strong>레버리지 효과</strong>이고, EGARCH가 이를 포착한다.
+</p>
+
+<div class="cc">코드 11-4. EGARCH + 뉴스 충격 곡선 (News Impact Curve)</div>
+<pre><code><span class="kw">from</span> arch <span class="kw">import</span> arch_model
+<span class="kw">import</span> numpy <span class="kw">as</span> np
+<span class="kw">import</span> matplotlib.pyplot <span class="kw">as</span> plt
+
+<span class="cm"># returns_pct는 코드 11-2에서 만든 퍼센트 수익률</span>
+
+<span class="cm"># 1. GARCH vs EGARCH vs GJR-GARCH 비교</span>
+models = {
+    <span class="st">'GARCH(1,1)'</span>:     <span class="fn">arch_model</span>(returns_pct, vol=<span class="st">'Garch'</span>, p=<span class="nu">1</span>, q=<span class="nu">1</span>),
+    <span class="st">'EGARCH(1,1)'</span>:    <span class="fn">arch_model</span>(returns_pct, vol=<span class="st">'EGARCH'</span>, p=<span class="nu">1</span>, q=<span class="nu">1</span>),
+    <span class="st">'GJR-GARCH(1,1)'</span>: <span class="fn">arch_model</span>(returns_pct, vol=<span class="st">'Garch'</span>, p=<span class="nu">1</span>, o=<span class="nu">1</span>, q=<span class="nu">1</span>),
+}
+
+results = {}
+<span class="kw">for</span> name, model <span class="kw">in</span> models.items():
+    res = model.<span class="fn">fit</span>(disp=<span class="st">'off'</span>)
+    results[name] = res
+    <span class="fn">print</span>(<span class="st">f"\n{name}: AIC={res.aic:.1f}, BIC={res.bic:.1f}"</span>)
+
+<span class="cm"># 2. 조건부 변동성 비교 시각화</span>
+fig, ax = plt.<span class="fn">subplots</span>(figsize=(<span class="nu">14</span>, <span class="nu">5</span>))
+colors = [<span class="st">'#3498db'</span>, <span class="st">'#e74c3c'</span>, <span class="st">'#2ecc71'</span>]
+<span class="kw">for</span> (name, res), color <span class="kw">in</span> <span class="fn">zip</span>(results.items(), colors):
+    vol = res.conditional_volatility / <span class="nu">100</span> * np.<span class="fn">sqrt</span>(<span class="nu">252</span>)
+    ax.<span class="fn">plot</span>(vol, label=name, alpha=<span class="nu">0.7</span>, color=color, linewidth=<span class="nu">1</span>)
+ax.<span class="fn">set_title</span>(<span class="st">'GARCH vs EGARCH vs GJR-GARCH 조건부 변동성 비교'</span>)
+ax.<span class="fn">set_ylabel</span>(<span class="st">'연환산 변동성'</span>)
+ax.<span class="fn">legend</span>()
+ax.<span class="fn">grid</span>(<span class="kw">True</span>, alpha=<span class="nu">0.3</span>)
+plt.<span class="fn">tight_layout</span>()
+plt.<span class="fn">show</span>()
+
+<span class="cm"># 3. 뉴스 충격 곡선 (News Impact Curve)</span>
+<span class="cm"># "양의 충격 vs 음의 충격이 변동성에 미치는 영향"을 시각화</span>
+shocks = np.<span class="fn">linspace</span>(-<span class="nu">4</span>, <span class="nu">4</span>, <span class="nu">200</span>)  <span class="cm"># 표준화된 충격 범위</span>
+
+<span class="cm"># GARCH: 대칭 (포물선)</span>
+garch_res = results[<span class="st">'GARCH(1,1)'</span>]
+omega_g = garch_res.params[<span class="st">'omega'</span>]
+alpha_g = garch_res.params[<span class="st">'alpha[1]'</span>]
+beta_g = garch_res.params[<span class="st">'beta[1]'</span>]
+long_var = omega_g / (<span class="nu">1</span> - alpha_g - beta_g)
+garch_nic = omega_g + alpha_g * shocks**<span class="nu">2</span> + beta_g * long_var
+
+fig, ax = plt.<span class="fn">subplots</span>(figsize=(<span class="nu">10</span>, <span class="nu">6</span>))
+ax.<span class="fn">plot</span>(shocks, garch_nic, <span class="st">'b-'</span>, linewidth=<span class="nu">2</span>, label=<span class="st">'GARCH (대칭)'</span>)
+ax.<span class="fn">axvline</span>(x=<span class="nu">0</span>, color=<span class="st">'gray'</span>, linestyle=<span class="st">'--'</span>, alpha=<span class="nu">0.5</span>)
+ax.<span class="fn">set_xlabel</span>(<span class="st">'충격 크기 (ε)'</span>, fontsize=<span class="nu">12</span>)
+ax.<span class="fn">set_ylabel</span>(<span class="st">'다음 기간 조건부 분산 (σ²)'</span>, fontsize=<span class="nu">12</span>)
+ax.<span class="fn">set_title</span>(<span class="st">'뉴스 충격 곡선 (News Impact Curve)'</span>, fontsize=<span class="nu">14</span>)
+ax.<span class="fn">legend</span>(fontsize=<span class="nu">11</span>)
+ax.<span class="fn">grid</span>(<span class="kw">True</span>, alpha=<span class="nu">0.3</span>)
+
+<span class="cm"># 주석: 비대칭 영역 표시</span>
+ax.<span class="fn">annotate</span>(<span class="st">'하락 충격 → 변동성 급등\n(레버리지 효과)'</span>,
+           xy=(-<span class="nu">3</span>, garch_nic[<span class="nu">25</span>]), fontsize=<span class="nu">10</span>,
+           color=<span class="st">'#e74c3c'</span>, fontweight=<span class="st">'bold'</span>)
+ax.<span class="fn">annotate</span>(<span class="st">'상승 충격 → 변동성 소폭 증가'</span>,
+           xy=(<span class="nu">1.5</span>, garch_nic[<span class="nu">150</span>]), fontsize=<span class="nu">10</span>,
+           color=<span class="st">'#3498db'</span>)
+plt.<span class="fn">tight_layout</span>()
+plt.<span class="fn">show</span>()</code></pre>
+
+<div class="ok">
+<p class="ni"><strong>뉴스 충격 곡선 해석</strong></p>
+<ul>
+<li><strong>GARCH:</strong> 좌우 대칭인 포물선. +3% 충격과 -3% 충격이 변동성에 미치는 영향이 동일하다.</li>
+<li><strong>EGARCH/GJR:</strong> 왼쪽(음의 충격)이 오른쪽(양의 충격)보다 가파르다. -3% 하락이 +3% 상승보다 변동성을 더 크게 올린다.</li>
+<li><strong>금융 의미:</strong> 시장이 폭락할 때 VIX(공포지수)가 급등하는 현상을 수학적으로 포착한 것이다. 리스크 관리에서 하방 리스크를 더 보수적으로 추정해야 하는 이유이기도 하다.</li>
+</ul>
+</div>
+
+<div class="warn">
+<p class="ni"><strong>⚠️ 어떤 GARCH 변형을 쓸 것인가?</strong></p>
+<ul>
+<li><strong>AIC/BIC가 가장 낮은 모델</strong>을 선택하는 것이 기본 원칙이다.</li>
+<li><strong>주식 시장:</strong> 레버리지 효과가 강하므로 EGARCH 또는 GJR-GARCH가 보통 더 좋다.</li>
+<li><strong>외환 시장:</strong> 레버리지 효과가 약하므로 기본 GARCH(1,1)로 충분한 경우가 많다.</li>
+<li><strong>실무 팁:</strong> 3개 모델을 모두 피팅하고 AIC를 비교하라. 코드 3줄이면 된다.</li>
+</ul>
+</div>
+
+
+<!-- ==================== Ch.12 ==================== -->
+<h2 id="ch12">Chapter 12. 실전 통합 — PCA + K-Means + ARIMA/GARCH 파이프라인</h2>
+
+<h3>12.1 전체 파이프라인 개요</h3>
+
+<p>
+이번 라운드에서 배운 모든 것을 하나의 파이프라인으로 통합한다. 실전에서 비지도학습과 시계열 분석은 독립적으로 쓰이지 않는다 — 서로 결합하여 더 강력한 분석 도구가 된다.
+</p>
+
+<!-- 파이프라인 다이어그램 (카드 스타일) -->
+<div style="margin:25px 0;padding:25px;background:linear-gradient(135deg,#f8f9fa,#e8f4f8);border-radius:12px;border:1px solid #b3e5fc">
+<p class="ni" style="text-align:center;font-weight:bold;margin-bottom:20px;font-size:15px;color:#01579b">🔧 Round 5 통합 파이프라인</p>
+<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px">
+<div style="background:#fff;padding:14px;border-radius:10px;box-shadow:0 2px 8px rgba(0,0,0,.08);border-top:4px solid #1976d2;text-align:center">
+<div style="font-size:24px;margin-bottom:6px">📊</div>
+<div style="font-weight:bold;font-size:12px;color:#1a1a1a">수익률 데이터</div>
+<div style="font-size:10px;color:#777;margin-top:4px">20종목 × 2년<br>yfinance 수집</div>
+</div>
+<div style="background:#fff;padding:14px;border-radius:10px;box-shadow:0 2px 8px rgba(0,0,0,.08);border-top:4px solid #388e3c;text-align:center">
+<div style="font-size:24px;margin-bottom:6px">🔬</div>
+<div style="font-weight:bold;font-size:12px;color:#1a1a1a">PCA</div>
+<div style="font-size:10px;color:#777;margin-top:4px">팩터 추출<br>차원 축소</div>
+</div>
+<div style="background:#fff;padding:14px;border-radius:10px;box-shadow:0 2px 8px rgba(0,0,0,.08);border-top:4px solid #7b1fa2;text-align:center">
+<div style="font-size:24px;margin-bottom:6px">🎯</div>
+<div style="font-weight:bold;font-size:12px;color:#1a1a1a">K-Means</div>
+<div style="font-size:10px;color:#777;margin-top:4px">종목 군집화<br>섹터 자동 분류</div>
+</div>
+<div style="background:#fff;padding:14px;border-radius:10px;box-shadow:0 2px 8px rgba(0,0,0,.08);border-top:4px solid #f57c00;text-align:center">
+<div style="font-size:24px;margin-bottom:6px">📈</div>
+<div style="font-weight:bold;font-size:12px;color:#1a1a1a">GARCH</div>
+<div style="font-size:10px;color:#777;margin-top:4px">클러스터별<br>변동성 예측</div>
+</div>
+<div style="background:#fff;padding:14px;border-radius:10px;box-shadow:0 2px 8px rgba(0,0,0,.08);border-top:4px solid #c62828;text-align:center">
+<div style="font-size:24px;margin-bottom:6px">⚖️</div>
+<div style="font-weight:bold;font-size:12px;color:#1a1a1a">포트폴리오</div>
+<div style="font-size:10px;color:#777;margin-top:4px">역변동성 가중<br>분산 투자</div>
+</div>
+</div>
+<div style="text-align:center;margin-top:14px;padding:8px;background:rgba(255,255,255,.7);border-radius:6px;font-size:11px;color:#555">
+📊 → 🔬 → 🎯 → 📈 → ⚖️ | 데이터 수집부터 포트폴리오 구성까지 <strong>End-to-End 파이프라인</strong>
+</div>
+</div>
+
+<h3>12.2 통합 코드: 전체 파이프라인</h3>
+
+<div class="cc">코드 12-1. PCA → K-Means → GARCH 통합 파이프라인</div>
+<pre><code><span class="kw">import</span> yfinance <span class="kw">as</span> yf
+<span class="kw">import</span> numpy <span class="kw">as</span> np
+<span class="kw">import</span> pandas <span class="kw">as</span> pd
+<span class="kw">import</span> matplotlib.pyplot <span class="kw">as</span> plt
+<span class="kw">from</span> sklearn.preprocessing <span class="kw">import</span> StandardScaler
+<span class="kw">from</span> sklearn.decomposition <span class="kw">import</span> PCA
+<span class="kw">from</span> sklearn.cluster <span class="kw">import</span> KMeans
+<span class="kw">from</span> arch <span class="kw">import</span> arch_model
+<span class="kw">import</span> warnings
+warnings.<span class="fn">filterwarnings</span>(<span class="st">'ignore'</span>)
+
+<span class="cm"># ===== STEP 1: 데이터 수집 =====</span>
+tickers = [<span class="st">'AAPL'</span>,<span class="st">'MSFT'</span>,<span class="st">'GOOGL'</span>,<span class="st">'NVDA'</span>,
+           <span class="st">'JPM'</span>,<span class="st">'BAC'</span>,<span class="st">'GS'</span>,<span class="st">'MS'</span>,
+           <span class="st">'XOM'</span>,<span class="st">'CVX'</span>,<span class="st">'COP'</span>,<span class="st">'SLB'</span>,
+           <span class="st">'JNJ'</span>,<span class="st">'PFE'</span>,<span class="st">'UNH'</span>,<span class="st">'MRK'</span>,
+           <span class="st">'WMT'</span>,<span class="st">'PG'</span>,<span class="st">'KO'</span>,<span class="st">'MCD'</span>]
+
+prices = yf.<span class="fn">download</span>(tickers, start=<span class="st">'2023-01-01'</span>,
+                     end=<span class="st">'2025-01-01'</span>)[<span class="st">'Close'</span>]
+returns = prices.<span class="fn">pct_change</span>().<span class="fn">dropna</span>()
+<span class="fn">print</span>(<span class="st">f"데이터: {returns.shape[0]}일 × {returns.shape[1]}종목"</span>)
+
+<span class="cm"># ===== STEP 2: PCA 팩터 추출 =====</span>
+scaler = <span class="fn">StandardScaler</span>()
+returns_scaled = scaler.<span class="fn">fit_transform</span>(returns)
+
+pca = <span class="fn">PCA</span>(n_components=<span class="nu">5</span>)
+factors = pca.<span class="fn">fit_transform</span>(returns_scaled)
+
+<span class="fn">print</span>(<span class="st">f"\nPCA 5개 팩터 분산 설명: {pca.explained_variance_ratio_.sum():.1%}"</span>)
+<span class="kw">for</span> i, ratio <span class="kw">in</span> <span class="fn">enumerate</span>(pca.explained_variance_ratio_):
+    <span class="fn">print</span>(<span class="st">f"  PC{i+1}: {ratio:.1%}"</span>)
+
+<span class="cm"># ===== STEP 3: K-Means 종목 클러스터링 =====</span>
+<span class="cm"># 종목별 피처: PCA 로딩 + 수익률 통계</span>
+loadings = pd.<span class="fn">DataFrame</span>(
+    pca.components_.T,
+    index=returns.columns,
+    columns=[<span class="st">f'PC{i+1}'</span> <span class="kw">for</span> i <span class="kw">in</span> <span class="fn">range</span>(<span class="nu">5</span>)]
+)
+loadings[<span class="st">'mean_ret'</span>] = returns.<span class="fn">mean</span>().values
+loadings[<span class="st">'std_ret'</span>] = returns.<span class="fn">std</span>().values
+
+features_for_cluster = <span class="fn">StandardScaler</span>().<span class="fn">fit_transform</span>(loadings)
+km = <span class="fn">KMeans</span>(n_clusters=<span class="nu">5</span>, random_state=<span class="nu">42</span>, n_init=<span class="nu">10</span>)
+clusters = km.<span class="fn">fit_predict</span>(features_for_cluster)
+
+<span class="fn">print</span>(<span class="st">"\n=== 클러스터 결과 ==="</span>)
+<span class="kw">for</span> c <span class="kw">in</span> <span class="fn">range</span>(<span class="nu">5</span>):
+    members = [t <span class="kw">for</span> t, cl <span class="kw">in</span> <span class="fn">zip</span>(tickers, clusters) <span class="kw">if</span> cl == c]
+    <span class="fn">print</span>(<span class="st">f"Cluster {c}: {members}"</span>)
+
+<span class="cm"># ===== STEP 4: 클러스터별 GARCH 변동성 예측 =====</span>
+<span class="fn">print</span>(<span class="st">"\n=== 클러스터별 GARCH(1,1) 변동성 예측 ==="</span>)
+cluster_vols = {}
+
+<span class="kw">for</span> c <span class="kw">in</span> <span class="fn">range</span>(<span class="nu">5</span>):
+    members = [t <span class="kw">for</span> t, cl <span class="kw">in</span> <span class="fn">zip</span>(tickers, clusters) <span class="kw">if</span> cl == c]
+    <span class="cm"># 클러스터 평균 수익률</span>
+    cluster_ret = returns[members].<span class="fn">mean</span>(axis=<span class="nu">1</span>) * <span class="nu">100</span>
+
+    <span class="cm"># GARCH(1,1) 피팅</span>
+    garch = <span class="fn">arch_model</span>(cluster_ret, vol=<span class="st">'Garch'</span>, p=<span class="nu">1</span>, q=<span class="nu">1</span>)
+    res = garch.<span class="fn">fit</span>(disp=<span class="st">'off'</span>)
+
+    <span class="cm"># 5일 예측</span>
+    fcast = res.<span class="fn">forecast</span>(horizon=<span class="nu">5</span>)
+    vol_5d = np.<span class="fn">sqrt</span>(fcast.variance.values[-<span class="nu">1</span>]) / <span class="nu">100</span> * np.<span class="fn">sqrt</span>(<span class="nu">252</span>)
+
+    cluster_vols[c] = vol_5d[<span class="nu">0</span>]
+    alpha = res.params.<span class="fn">get</span>(<span class="st">'alpha[1]'</span>, <span class="nu">0</span>)
+    beta = res.params.<span class="fn">get</span>(<span class="st">'beta[1]'</span>, <span class="nu">0</span>)
+    <span class="fn">print</span>(<span class="st">f"Cluster {c} ({', '.join(members[:2])}...): "</span>
+          <span class="st">f"α={alpha:.3f}, β={beta:.3f}, "</span>
+          <span class="st">f"예측 변동성={vol_5d[0]:.1%}"</span>)
+
+<span class="cm"># ===== STEP 5: 시각화 =====</span>
+fig, axes = plt.<span class="fn">subplots</span>(<span class="nu">2</span>, <span class="nu">2</span>, figsize=(<span class="nu">16</span>, <span class="nu">12</span>))
+
+<span class="cm"># (1) PCA 스크리 플롯</span>
+pca_full = <span class="fn">PCA</span>().<span class="fn">fit</span>(returns_scaled)
+axes[<span class="nu">0</span>,<span class="nu">0</span>].<span class="fn">bar</span>(<span class="fn">range</span>(<span class="nu">1</span>, <span class="nu">11</span>), pca_full.explained_variance_ratio_[:<span class="nu">10</span>],
+         color=<span class="st">'#3498db'</span>, alpha=<span class="nu">0.7</span>)
+axes[<span class="nu">0</span>,<span class="nu">0</span>].<span class="fn">plot</span>(<span class="fn">range</span>(<span class="nu">1</span>, <span class="nu">11</span>),
+             np.<span class="fn">cumsum</span>(pca_full.explained_variance_ratio_[:<span class="nu">10</span>]),
+             <span class="st">'ro-'</span>)
+axes[<span class="nu">0</span>,<span class="nu">0</span>].<span class="fn">set_title</span>(<span class="st">'PCA 스크리 플롯'</span>)
+axes[<span class="nu">0</span>,<span class="nu">0</span>].<span class="fn">set_xlabel</span>(<span class="st">'주성분'</span>)
+axes[<span class="nu">0</span>,<span class="nu">0</span>].<span class="fn">grid</span>(<span class="kw">True</span>, alpha=<span class="nu">0.3</span>)
+
+<span class="cm"># (2) K-Means 클러스터 (PCA 2D)</span>
+pca_2d = <span class="fn">PCA</span>(n_components=<span class="nu">2</span>).<span class="fn">fit_transform</span>(features_for_cluster)
+colors = [<span class="st">'#e74c3c'</span>,<span class="st">'#3498db'</span>,<span class="st">'#2ecc71'</span>,<span class="st">'#9b59b6'</span>,<span class="st">'#f39c12'</span>]
+<span class="kw">for</span> c <span class="kw">in</span> <span class="fn">range</span>(<span class="nu">5</span>):
+    mask = clusters == c
+    axes[<span class="nu">0</span>,<span class="nu">1</span>].<span class="fn">scatter</span>(pca_2d[mask,<span class="nu">0</span>], pca_2d[mask,<span class="nu">1</span>],
+                     c=colors[c], s=<span class="nu">100</span>, label=<span class="st">f'C{c}'</span>)
+    <span class="kw">for</span> t, (x,y) <span class="kw">in</span> <span class="fn">zip</span>(
+        np.<span class="fn">array</span>(tickers)[mask], pca_2d[mask]):
+        axes[<span class="nu">0</span>,<span class="nu">1</span>].<span class="fn">annotate</span>(t, (x+<span class="nu">0.05</span>,y+<span class="nu">0.05</span>), fontsize=<span class="nu">8</span>)
+axes[<span class="nu">0</span>,<span class="nu">1</span>].<span class="fn">set_title</span>(<span class="st">'K-Means 종목 클러스터'</span>)
+axes[<span class="nu">0</span>,<span class="nu">1</span>].<span class="fn">legend</span>()
+axes[<span class="nu">0</span>,<span class="nu">1</span>].<span class="fn">grid</span>(<span class="kw">True</span>, alpha=<span class="nu">0.3</span>)
+
+<span class="cm"># (3) 클러스터별 누적 수익률</span>
+<span class="kw">for</span> c <span class="kw">in</span> <span class="fn">range</span>(<span class="nu">5</span>):
+    members = [t <span class="kw">for</span> t, cl <span class="kw">in</span> <span class="fn">zip</span>(tickers, clusters) <span class="kw">if</span> cl == c]
+    cum = (<span class="nu">1</span> + returns[members].<span class="fn">mean</span>(axis=<span class="nu">1</span>)).<span class="fn">cumprod</span>() - <span class="nu">1</span>
+    axes[<span class="nu">1</span>,<span class="nu">0</span>].<span class="fn">plot</span>(cum, color=colors[c], label=<span class="st">f'C{c}'</span>, linewidth=<span class="nu">1.5</span>)
+axes[<span class="nu">1</span>,<span class="nu">0</span>].<span class="fn">set_title</span>(<span class="st">'클러스터별 누적 수익률'</span>)
+axes[<span class="nu">1</span>,<span class="nu">0</span>].<span class="fn">legend</span>()
+axes[<span class="nu">1</span>,<span class="nu">0</span>].<span class="fn">grid</span>(<span class="kw">True</span>, alpha=<span class="nu">0.3</span>)
+
+<span class="cm"># (4) 클러스터별 GARCH 예측 변동성</span>
+axes[<span class="nu">1</span>,<span class="nu">1</span>].<span class="fn">bar</span>(<span class="fn">range</span>(<span class="nu">5</span>), [cluster_vols[c] <span class="kw">for</span> c <span class="kw">in</span> <span class="fn">range</span>(<span class="nu">5</span>)],
+         color=colors)
+axes[<span class="nu">1</span>,<span class="nu">1</span>].<span class="fn">set_xlabel</span>(<span class="st">'클러스터'</span>)
+axes[<span class="nu">1</span>,<span class="nu">1</span>].<span class="fn">set_ylabel</span>(<span class="st">'예측 연환산 변동성'</span>)
+axes[<span class="nu">1</span>,<span class="nu">1</span>].<span class="fn">set_title</span>(<span class="st">'GARCH 클러스터별 변동성 예측'</span>)
+axes[<span class="nu">1</span>,<span class="nu">1</span>].<span class="fn">grid</span>(<span class="kw">True</span>, alpha=<span class="nu">0.3</span>)
+
+plt.<span class="fn">suptitle</span>(<span class="st">'Round 5 통합 파이프라인: PCA → K-Means → GARCH'</span>,
+            fontsize=<span class="nu">16</span>, fontweight=<span class="st">'bold'</span>, y=<span class="nu">1.02</span>)
+plt.<span class="fn">tight_layout</span>()
+plt.<span class="fn">show</span>()</code></pre>
+
+<h3>12.3 파이프라인 결과 해석과 투자 전략</h3>
+
+<div class="ok">
+<p class="ni"><strong>통합 파이프라인의 투자 전략 활용</strong></p>
+<ol>
+<li><strong>PCA 팩터 모니터링:</strong> PC1(시장 팩터)의 움직임으로 시장 전체 방향을 파악한다. PC1이 급락하면 시장 전체가 하락 중이라는 신호.</li>
+<li><strong>클러스터 분산 투자:</strong> 각 클러스터에서 1~2개 종목을 선택하여 포트폴리오를 구성하면 자연스럽게 분산 투자가 된다.</li>
+<li><strong>GARCH 기반 비중 조절:</strong> 변동성이 높은 클러스터의 비중을 줄이고, 낮은 클러스터의 비중을 늘린다 (Risk Parity 개념).</li>
+<li><strong>이상치 모니터링:</strong> DBSCAN으로 탐지된 이상치 종목은 특별 관찰 대상으로 분류한다.</li>
+</ol>
+</div>
+
+<div class="warn">
+<p class="ni"><strong>⚠️ 실전 주의사항</strong></p>
+<ul>
+<li><strong>과적합 위험:</strong> 과거 데이터에서 완벽한 클러스터가 미래에도 유지된다는 보장이 없다. 정기적으로 재클러스터링해야 한다.</li>
+<li><strong>거래 비용:</strong> 클러스터가 바뀔 때마다 포트폴리오를 재구성하면 거래 비용이 발생한다.</li>
+<li><strong>GARCH 한계:</strong> GARCH는 정상 상태의 변동성을 잘 예측하지만, 2008년 같은 구조적 변화(structural break)에는 대응하지 못한다.</li>
+<li><strong>백테스트 필수:</strong> 이 파이프라인을 실전에 적용하기 전에 반드시 R10에서 배울 백테스트를 수행해야 한다.</li>
+</ul>
+</div>
+
+<h3>12.4 클러스터 기반 역변동성 가중 포트폴리오</h3>
+
+<p>
+통합 파이프라인의 최종 목표는 투자 전략이다. 가장 직관적인 전략은 <strong>역변동성 가중(Inverse Volatility Weighting)</strong>이다. 변동성이 낮은 클러스터에 더 많은 비중을 주고, 높은 클러스터에 적은 비중을 준다. 이것은 R8에서 배울 Risk Parity의 간소화 버전이다.
+</p>
+
+<div class="cc">코드 12-2. 클러스터 기반 역변동성 가중 포트폴리오</div>
+<pre><code><span class="cm"># cluster_vols는 코드 12-1에서 계산한 클러스터별 GARCH 예측 변동성</span>
+
+<span class="cm"># 1. 역변동성 가중치 계산</span>
+inv_vols = {c: <span class="nu">1.0</span> / v <span class="kw">for</span> c, v <span class="kw">in</span> cluster_vols.items()}
+total_inv = <span class="fn">sum</span>(inv_vols.values())
+weights = {c: iv / total_inv <span class="kw">for</span> c, iv <span class="kw">in</span> inv_vols.items()}
+
+<span class="fn">print</span>(<span class="st">"=== 클러스터별 포트폴리오 비중 ==="</span>)
+<span class="kw">for</span> c <span class="kw">in</span> <span class="fn">range</span>(<span class="nu">5</span>):
+    members = [t <span class="kw">for</span> t, cl <span class="kw">in</span> <span class="fn">zip</span>(tickers, clusters) <span class="kw">if</span> cl == c]
+    <span class="fn">print</span>(<span class="st">f"Cluster {c} ({', '.join(members[:2])}...): "</span>
+          <span class="st">f"변동성={cluster_vols[c]:.1%}, 비중={weights[c]:.1%}"</span>)
+
+<span class="cm"># 2. 포트폴리오 수익률 계산</span>
+<span class="cm"># 각 클러스터에서 동일 가중 평균 수익률 → 클러스터 간 역변동성 가중</span>
+port_ret = pd.<span class="fn">Series</span>(<span class="nu">0.0</span>, index=returns.index)
+<span class="kw">for</span> c <span class="kw">in</span> <span class="fn">range</span>(<span class="nu">5</span>):
+    members = [t <span class="kw">for</span> t, cl <span class="kw">in</span> <span class="fn">zip</span>(tickers, clusters) <span class="kw">if</span> cl == c]
+    cluster_ret = returns[members].<span class="fn">mean</span>(axis=<span class="nu">1</span>)
+    port_ret += weights[c] * cluster_ret
+
+<span class="cm"># 3. 벤치마크: 동일 가중 포트폴리오</span>
+equal_ret = returns.<span class="fn">mean</span>(axis=<span class="nu">1</span>)
+
+<span class="cm"># 4. 성과 비교</span>
+cum_port = (<span class="nu">1</span> + port_ret).<span class="fn">cumprod</span>() - <span class="nu">1</span>
+cum_equal = (<span class="nu">1</span> + equal_ret).<span class="fn">cumprod</span>() - <span class="nu">1</span>
+
+fig, axes = plt.<span class="fn">subplots</span>(<span class="nu">2</span>, <span class="nu">1</span>, figsize=(<span class="nu">14</span>, <span class="nu">9</span>))
+
+<span class="cm"># 누적 수익률</span>
+axes[<span class="nu">0</span>].<span class="fn">plot</span>(cum_port, label=<span class="st">'역변동성 가중'</span>, color=<span class="st">'#e74c3c'</span>, linewidth=<span class="nu">2</span>)
+axes[<span class="nu">0</span>].<span class="fn">plot</span>(cum_equal, label=<span class="st">'동일 가중'</span>, color=<span class="st">'#3498db'</span>, linewidth=<span class="nu">2</span>)
+axes[<span class="nu">0</span>].<span class="fn">set_title</span>(<span class="st">'클러스터 기반 역변동성 가중 vs 동일 가중'</span>)
+axes[<span class="nu">0</span>].<span class="fn">legend</span>(fontsize=<span class="nu">11</span>)
+axes[<span class="nu">0</span>].<span class="fn">grid</span>(<span class="kw">True</span>, alpha=<span class="nu">0.3</span>)
+
+<span class="cm"># 롤링 샤프 비율</span>
+window = <span class="nu">60</span>
+sharpe_port = port_ret.<span class="fn">rolling</span>(window).<span class="fn">mean</span>() / port_ret.<span class="fn">rolling</span>(window).<span class="fn">std</span>() * np.<span class="fn">sqrt</span>(<span class="nu">252</span>)
+sharpe_equal = equal_ret.<span class="fn">rolling</span>(window).<span class="fn">mean</span>() / equal_ret.<span class="fn">rolling</span>(window).<span class="fn">std</span>() * np.<span class="fn">sqrt</span>(<span class="nu">252</span>)
+axes[<span class="nu">1</span>].<span class="fn">plot</span>(sharpe_port, label=<span class="st">'역변동성 가중'</span>, color=<span class="st">'#e74c3c'</span>, alpha=<span class="nu">0.7</span>)
+axes[<span class="nu">1</span>].<span class="fn">plot</span>(sharpe_equal, label=<span class="st">'동일 가중'</span>, color=<span class="st">'#3498db'</span>, alpha=<span class="nu">0.7</span>)
+axes[<span class="nu">1</span>].<span class="fn">axhline</span>(y=<span class="nu">0</span>, color=<span class="st">'black'</span>, linewidth=<span class="nu">0.5</span>)
+axes[<span class="nu">1</span>].<span class="fn">set_title</span>(<span class="st">'60일 롤링 샤프 비율'</span>)
+axes[<span class="nu">1</span>].<span class="fn">legend</span>(fontsize=<span class="nu">11</span>)
+axes[<span class="nu">1</span>].<span class="fn">grid</span>(<span class="kw">True</span>, alpha=<span class="nu">0.3</span>)
+
+plt.<span class="fn">tight_layout</span>()
+plt.<span class="fn">show</span>()
+
+<span class="cm"># 성과 요약</span>
+<span class="fn">print</span>(<span class="st">"\n=== 성과 요약 ==="</span>)
+<span class="kw">for</span> name, ret <span class="kw">in</span> [(<span class="st">"역변동성"</span>, port_ret), (<span class="st">"동일가중"</span>, equal_ret)]:
+    ann_ret = ret.<span class="fn">mean</span>() * <span class="nu">252</span>
+    ann_vol = ret.<span class="fn">std</span>() * np.<span class="fn">sqrt</span>(<span class="nu">252</span>)
+    sharpe = ann_ret / ann_vol
+    mdd = ((<span class="nu">1</span>+ret).<span class="fn">cumprod</span>().<span class="fn">cummax</span>() - (<span class="nu">1</span>+ret).<span class="fn">cumprod</span>()).<span class="fn">max</span>()
+    <span class="fn">print</span>(<span class="st">f"{name:8s}: 수익률={ann_ret:.1%}, 변동성={ann_vol:.1%}, "</span>
+          <span class="st">f"Sharpe={sharpe:.2f}, MDD={mdd:.1%}"</span>)</code></pre>
+
+<div class="ok">
+<p class="ni"><strong>역변동성 가중의 직관</strong></p>
+<p class="ni" style="margin-top:8px">"위험한 곳에는 적게, 안전한 곳에는 많이" — 이것이 역변동성 가중의 핵심이다. GARCH가 예측한 변동성이 높은 클러스터(예: 기술주)의 비중을 줄이고, 낮은 클러스터(예: 소비재)의 비중을 늘린다. 이 단순한 전략이 동일 가중보다 리스크 대비 수익률(Sharpe Ratio)이 높은 경우가 많다. R8에서 배울 마코위츠 최적화와 Risk Parity는 이 아이디어를 더 정교하게 발전시킨 것이다.</p>
+</div>
+
+
+<!-- ==================== Ch.13 ==================== -->
+<h2 id="ch13">Chapter 13. Quiz + 미니 프로젝트 + Round 6 예고</h2>
+
+<h3>13.1 핵심 개념 퀴즈 (10문제)</h3>
+
+<div class="def">
+<p class="ni"><strong>Q1.</strong> PCA에서 "분산 설명 비율이 95%"라는 것은 무엇을 의미하는가?</p>
+<p class="ni" style="margin-top:5px;color:#666"><em>힌트: 원본 데이터의 정보가 얼마나 보존되는지 생각하라.</em></p>
+</div>
+
+<div class="def">
+<p class="ni"><strong>Q2.</strong> PCA를 적용하기 전에 반드시 해야 하는 전처리는 무엇이며, 왜 필요한가?</p>
+<p class="ni" style="margin-top:5px;color:#666"><em>힌트: 주가(만 원)와 수익률(소수점)을 함께 쓰면 어떤 문제가 생기는가?</em></p>
+</div>
+
+<div class="def">
+<p class="ni"><strong>Q3.</strong> t-SNE와 PCA의 가장 큰 차이점 3가지를 설명하라.</p>
+<p class="ni" style="margin-top:5px;color:#666"><em>힌트: 선형/비선형, 전역/지역, 역변환 가능 여부</em></p>
+</div>
+
+<div class="def">
+<p class="ni"><strong>Q4.</strong> K-Means에서 K=10으로 설정하면 Inertia가 K=3보다 항상 작다. 그런데 왜 K=10이 항상 좋은 것은 아닌가?</p>
+<p class="ni" style="margin-top:5px;color:#666"><em>힌트: 과적합과 해석 가능성을 생각하라.</em></p>
+</div>
+
+<div class="def">
+<p class="ni"><strong>Q5.</strong> DBSCAN이 K-Means보다 유리한 상황 2가지를 금융 예시와 함께 설명하라.</p>
+<p class="ni" style="margin-top:5px;color:#666"><em>힌트: 이상치 탐지, 비구형 클러스터</em></p>
+</div>
+
+<div class="def">
+<p class="ni"><strong>Q6.</strong> AAPL 주가에 ADF 검정을 하면 p-value가 0.9이다. 이것은 무엇을 의미하며, 어떻게 해야 정상 시계열로 만들 수 있는가?</p>
+<p class="ni" style="margin-top:5px;color:#666"><em>힌트: 차분(differencing)과 I(d)의 관계</em></p>
+</div>
+
+<div class="def">
+<p class="ni"><strong>Q7.</strong> ARIMA(2,1,1)에서 각 숫자(2, 1, 1)가 의미하는 바를 설명하라.</p>
+<p class="ni" style="margin-top:5px;color:#666"><em>힌트: AR(p), I(d), MA(q)</em></p>
+</div>
+
+<div class="def">
+<p class="ni"><strong>Q8.</strong> GARCH(1,1)에서 α=0.05, β=0.93이면, 변동성 충격의 지속성은 어떠한가? α+β의 의미를 설명하라.</p>
+<p class="ni" style="margin-top:5px;color:#666"><em>힌트: α+β가 1에 가까울수록...</em></p>
+</div>
+
+<div class="def">
+<p class="ni"><strong>Q9.</strong> "수익률은 예측하기 어렵지만, 변동성은 예측 가능하다"는 말의 의미를 ARIMA와 GARCH의 관점에서 설명하라.</p>
+<p class="ni" style="margin-top:5px;color:#666"><em>힌트: 수익률의 ACF vs 수익률²의 ACF</em></p>
+</div>
+
+<div class="def">
+<p class="ni"><strong>Q10.</strong> PCA로 추출한 팩터를 K-Means의 입력으로 사용하는 것의 장점은 무엇인가?</p>
+<p class="ni" style="margin-top:5px;color:#666"><em>힌트: 차원의 저주, 노이즈 제거</em></p>
+</div>
+
+<h3>13.2 자가 체크리스트</h3>
+
+<div class="tc">표 13-1. Round 5 학습 체크리스트</div>
+<table>
+<thead>
+<tr><th>✓</th><th>항목</th><th>메모</th></tr>
+</thead>
+<tbody>
+<tr><td>□</td><td>지도학습과 비지도학습의 차이를 설명할 수 있다</td><td></td></tr>
+<tr><td>□</td><td>PCA의 수학적 원리(공분산 행렬 → 고유값 분해)를 이해한다</td><td></td></tr>
+<tr><td>□</td><td>sklearn PCA를 사용하고 스크리 플롯을 그릴 수 있다</td><td></td></tr>
+<tr><td>□</td><td>t-SNE의 용도와 한계를 알고 있다</td><td></td></tr>
+<tr><td>□</td><td>K-Means 알고리즘의 4단계를 설명할 수 있다</td><td></td></tr>
+<tr><td>□</td><td>엘보우 방법과 실루엣 점수로 최적 K를 찾을 수 있다</td><td></td></tr>
+<tr><td>□</td><td>DBSCAN의 eps, min_samples 파라미터를 이해한다</td><td></td></tr>
+<tr><td>□</td><td>계층적 클러스터링으로 덴드로그램을 그릴 수 있다</td><td></td></tr>
+<tr><td>□</td><td>정상성의 의미와 ADF 검정을 수행할 수 있다</td><td></td></tr>
+<tr><td>□</td><td>ACF/PACF 플롯을 해석하여 ARIMA 차수를 결정할 수 있다</td><td></td></tr>
+<tr><td>□</td><td>GARCH(1,1)의 파라미터(ω, α, β)를 해석할 수 있다</td><td></td></tr>
+<tr><td>□</td><td>PCA → K-Means → GARCH 통합 파이프라인을 실행할 수 있다</td><td></td></tr>
+</tbody>
+</table>
+
+<h3>13.3 미니 프로젝트: PCA 팩터 추출 + K-Means 종목 클러스터링 시각화</h3>
+
+<div class="ok">
+<p class="ni"><strong>프로젝트 과제</strong></p>
+<p class="ni">아래 요구사항을 만족하는 코드를 직접 작성하라:</p>
+<ol>
+<li><strong>데이터 수집:</strong> 관심 있는 시장(미국, 한국 등)에서 최소 30개 종목의 1년간 일간 수익률을 수집한다.
+<ul>
+<li>한국 시장: <code>yfinance</code>에서 <code>'005930.KS'</code>(삼성전자), <code>'000660.KS'</code>(SK하이닉스) 등</li>
+<li>미국 시장: S&P 500 구성 종목 중 30개 이상 선택</li>
+</ul>
+</li>
+<li><strong>PCA 분석:</strong>
+<ul>
+<li>스크리 플롯을 그리고, 90% 분산을 설명하는 주성분 수를 확인한다</li>
+<li>PC1~PC3의 로딩을 분석하여 각 팩터가 무엇을 의미하는지 해석한다</li>
+</ul>
+</li>
+<li><strong>K-Means 클러스터링:</strong>
+<ul>
+<li>엘보우 방법과 실루엣 점수로 최적 K를 결정한다</li>
+<li>PCA 2D 투영 위에 클러스터를 시각화한다</li>
+<li>각 클러스터의 종목 구성을 실제 섹터와 비교한다</li>
+</ul>
+</li>
+<li><strong>GARCH 변동성:</strong>
+<ul>
+<li>각 클러스터의 평균 수익률에 GARCH(1,1)을 피팅한다</li>
+<li>클러스터별 예측 변동성을 비교한다</li>
+</ul>
+</li>
+<li><strong>결과 분석:</strong>
+<ul>
+<li>데이터 기반 클러스터와 GICS 섹터 분류의 일치/불일치를 분석한다</li>
+<li>"각 클러스터에서 1종목씩 선택" 전략의 분산 투자 효과를 검증한다</li>
+</ul>
+</li>
+</ol>
+<p class="ni" style="margin-top:10px"><strong>제출 형식:</strong> Jupyter Notebook (.ipynb) 또는 Python 스크립트 (.py)</p>
+</div>
+
+<h3>13.4 다음 라운드 예고: Round 6 — NLP + 대안 데이터 + 감성분석</h3>
+
+<!-- 다음 라운드 예고 다이어그램 -->
+<div style="margin:25px 0;padding:20px;background:linear-gradient(135deg,#fff8e1,#e8f5e9);border-radius:10px;border:2px solid #f9a825">
+<p class="ni" style="text-align:center;font-weight:bold;font-size:15px;margin-bottom:12px;color:#e65100">🔮 Round 6 Preview — NLP &amp; Sentiment Analysis</p>
+<div style="display:flex;flex-wrap:wrap;gap:10px;justify-content:center;font-size:12px">
+<div style="background:#fff;padding:10px 16px;border-radius:8px;border:1px solid #ddd;text-align:center;min-width:120px">
+<div style="font-size:20px;margin-bottom:4px">📝</div>
+<div style="font-weight:bold;color:#2c3e50">토큰화</div>
+<div style="color:#777;font-size:10px">텍스트 전처리</div>
+</div>
+<div style="background:#fff;padding:10px 16px;border-radius:8px;border:1px solid #ddd;text-align:center;min-width:120px">
+<div style="font-size:20px;margin-bottom:4px">📊</div>
+<div style="font-weight:bold;color:#2c3e50">TF-IDF</div>
+<div style="color:#777;font-size:10px">문서 벡터화</div>
+</div>
+<div style="background:#fff;padding:10px 16px;border-radius:8px;border:1px solid #ddd;text-align:center;min-width:120px">
+<div style="font-size:20px;margin-bottom:4px">🧠</div>
+<div style="font-weight:bold;color:#2c3e50">Word2Vec</div>
+<div style="color:#777;font-size:10px">단어 임베딩</div>
+</div>
+<div style="background:#fff;padding:10px 16px;border-radius:8px;border:1px solid #ddd;text-align:center;min-width:120px">
+<div style="font-size:20px;margin-bottom:4px">😊😡</div>
+<div style="font-weight:bold;color:#2c3e50">감성분석</div>
+<div style="color:#777;font-size:10px">뉴스 → 시그널</div>
+</div>
+<div style="background:#fff;padding:10px 16px;border-radius:8px;border:1px solid #ddd;text-align:center;min-width:120px">
+<div style="font-size:20px;margin-bottom:4px">📰</div>
+<div style="font-weight:bold;color:#2c3e50">대안 데이터</div>
+<div style="color:#777;font-size:10px">SEC 공시, SNS</div>
+</div>
+</div>
+<p class="ni" style="text-align:center;margin-top:12px;color:#555;font-size:12px">
+라운드 5에서 숫자 데이터의 숨겨진 구조를 발견했다면, 라운드 6에서는 <strong>텍스트 데이터</strong>에서 매매 시그널을 추출한다.<br>
+금융 뉴스의 감성을 분석하고, SEC 공시를 텍스트 마이닝하여 알파를 찾는다.
+</p>
+</div>
+
+<div class="info">
+<p class="ni"><strong>교재 연동 (Round 6 미리보기):</strong> MLAT Ch.14~16 "Text Data for Trading", "Topic Modeling for Earnings Calls and Financial News", "Word Embeddings for Earnings Calls and SEC Filings"에서 금융 텍스트 데이터의 수집, 전처리, 모델링을 체계적으로 다룬다. MLDSF Ch.11~12에서는 NLP 케이스스터디를 제공한다.</p>
+</div>
+
+<div class="info">
+<p class="ni"><strong>🔄 Round 5 핵심 요약</strong></p>
+<p class="ni" style="margin-top:8px">이번 라운드에서 우리는 두 가지 큰 축을 배웠다:</p>
+<ul>
+<li><strong>비지도학습:</strong> PCA(차원 축소) → t-SNE(시각화) → K-Means/DBSCAN/계층적(클러스터링) — 정답 없이 데이터의 구조를 발견하는 기술</li>
+<li><strong>시계열 분석:</strong> 정상성/ADF → ACF/PACF/ARIMA(평균 예측) → GARCH(변동성 예측) — 시간의 흐름 속 패턴을 모델링하는 기술</li>
+</ul>
+<p class="ni" style="margin-top:8px">이 두 축을 결합하면: PCA로 팩터를 추출하고, K-Means로 종목을 군집화하고, GARCH로 각 클러스터의 변동성을 예측하는 통합 파이프라인이 완성된다. 이것은 R8의 포트폴리오 최적화와 R10의 최종 HFT 시스템의 핵심 구성 요소가 된다.</p>
+</div>
+
+</div><!-- paper-content -->
+</div><!-- container -->
+</div><!-- main-wrapper -->
+
+</body>
+</html>

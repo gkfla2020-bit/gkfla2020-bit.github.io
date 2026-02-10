@@ -1,0 +1,1217 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Round 1 - Python + Finance Data Fundamentals</title>
+<script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;500&family=Space+Mono:wght@400&family=Inter:wght@300;400&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Inter',sans-serif;background:#fafaf8;color:#1a1a1a;line-height:1.7;overflow-x:hidden}
+.sidebar{position:fixed;left:0;top:0;width:260px;height:100vh;background:rgba(255,255,255,.97);border-right:1px solid rgba(0,0,0,.06);padding:32px 24px;z-index:100;overflow-y:auto;display:flex;flex-direction:column}
+.sidebar-profile{text-align:center;margin-bottom:28px;padding-bottom:24px;border-bottom:1px solid rgba(0,0,0,.08)}
+.profile-icon{font-size:48px;margin-bottom:8px}
+.profile-name{font-family:'Cormorant Garamond',serif;font-size:1.3rem;font-weight:500;margin-bottom:4px}
+.profile-title{font-size:.68rem;color:#888;letter-spacing:.08em;text-transform:uppercase;margin-bottom:8px}
+.profile-bio{font-size:.78rem;color:#666;line-height:1.5}
+.sidebar-nav{flex:1;margin-top:16px}
+.nav-section{margin-bottom:20px}
+.nav-section-title{font-size:.6rem;font-weight:600;color:#aaa;letter-spacing:.15em;text-transform:uppercase;margin-bottom:10px}
+.nav-list{list-style:none}
+.nav-list li{margin-bottom:5px}
+.nav-list a{font-size:.78rem;color:#555;text-decoration:none;transition:all .2s;display:block;padding:3px 0}
+.nav-list a:hover{color:#0080c6;padding-left:4px}
+.nav-list a.active{color:#0080c6;font-weight:500}
+.nav-list a.done{color:#28a745}
+.badge{display:inline-block;font-size:.5rem;background:#0080c6;color:#fff;padding:1px 5px;border-radius:8px;margin-left:3px;vertical-align:middle}
+.badge-done{background:#28a745}
+.sidebar-footer{padding-top:16px;border-top:1px solid rgba(0,0,0,.06);font-size:.65rem;color:#aaa;text-align:center}
+.main-wrapper{margin-left:260px;min-height:100vh}
+.container{max-width:1100px;margin:0 auto;padding:50px 40px 80px}
+.paper-content{font-family:'Times New Roman','Nanum Myeongjo',serif;line-height:1.8;background:#fff;padding:40px;border-radius:8px;box-shadow:0 2px 20px rgba(0,0,0,.05)}
+.paper-header{text-align:center;margin-bottom:40px;padding-bottom:30px;border-bottom:2px solid #333}
+.paper-category{font-size:14px;color:#666;margin-bottom:10px}
+.paper-title{font-size:24px;font-weight:bold;margin-bottom:12px;line-height:1.4}
+.paper-subtitle{font-size:14px;color:#555;margin-bottom:8px}
+.paper-team{font-size:13px;color:#444}
+.abstract{background:#f8f9fa;padding:25px;margin:30px 0;border-left:4px solid #2c3e50}
+.abstract-title{font-weight:bold;font-size:16px;margin-bottom:15px}
+h2{font-size:18px;margin:35px 0 20px;padding-bottom:8px;border-bottom:1px solid #ddd;color:#2c3e50}
+h3{font-size:15px;margin:25px 0 15px;color:#34495e}
+h4{font-size:14px;margin:20px 0 12px;color:#34495e}
+p{text-align:justify;margin-bottom:15px;text-indent:2em}
+p.ni{text-indent:0}
+table{width:100%;border-collapse:collapse;margin:20px 0;font-size:12px}
+th,td{border:1px solid #ddd;padding:10px 8px;text-align:center}
+th{background:#2c3e50;color:white;font-weight:bold}
+tr:nth-child(even){background:#f8f9fa}
+tr:hover{background:#e8f4f8}
+.tc{font-size:13px;font-weight:bold;margin:15px 0 10px;text-align:center}
+.eq{text-align:center;margin:20px 0;padding:15px;background:#f8f9fa;border-radius:4px;overflow-x:auto}
+ul,ol{margin-left:2em;margin-bottom:15px}
+li{margin-bottom:6px}
+.def{background:#fff9e6;border:1px solid #ffc107;border-radius:4px;padding:20px;margin:20px 0}
+.info{background:#e8f4f8;border-left:4px solid #3498db;padding:20px;margin:20px 0}
+.warn{background:#fff3cd;border-left:4px solid #f39c12;padding:20px;margin:20px 0}
+.ok{background:#d4edda;border-left:4px solid #28a745;padding:20px;margin:20px 0}
+pre{background:#1e1e1e;color:#d4d4d4;padding:20px;border-radius:6px;overflow-x:auto;margin:20px 0;font-family:'Space Mono','Consolas',monospace;font-size:13px;line-height:1.6}
+code{font-family:'Space Mono','Consolas',monospace;font-size:13px}
+p code,li code,td code{background:#f0f0f0;padding:2px 6px;border-radius:3px;color:#c7254e;font-size:12px}
+.cc{font-size:12px;font-weight:bold;color:#2c3e50;margin-top:15px;margin-bottom:4px}
+.cm{color:#6a9955}.kw{color:#569cd6}.st{color:#ce9178}.fn{color:#dcdcaa}.nb{color:#4ec9b0}.nu{color:#b5cea8}
+.progress-bar{width:100%;height:6px;background:#e0e0e0;border-radius:3px;margin-top:16px}
+.progress-fill{height:100%;background:linear-gradient(90deg,#0080c6,#00b894);border-radius:3px;width:10%}
+.progress-label{font-size:11px;color:#888;margin-top:4px;text-align:center}
+@media(max-width:1024px){
+.sidebar{width:100%;height:auto;position:relative;border-right:none;border-bottom:1px solid rgba(0,0,0,.08);padding:16px}
+.sidebar-profile{margin-bottom:10px;padding-bottom:10px;display:flex;align-items:center;gap:12px;text-align:left}
+.profile-icon{font-size:32px;margin-bottom:0}.profile-bio{display:none}
+.nav-section{display:inline-block;margin-right:16px;margin-bottom:8px}
+.nav-list{display:flex;gap:10px;flex-wrap:wrap}.nav-list li{margin-bottom:0}
+.sidebar-footer{display:none}
+.main-wrapper{margin-left:0}
+.container{padding:0}.paper-content{padding:20px 16px;border-radius:0;box-shadow:none}
+.paper-title{font-size:18px}p{font-size:14px;text-indent:1.5em;text-align:left}
+pre{font-size:11px;padding:14px}table{font-size:10px;display:block;overflow-x:auto}
+}
+</style>
+</head>
+<body>
+
+<div class="sidebar">
+<div class="sidebar-profile">
+<div class="profile-icon">&#x1F680;</div>
+<div class="profile-name">HFT ML Master Plan</div>
+<div class="profile-title">Convex Opt + DL + HFT</div>
+<div class="profile-bio">10 Rounds: Zero to HFT System Trading</div>
+</div>
+<div class="sidebar-nav">
+<div class="nav-section">
+<div class="nav-section-title">Curriculum</div>
+<ul class="nav-list">
+<li><a class="active" href="#">R1. Python + Finance <span class="badge">NOW</span></a></li>
+<li><a href="../round_02/lecture_02.html">R2. Linear Algebra + Stats</a></li>
+<li><a href="#">R3. Data / Feature Eng.</a></li>
+<li><a href="#">R4. Supervised Learning</a></li>
+<li><a href="#">R5. Unsupervised + TS</a></li>
+<li><a href="#">R6. NLP + Sentiment</a></li>
+<li><a href="#">R7. Deep Learning</a></li>
+<li><a href="#">R8. Convex Opt + Transformer</a></li>
+<li><a href="#">R9. HFT + RL</a></li>
+<li><a href="#">R10. Final Project</a></li>
+</ul>
+</div>
+<div class="nav-section">
+<div class="nav-section-title">This Lecture</div>
+<ul class="nav-list">
+<li><a href="#ch1">1. 왜 파이썬인가</a></li>
+<li><a href="#ch2">2. 환경 세팅</a></li>
+<li><a href="#ch3">3. 변수와 자료형</a></li>
+<li><a href="#ch4">4. 연산자</a></li>
+<li><a href="#ch5">5. 조건문</a></li>
+<li><a href="#ch6">6. 반복문</a></li>
+<li><a href="#ch7">7. 함수</a></li>
+<li><a href="#ch8">8. 자료구조</a></li>
+<li><a href="#ch9">9. NumPy</a></li>
+<li><a href="#ch10">10. Pandas</a></li>
+<li><a href="#ch11">11. Matplotlib</a></li>
+<li><a href="#ch12">12. 실전: 주가 분석</a></li>
+<li><a href="#ch13">13. Mini Project + Quiz</a></li>
+</ul>
+</div>
+</div>
+<div class="sidebar-footer">Round 1 of 10</div>
+</div>
+
+<div class="main-wrapper">
+<div class="container">
+<div class="paper-content">
+
+<div class="paper-header">
+<div class="paper-category">Round 1 / 10</div>
+<h1 class="paper-title">Python Fundamentals + Finance Data Analysis</h1>
+<div class="paper-subtitle">프로그래밍 제로에서 실제 주가 데이터 분석까지</div>
+<div class="paper-team">Textbooks: 혼공파 Ch.1~6 / 파라활 Ch.4~5 / 두잇알고 Ch.1</div>
+<div class="progress-bar"><div class="progress-fill"></div></div>
+<div class="progress-label">Overall Progress: 10%</div>
+</div>
+
+<div class="abstract">
+<div class="abstract-title">Learning Objectives</div>
+<p class="ni">Round 1을 마치면 다음을 할 수 있다:</p>
+<ul>
+<li>Python 개발 환경을 설치하고 코드를 실행할 수 있다</li>
+<li>변수, 자료형, 연산자의 개념을 이해하고 활용할 수 있다</li>
+<li>조건문과 반복문으로 프로그램 흐름을 제어할 수 있다</li>
+<li>함수를 정의하고 재사용 가능한 코드를 작성할 수 있다</li>
+<li>리스트, 딕셔너리 등 자료구조를 활용할 수 있다</li>
+<li>NumPy로 수치 계산, Pandas로 데이터 분석, Matplotlib로 시각화를 할 수 있다</li>
+<li>yfinance로 실제 주가 데이터를 수집하고 수익률, 변동성, 샤프비율을 계산할 수 있다</li>
+</ul>
+<div style="font-size:13px;color:#555;margin-top:15px;font-style:italic"><strong>Keywords:</strong> Python, Variable, Loop, Function, NumPy, Pandas, Matplotlib, yfinance, Sharpe Ratio</div>
+</div>
+
+<!-- ═══════════════════════════════════════════ -->
+<!-- Ch1: 왜 파이썬인가 -->
+<!-- ═══════════════════════════════════════════ -->
+<h2 id="ch1">1. 왜 파이썬인가</h2>
+
+<h3>1.1 퀀트와 파이썬</h3>
+<p>HFT 시스템 트레이딩을 만들겠다는 목표를 세웠다면, 프로그래밍 언어 선택이 첫 번째 관문이다. 결론부터 말하면: 파이썬(Python)이 정답이다. 이유는 간단하다.</p>
+
+<p>월스트리트의 퀀트 팀, 한국의 자산운용사, 암호화폐 트레이딩 봇 개발자 — 이들이 공통적으로 사용하는 언어가 파이썬이다. 왜일까?</p>
+
+<ul>
+<li><strong>배우기 쉽다:</strong> 영어 문장처럼 읽히는 문법. <code>if price > 100: buy()</code> — 가격이 100 넘으면 사라. 직관적이다.</li>
+<li><strong>라이브러리 생태계:</strong> NumPy(수치계산), Pandas(데이터분석), scikit-learn(ML), PyTorch(딥러닝), cvxpy(최적화) — 우리가 10라운드에 걸쳐 배울 모든 것이 파이썬 라이브러리로 존재한다.</li>
+<li><strong>금융 데이터 접근:</strong> yfinance, pandas-datareader 등으로 전 세계 주가 데이터를 무료로 가져올 수 있다.</li>
+<li><strong>프로토타이핑 속도:</strong> 아이디어를 코드로 빠르게 구현하고 테스트할 수 있다. 전략 연구에 최적.</li>
+</ul>
+
+<div class="warn">
+<p class="ni"><strong>HFT에서의 파이썬 한계:</strong> 실제 초고빈도 매매(마이크로초 단위)의 실행 엔진은 C++로 작성한다. 파이썬은 느리기 때문이다. 하지만 전략 연구, 백테스팅, 시그널 생성은 파이썬으로 한다. 우리의 목표는 "파이썬으로 전략을 연구하고, 나중에 C++로 실행 엔진을 만드는 것"이다. Round 9~10에서 이 부분을 다룬다.</p>
+</div>
+
+<h3>1.2 파이썬 vs 다른 언어</h3>
+
+<div class="tc">Table 1. 퀀트 개발 언어 비교</div>
+<table>
+<tr><th>언어</th><th>속도</th><th>학습 난이도</th><th>ML 라이브러리</th><th>금융 활용</th><th>우리의 용도</th></tr>
+<tr><td>Python</td><td>느림</td><td>쉬움</td><td>최고</td><td>전략 연구, 백테스팅</td><td>R1~R10 전체</td></tr>
+<tr><td>C++</td><td>최고</td><td>어려움</td><td>제한적</td><td>HFT 실행 엔진</td><td>R9~R10 일부</td></tr>
+<tr><td>R</td><td>느림</td><td>보통</td><td>통계 특화</td><td>학술 연구</td><td>사용 안 함</td></tr>
+<tr><td>Java</td><td>빠름</td><td>보통</td><td>보통</td><td>거래소 시스템</td><td>사용 안 함</td></tr>
+</table>
+
+<div class="info">
+<p class="ni"><strong>교재 연동:</strong> 혼공파 Ch.1 "파이썬 시작하기"에서 파이썬의 특징과 역사를 다룬다. 두잇알고 Ch.1에서는 알고리즘과 프로그래밍의 관계를 설명한다.</p>
+</div>
+
+<!-- ═══════════════════════════════════════════ -->
+<!-- Ch2: 환경 세팅 -->
+<!-- ═══════════════════════════════════════════ -->
+<h2 id="ch2">2. 개발 환경 세팅</h2>
+
+<h3>2.1 Anaconda 설치</h3>
+<p>파이썬을 설치하는 가장 쉬운 방법은 Anaconda를 사용하는 것이다. Anaconda는 파이썬 + 주요 라이브러리(NumPy, Pandas, Matplotlib 등)를 한 번에 설치해주는 패키지다.</p>
+
+<ol>
+<li><strong>다운로드:</strong> <code>https://www.anaconda.com/download</code> 접속 → Windows 64-bit 다운로드</li>
+<li><strong>설치:</strong> 다운로드된 파일 실행 → "Add to PATH" 체크 → Install</li>
+<li><strong>확인:</strong> 명령 프롬프트(cmd)에서 <code>python --version</code> 입력</li>
+</ol>
+
+<pre><code><span class="cm"># 명령 프롬프트에서 확인</span>
+python --version
+<span class="cm"># Python 3.11.x 같은 버전이 나오면 성공!</span>
+
+<span class="cm"># 추가 라이브러리 설치</span>
+pip install yfinance    <span class="cm"># 주가 데이터 수집</span></code></pre>
+
+<h3>2.2 Jupyter Notebook vs VS Code</h3>
+<p>코드를 작성하는 도구(IDE)는 두 가지를 추천한다:</p>
+
+<ul>
+<li><strong>Jupyter Notebook:</strong> 셀 단위로 코드를 실행하고 결과를 바로 볼 수 있다. 데이터 분석과 학습에 최적. Anaconda에 포함되어 있다.</li>
+<li><strong>VS Code:</strong> 전문 개발 환경. 자동완성, 디버깅, Git 연동 등 기능이 풍부하다. 프로젝트가 커지면 이쪽으로 옮긴다.</li>
+</ul>
+
+<p>Round 1~5까지는 Jupyter Notebook을 사용하고, Round 6부터 VS Code로 전환하는 것을 추천한다.</p>
+
+<pre><code><span class="cm"># Jupyter Notebook 실행 (명령 프롬프트에서)</span>
+jupyter notebook
+<span class="cm"># 브라우저가 열리면 New → Python 3 클릭</span>
+
+<span class="cm"># 첫 번째 코드!</span>
+<span class="fn">print</span>(<span class="st">"Hello, Quant World!"</span>)</code></pre>
+
+<h3>2.3 코드 실행의 기본 원리</h3>
+<p>파이썬은 인터프리터 언어다. 코드를 한 줄씩 위에서 아래로 읽으면서 실행한다. C++처럼 컴파일(전체를 기계어로 번역)하는 과정이 없다. 그래서 빠르게 테스트할 수 있지만, 실행 속도는 느리다.</p>
+
+<pre><code><span class="cm"># 파이썬은 위에서 아래로 한 줄씩 실행된다</span>
+<span class="fn">print</span>(<span class="st">"1번째 줄"</span>)  <span class="cm"># 먼저 실행</span>
+<span class="fn">print</span>(<span class="st">"2번째 줄"</span>)  <span class="cm"># 그 다음 실행</span>
+<span class="fn">print</span>(<span class="st">"3번째 줄"</span>)  <span class="cm"># 마지막 실행</span>
+
+<span class="cm"># 주석(comment): # 뒤의 내용은 실행되지 않는다</span>
+<span class="cm"># 코드 설명을 적을 때 사용한다</span></code></pre>
+
+<!-- ═══════════════════════════════════════════ -->
+<!-- Ch3: 변수와 자료형 -->
+<!-- ═══════════════════════════════════════════ -->
+<h2 id="ch3">3. 변수와 자료형</h2>
+
+<h3>3.1 변수란? — 데이터를 담는 이름표</h3>
+<p>변수(variable)는 데이터를 저장하는 공간에 붙이는 이름이다. 택배 상자에 "삼성전자 주가"라고 라벨을 붙이는 것과 같다. 상자 안에 70,000이라는 숫자를 넣어두면, 나중에 "삼성전자 주가"라고 부르면 70,000이 나온다.</p>
+
+<pre><code><span class="cm"># 변수 만들기: 이름 = 값</span>
+stock_price = <span class="nu">70000</span>        <span class="cm"># 삼성전자 주가</span>
+stock_name = <span class="st">"삼성전자"</span>     <span class="cm"># 종목명</span>
+is_profitable = <span class="kw">True</span>       <span class="cm"># 수익 중인가?</span>
+daily_return = <span class="nu">0.025</span>       <span class="cm"># 일간 수익률 2.5%</span>
+
+<span class="fn">print</span>(stock_name, <span class="st">"현재가:"</span>, stock_price, <span class="st">"원"</span>)
+<span class="cm"># 삼성전자 현재가: 70000 원</span></code></pre>
+
+<div class="warn">
+<p class="ni"><strong>변수 이름 규칙:</strong></p>
+<ul>
+<li>영문, 숫자, 밑줄(_)만 사용 가능. 숫자로 시작 불가</li>
+<li>대소문자 구분: <code>Price</code>와 <code>price</code>는 다른 변수</li>
+<li>의미 있는 이름 사용: <code>x</code>보다 <code>stock_price</code>가 좋다</li>
+<li>파이썬 관례: 소문자 + 밑줄 (snake_case). <code>dailyReturn</code>(X) → <code>daily_return</code>(O)</li>
+</ul>
+</div>
+
+<h3>3.2 자료형 (Data Types)</h3>
+<p>변수에 담기는 데이터에는 종류(타입)가 있다. 숫자, 문자, 참/거짓 등. 파이썬은 변수에 값을 넣으면 자동으로 타입을 결정한다(동적 타이핑).</p>
+
+<pre><code><span class="cm"># 정수 (int) — 소수점 없는 숫자</span>
+shares = <span class="nu">100</span>              <span class="cm"># 보유 주식 수</span>
+<span class="fn">print</span>(<span class="fn">type</span>(shares))        <span class="cm"># &lt;class 'int'&gt;</span>
+
+<span class="cm"># 실수 (float) — 소수점 있는 숫자</span>
+price = <span class="nu">70500.5</span>           <span class="cm"># 주가</span>
+<span class="fn">print</span>(<span class="fn">type</span>(price))         <span class="cm"># &lt;class 'float'&gt;</span>
+
+<span class="cm"># 문자열 (str) — 텍스트</span>
+ticker = <span class="st">"005930.KS"</span>      <span class="cm"># 삼성전자 티커</span>
+<span class="fn">print</span>(<span class="fn">type</span>(ticker))        <span class="cm"># &lt;class 'str'&gt;</span>
+
+<span class="cm"># 불리언 (bool) — 참/거짓</span>
+is_bull = <span class="kw">True</span>             <span class="cm"># 상승장인가?</span>
+<span class="fn">print</span>(<span class="fn">type</span>(is_bull))       <span class="cm"># &lt;class 'bool'&gt;</span></code></pre>
+
+<div class="tc">Table 2. 파이썬 기본 자료형</div>
+<table>
+<tr><th>자료형</th><th>키워드</th><th>예시</th><th>금융 활용</th></tr>
+<tr><td>정수</td><td><code>int</code></td><td><code>100</code>, <code>-5</code>, <code>0</code></td><td>주식 수, 거래일 수</td></tr>
+<tr><td>실수</td><td><code>float</code></td><td><code>3.14</code>, <code>-0.025</code></td><td>주가, 수익률, 변동성</td></tr>
+<tr><td>문자열</td><td><code>str</code></td><td><code>"AAPL"</code>, <code>'삼성'</code></td><td>티커, 종목명, 날짜</td></tr>
+<tr><td>불리언</td><td><code>bool</code></td><td><code>True</code>, <code>False</code></td><td>매수/매도 시그널</td></tr>
+<tr><td>없음</td><td><code>None</code></td><td><code>None</code></td><td>데이터 없음, 결측치</td></tr>
+</table>
+
+<h3>3.3 타입 변환</h3>
+<p>때로는 타입을 바꿔야 할 때가 있다. 문자열 "100"을 숫자 100으로 바꾸거나, 숫자를 문자열로 바꾸는 것이다.</p>
+
+<pre><code><span class="cm"># 문자열 → 숫자</span>
+price_str = <span class="st">"70500"</span>
+price_int = <span class="fn">int</span>(price_str)
+<span class="fn">print</span>(price_int + <span class="nu">500</span>)  <span class="cm"># 71000 (계산 가능!)</span>
+
+<span class="cm"># 숫자 → 문자열</span>
+ret = <span class="nu">0.025</span>
+msg = <span class="st">"수익률: "</span> + <span class="fn">str</span>(ret * <span class="nu">100</span>) + <span class="st">"%"</span>
+<span class="fn">print</span>(msg)  <span class="cm"># 수익률: 2.5%</span>
+
+<span class="cm"># f-string (가장 편리한 방법!)</span>
+<span class="fn">print</span>(<span class="st">f"수익률: </span>{ret*100}<span class="st">%"</span>)        <span class="cm"># 수익률: 2.5%</span>
+<span class="fn">print</span>(<span class="st">f"수익률: </span>{ret*100:.2f}<span class="st">%"</span>)    <span class="cm"># 수익률: 2.50% (소수점 2자리)</span></code></pre>
+
+<div class="info">
+<p class="ni"><strong>f-string 포맷팅:</strong> <code>f"텍스트 {변수}"</code> 형태로 문자열 안에 변수를 넣을 수 있다. <code>:.2f</code>는 소수점 2자리, <code>:,</code>는 천 단위 쉼표, <code>:.1%</code>는 퍼센트 표시다. 금융 데이터 출력에 매우 자주 사용한다.</p>
+</div>
+
+<pre><code><span class="cm"># f-string 포맷팅 예제</span>
+price = <span class="nu">70500</span>
+change = <span class="nu">0.0234</span>
+volume = <span class="nu">15234567</span>
+
+<span class="fn">print</span>(<span class="st">f"주가: </span>{price:,}<span class="st">원"</span>)           <span class="cm"># 주가: 70,500원</span>
+<span class="fn">print</span>(<span class="st">f"등락률: </span>{change:.2%}<span class="st">"</span>)         <span class="cm"># 등락률: 2.34%</span>
+<span class="fn">print</span>(<span class="st">f"거래량: </span>{volume:,.0f}<span class="st">주"</span>)     <span class="cm"># 거래량: 15,234,567주</span>
+<span class="fn">print</span>(<span class="st">f"시가총액: </span>{price*5969782550/1e12:.1f}<span class="st">조원"</span>)  <span class="cm"># 시가총액 계산</span></code></pre>
+
+<!-- ═══════════════════════════════════════════ -->
+<!-- Ch4: 연산자 -->
+<!-- ═══════════════════════════════════════════ -->
+<h2 id="ch4">4. 연산자</h2>
+
+<h3>4.1 산술 연산자</h3>
+<p>사칙연산은 물론이고, 금융 계산에 필요한 거듭제곱, 나머지 연산 등을 알아보자.</p>
+
+<pre><code><span class="cm"># 기본 산술</span>
+<span class="fn">print</span>(<span class="nu">10</span> + <span class="nu">3</span>)    <span class="cm"># 13  (덧셈)</span>
+<span class="fn">print</span>(<span class="nu">10</span> - <span class="nu">3</span>)    <span class="cm"># 7   (뺄셈)</span>
+<span class="fn">print</span>(<span class="nu">10</span> * <span class="nu">3</span>)    <span class="cm"># 30  (곱셈)</span>
+<span class="fn">print</span>(<span class="nu">10</span> / <span class="nu">3</span>)    <span class="cm"># 3.333... (나눗셈 → 항상 float)</span>
+<span class="fn">print</span>(<span class="nu">10</span> // <span class="nu">3</span>)   <span class="cm"># 3   (몫)</span>
+<span class="fn">print</span>(<span class="nu">10</span> % <span class="nu">3</span>)    <span class="cm"># 1   (나머지)</span>
+<span class="fn">print</span>(<span class="nu">10</span> ** <span class="nu">3</span>)   <span class="cm"># 1000 (거듭제곱: 10의 3승)</span>
+
+<span class="cm"># 금융 계산 예</span>
+principal = <span class="nu">10000000</span>  <span class="cm"># 원금 1000만원</span>
+rate = <span class="nu">0.05</span>           <span class="cm"># 연 5%</span>
+years = <span class="nu">10</span>
+
+<span class="cm"># 복리 계산: 원금 × (1 + 이율)^기간</span>
+future_value = principal * (<span class="nu">1</span> + rate) ** years
+<span class="fn">print</span>(<span class="st">f"10년 후: </span>{future_value:,.0f}<span class="st">원"</span>)  <span class="cm"># 16,288,946원</span>
+
+<span class="cm"># 72의 법칙: 원금이 2배가 되는 기간 ≈ 72 / 이율(%)</span>
+doubling_years = <span class="nu">72</span> / (rate * <span class="nu">100</span>)
+<span class="fn">print</span>(<span class="st">f"원금 2배 기간: 약 </span>{doubling_years:.1f}<span class="st">년"</span>)  <span class="cm"># 약 14.4년</span></code></pre>
+
+<h3>4.2 비교 연산자</h3>
+<p>두 값을 비교하여 True 또는 False를 반환한다. 트레이딩 시그널 생성의 기본이다.</p>
+
+<pre><code>price = <span class="nu">70000</span>
+target = <span class="nu">75000</span>
+stop_loss = <span class="nu">65000</span>
+
+<span class="fn">print</span>(price > target)      <span class="cm"># False (목표가 도달 안 함)</span>
+<span class="fn">print</span>(price < stop_loss)    <span class="cm"># False (손절가 도달 안 함)</span>
+<span class="fn">print</span>(price >= <span class="nu">70000</span>)       <span class="cm"># True</span>
+<span class="fn">print</span>(price == <span class="nu">70000</span>)       <span class="cm"># True  (같은가? = 두 개!)</span>
+<span class="fn">print</span>(price != target)      <span class="cm"># True  (다른가?)</span></code></pre>
+
+<div class="warn">
+<p class="ni"><strong>= vs ==:</strong> <code>=</code>는 대입(변수에 값 저장), <code>==</code>는 비교(같은지 확인). 초보자가 가장 많이 하는 실수다. <code>if price = 70000:</code>은 에러, <code>if price == 70000:</code>이 맞다.</p>
+</div>
+
+<h3>4.3 논리 연산자</h3>
+<p>여러 조건을 결합할 때 사용한다. 트레이딩에서 "RSI가 30 이하이고 AND 거래량이 평균 이상이면 매수"처럼 복합 조건을 만들 때 필수다.</p>
+
+<pre><code>rsi = <span class="nu">25</span>
+volume_ratio = <span class="nu">1.5</span>  <span class="cm"># 평균 대비 1.5배</span>
+macd_signal = <span class="kw">True</span>
+
+<span class="cm"># and: 둘 다 True여야 True</span>
+buy_signal = (rsi < <span class="nu">30</span>) <span class="kw">and</span> (volume_ratio > <span class="nu">1.2</span>)
+<span class="fn">print</span>(<span class="st">f"매수 시그널: </span>{buy_signal}<span class="st">"</span>)  <span class="cm"># True</span>
+
+<span class="cm"># or: 하나만 True여도 True</span>
+alert = (rsi < <span class="nu">20</span>) <span class="kw">or</span> (rsi > <span class="nu">80</span>)
+<span class="fn">print</span>(<span class="st">f"극단값 경고: </span>{alert}<span class="st">"</span>)  <span class="cm"># False</span>
+
+<span class="cm"># not: 반전</span>
+<span class="fn">print</span>(<span class="kw">not</span> <span class="kw">True</span>)   <span class="cm"># False</span>
+<span class="fn">print</span>(<span class="kw">not</span> <span class="kw">False</span>)  <span class="cm"># True</span>
+
+<span class="cm"># 복합 조건: RSI 과매도 + 거래량 급증 + MACD 골든크로스</span>
+strong_buy = (rsi < <span class="nu">30</span>) <span class="kw">and</span> (volume_ratio > <span class="nu">1.5</span>) <span class="kw">and</span> macd_signal
+<span class="fn">print</span>(<span class="st">f"강력 매수: </span>{strong_buy}<span class="st">"</span>)  <span class="cm"># True</span></code></pre>
+
+<!-- ═══════════════════════════════════════════ -->
+<!-- Ch5: 조건문 -->
+<!-- ═══════════════════════════════════════════ -->
+<h2 id="ch5">5. 조건문</h2>
+
+<h3>5.1 if / elif / else — 프로그램의 분기점</h3>
+<p>조건문은 "만약 ~이면 ~하고, 아니면 ~해라"를 코드로 표현한 것이다. 트레이딩 로직의 핵심이다. 모든 매매 전략은 결국 조건문의 조합이다.</p>
+
+<pre><code><span class="cm"># 기본 구조</span>
+price = <span class="nu">70000</span>
+target = <span class="nu">75000</span>
+stop_loss = <span class="nu">65000</span>
+
+<span class="kw">if</span> price >= target:
+    <span class="fn">print</span>(<span class="st">"🎯 목표가 도달! 매도 실행"</span>)
+<span class="kw">elif</span> price <= stop_loss:
+    <span class="fn">print</span>(<span class="st">"🛑 손절가 도달! 손절 실행"</span>)
+<span class="kw">else</span>:
+    <span class="fn">print</span>(<span class="st">f"⏳ 홀딩 중... 현재가: </span>{price:,}<span class="st">원"</span>)
+<span class="cm"># 출력: ⏳ 홀딩 중... 현재가: 70,000원</span></code></pre>
+
+<div class="def">
+<p class="ni"><strong>들여쓰기(Indentation):</strong> 파이썬에서 들여쓰기는 문법이다. <code>if</code> 다음 줄은 반드시 4칸(또는 탭 1개) 들여쓰기해야 한다. 들여쓰기가 같은 줄들이 하나의 블록이다. 다른 언어의 중괄호 <code>{}</code> 역할을 한다. 들여쓰기를 잘못하면 <code>IndentationError</code>가 발생한다.</p>
+</div>
+
+<h3>5.2 실전: 트레이딩 시그널 판단기</h3>
+<pre><code><span class="cm"># RSI 기반 매매 시그널 판단</span>
+<span class="kw">def</span> <span class="fn">judge_signal</span>(rsi, volume_ratio):
+    <span class="st">"""RSI와 거래량으로 매매 시그널 판단"""</span>
+    <span class="kw">if</span> rsi < <span class="nu">20</span> <span class="kw">and</span> volume_ratio > <span class="nu">2.0</span>:
+        <span class="kw">return</span> <span class="st">"🔥 강력 매수 (극단적 과매도 + 거래량 폭증)"</span>
+    <span class="kw">elif</span> rsi < <span class="nu">30</span>:
+        <span class="kw">return</span> <span class="st">"📈 매수 고려 (과매도)"</span>
+    <span class="kw">elif</span> rsi > <span class="nu">80</span> <span class="kw">and</span> volume_ratio > <span class="nu">2.0</span>:
+        <span class="kw">return</span> <span class="st">"🔥 강력 매도 (극단적 과매수 + 거래량 폭증)"</span>
+    <span class="kw">elif</span> rsi > <span class="nu">70</span>:
+        <span class="kw">return</span> <span class="st">"📉 매도 고려 (과매수)"</span>
+    <span class="kw">else</span>:
+        <span class="kw">return</span> <span class="st">"⏸️ 중립 (관망)"</span>
+
+<span class="cm"># 테스트</span>
+<span class="fn">print</span>(judge_signal(<span class="nu">15</span>, <span class="nu">2.5</span>))  <span class="cm"># 🔥 강력 매수</span>
+<span class="fn">print</span>(judge_signal(<span class="nu">25</span>, <span class="nu">1.0</span>))  <span class="cm"># 📈 매수 고려</span>
+<span class="fn">print</span>(judge_signal(<span class="nu">50</span>, <span class="nu">1.0</span>))  <span class="cm"># ⏸️ 중립</span>
+<span class="fn">print</span>(judge_signal(<span class="nu">85</span>, <span class="nu">3.0</span>))  <span class="cm"># 🔥 강력 매도</span></code></pre>
+
+<!-- ═══════════════════════════════════════════ -->
+<!-- Ch6: 반복문 -->
+<!-- ═══════════════════════════════════════════ -->
+<h2 id="ch6">6. 반복문</h2>
+
+<h3>6.1 for 반복문 — "이것들을 하나씩 처리해라"</h3>
+<p>반복문은 같은 작업을 여러 번 수행할 때 사용한다. 금융에서 반복문이 필요한 상황: 250일 수익률을 하나씩 계산, 50개 종목의 데이터를 하나씩 다운로드, 10,000개 포트폴리오를 시뮬레이션 등.</p>
+
+<pre><code><span class="cm"># 기본 for 문: 리스트의 각 원소를 순회</span>
+stocks = [<span class="st">"삼성전자"</span>, <span class="st">"SK하이닉스"</span>, <span class="st">"NAVER"</span>, <span class="st">"카카오"</span>]
+
+<span class="kw">for</span> stock <span class="kw">in</span> stocks:
+    <span class="fn">print</span>(<span class="st">f"분석 중: </span>{stock}<span class="st">"</span>)
+<span class="cm"># 분석 중: 삼성전자</span>
+<span class="cm"># 분석 중: SK하이닉스</span>
+<span class="cm"># 분석 중: NAVER</span>
+<span class="cm"># 분석 중: 카카오</span></code></pre>
+
+<h3>6.2 range() — 숫자 범위 생성</h3>
+<pre><code><span class="cm"># range(시작, 끝, 간격) — 끝은 포함 안 됨!</span>
+<span class="kw">for</span> i <span class="kw">in</span> <span class="fn">range</span>(<span class="nu">5</span>):
+    <span class="fn">print</span>(i, end=<span class="st">" "</span>)  <span class="cm"># 0 1 2 3 4</span>
+
+<span class="fn">print</span>()
+<span class="kw">for</span> i <span class="kw">in</span> <span class="fn">range</span>(<span class="nu">1</span>, <span class="nu">11</span>):
+    <span class="fn">print</span>(i, end=<span class="st">" "</span>)  <span class="cm"># 1 2 3 4 5 6 7 8 9 10</span>
+
+<span class="cm"># 금융 예: 복리 성장 시뮬레이션</span>
+principal = <span class="nu">10000000</span>  <span class="cm"># 1000만원</span>
+rate = <span class="nu">0.07</span>           <span class="cm"># 연 7%</span>
+
+<span class="fn">print</span>(<span class="st">"\n=== 복리 성장 ==="</span>)
+<span class="kw">for</span> year <span class="kw">in</span> <span class="fn">range</span>(<span class="nu">1</span>, <span class="nu">11</span>):
+    principal *= (<span class="nu">1</span> + rate)
+    <span class="fn">print</span>(<span class="st">f"</span>{year}<span class="st">년차: </span>{principal:>15,.0f}<span class="st">원"</span>)</code></pre>
+
+<h3>6.3 while 반복문 — "조건이 참인 동안 반복"</h3>
+<pre><code><span class="cm"># 주가가 목표가에 도달할 때까지 시뮬레이션</span>
+<span class="kw">import</span> random
+random.seed(<span class="nu">42</span>)
+
+price = <span class="nu">70000</span>
+target = <span class="nu">80000</span>
+day = <span class="nu">0</span>
+
+<span class="kw">while</span> price < target:
+    <span class="cm"># 일간 수익률: -3% ~ +3% 랜덤</span>
+    daily_return = random.uniform(-<span class="nu">0.03</span>, <span class="nu">0.03</span>)
+    price *= (<span class="nu">1</span> + daily_return)
+    day += <span class="nu">1</span>
+
+<span class="fn">print</span>(<span class="st">f"</span>{day}<span class="st">일 만에 목표가 도달! 최종가: </span>{price:,.0f}<span class="st">원"</span>)</code></pre>
+
+<h3>6.4 리스트 컴프리헨션 — 파이썬의 강력한 무기</h3>
+<p>for 문을 한 줄로 압축하는 파이썬만의 문법이다. 금융 데이터 처리에서 매우 자주 사용한다.</p>
+
+<pre><code><span class="cm"># 일반 for 문</span>
+prices = [<span class="nu">100</span>, <span class="nu">105</span>, <span class="nu">102</span>, <span class="nu">108</span>, <span class="nu">110</span>]
+returns = []
+<span class="kw">for</span> i <span class="kw">in</span> <span class="fn">range</span>(<span class="nu">1</span>, <span class="fn">len</span>(prices)):
+    ret = (prices[i] - prices[i-<span class="nu">1</span>]) / prices[i-<span class="nu">1</span>]
+    returns.append(ret)
+
+<span class="cm"># 리스트 컴프리헨션으로 한 줄!</span>
+returns = [(prices[i] - prices[i-<span class="nu">1</span>]) / prices[i-<span class="nu">1</span>]
+           <span class="kw">for</span> i <span class="kw">in</span> <span class="fn">range</span>(<span class="nu">1</span>, <span class="fn">len</span>(prices))]
+
+<span class="fn">print</span>(<span class="st">"수익률:"</span>, [<span class="st">f"</span>{r:.2%}<span class="st">"</span> <span class="kw">for</span> r <span class="kw">in</span> returns])
+<span class="cm"># ['5.00%', '-2.86%', '5.88%', '1.85%']</span>
+
+<span class="cm"># 조건 필터링: 양수 수익률만</span>
+positive = [r <span class="kw">for</span> r <span class="kw">in</span> returns <span class="kw">if</span> r > <span class="nu">0</span>]
+<span class="fn">print</span>(<span class="st">"양수 수익률:"</span>, [<span class="st">f"</span>{r:.2%}<span class="st">"</span> <span class="kw">for</span> r <span class="kw">in</span> positive])</code></pre>
+
+<div class="ok">
+<p class="ni"><strong>리스트 컴프리헨션 패턴:</strong> <code>[표현식 for 변수 in 반복대상 if 조건]</code>. 이 패턴을 외워두면 코드가 훨씬 간결해진다. Pandas와 NumPy를 배우면 이것보다 더 빠른 방법이 있지만, 기본 파이썬에서는 이것이 최선이다.</p>
+</div>
+
+<!-- ═══════════════════════════════════════════ -->
+<!-- Ch7: 함수 -->
+<!-- ═══════════════════════════════════════════ -->
+<h2 id="ch7">7. 함수</h2>
+
+<h3>7.1 함수란? — 재사용 가능한 코드 블록</h3>
+<p>함수(function)는 특정 작업을 수행하는 코드를 묶어서 이름을 붙인 것이다. 한 번 만들어두면 몇 번이든 재사용할 수 있다. 수익률 계산, 샤프비율 계산 같은 작업을 매번 코드를 다시 쓰는 대신 함수로 만들어두면 된다.</p>
+
+<pre><code><span class="cm"># 함수 정의: def 함수이름(매개변수):</span>
+<span class="kw">def</span> <span class="fn">calculate_return</span>(buy_price, sell_price):
+    <span class="st">"""매수가와 매도가로 수익률 계산"""</span>
+    ret = (sell_price - buy_price) / buy_price
+    <span class="kw">return</span> ret
+
+<span class="cm"># 함수 호출</span>
+my_return = calculate_return(<span class="nu">70000</span>, <span class="nu">77000</span>)
+<span class="fn">print</span>(<span class="st">f"수익률: </span>{my_return:.2%}<span class="st">"</span>)  <span class="cm"># 수익률: 10.00%</span>
+
+<span class="cm"># 여러 번 재사용</span>
+<span class="fn">print</span>(calculate_return(<span class="nu">50000</span>, <span class="nu">55000</span>))  <span class="cm"># 0.1</span>
+<span class="fn">print</span>(calculate_return(<span class="nu">100</span>, <span class="nu">95</span>))       <span class="cm"># -0.05 (손실)</span></code></pre>
+
+<h3>7.2 기본값과 키워드 인자</h3>
+<pre><code><span class="cm"># 기본값(default) 설정</span>
+<span class="kw">def</span> <span class="fn">compound_interest</span>(principal, rate=<span class="nu">0.05</span>, years=<span class="nu">10</span>):
+    <span class="st">"""복리 계산. rate와 years는 기본값이 있어서 생략 가능"""</span>
+    <span class="kw">return</span> principal * (<span class="nu">1</span> + rate) ** years
+
+<span class="cm"># 다양한 호출 방법</span>
+<span class="fn">print</span>(compound_interest(<span class="nu">10000000</span>))                    <span class="cm"># 기본값 사용</span>
+<span class="fn">print</span>(compound_interest(<span class="nu">10000000</span>, <span class="nu">0.07</span>))               <span class="cm"># rate만 변경</span>
+<span class="fn">print</span>(compound_interest(<span class="nu">10000000</span>, rate=<span class="nu">0.10</span>, years=<span class="nu">20</span>))  <span class="cm"># 키워드 인자</span></code></pre>
+
+<h3>7.3 여러 값 반환</h3>
+<pre><code><span class="kw">def</span> <span class="fn">analyze_returns</span>(returns_list):
+    <span class="st">"""수익률 리스트의 기초 통계 계산"""</span>
+    n = <span class="fn">len</span>(returns_list)
+    mean_ret = <span class="fn">sum</span>(returns_list) / n
+    
+    <span class="cm"># 분산 계산 (수동)</span>
+    variance = <span class="fn">sum</span>((r - mean_ret)**<span class="nu">2</span> <span class="kw">for</span> r <span class="kw">in</span> returns_list) / (n - <span class="nu">1</span>)
+    std_ret = variance ** <span class="nu">0.5</span>
+    
+    <span class="cm"># 샤프비율 (무위험이자율 = 0 가정)</span>
+    sharpe = mean_ret / std_ret <span class="kw">if</span> std_ret > <span class="nu">0</span> <span class="kw">else</span> <span class="nu">0</span>
+    
+    <span class="kw">return</span> mean_ret, std_ret, sharpe  <span class="cm"># 튜플로 여러 값 반환</span>
+
+<span class="cm"># 사용</span>
+rets = [<span class="nu">0.02</span>, -<span class="nu">0.01</span>, <span class="nu">0.03</span>, -<span class="nu">0.005</span>, <span class="nu">0.015</span>, -<span class="nu">0.02</span>, <span class="nu">0.025</span>]
+mean, std, sharpe = analyze_returns(rets)  <span class="cm"># 언패킹</span>
+
+<span class="fn">print</span>(<span class="st">f"평균 수익률: </span>{mean:.4f}<span class="st">"</span>)
+<span class="fn">print</span>(<span class="st">f"표준편차:   </span>{std:.4f}<span class="st">"</span>)
+<span class="fn">print</span>(<span class="st">f"샤프비율:   </span>{sharpe:.4f}<span class="st">"</span>)</code></pre>
+
+<div class="info">
+<p class="ni"><strong>교재 연동:</strong> 혼공파 Ch.4 "함수"에서 함수의 기본 개념을, Ch.5 "함수 고급"에서 람다, 제너레이터 등을 다룬다. 우리는 Round 1에서 기본만 익히고, 고급 기능은 필요할 때 배운다.</p>
+</div>
+
+<!-- ═══════════════════════════════════════════ -->
+<!-- Ch8: 자료구조 -->
+<!-- ═══════════════════════════════════════════ -->
+<h2 id="ch8">8. 자료구조: 리스트, 튜플, 딕셔너리</h2>
+
+<h3>8.1 리스트 (List) — 순서 있는 데이터 모음</h3>
+<p>리스트는 여러 데이터를 순서대로 담는 자료구조다. 대괄호 <code>[]</code>로 만든다. 금융에서 가장 많이 사용하는 자료구조 중 하나다: 주가 시계열, 종목 목록, 수익률 배열 등.</p>
+
+<pre><code><span class="cm"># 리스트 생성</span>
+prices = [<span class="nu">70000</span>, <span class="nu">71500</span>, <span class="nu">69800</span>, <span class="nu">72000</span>, <span class="nu">73500</span>]
+tickers = [<span class="st">"AAPL"</span>, <span class="st">"MSFT"</span>, <span class="st">"GOOGL"</span>, <span class="st">"AMZN"</span>]
+
+<span class="cm"># 인덱싱: 0부터 시작!</span>
+<span class="fn">print</span>(prices[<span class="nu">0</span>])     <span class="cm"># 70000 (첫 번째)</span>
+<span class="fn">print</span>(prices[-<span class="nu">1</span>])    <span class="cm"># 73500 (마지막)</span>
+<span class="fn">print</span>(prices[<span class="nu">1</span>:<span class="nu">3</span>])   <span class="cm"># [71500, 69800] (슬라이싱: 1번~2번)</span>
+
+<span class="cm"># 리스트 수정</span>
+prices.append(<span class="nu">74000</span>)       <span class="cm"># 끝에 추가</span>
+prices[<span class="nu">0</span>] = <span class="nu">70500</span>          <span class="cm"># 첫 번째 원소 변경</span>
+<span class="fn">print</span>(<span class="st">f"길이: </span>{<span class="fn">len</span>(prices)}<span class="st">"</span>)  <span class="cm"># 6</span>
+
+<span class="cm"># 유용한 메서드</span>
+<span class="fn">print</span>(<span class="fn">max</span>(prices))    <span class="cm"># 최고가</span>
+<span class="fn">print</span>(<span class="fn">min</span>(prices))    <span class="cm"># 최저가</span>
+<span class="fn">print</span>(<span class="fn">sum</span>(prices))    <span class="cm"># 합계</span>
+<span class="fn">print</span>(<span class="fn">sorted</span>(prices)) <span class="cm"># 정렬 (원본 변경 안 함)</span></code></pre>
+
+<h3>8.2 튜플 (Tuple) — 변경 불가능한 리스트</h3>
+<p>튜플은 리스트와 비슷하지만 한 번 만들면 수정할 수 없다. 소괄호 <code>()</code>로 만든다. 변하면 안 되는 데이터(좌표, 설정값 등)에 사용한다.</p>
+
+<pre><code><span class="cm"># 튜플 생성</span>
+position = (<span class="st">"AAPL"</span>, <span class="nu">100</span>, <span class="nu">150.5</span>)  <span class="cm"># (종목, 수량, 매수가)</span>
+<span class="fn">print</span>(position[<span class="nu">0</span>])  <span class="cm"># "AAPL"</span>
+
+<span class="cm"># 수정 시도 → 에러!</span>
+<span class="cm"># position[1] = 200  # TypeError!</span>
+
+<span class="cm"># 함수에서 여러 값 반환할 때 자동으로 튜플</span>
+<span class="kw">def</span> <span class="fn">get_range</span>(prices):
+    <span class="kw">return</span> <span class="fn">min</span>(prices), <span class="fn">max</span>(prices)  <span class="cm"># 튜플 반환</span>
+
+low, high = get_range([<span class="nu">100</span>, <span class="nu">105</span>, <span class="nu">98</span>, <span class="nu">110</span>])
+<span class="fn">print</span>(<span class="st">f"범위: </span>{low}<span class="st"> ~ </span>{high}<span class="st">"</span>)  <span class="cm"># 범위: 98 ~ 110</span></code></pre>
+
+<h3>8.3 딕셔너리 (Dictionary) — 키-값 쌍</h3>
+<p>딕셔너리는 "이름표(키)"로 데이터를 찾는 자료구조다. 중괄호 <code>{}</code>로 만든다. 종목별 데이터를 관리할 때 매우 유용하다.</p>
+
+<pre><code><span class="cm"># 딕셔너리 생성</span>
+stock = {
+    <span class="st">"ticker"</span>: <span class="st">"005930.KS"</span>,
+    <span class="st">"name"</span>: <span class="st">"삼성전자"</span>,
+    <span class="st">"price"</span>: <span class="nu">70000</span>,
+    <span class="st">"volume"</span>: <span class="nu">15000000</span>,
+    <span class="st">"sector"</span>: <span class="st">"반도체"</span>
+}
+
+<span class="cm"># 값 접근</span>
+<span class="fn">print</span>(stock[<span class="st">"name"</span>])    <span class="cm"># 삼성전자</span>
+<span class="fn">print</span>(stock[<span class="st">"price"</span>])   <span class="cm"># 70000</span>
+
+<span class="cm"># 값 수정/추가</span>
+stock[<span class="st">"price"</span>] = <span class="nu">71000</span>          <span class="cm"># 수정</span>
+stock[<span class="st">"market_cap"</span>] = <span class="st">"420조"</span>   <span class="cm"># 새 키 추가</span>
+
+<span class="cm"># 포트폴리오를 딕셔너리로 관리</span>
+portfolio = {
+    <span class="st">"삼성전자"</span>: {<span class="st">"shares"</span>: <span class="nu">100</span>, <span class="st">"avg_price"</span>: <span class="nu">68000</span>},
+    <span class="st">"SK하이닉스"</span>: {<span class="st">"shares"</span>: <span class="nu">50</span>, <span class="st">"avg_price"</span>: <span class="nu">130000</span>},
+    <span class="st">"NAVER"</span>: {<span class="st">"shares"</span>: <span class="nu">30</span>, <span class="st">"avg_price"</span>: <span class="nu">200000</span>},
+}
+
+<span class="cm"># 포트폴리오 총 평가액 계산</span>
+current_prices = {<span class="st">"삼성전자"</span>: <span class="nu">70000</span>, <span class="st">"SK하이닉스"</span>: <span class="nu">135000</span>, <span class="st">"NAVER"</span>: <span class="nu">195000</span>}
+total = <span class="nu">0</span>
+<span class="kw">for</span> name, info <span class="kw">in</span> portfolio.items():
+    value = info[<span class="st">"shares"</span>] * current_prices[name]
+    profit = (current_prices[name] - info[<span class="st">"avg_price"</span>]) * info[<span class="st">"shares"</span>]
+    <span class="fn">print</span>(<span class="st">f"</span>{name:<span class="nu">8</span>}<span class="st">: 평가액 </span>{value:>12,}<span class="st">원, 손익 </span>{profit:>+10,}<span class="st">원"</span>)
+    total += value
+<span class="fn">print</span>(<span class="st">f"총 평가액: </span>{total:,}<span class="st">원"</span>)</code></pre>
+
+<div class="tc">Table 3. 자료구조 비교</div>
+<table>
+<tr><th>자료구조</th><th>생성</th><th>수정 가능</th><th>순서</th><th>중복</th><th>금융 활용</th></tr>
+<tr><td>리스트</td><td><code>[1, 2, 3]</code></td><td>O</td><td>O</td><td>O</td><td>주가 시계열, 종목 목록</td></tr>
+<tr><td>튜플</td><td><code>(1, 2, 3)</code></td><td>X</td><td>O</td><td>O</td><td>좌표, 설정값, 함수 반환</td></tr>
+<tr><td>딕셔너리</td><td><code>{"a": 1}</code></td><td>O</td><td>O (3.7+)</td><td>키 X</td><td>종목 정보, 포트폴리오</td></tr>
+<tr><td>집합</td><td><code>{1, 2, 3}</code></td><td>O</td><td>X</td><td>X</td><td>유니크 종목 목록</td></tr>
+</table>
+
+<!-- ═══════════════════════════════════════════ -->
+<!-- Ch9: NumPy -->
+<!-- ═══════════════════════════════════════════ -->
+<h2 id="ch9">9. NumPy — 수치 계산의 핵심 엔진</h2>
+
+<h3>9.1 NumPy란?</h3>
+<p>NumPy(Numerical Python)는 파이썬에서 수치 계산을 빠르게 수행하기 위한 라이브러리다. 파이썬 리스트로 100만 개의 수익률을 계산하면 느리지만, NumPy 배열로 하면 수십~수백 배 빠르다. ML, 딥러닝, 금융 분석의 모든 라이브러리가 NumPy 위에 구축되어 있다.</p>
+
+<pre><code><span class="kw">import</span> numpy <span class="kw">as</span> np  <span class="cm"># 관례적으로 np로 줄여 쓴다</span>
+
+<span class="cm"># NumPy 배열 생성</span>
+prices = np.array([<span class="nu">70000</span>, <span class="nu">71500</span>, <span class="nu">69800</span>, <span class="nu">72000</span>, <span class="nu">73500</span>])
+<span class="fn">print</span>(<span class="st">"타입:"</span>, <span class="fn">type</span>(prices))    <span class="cm"># numpy.ndarray</span>
+<span class="fn">print</span>(<span class="st">"shape:"</span>, prices.shape)   <span class="cm"># (5,)</span>
+<span class="fn">print</span>(<span class="st">"dtype:"</span>, prices.dtype)   <span class="cm"># int64</span></code></pre>
+
+<h3>9.2 왜 리스트 대신 NumPy를 쓰는가?</h3>
+<pre><code><span class="cm"># 속도 비교</span>
+<span class="kw">import</span> time
+
+<span class="cm"># 100만 개 수익률 계산</span>
+n = <span class="nu">1000000</span>
+list_data = <span class="fn">list</span>(<span class="fn">range</span>(n))
+np_data = np.arange(n)
+
+<span class="cm"># 리스트: 각 원소에 2를 곱하기</span>
+start = time.time()
+result_list = [x * <span class="nu">2</span> <span class="kw">for</span> x <span class="kw">in</span> list_data]
+list_time = time.time() - start
+
+<span class="cm"># NumPy: 벡터 연산</span>
+start = time.time()
+result_np = np_data * <span class="nu">2</span>
+np_time = time.time() - start
+
+<span class="fn">print</span>(<span class="st">f"리스트: </span>{list_time:.4f}<span class="st">초"</span>)
+<span class="fn">print</span>(<span class="st">f"NumPy:  </span>{np_time:.4f}<span class="st">초"</span>)
+<span class="fn">print</span>(<span class="st">f"NumPy가 </span>{list_time/np_time:.0f}<span class="st">배 빠름!"</span>)</code></pre>
+
+<h3>9.3 배열 생성 방법</h3>
+<pre><code><span class="cm"># 다양한 생성 방법</span>
+zeros = np.zeros(<span class="nu">5</span>)              <span class="cm"># [0, 0, 0, 0, 0]</span>
+ones = np.ones(<span class="nu">5</span>)               <span class="cm"># [1, 1, 1, 1, 1]</span>
+equal_w = np.ones(<span class="nu">5</span>) / <span class="nu">5</span>       <span class="cm"># [0.2, 0.2, 0.2, 0.2, 0.2] 동일비중</span>
+seq = np.arange(<span class="nu">0</span>, <span class="nu">10</span>, <span class="nu">2</span>)       <span class="cm"># [0, 2, 4, 6, 8]</span>
+lin = np.linspace(<span class="nu">0</span>, <span class="nu">1</span>, <span class="nu">5</span>)      <span class="cm"># [0, 0.25, 0.5, 0.75, 1.0]</span>
+
+<span class="cm"># 랜덤 배열 (시뮬레이션에 필수!)</span>
+np.random.seed(<span class="nu">42</span>)  <span class="cm"># 재현성을 위해 시드 고정</span>
+rand_returns = np.random.normal(<span class="nu">0.0005</span>, <span class="nu">0.02</span>, <span class="nu">252</span>)  <span class="cm"># 평균 0.05%, 표준편차 2%, 252일</span>
+<span class="fn">print</span>(<span class="st">f"시뮬레이션 수익률 평균: </span>{rand_returns.mean():.4f}<span class="st">"</span>)
+<span class="fn">print</span>(<span class="st">f"시뮬레이션 수익률 표준편차: </span>{rand_returns.std():.4f}<span class="st">"</span>)</code></pre>
+
+<h3>9.4 벡터 연산 (Vectorized Operations)</h3>
+<p>NumPy의 핵심 장점: for 문 없이 배열 전체에 연산을 적용할 수 있다. 이것을 벡터 연산이라 한다.</p>
+
+<pre><code><span class="cm"># 주가 배열</span>
+prices = np.array([<span class="nu">70000</span>, <span class="nu">71500</span>, <span class="nu">69800</span>, <span class="nu">72000</span>, <span class="nu">73500</span>, <span class="nu">72800</span>, <span class="nu">74200</span>])
+
+<span class="cm"># 일간 수익률 계산 — for 문 없이 한 줄!</span>
+returns = (prices[<span class="nu">1</span>:] - prices[:-<span class="nu">1</span>]) / prices[:-<span class="nu">1</span>]
+<span class="fn">print</span>(<span class="st">"일간 수익률:"</span>, np.round(returns * <span class="nu">100</span>, <span class="nu">2</span>), <span class="st">"%"</span>)
+
+<span class="cm"># 통계 함수</span>
+<span class="fn">print</span>(<span class="st">f"평균 수익률: </span>{returns.mean()*100:.3f}<span class="st">%"</span>)
+<span class="fn">print</span>(<span class="st">f"표준편차:   </span>{returns.std()*100:.3f}<span class="st">%"</span>)
+<span class="fn">print</span>(<span class="st">f"최대:       </span>{returns.max()*100:.3f}<span class="st">%"</span>)
+<span class="fn">print</span>(<span class="st">f"최소:       </span>{returns.min()*100:.3f}<span class="st">%"</span>)
+<span class="fn">print</span>(<span class="st">f"누적 수익률: </span>{(np.prod(1 + returns) - 1)*100:.2f}<span class="st">%"</span>)
+
+<span class="cm"># 조건 필터링</span>
+positive_days = returns[returns > <span class="nu">0</span>]
+<span class="fn">print</span>(<span class="st">f"상승일: </span>{<span class="fn">len</span>(positive_days)}<span class="st">일 / </span>{<span class="fn">len</span>(returns)}<span class="st">일"</span>)
+<span class="fn">print</span>(<span class="st">f"승률: </span>{<span class="fn">len</span>(positive_days)/<span class="fn">len</span>(returns):.1%}<span class="st">"</span>)</code></pre>
+
+<div class="info">
+<p class="ni"><strong>핵심 원칙:</strong> NumPy를 쓸 때는 for 문을 피하라. <code>for i in range(len(arr))</code> 대신 벡터 연산을 사용하면 코드가 짧아지고 수십 배 빨라진다. 이 습관은 Pandas, PyTorch에서도 그대로 적용된다.</p>
+</div>
+
+<h3>9.5 2차원 배열 (행렬 맛보기)</h3>
+<pre><code><span class="cm"># 3일 × 4종목 수익률 데이터</span>
+data = np.array([
+    [<span class="nu">0.02</span>, -<span class="nu">0.01</span>, <span class="nu">0.03</span>, <span class="nu">0.01</span>],
+    [-<span class="nu">0.01</span>, <span class="nu">0.02</span>, -<span class="nu">0.02</span>, <span class="nu">0.005</span>],
+    [<span class="nu">0.015</span>, <span class="nu">0.01</span>, <span class="nu">0.01</span>, -<span class="nu">0.01</span>]
+])
+
+<span class="fn">print</span>(<span class="st">f"Shape: </span>{data.shape}<span class="st">"</span>)       <span class="cm"># (3, 4) → 3행 4열</span>
+<span class="fn">print</span>(<span class="st">f"Day 1: </span>{data[0]}<span class="st">"</span>)          <span class="cm"># 첫째 날 전체</span>
+<span class="fn">print</span>(<span class="st">f"종목 1: </span>{data[:, 0]}<span class="st">"</span>)      <span class="cm"># 첫 번째 종목 3일</span>
+<span class="fn">print</span>(<span class="st">f"종목별 평균: </span>{data.mean(axis=0)}<span class="st">"</span>)  <span class="cm"># 열 방향 평균</span>
+<span class="fn">print</span>(<span class="st">f"일별 평균: </span>{data.mean(axis=1)}<span class="st">"</span>)    <span class="cm"># 행 방향 평균</span></code></pre>
+
+<div class="warn">
+<p class="ni"><strong>axis 이해하기:</strong> <code>axis=0</code>은 "행 방향으로 연산" (결과: 열 개수만큼), <code>axis=1</code>은 "열 방향으로 연산" (결과: 행 개수만큼). 헷갈리면 "axis=0은 행을 없앤다, axis=1은 열을 없앤다"로 외우자. Round 2에서 행렬을 본격적으로 다룬다.</p>
+</div>
+
+<!-- ═══════════════════════════════════════════ -->
+<!-- Ch10: Pandas -->
+<!-- ═══════════════════════════════════════════ -->
+<h2 id="ch10">10. Pandas — 금융 데이터 분석의 핵심</h2>
+
+<h3>10.1 Pandas란?</h3>
+<p>Pandas는 표 형태의 데이터를 다루는 라이브러리다. 엑셀의 스프레드시트를 파이썬으로 가져왔다고 생각하면 된다. 금융 데이터는 거의 항상 표 형태(날짜 × 종목)이므로, Pandas는 퀀트의 필수 도구다.</p>
+
+<p>Pandas의 두 가지 핵심 자료구조:</p>
+<ul>
+<li><strong>Series:</strong> 1차원 데이터 (인덱스 + 값). 하나의 열.</li>
+<li><strong>DataFrame:</strong> 2차원 데이터 (인덱스 + 여러 열). 엑셀 시트 전체.</li>
+</ul>
+
+<pre><code><span class="kw">import</span> pandas <span class="kw">as</span> pd  <span class="cm"># 관례적으로 pd로 줄여 쓴다</span>
+
+<span class="cm"># Series: 1차원</span>
+prices = pd.Series(
+    [<span class="nu">70000</span>, <span class="nu">71500</span>, <span class="nu">69800</span>, <span class="nu">72000</span>, <span class="nu">73500</span>],
+    index=pd.date_range(<span class="st">"2025-01-06"</span>, periods=<span class="nu">5</span>, freq=<span class="st">"B"</span>),  <span class="cm"># B = 영업일</span>
+    name=<span class="st">"삼성전자"</span>
+)
+<span class="fn">print</span>(prices)
+<span class="fn">print</span>(<span class="st">f"\n평균: </span>{prices.mean():,.0f}<span class="st">원"</span>)
+<span class="fn">print</span>(<span class="st">f"최고: </span>{prices.max():,.0f}<span class="st">원 (</span>{prices.idxmax().date()}<span class="st">)"</span>)</code></pre>
+
+<h3>10.2 DataFrame 생성과 기본 조작</h3>
+<pre><code><span class="cm"># DataFrame: 2차원 (여러 종목)</span>
+data = {
+    <span class="st">"삼성전자"</span>: [<span class="nu">70000</span>, <span class="nu">71500</span>, <span class="nu">69800</span>, <span class="nu">72000</span>, <span class="nu">73500</span>],
+    <span class="st">"SK하이닉스"</span>: [<span class="nu">130000</span>, <span class="nu">132000</span>, <span class="nu">128000</span>, <span class="nu">135000</span>, <span class="nu">137000</span>],
+    <span class="st">"NAVER"</span>: [<span class="nu">200000</span>, <span class="nu">198000</span>, <span class="nu">202000</span>, <span class="nu">205000</span>, <span class="nu">203000</span>],
+}
+dates = pd.date_range(<span class="st">"2025-01-06"</span>, periods=<span class="nu">5</span>, freq=<span class="st">"B"</span>)
+df = pd.DataFrame(data, index=dates)
+
+<span class="fn">print</span>(df)
+<span class="fn">print</span>(<span class="st">f"\nShape: </span>{df.shape}<span class="st">"</span>)  <span class="cm"># (5, 3)</span>
+<span class="fn">print</span>(<span class="st">f"Columns: </span>{<span class="fn">list</span>(df.columns)}<span class="st">"</span>)
+
+<span class="cm"># 기본 통계</span>
+<span class="fn">print</span>(<span class="st">"\n=== 기초 통계 ==="</span>)
+<span class="fn">print</span>(df.describe())</code></pre>
+
+<h3>10.3 데이터 선택과 필터링</h3>
+<pre><code><span class="cm"># 열 선택</span>
+<span class="fn">print</span>(df[<span class="st">"삼성전자"</span>])           <span class="cm"># Series 반환</span>
+<span class="fn">print</span>(df[[<span class="st">"삼성전자"</span>, <span class="st">"NAVER"</span>]])  <span class="cm"># DataFrame 반환</span>
+
+<span class="cm"># 행 선택</span>
+<span class="fn">print</span>(df.iloc[<span class="nu">0</span>])     <span class="cm"># 첫 번째 행 (위치 기반)</span>
+<span class="fn">print</span>(df.iloc[<span class="nu">1</span>:<span class="nu">3</span>])   <span class="cm"># 2~3번째 행</span>
+
+<span class="cm"># 조건 필터링: 삼성전자가 71000 이상인 날</span>
+mask = df[<span class="st">"삼성전자"</span>] >= <span class="nu">71000</span>
+<span class="fn">print</span>(<span class="st">"\n삼성 71000 이상인 날:"</span>)
+<span class="fn">print</span>(df[mask])</code></pre>
+
+<h3>10.4 수익률 계산 — pct_change()</h3>
+<p>Pandas에서 수익률 계산은 <code>pct_change()</code> 한 줄이면 된다. 이것이 Pandas의 위력이다.</p>
+
+<pre><code><span class="cm"># 일간 수익률 계산</span>
+returns = df.pct_change().dropna()  <span class="cm"># 첫 행은 NaN이므로 제거</span>
+<span class="fn">print</span>(<span class="st">"=== 일간 수익률 (%) ==="</span>)
+<span class="fn">print</span>((returns * <span class="nu">100</span>).round(<span class="nu">2</span>))
+
+<span class="cm"># 누적 수익률</span>
+cum_returns = (<span class="nu">1</span> + returns).cumprod() - <span class="nu">1</span>
+<span class="fn">print</span>(<span class="st">"\n=== 누적 수익률 (%) ==="</span>)
+<span class="fn">print</span>((cum_returns * <span class="nu">100</span>).round(<span class="nu">2</span>))
+
+<span class="cm"># 통계 요약</span>
+<span class="fn">print</span>(<span class="st">"\n=== 수익률 통계 ==="</span>)
+<span class="fn">print</span>(<span class="st">f"평균 일간 수익률:\n</span>{(returns.mean()*100).round(3)}<span class="st">"</span>)
+<span class="fn">print</span>(<span class="st">f"\n일간 변동성:\n</span>{(returns.std()*100).round(3)}<span class="st">"</span>)</code></pre>
+
+<div class="info">
+<p class="ni"><strong>교재 연동:</strong> 파라활(파이썬 라이브러리를 활용한 데이터 분석) Ch.4~5에서 Pandas의 기본 사용법을 상세히 다룬다. 우리는 여기서 금융에 필요한 핵심만 빠르게 익히고, 나머지는 필요할 때 참조한다.</p>
+</div>
+
+<!-- ═══════════════════════════════════════════ -->
+<!-- Ch11: Matplotlib -->
+<!-- ═══════════════════════════════════════════ -->
+<h2 id="ch11">11. Matplotlib — 데이터 시각화</h2>
+
+<h3>11.1 왜 시각화가 중요한가</h3>
+<p>숫자만 보면 패턴을 놓치기 쉽다. 차트를 그리면 추세, 변동성, 이상치가 한눈에 보인다. 퀀트 리서치에서 시각화는 "데이터를 이해하는 첫 번째 단계"다.</p>
+
+<h3>11.2 기본 차트</h3>
+<pre><code><span class="kw">import</span> matplotlib.pyplot <span class="kw">as</span> plt
+<span class="kw">import</span> matplotlib
+matplotlib.rcParams[<span class="st">'font.family'</span>] = <span class="st">'Malgun Gothic'</span>  <span class="cm"># 한글 폰트</span>
+matplotlib.rcParams[<span class="st">'axes.unicode_minus'</span>] = <span class="kw">False</span>
+
+<span class="cm"># 주가 차트</span>
+prices = pd.Series(
+    [<span class="nu">70000</span>, <span class="nu">71500</span>, <span class="nu">69800</span>, <span class="nu">72000</span>, <span class="nu">73500</span>, <span class="nu">72800</span>, <span class="nu">74200</span>,
+     <span class="nu">73000</span>, <span class="nu">75000</span>, <span class="nu">76500</span>],
+    index=pd.date_range(<span class="st">"2025-01-06"</span>, periods=<span class="nu">10</span>, freq=<span class="st">"B"</span>)
+)
+
+plt.figure(figsize=(<span class="nu">10</span>, <span class="nu">5</span>))
+plt.plot(prices, <span class="st">'b-o'</span>, linewidth=<span class="nu">2</span>, markersize=<span class="nu">5</span>, label=<span class="st">'삼성전자'</span>)
+plt.axhline(y=prices.mean(), color=<span class="st">'red'</span>, linestyle=<span class="st">'--'</span>,
+            alpha=<span class="nu">0.5</span>, label=<span class="st">f'평균: {prices.mean():,.0f}원'</span>)
+plt.title(<span class="st">'삼성전자 주가 추이'</span>, fontsize=<span class="nu">14</span>)
+plt.xlabel(<span class="st">'날짜'</span>)
+plt.ylabel(<span class="st">'주가 (원)'</span>)
+plt.legend()
+plt.grid(<span class="kw">True</span>, alpha=<span class="nu">0.3</span>)
+plt.tight_layout()
+plt.show()</code></pre>
+
+<h3>11.3 서브플롯 (여러 차트 한 번에)</h3>
+<pre><code><span class="cm"># 2행 2열 서브플롯</span>
+returns = prices.pct_change().dropna()
+
+fig, axes = plt.subplots(<span class="nu">2</span>, <span class="nu">2</span>, figsize=(<span class="nu">12</span>, <span class="nu">8</span>))
+
+<span class="cm"># (a) 주가 차트</span>
+axes[<span class="nu">0</span>,<span class="nu">0</span>].plot(prices, <span class="st">'b-'</span>, linewidth=<span class="nu">1.5</span>)
+axes[<span class="nu">0</span>,<span class="nu">0</span>].set_title(<span class="st">'(a) 주가'</span>)
+axes[<span class="nu">0</span>,<span class="nu">0</span>].grid(<span class="kw">True</span>, alpha=<span class="nu">0.3</span>)
+
+<span class="cm"># (b) 일간 수익률</span>
+colors = [<span class="st">'green'</span> <span class="kw">if</span> r >= <span class="nu">0</span> <span class="kw">else</span> <span class="st">'red'</span> <span class="kw">for</span> r <span class="kw">in</span> returns]
+axes[<span class="nu">0</span>,<span class="nu">1</span>].bar(returns.index, returns*<span class="nu">100</span>, color=colors, alpha=<span class="nu">0.7</span>)
+axes[<span class="nu">0</span>,<span class="nu">1</span>].set_title(<span class="st">'(b) 일간 수익률 (%)'</span>)
+axes[<span class="nu">0</span>,<span class="nu">1</span>].axhline(y=<span class="nu">0</span>, color=<span class="st">'black'</span>, linewidth=<span class="nu">0.5</span>)
+
+<span class="cm"># (c) 수익률 히스토그램</span>
+axes[<span class="nu">1</span>,<span class="nu">0</span>].hist(returns*<span class="nu">100</span>, bins=<span class="nu">10</span>, color=<span class="st">'steelblue'</span>,
+              edgecolor=<span class="st">'white'</span>, alpha=<span class="nu">0.8</span>)
+axes[<span class="nu">1</span>,<span class="nu">0</span>].set_title(<span class="st">'(c) 수익률 분포'</span>)
+axes[<span class="nu">1</span>,<span class="nu">0</span>].set_xlabel(<span class="st">'수익률 (%)'</span>)
+
+<span class="cm"># (d) 누적 수익률</span>
+cum = ((<span class="nu">1</span> + returns).cumprod() - <span class="nu">1</span>) * <span class="nu">100</span>
+axes[<span class="nu">1</span>,<span class="nu">1</span>].fill_between(cum.index, cum, alpha=<span class="nu">0.3</span>, color=<span class="st">'steelblue'</span>)
+axes[<span class="nu">1</span>,<span class="nu">1</span>].plot(cum, <span class="st">'b-'</span>, linewidth=<span class="nu">1.5</span>)
+axes[<span class="nu">1</span>,<span class="nu">1</span>].set_title(<span class="st">'(d) 누적 수익률 (%)'</span>)
+axes[<span class="nu">1</span>,<span class="nu">1</span>].grid(<span class="kw">True</span>, alpha=<span class="nu">0.3</span>)
+
+plt.suptitle(<span class="st">'삼성전자 분석 대시보드'</span>, fontsize=<span class="nu">15</span>)
+plt.tight_layout()
+plt.show()</code></pre>
+
+<div class="ok">
+<p class="ni"><strong>시각화 팁:</strong> <code>figsize</code>로 크기 조절, <code>grid(True, alpha=0.3)</code>으로 격자 추가, <code>tight_layout()</code>으로 겹침 방지. 이 세 가지만 기억하면 깔끔한 차트를 만들 수 있다.</p>
+</div>
+
+<!-- ═══════════════════════════════════════════ -->
+<!-- Ch12: 실전 주가 분석 -->
+<!-- ═══════════════════════════════════════════ -->
+<h2 id="ch12
+
+<!-- ═══════════════════════════════════════════ -->
+<!-- Ch12: 실전 주가 분석 -->
+<!-- ═══════════════════════════════════════════ -->
+<h2 id="ch12">12. 실전: 주가 데이터 수집 + 수익률 + 샤프비율</h2>
+
+<h3>12.1 yfinance로 실제 주가 데이터 수집</h3>
+<p>지금까지 가짜 데이터로 연습했다. 이제 진짜 주가 데이터를 가져와보자. yfinance 라이브러리를 사용하면 전 세계 주식, ETF, 암호화폐 데이터를 무료로 다운로드할 수 있다.</p>
+
+<pre><code><span class="kw">import</span> yfinance <span class="kw">as</span> yf
+<span class="kw">import</span> numpy <span class="kw">as</span> np
+<span class="kw">import</span> pandas <span class="kw">as</span> pd
+<span class="kw">import</span> matplotlib.pyplot <span class="kw">as</span> plt
+
+<span class="cm"># 삼성전자 1년 데이터 다운로드</span>
+samsung = yf.download(<span class="st">"005930.KS"</span>, start=<span class="st">"2024-01-01"</span>, end=<span class="st">"2025-01-01"</span>)
+<span class="fn">print</span>(<span class="st">f"데이터 크기: </span>{samsung.shape}<span class="st">"</span>)
+<span class="fn">print</span>(samsung.head())
+<span class="fn">print</span>(<span class="st">f"\n컬럼: </span>{<span class="fn">list</span>(samsung.columns)}<span class="st">"</span>)
+<span class="cm"># Open, High, Low, Close, Volume  (yfinance 1.0+)</span></code></pre>
+
+<div class="def">
+<p class="ni"><strong>yfinance 컬럼 설명:</strong></p>
+<ul>
+<li><strong>Open:</strong> 시가 (장 시작 가격)</li>
+<li><strong>High:</strong> 고가 (장중 최고가)</li>
+<li><strong>Low:</strong> 저가 (장중 최저가)</li>
+<li><strong>Close:</strong> 종가 (배당·분할 반영된 수정종가) — 수익률 계산에 사용 ⭐</li>
+<li><strong>Volume:</strong> 거래량</li>
+</ul>
+</div>
+
+<h3>12.2 수익률 계산</h3>
+<p>수익률(return)은 금융 분석의 가장 기본적인 지표다. "어제 대비 오늘 얼마나 변했는가"를 비율로 표현한 것이다.</p>
+
+<div class="eq">\[ r_t = \frac{P_t - P_{t-1}}{P_{t-1}} = \frac{P_t}{P_{t-1}} - 1 \]</div>
+
+<pre><code><span class="cm"># 일간 수익률</span>
+close = samsung[<span class="st">"Close"</span>]
+returns = close.pct_change().dropna()
+
+<span class="fn">print</span>(<span class="st">"=== 삼성전자 수익률 통계 ==="</span>)
+<span class="fn">print</span>(<span class="st">f"관측일 수: </span>{<span class="fn">len</span>(returns)}<span class="st">일"</span>)
+<span class="fn">print</span>(<span class="st">f"평균 일간 수익률: </span>{returns.mean()*100:.4f}<span class="st">%"</span>)
+<span class="fn">print</span>(<span class="st">f"일간 변동성:     </span>{returns.std()*100:.4f}<span class="st">%"</span>)
+<span class="fn">print</span>(<span class="st">f"최대 일간 수익:  </span>{returns.max()*100:.2f}<span class="st">%"</span>)
+<span class="fn">print</span>(<span class="st">f"최대 일간 손실:  </span>{returns.min()*100:.2f}<span class="st">%"</span>)
+<span class="fn">print</span>(<span class="st">f"상승일 비율:     </span>{(returns > 0).mean():.1%}<span class="st">"</span>)
+
+<span class="cm"># 연간화</span>
+ann_return = returns.mean() * <span class="nu">252</span>
+ann_vol = returns.std() * np.sqrt(<span class="nu">252</span>)
+<span class="fn">print</span>(<span class="st">f"\n연간 수익률: </span>{ann_return*100:.2f}<span class="st">%"</span>)
+<span class="fn">print</span>(<span class="st">f"연간 변동성: </span>{ann_vol*100:.2f}<span class="st">%"</span>)</code></pre>
+
+<h3>12.3 샤프비율 (Sharpe Ratio)</h3>
+<p>샤프비율은 "위험 한 단위당 얼마나 수익을 냈는가"를 측정하는 지표다. 윌리엄 샤프(William Sharpe)가 1966년에 제안했으며, 투자 성과를 평가하는 가장 널리 사용되는 지표다.</p>
+
+<div class="eq">\[ \text{Sharpe Ratio} = \frac{R_p - R_f}{\sigma_p} \]</div>
+
+<p>여기서 \(R_p\)는 포트폴리오 수익률, \(R_f\)는 무위험이자율(보통 국채 금리), \(\sigma_p\)는 포트폴리오 변동성이다.</p>
+
+<ul>
+<li>샤프비율 > 1: 좋은 투자</li>
+<li>샤프비율 > 2: 매우 좋은 투자</li>
+<li>샤프비율 > 3: 의심스러울 정도로 좋은 투자 (과적합 가능성)</li>
+<li>샤프비율 < 0: 무위험자산보다 못한 투자</li>
+</ul>
+
+<pre><code><span class="cm"># 샤프비율 계산</span>
+risk_free_rate = <span class="nu">0.035</span>  <span class="cm"># 한국 국채 3.5% 가정</span>
+
+sharpe = (ann_return - risk_free_rate) / ann_vol
+<span class="fn">print</span>(<span class="st">f"샤프비율: </span>{sharpe:.3f}<span class="st">"</span>)
+
+<span class="cm"># 함수로 만들기</span>
+<span class="kw">def</span> <span class="fn">calc_sharpe</span>(returns, rf=<span class="nu">0.035</span>):
+    <span class="st">"""일간 수익률 Series로 연간 샤프비율 계산"""</span>
+    ann_ret = returns.mean() * <span class="nu">252</span>
+    ann_vol = returns.std() * np.sqrt(<span class="nu">252</span>)
+    <span class="kw">return</span> (ann_ret - rf) / ann_vol
+
+<span class="fn">print</span>(<span class="st">f"삼성전자 샤프비율: </span>{calc_sharpe(returns):.3f}<span class="st">"</span>)</code></pre>
+
+<h3>12.4 다종목 비교 분석</h3>
+<pre><code><span class="cm"># 여러 종목 한 번에 다운로드</span>
+tickers = [<span class="st">"AAPL"</span>, <span class="st">"MSFT"</span>, <span class="st">"GOOGL"</span>, <span class="st">"AMZN"</span>, <span class="st">"NVDA"</span>]
+data = yf.download(tickers, start=<span class="st">"2024-01-01"</span>, end=<span class="st">"2025-01-01"</span>)[<span class="st">"Close"</span>]
+returns = data.pct_change().dropna()
+
+<span class="cm"># 종목별 성과 비교</span>
+<span class="fn">print</span>(<span class="st">"=== 종목별 성과 비교 ==="</span>)
+<span class="fn">print</span>(<span class="st">f"{'종목':<8} {'연간수익률':>10} {'연간변동성':>10} {'샤프비율':>8} {'최대손실':>8}"</span>)
+<span class="fn">print</span>(<span class="st">"-"</span> * <span class="nu">50</span>)
+
+<span class="kw">for</span> ticker <span class="kw">in</span> tickers:
+    r = returns[ticker]
+    ann_ret = r.mean() * <span class="nu">252</span> * <span class="nu">100</span>
+    ann_vol = r.std() * np.sqrt(<span class="nu">252</span>) * <span class="nu">100</span>
+    sharpe = calc_sharpe(r, rf=<span class="nu">0.05</span>)  <span class="cm"># 미국 국채 5%</span>
+    max_loss = r.min() * <span class="nu">100</span>
+    <span class="fn">print</span>(<span class="st">f"</span>{ticker:<span class="nu">8</span>} {ann_ret:>9.2f}<span class="st">% </span>{ann_vol:>9.2f}<span class="st">% </span>{sharpe:>8.3f} {max_loss:>7.2f}<span class="st">%"</span>)
+
+<span class="cm"># 누적 수익률 차트</span>
+cum = ((<span class="nu">1</span> + returns).cumprod() - <span class="nu">1</span>) * <span class="nu">100</span>
+
+plt.figure(figsize=(<span class="nu">12</span>, <span class="nu">6</span>))
+<span class="kw">for</span> ticker <span class="kw">in</span> tickers:
+    plt.plot(cum[ticker], linewidth=<span class="nu">1.5</span>, label=ticker)
+plt.title(<span class="st">"Cumulative Returns Comparison (2024)"</span>, fontsize=<span class="nu">14</span>)
+plt.xlabel(<span class="st">"Date"</span>)
+plt.ylabel(<span class="st">"Cumulative Return (%)"</span>)
+plt.legend(fontsize=<span class="nu">10</span>)
+plt.grid(<span class="kw">True</span>, alpha=<span class="nu">0.3</span>)
+plt.axhline(y=<span class="nu">0</span>, color=<span class="st">'black'</span>, linewidth=<span class="nu">0.5</span>)
+plt.tight_layout()
+plt.show()</code></pre>
+
+<h3>12.5 이동평균과 볼린저 밴드 맛보기</h3>
+<pre><code><span class="cm"># 삼성전자 이동평균</span>
+samsung_close = samsung[<span class="st">"Close"</span>]
+ma20 = samsung_close.rolling(window=<span class="nu">20</span>).mean()   <span class="cm"># 20일 이동평균</span>
+ma60 = samsung_close.rolling(window=<span class="nu">60</span>).mean()   <span class="cm"># 60일 이동평균</span>
+
+<span class="cm"># 볼린저 밴드</span>
+bb_mid = ma20
+bb_std = samsung_close.rolling(window=<span class="nu">20</span>).std()
+bb_upper = bb_mid + <span class="nu">2</span> * bb_std
+bb_lower = bb_mid - <span class="nu">2</span> * bb_std
+
+plt.figure(figsize=(<span class="nu">12</span>, <span class="nu">6</span>))
+plt.plot(samsung_close, <span class="st">'k-'</span>, linewidth=<span class="nu">1</span>, label=<span class="st">'Close'</span>)
+plt.plot(ma20, <span class="st">'b-'</span>, linewidth=<span class="nu">1</span>, label=<span class="st">'MA20'</span>)
+plt.plot(ma60, <span class="st">'r-'</span>, linewidth=<span class="nu">1</span>, label=<span class="st">'MA60'</span>)
+plt.fill_between(bb_upper.index, bb_lower, bb_upper,
+                 alpha=<span class="nu">0.1</span>, color=<span class="st">'blue'</span>, label=<span class="st">'Bollinger Band'</span>)
+plt.title(<span class="st">'삼성전자: 이동평균 + 볼린저 밴드'</span>, fontsize=<span class="nu">14</span>)
+plt.legend(fontsize=<span class="nu">10</span>)
+plt.grid(<span class="kw">True</span>, alpha=<span class="nu">0.3</span>)
+plt.tight_layout()
+plt.show()</code></pre>
+
+<div class="info">
+<p class="ni"><strong>Round 3 미리보기:</strong> 이동평균, 볼린저 밴드, RSI, MACD 등 기술적 지표를 직접 구현하고 백테스팅하는 것은 Round 3의 핵심 내용이다. 여기서는 맛보기만 한다.</p>
+</div>
+
+<!-- ═══════════════════════════════════════════ -->
+<!-- Ch13: Mini Project + Quiz -->
+<!-- ═══════════════════════════════════════════ -->
+<h2 id="ch13">13. Mini Project + Quiz</h2>
+
+<h3>13.1 종합 프로젝트: 5종목 성과 대시보드</h3>
+<p>Round 1에서 배운 모든 것을 하나의 프로젝트로 통합한다. 5개 종목의 데이터를 수집하고, 수익률/변동성/샤프비율을 계산하고, 4-panel 대시보드를 그린다.</p>
+
+<pre><code><span class="kw">import</span> numpy <span class="kw">as</span> np
+<span class="kw">import</span> pandas <span class="kw">as</span> pd
+<span class="kw">import</span> yfinance <span class="kw">as</span> yf
+<span class="kw">import</span> matplotlib.pyplot <span class="kw">as</span> plt
+
+<span class="cm"># ── 데이터 수집 ──</span>
+tickers = [<span class="st">"AAPL"</span>, <span class="st">"MSFT"</span>, <span class="st">"GOOGL"</span>, <span class="st">"GLD"</span>, <span class="st">"BTC-USD"</span>]
+names = [<span class="st">"Apple"</span>, <span class="st">"Microsoft"</span>, <span class="st">"Google"</span>, <span class="st">"Gold"</span>, <span class="st">"Bitcoin"</span>]
+data = yf.download(tickers, start=<span class="st">"2024-01-01"</span>, end=<span class="st">"2025-01-01"</span>)[<span class="st">"Close"</span>]
+data.columns = names
+returns = data.pct_change().dropna()
+
+<span class="cm"># ── 성과 테이블 ──</span>
+<span class="fn">print</span>(<span class="st">"╔══════════════════════════════════════════════╗"</span>)
+<span class="fn">print</span>(<span class="st">"║   ROUND 1 MINI PROJECT: PERFORMANCE REPORT   ║"</span>)
+<span class="fn">print</span>(<span class="st">"╚══════════════════════════════════════════════╝"</span>)
+
+summary = pd.DataFrame({
+    <span class="st">'연간수익률(%)'</span>: returns.mean() * <span class="nu">252</span> * <span class="nu">100</span>,
+    <span class="st">'연간변동성(%)'</span>: returns.std() * np.sqrt(<span class="nu">252</span>) * <span class="nu">100</span>,
+    <span class="st">'샤프비율'</span>: (returns.mean()*<span class="nu">252</span> - <span class="nu">0.05</span>) / (returns.std()*np.sqrt(<span class="nu">252</span>)),
+    <span class="st">'최대일간손실(%)'</span>: returns.min() * <span class="nu">100</span>,
+    <span class="st">'승률(%)'</span>: (returns > <span class="nu">0</span>).mean() * <span class="nu">100</span>
+})
+<span class="fn">print</span>(summary.round(<span class="nu">2</span>))
+
+<span class="cm"># ── 4-Panel 대시보드 ──</span>
+fig, axes = plt.subplots(<span class="nu">2</span>, <span class="nu">2</span>, figsize=(<span class="nu">14</span>, <span class="nu">10</span>))
+
+<span class="cm"># (a) 누적 수익률</span>
+cum = ((<span class="nu">1</span> + returns).cumprod() - <span class="nu">1</span>) * <span class="nu">100</span>
+cum.plot(ax=axes[<span class="nu">0</span>,<span class="nu">0</span>], linewidth=<span class="nu">1.2</span>)
+axes[<span class="nu">0</span>,<span class="nu">0</span>].set_title(<span class="st">"(a) Cumulative Returns (%)"</span>)
+axes[<span class="nu">0</span>,<span class="nu">0</span>].legend(fontsize=<span class="nu">8</span>)
+axes[<span class="nu">0</span>,<span class="nu">0</span>].grid(<span class="kw">True</span>, alpha=<span class="nu">0.3</span>)
+axes[<span class="nu">0</span>,<span class="nu">0</span>].axhline(y=<span class="nu">0</span>, color=<span class="st">'black'</span>, linewidth=<span class="nu">0.5</span>)
+
+<span class="cm"># (b) 변동성 비교 (막대 차트)</span>
+vols = returns.std() * np.sqrt(<span class="nu">252</span>) * <span class="nu">100</span>
+colors = [<span class="st">'steelblue'</span>]*<span class="nu">3</span> + [<span class="st">'gold'</span>] + [<span class="st">'orange'</span>]
+axes[<span class="nu">0</span>,<span class="nu">1</span>].bar(names, vols, color=colors, alpha=<span class="nu">0.8</span>)
+axes[<span class="nu">0</span>,<span class="nu">1</span>].set_title(<span class="st">"(b) Annual Volatility (%)"</span>)
+axes[<span class="nu">0</span>,<span class="nu">1</span>].set_ylabel(<span class="st">"Volatility (%)"</span>)
+
+<span class="cm"># (c) 수익률 분포</span>
+<span class="kw">for</span> name <span class="kw">in</span> names[:<span class="nu">3</span>]:
+    axes[<span class="nu">1</span>,<span class="nu">0</span>].hist(returns[name]*<span class="nu">100</span>, bins=<span class="nu">50</span>, alpha=<span class="nu">0.5</span>,
+                  label=name, density=<span class="kw">True</span>)
+axes[<span class="nu">1</span>,<span class="nu">0</span>].set_title(<span class="st">"(c) Return Distributions"</span>)
+axes[<span class="nu">1</span>,<span class="nu">0</span>].set_xlabel(<span class="st">"Daily Return (%)"</span>)
+axes[<span class="nu">1</span>,<span class="nu">0</span>].legend(fontsize=<span class="nu">9</span>)
+
+<span class="cm"># (d) 위험-수익 산점도</span>
+ann_rets = returns.mean() * <span class="nu">252</span> * <span class="nu">100</span>
+ann_vols = returns.std() * np.sqrt(<span class="nu">252</span>) * <span class="nu">100</span>
+axes[<span class="nu">1</span>,<span class="nu">1</span>].scatter(ann_vols, ann_rets, s=<span class="nu">100</span>, c=colors, edgecolors=<span class="st">'black'</span>, zorder=<span class="nu">5</span>)
+<span class="kw">for</span> i, name <span class="kw">in</span> <span class="fn">enumerate</span>(names):
+    axes[<span class="nu">1</span>,<span class="nu">1</span>].annotate(name, (ann_vols.iloc[i]+<span class="nu">0.5</span>, ann_rets.iloc[i]),
+                       fontsize=<span class="nu">9</span>)
+axes[<span class="nu">1</span>,<span class="nu">1</span>].set_title(<span class="st">"(d) Risk-Return Scatter"</span>)
+axes[<span class="nu">1</span>,<span class="nu">1</span>].set_xlabel(<span class="st">"Annual Volatility (%)"</span>)
+axes[<span class="nu">1</span>,<span class="nu">1</span>].set_ylabel(<span class="st">"Annual Return (%)"</span>)
+axes[<span class="nu">1</span>,<span class="nu">1</span>].grid(<span class="kw">True</span>, alpha=<span class="nu">0.3</span>)
+
+plt.suptitle(<span class="st">"Round 1 Mini Project: 5-Asset Performance Dashboard"</span>, fontsize=<span class="nu">15</span>, y=<span class="nu">1.01</span>)
+plt.tight_layout()
+plt.savefig(<span class="st">"round_01_dashboard.png"</span>, dpi=<span class="nu">150</span>, bbox_inches=<span class="st">'tight'</span>)
+plt.show()</code></pre>
+
+<h3>13.2 Quiz</h3>
+
+<div class="def">
+<p class="ni"><strong>Q1. [변수]</strong> 삼성전자 주가가 70,000원이고 100주를 보유 중이다. 총 평가액을 계산하는 코드를 작성하라. f-string으로 천 단위 쉼표를 포함하여 출력하라.</p>
+</div>
+
+<div class="def">
+<p class="ni"><strong>Q2. [조건문]</strong> RSI 값을 입력받아 "과매수"(>70), "과매도"(<30), "중립"(30~70)을 판단하는 함수를 작성하라.</p>
+</div>
+
+<div class="def">
+<p class="ni"><strong>Q3. [반복문]</strong> 원금 1,000만원을 연 8% 복리로 투자할 때, 원금이 2배가 되는 연도를 while 문으로 구하라. 72의 법칙(72/8=9년)과 비교하라.</p>
+</div>
+
+<div class="def">
+<p class="ni"><strong>Q4. [NumPy]</strong> <code>np.random.normal(0.0003, 0.015, 252)</code>로 1년 일간 수익률을 시뮬레이션하고, 연간 수익률과 연간 변동성을 계산하라.</p>
+</div>
+
+<div class="def">
+<p class="ni"><strong>Q5. [Pandas]</strong> yfinance로 비트코인(BTC-USD)의 2024년 데이터를 다운로드하고, 월별 수익률을 계산하라. 가장 수익률이 높았던 달과 낮았던 달은?</p>
+</div>
+
+<div class="def">
+<p class="ni"><strong>Q6. [샤프비율]</strong> 두 투자 전략의 연간 수익률이 각각 15%와 25%이고, 연간 변동성이 각각 10%와 30%이다. 무위험이자율이 4%일 때, 어떤 전략이 더 효율적인가? 샤프비율로 비교하라.</p>
+</div>
+
+<div class="def">
+<p class="ni"><strong>Q7. [종합]</strong> 한국 ETF 3개(KODEX 200: 069500.KS, KODEX 반도체: 091160.KS, TIGER 미국S&P500: 360750.KS)의 1년 데이터를 다운로드하고, 누적 수익률 차트를 그려라. 어떤 ETF의 샤프비율이 가장 높은가?</p>
+</div>
+
+<h3>13.3 Round 1 학습 정리</h3>
+
+<div class="tc">Table 4. Round 1 핵심 개념 요약</div>
+<table>
+<tr><th>챕터</th><th>핵심 개념</th><th>금융 적용</th><th>교재 연동</th></tr>
+<tr><td>1~2. 환경</td><td>Python, Anaconda, Jupyter</td><td>개발 환경 구축</td><td>혼공파 Ch.1</td></tr>
+<tr><td>3. 변수</td><td>int, float, str, bool</td><td>주가, 수익률, 티커</td><td>혼공파 Ch.2</td></tr>
+<tr><td>4. 연산자</td><td>산술, 비교, 논리</td><td>복리 계산, 시그널 조건</td><td>혼공파 Ch.2</td></tr>
+<tr><td>5. 조건문</td><td>if / elif / else</td><td>매매 시그널 판단</td><td>혼공파 Ch.3</td></tr>
+<tr><td>6. 반복문</td><td>for, while, 컴프리헨션</td><td>시뮬레이션, 데이터 처리</td><td>혼공파 Ch.3</td></tr>
+<tr><td>7. 함수</td><td>def, return, 기본값</td><td>수익률/샤프 계산 함수</td><td>혼공파 Ch.4</td></tr>
+<tr><td>8. 자료구조</td><td>리스트, 튜플, 딕셔너리</td><td>포트폴리오 관리</td><td>혼공파 Ch.3, 두잇알고 Ch.1</td></tr>
+<tr><td>9. NumPy</td><td>배열, 벡터 연산, 통계</td><td>수익률 계산, 시뮬레이션</td><td>파라활 Ch.4</td></tr>
+<tr><td>10. Pandas</td><td>Series, DataFrame</td><td>금융 데이터 분석</td><td>파라활 Ch.5</td></tr>
+<tr><td>11. Matplotlib</td><td>plot, subplot, 스타일</td><td>차트, 대시보드</td><td>파라활 Ch.9</td></tr>
+<tr><td>12. 실전</td><td>yfinance, 샤프비율</td><td>실제 주가 분석</td><td>MLDSF Ch.2</td></tr>
+</table>
+
+<h3>13.4 Next Round Preview</h3>
+
+<div class="info">
+<p class="ni"><strong>Round 2: Linear Algebra + Probability &amp; Statistics</strong></p>
+<ul>
+<li>벡터와 행렬의 개념, 내적, 행렬곱</li>
+<li>고유값/고유벡터와 PCA의 수학적 기반</li>
+<li>정규분포, 로그정규분포, GBM 시뮬레이션</li>
+<li>공분산 행렬과 상관계수</li>
+<li>베이즈 정리와 트레이딩 시그널</li>
+<li>편미분, 그래디언트, 경사하강법 (딥러닝 준비)</li>
+<li>실전: 포트폴리오 공분산 행렬 + 히트맵 + 효율적 프론티어</li>
+</ul>
+<p class="ni"><strong>교재:</strong> MLAT Ch.4 / MLDSF Ch.4 / 두잇알고 Ch.3</p>
+</div>
+
+</div><!-- paper-content -->
+</div><!-- container -->
+</div><!-- main-wrapper -->
+
+</body>
+</html>

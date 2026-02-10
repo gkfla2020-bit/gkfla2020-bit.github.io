@@ -1,0 +1,1712 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Round 4 - Supervised Learning: Regression + Classification</title>
+<script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;500&family=Space+Mono:wght@400&family=Inter:wght@300;400&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Inter',sans-serif;background:#fafaf8;color:#1a1a1a;line-height:1.7;overflow-x:hidden}
+.sidebar{position:fixed;left:0;top:0;width:260px;height:100vh;background:rgba(255,255,255,.97);border-right:1px solid rgba(0,0,0,.06);padding:32px 24px;z-index:100;overflow-y:auto;display:flex;flex-direction:column}
+.sidebar-profile{text-align:center;margin-bottom:28px;padding-bottom:24px;border-bottom:1px solid rgba(0,0,0,.08)}
+.profile-icon{font-size:48px;margin-bottom:8px}
+.profile-name{font-family:'Cormorant Garamond',serif;font-size:1.3rem;font-weight:500;margin-bottom:4px}
+.profile-title{font-size:.68rem;color:#888;letter-spacing:.08em;text-transform:uppercase;margin-bottom:8px}
+.profile-bio{font-size:.78rem;color:#666;line-height:1.5}
+.sidebar-nav{flex:1;margin-top:16px}
+.nav-section{margin-bottom:20px}
+.nav-section-title{font-size:.6rem;font-weight:600;color:#aaa;letter-spacing:.15em;text-transform:uppercase;margin-bottom:10px}
+.nav-list{list-style:none}
+.nav-list li{margin-bottom:5px}
+.nav-list a{font-size:.78rem;color:#555;text-decoration:none;transition:all .2s;display:block;padding:3px 0}
+.nav-list a:hover{color:#0080c6;padding-left:4px}
+.nav-list a.active{color:#0080c6;font-weight:500}
+.nav-list a.done{color:#28a745}
+.badge{display:inline-block;font-size:.5rem;background:#0080c6;color:#fff;padding:1px 5px;border-radius:8px;margin-left:3px;vertical-align:middle}
+.badge-done{background:#28a745}
+.sidebar-footer{padding-top:16px;border-top:1px solid rgba(0,0,0,.06);font-size:.65rem;color:#aaa;text-align:center}
+.main-wrapper{margin-left:260px;min-height:100vh}
+.container{max-width:1100px;margin:0 auto;padding:50px 40px 80px}
+.paper-content{font-family:'Times New Roman','Nanum Myeongjo',serif;line-height:1.8;background:#fff;padding:40px;border-radius:8px;box-shadow:0 2px 20px rgba(0,0,0,.05)}
+.paper-header{text-align:center;margin-bottom:40px;padding-bottom:30px;border-bottom:2px solid #333}
+.paper-category{font-size:14px;color:#666;margin-bottom:10px}
+.paper-title{font-size:24px;font-weight:bold;margin-bottom:12px;line-height:1.4}
+.paper-subtitle{font-size:14px;color:#555;margin-bottom:8px}
+.paper-team{font-size:13px;color:#444}
+</style>
+<style>
+.abstract{background:#f8f9fa;padding:25px;margin:30px 0;border-left:4px solid #2c3e50}
+.abstract-title{font-weight:bold;font-size:16px;margin-bottom:15px}
+h2{font-size:18px;margin:35px 0 20px;padding-bottom:8px;border-bottom:1px solid #ddd;color:#2c3e50}
+h3{font-size:15px;margin:25px 0 15px;color:#34495e}
+h4{font-size:14px;margin:20px 0 12px;color:#34495e}
+p{text-align:justify;margin-bottom:15px;text-indent:2em}
+p.ni{text-indent:0}
+table{width:100%;border-collapse:collapse;margin:20px 0;font-size:12px}
+th,td{border:1px solid #ddd;padding:10px 8px;text-align:center}
+th{background:#2c3e50;color:white;font-weight:bold}
+tr:nth-child(even){background:#f8f9fa}
+tr:hover{background:#e8f4f8}
+.tc{font-size:13px;font-weight:bold;margin:15px 0 10px;text-align:center}
+.eq{text-align:center;margin:20px 0;padding:15px;background:#f8f9fa;border-radius:4px;overflow-x:auto}
+ul,ol{margin-left:2em;margin-bottom:15px}
+li{margin-bottom:6px}
+.def{background:#fff9e6;border:1px solid #ffc107;border-radius:4px;padding:20px;margin:20px 0}
+.info{background:#e8f4f8;border-left:4px solid #3498db;padding:20px;margin:20px 0}
+.warn{background:#fff3cd;border-left:4px solid #f39c12;padding:20px;margin:20px 0}
+.ok{background:#d4edda;border-left:4px solid #28a745;padding:20px;margin:20px 0}
+pre{background:#1e1e1e;color:#d4d4d4;padding:20px;border-radius:6px;overflow-x:auto;margin:20px 0;font-family:'Space Mono','Consolas',monospace;font-size:13px;line-height:1.6}
+code{font-family:'Space Mono','Consolas',monospace;font-size:13px}
+p code,li code,td code{background:#f0f0f0;padding:2px 6px;border-radius:3px;color:#c7254e;font-size:12px}
+.cc{font-size:12px;font-weight:bold;color:#2c3e50;margin-top:15px;margin-bottom:4px}
+.cm{color:#6a9955}.kw{color:#569cd6}.st{color:#ce9178}.fn{color:#dcdcaa}.nb{color:#4ec9b0}.nu{color:#b5cea8}
+.progress-bar{width:100%;height:6px;background:#e0e0e0;border-radius:3px;margin-top:16px}
+.progress-fill{height:100%;background:linear-gradient(90deg,#0080c6,#00b894);border-radius:3px;width:40%}
+.progress-label{font-size:11px;color:#888;margin-top:4px;text-align:center}
+@media(max-width:1024px){
+.sidebar{width:100%;height:auto;position:relative;border-right:none;border-bottom:1px solid rgba(0,0,0,.08);padding:16px}
+.sidebar-profile{margin-bottom:10px;padding-bottom:10px;display:flex;align-items:center;gap:12px;text-align:left}
+.profile-icon{font-size:32px;margin-bottom:0}.profile-bio{display:none}
+.nav-section{display:inline-block;margin-right:16px;margin-bottom:8px}
+.nav-list{display:flex;gap:10px;flex-wrap:wrap}.nav-list li{margin-bottom:0}
+.sidebar-footer{display:none}
+.main-wrapper{margin-left:0}
+.container{padding:0}.paper-content{padding:20px 16px;border-radius:0;box-shadow:none}
+.paper-title{font-size:18px}p{font-size:14px;text-indent:1.5em;text-align:left}
+pre{font-size:11px;padding:14px}table{font-size:10px;display:block;overflow-x:auto}
+}
+</style>
+</head>
+<body>
+
+<div class="sidebar">
+<div class="sidebar-profile">
+<div class="profile-icon">&#x1F680;</div>
+<div class="profile-name">HFT ML Master Plan</div>
+<div class="profile-title">Convex Opt + DL + HFT</div>
+<div class="profile-bio">10 Rounds: Zero to HFT System Trading</div>
+</div>
+<div class="sidebar-nav">
+<div class="nav-section">
+<div class="nav-section-title">Curriculum</div>
+<ul class="nav-list">
+<li><a class="done" href="../round_01/lecture_01.html">R1. Python + Finance <span class="badge badge-done">DONE</span></a></li>
+<li><a class="done" href="../round_02/lecture_02.html">R2. Linear Algebra + Stats <span class="badge badge-done">DONE</span></a></li>
+<li><a class="done" href="../round_03/lecture_03.html">R3. Data / Feature Eng. <span class="badge badge-done">DONE</span></a></li>
+<li><a class="active" href="#">R4. Supervised Learning <span class="badge">NOW</span></a></li>
+<li><a href="#">R5. Unsupervised + TS</a></li>
+<li><a href="#">R6. NLP + Sentiment</a></li>
+<li><a href="#">R7. Deep Learning</a></li>
+<li><a href="#">R8. Convex Opt + Transformer</a></li>
+<li><a href="#">R9. HFT + RL</a></li>
+<li><a href="#">R10. Final Project</a></li>
+</ul>
+</div>
+<div class="nav-section">
+<div class="nav-section-title">This Lecture</div>
+<ul class="nav-list">
+<li><a href="#ch1">1. ML이란 무엇인가</a></li>
+<li><a href="#ch2">2. 회귀 vs 분류</a></li>
+<li><a href="#ch3">3. 선형회귀</a></li>
+<li><a href="#ch4">4. Ridge / Lasso 정규화</a></li>
+<li><a href="#ch5">5. 로지스틱 회귀</a></li>
+<li><a href="#ch6">6. 모델 평가 지표</a></li>
+<li><a href="#ch7">7. 교차검증과 과적합</a></li>
+<li><a href="#ch8">8. 결정 트리</a></li>
+<li><a href="#ch9">9. Random Forest</a></li>
+<li><a href="#ch10">10. Gradient Boosting</a></li>
+<li><a href="#ch11">11. XGBoost / LightGBM</a></li>
+<li><a href="#ch12">12. 실전: 주가 방향 예측</a></li>
+<li><a href="#ch13">13. Quiz + 미니 프로젝트</a></li>
+</ul>
+</div>
+</div>
+<div class="sidebar-footer">Round 4 of 10 · 📈 Supervised Learning</div>
+</div>
+
+<div class="main-wrapper">
+<div class="container">
+<div class="paper-content">
+
+<div class="paper-header">
+<div class="paper-category">Round 4 / 10 · ML 핵심 무기 시작</div>
+<h1 class="paper-title">Supervised Learning: Regression + Classification for Algorithmic Trading</h1>
+<div class="paper-subtitle">데이터에서 패턴을 학습하여 주가 수익률을 예측하고 매매 방향을 분류한다</div>
+<div class="paper-team">Textbooks: MLAT Ch.6~7, 11~12 / MLDSF Ch.4~6 / 혼공파 복습</div>
+<div class="progress-bar"><div class="progress-fill"></div></div>
+<div class="progress-label">Overall Progress: 40%</div>
+</div>
+
+<div class="abstract">
+<div class="abstract-title">Learning Objectives</div>
+<p class="ni">Round 4를 마치면 다음을 할 수 있다:</p>
+<ul>
+<li>지도학습의 두 가지 유형(회귀/분류)을 구분하고 금융 문제에 매핑할 수 있다</li>
+<li>선형회귀를 직접 구현하고, 계수의 금융적 의미를 해석할 수 있다</li>
+<li>Ridge/Lasso 정규화가 왜 필요한지 이해하고 적용할 수 있다</li>
+<li>로지스틱 회귀로 주가 상승/하락을 분류할 수 있다</li>
+<li>MSE, MAE, R², AUC-ROC, 혼동행렬 등 평가 지표를 올바르게 사용할 수 있다</li>
+<li>교차검증으로 과적합을 탐지하고 방지할 수 있다</li>
+<li>결정 트리의 작동 원리를 이해하고 시각화할 수 있다</li>
+<li>Random Forest와 Gradient Boosting의 차이를 설명할 수 있다</li>
+<li>XGBoost/LightGBM으로 실전 주가 방향 예측 모델을 구축할 수 있다</li>
+</ul>
+<div style="font-size:13px;color:#555;margin-top:15px;font-style:italic"><strong>Keywords:</strong> Supervised Learning, Linear Regression, Ridge, Lasso, Logistic Regression, Decision Tree, Random Forest, Gradient Boosting, XGBoost, LightGBM, Cross-Validation, Overfitting</div>
+</div>
+
+<!-- Round 4 전체 학습 로드맵 다이어그램 (CSS) -->
+<div style="margin:30px 0;padding:25px;background:linear-gradient(135deg,#f0f4f8,#e8eef4);border-radius:10px;border:1px solid #ccc">
+<p class="ni" style="text-align:center;font-weight:bold;font-size:15px;margin-bottom:18px;color:#2c3e50">🧠 지도학습 전체 로드맵</p>
+<div style="display:flex;align-items:stretch;justify-content:center;gap:6px;flex-wrap:wrap;font-size:12px">
+<div style="background:#3498db;color:#fff;padding:15px 12px;border-radius:8px;text-align:center;min-width:110px;display:flex;flex-direction:column;justify-content:center">
+<div style="font-size:22px;margin-bottom:4px">📐</div>
+<div style="font-weight:bold">선형 모델</div>
+<div style="font-size:10px;opacity:0.9;margin-top:4px">선형회귀<br>Ridge/Lasso<br>로지스틱</div>
+<div style="font-size:10px;margin-top:4px;background:rgba(255,255,255,0.2);padding:2px 4px;border-radius:3px">Ch.3~5</div>
+</div>
+<div style="display:flex;align-items:center;color:#3498db;font-size:20px">▶</div>
+<div style="background:#e67e22;color:#fff;padding:15px 12px;border-radius:8px;text-align:center;min-width:110px;display:flex;flex-direction:column;justify-content:center">
+<div style="font-size:22px;margin-bottom:4px">📏</div>
+<div style="font-weight:bold">평가 & 검증</div>
+<div style="font-size:10px;opacity:0.9;margin-top:4px">MSE, AUC<br>교차검증<br>과적합 방지</div>
+<div style="font-size:10px;margin-top:4px;background:rgba(255,255,255,0.2);padding:2px 4px;border-radius:3px">Ch.6~7</div>
+</div>
+<div style="display:flex;align-items:center;color:#e67e22;font-size:20px">▶</div>
+<div style="background:#27ae60;color:#fff;padding:15px 12px;border-radius:8px;text-align:center;min-width:110px;display:flex;flex-direction:column;justify-content:center">
+<div style="font-size:22px;margin-bottom:4px">🌳</div>
+<div style="font-weight:bold">트리 모델</div>
+<div style="font-size:10px;opacity:0.9;margin-top:4px">결정 트리<br>Random Forest<br>Bagging</div>
+<div style="font-size:10px;margin-top:4px;background:rgba(255,255,255,0.2);padding:2px 4px;border-radius:3px">Ch.8~9</div>
+</div>
+<div style="display:flex;align-items:center;color:#27ae60;font-size:20px">▶</div>
+<div style="background:#9b59b6;color:#fff;padding:15px 12px;border-radius:8px;text-align:center;min-width:110px;display:flex;flex-direction:column;justify-content:center">
+<div style="font-size:22px;margin-bottom:4px">🚀</div>
+<div style="font-weight:bold">부스팅</div>
+<div style="font-size:10px;opacity:0.9;margin-top:4px">Gradient Boost<br>XGBoost<br>LightGBM</div>
+<div style="font-size:10px;margin-top:4px;background:rgba(255,255,255,0.2);padding:2px 4px;border-radius:3px">Ch.10~11</div>
+</div>
+<div style="display:flex;align-items:center;color:#9b59b6;font-size:20px">▶</div>
+<div style="background:#e74c3c;color:#fff;padding:15px 12px;border-radius:8px;text-align:center;min-width:110px;display:flex;flex-direction:column;justify-content:center">
+<div style="font-size:22px;margin-bottom:4px">💰</div>
+<div style="font-weight:bold">실전 프로젝트</div>
+<div style="font-size:10px;opacity:0.9;margin-top:4px">주가 방향 예측<br>피처 중요도<br>백테스트 연결</div>
+<div style="font-size:10px;margin-top:4px;background:rgba(255,255,255,0.2);padding:2px 4px;border-radius:3px">Ch.12</div>
+</div>
+</div>
+</div>
+
+<!-- ═══════════════════════════════════════════ -->
+<!-- Ch1: ML이란 무엇인가 -->
+<!-- ═══════════════════════════════════════════ -->
+<h2 id="ch1">1. 머신러닝이란 무엇인가 — "데이터에서 규칙을 스스로 찾는다"</h2>
+
+<h3>1.1 전통적 프로그래밍 vs 머신러닝</h3>
+<p>전통적 프로그래밍에서는 인간이 규칙을 직접 코딩한다. "RSI가 30 이하이면 매수, 70 이상이면 매도" — 이것은 인간이 만든 규칙이다. 하지만 금융 시장은 너무 복잡해서 인간이 모든 규칙을 만들 수 없다. 수백 개의 피처가 서로 비선형적으로 상호작용하고, 시장 환경이 계속 변한다.</p>
+
+<p>머신러닝(Machine Learning, ML)은 접근 방식이 다르다. 데이터를 주면 컴퓨터가 스스로 패턴(규칙)을 찾아낸다. 인간은 "어떤 데이터를 줄 것인가"와 "어떤 알고리즘을 사용할 것인가"만 결정하면 된다.</p>
+
+<!-- 전통 프로그래밍 vs ML 비교 다이어그램 -->
+<div style="margin:25px 0;padding:20px;background:#f8f9fa;border-radius:8px;border:1px solid #ddd">
+<p class="ni" style="text-align:center;font-weight:bold;font-size:14px;margin-bottom:15px;color:#2c3e50">🔄 전통적 프로그래밍 vs 머신러닝</p>
+<div style="display:flex;gap:20px;justify-content:center;flex-wrap:wrap;font-size:12px">
+<div style="flex:1;min-width:250px;background:#fff;padding:15px;border-radius:8px;border:2px solid #3498db">
+<div style="font-weight:bold;color:#3498db;font-size:13px;margin-bottom:10px;text-align:center">전통적 프로그래밍</div>
+<div style="display:flex;flex-direction:column;gap:6px;align-items:center">
+<div style="background:#e8f4f8;padding:6px 12px;border-radius:4px">📊 데이터 + 📝 규칙</div>
+<div style="color:#3498db">↓</div>
+<div style="background:#3498db;color:#fff;padding:8px 16px;border-radius:4px;font-weight:bold">컴퓨터</div>
+<div style="color:#3498db">↓</div>
+<div style="background:#e8f4f8;padding:6px 12px;border-radius:4px">📤 결과</div>
+</div>
+<div style="margin-top:8px;color:#555;text-align:center;font-size:11px">인간이 규칙을 만든다</div>
+</div>
+<div style="flex:1;min-width:250px;background:#fff;padding:15px;border-radius:8px;border:2px solid #e74c3c">
+<div style="font-weight:bold;color:#e74c3c;font-size:13px;margin-bottom:10px;text-align:center">머신러닝</div>
+<div style="display:flex;flex-direction:column;gap:6px;align-items:center">
+<div style="background:#fde8e8;padding:6px 12px;border-radius:4px">📊 데이터 + 📤 정답</div>
+<div style="color:#e74c3c">↓</div>
+<div style="background:#e74c3c;color:#fff;padding:8px 16px;border-radius:4px;font-weight:bold">컴퓨터 (학습)</div>
+<div style="color:#e74c3c">↓</div>
+<div style="background:#fde8e8;padding:6px 12px;border-radius:4px">📝 규칙 (모델)</div>
+</div>
+<div style="margin-top:8px;color:#555;text-align:center;font-size:11px">컴퓨터가 규칙을 찾는다</div>
+</div>
+</div>
+</div>
+
+<div class="def">
+<p class="ni"><strong>정의: 지도학습 (Supervised Learning)</strong></p>
+<p class="ni">입력(X)과 정답(y)이 쌍으로 주어진 데이터에서, X → y의 매핑 함수 f를 학습하는 것이다. "지도"라는 이름은 정답(label)이 "선생님"처럼 학습을 안내하기 때문이다.</p>
+<div class="eq">\[ \hat{y} = f(X) \quad \text{where } f \text{ is learned from } \{(X_1, y_1), (X_2, y_2), \ldots, (X_n, y_n)\} \]</div>
+<p class="ni">금융에서의 예: X = [RSI, MACD, 변동성, 거래량, ...] → y = 내일 수익률 (회귀) 또는 상승/하락 (분류)</p>
+</div>
+
+<h3>1.2 ML의 세 가지 유형</h3>
+
+<div class="tc">Table 1. 머신러닝의 세 가지 유형</div>
+<table>
+<tr><th>유형</th><th>정답 유무</th><th>목표</th><th>금융 예시</th><th>라운드</th></tr>
+<tr><td>지도학습 (Supervised)</td><td>✅ 있음</td><td>예측 (회귀/분류)</td><td>주가 방향 예측, 부도 확률</td><td>R4 (이번!)</td></tr>
+<tr><td>비지도학습 (Unsupervised)</td><td>❌ 없음</td><td>구조 발견 (클러스터링/차원축소)</td><td>종목 그룹핑, 팩터 추출</td><td>R5</td></tr>
+<tr><td>강화학습 (Reinforcement)</td><td>🎮 보상</td><td>최적 행동 학습</td><td>자동매매 에이전트</td><td>R9</td></tr>
+</table>
+
+<p>이번 라운드에서는 지도학습에 집중한다. 지도학습은 금융 ML에서 가장 많이 사용되는 유형이다. "과거 데이터로 학습하고, 미래를 예측한다" — 이것이 알고리즘 트레이딩의 핵심이기 때문이다.</p>
+
+<h3>1.3 금융 ML의 특수한 어려움</h3>
+<p>금융 데이터에 ML을 적용하는 것은 이미지 인식이나 자연어 처리보다 훨씬 어렵다. 왜 그런지 이해하는 것이 매우 중요하다.</p>
+
+<div class="warn">
+<p class="ni"><strong>금융 ML이 어려운 5가지 이유:</strong></p>
+<ol>
+<li><strong>신호 대 잡음 비율(SNR)이 극도로 낮다:</strong> 이미지 인식의 정확도는 99%를 넘지만, 주가 방향 예측은 55%만 넘어도 대단하다. 금융 데이터의 대부분은 노이즈(잡음)이고, 진짜 신호는 아주 작다.</li>
+<li><strong>비정상성 (Non-stationarity):</strong> 시장의 통계적 성질이 시간에 따라 변한다. 2020년에 잘 작동한 모델이 2024년에는 안 될 수 있다.</li>
+<li><strong>적응적 시장 (Adaptive Markets):</strong> 다른 참여자들도 ML을 사용한다. 패턴이 발견되면 사라진다 (알파 감쇠).</li>
+<li><strong>과적합의 유혹:</strong> 피처가 많고 데이터가 적으면, 모델이 과거 노이즈를 "학습"해버린다.</li>
+<li><strong>시간 의존성:</strong> 금융 데이터는 시간 순서가 중요하다. 일반적인 랜덤 셔플 교차검증을 쓰면 미래 정보가 누출된다.</li>
+</ol>
+</div>
+
+<div class="info">
+<p class="ni"><strong>교재 연동:</strong> MLAT Ch.6 "The Machine Learning Process"에서 ML 워크플로우의 전체 구조를, Ch.7 "Linear Models"에서 선형 모델의 이론과 금융 적용을 다룬다. MLDSF Ch.4 "Supervised Learning"에서는 지도학습 모델의 개관과 금융 케이스스터디를 제공한다.</p>
+</div>
+
+<!-- ═══════════════════════════════════════════ -->
+<!-- Ch2: 회귀 vs 분류 -->
+<!-- ═══════════════════════════════════════════ -->
+<h2 id="ch2">2. 회귀 vs 분류 — 지도학습의 두 갈래</h2>
+
+<h3>2.1 회귀 (Regression): 연속적인 숫자를 예측</h3>
+<p>회귀는 출력(y)이 연속적인 숫자일 때 사용한다. "내일 삼성전자 수익률은 몇 %일까?" — 이것이 회귀 문제다. 출력이 -5%, 0%, +3.2% 같은 연속적인 값이기 때문이다.</p>
+
+<h3>2.2 분류 (Classification): 카테고리를 예측</h3>
+<p>분류는 출력(y)이 이산적인 카테고리일 때 사용한다. "내일 삼성전자가 오를까 내릴까?" — 이것이 분류 문제다. 출력이 "상승" 또는 "하락" 두 가지 중 하나이기 때문이다.</p>
+
+<div class="tc">Table 2. 회귀 vs 분류 비교</div>
+<table>
+<tr><th>구분</th><th>회귀 (Regression)</th><th>분류 (Classification)</th></tr>
+<tr><td>출력 타입</td><td>연속 숫자 (예: 수익률 %)</td><td>카테고리 (예: 상승/하락)</td></tr>
+<tr><td>금융 예시</td><td>내일 수익률 예측, VaR 추정</td><td>상승/하락 예측, 부도 여부</td></tr>
+<tr><td>평가 지표</td><td>MSE, MAE, R²</td><td>Accuracy, AUC-ROC, F1</td></tr>
+<tr><td>대표 모델</td><td>선형회귀, Ridge, Lasso</td><td>로지스틱 회귀, SVM, 트리</td></tr>
+<tr><td>손실 함수</td><td>Mean Squared Error</td><td>Cross-Entropy (Log Loss)</td></tr>
+</table>
+
+<div class="warn">
+<p class="ni"><strong>금융 ML에서의 실전 선택:</strong> 실전에서는 분류가 더 많이 사용된다. 왜? 수익률의 정확한 크기를 맞추는 것(회귀)보다, 방향만 맞추는 것(분류)이 훨씬 쉽기 때문이다. "내일 +2.3% 오른다"를 맞추기는 거의 불가능하지만, "내일 오른다"를 55% 확률로 맞추는 것은 가능하다. 그리고 방향만 맞춰도 돈을 벌 수 있다.</p>
+</div>
+
+<h3>2.3 금융 문제를 ML로 변환하기</h3>
+<p>금융 문제를 ML 문제로 변환하는 것이 첫 번째 단계다. Round 3에서 만든 피처 테이블이 입력(X)이 되고, 우리가 예측하고 싶은 것이 출력(y)이 된다.</p>
+
+<pre><code><span class="cm"># 금융 문제 → ML 문제 변환 예제</span>
+<span class="kw">import</span> yfinance <span class="kw">as</span> yf
+<span class="kw">import</span> pandas <span class="kw">as</span> pd
+<span class="kw">import</span> numpy <span class="kw">as</span> np
+
+<span class="cm"># 1. 데이터 수집 (Round 3 복습)</span>
+data = yf.download(<span class="st">"005930.KS"</span>, start=<span class="st">"2020-01-01"</span>, end=<span class="st">"2025-12-31"</span>)
+close = data[<span class="st">"Close"</span>].squeeze()  <span class="cm"># yfinance 1.0+: Close가 이미 수정종가</span>
+
+<span class="cm"># 2. 피처 생성 (X) — Round 3에서 배운 것들</span>
+features = pd.DataFrame(index=close.index)
+features[<span class="st">"ret_1d"</span>] = close.pct_change(<span class="nu">1</span>)      <span class="cm"># 1일 수익률</span>
+features[<span class="st">"ret_5d"</span>] = close.pct_change(<span class="nu">5</span>)      <span class="cm"># 5일 수익률</span>
+features[<span class="st">"ret_20d"</span>] = close.pct_change(<span class="nu">20</span>)    <span class="cm"># 20일 수익률</span>
+features[<span class="st">"vol_20d"</span>] = close.pct_change().rolling(<span class="nu">20</span>).std()  <span class="cm"># 20일 변동성</span>
+features[<span class="st">"sma_ratio"</span>] = close / close.rolling(<span class="nu">20</span>).mean()  <span class="cm"># 가격/SMA20</span>
+
+<span class="cm"># RSI 계산</span>
+delta = close.diff()
+gain = delta.where(delta > <span class="nu">0</span>, <span class="nu">0</span>)
+loss = -delta.where(delta < <span class="nu">0</span>, <span class="nu">0</span>)
+avg_gain = gain.ewm(alpha=<span class="nu">1</span>/<span class="nu">14</span>, min_periods=<span class="nu">14</span>).mean()
+avg_loss = loss.ewm(alpha=<span class="nu">1</span>/<span class="nu">14</span>, min_periods=<span class="nu">14</span>).mean()
+features[<span class="st">"rsi"</span>] = <span class="nu">100</span> - (<span class="nu">100</span> / (<span class="nu">1</span> + avg_gain / avg_loss))
+
+<span class="cm"># 3. 타겟 생성 (y)</span>
+<span class="cm"># 회귀 타겟: 5일 후 수익률</span>
+features[<span class="st">"target_reg"</span>] = close.pct_change(<span class="nu">5</span>).shift(-<span class="nu">5</span>)  <span class="cm"># 미래 5일 수익률</span>
+
+<span class="cm"># 분류 타겟: 5일 후 상승(1) / 하락(0)</span>
+features[<span class="st">"target_cls"</span>] = (close.pct_change(<span class="nu">5</span>).shift(-<span class="nu">5</span>) > <span class="nu">0</span>).astype(<span class="nb">int</span>)
+
+<span class="cm"># 4. 결측치 제거</span>
+features = features.dropna()
+<span class="fn">print</span>(<span class="st">f"피처 테이블: </span>{features.shape}<span class="st">"</span>)
+<span class="fn">print</span>(features.head(<span class="nu">5</span>))
+<span class="fn">print</span>(<span class="st">f"\n분류 타겟 분포:\n</span>{features[<span class="st">'target_cls'</span>].value_counts()}<span class="st">"</span>)</code></pre>
+
+<div class="def">
+<p class="ni"><strong>핵심: shift(-5)의 의미</strong></p>
+<p class="ni"><code>shift(-5)</code>는 데이터를 5행 위로 당긴다. 즉, 오늘 행에 "5일 후의 수익률"이 들어간다. 이것이 ML에서 "미래를 예측한다"를 구현하는 방법이다. 학습 시에는 과거 데이터만 사용하고, 타겟은 미래 값이다. 단, 마지막 5행은 미래 데이터가 없으므로 NaN이 되어 제거된다.</p>
+</div>
+
+<!-- ═══════════════════════════════════════════ -->
+<!-- Ch3: 선형회귀 -->
+<!-- ═══════════════════════════════════════════ -->
+<h2 id="ch3">3. 선형회귀 — 모든 ML의 출발점</h2>
+
+<h3>3.1 선형회귀란?</h3>
+<p>선형회귀(Linear Regression)는 가장 단순하면서도 가장 중요한 ML 모델이다. 입력 변수들의 가중합(weighted sum)으로 출력을 예측한다. "단순하다"고 무시하면 안 된다 — 금융에서 Fama-French 팩터 모델, CAPM, 리스크 모델 등 핵심 이론이 모두 선형회귀에 기반한다. MLAT Ch.7에서도 선형회귀를 "From Risk Factors to Return Forecasts"의 기본 도구로 다룬다.</p>
+
+<div class="eq">\[ \hat{y} = \beta_0 + \beta_1 x_1 + \beta_2 x_2 + \cdots + \beta_p x_p = \beta_0 + \sum_{j=1}^{p} \beta_j x_j \]</div>
+
+<p>각 기호의 의미:</p>
+<ul>
+<li>\(\hat{y}\): 예측값 (predicted value)</li>
+<li>\(\beta_0\): 절편 (intercept) — 모든 피처가 0일 때의 기본 예측값</li>
+<li>\(\beta_j\): j번째 피처의 계수 (coefficient) — "이 피처가 1 증가하면 y가 \(\beta_j\)만큼 변한다"</li>
+<li>\(x_j\): j번째 피처의 값</li>
+<li>\(p\): 피처의 개수</li>
+</ul>
+
+<h3>3.2 OLS (Ordinary Least Squares) — 최소제곱법</h3>
+<p>선형회귀의 학습 목표는 예측값과 실제값의 차이(잔차, residual)를 최소화하는 계수 β를 찾는 것이다. 가장 기본적인 방법이 OLS(최소제곱법)다. 잔차의 제곱합(RSS)을 최소화한다.</p>
+
+<div class="eq">\[ \text{RSS} = \sum_{i=1}^{n} (y_i - \hat{y}_i)^2 = \sum_{i=1}^{n} \left(y_i - \beta_0 - \sum_{j=1}^{p} \beta_j x_{ij}\right)^2 \]</div>
+
+<p>행렬 표기로 쓰면 더 깔끔하다 (Round 2에서 배운 선형대수가 여기서 쓰인다!):</p>
+
+<div class="eq">\[ \hat{\boldsymbol{\beta}} = (\mathbf{X}^T \mathbf{X})^{-1} \mathbf{X}^T \mathbf{y} \]</div>
+
+<p>이 공식은 "닫힌 형태 해(closed-form solution)"라고 한다. 반복 계산 없이 한 번에 최적 계수를 구할 수 있다. MLAT Ch.7에서 설명하듯, 이 해는 잔차 벡터 \(\mathbf{y} - \hat{\mathbf{y}}\)가 피처 공간에 직교(orthogonal)하도록 만든다 — Round 2에서 배운 직교 개념이 여기서 연결된다.</p>
+
+<h3>3.3 파이썬으로 선형회귀 구현</h3>
+
+<pre><code><span class="cm"># === 선형회귀: statsmodels (통계적 추론) + sklearn (예측) ===</span>
+<span class="kw">import</span> numpy <span class="kw">as</span> np
+<span class="kw">import</span> pandas <span class="kw">as</span> pd
+<span class="kw">import</span> statsmodels.api <span class="kw">as</span> sm
+<span class="kw">from</span> sklearn.linear_model <span class="kw">import</span> LinearRegression
+<span class="kw">from</span> sklearn.model_selection <span class="kw">import</span> train_test_split
+<span class="kw">from</span> sklearn.metrics <span class="kw">import</span> mean_squared_error, r2_score
+
+<span class="cm"># 피처(X)와 타겟(y) 분리</span>
+feature_cols = [<span class="st">"ret_1d"</span>, <span class="st">"ret_5d"</span>, <span class="st">"ret_20d"</span>, <span class="st">"vol_20d"</span>, <span class="st">"sma_ratio"</span>, <span class="st">"rsi"</span>]
+X = features[feature_cols]
+y = features[<span class="st">"target_reg"</span>]  <span class="cm"># 회귀 타겟: 5일 후 수익률</span>
+
+<span class="cm"># 시간 기준 분리 (금융에서는 반드시 시간 순서로!)</span>
+split_date = <span class="st">"2024-01-01"</span>
+X_train = X[X.index < split_date]
+X_test = X[X.index >= split_date]
+y_train = y[y.index < split_date]
+y_test = y[y.index >= split_date]
+
+<span class="fn">print</span>(<span class="st">f"Train: </span>{<span class="fn">len</span>(X_train)}<span class="st">행, Test: </span>{<span class="fn">len</span>(X_test)}<span class="st">행"</span>)
+<span class="fn">print</span>(<span class="st">f"Train 기간: </span>{X_train.index[0].date()}<span class="st"> ~ </span>{X_train.index[-1].date()}<span class="st">"</span>)
+<span class="fn">print</span>(<span class="st">f"Test 기간:  </span>{X_test.index[0].date()}<span class="st"> ~ </span>{X_test.index[-1].date()}<span class="st">"</span>)</code></pre>
+
+<div class="warn">
+<p class="ni"><strong>금융 ML의 철칙: 시간 기준 분리!</strong> 일반적인 ML에서는 <code>train_test_split(shuffle=True)</code>로 랜덤하게 나눈다. 하지만 금융에서는 절대 셔플하면 안 된다. 2024년 데이터로 학습하고 2023년을 예측하면 미래 정보 누출이다. 반드시 "과거로 학습 → 미래를 예측" 순서를 지켜야 한다. MLAT Ch.7에서도 이 점을 강조한다.</p>
+</div>
+
+<pre><code><span class="cm"># === 방법 1: statsmodels — 통계적 추론에 강점 ===</span>
+<span class="cm"># 상수항(절편) 추가</span>
+X_train_sm = sm.add_constant(X_train)
+X_test_sm = sm.add_constant(X_test)
+
+<span class="cm"># OLS 학습</span>
+model_sm = sm.OLS(y_train, X_train_sm).fit()
+<span class="fn">print</span>(model_sm.summary())
+<span class="cm"># → R², 각 계수의 p-value, t-통계량, F-통계량 등 상세 통계 출력</span>
+<span class="cm"># → MLAT Ch.7 Figure 7.2와 동일한 형태의 OLS Regression Results</span></code></pre>
+
+<pre><code><span class="cm"># === 방법 2: sklearn — 예측에 강점 ===</span>
+model_sk = LinearRegression()
+model_sk.fit(X_train, y_train)
+
+<span class="cm"># 예측</span>
+y_pred_train = model_sk.predict(X_train)
+y_pred_test = model_sk.predict(X_test)
+
+<span class="cm"># 평가</span>
+<span class="fn">print</span>(<span class="st">"=== 선형회귀 성능 ==="</span>)
+<span class="fn">print</span>(<span class="st">f"Train MSE: </span>{mean_squared_error(y_train, y_pred_train):.6f}<span class="st">"</span>)
+<span class="fn">print</span>(<span class="st">f"Test MSE:  </span>{mean_squared_error(y_test, y_pred_test):.6f}<span class="st">"</span>)
+<span class="fn">print</span>(<span class="st">f"Train R²:  </span>{r2_score(y_train, y_pred_train):.4f}<span class="st">"</span>)
+<span class="fn">print</span>(<span class="st">f"Test R²:   </span>{r2_score(y_test, y_pred_test):.4f}<span class="st">"</span>)
+
+<span class="cm"># 계수 해석</span>
+<span class="fn">print</span>(<span class="st">"\n=== 계수 (Coefficients) ==="</span>)
+<span class="kw">for</span> name, coef <span class="kw">in</span> <span class="fn">zip</span>(feature_cols, model_sk.coef_):
+    <span class="fn">print</span>(<span class="st">f"  </span>{name:12s}<span class="st">: </span>{coef:+.4f}<span class="st">"</span>)
+<span class="fn">print</span>(<span class="st">f"  </span>{<span class="st">'intercept'</span>:12s}<span class="st">: </span>{model_sk.intercept_:+.4f}<span class="st">"</span>)</code></pre>
+
+<div class="info">
+<p class="ni"><strong>계수 해석 예시:</strong> <code>ret_5d</code>의 계수가 +0.15라면, "최근 5일 수익률이 1%p 높을 때, 향후 5일 수익률이 0.15%p 높을 것으로 예측한다"는 뜻이다. 이것은 모멘텀 효과를 포착한 것이다. 반대로 <code>rsi</code>의 계수가 음수라면, RSI가 높을수록(과매수) 향후 수익률이 낮을 것으로 예측한다는 뜻이다 — 평균회귀 효과다.</p>
+</div>
+
+<h3>3.4 선형회귀의 가정과 한계</h3>
+<p>OLS가 최적의 추정량(BLUE, Best Linear Unbiased Estimator)이 되려면 Gauss-Markov 가정이 충족되어야 한다. MLAT Ch.7에서 상세히 다루는 이 가정들을 금융 맥락에서 살펴보자:</p>
+
+<div class="tc">Table 3. Gauss-Markov 가정과 금융에서의 위반 사례</div>
+<table>
+<tr><th>가정</th><th>내용</th><th>금융에서 위반 사례</th><th>해결책</th></tr>
+<tr><td>선형성</td><td>X와 y의 관계가 선형</td><td>RSI 30 이하/70 이상에서 비선형 반응</td><td>다항 피처, 트리 모델</td></tr>
+<tr><td>독립성</td><td>잔차가 서로 독립</td><td>시계열 자기상관 (오늘 잔차 → 내일 잔차)</td><td>Newey-West 표준오차</td></tr>
+<tr><td>등분산성</td><td>잔차의 분산이 일정</td><td>변동성 클러스터링 (위기 시 잔차 급증)</td><td>Robust 표준오차, GARCH</td></tr>
+<tr><td>정규성</td><td>잔차가 정규분포</td><td>금융 수익률의 팻테일</td><td>대표본에서 근사적 성립</td></tr>
+<tr><td>다중공선성 없음</td><td>피처 간 높은 상관 없음</td><td>RSI와 모멘텀의 높은 상관</td><td>VIF 체크, PCA, 정규화</td></tr>
+</table>
+
+<p>금융 데이터는 이 가정들을 거의 항상 위반한다. 그래서 선형회귀만으로는 한계가 있고, 정규화(Ridge/Lasso)나 비선형 모델(트리, 앙상블)이 필요하다.</p>
+
+<!-- ═══════════════════════════════════════════ -->
+<!-- Ch4: Ridge / Lasso 정규화 -->
+<!-- ═══════════════════════════════════════════ -->
+<h2 id="ch4">4. Ridge / Lasso 정규화 — 과적합을 막는 벌칙</h2>
+
+<h3>4.1 왜 정규화가 필요한가</h3>
+<p>피처가 많아지면 선형회귀는 학습 데이터에 과적합(overfitting)되기 쉽다. 계수가 비정상적으로 커지면서 학습 데이터의 노이즈까지 "학습"해버린다. 정규화(Regularization)는 계수의 크기에 벌칙(penalty)을 부과하여 이를 방지한다. MLAT Ch.7 "Regularizing linear regression using shrinkage" 섹션에서 이 개념을 상세히 다룬다.</p>
+
+<p>직관적으로 이해하자: 계수가 크다 = 모델이 복잡하다 = 과적합 위험이 높다. 정규화는 "계수를 작게 유지하라"는 제약을 추가하여 모델을 단순하게 만든다.</p>
+
+<h3>4.2 Ridge 회귀 (L2 정규화)</h3>
+<p>Ridge 회귀는 OLS 손실함수에 계수의 제곱합(L2 norm)을 벌칙으로 추가한다.</p>
+
+<div class="eq">\[ \text{Loss}_{\text{Ridge}} = \sum_{i=1}^{n}(y_i - \hat{y}_i)^2 + \lambda \sum_{j=1}^{p} \beta_j^2 \]</div>
+
+<p>\(\lambda\)(람다)는 정규화 강도를 조절하는 하이퍼파라미터다. \(\lambda = 0\)이면 일반 OLS와 동일하고, \(\lambda\)가 커질수록 계수가 0에 가까워진다. Ridge는 모든 계수를 균등하게 축소(shrink)하지만, 정확히 0으로 만들지는 않는다.</p>
+
+<h3>4.3 Lasso 회귀 (L1 정규화)</h3>
+<p>Lasso는 계수의 절대값 합(L1 norm)을 벌칙으로 사용한다.</p>
+
+<div class="eq">\[ \text{Loss}_{\text{Lasso}} = \sum_{i=1}^{n}(y_i - \hat{y}_i)^2 + \lambda \sum_{j=1}^{p} |\beta_j| \]</div>
+
+<p>Lasso의 핵심 특성: 일부 계수를 정확히 0으로 만든다. 즉, 자동으로 피처 선택(feature selection)을 수행한다. 20개 피처 중 실제로 유용한 5개만 남기고 나머지 15개의 계수를 0으로 만들 수 있다. 이것이 Ridge와의 가장 큰 차이다.</p>
+
+<div class="def">
+<p class="ni"><strong>Ridge vs Lasso 핵심 차이</strong></p>
+<ul>
+<li><strong>Ridge (L2):</strong> 모든 계수를 작게 만든다. 피처를 제거하지 않는다. 다중공선성에 강하다.</li>
+<li><strong>Lasso (L1):</strong> 일부 계수를 0으로 만든다 (피처 선택). 해석이 쉽다. 피처가 많을 때 유리하다.</li>
+<li><strong>Elastic Net:</strong> Ridge + Lasso를 결합. 두 벌칙을 동시에 사용한다.</li>
+</ul>
+</div>
+
+<h3>4.4 파이썬으로 Ridge/Lasso 구현</h3>
+
+<pre><code><span class="cm"># === Ridge / Lasso / Elastic Net 비교 ===</span>
+<span class="kw">from</span> sklearn.linear_model <span class="kw">import</span> Ridge, Lasso, ElasticNet
+<span class="kw">from</span> sklearn.preprocessing <span class="kw">import</span> StandardScaler
+<span class="kw">from</span> sklearn.metrics <span class="kw">import</span> mean_squared_error
+
+<span class="cm"># 스케일링 (정규화 모델에서는 필수!)</span>
+scaler = StandardScaler()
+X_train_s = scaler.fit_transform(X_train)
+X_test_s = scaler.transform(X_test)
+
+<span class="cm"># 여러 모델 비교</span>
+models = {
+    <span class="st">"OLS"</span>: LinearRegression(),
+    <span class="st">"Ridge(α=0.1)"</span>: Ridge(alpha=<span class="nu">0.1</span>),
+    <span class="st">"Ridge(α=1.0)"</span>: Ridge(alpha=<span class="nu">1.0</span>),
+    <span class="st">"Ridge(α=10)"</span>: Ridge(alpha=<span class="nu">10</span>),
+    <span class="st">"Lasso(α=0.001)"</span>: Lasso(alpha=<span class="nu">0.001</span>),
+    <span class="st">"Lasso(α=0.01)"</span>: Lasso(alpha=<span class="nu">0.01</span>),
+    <span class="st">"ElasticNet"</span>: ElasticNet(alpha=<span class="nu">0.01</span>, l1_ratio=<span class="nu">0.5</span>),
+}
+
+<span class="fn">print</span>(<span class="st">"=== 모델별 성능 비교 ==="</span>)
+<span class="fn">print</span>(<span class="st">f"</span>{<span class="st">'모델'</span>:20s} {<span class="st">'Train MSE'</span>:>12s} {<span class="st">'Test MSE'</span>:>12s} {<span class="st">'비영 계수'</span>:>10s}<span class="st">"</span>)
+<span class="fn">print</span>(<span class="st">"-"</span> * <span class="nu">58</span>)
+
+<span class="kw">for</span> name, model <span class="kw">in</span> models.items():
+    model.fit(X_train_s, y_train)
+    train_mse = mean_squared_error(y_train, model.predict(X_train_s))
+    test_mse = mean_squared_error(y_test, model.predict(X_test_s))
+    n_nonzero = np.sum(np.abs(model.coef_) > <span class="nu">1e-6</span>)
+    <span class="fn">print</span>(<span class="st">f"</span>{name:20s} {train_mse:12.6f} {test_mse:12.6f} {n_nonzero:10d}<span class="st">"</span>)</code></pre>
+
+<pre><code><span class="cm"># 계수 비교 시각화</span>
+<span class="kw">import</span> matplotlib.pyplot <span class="kw">as</span> plt
+
+fig, ax = plt.subplots(figsize=(<span class="nu">12</span>, <span class="nu">5</span>))
+x_pos = np.arange(<span class="fn">len</span>(feature_cols))
+width = <span class="nu">0.15</span>
+
+<span class="kw">for</span> i, (name, model) <span class="kw">in</span> <span class="fn">enumerate</span>([
+    (<span class="st">"OLS"</span>, models[<span class="st">"OLS"</span>]),
+    (<span class="st">"Ridge(1.0)"</span>, models[<span class="st">"Ridge(α=1.0)"</span>]),
+    (<span class="st">"Lasso(0.01)"</span>, models[<span class="st">"Lasso(α=0.01)"</span>]),
+]):
+    ax.bar(x_pos + i * width, model.coef_, width, label=name, alpha=<span class="nu">0.8</span>)
+
+ax.set_xticks(x_pos + width)
+ax.set_xticklabels(feature_cols, rotation=<span class="nu">45</span>)
+ax.set_ylabel(<span class="st">"계수 크기"</span>)
+ax.set_title(<span class="st">"OLS vs Ridge vs Lasso 계수 비교"</span>)
+ax.legend()
+ax.grid(<span class="kw">True</span>, alpha=<span class="nu">0.3</span>)
+ax.axhline(y=<span class="nu">0</span>, color=<span class="st">"black"</span>, linewidth=<span class="nu">0.5</span>)
+plt.tight_layout()
+plt.show()</code></pre>
+
+<div class="info">
+<p class="ni"><strong>교재 연동:</strong> MLAT Ch.7 "How ridge regression works"와 "How lasso regression works" 섹션에서 Ridge/Lasso의 기하학적 해석(제약 영역의 모양)과 해 경로(solution path)를 시각적으로 설명한다. Ridge의 제약 영역은 원(circle)이고, Lasso는 다이아몬드(diamond)다. 다이아몬드의 꼭짓점에서 해가 만나면 일부 계수가 정확히 0이 된다 — 이것이 Lasso의 피처 선택 원리다.</p>
+</div>
+
+<!-- ═══════════════════════════════════════════ -->
+<!-- Ch5: 로지스틱 회귀 -->
+<!-- ═══════════════════════════════════════════ -->
+<h2 id="ch5">5. 로지스틱 회귀 — 확률로 분류하기</h2>
+
+<h3>5.1 왜 선형회귀로 분류하면 안 되는가</h3>
+<p>상승(1)/하락(0)을 예측하고 싶다면, 선형회귀를 그대로 쓰면 안 될까? 안 된다. 선형회귀의 출력은 -∞ ~ +∞ 범위인데, 확률은 0 ~ 1 범위여야 한다. 선형회귀로 분류하면 "상승 확률 150%" 같은 말도 안 되는 결과가 나올 수 있다.</p>
+
+<h3>5.2 시그모이드 함수 — 실수를 확률로 변환</h3>
+<p>로지스틱 회귀는 선형회귀의 출력을 시그모이드(sigmoid) 함수에 통과시켜 0~1 사이의 확률로 변환한다.</p>
+
+<div class="eq">\[ P(y=1|X) = \sigma(z) = \frac{1}{1 + e^{-z}}, \quad z = \beta_0 + \sum_{j=1}^{p} \beta_j x_j \]</div>
+
+<p>시그모이드 함수의 성질: z가 매우 크면 σ(z) → 1 (확실히 상승), z가 매우 작으면 σ(z) → 0 (확실히 하락), z = 0이면 σ(z) = 0.5 (반반).</p>
+
+<pre><code><span class="cm"># 시그모이드 함수 시각화</span>
+<span class="kw">import</span> numpy <span class="kw">as</span> np
+<span class="kw">import</span> matplotlib.pyplot <span class="kw">as</span> plt
+
+z = np.linspace(-<span class="nu">6</span>, <span class="nu">6</span>, <span class="nu">200</span>)
+sigmoid = <span class="nu">1</span> / (<span class="nu">1</span> + np.exp(-z))
+
+fig, ax = plt.subplots(figsize=(<span class="nu">10</span>, <span class="nu">5</span>))
+ax.plot(z, sigmoid, color=<span class="st">"navy"</span>, linewidth=<span class="nu">2</span>)
+ax.axhline(y=<span class="nu">0.5</span>, color=<span class="st">"red"</span>, linestyle=<span class="st">"--"</span>, alpha=<span class="nu">0.5</span>, label=<span class="st">"임계값 0.5"</span>)
+ax.axvline(x=<span class="nu">0</span>, color=<span class="st">"gray"</span>, linestyle=<span class="st">":"</span>, alpha=<span class="nu">0.5</span>)
+ax.fill_between(z, sigmoid, <span class="nu">0.5</span>, where=(sigmoid > <span class="nu">0.5</span>), alpha=<span class="nu">0.1</span>, color=<span class="st">"green"</span>, label=<span class="st">"상승 예측"</span>)
+ax.fill_between(z, sigmoid, <span class="nu">0.5</span>, where=(sigmoid < <span class="nu">0.5</span>), alpha=<span class="nu">0.1</span>, color=<span class="st">"red"</span>, label=<span class="st">"하락 예측"</span>)
+ax.set_xlabel(<span class="st">"z (선형 결합)"</span>)
+ax.set_ylabel(<span class="st">"σ(z) = P(상승)"</span>)
+ax.set_title(<span class="st">"시그모이드 함수: 실수 → 확률"</span>)
+ax.legend()
+ax.grid(<span class="kw">True</span>, alpha=<span class="nu">0.3</span>)
+plt.tight_layout()
+plt.show()</code></pre>
+
+<h3>5.3 로지스틱 회귀로 주가 방향 예측</h3>
+
+<pre><code><span class="cm"># === 로지스틱 회귀: 주가 상승/하락 분류 ===</span>
+<span class="kw">from</span> sklearn.linear_model <span class="kw">import</span> LogisticRegression
+<span class="kw">from</span> sklearn.metrics <span class="kw">import</span> accuracy_score, classification_report
+
+<span class="cm"># 분류 타겟 사용</span>
+y_cls = features[<span class="st">"target_cls"</span>]
+y_train_cls = y_cls[y_cls.index < split_date]
+y_test_cls = y_cls[y_cls.index >= split_date]
+
+<span class="cm"># 로지스틱 회귀 학습</span>
+log_reg = LogisticRegression(C=<span class="nu">1.0</span>, max_iter=<span class="nu">1000</span>)
+log_reg.fit(X_train_s, y_train_cls)
+
+<span class="cm"># 예측: 클래스와 확률</span>
+y_pred_cls = log_reg.predict(X_test_s)
+y_pred_prob = log_reg.predict_proba(X_test_s)[:, <span class="nu">1</span>]  <span class="cm"># 상승 확률</span>
+
+<span class="fn">print</span>(<span class="st">"=== 로지스틱 회귀 성능 ==="</span>)
+<span class="fn">print</span>(<span class="st">f"정확도 (Accuracy): </span>{accuracy_score(y_test_cls, y_pred_cls):.4f}<span class="st">"</span>)
+<span class="fn">print</span>(<span class="st">f"\n분류 리포트:"</span>)
+<span class="fn">print</span>(classification_report(y_test_cls, y_pred_cls, target_names=[<span class="st">"하락"</span>, <span class="st">"상승"</span>]))
+
+<span class="cm"># 계수 해석</span>
+<span class="fn">print</span>(<span class="st">"=== 계수 (상승 확률에 대한 영향) ==="</span>)
+<span class="kw">for</span> name, coef <span class="kw">in</span> <span class="fn">zip</span>(feature_cols, log_reg.coef_[<span class="nu">0</span>]):
+    direction = <span class="st">"↑상승"</span> <span class="kw">if</span> coef > <span class="nu">0</span> <span class="kw">else</span> <span class="st">"↓하락"</span>
+    <span class="fn">print</span>(<span class="st">f"  </span>{name:12s}<span class="st">: </span>{coef:+.4f}<span class="st"> → 이 피처↑ 시 </span>{direction}<span class="st"> 확률↑"</span>)</code></pre>
+
+<div class="def">
+<p class="ni"><strong>C 파라미터의 의미:</strong> 로지스틱 회귀의 <code>C</code>는 정규화 강도의 역수다. C가 크면 정규화가 약하고(복잡한 모델), C가 작으면 정규화가 강하다(단순한 모델). Ridge/Lasso의 α와 반대 방향이라는 점에 주의하자. <code>C=1.0</code>이 기본값이다.</p>
+</div>
+
+<!-- ═══════════════════════════════════════════ -->
+<!-- Ch6: 모델 평가 지표 -->
+<!-- ═══════════════════════════════════════════ -->
+<h2 id="ch6">6. 모델 평가 지표 — "이 모델이 얼마나 좋은가?"</h2>
+
+<h3>6.1 회귀 평가 지표</h3>
+
+<div class="tc">Table 4. 회귀 모델 평가 지표</div>
+<table>
+<tr><th>지표</th><th>수식</th><th>범위</th><th>해석</th></tr>
+<tr><td>MSE</td><td>\(\frac{1}{n}\sum(y_i - \hat{y}_i)^2\)</td><td>[0, ∞)</td><td>작을수록 좋음. 큰 오차에 민감</td></tr>
+<tr><td>RMSE</td><td>\(\sqrt{\text{MSE}}\)</td><td>[0, ∞)</td><td>y와 같은 단위. 해석이 직관적</td></tr>
+<tr><td>MAE</td><td>\(\frac{1}{n}\sum|y_i - \hat{y}_i|\)</td><td>[0, ∞)</td><td>이상치에 덜 민감</td></tr>
+<tr><td>R²</td><td>\(1 - \frac{\text{RSS}}{\text{TSS}}\)</td><td>(-∞, 1]</td><td>1에 가까울수록 좋음. 0이면 평균 예측과 동일</td></tr>
+</table>
+
+<div class="warn">
+<p class="ni"><strong>금융에서 R²의 함정:</strong> 금융 수익률 예측에서 R²는 보통 0.01~0.05 수준이다. "겨우 1~5%밖에 설명 못 하는데 쓸모가 있나?"라고 생각할 수 있지만, 금융에서는 이 정도면 충분히 수익을 낼 수 있다. 매일 55%의 확률로 방향을 맞추면 연간 상당한 수익이 된다. R²가 낮다고 모델을 버리지 말자.</p>
+</div>
+
+<h3>6.2 분류 평가 지표</h3>
+
+<h4>혼동행렬 (Confusion Matrix)</h4>
+<p>분류 모델의 성능을 가장 상세하게 보여주는 도구다. 4가지 경우를 구분한다:</p>
+
+<!-- 혼동행렬 CSS 다이어그램 -->
+<div style="margin:25px 0;padding:20px;background:#f8f9fa;border-radius:8px;border:1px solid #ddd">
+<p class="ni" style="text-align:center;font-weight:bold;font-size:14px;margin-bottom:15px;color:#2c3e50">📊 혼동행렬 (Confusion Matrix)</p>
+<div style="display:grid;grid-template-columns:80px 1fr 1fr;grid-template-rows:40px 1fr 1fr;gap:4px;max-width:400px;margin:0 auto;font-size:12px">
+<div></div>
+<div style="background:#2c3e50;color:#fff;padding:8px;text-align:center;border-radius:4px 4px 0 0;font-weight:bold">예측: 상승</div>
+<div style="background:#2c3e50;color:#fff;padding:8px;text-align:center;border-radius:4px 4px 0 0;font-weight:bold">예측: 하락</div>
+<div style="background:#34495e;color:#fff;padding:8px;text-align:center;border-radius:4px 0 0 4px;font-weight:bold;writing-mode:horizontal-tb">실제: 상승</div>
+<div style="background:#d4edda;padding:12px;text-align:center;border-radius:0"><strong style="color:#155724">TP</strong><br>진양성<br><span style="font-size:10px;color:#555">"상승 맞춤 ✓"</span></div>
+<div style="background:#f8d7da;padding:12px;text-align:center;border-radius:0"><strong style="color:#721c24">FN</strong><br>위음성<br><span style="font-size:10px;color:#555">"상승인데 하락 예측"</span></div>
+<div style="background:#34495e;color:#fff;padding:8px;text-align:center;border-radius:4px 0 0 4px;font-weight:bold">실제: 하락</div>
+<div style="background:#f8d7da;padding:12px;text-align:center;border-radius:0"><strong style="color:#721c24">FP</strong><br>위양성<br><span style="font-size:10px;color:#555">"하락인데 상승 예측"</span></div>
+<div style="background:#d4edda;padding:12px;text-align:center;border-radius:0"><strong style="color:#155724">TN</strong><br>진음성<br><span style="font-size:10px;color:#555">"하락 맞춤 ✓"</span></div>
+</div>
+</div>
+
+<pre><code><span class="cm"># === 혼동행렬과 분류 지표 ===</span>
+<span class="kw">from</span> sklearn.metrics <span class="kw">import</span> (confusion_matrix, accuracy_score,
+    precision_score, recall_score, f1_score, roc_auc_score, roc_curve)
+
+<span class="cm"># 혼동행렬</span>
+cm = confusion_matrix(y_test_cls, y_pred_cls)
+<span class="fn">print</span>(<span class="st">"=== 혼동행렬 ==="</span>)
+<span class="fn">print</span>(<span class="st">f"TN=</span>{cm[0,0]}<span class="st">, FP=</span>{cm[0,1]}<span class="st">"</span>)
+<span class="fn">print</span>(<span class="st">f"FN=</span>{cm[1,0]}<span class="st">, TP=</span>{cm[1,1]}<span class="st">"</span>)
+
+<span class="cm"># 주요 지표</span>
+<span class="fn">print</span>(<span class="st">f"\nAccuracy:  </span>{accuracy_score(y_test_cls, y_pred_cls):.4f}<span class="st">"</span>)
+<span class="fn">print</span>(<span class="st">f"Precision: </span>{precision_score(y_test_cls, y_pred_cls):.4f}<span class="st">"</span>)
+<span class="fn">print</span>(<span class="st">f"Recall:    </span>{recall_score(y_test_cls, y_pred_cls):.4f}<span class="st">"</span>)
+<span class="fn">print</span>(<span class="st">f"F1 Score:  </span>{f1_score(y_test_cls, y_pred_cls):.4f}<span class="st">"</span>)
+<span class="fn">print</span>(<span class="st">f"AUC-ROC:   </span>{roc_auc_score(y_test_cls, y_pred_prob):.4f}<span class="st">"</span>)</code></pre>
+
+<h4>AUC-ROC 곡선</h4>
+<p>AUC-ROC는 분류 모델의 가장 중요한 평가 지표 중 하나다. 임계값(threshold)을 변화시키면서 True Positive Rate(재현율)과 False Positive Rate의 관계를 그린 곡선이다. AUC(Area Under Curve)가 1이면 완벽한 분류, 0.5면 랜덤 추측과 동일하다.</p>
+
+<pre><code><span class="cm"># AUC-ROC 곡선 시각화</span>
+fpr, tpr, thresholds = roc_curve(y_test_cls, y_pred_prob)
+auc = roc_auc_score(y_test_cls, y_pred_prob)
+
+fig, ax = plt.subplots(figsize=(<span class="nu">8</span>, <span class="nu">6</span>))
+ax.plot(fpr, tpr, color=<span class="st">"navy"</span>, linewidth=<span class="nu">2</span>, label=<span class="st">f"로지스틱 회귀 (AUC = </span>{auc:.3f}<span class="st">)"</span>)
+ax.plot([<span class="nu">0</span>, <span class="nu">1</span>], [<span class="nu">0</span>, <span class="nu">1</span>], color=<span class="st">"red"</span>, linestyle=<span class="st">"--"</span>, label=<span class="st">"랜덤 (AUC = 0.500)"</span>)
+ax.set_xlabel(<span class="st">"False Positive Rate"</span>)
+ax.set_ylabel(<span class="st">"True Positive Rate"</span>)
+ax.set_title(<span class="st">"ROC Curve — 주가 방향 예측"</span>)
+ax.legend(loc=<span class="st">"lower right"</span>)
+ax.grid(<span class="kw">True</span>, alpha=<span class="nu">0.3</span>)
+plt.tight_layout()
+plt.show()</code></pre>
+
+<!-- ═══════════════════════════════════════════ -->
+<!-- Ch7: 교차검증과 과적합 -->
+<!-- ═══════════════════════════════════════════ -->
+<h2 id="ch7">7. 교차검증과 과적합 — ML의 가장 큰 적</h2>
+
+<h3>7.1 과적합 (Overfitting) vs 과소적합 (Underfitting)</h3>
+<p>과적합은 모델이 학습 데이터의 노이즈까지 "외워버리는" 현상이다. 학습 데이터에서는 성능이 좋지만, 새로운 데이터(테스트)에서는 성능이 급락한다. MLAT Ch.6에서 이것을 bias-variance trade-off로 설명한다.</p>
+
+<!-- 과적합 다이어그램 -->
+<div style="margin:25px 0;padding:20px;background:#f8f9fa;border-radius:8px;border:1px solid #ddd">
+<p class="ni" style="text-align:center;font-weight:bold;font-size:14px;margin-bottom:15px;color:#2c3e50">⚖️ Bias-Variance Trade-off</p>
+<div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap;font-size:12px">
+<div style="flex:1;min-width:180px;background:#fde8e8;padding:15px;border-radius:8px;border:2px solid #e74c3c;text-align:center">
+<div style="font-weight:bold;color:#e74c3c;font-size:13px;margin-bottom:6px">과소적합 (Underfitting)</div>
+<div style="font-size:11px;color:#555">High Bias, Low Variance</div>
+<div style="margin:8px 0;font-size:24px">📉</div>
+<div style="font-size:11px;color:#555">모델이 너무 단순<br>Train ❌ Test ❌</div>
+<div style="margin-top:6px;background:#fff;padding:4px;border-radius:3px;font-size:10px">예: 피처 1개로 선형회귀</div>
+</div>
+<div style="flex:1;min-width:180px;background:#d4edda;padding:15px;border-radius:8px;border:2px solid #28a745;text-align:center">
+<div style="font-weight:bold;color:#28a745;font-size:13px;margin-bottom:6px">적절한 적합 ✓</div>
+<div style="font-size:11px;color:#555">Balanced Bias-Variance</div>
+<div style="margin:8px 0;font-size:24px">✅</div>
+<div style="font-size:11px;color:#555">일반화 성능 최적<br>Train ✓ Test ✓</div>
+<div style="margin-top:6px;background:#fff;padding:4px;border-radius:3px;font-size:10px">예: 정규화된 모델, 적절한 트리 깊이</div>
+</div>
+<div style="flex:1;min-width:180px;background:#fde8e8;padding:15px;border-radius:8px;border:2px solid #e74c3c;text-align:center">
+<div style="font-weight:bold;color:#e74c3c;font-size:13px;margin-bottom:6px">과적합 (Overfitting)</div>
+<div style="font-size:11px;color:#555">Low Bias, High Variance</div>
+<div style="margin:8px 0;font-size:24px">📈</div>
+<div style="font-size:11px;color:#555">모델이 너무 복잡<br>Train ✓ Test ❌</div>
+<div style="margin-top:6px;background:#fff;padding:4px;border-radius:3px;font-size:10px">예: 깊이 무제한 결정 트리</div>
+</div>
+</div>
+</div>
+
+<h3>7.2 금융 시계열 교차검증 — TimeSeriesSplit</h3>
+<p>일반적인 K-Fold 교차검증은 데이터를 랜덤하게 섞어서 나눈다. 하지만 금융 시계열에서는 이것이 미래 정보 누출을 일으킨다. 금융에서는 반드시 시간 순서를 유지하는 교차검증을 사용해야 한다.</p>
+
+<pre><code><span class="cm"># === 금융 시계열 교차검증 ===</span>
+<span class="kw">from</span> sklearn.model_selection <span class="kw">import</span> TimeSeriesSplit, cross_val_score
+
+<span class="cm"># TimeSeriesSplit: 시간 순서를 유지하는 교차검증</span>
+tscv = TimeSeriesSplit(n_splits=<span class="nu">5</span>)
+
+<span class="cm"># 각 fold의 구조 확인</span>
+<span class="fn">print</span>(<span class="st">"=== TimeSeriesSplit 구조 ==="</span>)
+<span class="kw">for</span> i, (train_idx, test_idx) <span class="kw">in</span> <span class="fn">enumerate</span>(tscv.split(X_train)):
+    <span class="fn">print</span>(<span class="st">f"Fold </span>{i+1}<span class="st">: Train[</span>{train_idx[0]}<span class="st">:</span>{train_idx[-1]}<span class="st">] → Test[</span>{test_idx[0]}<span class="st">:</span>{test_idx[-1]}<span class="st">]"</span>)
+    <span class="fn">print</span>(<span class="st">f"        Train </span>{<span class="fn">len</span>(train_idx)}<span class="st">행, Test </span>{<span class="fn">len</span>(test_idx)}<span class="st">행"</span>)
+
+<span class="cm"># 교차검증 점수</span>
+scores = cross_val_score(
+    LogisticRegression(C=<span class="nu">1.0</span>, max_iter=<span class="nu">1000</span>),
+    scaler.fit_transform(X_train),
+    y_train_cls,
+    cv=tscv,
+    scoring=<span class="st">"roc_auc"</span>
+)
+<span class="fn">print</span>(<span class="st">f"\n=== 교차검증 AUC-ROC ==="</span>)
+<span class="fn">print</span>(<span class="st">f"각 Fold: </span>{scores.round(4)}<span class="st">"</span>)
+<span class="fn">print</span>(<span class="st">f"평균: </span>{scores.mean():.4f}<span class="st"> ± </span>{scores.std():.4f}<span class="st">"</span>)</code></pre>
+
+<div class="info">
+<p class="ni"><strong>교재 연동:</strong> MLAT Ch.6 "How to select a model using cross-validation"에서 교차검증의 다양한 변형을 다룬다. 특히 금융에서는 Purged K-Fold CV(학습/테스트 사이에 갭을 두어 정보 누출 방지)가 더 엄격한 방법이다. MLAT Ch.7에서는 GridSearchCV를 사용한 하이퍼파라미터 튜닝 예제를 제공한다.</p>
+</div>
+
+<!-- ═══════════════════════════════════════════ -->
+<!-- Ch8: 결정 트리 -->
+<!-- ═══════════════════════════════════════════ -->
+<h2 id="ch8">8. 결정 트리 — 비선형 관계를 포착하다</h2>
+
+<h3>8.1 결정 트리란?</h3>
+<p>결정 트리(Decision Tree)는 데이터를 반복적으로 분할하여 예측하는 모델이다. "RSI가 30 이하인가?" → "예" → "5일 모멘텀이 양수인가?" → "예" → "상승 예측" 같은 if-else 규칙의 트리 구조를 자동으로 학습한다. MLAT Ch.11에서 "Decision trees learn rules from data that encode nonlinear relationships"라고 설명하듯, 선형 모델이 포착하지 못하는 비선형 패턴을 잡아낼 수 있다.</p>
+
+<!-- 결정 트리 구조 CSS 다이어그램 -->
+<div style="margin:25px 0;padding:20px;background:linear-gradient(135deg,#f8f9fa,#e8f0e8);border-radius:10px;border:1px solid #ccc">
+<p class="ni" style="text-align:center;font-weight:bold;font-size:14px;margin-bottom:15px;color:#2c3e50">🌳 결정 트리 구조 예시</p>
+<div style="display:flex;flex-direction:column;align-items:center;gap:8px;font-size:12px">
+<div style="background:#3498db;color:#fff;padding:10px 20px;border-radius:8px;font-weight:bold">RSI ≤ 30?</div>
+<div style="display:flex;gap:60px">
+<div style="text-align:center;color:#27ae60;font-weight:bold">Yes ↙</div>
+<div style="text-align:center;color:#e74c3c;font-weight:bold">↘ No</div>
+</div>
+<div style="display:flex;gap:20px">
+<div style="background:#e67e22;color:#fff;padding:8px 16px;border-radius:8px">모멘텀 > 0?</div>
+<div style="background:#e67e22;color:#fff;padding:8px 16px;border-radius:8px">변동성 > 0.3?</div>
+</div>
+<div style="display:flex;gap:10px;flex-wrap:wrap;justify-content:center">
+<div style="background:#27ae60;color:#fff;padding:6px 12px;border-radius:4px;font-size:11px">📈 상승 (68%)</div>
+<div style="background:#e74c3c;color:#fff;padding:6px 12px;border-radius:4px;font-size:11px">📉 하락 (55%)</div>
+<div style="background:#e74c3c;color:#fff;padding:6px 12px;border-radius:4px;font-size:11px">📉 하락 (62%)</div>
+<div style="background:#27ae60;color:#fff;padding:6px 12px;border-radius:4px;font-size:11px">📈 상승 (51%)</div>
+</div>
+</div>
+</div>
+
+<h3>8.2 분할 기준: Gini vs Entropy</h3>
+<p>결정 트리는 데이터를 분할할 때 "어떤 피처의 어떤 값으로 나누면 가장 순수한(homogeneous) 그룹이 만들어지는가"를 기준으로 한다. 여기서 "순수하다"는 것은 한 그룹 안에 같은 클래스(예: 상승만, 또는 하락만)가 모여 있다는 뜻이다. 이 순수도를 측정하는 방법이 두 가지 있다: Gini 불순도와 Entropy.</p>
+
+<h4>불순도(Impurity)란? — 직관적 비유</h4>
+<p>교실에 학생 100명이 있다고 하자. 전원이 남학생이면 "순수한" 그룹이다 — 누가 남학생인지 맞추기 쉽다. 반면 남녀가 50:50이면 "불순한" 그룹이다 — 랜덤으로 찍어도 50%밖에 못 맞춘다. 불순도는 이 "뒤섞인 정도"를 숫자로 표현한 것이다. 결정 트리는 분할 후 불순도가 최대한 줄어드는 방향으로 데이터를 나눈다.</p>
+
+<h4>Gini 불순도 (Gini Impurity)</h4>
+<div class="eq">\[ \text{Gini}(S) = 1 - \sum_{k=1}^{K} p_k^2 \]</div>
+<p class="ni">여기서 \(p_k\)는 그룹 \(S\) 안에서 클래스 \(k\)의 비율이다. 직관적 의미: "이 그룹에서 랜덤으로 샘플 하나를 뽑고, 다시 랜덤으로 클래스를 배정했을 때, 틀릴 확률"이다.</p>
+
+<div class="def">
+<p class="ni"><strong>Gini 계산 예시 (이진 분류: 상승/하락)</strong></p>
+<ul>
+<li><strong>완전 순수:</strong> 상승 100%, 하락 0% → Gini = \(1 - (1.0^2 + 0.0^2) = 0\) → 불순도 0 (최소)</li>
+<li><strong>완전 불순:</strong> 상승 50%, 하락 50% → Gini = \(1 - (0.5^2 + 0.5^2) = 1 - 0.5 = 0.5\) → 불순도 최대</li>
+<li><strong>약간 치우침:</strong> 상승 70%, 하락 30% → Gini = \(1 - (0.7^2 + 0.3^2) = 1 - 0.58 = 0.42\)</li>
+<li><strong>많이 치우침:</strong> 상승 90%, 하락 10% → Gini = \(1 - (0.9^2 + 0.1^2) = 1 - 0.82 = 0.18\)</li>
+</ul>
+<p class="ni">Gini 값이 0에 가까울수록 순수하고, 0.5에 가까울수록 뒤섞여 있다.</p>
+</div>
+
+<h4>Entropy (엔트로피)</h4>
+<div class="eq">\[ \text{Entropy}(S) = -\sum_{k=1}^{K} p_k \log_2 p_k \]</div>
+<p class="ni">Entropy는 정보이론(Information Theory)에서 온 개념이다. "이 그룹의 클래스를 알아내려면 평균적으로 몇 비트(bit)의 정보가 필요한가?"를 측정한다. 모든 샘플이 같은 클래스면 정보가 필요 없으므로 Entropy = 0이다. 반반이면 1비트가 필요하므로 Entropy = 1이다.</p>
+
+<div class="def">
+<p class="ni"><strong>Entropy 계산 예시 (이진 분류: 상승/하락)</strong></p>
+<ul>
+<li><strong>완전 순수:</strong> 상승 100% → Entropy = \(-1.0 \cdot \log_2(1.0) = 0\) → 불확실성 0</li>
+<li><strong>완전 불순:</strong> 상승 50%, 하락 50% → Entropy = \(-0.5 \cdot \log_2(0.5) - 0.5 \cdot \log_2(0.5) = 1.0\) → 불확실성 최대</li>
+<li><strong>약간 치우침:</strong> 상승 70%, 하락 30% → Entropy = \(-0.7 \cdot \log_2(0.7) - 0.3 \cdot \log_2(0.3) \approx 0.88\)</li>
+<li><strong>많이 치우침:</strong> 상승 90%, 하락 10% → Entropy ≈ 0.47</li>
+</ul>
+<p class="ni">Entropy 값이 0에 가까울수록 순수하고, 1에 가까울수록 뒤섞여 있다 (이진 분류 기준).</p>
+</div>
+
+<h4>Information Gain — 분할의 "이득"</h4>
+<p>트리가 실제로 분할을 결정할 때는 불순도 자체가 아니라, 분할 전후의 불순도 감소량을 본다. 이것을 Information Gain이라 한다:</p>
+
+<div class="eq">\[ \text{IG}(S, A) = \text{Impurity}(S) - \sum_{v \in \text{values}(A)} \frac{|S_v|}{|S|} \cdot \text{Impurity}(S_v) \]</div>
+
+<p class="ni">즉, "분할 전 불순도 − 분할 후 가중 평균 불순도 = 정보 이득". 트리는 모든 피처의 모든 분할점에 대해 IG를 계산하고, IG가 가장 큰 분할을 선택한다.</p>
+
+<div class="info">
+<p class="ni"><strong>구체적 예시: RSI ≤ 30으로 분할</strong></p>
+<p class="ni">전체 노드: 상승 50%, 하락 50% → Gini = 0.50</p>
+<p class="ni">분할 후:</p>
+<ul>
+<li>왼쪽 (RSI ≤ 30, 20%): 상승 75%, 하락 25% → Gini = \(1 - 0.75^2 - 0.25^2 = 0.375\)</li>
+<li>오른쪽 (RSI > 30, 80%): 상승 44%, 하락 56% → Gini = \(1 - 0.44^2 - 0.56^2 = 0.493\)</li>
+</ul>
+<p class="ni">가중 평균 Gini = \(0.2 \times 0.375 + 0.8 \times 0.493 = 0.469\)</p>
+<p class="ni">Information Gain = \(0.500 - 0.469 = 0.031\)</p>
+<p class="ni">트리는 이 값을 다른 모든 분할 후보(예: 모멘텀 > 0, 변동성 > 0.3 등)의 IG와 비교하여 가장 큰 것을 선택한다.</p>
+</div>
+
+<h4>Gini vs Entropy — 어떤 것을 쓸까?</h4>
+
+<table>
+<caption class="tc">Gini vs Entropy 비교</caption>
+<thead><tr><th>항목</th><th>Gini 불순도</th><th>Entropy</th></tr></thead>
+<tbody>
+<tr><td>범위 (이진)</td><td>0 ~ 0.5</td><td>0 ~ 1.0</td></tr>
+<tr><td>계산 비용</td><td>빠름 (제곱만)</td><td>느림 (로그 계산)</td></tr>
+<tr><td>sklearn 기본값</td><td>✅ criterion="gini"</td><td>criterion="entropy"</td></tr>
+<tr><td>성능 차이</td><td colspan="2" style="text-align:center">실전에서 거의 동일 (2% 미만 차이)</td></tr>
+<tr><td>직관</td><td>"랜덤 배정 시 틀릴 확률"</td><td>"클래스를 알려면 필요한 정보량"</td></tr>
+<tr><td>민감도</td><td>빈도 높은 클래스에 민감</td><td>클래스 분포 변화에 더 민감</td></tr>
+</tbody>
+</table>
+
+<p>결론: 대부분의 경우 Gini를 쓰면 된다. Entropy를 써도 결과는 거의 같다. MLAT Ch.11에서도 "In practice, the choice between Gini and Entropy rarely makes a significant difference"라고 언급한다.</p>
+
+<pre><code><span class="cm"># === Gini vs Entropy 직접 계산해보기 ===</span>
+<span class="kw">import</span> numpy <span class="kw">as</span> np
+
+<span class="kw">def</span> <span class="fn">gini</span>(p):
+    <span class="st">"""Gini 불순도: p는 양성 클래스 비율"""</span>
+    <span class="kw">return</span> <span class="nu">1</span> - p**<span class="nu">2</span> - (<span class="nu">1</span>-p)**<span class="nu">2</span>
+
+<span class="kw">def</span> <span class="fn">entropy</span>(p):
+    <span class="st">"""Entropy: p는 양성 클래스 비율"""</span>
+    <span class="kw">if</span> p == <span class="nu">0</span> <span class="kw">or</span> p == <span class="nu">1</span>:
+        <span class="kw">return</span> <span class="nu">0</span>
+    <span class="kw">return</span> -p * np.log2(p) - (<span class="nu">1</span>-p) * np.log2(<span class="nu">1</span>-p)
+
+<span class="cm"># 다양한 비율에서 비교</span>
+<span class="fn">print</span>(<span class="st">f"{'비율(상승%)':>10s} | {'Gini':>6s} | {'Entropy':>8s}"</span>)
+<span class="fn">print</span>(<span class="st">"-"</span> * <span class="nu">32</span>)
+<span class="kw">for</span> p <span class="kw">in</span> [<span class="nu">0.0</span>, <span class="nu">0.1</span>, <span class="nu">0.3</span>, <span class="nu">0.5</span>, <span class="nu">0.7</span>, <span class="nu">0.9</span>, <span class="nu">1.0</span>]:
+    <span class="fn">print</span>(<span class="st">f"</span>{p:>9.0%}<span class="st"> | </span>{gini(p):>6.3f}<span class="st"> | </span>{entropy(p):>8.3f}<span class="st">"</span>)
+
+<span class="cm"># 출력:</span>
+<span class="cm">#    비율(상승%) |   Gini | Entropy</span>
+<span class="cm"># --------------------------------</span>
+<span class="cm">#          0% |  0.000 |    0.000  ← 완전 순수</span>
+<span class="cm">#         10% |  0.180 |    0.469</span>
+<span class="cm">#         30% |  0.420 |    0.881</span>
+<span class="cm">#         50% |  0.500 |    1.000  ← 최대 불순</span>
+<span class="cm">#         70% |  0.420 |    0.881</span>
+<span class="cm">#         90% |  0.180 |    0.469</span>
+<span class="cm">#        100% |  0.000 |    0.000  ← 완전 순수</span></code></pre>
+
+<div class="warn">
+<p class="ni"><strong>금융에서의 함정 — 클래스 불균형:</strong> 주가 방향 예측에서 상승/하락이 정확히 50:50인 경우는 드물다. 예를 들어 상승장에서는 상승 60%, 하락 40%일 수 있다. 이때 트리가 "무조건 상승"이라고 예측해도 Gini가 낮아 보일 수 있다. 이런 클래스 불균형 문제는 <code>class_weight="balanced"</code> 옵션으로 완화할 수 있다.</p>
+</div>
+
+<h3>8.3 결정 트리 구현과 시각화</h3>
+
+<pre><code><span class="cm"># === 결정 트리 분류 ===</span>
+<span class="kw">from</span> sklearn.tree <span class="kw">import</span> DecisionTreeClassifier, plot_tree
+
+<span class="cm"># 깊이 제한 없는 트리 (과적합 위험!)</span>
+tree_full = DecisionTreeClassifier(random_state=<span class="nu">42</span>)
+tree_full.fit(X_train_s, y_train_cls)
+
+<span class="cm"># 깊이 제한 트리 (정규화)</span>
+tree_pruned = DecisionTreeClassifier(
+    max_depth=<span class="nu">4</span>,
+    min_samples_leaf=<span class="nu">50</span>,
+    random_state=<span class="nu">42</span>
+)
+tree_pruned.fit(X_train_s, y_train_cls)
+
+<span class="cm"># 성능 비교</span>
+<span class="fn">print</span>(<span class="st">"=== 결정 트리 과적합 비교 ==="</span>)
+<span class="kw">for</span> name, model <span class="kw">in</span> [(<span class="st">"깊이 무제한"</span>, tree_full), (<span class="st">"깊이=4"</span>, tree_pruned)]:
+    train_acc = model.score(X_train_s, y_train_cls)
+    test_acc = model.score(X_test_s, y_test_cls)
+    <span class="fn">print</span>(<span class="st">f"</span>{name:12s}<span class="st">: Train </span>{train_acc:.4f}<span class="st">, Test </span>{test_acc:.4f}<span class="st">, 차이 </span>{train_acc - test_acc:.4f}<span class="st">"</span>)
+<span class="cm"># → 깊이 무제한: Train ≈ 1.0, Test ≈ 0.50 (심각한 과적합!)</span>
+<span class="cm"># → 깊이=4:     Train ≈ 0.55, Test ≈ 0.53 (적절한 적합)</span>
+
+<span class="cm"># 트리 시각화</span>
+fig, ax = plt.subplots(figsize=(<span class="nu">20</span>, <span class="nu">8</span>))
+plot_tree(tree_pruned, feature_names=feature_cols,
+          class_names=[<span class="st">"하락"</span>, <span class="st">"상승"</span>], filled=<span class="kw">True</span>,
+          rounded=<span class="kw">True</span>, fontsize=<span class="nu">9</span>, ax=ax)
+plt.title(<span class="st">"결정 트리 시각화 (max_depth=4)"</span>)
+plt.tight_layout()
+plt.show()</code></pre>
+
+<div class="warn">
+<p class="ni"><strong>결정 트리의 치명적 약점 — 과적합:</strong> MLAT Ch.11에서 강조하듯, 깊이 제한 없는 결정 트리는 학습 데이터를 100% 외워버린다. 각 리프 노드에 샘플이 1개만 남을 때까지 분할하기 때문이다. 이것은 시험 문제를 외워서 100점 맞는 것과 같다 — 새로운 문제에는 전혀 대응하지 못한다. 반드시 <code>max_depth</code>, <code>min_samples_leaf</code> 등으로 정규화해야 한다.</p>
+</div>
+
+<!-- ═══════════════════════════════════════════ -->
+<!-- Ch9: Random Forest -->
+<!-- ═══════════════════════════════════════════ -->
+<h2 id="ch9">9. Random Forest — 나무를 모아 숲을 만든다</h2>
+
+<h3>9.1 앙상블의 핵심 아이디어</h3>
+<p>결정 트리 하나는 불안정하고 과적합에 취약하다. 하지만 수백 개의 트리를 만들어서 다수결 투표를 하면? 개별 트리의 약점이 상쇄되어 훨씬 안정적인 예측이 가능하다. 이것이 앙상블(ensemble)의 핵심 아이디어다. MLAT Ch.11 "Why ensemble models perform better" 섹션에서 이 원리를 상세히 설명한다.</p>
+
+<div class="def">
+<p class="ni"><strong>Random Forest의 두 가지 랜덤성</strong></p>
+<ol>
+<li><strong>Bootstrap Aggregation (Bagging):</strong> 각 트리는 원본 데이터에서 복원 추출(bootstrap)한 서로 다른 샘플로 학습한다. 데이터의 약 63%가 선택되고 37%는 빠진다(OOB, Out-of-Bag).</li>
+<li><strong>Random Feature Selection:</strong> 각 분할(split)에서 전체 피처 중 일부만 랜덤하게 선택하여 최적 분할을 찾는다. 분류에서는 보통 \(\sqrt{p}\)개, 회귀에서는 \(p/3\)개를 사용한다.</li>
+</ol>
+<p class="ni">이 두 가지 랜덤성이 트리 간의 상관을 줄여서 앙상블의 분산을 감소시킨다.</p>
+</div>
+
+<h3>9.2 Random Forest 구현</h3>
+
+<pre><code><span class="cm"># === Random Forest 분류 ===</span>
+<span class="kw">from</span> sklearn.ensemble <span class="kw">import</span> RandomForestClassifier
+
+<span class="cm"># Random Forest 학습</span>
+rf = RandomForestClassifier(
+    n_estimators=<span class="nu">500</span>,       <span class="cm"># 트리 500개</span>
+    max_depth=<span class="nu">6</span>,             <span class="cm"># 각 트리 최대 깊이</span>
+    min_samples_leaf=<span class="nu">50</span>,     <span class="cm"># 리프 노드 최소 샘플</span>
+    max_features=<span class="st">"sqrt"</span>,     <span class="cm"># 각 분할에서 √p개 피처 사용</span>
+    n_jobs=-<span class="nu">1</span>,               <span class="cm"># 모든 CPU 코어 사용</span>
+    random_state=<span class="nu">42</span>
+)
+rf.fit(X_train_s, y_train_cls)
+
+<span class="cm"># 성능 평가</span>
+y_pred_rf = rf.predict(X_test_s)
+y_prob_rf = rf.predict_proba(X_test_s)[:, <span class="nu">1</span>]
+
+<span class="fn">print</span>(<span class="st">"=== Random Forest 성능 ==="</span>)
+<span class="fn">print</span>(<span class="st">f"Train Accuracy: </span>{rf.score(X_train_s, y_train_cls):.4f}<span class="st">"</span>)
+<span class="fn">print</span>(<span class="st">f"Test Accuracy:  </span>{rf.score(X_test_s, y_test_cls):.4f}<span class="st">"</span>)
+<span class="fn">print</span>(<span class="st">f"Test AUC-ROC:   </span>{roc_auc_score(y_test_cls, y_prob_rf):.4f}<span class="st">"</span>)</code></pre>
+
+<h3>9.3 피처 중요도 (Feature Importance)</h3>
+<p>Random Forest의 큰 장점 중 하나는 각 피처가 예측에 얼마나 기여하는지를 자동으로 계산해준다는 것이다. MLAT Ch.11 "Feature importance for random forests"에서 이 개념을 다룬다.</p>
+
+<pre><code><span class="cm"># 피처 중요도 시각화</span>
+importances = pd.Series(rf.feature_importances_, index=feature_cols)
+importances = importances.sort_values(ascending=<span class="kw">True</span>)
+
+fig, ax = plt.subplots(figsize=(<span class="nu">10</span>, <span class="nu">5</span>))
+importances.plot(kind=<span class="st">"barh"</span>, ax=ax, color=<span class="st">"steelblue"</span>)
+ax.set_xlabel(<span class="st">"Feature Importance (Gini)"</span>)
+ax.set_title(<span class="st">"Random Forest — 피처 중요도"</span>)
+ax.grid(<span class="kw">True</span>, alpha=<span class="nu">0.3</span>, axis=<span class="st">"x"</span>)
+plt.tight_layout()
+plt.show()
+
+<span class="fn">print</span>(<span class="st">"=== 피처 중요도 순위 ==="</span>)
+<span class="kw">for</span> name, imp <span class="kw">in</span> importances[::-<span class="nu">1</span>].items():
+    bar = <span class="st">"█"</span> * <span class="nb">int</span>(imp * <span class="nu">100</span>)
+    <span class="fn">print</span>(<span class="st">f"  </span>{name:12s}<span class="st">: </span>{imp:.4f}<span class="st"> </span>{bar}<span class="st">"</span>)</code></pre>
+
+<div class="info">
+<p class="ni"><strong>OOB Score — 공짜 검증:</strong> Random Forest는 각 트리가 학습에 사용하지 않은 37%의 데이터(OOB)로 자동 검증할 수 있다. <code>oob_score=True</code>로 설정하면 별도의 검증 세트 없이도 일반화 성능을 추정할 수 있다. MLAT Ch.11 "Out-of-bag testing" 섹션에서 이 기법을 다룬다.</p>
+</div>
+
+<!-- ═══════════════════════════════════════════ -->
+<!-- Ch10: Gradient Boosting -->
+<!-- ═══════════════════════════════════════════ -->
+<h2 id="ch10">10. Gradient Boosting — 약한 학습기를 순차적으로 강화</h2>
+
+<h3>10.1 Bagging vs Boosting</h3>
+<p>Random Forest는 여러 트리를 병렬로(parallel) 만들어서 평균을 낸다(Bagging). Gradient Boosting은 접근이 다르다 — 트리를 순차적으로(sequential) 만들되, 이전 트리가 틀린 부분을 다음 트리가 보정한다. MLAT Ch.12에서 이 차이를 상세히 다룬다.</p>
+
+<!-- Bagging vs Boosting 비교 다이어그램 -->
+<div style="margin:25px 0;padding:20px;background:#f8f9fa;border-radius:8px;border:1px solid #ddd">
+<p class="ni" style="text-align:center;font-weight:bold;font-size:14px;margin-bottom:15px;color:#2c3e50">🔄 Bagging vs Boosting</p>
+<div style="display:flex;gap:20px;justify-content:center;flex-wrap:wrap;font-size:12px">
+<div style="flex:1;min-width:250px;background:#fff;padding:15px;border-radius:8px;border:2px solid #3498db">
+<div style="font-weight:bold;color:#3498db;font-size:13px;margin-bottom:8px;text-align:center">Bagging (Random Forest)</div>
+<div style="display:flex;gap:4px;justify-content:center;margin:8px 0">
+<div style="background:#3498db;color:#fff;padding:4px 8px;border-radius:4px;font-size:10px">Tree 1</div>
+<div style="background:#3498db;color:#fff;padding:4px 8px;border-radius:4px;font-size:10px">Tree 2</div>
+<div style="background:#3498db;color:#fff;padding:4px 8px;border-radius:4px;font-size:10px">Tree 3</div>
+</div>
+<div style="text-align:center;color:#3498db;font-size:10px">↓ 병렬 학습 ↓</div>
+<div style="text-align:center;background:#e8f4f8;padding:6px;border-radius:4px;margin-top:4px;font-weight:bold">다수결 투표 / 평균</div>
+<div style="margin-top:6px;color:#555;font-size:11px;text-align:center">분산 감소 ↓ | 편향 유지</div>
+</div>
+<div style="flex:1;min-width:250px;background:#fff;padding:15px;border-radius:8px;border:2px solid #e74c3c">
+<div style="font-weight:bold;color:#e74c3c;font-size:13px;margin-bottom:8px;text-align:center">Boosting (Gradient Boosting)</div>
+<div style="display:flex;gap:4px;justify-content:center;align-items:center;margin:8px 0">
+<div style="background:#e74c3c;color:#fff;padding:4px 8px;border-radius:4px;font-size:10px">Tree 1</div>
+<div style="color:#e74c3c">→</div>
+<div style="background:#e74c3c;color:#fff;padding:4px 8px;border-radius:4px;font-size:10px">Tree 2</div>
+<div style="color:#e74c3c">→</div>
+<div style="background:#e74c3c;color:#fff;padding:4px 8px;border-radius:4px;font-size:10px">Tree 3</div>
+</div>
+<div style="text-align:center;color:#e74c3c;font-size:10px">→ 순차 학습 (잔차 보정) →</div>
+<div style="text-align:center;background:#fde8e8;padding:6px;border-radius:4px;margin-top:4px;font-weight:bold">가중 합산</div>
+<div style="margin-top:6px;color:#555;font-size:11px;text-align:center">편향 감소 ↓ | 과적합 주의</div>
+</div>
+</div>
+</div>
+
+<h3>10.2 Gradient Boosting의 작동 원리</h3>
+<p>Gradient Boosting은 다음과 같이 작동한다:</p>
+<ol>
+<li>첫 번째 트리가 예측한다 → 잔차(residual)를 계산한다</li>
+<li>두 번째 트리가 잔차를 예측한다 → 새로운 잔차를 계산한다</li>
+<li>세 번째 트리가 새로운 잔차를 예측한다 → ...</li>
+<li>최종 예측 = 모든 트리의 예측을 합산한다</li>
+</ol>
+
+<div class="eq">\[ F_m(x) = F_{m-1}(x) + \eta \cdot h_m(x) \]</div>
+
+<p>여기서 \(\eta\)(학습률, learning rate)는 각 트리의 기여도를 조절한다. 학습률이 작을수록 더 많은 트리가 필요하지만, 과적합 위험이 줄어든다. 보통 0.01~0.1 사이의 값을 사용한다.</p>
+
+<pre><code><span class="cm"># === Gradient Boosting 분류 ===</span>
+<span class="kw">from</span> sklearn.ensemble <span class="kw">import</span> GradientBoostingClassifier
+
+gb = GradientBoostingClassifier(
+    n_estimators=<span class="nu">200</span>,
+    learning_rate=<span class="nu">0.05</span>,
+    max_depth=<span class="nu">3</span>,           <span class="cm"># 부스팅에서는 얕은 트리 사용</span>
+    min_samples_leaf=<span class="nu">30</span>,
+    subsample=<span class="nu">0.8</span>,         <span class="cm"># Stochastic GB: 80% 샘플 사용</span>
+    random_state=<span class="nu">42</span>
+)
+gb.fit(X_train_s, y_train_cls)
+
+y_prob_gb = gb.predict_proba(X_test_s)[:, <span class="nu">1</span>]
+<span class="fn">print</span>(<span class="st">"=== Gradient Boosting 성능 ==="</span>)
+<span class="fn">print</span>(<span class="st">f"Train Accuracy: </span>{gb.score(X_train_s, y_train_cls):.4f}<span class="st">"</span>)
+<span class="fn">print</span>(<span class="st">f"Test Accuracy:  </span>{gb.score(X_test_s, y_test_cls):.4f}<span class="st">"</span>)
+<span class="fn">print</span>(<span class="st">f"Test AUC-ROC:   </span>{roc_auc_score(y_test_cls, y_prob_gb):.4f}<span class="st">"</span>)</code></pre>
+
+<div class="info">
+<p class="ni"><strong>교재 연동:</strong> MLAT Ch.12 "Boosting Your Trading Strategy"에서 Gradient Boosting의 수학적 배경과 금융 적용을 상세히 다룬다. 특히 learning_rate와 n_estimators의 트레이드오프, subsample을 사용한 Stochastic Gradient Boosting의 정규화 효과를 설명한다. sklearn의 GradientBoostingClassifier는 교육용으로 좋지만, 실전에서는 다음 장에서 다룰 XGBoost/LightGBM이 훨씬 빠르고 강력하다.</p>
+</div>
+
+<!-- ═══════════════════════════════════════════ -->
+<!-- Ch11: XGBoost / LightGBM -->
+<!-- ═══════════════════════════════════════════ -->
+<h2 id="ch11">11. XGBoost / LightGBM — 실전 부스팅의 양대 산맥</h2>
+
+<h3>11.1 왜 sklearn Gradient Boosting으로는 부족한가?</h3>
+<p>앞 장에서 배운 sklearn의 GradientBoostingClassifier는 개념 이해에는 좋지만, 실전에서는 심각한 한계가 있다:</p>
+
+<table>
+<caption class="tc">sklearn GB vs XGBoost/LightGBM 비교</caption>
+<thead><tr><th>항목</th><th>sklearn GB</th><th>XGBoost</th><th>LightGBM</th></tr></thead>
+<tbody>
+<tr><td>학습 속도</td><td>느림 (단일 스레드)</td><td>빠름 (병렬 처리)</td><td>매우 빠름 (히스토그램 기반)</td></tr>
+<tr><td>메모리 사용</td><td>높음</td><td>중간</td><td>낮음</td></tr>
+<tr><td>Early Stopping</td><td>제한적</td><td>내장</td><td>내장</td></tr>
+<tr><td>결측치 처리</td><td>불가 (전처리 필요)</td><td>자동 처리</td><td>자동 처리</td></tr>
+<tr><td>범주형 피처</td><td>불가</td><td>제한적</td><td>네이티브 지원</td></tr>
+<tr><td>GPU 지원</td><td>없음</td><td>있음</td><td>있음</td></tr>
+<tr><td>Kaggle/실전 사용</td><td>거의 없음</td><td>매우 많음</td><td>매우 많음</td></tr>
+</tbody>
+</table>
+
+<p>MLAT Ch.12에서 "XGBoost, LightGBM, and CatBoost have firmly established gradient boosting as the go-to solution for structured data"라고 강조하듯, 이 라이브러리들은 Kaggle 대회와 금융 실무에서 압도적으로 많이 사용된다.</p>
+
+<h3>11.2 XGBoost — eXtreme Gradient Boosting</h3>
+<p>XGBoost는 2014년 Tianqi Chen이 개발한 라이브러리로, Gradient Boosting을 극한까지 최적화했다. MLAT Ch.12에서 설명하듯, XGBoost의 핵심 혁신은 다음과 같다:</p>
+
+<div class="def">
+<p class="ni"><strong>XGBoost의 핵심 혁신</strong></p>
+<ol>
+<li><strong>2차 근사 (Second-order approximation):</strong> 손실 함수의 1차 미분(gradient)뿐 아니라 2차 미분(Hessian)도 사용하여 더 정확한 분할을 찾는다.</li>
+<li><strong>정규화 항 내장:</strong> 목적 함수에 L1/L2 정규화를 직접 포함하여 과적합을 제어한다.</li>
+<li><strong>근사 분할 탐색 (Approximate split-finding):</strong> 모든 분할점을 탐색하는 대신 quantile sketch로 후보를 줄여 속도를 높인다.</li>
+<li><strong>결측치 자동 처리:</strong> 결측치가 있는 샘플을 왼쪽/오른쪽 중 최적 방향으로 자동 배정한다.</li>
+<li><strong>병렬 처리:</strong> 피처별 분할 탐색을 병렬화하여 멀티코어 CPU를 활용한다.</li>
+</ol>
+</div>
+
+<div class="eq">\[ \mathcal{L}^{(m)} = \sum_{i=1}^{n} \left[ g_i f_m(x_i) + \frac{1}{2} h_i f_m^2(x_i) \right] + \Omega(f_m) \]</div>
+<p class="ni">여기서 \(g_i = \partial_{\hat{y}} l(y_i, \hat{y}_i^{(m-1)})\)는 1차 gradient, \(h_i = \partial^2_{\hat{y}} l(y_i, \hat{y}_i^{(m-1)})\)는 2차 Hessian, \(\Omega(f_m) = \gamma T + \frac{1}{2}\lambda \|w\|^2\)는 정규화 항이다. MLAT Ch.12 "How XGBoost speeds up computation"에서 이 수식의 유도 과정을 상세히 다룬다.</p>
+
+<pre><code><span class="cm"># === XGBoost 설치 및 기본 사용 ===</span>
+<span class="cm"># pip install xgboost</span>
+<span class="kw">import</span> xgboost <span class="kw">as</span> xgb
+
+<span class="cm"># XGBoost 분류기</span>
+xgb_clf = xgb.XGBClassifier(
+    n_estimators=<span class="nu">500</span>,
+    learning_rate=<span class="nu">0.05</span>,
+    max_depth=<span class="nu">4</span>,
+    min_child_weight=<span class="nu">30</span>,     <span class="cm"># 리프 노드 최소 가중치 합</span>
+    subsample=<span class="nu">0.8</span>,            <span class="cm"># 행 샘플링 비율</span>
+    colsample_bytree=<span class="nu">0.8</span>,    <span class="cm"># 열 샘플링 비율</span>
+    reg_alpha=<span class="nu">0.1</span>,            <span class="cm"># L1 정규화</span>
+    reg_lambda=<span class="nu">1.0</span>,           <span class="cm"># L2 정규화</span>
+    eval_metric=<span class="st">"auc"</span>,
+    random_state=<span class="nu">42</span>,
+    n_jobs=-<span class="nu">1</span>
+)
+
+<span class="cm"># Early Stopping으로 학습</span>
+xgb_clf.fit(
+    X_train_s, y_train_cls,
+    eval_set=[(X_test_s, y_test_cls)],
+    verbose=<span class="nu">50</span>   <span class="cm"># 50라운드마다 출력</span>
+)
+
+<span class="cm"># 성능 평가</span>
+y_prob_xgb = xgb_clf.predict_proba(X_test_s)[:, <span class="nu">1</span>]
+<span class="fn">print</span>(<span class="st">f"\n=== XGBoost 성능 ==="</span>)
+<span class="fn">print</span>(<span class="st">f"Train Accuracy: </span>{xgb_clf.score(X_train_s, y_train_cls):.4f}<span class="st">"</span>)
+<span class="fn">print</span>(<span class="st">f"Test Accuracy:  </span>{xgb_clf.score(X_test_s, y_test_cls):.4f}<span class="st">"</span>)
+<span class="fn">print</span>(<span class="st">f"Test AUC-ROC:   </span>{roc_auc_score(y_test_cls, y_prob_xgb):.4f}<span class="st">"</span>)
+<span class="fn">print</span>(<span class="st">f"Best Iteration: </span>{xgb_clf.best_iteration}<span class="st">"</span>)</code></pre>
+
+<h3>11.3 LightGBM — 더 빠르고 더 효율적인</h3>
+<p>LightGBM은 2017년 Microsoft가 개발한 라이브러리로, XGBoost보다 더 빠른 학습 속도를 목표로 설계되었다. MLAT Ch.12에서 설명하는 두 가지 핵심 혁신:</p>
+
+<div class="def">
+<p class="ni"><strong>LightGBM의 핵심 혁신</strong></p>
+<ol>
+<li><strong>Gradient-based One-Side Sampling (GOSS):</strong> gradient가 큰(=학습이 덜 된) 샘플은 모두 유지하고, gradient가 작은(=이미 잘 학습된) 샘플은 랜덤 샘플링한다. 정보 손실을 최소화하면서 학습 데이터를 줄인다.</li>
+<li><strong>Exclusive Feature Bundling (EFB):</strong> 동시에 0이 아닌 값을 갖지 않는 피처들을 하나로 묶어서 피처 수를 줄인다. 원-핫 인코딩된 피처에 특히 효과적이다.</li>
+<li><strong>Leaf-wise 성장:</strong> XGBoost의 level-wise(층별) 성장과 달리, 가장 손실 감소가 큰 리프를 우선 분할한다. 같은 수의 리프에서 더 낮은 손실을 달성하지만, 과적합 위험이 있어 <code>num_leaves</code> 제한이 중요하다.</li>
+<li><strong>히스토그램 기반 분할:</strong> 연속형 피처를 256개 bin으로 이산화하여 분할 탐색 속도를 극적으로 높인다.</li>
+</ol>
+</div>
+
+<!-- XGBoost vs LightGBM 트리 성장 방식 비교 다이어그램 -->
+<div style="margin:25px 0;padding:20px;background:linear-gradient(135deg,#f0f4ff,#fff5f0);border-radius:10px;border:1px solid #ccc">
+<p class="ni" style="text-align:center;font-weight:bold;font-size:14px;margin-bottom:15px;color:#2c3e50">🌲 트리 성장 방식 비교</p>
+<div style="display:flex;gap:20px;justify-content:center;flex-wrap:wrap;font-size:11px">
+<div style="flex:1;min-width:240px;background:#fff;padding:15px;border-radius:8px;border:2px solid #3498db">
+<div style="font-weight:bold;color:#3498db;font-size:13px;margin-bottom:10px;text-align:center">Level-wise (XGBoost)</div>
+<div style="text-align:center">
+<div style="display:inline-block;background:#3498db;color:#fff;padding:4px 12px;border-radius:4px;margin:2px">Root</div><br>
+<div style="display:inline-flex;gap:8px;margin:4px 0">
+<div style="background:#5dade2;color:#fff;padding:3px 10px;border-radius:4px">L1</div>
+<div style="background:#5dade2;color:#fff;padding:3px 10px;border-radius:4px">L2</div>
+</div><br>
+<div style="display:inline-flex;gap:4px;margin:4px 0">
+<div style="background:#85c1e9;color:#fff;padding:3px 8px;border-radius:4px;font-size:10px">L3</div>
+<div style="background:#85c1e9;color:#fff;padding:3px 8px;border-radius:4px;font-size:10px">L4</div>
+<div style="background:#85c1e9;color:#fff;padding:3px 8px;border-radius:4px;font-size:10px">L5</div>
+<div style="background:#85c1e9;color:#fff;padding:3px 8px;border-radius:4px;font-size:10px">L6</div>
+</div>
+</div>
+<p class="ni" style="text-align:center;margin-top:8px;color:#555;font-size:10px">한 층씩 균등하게 성장<br>→ 균형 잡힌 트리</p>
+</div>
+<div style="flex:1;min-width:240px;background:#fff;padding:15px;border-radius:8px;border:2px solid #e67e22">
+<div style="font-weight:bold;color:#e67e22;font-size:13px;margin-bottom:10px;text-align:center">Leaf-wise (LightGBM)</div>
+<div style="text-align:center">
+<div style="display:inline-block;background:#e67e22;color:#fff;padding:4px 12px;border-radius:4px;margin:2px">Root</div><br>
+<div style="display:inline-flex;gap:8px;margin:4px 0">
+<div style="background:#f39c12;color:#fff;padding:3px 10px;border-radius:4px">L1</div>
+<div style="background:#d4d4d4;color:#888;padding:3px 10px;border-radius:4px">L2</div>
+</div><br>
+<div style="display:inline-flex;gap:4px;margin:4px 0">
+<div style="background:#f5b041;color:#fff;padding:3px 8px;border-radius:4px;font-size:10px">L3</div>
+<div style="background:#f5b041;color:#fff;padding:3px 8px;border-radius:4px;font-size:10px">L4</div>
+<div style="background:#d4d4d4;color:#888;padding:3px 8px;border-radius:4px;font-size:10px">—</div>
+<div style="background:#d4d4d4;color:#888;padding:3px 8px;border-radius:4px;font-size:10px">—</div>
+</div>
+</div>
+<p class="ni" style="text-align:center;margin-top:8px;color:#555;font-size:10px">손실 최대 감소 리프 우선 분할<br>→ 비대칭 트리, 더 낮은 손실</p>
+</div>
+</div>
+</div>
+
+<pre><code><span class="cm"># === LightGBM 설치 및 기본 사용 ===</span>
+<span class="cm"># pip install lightgbm</span>
+<span class="kw">import</span> lightgbm <span class="kw">as</span> lgb
+
+<span class="cm"># LightGBM 분류기</span>
+lgb_clf = lgb.LGBMClassifier(
+    n_estimators=<span class="nu">500</span>,
+    learning_rate=<span class="nu">0.05</span>,
+    num_leaves=<span class="nu">31</span>,            <span class="cm"># 리프 노드 수 (2^5 - 1)</span>
+    max_depth=-<span class="nu">1</span>,             <span class="cm"># 제한 없음 (num_leaves로 제어)</span>
+    min_child_samples=<span class="nu">30</span>,    <span class="cm"># 리프 최소 샘플 수</span>
+    subsample=<span class="nu">0.8</span>,
+    colsample_bytree=<span class="nu">0.8</span>,
+    reg_alpha=<span class="nu">0.1</span>,
+    reg_lambda=<span class="nu">1.0</span>,
+    random_state=<span class="nu">42</span>,
+    n_jobs=-<span class="nu">1</span>,
+    verbose=-<span class="nu">1</span>              <span class="cm"># 로그 출력 억제</span>
+)
+
+<span class="cm"># Early Stopping으로 학습</span>
+lgb_clf.fit(
+    X_train_s, y_train_cls,
+    eval_set=[(X_test_s, y_test_cls)],
+    callbacks=[lgb.log_evaluation(<span class="nu">50</span>)]
+)
+
+<span class="cm"># 성능 평가</span>
+y_prob_lgb = lgb_clf.predict_proba(X_test_s)[:, <span class="nu">1</span>]
+<span class="fn">print</span>(<span class="st">f"\n=== LightGBM 성능 ==="</span>)
+<span class="fn">print</span>(<span class="st">f"Train Accuracy: </span>{lgb_clf.score(X_train_s, y_train_cls):.4f}<span class="st">"</span>)
+<span class="fn">print</span>(<span class="st">f"Test Accuracy:  </span>{lgb_clf.score(X_test_s, y_test_cls):.4f}<span class="st">"</span>)
+<span class="fn">print</span>(<span class="st">f"Test AUC-ROC:   </span>{roc_auc_score(y_test_cls, y_prob_lgb):.4f}<span class="st">"</span>)
+<span class="fn">print</span>(<span class="st">f"Best Iteration: </span>{lgb_clf.best_iteration_}<span class="st">"</span>)</code></pre>
+
+<h3>11.4 하이퍼파라미터 튜닝 — GridSearchCV + TimeSeriesSplit</h3>
+<p>모델의 성능은 하이퍼파라미터 설정에 크게 좌우된다. MLAT Ch.12 "Hyperparameter tuning with LightGBM" 섹션에서 강조하듯, 체계적인 탐색이 필수다. 금융 데이터에서는 반드시 TimeSeriesSplit을 사용해야 미래 정보 누출을 방지할 수 있다.</p>
+
+<pre><code><span class="cm"># === 하이퍼파라미터 튜닝 (LightGBM + TimeSeriesSplit) ===</span>
+<span class="kw">from</span> sklearn.model_selection <span class="kw">import</span> GridSearchCV, TimeSeriesSplit
+
+<span class="cm"># 탐색할 하이퍼파라미터 그리드</span>
+param_grid = {
+    <span class="st">"n_estimators"</span>: [<span class="nu">200</span>, <span class="nu">500</span>],
+    <span class="st">"learning_rate"</span>: [<span class="nu">0.01</span>, <span class="nu">0.05</span>, <span class="nu">0.1</span>],
+    <span class="st">"num_leaves"</span>: [<span class="nu">15</span>, <span class="nu">31</span>, <span class="nu">63</span>],
+    <span class="st">"min_child_samples"</span>: [<span class="nu">20</span>, <span class="nu">50</span>],
+}
+
+<span class="cm"># 시계열 교차검증 (5-Fold)</span>
+tscv = TimeSeriesSplit(n_splits=<span class="nu">5</span>)
+
+<span class="cm"># GridSearchCV 실행</span>
+grid_search = GridSearchCV(
+    lgb.LGBMClassifier(
+        subsample=<span class="nu">0.8</span>,
+        colsample_bytree=<span class="nu">0.8</span>,
+        reg_alpha=<span class="nu">0.1</span>,
+        reg_lambda=<span class="nu">1.0</span>,
+        random_state=<span class="nu">42</span>,
+        n_jobs=-<span class="nu">1</span>,
+        verbose=-<span class="nu">1</span>
+    ),
+    param_grid,
+    cv=tscv,
+    scoring=<span class="st">"roc_auc"</span>,
+    n_jobs=-<span class="nu">1</span>,
+    verbose=<span class="nu">1</span>
+)
+grid_search.fit(X_train_s, y_train_cls)
+
+<span class="cm"># 최적 파라미터 출력</span>
+<span class="fn">print</span>(<span class="st">"=== GridSearchCV 결과 ==="</span>)
+<span class="fn">print</span>(<span class="st">f"최적 파라미터: </span>{grid_search.best_params_}<span class="st">"</span>)
+<span class="fn">print</span>(<span class="st">f"최적 AUC-ROC:  </span>{grid_search.best_score_:.4f}<span class="st">"</span>)
+
+<span class="cm"># 최적 모델로 테스트</span>
+best_lgb = grid_search.best_estimator_
+y_prob_best = best_lgb.predict_proba(X_test_s)[:, <span class="nu">1</span>]
+<span class="fn">print</span>(<span class="st">f"Test AUC-ROC:  </span>{roc_auc_score(y_test_cls, y_prob_best):.4f}<span class="st">"</span>)</code></pre>
+
+<div class="warn">
+<p class="ni"><strong>주의: 탐색 공간이 너무 크면 시간이 오래 걸린다!</strong> 위 그리드는 2×3×3×2 = 36개 조합 × 5 Fold = 180번 학습이다. 실전에서는 RandomizedSearchCV(랜덤 탐색)나 Optuna(베이지안 최적화)를 사용하면 더 효율적이다. MLAT Ch.12에서도 "Parameter impact on test scores" 섹션에서 하이퍼파라미터 간 상호작용을 분석하는 방법을 다룬다.</p>
+</div>
+
+<h3>11.5 XGBoost vs LightGBM — 어떤 것을 선택할까?</h3>
+
+<table>
+<caption class="tc">XGBoost vs LightGBM 실전 비교</caption>
+<thead><tr><th>기준</th><th>XGBoost</th><th>LightGBM</th><th>추천</th></tr></thead>
+<tbody>
+<tr><td>학습 속도</td><td>빠름</td><td>더 빠름 (2~10배)</td><td>LightGBM</td></tr>
+<tr><td>메모리 효율</td><td>보통</td><td>우수 (히스토그램)</td><td>LightGBM</td></tr>
+<tr><td>소규모 데이터 (&lt;10K)</td><td>안정적</td><td>과적합 위험</td><td>XGBoost</td></tr>
+<tr><td>대규모 데이터 (&gt;100K)</td><td>느려짐</td><td>여전히 빠름</td><td>LightGBM</td></tr>
+<tr><td>범주형 피처</td><td>원-핫 인코딩 필요</td><td>네이티브 지원</td><td>LightGBM</td></tr>
+<tr><td>커뮤니티/문서</td><td>매우 풍부</td><td>풍부</td><td>비슷</td></tr>
+<tr><td>Kaggle 우승 비율</td><td>높음</td><td>높음</td><td>비슷</td></tr>
+<tr><td>금융 실무</td><td>많이 사용</td><td>많이 사용</td><td>둘 다 시도</td></tr>
+</tbody>
+</table>
+
+<div class="ok">
+<p class="ni"><strong>실전 팁:</strong> 정답은 "둘 다 시도하고 비교하라"이다. 금융 데이터는 노이즈가 많아서 어떤 모델이 더 좋을지 사전에 알 수 없다. 보통 LightGBM으로 빠르게 프로토타이핑하고, XGBoost로 교차 검증하여 최종 모델을 선택한다. MLAT Ch.12에서도 여러 부스팅 구현체를 비교 실험하는 접근을 권장한다.</p>
+</div>
+
+<!-- ═══════════════════════════════════════════ -->
+<!-- Ch12: 실전 파이프라인 통합 -->
+<!-- ═══════════════════════════════════════════ -->
+<h2 id="ch12">12. 실전: 주가 방향 예측 파이프라인</h2>
+
+<h3>12.1 전체 파이프라인 개요</h3>
+<p>지금까지 배운 모든 것을 하나의 파이프라인으로 통합한다. 데이터 수집부터 모델 비교, 수익률 시뮬레이션까지 — 이것이 실제 퀀트가 매일 하는 작업의 축소판이다.</p>
+
+<!-- 전체 파이프라인 플로우 다이어그램 -->
+<div style="margin:25px 0;padding:20px;background:linear-gradient(135deg,#f0f8ff,#f8f0ff);border-radius:10px;border:1px solid #ccc">
+<p class="ni" style="text-align:center;font-weight:bold;font-size:14px;margin-bottom:15px;color:#2c3e50">🔄 ML 트레이딩 파이프라인 전체 흐름</p>
+<div style="display:flex;flex-wrap:wrap;gap:8px;justify-content:center;align-items:center;font-size:11px">
+<div style="background:#3498db;color:#fff;padding:8px 14px;border-radius:6px;text-align:center;font-weight:bold">1. 데이터 수집<br><span style="font-size:9px;opacity:0.8">yfinance API</span></div>
+<div style="color:#7f8c8d;font-weight:bold">→</div>
+<div style="background:#2ecc71;color:#fff;padding:8px 14px;border-radius:6px;text-align:center;font-weight:bold">2. 피처 생성<br><span style="font-size:9px;opacity:0.8">기술적 지표</span></div>
+<div style="color:#7f8c8d;font-weight:bold">→</div>
+<div style="background:#e67e22;color:#fff;padding:8px 14px;border-radius:6px;text-align:center;font-weight:bold">3. 타겟 정의<br><span style="font-size:9px;opacity:0.8">N일 후 방향</span></div>
+<div style="color:#7f8c8d;font-weight:bold">→</div>
+<div style="background:#9b59b6;color:#fff;padding:8px 14px;border-radius:6px;text-align:center;font-weight:bold">4. 시계열 분할<br><span style="font-size:9px;opacity:0.8">TimeSeriesSplit</span></div>
+<div style="color:#7f8c8d;font-weight:bold">→</div>
+<div style="background:#e74c3c;color:#fff;padding:8px 14px;border-radius:6px;text-align:center;font-weight:bold">5. 모델 학습<br><span style="font-size:9px;opacity:0.8">9개 모델 비교</span></div>
+<div style="color:#7f8c8d;font-weight:bold">→</div>
+<div style="background:#1abc9c;color:#fff;padding:8px 14px;border-radius:6px;text-align:center;font-weight:bold">6. 수익률 시뮬<br><span style="font-size:9px;opacity:0.8">누적 수익률</span></div>
+</div>
+</div>
+
+<h3>12.2 통합 코드: 데이터 → 피처 → 타겟</h3>
+
+<pre><code><span class="cm"># ============================================</span>
+<span class="cm"># 실전 파이프라인: 주가 방향 예측</span>
+<span class="cm"># Round 4에서 배운 모든 모델을 통합 비교</span>
+<span class="cm"># ============================================</span>
+
+<span class="kw">import</span> numpy <span class="kw">as</span> np
+<span class="kw">import</span> pandas <span class="kw">as</span> pd
+<span class="kw">import</span> yfinance <span class="kw">as</span> yf
+<span class="kw">import</span> matplotlib.pyplot <span class="kw">as</span> plt
+<span class="kw">from</span> sklearn.preprocessing <span class="kw">import</span> StandardScaler
+<span class="kw">from</span> sklearn.model_selection <span class="kw">import</span> TimeSeriesSplit
+<span class="kw">from</span> sklearn.metrics <span class="kw">import</span> accuracy_score, roc_auc_score
+<span class="kw">import</span> warnings
+warnings.filterwarnings(<span class="st">"ignore"</span>)
+
+<span class="cm"># --- Step 1: 데이터 수집 ---</span>
+ticker = <span class="st">"SPY"</span>
+df = yf.download(ticker, start=<span class="st">"2010-01-01"</span>, end=<span class="st">"2024-12-31"</span>)
+df = df[[<span class="st">"Open"</span>, <span class="st">"High"</span>, <span class="st">"Low"</span>, <span class="st">"Close"</span>, <span class="st">"Volume"</span>]].copy()
+df.columns = [<span class="st">"open"</span>, <span class="st">"high"</span>, <span class="st">"low"</span>, <span class="st">"close"</span>, <span class="st">"volume"</span>]
+
+<span class="cm"># --- Step 2: 피처 생성 ---</span>
+df[<span class="st">"ret_1d"</span>] = df[<span class="st">"close"</span>].pct_change()
+df[<span class="st">"ret_5d"</span>] = df[<span class="st">"close"</span>].pct_change(<span class="nu">5</span>)
+df[<span class="st">"ret_20d"</span>] = df[<span class="st">"close"</span>].pct_change(<span class="nu">20</span>)
+df[<span class="st">"vol_20d"</span>] = df[<span class="st">"ret_1d"</span>].rolling(<span class="nu">20</span>).std()
+df[<span class="st">"sma_ratio"</span>] = df[<span class="st">"close"</span>] / df[<span class="st">"close"</span>].rolling(<span class="nu">20</span>).mean()
+df[<span class="st">"rsi"</span>] = <span class="nu">100</span> - <span class="nu">100</span> / (<span class="nu">1</span> + df[<span class="st">"ret_1d"</span>].clip(lower=<span class="nu">0</span>).rolling(<span class="nu">14</span>).mean() /
+                              df[<span class="st">"ret_1d"</span>].clip(upper=<span class="nu">0</span>).abs().rolling(<span class="nu">14</span>).mean())
+df[<span class="st">"vol_ratio"</span>] = df[<span class="st">"volume"</span>] / df[<span class="st">"volume"</span>].rolling(<span class="nu">20</span>).mean()
+
+<span class="cm"># --- Step 3: 타겟 정의 (5일 후 상승=1, 하락=0) ---</span>
+df[<span class="st">"target"</span>] = (df[<span class="st">"close"</span>].shift(-<span class="nu">5</span>) > df[<span class="st">"close"</span>]).astype(<span class="nb">int</span>)
+
+<span class="cm"># 결측치 제거</span>
+feature_cols = [<span class="st">"ret_1d"</span>, <span class="st">"ret_5d"</span>, <span class="st">"ret_20d"</span>, <span class="st">"vol_20d"</span>,
+                <span class="st">"sma_ratio"</span>, <span class="st">"rsi"</span>, <span class="st">"vol_ratio"</span>]
+df = df.dropna(subset=feature_cols + [<span class="st">"target"</span>])
+
+<span class="fn">print</span>(<span class="st">f"데이터 기간: </span>{df.index[0].date()}<span class="st"> ~ </span>{df.index[-1].date()}<span class="st">"</span>)
+<span class="fn">print</span>(<span class="st">f"총 샘플 수: </span>{len(df):,}<span class="st">"</span>)
+<span class="fn">print</span>(<span class="st">f"타겟 분포: 상승 </span>{df['target'].mean():.1%}<span class="st"> / 하락 </span>{1-df['target'].mean():.1%}<span class="st">"</span>)</code></pre>
+
+<h3>12.3 모델 9종 비교 실험</h3>
+
+<pre><code><span class="cm"># --- Step 4: 시계열 분할 ---</span>
+<span class="cm"># 마지막 2년을 테스트 세트로 사용</span>
+split_date = <span class="st">"2023-01-01"</span>
+train = df[df.index < split_date]
+test = df[df.index >= split_date]
+
+X_train, y_train = train[feature_cols], train[<span class="st">"target"</span>]
+X_test, y_test = test[feature_cols], test[<span class="st">"target"</span>]
+
+<span class="cm"># 스케일링</span>
+scaler = StandardScaler()
+X_train_s = scaler.fit_transform(X_train)
+X_test_s = scaler.transform(X_test)
+
+<span class="fn">print</span>(<span class="st">f"Train: </span>{len(train):,}<span class="st"> 샘플 ({train.index[0].date()} ~ {train.index[-1].date()})"</span>)
+<span class="fn">print</span>(<span class="st">f"Test:  </span>{len(test):,}<span class="st"> 샘플 ({test.index[0].date()} ~ {test.index[-1].date()})"</span>)
+
+<span class="cm"># --- Step 5: 9개 모델 정의 ---</span>
+<span class="kw">from</span> sklearn.linear_model <span class="kw">import</span> LinearRegression, Ridge, Lasso, LogisticRegression
+<span class="kw">from</span> sklearn.tree <span class="kw">import</span> DecisionTreeClassifier
+<span class="kw">from</span> sklearn.ensemble <span class="kw">import</span> RandomForestClassifier, GradientBoostingClassifier
+<span class="kw">import</span> xgboost <span class="kw">as</span> xgb
+<span class="kw">import</span> lightgbm <span class="kw">as</span> lgb
+
+models = {
+    <span class="st">"OLS (회귀→분류)"</span>: LinearRegression(),
+    <span class="st">"Ridge (회귀→분류)"</span>: Ridge(alpha=<span class="nu">1.0</span>),
+    <span class="st">"Lasso (회귀→분류)"</span>: Lasso(alpha=<span class="nu">0.01</span>),
+    <span class="st">"Logistic"</span>: LogisticRegression(C=<span class="nu">1.0</span>, max_iter=<span class="nu">1000</span>),
+    <span class="st">"Decision Tree"</span>: DecisionTreeClassifier(max_depth=<span class="nu">4</span>, min_samples_leaf=<span class="nu">50</span>, random_state=<span class="nu">42</span>),
+    <span class="st">"Random Forest"</span>: RandomForestClassifier(n_estimators=<span class="nu">300</span>, max_depth=<span class="nu">5</span>, min_samples_leaf=<span class="nu">50</span>, random_state=<span class="nu">42</span>, n_jobs=-<span class="nu">1</span>),
+    <span class="st">"Gradient Boost"</span>: GradientBoostingClassifier(n_estimators=<span class="nu">200</span>, learning_rate=<span class="nu">0.05</span>, max_depth=<span class="nu">3</span>, random_state=<span class="nu">42</span>),
+    <span class="st">"XGBoost"</span>: xgb.XGBClassifier(n_estimators=<span class="nu">300</span>, learning_rate=<span class="nu">0.05</span>, max_depth=<span class="nu">4</span>, eval_metric=<span class="st">"auc"</span>, random_state=<span class="nu">42</span>, n_jobs=-<span class="nu">1</span>, verbosity=<span class="nu">0</span>),
+    <span class="st">"LightGBM"</span>: lgb.LGBMClassifier(n_estimators=<span class="nu">300</span>, learning_rate=<span class="nu">0.05</span>, num_leaves=<span class="nu">31</span>, random_state=<span class="nu">42</span>, n_jobs=-<span class="nu">1</span>, verbose=-<span class="nu">1</span>),
+}
+
+<span class="cm"># --- 모델 학습 및 평가 ---</span>
+results = []
+
+<span class="kw">for</span> name, model <span class="kw">in</span> models.items():
+    <span class="cm"># 회귀 모델은 확률로 변환</span>
+    is_regressor = name <span class="kw">in</span> [<span class="st">"OLS (회귀→분류)"</span>, <span class="st">"Ridge (회귀→분류)"</span>, <span class="st">"Lasso (회귀→분류)"</span>]
+
+    <span class="kw">if</span> is_regressor:
+        model.fit(X_train_s, y_train)
+        y_prob = model.predict(X_test_s)
+        y_prob = np.clip(y_prob, <span class="nu">0</span>, <span class="nu">1</span>)  <span class="cm"># 0~1 범위로 클리핑</span>
+        y_pred = (y_prob > <span class="nu">0.5</span>).astype(<span class="nb">int</span>)
+    <span class="kw">else</span>:
+        model.fit(X_train_s, y_train)
+        y_prob = model.predict_proba(X_test_s)[:, <span class="nu">1</span>]
+        y_pred = model.predict(X_test_s)
+
+    acc = accuracy_score(y_test, y_pred)
+    <span class="kw">try</span>:
+        auc = roc_auc_score(y_test, y_prob)
+    <span class="kw">except</span>:
+        auc = <span class="nu">0.5</span>
+
+    results.append({<span class="st">"Model"</span>: name, <span class="st">"Accuracy"</span>: acc, <span class="st">"AUC-ROC"</span>: auc})
+    <span class="fn">print</span>(<span class="st">f"</span>{name:20s}<span class="st"> | Acc: </span>{acc:.4f}<span class="st"> | AUC: </span>{auc:.4f}<span class="st">"</span>)
+
+<span class="cm"># 결과 DataFrame</span>
+results_df = pd.DataFrame(results).sort_values(<span class="st">"AUC-ROC"</span>, ascending=<span class="kw">False</span>)
+<span class="fn">print</span>(<span class="st">"\n=== 모델 성능 순위 (AUC-ROC 기준) ==="</span>)
+<span class="fn">print</span>(results_df.to_string(index=<span class="kw">False</span>))</code></pre>
+
+<h3>12.4 모델 성능 비교 시각화</h3>
+
+<pre><code><span class="cm"># 모델 성능 비교 차트</span>
+fig, axes = plt.subplots(<span class="nu">1</span>, <span class="nu">2</span>, figsize=(<span class="nu">14</span>, <span class="nu">5</span>))
+
+<span class="cm"># Accuracy 비교</span>
+colors = [<span class="st">"#e74c3c"</span> <span class="kw">if</span> v == results_df[<span class="st">"Accuracy"</span>].max() <span class="kw">else</span> <span class="st">"#3498db"</span>
+          <span class="kw">for</span> v <span class="kw">in</span> results_df[<span class="st">"Accuracy"</span>]]
+axes[<span class="nu">0</span>].barh(results_df[<span class="st">"Model"</span>], results_df[<span class="st">"Accuracy"</span>], color=colors)
+axes[<span class="nu">0</span>].set_xlabel(<span class="st">"Accuracy"</span>)
+axes[<span class="nu">0</span>].set_title(<span class="st">"모델별 Accuracy 비교"</span>)
+axes[<span class="nu">0</span>].axvline(x=<span class="nu">0.5</span>, color=<span class="st">"gray"</span>, linestyle=<span class="st">"--"</span>, alpha=<span class="nu">0.5</span>, label=<span class="st">"랜덤 기준선"</span>)
+axes[<span class="nu">0</span>].legend()
+
+<span class="cm"># AUC-ROC 비교</span>
+colors = [<span class="st">"#e74c3c"</span> <span class="kw">if</span> v == results_df[<span class="st">"AUC-ROC"</span>].max() <span class="kw">else</span> <span class="st">"#2ecc71"</span>
+          <span class="kw">for</span> v <span class="kw">in</span> results_df[<span class="st">"AUC-ROC"</span>]]
+axes[<span class="nu">1</span>].barh(results_df[<span class="st">"Model"</span>], results_df[<span class="st">"AUC-ROC"</span>], color=colors)
+axes[<span class="nu">1</span>].set_xlabel(<span class="st">"AUC-ROC"</span>)
+axes[<span class="nu">1</span>].set_title(<span class="st">"모델별 AUC-ROC 비교"</span>)
+axes[<span class="nu">1</span>].axvline(x=<span class="nu">0.5</span>, color=<span class="st">"gray"</span>, linestyle=<span class="st">"--"</span>, alpha=<span class="nu">0.5</span>, label=<span class="st">"랜덤 기준선"</span>)
+axes[<span class="nu">1</span>].legend()
+
+plt.tight_layout()
+plt.show()</code></pre>
+
+<h3>12.5 수익률 시뮬레이션 — 모델 신호 기반 트레이딩</h3>
+<p>모델의 예측을 실제 트레이딩 신호로 변환하여 수익률을 시뮬레이션한다. "상승 예측 → 매수(Long)", "하락 예측 → 현금 보유(Flat)" 전략이다. MLAT Ch.11-12에서 다루는 백테스트의 간소화 버전이다.</p>
+
+<pre><code><span class="cm"># === 수익률 시뮬레이션 ===</span>
+<span class="cm"># 최적 모델 3개로 시뮬레이션</span>
+top_models = results_df.head(<span class="nu">3</span>)[<span class="st">"Model"</span>].tolist()
+
+<span class="cm"># 테스트 기간 일별 수익률</span>
+test_returns = test[<span class="st">"ret_1d"</span>].values
+
+fig, ax = plt.subplots(figsize=(<span class="nu">12</span>, <span class="nu">6</span>))
+
+<span class="cm"># Buy & Hold 벤치마크</span>
+cumret_bh = np.cumprod(<span class="nu">1</span> + test_returns) - <span class="nu">1</span>
+ax.plot(test.index, cumret_bh * <span class="nu">100</span>, <span class="st">"k--"</span>, alpha=<span class="nu">0.5</span>, linewidth=<span class="nu">1.5</span>, label=<span class="st">"Buy & Hold"</span>)
+
+<span class="cm"># 각 모델의 전략 수익률</span>
+colors_line = [<span class="st">"#e74c3c"</span>, <span class="st">"#3498db"</span>, <span class="st">"#2ecc71"</span>]
+<span class="kw">for</span> i, name <span class="kw">in</span> <span class="nb">enumerate</span>(top_models):
+    model = models[name]
+    is_regressor = <span class="st">"회귀"</span> <span class="kw">in</span> name
+    <span class="kw">if</span> is_regressor:
+        signals = (model.predict(X_test_s) > <span class="nu">0.5</span>).astype(<span class="nb">int</span>)
+    <span class="kw">else</span>:
+        signals = model.predict(X_test_s)
+
+    <span class="cm"># 신호 × 수익률 (상승 예측 시 매수, 하락 예측 시 현금)</span>
+    strategy_returns = signals * test_returns
+    cumret = np.cumprod(<span class="nu">1</span> + strategy_returns) - <span class="nu">1</span>
+    ax.plot(test.index, cumret * <span class="nu">100</span>, color=colors_line[i], linewidth=<span class="nu">1.5</span>, label=name)
+
+ax.set_xlabel(<span class="st">"Date"</span>)
+ax.set_ylabel(<span class="st">"누적 수익률 (%)"</span>)
+ax.set_title(<span class="st">"ML 모델 기반 트레이딩 전략 vs Buy & Hold"</span>)
+ax.legend(loc=<span class="st">"upper left"</span>)
+ax.grid(<span class="kw">True</span>, alpha=<span class="nu">0.3</span>)
+ax.axhline(y=<span class="nu">0</span>, color=<span class="st">"gray"</span>, linewidth=<span class="nu">0.5</span>)
+plt.tight_layout()
+plt.show()
+
+<span class="cm"># 전략 성과 요약</span>
+<span class="fn">print</span>(<span class="st">"=== 전략 성과 요약 ==="</span>)
+<span class="fn">print</span>(<span class="st">f"{'전략':20s} | {'누적수익률':>10s} | {'연환산':>8s} | {'샤프비율':>8s}"</span>)
+<span class="fn">print</span>(<span class="st">"-"</span> * <span class="nu">55</span>)
+
+<span class="kw">for</span> name <span class="kw">in</span> [<span class="st">"Buy & Hold"</span>] + top_models:
+    <span class="kw">if</span> name == <span class="st">"Buy & Hold"</span>:
+        strat_ret = test_returns
+    <span class="kw">else</span>:
+        model = models[name]
+        is_regressor = <span class="st">"회귀"</span> <span class="kw">in</span> name
+        <span class="kw">if</span> is_regressor:
+            signals = (model.predict(X_test_s) > <span class="nu">0.5</span>).astype(<span class="nb">int</span>)
+        <span class="kw">else</span>:
+            signals = model.predict(X_test_s)
+        strat_ret = signals * test_returns
+
+    cum = (np.cumprod(<span class="nu">1</span> + strat_ret) - <span class="nu">1</span>)[-<span class="nu">1</span>]
+    ann = (<span class="nu">1</span> + cum) ** (<span class="nu">252</span> / <span class="nb">len</span>(strat_ret)) - <span class="nu">1</span>
+    sharpe = strat_ret.mean() / strat_ret.std() * np.sqrt(<span class="nu">252</span>) <span class="kw">if</span> strat_ret.std() > <span class="nu">0</span> <span class="kw">else</span> <span class="nu">0</span>
+    <span class="fn">print</span>(<span class="st">f"</span>{name:20s}<span class="st"> | </span>{cum:>9.1%}<span class="st"> | </span>{ann:>7.1%}<span class="st"> | </span>{sharpe:>8.2f}<span class="st">"</span>)</code></pre>
+
+<div class="warn">
+<p class="ni"><strong>현실 주의사항 — 이 시뮬레이션의 한계:</strong></p>
+<ol>
+<li><strong>거래 비용 미포함:</strong> 실제로는 매매 수수료, 슬리피지(slippage)가 수익을 깎아먹는다.</li>
+<li><strong>Look-ahead bias 가능성:</strong> 피처 생성 시 미래 데이터가 섞이지 않았는지 항상 확인해야 한다.</li>
+<li><strong>과최적화 위험:</strong> 테스트 세트에서 좋은 모델을 "선택"하는 것 자체가 과적합이다. 실전에서는 검증 세트(validation)와 테스트 세트를 분리해야 한다.</li>
+<li><strong>시장 레짐 변화:</strong> 과거에 잘 작동한 모델이 미래에도 작동한다는 보장이 없다.</li>
+</ol>
+<p class="ni">MLAT Ch.8 "The ML4T Workflow"에서 이러한 백테스트 함정을 상세히 다룬다. 라운드 8에서 Zipline을 사용한 본격적인 백테스트를 배울 것이다.</p>
+</div>
+
+<div class="info">
+<p class="ni"><strong>교재 연동:</strong> 이 파이프라인은 MLAT Ch.7 (선형 모델), Ch.11 (Random Forest), Ch.12 (Gradient Boosting)의 내용을 통합한 것이다. MLAT에서는 각 모델을 일본 주식 데이터에 적용하여 Long-Short 전략을 구현하고 Zipline으로 백테스트한다. 우리는 아직 간소화 버전이지만, 핵심 워크플로우는 동일하다.</p>
+</div>
+
+<!-- ═══════════════════════════════════════════ -->
+<!-- Ch13: Quiz + 미니 프로젝트 -->
+<!-- ═══════════════════════════════════════════ -->
+<h2 id="ch13">13. Quiz + 미니 프로젝트</h2>
+
+<h3>13.1 핵심 개념 퀴즈 (10문제)</h3>
+<p>라운드 4에서 배운 내용을 점검하자. 답을 먼저 생각한 후 확인하라.</p>
+
+<div class="def">
+<p class="ni"><strong>Q1.</strong> 지도학습(Supervised Learning)의 정의를 한 문장으로 설명하라. 비지도학습과의 핵심 차이는?</p>
+<p class="ni" style="color:#888;font-size:12px">힌트: 타겟(label)의 유무</p>
+</div>
+
+<div class="def">
+<p class="ni"><strong>Q2.</strong> 회귀(Regression)와 분류(Classification)의 차이를 금융 예시와 함께 설명하라.</p>
+<p class="ni" style="color:#888;font-size:12px">힌트: 연속값 vs 범주값</p>
+</div>
+
+<div class="def">
+<p class="ni"><strong>Q3.</strong> Ridge 회귀와 Lasso 회귀의 정규화 방식 차이를 수식으로 쓰고, Lasso가 피처 선택 효과를 갖는 이유를 설명하라.</p>
+<p class="ni" style="color:#888;font-size:12px">힌트: L2 vs L1, 계수를 정확히 0으로</p>
+</div>
+
+<div class="def">
+<p class="ni"><strong>Q4.</strong> 로지스틱 회귀에서 시그모이드 함수의 역할은 무엇인가? 출력값의 범위는?</p>
+<p class="ni" style="color:#888;font-size:12px">힌트: 선형 결합 → 확률 변환</p>
+</div>
+
+<div class="def">
+<p class="ni"><strong>Q5.</strong> 혼동행렬(Confusion Matrix)에서 Precision과 Recall의 차이를 설명하라. 금융에서 어떤 것이 더 중요한 경우가 있는가?</p>
+<p class="ni" style="color:#888;font-size:12px">힌트: "상승 예측 중 실제 상승 비율" vs "실제 상승 중 예측 성공 비율"</p>
+</div>
+
+<div class="def">
+<p class="ni"><strong>Q6.</strong> 금융 시계열 데이터에서 일반 K-Fold CV 대신 TimeSeriesSplit을 사용해야 하는 이유는?</p>
+<p class="ni" style="color:#888;font-size:12px">힌트: 미래 정보 누출 (look-ahead bias)</p>
+</div>
+
+<div class="def">
+<p class="ni"><strong>Q7.</strong> 결정 트리의 과적합 문제를 해결하는 방법 3가지를 나열하라.</p>
+<p class="ni" style="color:#888;font-size:12px">힌트: max_depth, min_samples_leaf, 그리고 앙상블</p>
+</div>
+
+<div class="def">
+<p class="ni"><strong>Q8.</strong> Random Forest의 "두 가지 랜덤성"을 설명하라. 이것이 왜 과적합을 줄이는가?</p>
+<p class="ni" style="color:#888;font-size:12px">힌트: Bootstrap + Random Feature Selection → 트리 간 상관 감소</p>
+</div>
+
+<div class="def">
+<p class="ni"><strong>Q9.</strong> Bagging(Random Forest)과 Boosting(Gradient Boosting)의 핵심 차이를 "병렬 vs 순차"로 설명하라.</p>
+<p class="ni" style="color:#888;font-size:12px">힌트: 분산 감소 vs 편향 감소</p>
+</div>
+
+<div class="def">
+<p class="ni"><strong>Q10.</strong> XGBoost가 sklearn GradientBoosting보다 빠른 이유 3가지를 설명하라.</p>
+<p class="ni" style="color:#888;font-size:12px">힌트: 2차 근사, 근사 분할 탐색, 병렬 처리</p>
+</div>
+
+<h3>13.2 자가 체크리스트</h3>
+<p>아래 항목을 모두 체크할 수 있으면 라운드 4를 완료한 것이다:</p>
+
+<table>
+<thead><tr><th>✓</th><th>항목</th><th>확인</th></tr></thead>
+<tbody>
+<tr><td>□</td><td>지도학습의 3유형(회귀/분류/랭킹)을 설명할 수 있다</td><td></td></tr>
+<tr><td>□</td><td>OLS, Ridge, Lasso의 차이를 수식과 함께 설명할 수 있다</td><td></td></tr>
+<tr><td>□</td><td>로지스틱 회귀로 주가 방향 예측 코드를 작성할 수 있다</td><td></td></tr>
+<tr><td>□</td><td>혼동행렬, AUC-ROC를 해석할 수 있다</td><td></td></tr>
+<tr><td>□</td><td>TimeSeriesSplit의 필요성을 설명할 수 있다</td><td></td></tr>
+<tr><td>□</td><td>결정 트리의 분할 기준(Gini/Entropy)을 이해한다</td><td></td></tr>
+<tr><td>□</td><td>Random Forest의 Bagging 원리를 설명할 수 있다</td><td></td></tr>
+<tr><td>□</td><td>Gradient Boosting의 순차 학습 원리를 이해한다</td><td></td></tr>
+<tr><td>□</td><td>XGBoost/LightGBM을 설치하고 학습시킬 수 있다</td><td></td></tr>
+<tr><td>□</td><td>GridSearchCV로 하이퍼파라미터 튜닝을 할 수 있다</td><td></td></tr>
+<tr><td>□</td><td>9개 모델을 비교하는 파이프라인을 실행할 수 있다</td><td></td></tr>
+</tbody>
+</table>
+
+<h3>13.3 미니 프로젝트: XGBoost로 내일 주가 방향 예측</h3>
+
+<div class="ok">
+<p class="ni"><strong>프로젝트 과제</strong></p>
+<p class="ni">아래 요구사항을 만족하는 코드를 직접 작성하라:</p>
+<ol>
+<li><strong>종목 선택:</strong> 관심 있는 종목 1개를 선택한다 (예: AAPL, TSLA, 005930.KS 등)</li>
+<li><strong>피처 확장:</strong> 본문의 7개 피처 외에 최소 3개의 새로운 피처를 추가한다
+<ul>
+<li>예: MACD, Bollinger Band 위치, ATR, 거래량 변화율, 요일 더미 등</li>
+</ul>
+</li>
+<li><strong>타겟 변경:</strong> 5일 후 대신 1일 후 방향을 예측해본다. 성능이 어떻게 달라지는가?</li>
+<li><strong>모델 튜닝:</strong> XGBoost에 GridSearchCV(TimeSeriesSplit)를 적용하여 최적 파라미터를 찾는다</li>
+<li><strong>결과 분석:</strong>
+<ul>
+<li>최적 파라미터와 CV AUC-ROC 점수를 출력한다</li>
+<li>피처 중요도 상위 5개를 시각화한다</li>
+<li>테스트 기간 누적 수익률을 Buy &amp; Hold와 비교한다</li>
+</ul>
+</li>
+</ol>
+<p class="ni" style="margin-top:10px"><strong>제출 형식:</strong> Jupyter Notebook (.ipynb) 또는 Python 스크립트 (.py)</p>
+</div>
+
+<h3>13.4 다음 라운드 예고: Round 5 — 비지도학습과 차원 축소</h3>
+
+<!-- 다음 라운드 예고 다이어그램 -->
+<div style="margin:25px 0;padding:20px;background:linear-gradient(135deg,#fff8e1,#e8f5e9);border-radius:10px;border:2px solid #f9a825">
+<p class="ni" style="text-align:center;font-weight:bold;font-size:15px;margin-bottom:12px;color:#e65100">🔮 Round 5 Preview — 비지도학습 &amp; 차원 축소</p>
+<div style="display:flex;flex-wrap:wrap;gap:10px;justify-content:center;font-size:12px">
+<div style="background:#fff;padding:10px 16px;border-radius:8px;border:1px solid #ddd;text-align:center;min-width:120px">
+<div style="font-size:20px;margin-bottom:4px">📊</div>
+<div style="font-weight:bold;color:#2c3e50">PCA</div>
+<div style="color:#777;font-size:10px">주성분 분석</div>
+</div>
+<div style="background:#fff;padding:10px 16px;border-radius:8px;border:1px solid #ddd;text-align:center;min-width:120px">
+<div style="font-size:20px;margin-bottom:4px">🎯</div>
+<div style="font-weight:bold;color:#2c3e50">K-Means</div>
+<div style="color:#777;font-size:10px">클러스터링</div>
+</div>
+<div style="background:#fff;padding:10px 16px;border-radius:8px;border:1px solid #ddd;text-align:center;min-width:120px">
+<div style="font-size:20px;margin-bottom:4px">🌐</div>
+<div style="font-weight:bold;color:#2c3e50">t-SNE</div>
+<div style="color:#777;font-size:10px">시각화</div>
+</div>
+<div style="background:#fff;padding:10px 16px;border-radius:8px;border:1px solid #ddd;text-align:center;min-width:120px">
+<div style="font-size:20px;margin-bottom:4px">📈</div>
+<div style="font-weight:bold;color:#2c3e50">시장 레짐</div>
+<div style="color:#777;font-size:10px">HMM 기초</div>
+</div>
+<div style="background:#fff;padding:10px 16px;border-radius:8px;border:1px solid #ddd;text-align:center;min-width:120px">
+<div style="font-size:20px;margin-bottom:4px">🏗️</div>
+<div style="font-weight:bold;color:#2c3e50">오토인코더</div>
+<div style="color:#777;font-size:10px">비선형 차원 축소</div>
+</div>
+</div>
+<p class="ni" style="text-align:center;margin-top:12px;color:#555;font-size:12px">
+라운드 4에서 "정답이 있는" 지도학습을 배웠다면, 라운드 5에서는 "정답 없이" 데이터의 숨겨진 구조를 발견하는 비지도학습을 배운다.<br>
+PCA로 수십 개의 피처를 압축하고, K-Means로 종목을 군집화하고, HMM으로 시장 레짐(상승장/하락장/횡보장)을 자동 탐지한다.
+</p>
+</div>
+
+<div class="info">
+<p class="ni"><strong>교재 연동 (Round 5 미리보기):</strong> MLAT Ch.13 "Data-Driven Risk Factors and Asset Allocation with Unsupervised Learning"에서 PCA, K-Means, 계층적 클러스터링을 금융 데이터에 적용하는 방법을 다룬다. 두잇알고에서는 기본 알고리즘 구조를, 파라활에서는 sklearn의 비지도학습 API를 참고한다.</p>
+</div>
+
+</div><!-- paper-content -->
+</div><!-- container -->
+</div><!-- main-wrapper -->
+
+</body>
+</html>
