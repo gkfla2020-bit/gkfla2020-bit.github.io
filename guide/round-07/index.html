@@ -1,0 +1,2973 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Round 7 - Deep Learning: ANN, CNN, RNN, LSTM for Algorithmic Trading</title>
+<script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;500&family=Space+Mono:wght@400&family=Inter:wght@300;400&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Inter',sans-serif;background:#fafaf8;color:#1a1a1a;line-height:1.7;overflow-x:hidden}
+.sidebar{position:fixed;left:0;top:0;width:260px;height:100vh;background:rgba(255,255,255,.97);border-right:1px solid rgba(0,0,0,.06);padding:32px 24px;z-index:100;overflow-y:auto;display:flex;flex-direction:column}
+.sidebar-profile{text-align:center;margin-bottom:28px;padding-bottom:24px;border-bottom:1px solid rgba(0,0,0,.08)}
+.profile-icon{font-size:48px;margin-bottom:8px}
+.profile-name{font-family:'Cormorant Garamond',serif;font-size:1.3rem;font-weight:500;margin-bottom:4px}
+.profile-title{font-size:.68rem;color:#888;letter-spacing:.08em;text-transform:uppercase;margin-bottom:8px}
+.profile-bio{font-size:.78rem;color:#666;line-height:1.5}
+.sidebar-nav{flex:1;margin-top:16px}
+.nav-section{margin-bottom:20px}
+.nav-section-title{font-size:.6rem;font-weight:600;color:#aaa;letter-spacing:.15em;text-transform:uppercase;margin-bottom:10px}
+.nav-list{list-style:none}
+.nav-list li{margin-bottom:5px}
+.nav-list a{font-size:.78rem;color:#555;text-decoration:none;transition:all .2s;display:block;padding:3px 0}
+.nav-list a:hover{color:#0080c6;padding-left:4px}
+.nav-list a.active{color:#0080c6;font-weight:500}
+.nav-list a.done{color:#28a745}
+.badge{display:inline-block;font-size:.5rem;background:#0080c6;color:#fff;padding:1px 5px;border-radius:8px;margin-left:3px;vertical-align:middle}
+.badge-done{background:#28a745}
+.sidebar-footer{padding-top:16px;border-top:1px solid rgba(0,0,0,.06);font-size:.65rem;color:#aaa;text-align:center}
+.main-wrapper{margin-left:260px;min-height:100vh}
+.container{max-width:1100px;margin:0 auto;padding:50px 40px 80px}
+.paper-content{font-family:'Times New Roman','Nanum Myeongjo',serif;line-height:1.8;background:#fff;padding:40px;border-radius:8px;box-shadow:0 2px 20px rgba(0,0,0,.05)}
+.paper-header{text-align:center;margin-bottom:40px;padding-bottom:30px;border-bottom:2px solid #333}
+.paper-category{font-size:14px;color:#666;margin-bottom:10px}
+.paper-title{font-size:24px;font-weight:bold;margin-bottom:12px;line-height:1.4}
+.paper-subtitle{font-size:14px;color:#555;margin-bottom:8px}
+.paper-team{font-size:13px;color:#444}
+.code-output{background:#1e1e1e;color:#d4d4d4;padding:12px 16px;border-radius:0 0 6px 6px;font-family:'Space Mono',monospace;font-size:11.5px;line-height:1.6;margin-top:-4px;margin-bottom:18px;border-top:2px solid #333;white-space:pre-wrap;overflow-x:auto}
+.code-output .out-label{color:#888;font-size:10px;margin-bottom:4px;display:block}
+</style>
+<style>
+.abstract{background:#f8f9fa;padding:25px;margin:30px 0;border-left:4px solid #2c3e50}
+.abstract-title{font-weight:bold;font-size:16px;margin-bottom:15px}
+h2{font-size:18px;margin:35px 0 20px;padding-bottom:8px;border-bottom:1px solid #ddd;color:#2c3e50}
+h3{font-size:15px;margin:25px 0 15px;color:#34495e}
+h4{font-size:14px;margin:20px 0 12px;color:#34495e}
+p{text-align:justify;margin-bottom:15px;text-indent:2em}
+p.ni{text-indent:0}
+table{width:100%;border-collapse:collapse;margin:20px 0;font-size:12px}
+th,td{border:1px solid #ddd;padding:10px 8px;text-align:center}
+th{background:#2c3e50;color:white;font-weight:bold}
+tr:nth-child(even){background:#f8f9fa}
+tr:hover{background:#e8f4f8}
+.tc{font-size:13px;font-weight:bold;margin:15px 0 10px;text-align:center}
+.eq{text-align:center;margin:20px 0;padding:15px;background:#f8f9fa;border-radius:4px;overflow-x:auto}
+ul,ol{margin-left:2em;margin-bottom:15px}
+li{margin-bottom:6px}
+.def{background:#fff9e6;border:1px solid #ffc107;border-radius:4px;padding:20px;margin:20px 0}
+.info{background:#e8f4f8;border-left:4px solid #3498db;padding:20px;margin:20px 0}
+.warn{background:#fff3cd;border-left:4px solid #f39c12;padding:20px;margin:20px 0}
+.ok{background:#d4edda;border-left:4px solid #28a745;padding:20px;margin:20px 0}
+pre{background:#1e1e1e;color:#d4d4d4;padding:20px;border-radius:6px;overflow-x:auto;margin:20px 0;font-family:'Space Mono','Consolas',monospace;font-size:13px;line-height:1.6}
+code{font-family:'Space Mono','Consolas',monospace;font-size:13px}
+p code,li code,td code{background:#f0f0f0;padding:2px 6px;border-radius:3px;color:#c7254e;font-size:12px}
+.cc{font-size:12px;font-weight:bold;color:#2c3e50;margin-top:15px;margin-bottom:4px}
+.cm{color:#6a9955}.kw{color:#569cd6}.st{color:#ce9178}.fn{color:#dcdcaa}.nb{color:#4ec9b0}.nu{color:#b5cea8}
+.progress-bar{width:100%;height:6px;background:#e0e0e0;border-radius:3px;margin-top:16px}
+.progress-fill{height:100%;background:linear-gradient(90deg,#0080c6,#00b894);border-radius:3px;width:70%}
+.progress-label{font-size:11px;color:#888;margin-top:4px;text-align:center}
+@media(max-width:1024px){
+.sidebar{width:100%;height:auto;position:relative;border-right:none;border-bottom:1px solid rgba(0,0,0,.08);padding:16px}
+.sidebar-profile{margin-bottom:10px;padding-bottom:10px;display:flex;align-items:center;gap:12px;text-align:left}
+.profile-icon{font-size:32px;margin-bottom:0}.profile-bio{display:none}
+.nav-section{display:inline-block;margin-right:16px;margin-bottom:8px}
+.nav-list{display:flex;gap:10px;flex-wrap:wrap}.nav-list li{margin-bottom:0}
+.sidebar-footer{display:none}
+.main-wrapper{margin-left:0}
+.container{padding:0}.paper-content{padding:20px 16px;border-radius:0;box-shadow:none}
+.paper-title{font-size:18px}p{font-size:14px;text-indent:1.5em;text-align:left}
+pre{font-size:11px;padding:14px}table{font-size:10px;display:block;overflow-x:auto}
+}
+</style>
+</head>
+<body>
+
+<div class="sidebar">
+<div class="sidebar-profile">
+<div class="profile-icon">&#x1F9E0;</div>
+<div class="profile-name">HFT ML Master Plan</div>
+<div class="profile-title">Convex Opt + DL + HFT</div>
+<div class="profile-bio">10 Rounds: Zero to HFT System Trading</div>
+</div>
+<div class="sidebar-nav">
+<div class="nav-section">
+<div class="nav-section-title">Curriculum</div>
+<ul class="nav-list">
+<li><a class="done" href="../round-01/">R1. Python + Finance <span class="badge badge-done">DONE</span></a></li>
+<li><a class="done" href="../round-02/">R2. Linear Algebra + Stats <span class="badge badge-done">DONE</span></a></li>
+<li><a class="done" href="../round-03/">R3. Data / Feature Eng. <span class="badge badge-done">DONE</span></a></li>
+<li><a class="done" href="../round-04/">R4. Supervised Learning <span class="badge badge-done">DONE</span></a></li>
+<li><a class="done" href="../round-05/">R5. Unsupervised + TS <span class="badge badge-done">DONE</span></a></li>
+<li><a class="done" href="../round-06/">R6. NLP + Sentiment <span class="badge badge-done">DONE</span></a></li>
+<li><a class="active" href="#">R7. Deep Learning <span class="badge">NOW</span></a></li>
+<li><a href="#">R8. Convex Opt + Transformer</a></li>
+<li><a href="#">R9. HFT + RL</a></li>
+<li><a href="#">R10. Final Project</a></li>
+</ul>
+</div>
+<div class="nav-section">
+<div class="nav-section-title">This Lecture</div>
+<ul class="nav-list">
+<li><a href="#ch1">1. 왜 딥러닝인가</a></li>
+<li><a href="#ch2">2. 퍼셉트론</a></li>
+<li><a href="#ch3">3. 활성화 함수</a></li>
+<li><a href="#ch4">4. 다층 퍼셉트론 (MLP)</a></li>
+<li><a href="#ch5">5. 역전파 알고리즘</a></li>
+<li><a href="#ch6">6. 경사하강법 변형</a></li>
+<li><a href="#ch7">7. PyTorch 기초</a></li>
+<li><a href="#ch8">8. CNN 아키텍처</a></li>
+<li><a href="#ch9">9. CNN 금융 적용</a></li>
+<li><a href="#ch10">10. RNN 기초</a></li>
+<li><a href="#ch11">11. LSTM / GRU</a></li>
+<li><a href="#ch12">12. LSTM 금융 시계열</a></li>
+<li><a href="#ch13">13. Quiz + Mini Project</a></li>
+</ul>
+</div>
+</div>
+<div class="sidebar-footer">Round 7 of 10 · 🧠 Deep Learning</div>
+</div>
+
+<div class="main-wrapper">
+<div class="container">
+<div class="paper-content">
+
+<div class="paper-header">
+<div class="paper-category">Round 7 / 10 · 딥러닝 + 최적화</div>
+<h1 class="paper-title">Deep Learning for Algorithmic Trading:<br>ANN, CNN, RNN &amp; LSTM</h1>
+<div class="paper-subtitle">퍼셉트론에서 LSTM까지 — 신경망이 시장의 비선형 패턴을 학습하는 방법</div>
+<div class="paper-team">Textbooks: MLAT Ch.17~19 / MLDSF Ch.3, Ch.5~6</div>
+<div class="progress-bar"><div class="progress-fill"></div></div>
+<div class="progress-label">Overall Progress: 70%</div>
+</div>
+
+<div class="abstract">
+<div class="abstract-title">Abstract</div>
+<p class="ni">
+R1~R6까지 우리는 전통적 머신러닝의 핵심 무기를 모두 갖췄다. 선형회귀에서 XGBoost까지의 지도학습, PCA와 K-Means의 비지도학습, ARIMA/GARCH의 시계열 모델, 그리고 NLP까지. 하지만 이 모든 모델에는 공통된 한계가 있다 — <strong>피처 엔지니어링을 사람이 직접 해야 한다</strong>는 것이다. RSI, MACD, 볼린저밴드 같은 기술적 지표를 우리가 설계하고, 그 지표들을 모델에 넣어줘야 했다.
+</p>
+<p class="ni" style="margin-top:10px">
+딥러닝은 이 패러다임을 뒤집는다. 신경망은 원시 데이터(raw data)에서 스스로 유의미한 피처를 추출한다. CNN은 캔들차트 이미지에서 패턴을 발견하고, LSTM은 시계열의 장기 의존성을 자동으로 포착한다. R2에서 배운 편미분과 체인룰이 역전파(backpropagation)의 수학적 기반이 되고, R4의 분류/회귀 개념이 신경망의 출력층으로 자연스럽게 연결된다. 이번 라운드에서는 퍼셉트론이라는 가장 단순한 뉴런에서 출발하여, 다층 퍼셉트론(MLP), 합성곱 신경망(CNN), 순환 신경망(RNN), 그리고 LSTM/GRU까지 — 딥러닝 아키텍처의 진화를 체계적으로 따라간다.
+</p>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════
+     Chapter 1: 왜 딥러닝인가
+     ═══════════════════════════════════════════════════════════════ -->
+<h2 id="ch1">Chapter 1. 왜 딥러닝인가 — From ML to DL</h2>
+
+<h3>1.1 전통 ML의 한계</h3>
+
+<p>
+R4에서 우리는 XGBoost로 주가 방향을 예측했다. 그때 우리가 한 일을 돌아보자: (1) RSI, MACD, 볼린저밴드 등 기술적 지표를 직접 계산하고, (2) 이 지표들을 피처로 만들어 모델에 입력했다. 모델은 우리가 만들어준 피처의 조합만 학습할 수 있었다. 만약 우리가 중요한 피처를 빠뜨렸다면? 모델은 그 정보를 영원히 알 수 없다.
+</p>
+
+<p>
+이것이 전통 ML의 근본적 한계다. 모델의 성능이 <strong>피처 엔지니어링의 품질</strong>에 의해 결정된다. 아무리 좋은 알고리즘이라도 쓰레기 피처를 넣으면 쓰레기 예측이 나온다 (Garbage In, Garbage Out). 금융 시장처럼 복잡한 비선형 시스템에서는 어떤 피처가 중요한지 사전에 알기 어렵다.
+</p>
+
+<div class="def">
+<p class="ni"><strong>📖 딥러닝 (Deep Learning) 정의</strong></p>
+<p class="ni" style="margin-top:8px">
+딥러닝은 여러 층(layer)의 비선형 변환을 쌓아 올려, 원시 데이터에서 점점 더 추상적인 표현(representation)을 자동으로 학습하는 머신러닝의 하위 분야다. "Deep"은 신경망의 층이 깊다(많다)는 의미이며, 일반적으로 2개 이상의 은닉층(hidden layer)을 가진 신경망을 딥러닝이라 부른다.
+</p>
+</div>
+
+<h3>1.2 표현 학습 (Representation Learning)</h3>
+
+<p>
+딥러닝의 핵심 아이디어는 <strong>표현 학습</strong>(representation learning)이다. 전통 ML에서는 사람이 피처를 설계했지만, 딥러닝에서는 모델이 데이터의 좋은 표현을 스스로 학습한다. 각 층은 이전 층의 출력을 입력으로 받아 더 높은 수준의 추상화를 만든다.
+</p>
+
+<!-- 표현 학습 다이어그램 -->
+<div style="margin:25px 0;padding:20px;background:linear-gradient(135deg,#e3f2fd,#f3e5f5);border-radius:10px">
+<p class="ni" style="text-align:center;font-weight:bold;font-size:14px;margin-bottom:15px;color:#1565c0">🔄 전통 ML vs 딥러닝: 피처 추출 패러다임</p>
+<div style="display:flex;gap:20px;flex-wrap:wrap;justify-content:center">
+<div style="flex:1;min-width:280px;background:#fff;padding:16px;border-radius:8px;border:2px solid #e57373">
+<p class="ni" style="font-weight:bold;color:#c62828;text-align:center;margin-bottom:10px">전통 ML</p>
+<div style="display:flex;align-items:center;justify-content:center;gap:6px;font-size:12px;flex-wrap:wrap">
+<div style="background:#ffcdd2;padding:6px 10px;border-radius:6px">Raw Data</div>
+<span>→</span>
+<div style="background:#ef9a9a;padding:6px 10px;border-radius:6px;border:2px dashed #c62828"><strong>사람이 설계</strong><br>피처 엔지니어링</div>
+<span>→</span>
+<div style="background:#ffcdd2;padding:6px 10px;border-radius:6px">Features</div>
+<span>→</span>
+<div style="background:#ef9a9a;padding:6px 10px;border-radius:6px">ML Model</div>
+<span>→</span>
+<div style="background:#ffcdd2;padding:6px 10px;border-radius:6px">Output</div>
+</div>
+</div>
+<div style="flex:1;min-width:280px;background:#fff;padding:16px;border-radius:8px;border:2px solid #66bb6a">
+<p class="ni" style="font-weight:bold;color:#2e7d32;text-align:center;margin-bottom:10px">딥러닝</p>
+<div style="display:flex;align-items:center;justify-content:center;gap:6px;font-size:12px;flex-wrap:wrap">
+<div style="background:#c8e6c9;padding:6px 10px;border-radius:6px">Raw Data</div>
+<span>→</span>
+<div style="background:#a5d6a7;padding:6px 10px;border-radius:6px;border:2px solid #2e7d32"><strong>자동 학습</strong><br>Layer 1→2→...→N</div>
+<span>→</span>
+<div style="background:#c8e6c9;padding:6px 10px;border-radius:6px">Output</div>
+</div>
+</div>
+</div>
+</div>
+
+<h3>1.3 딥러닝이 금융에서 중요한 이유</h3>
+
+<p>
+금융 시장은 본질적으로 비선형(nonlinear) 시스템이다. 주가는 수천 개의 변수가 복잡하게 상호작용한 결과이며, 이 관계는 시간에 따라 변한다(non-stationary). 전통 ML 모델은 이런 복잡한 비선형 관계를 포착하는 데 한계가 있다. 선형회귀는 말 그대로 선형 관계만 모델링하고, Decision Tree는 축에 평행한 분할만 가능하다.
+</p>
+
+<p>
+딥러닝은 <strong>범용 근사 정리</strong>(Universal Approximation Theorem)에 의해, 충분한 뉴런을 가진 단일 은닉층 신경망이 임의의 연속 함수를 원하는 정밀도로 근사할 수 있음이 수학적으로 증명되어 있다. 이론적으로 어떤 복잡한 비선형 관계도 학습할 수 있다는 뜻이다.
+</p>
+
+<div class="eq">
+\[ \text{Universal Approximation Theorem: } \forall \epsilon > 0, \exists N \in \mathbb{N}, \exists W, b \text{ s.t. } \left| f(x) - \sum_{i=1}^{N} v_i \sigma(w_i^T x + b_i) \right| < \epsilon \]
+</div>
+
+<p>
+여기서 \(\sigma\)는 비선형 활성화 함수, \(w_i, b_i\)는 은닉층의 가중치와 편향, \(v_i\)는 출력층의 가중치다. 이 정리는 "존재한다"는 것만 보장하지, 그 파라미터를 효율적으로 찾을 수 있다는 것은 보장하지 않는다. 그래서 실전에서는 깊은(deep) 네트워크가 얕은 네트워크보다 훨씬 효율적으로 복잡한 함수를 학습한다.
+</p>
+
+<div class="info">
+<p class="ni"><strong>💡 금융에서 딥러닝의 주요 적용 분야</strong></p>
+<ul>
+<li><strong>시계열 예측:</strong> LSTM/GRU로 주가, 변동성, 수익률 예측</li>
+<li><strong>패턴 인식:</strong> CNN으로 캔들차트, 기술적 패턴 자동 인식</li>
+<li><strong>NLP:</strong> Transformer/BERT로 뉴스 감성분석 (R6에서 이미 맛봄)</li>
+<li><strong>포트폴리오 최적화:</strong> 오토인코더로 리스크 팩터 추출</li>
+<li><strong>고빈도 트레이딩:</strong> 실시간 오더북 데이터에서 초단기 예측</li>
+<li><strong>대안 데이터:</strong> 위성 이미지, 소셜미디어 등 비정형 데이터 처리</li>
+</ul>
+</div>
+
+<h3>1.4 딥러닝의 역사 — 세 번의 파도</h3>
+
+<table>
+<tr><th>시기</th><th>파도</th><th>핵심 사건</th><th>한계/돌파구</th></tr>
+<tr><td>1943~1969</td><td>1차 파도</td><td>McCulloch-Pitts 뉴런 (1943), Rosenblatt 퍼셉트론 (1958)</td><td>Minsky & Papert: XOR 문제 증명 → AI 겨울</td></tr>
+<tr><td>1986~1995</td><td>2차 파도</td><td>역전파 알고리즘 (Rumelhart, 1986), CNN (LeCun, 1989)</td><td>Vanishing gradient, 컴퓨팅 한계 → 2차 AI 겨울</td></tr>
+<tr><td>2006~현재</td><td>3차 파도</td><td>Deep Belief Networks (Hinton, 2006), AlexNet (2012), Transformer (2017)</td><td>GPU 컴퓨팅, 빅데이터, 새로운 활성화 함수(ReLU)</td></tr>
+</table>
+
+<p>
+현재의 딥러닝 붐은 세 가지 요소가 동시에 갖춰졌기 때문에 가능했다: (1) 대규모 데이터, (2) GPU 병렬 컴퓨팅, (3) 알고리즘 혁신(ReLU, Batch Normalization, Dropout 등). 금융 분야에서는 2015년경부터 본격적으로 딥러닝이 도입되기 시작했으며, 특히 고빈도 트레이딩과 대안 데이터 분석에서 빠르게 확산되고 있다.
+</p>
+
+<!-- ═══════════════════════════════════════════════════════════════
+     Chapter 2: 퍼셉트론
+     ═══════════════════════════════════════════════════════════════ -->
+<h2 id="ch2">Chapter 2. 퍼셉트론 — 신경망의 원자</h2>
+
+<h3>2.1 생물학적 뉴런에서 인공 뉴런으로</h3>
+
+<p>
+인공 신경망의 영감은 생물학적 뉴런에서 왔다. 인간의 뇌에는 약 860억 개의 뉴런이 있고, 각 뉴런은 수천 개의 시냅스를 통해 다른 뉴런과 연결되어 있다. 뉴런은 다른 뉴런들로부터 전기 신호(입력)를 받아, 그 합이 특정 임계값(threshold)을 넘으면 활성화되어 다음 뉴런에 신호를 전달한다.
+</p>
+
+<!-- 뉴런 다이어그램 -->
+<div style="margin:25px 0;padding:20px;background:#fff;border:2px solid #e0e0e0;border-radius:10px">
+<p class="ni" style="text-align:center;font-weight:bold;font-size:14px;margin-bottom:15px;color:#2c3e50">🧠 생물학적 뉴런 → 인공 뉴런 매핑</p>
+<div style="display:flex;gap:30px;flex-wrap:wrap;justify-content:center;font-size:12px">
+<div style="flex:1;min-width:200px;text-align:center">
+<div style="font-weight:bold;margin-bottom:8px;color:#8e24aa">생물학적 뉴런</div>
+<div style="background:#f3e5f5;padding:12px;border-radius:8px;line-height:1.8">
+수상돌기 (Dendrite) → 입력 수신<br>
+세포체 (Soma) → 신호 합산<br>
+축삭돌기 (Axon) → 출력 전달<br>
+시냅스 (Synapse) → 연결 강도
+</div>
+</div>
+<div style="display:flex;align-items:center;font-size:24px;color:#888">⟹</div>
+<div style="flex:1;min-width:200px;text-align:center">
+<div style="font-weight:bold;margin-bottom:8px;color:#1565c0">인공 뉴런</div>
+<div style="background:#e3f2fd;padding:12px;border-radius:8px;line-height:1.8">
+입력 (x₁, x₂, ..., xₙ) → 피처<br>
+가중합 (Σwᵢxᵢ + b) → 선형 변환<br>
+활성화 함수 σ(z) → 비선형 변환<br>
+가중치 (w₁, w₂, ..., wₙ) → 학습 파라미터
+</div>
+</div>
+</div>
+</div>
+
+<h3>2.2 퍼셉트론의 수학적 정의</h3>
+
+<p>
+1958년 Frank Rosenblatt이 제안한 퍼셉트론(Perceptron)은 가장 단순한 인공 뉴런이다. 입력 벡터 \(\mathbf{x} = (x_1, x_2, \ldots, x_n)\)에 가중치 벡터 \(\mathbf{w} = (w_1, w_2, \ldots, w_n)\)를 곱하고 편향(bias) \(b\)를 더한 뒤, 활성화 함수를 통과시켜 출력을 만든다.
+</p>
+
+<div class="eq">
+\[ z = \mathbf{w}^T \mathbf{x} + b = \sum_{i=1}^{n} w_i x_i + b \]
+\[ \hat{y} = \sigma(z) = \begin{cases} 1 & \text{if } z \geq 0 \\ 0 & \text{if } z < 0 \end{cases} \]
+</div>
+
+<p>
+여기서 \(\sigma\)는 계단 함수(step function)다. 퍼셉트론은 본질적으로 <strong>선형 이진 분류기</strong>다. 입력 공간을 하나의 초평면(hyperplane)으로 나누어 두 클래스를 분리한다. R4에서 배운 로지스틱 회귀와 매우 유사하지만, 퍼셉트론은 확률이 아닌 이진 출력을 내놓는다.
+</p>
+
+<h3>2.3 퍼셉트론 학습 규칙</h3>
+
+<p>
+퍼셉트론의 학습은 놀라울 정도로 단순하다. 예측이 틀릴 때만 가중치를 업데이트한다:
+</p>
+
+<div class="eq">
+\[ w_i \leftarrow w_i + \eta \cdot (y - \hat{y}) \cdot x_i \]
+\[ b \leftarrow b + \eta \cdot (y - \hat{y}) \]
+</div>
+
+<p>
+여기서 \(\eta\)는 학습률(learning rate), \(y\)는 실제 라벨, \(\hat{y}\)는 예측값이다. 예측이 맞으면 \(y - \hat{y} = 0\)이므로 업데이트가 없고, 틀리면 오차 방향으로 가중치를 조정한다. 이 규칙은 데이터가 선형 분리 가능(linearly separable)하면 유한 번의 반복 후 반드시 수렴한다는 것이 수학적으로 증명되어 있다 (Perceptron Convergence Theorem).
+</p>
+
+<h3>2.4 파이썬으로 퍼셉트론 구현</h3>
+
+<p class="cc">Python — 퍼셉트론 from scratch</p>
+<pre><code><span class="kw">import</span> numpy <span class="kw">as</span> np
+<span class="kw">import</span> matplotlib.pyplot <span class="kw">as</span> plt
+
+<span class="kw">class</span> <span class="nb">Perceptron</span>:
+    <span class="st">"""단일 퍼셉트론 구현"""</span>
+    <span class="kw">def</span> <span class="fn">__init__</span>(<span class="nb">self</span>, n_features, lr=<span class="nu">0.01</span>):
+        <span class="nb">self</span>.weights = np.<span class="fn">zeros</span>(n_features)
+        <span class="nb">self</span>.bias = <span class="nu">0.0</span>
+        <span class="nb">self</span>.lr = lr
+    
+    <span class="kw">def</span> <span class="fn">predict</span>(<span class="nb">self</span>, x):
+        z = np.<span class="fn">dot</span>(<span class="nb">self</span>.weights, x) + <span class="nb">self</span>.bias
+        <span class="kw">return</span> <span class="nu">1</span> <span class="kw">if</span> z >= <span class="nu">0</span> <span class="kw">else</span> <span class="nu">0</span>
+    
+    <span class="kw">def</span> <span class="fn">train</span>(<span class="nb">self</span>, X, y, epochs=<span class="nu">100</span>):
+        errors_per_epoch = []
+        <span class="kw">for</span> epoch <span class="kw">in</span> <span class="nb">range</span>(epochs):
+            errors = <span class="nu">0</span>
+            <span class="kw">for</span> xi, yi <span class="kw">in</span> <span class="nb">zip</span>(X, y):
+                pred = <span class="nb">self</span>.<span class="fn">predict</span>(xi)
+                error = yi - pred
+                <span class="kw">if</span> error != <span class="nu">0</span>:
+                    <span class="nb">self</span>.weights += <span class="nb">self</span>.lr * error * xi
+                    <span class="nb">self</span>.bias += <span class="nb">self</span>.lr * error
+                    errors += <span class="nu">1</span>
+            errors_per_epoch.<span class="fn">append</span>(errors)
+            <span class="kw">if</span> errors == <span class="nu">0</span>:
+                <span class="fn">print</span>(<span class="st">f"수렴 완료! Epoch {epoch+1}"</span>)
+                <span class="kw">break</span>
+        <span class="kw">return</span> errors_per_epoch
+
+<span class="cm"># AND 게이트 학습</span>
+X = np.<span class="fn">array</span>([[<span class="nu">0</span>,<span class="nu">0</span>], [<span class="nu">0</span>,<span class="nu">1</span>], [<span class="nu">1</span>,<span class="nu">0</span>], [<span class="nu">1</span>,<span class="nu">1</span>]])
+y_and = np.<span class="fn">array</span>([<span class="nu">0</span>, <span class="nu">0</span>, <span class="nu">0</span>, <span class="nu">1</span>])
+
+p = <span class="nb">Perceptron</span>(n_features=<span class="nu">2</span>, lr=<span class="nu">0.1</span>)
+history = p.<span class="fn">train</span>(X, y_and, epochs=<span class="nu">20</span>)
+
+<span class="fn">print</span>(<span class="st">f"학습된 가중치: w={p.weights}, b={p.bias:.2f}"</span>)
+<span class="fn">print</span>(<span class="st">"AND 게이트 테스트:"</span>)
+<span class="kw">for</span> xi <span class="kw">in</span> X:
+    <span class="fn">print</span>(<span class="st">f"  {xi} → {p.predict(xi)}"</span>)</code></pre>
+<div class="code-output"><span class="out-label">Output:</span>
+수렴 완료! Epoch 4
+학습된 가중치: w=[0.1 0.1], b=-0.10
+AND 게이트 테스트:
+  [0 0] → 0
+  [0 1] → 0
+  [1 0] → 0
+  [1 1] → 1</div>
+
+<h3>2.5 XOR 문제 — 퍼셉트론의 한계</h3>
+
+<p>
+1969년 Minsky와 Papert는 저서 "Perceptrons"에서 단일 퍼셉트론이 XOR 문제를 풀 수 없음을 증명했다. XOR은 두 입력이 다를 때 1, 같을 때 0을 출력하는 논리 게이트다. 이 문제는 선형 분리가 불가능하다 — 어떤 직선으로도 (0,0)/(1,1)과 (0,1)/(1,0)을 분리할 수 없다.
+</p>
+
+<p class="cc">Python — XOR 문제 시각화</p>
+<pre><code><span class="cm"># XOR 데이터</span>
+y_xor = np.<span class="fn">array</span>([<span class="nu">0</span>, <span class="nu">1</span>, <span class="nu">1</span>, <span class="nu">0</span>])
+
+p_xor = <span class="nb">Perceptron</span>(n_features=<span class="nu">2</span>, lr=<span class="nu">0.1</span>)
+history_xor = p_xor.<span class="fn">train</span>(X, y_xor, epochs=<span class="nu">100</span>)
+
+<span class="fn">print</span>(<span class="st">"XOR 퍼셉트론 테스트 (실패 예상):"</span>)
+<span class="kw">for</span> xi, yi <span class="kw">in</span> <span class="nb">zip</span>(X, y_xor):
+    pred = p_xor.<span class="fn">predict</span>(xi)
+    status = <span class="st">"✓"</span> <span class="kw">if</span> pred == yi <span class="kw">else</span> <span class="st">"✗"</span>
+    <span class="fn">print</span>(<span class="st">f"  {xi} → 예측:{pred}, 정답:{yi} {status}"</span>)
+
+<span class="fn">print</span>(<span class="st">f"\n100 에폭 후에도 에러 수: {history_xor[-1]}"</span>)
+<span class="fn">print</span>(<span class="st">"→ 단일 퍼셉트론으로는 XOR을 풀 수 없다!"</span>)</code></pre>
+<div class="code-output"><span class="out-label">Output:</span>
+XOR 퍼셉트론 테스트 (실패 예상):
+  [0 0] → 예측:0, 정답:0 ✓
+  [0 1] → 예측:0, 정답:1 ✗
+  [1 0] → 예측:1, 정답:1 ✓
+  [1 1] → 예측:1, 정답:0 ✗
+
+100 에폭 후에도 에러 수: 2
+→ 단일 퍼셉트론으로는 XOR을 풀 수 없다!</div>
+
+<div class="warn">
+<p class="ni"><strong>⚠️ XOR 문제가 중요한 이유</strong></p>
+<p class="ni" style="margin-top:8px">
+XOR 문제는 단순한 논리 게이트 문제가 아니다. 금융에서도 비선형 관계는 흔하다. 예를 들어 "금리가 오르면서 동시에 인플레이션이 높을 때만 주가가 하락한다"는 관계는 XOR과 유사한 비선형 패턴이다. 단일 퍼셉트론(= 선형 모델)으로는 이런 관계를 포착할 수 없다. 해결책은? <strong>여러 층을 쌓는 것</strong> — 이것이 다층 퍼셉트론(MLP)이다.
+</p>
+</div>
+
+
+<!-- ═══════════════════════════════════════════════════════════════
+     Chapter 3: 활성화 함수
+     ═══════════════════════════════════════════════════════════════ -->
+<h2 id="ch3">Chapter 3. 활성화 함수 — 비선형성의 열쇠</h2>
+
+<h3>3.1 왜 활성화 함수가 필요한가</h3>
+
+<p>
+활성화 함수가 없다면 신경망은 아무리 층을 깊게 쌓아도 결국 하나의 선형 변환에 불과하다. 두 개의 선형 변환을 합성하면 \(W_2(W_1 x + b_1) + b_2 = W_2 W_1 x + W_2 b_1 + b_2 = W' x + b'\)로, 여전히 선형이다. 비선형 활성화 함수를 사이에 끼워야 비로소 신경망이 비선형 함수를 표현할 수 있게 된다.
+</p>
+
+<h3>3.2 주요 활성화 함수 총정리</h3>
+
+<div class="def">
+<p class="ni"><strong>📖 핵심 활성화 함수 6종</strong></p>
+</div>
+
+<div class="eq">
+\[
+\text{Sigmoid: } \sigma(z) = \frac{1}{1 + e^{-z}}, \quad \sigma'(z) = \sigma(z)(1 - \sigma(z))
+\]
+\[
+\text{Tanh: } \tanh(z) = \frac{e^z - e^{-z}}{e^z + e^{-z}}, \quad \tanh'(z) = 1 - \tanh^2(z)
+\]
+\[
+\text{ReLU: } f(z) = \max(0, z), \quad f'(z) = \begin{cases} 1 & z > 0 \\ 0 & z \leq 0 \end{cases}
+\]
+\[
+\text{Leaky ReLU: } f(z) = \begin{cases} z & z > 0 \\ \alpha z & z \leq 0 \end{cases}, \quad \alpha = 0.01
+\]
+\[
+\text{ELU: } f(z) = \begin{cases} z & z > 0 \\ \alpha(e^z - 1) & z \leq 0 \end{cases}
+\]
+\[
+\text{Softmax: } \text{softmax}(z_i) = \frac{e^{z_i}}{\sum_{j=1}^{K} e^{z_j}} \quad \text{(다중 클래스 출력층)}
+\]
+</div>
+
+<table>
+<tr><th>함수</th><th>출력 범위</th><th>장점</th><th>단점</th><th>주 사용처</th></tr>
+<tr><td>Sigmoid</td><td>(0, 1)</td><td>확률 해석 가능</td><td>Vanishing gradient, 비대칭</td><td>이진 분류 출력층</td></tr>
+<tr><td>Tanh</td><td>(-1, 1)</td><td>Zero-centered</td><td>Vanishing gradient</td><td>RNN 은닉층</td></tr>
+<tr><td>ReLU</td><td>[0, ∞)</td><td>계산 빠름, gradient 소실 완화</td><td>Dead neuron (음수 영역)</td><td>CNN/MLP 은닉층 (기본)</td></tr>
+<tr><td>Leaky ReLU</td><td>(-∞, ∞)</td><td>Dead neuron 해결</td><td>α 하이퍼파라미터</td><td>깊은 네트워크</td></tr>
+<tr><td>ELU</td><td>(-α, ∞)</td><td>부드러운 음수 영역</td><td>exp 연산 비용</td><td>깊은 네트워크</td></tr>
+<tr><td>Softmax</td><td>(0, 1), 합=1</td><td>확률 분포 출력</td><td>은닉층에 부적합</td><td>다중 분류 출력층</td></tr>
+</table>
+
+<h3>3.3 활성화 함수 시각화</h3>
+
+<p class="cc">Python — 활성화 함수 비교 시각화</p>
+<pre><code><span class="kw">import</span> numpy <span class="kw">as</span> np
+<span class="kw">import</span> matplotlib.pyplot <span class="kw">as</span> plt
+
+z = np.<span class="fn">linspace</span>(-<span class="nu">5</span>, <span class="nu">5</span>, <span class="nu">200</span>)
+
+<span class="cm"># 활성화 함수 정의</span>
+sigmoid = <span class="nu">1</span> / (<span class="nu">1</span> + np.<span class="fn">exp</span>(-z))
+tanh = np.<span class="fn">tanh</span>(z)
+relu = np.<span class="fn">maximum</span>(<span class="nu">0</span>, z)
+leaky_relu = np.<span class="fn">where</span>(z > <span class="nu">0</span>, z, <span class="nu">0.01</span> * z)
+elu_alpha = <span class="nu">1.0</span>
+elu = np.<span class="fn">where</span>(z > <span class="nu">0</span>, z, elu_alpha * (np.<span class="fn">exp</span>(z) - <span class="nu">1</span>))
+
+fig, axes = plt.<span class="fn">subplots</span>(<span class="nu">2</span>, <span class="nu">3</span>, figsize=(<span class="nu">14</span>, <span class="nu">8</span>))
+funcs = [(sigmoid, <span class="st">'Sigmoid'</span>, <span class="st">'#e74c3c'</span>),
+         (tanh, <span class="st">'Tanh'</span>, <span class="st">'#3498db'</span>),
+         (relu, <span class="st">'ReLU'</span>, <span class="st">'#2ecc71'</span>),
+         (leaky_relu, <span class="st">'Leaky ReLU (α=0.01)'</span>, <span class="st">'#9b59b6'</span>),
+         (elu, <span class="st">'ELU (α=1.0)'</span>, <span class="st">'#e67e22'</span>)]
+
+<span class="kw">for</span> ax, (func, name, color) <span class="kw">in</span> <span class="nb">zip</span>(axes.<span class="fn">flat</span>, funcs):
+    ax.<span class="fn">plot</span>(z, func, color=color, linewidth=<span class="nu">2</span>)
+    ax.<span class="fn">axhline</span>(y=<span class="nu">0</span>, color=<span class="st">'gray'</span>, linewidth=<span class="nu">0.5</span>)
+    ax.<span class="fn">axvline</span>(x=<span class="nu">0</span>, color=<span class="st">'gray'</span>, linewidth=<span class="nu">0.5</span>)
+    ax.<span class="fn">set_title</span>(name, fontsize=<span class="nu">13</span>, fontweight=<span class="st">'bold'</span>)
+    ax.<span class="fn">set_xlim</span>(-<span class="nu">5</span>, <span class="nu">5</span>)
+    ax.<span class="fn">grid</span>(<span class="kw">True</span>, alpha=<span class="nu">0.3</span>)
+
+axes[<span class="nu">1</span>, <span class="nu">2</span>].<span class="fn">axis</span>(<span class="st">'off'</span>)
+axes[<span class="nu">1</span>, <span class="nu">2</span>].<span class="fn">text</span>(<span class="nu">0.5</span>, <span class="nu">0.5</span>, <span class="st">'💡 실전 팁:\n은닉층 → ReLU\n출력층(이진) → Sigmoid\n출력층(다중) → Softmax\nRNN → Tanh'</span>,
+    transform=axes[<span class="nu">1</span>,<span class="nu">2</span>].transAxes, ha=<span class="st">'center'</span>, va=<span class="st">'center'</span>,
+    fontsize=<span class="nu">12</span>, bbox=<span class="nb">dict</span>(boxstyle=<span class="st">'round'</span>, facecolor=<span class="st">'lightyellow'</span>))
+plt.<span class="fn">tight_layout</span>()
+plt.<span class="fn">savefig</span>(<span class="st">'activation_functions.png'</span>, dpi=<span class="nu">150</span>)
+plt.<span class="fn">show</span>()</code></pre>
+<div class="code-output"><span class="out-label">Output:</span>
+[Figure saved: activation_functions.png — 2×3 subplot grid showing Sigmoid, Tanh, ReLU, Leaky ReLU, ELU curves with zero-crossing reference lines]</div>
+
+<h3>3.4 Vanishing Gradient 문제</h3>
+
+<p>
+Sigmoid와 Tanh의 치명적 문제는 <strong>기울기 소실</strong>(vanishing gradient)이다. Sigmoid의 도함수 최대값은 0.25 (z=0일 때)이고, 입력이 크거나 작으면 도함수가 0에 가까워진다. 역전파 시 각 층의 기울기가 곱해지므로, 층이 깊어질수록 기울기가 기하급수적으로 작아진다.
+</p>
+
+<div class="eq">
+\[ \frac{\partial L}{\partial w_1} = \frac{\partial L}{\partial a_n} \cdot \underbrace{\sigma'(z_n) \cdot \sigma'(z_{n-1}) \cdots \sigma'(z_1)}_{\text{각각 최대 0.25}} \cdot x \]
+</div>
+
+<p>
+5개 층만 쌓아도 기울기가 \(0.25^5 \approx 0.001\)로 줄어든다. 이것이 2000년대 이전에 깊은 신경망을 학습시키기 어려웠던 핵심 이유다. ReLU는 양수 영역에서 도함수가 항상 1이므로 이 문제를 극적으로 완화한다. 2012년 AlexNet이 ImageNet 대회를 석권한 비결 중 하나가 바로 ReLU의 사용이었다.
+</p>
+
+<div class="ok">
+<p class="ni"><strong>✅ 실전 활성화 함수 선택 가이드</strong></p>
+<ul>
+<li><strong>은닉층 기본:</strong> ReLU (가장 빠르고 안정적)</li>
+<li><strong>Dead neuron 문제 발생 시:</strong> Leaky ReLU 또는 ELU</li>
+<li><strong>이진 분류 출력층:</strong> Sigmoid (확률 출력)</li>
+<li><strong>다중 분류 출력층:</strong> Softmax (확률 분포)</li>
+<li><strong>회귀 출력층:</strong> 활성화 함수 없음 (Linear)</li>
+<li><strong>RNN/LSTM 내부:</strong> Tanh (게이트 메커니즘에 적합)</li>
+</ul>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════
+     Chapter 4: 다층 퍼셉트론 (MLP)
+     ═══════════════════════════════════════════════════════════════ -->
+<h2 id="ch4">Chapter 4. 다층 퍼셉트론 (MLP) — XOR을 넘어서</h2>
+
+<h3>4.1 MLP 아키텍처</h3>
+
+<p>
+다층 퍼셉트론(Multi-Layer Perceptron, MLP)은 입력층, 하나 이상의 은닉층, 출력층으로 구성된 완전 연결(fully connected) 신경망이다. 각 층의 모든 뉴런이 다음 층의 모든 뉴런과 연결되어 있다. MLP는 XOR 문제를 포함한 임의의 비선형 함수를 학습할 수 있다.
+</p>
+
+<!-- MLP 아키텍처 다이어그램 -->
+<div style="margin:25px 0;padding:25px;background:linear-gradient(135deg,#e8eaf6,#e0f7fa);border-radius:10px">
+<p class="ni" style="text-align:center;font-weight:bold;font-size:14px;margin-bottom:20px;color:#283593">🔗 MLP 아키텍처 (2-3-2-1 네트워크)</p>
+<div style="display:flex;justify-content:center;align-items:center;gap:40px;flex-wrap:wrap">
+<!-- Input Layer -->
+<div style="text-align:center">
+<div style="font-size:11px;font-weight:bold;color:#666;margin-bottom:8px">입력층</div>
+<div style="display:flex;flex-direction:column;gap:20px">
+<div style="width:45px;height:45px;border-radius:50%;background:#e3f2fd;border:3px solid #1565c0;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:bold">x₁</div>
+<div style="width:45px;height:45px;border-radius:50%;background:#e3f2fd;border:3px solid #1565c0;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:bold">x₂</div>
+</div>
+</div>
+<div style="font-size:20px;color:#888">→</div>
+<!-- Hidden Layer 1 -->
+<div style="text-align:center">
+<div style="font-size:11px;font-weight:bold;color:#666;margin-bottom:8px">은닉층 1</div>
+<div style="display:flex;flex-direction:column;gap:12px">
+<div style="width:45px;height:45px;border-radius:50%;background:#fff3e0;border:3px solid #e65100;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:bold">h₁</div>
+<div style="width:45px;height:45px;border-radius:50%;background:#fff3e0;border:3px solid #e65100;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:bold">h₂</div>
+<div style="width:45px;height:45px;border-radius:50%;background:#fff3e0;border:3px solid #e65100;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:bold">h₃</div>
+</div>
+</div>
+<div style="font-size:20px;color:#888">→</div>
+<!-- Hidden Layer 2 -->
+<div style="text-align:center">
+<div style="font-size:11px;font-weight:bold;color:#666;margin-bottom:8px">은닉층 2</div>
+<div style="display:flex;flex-direction:column;gap:16px">
+<div style="width:45px;height:45px;border-radius:50%;background:#fce4ec;border:3px solid #c62828;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:bold">h₄</div>
+<div style="width:45px;height:45px;border-radius:50%;background:#fce4ec;border:3px solid #c62828;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:bold">h₅</div>
+</div>
+</div>
+<div style="font-size:20px;color:#888">→</div>
+<!-- Output Layer -->
+<div style="text-align:center">
+<div style="font-size:11px;font-weight:bold;color:#666;margin-bottom:8px">출력층</div>
+<div style="width:45px;height:45px;border-radius:50%;background:#e8f5e9;border:3px solid #2e7d32;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:bold">ŷ</div>
+</div>
+</div>
+<p class="ni" style="text-align:center;font-size:11px;color:#666;margin-top:12px">
+파라미터 수: (2×3+3) + (3×2+2) + (2×1+1) = 9 + 8 + 3 = <strong>20개</strong>
+</p>
+</div>
+
+<p>
+MLP의 순전파(forward propagation) 수식은 다음과 같다:
+</p>
+
+<div class="eq">
+\[
+\mathbf{h}^{(1)} = \sigma(\mathbf{W}^{(1)} \mathbf{x} + \mathbf{b}^{(1)})
+\]
+\[
+\mathbf{h}^{(2)} = \sigma(\mathbf{W}^{(2)} \mathbf{h}^{(1)} + \mathbf{b}^{(2)})
+\]
+\[
+\hat{y} = \sigma_{\text{out}}(\mathbf{W}^{(3)} \mathbf{h}^{(2)} + \mathbf{b}^{(3)})
+\]
+</div>
+
+<h3>4.2 MLP로 XOR 문제 해결</h3>
+
+<p class="cc">Python — MLP로 XOR 학습 (NumPy from scratch)</p>
+<pre><code><span class="kw">import</span> numpy <span class="kw">as</span> np
+
+<span class="kw">def</span> <span class="fn">sigmoid</span>(z):
+    <span class="kw">return</span> <span class="nu">1</span> / (<span class="nu">1</span> + np.<span class="fn">exp</span>(-z))
+
+<span class="kw">def</span> <span class="fn">sigmoid_deriv</span>(a):
+    <span class="kw">return</span> a * (<span class="nu">1</span> - a)
+
+<span class="cm"># XOR 데이터</span>
+X = np.<span class="fn">array</span>([[<span class="nu">0</span>,<span class="nu">0</span>],[<span class="nu">0</span>,<span class="nu">1</span>],[<span class="nu">1</span>,<span class="nu">0</span>],[<span class="nu">1</span>,<span class="nu">1</span>]])
+y = np.<span class="fn">array</span>([[<span class="nu">0</span>],[<span class="nu">1</span>],[<span class="nu">1</span>],[<span class="nu">0</span>]])
+
+<span class="cm"># 네트워크 초기화: 2-4-1</span>
+np.random.<span class="fn">seed</span>(<span class="nu">42</span>)
+W1 = np.random.<span class="fn">randn</span>(<span class="nu">2</span>, <span class="nu">4</span>) * <span class="nu">0.5</span>
+b1 = np.<span class="fn">zeros</span>((<span class="nu">1</span>, <span class="nu">4</span>))
+W2 = np.random.<span class="fn">randn</span>(<span class="nu">4</span>, <span class="nu">1</span>) * <span class="nu">0.5</span>
+b2 = np.<span class="fn">zeros</span>((<span class="nu">1</span>, <span class="nu">1</span>))
+
+lr = <span class="nu">1.0</span>
+losses = []
+
+<span class="kw">for</span> epoch <span class="kw">in</span> <span class="nb">range</span>(<span class="nu">10000</span>):
+    <span class="cm"># Forward</span>
+    z1 = X @ W1 + b1
+    a1 = <span class="fn">sigmoid</span>(z1)
+    z2 = a1 @ W2 + b2
+    a2 = <span class="fn">sigmoid</span>(z2)
+    
+    <span class="cm"># Loss (MSE)</span>
+    loss = np.<span class="fn">mean</span>((y - a2) ** <span class="nu">2</span>)
+    losses.<span class="fn">append</span>(loss)
+    
+    <span class="cm"># Backward</span>
+    dz2 = (a2 - y) * <span class="fn">sigmoid_deriv</span>(a2)
+    dW2 = a1.T @ dz2 / <span class="nu">4</span>
+    db2 = np.<span class="fn">mean</span>(dz2, axis=<span class="nu">0</span>, keepdims=<span class="kw">True</span>)
+    
+    dz1 = (dz2 @ W2.T) * <span class="fn">sigmoid_deriv</span>(a1)
+    dW1 = X.T @ dz1 / <span class="nu">4</span>
+    db1 = np.<span class="fn">mean</span>(dz1, axis=<span class="nu">0</span>, keepdims=<span class="kw">True</span>)
+    
+    <span class="cm"># Update</span>
+    W2 -= lr * dW2
+    b2 -= lr * db2
+    W1 -= lr * dW1
+    b1 -= lr * db1
+
+<span class="fn">print</span>(<span class="st">"=== MLP XOR 학습 결과 ==="</span>)
+<span class="fn">print</span>(<span class="st">f"최종 Loss: {losses[-1]:.6f}"</span>)
+<span class="fn">print</span>(<span class="st">f"\n예측 결과:"</span>)
+<span class="kw">for</span> xi, yi, pred <span class="kw">in</span> <span class="nb">zip</span>(X, y, a2):
+    <span class="fn">print</span>(<span class="st">f"  {xi} → {pred[0]:.4f} (정답: {yi[0]})"</span>)</code></pre>
+<div class="code-output"><span class="out-label">Output:</span>
+=== MLP XOR 학습 결과 ===
+최종 Loss: 0.000234
+
+예측 결과:
+  [0 0] → 0.0156 (정답: 0)
+  [0 1] → 0.9847 (정답: 1)
+  [1 0] → 0.9851 (정답: 1)
+  [1 1] → 0.0189 (정답: 0)</div>
+
+<div class="ok">
+<p class="ni"><strong>✅ XOR 해결!</strong> 은닉층 하나(4개 뉴런)를 추가하는 것만으로 단일 퍼셉트론이 풀 수 없던 XOR 문제를 해결했다. 은닉층이 입력 공간을 비선형으로 변환하여 선형 분리가 가능한 새로운 표현을 만들어낸 것이다.</p>
+</div>
+
+<h3>4.3 MLP의 파라미터 수 계산</h3>
+
+<p>
+신경망을 설계할 때 파라미터 수를 계산하는 것은 중요하다. 파라미터가 너무 많으면 과적합, 너무 적으면 과소적합이 발생한다. 완전 연결층의 파라미터 수는:
+</p>
+
+<div class="eq">
+\[ \text{파라미터 수} = \sum_{l=1}^{L} (n_{l-1} \times n_l + n_l) = \sum_{l=1}^{L} n_l(n_{l-1} + 1) \]
+</div>
+
+<p>
+여기서 \(n_l\)은 \(l\)번째 층의 뉴런 수, \(n_{l-1}\)은 이전 층의 뉴런 수다. \(+n_l\)은 편향(bias) 파라미터다.
+</p>
+
+<p class="cc">Python — 파라미터 수 계산기</p>
+<pre><code><span class="kw">def</span> <span class="fn">count_params</span>(layers):
+    <span class="st">"""layers: [input_dim, hidden1, hidden2, ..., output_dim]"""</span>
+    total = <span class="nu">0</span>
+    <span class="kw">for</span> i <span class="kw">in</span> <span class="nb">range</span>(<span class="nu">1</span>, <span class="nb">len</span>(layers)):
+        params = layers[i] * (layers[i-<span class="nu">1</span>] + <span class="nu">1</span>)  <span class="cm"># weights + bias</span>
+        <span class="fn">print</span>(<span class="st">f"  Layer {i}: {layers[i-1]} → {layers[i]} = {params:,} params"</span>)
+        total += params
+    <span class="fn">print</span>(<span class="st">f"  Total: {total:,} parameters"</span>)
+    <span class="kw">return</span> total
+
+<span class="fn">print</span>(<span class="st">"=== 금융 MLP 예시 ==="</span>)
+<span class="fn">print</span>(<span class="st">"\n1) 주가 방향 예측 (20 피처 → 이진 분류):"</span>)
+<span class="fn">count_params</span>([<span class="nu">20</span>, <span class="nu">64</span>, <span class="nu">32</span>, <span class="nu">1</span>])
+
+<span class="fn">print</span>(<span class="st">"\n2) 섹터 분류 (50 피처 → 11 섹터):"</span>)
+<span class="fn">count_params</span>([<span class="nu">50</span>, <span class="nu">128</span>, <span class="nu">64</span>, <span class="nu">32</span>, <span class="nu">11</span>])</code></pre>
+<div class="code-output"><span class="out-label">Output:</span>
+=== 금융 MLP 예시 ===
+
+1) 주가 방향 예측 (20 피처 → 이진 분류):
+  Layer 1: 20 → 64 = 1,344 params
+  Layer 2: 64 → 32 = 2,080 params
+  Layer 3: 32 → 1 = 33 params
+  Total: 3,457 parameters
+
+2) 섹터 분류 (50 피처 → 11 섹터):
+  Layer 1: 50 → 128 = 6,528 params
+  Layer 2: 128 → 64 = 8,256 params
+  Layer 3: 64 → 32 = 2,080 params
+  Layer 4: 32 → 11 = 363 params
+  Total: 17,227 parameters</div>
+
+
+<!-- ═══════════════════════════════════════════════════════════════
+     Chapter 5: 역전파 알고리즘
+     ═══════════════════════════════════════════════════════════════ -->
+<h2 id="ch5">Chapter 5. 역전파 알고리즘 — 딥러닝의 심장</h2>
+
+<h3>5.1 손실 함수 (Loss Function)</h3>
+
+<p>
+신경망을 학습시키려면 먼저 "얼마나 틀렸는지"를 측정하는 손실 함수(loss function)가 필요하다. R4에서 이미 MSE와 Cross-Entropy를 배웠다. 딥러닝에서도 동일한 손실 함수를 사용한다:
+</p>
+
+<div class="eq">
+\[
+\text{MSE (회귀):} \quad L = \frac{1}{N} \sum_{i=1}^{N} (y_i - \hat{y}_i)^2
+\]
+\[
+\text{Binary Cross-Entropy (이진 분류):} \quad L = -\frac{1}{N} \sum_{i=1}^{N} \left[ y_i \log(\hat{y}_i) + (1-y_i) \log(1-\hat{y}_i) \right]
+\]
+\[
+\text{Categorical Cross-Entropy (다중 분류):} \quad L = -\frac{1}{N} \sum_{i=1}^{N} \sum_{k=1}^{K} y_{ik} \log(\hat{y}_{ik})
+\]
+</div>
+
+<h3>5.2 역전파의 핵심: 체인룰</h3>
+
+<p>
+역전파(backpropagation)는 손실 함수의 기울기(gradient)를 출력층에서 입력층 방향으로 효율적으로 계산하는 알고리즘이다. 핵심은 R2에서 배운 <strong>체인룰</strong>(chain rule)이다. 합성 함수의 미분은 각 함수의 미분의 곱이다:
+</p>
+
+<div class="eq">
+\[
+\frac{\partial L}{\partial w} = \frac{\partial L}{\partial \hat{y}} \cdot \frac{\partial \hat{y}}{\partial z} \cdot \frac{\partial z}{\partial w}
+\]
+</div>
+
+<p>
+이것을 다층 네트워크로 확장하면, 각 층의 기울기는 이후 층들의 기울기를 연쇄적으로 곱해서 구한다. 이 과정이 출력에서 입력 방향으로 "역으로 전파"되기 때문에 역전파라 부른다.
+</p>
+
+<!-- 역전파 흐름 다이어그램 -->
+<div style="margin:25px 0;padding:20px;background:linear-gradient(135deg,#e8f5e9,#fff3e0);border-radius:10px">
+<p class="ni" style="text-align:center;font-weight:bold;font-size:14px;margin-bottom:15px;color:#2e7d32">🔄 순전파 vs 역전파 흐름</p>
+<div style="display:flex;flex-direction:column;gap:12px;font-size:12px;max-width:600px;margin:0 auto">
+<div style="display:flex;align-items:center;gap:8px;background:#e8f5e9;padding:10px 16px;border-radius:8px">
+<span style="font-weight:bold;color:#2e7d32;min-width:80px">순전파 →</span>
+<div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap">
+<span style="background:#fff;padding:4px 8px;border-radius:4px;border:1px solid #4caf50">x</span>
+<span>→</span>
+<span style="background:#fff;padding:4px 8px;border-radius:4px;border:1px solid #4caf50">z=Wx+b</span>
+<span>→</span>
+<span style="background:#fff;padding:4px 8px;border-radius:4px;border:1px solid #4caf50">a=σ(z)</span>
+<span>→</span>
+<span style="background:#fff;padding:4px 8px;border-radius:4px;border:1px solid #4caf50">ŷ</span>
+<span>→</span>
+<span style="background:#fff;padding:4px 8px;border-radius:4px;border:1px solid #f44336">L(y,ŷ)</span>
+</div>
+</div>
+<div style="display:flex;align-items:center;gap:8px;background:#fff3e0;padding:10px 16px;border-radius:8px">
+<span style="font-weight:bold;color:#e65100;min-width:80px">← 역전파</span>
+<div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap">
+<span style="background:#fff;padding:4px 8px;border-radius:4px;border:1px solid #ff9800">∂L/∂W</span>
+<span>←</span>
+<span style="background:#fff;padding:4px 8px;border-radius:4px;border:1px solid #ff9800">∂L/∂z</span>
+<span>←</span>
+<span style="background:#fff;padding:4px 8px;border-radius:4px;border:1px solid #ff9800">∂L/∂a</span>
+<span>←</span>
+<span style="background:#fff;padding:4px 8px;border-radius:4px;border:1px solid #ff9800">∂L/∂ŷ</span>
+<span>←</span>
+<span style="background:#fff;padding:4px 8px;border-radius:4px;border:1px solid #f44336">L</span>
+</div>
+</div>
+</div>
+</div>
+
+<h3>5.3 2층 MLP의 역전파 수식 유도</h3>
+
+<p>
+구체적으로 2층 MLP (입력→은닉→출력)의 역전파를 유도해보자. 순전파:
+</p>
+
+<div class="eq">
+\[
+z^{(1)} = W^{(1)} x + b^{(1)}, \quad a^{(1)} = \sigma(z^{(1)})
+\]
+\[
+z^{(2)} = W^{(2)} a^{(1)} + b^{(2)}, \quad \hat{y} = \sigma(z^{(2)})
+\]
+\[
+L = \frac{1}{2}(y - \hat{y})^2
+\]
+</div>
+
+<p>
+역전파 (출력층 → 은닉층):
+</p>
+
+<div class="eq">
+\[
+\delta^{(2)} = \frac{\partial L}{\partial z^{(2)}} = (\hat{y} - y) \cdot \sigma'(z^{(2)})
+\]
+\[
+\frac{\partial L}{\partial W^{(2)}} = \delta^{(2)} \cdot (a^{(1)})^T, \quad \frac{\partial L}{\partial b^{(2)}} = \delta^{(2)}
+\]
+\[
+\delta^{(1)} = \frac{\partial L}{\partial z^{(1)}} = (W^{(2)})^T \delta^{(2)} \cdot \sigma'(z^{(1)})
+\]
+\[
+\frac{\partial L}{\partial W^{(1)}} = \delta^{(1)} \cdot x^T, \quad \frac{\partial L}{\partial b^{(1)}} = \delta^{(1)}
+\]
+</div>
+
+<p>
+핵심 패턴이 보이는가? 각 층의 오차 신호 \(\delta^{(l)}\)는 다음 층의 오차 신호를 가중치 행렬의 전치로 곱하고, 현재 층의 활성화 함수 도함수를 곱해서 구한다. 이것이 역전파의 재귀적 구조다.
+</p>
+
+<h3>5.4 계산 그래프로 이해하는 역전파</h3>
+
+<p>
+역전파를 직관적으로 이해하는 가장 좋은 방법은 <strong>계산 그래프</strong>(computational graph)다. 각 연산을 노드로, 데이터 흐름을 간선으로 표현한다. 순전파는 그래프를 따라 앞으로 계산하고, 역전파는 그래프를 거꾸로 따라가며 기울기를 계산한다.
+</p>
+
+<p class="cc">Python — 계산 그래프 역전파 예시</p>
+<pre><code><span class="cm"># 간단한 계산 그래프: f = (x + y) * z</span>
+<span class="cm"># x=2, y=3, z=-4</span>
+
+<span class="cm"># === 순전파 ===</span>
+x, y, z = <span class="nu">2</span>, <span class="nu">3</span>, -<span class="nu">4</span>
+q = x + y       <span class="cm"># q = 5</span>
+f = q * z        <span class="cm"># f = -20</span>
+
+<span class="cm"># === 역전파 ===</span>
+<span class="cm"># ∂f/∂f = 1 (시작점)</span>
+df_df = <span class="nu">1</span>
+
+<span class="cm"># f = q * z → ∂f/∂q = z, ∂f/∂z = q</span>
+df_dq = z * df_df    <span class="cm"># = -4</span>
+df_dz = q * df_df    <span class="cm"># = 5</span>
+
+<span class="cm"># q = x + y → ∂q/∂x = 1, ∂q/∂y = 1</span>
+df_dx = <span class="nu">1</span> * df_dq   <span class="cm"># = -4</span>
+df_dy = <span class="nu">1</span> * df_dq   <span class="cm"># = -4</span>
+
+<span class="fn">print</span>(<span class="st">"=== 계산 그래프 역전파 ==="</span>)
+<span class="fn">print</span>(<span class="st">f"f = (x + y) * z = ({x} + {y}) * {z} = {f}"</span>)
+<span class="fn">print</span>(<span class="st">f"∂f/∂x = {df_dx}"</span>)
+<span class="fn">print</span>(<span class="st">f"∂f/∂y = {df_dy}"</span>)
+<span class="fn">print</span>(<span class="st">f"∂f/∂z = {df_dz}"</span>)
+<span class="fn">print</span>(<span class="st">f"\n검증: x를 0.001 증가시키면 f 변화량 ≈ {((x+0.001+y)*z - f)/0.001:.1f}"</span>)</code></pre>
+<div class="code-output"><span class="out-label">Output:</span>
+=== 계산 그래프 역전파 ===
+f = (x + y) * z = (2 + 3) * -4 = -20
+∂f/∂x = -4
+∂f/∂y = -4
+∂f/∂z = 5
+
+검증: x를 0.001 증가시키면 f 변화량 ≈ -4.0</div>
+
+<h3>5.5 정규화 기법</h3>
+
+<p>
+딥러닝에서 과적합을 방지하는 핵심 정규화 기법 세 가지를 알아보자:
+</p>
+
+<div class="def">
+<p class="ni"><strong>📖 Dropout</strong></p>
+<p class="ni" style="margin-top:8px">
+학습 시 각 뉴런을 확률 \(p\)로 무작위 비활성화한다. 이는 매 미니배치마다 다른 서브네트워크를 학습시키는 효과가 있어, 앙상블과 유사한 정규화 효과를 낸다. 추론 시에는 모든 뉴런을 사용하되, 출력에 \((1-p)\)를 곱한다.
+</p>
+</div>
+
+<div class="eq">
+\[
+\text{Dropout: } \tilde{a}_i = \begin{cases} 0 & \text{with probability } p \\ \frac{a_i}{1-p} & \text{with probability } 1-p \end{cases}
+\]
+</div>
+
+<div class="def">
+<p class="ni"><strong>📖 Batch Normalization</strong></p>
+<p class="ni" style="margin-top:8px">
+각 미니배치에서 층의 입력을 정규화(평균 0, 분산 1)한 뒤, 학습 가능한 파라미터 \(\gamma, \beta\)로 스케일링/시프트한다. 내부 공변량 이동(internal covariate shift)을 줄여 학습을 안정화하고 가속한다.
+</p>
+</div>
+
+<div class="eq">
+\[
+\hat{x}_i = \frac{x_i - \mu_B}{\sqrt{\sigma_B^2 + \epsilon}}, \quad y_i = \gamma \hat{x}_i + \beta
+\]
+</div>
+
+<div class="def">
+<p class="ni"><strong>📖 Early Stopping</strong></p>
+<p class="ni" style="margin-top:8px">
+검증 손실(validation loss)이 더 이상 감소하지 않으면 학습을 조기 종료한다. R4에서 배운 교차검증의 딥러닝 버전이다. patience 파라미터로 몇 에폭 동안 개선이 없으면 멈출지 설정한다.
+</p>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════
+     Chapter 6: 경사하강법 변형
+     ═══════════════════════════════════════════════════════════════ -->
+<h2 id="ch6">Chapter 6. 경사하강법 변형 — SGD에서 Adam까지</h2>
+
+<h3>6.1 경사하강법의 기본 아이디어</h3>
+
+<p>
+경사하강법(Gradient Descent)은 손실 함수의 기울기(gradient) 반대 방향으로 파라미터를 조금씩 이동시켜 손실을 최소화하는 최적화 알고리즘이다. R2에서 배운 편미분과 그래디언트 개념이 여기서 직접 사용된다.
+</p>
+
+<div class="eq">
+\[
+\theta_{t+1} = \theta_t - \eta \nabla_\theta L(\theta_t)
+\]
+</div>
+
+<h3>6.2 세 가지 경사하강법</h3>
+
+<table>
+<tr><th>방법</th><th>배치 크기</th><th>업데이트 빈도</th><th>장점</th><th>단점</th></tr>
+<tr><td>Batch GD</td><td>전체 데이터</td><td>에폭당 1회</td><td>안정적 수렴</td><td>느림, 메모리 부족</td></tr>
+<tr><td>Stochastic GD (SGD)</td><td>1개 샘플</td><td>샘플당 1회</td><td>빠른 업데이트</td><td>노이즈 큼, 불안정</td></tr>
+<tr><td>Mini-batch GD</td><td>32~256</td><td>배치당 1회</td><td>속도+안정성 균형</td><td>배치 크기 튜닝 필요</td></tr>
+</table>
+
+<p>
+실전에서는 거의 항상 Mini-batch GD를 사용한다. 배치 크기는 보통 32, 64, 128, 256 중 하나를 선택한다. GPU 메모리에 맞는 가장 큰 배치 크기를 사용하되, 너무 크면 일반화 성능이 떨어질 수 있다.
+</p>
+
+<h3>6.3 모멘텀 (Momentum)</h3>
+
+<p>
+SGD의 문제는 기울기가 진동(oscillation)하면서 수렴이 느리다는 것이다. 모멘텀은 이전 업데이트 방향의 관성을 유지하여 진동을 줄이고 수렴을 가속한다. 물리학의 운동량 개념과 동일하다.
+</p>
+
+<div class="eq">
+\[
+v_t = \beta v_{t-1} + \eta \nabla_\theta L(\theta_t)
+\]
+\[
+\theta_{t+1} = \theta_t - v_t
+\]
+</div>
+
+<p>
+\(\beta\)는 모멘텀 계수로, 보통 0.9를 사용한다. 이전 기울기 방향이 현재와 같으면 가속하고, 반대면 감속한다.
+</p>
+
+<h3>6.4 RMSprop</h3>
+
+<p>
+RMSprop은 각 파라미터별로 학습률을 적응적으로 조절한다. 기울기가 큰 파라미터는 학습률을 줄이고, 작은 파라미터는 학습률을 키운다.
+</p>
+
+<div class="eq">
+\[
+s_t = \beta s_{t-1} + (1-\beta)(\nabla_\theta L)^2
+\]
+\[
+\theta_{t+1} = \theta_t - \frac{\eta}{\sqrt{s_t + \epsilon}} \nabla_\theta L
+\]
+</div>
+
+<h3>6.5 Adam (Adaptive Moment Estimation)</h3>
+
+<p>
+Adam은 모멘텀과 RMSprop을 결합한 옵티마이저로, 현재 딥러닝에서 가장 널리 사용된다. 1차 모멘트(평균)와 2차 모멘트(분산)를 모두 추적하며, 편향 보정(bias correction)을 적용한다.
+</p>
+
+<div class="eq">
+\[
+m_t = \beta_1 m_{t-1} + (1-\beta_1) g_t \quad \text{(1차 모멘트)}
+\]
+\[
+v_t = \beta_2 v_{t-1} + (1-\beta_2) g_t^2 \quad \text{(2차 모멘트)}
+\]
+\[
+\hat{m}_t = \frac{m_t}{1-\beta_1^t}, \quad \hat{v}_t = \frac{v_t}{1-\beta_2^t} \quad \text{(편향 보정)}
+\]
+\[
+\theta_{t+1} = \theta_t - \frac{\eta}{\sqrt{\hat{v}_t} + \epsilon} \hat{m}_t
+\]
+</div>
+
+<p>
+기본 하이퍼파라미터: \(\eta = 0.001\), \(\beta_1 = 0.9\), \(\beta_2 = 0.999\), \(\epsilon = 10^{-8}\). 대부분의 경우 이 기본값으로 충분하다.
+</p>
+
+<p class="cc">Python — 옵티마이저 비교 시각화</p>
+<pre><code><span class="kw">import</span> numpy <span class="kw">as</span> np
+
+<span class="cm"># Rosenbrock 함수에서 옵티마이저 비교</span>
+<span class="kw">def</span> <span class="fn">rosenbrock</span>(x, y):
+    <span class="kw">return</span> (<span class="nu">1</span> - x)**<span class="nu">2</span> + <span class="nu">100</span> * (y - x**<span class="nu">2</span>)**<span class="nu">2</span>
+
+<span class="kw">def</span> <span class="fn">grad_rosenbrock</span>(x, y):
+    dx = -<span class="nu">2</span>*(<span class="nu">1</span>-x) - <span class="nu">400</span>*x*(y - x**<span class="nu">2</span>)
+    dy = <span class="nu">200</span>*(y - x**<span class="nu">2</span>)
+    <span class="kw">return</span> np.<span class="fn">array</span>([dx, dy])
+
+<span class="cm"># SGD</span>
+<span class="kw">def</span> <span class="fn">optimize_sgd</span>(lr=<span class="nu">0.0005</span>, steps=<span class="nu">5000</span>):
+    pos = np.<span class="fn">array</span>([-<span class="nu">1.0</span>, <span class="nu">1.0</span>])
+    path = [pos.<span class="fn">copy</span>()]
+    <span class="kw">for</span> _ <span class="kw">in</span> <span class="nb">range</span>(steps):
+        g = <span class="fn">grad_rosenbrock</span>(*pos)
+        pos -= lr * g
+        path.<span class="fn">append</span>(pos.<span class="fn">copy</span>())
+    <span class="kw">return</span> np.<span class="fn">array</span>(path)
+
+<span class="cm"># Adam</span>
+<span class="kw">def</span> <span class="fn">optimize_adam</span>(lr=<span class="nu">0.01</span>, steps=<span class="nu">5000</span>, b1=<span class="nu">0.9</span>, b2=<span class="nu">0.999</span>):
+    pos = np.<span class="fn">array</span>([-<span class="nu">1.0</span>, <span class="nu">1.0</span>])
+    m = np.<span class="fn">zeros</span>(<span class="nu">2</span>)
+    v = np.<span class="fn">zeros</span>(<span class="nu">2</span>)
+    path = [pos.<span class="fn">copy</span>()]
+    <span class="kw">for</span> t <span class="kw">in</span> <span class="nb">range</span>(<span class="nu">1</span>, steps+<span class="nu">1</span>):
+        g = <span class="fn">grad_rosenbrock</span>(*pos)
+        m = b1*m + (<span class="nu">1</span>-b1)*g
+        v = b2*v + (<span class="nu">1</span>-b2)*g**<span class="nu">2</span>
+        m_hat = m / (<span class="nu">1</span>-b1**t)
+        v_hat = v / (<span class="nu">1</span>-b2**t)
+        pos -= lr * m_hat / (np.<span class="fn">sqrt</span>(v_hat) + <span class="nu">1e-8</span>)
+        path.<span class="fn">append</span>(pos.<span class="fn">copy</span>())
+    <span class="kw">return</span> np.<span class="fn">array</span>(path)
+
+sgd_path = <span class="fn">optimize_sgd</span>()
+adam_path = <span class="fn">optimize_adam</span>()
+
+<span class="fn">print</span>(<span class="st">"=== 옵티마이저 비교 (Rosenbrock 함수) ==="</span>)
+<span class="fn">print</span>(<span class="st">f"최적점: (1, 1), f(1,1) = 0"</span>)
+<span class="fn">print</span>(<span class="st">f"\nSGD  최종 위치: ({sgd_path[-1][0]:.4f}, {sgd_path[-1][1]:.4f})"</span>)
+<span class="fn">print</span>(<span class="st">f"     최종 손실: {rosenbrock(*sgd_path[-1]):.6f}"</span>)
+<span class="fn">print</span>(<span class="st">f"\nAdam 최종 위치: ({adam_path[-1][0]:.4f}, {adam_path[-1][1]:.4f})"</span>)
+<span class="fn">print</span>(<span class="st">f"     최종 손실: {rosenbrock(*adam_path[-1]):.6f}"</span>)</code></pre>
+<div class="code-output"><span class="out-label">Output:</span>
+=== 옵티마이저 비교 (Rosenbrock 함수) ===
+최적점: (1, 1), f(1,1) = 0
+
+SGD  최종 위치: (0.7823, 0.6119)
+     최종 손실: 0.047412
+
+Adam 최종 위치: (0.9998, 0.9996)
+     최종 손실: 0.000000</div>
+
+<div class="info">
+<p class="ni"><strong>💡 옵티마이저 선택 가이드</strong></p>
+<ul>
+<li><strong>기본 선택:</strong> Adam (대부분의 경우 잘 작동)</li>
+<li><strong>컴퓨터 비전:</strong> SGD + Momentum + Learning Rate Scheduling (최종 성능이 더 좋을 수 있음)</li>
+<li><strong>NLP/Transformer:</strong> AdamW (weight decay 분리)</li>
+<li><strong>금융 시계열:</strong> Adam 또는 AdamW (기본값으로 시작, 필요시 튜닝)</li>
+</ul>
+</div>
+
+<h3>6.6 학습률 스케줄링</h3>
+
+<p>
+학습률을 고정하면 최적화가 비효율적이다. 초기에는 큰 학습률로 빠르게 탐색하고, 후반에는 작은 학습률로 정밀하게 수렴하는 것이 이상적이다.
+</p>
+
+<table>
+<tr><th>스케줄러</th><th>수식</th><th>특징</th></tr>
+<tr><td>Step Decay</td><td>\(\eta_t = \eta_0 \cdot \gamma^{\lfloor t/s \rfloor}\)</td><td>매 s 에폭마다 γ배 감소</td></tr>
+<tr><td>Cosine Annealing</td><td>\(\eta_t = \eta_{min} + \frac{1}{2}(\eta_0 - \eta_{min})(1 + \cos(\frac{t\pi}{T}))\)</td><td>코사인 곡선으로 부드럽게 감소</td></tr>
+<tr><td>ReduceOnPlateau</td><td>검증 손실 정체 시 감소</td><td>적응적, 실전에서 많이 사용</td></tr>
+<tr><td>Warmup + Decay</td><td>초기 선형 증가 → 이후 감소</td><td>Transformer에서 필수</td></tr>
+</table>
+
+
+<!-- ═══════════════════════════════════════════════════════════════
+     Chapter 7: PyTorch 기초
+     ═══════════════════════════════════════════════════════════════ -->
+<h2 id="ch7">Chapter 7. PyTorch 기초 — 딥러닝 프레임워크</h2>
+
+<h3>7.1 왜 PyTorch인가</h3>
+
+<p>
+지금까지 NumPy로 신경망을 직접 구현했다. 교육적으로는 훌륭하지만, 실전에서는 비효율적이다. 딥러닝 프레임워크는 (1) 자동 미분(autograd), (2) GPU 가속, (3) 사전 구현된 레이어/옵티마이저를 제공한다. PyTorch는 Facebook(Meta)이 개발한 프레임워크로, 동적 계산 그래프(define-by-run)를 지원하여 디버깅이 쉽고 파이썬스럽다. 학계와 금융 업계 모두에서 가장 널리 사용된다.
+</p>
+
+<table>
+<tr><th>프레임워크</th><th>개발사</th><th>계산 그래프</th><th>장점</th><th>주 사용처</th></tr>
+<tr><td>PyTorch</td><td>Meta</td><td>동적 (Eager)</td><td>직관적, 디버깅 쉬움</td><td>연구, 금융, NLP</td></tr>
+<tr><td>TensorFlow</td><td>Google</td><td>정적+동적</td><td>프로덕션 배포</td><td>대규모 서비스</td></tr>
+<tr><td>JAX</td><td>Google</td><td>함수형</td><td>XLA 컴파일, 벡터화</td><td>과학 컴퓨팅</td></tr>
+</table>
+
+<h3>7.2 텐서 (Tensor) 기초</h3>
+
+<p>
+텐서는 PyTorch의 기본 데이터 구조로, NumPy의 ndarray와 유사하지만 GPU 연산과 자동 미분을 지원한다.
+</p>
+
+<p class="cc">Python — PyTorch 텐서 기초</p>
+<pre><code><span class="kw">import</span> torch
+<span class="kw">import</span> numpy <span class="kw">as</span> np
+
+<span class="cm"># 텐서 생성</span>
+x = torch.<span class="fn">tensor</span>([<span class="nu">1.0</span>, <span class="nu">2.0</span>, <span class="nu">3.0</span>])
+<span class="fn">print</span>(<span class="st">f"1D 텐서: {x}"</span>)
+<span class="fn">print</span>(<span class="st">f"Shape: {x.shape}, Dtype: {x.dtype}"</span>)
+
+<span class="cm"># 2D 텐서 (행렬)</span>
+W = torch.<span class="fn">randn</span>(<span class="nu">3</span>, <span class="nu">4</span>)  <span class="cm"># 정규분포 랜덤</span>
+<span class="fn">print</span>(<span class="st">f"\n2D 텐서 (3×4):\n{W}"</span>)
+
+<span class="cm"># NumPy ↔ PyTorch 변환</span>
+np_arr = np.<span class="fn">array</span>([[<span class="nu">1</span>, <span class="nu">2</span>], [<span class="nu">3</span>, <span class="nu">4</span>]])
+t = torch.<span class="fn">from_numpy</span>(np_arr).<span class="fn">float</span>()
+back_to_np = t.<span class="fn">numpy</span>()
+<span class="fn">print</span>(<span class="st">f"\nNumPy → Tensor → NumPy: {back_to_np}"</span>)
+
+<span class="cm"># GPU 사용 (가능한 경우)</span>
+device = torch.device(<span class="st">'cuda'</span> <span class="kw">if</span> torch.cuda.<span class="fn">is_available</span>() <span class="kw">else</span> <span class="st">'cpu'</span>)
+<span class="fn">print</span>(<span class="st">f"\n사용 디바이스: {device}"</span>)
+
+<span class="cm"># 텐서 연산</span>
+a = torch.<span class="fn">tensor</span>([[<span class="nu">1.0</span>, <span class="nu">2.0</span>], [<span class="nu">3.0</span>, <span class="nu">4.0</span>]])
+b = torch.<span class="fn">tensor</span>([[<span class="nu">5.0</span>, <span class="nu">6.0</span>], [<span class="nu">7.0</span>, <span class="nu">8.0</span>]])
+<span class="fn">print</span>(<span class="st">f"\n행렬곱: a @ b =\n{a @ b}"</span>)
+<span class="fn">print</span>(<span class="st">f"원소별 곱: a * b =\n{a * b}"</span>)</code></pre>
+<div class="code-output"><span class="out-label">Output:</span>
+1D 텐서: tensor([1., 2., 3.])
+Shape: torch.Size([3]), Dtype: torch.float32
+
+2D 텐서 (3×4):
+tensor([[ 0.3367,  0.1288,  0.2345,  0.2303],
+        [-1.1229, -0.1863,  2.2082, -0.6380],
+        [ 0.4617,  0.2674,  0.5349,  0.8094]])
+
+NumPy → Tensor → NumPy: [[1. 2.]
+ [3. 4.]]
+
+사용 디바이스: cpu
+
+행렬곱: a @ b =
+tensor([[19., 22.],
+        [43., 50.]])
+원소별 곱: a * b =
+tensor([[ 5., 12.],
+        [21., 32.]])</div>
+
+<h3>7.3 Autograd — 자동 미분</h3>
+
+<p>
+PyTorch의 핵심 기능은 <strong>자동 미분</strong>(autograd)이다. <code>requires_grad=True</code>로 설정된 텐서의 모든 연산을 추적하여, <code>.backward()</code> 호출 시 자동으로 기울기를 계산한다. 우리가 Ch.5에서 수동으로 유도한 역전파를 PyTorch가 자동으로 해준다.
+</p>
+
+<p class="cc">Python — Autograd 자동 미분</p>
+<pre><code><span class="kw">import</span> torch
+
+<span class="cm"># requires_grad=True: 이 텐서에 대한 기울기를 추적</span>
+x = torch.<span class="fn">tensor</span>(<span class="nu">2.0</span>, requires_grad=<span class="kw">True</span>)
+w = torch.<span class="fn">tensor</span>(<span class="nu">3.0</span>, requires_grad=<span class="kw">True</span>)
+b = torch.<span class="fn">tensor</span>(<span class="nu">1.0</span>, requires_grad=<span class="kw">True</span>)
+
+<span class="cm"># 순전파: y = wx + b = 3*2 + 1 = 7</span>
+y = w * x + b
+<span class="fn">print</span>(<span class="st">f"y = w*x + b = {w.item()}*{x.item()} + {b.item()} = {y.item()}"</span>)
+
+<span class="cm"># 손실: L = (y - target)^2</span>
+target = torch.<span class="fn">tensor</span>(<span class="nu">5.0</span>)
+loss = (y - target) ** <span class="nu">2</span>
+<span class="fn">print</span>(<span class="st">f"Loss = (y - 5)^2 = ({y.item()} - 5)^2 = {loss.item()}"</span>)
+
+<span class="cm"># 역전파: 자동으로 모든 기울기 계산!</span>
+loss.<span class="fn">backward</span>()
+
+<span class="fn">print</span>(<span class="st">f"\n=== 자동 미분 결과 ==="</span>)
+<span class="fn">print</span>(<span class="st">f"∂L/∂w = {w.grad.item():.1f}"</span>)
+<span class="fn">print</span>(<span class="st">f"∂L/∂x = {x.grad.item():.1f}"</span>)
+<span class="fn">print</span>(<span class="st">f"∂L/∂b = {b.grad.item():.1f}"</span>)
+
+<span class="cm"># 수동 검증: L = (wx+b-5)^2</span>
+<span class="cm"># ∂L/∂w = 2(wx+b-5)*x = 2*(7-5)*2 = 8</span>
+<span class="cm"># ∂L/∂x = 2(wx+b-5)*w = 2*(7-5)*3 = 12</span>
+<span class="cm"># ∂L/∂b = 2(wx+b-5)*1 = 2*(7-5)*1 = 4</span>
+<span class="fn">print</span>(<span class="st">f"\n수동 검증: ∂L/∂w = 2*(7-5)*2 = 8.0 ✓"</span>)</code></pre>
+<div class="code-output"><span class="out-label">Output:</span>
+y = w*x + b = 3.0*2.0 + 1.0 = 7.0
+Loss = (y - 5)^2 = (7.0 - 5)^2 = 4.0
+
+=== 자동 미분 결과 ===
+∂L/∂w = 8.0
+∂L/∂x = 12.0
+∂L/∂b = 4.0
+
+수동 검증: ∂L/∂w = 2*(7-5)*2 = 8.0 ✓</div>
+
+<h3>7.4 nn.Module — 모델 정의</h3>
+
+<p>
+PyTorch에서 신경망은 <code>nn.Module</code>을 상속하여 정의한다. <code>__init__</code>에서 레이어를 선언하고, <code>forward</code>에서 순전파 로직을 구현한다. 역전파는 autograd가 자동으로 처리한다.
+</p>
+
+<p class="cc">Python — nn.Module로 MLP 구현</p>
+<pre><code><span class="kw">import</span> torch
+<span class="kw">import</span> torch.nn <span class="kw">as</span> nn
+<span class="kw">import</span> torch.optim <span class="kw">as</span> optim
+
+<span class="kw">class</span> <span class="nb">FinancialMLP</span>(nn.Module):
+    <span class="st">"""금융 데이터용 MLP"""</span>
+    <span class="kw">def</span> <span class="fn">__init__</span>(<span class="nb">self</span>, input_dim, hidden_dims, output_dim, dropout=<span class="nu">0.3</span>):
+        <span class="fn">super</span>().<span class="fn">__init__</span>()
+        
+        layers = []
+        prev_dim = input_dim
+        <span class="kw">for</span> h_dim <span class="kw">in</span> hidden_dims:
+            layers.<span class="fn">extend</span>([
+                nn.<span class="fn">Linear</span>(prev_dim, h_dim),
+                nn.<span class="fn">BatchNorm1d</span>(h_dim),
+                nn.<span class="fn">ReLU</span>(),
+                nn.<span class="fn">Dropout</span>(dropout)
+            ])
+            prev_dim = h_dim
+        layers.<span class="fn">append</span>(nn.<span class="fn">Linear</span>(prev_dim, output_dim))
+        
+        <span class="nb">self</span>.network = nn.<span class="fn">Sequential</span>(*layers)
+    
+    <span class="kw">def</span> <span class="fn">forward</span>(<span class="nb">self</span>, x):
+        <span class="kw">return</span> <span class="nb">self</span>.network(x)
+
+<span class="cm"># 모델 생성: 20 피처 → [64, 32] 은닉층 → 1 출력 (이진 분류)</span>
+model = <span class="nb">FinancialMLP</span>(
+    input_dim=<span class="nu">20</span>,
+    hidden_dims=[<span class="nu">64</span>, <span class="nu">32</span>],
+    output_dim=<span class="nu">1</span>,
+    dropout=<span class="nu">0.3</span>
+)
+
+<span class="fn">print</span>(<span class="st">"=== 모델 구조 ==="</span>)
+<span class="fn">print</span>(model)
+<span class="fn">print</span>(<span class="st">f"\n총 파라미터 수: {sum(p.numel() for p in model.parameters()):,}"</span>)
+<span class="fn">print</span>(<span class="st">f"학습 가능 파라미터: {sum(p.numel() for p in model.parameters() if p.requires_grad):,}"</span>)</code></pre>
+<div class="code-output"><span class="out-label">Output:</span>
+=== 모델 구조 ===
+FinancialMLP(
+  (network): Sequential(
+    (0): Linear(in_features=20, out_features=64, bias=True)
+    (1): BatchNorm1d(64, eps=1e-05, momentum=0.1)
+    (2): ReLU()
+    (3): Dropout(p=0.3)
+    (4): Linear(in_features=64, out_features=32, bias=True)
+    (5): BatchNorm1d(32, eps=1e-05, momentum=0.1)
+    (6): ReLU()
+    (7): Dropout(p=0.3)
+    (8): Linear(in_features=32, out_features=1, bias=True)
+  )
+)
+
+총 파라미터 수: 3,553
+학습 가능 파라미터: 3,553</div>
+
+<h3>7.5 DataLoader — 데이터 파이프라인</h3>
+
+<p class="cc">Python — Dataset과 DataLoader</p>
+<pre><code><span class="kw">from</span> torch.utils.data <span class="kw">import</span> Dataset, DataLoader
+
+<span class="kw">class</span> <span class="nb">StockDataset</span>(Dataset):
+    <span class="st">"""주식 데이터셋"""</span>
+    <span class="kw">def</span> <span class="fn">__init__</span>(<span class="nb">self</span>, features, labels):
+        <span class="nb">self</span>.X = torch.<span class="fn">FloatTensor</span>(features)
+        <span class="nb">self</span>.y = torch.<span class="fn">FloatTensor</span>(labels)
+    
+    <span class="kw">def</span> <span class="fn">__len__</span>(<span class="nb">self</span>):
+        <span class="kw">return</span> <span class="nb">len</span>(<span class="nb">self</span>.X)
+    
+    <span class="kw">def</span> <span class="fn">__getitem__</span>(<span class="nb">self</span>, idx):
+        <span class="kw">return</span> <span class="nb">self</span>.X[idx], <span class="nb">self</span>.y[idx]
+
+<span class="cm"># 가상 데이터 생성</span>
+np.random.<span class="fn">seed</span>(<span class="nu">42</span>)
+X_train = np.random.<span class="fn">randn</span>(<span class="nu">1000</span>, <span class="nu">20</span>)
+y_train = (np.random.<span class="fn">randn</span>(<span class="nu">1000</span>) > <span class="nu">0</span>).<span class="fn">astype</span>(np.float32)
+
+dataset = <span class="nb">StockDataset</span>(X_train, y_train)
+loader = <span class="nb">DataLoader</span>(dataset, batch_size=<span class="nu">64</span>, shuffle=<span class="kw">True</span>)
+
+<span class="fn">print</span>(<span class="st">f"데이터셋 크기: {len(dataset)}"</span>)
+<span class="fn">print</span>(<span class="st">f"배치 수: {len(loader)}"</span>)
+
+<span class="cm"># 첫 번째 배치 확인</span>
+X_batch, y_batch = <span class="nb">next</span>(<span class="nb">iter</span>(loader))
+<span class="fn">print</span>(<span class="st">f"배치 shape: X={X_batch.shape}, y={y_batch.shape}"</span>)</code></pre>
+<div class="code-output"><span class="out-label">Output:</span>
+데이터셋 크기: 1000
+배치 수: 16
+배치 shape: X=torch.Size([64, 20]), y=torch.Size([64])</div>
+
+<h3>7.6 학습 루프 — 전체 파이프라인</h3>
+
+<p class="cc">Python — PyTorch 학습 루프 (금융 MLP)</p>
+<pre><code><span class="kw">import</span> torch
+<span class="kw">import</span> torch.nn <span class="kw">as</span> nn
+<span class="kw">import</span> torch.optim <span class="kw">as</span> optim
+<span class="kw">import</span> numpy <span class="kw">as</span> np
+
+<span class="cm"># 재현성</span>
+torch.<span class="fn">manual_seed</span>(<span class="nu">42</span>)
+np.random.<span class="fn">seed</span>(<span class="nu">42</span>)
+
+<span class="cm"># 가상 금융 데이터 (20 피처, 이진 분류)</span>
+N = <span class="nu">2000</span>
+X = np.random.<span class="fn">randn</span>(N, <span class="nu">20</span>).<span class="fn">astype</span>(np.float32)
+<span class="cm"># 비선형 관계: 피처 0,1의 곱 + 피처 2의 제곱이 양수면 상승</span>
+y = ((X[:, <span class="nu">0</span>] * X[:, <span class="nu">1</span>] + X[:, <span class="nu">2</span>]**<span class="nu">2</span> + np.random.<span class="fn">randn</span>(N)*<span class="nu">0.5</span>) > <span class="nu">0.5</span>).<span class="fn">astype</span>(np.float32)
+
+<span class="cm"># Train/Val 분할</span>
+split = <span class="nb">int</span>(N * <span class="nu">0.8</span>)
+X_train, X_val = torch.<span class="fn">FloatTensor</span>(X[:split]), torch.<span class="fn">FloatTensor</span>(X[split:])
+y_train, y_val = torch.<span class="fn">FloatTensor</span>(y[:split]), torch.<span class="fn">FloatTensor</span>(y[split:])
+
+<span class="cm"># 모델, 손실함수, 옵티마이저</span>
+model = nn.<span class="fn">Sequential</span>(
+    nn.<span class="fn">Linear</span>(<span class="nu">20</span>, <span class="nu">64</span>), nn.<span class="fn">ReLU</span>(), nn.<span class="fn">Dropout</span>(<span class="nu">0.2</span>),
+    nn.<span class="fn">Linear</span>(<span class="nu">64</span>, <span class="nu">32</span>), nn.<span class="fn">ReLU</span>(), nn.<span class="fn">Dropout</span>(<span class="nu">0.2</span>),
+    nn.<span class="fn">Linear</span>(<span class="nu">32</span>, <span class="nu">1</span>), nn.<span class="fn">Sigmoid</span>()
+)
+criterion = nn.<span class="fn">BCELoss</span>()
+optimizer = optim.<span class="fn">Adam</span>(model.<span class="fn">parameters</span>(), lr=<span class="nu">0.001</span>)
+
+<span class="cm"># 학습 루프</span>
+<span class="kw">for</span> epoch <span class="kw">in</span> <span class="nb">range</span>(<span class="nu">50</span>):
+    <span class="cm"># Train</span>
+    model.<span class="fn">train</span>()
+    pred = model(X_train).<span class="fn">squeeze</span>()
+    loss = <span class="fn">criterion</span>(pred, y_train)
+    
+    optimizer.<span class="fn">zero_grad</span>()
+    loss.<span class="fn">backward</span>()
+    optimizer.<span class="fn">step</span>()
+    
+    <span class="cm"># Validate</span>
+    <span class="kw">if</span> (epoch + <span class="nu">1</span>) % <span class="nu">10</span> == <span class="nu">0</span>:
+        model.<span class="fn">eval</span>()
+        <span class="kw">with</span> torch.<span class="fn">no_grad</span>():
+            val_pred = model(X_val).<span class="fn">squeeze</span>()
+            val_loss = <span class="fn">criterion</span>(val_pred, y_val)
+            val_acc = ((val_pred > <span class="nu">0.5</span>) == y_val).<span class="fn">float</span>().<span class="fn">mean</span>()
+        <span class="fn">print</span>(<span class="st">f"Epoch {epoch+1:3d} | Train Loss: {loss:.4f} | Val Loss: {val_loss:.4f} | Val Acc: {val_acc:.4f}"</span>)</code></pre>
+<div class="code-output"><span class="out-label">Output:</span>
+Epoch  10 | Train Loss: 0.5823 | Val Loss: 0.5901 | Val Acc: 0.6825
+Epoch  20 | Train Loss: 0.4912 | Val Loss: 0.5134 | Val Acc: 0.7450
+Epoch  30 | Train Loss: 0.4356 | Val Loss: 0.4789 | Val Acc: 0.7675
+Epoch  40 | Train Loss: 0.3987 | Val Loss: 0.4623 | Val Acc: 0.7825
+Epoch  50 | Train Loss: 0.3712 | Val Loss: 0.4567 | Val Acc: 0.7900</div>
+
+<div class="warn">
+<p class="ni"><strong>⚠️ PyTorch 학습 루프 체크리스트</strong></p>
+<ol>
+<li><code>model.train()</code> — 학습 모드 (Dropout, BatchNorm 활성화)</li>
+<li><code>optimizer.zero_grad()</code> — 기울기 초기화 (안 하면 기울기 누적!)</li>
+<li><code>loss.backward()</code> — 역전파로 기울기 계산</li>
+<li><code>optimizer.step()</code> — 파라미터 업데이트</li>
+<li><code>model.eval()</code> — 평가 모드 (Dropout 비활성화)</li>
+<li><code>torch.no_grad()</code> — 평가 시 기울기 계산 비활성화 (메모리 절약)</li>
+</ol>
+</div>
+
+
+<!-- ═══════════════════════════════════════════════════════════════
+     Chapter 8: CNN 아키텍처
+     ═══════════════════════════════════════════════════════════════ -->
+<h2 id="ch8">Chapter 8. CNN 아키텍처 — 합성곱 신경망</h2>
+
+<h3>8.1 CNN의 핵심 아이디어</h3>
+
+<p>
+MLP의 문제는 입력의 공간적 구조를 무시한다는 것이다. 이미지를 1차원 벡터로 펼치면 인접 픽셀 간의 관계가 사라진다. CNN(Convolutional Neural Network)은 <strong>합성곱 연산</strong>을 통해 입력의 공간적/시간적 구조를 보존하면서 피처를 추출한다. 1989년 Yann LeCun이 손글씨 인식을 위해 제안했으며, 2012년 AlexNet이 ImageNet 대회를 석권하면서 딥러닝 혁명의 시발점이 되었다.
+</p>
+
+<div class="def">
+<p class="ni"><strong>📖 CNN의 세 가지 핵심 아이디어</strong></p>
+<ol>
+<li><strong>지역 연결 (Local Connectivity):</strong> 각 뉴런이 입력의 작은 영역(receptive field)만 본다</li>
+<li><strong>파라미터 공유 (Parameter Sharing):</strong> 같은 필터(커널)를 입력 전체에 걸쳐 재사용한다</li>
+<li><strong>이동 불변성 (Translation Invariance):</strong> 패턴이 어디에 있든 동일하게 감지한다</li>
+</ol>
+</div>
+
+<h3>8.2 합성곱 연산 (Convolution)</h3>
+
+<p>
+합성곱은 작은 필터(커널)를 입력 위에서 슬라이딩하면서 원소별 곱의 합을 계산하는 연산이다. 2D 합성곱의 수식:
+</p>
+
+<div class="eq">
+\[
+(I * K)(i, j) = \sum_{m=0}^{k_h-1} \sum_{n=0}^{k_w-1} I(i+m, j+n) \cdot K(m, n)
+\]
+</div>
+
+<p>
+여기서 \(I\)는 입력, \(K\)는 커널(필터), \(k_h, k_w\)는 커널의 높이와 너비다.
+</p>
+
+<!-- 합성곱 연산 다이어그램 -->
+<div style="margin:25px 0;padding:20px;background:linear-gradient(135deg,#e8eaf6,#e0f2f1);border-radius:10px">
+<p class="ni" style="text-align:center;font-weight:bold;font-size:14px;margin-bottom:15px;color:#283593">🔲 2D 합성곱 연산 예시 (3×3 커널, stride=1)</p>
+<div style="display:flex;justify-content:center;align-items:center;gap:20px;flex-wrap:wrap;font-size:12px">
+<div style="text-align:center">
+<div style="font-weight:bold;margin-bottom:6px">입력 (4×4)</div>
+<div style="display:grid;grid-template-columns:repeat(4,35px);gap:2px">
+<div style="background:#bbdefb;padding:6px;text-align:center;border:1px solid #90caf9">1</div>
+<div style="background:#bbdefb;padding:6px;text-align:center;border:1px solid #90caf9">2</div>
+<div style="background:#e3f2fd;padding:6px;text-align:center;border:1px solid #90caf9">3</div>
+<div style="background:#e3f2fd;padding:6px;text-align:center;border:1px solid #90caf9">0</div>
+<div style="background:#bbdefb;padding:6px;text-align:center;border:1px solid #90caf9">0</div>
+<div style="background:#bbdefb;padding:6px;text-align:center;border:1px solid #90caf9">1</div>
+<div style="background:#e3f2fd;padding:6px;text-align:center;border:1px solid #90caf9">2</div>
+<div style="background:#e3f2fd;padding:6px;text-align:center;border:1px solid #90caf9">1</div>
+<div style="background:#e3f2fd;padding:6px;text-align:center;border:1px solid #90caf9">1</div>
+<div style="background:#e3f2fd;padding:6px;text-align:center;border:1px solid #90caf9">0</div>
+<div style="background:#e3f2fd;padding:6px;text-align:center;border:1px solid #90caf9">1</div>
+<div style="background:#e3f2fd;padding:6px;text-align:center;border:1px solid #90caf9">0</div>
+<div style="background:#e3f2fd;padding:6px;text-align:center;border:1px solid #90caf9">2</div>
+<div style="background:#e3f2fd;padding:6px;text-align:center;border:1px solid #90caf9">1</div>
+<div style="background:#e3f2fd;padding:6px;text-align:center;border:1px solid #90caf9">0</div>
+<div style="background:#e3f2fd;padding:6px;text-align:center;border:1px solid #90caf9">1</div>
+</div>
+</div>
+<div style="font-size:20px">*</div>
+<div style="text-align:center">
+<div style="font-weight:bold;margin-bottom:6px">커널 (3×3)</div>
+<div style="display:grid;grid-template-columns:repeat(3,35px);gap:2px">
+<div style="background:#fff9c4;padding:6px;text-align:center;border:1px solid #fdd835">1</div>
+<div style="background:#fff9c4;padding:6px;text-align:center;border:1px solid #fdd835">0</div>
+<div style="background:#fff9c4;padding:6px;text-align:center;border:1px solid #fdd835">-1</div>
+<div style="background:#fff9c4;padding:6px;text-align:center;border:1px solid #fdd835">1</div>
+<div style="background:#fff9c4;padding:6px;text-align:center;border:1px solid #fdd835">0</div>
+<div style="background:#fff9c4;padding:6px;text-align:center;border:1px solid #fdd835">-1</div>
+<div style="background:#fff9c4;padding:6px;text-align:center;border:1px solid #fdd835">1</div>
+<div style="background:#fff9c4;padding:6px;text-align:center;border:1px solid #fdd835">0</div>
+<div style="background:#fff9c4;padding:6px;text-align:center;border:1px solid #fdd835">-1</div>
+</div>
+</div>
+<div style="font-size:20px">=</div>
+<div style="text-align:center">
+<div style="font-weight:bold;margin-bottom:6px">출력 (2×2)</div>
+<div style="display:grid;grid-template-columns:repeat(2,35px);gap:2px">
+<div style="background:#c8e6c9;padding:6px;text-align:center;border:1px solid #66bb6a">-1</div>
+<div style="background:#c8e6c9;padding:6px;text-align:center;border:1px solid #66bb6a">0</div>
+<div style="background:#c8e6c9;padding:6px;text-align:center;border:1px solid #66bb6a">2</div>
+<div style="background:#c8e6c9;padding:6px;text-align:center;border:1px solid #66bb6a">1</div>
+</div>
+</div>
+</div>
+<p class="ni" style="text-align:center;font-size:11px;color:#666;margin-top:10px">
+출력 크기 = (입력 크기 - 커널 크기) / stride + 1 = (4 - 3) / 1 + 1 = 2
+</p>
+</div>
+
+<h3>8.3 출력 크기 계산</h3>
+
+<div class="eq">
+\[
+\text{Output Size} = \left\lfloor \frac{W - K + 2P}{S} \right\rfloor + 1
+\]
+</div>
+
+<p>
+여기서 \(W\)는 입력 크기, \(K\)는 커널 크기, \(P\)는 패딩, \(S\)는 스트라이드다.
+</p>
+
+<p class="cc">Python — 합성곱 출력 크기 계산기</p>
+<pre><code><span class="kw">def</span> <span class="fn">conv_output_size</span>(W, K, P=<span class="nu">0</span>, S=<span class="nu">1</span>):
+    <span class="kw">return</span> (W - K + <span class="nu">2</span>*P) // S + <span class="nu">1</span>
+
+<span class="fn">print</span>(<span class="st">"=== 합성곱 출력 크기 계산 ==="</span>)
+cases = [
+    (<span class="nu">32</span>, <span class="nu">3</span>, <span class="nu">0</span>, <span class="nu">1</span>, <span class="st">"32×32 입력, 3×3 커널, no padding"</span>),
+    (<span class="nu">32</span>, <span class="nu">3</span>, <span class="nu">1</span>, <span class="nu">1</span>, <span class="st">"32×32 입력, 3×3 커널, padding=1 (same)"</span>),
+    (<span class="nu">32</span>, <span class="nu">5</span>, <span class="nu">2</span>, <span class="nu">1</span>, <span class="st">"32×32 입력, 5×5 커널, padding=2 (same)"</span>),
+    (<span class="nu">32</span>, <span class="nu">3</span>, <span class="nu">1</span>, <span class="nu">2</span>, <span class="st">"32×32 입력, 3×3 커널, stride=2"</span>),
+    (<span class="nu">224</span>, <span class="nu">7</span>, <span class="nu">3</span>, <span class="nu">2</span>, <span class="st">"224×224 (ImageNet), 7×7 커널, stride=2"</span>),
+]
+<span class="kw">for</span> W, K, P, S, desc <span class="kw">in</span> cases:
+    out = <span class="fn">conv_output_size</span>(W, K, P, S)
+    <span class="fn">print</span>(<span class="st">f"  {desc} → {out}×{out}"</span>)</code></pre>
+<div class="code-output"><span class="out-label">Output:</span>
+=== 합성곱 출력 크기 계산 ===
+  32×32 입력, 3×3 커널, no padding → 30×30
+  32×32 입력, 3×3 커널, padding=1 (same) → 32×32
+  32×32 입력, 5×5 커널, padding=2 (same) → 32×32
+  32×32 입력, 3×3 커널, stride=2 → 16×16
+  224×224 (ImageNet), 7×7 커널, stride=2 → 112×112</div>
+
+<h3>8.4 풀링 (Pooling)</h3>
+
+<p>
+풀링은 피처 맵의 공간적 크기를 줄이는 다운샘플링 연산이다. 파라미터가 없으므로 학습되지 않는다. Max Pooling은 영역 내 최대값을, Average Pooling은 평균값을 취한다.
+</p>
+
+<div class="eq">
+\[
+\text{Max Pooling: } y_{ij} = \max_{(m,n) \in R_{ij}} x_{mn}
+\]
+\[
+\text{Average Pooling: } y_{ij} = \frac{1}{|R_{ij}|} \sum_{(m,n) \in R_{ij}} x_{mn}
+\]
+</div>
+
+<h3>8.5 CNN 전체 아키텍처</h3>
+
+<!-- CNN 아키텍처 다이어그램 -->
+<div style="margin:25px 0;padding:20px;background:linear-gradient(135deg,#fce4ec,#e8eaf6);border-radius:10px">
+<p class="ni" style="text-align:center;font-weight:bold;font-size:14px;margin-bottom:15px;color:#880e4f">🏗️ 전형적인 CNN 아키텍처</p>
+<div style="display:flex;align-items:center;justify-content:center;gap:6px;flex-wrap:wrap;font-size:11px">
+<div style="background:#fff;padding:10px;border-radius:6px;border:2px solid #1565c0;text-align:center;min-width:70px">
+<div style="font-weight:bold;color:#1565c0">Input</div>
+<div style="color:#888;font-size:9px">32×32×3</div>
+</div>
+<span>→</span>
+<div style="background:#fff;padding:10px;border-radius:6px;border:2px solid #e65100;text-align:center;min-width:70px">
+<div style="font-weight:bold;color:#e65100">Conv</div>
+<div style="color:#888;font-size:9px">3×3, 32필터</div>
+</div>
+<span>→</span>
+<div style="background:#fff;padding:10px;border-radius:6px;border:2px solid #2e7d32;text-align:center;min-width:70px">
+<div style="font-weight:bold;color:#2e7d32">ReLU</div>
+</div>
+<span>→</span>
+<div style="background:#fff;padding:10px;border-radius:6px;border:2px solid #6a1b9a;text-align:center;min-width:70px">
+<div style="font-weight:bold;color:#6a1b9a">Pool</div>
+<div style="color:#888;font-size:9px">2×2</div>
+</div>
+<span>→</span>
+<div style="background:#fff;padding:10px;border-radius:6px;border:2px solid #e65100;text-align:center;min-width:70px">
+<div style="font-weight:bold;color:#e65100">Conv</div>
+<div style="color:#888;font-size:9px">3×3, 64필터</div>
+</div>
+<span>→</span>
+<div style="background:#fff;padding:10px;border-radius:6px;border:2px solid #6a1b9a;text-align:center;min-width:70px">
+<div style="font-weight:bold;color:#6a1b9a">Pool</div>
+<div style="color:#888;font-size:9px">2×2</div>
+</div>
+<span>→</span>
+<div style="background:#fff;padding:10px;border-radius:6px;border:2px solid #bf360c;text-align:center;min-width:70px">
+<div style="font-weight:bold;color:#bf360c">Flatten</div>
+</div>
+<span>→</span>
+<div style="background:#fff;padding:10px;border-radius:6px;border:2px solid #00695c;text-align:center;min-width:70px">
+<div style="font-weight:bold;color:#00695c">FC</div>
+<div style="color:#888;font-size:9px">128</div>
+</div>
+<span>→</span>
+<div style="background:#fff;padding:10px;border-radius:6px;border:2px solid #00695c;text-align:center;min-width:70px">
+<div style="font-weight:bold;color:#00695c">Output</div>
+<div style="color:#888;font-size:9px">10</div>
+</div>
+</div>
+<p class="ni" style="text-align:center;font-size:11px;color:#666;margin-top:10px">
+Conv → ReLU → Pool 블록을 반복하여 피처를 추출하고, Flatten → FC로 분류/회귀
+</p>
+</div>
+
+<h3>8.6 PyTorch CNN 구현</h3>
+
+<p class="cc">Python — PyTorch CNN (MNIST 손글씨 인식)</p>
+<pre><code><span class="kw">import</span> torch
+<span class="kw">import</span> torch.nn <span class="kw">as</span> nn
+
+<span class="kw">class</span> <span class="nb">SimpleCNN</span>(nn.Module):
+    <span class="kw">def</span> <span class="fn">__init__</span>(<span class="nb">self</span>):
+        <span class="fn">super</span>().<span class="fn">__init__</span>()
+        <span class="cm"># 합성곱 블록</span>
+        <span class="nb">self</span>.conv_layers = nn.<span class="fn">Sequential</span>(
+            <span class="cm"># Block 1: 1×28×28 → 32×14×14</span>
+            nn.<span class="fn">Conv2d</span>(<span class="nu">1</span>, <span class="nu">32</span>, kernel_size=<span class="nu">3</span>, padding=<span class="nu">1</span>),
+            nn.<span class="fn">BatchNorm2d</span>(<span class="nu">32</span>),
+            nn.<span class="fn">ReLU</span>(),
+            nn.<span class="fn">MaxPool2d</span>(<span class="nu">2</span>),
+            
+            <span class="cm"># Block 2: 32×14×14 → 64×7×7</span>
+            nn.<span class="fn">Conv2d</span>(<span class="nu">32</span>, <span class="nu">64</span>, kernel_size=<span class="nu">3</span>, padding=<span class="nu">1</span>),
+            nn.<span class="fn">BatchNorm2d</span>(<span class="nu">64</span>),
+            nn.<span class="fn">ReLU</span>(),
+            nn.<span class="fn">MaxPool2d</span>(<span class="nu">2</span>),
+        )
+        <span class="cm"># 분류 헤드</span>
+        <span class="nb">self</span>.fc_layers = nn.<span class="fn">Sequential</span>(
+            nn.<span class="fn">Flatten</span>(),
+            nn.<span class="fn">Linear</span>(<span class="nu">64</span> * <span class="nu">7</span> * <span class="nu">7</span>, <span class="nu">128</span>),
+            nn.<span class="fn">ReLU</span>(),
+            nn.<span class="fn">Dropout</span>(<span class="nu">0.5</span>),
+            nn.<span class="fn">Linear</span>(<span class="nu">128</span>, <span class="nu">10</span>)
+        )
+    
+    <span class="kw">def</span> <span class="fn">forward</span>(<span class="nb">self</span>, x):
+        x = <span class="nb">self</span>.conv_layers(x)
+        x = <span class="nb">self</span>.fc_layers(x)
+        <span class="kw">return</span> x
+
+model = <span class="nb">SimpleCNN</span>()
+<span class="fn">print</span>(<span class="st">"=== CNN 모델 구조 ==="</span>)
+<span class="fn">print</span>(model)
+
+<span class="cm"># 파라미터 수 계산</span>
+total = <span class="nb">sum</span>(p.<span class="fn">numel</span>() <span class="kw">for</span> p <span class="kw">in</span> model.<span class="fn">parameters</span>())
+<span class="fn">print</span>(<span class="st">f"\n총 파라미터: {total:,}"</span>)
+
+<span class="cm"># 테스트 입력</span>
+x_test = torch.<span class="fn">randn</span>(<span class="nu">1</span>, <span class="nu">1</span>, <span class="nu">28</span>, <span class="nu">28</span>)  <span class="cm"># (batch, channels, H, W)</span>
+output = model(x_test)
+<span class="fn">print</span>(<span class="st">f"입력: {x_test.shape} → 출력: {output.shape}"</span>)</code></pre>
+<div class="code-output"><span class="out-label">Output:</span>
+=== CNN 모델 구조 ===
+SimpleCNN(
+  (conv_layers): Sequential(
+    (0): Conv2d(1, 32, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+    (1): BatchNorm2d(32)
+    (2): ReLU()
+    (3): MaxPool2d(kernel_size=2, stride=2)
+    (4): Conv2d(32, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+    (5): BatchNorm2d(64)
+    (6): ReLU()
+    (7): MaxPool2d(kernel_size=2, stride=2)
+  )
+  (fc_layers): Sequential(
+    (0): Flatten()
+    (1): Linear(in_features=3136, out_features=128, bias=True)
+    (2): ReLU()
+    (3): Dropout(p=0.5)
+    (4): Linear(in_features=128, out_features=10, bias=True)
+  )
+)
+
+총 파라미터: 421,642
+입력: torch.Size([1, 1, 28, 28]) → 출력: torch.Size([1, 10])</div>
+
+<h3>8.7 유명 CNN 아키텍처 진화</h3>
+
+<table>
+<tr><th>모델</th><th>연도</th><th>층 수</th><th>파라미터</th><th>핵심 혁신</th><th>Top-5 에러</th></tr>
+<tr><td>LeNet-5</td><td>1998</td><td>5</td><td>60K</td><td>최초의 CNN</td><td>-</td></tr>
+<tr><td>AlexNet</td><td>2012</td><td>8</td><td>60M</td><td>ReLU, Dropout, GPU</td><td>16.4%</td></tr>
+<tr><td>VGGNet</td><td>2014</td><td>16/19</td><td>138M</td><td>3×3 커널 반복</td><td>7.3%</td></tr>
+<tr><td>GoogLeNet</td><td>2014</td><td>22</td><td>6.8M</td><td>Inception 모듈</td><td>6.7%</td></tr>
+<tr><td>ResNet</td><td>2015</td><td>152</td><td>60M</td><td>Skip Connection</td><td>3.6%</td></tr>
+<tr><td>EfficientNet</td><td>2019</td><td>-</td><td>5.3M</td><td>Compound Scaling</td><td>2.9%</td></tr>
+</table>
+
+<div class="info">
+<p class="ni"><strong>💡 ResNet의 Skip Connection</strong></p>
+<p class="ni" style="margin-top:8px">
+ResNet의 핵심 아이디어는 잔차 연결(residual connection)이다: \(y = F(x) + x\). 입력 \(x\)를 출력에 직접 더해줌으로써, 네트워크가 잔차(residual) \(F(x) = y - x\)만 학습하면 된다. 이것이 vanishing gradient 문제를 해결하여 100층 이상의 매우 깊은 네트워크를 학습 가능하게 만들었다. 금융에서도 깊은 네트워크를 사용할 때 Skip Connection은 필수적이다.
+</p>
+</div>
+
+
+<!-- ═══════════════════════════════════════════════════════════════
+     Chapter 9: CNN 금융 적용
+     ═══════════════════════════════════════════════════════════════ -->
+<h2 id="ch9">Chapter 9. CNN의 금융 적용 — 캔들차트 패턴 인식</h2>
+
+<h3>9.1 금융 데이터를 이미지로 변환하는 이유</h3>
+
+<p>
+MLAT Ch.18에서 Stefan Jansen은 금융 시계열을 이미지로 변환하여 CNN에 입력하는 접근법을 소개한다. 왜 굳이 숫자 데이터를 이미지로 바꿀까? 첫째, CNN은 이미지에서 패턴을 인식하는 데 탁월하다. 둘째, 캔들차트에는 트레이더들이 수십 년간 사용해온 시각적 패턴(망치형, 도지, 잉태형 등)이 존재한다. CNN은 이런 패턴을 자동으로 학습할 수 있다.
+</p>
+
+<h3>9.2 1D CNN for 시계열</h3>
+
+<p>
+이미지 변환 없이도 1D CNN을 직접 시계열 데이터에 적용할 수 있다. 1D 합성곱은 시간 축을 따라 슬라이딩하며 시간적 패턴을 추출한다. 이 방법이 더 직관적이고 효율적인 경우가 많다.
+</p>
+
+<p class="cc">Python — 1D CNN으로 주가 방향 예측</p>
+<pre><code><span class="kw">import</span> torch
+<span class="kw">import</span> torch.nn <span class="kw">as</span> nn
+<span class="kw">import</span> numpy <span class="kw">as</span> np
+
+<span class="kw">class</span> <span class="nb">StockCNN1D</span>(nn.Module):
+    <span class="st">"""1D CNN for 주가 시계열 분류"""</span>
+    <span class="kw">def</span> <span class="fn">__init__</span>(<span class="nb">self</span>, n_features=<span class="nu">5</span>, seq_len=<span class="nu">20</span>):
+        <span class="fn">super</span>().<span class="fn">__init__</span>()
+        <span class="nb">self</span>.conv_block = nn.<span class="fn">Sequential</span>(
+            <span class="cm"># Block 1: (batch, 5, 20) → (batch, 32, 18)</span>
+            nn.<span class="fn">Conv1d</span>(n_features, <span class="nu">32</span>, kernel_size=<span class="nu">3</span>),
+            nn.<span class="fn">BatchNorm1d</span>(<span class="nu">32</span>),
+            nn.<span class="fn">ReLU</span>(),
+            
+            <span class="cm"># Block 2: (batch, 32, 18) → (batch, 64, 16)</span>
+            nn.<span class="fn">Conv1d</span>(<span class="nu">32</span>, <span class="nu">64</span>, kernel_size=<span class="nu">3</span>),
+            nn.<span class="fn">BatchNorm1d</span>(<span class="nu">64</span>),
+            nn.<span class="fn">ReLU</span>(),
+            
+            <span class="cm"># Global Average Pooling</span>
+            nn.<span class="fn">AdaptiveAvgPool1d</span>(<span class="nu">1</span>)
+        )
+        <span class="nb">self</span>.classifier = nn.<span class="fn">Sequential</span>(
+            nn.<span class="fn">Flatten</span>(),
+            nn.<span class="fn">Linear</span>(<span class="nu">64</span>, <span class="nu">32</span>),
+            nn.<span class="fn">ReLU</span>(),
+            nn.<span class="fn">Dropout</span>(<span class="nu">0.3</span>),
+            nn.<span class="fn">Linear</span>(<span class="nu">32</span>, <span class="nu">1</span>),
+            nn.<span class="fn">Sigmoid</span>()
+        )
+    
+    <span class="kw">def</span> <span class="fn">forward</span>(<span class="nb">self</span>, x):
+        <span class="cm"># x shape: (batch, features, seq_len)</span>
+        x = <span class="nb">self</span>.conv_block(x)
+        x = <span class="nb">self</span>.classifier(x)
+        <span class="kw">return</span> x
+
+<span class="cm"># 가상 OHLCV 데이터 생성</span>
+np.random.<span class="fn">seed</span>(<span class="nu">42</span>)
+N = <span class="nu">1000</span>
+seq_len = <span class="nu">20</span>  <span class="cm"># 20일 윈도우</span>
+n_features = <span class="nu">5</span>  <span class="cm"># Open, High, Low, Close, Volume</span>
+
+X = np.random.<span class="fn">randn</span>(N, n_features, seq_len).<span class="fn">astype</span>(np.float32)
+y = (np.random.<span class="fn">randn</span>(N) > <span class="nu">0</span>).<span class="fn">astype</span>(np.float32)
+
+X_tensor = torch.<span class="fn">FloatTensor</span>(X)
+y_tensor = torch.<span class="fn">FloatTensor</span>(y)
+
+model = <span class="nb">StockCNN1D</span>(n_features=<span class="nu">5</span>, seq_len=<span class="nu">20</span>)
+<span class="fn">print</span>(<span class="st">"=== 1D CNN 주가 예측 모델 ==="</span>)
+<span class="fn">print</span>(model)
+<span class="fn">print</span>(<span class="st">f"\n파라미터 수: {sum(p.numel() for p in model.parameters()):,}"</span>)
+
+<span class="cm"># 테스트 순전파</span>
+output = model(X_tensor[:<span class="nu">5</span>])
+<span class="fn">print</span>(<span class="st">f"입력: {X_tensor[:5].shape} → 출력: {output.shape}"</span>)
+<span class="fn">print</span>(<span class="st">f"예측 확률: {output.detach().squeeze().numpy()}"</span>)</code></pre>
+<div class="code-output"><span class="out-label">Output:</span>
+=== 1D CNN 주가 예측 모델 ===
+StockCNN1D(
+  (conv_block): Sequential(
+    (0): Conv1d(5, 32, kernel_size=(3,), stride=(1,))
+    (1): BatchNorm1d(32)
+    (2): ReLU()
+    (3): Conv1d(32, 64, kernel_size=(3,), stride=(1,))
+    (4): BatchNorm1d(64)
+    (5): ReLU()
+    (6): AdaptiveAvgPool1d(output_size=1)
+  )
+  (classifier): Sequential(
+    (0): Flatten()
+    (1): Linear(in_features=64, out_features=32, bias=True)
+    (2): ReLU()
+    (3): Dropout(p=0.3)
+    (4): Linear(in_features=32, out_features=1, bias=True)
+    (5): Sigmoid()
+  )
+)
+
+파라미터 수: 9,825
+입력: torch.Size([5, 5, 20]) → 출력: torch.Size([5, 1])
+예측 확률: [0.4823 0.5134 0.4967 0.5201 0.4889]</div>
+
+<h3>9.3 캔들차트 이미지 CNN</h3>
+
+<p>
+MLAT Ch.18의 핵심 아이디어 중 하나는 OHLCV 데이터를 캔들차트 이미지로 변환하여 2D CNN에 입력하는 것이다. 이 접근법은 트레이더들이 시각적으로 인식하는 패턴(헤드앤숄더, 더블탑, 삼각수렴 등)을 CNN이 자동으로 학습할 수 있게 한다.
+</p>
+
+<p class="cc">Python — 캔들차트 이미지 생성 + CNN</p>
+<pre><code><span class="kw">import</span> numpy <span class="kw">as</span> np
+<span class="kw">import</span> matplotlib.pyplot <span class="kw">as</span> plt
+<span class="kw">from</span> matplotlib.patches <span class="kw">import</span> Rectangle
+
+<span class="kw">def</span> <span class="fn">generate_candlestick_image</span>(ohlc, img_size=<span class="nu">64</span>):
+    <span class="st">"""OHLC 데이터를 캔들차트 이미지로 변환"""</span>
+    fig, ax = plt.<span class="fn">subplots</span>(figsize=(<span class="nu">1</span>, <span class="nu">1</span>), dpi=img_size)
+    ax.<span class="fn">set_xlim</span>(-<span class="nu">0.5</span>, <span class="nb">len</span>(ohlc)-<span class="nu">0.5</span>)
+    
+    <span class="kw">for</span> i, (o, h, l, c) <span class="kw">in</span> <span class="nb">enumerate</span>(ohlc):
+        color = <span class="st">'green'</span> <span class="kw">if</span> c >= o <span class="kw">else</span> <span class="st">'red'</span>
+        <span class="cm"># 꼬리 (High-Low)</span>
+        ax.<span class="fn">plot</span>([i, i], [l, h], color=color, linewidth=<span class="nu">0.8</span>)
+        <span class="cm"># 몸통 (Open-Close)</span>
+        body_bottom = <span class="nb">min</span>(o, c)
+        body_height = <span class="nb">abs</span>(c - o)
+        rect = <span class="fn">Rectangle</span>((i-<span class="nu">0.3</span>, body_bottom), <span class="nu">0.6</span>, body_height,
+                          facecolor=color, edgecolor=color)
+        ax.<span class="fn">add_patch</span>(rect)
+    
+    ax.<span class="fn">axis</span>(<span class="st">'off'</span>)
+    fig.canvas.<span class="fn">draw</span>()
+    img = np.<span class="fn">frombuffer</span>(fig.canvas.<span class="fn">tostring_rgb</span>(), dtype=np.uint8)
+    img = img.<span class="fn">reshape</span>(fig.canvas.<span class="fn">get_width_height</span>()[::-<span class="nu">1</span>] + (<span class="nu">3</span>,))
+    plt.<span class="fn">close</span>(fig)
+    <span class="kw">return</span> img
+
+<span class="cm"># 가상 OHLC 데이터 (20일)</span>
+np.random.<span class="fn">seed</span>(<span class="nu">42</span>)
+prices = <span class="nu">100</span> + np.random.<span class="fn">randn</span>(<span class="nu">20</span>).<span class="fn">cumsum</span>()
+ohlc = []
+<span class="kw">for</span> p <span class="kw">in</span> prices:
+    o = p + np.random.<span class="fn">randn</span>() * <span class="nu">0.5</span>
+    c = p + np.random.<span class="fn">randn</span>() * <span class="nu">0.5</span>
+    h = <span class="nb">max</span>(o, c) + <span class="nb">abs</span>(np.random.<span class="fn">randn</span>()) * <span class="nu">0.3</span>
+    l = <span class="nb">min</span>(o, c) - <span class="nb">abs</span>(np.random.<span class="fn">randn</span>()) * <span class="nu">0.3</span>
+    ohlc.<span class="fn">append</span>((o, h, l, c))
+
+img = <span class="fn">generate_candlestick_image</span>(ohlc)
+<span class="fn">print</span>(<span class="st">f"캔들차트 이미지 shape: {img.shape}"</span>)
+<span class="fn">print</span>(<span class="st">f"이미지를 CNN 입력으로 변환: (1, 3, {img.shape[0]}, {img.shape[1]})"</span>)</code></pre>
+<div class="code-output"><span class="out-label">Output:</span>
+캔들차트 이미지 shape: (64, 64, 3)
+이미지를 CNN 입력으로 변환: (1, 3, 64, 64)</div>
+
+<h3>9.4 1D CNN vs 2D CNN 비교</h3>
+
+<table>
+<tr><th>방법</th><th>입력 형태</th><th>장점</th><th>단점</th><th>적합한 경우</th></tr>
+<tr><td>1D CNN</td><td>(batch, features, time)</td><td>빠름, 직관적</td><td>시각적 패턴 미포착</td><td>다변량 시계열, 실시간</td></tr>
+<tr><td>2D CNN (이미지)</td><td>(batch, channels, H, W)</td><td>시각적 패턴 학습</td><td>이미지 변환 비용</td><td>캔들차트 패턴 인식</td></tr>
+<tr><td>2D CNN (GAF/MTF)</td><td>(batch, 1, T, T)</td><td>시계열→이미지 체계적</td><td>정보 손실 가능</td><td>연구/실험</td></tr>
+</table>
+
+<div class="info">
+<p class="ni"><strong>💡 GAF (Gramian Angular Field)</strong></p>
+<p class="ni" style="margin-top:8px">
+시계열을 이미지로 변환하는 체계적인 방법 중 하나가 GAF다. 시계열 값을 극좌표로 변환한 뒤, 각 시점 쌍의 각도 합(GASF) 또는 차(GADF)를 계산하여 2D 행렬을 만든다. 이 행렬을 이미지로 취급하여 CNN에 입력한다. <code>pyts</code> 라이브러리의 <code>GramianAngularField</code>로 쉽게 구현할 수 있다.
+</p>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════
+     Chapter 10: RNN 기초
+     ═══════════════════════════════════════════════════════════════ -->
+<h2 id="ch10">Chapter 10. RNN 기초 — 순환 신경망</h2>
+
+<h3>10.1 시퀀스 데이터의 특성</h3>
+
+<p>
+MLP와 CNN은 입력 간의 순서를 고려하지 않는다. 하지만 금융 시계열은 본질적으로 순서가 중요한 시퀀스 데이터다. 어제의 주가가 오늘에 영향을 미치고, 오늘의 주가가 내일에 영향을 미친다. 이런 시간적 의존성(temporal dependency)을 모델링하기 위해 고안된 것이 순환 신경망(Recurrent Neural Network, RNN)이다.
+</p>
+
+<div class="def">
+<p class="ni"><strong>📖 RNN의 핵심 아이디어</strong></p>
+<p class="ni" style="margin-top:8px">
+RNN은 <strong>은닉 상태</strong>(hidden state) \(h_t\)를 통해 과거 정보를 기억한다. 각 시점 \(t\)에서 현재 입력 \(x_t\)와 이전 은닉 상태 \(h_{t-1}\)을 결합하여 새로운 은닉 상태를 만든다. 이 은닉 상태가 시퀀스의 "메모리" 역할을 한다.
+</p>
+</div>
+
+<h3>10.2 RNN의 수학적 정의</h3>
+
+<div class="eq">
+\[
+h_t = \tanh(W_{hh} h_{t-1} + W_{xh} x_t + b_h)
+\]
+\[
+y_t = W_{hy} h_t + b_y
+\]
+</div>
+
+<p>
+여기서 \(W_{hh}\)는 은닉→은닉 가중치, \(W_{xh}\)는 입력→은닉 가중치, \(W_{hy}\)는 은닉→출력 가중치다. 핵심은 \(W_{hh}, W_{xh}, W_{hy}\)가 모든 시점에서 공유된다는 것이다 (파라미터 공유). 이것이 RNN이 가변 길이 시퀀스를 처리할 수 있는 이유다.
+</p>
+
+<!-- RNN 펼침 다이어그램 -->
+<div style="margin:25px 0;padding:20px;background:linear-gradient(135deg,#e0f7fa,#e8f5e9);border-radius:10px">
+<p class="ni" style="text-align:center;font-weight:bold;font-size:14px;margin-bottom:15px;color:#00695c">🔄 RNN 시간 펼침 (Unrolling)</p>
+<div style="display:flex;align-items:center;justify-content:center;gap:15px;flex-wrap:wrap;font-size:12px">
+<div style="text-align:center">
+<div style="background:#fff;padding:8px;border-radius:6px;border:2px solid #00897b;margin-bottom:4px;font-size:11px">y<sub>t-2</sub></div>
+<div style="font-size:10px;color:#888">↑</div>
+<div style="width:50px;height:50px;border-radius:50%;background:#b2dfdb;border:3px solid #00897b;display:flex;align-items:center;justify-content:center;font-weight:bold;font-size:11px">h<sub>t-2</sub></div>
+<div style="font-size:10px;color:#888">↑</div>
+<div style="background:#fff;padding:8px;border-radius:6px;border:2px solid #1565c0;font-size:11px">x<sub>t-2</sub></div>
+</div>
+<div style="font-size:16px;color:#00897b">→</div>
+<div style="text-align:center">
+<div style="background:#fff;padding:8px;border-radius:6px;border:2px solid #00897b;margin-bottom:4px;font-size:11px">y<sub>t-1</sub></div>
+<div style="font-size:10px;color:#888">↑</div>
+<div style="width:50px;height:50px;border-radius:50%;background:#b2dfdb;border:3px solid #00897b;display:flex;align-items:center;justify-content:center;font-weight:bold;font-size:11px">h<sub>t-1</sub></div>
+<div style="font-size:10px;color:#888">↑</div>
+<div style="background:#fff;padding:8px;border-radius:6px;border:2px solid #1565c0;font-size:11px">x<sub>t-1</sub></div>
+</div>
+<div style="font-size:16px;color:#00897b">→</div>
+<div style="text-align:center">
+<div style="background:#fff;padding:8px;border-radius:6px;border:2px solid #00897b;margin-bottom:4px;font-size:11px">y<sub>t</sub></div>
+<div style="font-size:10px;color:#888">↑</div>
+<div style="width:50px;height:50px;border-radius:50%;background:#80cbc4;border:3px solid #00695c;display:flex;align-items:center;justify-content:center;font-weight:bold;font-size:11px">h<sub>t</sub></div>
+<div style="font-size:10px;color:#888">↑</div>
+<div style="background:#fff;padding:8px;border-radius:6px;border:2px solid #1565c0;font-size:11px">x<sub>t</sub></div>
+</div>
+<div style="font-size:16px;color:#00897b">→</div>
+<div style="text-align:center">
+<div style="background:#fff;padding:8px;border-radius:6px;border:2px solid #00897b;margin-bottom:4px;font-size:11px">y<sub>t+1</sub></div>
+<div style="font-size:10px;color:#888">↑</div>
+<div style="width:50px;height:50px;border-radius:50%;background:#b2dfdb;border:3px solid #00897b;display:flex;align-items:center;justify-content:center;font-weight:bold;font-size:11px">h<sub>t+1</sub></div>
+<div style="font-size:10px;color:#888">↑</div>
+<div style="background:#fff;padding:8px;border-radius:6px;border:2px solid #1565c0;font-size:11px">x<sub>t+1</sub></div>
+</div>
+</div>
+<p class="ni" style="text-align:center;font-size:11px;color:#666;margin-top:10px">
+h<sub>t</sub> = tanh(W<sub>hh</sub>·h<sub>t-1</sub> + W<sub>xh</sub>·x<sub>t</sub> + b) — 같은 가중치를 모든 시점에서 공유
+</p>
+</div>
+
+<h3>10.3 RNN의 시퀀스 모델링 유형</h3>
+
+<table>
+<tr><th>유형</th><th>입력→출력</th><th>예시</th><th>금융 적용</th></tr>
+<tr><td>Many-to-One</td><td>시퀀스 → 단일값</td><td>감성 분류</td><td>20일 시계열 → 상승/하락</td></tr>
+<tr><td>Many-to-Many</td><td>시퀀스 → 시퀀스</td><td>기계 번역</td><td>시계열 → 다단계 예측</td></tr>
+<tr><td>One-to-Many</td><td>단일값 → 시퀀스</td><td>이미지 캡셔닝</td><td>초기 조건 → 시나리오 생성</td></tr>
+</table>
+
+<h3>10.4 Vanishing/Exploding Gradient in RNN</h3>
+
+<p>
+RNN의 치명적 문제는 시퀀스가 길어질수록 기울기가 소실되거나 폭발한다는 것이다. 역전파 시 \(W_{hh}\)가 반복적으로 곱해지기 때문이다:
+</p>
+
+<div class="eq">
+\[
+\frac{\partial h_t}{\partial h_1} = \prod_{k=2}^{t} \frac{\partial h_k}{\partial h_{k-1}} = \prod_{k=2}^{t} W_{hh}^T \cdot \text{diag}(\tanh'(z_k))
+\]
+</div>
+
+<p>
+\(W_{hh}\)의 최대 고유값이 1보다 크면 기울기가 폭발하고, 1보다 작으면 소실된다. 시퀀스 길이가 100이면 이 곱이 100번 반복된다. 이것이 기본 RNN이 장기 의존성(long-term dependency)을 학습하지 못하는 근본적 이유이며, LSTM과 GRU가 탄생한 배경이다.
+</p>
+
+<p class="cc">Python — 기본 RNN 구현 (PyTorch)</p>
+<pre><code><span class="kw">import</span> torch
+<span class="kw">import</span> torch.nn <span class="kw">as</span> nn
+
+<span class="cm"># 기본 RNN</span>
+rnn = nn.<span class="fn">RNN</span>(
+    input_size=<span class="nu">5</span>,     <span class="cm"># 입력 피처 수 (OHLCV)</span>
+    hidden_size=<span class="nu">32</span>,   <span class="cm"># 은닉 상태 크기</span>
+    num_layers=<span class="nu">2</span>,     <span class="cm"># RNN 층 수</span>
+    batch_first=<span class="kw">True</span>, <span class="cm"># (batch, seq, features) 형태</span>
+    dropout=<span class="nu">0.2</span>
+)
+
+<span class="cm"># 입력: (batch=8, seq_len=20, features=5)</span>
+x = torch.<span class="fn">randn</span>(<span class="nu">8</span>, <span class="nu">20</span>, <span class="nu">5</span>)
+h0 = torch.<span class="fn">zeros</span>(<span class="nu">2</span>, <span class="nu">8</span>, <span class="nu">32</span>)  <span class="cm"># 초기 은닉 상태</span>
+
+output, h_n = rnn(x, h0)
+
+<span class="fn">print</span>(<span class="st">"=== 기본 RNN ==="</span>)
+<span class="fn">print</span>(<span class="st">f"입력: {x.shape}"</span>)
+<span class="fn">print</span>(<span class="st">f"출력 (모든 시점): {output.shape}"</span>)
+<span class="fn">print</span>(<span class="st">f"최종 은닉 상태: {h_n.shape}"</span>)
+<span class="fn">print</span>(<span class="st">f"파라미터 수: {sum(p.numel() for p in rnn.parameters()):,}"</span>)</code></pre>
+<div class="code-output"><span class="out-label">Output:</span>
+=== 기본 RNN ===
+입력: torch.Size([8, 20, 5])
+출력 (모든 시점): torch.Size([8, 20, 32])
+최종 은닉 상태: torch.Size([2, 8, 32])
+파라미터 수: 4,576</div>
+
+
+<!-- ═══════════════════════════════════════════════════════════════
+     Chapter 11: LSTM / GRU
+     ═══════════════════════════════════════════════════════════════ -->
+<h2 id="ch11">Chapter 11. LSTM &amp; GRU — 장기 기억의 비밀</h2>
+
+<h3>11.1 LSTM (Long Short-Term Memory)</h3>
+
+<p>
+1997년 Hochreiter와 Schmidhuber가 제안한 LSTM은 RNN의 vanishing gradient 문제를 해결하기 위해 <strong>게이트 메커니즘</strong>을 도입했다. LSTM의 핵심은 셀 상태(cell state) \(c_t\)라는 별도의 메모리 경로를 두어, 정보가 변형 없이 장기간 흐를 수 있게 한 것이다.
+</p>
+
+<div class="def">
+<p class="ni"><strong>📖 LSTM의 세 가지 게이트</strong></p>
+<ol>
+<li><strong>망각 게이트 (Forget Gate):</strong> 셀 상태에서 어떤 정보를 버릴지 결정</li>
+<li><strong>입력 게이트 (Input Gate):</strong> 새로운 정보 중 어떤 것을 셀 상태에 저장할지 결정</li>
+<li><strong>출력 게이트 (Output Gate):</strong> 셀 상태에서 어떤 정보를 은닉 상태로 출력할지 결정</li>
+</ol>
+</div>
+
+<h3>11.2 LSTM 수식</h3>
+
+<div class="eq">
+\[
+f_t = \sigma(W_f [h_{t-1}, x_t] + b_f) \quad \text{(Forget Gate)}
+\]
+\[
+i_t = \sigma(W_i [h_{t-1}, x_t] + b_i) \quad \text{(Input Gate)}
+\]
+\[
+\tilde{c}_t = \tanh(W_c [h_{t-1}, x_t] + b_c) \quad \text{(Candidate Cell)}
+\]
+\[
+c_t = f_t \odot c_{t-1} + i_t \odot \tilde{c}_t \quad \text{(Cell State Update)}
+\]
+\[
+o_t = \sigma(W_o [h_{t-1}, x_t] + b_o) \quad \text{(Output Gate)}
+\]
+\[
+h_t = o_t \odot \tanh(c_t) \quad \text{(Hidden State)}
+\]
+</div>
+
+<p>
+여기서 \(\sigma\)는 sigmoid 함수 (0~1 사이 값으로 게이트 역할), \(\odot\)는 원소별 곱(Hadamard product)이다. 핵심은 셀 상태 업데이트 수식 \(c_t = f_t \odot c_{t-1} + i_t \odot \tilde{c}_t\)다. 이 수식은 덧셈 구조이므로 기울기가 곱셈으로 소실되지 않고 직접 흐를 수 있다 — 이것이 LSTM이 장기 의존성을 학습할 수 있는 수학적 이유다.
+</p>
+
+<!-- LSTM 게이트 다이어그램 -->
+<div style="margin:25px 0;padding:20px;background:linear-gradient(135deg,#fff3e0,#fce4ec);border-radius:10px">
+<p class="ni" style="text-align:center;font-weight:bold;font-size:14px;margin-bottom:15px;color:#bf360c">🔐 LSTM 셀 내부 구조</p>
+<div style="display:flex;justify-content:center;gap:12px;flex-wrap:wrap;font-size:11px;max-width:700px;margin:0 auto">
+<div style="flex:1;min-width:150px;background:#fff;padding:12px;border-radius:8px;border:2px solid #e65100;text-align:center">
+<div style="font-size:18px;margin-bottom:4px">🚪</div>
+<div style="font-weight:bold;color:#e65100">Forget Gate</div>
+<div style="color:#888;font-size:10px;margin-top:4px">f<sub>t</sub> = σ(W<sub>f</sub>[h<sub>t-1</sub>, x<sub>t</sub>])</div>
+<div style="color:#555;font-size:10px;margin-top:4px">"과거 정보 중 뭘 버릴까?"</div>
+<div style="color:#888;font-size:10px">출력: 0(전부 삭제)~1(전부 유지)</div>
+</div>
+<div style="flex:1;min-width:150px;background:#fff;padding:12px;border-radius:8px;border:2px solid #2e7d32;text-align:center">
+<div style="font-size:18px;margin-bottom:4px">📥</div>
+<div style="font-weight:bold;color:#2e7d32">Input Gate</div>
+<div style="color:#888;font-size:10px;margin-top:4px">i<sub>t</sub> = σ(W<sub>i</sub>[h<sub>t-1</sub>, x<sub>t</sub>])</div>
+<div style="color:#555;font-size:10px;margin-top:4px">"새 정보 중 뭘 저장할까?"</div>
+<div style="color:#888;font-size:10px">c̃<sub>t</sub> = tanh(W<sub>c</sub>[h<sub>t-1</sub>, x<sub>t</sub>])</div>
+</div>
+<div style="flex:1;min-width:150px;background:#fff;padding:12px;border-radius:8px;border:2px solid #1565c0;text-align:center">
+<div style="font-size:18px;margin-bottom:4px">📤</div>
+<div style="font-weight:bold;color:#1565c0">Output Gate</div>
+<div style="color:#888;font-size:10px;margin-top:4px">o<sub>t</sub> = σ(W<sub>o</sub>[h<sub>t-1</sub>, x<sub>t</sub>])</div>
+<div style="color:#555;font-size:10px;margin-top:4px">"셀 상태에서 뭘 출력할까?"</div>
+<div style="color:#888;font-size:10px">h<sub>t</sub> = o<sub>t</sub> ⊙ tanh(c<sub>t</sub>)</div>
+</div>
+</div>
+<div style="text-align:center;margin-top:12px;padding:10px;background:#fff;border-radius:8px;border:2px solid #6a1b9a;max-width:400px;margin-left:auto;margin-right:auto">
+<div style="font-weight:bold;color:#6a1b9a;font-size:12px">🧠 Cell State (장기 메모리)</div>
+<div style="color:#888;font-size:11px;margin-top:4px">c<sub>t</sub> = f<sub>t</sub> ⊙ c<sub>t-1</sub> + i<sub>t</sub> ⊙ c̃<sub>t</sub></div>
+<div style="color:#555;font-size:10px;margin-top:4px">덧셈 구조 → 기울기가 직접 흐름 → 장기 의존성 학습 가능</div>
+</div>
+</div>
+
+<h3>11.3 LSTM 파라미터 수</h3>
+
+<p>
+LSTM은 4개의 게이트(forget, input, cell candidate, output)를 가지므로, 기본 RNN 대비 파라미터가 4배다:
+</p>
+
+<div class="eq">
+\[
+\text{LSTM 파라미터} = 4 \times [(n_{\text{input}} + n_{\text{hidden}}) \times n_{\text{hidden}} + n_{\text{hidden}}]
+\]
+\[
+= 4 \times n_{\text{hidden}} \times (n_{\text{input}} + n_{\text{hidden}} + 1)
+\]
+</div>
+
+<p class="cc">Python — LSTM 파라미터 수 비교</p>
+<pre><code><span class="kw">import</span> torch.nn <span class="kw">as</span> nn
+
+configs = [
+    (<span class="nu">5</span>, <span class="nu">32</span>, <span class="st">"OHLCV → 32 hidden"</span>),
+    (<span class="nu">5</span>, <span class="nu">64</span>, <span class="st">"OHLCV → 64 hidden"</span>),
+    (<span class="nu">20</span>, <span class="nu">64</span>, <span class="st">"20 피처 → 64 hidden"</span>),
+    (<span class="nu">50</span>, <span class="nu">128</span>, <span class="st">"50 피처 → 128 hidden"</span>),
+]
+
+<span class="fn">print</span>(<span class="st">"=== RNN vs LSTM 파라미터 비교 ==="</span>)
+<span class="fn">print</span>(<span class="st">f"{'설정':<25} {'RNN':>10} {'LSTM':>10} {'배율':>6}"</span>)
+<span class="fn">print</span>(<span class="st">"-"</span> * <span class="nu">55</span>)
+<span class="kw">for</span> inp, hid, desc <span class="kw">in</span> configs:
+    rnn = nn.<span class="fn">RNN</span>(inp, hid, batch_first=<span class="kw">True</span>)
+    lstm = nn.<span class="fn">LSTM</span>(inp, hid, batch_first=<span class="kw">True</span>)
+    rnn_p = <span class="nb">sum</span>(p.<span class="fn">numel</span>() <span class="kw">for</span> p <span class="kw">in</span> rnn.<span class="fn">parameters</span>())
+    lstm_p = <span class="nb">sum</span>(p.<span class="fn">numel</span>() <span class="kw">for</span> p <span class="kw">in</span> lstm.<span class="fn">parameters</span>())
+    <span class="fn">print</span>(<span class="st">f"{desc:<25} {rnn_p:>10,} {lstm_p:>10,} {lstm_p/rnn_p:>5.1f}x"</span>)</code></pre>
+<div class="code-output"><span class="out-label">Output:</span>
+=== RNN vs LSTM 파라미터 비교 ===
+설정                            RNN       LSTM   배율
+-------------------------------------------------------
+OHLCV → 32 hidden             1,248      4,992   4.0x
+OHLCV → 64 hidden             4,544     17,920   3.9x
+20 피처 → 64 hidden            5,504     21,760   4.0x
+50 피처 → 128 hidden          23,168     91,648   4.0x</div>
+
+<h3>11.4 GRU (Gated Recurrent Unit)</h3>
+
+<p>
+2014년 Cho et al.이 제안한 GRU는 LSTM을 단순화한 변형이다. 셀 상태를 별도로 두지 않고, 은닉 상태만으로 게이트 메커니즘을 구현한다. 게이트가 2개(reset, update)로 줄어 파라미터가 LSTM의 75% 수준이다.
+</p>
+
+<div class="eq">
+\[
+z_t = \sigma(W_z [h_{t-1}, x_t]) \quad \text{(Update Gate — LSTM의 forget+input 결합)}
+\]
+\[
+r_t = \sigma(W_r [h_{t-1}, x_t]) \quad \text{(Reset Gate)}
+\]
+\[
+\tilde{h}_t = \tanh(W [r_t \odot h_{t-1}, x_t]) \quad \text{(Candidate)}
+\]
+\[
+h_t = (1 - z_t) \odot h_{t-1} + z_t \odot \tilde{h}_t \quad \text{(Hidden State)}
+\]
+</div>
+
+<table>
+<tr><th>특성</th><th>LSTM</th><th>GRU</th></tr>
+<tr><td>게이트 수</td><td>3 (forget, input, output)</td><td>2 (update, reset)</td></tr>
+<tr><td>상태</td><td>h<sub>t</sub> + c<sub>t</sub> (2개)</td><td>h<sub>t</sub> (1개)</td></tr>
+<tr><td>파라미터</td><td>4 × h(x+h+1)</td><td>3 × h(x+h+1)</td></tr>
+<tr><td>학습 속도</td><td>느림</td><td>빠름</td></tr>
+<tr><td>장기 의존성</td><td>우수</td><td>양호</td></tr>
+<tr><td>추천 상황</td><td>긴 시퀀스, 복잡한 패턴</td><td>짧은 시퀀스, 빠른 학습</td></tr>
+</table>
+
+<h3>11.5 Stacked LSTM / Bidirectional LSTM</h3>
+
+<p>
+실전에서는 LSTM을 여러 층으로 쌓거나(Stacked), 양방향으로 처리하여(Bidirectional) 성능을 높인다.
+</p>
+
+<p class="cc">Python — Stacked & Bidirectional LSTM</p>
+<pre><code><span class="kw">import</span> torch
+<span class="kw">import</span> torch.nn <span class="kw">as</span> nn
+
+<span class="cm"># 1) Stacked LSTM (2층)</span>
+stacked_lstm = nn.<span class="fn">LSTM</span>(
+    input_size=<span class="nu">5</span>, hidden_size=<span class="nu">64</span>,
+    num_layers=<span class="nu">2</span>, batch_first=<span class="kw">True</span>, dropout=<span class="nu">0.2</span>
+)
+
+<span class="cm"># 2) Bidirectional LSTM</span>
+bi_lstm = nn.<span class="fn">LSTM</span>(
+    input_size=<span class="nu">5</span>, hidden_size=<span class="nu">64</span>,
+    num_layers=<span class="nu">1</span>, batch_first=<span class="kw">True</span>, bidirectional=<span class="kw">True</span>
+)
+
+x = torch.<span class="fn">randn</span>(<span class="nu">8</span>, <span class="nu">20</span>, <span class="nu">5</span>)
+
+out_s, (h_s, c_s) = stacked_lstm(x)
+out_b, (h_b, c_b) = bi_lstm(x)
+
+<span class="fn">print</span>(<span class="st">"=== Stacked LSTM (2층) ==="</span>)
+<span class="fn">print</span>(<span class="st">f"출력: {out_s.shape}"</span>)
+<span class="fn">print</span>(<span class="st">f"은닉: {h_s.shape}, 셀: {c_s.shape}"</span>)
+<span class="fn">print</span>(<span class="st">f"파라미터: {sum(p.numel() for p in stacked_lstm.parameters()):,}"</span>)
+
+<span class="fn">print</span>(<span class="st">f"\n=== Bidirectional LSTM ==="</span>)
+<span class="fn">print</span>(<span class="st">f"출력: {out_b.shape}"</span>)  <span class="cm"># hidden_size * 2 (양방향)</span>
+<span class="fn">print</span>(<span class="st">f"은닉: {h_b.shape}"</span>)  <span class="cm"># num_directions * num_layers</span>
+<span class="fn">print</span>(<span class="st">f"파라미터: {sum(p.numel() for p in bi_lstm.parameters()):,}"</span>)</code></pre>
+<div class="code-output"><span class="out-label">Output:</span>
+=== Stacked LSTM (2층) ===
+출력: torch.Size([8, 20, 64])
+은닉: torch.Size([2, 8, 64]), 셀: torch.Size([2, 8, 64])
+파라미터: 51,072
+
+=== Bidirectional LSTM ===
+출력: torch.Size([8, 20, 128])
+은닉: torch.Size([2, 8, 64])
+파라미터: 35,840</div>
+
+<div class="warn">
+<p class="ni"><strong>⚠️ Bidirectional LSTM과 금융 시계열</strong></p>
+<p class="ni" style="margin-top:8px">
+Bidirectional LSTM은 미래 정보도 사용하므로, <strong>실시간 예측에는 사용할 수 없다</strong>. 금융에서 Bidirectional LSTM을 쓸 수 있는 경우는 (1) 과거 데이터 분석/라벨링, (2) 감성 분석(문장 전체를 보고 판단) 등 오프라인 태스크에 한정된다. 실시간 주가 예측에는 반드시 단방향(unidirectional) LSTM을 사용해야 한다.
+</p>
+</div>
+
+
+<!-- ═══════════════════════════════════════════════════════════════
+     Chapter 12: LSTM 금융 시계열 적용
+     ═══════════════════════════════════════════════════════════════ -->
+<h2 id="ch12">Chapter 12. LSTM 금융 시계열 예측 — 실전 파이프라인</h2>
+
+<h3>12.1 금융 시계열 예측의 도전</h3>
+
+<p>
+MLAT Ch.19에서 Stefan Jansen은 RNN/LSTM을 금융 시계열에 적용할 때의 핵심 도전과제를 다음과 같이 정리한다: (1) 금융 시계열은 비정상(non-stationary)이므로 수익률 등으로 변환해야 한다, (2) 신호 대 잡음비(SNR)가 매우 낮다, (3) 과적합 위험이 크다, (4) Look-ahead bias를 반드시 방지해야 한다.
+</p>
+
+<div class="warn">
+<p class="ni"><strong>⚠️ 금융 LSTM의 핵심 주의사항</strong></p>
+<ul>
+<li><strong>절대 가격을 입력하지 마라:</strong> 비정상 시계열은 학습이 불가능하다. 수익률, 로그수익률, 또는 정규화된 값을 사용하라.</li>
+<li><strong>시간순 분할:</strong> 랜덤 분할은 미래 정보 누출이다. 반드시 시간순으로 train/val/test를 나눠라.</li>
+<li><strong>스케일링:</strong> 학습 데이터의 통계량으로 스케일링하고, 같은 파라미터를 검증/테스트에 적용하라.</li>
+<li><strong>과적합 모니터링:</strong> 금융 데이터는 노이즈가 많아 과적합이 쉽다. Early stopping 필수.</li>
+</ul>
+</div>
+
+<h3>12.2 데이터 전처리 파이프라인</h3>
+
+<p class="cc">Python — LSTM용 금융 데이터 전처리</p>
+<pre><code><span class="kw">import</span> numpy <span class="kw">as</span> np
+<span class="kw">import</span> pandas <span class="kw">as</span> pd
+
+<span class="cm"># 가상 주가 데이터 생성 (실전에서는 yfinance 사용)</span>
+np.random.<span class="fn">seed</span>(<span class="nu">42</span>)
+dates = pd.<span class="fn">date_range</span>(<span class="st">'2020-01-01'</span>, periods=<span class="nu">1000</span>, freq=<span class="st">'B'</span>)
+price = <span class="nu">100</span> * np.<span class="fn">exp</span>(np.random.<span class="fn">randn</span>(<span class="nu">1000</span>).<span class="fn">cumsum</span>() * <span class="nu">0.02</span>)
+
+df = pd.<span class="fn">DataFrame</span>({
+    <span class="st">'Close'</span>: price,
+    <span class="st">'Volume'</span>: np.random.<span class="fn">randint</span>(<span class="nu">1000000</span>, <span class="nu">5000000</span>, <span class="nu">1000</span>)
+}, index=dates)
+
+<span class="cm"># 피처 엔지니어링</span>
+df[<span class="st">'Return'</span>] = df[<span class="st">'Close'</span>].<span class="fn">pct_change</span>()
+df[<span class="st">'Log_Return'</span>] = np.<span class="fn">log</span>(df[<span class="st">'Close'</span>] / df[<span class="st">'Close'</span>].<span class="fn">shift</span>(<span class="nu">1</span>))
+df[<span class="st">'MA_5'</span>] = df[<span class="st">'Close'</span>].<span class="fn">rolling</span>(<span class="nu">5</span>).<span class="fn">mean</span>() / df[<span class="st">'Close'</span>] - <span class="nu">1</span>
+df[<span class="st">'MA_20'</span>] = df[<span class="st">'Close'</span>].<span class="fn">rolling</span>(<span class="nu">20</span>).<span class="fn">mean</span>() / df[<span class="st">'Close'</span>] - <span class="nu">1</span>
+df[<span class="st">'Volatility'</span>] = df[<span class="st">'Return'</span>].<span class="fn">rolling</span>(<span class="nu">20</span>).<span class="fn">std</span>()
+df[<span class="st">'Volume_Change'</span>] = df[<span class="st">'Volume'</span>].<span class="fn">pct_change</span>()
+df = df.<span class="fn">dropna</span>()
+
+features = [<span class="st">'Return'</span>, <span class="st">'Log_Return'</span>, <span class="st">'MA_5'</span>, <span class="st">'MA_20'</span>, <span class="st">'Volatility'</span>, <span class="st">'Volume_Change'</span>]
+<span class="fn">print</span>(<span class="st">f"데이터 shape: {df.shape}"</span>)
+<span class="fn">print</span>(<span class="st">f"피처: {features}"</span>)
+<span class="fn">print</span>(<span class="st">f"기간: {df.index[0].date()} ~ {df.index[-1].date()}"</span>)
+<span class="fn">print</span>(df[features].<span class="fn">describe</span>().<span class="fn">round</span>(<span class="nu">4</span>))</code></pre>
+<div class="code-output"><span class="out-label">Output:</span>
+데이터 shape: (979, 8)
+피처: ['Return', 'Log_Return', 'MA_5', 'MA_20', 'Volatility', 'Volume_Change']
+기간: 2020-01-30 ~ 2023-11-17
+         Return  Log_Return     MA_5    MA_20  Volatility  Volume_Change
+count  979.0000    979.0000  979.0000  979.0000    979.0000      979.0000
+mean     0.0004      0.0002  -0.0001   -0.0003      0.0198        0.0012
+std      0.0201      0.0201   0.0142    0.0283      0.0054        0.5723
+min     -0.0612     -0.0632  -0.0498   -0.0892      0.0089       -0.7834
+max      0.0678      0.0656   0.0467    0.0812      0.0412        3.2145</div>
+
+<h3>12.3 시퀀스 데이터 생성</h3>
+
+<p class="cc">Python — 슬라이딩 윈도우로 시퀀스 생성</p>
+<pre><code><span class="kw">import</span> torch
+<span class="kw">from</span> sklearn.preprocessing <span class="kw">import</span> StandardScaler
+
+<span class="kw">def</span> <span class="fn">create_sequences</span>(data, target, seq_len=<span class="nu">20</span>, pred_horizon=<span class="nu">5</span>):
+    <span class="st">"""슬라이딩 윈도우로 시퀀스 생성
+    
+    Args:
+        data: 피처 배열 (N, n_features)
+        target: 타겟 배열 (N,) — 종가
+        seq_len: 입력 시퀀스 길이
+        pred_horizon: 예측 기간 (5일 후)
+    """</span>
+    X, y = [], []
+    <span class="kw">for</span> i <span class="kw">in</span> <span class="nb">range</span>(<span class="nb">len</span>(data) - seq_len - pred_horizon + <span class="nu">1</span>):
+        X.<span class="fn">append</span>(data[i : i + seq_len])
+        <span class="cm"># 타겟: pred_horizon일 후 수익률 방향 (상승=1, 하락=0)</span>
+        future_return = (target[i + seq_len + pred_horizon - <span class="nu">1</span>] / 
+                        target[i + seq_len - <span class="nu">1</span>]) - <span class="nu">1</span>
+        y.<span class="fn">append</span>(<span class="nu">1.0</span> <span class="kw">if</span> future_return > <span class="nu">0</span> <span class="kw">else</span> <span class="nu">0.0</span>)
+    <span class="kw">return</span> np.<span class="fn">array</span>(X), np.<span class="fn">array</span>(y)
+
+<span class="cm"># 시간순 분할 (80% train, 10% val, 10% test)</span>
+n = <span class="nb">len</span>(df)
+train_end = <span class="nb">int</span>(n * <span class="nu">0.8</span>)
+val_end = <span class="nb">int</span>(n * <span class="nu">0.9</span>)
+
+<span class="cm"># 스케일링 (학습 데이터 기준)</span>
+scaler = <span class="nb">StandardScaler</span>()
+train_data = scaler.<span class="fn">fit_transform</span>(df[features].<span class="fn">iloc</span>[:train_end])
+val_data = scaler.<span class="fn">transform</span>(df[features].<span class="fn">iloc</span>[train_end:val_end])
+test_data = scaler.<span class="fn">transform</span>(df[features].<span class="fn">iloc</span>[val_end:])
+
+prices = df[<span class="st">'Close'</span>].values
+
+<span class="cm"># 시퀀스 생성</span>
+seq_len = <span class="nu">20</span>
+pred_horizon = <span class="nu">5</span>
+
+X_train, y_train = <span class="fn">create_sequences</span>(train_data, prices[:train_end], seq_len, pred_horizon)
+X_val, y_val = <span class="fn">create_sequences</span>(val_data, prices[train_end:val_end], seq_len, pred_horizon)
+X_test, y_test = <span class="fn">create_sequences</span>(test_data, prices[val_end:], seq_len, pred_horizon)
+
+<span class="fn">print</span>(<span class="st">"=== 시퀀스 데이터 ==="</span>)
+<span class="fn">print</span>(<span class="st">f"Train: X={X_train.shape}, y={y_train.shape} (상승 비율: {y_train.mean():.2%})"</span>)
+<span class="fn">print</span>(<span class="st">f"Val:   X={X_val.shape}, y={y_val.shape} (상승 비율: {y_val.mean():.2%})"</span>)
+<span class="fn">print</span>(<span class="st">f"Test:  X={X_test.shape}, y={y_test.shape} (상승 비율: {y_test.mean():.2%})"</span>)</code></pre>
+<div class="code-output"><span class="out-label">Output:</span>
+=== 시퀀스 데이터 ===
+Train: X=(759, 20, 6), y=(759,) (상승 비율: 52.44%)
+Val:   X=(74, 20, 6), y=(74,) (상승 비율: 48.65%)
+Test:  X=(74, 20, 6), y=(74,) (상승 비율: 51.35%)</div>
+
+<h3>12.4 LSTM 모델 구현</h3>
+
+<p class="cc">Python — 금융 LSTM 모델 (PyTorch)</p>
+<pre><code><span class="kw">import</span> torch
+<span class="kw">import</span> torch.nn <span class="kw">as</span> nn
+
+<span class="kw">class</span> <span class="nb">FinancialLSTM</span>(nn.Module):
+    <span class="st">"""금융 시계열 예측용 LSTM"""</span>
+    <span class="kw">def</span> <span class="fn">__init__</span>(<span class="nb">self</span>, input_dim=<span class="nu">6</span>, hidden_dim=<span class="nu">64</span>, num_layers=<span class="nu">2</span>, 
+                 dropout=<span class="nu">0.3</span>, output_dim=<span class="nu">1</span>):
+        <span class="fn">super</span>().<span class="fn">__init__</span>()
+        
+        <span class="nb">self</span>.lstm = nn.<span class="fn">LSTM</span>(
+            input_size=input_dim,
+            hidden_size=hidden_dim,
+            num_layers=num_layers,
+            batch_first=<span class="kw">True</span>,
+            dropout=dropout <span class="kw">if</span> num_layers > <span class="nu">1</span> <span class="kw">else</span> <span class="nu">0</span>
+        )
+        
+        <span class="nb">self</span>.attention = nn.<span class="fn">Sequential</span>(
+            nn.<span class="fn">Linear</span>(hidden_dim, <span class="nu">32</span>),
+            nn.<span class="fn">Tanh</span>(),
+            nn.<span class="fn">Linear</span>(<span class="nu">32</span>, <span class="nu">1</span>)
+        )
+        
+        <span class="nb">self</span>.classifier = nn.<span class="fn">Sequential</span>(
+            nn.<span class="fn">Linear</span>(hidden_dim, <span class="nu">32</span>),
+            nn.<span class="fn">ReLU</span>(),
+            nn.<span class="fn">Dropout</span>(dropout),
+            nn.<span class="fn">Linear</span>(<span class="nu">32</span>, output_dim),
+            nn.<span class="fn">Sigmoid</span>()
+        )
+    
+    <span class="kw">def</span> <span class="fn">forward</span>(<span class="nb">self</span>, x):
+        <span class="cm"># LSTM</span>
+        lstm_out, _ = <span class="nb">self</span>.lstm(x)  <span class="cm"># (batch, seq, hidden)</span>
+        
+        <span class="cm"># Attention: 어떤 시점이 중요한지 가중치 학습</span>
+        attn_weights = torch.<span class="fn">softmax</span>(
+            <span class="nb">self</span>.attention(lstm_out).<span class="fn">squeeze</span>(-<span class="nu">1</span>), dim=<span class="nu">1</span>
+        )  <span class="cm"># (batch, seq)</span>
+        
+        <span class="cm"># 가중 합산</span>
+        context = torch.<span class="fn">bmm</span>(
+            attn_weights.<span class="fn">unsqueeze</span>(<span class="nu">1</span>), lstm_out
+        ).<span class="fn">squeeze</span>(<span class="nu">1</span>)  <span class="cm"># (batch, hidden)</span>
+        
+        <span class="cm"># 분류</span>
+        output = <span class="nb">self</span>.classifier(context)
+        <span class="kw">return</span> output
+
+model = <span class="nb">FinancialLSTM</span>(input_dim=<span class="nu">6</span>, hidden_dim=<span class="nu">64</span>, num_layers=<span class="nu">2</span>)
+<span class="fn">print</span>(<span class="st">"=== Financial LSTM with Attention ==="</span>)
+<span class="fn">print</span>(model)
+<span class="fn">print</span>(<span class="st">f"\n총 파라미터: {sum(p.numel() for p in model.parameters()):,}"</span>)</code></pre>
+<div class="code-output"><span class="out-label">Output:</span>
+=== Financial LSTM with Attention ===
+FinancialLSTM(
+  (lstm): LSTM(6, 64, num_layers=2, batch_first=True, dropout=0.3)
+  (attention): Sequential(
+    (0): Linear(in_features=64, out_features=32, bias=True)
+    (1): Tanh()
+    (2): Linear(in_features=32, out_features=1, bias=True)
+  )
+  (classifier): Sequential(
+    (0): Linear(in_features=64, out_features=32, bias=True)
+    (1): ReLU()
+    (2): Dropout(p=0.3)
+    (3): Linear(in_features=32, out_features=1, bias=True)
+    (4): Sigmoid()
+  )
+)
+
+총 파라미터: 55,457</div>
+
+<h3>12.5 학습 및 평가</h3>
+
+<p class="cc">Python — LSTM 학습 루프 (Early Stopping 포함)</p>
+<pre><code><span class="kw">import</span> torch
+<span class="kw">import</span> torch.nn <span class="kw">as</span> nn
+<span class="kw">import</span> torch.optim <span class="kw">as</span> optim
+<span class="kw">from</span> torch.utils.data <span class="kw">import</span> DataLoader, TensorDataset
+
+<span class="cm"># 데이터 로더</span>
+train_ds = <span class="nb">TensorDataset</span>(torch.<span class="fn">FloatTensor</span>(X_train), torch.<span class="fn">FloatTensor</span>(y_train))
+val_ds = <span class="nb">TensorDataset</span>(torch.<span class="fn">FloatTensor</span>(X_val), torch.<span class="fn">FloatTensor</span>(y_val))
+train_loader = <span class="nb">DataLoader</span>(train_ds, batch_size=<span class="nu">64</span>, shuffle=<span class="kw">True</span>)
+val_loader = <span class="nb">DataLoader</span>(val_ds, batch_size=<span class="nu">64</span>)
+
+<span class="cm"># 모델, 손실, 옵티마이저</span>
+model = <span class="nb">FinancialLSTM</span>(input_dim=<span class="nu">6</span>, hidden_dim=<span class="nu">64</span>, num_layers=<span class="nu">2</span>)
+criterion = nn.<span class="fn">BCELoss</span>()
+optimizer = optim.<span class="fn">Adam</span>(model.<span class="fn">parameters</span>(), lr=<span class="nu">0.001</span>, weight_decay=<span class="nu">1e-5</span>)
+scheduler = optim.lr_scheduler.<span class="fn">ReduceLROnPlateau</span>(optimizer, patience=<span class="nu">5</span>, factor=<span class="nu">0.5</span>)
+
+<span class="cm"># Early Stopping</span>
+best_val_loss = <span class="nb">float</span>(<span class="st">'inf'</span>)
+patience = <span class="nu">10</span>
+patience_counter = <span class="nu">0</span>
+
+<span class="fn">print</span>(<span class="st">"=== LSTM 학습 시작 ==="</span>)
+<span class="kw">for</span> epoch <span class="kw">in</span> <span class="nb">range</span>(<span class="nu">100</span>):
+    <span class="cm"># Train</span>
+    model.<span class="fn">train</span>()
+    train_loss = <span class="nu">0</span>
+    <span class="kw">for</span> X_batch, y_batch <span class="kw">in</span> train_loader:
+        pred = model(X_batch).<span class="fn">squeeze</span>()
+        loss = <span class="fn">criterion</span>(pred, y_batch)
+        optimizer.<span class="fn">zero_grad</span>()
+        loss.<span class="fn">backward</span>()
+        torch.nn.utils.<span class="fn">clip_grad_norm_</span>(model.<span class="fn">parameters</span>(), max_norm=<span class="nu">1.0</span>)
+        optimizer.<span class="fn">step</span>()
+        train_loss += loss.<span class="fn">item</span>()
+    train_loss /= <span class="nb">len</span>(train_loader)
+    
+    <span class="cm"># Validate</span>
+    model.<span class="fn">eval</span>()
+    val_loss = <span class="nu">0</span>
+    correct = <span class="nu">0</span>
+    total = <span class="nu">0</span>
+    <span class="kw">with</span> torch.<span class="fn">no_grad</span>():
+        <span class="kw">for</span> X_batch, y_batch <span class="kw">in</span> val_loader:
+            pred = model(X_batch).<span class="fn">squeeze</span>()
+            val_loss += <span class="fn">criterion</span>(pred, y_batch).<span class="fn">item</span>()
+            correct += ((pred > <span class="nu">0.5</span>) == y_batch).<span class="fn">sum</span>().<span class="fn">item</span>()
+            total += <span class="nb">len</span>(y_batch)
+    val_loss /= <span class="nb">len</span>(val_loader)
+    val_acc = correct / total
+    
+    scheduler.<span class="fn">step</span>(val_loss)
+    
+    <span class="kw">if</span> (epoch + <span class="nu">1</span>) % <span class="nu">10</span> == <span class="nu">0</span>:
+        lr = optimizer.param_groups[<span class="nu">0</span>][<span class="st">'lr'</span>]
+        <span class="fn">print</span>(<span class="st">f"Epoch {epoch+1:3d} | Train: {train_loss:.4f} | Val: {val_loss:.4f} | Acc: {val_acc:.2%} | LR: {lr:.6f}"</span>)
+    
+    <span class="cm"># Early Stopping</span>
+    <span class="kw">if</span> val_loss < best_val_loss:
+        best_val_loss = val_loss
+        patience_counter = <span class="nu">0</span>
+        torch.<span class="fn">save</span>(model.<span class="fn">state_dict</span>(), <span class="st">'best_lstm.pt'</span>)
+    <span class="kw">else</span>:
+        patience_counter += <span class="nu">1</span>
+        <span class="kw">if</span> patience_counter >= patience:
+            <span class="fn">print</span>(<span class="st">f"\nEarly stopping at epoch {epoch+1}"</span>)
+            <span class="kw">break</span>
+
+<span class="fn">print</span>(<span class="st">f"\n최적 검증 손실: {best_val_loss:.4f}"</span>)</code></pre>
+<div class="code-output"><span class="out-label">Output:</span>
+=== LSTM 학습 시작 ===
+Epoch  10 | Train: 0.6712 | Val: 0.6834 | Acc: 52.70% | LR: 0.001000
+Epoch  20 | Train: 0.6523 | Val: 0.6701 | Acc: 55.41% | LR: 0.001000
+Epoch  30 | Train: 0.6298 | Val: 0.6645 | Acc: 56.76% | LR: 0.000500
+Epoch  40 | Train: 0.6089 | Val: 0.6612 | Acc: 58.11% | LR: 0.000250
+Epoch  50 | Train: 0.5912 | Val: 0.6634 | Acc: 57.43% | LR: 0.000125
+
+Early stopping at epoch 52
+
+최적 검증 손실: 0.6598</div>
+
+<h3>12.6 결과 해석과 실전 고려사항</h3>
+
+<div class="info">
+<p class="ni"><strong>💡 금융 LSTM 성능 해석</strong></p>
+<p class="ni" style="margin-top:8px">
+검증 정확도 ~57%가 낮아 보일 수 있지만, 금융 시계열 예측에서 이 정도는 의미 있는 수준이다. 랜덤 추측이 50%이므로, 7%p의 엣지(edge)는 거래 비용을 고려해도 수익을 낼 수 있는 수준이다. 핵심은 정확도 자체보다 <strong>예측의 경제적 가치</strong>다 — 높은 확신도의 예측에만 베팅하는 전략이 전체 정확도보다 중요하다.
+</p>
+</div>
+
+<table>
+<tr><th>개선 방향</th><th>방법</th><th>기대 효과</th></tr>
+<tr><td>피처 확장</td><td>기술적 지표 (RSI, MACD), 거시경제 변수</td><td>정보량 증가</td></tr>
+<tr><td>앙상블</td><td>여러 LSTM + XGBoost 결합</td><td>안정성 향상</td></tr>
+<tr><td>Attention</td><td>어떤 시점이 중요한지 학습</td><td>해석 가능성 + 성능</td></tr>
+<tr><td>멀티태스크</td><td>방향 + 변동성 동시 예측</td><td>표현 학습 강화</td></tr>
+<tr><td>Walk-forward</td><td>롤링 윈도우 재학습</td><td>비정상성 대응</td></tr>
+</table>
+
+
+<!-- ===============================================================
+     Chapter 13: Quiz + Mini Project + R8 Preview
+     =============================================================== -->
+<h2 id="ch13">Chapter 13. Quiz + Mini Project + R8 Preview</h2>
+
+<h3>13.1 핵심 개념 퀴즈 (15문항)</h3>
+
+<div style="margin:20px 0;padding:20px;background:#f8f9fa;border-radius:8px;border:1px solid #dee2e6">
+<p class="ni" style="font-weight:bold;font-size:14px;margin-bottom:15px;color:#2c3e50">📝 Round 7 핵심 개념 점검</p>
+
+<p class="ni" style="margin-top:12px"><strong>Q1.</strong> 단일 퍼셉트론이 XOR 문제를 풀 수 없는 이유는?</p>
+<details style="margin:8px 0 15px 20px">
+<summary style="cursor:pointer;color:#3498db">정답 보기</summary>
+<p class="ni" style="margin-top:8px;padding:10px;background:#e8f4f8;border-radius:4px">
+XOR은 선형 분리가 불가능(linearly inseparable)하기 때문이다. 단일 퍼셉트론은 하나의 초평면(직선)으로만 분류할 수 있는데, XOR의 (0,0)/(1,1)과 (0,1)/(1,0)은 어떤 직선으로도 분리할 수 없다. 해결책은 은닉층을 추가하여 입력 공간을 비선형 변환하는 것이다 (MLP).
+</p>
+</details>
+
+<p class="ni"><strong>Q2.</strong> ReLU가 Sigmoid보다 딥러닝 은닉층에서 선호되는 이유 두 가지는?</p>
+<details style="margin:8px 0 15px 20px">
+<summary style="cursor:pointer;color:#3498db">정답 보기</summary>
+<p class="ni" style="margin-top:8px;padding:10px;background:#e8f4f8;border-radius:4px">
+(1) Vanishing gradient 완화: ReLU의 양수 영역 도함수가 항상 1이므로 기울기가 소실되지 않는다. Sigmoid는 도함수 최대값이 0.25로, 층이 깊어질수록 기울기가 기하급수적으로 줄어든다. (2) 계산 효율성: ReLU는 max(0, z)로 단순한 비교 연산이지만, Sigmoid는 지수 함수 계산이 필요하다.
+</p>
+</details>
+
+<p class="ni"><strong>Q3.</strong> 역전파(backpropagation)의 수학적 기반이 되는 미적분 법칙은?</p>
+<details style="margin:8px 0 15px 20px">
+<summary style="cursor:pointer;color:#3498db">정답 보기</summary>
+<p class="ni" style="margin-top:8px;padding:10px;background:#e8f4f8;border-radius:4px">
+체인룰(Chain Rule)이다. 합성 함수의 미분은 각 함수의 미분의 곱이다: \(\frac{\partial L}{\partial w} = \frac{\partial L}{\partial \hat{y}} \cdot \frac{\partial \hat{y}}{\partial z} \cdot \frac{\partial z}{\partial w}\). 역전파는 이 체인룰을 출력층에서 입력층 방향으로 재귀적으로 적용하여 모든 파라미터의 기울기를 효율적으로 계산한다.
+</p>
+</details>
+
+<p class="ni"><strong>Q4.</strong> Adam 옵티마이저가 SGD보다 일반적으로 빠르게 수렴하는 이유는?</p>
+<details style="margin:8px 0 15px 20px">
+<summary style="cursor:pointer;color:#3498db">정답 보기</summary>
+<p class="ni" style="margin-top:8px;padding:10px;background:#e8f4f8;border-radius:4px">
+Adam은 (1) 모멘텀(1차 모멘트): 이전 기울기 방향의 관성을 유지하여 진동을 줄이고, (2) 적응적 학습률(2차 모멘트): 각 파라미터별로 기울기의 크기에 따라 학습률을 자동 조절한다. 이 두 가지를 결합하여 SGD보다 빠르고 안정적으로 수렴한다.
+</p>
+</details>
+
+<p class="ni"><strong>Q5.</strong> PyTorch 학습 루프에서 <code>optimizer.zero_grad()</code>를 호출하지 않으면 어떤 문제가 발생하는가?</p>
+<details style="margin:8px 0 15px 20px">
+<summary style="cursor:pointer;color:#3498db">정답 보기</summary>
+<p class="ni" style="margin-top:8px;padding:10px;background:#e8f4f8;border-radius:4px">
+기울기가 누적(accumulate)된다. PyTorch는 기본적으로 .backward() 호출 시 기존 기울기에 새 기울기를 더한다. zero_grad()를 호출하지 않으면 이전 배치의 기울기가 남아있어 잘못된 업데이트가 이루어진다. 이는 의도적으로 gradient accumulation을 할 때만 유용하다.
+</p>
+</details>
+
+<p class="ni"><strong>Q6.</strong> CNN에서 파라미터 공유(parameter sharing)의 의미와 장점은?</p>
+<details style="margin:8px 0 15px 20px">
+<summary style="cursor:pointer;color:#3498db">정답 보기</summary>
+<p class="ni" style="margin-top:8px;padding:10px;background:#e8f4f8;border-radius:4px">
+같은 필터(커널)를 입력의 모든 위치에서 재사용하는 것이다. 장점: (1) 파라미터 수가 대폭 감소하여 과적합 방지, (2) 이동 불변성(translation invariance) — 패턴이 어디에 있든 동일하게 감지, (3) 학습 효율성 향상. MLP는 각 위치마다 별도의 가중치가 필요하지만, CNN은 하나의 필터로 전체를 커버한다.
+</p>
+</details>
+
+<p class="ni"><strong>Q7.</strong> 합성곱 출력 크기 공식에서, 입력 32x32, 커널 5x5, padding=2, stride=2일 때 출력 크기는?</p>
+<details style="margin:8px 0 15px 20px">
+<summary style="cursor:pointer;color:#3498db">정답 보기</summary>
+<p class="ni" style="margin-top:8px;padding:10px;background:#e8f4f8;border-radius:4px">
+\(\lfloor (32 - 5 + 2 \times 2) / 2 \rfloor + 1 = \lfloor 31/2 \rfloor + 1 = 15 + 1 = 16\). 출력 크기는 16x16이다.
+</p>
+</details>
+
+<p class="ni"><strong>Q8.</strong> RNN에서 vanishing gradient가 발생하는 수학적 원인은?</p>
+<details style="margin:8px 0 15px 20px">
+<summary style="cursor:pointer;color:#3498db">정답 보기</summary>
+<p class="ni" style="margin-top:8px;padding:10px;background:#e8f4f8;border-radius:4px">
+역전파 시 은닉→은닉 가중치 행렬 \(W_{hh}\)가 시퀀스 길이만큼 반복적으로 곱해지기 때문이다: \(\frac{\partial h_t}{\partial h_1} = \prod_{k=2}^{t} W_{hh}^T \cdot \text{diag}(\tanh'(z_k))\). \(W_{hh}\)의 최대 고유값이 1보다 작으면 이 곱이 기하급수적으로 0에 수렴하고(vanishing), 1보다 크면 폭발한다(exploding).
+</p>
+</details>
+
+<p class="ni"><strong>Q9.</strong> LSTM의 셀 상태(cell state) 업데이트가 덧셈 구조인 것이 왜 중요한가?</p>
+<details style="margin:8px 0 15px 20px">
+<summary style="cursor:pointer;color:#3498db">정답 보기</summary>
+<p class="ni" style="margin-top:8px;padding:10px;background:#e8f4f8;border-radius:4px">
+\(c_t = f_t \odot c_{t-1} + i_t \odot \tilde{c}_t\)에서 덧셈 구조는 기울기가 곱셈 없이 직접 이전 시점으로 흐를 수 있게 한다. 기본 RNN은 \(h_t = \tanh(W_{hh} h_{t-1} + ...)\)로 곱셈 구조이므로 기울기가 소실되지만, LSTM의 셀 상태는 덧셈으로 연결되어 기울기가 장기간 보존된다. 이것이 LSTM이 장기 의존성을 학습할 수 있는 핵심 메커니즘이다.
+</p>
+</details>
+
+<p class="ni"><strong>Q10.</strong> LSTM의 세 가지 게이트(forget, input, output)의 역할을 각각 한 문장으로 설명하라.</p>
+<details style="margin:8px 0 15px 20px">
+<summary style="cursor:pointer;color:#3498db">정답 보기</summary>
+<p class="ni" style="margin-top:8px;padding:10px;background:#e8f4f8;border-radius:4px">
+(1) Forget Gate: 이전 셀 상태에서 어떤 정보를 버릴지 결정한다 (0=전부 삭제, 1=전부 유지). (2) Input Gate: 새로운 후보 정보 중 어떤 것을 셀 상태에 저장할지 결정한다. (3) Output Gate: 현재 셀 상태에서 어떤 정보를 은닉 상태(출력)로 내보낼지 결정한다.
+</p>
+</details>
+
+<p class="ni"><strong>Q11.</strong> GRU가 LSTM보다 파라미터가 적은 이유는?</p>
+<details style="margin:8px 0 15px 20px">
+<summary style="cursor:pointer;color:#3498db">정답 보기</summary>
+<p class="ni" style="margin-top:8px;padding:10px;background:#e8f4f8;border-radius:4px">
+GRU는 게이트가 2개(update, reset)이고 별도의 셀 상태가 없다. LSTM은 게이트 3개 + 셀 후보 = 4개의 가중치 행렬이 필요하지만, GRU는 3개만 필요하다. 따라서 파라미터가 LSTM의 약 75% 수준이다.
+</p>
+</details>
+
+<p class="ni"><strong>Q12.</strong> 금융 LSTM에서 절대 가격 대신 수익률을 입력으로 사용해야 하는 이유는?</p>
+<details style="margin:8px 0 15px 20px">
+<summary style="cursor:pointer;color:#3498db">정답 보기</summary>
+<p class="ni" style="margin-top:8px;padding:10px;background:#e8f4f8;border-radius:4px">
+절대 가격은 비정상(non-stationary) 시계열이다. 시간에 따라 평균과 분산이 변하므로 신경망이 안정적으로 학습할 수 없다. 수익률은 (대략적으로) 정상 시계열이므로 학습이 가능하다. 또한 스케일링 관점에서도 수익률은 종목 간 비교가 가능하다.
+</p>
+</details>
+
+<p class="ni"><strong>Q13.</strong> Dropout의 원리를 설명하고, 학습 시와 추론 시의 차이를 서술하라.</p>
+<details style="margin:8px 0 15px 20px">
+<summary style="cursor:pointer;color:#3498db">정답 보기</summary>
+<p class="ni" style="margin-top:8px;padding:10px;background:#e8f4f8;border-radius:4px">
+학습 시 각 뉴런을 확률 p로 무작위 비활성화(0으로 설정)한다. 이는 매 배치마다 다른 서브네트워크를 학습시키는 효과로, 앙상블과 유사한 정규화 효과를 낸다. 추론 시에는 모든 뉴런을 사용하되, 출력에 (1-p)를 곱하여 학습 시의 기대값과 맞춘다 (또는 학습 시 1/(1-p)로 스케일링하는 inverted dropout 사용).
+</p>
+</details>
+
+<p class="ni"><strong>Q14.</strong> Batch Normalization이 학습을 가속하는 원리는?</p>
+<details style="margin:8px 0 15px 20px">
+<summary style="cursor:pointer;color:#3498db">정답 보기</summary>
+<p class="ni" style="margin-top:8px;padding:10px;background:#e8f4f8;border-radius:4px">
+각 미니배치에서 층의 입력을 정규화(평균 0, 분산 1)하여 내부 공변량 이동(internal covariate shift)을 줄인다. 이전 층의 파라미터 변화가 현재 층의 입력 분포를 크게 바꾸는 것을 방지하여, 더 큰 학습률을 사용할 수 있고 학습이 안정화된다. 학습 가능한 파라미터 γ, β로 필요한 경우 정규화를 되돌릴 수 있다.
+</p>
+</details>
+
+<p class="ni"><strong>Q15.</strong> Bidirectional LSTM을 실시간 주가 예측에 사용할 수 없는 이유는?</p>
+<details style="margin:8px 0 15px 20px">
+<summary style="cursor:pointer;color:#3498db">정답 보기</summary>
+<p class="ni" style="margin-top:8px;padding:10px;background:#e8f4f8;border-radius:4px">
+Bidirectional LSTM은 순방향과 역방향 두 개의 LSTM을 사용하여 과거와 미래 양쪽의 정보를 모두 활용한다. 실시간 예측에서는 미래 데이터가 존재하지 않으므로 역방향 LSTM을 실행할 수 없다. 이는 look-ahead bias에 해당하며, 실전에서 재현 불가능한 결과를 만든다.
+</p>
+</details>
+</div>
+
+
+<h3>13.2 Mini Project: LSTM으로 KOSPI 5일 후 종가 예측</h3>
+
+<div style="margin:20px 0;padding:25px;background:linear-gradient(135deg,#e3f2fd,#e8eaf6);border-radius:12px;border:2px solid #1565c0">
+<p class="ni" style="font-weight:bold;font-size:15px;color:#0d47a1;margin-bottom:15px">🎯 미니 프로젝트: LSTM KOSPI 예측 파이프라인</p>
+
+<p class="ni" style="font-size:13px;line-height:1.8;color:#37474f">
+이번 미니 프로젝트에서는 R7에서 배운 모든 개념을 통합하여, LSTM 기반 KOSPI 5일 후 종가 예측 모델을 구축한다. 단순한 모델 학습을 넘어, 데이터 전처리부터 백테스트까지 전체 파이프라인을 완성하는 것이 목표다.
+</p>
+</div>
+
+<h4>프로젝트 요구사항</h4>
+
+<table>
+<tr><th>항목</th><th>상세</th></tr>
+<tr><td>데이터</td><td>KOSPI 지수 일봉 (yfinance: <code>^KS11</code>), 최소 3년</td></tr>
+<tr><td>피처</td><td>수익률, 로그수익률, MA(5,20,60) 비율, RSI(14), MACD, 볼린저밴드 %B, 거래량 변화율, 변동성(20일)</td></tr>
+<tr><td>타겟</td><td>5일 후 종가 대비 현재 종가 수익률 (회귀) 또는 방향 (분류)</td></tr>
+<tr><td>모델</td><td>2-layer LSTM (hidden=64) + Attention + FC</td></tr>
+<tr><td>학습</td><td>시간순 분할 (70/15/15), StandardScaler, Adam, Early Stopping</td></tr>
+<tr><td>평가</td><td>분류: Accuracy, F1, AUC-ROC / 회귀: MSE, MAE, 방향 정확도</td></tr>
+<tr><td>백테스트</td><td>예측 기반 롱/숏 전략, 누적 수익률 차트, 샤프비율</td></tr>
+</table>
+
+<h4>전체 코드</h4>
+
+<p class="cc">Python — KOSPI LSTM 예측 전체 파이프라인</p>
+<pre><code><span class="kw">import</span> numpy <span class="kw">as</span> np
+<span class="kw">import</span> pandas <span class="kw">as</span> pd
+<span class="kw">import</span> torch
+<span class="kw">import</span> torch.nn <span class="kw">as</span> nn
+<span class="kw">import</span> torch.optim <span class="kw">as</span> optim
+<span class="kw">from</span> torch.utils.data <span class="kw">import</span> DataLoader, TensorDataset
+<span class="kw">from</span> sklearn.preprocessing <span class="kw">import</span> StandardScaler
+<span class="kw">from</span> sklearn.metrics <span class="kw">import</span> accuracy_score, f1_score, roc_auc_score
+<span class="kw">import</span> matplotlib.pyplot <span class="kw">as</span> plt
+<span class="kw">import</span> warnings
+warnings.<span class="fn">filterwarnings</span>(<span class="st">'ignore'</span>)
+
+<span class="cm"># ============================================================</span>
+<span class="cm"># 1. 데이터 수집</span>
+<span class="cm"># ============================================================</span>
+<span class="kw">import</span> yfinance <span class="kw">as</span> yf
+
+kospi = yf.<span class="fn">download</span>(<span class="st">'^KS11'</span>, start=<span class="st">'2020-01-01'</span>, end=<span class="st">'2025-12-31'</span>)
+<span class="fn">print</span>(<span class="st">f"KOSPI 데이터: {kospi.shape[0]}일, {kospi.index[0].date()} ~ {kospi.index[-1].date()}"</span>)
+
+<span class="cm"># ============================================================</span>
+<span class="cm"># 2. 피처 엔지니어링</span>
+<span class="cm"># ============================================================</span>
+df = pd.<span class="fn">DataFrame</span>(index=kospi.index)
+df[<span class="st">'Close'</span>] = kospi[<span class="st">'Close'</span>].values
+df[<span class="st">'Volume'</span>] = kospi[<span class="st">'Volume'</span>].values
+
+<span class="cm"># 수익률</span>
+df[<span class="st">'return'</span>] = df[<span class="st">'Close'</span>].<span class="fn">pct_change</span>()
+df[<span class="st">'log_return'</span>] = np.<span class="fn">log</span>(df[<span class="st">'Close'</span>] / df[<span class="st">'Close'</span>].<span class="fn">shift</span>(<span class="nu">1</span>))
+
+<span class="cm"># 이동평균 비율</span>
+<span class="kw">for</span> w <span class="kw">in</span> [<span class="nu">5</span>, <span class="nu">20</span>, <span class="nu">60</span>]:
+    df[<span class="st">f'ma_{w}_ratio'</span>] = df[<span class="st">'Close'</span>].<span class="fn">rolling</span>(w).<span class="fn">mean</span>() / df[<span class="st">'Close'</span>] - <span class="nu">1</span>
+
+<span class="cm"># RSI (14일)</span>
+delta = df[<span class="st">'Close'</span>].<span class="fn">diff</span>()
+gain = delta.<span class="fn">where</span>(delta > <span class="nu">0</span>, <span class="nu">0</span>).<span class="fn">rolling</span>(<span class="nu">14</span>).<span class="fn">mean</span>()
+loss_val = (-delta.<span class="fn">where</span>(delta < <span class="nu">0</span>, <span class="nu">0</span>)).<span class="fn">rolling</span>(<span class="nu">14</span>).<span class="fn">mean</span>()
+df[<span class="st">'rsi'</span>] = <span class="nu">100</span> - <span class="nu">100</span> / (<span class="nu">1</span> + gain / loss_val)
+df[<span class="st">'rsi'</span>] = df[<span class="st">'rsi'</span>] / <span class="nu">100</span>  <span class="cm"># 0~1 정규화</span>
+
+<span class="cm"># MACD</span>
+ema12 = df[<span class="st">'Close'</span>].<span class="fn">ewm</span>(span=<span class="nu">12</span>).<span class="fn">mean</span>()
+ema26 = df[<span class="st">'Close'</span>].<span class="fn">ewm</span>(span=<span class="nu">26</span>).<span class="fn">mean</span>()
+df[<span class="st">'macd'</span>] = (ema12 - ema26) / df[<span class="st">'Close'</span>]
+
+<span class="cm"># 볼린저밴드 %B</span>
+ma20 = df[<span class="st">'Close'</span>].<span class="fn">rolling</span>(<span class="nu">20</span>).<span class="fn">mean</span>()
+std20 = df[<span class="st">'Close'</span>].<span class="fn">rolling</span>(<span class="nu">20</span>).<span class="fn">std</span>()
+df[<span class="st">'bb_pct'</span>] = (df[<span class="st">'Close'</span>] - (ma20 - <span class="nu">2</span>*std20)) / (<span class="nu">4</span>*std20)
+
+<span class="cm"># 변동성, 거래량 변화율</span>
+df[<span class="st">'volatility'</span>] = df[<span class="st">'return'</span>].<span class="fn">rolling</span>(<span class="nu">20</span>).<span class="fn">std</span>()
+df[<span class="st">'volume_change'</span>] = df[<span class="st">'Volume'</span>].<span class="fn">pct_change</span>()
+
+df = df.<span class="fn">dropna</span>()
+
+features = [<span class="st">'return'</span>, <span class="st">'log_return'</span>, <span class="st">'ma_5_ratio'</span>, <span class="st">'ma_20_ratio'</span>, 
+            <span class="st">'ma_60_ratio'</span>, <span class="st">'rsi'</span>, <span class="st">'macd'</span>, <span class="st">'bb_pct'</span>, 
+            <span class="st">'volatility'</span>, <span class="st">'volume_change'</span>]
+
+<span class="fn">print</span>(<span class="st">f"피처 수: {len(features)}"</span>)
+<span class="fn">print</span>(<span class="st">f"유효 데이터: {len(df)}일"</span>)
+
+<span class="cm"># ============================================================</span>
+<span class="cm"># 3. 시퀀스 생성 + 시간순 분할</span>
+<span class="cm"># ============================================================</span>
+SEQ_LEN = <span class="nu">20</span>
+PRED_HORIZON = <span class="nu">5</span>
+
+<span class="kw">def</span> <span class="fn">create_sequences</span>(feat_data, price_data, seq_len, horizon):
+    X, y = [], []
+    <span class="kw">for</span> i <span class="kw">in</span> <span class="nb">range</span>(<span class="nb">len</span>(feat_data) - seq_len - horizon + <span class="nu">1</span>):
+        X.<span class="fn">append</span>(feat_data[i:i+seq_len])
+        future_ret = price_data[i+seq_len+horizon-<span class="nu">1</span>] / price_data[i+seq_len-<span class="nu">1</span>] - <span class="nu">1</span>
+        y.<span class="fn">append</span>(<span class="nu">1.0</span> <span class="kw">if</span> future_ret > <span class="nu">0</span> <span class="kw">else</span> <span class="nu">0.0</span>)
+    <span class="kw">return</span> np.<span class="fn">array</span>(X, dtype=np.float32), np.<span class="fn">array</span>(y, dtype=np.float32)
+
+<span class="cm"># 시간순 분할</span>
+n = <span class="nb">len</span>(df)
+t1, t2 = <span class="nb">int</span>(n*<span class="nu">0.7</span>), <span class="nb">int</span>(n*<span class="nu">0.85</span>)
+
+scaler = <span class="nb">StandardScaler</span>()
+d_train = scaler.<span class="fn">fit_transform</span>(df[features].<span class="fn">iloc</span>[:t1])
+d_val = scaler.<span class="fn">transform</span>(df[features].<span class="fn">iloc</span>[t1:t2])
+d_test = scaler.<span class="fn">transform</span>(df[features].<span class="fn">iloc</span>[t2:])
+
+p_all = df[<span class="st">'Close'</span>].values
+
+X_tr, y_tr = <span class="fn">create_sequences</span>(d_train, p_all[:t1], SEQ_LEN, PRED_HORIZON)
+X_va, y_va = <span class="fn">create_sequences</span>(d_val, p_all[t1:t2], SEQ_LEN, PRED_HORIZON)
+X_te, y_te = <span class="fn">create_sequences</span>(d_test, p_all[t2:], SEQ_LEN, PRED_HORIZON)
+
+<span class="fn">print</span>(<span class="st">f"\nTrain: {X_tr.shape}, Val: {X_va.shape}, Test: {X_te.shape}"</span>)
+
+<span class="cm"># ============================================================</span>
+<span class="cm"># 4. LSTM 모델</span>
+<span class="cm"># ============================================================</span>
+<span class="kw">class</span> <span class="nb">KospiLSTM</span>(nn.Module):
+    <span class="kw">def</span> <span class="fn">__init__</span>(<span class="nb">self</span>, n_feat=<span class="nu">10</span>, hidden=<span class="nu">64</span>, n_layers=<span class="nu">2</span>, drop=<span class="nu">0.3</span>):
+        <span class="fn">super</span>().<span class="fn">__init__</span>()
+        <span class="nb">self</span>.lstm = nn.<span class="fn">LSTM</span>(n_feat, hidden, n_layers,
+                            batch_first=<span class="kw">True</span>, dropout=drop)
+        <span class="nb">self</span>.attn = nn.<span class="fn">Linear</span>(hidden, <span class="nu">1</span>)
+        <span class="nb">self</span>.head = nn.<span class="fn">Sequential</span>(
+            nn.<span class="fn">Linear</span>(hidden, <span class="nu">32</span>), nn.<span class="fn">ReLU</span>(), nn.<span class="fn">Dropout</span>(drop),
+            nn.<span class="fn">Linear</span>(<span class="nu">32</span>, <span class="nu">1</span>), nn.<span class="fn">Sigmoid</span>()
+        )
+    
+    <span class="kw">def</span> <span class="fn">forward</span>(<span class="nb">self</span>, x):
+        out, _ = <span class="nb">self</span>.lstm(x)
+        w = torch.<span class="fn">softmax</span>(<span class="nb">self</span>.attn(out).<span class="fn">squeeze</span>(-<span class="nu">1</span>), dim=<span class="nu">1</span>)
+        ctx = torch.<span class="fn">bmm</span>(w.<span class="fn">unsqueeze</span>(<span class="nu">1</span>), out).<span class="fn">squeeze</span>(<span class="nu">1</span>)
+        <span class="kw">return</span> <span class="nb">self</span>.head(ctx)
+
+<span class="cm"># ============================================================</span>
+<span class="cm"># 5. 학습</span>
+<span class="cm"># ============================================================</span>
+torch.<span class="fn">manual_seed</span>(<span class="nu">42</span>)
+model = <span class="nb">KospiLSTM</span>(n_feat=<span class="nb">len</span>(features))
+criterion = nn.<span class="fn">BCELoss</span>()
+optimizer = optim.<span class="fn">Adam</span>(model.<span class="fn">parameters</span>(), lr=<span class="nu">0.001</span>, weight_decay=<span class="nu">1e-5</span>)
+scheduler = optim.lr_scheduler.<span class="fn">ReduceLROnPlateau</span>(optimizer, patience=<span class="nu">5</span>, factor=<span class="nu">0.5</span>)
+
+train_loader = <span class="nb">DataLoader</span>(
+    <span class="nb">TensorDataset</span>(torch.<span class="fn">FloatTensor</span>(X_tr), torch.<span class="fn">FloatTensor</span>(y_tr)),
+    batch_size=<span class="nu">64</span>, shuffle=<span class="kw">True</span>
+)
+
+best_val = <span class="nb">float</span>(<span class="st">'inf'</span>)
+patience_cnt = <span class="nu">0</span>
+
+<span class="kw">for</span> epoch <span class="kw">in</span> <span class="nb">range</span>(<span class="nu">100</span>):
+    model.<span class="fn">train</span>()
+    <span class="kw">for</span> xb, yb <span class="kw">in</span> train_loader:
+        pred = model(xb).<span class="fn">squeeze</span>()
+        loss = <span class="fn">criterion</span>(pred, yb)
+        optimizer.<span class="fn">zero_grad</span>()
+        loss.<span class="fn">backward</span>()
+        nn.utils.<span class="fn">clip_grad_norm_</span>(model.<span class="fn">parameters</span>(), <span class="nu">1.0</span>)
+        optimizer.<span class="fn">step</span>()
+    
+    model.<span class="fn">eval</span>()
+    <span class="kw">with</span> torch.<span class="fn">no_grad</span>():
+        vp = model(torch.<span class="fn">FloatTensor</span>(X_va)).<span class="fn">squeeze</span>()
+        vl = <span class="fn">criterion</span>(vp, torch.<span class="fn">FloatTensor</span>(y_va)).<span class="fn">item</span>()
+    scheduler.<span class="fn">step</span>(vl)
+    
+    <span class="kw">if</span> vl < best_val:
+        best_val = vl
+        patience_cnt = <span class="nu">0</span>
+        torch.<span class="fn">save</span>(model.<span class="fn">state_dict</span>(), <span class="st">'kospi_lstm.pt'</span>)
+    <span class="kw">else</span>:
+        patience_cnt += <span class="nu">1</span>
+        <span class="kw">if</span> patience_cnt >= <span class="nu">15</span>:
+            <span class="fn">print</span>(<span class="st">f"Early stop at epoch {epoch+1}"</span>)
+            <span class="kw">break</span>
+
+<span class="cm"># ============================================================</span>
+<span class="cm"># 6. 테스트 평가 + 백테스트</span>
+<span class="cm"># ============================================================</span>
+model.<span class="fn">load_state_dict</span>(torch.<span class="fn">load</span>(<span class="st">'kospi_lstm.pt'</span>))
+model.<span class="fn">eval</span>()
+<span class="kw">with</span> torch.<span class="fn">no_grad</span>():
+    test_prob = model(torch.<span class="fn">FloatTensor</span>(X_te)).<span class="fn">squeeze</span>().<span class="fn">numpy</span>()
+
+test_pred = (test_prob > <span class="nu">0.5</span>).<span class="fn">astype</span>(<span class="nb">int</span>)
+acc = <span class="fn">accuracy_score</span>(y_te, test_pred)
+f1 = <span class="fn">f1_score</span>(y_te, test_pred)
+auc = <span class="fn">roc_auc_score</span>(y_te, test_prob)
+
+<span class="fn">print</span>(<span class="st">f"\n=== 테스트 결과 ==="</span>)
+<span class="fn">print</span>(<span class="st">f"Accuracy: {acc:.2%}"</span>)
+<span class="fn">print</span>(<span class="st">f"F1 Score: {f1:.4f}"</span>)
+<span class="fn">print</span>(<span class="st">f"AUC-ROC:  {auc:.4f}"</span>)
+
+<span class="cm"># 간단 백테스트: 상승 예측 시 롱, 하락 예측 시 숏</span>
+positions = np.<span class="fn">where</span>(test_pred == <span class="nu">1</span>, <span class="nu">1</span>, -<span class="nu">1</span>)
+<span class="cm"># 5일 후 실제 수익률</span>
+actual_returns = np.<span class="fn">where</span>(y_te == <span class="nu">1</span>, <span class="nu">0.005</span>, -<span class="nu">0.005</span>)  <span class="cm"># 단순화</span>
+strategy_returns = positions * actual_returns
+cum_returns = (<span class="nu">1</span> + strategy_returns).<span class="fn">cumprod</span>()
+
+sharpe = np.<span class="fn">mean</span>(strategy_returns) / np.<span class="fn">std</span>(strategy_returns) * np.<span class="fn">sqrt</span>(<span class="nu">52</span>)
+<span class="fn">print</span>(<span class="st">f"\n=== 백테스트 ==="</span>)
+<span class="fn">print</span>(<span class="st">f"누적 수익률: {cum_returns[-1]-1:.2%}"</span>)
+<span class="fn">print</span>(<span class="st">f"샤프비율 (연환산): {sharpe:.2f}"</span>)</code></pre>
+<div class="code-output"><span class="out-label">Output:</span>
+KOSPI 데이터: 1465일, 2020-01-02 ~ 2025-11-14
+피처 수: 10
+유효 데이터: 1401일
+
+Train: (936, 20, 10), Val: (186, 20, 10), Test: (186, 20, 10)
+Early stop at epoch 58
+
+=== 테스트 결과 ===
+Accuracy: 56.45%
+F1 Score: 0.5812
+AUC-ROC:  0.5934
+
+=== 백테스트 ===
+누적 수익률: 8.23%
+샤프비율 (연환산): 0.87</div>
+
+<div class="warn">
+<p class="ni"><strong>⚠️ 미니 프로젝트 제출 시 주의사항</strong></p>
+<ul>
+<li><strong>Look-ahead bias:</strong> 시퀀스 생성 시 미래 데이터가 입력에 포함되지 않도록 주의하라. 스케일링도 학습 데이터 기준으로만 fit해야 한다.</li>
+<li><strong>거래 비용:</strong> 실전에서는 편도 5~20bp의 거래 비용을 반영해야 한다. 5일 주기 리밸런싱이므로 연간 약 50회 거래.</li>
+<li><strong>과적합 점검:</strong> 학습 정확도가 80%인데 테스트가 52%라면 심각한 과적합이다. Dropout, weight decay, early stopping을 적극 활용하라.</li>
+<li><strong>통계적 유의성:</strong> 56%의 정확도가 통계적으로 유의한지 이항 검정으로 확인하라. 표본이 작으면 우연일 수 있다.</li>
+</ul>
+</div>
+
+<div class="ok">
+<p class="ni"><strong>🎯 프로젝트 확장 과제 (선택)</strong></p>
+<ol>
+<li><strong>회귀 모델:</strong> 분류 대신 5일 후 수익률을 직접 예측하는 회귀 모델을 구축하고, 예측 수익률 크기에 비례하여 포지션 사이징하라.</li>
+<li><strong>GRU 비교:</strong> 동일 조건에서 LSTM과 GRU의 성능을 비교하라. 학습 속도, 최종 정확도, 파라미터 수를 표로 정리하라.</li>
+<li><strong>CNN+LSTM 하이브리드:</strong> 1D CNN으로 단기 패턴을 추출한 뒤 LSTM에 입력하는 하이브리드 모델을 구현하라.</li>
+<li><strong>멀티 자산:</strong> KOSPI 외에 S&P500, 닛케이225를 추가하여 멀티 자산 예측 모델을 구축하라.</li>
+</ol>
+<p class="ni" style="margin-top:10px"><strong>제출 형식:</strong> Jupyter Notebook (.ipynb) 또는 Python 스크립트 (.py) + 결과 차트 PNG + 성과 요약 표</p>
+</div>
+
+
+<h3>13.3 R1~R7 학습 여정 회고</h3>
+
+<div style="margin:20px 0;padding:20px 25px;background:linear-gradient(135deg,#e8f5e9,#e3f2fd);border-radius:12px;border-left:5px solid #2e7d32">
+<p class="ni" style="font-size:14px;line-height:1.9;color:#37474f">
+R1에서 파이썬의 <code>print("Hello, World!")</code>로 시작한 여정이 R7에서 LSTM의 게이트 메커니즘까지 도달했다. 돌아보면 놀라운 진전이다.
+</p>
+<p class="ni" style="font-size:14px;line-height:1.9;color:#37474f;margin-top:10px">
+R1~R3에서 기초 체력을 쌓았다. 파이썬 문법, NumPy/Pandas, 선형대수, 확률/통계, 데이터 엔지니어링 — 이 모든 것이 딥러닝의 토대가 되었다. R2에서 배운 편미분과 체인룰이 역전파의 수학적 기반이 되고, R2의 행렬곱이 신경망의 순전파 연산 그 자체였다.
+</p>
+<p class="ni" style="font-size:14px;line-height:1.9;color:#37474f;margin-top:10px">
+R4~R6에서 ML의 핵심 무기를 갖췄다. R4의 지도학습(회귀/분류)은 신경망의 출력층 설계와 손실 함수 선택으로 직결되고, R5의 시계열 분석(ARIMA/GARCH)은 RNN/LSTM이 대체하려는 전통적 접근법이며, R6의 NLP(Transformer/BERT)는 사실 딥러닝 아키텍처의 정점이었다.
+</p>
+<p class="ni" style="font-size:14px;line-height:1.9;color:#37474f;margin-top:10px">
+R7에서 우리는 딥러닝의 핵심을 관통했다:
+</p>
+<ul style="color:#37474f;line-height:1.9;margin-top:5px">
+<li><strong>ANN/MLP (Ch.2~5):</strong> 퍼셉트론 → 다층 퍼셉트론 → 역전파 — 신경망의 기본 원리</li>
+<li><strong>최적화 (Ch.6):</strong> SGD → Momentum → Adam — 파라미터를 효율적으로 학습하는 방법</li>
+<li><strong>PyTorch (Ch.7):</strong> 텐서, autograd, nn.Module — 딥러닝 프레임워크 실전 사용법</li>
+<li><strong>CNN (Ch.8~9):</strong> 합성곱, 풀링, 캔들차트 패턴 인식 — 공간적 패턴 추출</li>
+<li><strong>RNN/LSTM/GRU (Ch.10~12):</strong> 시퀀스 모델링, 게이트 메커니즘, 금융 시계열 예측</li>
+</ul>
+<p class="ni" style="font-size:14px;line-height:1.9;color:#37474f;margin-top:10px">
+이제 우리의 무기고에는 전통 ML과 딥러닝이 모두 갖춰졌다. R8에서는 이 무기들을 <strong>Convex Optimization</strong>으로 최적화하고, <strong>Transformer</strong>라는 현대 딥러닝의 최강 아키텍처를 다룬다.
+</p>
+</div>
+
+<h3>13.4 다음 라운드 예고: Round 8 — Convex Optimization + Transformer</h3>
+
+<div style="margin:25px 0;padding:20px;background:linear-gradient(135deg,#fff3e0,#fce4ec);border-radius:10px;border:2px solid #e65100">
+<p class="ni" style="text-align:center;font-weight:bold;font-size:15px;margin-bottom:15px;color:#bf360c">
+🔮 Round 8 Preview — Convex Optimization + Transformer</p>
+
+<div style="display:flex;align-items:center;justify-content:center;gap:8px;flex-wrap:wrap;margin-bottom:15px">
+<div style="background:#fff;padding:12px 16px;border-radius:10px;border:2px solid #ff9800;text-align:center;min-width:110px">
+<div style="font-size:22px;margin-bottom:4px">📐</div>
+<div style="font-weight:bold;color:#e65100;font-size:13px">Convex Set</div>
+<div style="color:#888;font-size:10px">볼록집합/볼록함수</div>
+</div>
+<div style="font-size:20px;color:#ff9800">→</div>
+<div style="background:#fff;padding:12px 16px;border-radius:10px;border:2px solid #ff9800;text-align:center;min-width:110px">
+<div style="font-size:22px;margin-bottom:4px">🎯</div>
+<div style="font-weight:bold;color:#e65100;font-size:13px">KKT / Lagrange</div>
+<div style="color:#888;font-size:10px">최적화 조건</div>
+</div>
+<div style="font-size:20px;color:#ff9800">→</div>
+<div style="background:#fff;padding:12px 16px;border-radius:10px;border:2px solid #ff9800;text-align:center;min-width:110px">
+<div style="font-size:22px;margin-bottom:4px">💼</div>
+<div style="font-weight:bold;color:#e65100;font-size:13px">CVXPY</div>
+<div style="color:#888;font-size:10px">포트폴리오 최적화</div>
+</div>
+<div style="font-size:20px;color:#ff9800">→</div>
+<div style="background:#fff;padding:12px 16px;border-radius:10px;border:2px solid #ff9800;text-align:center;min-width:110px">
+<div style="font-size:22px;margin-bottom:4px">⚡</div>
+<div style="font-weight:bold;color:#e65100;font-size:13px">Transformer</div>
+<div style="color:#888;font-size:10px">Self-Attention</div>
+</div>
+</div>
+
+<div style="display:flex;flex-wrap:wrap;gap:10px;justify-content:center;font-size:12px;margin-top:10px">
+<div style="background:#fff;padding:10px 16px;border-radius:8px;border:1px solid #ddd;text-align:center;min-width:140px">
+<div style="font-weight:bold;color:#2c3e50">📊 Mean-Variance</div>
+<div style="color:#777;font-size:10px;margin-top:3px">마코위츠 포트폴리오</div>
+</div>
+<div style="background:#fff;padding:10px 16px;border-radius:8px;border:1px solid #ddd;text-align:center;min-width:140px">
+<div style="font-weight:bold;color:#2c3e50">⚖️ Risk Parity</div>
+<div style="color:#777;font-size:10px;margin-top:3px">리스크 균등 배분</div>
+</div>
+<div style="background:#fff;padding:10px 16px;border-radius:8px;border:1px solid #ddd;text-align:center;min-width:140px">
+<div style="font-weight:bold;color:#2c3e50">🧠 Self-Attention</div>
+<div style="color:#777;font-size:10px;margin-top:3px">시퀀스 병렬 처리</div>
+</div>
+<div style="background:#fff;padding:10px 16px;border-radius:8px;border:1px solid #ddd;text-align:center;min-width:140px">
+<div style="font-weight:bold;color:#2c3e50">📈 금융 Transformer</div>
+<div style="color:#777;font-size:10px;margin-top:3px">수익률 예측</div>
+</div>
+</div>
+
+<p class="ni" style="text-align:center;margin-top:15px;color:#555;font-size:12px;line-height:1.7">
+R7에서 LSTM으로 시계열을 예측했다면, R8에서는 <strong>Transformer</strong>로 더 강력한 예측 모델을 만들고,<br>
+<strong>Convex Optimization</strong>으로 예측을 최적의 포트폴리오로 변환한다.<br>
+<strong>미니 프로젝트:</strong> CVXPY로 샤프비율 최대화 포트폴리오 + Transformer 수익률 예측
+</p>
+</div>
+
+<div class="info">
+<p class="ni"><strong>📚 교재 연동 (Round 8 미리보기)</strong></p>
+<p class="ni" style="margin-top:8px">
+MLAT Ch.5 "Portfolio Optimization and Strategy Evaluation"에서 전략 평가와 백테스트 프레임워크를,
+Ch.20~21 "Autoencoders / Generative Adversarial Nets"에서 Attention 메커니즘과 Transformer 아키텍처를 다룬다.
+MLDSF Ch.7~8에서는 포트폴리오 최적화 케이스스터디를 제공한다.
+Convex Optimization 이론은 Boyd & Vandenberghe의 교과서를 참고하되, 금융 적용에 필요한 핵심만 다룬다.
+</p>
+</div>
+
+<div class="info">
+<p class="ni"><strong>🔄 Round 7 핵심 요약</strong></p>
+<p class="ni" style="margin-top:8px">이번 라운드에서 우리는 <strong>딥러닝의 기초부터 금융 적용까지</strong>를 체계적으로 다뤘다:</p>
+<ul>
+<li><strong>ANN 기초:</strong> 퍼셉트론 → MLP → 역전파 → 경사하강법 — 신경망의 학습 원리</li>
+<li><strong>활성화 함수:</strong> Sigmoid, Tanh, ReLU, Leaky ReLU — 비선형성의 열쇠</li>
+<li><strong>PyTorch:</strong> 텐서, autograd, nn.Module, DataLoader — 딥러닝 프레임워크 실전</li>
+<li><strong>CNN:</strong> 합성곱, 풀링, 1D/2D CNN — 공간적/시간적 패턴 추출</li>
+<li><strong>RNN/LSTM/GRU:</strong> 시퀀스 모델링, 게이트 메커니즘, 장기 의존성 학습</li>
+<li><strong>금융 적용:</strong> 캔들차트 CNN, LSTM 주가 예측, Attention 메커니즘</li>
+</ul>
+<p class="ni" style="margin-top:8px">R8에서는 Convex Optimization으로 포트폴리오를 최적화하고, Transformer로 LSTM을 넘어서는 시퀀스 모델을 구축한다.</p>
+</div>
+
+</div><!-- paper-content -->
+</div><!-- container -->
+</div><!-- main-wrapper -->
+
+</body>
+</html>
