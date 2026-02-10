@@ -95,12 +95,12 @@ pre{font-size:11px;padding:14px}table{font-size:10px;display:block;overflow-x:au
 <div class="nav-section">
 <div class="nav-section-title">Curriculum</div>
 <ul class="nav-list">
-<li><a class="done" href="../round-01/">R1. Python + Finance <span class="badge badge-done">DONE</span></a></li>
-<li><a class="done" href="../round-02/">R2. Linear Algebra + Stats <span class="badge badge-done">DONE</span></a></li>
-<li><a class="done" href="../round-03/">R3. Data / Feature Eng. <span class="badge badge-done">DONE</span></a></li>
-<li><a class="done" href="../round-04/">R4. Supervised Learning <span class="badge badge-done">DONE</span></a></li>
-<li><a class="done" href="../round-05/">R5. Unsupervised + TS <span class="badge badge-done">DONE</span></a></li>
-<li><a class="done" href="../round-06/">R6. NLP + Sentiment <span class="badge badge-done">DONE</span></a></li>
+<li><a class="done" href="../round_01/lecture_01.html">R1. Python + Finance <span class="badge badge-done">DONE</span></a></li>
+<li><a class="done" href="../round_02/lecture_02.html">R2. Linear Algebra + Stats <span class="badge badge-done">DONE</span></a></li>
+<li><a class="done" href="../round_03/lecture_03.html">R3. Data / Feature Eng. <span class="badge badge-done">DONE</span></a></li>
+<li><a class="done" href="../round_04/lecture_04.html">R4. Supervised Learning <span class="badge badge-done">DONE</span></a></li>
+<li><a class="done" href="../round_05/lecture_05.html">R5. Unsupervised + TS <span class="badge badge-done">DONE</span></a></li>
+<li><a class="done" href="../round_06/lecture_06.html">R6. NLP + Sentiment <span class="badge badge-done">DONE</span></a></li>
 <li><a class="active" href="#">R7. Deep Learning <span class="badge">NOW</span></a></li>
 <li><a href="#">R8. Convex Opt + Transformer</a></li>
 <li><a href="#">R9. HFT + RL</a></li>
@@ -2647,6 +2647,7 @@ warnings.<span class="fn">filterwarnings</span>(<span class="st">'ignore'</span>
 <span class="kw">import</span> yfinance <span class="kw">as</span> yf
 
 kospi = yf.<span class="fn">download</span>(<span class="st">'^KS11'</span>, start=<span class="st">'2020-01-01'</span>, end=<span class="st">'2025-12-31'</span>)
+kospi = kospi.<span class="fn">squeeze</span>(axis=<span class="nu">1</span>, level=<span class="nu">0</span>) <span class="kw">if</span> <span class="nb">isinstance</span>(kospi.columns, pd.MultiIndex) <span class="kw">else</span> kospi
 <span class="fn">print</span>(<span class="st">f"KOSPI 데이터: {kospi.shape[0]}일, {kospi.index[0].date()} ~ {kospi.index[-1].date()}"</span>)
 
 <span class="cm"># ============================================================</span>
@@ -2791,7 +2792,7 @@ patience_cnt = <span class="nu">0</span>
 <span class="cm"># ============================================================</span>
 <span class="cm"># 6. 테스트 평가 + 백테스트</span>
 <span class="cm"># ============================================================</span>
-model.<span class="fn">load_state_dict</span>(torch.<span class="fn">load</span>(<span class="st">'kospi_lstm.pt'</span>))
+model.<span class="fn">load_state_dict</span>(torch.<span class="fn">load</span>(<span class="st">'kospi_lstm.pt'</span>, weights_only=<span class="kw">True</span>))
 model.<span class="fn">eval</span>()
 <span class="kw">with</span> torch.<span class="fn">no_grad</span>():
     test_prob = model(torch.<span class="fn">FloatTensor</span>(X_te)).<span class="fn">squeeze</span>().<span class="fn">numpy</span>()
