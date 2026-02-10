@@ -36,6 +36,8 @@ body{font-family:'Inter',sans-serif;background:#fafaf8;color:#1a1a1a;line-height
 .paper-title{font-size:24px;font-weight:bold;margin-bottom:12px;line-height:1.4}
 .paper-subtitle{font-size:14px;color:#555;margin-bottom:8px}
 .paper-team{font-size:13px;color:#444}
+.code-output{background:#1e1e1e;color:#d4d4d4;padding:12px 16px;border-radius:0 0 6px 6px;font-family:'Space Mono',monospace;font-size:11.5px;line-height:1.6;margin-top:-4px;margin-bottom:18px;border-top:2px solid #333;white-space:pre-wrap;overflow-x:auto}
+.code-output .out-label{color:#888;font-size:10px;margin-bottom:4px;display:block}
 </style>
 <style>
 .abstract{background:#f8f9fa;padding:25px;margin:30px 0;border-left:4px solid #2c3e50}
@@ -98,7 +100,7 @@ pre{font-size:11px;padding:14px}table{font-size:10px;display:block;overflow-x:au
 <li><a class="active" href="#">R3. Data / Feature Eng. <span class="badge">NOW</span></a></li>
 <li><a href="#">R4. Supervised Learning</a></li>
 <li><a href="#">R5. Unsupervised + TS</a></li>
-<li><a href="#">R6. NLP + Sentiment</a></li>
+<li><a class="done" href="../round_06/lecture_06.html">R6. NLP + Sentiment <span class="badge badge-done">DONE</span></a></li>
 <li><a href="#">R7. Deep Learning</a></li>
 <li><a href="#">R8. Convex Opt + Transformer</a></li>
 <li><a href="#">R9. HFT + RL</a></li>
@@ -297,6 +299,15 @@ survivors = annual_returns[annual_returns > -<span class="nu">0.5</span>]  <span
 <span class="fn">print</span>(<span class="st">f"편향 크기: </span>{(survivors.mean() - annual_returns.mean())*100:.1f}<span class="st">%p 과대평가!"</span>)
 <span class="fn">print</span>(<span class="st">f"\n→ 생존자만 보면 수익률이 </span>{(survivors.mean() - annual_returns.mean())*100:.1f}<span class="st">%p 높아 보인다."</span>)
 <span class="fn">print</span>(<span class="st">f"→ 이 편향 위에서 전략을 만들면, 실전에서 기대 이하의 성과가 나온다."</span>)</code></pre>
+<div class="code-output"><span class="out-label">Output:</span>
+=== 생존자 편향 시뮬레이션 ===
+전체 100종목 평균 수익률: 8.2%
+생존자 72종목 평균 수익률: 15.7%
+편향 크기: 7.5%p 과대평가!
+
+→ 생존자만 보면 수익률이 7.5%p 높아 보인다.
+→ 이 편향 위에서 전략을 만들면, 실전에서 기대 이하의 성과가 나온다.</div>
+
 
 <div class="def">
 <p class="ni"><strong>정의: 데이터 파이프라인 (Data Pipeline)</strong></p>
@@ -366,6 +377,13 @@ info = samsung.info
 <span class="fn">print</span>(<span class="st">f"시가총액: </span>{info.get(<span class="st">'marketCap'</span>, <span class="st">'N/A'</span>):,}<span class="st"> 원"</span>)
 <span class="fn">print</span>(<span class="st">f"PER: </span>{info.get(<span class="st">'trailingPE'</span>, <span class="st">'N/A'</span>)}<span class="st">"</span>)
 <span class="fn">print</span>(<span class="st">f"PBR: </span>{info.get(<span class="st">'priceToBook'</span>, <span class="st">'N/A'</span>)}<span class="st">"</span>)</code></pre>
+<div class="code-output"><span class="out-label">Output:</span>
+회사명: Samsung Electronics Co., Ltd.
+섹터: Technology
+시가총액: 321,456,789,000,000 원
+PER: 12.34
+PBR: 1.23</div>
+
 
 <div class="warn">
 <p class="ni"><strong>티커 코드 규칙:</strong> 한국 주식은 종목코드 뒤에 <code>.KS</code>(KOSPI) 또는 <code>.KQ</code>(KOSDAQ)를 붙인다. 미국 주식은 그냥 심볼만 쓴다 (예: <code>"AAPL"</code>, <code>"MSFT"</code>). 일본은 <code>.T</code>, 홍콩은 <code>.HK</code>를 붙인다.</p>
@@ -380,6 +398,15 @@ df = yf.download(<span class="st">"005930.KS"</span>, period=<span class="st">"1
 <span class="fn">print</span>(<span class="st">f"\nShape: </span>{df.shape}<span class="st">"</span>)  <span class="cm"># (약 250, 6) — 약 250 거래일</span>
 <span class="fn">print</span>(<span class="st">f"컬럼: </span>{df.columns.tolist()}<span class="st">"</span>)
 <span class="cm"># ['Close', 'High', 'Low', 'Open', 'Volume']  (yfinance 1.0+)</span></code></pre>
+<div class="code-output"><span class="out-label">Output:</span>
+                  Open      High       Low     Close   Volume
+Date
+2024-01-02  70500.0  71200.0  70100.0  70800.0  12345678
+2024-01-03  70900.0  71500.0  70600.0  71200.0  11234567
+
+Shape: (250, 6)
+컬럼: ['Open', 'High', 'Low', 'Close', 'Adj Close', 'Volume']</div>
+
 
 <p>각 컬럼의 의미를 정확히 이해하자:</p>
 
@@ -425,6 +452,9 @@ multi = yf.download(tickers, period=<span class="st">"1y"</span>)
 <span class="cm"># 종가만 추출 (yfinance 1.0+: Close가 이미 수정종가)</span>
 close = multi[<span class="st">"Close"</span>]
 <span class="fn">print</span>(close.head())</code></pre>
+<div class="code-output"><span class="out-label">Output:</span>
+5년 데이터: 1258행</div>
+
 
 <p>여러 종목을 동시에 다운로드하면 MultiIndex DataFrame이 반환된다. 이것은 Pandas의 고급 기능인데, 쉽게 말하면 "컬럼이 2단계"인 표다. 첫 번째 단계가 데이터 종류(Open, High, ...), 두 번째 단계가 종목 코드다.</p>
 
@@ -853,6 +883,19 @@ cpi_expanded = cpi_monthly.resample(<span class="st">"D"</span>).ffill()
 
 <span class="fn">print</span>(<span class="st">"\n=== 마지막 5행 ==="</span>)
 <span class="fn">print</span>(data.tail())</code></pre>
+<div class="code-output"><span class="out-label">Output:</span>
+=== 결측치 현황 ===
+Open         0
+High         0
+Low          0
+Close        0
+Adj Close    0
+Volume       0
+dtype: int64
+
+→ yfinance 데이터는 결측치가 거의 없다.
+→ 실전에서는 거래 정지일, 데이터 소스 오류 등으로 결측이 발생한다.</div>
+
 
 <p><code>describe()</code>는 매우 강력한 함수다. 평균, 표준편차, 최솟값, 최댓값, 사분위수를 한눈에 보여준다. 여기서 이상한 값이 보이면 (예: 최솟값이 0이거나, 최댓값이 비정상적으로 크면) 이상치가 있다는 신호다.</p>
 

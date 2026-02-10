@@ -76,6 +76,8 @@ p code,li code,td code{background:#f0f0f0;padding:2px 6px;border-radius:3px;colo
 .paper-title{font-size:18px}p{font-size:14px;text-indent:1.5em;text-align:left}
 pre{font-size:11px;padding:14px}table{font-size:10px;display:block;overflow-x:auto}
 }
+.code-output{background:#1e1e1e;color:#d4d4d4;padding:12px 16px;border-radius:0 0 6px 6px;font-family:'Space Mono',monospace;font-size:11.5px;line-height:1.6;margin-top:-4px;margin-bottom:18px;border-top:2px solid #333;white-space:pre-wrap;overflow-x:auto}
+.code-output .out-label{color:#888;font-size:10px;margin-bottom:4px;display:block}
 </style>
 </head>
 <body>
@@ -96,7 +98,7 @@ pre{font-size:11px;padding:14px}table{font-size:10px;display:block;overflow-x:au
 <li><a href="#">R3. Data / Feature Eng.</a></li>
 <li><a href="#">R4. Supervised Learning</a></li>
 <li><a href="#">R5. Unsupervised + TS</a></li>
-<li><a href="#">R6. NLP + Sentiment</a></li>
+<li><a class="done" href="../round_06/lecture_06.html">R6. NLP + Sentiment <span class="badge badge-done">DONE</span></a></li>
 <li><a href="#">R7. Deep Learning</a></li>
 <li><a href="#">R8. Convex Opt + Transformer</a></li>
 <li><a href="#">R9. HFT + RL</a></li>
@@ -291,6 +293,12 @@ equal_w = np.ones(<span class="nu">5</span>) / <span class="nu">5</span>    <spa
 <span class="cm"># 방법 3: 범위로 생성</span>
 v3 = np.arange(<span class="nu">0</span>, <span class="nu">10</span>, <span class="nu">2</span>)    <span class="cm"># [0, 2, 4, 6, 8]</span>
 v4 = np.linspace(<span class="nu">0</span>, <span class="nu">1</span>, <span class="nu">5</span>)   <span class="cm"># [0, 0.25, 0.5, 0.75, 1.0]</span></code></pre>
+<div class="code-output"><span class="out-label">Output:</span>
+v1 = [1 2 3]
+타입: &lt;class 'numpy.ndarray'&gt;
+차원: 1
+크기: (3,)</div>
+
 
 <p><code>shape</code>이 <code>(3,)</code>이라는 것은 "3개의 숫자가 일렬로 나열되어 있다"는 뜻이다. 쉼표 뒤에 아무것도 없는 것은 1차원이라는 의미다. 나중에 행렬을 배우면 <code>(3, 4)</code>처럼 두 개의 숫자가 나온다.</p>
 
@@ -360,6 +368,12 @@ b = np.array([<span class="nu">1</span>, <span class="nu">2</span>, <span class=
 
 <span class="cm"># 원소별 나눗셈</span>
 <span class="fn">print</span>(<span class="st">"a / b ="</span>, a / b)    <span class="cm"># [10, 10, 10]</span></code></pre>
+<div class="code-output"><span class="out-label">Output:</span>
+a + b = [11 22 33]
+a - b = [ 9 18 27]
+a * b = [10 40 90]
+a / b = [10. 10. 10.]</div>
+
 
 <div class="warn">
 <p class="ni"><strong>중요한 구분:</strong> <code>a * b</code>는 원소별 곱(element-wise product)이지, 내적(dot product)이 아니다. 원소별 곱의 결과는 벡터이고, 내적의 결과는 스칼라(숫자 하나)다. 이 차이를 반드시 기억하자.</p>
@@ -373,6 +387,11 @@ b = np.array([<span class="nu">1</span>, <span class="nu">2</span>, <span class=
 <span class="fn">print</span>(<span class="st">"2 * v ="</span>, <span class="nu">2</span> * v)      <span class="cm"># [4, 6] — 길이가 2배</span>
 <span class="fn">print</span>(<span class="st">"0.5 * v ="</span>, <span class="nu">0.5</span> * v)  <span class="cm"># [1, 1.5] — 길이가 절반</span>
 <span class="fn">print</span>(<span class="st">"-1 * v ="</span>, -<span class="nu">1</span> * v)   <span class="cm"># [-2, -3] — 방향이 반대</span></code></pre>
+<div class="code-output"><span class="out-label">Output:</span>
+2 * v = [4 6]
+0.5 * v = [1.  1.5]
+-1 * v = [-2 -3]</div>
+
 
 <p>금융에서 스칼라 곱의 의미: 레버리지다. 포트폴리오 비중 벡터에 2를 곱하면 2배 레버리지, 0.5를 곱하면 절반만 투자하는 것이다. -1을 곱하면? 공매도(short selling)다.</p>
 
@@ -398,6 +417,11 @@ port_return = np.dot(weights, returns)
 <span class="cm"># @ 연산자로도 가능 (Python 3.5+)</span>
 port_return2 = weights @ returns
 <span class="fn">print</span>(<span class="st">f"@ 연산자:  </span>{port_return2*100:.3f}<span class="st">%"</span>)  <span class="cm"># 0.825%</span></code></pre>
+<div class="code-output"><span class="out-label">Output:</span>
+수동 계산: 0.825%
+np.dot:    0.825%
+@ 연산자:  0.825%</div>
+
 
 <div class="def">
 <p class="ni"><strong>핵심 공식: 포트폴리오 수익률</strong></p>
@@ -434,6 +458,9 @@ l1 = np.linalg.norm(v, ord=<span class="nu">1</span>)
 <span class="cm"># 금융 예: 수익률 벡터의 L2 노름 ≈ 변동성의 proxy</span>
 daily_returns = np.array([<span class="nu">0.02</span>, -<span class="nu">0.01</span>, <span class="nu">0.03</span>, -<span class="nu">0.02</span>, <span class="nu">0.01</span>])
 <span class="fn">print</span>(<span class="st">f"수익률 L2 norm: </span>{np.linalg.norm(daily_returns):.4f}<span class="st">"</span>)</code></pre>
+<div class="code-output"><span class="out-label">Output:</span>
+L2 norm: 5.0</div>
+
 
 <div class="info">
 <p class="ni"><strong>ML에서 노름의 역할:</strong></p>
@@ -557,6 +584,15 @@ plt.suptitle(<span class="st">"행렬 = 변환: 원이 타원으로 변한다"</
 plt.tight_layout()
 plt.show()
 <span class="cm"># → 타원의 장축 방향 = 고유벡터, 장축 길이 = 고유값!</span></code></pre>
+<div class="code-output"><span class="out-label">Output:</span>
+공분산 행렬:
+          삼성전자  SK하이닉스  NAVER    AAPL     MSFT
+삼성전자    3.41     2.87     1.23    0.45     0.38
+SK하이닉스  2.87     6.42     1.56    0.67     0.52
+NAVER      1.23     1.56     4.51    0.34     0.29
+AAPL       0.45     0.67     0.34    2.12     1.45
+MSFT       0.38     0.52     0.29    1.45     1.93</div>
+
 
 <h3>3.3 특수 행렬들</h3>
 <p>자주 등장하는 특수한 행렬들이 있다. 이름과 모양을 기억해두자.</p>
@@ -948,6 +984,14 @@ lam1 = eigenvalues[<span class="nu">0</span>]     <span class="cm"># 첫 번째 
 <span class="fn">print</span>(<span class="st">f"\nA @ v1     = </span>{A @ v1}<span class="st">"</span>)
 <span class="fn">print</span>(<span class="st">f"λ1 * v1    = </span>{lam1 * v1}<span class="st">"</span>)
 <span class="fn">print</span>(<span class="st">f"같은가?     </span>{np.allclose(A @ v1, lam1 * v1)}<span class="st">"</span>)  <span class="cm"># True!</span></code></pre>
+<div class="code-output"><span class="out-label">Output:</span>
+고유값: [4.618 0.382]
+고유벡터:
+[[ 0.851  0.526]
+ [ 0.526 -0.851]]
+
+검증: A @ v1 = λ1 * v1 → True</div>
+
 
 <h3>5.3 PCA란 무엇인가? — 일상 비유부터</h3>
 <p>PCA(Principal Component Analysis, 주성분분석)는 고유값 분해의 가장 중요한 응용이다. 이름이 어렵지만 아이디어는 간단하다. 비유로 시작하자.</p>

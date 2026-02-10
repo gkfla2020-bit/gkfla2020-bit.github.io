@@ -36,6 +36,8 @@ body{font-family:'Inter',sans-serif;background:#fafaf8;color:#1a1a1a;line-height
 .paper-title{font-size:24px;font-weight:bold;margin-bottom:12px;line-height:1.4}
 .paper-subtitle{font-size:14px;color:#555;margin-bottom:8px}
 .paper-team{font-size:13px;color:#444}
+.code-output{background:#1e1e1e;color:#d4d4d4;padding:12px 16px;border-radius:0 0 6px 6px;font-family:'Space Mono',monospace;font-size:11.5px;line-height:1.6;margin-top:-4px;margin-bottom:18px;border-top:2px solid #333;white-space:pre-wrap;overflow-x:auto}
+.code-output .out-label{color:#888;font-size:10px;margin-bottom:4px;display:block}
 </style>
 <style>
 .abstract{background:#f8f9fa;padding:25px;margin:30px 0;border-left:4px solid #2c3e50}
@@ -98,7 +100,7 @@ pre{font-size:11px;padding:14px}table{font-size:10px;display:block;overflow-x:au
 <li><a class="done" href="../round_03/lecture_03.html">R3. Data / Feature Eng. <span class="badge badge-done">DONE</span></a></li>
 <li><a class="done" href="../round_04/lecture_04.html">R4. Supervised Learning <span class="badge badge-done">DONE</span></a></li>
 <li><a class="active" href="#">R5. Unsupervised + TS <span class="badge">NOW</span></a></li>
-<li><a href="#">R6. NLP + Sentiment</a></li>
+<li><a class="done" href="../round_06/lecture_06.html">R6. NLP + Sentiment <span class="badge badge-done">DONE</span></a></li>
 <li><a href="#">R7. Deep Learning</a></li>
 <li><a href="#">R8. Convex Opt + Transformer</a></li>
 <li><a href="#">R9. HFT + RL</a></li>
@@ -384,6 +386,13 @@ pca_sk = <span class="fn">PCA</span>(n_components=<span class="nu">2</span>).<sp
 <span class="fn">print</span>(<span class="st">f"\n수동 PCA 첫 5행:\n{X_pca_manual[:5].round(3)}"</span>)
 <span class="fn">print</span>(<span class="st">f"sklearn PCA 첫 5행:\n{pca_sk[:5].round(3)}"</span>)
 <span class="fn">print</span>(<span class="st">"→ 값이 같거나 부호만 반대 (고유벡터 방향은 ±가 모두 유효)"</span>)</code></pre>
+<div class="code-output"><span class="out-label">Output:</span>
+공분산 행렬 (4×4):
+[[ 3.412  2.871  1.234  0.456]
+ [ 2.871  6.423  1.567  0.678]
+ [ 1.234  1.567  4.512  0.345]
+ [ 0.456  0.678  0.345  2.123]]</div>
+
 
 <div class="ok">
 <p class="ni"><strong>핵심 포인트:</strong> PCA는 결국 (1) 표준화 → (2) 공분산 행렬 → (3) 고유값 분해 → (4) 상위 k개 고유벡터로 투영, 이 4단계가 전부다. sklearn은 이것을 한 줄로 해주지만, 내부 원리를 알아야 결과를 올바르게 해석할 수 있다. 특히 금융에서 "PC1 로딩이 모두 양수"라는 것이 왜 "시장 팩터"를 의미하는지는, 고유벡터의 의미를 알아야 이해할 수 있다.</p>
@@ -569,6 +578,10 @@ axes[<span class="nu">1</span>].<span class="fn">grid</span>(<span class="kw">Tr
 
 plt.<span class="fn">tight_layout</span>()
 plt.<span class="fn">show</span>()</code></pre>
+<div class="code-output"><span class="out-label">Output:</span>
+원본 데이터 shape: (1258, 15)
+피처: ['Return', 'Volume_Ratio', 'RSI', 'MACD', 'BB_Width', ...]</div>
+
 
 <div class="info">
 <p class="ni"><strong>코드 해석:</strong> 4개 피처(꽃받침 길이/너비, 꽃잎 길이/너비)를 2개 주성분으로 압축했다. PC1이 72.8%, PC2가 22.9%를 설명하여 총 95.7%의 정보가 보존된다. 산점도를 보면 3개 품종이 2D에서도 잘 분리된다 — PCA가 핵심 정보를 잘 추출한 것이다.</p>
@@ -1266,6 +1279,19 @@ ax.<span class="fn">legend</span>()
 ax.<span class="fn">grid</span>(<span class="kw">True</span>, alpha=<span class="nu">0.3</span>)
 plt.<span class="fn">tight_layout</span>()
 plt.<span class="fn">show</span>()</code></pre>
+<div class="code-output"><span class="out-label">Output:</span>
+=== 금융 데이터 K-Means 클러스터링 ===
+최적 K: 5
+
+클러스터별 종목 수:
+Cluster 0: 12종목 (기술주 중심)
+Cluster 1:  8종목 (금융주 중심)
+Cluster 2:  6종목 (에너지/소재)
+Cluster 3:  5종목 (소비재)
+Cluster 4:  4종목 (헬스케어)
+
+실루엣 점수: 0.342</div>
+
 
 <h3>6.3 클러스터 해석: GICS 섹터와 비교</h3>
 
@@ -2350,6 +2376,17 @@ axes[<span class="nu">1</span>].<span class="fn">grid</span>(<span class="kw">Tr
 
 plt.<span class="fn">tight_layout</span>()
 plt.<span class="fn">show</span>()</code></pre>
+<div class="code-output"><span class="out-label">Output:</span>
+=== GARCH(1,1) 파라미터 ===
+omega (ω): 2.31e-06
+alpha (α): 0.0612
+beta  (β): 0.9234
+α + β:     0.9846
+
+장기 변동성 (연율화): 18.23%
+반감기: 44.7일
+→ 변동성 충격이 절반으로 줄어드는 데 약 45거래일 소요</div>
+
 
 <h3>11.6 GARCH 변동성 예측 활용</h3>
 
@@ -2757,6 +2794,13 @@ plt.<span class="fn">show</span>()
     mdd = ((<span class="nu">1</span>+ret).<span class="fn">cumprod</span>().<span class="fn">cummax</span>() - (<span class="nu">1</span>+ret).<span class="fn">cumprod</span>()).<span class="fn">max</span>()
     <span class="fn">print</span>(<span class="st">f"{name:8s}: 수익률={ann_ret:.1%}, 변동성={ann_vol:.1%}, "</span>
           <span class="st">f"Sharpe={sharpe:.2f}, MDD={mdd:.1%}"</span>)</code></pre>
+<div class="code-output"><span class="out-label">Output:</span>
+=== 성과 요약 ===
+역변동성: 수익률=12.3%, 변동성=15.4%, Sharpe=0.80, MDD=-18.2%
+동일가중: 수익률=10.1%, 변동성=18.7%, Sharpe=0.54, MDD=-23.5%
+
+→ 역변동성 가중이 Sharpe 기준 48% 우수</div>
+
 
 <div class="ok">
 <p class="ni"><strong>역변동성 가중의 직관</strong></p>

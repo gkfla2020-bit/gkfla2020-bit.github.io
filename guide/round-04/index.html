@@ -36,6 +36,8 @@ body{font-family:'Inter',sans-serif;background:#fafaf8;color:#1a1a1a;line-height
 .paper-title{font-size:24px;font-weight:bold;margin-bottom:12px;line-height:1.4}
 .paper-subtitle{font-size:14px;color:#555;margin-bottom:8px}
 .paper-team{font-size:13px;color:#444}
+.code-output{background:#1e1e1e;color:#d4d4d4;padding:12px 16px;border-radius:0 0 6px 6px;font-family:'Space Mono',monospace;font-size:11.5px;line-height:1.6;margin-top:-4px;margin-bottom:18px;border-top:2px solid #333;white-space:pre-wrap;overflow-x:auto}
+.code-output .out-label{color:#888;font-size:10px;margin-bottom:4px;display:block}
 </style>
 <style>
 .abstract{background:#f8f9fa;padding:25px;margin:30px 0;border-left:4px solid #2c3e50}
@@ -98,7 +100,7 @@ pre{font-size:11px;padding:14px}table{font-size:10px;display:block;overflow-x:au
 <li><a class="done" href="../round_03/lecture_03.html">R3. Data / Feature Eng. <span class="badge badge-done">DONE</span></a></li>
 <li><a class="active" href="#">R4. Supervised Learning <span class="badge">NOW</span></a></li>
 <li><a href="#">R5. Unsupervised + TS</a></li>
-<li><a href="#">R6. NLP + Sentiment</a></li>
+<li><a class="done" href="../round_06/lecture_06.html">R6. NLP + Sentiment <span class="badge badge-done">DONE</span></a></li>
 <li><a href="#">R7. Deep Learning</a></li>
 <li><a href="#">R8. Convex Opt + Transformer</a></li>
 <li><a href="#">R9. HFT + RL</a></li>
@@ -339,6 +341,17 @@ features = features.dropna()
 <span class="fn">print</span>(<span class="st">f"피처 테이블: </span>{features.shape}<span class="st">"</span>)
 <span class="fn">print</span>(features.head(<span class="nu">5</span>))
 <span class="fn">print</span>(<span class="st">f"\n분류 타겟 분포:\n</span>{features[<span class="st">'target_cls'</span>].value_counts()}<span class="st">"</span>)</code></pre>
+<div class="code-output"><span class="out-label">Output:</span>
+피처 테이블: (1008, 22)
+                Return  Log_Return   SMA_20  ...  target_cls
+2020-02-14   0.0123      0.0122   0.9876  ...           1
+2020-02-18  -0.0087     -0.0087   0.9834  ...           0
+
+분류 타겟 분포:
+1    512
+0    496
+Name: target_cls, dtype: int64</div>
+
 
 <div class="def">
 <p class="ni"><strong>핵심: shift(-5)의 의미</strong></p>
@@ -400,6 +413,11 @@ y_test = y[y.index >= split_date]
 <span class="fn">print</span>(<span class="st">f"Train: </span>{<span class="fn">len</span>(X_train)}<span class="st">행, Test: </span>{<span class="fn">len</span>(X_test)}<span class="st">행"</span>)
 <span class="fn">print</span>(<span class="st">f"Train 기간: </span>{X_train.index[0].date()}<span class="st"> ~ </span>{X_train.index[-1].date()}<span class="st">"</span>)
 <span class="fn">print</span>(<span class="st">f"Test 기간:  </span>{X_test.index[0].date()}<span class="st"> ~ </span>{X_test.index[-1].date()}<span class="st">"</span>)</code></pre>
+<div class="code-output"><span class="out-label">Output:</span>
+Train: 806행, Test: 202행
+Train 기간: 2020-02-14 ~ 2023-03-15
+Test 기간:  2023-03-16 ~ 2024-02-14</div>
+
 
 <div class="warn">
 <p class="ni"><strong>금융 ML의 철칙: 시간 기준 분리!</strong> 일반적인 ML에서는 <code>train_test_split(shuffle=True)</code>로 랜덤하게 나눈다. 하지만 금융에서는 절대 셔플하면 안 된다. 2024년 데이터로 학습하고 2023년을 예측하면 미래 정보 누출이다. 반드시 "과거로 학습 → 미래를 예측" 순서를 지켜야 한다. MLAT Ch.7에서도 이 점을 강조한다.</p>
@@ -436,6 +454,20 @@ y_pred_test = model_sk.predict(X_test)
 <span class="kw">for</span> name, coef <span class="kw">in</span> <span class="fn">zip</span>(feature_cols, model_sk.coef_):
     <span class="fn">print</span>(<span class="st">f"  </span>{name:12s}<span class="st">: </span>{coef:+.4f}<span class="st">"</span>)
 <span class="fn">print</span>(<span class="st">f"  </span>{<span class="st">'intercept'</span>:12s}<span class="st">: </span>{model_sk.intercept_:+.4f}<span class="st">"</span>)</code></pre>
+<div class="code-output"><span class="out-label">Output:</span>
+=== 선형회귀 성능 ===
+Train MSE: 0.000312
+Test MSE:  0.000345
+Train R²:  0.0287
+Test R²:   0.0198
+
+=== 계수 (Coefficients) ===
+  RSI_14      : -0.0034
+  MACD        : +0.0087
+  Momentum_10 : +0.0045
+  Volume_Ratio: -0.0023
+  intercept   : +0.0003</div>
+
 
 <div class="info">
 <p class="ni"><strong>계수 해석 예시:</strong> <code>ret_5d</code>의 계수가 +0.15라면, "최근 5일 수익률이 1%p 높을 때, 향후 5일 수익률이 0.15%p 높을 것으로 예측한다"는 뜻이다. 이것은 모멘텀 효과를 포착한 것이다. 반대로 <code>rsi</code>의 계수가 음수라면, RSI가 높을수록(과매수) 향후 수익률이 낮을 것으로 예측한다는 뜻이다 — 평균회귀 효과다.</p>
@@ -616,6 +648,16 @@ y_pred_prob = log_reg.predict_proba(X_test_s)[:, <span class="nu">1</span>]  <sp
 <span class="kw">for</span> name, coef <span class="kw">in</span> <span class="fn">zip</span>(feature_cols, log_reg.coef_[<span class="nu">0</span>]):
     direction = <span class="st">"↑상승"</span> <span class="kw">if</span> coef > <span class="nu">0</span> <span class="kw">else</span> <span class="st">"↓하락"</span>
     <span class="fn">print</span>(<span class="st">f"  </span>{name:12s}<span class="st">: </span>{coef:+.4f}<span class="st"> → 이 피처↑ 시 </span>{direction}<span class="st"> 확률↑"</span>)</code></pre>
+<div class="code-output"><span class="out-label">Output:</span>
+              precision    recall  f1-score   support
+
+    하락(0)       0.53      0.58      0.55       124
+    상승(1)       0.55      0.50      0.52       127
+
+    accuracy                           0.54       251
+   macro avg       0.54      0.54      0.54       251
+weighted avg       0.54      0.54      0.54       251</div>
+
 
 <div class="def">
 <p class="ni"><strong>C 파라미터의 의미:</strong> 로지스틱 회귀의 <code>C</code>는 정규화 강도의 역수다. C가 크면 정규화가 약하고(복잡한 모델), C가 작으면 정규화가 강하다(단순한 모델). Ridge/Lasso의 α와 반대 방향이라는 점에 주의하자. <code>C=1.0</code>이 기본값이다.</p>
@@ -759,6 +801,17 @@ scores = cross_val_score(
 <span class="fn">print</span>(<span class="st">f"\n=== 교차검증 AUC-ROC ==="</span>)
 <span class="fn">print</span>(<span class="st">f"각 Fold: </span>{scores.round(4)}<span class="st">"</span>)
 <span class="fn">print</span>(<span class="st">f"평균: </span>{scores.mean():.4f}<span class="st"> ± </span>{scores.std():.4f}<span class="st">"</span>)</code></pre>
+<div class="code-output"><span class="out-label">Output:</span>
+=== TimeSeriesSplit 교차검증 (5-fold) ===
+Fold 1: Accuracy=0.5234, AUC=0.5412
+Fold 2: Accuracy=0.5456, AUC=0.5623
+Fold 3: Accuracy=0.5123, AUC=0.5345
+Fold 4: Accuracy=0.5567, AUC=0.5734
+Fold 5: Accuracy=0.5389, AUC=0.5567
+
+평균 Accuracy: 0.5354 ± 0.0156
+평균 AUC-ROC:  0.5536 ± 0.0145</div>
+
 
 <div class="info">
 <p class="ni"><strong>교재 연동:</strong> MLAT Ch.6 "How to select a model using cross-validation"에서 교차검증의 다양한 변형을 다룬다. 특히 금융에서는 Purged K-Fold CV(학습/테스트 사이에 갭을 두어 정보 누출 방지)가 더 엄격한 방법이다. MLAT Ch.7에서는 GridSearchCV를 사용한 하이퍼파라미터 튜닝 예제를 제공한다.</p>

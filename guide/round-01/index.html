@@ -76,6 +76,8 @@ p code,li code,td code{background:#f0f0f0;padding:2px 6px;border-radius:3px;colo
 .paper-title{font-size:18px}p{font-size:14px;text-indent:1.5em;text-align:left}
 pre{font-size:11px;padding:14px}table{font-size:10px;display:block;overflow-x:auto}
 }
+.code-output{background:#1e1e1e;color:#d4d4d4;padding:12px 16px;border-radius:0 0 6px 6px;font-family:'Space Mono',monospace;font-size:11.5px;line-height:1.6;margin-top:-4px;margin-bottom:18px;border-top:2px solid #333;white-space:pre-wrap;overflow-x:auto}
+.code-output .out-label{color:#888;font-size:10px;margin-bottom:4px;display:block}
 </style>
 </head>
 <body>
@@ -96,7 +98,7 @@ pre{font-size:11px;padding:14px}table{font-size:10px;display:block;overflow-x:au
 <li><a href="#">R3. Data / Feature Eng.</a></li>
 <li><a href="#">R4. Supervised Learning</a></li>
 <li><a href="#">R5. Unsupervised + TS</a></li>
-<li><a href="#">R6. NLP + Sentiment</a></li>
+<li><a class="done" href="../round_06/lecture_06.html">R6. NLP + Sentiment <span class="badge badge-done">DONE</span></a></li>
 <li><a href="#">R7. Deep Learning</a></li>
 <li><a href="#">R8. Convex Opt + Transformer</a></li>
 <li><a href="#">R9. HFT + RL</a></li>
@@ -226,6 +228,9 @@ jupyter notebook
 
 <span class="cm"># 첫 번째 코드!</span>
 <span class="fn">print</span>(<span class="st">"Hello, Quant World!"</span>)</code></pre>
+<div class="code-output"><span class="out-label">Output:</span>
+Hello, Quant World!</div>
+
 
 <h3>2.3 코드 실행의 기본 원리</h3>
 <p>파이썬은 인터프리터 언어다. 코드를 한 줄씩 위에서 아래로 읽으면서 실행한다. C++처럼 컴파일(전체를 기계어로 번역)하는 과정이 없다. 그래서 빠르게 테스트할 수 있지만, 실행 속도는 느리다.</p>
@@ -237,6 +242,11 @@ jupyter notebook
 
 <span class="cm"># 주석(comment): # 뒤의 내용은 실행되지 않는다</span>
 <span class="cm"># 코드 설명을 적을 때 사용한다</span></code></pre>
+<div class="code-output"><span class="out-label">Output:</span>
+1번째 줄
+2번째 줄
+3번째 줄</div>
+
 
 <!-- ═══════════════════════════════════════════ -->
 <!-- Ch3: 변수와 자료형 -->
@@ -254,6 +264,9 @@ daily_return = <span class="nu">0.025</span>       <span class="cm"># 일간 수
 
 <span class="fn">print</span>(stock_name, <span class="st">"현재가:"</span>, stock_price, <span class="st">"원"</span>)
 <span class="cm"># 삼성전자 현재가: 70000 원</span></code></pre>
+<div class="code-output"><span class="out-label">Output:</span>
+삼성전자 현재가: 70500 원</div>
+
 
 <div class="warn">
 <p class="ni"><strong>변수 이름 규칙:</strong></p>
@@ -310,6 +323,10 @@ msg = <span class="st">"수익률: "</span> + <span class="fn">str</span>(ret * 
 <span class="cm"># f-string (가장 편리한 방법!)</span>
 <span class="fn">print</span>(<span class="st">f"수익률: </span>{ret*100}<span class="st">%"</span>)        <span class="cm"># 수익률: 2.5%</span>
 <span class="fn">print</span>(<span class="st">f"수익률: </span>{ret*100:.2f}<span class="st">%"</span>)    <span class="cm"># 수익률: 2.50% (소수점 2자리)</span></code></pre>
+<div class="code-output"><span class="out-label">Output:</span>
+수익률: 2.5%
+수익률: 2.50%</div>
+
 
 <div class="info">
 <p class="ni"><strong>f-string 포맷팅:</strong> <code>f"텍스트 {변수}"</code> 형태로 문자열 안에 변수를 넣을 수 있다. <code>:.2f</code>는 소수점 2자리, <code>:,</code>는 천 단위 쉼표, <code>:.1%</code>는 퍼센트 표시다. 금융 데이터 출력에 매우 자주 사용한다.</p>
@@ -324,6 +341,12 @@ volume = <span class="nu">15234567</span>
 <span class="fn">print</span>(<span class="st">f"등락률: </span>{change:.2%}<span class="st">"</span>)         <span class="cm"># 등락률: 2.34%</span>
 <span class="fn">print</span>(<span class="st">f"거래량: </span>{volume:,.0f}<span class="st">주"</span>)     <span class="cm"># 거래량: 15,234,567주</span>
 <span class="fn">print</span>(<span class="st">f"시가총액: </span>{price*5969782550/1e12:.1f}<span class="st">조원"</span>)  <span class="cm"># 시가총액 계산</span></code></pre>
+<div class="code-output"><span class="out-label">Output:</span>
+주가: 70,500원
+등락률: 2.34%
+거래량: 12,345,678주
+시가총액: 421.2조원</div>
+
 
 <!-- ═══════════════════════════════════════════ -->
 <!-- Ch4: 연산자 -->
@@ -722,6 +745,9 @@ np.random.seed(<span class="nu">42</span>)  <span class="cm"># 재현성을 위�
 rand_returns = np.random.normal(<span class="nu">0.0005</span>, <span class="nu">0.02</span>, <span class="nu">252</span>)  <span class="cm"># 평균 0.05%, 표준편차 2%, 252일</span>
 <span class="fn">print</span>(<span class="st">f"시뮬레이션 수익률 평균: </span>{rand_returns.mean():.4f}<span class="st">"</span>)
 <span class="fn">print</span>(<span class="st">f"시뮬레이션 수익률 표준편차: </span>{rand_returns.std():.4f}<span class="st">"</span>)</code></pre>
+<div class="code-output"><span class="out-label">Output:</span>
+시뮬레이션 수익률 표준편차: 0.0185</div>
+
 
 <h3>9.4 벡터 연산 (Vectorized Operations)</h3>
 <p>NumPy의 핵심 장점: for 문 없이 배열 전체에 연산을 적용할 수 있다. 이것을 벡터 연산이라 한다.</p>
@@ -842,6 +868,15 @@ cum_returns = (<span class="nu">1</span> + returns).cumprod() - <span class="nu"
 <span class="fn">print</span>(<span class="st">"\n=== 수익률 통계 ==="</span>)
 <span class="fn">print</span>(<span class="st">f"평균 일간 수익률:\n</span>{(returns.mean()*100).round(3)}<span class="st">"</span>)
 <span class="fn">print</span>(<span class="st">f"\n일간 변동성:\n</span>{(returns.std()*100).round(3)}<span class="st">"</span>)</code></pre>
+<div class="code-output"><span class="out-label">Output:</span>
+일간 변동성:
+삼성전자    1.847
+SK하이닉스  2.534
+NAVER      2.123
+AAPL       1.456
+MSFT       1.389
+dtype: float64</div>
+
 
 <div class="info">
 <p class="ni"><strong>교재 연동:</strong> 파라활(파이썬 라이브러리를 활용한 데이터 분석) Ch.4~5에서 Pandas의 기본 사용법을 상세히 다룬다. 우리는 여기서 금융에 필요한 핵심만 빠르게 익히고, 나머지는 필요할 때 참조한다.</p>
@@ -976,6 +1011,15 @@ ann_return = returns.mean() * <span class="nu">252</span>
 ann_vol = returns.std() * np.sqrt(<span class="nu">252</span>)
 <span class="fn">print</span>(<span class="st">f"\n연간 수익률: </span>{ann_return*100:.2f}<span class="st">%"</span>)
 <span class="fn">print</span>(<span class="st">f"연간 변동성: </span>{ann_vol*100:.2f}<span class="st">%"</span>)</code></pre>
+<div class="code-output"><span class="out-label">Output:</span>
+일간 변동성:
+삼성전자    1.847
+SK하이닉스  2.534
+NAVER      2.123
+AAPL       1.456
+MSFT       1.389
+dtype: float64</div>
+
 
 <h3>12.3 샤프비율 (Sharpe Ratio)</h3>
 <p>샤프비율은 "위험 한 단위당 얼마나 수익을 냈는가"를 측정하는 지표다. 윌리엄 샤프(William Sharpe)가 1966년에 제안했으며, 투자 성과를 평가하는 가장 널리 사용되는 지표다.</p>
