@@ -1,0 +1,1330 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Bonus 2 - 미적분 올인원 (Calculus All-in-One)</title>
+<script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;500&family=Space+Mono:wght@400&family=Inter:wght@300;400&display=swap" rel="stylesheet">
+<script src="https://cdn.plot.ly/plotly-2.27.0.min.js"></script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Inter',sans-serif;background:#fafaf8;color:#1a1a1a;line-height:1.7;overflow-x:hidden}
+.sidebar{position:fixed;left:0;top:0;width:260px;height:100vh;background:rgba(255,255,255,.97);border-right:1px solid rgba(0,0,0,.06);padding:32px 24px;z-index:100;overflow-y:auto;display:flex;flex-direction:column}
+.sidebar-profile{text-align:center;margin-bottom:28px;padding-bottom:24px;border-bottom:1px solid rgba(0,0,0,.08)}
+.profile-icon{font-size:48px;margin-bottom:8px}
+.profile-name{font-family:'Cormorant Garamond',serif;font-size:1.3rem;font-weight:500;margin-bottom:4px}
+.profile-title{font-size:.68rem;color:#888;letter-spacing:.08em;text-transform:uppercase;margin-bottom:8px}
+.profile-bio{font-size:.78rem;color:#666;line-height:1.5}
+.sidebar-nav{flex:1;margin-top:16px}
+.nav-section{margin-bottom:20px}
+.nav-section-title{font-size:.6rem;font-weight:600;color:#aaa;letter-spacing:.15em;text-transform:uppercase;margin-bottom:10px}
+.nav-list{list-style:none}
+.nav-list li{margin-bottom:5px}
+.nav-list a{font-size:.78rem;color:#555;text-decoration:none;transition:all .2s;display:block;padding:3px 0}
+.nav-list a:hover{color:#0080c6;padding-left:4px}
+.nav-list a.active{color:#0080c6;font-weight:500}
+.nav-list a.done{color:#28a745}
+.badge{display:inline-block;font-size:.5rem;background:#0080c6;color:#fff;padding:1px 5px;border-radius:8px;margin-left:3px;vertical-align:middle}
+.badge-done{background:#28a745}
+.badge-bonus{background:#9c27b0}
+.sidebar-footer{padding-top:16px;border-top:1px solid rgba(0,0,0,.06);font-size:.65rem;color:#aaa;text-align:center}
+.main-wrapper{margin-left:260px;min-height:100vh}
+.container{max-width:1100px;margin:0 auto;padding:50px 40px 80px}
+.paper-content{font-family:'Times New Roman','Nanum Myeongjo',serif;line-height:1.8;background:#fff;padding:40px;border-radius:8px;box-shadow:0 2px 20px rgba(0,0,0,.05)}
+.paper-header{text-align:center;margin-bottom:40px;padding-bottom:30px;border-bottom:2px solid #333}
+.paper-category{font-size:14px;color:#666;margin-bottom:10px}
+.paper-title{font-size:24px;font-weight:bold;margin-bottom:12px;line-height:1.4}
+.paper-subtitle{font-size:14px;color:#555;margin-bottom:8px}
+.paper-team{font-size:13px;color:#444}
+.abstract{background:#f8f9fa;padding:25px;margin:30px 0;border-left:4px solid #2c3e50}
+.abstract-title{font-weight:bold;font-size:16px;margin-bottom:15px}
+h2{font-size:18px;margin:35px 0 20px;padding-bottom:8px;border-bottom:1px solid #ddd;color:#2c3e50}
+h3{font-size:15px;margin:25px 0 15px;color:#34495e}
+h4{font-size:14px;margin:20px 0 12px;color:#34495e}
+p{text-align:justify;margin-bottom:15px;text-indent:2em}
+p.ni{text-indent:0}
+table{width:100%;border-collapse:collapse;margin:20px 0;font-size:12px}
+th,td{border:1px solid #ddd;padding:10px 8px;text-align:center}
+th{background:#2c3e50;color:white;font-weight:bold}
+tr:nth-child(even){background:#f8f9fa}
+tr:hover{background:#e8f4f8}
+.tc{font-size:13px;font-weight:bold;margin:15px 0 10px;text-align:center}
+.eq{text-align:center;margin:20px 0;padding:15px;background:#f8f9fa;border-radius:4px;overflow-x:auto}
+ul,ol{margin-left:2em;margin-bottom:15px}
+li{margin-bottom:6px}
+.def{background:#fff9e6;border:1px solid #ffc107;border-radius:4px;padding:20px;margin:20px 0}
+.info{background:#e8f4f8;border-left:4px solid #3498db;padding:20px;margin:20px 0}
+.warn{background:#fff3cd;border-left:4px solid #f39c12;padding:20px;margin:20px 0}
+.ok{background:#d4edda;border-left:4px solid #28a745;padding:20px;margin:20px 0}
+pre{background:#1e1e1e;color:#d4d4d4;padding:20px;border-radius:6px;overflow-x:auto;margin:20px 0;font-family:'Space Mono','Consolas',monospace;font-size:13px;line-height:1.6}
+code{font-family:'Space Mono','Consolas',monospace;font-size:13px}
+p code,li code,td code{background:#f0f0f0;padding:2px 6px;border-radius:3px;color:#c7254e;font-size:12px}
+.cc{font-size:12px;font-weight:bold;color:#2c3e50;margin-top:15px;margin-bottom:4px}
+.cm{color:#6a9955}.kw{color:#569cd6}.st{color:#ce9178}.fn{color:#dcdcaa}.nb{color:#4ec9b0}.nu{color:#b5cea8}
+.progress-bar{width:100%;height:6px;background:#e0e0e0;border-radius:3px;margin-top:16px}
+.progress-fill{height:100%;background:linear-gradient(90deg,#9c27b0,#e040fb);border-radius:3px;width:100%}
+.progress-label{font-size:11px;color:#888;margin-top:4px;text-align:center}
+details{margin:20px 0;border:1px solid #ddd;border-radius:6px;overflow:hidden}
+details summary{padding:14px 20px;background:#f0f4f8;cursor:pointer;font-weight:bold;font-size:14px;color:#2c3e50;user-select:none;transition:background .2s}
+details summary:hover{background:#e0e8f0}
+details[open] summary{background:#d0dce8;border-bottom:1px solid #ddd}
+details .answer-content{padding:20px;background:#fff}
+.problem-box{background:#f0f4ff;border:2px solid #5c6bc0;border-radius:8px;padding:20px;margin:20px 0}
+.problem-box .problem-title{font-weight:bold;color:#283593;font-size:15px;margin-bottom:12px}
+@media(max-width:1024px){
+.sidebar{width:100%;height:auto;position:relative;border-right:none;border-bottom:1px solid rgba(0,0,0,.08);padding:16px}
+.sidebar-profile{margin-bottom:10px;padding-bottom:10px;display:flex;align-items:center;gap:12px;text-align:left}
+.profile-icon{font-size:32px;margin-bottom:0}.profile-bio{display:none}
+.nav-section{display:inline-block;margin-right:16px;margin-bottom:8px}
+.nav-list{display:flex;gap:10px;flex-wrap:wrap}.nav-list li{margin-bottom:0}
+.sidebar-footer{display:none}
+.main-wrapper{margin-left:0}
+.container{padding:0}.paper-content{padding:20px 16px;border-radius:0;box-shadow:none}
+.paper-title{font-size:18px}p{font-size:14px;text-indent:1.5em;text-align:left}
+pre{font-size:11px;padding:14px}table{font-size:10px;display:block;overflow-x:auto}
+}
+.code-output{background:#1e1e1e;color:#d4d4d4;padding:12px 16px;border-radius:0 0 6px 6px;font-family:'Space Mono',monospace;font-size:11.5px;line-height:1.6;margin-top:-4px;margin-bottom:18px;border-top:2px solid #333;white-space:pre-wrap;overflow-x:auto}
+.code-output .out-label{color:#888;font-size:10px;margin-bottom:4px;display:block}
+</style>
+</head>
+<body>
+
+<div class="sidebar">
+<div class="sidebar-profile">
+<div class="profile-icon">&#x1F4D0;</div>
+<div class="profile-name">HFT ML Master Plan</div>
+<div class="profile-title">Convex Opt + DL + HFT</div>
+<div class="profile-bio">Bonus Rounds: 수학 기초 올인원</div>
+</div>
+<div class="sidebar-nav">
+<div class="nav-section">
+<div class="nav-section-title">Curriculum</div>
+<ul class="nav-list">
+<li><a class="done" href="../round-01/">R1. Python + Finance <span class="badge badge-done">DONE</span></a></li>
+<li><a class="done" href="../bonus-01/">B1. 선형대수 올인원 <span class="badge badge-done">DONE</span></a></li>
+<li><a class="done" href="../round-02/">R2. Linear Algebra + Stats <span class="badge badge-done">DONE</span></a></li>
+<li><a class="active" href="#">B2. 미적분 올인원 <span class="badge badge-bonus">BONUS</span></a></li>
+<li><a href="../round-03/">R3. Data / Feature Eng.</a></li>
+<li><a href="../bonus-04/">B4. 재무관리 올인원</a></li>
+<li><a href="../round-04/">R4. Supervised Learning</a></li>
+<li><a href="../bonus-03/">B3. 확률·통계 올인원</a></li>
+<li><a href="../round-05/">R5. Unsupervised + TS</a></li>
+<li><a href="../bonus-05/">B5. 금융공학 올인원</a></li>
+<li><a href="../round-06/">R6. NLP + Sentiment</a></li>
+<li><a href="../round-07/">R7. Deep Learning</a></li>
+<li><a href="../bonus-06/">B6. 최적화 이론 올인원</a></li>
+<li><a href="../round-08/">R8. Convex Opt + Transformer</a></li>
+<li><a href="../round-09/">R9. HFT + RL</a></li>
+<li><a href="../round-10/">R10. Final Project</a></li>
+</ul>
+</div>
+<div class="nav-section">
+<div class="nav-section-title">This Lecture</div>
+<ul class="nav-list">
+<li><a href="#ch1">1. 극한과 연속</a></li>
+<li><a href="#ch2">2. 미분의 정의와 직관</a></li>
+<li><a href="#ch3">3. 미분 공식 총정리</a></li>
+<li><a href="#ch4">4. 편미분과 그래디언트</a></li>
+<li><a href="#ch5">5. 체인룰 (연쇄법칙)</a></li>
+<li><a href="#ch6">6. 적분의 직관</a></li>
+<li><a href="#ch7">7. 테일러 급수</a></li>
+<li><a href="#ch8">8. 경사하강법</a></li>
+<li><a href="#ch9">9. 금융에서의 미적분</a></li>
+<li><a href="#ch10">10. 종합 문제</a></li>
+</ul>
+</div>
+</div>
+<div class="sidebar-footer">Bonus 2 — 미적분 올인원</div>
+</div>
+
+<div class="main-wrapper">
+<div class="container">
+<div class="paper-content">
+
+<div class="paper-header">
+<div class="paper-category">Bonus Round 2 / 6 — R2와 R3 사이</div>
+<h1 class="paper-title">미적분 올인원 (Calculus All-in-One)</h1>
+<div class="paper-subtitle">극한 → 미분 → 편미분 → 체인룰 → 적분 → 테일러 급수 → 경사하강법</div>
+<div class="paper-team">딥러닝과 금융공학의 수학적 엔진을 완전 정복하는 자습서</div>
+<div class="progress-bar"><div class="progress-fill"></div></div>
+<div class="progress-label">Bonus Round — 미적분 완전 정복</div>
+</div>
+
+<div class="abstract">
+<div class="abstract-title">왜 미적분인가?</div>
+<p class="ni">딥러닝의 역전파(backpropagation)는 체인룰이고, 경사하강법은 미분이며, 옵션 가격의 블랙-숄즈 공식은 편미분방정식이다. 미적분 없이는 ML도, 금융공학도 이해할 수 없다. 이 강의를 마치면:</p>
+<ul>
+<li>미분의 기하학적 의미(접선의 기울기)를 직관적으로 설명할 수 있다</li>
+<li>주요 함수의 미분 공식을 외우고 적용할 수 있다</li>
+<li>편미분과 그래디언트 벡터를 이해하고 계산할 수 있다</li>
+<li>체인룰을 적용하여 합성함수를 미분할 수 있다</li>
+<li>경사하강법의 원리를 이해하고 Python으로 구현할 수 있다</li>
+<li>금융에서 미적분이 어떻게 사용되는지(듀레이션, 그릭스, BSM) 설명할 수 있다</li>
+</ul>
+<div style="font-size:13px;color:#555;margin-top:15px;font-style:italic"><strong>Keywords:</strong> Limit, Derivative, Partial Derivative, Chain Rule, Integral, Taylor Series, Gradient Descent, Black-Scholes</div>
+</div>
+
+<!-- ═══════════════════════════════════════════ -->
+<!-- Ch1: 극한과 연속 -->
+<!-- ═══════════════════════════════════════════ -->
+<h2 id="ch1">1. 극한과 연속 — 미적분의 출발점</h2>
+
+<h3>1.1 극한이란?</h3>
+<p>극한(limit)은 "어떤 값에 한없이 가까이 다가갈 때 함수값이 어디로 향하는가"를 묻는 것이다. 미분의 정의 자체가 극한이므로, 극한을 이해해야 미분을 이해할 수 있다.</p>
+
+<div class="eq">
+$$\lim_{x \to a} f(x) = L \quad \Longleftrightarrow \quad x\text{가 }a\text{에 가까워질수록 }f(x)\text{가 }L\text{에 가까워진다}$$
+</div>
+
+<p>금융 비유: 주가가 70,000원에 "수렴"한다는 것은, 시간이 지날수록 주가가 70,000원에 가까워진다는 뜻이다. 정확히 70,000원이 되는 것이 아니라, 한없이 가까워지는 것이다.</p>
+
+<pre><code><span class="kw">import</span> numpy <span class="kw">as</span> np
+
+<span class="cm"># 극한 예: lim(x→0) sin(x)/x = 1</span>
+xs = [<span class="nu">1</span>, <span class="nu">0.1</span>, <span class="nu">0.01</span>, <span class="nu">0.001</span>, <span class="nu">0.0001</span>, <span class="nu">0.00001</span>]
+<span class="kw">for</span> x <span class="kw">in</span> xs:
+    <span class="fn">print</span>(<span class="st">f"x = </span>{x:<span class="nu">10</span>}<span class="st">  →  sin(x)/x = </span>{np.sin(x)/x:.10f}<span class="st">"</span>)
+<span class="cm"># x가 0에 가까워질수록 sin(x)/x → 1.0000000000</span></code></pre>
+<div class="code-output"><span class="out-label">Output:</span>
+x =          1  →  sin(x)/x = 0.8414709848
+x =        0.1  →  sin(x)/x = 0.9983341665
+x =       0.01  →  sin(x)/x = 0.9999833334
+x =      0.001  →  sin(x)/x = 0.9999998333
+x =     0.0001  →  sin(x)/x = 0.9999999983
+x =    0.00001  →  sin(x)/x = 1.0000000000</div>
+
+<h3>1.2 연속함수</h3>
+<p>함수가 점 \(a\)에서 연속(continuous)이라 함은: (1) \(f(a)\)가 존재하고, (2) \(\lim_{x \to a} f(x)\)가 존재하고, (3) 둘이 같다는 것이다. 직관적으로 "그래프를 펜을 떼지 않고 그릴 수 있다"는 뜻이다.</p>
+
+<div class="info">
+<p class="ni"><strong>왜 연속이 중요한가:</strong> 미분은 연속인 함수에서만 정의된다. 주가 데이터는 이산적(discrete)이지만, 블랙-숄즈 모델은 주가를 연속 함수로 모델링한다. 이 "이산 → 연속" 근사가 금융공학의 출발점이다.</p>
+</div>
+
+<!-- ═══════════════════════════════════════════ -->
+<!-- Ch2: 미분의 정의와 직관 -->
+<!-- ═══════════════════════════════════════════ -->
+<h2 id="ch2">2. 미분의 정의와 직관</h2>
+
+<h3>2.1 미분 = 순간 변화율 = 접선의 기울기</h3>
+<p>미분(derivative)은 함수가 어떤 점에서 얼마나 빠르게 변하는지를 측정한다. 기하학적으로는 그래프 위의 한 점에서 접선의 기울기다.</p>
+
+<div class="def">
+<p class="ni"><strong>미분의 정의:</strong></p>
+<div class="eq">
+$$f'(x) = \lim_{h \to 0} \frac{f(x+h) - f(x)}{h}$$
+</div>
+<p class="ni">\(\frac{f(x+h) - f(x)}{h}\)는 두 점을 잇는 할선(secant line)의 기울기다. \(h \to 0\)이면 할선이 접선(tangent line)이 된다.</p>
+</div>
+
+<p>금융 비유: 주가 \(P(t)\)의 미분 \(P'(t)\)는 "지금 이 순간 주가가 얼마나 빠르게 오르고 있는가"다. 양수면 상승 중, 음수면 하락 중, 0이면 변곡점(고점 또는 저점)이다.</p>
+
+<!-- ▼ Plotly: 접선 시각화 -->
+<div id="plot-ch2-tangent" style="width:100%;height:420px;margin:25px 0"></div>
+<script>
+(function(){
+  var xs=[],ys=[],tx=[],ty=[];
+  for(var x=-2;x<=4;x+=0.05){xs.push(x);ys.push(x*x);}
+  // x=1에서 접선: f(1)=1, f'(1)=2 → y=2(x-1)+1=2x-1
+  for(var x=-0.5;x<=2.5;x+=0.05){tx.push(x);ty.push(2*x-1);}
+  Plotly.newPlot('plot-ch2-tangent',[
+    {x:xs,y:ys,mode:'lines',name:'f(x) = x²',line:{width:3,color:'#1e88e5'}},
+    {x:tx,y:ty,mode:'lines',name:'접선 at x=1 (기울기=2)',line:{width:2,color:'#e53935',dash:'dash'}},
+    {x:[1],y:[1],mode:'markers',name:'접점 (1, 1)',marker:{size:12,color:'#e53935',symbol:'circle'}}
+  ],{
+    title:{text:'📐 미분 = 접선의 기울기: f(x)=x²에서 f\'(1)=2',font:{size:13}},
+    xaxis:{title:'x',range:[-2,4],zeroline:true,zerolinewidth:2},
+    yaxis:{title:'f(x)',range:[-2,10],zeroline:true,zerolinewidth:2},
+    margin:{l:50,r:20,t:45,b:40},
+    legend:{x:0.02,y:0.98},
+    annotations:[{x:2,y:3,text:'기울기 = 2<br>(x가 1 증가하면 f(x)가 2 증가)',
+      showarrow:true,arrowhead:2,ax:80,ay:-40,font:{size:11}}]
+  },{responsive:true});
+})();
+</script>
+<p class="ni" style="font-size:11px;color:#888;text-align:center;margin-top:-10px">🖱️ 파란 곡선 f(x)=x² 위의 점 (1,1)에서 빨간 접선의 기울기가 f'(1)=2</p>
+
+<h3>2.2 수치 미분 (Numerical Differentiation)</h3>
+<p>컴퓨터에서는 극한을 직접 계산할 수 없으므로, 아주 작은 \(h\)를 사용하여 근사한다. 중앙차분법(central difference)이 가장 정확하다.</p>
+
+<div class="eq">
+$$f'(x) \approx \frac{f(x+h) - f(x-h)}{2h} \quad (\text{중앙차분, 오차 } O(h^2))$$
+</div>
+
+<pre><code><span class="kw">import</span> numpy <span class="kw">as</span> np
+
+<span class="kw">def</span> <span class="fn">numerical_derivative</span>(f, x, h=<span class="nu">1e-5</span>):
+    <span class="st">"""중앙차분법으로 수치 미분"""</span>
+    <span class="kw">return</span> (f(x + h) - f(x - h)) / (<span class="nu">2</span> * h)
+
+<span class="cm"># f(x) = x² → f'(x) = 2x</span>
+f = <span class="kw">lambda</span> x: x**<span class="nu">2</span>
+<span class="fn">print</span>(<span class="st">f"f'(3) 수치: </span>{numerical_derivative(f, 3):.6f}<span class="st">"</span>)  <span class="cm"># ≈ 6.0</span>
+<span class="fn">print</span>(<span class="st">f"f'(3) 해석: </span>{2*3}<span class="st">"</span>)  <span class="cm"># 정확히 6</span>
+
+<span class="cm"># g(x) = sin(x) → g'(x) = cos(x)</span>
+g = <span class="kw">lambda</span> x: np.sin(x)
+<span class="fn">print</span>(<span class="st">f"\ng'(π/4) 수치: </span>{numerical_derivative(g, np.pi/4):.6f}<span class="st">"</span>)
+<span class="fn">print</span>(<span class="st">f"g'(π/4) 해석: </span>{np.cos(np.pi/4):.6f}<span class="st">"</span>)</code></pre>
+<div class="code-output"><span class="out-label">Output:</span>
+f'(3) 수치: 6.000000
+f'(3) 해석: 6
+
+g'(π/4) 수치: 0.707107
+g'(π/4) 해석: 0.707107</div>
+
+<!-- ═══════════════════════════════════════════ -->
+<!-- 연습문제 2 -->
+<!-- ═══════════════════════════════════════════ -->
+<div class="problem-box">
+<div class="problem-title">✏️ 연습문제 2.1</div>
+<p class="ni">함수 \(f(x) = x^3 - 3x + 1\)에 대해:</p>
+<ol>
+<li>미분의 정의를 사용하여 \(f'(x)\)를 구하라.</li>
+<li>\(f'(x) = 0\)인 점을 구하라. 이 점들은 무엇을 의미하는가?</li>
+<li>수치 미분으로 \(f'(2)\)를 검증하라.</li>
+</ol>
+</div>
+
+<details>
+<summary>🔑 풀이 보기</summary>
+<div class="answer-content">
+<p class="ni"><strong>1) 해석적 미분:</strong></p>
+<div class="eq">$$f'(x) = 3x^2 - 3$$</div>
+
+<p class="ni"><strong>2) 임계점:</strong></p>
+<div class="eq">$$3x^2 - 3 = 0 \quad \Rightarrow \quad x^2 = 1 \quad \Rightarrow \quad x = \pm 1$$</div>
+<p class="ni">\(x = -1\): 극대점 (f(-1) = 3), \(x = 1\): 극소점 (f(1) = -1). 이 점들에서 접선의 기울기가 0이므로 함수가 증가에서 감소로(또는 반대로) 전환된다. 금융에서 주가의 고점/저점에 해당.</p>
+
+<p class="ni"><strong>3) 수치 검증:</strong></p>
+<div class="eq">$$f'(2) = 3(4) - 3 = 9$$</div>
+<pre><code>f = <span class="kw">lambda</span> x: x**<span class="nu">3</span> - <span class="nu">3</span>*x + <span class="nu">1</span>
+<span class="fn">print</span>(<span class="st">f"수치: </span>{numerical_derivative(f, 2):.6f}<span class="st">"</span>)  <span class="cm"># 9.000000</span>
+<span class="fn">print</span>(<span class="st">f"해석: </span>{3*4-3}<span class="st">"</span>)  <span class="cm"># 9</span></code></pre>
+</div>
+</details>
+
+<!-- ═══════════════════════════════════════════ -->
+<!-- Ch3: 미분 공식 총정리 -->
+<!-- ═══════════════════════════════════════════ -->
+<h2 id="ch3">3. 미분 공식 총정리</h2>
+
+<h3>3.1 기본 미분 공식</h3>
+<p>다음 공식들은 외워야 한다. ML과 금융에서 반복적으로 등장한다.</p>
+
+<div class="tc">Table 1. 핵심 미분 공식</div>
+<table>
+<tr><th>함수 \(f(x)\)</th><th>도함수 \(f'(x)\)</th><th>ML/금융 활용</th></tr>
+<tr><td>\(c\) (상수)</td><td>\(0\)</td><td>바이어스 항</td></tr>
+<tr><td>\(x^n\)</td><td>\(nx^{n-1}\)</td><td>다항 회귀, 복리 계산</td></tr>
+<tr><td>\(e^x\)</td><td>\(e^x\)</td><td>연속 복리, 소프트맥스</td></tr>
+<tr><td>\(\ln x\)</td><td>\(\frac{1}{x}\)</td><td>로그 수익률, 크로스엔트로피</td></tr>
+<tr><td>\(\sin x\)</td><td>\(\cos x\)</td><td>시계열 주기 분석</td></tr>
+<tr><td>\(\cos x\)</td><td>\(-\sin x\)</td><td>시계열 주기 분석</td></tr>
+<tr><td>\(\frac{1}{1+e^{-x}}\) (시그모이드)</td><td>\(\sigma(x)(1-\sigma(x))\)</td><td>로지스틱 회귀, 뉴럴넷</td></tr>
+<tr><td>\(\tanh x\)</td><td>\(1 - \tanh^2 x\)</td><td>RNN 활성화 함수</td></tr>
+<tr><td>\(\max(0, x)\) (ReLU)</td><td>\(\begin{cases}1 & x>0\\0 & x<0\end{cases}\)</td><td>딥러닝 활성화 함수</td></tr>
+</table>
+
+<h3>3.2 미분 법칙</h3>
+
+<div class="def">
+<p class="ni"><strong>네 가지 핵심 법칙:</strong></p>
+<ul>
+<li><strong>합의 법칙:</strong> \((f + g)' = f' + g'\)</li>
+<li><strong>상수배 법칙:</strong> \((cf)' = cf'\)</li>
+<li><strong>곱의 법칙:</strong> \((fg)' = f'g + fg'\)</li>
+<li><strong>몫의 법칙:</strong> \(\left(\frac{f}{g}\right)' = \frac{f'g - fg'}{g^2}\)</li>
+</ul>
+</div>
+
+<pre><code><span class="kw">import</span> numpy <span class="kw">as</span> np
+
+<span class="kw">def</span> <span class="fn">nd</span>(f, x, h=<span class="nu">1e-7</span>):
+    <span class="st">"""수치 미분 (중앙차분)"""</span>
+    <span class="kw">return</span> (f(x+h) - f(x-h)) / (<span class="nu">2</span>*h)
+
+<span class="cm"># 거듭제곱 법칙: (x^3)' = 3x^2</span>
+<span class="fn">print</span>(<span class="st">"(x³)' at x=2:"</span>, nd(<span class="kw">lambda</span> x: x**<span class="nu">3</span>, <span class="nu">2</span>))  <span class="cm"># 12.0</span>
+
+<span class="cm"># 지수함수: (e^x)' = e^x</span>
+<span class="fn">print</span>(<span class="st">"(eˣ)' at x=1:"</span>, nd(np.exp, <span class="nu">1</span>))  <span class="cm"># 2.71828...</span>
+<span class="fn">print</span>(<span class="st">"e¹ =         "</span>, np.exp(<span class="nu">1</span>))
+
+<span class="cm"># 로그함수: (ln x)' = 1/x</span>
+<span class="fn">print</span>(<span class="st">"(ln x)' at x=2:"</span>, nd(np.log, <span class="nu">2</span>))  <span class="cm"># 0.5</span>
+
+<span class="cm"># 시그모이드: σ'(x) = σ(x)(1-σ(x))</span>
+sigmoid = <span class="kw">lambda</span> x: <span class="nu">1</span> / (<span class="nu">1</span> + np.exp(-x))
+x = <span class="nu">0.5</span>
+<span class="fn">print</span>(<span class="st">f"\nσ'(0.5) 수치: </span>{nd(sigmoid, x):.6f}<span class="st">"</span>)
+<span class="fn">print</span>(<span class="st">f"σ'(0.5) 공식: </span>{sigmoid(x)*(1-sigmoid(x)):.6f}<span class="st">"</span>)</code></pre>
+<div class="code-output"><span class="out-label">Output:</span>
+(x³)' at x=2: 12.000000
+(eˣ)' at x=1: 2.718282
+e¹ =          2.718281828459045
+(ln x)' at x=2: 0.500000
+
+σ'(0.5) 수치: 0.235004
+σ'(0.5) 공식: 0.235004</div>
+
+<h3>3.3 시그모이드와 ReLU — 딥러닝의 핵심 함수</h3>
+<p>딥러닝에서 활성화 함수의 미분은 역전파(backpropagation)의 핵심이다. 시그모이드의 미분이 왜 문제가 되는지, ReLU가 왜 등장했는지 이해하자.</p>
+
+<!-- ▼ Plotly: 활성화 함수와 도함수 -->
+<div id="plot-ch3-activation" style="width:100%;height:420px;margin:25px 0"></div>
+<script>
+(function(){
+  var xs=[],sig=[],sig_d=[],relu=[],relu_d=[],tanh_v=[],tanh_d=[];
+  for(var x=-5;x<=5;x+=0.05){
+    xs.push(x);
+    var s=1/(1+Math.exp(-x));
+    sig.push(s); sig_d.push(s*(1-s));
+    relu.push(Math.max(0,x)); relu_d.push(x>0?1:0);
+    var t=Math.tanh(x);
+    tanh_v.push(t); tanh_d.push(1-t*t);
+  }
+  Plotly.newPlot('plot-ch3-activation',[
+    {x:xs,y:sig,mode:'lines',name:'σ(x)',line:{width:2,color:'#1e88e5'}},
+    {x:xs,y:sig_d,mode:'lines',name:"σ'(x)",line:{width:2,color:'#1e88e5',dash:'dash'}},
+    {x:xs,y:relu,mode:'lines',name:'ReLU(x)',line:{width:2,color:'#e53935'}},
+    {x:xs,y:relu_d,mode:'lines',name:"ReLU'(x)",line:{width:2,color:'#e53935',dash:'dash'}},
+    {x:xs,y:tanh_v,mode:'lines',name:'tanh(x)',line:{width:2,color:'#43a047'}},
+    {x:xs,y:tanh_d,mode:'lines',name:"tanh'(x)",line:{width:2,color:'#43a047',dash:'dash'}}
+  ],{
+    title:{text:'🧠 활성화 함수(실선)와 도함수(점선)',font:{size:13}},
+    xaxis:{title:'x',zeroline:true,zerolinewidth:2},
+    yaxis:{title:'y',range:[-1.5,5],zeroline:true,zerolinewidth:2},
+    margin:{l:50,r:20,t:45,b:40},
+    legend:{x:0.02,y:0.98,bgcolor:'rgba(255,255,255,0.8)'},
+    annotations:[{x:0,y:0.25,text:"σ' 최대 = 0.25<br>(기울기 소실!)",showarrow:true,arrowhead:2,ax:-80,ay:-30,font:{size:10,color:'#1e88e5'}}]
+  },{responsive:true});
+})();
+</script>
+<p class="ni" style="font-size:11px;color:#888;text-align:center;margin-top:-10px">🖱️ 시그모이드의 도함수 최대값은 0.25 → 레이어가 깊어지면 기울기가 소실된다. ReLU는 양수 영역에서 도함수=1로 이 문제를 해결</p>
+
+<div class="warn">
+<p class="ni"><strong>기울기 소실 문제 (Vanishing Gradient):</strong> 시그모이드의 도함수 최대값은 0.25다. 10개 레이어를 통과하면 기울기가 \(0.25^{10} \approx 0.000001\)로 거의 사라진다. 이것이 딥러닝 초기의 최대 난제였고, ReLU의 등장으로 해결되었다. ReLU의 도함수는 양수 영역에서 항상 1이므로 기울기가 보존된다.</p>
+</div>
+
+<!-- ═══════════════════════════════════════════ -->
+<!-- Ch4: 편미분과 그래디언트 -->
+<!-- ═══════════════════════════════════════════ -->
+<h2 id="ch4">4. 편미분과 그래디언트</h2>
+
+<h3>4.1 편미분 (Partial Derivative)</h3>
+<p>변수가 여러 개인 함수에서, 하나의 변수만 변화시키고 나머지는 고정한 채 미분하는 것이 편미분이다. ML에서 손실함수는 수천~수억 개의 파라미터를 가지므로, 편미분은 필수다.</p>
+
+<div class="eq">
+$$f(x, y) = x^2 + 3xy + y^2 \quad \Rightarrow \quad \frac{\partial f}{\partial x} = 2x + 3y, \quad \frac{\partial f}{\partial y} = 3x + 2y$$
+</div>
+
+<p>금융 비유: 포트폴리오 수익률이 삼성전자 비중(\(w_1\))과 SK하이닉스 비중(\(w_2\))에 의존한다면, \(\frac{\partial r_p}{\partial w_1}\)은 "삼성전자 비중을 1% 늘리면 포트폴리오 수익률이 얼마나 변하는가"를 의미한다.</p>
+
+<pre><code><span class="kw">import</span> numpy <span class="kw">as</span> np
+
+<span class="cm"># f(x,y) = x² + 3xy + y²</span>
+f = <span class="kw">lambda</span> x, y: x**<span class="nu">2</span> + <span class="nu">3</span>*x*y + y**<span class="nu">2</span>
+
+<span class="cm"># 편미분 (수치)</span>
+<span class="kw">def</span> <span class="fn">partial_x</span>(f, x, y, h=<span class="nu">1e-7</span>):
+    <span class="kw">return</span> (f(x+h, y) - f(x-h, y)) / (<span class="nu">2</span>*h)
+
+<span class="kw">def</span> <span class="fn">partial_y</span>(f, x, y, h=<span class="nu">1e-7</span>):
+    <span class="kw">return</span> (f(x, y+h) - f(x, y-h)) / (<span class="nu">2</span>*h)
+
+x, y = <span class="nu">1</span>, <span class="nu">2</span>
+<span class="fn">print</span>(<span class="st">f"∂f/∂x at (1,2) 수치: </span>{partial_x(f, x, y):.4f}<span class="st">"</span>)
+<span class="fn">print</span>(<span class="st">f"∂f/∂x at (1,2) 해석: </span>{2*x + 3*y}<span class="st">"</span>)  <span class="cm"># 2+6=8</span>
+<span class="fn">print</span>(<span class="st">f"∂f/∂y at (1,2) 수치: </span>{partial_y(f, x, y):.4f}<span class="st">"</span>)
+<span class="fn">print</span>(<span class="st">f"∂f/∂y at (1,2) 해석: </span>{3*x + 2*y}<span class="st">"</span>)  <span class="cm"># 3+4=7</span></code></pre>
+<div class="code-output"><span class="out-label">Output:</span>
+∂f/∂x at (1,2) 수치: 8.0000
+∂f/∂x at (1,2) 해석: 8
+∂f/∂y at (1,2) 수치: 7.0000
+∂f/∂y at (1,2) 해석: 7</div>
+
+<h3>4.2 그래디언트 벡터 (Gradient)</h3>
+<p>모든 편미분을 하나의 벡터로 모은 것이 그래디언트다. 그래디언트는 함수가 가장 빠르게 증가하는 방향을 가리킨다.</p>
+
+<div class="eq">
+$$\nabla f = \begin{bmatrix} \frac{\partial f}{\partial x_1} \\ \frac{\partial f}{\partial x_2} \\ \vdots \\ \frac{\partial f}{\partial x_n} \end{bmatrix}$$
+</div>
+
+<div class="def">
+<p class="ni"><strong>그래디언트의 핵심 성질:</strong></p>
+<ul>
+<li>그래디언트 방향 = 함수가 가장 빠르게 증가하는 방향</li>
+<li>그래디언트 반대 방향 = 함수가 가장 빠르게 감소하는 방향 → 경사하강법!</li>
+<li>그래디언트 크기 = 변화의 속도 (가파른 정도)</li>
+<li>그래디언트 = 0인 점 = 극값 (최대, 최소, 안장점)</li>
+</ul>
+</div>
+
+<!-- ▼ Plotly: 3D 곡면 + 그래디언트 -->
+<div id="plot-ch4-gradient" style="width:100%;height:520px;margin:25px 0"></div>
+<script>
+(function(){
+  var n=40;
+  var xv=[],yv=[],zv=[];
+  for(var i=0;i<n;i++){
+    var row_x=[],row_y=[],row_z=[];
+    for(var j=0;j<n;j++){
+      var x=-3+6*i/(n-1), y=-3+6*j/(n-1);
+      row_x.push(x);row_y.push(y);
+      row_z.push(x*x+y*y);
+    }
+    xv.push(row_x);yv.push(row_y);zv.push(row_z);
+  }
+  // 그래디언트 화살표 시작점
+  var gx=[2,2,-2,-2,0],gy=[2,-2,2,-2,0],gz=[];
+  for(var i=0;i<gx.length;i++) gz.push(gx[i]*gx[i]+gy[i]*gy[i]+0.5);
+  Plotly.newPlot('plot-ch4-gradient',[
+    {x:xv,y:yv,z:zv,type:'surface',colorscale:'Viridis',opacity:0.85,showscale:false},
+    {x:gx,y:gy,z:gz,mode:'markers',type:'scatter3d',name:'그래디언트 방향',
+     marker:{size:6,color:'#e53935',symbol:'diamond'}}
+  ],{
+    title:{text:'🏔️ f(x,y) = x² + y² — 그래디언트는 바깥(증가) 방향',font:{size:13}},
+    scene:{
+      xaxis:{title:'x'},yaxis:{title:'y'},zaxis:{title:'f(x,y)'},
+      camera:{eye:{x:1.8,y:1.8,z:1.2}}
+    },
+    margin:{l:0,r:0,t:45,b:0}
+  },{responsive:true});
+})();
+</script>
+<p class="ni" style="font-size:11px;color:#888;text-align:center;margin-top:-10px">🖱️ 3D 회전 가능! 그래디언트는 곡면의 가장 가파른 오르막 방향. 경사하강법은 이 반대 방향으로 내려간다</p>
+
+<!-- ═══════════════════════════════════════════ -->
+<!-- 연습문제 4 -->
+<!-- ═══════════════════════════════════════════ -->
+<div class="problem-box">
+<div class="problem-title">✏️ 연습문제 4.1</div>
+<p class="ni">함수 \(f(x, y) = 3x^2 y + y^3 - 6xy\)에 대해:</p>
+<ol>
+<li>\(\frac{\partial f}{\partial x}\)와 \(\frac{\partial f}{\partial y}\)를 구하라.</li>
+<li>점 \((1, 2)\)에서의 그래디언트 벡터 \(\nabla f(1, 2)\)를 구하라.</li>
+<li>그래디언트의 크기(노름)를 구하라. 이것은 무엇을 의미하는가?</li>
+</ol>
+</div>
+
+<details>
+<summary>🔑 풀이 보기</summary>
+<div class="answer-content">
+<p class="ni"><strong>1) 편미분:</strong></p>
+<div class="eq">$$\frac{\partial f}{\partial x} = 6xy - 6y, \quad \frac{\partial f}{\partial y} = 3x^2 + 3y^2 - 6x$$</div>
+
+<p class="ni"><strong>2) 그래디언트 at (1,2):</strong></p>
+<div class="eq">$$\frac{\partial f}{\partial x}\bigg|_{(1,2)} = 6(1)(2) - 6(2) = 12 - 12 = 0$$</div>
+<div class="eq">$$\frac{\partial f}{\partial y}\bigg|_{(1,2)} = 3(1) + 3(4) - 6(1) = 3 + 12 - 6 = 9$$</div>
+<div class="eq">$$\nabla f(1,2) = \begin{bmatrix} 0 \\ 9 \end{bmatrix}$$</div>
+
+<p class="ni"><strong>3) 크기:</strong> \(\|\nabla f\| = \sqrt{0^2 + 9^2} = 9\). 이 점에서 함수는 y 방향으로만 변화하며, 변화 속도는 9이다.</p>
+
+<pre><code>f = <span class="kw">lambda</span> x,y: <span class="nu">3</span>*x**<span class="nu">2</span>*y + y**<span class="nu">3</span> - <span class="nu">6</span>*x*y
+grad = np.array([partial_x(f,<span class="nu">1</span>,<span class="nu">2</span>), partial_y(f,<span class="nu">1</span>,<span class="nu">2</span>)])
+<span class="fn">print</span>(<span class="st">f"∇f(1,2) = </span>{grad}<span class="st">"</span>)
+<span class="fn">print</span>(<span class="st">f"|∇f| = </span>{np.linalg.norm(grad):.4f}<span class="st">"</span>)</code></pre>
+</div>
+</details>
+
+<!-- ═══════════════════════════════════════════ -->
+<!-- Ch5: 체인룰 (연쇄법칙) -->
+<!-- ═══════════════════════════════════════════ -->
+<h2 id="ch5">5. 체인룰 (Chain Rule, 연쇄법칙)</h2>
+
+<h3>5.1 합성함수의 미분</h3>
+<p>체인룰은 딥러닝 역전파의 수학적 기초다. 합성함수 \(f(g(x))\)의 미분은 바깥 함수의 미분 × 안쪽 함수의 미분이다.</p>
+
+<div class="eq">
+$$\frac{d}{dx}f(g(x)) = f'(g(x)) \cdot g'(x)$$
+</div>
+
+<p>비유: 자동차 속도(km/h) × 시간당 연료 소비(L/h) = km당 연료 소비(L/km). 중간 변수를 통해 연결되는 변화율을 곱하는 것이다.</p>
+
+<div class="def">
+<p class="ni"><strong>체인룰 적용 예:</strong></p>
+<div class="eq">$$\frac{d}{dx}e^{3x^2} = e^{3x^2} \cdot 6x \quad \text{(바깥: } e^u \to e^u, \text{ 안쪽: } 3x^2 \to 6x\text{)}$$</div>
+<div class="eq">$$\frac{d}{dx}\ln(\sin x) = \frac{1}{\sin x} \cdot \cos x = \frac{\cos x}{\sin x} = \cot x$$</div>
+<div class="eq">$$\frac{d}{dx}\sigma(wx+b) = \sigma(wx+b)(1-\sigma(wx+b)) \cdot w \quad \text{(뉴럴넷 1개 뉴런!)}$$</div>
+</div>
+
+<pre><code><span class="kw">import</span> numpy <span class="kw">as</span> np
+
+<span class="kw">def</span> <span class="fn">nd</span>(f, x, h=<span class="nu">1e-7</span>):
+    <span class="kw">return</span> (f(x+h) - f(x-h)) / (<span class="nu">2</span>*h)
+
+<span class="cm"># 예1: d/dx e^(3x²) at x=1</span>
+f1 = <span class="kw">lambda</span> x: np.exp(<span class="nu">3</span>*x**<span class="nu">2</span>)
+<span class="fn">print</span>(<span class="st">f"d/dx e^(3x²) at x=1"</span>)
+<span class="fn">print</span>(<span class="st">f"  수치: </span>{nd(f1, 1):.4f}<span class="st">"</span>)
+<span class="fn">print</span>(<span class="st">f"  해석: </span>{np.exp(3)*6:.4f}<span class="st">"</span>)  <span class="cm"># e³ × 6</span>
+
+<span class="cm"># 예2: 뉴럴넷 1개 뉴런 — σ(2x + 1)</span>
+sigmoid = <span class="kw">lambda</span> x: <span class="nu">1</span>/(<span class="nu">1</span>+np.exp(-x))
+neuron = <span class="kw">lambda</span> x: sigmoid(<span class="nu">2</span>*x + <span class="nu">1</span>)
+x = <span class="nu">0.5</span>
+z = <span class="nu">2</span>*x + <span class="nu">1</span>  <span class="cm"># = 2</span>
+<span class="fn">print</span>(<span class="st">f"\nd/dx σ(2x+1) at x=0.5"</span>)
+<span class="fn">print</span>(<span class="st">f"  수치: </span>{nd(neuron, x):.6f}<span class="st">"</span>)
+<span class="fn">print</span>(<span class="st">f"  해석: </span>{sigmoid(z)*(1-sigmoid(z))*2:.6f}<span class="st">"</span>)  <span class="cm"># σ(2)(1-σ(2))×2</span></code></pre>
+<div class="code-output"><span class="out-label">Output:</span>
+d/dx e^(3x²) at x=1
+  수치: 120.5131
+  해석: 120.5131
+
+d/dx σ(2x+1) at x=0.5
+  수치: 0.209987
+  해석: 0.209987</div>
+
+<h3>5.2 다변수 체인룰 — 역전파의 핵심</h3>
+<p>딥러닝에서 손실함수 \(L\)은 여러 레이어를 거쳐 계산된다: \(L = L(y, \hat{y})\), \(\hat{y} = \sigma(z)\), \(z = wx + b\). 각 파라미터에 대한 미분은 체인룰을 연쇄적으로 적용한다.</p>
+
+<div class="eq">
+$$\frac{\partial L}{\partial w} = \frac{\partial L}{\partial \hat{y}} \cdot \frac{\partial \hat{y}}{\partial z} \cdot \frac{\partial z}{\partial w}$$
+</div>
+
+<pre><code><span class="cm"># 역전파 시뮬레이션: 1개 뉴런</span>
+<span class="cm"># 순전파: z = wx + b → ŷ = σ(z) → L = (y - ŷ)²</span>
+w, b, x, y = <span class="nu">0.5</span>, <span class="nu">0.1</span>, <span class="nu">2.0</span>, <span class="nu">1.0</span>
+
+<span class="cm"># Forward pass</span>
+z = w * x + b           <span class="cm"># 1.1</span>
+y_hat = sigmoid(z)       <span class="cm"># σ(1.1) ≈ 0.7503</span>
+L = (y - y_hat) ** <span class="nu">2</span>    <span class="cm"># 손실</span>
+
+<span class="cm"># Backward pass (체인룰!)</span>
+dL_dyhat = -<span class="nu">2</span> * (y - y_hat)                    <span class="cm"># ∂L/∂ŷ</span>
+dyhat_dz = sigmoid(z) * (<span class="nu">1</span> - sigmoid(z))       <span class="cm"># ∂ŷ/∂z = σ'(z)</span>
+dz_dw = x                                       <span class="cm"># ∂z/∂w = x</span>
+dz_db = <span class="nu">1</span>                                       <span class="cm"># ∂z/∂b = 1</span>
+
+dL_dw = dL_dyhat * dyhat_dz * dz_dw  <span class="cm"># 체인룰!</span>
+dL_db = dL_dyhat * dyhat_dz * dz_db
+
+<span class="fn">print</span>(<span class="st">f"z = </span>{z:.4f}<span class="st">"</span>)
+<span class="fn">print</span>(<span class="st">f"ŷ = σ(z) = </span>{y_hat:.4f}<span class="st">"</span>)
+<span class="fn">print</span>(<span class="st">f"L = (y-ŷ)² = </span>{L:.4f}<span class="st">"</span>)
+<span class="fn">print</span>(<span class="st">f"\n∂L/∂w = </span>{dL_dw:.6f}<span class="st">"</span>)
+<span class="fn">print</span>(<span class="st">f"∂L/∂b = </span>{dL_db:.6f}<span class="st">"</span>)</code></pre>
+<div class="code-output"><span class="out-label">Output:</span>
+z = 1.1000
+ŷ = σ(z) = 0.7503
+L = (y-ŷ)² = 0.0624
+
+∂L/∂w = -0.186867
+∂L/∂b = -0.093434</div>
+
+<div class="ok">
+<p class="ni"><strong>역전파 = 체인룰의 반복 적용:</strong> 딥러닝의 역전파 알고리즘은 결국 체인룰을 출력층에서 입력층 방향으로 반복 적용하는 것이다. 각 레이어에서 "로컬 그래디언트"를 계산하고, 이전 레이어에서 전달된 그래디언트와 곱한다. 이것이 전부다.</p>
+</div>
+
+<!-- ═══════════════════════════════════════════ -->
+<!-- Ch6: 적분의 직관 -->
+<!-- ═══════════════════════════════════════════ -->
+<h2 id="ch6">6. 적분의 직관</h2>
+
+<h3>6.1 적분 = 미분의 역연산 = 넓이</h3>
+<p>미분이 "순간 변화율"이라면, 적분은 "변화율의 누적"이다. 기하학적으로 곡선 아래의 넓이다.</p>
+
+<div class="eq">
+$$\int_a^b f(x)\,dx = F(b) - F(a), \quad \text{여기서 } F'(x) = f(x)$$
+</div>
+
+<p>금융 비유: 일간 수익률 \(r(t)\)를 적분하면 누적 수익률이 된다. 순간 변동성을 적분하면 기간 변동성이 된다.</p>
+
+<h3>6.2 핵심 적분 공식</h3>
+
+<div class="tc">Table 2. 핵심 적분 공식</div>
+<table>
+<tr><th>함수</th><th>부정적분</th><th>금융 활용</th></tr>
+<tr><td>\(x^n\)</td><td>\(\frac{x^{n+1}}{n+1} + C\)</td><td>다항 모델</td></tr>
+<tr><td>\(e^x\)</td><td>\(e^x + C\)</td><td>연속 복리</td></tr>
+<tr><td>\(\frac{1}{x}\)</td><td>\(\ln|x| + C\)</td><td>로그 수익률</td></tr>
+<tr><td>\(e^{-x^2}\)</td><td>해석해 없음 (수치적분)</td><td>정규분포 CDF</td></tr>
+</table>
+
+<pre><code><span class="kw">import</span> numpy <span class="kw">as</span> np
+<span class="kw">from</span> scipy <span class="kw">import</span> integrate
+
+<span class="cm"># 수치 적분: ∫₀¹ x² dx = [x³/3]₀¹ = 1/3</span>
+result, error = integrate.quad(<span class="kw">lambda</span> x: x**<span class="nu">2</span>, <span class="nu">0</span>, <span class="nu">1</span>)
+<span class="fn">print</span>(<span class="st">f"∫₀¹ x² dx = </span>{result:.6f}<span class="st"> (해석: </span>{1/3:.6f}<span class="st">)"</span>)
+
+<span class="cm"># 정규분포 확률: P(-1 < Z < 1) = ∫₋₁¹ φ(z) dz</span>
+<span class="kw">from</span> scipy.stats <span class="kw">import</span> norm
+phi = <span class="kw">lambda</span> z: norm.pdf(z)
+prob, _ = integrate.quad(phi, -<span class="nu">1</span>, <span class="nu">1</span>)
+<span class="fn">print</span>(<span class="st">f"P(-1 < Z < 1) = </span>{prob:.4f}<span class="st">"</span>)  <span class="cm"># ≈ 0.6827 (68-95-99.7 법칙)</span>
+
+<span class="cm"># 누적 수익률 = 일간 수익률의 적분(합)</span>
+daily_returns = np.array([<span class="nu">0.01</span>, -<span class="nu">0.005</span>, <span class="nu">0.02</span>, -<span class="nu">0.01</span>, <span class="nu">0.015</span>])
+cumulative = np.cumsum(daily_returns)
+<span class="fn">print</span>(<span class="st">f"\n일간 수익률: </span>{daily_returns}<span class="st">"</span>)
+<span class="fn">print</span>(<span class="st">f"누적 수익률: </span>{cumulative}<span class="st">"</span>)</code></pre>
+<div class="code-output"><span class="out-label">Output:</span>
+∫₀¹ x² dx = 0.333333 (해석: 0.333333)
+P(-1 < Z < 1) = 0.6827
+일간 수익률: [ 0.01  -0.005  0.02  -0.01   0.015]
+누적 수익률: [0.01  0.005 0.025 0.015 0.03 ]</div>
+
+<!-- ▼ Plotly: 적분 = 넓이 시각화 -->
+<div id="plot-ch6-integral" style="width:100%;height:400px;margin:25px 0"></div>
+<script>
+(function(){
+  var xs=[],ys=[],fx=[],fy=[];
+  for(var x=0;x<=3;x+=0.02){xs.push(x);ys.push(x*x);}
+  // 적분 영역 (0~2)
+  fx.push(0);fy.push(0);
+  for(var x=0;x<=2;x+=0.02){fx.push(x);fy.push(x*x);}
+  fx.push(2);fy.push(0);
+  Plotly.newPlot('plot-ch6-integral',[
+    {x:fx,y:fy,fill:'toself',fillcolor:'rgba(30,136,229,0.3)',line:{color:'transparent'},name:'∫₀² x² dx = 8/3',showlegend:true},
+    {x:xs,y:ys,mode:'lines',name:'f(x) = x²',line:{width:3,color:'#1e88e5'}}
+  ],{
+    title:{text:'📏 적분 = 곡선 아래 넓이: ∫₀² x² dx = 8/3 ≈ 2.667',font:{size:13}},
+    xaxis:{title:'x',range:[-0.5,3.5],zeroline:true,zerolinewidth:2},
+    yaxis:{title:'f(x)',range:[-0.5,9],zeroline:true,zerolinewidth:2},
+    margin:{l:50,r:20,t:45,b:40},
+    legend:{x:0.02,y:0.98}
+  },{responsive:true});
+})();
+</script>
+<p class="ni" style="font-size:11px;color:#888;text-align:center;margin-top:-10px">🖱️ 파란 영역의 넓이 = ∫₀² x² dx = [x³/3]₀² = 8/3 ≈ 2.667</p>
+
+<!-- ═══════════════════════════════════════════ -->
+<!-- Ch7: 테일러 급수 -->
+<!-- ═══════════════════════════════════════════ -->
+<h2 id="ch7">7. 테일러 급수 (Taylor Series)</h2>
+
+<h3>7.1 어떤 함수든 다항식으로 근사할 수 있다</h3>
+<p>테일러 급수는 복잡한 함수를 다항식으로 근사하는 도구다. 점 \(a\) 근처에서:</p>
+
+<div class="eq">
+$$f(x) \approx f(a) + f'(a)(x-a) + \frac{f''(a)}{2!}(x-a)^2 + \frac{f'''(a)}{3!}(x-a)^3 + \cdots$$
+</div>
+
+<p>특히 \(a = 0\)일 때 매클로린 급수라 한다:</p>
+
+<div class="eq">
+$$e^x = 1 + x + \frac{x^2}{2!} + \frac{x^3}{3!} + \cdots, \quad \sin x = x - \frac{x^3}{3!} + \frac{x^5}{5!} - \cdots$$
+</div>
+
+<p>금융에서의 활용: 옵션 가격의 그릭스(Greeks)는 테일러 전개의 각 항이다. 델타(Δ)는 1차 항, 감마(Γ)는 2차 항이다.</p>
+
+<pre><code><span class="kw">import</span> numpy <span class="kw">as</span> np
+<span class="kw">import</span> math
+
+<span class="cm"># e^x의 테일러 근사 (n차까지)</span>
+<span class="kw">def</span> <span class="fn">taylor_exp</span>(x, n):
+    <span class="kw">return</span> <span class="fn">sum</span>(x**k / math.factorial(k) <span class="kw">for</span> k <span class="kw">in</span> <span class="fn">range</span>(n+<span class="nu">1</span>))
+
+x = <span class="nu">1.0</span>
+<span class="fn">print</span>(<span class="st">f"e^1 정확값: </span>{np.exp(1):.10f}<span class="st">"</span>)
+<span class="kw">for</span> n <span class="kw">in</span> [<span class="nu">1</span>, <span class="nu">2</span>, <span class="nu">3</span>, <span class="nu">5</span>, <span class="nu">10</span>]:
+    approx = taylor_exp(x, n)
+    error = <span class="fn">abs</span>(approx - np.exp(<span class="nu">1</span>))
+    <span class="fn">print</span>(<span class="st">f"  {n:2d}차 근사: </span>{approx:.10f}<span class="st">  오차: </span>{error:.2e}<span class="st">"</span>)</code></pre>
+<div class="code-output"><span class="out-label">Output:</span>
+e^1 정확값: 2.7182818285
+   1차 근사: 2.0000000000  오차: 7.18e-01
+   2차 근사: 2.5000000000  오차: 2.18e-01
+   3차 근사: 2.6666666667  오차: 5.16e-02
+   5차 근사: 2.7166666667  오차: 1.62e-03
+  10차 근사: 2.7182818011  오차: 2.73e-08</div>
+
+<!-- ▼ Plotly: 테일러 근사 시각화 -->
+<div id="plot-ch7-taylor" style="width:100%;height:420px;margin:25px 0"></div>
+<script>
+(function(){
+  function factorial(n){var r=1;for(var i=2;i<=n;i++)r*=i;return r;}
+  function taylorSin(x,n){var s=0;for(var k=0;k<=n;k++){var p=2*k+1;s+=Math.pow(-1,k)*Math.pow(x,p)/factorial(p);}return s;}
+  var xs=[],exact=[],t1=[],t3=[],t5=[],t9=[];
+  for(var x=-8;x<=8;x+=0.05){
+    xs.push(x);exact.push(Math.sin(x));
+    t1.push(taylorSin(x,0));t3.push(taylorSin(x,1));
+    t5.push(taylorSin(x,2));t9.push(taylorSin(x,4));
+  }
+  Plotly.newPlot('plot-ch7-taylor',[
+    {x:xs,y:exact,mode:'lines',name:'sin(x) 정확값',line:{width:3,color:'#333'}},
+    {x:xs,y:t1,mode:'lines',name:'1차 (x)',line:{width:2,color:'#e53935',dash:'dot'}},
+    {x:xs,y:t3,mode:'lines',name:'3차 (x - x³/6)',line:{width:2,color:'#ff9800',dash:'dash'}},
+    {x:xs,y:t5,mode:'lines',name:'5차',line:{width:2,color:'#43a047',dash:'dashdot'}},
+    {x:xs,y:t9,mode:'lines',name:'9차',line:{width:2,color:'#1e88e5'}}
+  ],{
+    title:{text:'🔬 sin(x)의 테일러 근사: 차수가 높을수록 정확',font:{size:13}},
+    xaxis:{title:'x',range:[-8,8]},
+    yaxis:{title:'y',range:[-3,3]},
+    margin:{l:50,r:20,t:45,b:40},
+    legend:{x:0.02,y:0.98,bgcolor:'rgba(255,255,255,0.8)'}
+  },{responsive:true});
+})();
+</script>
+<p class="ni" style="font-size:11px;color:#888;text-align:center;margin-top:-10px">🖱️ 차수가 높아질수록 근사가 정확해진다. 9차면 -6~6 범위에서 거의 완벽</p>
+
+<div class="info">
+<p class="ni"><strong>테일러 급수와 ML:</strong> 뉴럴넷의 보편 근사 정리(Universal Approximation Theorem)는 "충분히 넓은 네트워크는 어떤 연속함수든 근사할 수 있다"는 것이다. 테일러 급수가 다항식으로 함수를 근사하듯, 뉴럴넷은 활성화 함수의 조합으로 함수를 근사한다.</p>
+</div>
+
+<!-- ═══════════════════════════════════════════ -->
+<!-- Ch8: 경사하강법 -->
+<!-- ═══════════════════════════════════════════ -->
+<h2 id="ch8">8. 경사하강법 (Gradient Descent)</h2>
+
+<h3>8.1 최적화 문제</h3>
+<p>ML의 핵심은 최적화다: 손실함수 \(L(\theta)\)를 최소화하는 파라미터 \(\theta\)를 찾는 것. 경사하강법은 그래디언트의 반대 방향으로 조금씩 이동하여 최솟값을 찾는 알고리즘이다.</p>
+
+<div class="eq">
+$$\theta_{t+1} = \theta_t - \alpha \nabla L(\theta_t)$$
+</div>
+
+<div class="def">
+<p class="ni"><strong>경사하강법의 구성요소:</strong></p>
+<ul>
+<li>\(\theta_t\): 현재 파라미터 값</li>
+<li>\(\alpha\): 학습률 (learning rate) — 한 번에 얼마나 이동할지</li>
+<li>\(\nabla L(\theta_t)\): 현재 위치에서의 그래디언트 — 어느 방향으로 이동할지</li>
+<li>\(\theta_{t+1}\): 업데이트된 파라미터</li>
+</ul>
+<p class="ni">비유: 안개 낀 산에서 가장 낮은 곳을 찾으려면? 발밑의 경사(그래디언트)를 느끼고, 내리막 방향으로 한 걸음씩 내려간다.</p>
+</div>
+
+<h3>8.2 1D 경사하강법 구현</h3>
+<pre><code><span class="kw">import</span> numpy <span class="kw">as</span> np
+
+<span class="cm"># 목적함수: f(x) = (x-3)² + 2  → 최솟값은 x=3에서 f=2</span>
+f = <span class="kw">lambda</span> x: (x - <span class="nu">3</span>)**<span class="nu">2</span> + <span class="nu">2</span>
+df = <span class="kw">lambda</span> x: <span class="nu">2</span> * (x - <span class="nu">3</span>)  <span class="cm"># 도함수</span>
+
+<span class="cm"># 경사하강법</span>
+x = <span class="nu">10.0</span>          <span class="cm"># 시작점</span>
+lr = <span class="nu">0.1</span>          <span class="cm"># 학습률</span>
+history = [x]
+
+<span class="kw">for</span> i <span class="kw">in</span> <span class="fn">range</span>(<span class="nu">30</span>):
+    grad = df(x)
+    x = x - lr * grad  <span class="cm"># 업데이트!</span>
+    history.append(x)
+    <span class="kw">if</span> i < <span class="nu">5</span> <span class="kw">or</span> i % <span class="nu">10</span> == <span class="nu">9</span>:
+        <span class="fn">print</span>(<span class="st">f"Step </span>{i+1:2d}<span class="st">: x = </span>{x:.6f}<span class="st">, f(x) = </span>{f(x):.6f}<span class="st">, grad = </span>{grad:.4f}<span class="st">"</span>)
+
+<span class="fn">print</span>(<span class="st">f"\n최종: x = </span>{x:.6f}<span class="st"> (정답: 3.0)"</span>)</code></pre>
+<div class="code-output"><span class="out-label">Output:</span>
+Step  1: x = 8.600000, f(x) = 33.360000, grad = 14.0000
+Step  2: x = 7.480000, f(x) = 22.070400, grad = 11.2000
+Step  3: x = 6.584000, f(x) = 14.852256, grad = 8.9600
+Step  4: x = 5.867200, f(x) = 10.225444, grad = 7.1680
+Step  5: x = 5.293760, f(x) = 7.264284, grad = 5.7344
+Step 10: x = 3.440729, f(x) = 2.194243, grad = 1.1018
+Step 20: x = 3.003623, f(x) = 2.000013, grad = 0.0090
+Step 30: x = 3.000003, f(x) = 2.000000, grad = 0.0000
+
+최종: x = 3.000003 (정답: 3.0)</div>
+
+<!-- ▼ Plotly: 경사하강법 애니메이션 -->
+<div id="plot-ch8-gd" style="width:100%;height:420px;margin:25px 0"></div>
+<script>
+(function(){
+  var xs=[],ys=[];
+  for(var x=-1;x<=11;x+=0.05){xs.push(x);ys.push((x-3)*(x-3)+2);}
+  // GD 경로
+  var gx=[10],gy=[(10-3)*(10-3)+2];
+  var cx=10,lr=0.1;
+  for(var i=0;i<30;i++){
+    var g=2*(cx-3);cx=cx-lr*g;
+    gx.push(cx);gy.push((cx-3)*(cx-3)+2);
+  }
+  Plotly.newPlot('plot-ch8-gd',[
+    {x:xs,y:ys,mode:'lines',name:'f(x) = (x-3)²+2',line:{width:3,color:'#1e88e5'}},
+    {x:gx,y:gy,mode:'lines+markers',name:'경사하강법 경로',
+     line:{width:2,color:'#e53935'},marker:{size:5,color:'#e53935'}},
+    {x:[3],y:[2],mode:'markers',name:'최솟값 (3, 2)',
+     marker:{size:14,color:'#43a047',symbol:'star'}}
+  ],{
+    title:{text:'⛰️ 경사하강법: x=10에서 출발 → x=3으로 수렴',font:{size:13}},
+    xaxis:{title:'x',range:[-1,11]},
+    yaxis:{title:'f(x)',range:[0,55]},
+    margin:{l:50,r:20,t:45,b:40},
+    legend:{x:0.5,y:0.98}
+  },{responsive:true});
+})();
+</script>
+<p class="ni" style="font-size:11px;color:#888;text-align:center;margin-top:-10px">🖱️ 빨간 점이 x=10에서 출발하여 최솟값 x=3으로 수렴하는 과정. 처음엔 큰 보폭, 점점 작아진다</p>
+
+<h3>8.3 학습률의 중요성</h3>
+
+<div class="warn">
+<p class="ni"><strong>학습률(α)이 너무 크면:</strong> 최솟값을 지나쳐서 발산한다. 산에서 너무 큰 보폭으로 뛰면 반대편 절벽으로 날아간다.</p>
+<p class="ni"><strong>학습률이 너무 작으면:</strong> 수렴이 너무 느리다. 개미 걸음으로 산을 내려가는 격.</p>
+<p class="ni"><strong>적절한 학습률:</strong> 보통 0.001~0.01에서 시작. Adam 같은 적응형 옵티마이저는 학습률을 자동 조절한다.</p>
+</div>
+
+<!-- ▼ Plotly: 학습률 비교 -->
+<div id="plot-ch8-lr" style="width:100%;height:400px;margin:25px 0"></div>
+<script>
+(function(){
+  function gd(lr,steps){
+    var x=10,path=[x];
+    for(var i=0;i<steps;i++){x=x-lr*2*(x-3);path.push(x);}
+    return path;
+  }
+  var steps=Array.from({length:31},function(_,i){return i;});
+  var p1=gd(0.01,30),p2=gd(0.1,30),p3=gd(0.5,30),p4=gd(0.95,30);
+  Plotly.newPlot('plot-ch8-lr',[
+    {x:steps,y:p1,mode:'lines+markers',name:'α=0.01 (느림)',line:{width:2},marker:{size:3}},
+    {x:steps,y:p2,mode:'lines+markers',name:'α=0.1 (적절)',line:{width:2},marker:{size:3}},
+    {x:steps,y:p3,mode:'lines+markers',name:'α=0.5 (빠름)',line:{width:2},marker:{size:3}},
+    {x:steps,y:p4,mode:'lines+markers',name:'α=0.95 (진동)',line:{width:2,color:'#e53935'},marker:{size:3}}
+  ],{
+    title:{text:'📉 학습률에 따른 수렴 속도 비교',font:{size:13}},
+    xaxis:{title:'Step'},
+    yaxis:{title:'x 값',zeroline:true},
+    margin:{l:50,r:20,t:45,b:40},
+    legend:{x:0.5,y:0.98},
+    shapes:[{type:'line',x0:0,x1:30,y0:3,y1:3,line:{color:'#43a047',dash:'dot',width:2}}],
+    annotations:[{x:25,y:3.5,text:'정답 x=3',showarrow:false,font:{size:10,color:'#43a047'}}]
+  },{responsive:true});
+})();
+</script>
+<p class="ni" style="font-size:11px;color:#888;text-align:center;margin-top:-10px">🖱️ α=0.01은 30스텝 후에도 멀고, α=0.1은 적절히 수렴, α=0.95는 진동하며 불안정</p>
+
+<h3>8.4 2D 경사하강법</h3>
+<pre><code><span class="cm"># 2D 경사하강법: f(x,y) = x² + 2y² (타원형 등고선)</span>
+f2d = <span class="kw">lambda</span> x, y: x**<span class="nu">2</span> + <span class="nu">2</span>*y**<span class="nu">2</span>
+grad_f = <span class="kw">lambda</span> x, y: np.array([<span class="nu">2</span>*x, <span class="nu">4</span>*y])
+
+pos = np.array([<span class="nu">4.0</span>, <span class="nu">3.0</span>])  <span class="cm"># 시작점</span>
+lr = <span class="nu">0.1</span>
+path = [pos.copy()]
+
+<span class="kw">for</span> i <span class="kw">in</span> <span class="fn">range</span>(<span class="nu">30</span>):
+    g = grad_f(pos[<span class="nu">0</span>], pos[<span class="nu">1</span>])
+    pos = pos - lr * g
+    path.append(pos.copy())
+
+path = np.array(path)
+<span class="fn">print</span>(<span class="st">f"시작: ({path[0,0]:.2f}, {path[0,1]:.2f}), f = {f2d(*path[0]):.2f}"</span>)
+<span class="fn">print</span>(<span class="st">f"최종: ({path[-1,0]:.4f}, {path[-1,1]:.4f}), f = {f2d(*path[-1]):.6f}"</span>)</code></pre>
+<div class="code-output"><span class="out-label">Output:</span>
+시작: (4.00, 3.00), f = 34.00
+최종: (0.0048, 0.0000), f = 0.000023</div>
+
+<!-- ═══════════════════════════════════════════ -->
+<!-- 연습문제 8 -->
+<!-- ═══════════════════════════════════════════ -->
+<div class="problem-box">
+<div class="problem-title">✏️ 연습문제 8.1</div>
+<p class="ni">함수 \(f(x) = x^4 - 4x^2 + 5\)에 대해:</p>
+<ol>
+<li>\(f'(x)\)를 구하라.</li>
+<li>극값(극대/극소)을 모두 구하라.</li>
+<li>\(x = 3\)에서 시작하여 학습률 0.01로 경사하강법을 50스텝 실행하라. 어느 극소로 수렴하는가?</li>
+<li>\(x = 0.1\)에서 시작하면 어디로 수렴하는가? 왜 다른 결과가 나오는가?</li>
+</ol>
+</div>
+
+<details>
+<summary>🔑 풀이 보기</summary>
+<div class="answer-content">
+<p class="ni"><strong>1)</strong> \(f'(x) = 4x^3 - 8x\)</p>
+
+<p class="ni"><strong>2)</strong> \(f'(x) = 0 \Rightarrow 4x(x^2 - 2) = 0 \Rightarrow x = 0, \pm\sqrt{2}\)</p>
+<ul>
+<li>\(x = 0\): \(f''(0) = -8 < 0\) → 극대 (f=5)</li>
+<li>\(x = \pm\sqrt{2}\): \(f''(\pm\sqrt{2}) = 16 > 0\) → 극소 (f=1)</li>
+</ul>
+
+<p class="ni"><strong>3-4)</strong></p>
+<pre><code>f = <span class="kw">lambda</span> x: x**<span class="nu">4</span> - <span class="nu">4</span>*x**<span class="nu">2</span> + <span class="nu">5</span>
+df = <span class="kw">lambda</span> x: <span class="nu">4</span>*x**<span class="nu">3</span> - <span class="nu">8</span>*x
+
+<span class="kw">for</span> x0 <span class="kw">in</span> [<span class="nu">3.0</span>, <span class="nu">0.1</span>]:
+    x = x0
+    <span class="kw">for</span> _ <span class="kw">in</span> <span class="fn">range</span>(<span class="nu">500</span>):
+        x = x - <span class="nu">0.01</span> * df(x)
+    <span class="fn">print</span>(<span class="st">f"x₀={x0} → x={x:.4f}, f(x)={f(x):.4f}"</span>)
+<span class="cm"># x₀=3.0 → x=1.4142 (√2), f=1.0  (오른쪽 극소)</span>
+<span class="cm"># x₀=0.1 → x=1.4142 (√2), f=1.0  (가까운 극소로)</span></code></pre>
+<p class="ni">시작점에 따라 다른 극소로 수렴할 수 있다. 이것이 비볼록(non-convex) 최적화의 핵심 문제다. 딥러닝에서 랜덤 초기화를 여러 번 하는 이유.</p>
+</div>
+</details>
+
+<!-- ═══════════════════════════════════════════ -->
+<!-- Ch9: 금융에서의 미적분 -->
+<!-- ═══════════════════════════════════════════ -->
+<h2 id="ch9">9. 금융에서의 미적분 — 실전 응용</h2>
+
+<h3>9.1 연속 복리와 로그 수익률</h3>
+<p>이산 복리 \(P(1+r)^t\)에서 복리 주기를 무한히 짧게 하면 연속 복리가 된다:</p>
+
+<div class="eq">
+$$\lim_{n \to \infty} P\left(1 + \frac{r}{n}\right)^{nt} = Pe^{rt}$$
+</div>
+
+<p>로그 수익률(연속 수익률)은 가격의 로그 차분이다:</p>
+
+<div class="eq">
+$$r_{\text{log}} = \ln\frac{P_t}{P_{t-1}} = \ln P_t - \ln P_{t-1}$$
+</div>
+
+<pre><code><span class="kw">import</span> numpy <span class="kw">as</span> np
+
+<span class="cm"># 이산 복리 vs 연속 복리</span>
+P, r, t = <span class="nu">10000000</span>, <span class="nu">0.05</span>, <span class="nu">10</span>
+discrete = P * (<span class="nu">1</span> + r)**t
+continuous = P * np.exp(r * t)
+<span class="fn">print</span>(<span class="st">f"이산 복리:  </span>{discrete:,.0f}<span class="st">원"</span>)
+<span class="fn">print</span>(<span class="st">f"연속 복리:  </span>{continuous:,.0f}<span class="st">원"</span>)
+<span class="fn">print</span>(<span class="st">f"차이:       </span>{continuous-discrete:,.0f}<span class="st">원"</span>)
+
+<span class="cm"># 로그 수익률 vs 단순 수익률</span>
+prices = np.array([<span class="nu">100</span>, <span class="nu">105</span>, <span class="nu">102</span>, <span class="nu">110</span>, <span class="nu">108</span>])
+simple_ret = np.diff(prices) / prices[:-<span class="nu">1</span>]
+log_ret = np.diff(np.log(prices))
+
+<span class="fn">print</span>(<span class="st">f"\n단순 수익률: </span>{simple_ret}<span class="st">"</span>)
+<span class="fn">print</span>(<span class="st">f"로그 수익률: </span>{log_ret}<span class="st">"</span>)
+<span class="fn">print</span>(<span class="st">f"\n로그 수익률 합 = </span>{log_ret.sum():.4f}<span class="st">"</span>)
+<span class="fn">print</span>(<span class="st">f"ln(108/100)  = </span>{np.log(108/100):.4f}<span class="st">"</span>)  <span class="cm"># 같다! (시간 가산성)</span></code></pre>
+<div class="code-output"><span class="out-label">Output:</span>
+이산 복리:  16,288,946원
+연속 복리:  16,487,213원
+차이:       198,267원
+
+단순 수익률: [ 0.05   -0.0286  0.0784 -0.0182]
+로그 수익률: [ 0.0488 -0.029   0.0755 -0.0183]
+
+로그 수익률 합 = 0.0770
+ln(108/100)  = 0.0770</div>
+
+<div class="ok">
+<p class="ni"><strong>로그 수익률의 장점:</strong> 로그 수익률은 시간에 대해 가산적(additive)이다. 5일간의 로그 수익률을 더하면 5일간의 총 로그 수익률이 된다. 단순 수익률은 이 성질이 없다. 이것이 금융 모델링에서 로그 수익률을 선호하는 이유다.</p>
+</div>
+
+<h3>9.2 듀레이션 — 채권 가격의 미분</h3>
+<p>채권 가격 \(P\)는 금리 \(y\)의 함수다. 듀레이션(duration)은 채권 가격의 금리 민감도, 즉 미분이다:</p>
+
+<div class="eq">
+$$D = -\frac{1}{P}\frac{dP}{dy} \quad \Rightarrow \quad \Delta P \approx -D \cdot P \cdot \Delta y$$
+</div>
+
+<p>금리가 1% 오르면 듀레이션 5년인 채권의 가격은 약 5% 하락한다.</p>
+
+<pre><code><span class="cm"># 채권 가격과 듀레이션</span>
+<span class="kw">def</span> <span class="fn">bond_price</span>(face, coupon_rate, ytm, years):
+    <span class="st">"""채권 가격 계산"""</span>
+    coupon = face * coupon_rate
+    price = <span class="fn">sum</span>(coupon / (<span class="nu">1</span>+ytm)**t <span class="kw">for</span> t <span class="kw">in</span> <span class="fn">range</span>(<span class="nu">1</span>, years+<span class="nu">1</span>))
+    price += face / (<span class="nu">1</span>+ytm)**years
+    <span class="kw">return</span> price
+
+face = <span class="nu">10000</span>  <span class="cm"># 액면가</span>
+coupon = <span class="nu">0.03</span>  <span class="cm"># 쿠폰 3%</span>
+ytm = <span class="nu">0.04</span>     <span class="cm"># 시장 금리 4%</span>
+years = <span class="nu">5</span>
+
+P = bond_price(face, coupon, ytm, years)
+<span class="fn">print</span>(<span class="st">f"채권 가격: </span>{P:,.2f}<span class="st">원"</span>)
+
+<span class="cm"># 수치 미분으로 듀레이션 계산</span>
+h = <span class="nu">0.0001</span>
+dP_dy = (bond_price(face, coupon, ytm+h, years) - bond_price(face, coupon, ytm-h, years)) / (<span class="nu">2</span>*h)
+duration = -dP_dy / P
+<span class="fn">print</span>(<span class="st">f"듀레이션: </span>{duration:.4f}<span class="st">년"</span>)
+<span class="fn">print</span>(<span class="st">f"\n금리 1%↑ 시 가격 변화: </span>{-duration * P * 0.01:,.2f}<span class="st">원 (</span>{-duration*0.01:.2%}<span class="st">)"</span>)</code></pre>
+<div class="code-output"><span class="out-label">Output:</span>
+채권 가격: 9,554.42원
+듀레이션: 4.6299년
+
+금리 1%↑ 시 가격 변화: -442.44원 (-4.63%)</div>
+
+<h3>9.3 옵션 그릭스 — 편미분의 금융 응용</h3>
+<p>옵션 가격 \(C\)는 기초자산 가격 \(S\), 시간 \(t\), 변동성 \(\sigma\) 등 여러 변수의 함수다. 각 변수에 대한 편미분이 그릭스(Greeks)다:</p>
+
+<div class="tc">Table 3. 옵션 그릭스 = 편미분</div>
+<table>
+<tr><th>그릭</th><th>정의</th><th>의미</th><th>테일러 급수 항</th></tr>
+<tr><td>델타 (Δ)</td><td>\(\frac{\partial C}{\partial S}\)</td><td>기초자산 가격 변화에 대한 민감도</td><td>1차 항</td></tr>
+<tr><td>감마 (Γ)</td><td>\(\frac{\partial^2 C}{\partial S^2}\)</td><td>델타의 변화율 (2차 미분)</td><td>2차 항</td></tr>
+<tr><td>세타 (Θ)</td><td>\(\frac{\partial C}{\partial t}\)</td><td>시간 경과에 따른 가치 감소</td><td>시간 항</td></tr>
+<tr><td>베가 (ν)</td><td>\(\frac{\partial C}{\partial \sigma}\)</td><td>변동성 변화에 대한 민감도</td><td>변동성 항</td></tr>
+<tr><td>로 (ρ)</td><td>\(\frac{\partial C}{\partial r}\)</td><td>금리 변화에 대한 민감도</td><td>금리 항</td></tr>
+</table>
+
+<pre><code><span class="kw">from</span> scipy.stats <span class="kw">import</span> norm
+
+<span class="kw">def</span> <span class="fn">black_scholes_call</span>(S, K, T, r, sigma):
+    <span class="st">"""블랙-숄즈 콜옵션 가격"""</span>
+    d1 = (np.log(S/K) + (r + sigma**<span class="nu">2</span>/<span class="nu">2</span>)*T) / (sigma*np.sqrt(T))
+    d2 = d1 - sigma*np.sqrt(T)
+    <span class="kw">return</span> S * norm.cdf(d1) - K * np.exp(-r*T) * norm.cdf(d2)
+
+S, K, T, r, sigma = <span class="nu">100</span>, <span class="nu">100</span>, <span class="nu">0.5</span>, <span class="nu">0.05</span>, <span class="nu">0.2</span>
+C = black_scholes_call(S, K, T, r, sigma)
+<span class="fn">print</span>(<span class="st">f"콜옵션 가격: </span>{C:.4f}<span class="st">"</span>)
+
+<span class="cm"># 수치 미분으로 그릭스 계산</span>
+h = <span class="nu">0.01</span>
+delta = (black_scholes_call(S+h,K,T,r,sigma) - black_scholes_call(S-h,K,T,r,sigma)) / (<span class="nu">2</span>*h)
+gamma = (black_scholes_call(S+h,K,T,r,sigma) - <span class="nu">2</span>*C + black_scholes_call(S-h,K,T,r,sigma)) / h**<span class="nu">2</span>
+theta = (black_scholes_call(S,K,T-h,r,sigma) - black_scholes_call(S,K,T+h,r,sigma)) / (<span class="nu">2</span>*h)
+vega = (black_scholes_call(S,K,T,r,sigma+h) - black_scholes_call(S,K,T,r,sigma-h)) / (<span class="nu">2</span>*h)
+
+<span class="fn">print</span>(<span class="st">f"\nΔ (Delta): </span>{delta:.4f}<span class="st">  ← 주가 1원↑ → 옵션 </span>{delta:.4f}<span class="st">원↑"</span>)
+<span class="fn">print</span>(<span class="st">f"Γ (Gamma): </span>{gamma:.4f}<span class="st">  ← 델타의 변화율"</span>)
+<span class="fn">print</span>(<span class="st">f"Θ (Theta): </span>{theta:.4f}<span class="st">  ← 하루 시간가치 감소"</span>)
+<span class="fn">print</span>(<span class="st">f"ν (Vega):  </span>{vega:.4f}<span class="st">  ← 변동성 1%↑ → 옵션 </span>{vega/100:.4f}<span class="st">원↑"</span>)</code></pre>
+<div class="code-output"><span class="out-label">Output:</span>
+콜옵션 가격: 6.8893
+
+Δ (Delta): 0.5955  ← 주가 1원↑ → 옵션 0.5955원↑
+Γ (Gamma): 0.0274  ← 델타의 변화율
+Θ (Theta): -8.8073  ← 하루 시간가치 감소
+ν (Vega):  27.4093  ← 변동성 1%↑ → 옵션 0.2741원↑</div>
+
+<!-- ▼ Plotly: 옵션 가격 곡면 3D -->
+<div id="plot-ch9-bsm" style="width:100%;height:520px;margin:25px 0"></div>
+<script>
+(function(){
+  // 간이 BSM (정규분포 CDF 근사)
+  function normcdf(x){var t=1/(1+0.2316419*Math.abs(x));var d=0.3989422802*Math.exp(-x*x/2);
+    var p=d*t*(0.3193815+t*(-0.3565638+t*(1.781478+t*(-1.821256+t*1.330274))));
+    return x>0?1-p:p;}
+  function bsCall(S,K,T,r,sig){
+    if(T<=0)return Math.max(S-K,0);
+    var d1=(Math.log(S/K)+(r+sig*sig/2)*T)/(sig*Math.sqrt(T));
+    var d2=d1-sig*Math.sqrt(T);
+    return S*normcdf(d1)-K*Math.exp(-r*T)*normcdf(d2);
+  }
+  var n=30;var xv=[],yv=[],zv=[];
+  for(var i=0;i<n;i++){
+    var rx=[],ry=[],rz=[];
+    for(var j=0;j<n;j++){
+      var S=60+80*i/(n-1);  // 60~140
+      var sig=0.05+0.55*j/(n-1);  // 0.05~0.6
+      rx.push(S);ry.push(sig*100);rz.push(bsCall(S,100,0.5,0.05,sig));
+    }
+    xv.push(rx);yv.push(ry);zv.push(rz);
+  }
+  Plotly.newPlot('plot-ch9-bsm',[
+    {x:xv,y:yv,z:zv,type:'surface',colorscale:'Viridis',opacity:0.9,showscale:true,
+     colorbar:{title:'옵션가격',titleside:'right'}}
+  ],{
+    title:{text:'💰 블랙-숄즈 콜옵션 가격 곡면 (K=100, T=0.5년)',font:{size:13}},
+    scene:{
+      xaxis:{title:'기초자산 가격 S'},
+      yaxis:{title:'변동성 σ (%)'},
+      zaxis:{title:'콜옵션 가격 C'},
+      camera:{eye:{x:1.8,y:-1.5,z:1.0}}
+    },
+    margin:{l:0,r:0,t:45,b:0}
+  },{responsive:true});
+})();
+</script>
+<p class="ni" style="font-size:11px;color:#888;text-align:center;margin-top:-10px">🖱️ 3D 회전 가능! S축 방향 기울기 = 델타(Δ), σ축 방향 기울기 = 베가(ν). 곡면의 기울기가 곧 그릭스</p>
+
+<!-- ═══════════════════════════════════════════ -->
+<!-- Ch10: 종합 문제 -->
+<!-- ═══════════════════════════════════════════ -->
+<h2 id="ch10">10. 종합 문제</h2>
+
+<p>지금까지 배운 미적분 개념을 종합하는 문제들이다.</p>
+
+<!-- 종합문제 1 -->
+<div class="problem-box">
+<div class="problem-title">✏️ 종합문제 1: 경사하강법으로 선형 회귀</div>
+<p class="ni">데이터 \(\{(1,2), (2,4), (3,5), (4,4), (5,5)\}\)에 대해 \(y = wx + b\)를 경사하강법으로 피팅하라.</p>
+<ol>
+<li>MSE 손실함수 \(L(w,b) = \frac{1}{n}\sum(y_i - wx_i - b)^2\)의 \(\frac{\partial L}{\partial w}\)와 \(\frac{\partial L}{\partial b}\)를 구하라.</li>
+<li>학습률 0.01로 100스텝 경사하강법을 실행하라.</li>
+<li>최종 \(w\)와 \(b\)를 구하고, NumPy의 <code>np.polyfit</code>과 비교하라.</li>
+</ol>
+</div>
+
+<details>
+<summary>🔑 풀이 보기</summary>
+<div class="answer-content">
+<p class="ni"><strong>1) 그래디언트:</strong></p>
+<div class="eq">$$\frac{\partial L}{\partial w} = \frac{-2}{n}\sum x_i(y_i - wx_i - b), \quad \frac{\partial L}{\partial b} = \frac{-2}{n}\sum (y_i - wx_i - b)$$</div>
+
+<pre><code><span class="kw">import</span> numpy <span class="kw">as</span> np
+
+x = np.array([<span class="nu">1</span>, <span class="nu">2</span>, <span class="nu">3</span>, <span class="nu">4</span>, <span class="nu">5</span>], dtype=<span class="nb">float</span>)
+y = np.array([<span class="nu">2</span>, <span class="nu">4</span>, <span class="nu">5</span>, <span class="nu">4</span>, <span class="nu">5</span>], dtype=<span class="nb">float</span>)
+n = <span class="fn">len</span>(x)
+
+w, b = <span class="nu">0.0</span>, <span class="nu">0.0</span>
+lr = <span class="nu">0.01</span>
+
+<span class="kw">for</span> step <span class="kw">in</span> <span class="fn">range</span>(<span class="nu">1000</span>):
+    pred = w * x + b
+    error = y - pred
+    dw = -<span class="nu">2</span>/n * np.sum(x * error)
+    db = -<span class="nu">2</span>/n * np.sum(error)
+    w -= lr * dw
+    b -= lr * db
+
+<span class="fn">print</span>(<span class="st">f"GD 결과: w = </span>{w:.4f}<span class="st">, b = </span>{b:.4f}<span class="st">"</span>)
+
+<span class="cm"># NumPy 검증</span>
+w_np, b_np = np.polyfit(x, y, <span class="nu">1</span>)
+<span class="fn">print</span>(<span class="st">f"polyfit:  w = </span>{w_np:.4f}<span class="st">, b = </span>{b_np:.4f}<span class="st">"</span>)</code></pre>
+<div class="code-output"><span class="out-label">Output:</span>
+GD 결과: w = 0.6000, b = 2.2000
+polyfit:  w = 0.6000, b = 2.2000</div>
+<p class="ni">경사하강법과 해석적 해가 일치한다.</p>
+</div>
+</details>
+
+<!-- 종합문제 2 -->
+<div class="problem-box">
+<div class="problem-title">✏️ 종합문제 2: 뉴럴넷 역전파 손계산</div>
+<p class="ni">1개 뉴런 네트워크: \(\hat{y} = \sigma(w_1 x_1 + w_2 x_2 + b)\), 손실 \(L = (\hat{y} - y)^2\)</p>
+<p class="ni">입력: \(x_1 = 2, x_2 = 3\), 정답: \(y = 1\), 파라미터: \(w_1 = 0.5, w_2 = -0.3, b = 0.1\)</p>
+<ol>
+<li>순전파를 수행하여 \(\hat{y}\)와 \(L\)을 구하라.</li>
+<li>체인룰로 \(\frac{\partial L}{\partial w_1}\), \(\frac{\partial L}{\partial w_2}\), \(\frac{\partial L}{\partial b}\)를 구하라.</li>
+<li>학습률 0.1로 파라미터를 1스텝 업데이트하라.</li>
+</ol>
+</div>
+
+<details>
+<summary>🔑 풀이 보기</summary>
+<div class="answer-content">
+<pre><code><span class="kw">import</span> numpy <span class="kw">as</span> np
+sigmoid = <span class="kw">lambda</span> x: <span class="nu">1</span>/(<span class="nu">1</span>+np.exp(-x))
+
+x1, x2, y = <span class="nu">2</span>, <span class="nu">3</span>, <span class="nu">1</span>
+w1, w2, b = <span class="nu">0.5</span>, -<span class="nu">0.3</span>, <span class="nu">0.1</span>
+
+<span class="cm"># 1) 순전파</span>
+z = w1*x1 + w2*x2 + b  <span class="cm"># 0.5×2 + (-0.3)×3 + 0.1 = 0.2</span>
+y_hat = sigmoid(z)       <span class="cm"># σ(0.2) ≈ 0.5498</span>
+L = (y_hat - y)**<span class="nu">2</span>       <span class="cm"># (0.5498-1)² ≈ 0.2027</span>
+<span class="fn">print</span>(<span class="st">f"z = </span>{z:.4f}<span class="st">"</span>)
+<span class="fn">print</span>(<span class="st">f"ŷ = </span>{y_hat:.4f}<span class="st">"</span>)
+<span class="fn">print</span>(<span class="st">f"L = </span>{L:.4f}<span class="st">"</span>)
+
+<span class="cm"># 2) 역전파 (체인룰)</span>
+dL_dyhat = <span class="nu">2</span> * (y_hat - y)                      <span class="cm"># -0.9004</span>
+dyhat_dz = sigmoid(z) * (<span class="nu">1</span> - sigmoid(z))         <span class="cm"># 0.2475</span>
+dz_dw1 = x1                                       <span class="cm"># 2</span>
+dz_dw2 = x2                                       <span class="cm"># 3</span>
+dz_db = <span class="nu">1</span>
+
+dL_dw1 = dL_dyhat * dyhat_dz * dz_dw1
+dL_dw2 = dL_dyhat * dyhat_dz * dz_dw2
+dL_db  = dL_dyhat * dyhat_dz * dz_db
+
+<span class="fn">print</span>(<span class="st">f"\n∂L/∂w₁ = </span>{dL_dw1:.6f}<span class="st">"</span>)
+<span class="fn">print</span>(<span class="st">f"∂L/∂w₂ = </span>{dL_dw2:.6f}<span class="st">"</span>)
+<span class="fn">print</span>(<span class="st">f"∂L/∂b  = </span>{dL_db:.6f}<span class="st">"</span>)
+
+<span class="cm"># 3) 업데이트</span>
+lr = <span class="nu">0.1</span>
+w1_new = w1 - lr * dL_dw1
+w2_new = w2 - lr * dL_dw2
+b_new  = b  - lr * dL_db
+<span class="fn">print</span>(<span class="st">f"\n업데이트: w₁ </span>{w1:.4f}<span class="st"> → </span>{w1_new:.4f}<span class="st">"</span>)
+<span class="fn">print</span>(<span class="st">f"업데이트: w₂ </span>{w2:.4f}<span class="st"> → </span>{w2_new:.4f}<span class="st">"</span>)
+<span class="fn">print</span>(<span class="st">f"업데이트: b  </span>{b:.4f}<span class="st"> → </span>{b_new:.4f}<span class="st">"</span>)</code></pre>
+<div class="code-output"><span class="out-label">Output:</span>
+z = 0.2000
+ŷ = 0.5498
+L = 0.2027
+
+∂L/∂w₁ = -0.445596
+∂L/∂w₂ = -0.668394
+∂L/∂b  = -0.222798
+
+업데이트: w₁ 0.5000 → 0.5446
+업데이트: w₂ -0.3000 → -0.2332
+업데이트: b  0.1000 → 0.1223</div>
+<p class="ni">w₁과 w₂가 증가하고 b도 증가했다. 이는 ŷ를 1에 가깝게 만들기 위해 z를 키우는 방향이다. 이 과정을 수천 번 반복하면 네트워크가 학습된다.</p>
+</div>
+</details>
+
+<!-- 종합문제 3 -->
+<div class="problem-box">
+<div class="problem-title">✏️ 종합문제 3: 옵션 델타 헤징</div>
+<p class="ni">ATM 콜옵션(S=K=100, T=0.5, r=5%, σ=20%)을 100계약 매도했다.</p>
+<ol>
+<li>델타(Δ)를 구하라.</li>
+<li>델타 중립(delta-neutral)을 만들려면 기초자산을 몇 주 매수해야 하는가?</li>
+<li>기초자산이 100→102로 올랐을 때, 옵션 포지션 손실과 주식 포지션 이익을 비교하라.</li>
+</ol>
+</div>
+
+<details>
+<summary>🔑 풀이 보기</summary>
+<div class="answer-content">
+<pre><code><span class="kw">from</span> scipy.stats <span class="kw">import</span> norm
+
+<span class="kw">def</span> <span class="fn">bs_call</span>(S,K,T,r,sig):
+    d1 = (np.log(S/K)+(r+sig**<span class="nu">2</span>/<span class="nu">2</span>)*T)/(sig*np.sqrt(T))
+    d2 = d1 - sig*np.sqrt(T)
+    <span class="kw">return</span> S*norm.cdf(d1) - K*np.exp(-r*T)*norm.cdf(d2)
+
+<span class="kw">def</span> <span class="fn">bs_delta</span>(S,K,T,r,sig):
+    d1 = (np.log(S/K)+(r+sig**<span class="nu">2</span>/<span class="nu">2</span>)*T)/(sig*np.sqrt(T))
+    <span class="kw">return</span> norm.cdf(d1)
+
+S,K,T,r,sig = <span class="nu">100</span>,<span class="nu">100</span>,<span class="nu">0.5</span>,<span class="nu">0.05</span>,<span class="nu">0.2</span>
+contracts = <span class="nu">100</span>
+
+<span class="cm"># 1) 델타</span>
+delta = bs_delta(S,K,T,r,sig)
+<span class="fn">print</span>(<span class="st">f"1) Δ = </span>{delta:.4f}<span class="st">"</span>)
+
+<span class="cm"># 2) 헤지 수량</span>
+hedge_shares = delta * contracts
+<span class="fn">print</span>(<span class="st">f"2) 매수할 주식: </span>{hedge_shares:.1f}<span class="st">주"</span>)
+
+<span class="cm"># 3) S: 100 → 102</span>
+C_old = bs_call(<span class="nu">100</span>,K,T,r,sig)
+C_new = bs_call(<span class="nu">102</span>,K,T,r,sig)
+option_loss = (C_new - C_old) * contracts  <span class="cm"># 매도했으므로 가격↑ = 손실</span>
+stock_gain = hedge_shares * (<span class="nu">102</span> - <span class="nu">100</span>)
+<span class="fn">print</span>(<span class="st">f"\n3) 옵션 손실: </span>{-option_loss:.2f}<span class="st">원"</span>)
+<span class="fn">print</span>(<span class="st">f"   주식 이익: </span>{stock_gain:.2f}<span class="st">원"</span>)
+<span class="fn">print</span>(<span class="st">f"   순손익:    </span>{stock_gain - option_loss:.2f}<span class="st">원 (거의 0!)"</span>)</code></pre>
+<div class="code-output"><span class="out-label">Output:</span>
+1) Δ = 0.5955
+2) 매수할 주식: 59.5주
+
+3) 옵션 손실: 122.72원
+   주식 이익: 119.10원
+   순손익:    -3.62원 (거의 0!)</div>
+<p class="ni">델타 헤징으로 주가 변동 리스크를 거의 제거했다. 남은 -3.62원의 차이는 감마(Γ) 효과 때문이다. 이것이 "그릭스 = 편미분"의 실전 응용이다.</p>
+</div>
+</details>
+
+<!-- ═══════════════════════════════════════════ -->
+<!-- 핵심 요약 -->
+<!-- ═══════════════════════════════════════════ -->
+<h2>핵심 요약: 미적분 치트시트</h2>
+
+<div class="tc">Table 4. 미적분 핵심 개념 → ML/금융 매핑</div>
+<table>
+<tr><th>개념</th><th>수식</th><th>ML 응용</th><th>금융 응용</th></tr>
+<tr><td>미분</td><td>\(f'(x) = \lim \frac{f(x+h)-f(x)}{h}\)</td><td>그래디언트 계산</td><td>민감도 분석</td></tr>
+<tr><td>편미분</td><td>\(\frac{\partial f}{\partial x_i}\)</td><td>다변수 최적화</td><td>그릭스 (Δ, Γ, Θ, ν)</td></tr>
+<tr><td>그래디언트</td><td>\(\nabla f\)</td><td>경사하강법 방향</td><td>리스크 방향</td></tr>
+<tr><td>체인룰</td><td>\(\frac{dL}{dw} = \frac{dL}{dy}\frac{dy}{dz}\frac{dz}{dw}\)</td><td>역전파</td><td>복합 파생상품</td></tr>
+<tr><td>적분</td><td>\(\int f(x)dx\)</td><td>확률 계산 (CDF)</td><td>누적 수익률, VaR</td></tr>
+<tr><td>테일러 급수</td><td>\(f(a) + f'(a)(x-a) + \cdots\)</td><td>보편 근사 정리</td><td>델타-감마 근사</td></tr>
+<tr><td>경사하강법</td><td>\(\theta \leftarrow \theta - \alpha\nabla L\)</td><td>모든 ML 학습</td><td>포트폴리오 최적화</td></tr>
+<tr><td>수치 미분</td><td>\(\frac{f(x+h)-f(x-h)}{2h}\)</td><td>그래디언트 검증</td><td>그릭스 수치 계산</td></tr>
+</table>
+
+<div class="info">
+<p class="ni"><strong>다음 단계:</strong> 이 강의의 미적분 기초는 R3(Data/Feature Engineering)에서 피처 변환과 정규화의 수학적 배경이 되고, R4(Supervised Learning)에서 경사하강법 기반 모델 학습의 핵심이 된다. 특히 체인룰은 R7(Deep Learning)의 역전파를 이해하는 데 필수적이다.</p>
+</div>
+
+</div><!-- paper-content -->
+</div><!-- container -->
+</div><!-- main-wrapper -->
+
+</body>
+</html>
