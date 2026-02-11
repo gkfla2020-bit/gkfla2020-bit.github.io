@@ -7,6 +7,7 @@
 <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
 <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;500&family=Space+Mono:wght@400&family=Inter:wght@300;400&display=swap" rel="stylesheet">
+<script src="https://cdn.plot.ly/plotly-2.27.0.min.js"></script>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
 body{font-family:'Inter',sans-serif;background:#fafaf8;color:#1a1a1a;line-height:1.7;overflow-x:hidden}
@@ -95,13 +96,13 @@ pre{font-size:11px;padding:14px}table{font-size:10px;display:block;overflow-x:au
 <div class="nav-section">
 <div class="nav-section-title">Curriculum</div>
 <ul class="nav-list">
-<li><a class="done" href="../round-01/">R1. Python + Finance <span class="badge badge-done">DONE</span></a></li>
-<li><a class="done" href="../round-02/">R2. Linear Algebra + Stats <span class="badge badge-done">DONE</span></a></li>
-<li><a class="done" href="../round-03/">R3. Data / Feature Eng. <span class="badge badge-done">DONE</span></a></li>
+<li><a class="done" href="../round_01/lecture_01.html">R1. Python + Finance <span class="badge badge-done">DONE</span></a></li>
+<li><a class="done" href="../round_02/lecture_02.html">R2. Linear Algebra + Stats <span class="badge badge-done">DONE</span></a></li>
+<li><a class="done" href="../round_03/lecture_03.html">R3. Data / Feature Eng. <span class="badge badge-done">DONE</span></a></li>
 <li><a class="active" href="#">R4. Supervised Learning <span class="badge">NOW</span></a></li>
 <li><a href="#">R5. Unsupervised + TS</a></li>
-<li><a class="done" href="../round-06/">R6. NLP + Sentiment <span class="badge badge-done">DONE</span></a></li>
-<li><a href="#">R7. Deep Learning</a></li>
+<li><a class="done" href="../round_06/lecture_06.html">R6. NLP + Sentiment <span class="badge badge-done">DONE</span></a></li>
+<li><a class="done" href="../round_07/lecture_07.html">R7. Deep Learning <span class="badge badge-done">DONE</span></a></li>
 <li><a href="#">R8. Convex Opt + Transformer</a></li>
 <li><a href="#">R9. HFT + RL</a></li>
 <li><a href="#">R10. Final Project</a></li>
@@ -488,6 +489,39 @@ Test R²:   0.0198
 
 <p>금융 데이터는 이 가정들을 거의 항상 위반한다. 그래서 선형회귀만으로는 한계가 있고, 정규화(Ridge/Lasso)나 비선형 모델(트리, 앙상블)이 필요하다.</p>
 
+<!-- ══ Plotly: 3D 선형회귀 + 잔차 ══ -->
+<div id="plot-ch3-reg3d" style="width:100%;height:520px;margin:25px 0"></div>
+<p class="ni" style="font-size:12px;color:#888;text-align:center">🖱️ 3D 선형회귀: RSI + 모멘텀 → 수익률 예측 · 드래그로 회전 · 파란 점=실제, 평면=예측</p>
+<script>
+(function(){
+  function mulberry32(a){return function(){a|=0;a=a+0x6D2B79F5|0;var t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296}}
+  var rng=mulberry32(42);
+  function randn(){var u=0,v=0;while(u===0)u=rng();while(v===0)v=rng();return Math.sqrt(-2*Math.log(u))*Math.cos(2*Math.PI*v)}
+  var N=150,x1=[],x2=[],y=[];
+  for(var i=0;i<N;i++){
+    var rsi=30+randn()*15,mom=(rng()-0.5)*0.1;
+    var ret=0.001-0.0003*(rsi-50)+0.15*mom+randn()*0.02;
+    x1.push(rsi);x2.push(mom*100);y.push(ret*100);
+  }
+  // 회귀 평면 계산 (간단 OLS)
+  var mx1=x1.reduce(function(s,v){return s+v},0)/N,mx2=x2.reduce(function(s,v){return s+v},0)/N,my=y.reduce(function(s,v){return s+v},0)/N;
+  var s11=0,s12=0,s1y=0,s22=0,s2y=0;
+  for(var i=0;i<N;i++){var d1=x1[i]-mx1,d2=x2[i]-mx2,dy=y[i]-my;s11+=d1*d1;s12+=d1*d2;s1y+=d1*dy;s22+=d2*d2;s2y+=d2*dy}
+  var det=s11*s22-s12*s12;var b1=(s22*s1y-s12*s2y)/det,b2=(s11*s2y-s12*s1y)/det,b0=my-b1*mx1-b2*mx2;
+  var gx=[],gy=[];for(var i=15;i<=75;i+=3)gx.push(i);for(var i=-8;i<=8;i+=1)gy.push(i);
+  var gz=[];for(var j=0;j<gy.length;j++){var row=[];for(var i=0;i<gx.length;i++)row.push(b0+b1*gx[i]+b2*gy[j]);gz.push(row)}
+  Plotly.newPlot('plot-ch3-reg3d',[
+    {x:x1,y:x2,z:y,mode:'markers',type:'scatter3d',name:'실제 데이터',marker:{size:3,color:y,colorscale:'RdBu',cmin:-5,cmax:5,opacity:0.7}},
+    {x:gx,y:gy,z:gz,type:'surface',name:'회귀 평면',opacity:0.5,colorscale:[[0,'rgba(52,152,219,0.3)'],[1,'rgba(231,76,60,0.3)']],showscale:false}
+  ],{
+    title:{text:'📐 3D 선형회귀: RSI + 모멘텀 → 수익률 예측',font:{size:14}},
+    scene:{xaxis:{title:'RSI'},yaxis:{title:'모멘텀 (%)'},zaxis:{title:'수익률 (%)'},
+      camera:{eye:{x:1.5,y:-1.8,z:0.8}}},
+    margin:{t:50,b:20,l:0,r:0},paper_bgcolor:'#fff'
+  },{responsive:true});
+})();
+</script>
+
 <!-- ═══════════════════════════════════════════ -->
 <!-- Ch4: Ridge / Lasso 정규화 -->
 <!-- ═══════════════════════════════════════════ -->
@@ -582,6 +616,62 @@ plt.show()</code></pre>
 <div class="info">
 <p class="ni"><strong>교재 연동:</strong> MLAT Ch.7 "How ridge regression works"와 "How lasso regression works" 섹션에서 Ridge/Lasso의 기하학적 해석(제약 영역의 모양)과 해 경로(solution path)를 시각적으로 설명한다. Ridge의 제약 영역은 원(circle)이고, Lasso는 다이아몬드(diamond)다. 다이아몬드의 꼭짓점에서 해가 만나면 일부 계수가 정확히 0이 된다 — 이것이 Lasso의 피처 선택 원리다.</p>
 </div>
+
+<!-- ══ Plotly: Ridge vs Lasso 계수 경로 ══ -->
+<div id="plot-ch4-path" style="width:100%;height:480px;margin:25px 0"></div>
+<p class="ni" style="font-size:12px;color:#888;text-align:center">🖱️ Ridge vs Lasso 계수 경로 — α가 커질수록 계수가 축소 · Lasso는 일부 계수가 정확히 0 (피처 선택) · 드롭다운으로 전환</p>
+<script>
+(function(){
+  // Ridge: 계수가 점진적으로 0에 수렴 (절대 0이 되지 않음)
+  // Lasso: 계수가 순차적으로 정확히 0이 됨
+  var feats=['RSI','모멘텀','변동성','SMA비율','MACD','거래량비','BB%B','ATR'];
+  var alphas=[];for(var i=-3;i<=3;i+=0.2)alphas.push(Math.pow(10,i));
+  var colors=['#e74c3c','#3498db','#2ecc71','#f39c12','#9b59b6','#1abc9c','#e67e22','#34495e'];
+  var ols=[0.15,-0.22,0.08,0.18,-0.12,0.05,-0.09,0.03]; // OLS 계수
+
+  // Ridge path: β_ridge = β_ols / (1 + α/λ_i)
+  var ridgeTraces=[];
+  feats.forEach(function(f,fi){
+    var ys=alphas.map(function(a){return ols[fi]/(1+a*0.5)});
+    ridgeTraces.push({x:alphas,y:ys,mode:'lines',name:f,line:{color:colors[fi],width:2},visible:true});
+  });
+
+  // Lasso path: soft thresholding
+  var lassoTraces=[];
+  feats.forEach(function(f,fi){
+    var ys=alphas.map(function(a){
+      var thresh=a*0.02;
+      var v=ols[fi];
+      if(Math.abs(v)<=thresh)return 0;
+      return v>0?v-thresh:v+thresh;
+    });
+    lassoTraces.push({x:alphas,y:ys,mode:'lines',name:f,line:{color:colors[fi],width:2},visible:false});
+  });
+
+  var allTraces=ridgeTraces.concat(lassoTraces);
+  var nf=feats.length;
+  var visRidge=[];for(var i=0;i<nf*2;i++)visRidge.push(i<nf);
+  var visLasso=[];for(var i=0;i<nf*2;i++)visLasso.push(i>=nf);
+
+  Plotly.newPlot('plot-ch4-path',allTraces,{
+    title:{text:'📉 정규화 계수 경로 (Coefficient Path)',font:{size:14}},
+    xaxis:{title:'α (정규화 강도)',type:'log',gridcolor:'#eee'},
+    yaxis:{title:'계수 값 (β)',gridcolor:'#eee',zeroline:true,zerolinecolor:'#333',zerolinewidth:1},
+    legend:{orientation:'h',y:-0.15,font:{size:10}},
+    hovermode:'x unified',
+    plot_bgcolor:'#fafafa',paper_bgcolor:'#fff',margin:{t:80,b:60},
+    updatemenus:[{
+      buttons:[
+        {method:'update',args:[{visible:visRidge}],label:'Ridge (L2)'},
+        {method:'update',args:[{visible:visLasso}],label:'Lasso (L1)'}
+      ],direction:'right',showactive:true,type:'buttons',
+      x:0.02,xanchor:'left',y:1.12,yanchor:'top',
+      bgcolor:'#f0f0f0',bordercolor:'#ccc'
+    }],
+    annotations:[{x:2,y:0,text:'← α 작음 (과적합) | α 큼 (과소적합) →',showarrow:false,font:{size:10,color:'#888'}}]
+  },{responsive:true});
+})();
+</script>
 
 <!-- ═══════════════════════════════════════════ -->
 <!-- Ch5: 로지스틱 회귀 -->
@@ -850,6 +940,62 @@ MLAT Ch.7에서 Jansen은 금융 시계열 예측에서 <strong>LightGBM이 가�
 </p>
 </div>
 
+<!-- ══ Plotly: 시그모이드 함수 + 2D 결정 경계 ══ -->
+<div style="display:flex;flex-wrap:wrap;gap:10px;margin:25px 0">
+<div id="plot-ch5-sigmoid" style="flex:1;min-width:400px;height:380px"></div>
+<div id="plot-ch5-boundary" style="flex:1;min-width:400px;height:380px"></div>
+</div>
+<p class="ni" style="font-size:12px;color:#888;text-align:center">🖱️ 좌: 시그모이드 함수 (z→확률 변환) · 우: 로지스틱 회귀 결정 경계 (RSI vs 모멘텀으로 상승/하락 분류)</p>
+<script>
+(function(){
+  // 시그모이드 함수
+  var zs=[];for(var z=-8;z<=8;z+=0.1)zs.push(z);
+  var sig=zs.map(function(z){return 1/(1+Math.exp(-z))});
+  Plotly.newPlot('plot-ch5-sigmoid',[
+    {x:zs,y:sig,mode:'lines',name:'σ(z)=1/(1+e⁻ᶻ)',line:{color:'#e74c3c',width:3}},
+    {x:[-8,8],y:[0.5,0.5],mode:'lines',name:'임계값 0.5',line:{color:'#999',dash:'dash',width:1.5}},
+    {x:[0,0],y:[0,1],mode:'lines',showlegend:false,line:{color:'#999',dash:'dot',width:1}}
+  ],{
+    title:{text:'σ(z) 시그모이드 함수',font:{size:13}},
+    xaxis:{title:'z = β₀ + β₁x₁ + β₂x₂',gridcolor:'#eee'},
+    yaxis:{title:'P(상승)',gridcolor:'#eee',range:[-0.05,1.05]},
+    legend:{x:0.02,y:0.98},
+    plot_bgcolor:'#fafafa',paper_bgcolor:'#fff',margin:{t:40,b:50,l:50,r:10},
+    annotations:[
+      {x:3,y:0.95,text:'z > 0 → P > 0.5 → 상승',showarrow:false,font:{size:10,color:'#27ae60'}},
+      {x:-3,y:0.05,text:'z < 0 → P < 0.5 → 하락',showarrow:false,font:{size:10,color:'#e74c3c'}}
+    ]
+  },{responsive:true});
+
+  // 2D 결정 경계
+  function mulberry32(a){return function(){a|=0;a=a+0x6D2B79F5|0;var t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296}}
+  var rng=mulberry32(77);
+  function randn(){var u=0,v=0;while(u===0)u=rng();while(v===0)v=rng();return Math.sqrt(-2*Math.log(u))*Math.cos(2*Math.PI*v)}
+  var up_x=[],up_y=[],dn_x=[],dn_y=[];
+  for(var i=0;i<80;i++){
+    var rsi=25+randn()*12,mom=(rng()-0.3)*8;
+    up_x.push(rsi);up_y.push(mom);
+  }
+  for(var i=0;i<80;i++){
+    var rsi=55+randn()*12,mom=(rng()-0.7)*8;
+    dn_x.push(rsi);dn_y.push(mom);
+  }
+  // 결정 경계: 대략 RSI=40 근처 대각선
+  var bx=[20,70],by=[6,-6];
+  Plotly.newPlot('plot-ch5-boundary',[
+    {x:up_x,y:up_y,mode:'markers',name:'상승 (y=1)',marker:{color:'#27ae60',size:6,symbol:'circle'}},
+    {x:dn_x,y:dn_y,mode:'markers',name:'하락 (y=0)',marker:{color:'#e74c3c',size:6,symbol:'x'}},
+    {x:bx,y:by,mode:'lines',name:'결정 경계',line:{color:'#2c3e50',width:2.5,dash:'dash'}}
+  ],{
+    title:{text:'로지스틱 회귀 결정 경계',font:{size:13}},
+    xaxis:{title:'RSI',gridcolor:'#eee'},
+    yaxis:{title:'모멘텀 (%)',gridcolor:'#eee'},
+    legend:{x:0.02,y:0.98},
+    plot_bgcolor:'#fafafa',paper_bgcolor:'#fff',margin:{t:40,b:50,l:50,r:10}
+  },{responsive:true});
+})();
+</script>
+
 
 <!-- ═══════════════════════════════════════════ -->
 <!-- Ch6: 모델 평가 지표 -->
@@ -926,6 +1072,70 @@ ax.legend(loc=<span class="st">"lower right"</span>)
 ax.grid(<span class="kw">True</span>, alpha=<span class="nu">0.3</span>)
 plt.tight_layout()
 plt.show()</code></pre>
+
+<!-- ══ Plotly: ROC 곡선 비교 + 인터랙티브 Confusion Matrix ══ -->
+<div style="display:flex;flex-wrap:wrap;gap:10px;margin:25px 0">
+<div id="plot-ch6-roc" style="flex:1;min-width:420px;height:420px"></div>
+<div id="plot-ch6-cm" style="flex:1;min-width:380px;height:420px"></div>
+</div>
+<p class="ni" style="font-size:12px;color:#888;text-align:center">🖱️ 좌: 3개 모델 ROC 곡선 비교 (AUC가 클수록 좋음) · 우: Confusion Matrix 히트맵 · 마우스 오버로 수치 확인</p>
+<script>
+(function(){
+  // ROC 곡선: 3개 모델
+  function genROC(auc,n){
+    var pts=[[0,0]];
+    for(var i=1;i<n;i++){
+      var t=i/n;
+      var fpr=t;
+      var tpr=1-Math.pow(1-t,1/(1-auc+0.01));
+      tpr=Math.min(1,Math.max(0,tpr+(Math.random()-0.5)*0.02));
+      pts.push([fpr,tpr]);
+    }
+    pts.push([1,1]);pts.sort(function(a,b){return a[0]-b[0]});
+    return pts;
+  }
+  var models=[
+    {name:'LightGBM (AUC=0.62)',auc:0.62,color:'#e74c3c'},
+    {name:'로지스틱 회귀 (AUC=0.56)',auc:0.56,color:'#3498db'},
+    {name:'Random Forest (AUC=0.59)',auc:0.59,color:'#2ecc71'}
+  ];
+  var rocTraces=[];
+  models.forEach(function(m){
+    var pts=genROC(m.auc,50);
+    rocTraces.push({x:pts.map(function(p){return p[0]}),y:pts.map(function(p){return p[1]}),
+      mode:'lines',name:m.name,line:{color:m.color,width:2.5}});
+  });
+  rocTraces.push({x:[0,1],y:[0,1],mode:'lines',name:'랜덤 (AUC=0.5)',line:{color:'#999',dash:'dash',width:1.5}});
+  Plotly.newPlot('plot-ch6-roc',rocTraces,{
+    title:{text:'📈 ROC 곡선 비교 (주가 방향 예측)',font:{size:13}},
+    xaxis:{title:'False Positive Rate',gridcolor:'#eee',range:[0,1]},
+    yaxis:{title:'True Positive Rate',gridcolor:'#eee',range:[0,1]},
+    legend:{x:0.45,y:0.15,font:{size:10}},
+    plot_bgcolor:'#fafafa',paper_bgcolor:'#fff',margin:{t:40,b:50,l:50,r:10}
+  },{responsive:true});
+
+  // Confusion Matrix
+  var cm=[[85,42],[38,95]]; // TP=95, TN=85, FP=42, FN=38
+  var labels=['하락 (0)','상승 (1)'];
+  var annots=[];
+  var texts=[['TN=85','FP=42'],['FN=38','TP=95']];
+  for(var i=0;i<2;i++)for(var j=0;j<2;j++){
+    annots.push({x:labels[j],y:labels[i],text:texts[i][j]+'<br>('+cm[i][j]+'건)',
+      showarrow:false,font:{size:14,color:cm[i][j]>60?'white':'black'}});
+  }
+  Plotly.newPlot('plot-ch6-cm',[{
+    z:cm,x:labels,y:labels,type:'heatmap',
+    colorscale:[[0,'#f5f5f5'],[1,'#2c3e50']],showscale:false,
+    hovertemplate:'실제: %{y}<br>예측: %{x}<br>건수: %{z}<extra></extra>'
+  }],{
+    title:{text:'📊 Confusion Matrix (LightGBM)',font:{size:13}},
+    xaxis:{title:'예측 (Predicted)',side:'bottom'},
+    yaxis:{title:'실제 (Actual)',autorange:'reversed'},
+    plot_bgcolor:'#fff',paper_bgcolor:'#fff',margin:{t:40,b:50,l:80,r:10},
+    annotations:annots
+  },{responsive:true});
+})();
+</script>
 
 <!-- ═══════════════════════════════════════════ -->
 <!-- Ch7: 교차검증과 과적합 -->
@@ -1004,6 +1214,49 @@ Fold 5: Accuracy=0.5389, AUC=0.5567
 <div class="info">
 <p class="ni"><strong>교재 연동:</strong> MLAT Ch.6 "How to select a model using cross-validation"에서 교차검증의 다양한 변형을 다룬다. 특히 금융에서는 Purged K-Fold CV(학습/테스트 사이에 갭을 두어 정보 누출 방지)가 더 엄격한 방법이다. MLAT Ch.7에서는 GridSearchCV를 사용한 하이퍼파라미터 튜닝 예제를 제공한다.</p>
 </div>
+
+<!-- ══ Plotly: Bias-Variance Tradeoff + 과적합 곡선 ══ -->
+<div id="plot-ch7-bv" style="width:100%;height:450px;margin:25px 0"></div>
+<p class="ni" style="font-size:12px;color:#888;text-align:center">🖱️ 모델 복잡도에 따른 Train/Test 오차 — 최적 복잡도에서 Test 오차가 최소 · 그 이후는 과적합</p>
+<script>
+(function(){
+  var complexity=[];for(var i=1;i<=20;i++)complexity.push(i);
+  // Train error: 복잡도 증가 → 단조 감소
+  var trainErr=complexity.map(function(c){return 0.5*Math.exp(-0.3*c)+0.02});
+  // Test error: U자형 (최적점 이후 증가)
+  var testErr=complexity.map(function(c){return 0.3*Math.exp(-0.25*c)+0.005*c*c/100+0.08+(c>12?0.02*(c-12):0)});
+  // Bias: 감소
+  var bias=complexity.map(function(c){return 0.45*Math.exp(-0.3*c)+0.03});
+  // Variance: 증가
+  var variance=complexity.map(function(c){return 0.01+0.003*c*c/10});
+
+  var optIdx=0,minTest=999;
+  testErr.forEach(function(v,i){if(v<minTest){minTest=v;optIdx=i}});
+
+  Plotly.newPlot('plot-ch7-bv',[
+    {x:complexity,y:trainErr,mode:'lines',name:'Train Error',line:{color:'#3498db',width:2.5}},
+    {x:complexity,y:testErr,mode:'lines',name:'Test Error',line:{color:'#e74c3c',width:2.5}},
+    {x:complexity,y:bias,mode:'lines',name:'Bias²',line:{color:'#f39c12',width:1.5,dash:'dot'}},
+    {x:complexity,y:variance,mode:'lines',name:'Variance',line:{color:'#9b59b6',width:1.5,dash:'dot'}},
+    {x:[complexity[optIdx]],y:[testErr[optIdx]],mode:'markers',name:'최적 복잡도',
+     marker:{color:'#27ae60',size:14,symbol:'star'}}
+  ],{
+    title:{text:'⚖️ Bias-Variance Tradeoff — 모델 복잡도 vs 오차',font:{size:14}},
+    xaxis:{title:'모델 복잡도 (예: 트리 깊이, 피처 수)',gridcolor:'#eee'},
+    yaxis:{title:'오차 (Error)',gridcolor:'#eee',range:[0,0.6]},
+    legend:{orientation:'h',y:-0.15},
+    hovermode:'x unified',
+    plot_bgcolor:'#fafafa',paper_bgcolor:'#fff',margin:{t:50,b:60},
+    shapes:[{type:'line',x0:complexity[optIdx],x1:complexity[optIdx],y0:0,y1:0.6,
+      line:{color:'#27ae60',width:1.5,dash:'dash'}}],
+    annotations:[
+      {x:3,y:0.45,text:'과소적합<br>(High Bias)',showarrow:false,font:{size:11,color:'#f39c12'}},
+      {x:17,y:0.45,text:'과적합<br>(High Variance)',showarrow:false,font:{size:11,color:'#9b59b6'}},
+      {x:complexity[optIdx],y:testErr[optIdx]-0.05,text:'Sweet Spot',showarrow:true,arrowhead:2,font:{size:11,color:'#27ae60'}}
+    ]
+  },{responsive:true});
+})();
+</script>
 
 <!-- ═══════════════════════════════════════════ -->
 <!-- Ch8: 결정 트리 -->
@@ -1181,6 +1434,82 @@ plt.show()</code></pre>
 <p class="ni"><strong>결정 트리의 치명적 약점 — 과적합:</strong> MLAT Ch.11에서 강조하듯, 깊이 제한 없는 결정 트리는 학습 데이터를 100% 외워버린다. 각 리프 노드에 샘플이 1개만 남을 때까지 분할하기 때문이다. 이것은 시험 문제를 외워서 100점 맞는 것과 같다 — 새로운 문제에는 전혀 대응하지 못한다. 반드시 <code>max_depth</code>, <code>min_samples_leaf</code> 등으로 정규화해야 한다.</p>
 </div>
 
+<!-- ══ Plotly: 결정 트리 결정 경계 (깊이별 비교) ══ -->
+<div id="plot-ch8-tree" style="width:100%;height:480px;margin:25px 0"></div>
+<p class="ni" style="font-size:12px;color:#888;text-align:center">🖱️ 결정 트리 결정 경계 — 깊이가 깊을수록 복잡한 경계 (과적합 위험) · 드롭다운으로 깊이 전환</p>
+<script>
+(function(){
+  function mulberry32(a){return function(){a|=0;a=a+0x6D2B79F5|0;var t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296}}
+  var rng=mulberry32(2024);
+  function randn(){var u=0,v=0;while(u===0)u=rng();while(v===0)v=rng();return Math.sqrt(-2*Math.log(u))*Math.cos(2*Math.PI*v)}
+
+  // 데이터: 비선형 패턴 (XOR-like)
+  var N=200,x1=[],x2=[],cls=[];
+  for(var i=0;i<N;i++){
+    var a=rng()*100,b=rng()*100;
+    x1.push(a);x2.push(b);
+    // 비선형 경계: 두 사분면에서 상승
+    var label=((a>50&&b>50)||(a<50&&b<50))?1:0;
+    if(rng()<0.15)label=1-label; // 노이즈
+    cls.push(label);
+  }
+
+  var up_x1=[],up_x2=[],dn_x1=[],dn_x2=[];
+  for(var i=0;i<N;i++){
+    if(cls[i]===1){up_x1.push(x1[i]);up_x2.push(x2[i])}
+    else{dn_x1.push(x1[i]);dn_x2.push(x2[i])}
+  }
+
+  // 결정 경계 히트맵 (깊이별)
+  var gSize=40,gx=[],gy=[];
+  for(var i=0;i<gSize;i++){gx.push(i*100/gSize+50/gSize);gy.push(i*100/gSize+50/gSize)}
+
+  function treePredict(x,y,depth){
+    // depth=2: 단순 사분면 분할
+    if(depth<=2){return((x>50&&y>50)||(x<50&&y<50))?0.7:0.3}
+    // depth=4: 더 세밀한 분할
+    if(depth<=4){
+      var p=((x>50&&y>50)||(x<50&&y<50))?0.65:0.35;
+      if(x>25&&x<75&&y>25&&y<75)p+=(x>50?0.1:-0.1);
+      return Math.max(0,Math.min(1,p));
+    }
+    // depth=8: 과적합 (노이즈까지 학습)
+    var p=((x>50&&y>50)||(x<50&&y<50))?0.6:0.4;
+    p+=Math.sin(x/8)*0.15+Math.cos(y/8)*0.15;
+    return Math.max(0,Math.min(1,p));
+  }
+
+  var depths=[2,4,8];
+  var allTraces=[];
+  depths.forEach(function(d,di){
+    var z=[];
+    for(var j=0;j<gSize;j++){var row=[];for(var i=0;i<gSize;i++)row.push(treePredict(gx[i],gy[j],d));z.push(row)}
+    allTraces.push({x:gx,y:gy,z:z,type:'heatmap',colorscale:[[0,'rgba(231,76,60,0.3)'],[1,'rgba(46,204,113,0.3)']],
+      showscale:false,visible:di===0,hoverinfo:'skip'});
+    allTraces.push({x:up_x1,y:up_x2,mode:'markers',name:'상승',marker:{color:'#27ae60',size:5,symbol:'circle',line:{width:0.5,color:'#fff'}},visible:di===0});
+    allTraces.push({x:dn_x1,y:dn_x2,mode:'markers',name:'하락',marker:{color:'#e74c3c',size:5,symbol:'x'},visible:di===0});
+  });
+
+  var buttons=depths.map(function(d,di){
+    var vis=[];for(var i=0;i<depths.length*3;i++)vis.push(i>=di*3&&i<(di+1)*3);
+    return{method:'update',args:[{visible:vis}],label:'max_depth='+d};
+  });
+
+  Plotly.newPlot('plot-ch8-tree',allTraces,{
+    title:{text:'🌳 결정 트리 결정 경계 (깊이별 비교)',font:{size:14}},
+    xaxis:{title:'RSI',gridcolor:'#eee',range:[0,100]},
+    yaxis:{title:'모멘텀 스코어',gridcolor:'#eee',range:[0,100]},
+    legend:{x:0.02,y:0.98},
+    plot_bgcolor:'#fafafa',paper_bgcolor:'#fff',margin:{t:80,b:50},
+    updatemenus:[{
+      buttons:buttons,direction:'right',showactive:true,type:'buttons',
+      x:0.02,xanchor:'left',y:1.12,yanchor:'top',bgcolor:'#f0f0f0',bordercolor:'#ccc'
+    }],
+    annotations:[{x:50,y:105,text:'깊이↑ → 경계 복잡↑ → 과적합 위험↑',showarrow:false,font:{size:11,color:'#888'},xref:'x',yref:'y'}]
+  },{responsive:true});
+})();
+</script>
+
 <!-- ═══════════════════════════════════════════ -->
 <!-- Ch9: Random Forest -->
 <!-- ═══════════════════════════════════════════ -->
@@ -1246,6 +1575,56 @@ plt.show()
 <div class="info">
 <p class="ni"><strong>OOB Score — 공짜 검증:</strong> Random Forest는 각 트리가 학습에 사용하지 않은 37%의 데이터(OOB)로 자동 검증할 수 있다. <code>oob_score=True</code>로 설정하면 별도의 검증 세트 없이도 일반화 성능을 추정할 수 있다. MLAT Ch.11 "Out-of-bag testing" 섹션에서 이 기법을 다룬다.</p>
 </div>
+
+<!-- ══ Plotly: Random Forest 피처 중요도 + 트리 수 vs 성능 ══ -->
+<div style="display:flex;flex-wrap:wrap;gap:10px;margin:25px 0">
+<div id="plot-ch9-imp" style="flex:1;min-width:420px;height:420px"></div>
+<div id="plot-ch9-ntree" style="flex:1;min-width:380px;height:420px"></div>
+</div>
+<p class="ni" style="font-size:12px;color:#888;text-align:center">🖱️ 좌: 피처 중요도 (어떤 피처가 예측에 가장 기여하는가) · 우: 트리 수 증가에 따른 OOB 오차 수렴</p>
+<script>
+(function(){
+  // 피처 중요도
+  var feats=['rsi_14','macd_hist','vol_20d','mom_60d','bb_pct_b','price_sma20','atr_pct','vol_ma_ratio','ret_5d','sma_cross','bb_width','body_ratio'];
+  var imps=[0.12,0.11,0.10,0.09,0.09,0.08,0.08,0.07,0.07,0.07,0.06,0.06];
+  // 정렬
+  var sorted=feats.map(function(f,i){return{name:f,imp:imps[i]}}).sort(function(a,b){return a.imp-b.imp});
+  var colors=sorted.map(function(d){return d.imp>0.09?'#e74c3c':d.imp>0.07?'#f39c12':'#3498db'});
+
+  Plotly.newPlot('plot-ch9-imp',[{
+    x:sorted.map(function(d){return d.imp}),
+    y:sorted.map(function(d){return d.name}),
+    type:'bar',orientation:'h',
+    marker:{color:colors,opacity:0.85},
+    hovertemplate:'%{y}: %{x:.3f}<extra></extra>'
+  }],{
+    title:{text:'🌲 Random Forest 피처 중요도',font:{size:13}},
+    xaxis:{title:'Importance',gridcolor:'#eee'},
+    yaxis:{tickfont:{size:10}},
+    plot_bgcolor:'#fafafa',paper_bgcolor:'#fff',margin:{t:40,b:50,l:100,r:10}
+  },{responsive:true});
+
+  // 트리 수 vs OOB 오차
+  function mulberry32(a){return function(){a|=0;a=a+0x6D2B79F5|0;var t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296}}
+  var rng=mulberry32(99);
+  var nTrees=[1,5,10,20,50,100,200,300,500];
+  var oobErr=nTrees.map(function(n){return 0.48*Math.exp(-0.02*n)+0.44+(rng()-0.5)*0.005});
+  var trainErr=nTrees.map(function(n){return 0.35*Math.exp(-0.03*n)+0.15+(rng()-0.5)*0.003});
+
+  Plotly.newPlot('plot-ch9-ntree',[
+    {x:nTrees,y:trainErr,mode:'lines+markers',name:'Train Error',line:{color:'#3498db',width:2},marker:{size:6}},
+    {x:nTrees,y:oobErr,mode:'lines+markers',name:'OOB Error',line:{color:'#e74c3c',width:2},marker:{size:6}}
+  ],{
+    title:{text:'🌳 트리 수 vs 오차 (수렴 관찰)',font:{size:13}},
+    xaxis:{title:'n_estimators (트리 수)',gridcolor:'#eee'},
+    yaxis:{title:'Error',gridcolor:'#eee'},
+    legend:{x:0.6,y:0.95},
+    hovermode:'x unified',
+    plot_bgcolor:'#fafafa',paper_bgcolor:'#fff',margin:{t:40,b:50,l:50,r:10},
+    annotations:[{x:300,y:oobErr[7]+0.01,text:'수렴 → 트리 더 추가해도 효과 없음',showarrow:false,font:{size:10,color:'#888'}}]
+  },{responsive:true});
+})();
+</script>
 
 <!-- ═══════════════════════════════════════════ -->
 <!-- Ch10: Gradient Boosting -->
@@ -1557,6 +1936,68 @@ y_prob_best = best_lgb.predict_proba(X_test_s)[:, <span class="nu">1</span>]
 <p class="ni"><strong>실전 팁:</strong> 정답은 "둘 다 시도하고 비교하라"이다. 금융 데이터는 노이즈가 많아서 어떤 모델이 더 좋을지 사전에 알 수 없다. 보통 LightGBM으로 빠르게 프로토타이핑하고, XGBoost로 교차 검증하여 최종 모델을 선택한다. MLAT Ch.12에서도 여러 부스팅 구현체를 비교 실험하는 접근을 권장한다.</p>
 </div>
 
+<!-- ══ Plotly: 모델 성능 비교 레이더 차트 + 학습 곡선 ══ -->
+<div style="display:flex;flex-wrap:wrap;gap:10px;margin:25px 0">
+<div id="plot-ch11-radar" style="flex:1;min-width:400px;height:430px"></div>
+<div id="plot-ch11-learn" style="flex:1;min-width:400px;height:430px"></div>
+</div>
+<p class="ni" style="font-size:12px;color:#888;text-align:center">🖱️ 좌: 6개 모델 성능 비교 (레이더 차트) · 우: Boosting 학습 곡선 — 라운드 증가에 따른 Train/Val 오차</p>
+<script>
+(function(){
+  // 레이더 차트: 6개 모델 × 5개 지표
+  var metrics=['AUC-ROC','Accuracy','학습 속도','해석 가능성','과적합 저항'];
+  var models=[
+    {name:'선형회귀',vals:[0.53,0.52,0.95,0.95,0.85],color:'#95a5a6'},
+    {name:'로지스틱',vals:[0.56,0.54,0.90,0.85,0.80],color:'#3498db'},
+    {name:'Decision Tree',vals:[0.52,0.51,0.85,0.70,0.30],color:'#f39c12'},
+    {name:'Random Forest',vals:[0.59,0.56,0.60,0.40,0.75],color:'#2ecc71'},
+    {name:'XGBoost',vals:[0.61,0.57,0.50,0.35,0.70],color:'#e74c3c'},
+    {name:'LightGBM',vals:[0.62,0.58,0.80,0.35,0.72],color:'#9b59b6'}
+  ];
+  var radarTraces=models.map(function(m){
+    var r=m.vals.concat([m.vals[0]]); // 닫기
+    var theta=metrics.concat([metrics[0]]);
+    return{type:'scatterpolar',r:r,theta:theta,fill:'toself',name:m.name,
+      line:{color:m.color,width:2},fillcolor:m.color.replace(')',',0.1)').replace('rgb','rgba'),opacity:0.8};
+  });
+  Plotly.newPlot('plot-ch11-radar',radarTraces,{
+    title:{text:'🎯 모델 성능 비교 (레이더 차트)',font:{size:13}},
+    polar:{radialaxis:{visible:true,range:[0,1],gridcolor:'#ddd'}},
+    legend:{font:{size:9},orientation:'h',y:-0.1},
+    paper_bgcolor:'#fff',margin:{t:50,b:60}
+  },{responsive:true});
+
+  // Boosting 학습 곡선
+  function mulberry32(a){return function(){a|=0;a=a+0x6D2B79F5|0;var t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296}}
+  var rng=mulberry32(42);
+  var rounds=[];for(var i=1;i<=300;i+=3)rounds.push(i);
+  var xgbTrain=rounds.map(function(r){return 0.5*Math.exp(-0.015*r)+0.15+(rng()-0.5)*0.003});
+  var xgbVal=rounds.map(function(r){return 0.5*Math.exp(-0.008*r)+0.38+(r>150?0.0003*(r-150):0)+(rng()-0.5)*0.005});
+  var lgbTrain=rounds.map(function(r){return 0.5*Math.exp(-0.018*r)+0.14+(rng()-0.5)*0.003});
+  var lgbVal=rounds.map(function(r){return 0.5*Math.exp(-0.01*r)+0.37+(r>120?0.0004*(r-120):0)+(rng()-0.5)*0.005});
+
+  Plotly.newPlot('plot-ch11-learn',[
+    {x:rounds,y:xgbTrain,mode:'lines',name:'XGB Train',line:{color:'#e74c3c',width:1.5}},
+    {x:rounds,y:xgbVal,mode:'lines',name:'XGB Val',line:{color:'#e74c3c',width:2.5,dash:'dash'}},
+    {x:rounds,y:lgbTrain,mode:'lines',name:'LGB Train',line:{color:'#9b59b6',width:1.5}},
+    {x:rounds,y:lgbVal,mode:'lines',name:'LGB Val',line:{color:'#9b59b6',width:2.5,dash:'dash'}}
+  ],{
+    title:{text:'📉 Boosting 학습 곡선 (XGBoost vs LightGBM)',font:{size:13}},
+    xaxis:{title:'Boosting Rounds',gridcolor:'#eee'},
+    yaxis:{title:'Log Loss',gridcolor:'#eee'},
+    legend:{x:0.65,y:0.95,font:{size:10}},
+    hovermode:'x unified',
+    plot_bgcolor:'#fafafa',paper_bgcolor:'#fff',margin:{t:40,b:50},
+    shapes:[{type:'line',x0:150,x1:150,y0:0.1,y1:0.7,line:{color:'#e74c3c',width:1,dash:'dot'}},
+            {type:'line',x0:120,x1:120,y0:0.1,y1:0.7,line:{color:'#9b59b6',width:1,dash:'dot'}}],
+    annotations:[
+      {x:150,y:0.65,text:'XGB early stop',showarrow:false,font:{size:9,color:'#e74c3c'}},
+      {x:120,y:0.68,text:'LGB early stop',showarrow:false,font:{size:9,color:'#9b59b6'}}
+    ]
+  },{responsive:true});
+})();
+</script>
+
 <!-- ═══════════════════════════════════════════ -->
 <!-- Ch12: 실전 파이프라인 통합 -->
 <!-- ═══════════════════════════════════════════ -->
@@ -1799,6 +2240,72 @@ plt.show()
 <div class="info">
 <p class="ni"><strong>교재 연동:</strong> 이 파이프라인은 MLAT Ch.7 (선형 모델), Ch.11 (Random Forest), Ch.12 (Gradient Boosting)의 내용을 통합한 것이다. MLAT에서는 각 모델을 일본 주식 데이터에 적용하여 Long-Short 전략을 구현하고 Zipline으로 백테스트한다. 우리는 아직 간소화 버전이지만, 핵심 워크플로우는 동일하다.</p>
 </div>
+
+<!-- ══ Plotly: 전략 누적 수익률 비교 (모델 vs Buy&Hold) ══ -->
+<div id="plot-ch12-strat" style="width:100%;height:500px;margin:25px 0"></div>
+<p class="ni" style="font-size:12px;color:#888;text-align:center">🖱️ ML 전략 vs Buy&Hold 누적 수익률 비교 — 드래그로 구간 확대 · 범례 클릭으로 토글</p>
+<script>
+(function(){
+  function mulberry32(a){return function(){a|=0;a=a+0x6D2B79F5|0;var t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296}}
+  var rng=mulberry32(2024);
+  function randn(){var u=0,v=0;while(u===0)u=rng();while(v===0)v=rng();return Math.sqrt(-2*Math.log(u))*Math.cos(2*Math.PI*v)}
+
+  var N=252; // 1년
+  var dates=[];var d=new Date(2024,0,2);
+  for(var i=0;i<N;i++){dates.push(new Date(d));d.setDate(d.getDate()+(d.getDay()===5?3:1))}
+
+  // 일간 수익률 생성
+  var mktRet=[];
+  for(var i=0;i<N;i++){
+    var r=0.0003+randn()*0.015;
+    if(i>100&&i<130)r-=0.005; // 하락장
+    if(i>180&&i<220)r+=0.003; // 상승장
+    mktRet.push(r);
+  }
+
+  // 모델 시그널 (정확도 ~55%)
+  var signals=mktRet.map(function(r){
+    var correct=rng()<0.55;
+    return correct?(r>0?1:-1):(r>0?-1:1);
+  });
+
+  // 전략 수익률
+  var stratRet=mktRet.map(function(r,i){return signals[i]*r-0.0002}); // 거래비용 2bp
+  var lgbRet=mktRet.map(function(r,i){
+    var sig=rng()<0.58?(r>0?1:-1):(r>0?-1:1);
+    return sig*r-0.0002;
+  });
+
+  // 누적 수익률
+  function cumRet(rets){var c=[0];for(var i=0;i<rets.length;i++)c.push(c[i]+rets[i]);return c.slice(1).map(function(v){return(Math.exp(v)-1)*100})}
+  var cumMkt=cumRet(mktRet);
+  var cumStrat=cumRet(stratRet);
+  var cumLgb=cumRet(lgbRet);
+
+  // 드로다운 계산
+  function maxDD(cumR){var peak=-999,dd=0;cumR.forEach(function(v){if(v>peak)peak=v;var d=v-peak;if(d<dd)dd=d});return dd}
+
+  Plotly.newPlot('plot-ch12-strat',[
+    {x:dates,y:cumMkt,mode:'lines',name:'Buy & Hold (시장)',line:{color:'#95a5a6',width:2}},
+    {x:dates,y:cumStrat,mode:'lines',name:'RF 전략 (Acc≈55%)',line:{color:'#3498db',width:2.5}},
+    {x:dates,y:cumLgb,mode:'lines',name:'LightGBM 전략 (Acc≈58%)',line:{color:'#e74c3c',width:2.5}},
+    {x:dates,y:dates.map(function(){return 0}),mode:'lines',showlegend:false,line:{color:'#999',width:0.5,dash:'dot'}}
+  ],{
+    title:{text:'💰 ML 전략 vs Buy&Hold 누적 수익률 (1년 시뮬레이션)',font:{size:14}},
+    xaxis:{title:'날짜',gridcolor:'#eee'},
+    yaxis:{title:'누적 수익률 (%)',gridcolor:'#eee',zeroline:true,zerolinecolor:'#999'},
+    legend:{orientation:'h',y:-0.12},
+    hovermode:'x unified',
+    plot_bgcolor:'#fafafa',paper_bgcolor:'#fff',margin:{t:50,b:55},
+    annotations:[
+      {x:dates[125],y:Math.min.apply(null,cumMkt.slice(100,135))-2,text:'📉 하락장',showarrow:false,font:{size:10,color:'#e74c3c'}},
+      {x:dates[200],y:Math.max.apply(null,cumLgb.slice(180,220))+2,text:'📈 상승장',showarrow:false,font:{size:10,color:'#27ae60'}},
+      {x:dates[N-1],y:cumMkt[N-1],text:'시장: '+cumMkt[N-1].toFixed(1)+'%',showarrow:true,arrowhead:2,ax:40,font:{size:10,color:'#95a5a6'}},
+      {x:dates[N-1],y:cumLgb[N-1],text:'LGB: '+cumLgb[N-1].toFixed(1)+'%',showarrow:true,arrowhead:2,ax:40,font:{size:10,color:'#e74c3c'}}
+    ]
+  },{responsive:true});
+})();
+</script>
 
 <!-- ═══════════════════════════════════════════ -->
 <!-- Ch13: Quiz + 미니 프로젝트 -->
