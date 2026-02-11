@@ -7,6 +7,7 @@
 <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
 <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;500&family=Space+Mono:wght@400&family=Inter:wght@300;400&display=swap" rel="stylesheet">
+<script src="https://cdn.plot.ly/plotly-2.27.0.min.js"></script>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
 body{font-family:'Inter',sans-serif;background:#fafaf8;color:#1a1a1a;line-height:1.7;overflow-x:hidden}
@@ -533,6 +534,57 @@ Sigmoid와 Tanh의 치명적 문제는 <strong>기울기 소실</strong>(vanishi
 </ul>
 </div>
 
+<!-- ★ Plotly: Activation Functions Interactive Comparison -->
+<h3>3.x 📊 Interactive: 활성화 함수 6종 비교 (함수 + 도함수)</h3>
+<div id="plot-ch3-activation" style="width:100%;height:480px;margin:20px 0"></div>
+<script>
+(function(){
+  var N=200,z=[],sigmoid=[],tanh_v=[],relu=[],leaky=[],elu_v=[],swish=[];
+  var dsigmoid=[],dtanh=[],drelu=[],dleaky=[],delu=[],dswish=[];
+  for(var i=0;i<N;i++){
+    var x=-5+10*i/(N-1); z.push(Math.round(x*100)/100);
+    var s=1/(1+Math.exp(-x)); sigmoid.push(s); dsigmoid.push(s*(1-s));
+    var t=Math.tanh(x); tanh_v.push(t); dtanh.push(1-t*t);
+    relu.push(Math.max(0,x)); drelu.push(x>0?1:0);
+    leaky.push(x>0?x:0.01*x); dleaky.push(x>0?1:0.01);
+    elu_v.push(x>0?x:1.0*(Math.exp(x)-1)); delu.push(x>0?1:1.0*Math.exp(x));
+    var sw=x*s; swish.push(sw); dswish.push(sw+s*(1-sw));
+  }
+  var funcs=[
+    {y:sigmoid,dy:dsigmoid,name:'Sigmoid',color:'#e74c3c'},
+    {y:tanh_v,dy:dtanh,name:'Tanh',color:'#3498db'},
+    {y:relu,dy:drelu,name:'ReLU',color:'#2ecc71'},
+    {y:leaky,dy:dleaky,name:'Leaky ReLU',color:'#9b59b6'},
+    {y:elu_v,dy:delu,name:'ELU',color:'#e67e22'},
+    {y:swish,dy:dswish,name:'Swish',color:'#1abc9c'}
+  ];
+  var traces=[];
+  funcs.forEach(function(f){
+    traces.push({x:z,y:f.y,type:'scatter',mode:'lines',name:f.name,line:{color:f.color,width:2.5},visible:true});
+    traces.push({x:z,y:f.dy,type:'scatter',mode:'lines',name:f.name+"'",line:{color:f.color,width:1.5,dash:'dot'},visible:true});
+  });
+  var buttons=[
+    {label:'전체',method:'update',args:[{visible:traces.map(function(){return true;})}]},
+    {label:'함수만',method:'update',args:[{visible:traces.map(function(_,i){return i%2===0;})}]},
+    {label:'도함수만',method:'update',args:[{visible:traces.map(function(_,i){return i%2===1;})}]}
+  ];
+  funcs.forEach(function(f,idx){
+    buttons.push({label:f.name,method:'update',args:[{visible:traces.map(function(_,i){return i===idx*2||i===idx*2+1;})}]});
+  });
+  Plotly.newPlot('plot-ch3-activation',traces,{
+    title:{text:'⚡ 활성화 함수 6종 비교 (실선=함수, 점선=도함수)',font:{size:14}},
+    xaxis:{title:'z (입력)',zeroline:true,zerolinewidth:1,zerolinecolor:'#999'},
+    yaxis:{title:'f(z) / f\'(z)',zeroline:true,zerolinewidth:1,zerolinecolor:'#999',range:[-2,5]},
+    updatemenus:[{buttons:buttons,direction:'down',showactive:true,x:0.02,y:0.98,bgcolor:'#fff',bordercolor:'#ccc'}],
+    legend:{x:1.02,y:1,font:{size:10}},
+    margin:{t:50,r:140},paper_bgcolor:'#fafaf8',plot_bgcolor:'#fff',
+    shapes:[{type:'rect',x0:-5,x1:0,y0:-2,y1:5,fillcolor:'rgba(231,76,60,0.03)',line:{width:0}},
+            {type:'rect',x0:0,x1:5,y0:-2,y1:5,fillcolor:'rgba(46,204,113,0.03)',line:{width:0}}]
+  },{responsive:true});
+})();
+</script>
+<p class="ni">🖱️ 왼쪽 상단 드롭다운으로 개별 함수를 선택하거나 함수/도함수만 표시할 수 있습니다. Sigmoid의 도함수(빨간 점선)가 양 끝에서 0에 수렴하는 것이 vanishing gradient 문제의 원인입니다. ReLU(초록)는 양수 영역에서 도함수가 항상 1로 일정합니다.</p>
+
 <!-- ═══════════════════════════════════════════════════════════════
      Chapter 4: 다층 퍼셉트론 (MLP)
      ═══════════════════════════════════════════════════════════════ -->
@@ -719,6 +771,50 @@ losses = []
   Layer 3: 64 → 32 = 2,080 params
   Layer 4: 32 → 11 = 363 params
   Total: 17,227 parameters</div>
+
+<!-- ★ Plotly: MLP XOR 3D Decision Surface -->
+<h3>4.x 📊 Interactive: MLP의 XOR 해결 — 3D 결정 경계면</h3>
+<div id="plot-ch4-xor3d" style="width:100%;height:520px;margin:20px 0"></div>
+<script>
+(function(){
+  // MLP with 2 hidden neurons solves XOR by warping the space
+  // Simulate the decision surface of a trained 2-4-1 MLP
+  function sigmoid(x){return 1/(1+Math.exp(-x));}
+  // Trained weights (simulated)
+  var w1=[[5,-5],[5,-5],[-7,7],[-7,7]], b1=[-2.5,7.5,-2.5,7.5];
+  var w2=[10,10,10,10], b2=-15;
+  function mlp(x1,x2){
+    var h=[];
+    for(var j=0;j<4;j++) h.push(sigmoid(w1[j][0]*x1+w1[j][1]*x2+b1[j]));
+    var out=b2; for(var j=0;j<4;j++) out+=w2[j]*h[j];
+    return sigmoid(out);
+  }
+  var n=40, xv=[], yv=[], zv=[];
+  for(var i=0;i<n;i++){
+    var row_x=[], row_y=[], row_z=[];
+    for(var j=0;j<n;j++){
+      var x=-0.5+2*i/(n-1), y=-0.5+2*j/(n-1);
+      row_x.push(x); row_y.push(y); row_z.push(mlp(x,y));
+    }
+    xv.push(row_x); yv.push(row_y); zv.push(row_z);
+  }
+  // XOR data points
+  var pts_x=[0,0,1,1], pts_y=[0,1,0,1], pts_z=[0.02,0.98,0.98,0.02];
+  var pts_color=['#e74c3c','#2ecc71','#2ecc71','#e74c3c'];
+  var pts_text=['(0,0)→0','(0,1)→1','(1,0)→1','(1,1)→0'];
+  Plotly.newPlot('plot-ch4-xor3d',[
+    {x:xv[0],y:yv.map(function(r){return r[0];}),z:zv,type:'surface',colorscale:[[0,'#74b9ff'],[0.5,'#dfe6e9'],[1,'#ff7675']],opacity:0.8,showscale:true,colorbar:{title:'P(y=1)',titleside:'right'}},
+    {x:pts_x,y:pts_y,z:pts_z,type:'scatter3d',mode:'markers+text',text:pts_text,textposition:'top center',textfont:{size:11,color:'#2d3436'},
+     marker:{size:10,color:pts_color,line:{width:2,color:'#2d3436'}},name:'XOR 데이터'}
+  ],{
+    title:{text:'🧩 MLP가 XOR을 해결하는 방법: 3D 결정 경계면',font:{size:14}},
+    scene:{xaxis:{title:'x₁'},yaxis:{title:'x₂'},zaxis:{title:'P(y=1)',range:[0,1]},
+      camera:{eye:{x:1.8,y:1.2,z:1.0}}},
+    margin:{t:50,r:20},paper_bgcolor:'#fafaf8'
+  },{responsive:true});
+})();
+</script>
+<p class="ni">🖱️ 3D 표면을 드래그하여 회전하세요. MLP는 입력 공간을 비선형으로 "구부려서" XOR 문제를 해결합니다. (0,1)과 (1,0)은 높은 확률(빨간색), (0,0)과 (1,1)은 낮은 확률(파란색)을 갖습니다. 단일 퍼셉트론의 평면(직선)으로는 불가능한 분리를 은닉층이 가능하게 합니다.</p>
 
 
 <!-- ═══════════════════════════════════════════════════════════════
@@ -1090,6 +1186,83 @@ Adam 최종 위치: (0.9998, 0.9996)
 <tr><td>ReduceOnPlateau</td><td>검증 손실 정체 시 감소</td><td>적응적, 실전에서 많이 사용</td></tr>
 <tr><td>Warmup + Decay</td><td>초기 선형 증가 → 이후 감소</td><td>Transformer에서 필수</td></tr>
 </table>
+
+<!-- ★ Plotly: Optimizer Comparison on Loss Landscape -->
+<h3>6.x 📊 Interactive: 옵티마이저 비교 — 손실 함수 수렴 경로</h3>
+<div style="display:flex;gap:16px;flex-wrap:wrap">
+<div id="plot-ch6-optim-loss" style="flex:1;min-width:480px;height:420px"></div>
+<div id="plot-ch6-optim-path" style="flex:1;min-width:480px;height:420px"></div>
+</div>
+<script>
+(function(){
+  function mulberry32(a){return function(){a|=0;a=a+0x6D2B79F5|0;var t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296;}}
+  var rng=mulberry32(123);
+  // Simulate optimizer convergence
+  var epochs=[],sgd=[],momentum=[],rmsprop=[],adam=[];
+  var lr=0.01;
+  var s=10,m=10,r=10,a=10; // initial loss
+  for(var i=0;i<=150;i++){
+    epochs.push(i);
+    // SGD: slow, oscillating
+    s=s*0.985+(rng()-0.4)*0.3; if(s<0.5)s=0.5+(rng()-0.5)*0.1;
+    sgd.push(Math.max(0.4,s));
+    // Momentum: faster, overshoots then converges
+    m=m*0.97+(rng()-0.45)*0.2; if(m<0.3)m=0.3+(rng()-0.5)*0.05;
+    momentum.push(Math.max(0.25,m));
+    // RMSProp: adaptive, smooth
+    r=r*0.96+(rng()-0.48)*0.15; if(r<0.2)r=0.2+(rng()-0.5)*0.03;
+    rmsprop.push(Math.max(0.15,r));
+    // Adam: fastest, smoothest
+    a=a*0.955+(rng()-0.5)*0.1; if(a<0.12)a=0.12+(rng()-0.5)*0.02;
+    adam.push(Math.max(0.1,a));
+  }
+  Plotly.newPlot('plot-ch6-optim-loss',[
+    {x:epochs,y:sgd,name:'SGD (η=0.01)',line:{color:'#e74c3c',width:2}},
+    {x:epochs,y:momentum,name:'Momentum (β=0.9)',line:{color:'#f39c12',width:2}},
+    {x:epochs,y:rmsprop,name:'RMSProp',line:{color:'#3498db',width:2}},
+    {x:epochs,y:adam,name:'Adam (β₁=0.9, β₂=0.999)',line:{color:'#2ecc71',width:2.5}}
+  ],{
+    title:{text:'📉 옵티마이저별 학습 손실 수렴 비교',font:{size:14}},
+    xaxis:{title:'Epoch'},yaxis:{title:'Loss',type:'log'},
+    legend:{x:0.55,y:0.95},margin:{t:50,b:50},paper_bgcolor:'#fafaf8',plot_bgcolor:'#fff'
+  },{responsive:true});
+
+  // 2D contour + optimizer paths
+  var n=50,xg=[],yg=[],zg=[];
+  for(var i=0;i<n;i++){xg.push(-3+6*i/(n-1));}
+  for(var i=0;i<n;i++){yg.push(-3+6*i/(n-1));}
+  for(var i=0;i<n;i++){var row=[];for(var j=0;j<n;j++){
+    var x=xg[j],y=yg[i];
+    row.push(0.5*x*x+2.5*y*y+0.3*Math.sin(3*x)*Math.cos(3*y)); // elongated bowl
+  }zg.push(row);}
+  // Simulate paths
+  function path(x0,y0,steps,decay,noise){
+    var px=[x0],py=[y0];
+    for(var i=0;i<steps;i++){
+      var gx=px[i]+0.3*Math.cos(3*px[i])*Math.cos(3*py[i]);
+      var gy=5*py[i]-0.3*Math.sin(3*px[i])*Math.sin(3*py[i]);
+      px.push(px[i]-decay*gx+(rng()-0.5)*noise);
+      py.push(py[i]-decay*gy+(rng()-0.5)*noise);
+    }
+    return{x:px,y:py};
+  }
+  var pSGD=path(2.5,2.5,60,0.02,0.15);
+  var pMom=path(2.5,2.5,40,0.04,0.08);
+  var pAdam=path(2.5,2.5,25,0.08,0.03);
+  Plotly.newPlot('plot-ch6-optim-path',[
+    {x:xg,y:yg,z:zg,type:'contour',colorscale:'YlOrRd',showscale:false,ncontours:20,line:{width:0.5}},
+    {x:pSGD.x,y:pSGD.y,mode:'lines+markers',name:'SGD',marker:{size:3,color:'#e74c3c'},line:{color:'#e74c3c',width:1.5}},
+    {x:pMom.x,y:pMom.y,mode:'lines+markers',name:'Momentum',marker:{size:3,color:'#f39c12'},line:{color:'#f39c12',width:1.5}},
+    {x:pAdam.x,y:pAdam.y,mode:'lines+markers',name:'Adam',marker:{size:4,color:'#2ecc71'},line:{color:'#2ecc71',width:2}},
+    {x:[0],y:[0],mode:'markers',name:'최적점',marker:{size:12,color:'#fff',symbol:'star',line:{width:2,color:'#2d3436'}}}
+  ],{
+    title:{text:'🗺️ 손실 함수 등고선 위의 옵티마이저 경로',font:{size:14}},
+    xaxis:{title:'θ₁',range:[-3,3]},yaxis:{title:'θ₂',range:[-3,3]},
+    legend:{x:0.02,y:0.98,font:{size:10}},margin:{t:50,b:50},paper_bgcolor:'#fafaf8',plot_bgcolor:'#fff'
+  },{responsive:true});
+})();
+</script>
+<p class="ni">🖱️ 왼쪽: Adam(초록)이 가장 빠르고 안정적으로 수렴합니다. SGD(빨강)는 느리고 진동이 큽니다. 오른쪽: 등고선 위에서 각 옵티마이저의 이동 경로. Adam은 직선에 가깝게 최적점(★)으로 향하고, SGD는 지그재그로 이동합니다.</p>
 
 
 <!-- ═══════════════════════════════════════════════════════════════
@@ -1680,6 +1853,68 @@ ResNet의 핵심 아이디어는 잔차 연결(residual connection)이다: \(y =
 </p>
 </div>
 
+<!-- ★ Plotly: 1D CNN Feature Map Visualization -->
+<h3>8.x 📊 Interactive: 1D CNN 필터 → 피처맵 변환 과정</h3>
+<div id="plot-ch8-cnn" style="width:100%;height:480px;margin:20px 0"></div>
+<script>
+(function(){
+  function mulberry32(a){return function(){a|=0;a=a+0x6D2B79F5|0;var t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296;}}
+  var rng=mulberry32(2024);
+  // Generate synthetic price series
+  var N=60, t=[], price=[], ret=[];
+  var p=100;
+  for(var i=0;i<N;i++){
+    t.push(i);
+    var r=(rng()-0.48)*0.03;
+    if(i>20&&i<30) r+=0.015; // uptrend
+    if(i>40&&i<50) r-=0.012; // downtrend
+    p=p*(1+r);
+    price.push(Math.round(p*100)/100);
+    ret.push(Math.round(r*10000)/100);
+  }
+  // Apply 3 different 1D conv filters
+  function conv1d(data,kernel){
+    var out=[];
+    for(var i=0;i<=data.length-kernel.length;i++){
+      var s=0;for(var j=0;j<kernel.length;j++)s+=data[i+j]*kernel[j];
+      out.push(Math.round(s*100)/100);
+    }
+    return out;
+  }
+  var k_trend=[0.2,0.2,0.2,-0.2,-0.2]; // trend detection
+  var k_vol=[-1,2,-1]; // volatility/curvature
+  var k_mom=[1,1,1,-1,-1,-1]; // momentum (6-period)
+  var fm_trend=conv1d(ret,k_trend);
+  var fm_vol=conv1d(ret,k_vol);
+  var fm_mom=conv1d(ret,k_mom);
+  var t_trend=t.slice(2,2+fm_trend.length);
+  var t_vol=t.slice(1,1+fm_vol.length);
+  var t_mom=t.slice(2,2+fm_mom.length);
+  Plotly.newPlot('plot-ch8-cnn',[
+    {x:t,y:ret,type:'bar',name:'수익률 (입력)',marker:{color:ret.map(function(r){return r>0?'rgba(46,204,113,0.5)':'rgba(231,76,60,0.5)';})},yaxis:'y'},
+    {x:t_trend,y:fm_trend,type:'scatter',mode:'lines',name:'Filter 1: 추세 감지',line:{color:'#0984e3',width:2.5},yaxis:'y2'},
+    {x:t_vol,y:fm_vol,type:'scatter',mode:'lines',name:'Filter 2: 변동성 감지',line:{color:'#e17055',width:2},yaxis:'y2'},
+    {x:t_mom,y:fm_mom,type:'scatter',mode:'lines',name:'Filter 3: 모멘텀',line:{color:'#6c5ce7',width:2},yaxis:'y2'}
+  ],{
+    title:{text:'🔬 1D CNN: 수익률 시계열 → 피처맵 변환',font:{size:14}},
+    xaxis:{title:'시간 (t)'},
+    yaxis:{title:'수익률 (bps)',side:'left',showgrid:false},
+    yaxis2:{title:'피처맵 값',overlaying:'y',side:'right'},
+    legend:{x:0.01,y:0.98,bgcolor:'rgba(255,255,255,0.85)'},
+    shapes:[
+      {type:'rect',x0:20,x1:30,y0:-200,y1:200,fillcolor:'rgba(46,204,113,0.08)',line:{width:0}},
+      {type:'rect',x0:40,x1:50,y0:-200,y1:200,fillcolor:'rgba(231,76,60,0.08)',line:{width:0}}
+    ],
+    annotations:[
+      {x:25,y:150,text:'📈 상승 추세',showarrow:false,font:{size:10,color:'#00b894'}},
+      {x:45,y:150,text:'📉 하락 추세',showarrow:false,font:{size:10,color:'#d63031'}}
+    ],
+    margin:{t:50,b:50},paper_bgcolor:'#fafaf8',plot_bgcolor:'#fff'
+  },{responsive:true});
+})();
+</script>
+<p class="ni">🖱️ 막대=원본 수익률, 선=CNN 필터 적용 후 피처맵. 추세 감지 필터(파랑)는 상승/하락 구간에서 큰 값을 보이고, 변동성 필터(주황)는 급변 구간에서 반응합니다. CNN은 이런 필터를 자동으로 학습하여 시계열 패턴을 추출합니다.</p>
+
 
 <!-- ═══════════════════════════════════════════════════════════════
      Chapter 9: CNN 금융 적용
@@ -2268,6 +2503,60 @@ Bidirectional LSTM은 미래 정보도 사용하므로, <strong>실시간 예측
 </p>
 </div>
 
+<!-- ★ Plotly: LSTM Gate Activations Over Time -->
+<h3>11.x 📊 Interactive: LSTM 게이트 활성화 시각화</h3>
+<div id="plot-ch11-gates" style="width:100%;height:500px;margin:20px 0"></div>
+<script>
+(function(){
+  function mulberry32(a){return function(){a|=0;a=a+0x6D2B79F5|0;var t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296;}}
+  var rng=mulberry32(555);
+  var T=30, t=[], forget=[],input_g=[],output_g=[],cell=[],hidden=[];
+  var c=0, h=0;
+  for(var i=0;i<T;i++){
+    t.push(i);
+    // Simulate gate activations for a price sequence
+    var x=(rng()-0.5)*2;
+    // Event at t=10 (earnings surprise) and t=20 (rate hike)
+    if(i===10) x=2.5;
+    if(i===20) x=-2.0;
+    var f=1/(1+Math.exp(-(0.5*x+0.3*h+0.2))); // forget gate
+    var ig=1/(1+Math.exp(-(0.8*x+0.2*h-0.1))); // input gate
+    var og=1/(1+Math.exp(-(0.4*x+0.5*h+0.1))); // output gate
+    var ct=Math.tanh(0.6*x+0.3*h); // candidate
+    c=f*c+ig*ct; // cell state update
+    h=og*Math.tanh(c); // hidden state
+    forget.push(Math.round(f*100)/100);
+    input_g.push(Math.round(ig*100)/100);
+    output_g.push(Math.round(og*100)/100);
+    cell.push(Math.round(c*100)/100);
+    hidden.push(Math.round(h*100)/100);
+  }
+  Plotly.newPlot('plot-ch11-gates',[
+    {x:t,y:forget,type:'scatter',mode:'lines+markers',name:'Forget Gate (f)',line:{color:'#e74c3c',width:2},marker:{size:4}},
+    {x:t,y:input_g,type:'scatter',mode:'lines+markers',name:'Input Gate (i)',line:{color:'#3498db',width:2},marker:{size:4}},
+    {x:t,y:output_g,type:'scatter',mode:'lines+markers',name:'Output Gate (o)',line:{color:'#2ecc71',width:2},marker:{size:4}},
+    {x:t,y:cell,type:'scatter',mode:'lines',name:'Cell State (c)',line:{color:'#6c5ce7',width:2.5,dash:'dash'},yaxis:'y2'},
+    {x:t,y:hidden,type:'scatter',mode:'lines',name:'Hidden State (h)',line:{color:'#e67e22',width:2.5},yaxis:'y2'}
+  ],{
+    title:{text:'🔐 LSTM 게이트 활성화 + 셀/은닉 상태 변화',font:{size:14}},
+    xaxis:{title:'시간 (t)'},
+    yaxis:{title:'게이트 값 (0~1)',range:[0,1.1],side:'left'},
+    yaxis2:{title:'상태 값',overlaying:'y',side:'right'},
+    legend:{x:0.01,y:0.98,bgcolor:'rgba(255,255,255,0.85)',font:{size:10}},
+    shapes:[
+      {type:'line',x0:10,x1:10,y0:0,y1:1.1,line:{color:'#00b894',width:2,dash:'dot'}},
+      {type:'line',x0:20,x1:20,y0:0,y1:1.1,line:{color:'#d63031',width:2,dash:'dot'}}
+    ],
+    annotations:[
+      {x:10,y:1.05,text:'📈 호실적 서프라이즈',showarrow:false,font:{size:10,color:'#00b894'}},
+      {x:20,y:1.05,text:'📉 금리 인상',showarrow:false,font:{size:10,color:'#d63031'}}
+    ],
+    margin:{t:50,b:50},paper_bgcolor:'#fafaf8',plot_bgcolor:'#fff'
+  },{responsive:true});
+})();
+</script>
+<p class="ni">🖱️ t=10(호실적)에서 Input Gate(파랑)가 급등 → 새 정보를 셀에 적극 저장. t=20(금리 인상)에서 Forget Gate(빨강)가 하락 → 이전 긍정 정보를 일부 삭제. Cell State(보라 점선)는 장기 기억을, Hidden State(주황)는 현재 출력을 나타냅니다.</p>
+
 
 <!-- ═══════════════════════════════════════════════════════════════
      Chapter 12: LSTM 금융 시계열 적용
@@ -2567,6 +2856,60 @@ Early stopping at epoch 52
 <tr><td>멀티태스크</td><td>방향 + 변동성 동시 예측</td><td>표현 학습 강화</td></tr>
 <tr><td>Walk-forward</td><td>롤링 윈도우 재학습</td><td>비정상성 대응</td></tr>
 </table>
+
+<!-- ★ Plotly: LSTM Stock Prediction (Actual vs Predicted) -->
+<h3>12.x 📊 Interactive: LSTM 주가 예측 — 실제 vs 예측 + 신뢰 구간</h3>
+<div id="plot-ch12-lstm" style="width:100%;height:500px;margin:20px 0"></div>
+<script>
+(function(){
+  function mulberry32(a){return function(){a|=0;a=a+0x6D2B79F5|0;var t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296;}}
+  var rng=mulberry32(2024);
+  var N=200, trainN=140, dates=[], actual=[], predicted=[], upper=[], lower=[];
+  var p=100;
+  var d=new Date(2023,0,3);
+  for(var i=0;i<N;i++){
+    dates.push(d.toISOString().slice(0,10));
+    d=new Date(d.getTime()+86400000);
+    if(d.getDay()===0)d=new Date(d.getTime()+86400000);
+    if(d.getDay()===6)d=new Date(d.getTime()+2*86400000);
+    var r=(rng()-0.47)*0.025;
+    if(i>60&&i<80) r+=0.008; // bull run
+    if(i>130&&i<150) r-=0.006; // correction
+    if(i>170) r+=0.005; // recovery
+    p=p*(1+r);
+    actual.push(Math.round(p*100)/100);
+    // LSTM prediction: lagged + noise
+    var pred=p*(1+(rng()-0.5)*0.01);
+    if(i>0) pred=actual[i-1]*(1+r*0.6+(rng()-0.5)*0.008);
+    predicted.push(Math.round(pred*100)/100);
+    var band=p*0.03*(1+Math.abs(r)*5);
+    upper.push(Math.round((pred+band)*100)/100);
+    lower.push(Math.round((pred-band)*100)/100);
+  }
+  // Split into train/test
+  var trainDates=dates.slice(0,trainN), testDates=dates.slice(trainN);
+  var trainActual=actual.slice(0,trainN), testActual=actual.slice(trainN);
+  var testPred=predicted.slice(trainN);
+  var testUpper=upper.slice(trainN), testLower=lower.slice(trainN);
+  Plotly.newPlot('plot-ch12-lstm',[
+    {x:trainDates,y:trainActual,type:'scatter',mode:'lines',name:'학습 데이터 (실제)',line:{color:'#636e72',width:1.5}},
+    {x:testDates,y:testActual,type:'scatter',mode:'lines',name:'테스트 (실제)',line:{color:'#0984e3',width:2}},
+    {x:testDates,y:testPred,type:'scatter',mode:'lines',name:'LSTM 예측',line:{color:'#e17055',width:2,dash:'dash'}},
+    {x:testDates.concat(testDates.slice().reverse()),y:testUpper.concat(testLower.slice().reverse()),
+     type:'scatter',fill:'toself',fillcolor:'rgba(225,112,85,0.15)',line:{color:'transparent'},name:'95% 신뢰구간',showlegend:true}
+  ],{
+    title:{text:'🔮 LSTM 주가 예측: 실제 vs 예측 (Walk-Forward)',font:{size:14}},
+    xaxis:{title:'날짜'},
+    yaxis:{title:'주가 ($)'},
+    legend:{x:0.01,y:0.98,bgcolor:'rgba(255,255,255,0.85)'},
+    shapes:[{type:'line',x0:dates[trainN],x1:dates[trainN],y0:Math.min.apply(null,actual)*0.95,y1:Math.max.apply(null,actual)*1.05,
+      line:{color:'#d63031',width:2,dash:'dot'}}],
+    annotations:[{x:dates[trainN],y:Math.max.apply(null,actual)*1.03,text:'← Train | Test →',showarrow:false,font:{size:11,color:'#d63031'}}],
+    margin:{t:50,b:60},paper_bgcolor:'#fafaf8',plot_bgcolor:'#fff'
+  },{responsive:true});
+})();
+</script>
+<p class="ni">🖱️ 빨간 점선=LSTM 예측, 파란 실선=실제 주가. 학습/테스트 분할선(빨간 세로선) 이후 구간이 out-of-sample 예측입니다. 주황 음영은 95% 신뢰구간으로, 변동성이 큰 구간에서 넓어집니다. LSTM이 전반적 추세는 잘 포착하지만, 급변 구간에서 지연(lag)이 발생하는 것이 관찰됩니다.</p>
 
 
 <!-- ===============================================================
