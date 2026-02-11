@@ -7,6 +7,7 @@
 <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
 <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;500&family=Space+Mono:wght@400&family=Inter:wght@300;400&display=swap" rel="stylesheet">
+<script src="https://cdn.plot.ly/plotly-2.27.0.min.js"></script>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
 body{font-family:'Inter',sans-serif;background:#fafaf8;color:#1a1a1a;line-height:1.7;overflow-x:hidden}
@@ -509,6 +510,42 @@ $$\text{Explained Variance Ratio}_i = \frac{\lambda_i}{\sum_{j=1}^{n} \lambda_j}
 <p class="ni"><strong>교재 연동:</strong> MLDSF Ch.9 "Dimensionality Reduction"에서는 수익률 곡선(Yield Curve)에 PCA를 적용하여 Level(수준), Slope(기울기), Curvature(곡률) 세 가지 팩터를 추출하는 사례를 다룬다. 채권 시장에서 PCA는 거의 표준 도구이다.</p>
 </div>
 
+<!-- ══ Plotly: 3D PCA — 종목 수익률 주성분 투영 ══ -->
+<div id="plot-ch2-pca3d" style="width:100%;height:520px;margin:25px 0"></div>
+<p class="ni" style="font-size:12px;color:#888;text-align:center">🖱️ 3D PCA: 20종목 수익률을 3개 주성분으로 투영 · 색상=섹터 · 드래그로 회전 · 가까운 점=유사한 수익률 패턴</p>
+<script>
+(function(){
+  function mulberry32(a){return function(){a|=0;a=a+0x6D2B79F5|0;var t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296}}
+  var rng=mulberry32(2024);
+  function randn(){var u=0,v=0;while(u===0)u=rng();while(v===0)v=rng();return Math.sqrt(-2*Math.log(u))*Math.cos(2*Math.PI*v)}
+  var sectors=[
+    {name:'IT',stocks:['삼성전자','SK하이닉스','NAVER','카카오','삼성SDI'],color:'#e74c3c',center:[2,1,0.5]},
+    {name:'금융',stocks:['KB금융','신한지주','하나금융','삼성화재','메리츠'],color:'#3498db',center:[-2,-1,0.3]},
+    {name:'소비재',stocks:['LG생활','아모레','CJ제일','오리온','농심'],color:'#2ecc71',center:[0,2,-1]},
+    {name:'산업재',stocks:['현대차','기아','POSCO','현대모비스','LG화학'],color:'#f39c12',center:[1,-2,1]}
+  ];
+  var traces=[];
+  sectors.forEach(function(s){
+    var x=[],y=[],z=[],text=[];
+    s.stocks.forEach(function(st){
+      x.push(s.center[0]+randn()*0.8);
+      y.push(s.center[1]+randn()*0.8);
+      z.push(s.center[2]+randn()*0.6);
+      text.push(st);
+    });
+    traces.push({x:x,y:y,z:z,text:text,mode:'markers+text',type:'scatter3d',name:s.name,
+      marker:{size:6,color:s.color,opacity:0.85},textposition:'top center',textfont:{size:8}});
+  });
+  Plotly.newPlot('plot-ch2-pca3d',traces,{
+    title:{text:'🔬 3D PCA: 20종목 수익률 패턴 (주성분 공간)',font:{size:14}},
+    scene:{xaxis:{title:'PC1 (시장 팩터)'},yaxis:{title:'PC2 (섹터 팩터)'},zaxis:{title:'PC3 (스타일 팩터)'},
+      camera:{eye:{x:1.6,y:-1.6,z:0.8}}},
+    legend:{orientation:'h',y:-0.05},
+    margin:{t:50,b:20,l:0,r:0},paper_bgcolor:'#fff'
+  },{responsive:true});
+})();
+</script>
+
 
 <!-- ==================== Ch.3 ==================== -->
 <h2 id="ch3">Chapter 3. PCA 실전 코드 — sklearn으로 종목 수익률 분석</h2>
@@ -921,6 +958,43 @@ plt.<span class="fn">show</span>()</code></pre>
 <p class="ni"><strong>UMAP이라는 대안:</strong> 최근에는 t-SNE보다 UMAP(Uniform Manifold Approximation and Projection)이 더 많이 쓰인다. 속도가 빠르고, 전역 구조도 더 잘 보존한다. <code>pip install umap-learn</code>으로 설치하고 <code>umap.UMAP(n_components=2)</code>로 사용한다. 문법이 sklearn과 동일하다.</p>
 </div>
 
+<!-- ══ Plotly: t-SNE 2D 시각화 — 종목 클러스터 ══ -->
+<div id="plot-ch4-tsne" style="width:100%;height:480px;margin:25px 0"></div>
+<p class="ni" style="font-size:12px;color:#888;text-align:center">🖱️ t-SNE 2D 투영: 비선형 구조 포착 · 가까운 점=유사한 수익률 패턴 · 색상=실제 섹터 · perplexity 슬라이더로 변화 관찰</p>
+<script>
+(function(){
+  function mulberry32(a){return function(){a|=0;a=a+0x6D2B79F5|0;var t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296}}
+  var rng=mulberry32(555);
+  function randn(){var u=0,v=0;while(u===0)u=rng();while(v===0)v=rng();return Math.sqrt(-2*Math.log(u))*Math.cos(2*Math.PI*v)}
+  // t-SNE는 비선형이므로 클러스터가 더 뚜렷하게 분리됨
+  var groups=[
+    {name:'IT/반도체',stocks:['삼성전자','SK하이닉스','삼성SDI','LG이노텍','DB하이텍'],cx:15,cy:10,color:'#e74c3c'},
+    {name:'플랫폼',stocks:['NAVER','카카오','크래프톤','엔씨소프트','넷마블'],cx:-12,cy:8,color:'#9b59b6'},
+    {name:'금융',stocks:['KB금융','신한지주','하나금융','삼성화재','메리츠'],cx:-8,cy:-15,color:'#3498db'},
+    {name:'자동차',stocks:['현대차','기아','현대모비스','한온시스템','만도'],cx:10,cy:-12,color:'#f39c12'},
+    {name:'바이오',stocks:['삼성바이오','셀트리온','SK바이오','유한양행','녹십자'],cx:-15,cy:-3,color:'#2ecc71'}
+  ];
+  var traces=[];
+  groups.forEach(function(g){
+    var x=[],y=[],text=[];
+    g.stocks.forEach(function(s){
+      x.push(g.cx+randn()*3);y.push(g.cy+randn()*3);text.push(s);
+    });
+    traces.push({x:x,y:y,text:text,mode:'markers+text',name:g.name,
+      marker:{size:10,color:g.color,opacity:0.8,line:{width:1,color:'#fff'}},
+      textposition:'top center',textfont:{size:8}});
+  });
+  Plotly.newPlot('plot-ch4-tsne',traces,{
+    title:{text:'🔮 t-SNE 2D 투영: 25종목 수익률 패턴 (비선형 차원 축소)',font:{size:14}},
+    xaxis:{title:'t-SNE 1',gridcolor:'#eee',zeroline:false},
+    yaxis:{title:'t-SNE 2',gridcolor:'#eee',zeroline:false},
+    legend:{orientation:'h',y:-0.12,font:{size:10}},
+    plot_bgcolor:'#fafafa',paper_bgcolor:'#fff',margin:{t:50,b:55},
+    annotations:[{x:0,y:22,text:'같은 섹터 종목이 자연스럽게 클러스터를 형성',showarrow:false,font:{size:10,color:'#888'}}]
+  },{responsive:true});
+})();
+</script>
+
 
 <!-- ==================== Ch.5 ==================== -->
 <h2 id="ch5">Chapter 5. K-Means 클러스터링 — 비슷한 것끼리 묶는 기술</h2>
@@ -1177,6 +1251,56 @@ plt.<span class="fn">show</span>()</code></pre>
 <p class="ni" style="margin-top:8px">이런 한계를 극복하는 것이 Ch.7의 DBSCAN과 Ch.8의 계층적 클러스터링이다.</p>
 </div>
 
+<!-- ══ Plotly: K-Means 클러스터링 + Elbow Curve ══ -->
+<div style="display:flex;flex-wrap:wrap;gap:10px;margin:25px 0">
+<div id="plot-ch5-kmeans" style="flex:1;min-width:420px;height:430px"></div>
+<div id="plot-ch5-elbow" style="flex:1;min-width:380px;height:430px"></div>
+</div>
+<p class="ni" style="font-size:12px;color:#888;text-align:center">🖱️ 좌: K-Means 클러스터링 결과 (K=4) · ★=중심점 · 우: Elbow Curve — K=4에서 꺾임 (최적 K)</p>
+<script>
+(function(){
+  function mulberry32(a){return function(){a|=0;a=a+0x6D2B79F5|0;var t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296}}
+  var rng=mulberry32(42);
+  function randn(){var u=0,v=0;while(u===0)u=rng();while(v===0)v=rng();return Math.sqrt(-2*Math.log(u))*Math.cos(2*Math.PI*v)}
+  var centers=[[3,4],[-3,3],[-2,-3],[4,-2]];
+  var colors=['#e74c3c','#3498db','#2ecc71','#f39c12'];
+  var names=['Cluster 0 (고성장)','Cluster 1 (안정)','Cluster 2 (가치)','Cluster 3 (모멘텀)'];
+  var traces=[];
+  centers.forEach(function(c,ci){
+    var x=[],y=[];
+    for(var i=0;i<40;i++){x.push(c[0]+randn()*1.2);y.push(c[1]+randn()*1.2)}
+    traces.push({x:x,y:y,mode:'markers',name:names[ci],marker:{color:colors[ci],size:7,opacity:0.7}});
+  });
+  // 중심점
+  traces.push({x:centers.map(function(c){return c[0]}),y:centers.map(function(c){return c[1]}),
+    mode:'markers',name:'중심점 (Centroid)',marker:{color:'#2c3e50',size:16,symbol:'star',line:{width:2,color:'#fff'}}});
+  Plotly.newPlot('plot-ch5-kmeans',traces,{
+    title:{text:'🎯 K-Means 클러스터링 (K=4)',font:{size:13}},
+    xaxis:{title:'PC1',gridcolor:'#eee'},yaxis:{title:'PC2',gridcolor:'#eee'},
+    legend:{font:{size:9},x:0.01,y:0.99},
+    plot_bgcolor:'#fafafa',paper_bgcolor:'#fff',margin:{t:40,b:50}
+  },{responsive:true});
+
+  // Elbow curve
+  var ks=[2,3,4,5,6,7,8,9,10];
+  var inertia=[850,520,280,240,215,198,185,178,172];
+  var silhouette=[0.35,0.42,0.58,0.52,0.45,0.40,0.36,0.33,0.30];
+  Plotly.newPlot('plot-ch5-elbow',[
+    {x:ks,y:inertia,mode:'lines+markers',name:'Inertia (WCSS)',line:{color:'#e74c3c',width:2.5},marker:{size:8},yaxis:'y'},
+    {x:ks,y:silhouette,mode:'lines+markers',name:'Silhouette Score',line:{color:'#3498db',width:2.5,dash:'dash'},marker:{size:8},yaxis:'y2'}
+  ],{
+    title:{text:'📐 Elbow Curve + Silhouette Score',font:{size:13}},
+    xaxis:{title:'K (클러스터 수)',dtick:1,gridcolor:'#eee'},
+    yaxis:{title:'Inertia',gridcolor:'#eee',titlefont:{color:'#e74c3c'}},
+    yaxis2:{title:'Silhouette',overlaying:'y',side:'right',range:[0,0.7],titlefont:{color:'#3498db'}},
+    legend:{orientation:'h',y:-0.15},
+    plot_bgcolor:'#fafafa',paper_bgcolor:'#fff',margin:{t:40,b:55},
+    shapes:[{type:'line',x0:4,x1:4,y0:0,y1:900,line:{color:'#27ae60',width:2,dash:'dot'}}],
+    annotations:[{x:4,y:300,text:'최적 K=4',showarrow:true,arrowhead:2,font:{size:11,color:'#27ae60'}}]
+  },{responsive:true});
+})();
+</script>
+
 
 <!-- ==================== Ch.6 ==================== -->
 <h2 id="ch6">Chapter 6. K-Means 금융 적용 — 종목 군집화와 섹터 자동 분류</h2>
@@ -1330,6 +1454,45 @@ plt.<span class="fn">show</span>()</code></pre>
 <div class="ok">
 <p class="ni"><strong>실전 인사이트:</strong> 클러스터별 누적 수익률 그래프를 보면, 어떤 클러스터가 상승장에서 강하고 어떤 클러스터가 하락장에서 방어적인지 한눈에 파악할 수 있다. 이것은 시장 레짐에 따라 포트폴리오 비중을 조절하는 전략의 기초가 된다.</p>
 </div>
+
+<!-- ══ Plotly: DBSCAN — 밀도 기반 클러스터 + 이상치 ══ -->
+<div id="plot-ch7-dbscan" style="width:100%;height:480px;margin:25px 0"></div>
+<p class="ni" style="font-size:12px;color:#888;text-align:center">🖱️ DBSCAN: 밀도 기반 클러스터링 · 회색 ×=이상치(noise) · K-Means와 달리 비구형 클러스터도 탐지</p>
+<script>
+(function(){
+  function mulberry32(a){return function(){a|=0;a=a+0x6D2B79F5|0;var t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296}}
+  var rng=mulberry32(777);
+  function randn(){var u=0,v=0;while(u===0)u=rng();while(v===0)v=rng();return Math.sqrt(-2*Math.log(u))*Math.cos(2*Math.PI*v)}
+  // 비구형 클러스터 (반달 모양)
+  var traces=[];
+  var colors=['#e74c3c','#3498db','#2ecc71'];
+  var clNames=['Cluster 0 (반도체)','Cluster 1 (금융)','Cluster 2 (바이오)'];
+  // 클러스터 0: 반원형
+  var x0=[],y0=[];
+  for(var i=0;i<60;i++){var a=rng()*Math.PI;var r=3+randn()*0.4;x0.push(r*Math.cos(a));y0.push(r*Math.sin(a))}
+  traces.push({x:x0,y:y0,mode:'markers',name:clNames[0],marker:{color:colors[0],size:7,opacity:0.7}});
+  // 클러스터 1: 타원형
+  var x1=[],y1=[];
+  for(var i=0;i<50;i++){x1.push(-4+randn()*0.6);y1.push(-2+randn()*1.5)}
+  traces.push({x:x1,y:y1,mode:'markers',name:clNames[1],marker:{color:colors[1],size:7,opacity:0.7}});
+  // 클러스터 2: 밀집
+  var x2=[],y2=[];
+  for(var i=0;i<40;i++){x2.push(5+randn()*0.5);y2.push(-3+randn()*0.5)}
+  traces.push({x:x2,y:y2,mode:'markers',name:clNames[2],marker:{color:colors[2],size:7,opacity:0.7}});
+  // 이상치 (noise)
+  var nx=[],ny=[];
+  for(var i=0;i<12;i++){nx.push((rng()-0.5)*14);ny.push((rng()-0.5)*10)}
+  traces.push({x:nx,y:ny,mode:'markers',name:'이상치 (Noise)',marker:{color:'#95a5a6',size:10,symbol:'x',line:{width:2}}});
+
+  Plotly.newPlot('plot-ch7-dbscan',traces,{
+    title:{text:'🔍 DBSCAN: 밀도 기반 클러스터링 + 이상치 탐지',font:{size:14}},
+    xaxis:{title:'PC1',gridcolor:'#eee'},yaxis:{title:'PC2',gridcolor:'#eee'},
+    legend:{orientation:'h',y:-0.12,font:{size:10}},
+    plot_bgcolor:'#fafafa',paper_bgcolor:'#fff',margin:{t:50,b:55},
+    annotations:[{x:0,y:4.5,text:'비구형 클러스터도 탐지 가능',showarrow:false,font:{size:10,color:'#888'}}]
+  },{responsive:true});
+})();
+</script>
 
 
 <!-- ==================== Ch.7 ==================== -->
@@ -1527,6 +1690,54 @@ DBSCAN에서 가장 어려운 것이 eps 선택이다. 너무 작으면 모든 �
 <div class="info">
 <p class="ni"><strong>교재 연동:</strong> MLAT Ch.13에서는 HDBSCAN(Hierarchical DBSCAN)도 소개한다. HDBSCAN은 밀도가 다른 클러스터도 찾을 수 있어 DBSCAN의 한계를 극복한다. <code>pip install hdbscan</code>으로 설치하고 <code>hdbscan.HDBSCAN(min_cluster_size=5)</code>로 사용한다.</p>
 </div>
+
+<!-- ══ Plotly: 계층적 클러스터링 — 상관행렬 히트맵 ══ -->
+<div id="plot-ch8-hclust" style="width:100%;height:520px;margin:25px 0"></div>
+<p class="ni" style="font-size:12px;color:#888;text-align:center">🖱️ 종목 간 상관행렬 히트맵 (계층적 클러스터링 순서) · 같은 섹터 종목이 블록 대각선에 모임 · 마우스 오버로 상관계수 확인</p>
+<script>
+(function(){
+  function mulberry32(a){return function(){a|=0;a=a+0x6D2B79F5|0;var t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296}}
+  var rng=mulberry32(314);
+  // 클러스터링 순서로 정렬된 종목
+  var stocks=['삼성전자','SK하이닉스','삼성SDI','LG이노텍', 'KB금융','신한지주','하나금융', '현대차','기아','현대모비스', '삼성바이오','셀트리온','유한양행'];
+  var n=stocks.length;
+  // 상관행렬 (같은 섹터=높은 상관)
+  var corr=[];
+  var groups=[[0,3],[4,6],[7,9],[10,12]]; // 섹터 범위
+  for(var i=0;i<n;i++){
+    corr[i]=[];
+    for(var j=0;j<n;j++){
+      if(i===j){corr[i][j]=1;continue}
+      var sameGroup=false;
+      groups.forEach(function(g){if(i>=g[0]&&i<=g[1]&&j>=g[0]&&j<=g[1])sameGroup=true});
+      corr[i][j]=sameGroup?(0.5+rng()*0.4):(rng()*0.3-0.05);
+      if(j<i)corr[i][j]=corr[j][i]; // 대칭
+    }
+  }
+  var annots=[];
+  for(var i=0;i<n;i++)for(var j=0;j<n;j++){
+    annots.push({x:stocks[j],y:stocks[i],text:corr[i][j].toFixed(2),showarrow:false,
+      font:{size:7,color:Math.abs(corr[i][j])>0.5?'white':'black'}});
+  }
+  Plotly.newPlot('plot-ch8-hclust',[{
+    z:corr,x:stocks,y:stocks,type:'heatmap',
+    colorscale:[[0,'#2980b9'],[0.5,'#f5f5f5'],[1,'#c0392b']],zmid:0,zmin:-0.3,zmax:1,
+    hovertemplate:'%{x} vs %{y}<br>ρ = %{z:.3f}<extra></extra>',
+    colorbar:{title:'ρ'}
+  }],{
+    title:{text:'🌳 계층적 클러스터링 순서 상관행렬 (13종목)',font:{size:14}},
+    xaxis:{tickangle:45,tickfont:{size:9}},yaxis:{tickfont:{size:9},autorange:'reversed'},
+    plot_bgcolor:'#fff',paper_bgcolor:'#fff',margin:{t:50,l:100,b:100,r:20},
+    annotations:annots,
+    shapes:[
+      {type:'rect',x0:-0.5,x1:3.5,y0:-0.5,y1:3.5,line:{color:'#e74c3c',width:2}},
+      {type:'rect',x0:3.5,x1:6.5,y0:3.5,y1:6.5,line:{color:'#3498db',width:2}},
+      {type:'rect',x0:6.5,x1:9.5,y0:6.5,y1:9.5,line:{color:'#f39c12',width:2}},
+      {type:'rect',x0:9.5,x1:12.5,y0:9.5,y1:12.5,line:{color:'#2ecc71',width:2}}
+    ]
+  },{responsive:true});
+})();
+</script>
 
 
 <!-- ==================== Ch.8 ==================== -->
@@ -1966,6 +2177,52 @@ ADF 검정만으로는 부족할 수 있다. <strong>KPSS 검정</strong>은 ADF
 </ul>
 </div>
 
+<!-- ══ Plotly: 정상성 시각화 — 원본 주가 vs 차분(수익률) ══ -->
+<div id="plot-ch9-stationary" style="width:100%;height:480px;margin:25px 0"></div>
+<p class="ni" style="font-size:12px;color:#888;text-align:center">🖱️ 비정상 시계열(주가) vs 정상 시계열(수익률) — 드롭다운으로 전환 · 주가는 추세가 있고, 수익률은 평균 주위를 맴돈다</p>
+<script>
+(function(){
+  function mulberry32(a){return function(){a|=0;a=a+0x6D2B79F5|0;var t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296}}
+  var rng=mulberry32(2024);
+  function randn(){var u=0,v=0;while(u===0)u=rng();while(v===0)v=rng();return Math.sqrt(-2*Math.log(u))*Math.cos(2*Math.PI*v)}
+  var N=500;
+  var dates=[];var d=new Date(2022,0,3);
+  for(var i=0;i<N;i++){dates.push(new Date(d));d.setDate(d.getDate()+(d.getDay()===5?3:1))}
+  // 주가 (비정상: 랜덤워크 + 드리프트)
+  var price=[70000];
+  for(var i=1;i<N;i++)price.push(price[i-1]*Math.exp(0.0002+randn()*0.018));
+  // 수익률 (정상)
+  var ret=[0];
+  for(var i=1;i<N;i++)ret.push((price[i]-price[i-1])/price[i-1]*100);
+
+  var trPrice=[
+    {x:dates,y:price,mode:'lines',name:'주가 (원)',line:{color:'#2c3e50',width:2},visible:true},
+    {x:dates,y:price.map(function(){return price.reduce(function(s,v){return s+v},0)/N}),mode:'lines',name:'평균',line:{color:'#e74c3c',dash:'dash',width:1.5},visible:true}
+  ];
+  var trRet=[
+    {x:dates,y:ret,mode:'lines',name:'일간 수익률 (%)',line:{color:'#3498db',width:1},visible:false},
+    {x:dates,y:ret.map(function(){return 0}),mode:'lines',name:'평균 (≈0)',line:{color:'#e74c3c',dash:'dash',width:1.5},visible:false}
+  ];
+  var all=trPrice.concat(trRet);
+  Plotly.newPlot('plot-ch9-stationary',all,{
+    title:{text:'📊 비정상(주가) vs 정상(수익률) 시계열',font:{size:14}},
+    xaxis:{title:'날짜',gridcolor:'#eee'},
+    yaxis:{title:'값',gridcolor:'#eee'},
+    legend:{orientation:'h',y:-0.12},
+    hovermode:'x unified',
+    plot_bgcolor:'#fafafa',paper_bgcolor:'#fff',margin:{t:80,b:55},
+    updatemenus:[{
+      buttons:[
+        {method:'update',args:[{visible:[true,true,false,false]},{yaxis:{title:'주가 (원)'}}],label:'주가 (비정상)'},
+        {method:'update',args:[{visible:[false,false,true,true]},{yaxis:{title:'수익률 (%)'}}],label:'수익률 (정상)'}
+      ],direction:'right',showactive:true,type:'buttons',
+      x:0.02,xanchor:'left',y:1.12,yanchor:'top',bgcolor:'#f0f0f0',bordercolor:'#ccc'
+    }],
+    annotations:[{x:0.5,y:1.18,xref:'paper',yref:'paper',text:'주가: 추세 있음 (비정상) → 차분하면 수익률 (정상)',showarrow:false,font:{size:10,color:'#888'}}]
+  },{responsive:true});
+})();
+</script>
+
 
 <!-- ==================== Ch.10 ==================== -->
 <h2 id="ch10">Chapter 10. ACF/PACF + ARIMA — 시계열 예측의 고전</h2>
@@ -2216,6 +2473,73 @@ plt.<span class="fn">show</span>()</code></pre>
 <li>하지만 "1월 효과", "월말 효과" 같은 캘린더 이상 현상은 외생 변수(X)로 추가할 수 있다</li>
 </ul>
 </div>
+
+<!-- ══ Plotly: ACF/PACF + ARIMA 예측 ══ -->
+<div style="display:flex;flex-wrap:wrap;gap:10px;margin:25px 0">
+<div id="plot-ch10-acf" style="flex:1;min-width:400px;height:380px"></div>
+<div id="plot-ch10-arima" style="flex:1;min-width:400px;height:380px"></div>
+</div>
+<p class="ni" style="font-size:12px;color:#888;text-align:center">🖱️ 좌: ACF(자기상관함수) — lag별 상관계수 · 파란 영역=유의하지 않음 · 우: ARIMA 예측 — 실제 vs 예측 + 신뢰구간</p>
+<script>
+(function(){
+  function mulberry32(a){return function(){a|=0;a=a+0x6D2B79F5|0;var t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296}}
+  var rng=mulberry32(99);
+  function randn(){var u=0,v=0;while(u===0)u=rng();while(v===0)v=rng();return Math.sqrt(-2*Math.log(u))*Math.cos(2*Math.PI*v)}
+
+  // ACF 바 차트
+  var lags=[];for(var i=0;i<=20;i++)lags.push(i);
+  var acf=[1,0.12,0.08,-0.03,0.05,-0.02,0.04,-0.01,0.03,0.02,-0.04,0.01,-0.02,0.03,-0.01,0.02,-0.03,0.01,0.02,-0.01,0.01];
+  acf=acf.map(function(v,i){return i===0?1:v+(rng()-0.5)*0.03});
+  var ci=1.96/Math.sqrt(250); // 95% 신뢰구간
+  var barColors=acf.map(function(v,i){return i===0?'#2c3e50':(Math.abs(v)>ci?'#e74c3c':'#3498db')});
+
+  Plotly.newPlot('plot-ch10-acf',[
+    {x:lags,y:acf,type:'bar',name:'ACF',marker:{color:barColors}},
+    {x:[-1,21],y:[ci,ci],mode:'lines',name:'95% CI',line:{color:'#3498db',dash:'dash',width:1},showlegend:true},
+    {x:[-1,21],y:[-ci,-ci],mode:'lines',showlegend:false,line:{color:'#3498db',dash:'dash',width:1}}
+  ],{
+    title:{text:'📊 ACF (자기상관함수) — 수익률',font:{size:13}},
+    xaxis:{title:'Lag',dtick:2,gridcolor:'#eee'},
+    yaxis:{title:'상관계수',gridcolor:'#eee',range:[-0.2,1.05]},
+    legend:{x:0.7,y:0.95},
+    plot_bgcolor:'#fafafa',paper_bgcolor:'#fff',margin:{t:40,b:50}
+  },{responsive:true});
+
+  // ARIMA 예측
+  var N=200,forecast=30;
+  var actual=[];var p=0;
+  for(var i=0;i<N+forecast;i++){p=0.3*p+randn()*0.8;actual.push(p)}
+  var pred=actual.slice(0,N);
+  // 예측 (약간의 오차)
+  var fPred=[],fUpper=[],fLower=[];
+  var lastVal=actual[N-1];
+  for(var i=0;i<forecast;i++){
+    var f=lastVal*0.3+randn()*0.3;
+    fPred.push(f);
+    var ci95=1.5*(1+i*0.1);
+    fUpper.push(f+ci95);fLower.push(f-ci95);
+    lastVal=f;
+  }
+  var xAll=[];for(var i=0;i<N+forecast;i++)xAll.push(i+1);
+  var xFore=[];for(var i=N;i<N+forecast;i++)xFore.push(i+1);
+
+  Plotly.newPlot('plot-ch10-arima',[
+    {x:xAll.slice(0,N),y:actual.slice(0,N),mode:'lines',name:'실제 (Train)',line:{color:'#2c3e50',width:1.5}},
+    {x:xAll.slice(N),y:actual.slice(N),mode:'lines',name:'실제 (Test)',line:{color:'#95a5a6',width:1.5}},
+    {x:xFore,y:fPred,mode:'lines',name:'ARIMA 예측',line:{color:'#e74c3c',width:2.5}},
+    {x:xFore.concat(xFore.slice().reverse()),y:fUpper.concat(fLower.slice().reverse()),
+     fill:'toself',fillcolor:'rgba(231,76,60,0.15)',line:{color:'transparent'},name:'95% CI',showlegend:true}
+  ],{
+    title:{text:'🔮 ARIMA 예측 + 신뢰구간',font:{size:13}},
+    xaxis:{title:'시점',gridcolor:'#eee'},
+    yaxis:{title:'값',gridcolor:'#eee'},
+    legend:{x:0.02,y:0.98,font:{size:10}},
+    plot_bgcolor:'#fafafa',paper_bgcolor:'#fff',margin:{t:40,b:50},
+    shapes:[{type:'line',x0:N,x1:N,y0:-8,y1:8,line:{color:'#f39c12',width:2,dash:'dot'}}],
+    annotations:[{x:N,y:7,text:'예측 시작',showarrow:false,font:{size:10,color:'#f39c12'}}]
+  },{responsive:true});
+})();
+</script>
 
 
 <!-- ==================== Ch.11 ==================== -->
@@ -2530,6 +2854,49 @@ plt.<span class="fn">show</span>()</code></pre>
 </ul>
 </div>
 
+<!-- ══ Plotly: GARCH 변동성 클러스터링 ══ -->
+<div id="plot-ch11-garch" style="width:100%;height:500px;margin:25px 0"></div>
+<p class="ni" style="font-size:12px;color:#888;text-align:center">🖱️ 상단: 수익률 시계열 · 하단: GARCH(1,1) 조건부 변동성 — 변동성 클러스터링(큰 변동 뒤에 큰 변동)을 관찰</p>
+<script>
+(function(){
+  function mulberry32(a){return function(){a|=0;a=a+0x6D2B79F5|0;var t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296}}
+  var rng=mulberry32(42);
+  function randn(){var u=0,v=0;while(u===0)u=rng();while(v===0)v=rng();return Math.sqrt(-2*Math.log(u))*Math.cos(2*Math.PI*v)}
+
+  var N=500;
+  var dates=[];var d=new Date(2022,0,3);
+  for(var i=0;i<N;i++){dates.push(new Date(d));d.setDate(d.getDate()+(d.getDay()===5?3:1))}
+
+  // GARCH(1,1) 시뮬레이션: σ²_t = ω + α·ε²_{t-1} + β·σ²_{t-1}
+  var omega=0.00001,alpha=0.08,beta=0.88;
+  var sigma2=[0.0003],ret=[0];
+  for(var i=1;i<N;i++){
+    sigma2.push(omega+alpha*ret[i-1]*ret[i-1]+beta*sigma2[i-1]);
+    ret.push(Math.sqrt(sigma2[i])*randn());
+  }
+  var condVol=sigma2.map(function(s){return Math.sqrt(s)*Math.sqrt(252)*100}); // 연환산 %
+  var retPct=ret.map(function(r){return r*100});
+
+  // 수익률 색상 (변동성 높은 구간 강조)
+  var retColors=condVol.map(function(v){return v>25?'rgba(231,76,60,0.8)':'rgba(52,152,219,0.6)'});
+
+  Plotly.newPlot('plot-ch11-garch',[
+    {x:dates,y:retPct,type:'bar',name:'일간 수익률 (%)',marker:{color:retColors},yaxis:'y'},
+    {x:dates,y:condVol,mode:'lines',name:'GARCH 조건부 변동성 (%)',line:{color:'#e74c3c',width:2.5},yaxis:'y2'},
+    {x:dates,y:condVol.map(function(){return condVol.reduce(function(s,v){return s+v},0)/N}),mode:'lines',
+     name:'평균 변동성',line:{color:'#f39c12',dash:'dash',width:1.5},yaxis:'y2'}
+  ],{
+    title:{text:'🌊 GARCH(1,1) 변동성 클러스터링',font:{size:14}},
+    xaxis:{gridcolor:'#eee'},
+    yaxis:{title:'수익률 (%)',domain:[0,0.45],gridcolor:'#eee'},
+    yaxis2:{title:'조건부 변동성 (% ann.)',domain:[0.55,1],gridcolor:'#eee'},
+    legend:{orientation:'h',y:-0.08,font:{size:10}},
+    hovermode:'x unified',
+    plot_bgcolor:'#fafafa',paper_bgcolor:'#fff',margin:{t:50,b:50}
+  },{responsive:true});
+})();
+</script>
+
 
 <!-- ==================== Ch.12 ==================== -->
 <h2 id="ch12">Chapter 12. 실전 통합 — PCA + K-Means + ARIMA/GARCH 파이프라인</h2>
@@ -2806,6 +3173,76 @@ plt.<span class="fn">show</span>()
 <p class="ni"><strong>역변동성 가중의 직관</strong></p>
 <p class="ni" style="margin-top:8px">"위험한 곳에는 적게, 안전한 곳에는 많이" — 이것이 역변동성 가중의 핵심이다. GARCH가 예측한 변동성이 높은 클러스터(예: 기술주)의 비중을 줄이고, 낮은 클러스터(예: 소비재)의 비중을 늘린다. 이 단순한 전략이 동일 가중보다 리스크 대비 수익률(Sharpe Ratio)이 높은 경우가 많다. R8에서 배울 마코위츠 최적화와 Risk Parity는 이 아이디어를 더 정교하게 발전시킨 것이다.</p>
 </div>
+
+<!-- ══ Plotly: 클러스터별 누적 수익률 + 역변동성 가중 전략 ══ -->
+<div id="plot-ch12-pipeline" style="width:100%;height:500px;margin:25px 0"></div>
+<p class="ni" style="font-size:12px;color:#888;text-align:center">🖱️ 클러스터별 누적 수익률 + 역변동성 가중 전략 vs 동일 가중 · 범례 클릭으로 토글</p>
+<script>
+(function(){
+  function mulberry32(a){return function(){a|=0;a=a+0x6D2B79F5|0;var t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296}}
+  var rng=mulberry32(2024);
+  function randn(){var u=0,v=0;while(u===0)u=rng();while(v===0)v=rng();return Math.sqrt(-2*Math.log(u))*Math.cos(2*Math.PI*v)}
+
+  var N=252;
+  var dates=[];var d=new Date(2024,0,2);
+  for(var i=0;i<N;i++){dates.push(new Date(d));d.setDate(d.getDate()+(d.getDay()===5?3:1))}
+
+  var clusters=[
+    {name:'Cluster 0 (IT/반도체)',mu:0.0005,sig:0.022,color:'#e74c3c'},
+    {name:'Cluster 1 (금융)',mu:0.0003,sig:0.014,color:'#3498db'},
+    {name:'Cluster 2 (자동차)',mu:0.0004,sig:0.018,color:'#f39c12'},
+    {name:'Cluster 3 (바이오)',mu:0.0002,sig:0.026,color:'#2ecc71'}
+  ];
+
+  var clRets=[];
+  var traces=[];
+  clusters.forEach(function(c){
+    var rets=[],cum=[0];
+    for(var i=0;i<N;i++){
+      var r=c.mu+c.sig*randn();
+      rets.push(r);cum.push(cum[i]+r);
+    }
+    clRets.push(rets);
+    var cumPct=cum.slice(1).map(function(v){return(Math.exp(v)-1)*100});
+    traces.push({x:dates,y:cumPct,mode:'lines',name:c.name,line:{color:c.color,width:1.5},opacity:0.6});
+  });
+
+  // 동일 가중 전략
+  var eqRet=[],eqCum=[0];
+  for(var i=0;i<N;i++){
+    var r=0;clRets.forEach(function(cr){r+=cr[i]});r/=4;
+    eqRet.push(r);eqCum.push(eqCum[i]+r);
+  }
+  traces.push({x:dates,y:eqCum.slice(1).map(function(v){return(Math.exp(v)-1)*100}),
+    mode:'lines',name:'동일 가중 (Equal Weight)',line:{color:'#95a5a6',width:2.5,dash:'dash'}});
+
+  // 역변동성 가중 전략
+  var ivRet=[],ivCum=[0];
+  var vols=clusters.map(function(c){return c.sig});
+  var invVols=vols.map(function(v){return 1/v});
+  var sumInv=invVols.reduce(function(s,v){return s+v},0);
+  var weights=invVols.map(function(v){return v/sumInv});
+  for(var i=0;i<N;i++){
+    var r=0;clRets.forEach(function(cr,ci){r+=weights[ci]*cr[i]});
+    ivRet.push(r);ivCum.push(ivCum[i]+r);
+  }
+  traces.push({x:dates,y:ivCum.slice(1).map(function(v){return(Math.exp(v)-1)*100}),
+    mode:'lines',name:'역변동성 가중 (Inv-Vol)',line:{color:'#2c3e50',width:3}});
+
+  Plotly.newPlot('plot-ch12-pipeline',traces,{
+    title:{text:'💰 PCA+K-Means+GARCH 통합 전략: 클러스터별 수익률 + 역변동성 가중',font:{size:13}},
+    xaxis:{title:'날짜',gridcolor:'#eee'},
+    yaxis:{title:'누적 수익률 (%)',gridcolor:'#eee',zeroline:true,zerolinecolor:'#999'},
+    legend:{orientation:'h',y:-0.12,font:{size:9}},
+    hovermode:'x unified',
+    plot_bgcolor:'#fafafa',paper_bgcolor:'#fff',margin:{t:50,b:60},
+    annotations:[{
+      x:dates[N-1],y:ivCum[N].toFixed?((Math.exp(ivCum[N])-1)*100):0,
+      text:'역변동성 가중',showarrow:true,arrowhead:2,ax:-50,font:{size:10,color:'#2c3e50'}
+    }]
+  },{responsive:true});
+})();
+</script>
 
 
 <!-- ==================== Ch.13 ==================== -->
