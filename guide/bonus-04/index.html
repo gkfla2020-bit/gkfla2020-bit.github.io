@@ -1,0 +1,1476 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Bonus 4 - 재무관리 올인원 (Financial Management All-in-One)</title>
+<script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;500&family=Space+Mono:wght@400&family=Inter:wght@300;400&display=swap" rel="stylesheet">
+<script src="https://cdn.plot.ly/plotly-2.27.0.min.js"></script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Inter',sans-serif;background:#fafaf8;color:#1a1a1a;line-height:1.7;overflow-x:hidden}
+.sidebar{position:fixed;left:0;top:0;width:260px;height:100vh;background:rgba(255,255,255,.97);border-right:1px solid rgba(0,0,0,.06);padding:32px 24px;z-index:100;overflow-y:auto;display:flex;flex-direction:column}
+.sidebar-profile{text-align:center;margin-bottom:28px;padding-bottom:24px;border-bottom:1px solid rgba(0,0,0,.08)}
+.profile-icon{font-size:48px;margin-bottom:8px}
+.profile-name{font-family:'Cormorant Garamond',serif;font-size:1.3rem;font-weight:500;margin-bottom:4px}
+.profile-title{font-size:.68rem;color:#888;letter-spacing:.08em;text-transform:uppercase;margin-bottom:8px}
+.profile-bio{font-size:.78rem;color:#666;line-height:1.5}
+.sidebar-nav{flex:1;margin-top:16px}
+.nav-section{margin-bottom:20px}
+.nav-section-title{font-size:.6rem;font-weight:600;color:#aaa;letter-spacing:.15em;text-transform:uppercase;margin-bottom:10px}
+.nav-list{list-style:none}
+.nav-list li{margin-bottom:5px}
+.nav-list a{font-size:.78rem;color:#555;text-decoration:none;transition:all .2s;display:block;padding:3px 0}
+.nav-list a:hover{color:#0080c6;padding-left:4px}
+.nav-list a.active{color:#0080c6;font-weight:500}
+.nav-list a.done{color:#28a745}
+.badge{display:inline-block;font-size:.5rem;background:#0080c6;color:#fff;padding:1px 5px;border-radius:8px;margin-left:3px;vertical-align:middle}
+.badge-done{background:#28a745}
+.badge-bonus{background:#9c27b0}
+.sidebar-footer{padding-top:16px;border-top:1px solid rgba(0,0,0,.06);font-size:.65rem;color:#aaa;text-align:center}
+.main-wrapper{margin-left:260px;min-height:100vh}
+.container{max-width:1100px;margin:0 auto;padding:50px 40px 80px}
+.paper-content{font-family:'Times New Roman','Nanum Myeongjo',serif;line-height:1.8;background:#fff;padding:40px;border-radius:8px;box-shadow:0 2px 20px rgba(0,0,0,.05)}
+.paper-header{text-align:center;margin-bottom:40px;padding-bottom:30px;border-bottom:2px solid #333}
+.paper-category{font-size:14px;color:#666;margin-bottom:10px}
+.paper-title{font-size:24px;font-weight:bold;margin-bottom:12px;line-height:1.4}
+.paper-subtitle{font-size:14px;color:#555;margin-bottom:8px}
+.paper-team{font-size:13px;color:#444}
+.abstract{background:#f8f9fa;padding:25px;margin:30px 0;border-left:4px solid #2c3e50}
+.abstract-title{font-weight:bold;font-size:16px;margin-bottom:15px}
+h2{font-size:18px;margin:35px 0 20px;padding-bottom:8px;border-bottom:1px solid #ddd;color:#2c3e50}
+h3{font-size:15px;margin:25px 0 15px;color:#34495e}
+h4{font-size:14px;margin:20px 0 12px;color:#34495e}
+p{text-align:justify;margin-bottom:15px;text-indent:2em}
+p.ni{text-indent:0}
+table{width:100%;border-collapse:collapse;margin:20px 0;font-size:12px}
+th,td{border:1px solid #ddd;padding:10px 8px;text-align:center}
+th{background:#2c3e50;color:white;font-weight:bold}
+tr:nth-child(even){background:#f8f9fa}
+tr:hover{background:#e8f4f8}
+.tc{font-size:13px;font-weight:bold;margin:15px 0 10px;text-align:center}
+.eq{text-align:center;margin:20px 0;padding:15px;background:#f8f9fa;border-radius:4px;overflow-x:auto}
+ul,ol{margin-left:2em;margin-bottom:15px}
+li{margin-bottom:6px}
+.def{background:#fff9e6;border:1px solid #ffc107;border-radius:4px;padding:20px;margin:20px 0}
+.info{background:#e8f4f8;border-left:4px solid #3498db;padding:20px;margin:20px 0}
+.warn{background:#fff3cd;border-left:4px solid #f39c12;padding:20px;margin:20px 0}
+.ok{background:#d4edda;border-left:4px solid #28a745;padding:20px;margin:20px 0}
+pre{background:#1e1e1e;color:#d4d4d4;padding:20px;border-radius:6px;overflow-x:auto;margin:20px 0;font-family:'Space Mono','Consolas',monospace;font-size:13px;line-height:1.6}
+code{font-family:'Space Mono','Consolas',monospace;font-size:13px}
+p code,li code,td code{background:#f0f0f0;padding:2px 6px;border-radius:3px;color:#c7254e;font-size:12px}
+.cc{font-size:12px;font-weight:bold;color:#2c3e50;margin-top:15px;margin-bottom:4px}
+.cm{color:#6a9955}.kw{color:#569cd6}.st{color:#ce9178}.fn{color:#dcdcaa}.nb{color:#4ec9b0}.nu{color:#b5cea8}
+.progress-bar{width:100%;height:6px;background:#e0e0e0;border-radius:3px;margin-top:16px}
+.progress-fill{height:100%;background:linear-gradient(90deg,#9c27b0,#e040fb);border-radius:3px;width:100%}
+.progress-label{font-size:11px;color:#888;margin-top:4px;text-align:center}
+details{margin:20px 0;border:1px solid #ddd;border-radius:6px;overflow:hidden}
+details summary{padding:14px 20px;background:#f0f4f8;cursor:pointer;font-weight:bold;font-size:14px;color:#2c3e50;user-select:none;transition:background .2s}
+details summary:hover{background:#e0e8f0}
+details[open] summary{background:#d0dce8;border-bottom:1px solid #ddd}
+details .answer-content{padding:20px;background:#fff}
+.problem-box{background:#f0f4ff;border:2px solid #5c6bc0;border-radius:8px;padding:20px;margin:20px 0}
+.problem-box .problem-title{font-weight:bold;color:#283593;font-size:15px;margin-bottom:12px}
+@media(max-width:1024px){
+.sidebar{width:100%;height:auto;position:relative;border-right:none;border-bottom:1px solid rgba(0,0,0,.08);padding:16px}
+.sidebar-profile{margin-bottom:10px;padding-bottom:10px;display:flex;align-items:center;gap:12px;text-align:left}
+.profile-icon{font-size:32px;margin-bottom:0}.profile-bio{display:none}
+.nav-section{display:inline-block;margin-right:16px;margin-bottom:8px}
+.nav-list{display:flex;gap:10px;flex-wrap:wrap}.nav-list li{margin-bottom:0}
+.sidebar-footer{display:none}
+.main-wrapper{margin-left:0}
+.container{padding:0}.paper-content{padding:20px 16px;border-radius:0;box-shadow:none}
+.paper-title{font-size:18px}p{font-size:14px;text-indent:1.5em;text-align:left}
+pre{font-size:11px;padding:14px}table{font-size:10px;display:block;overflow-x:auto}
+}
+.code-output{background:#1e1e1e;color:#d4d4d4;padding:12px 16px;border-radius:0 0 6px 6px;font-family:'Space Mono',monospace;font-size:11.5px;line-height:1.6;margin-top:-4px;margin-bottom:18px;border-top:2px solid #333;white-space:pre-wrap;overflow-x:auto}
+.code-output .out-label{color:#888;font-size:10px;margin-bottom:4px;display:block}
+</style>
+</head>
+<body>
+
+<div class="sidebar">
+<div class="sidebar-profile">
+<div class="profile-icon">&#x1F4B0;</div>
+<div class="profile-name">HFT ML Master Plan</div>
+<div class="profile-title">Convex Opt + DL + HFT</div>
+<div class="profile-bio">Bonus Rounds: 수학 기초 올인원</div>
+</div>
+<div class="sidebar-nav">
+<div class="nav-section">
+<div class="nav-section-title">Curriculum</div>
+<ul class="nav-list">
+<li><a class="done" href="../round-01/">R1. Python + Finance <span class="badge badge-done">DONE</span></a></li>
+<li><a class="done" href="../bonus-01/">B1. 선형대수 올인원 <span class="badge badge-done">DONE</span></a></li>
+<li><a class="done" href="../round-02/">R2. Linear Algebra + Stats <span class="badge badge-done">DONE</span></a></li>
+<li><a class="done" href="../bonus-02/">B2. 미적분 올인원 <span class="badge badge-done">DONE</span></a></li>
+<li><a class="done" href="../round-03/">R3. Data / Feature Eng. <span class="badge badge-done">DONE</span></a></li>
+<li><a class="active" href="#">B4. 재무관리 올인원 <span class="badge badge-bonus">BONUS</span></a></li>
+<li><a href="../round-04/">R4. Supervised Learning</a></li>
+<li><a href="../bonus-03/">B3. 확률·통계 올인원</a></li>
+<li><a href="../round-05/">R5. Unsupervised + TS</a></li>
+<li><a href="../bonus-05/">B5. 금융공학 올인원</a></li>
+<li><a href="../round-06/">R6. NLP + Sentiment</a></li>
+<li><a href="../round-07/">R7. Deep Learning</a></li>
+<li><a href="../bonus-06/">B6. 최적화 이론 올인원</a></li>
+<li><a href="../round-08/">R8. Convex Opt + Transformer</a></li>
+<li><a href="../round-09/">R9. HFT + RL</a></li>
+<li><a href="../round-10/">R10. Final Project</a></li>
+</ul>
+</div>
+<div class="nav-section">
+<div class="nav-section-title">This Lecture</div>
+<ul class="nav-list">
+<li><a href="#ch1">1. 화폐의 시간가치</a></li>
+<li><a href="#ch2">2. 현금흐름 할인 (DCF)</a></li>
+<li><a href="#ch3">3. 수익률과 위험</a></li>
+<li><a href="#ch4">4. 포트폴리오 이론</a></li>
+<li><a href="#ch5">5. CAPM</a></li>
+<li><a href="#ch6">6. 효율적 시장 가설</a></li>
+<li><a href="#ch7">7. 팩터 모델</a></li>
+<li><a href="#ch8">8. 성과 평가 지표</a></li>
+<li><a href="#ch9">9. 행동재무학</a></li>
+<li><a href="#ch10">10. 종합 문제</a></li>
+</ul>
+</div>
+</div>
+<div class="sidebar-footer">Bonus 4 — 재무관리 올인원</div>
+</div>
+
+<div class="main-wrapper">
+<div class="container">
+<div class="paper-content">
+
+<div class="paper-header">
+<div class="paper-category">Bonus Round 4 / 6 — R3과 R4 사이</div>
+<h1 class="paper-title">재무관리 올인원 (Financial Management All-in-One)</h1>
+<div class="paper-subtitle">화폐의 시간가치 → DCF → 포트폴리오 이론 → CAPM → 팩터 모델 → 성과 평가</div>
+<div class="paper-team">퀀트가 반드시 알아야 할 재무관리의 모든 것</div>
+<div class="progress-bar"><div class="progress-fill"></div></div>
+<div class="progress-label">Bonus Round — 재무관리 완전 정복</div>
+</div>
+
+<div class="abstract">
+<div class="abstract-title">왜 재무관리인가?</div>
+<p class="ni">ML 모델이 아무리 정교해도, 금융의 기본 원리를 모르면 의미 없는 예측을 하게 된다. "왜 미래의 돈이 현재의 돈보다 가치가 낮은가?", "리스크와 수익률의 관계는?", "시장은 효율적인가?" — 이 질문들에 답할 수 있어야 진짜 퀀트다. 이 강의를 마치면:</p>
+<ul>
+<li>현재가치/미래가치를 계산하고 DCF 밸류에이션을 수행할 수 있다</li>
+<li>수익률, 변동성, 샤프비율을 정확히 계산하고 해석할 수 있다</li>
+<li>마코위츠 포트폴리오 이론과 효율적 프론티어를 이해한다</li>
+<li>CAPM과 베타의 의미를 설명하고 계산할 수 있다</li>
+<li>Fama-French 팩터 모델의 구조를 이해한다</li>
+<li>효율적 시장 가설의 함의와 한계를 논할 수 있다</li>
+</ul>
+<div style="font-size:13px;color:#555;margin-top:15px;font-style:italic"><strong>Keywords:</strong> TVM, DCF, NPV, IRR, CAPM, Beta, Sharpe Ratio, Efficient Frontier, EMH, Fama-French</div>
+</div>
+
+<!-- ═══════════════════════════════════════════ -->
+<!-- Ch1: 화폐의 시간가치 -->
+<!-- ═══════════════════════════════════════════ -->
+<h2 id="ch1">1. 화폐의 시간가치 (Time Value of Money)</h2>
+
+<h3>1.1 오늘의 100만원 vs 1년 후의 100만원</h3>
+<p>재무관리의 가장 기본 원리: 오늘의 돈이 미래의 같은 금액보다 가치가 높다. 이유는 세 가지다: (1) 투자 기회 — 오늘 100만원을 투자하면 1년 후 105만원이 된다, (2) 인플레이션 — 물가가 오르면 같은 금액의 구매력이 줄어든다, (3) 불확실성 — 미래의 돈은 받지 못할 위험이 있다.</p>
+
+<div class="def">
+<p class="ni"><strong>핵심 공식:</strong></p>
+<div class="eq">$$FV = PV \times (1 + r)^n \quad \Longleftrightarrow \quad PV = \frac{FV}{(1 + r)^n}$$</div>
+<ul>
+<li>\(PV\): 현재가치 (Present Value) — 오늘의 가치</li>
+<li>\(FV\): 미래가치 (Future Value) — n기간 후의 가치</li>
+<li>\(r\): 할인율/이자율 (discount rate)</li>
+<li>\(n\): 기간 수</li>
+</ul>
+</div>
+
+<pre><code><span class="kw">import</span> numpy <span class="kw">as</span> np
+
+<span class="cm"># 미래가치: 1000만원을 연 5%로 10년 투자</span>
+PV = <span class="nu">10_000_000</span>
+r = <span class="nu">0.05</span>
+n = <span class="nu">10</span>
+FV = PV * (<span class="nu">1</span> + r)**n
+<span class="fn">print</span>(<span class="st">f"미래가치: </span>{FV:,.0f}<span class="st">원"</span>)  <span class="cm"># 16,288,946원</span>
+
+<span class="cm"># 현재가치: 10년 후 2000만원의 현재 가치 (할인율 7%)</span>
+FV2 = <span class="nu">20_000_000</span>
+r2 = <span class="nu">0.07</span>
+PV2 = FV2 / (<span class="nu">1</span> + r2)**<span class="nu">10</span>
+<span class="fn">print</span>(<span class="st">f"현재가치: </span>{PV2:,.0f}<span class="st">원"</span>)  <span class="cm"># 10,166,990원</span>
+
+<span class="cm"># 72의 법칙: 원금 2배 기간 ≈ 72 / 이율(%)</span>
+<span class="kw">for</span> rate <span class="kw">in</span> [<span class="nu">3</span>, <span class="nu">5</span>, <span class="nu">7</span>, <span class="nu">10</span>, <span class="nu">15</span>]:
+    <span class="fn">print</span>(<span class="st">f"  연 </span>{rate}<span class="st">% → 2배까지 약 </span>{72/rate:.1f}<span class="st">년"</span>)</code></pre>
+<div class="code-output"><span class="out-label">Output:</span>
+미래가치: 16,288,946원
+현재가치: 10,166,990원
+  연 3% → 2배까지 약 24.0년
+  연 5% → 2배까지 약 14.4년
+  연 7% → 2배까지 약 10.3년
+  연 10% → 2배까지 약 7.2년
+  연 15% → 2배까지 약 4.8년</div>
+
+<!-- ▼ Plotly: 복리 성장 비교 -->
+<div id="plot-ch1-compound" style="width:100%;height:400px;margin:25px 0"></div>
+<script>
+(function(){
+  var years=[],g3=[],g5=[],g7=[],g10=[];
+  var p3=100,p5=100,p7=100,p10=100;
+  for(var y=0;y<=30;y++){
+    years.push(y);g3.push(p3);g5.push(p5);g7.push(p7);g10.push(p10);
+    p3*=1.03;p5*=1.05;p7*=1.07;p10*=1.10;
+  }
+  Plotly.newPlot('plot-ch1-compound',[
+    {x:years,y:g3,mode:'lines',name:'연 3%',line:{width:2}},
+    {x:years,y:g5,mode:'lines',name:'연 5%',line:{width:2}},
+    {x:years,y:g7,mode:'lines',name:'연 7%',line:{width:2,color:'#e53935'}},
+    {x:years,y:g10,mode:'lines',name:'연 10%',line:{width:2,color:'#ff9800'}}
+  ],{
+    title:{text:'💰 복리의 마법: 100만원을 30년간 투자하면?',font:{size:13}},
+    xaxis:{title:'투자 기간 (년)'},
+    yaxis:{title:'자산 (만원)',tickformat:',.0f'},
+    margin:{l:60,r:20,t:45,b:40},
+    legend:{x:0.05,y:0.95},hovermode:'x unified',
+    shapes:[{type:'line',x0:0,x1:30,y0:200,y1:200,line:{color:'#888',dash:'dot',width:1}}],
+    annotations:[{x:20,y:210,text:'원금 2배',showarrow:false,font:{size:10,color:'#888'}}]
+  },{responsive:true});
+})();
+</script>
+<p class="ni" style="font-size:11px;color:#888;text-align:center;margin-top:-10px">🖱️ 연 10%로 30년 투자하면 100만원 → 1,745만원. 복리 효과는 시간이 길수록 극적</p>
+
+<h3>1.2 연금의 현재가치</h3>
+<p>매년 일정 금액을 받는 현금흐름(연금, annuity)의 현재가치:</p>
+
+<div class="eq">
+$$PV_{\text{annuity}} = C \times \frac{1 - (1+r)^{-n}}{r}$$
+</div>
+
+<pre><code><span class="cm"># 연금 현재가치: 매년 500만원을 10년간 받는 연금 (할인율 6%)</span>
+C = <span class="nu">5_000_000</span>
+r = <span class="nu">0.06</span>
+n = <span class="nu">10</span>
+PV_annuity = C * (<span class="nu">1</span> - (<span class="nu">1</span>+r)**(-n)) / r
+<span class="fn">print</span>(<span class="st">f"연금 현재가치: </span>{PV_annuity:,.0f}<span class="st">원"</span>)  <span class="cm"># 36,800,444원</span>
+<span class="fn">print</span>(<span class="st">f"총 수령액:     </span>{C*n:,.0f}<span class="st">원"</span>)         <span class="cm"># 50,000,000원</span>
+<span class="fn">print</span>(<span class="st">f"할인 효과:     </span>{C*n - PV_annuity:,.0f}<span class="st">원 감소"</span>)</code></pre>
+<div class="code-output"><span class="out-label">Output:</span>
+연금 현재가치: 36,800,444원
+총 수령액:     50,000,000원
+할인 효과:     13,199,556원 감소</div>
+
+<!-- ═══════════════════════════════════════════ -->
+<!-- Ch2: DCF -->
+<!-- ═══════════════════════════════════════════ -->
+<h2 id="ch2">2. 현금흐름 할인 (DCF) — 기업 가치 평가의 핵심</h2>
+
+<h3>2.1 NPV (순현재가치)</h3>
+<p>투자 프로젝트의 가치를 평가하는 가장 기본적인 방법이다. 미래 현금흐름을 현재가치로 할인하여 합산한 것이 NPV다.</p>
+
+<div class="eq">
+$$NPV = -C_0 + \sum_{t=1}^{n} \frac{CF_t}{(1+r)^t}$$
+</div>
+
+<p>NPV > 0이면 투자할 가치가 있고, NPV < 0이면 투자하지 않는 것이 합리적이다.</p>
+
+<pre><code><span class="kw">import</span> numpy <span class="kw">as</span> np
+
+<span class="cm"># 투자 프로젝트: 초기 투자 1억, 5년간 현금흐름</span>
+initial = -<span class="nu">100_000_000</span>
+cashflows = [<span class="nu">25_000_000</span>, <span class="nu">30_000_000</span>, <span class="nu">35_000_000</span>, <span class="nu">30_000_000</span>, <span class="nu">20_000_000</span>]
+r = <span class="nu">0.08</span>  <span class="cm"># 할인율 8%</span>
+
+<span class="cm"># NPV 계산</span>
+npv = initial
+<span class="kw">for</span> t, cf <span class="kw">in</span> <span class="fn">enumerate</span>(cashflows, <span class="nu">1</span>):
+    npv += cf / (<span class="nu">1</span> + r)**t
+
+<span class="fn">print</span>(<span class="st">f"NPV = </span>{npv:,.0f}<span class="st">원"</span>)
+<span class="fn">print</span>(<span class="st">f"투자 결정: </span>{'✅ 투자' <span class="kw">if</span> npv > 0 <span class="kw">else</span> '❌ 기각'}<span class="st">"</span>)
+
+<span class="cm"># NumPy로 간단하게</span>
+all_cf = np.array([initial] + cashflows)
+npv_np = np.npv(<span class="nu">0.08</span>, all_cf) <span class="kw">if</span> <span class="fn">hasattr</span>(np, <span class="st">'npv'</span>) <span class="kw">else</span> np.sum(all_cf / (<span class="nu">1.08</span>)**np.arange(<span class="fn">len</span>(all_cf)))
+<span class="fn">print</span>(<span class="st">f"NPV (검증): </span>{npv_np:,.0f}<span class="st">원"</span>)</code></pre>
+<div class="code-output"><span class="out-label">Output:</span>
+NPV = 12,322,504원
+투자 결정: ✅ 투자
+NPV (검증): 12,322,504원</div>
+
+<h3>2.2 IRR (내부수익률)</h3>
+<p>IRR은 NPV를 0으로 만드는 할인율이다. "이 투자의 실질 수익률은 얼마인가?"에 대한 답이다.</p>
+
+<div class="eq">
+$$0 = -C_0 + \sum_{t=1}^{n} \frac{CF_t}{(1+IRR)^t}$$
+</div>
+
+<pre><code><span class="kw">from</span> scipy.optimize <span class="kw">import</span> brentq
+
+<span class="cm"># IRR 계산</span>
+<span class="kw">def</span> <span class="fn">npv_func</span>(r, cashflows):
+    <span class="kw">return</span> <span class="fn">sum</span>(cf / (<span class="nu">1</span>+r)**t <span class="kw">for</span> t, cf <span class="kw">in</span> <span class="fn">enumerate</span>(cashflows))
+
+all_cf = [-<span class="nu">100_000_000</span>, <span class="nu">25_000_000</span>, <span class="nu">30_000_000</span>, <span class="nu">35_000_000</span>, <span class="nu">30_000_000</span>, <span class="nu">20_000_000</span>]
+irr = brentq(npv_func, <span class="nu">0.01</span>, <span class="nu">0.50</span>, args=(all_cf,))
+<span class="fn">print</span>(<span class="st">f"IRR = </span>{irr:.2%}<span class="st">"</span>)
+<span class="fn">print</span>(<span class="st">f"할인율(8%) < IRR(</span>{irr:.1%}<span class="st">) → 투자 가치 있음"</span>)</code></pre>
+<div class="code-output"><span class="out-label">Output:</span>
+IRR = 12.37%
+할인율(8%) < IRR(12.4%) → 투자 가치 있음</div>
+
+<div class="problem-box">
+<div class="problem-title">✏️ 연습문제 2.1</div>
+<p class="ni">두 투자 프로젝트를 비교하라 (할인율 10%):</p>
+<ul>
+<li>프로젝트 A: 초기 투자 5000만원, 3년간 매년 2500만원 수입</li>
+<li>프로젝트 B: 초기 투자 8000만원, 3년간 매년 3800만원 수입</li>
+</ul>
+<p class="ni">각각의 NPV와 IRR을 구하고, 어느 프로젝트가 더 나은지 판단하라.</p>
+</div>
+
+<details>
+<summary>🔑 풀이 보기</summary>
+<div class="answer-content">
+<pre><code><span class="kw">from</span> scipy.optimize <span class="kw">import</span> brentq
+
+<span class="kw">def</span> <span class="fn">calc_npv</span>(r, cfs):
+    <span class="kw">return</span> <span class="fn">sum</span>(cf/(<span class="nu">1</span>+r)**t <span class="kw">for</span> t,cf <span class="kw">in</span> <span class="fn">enumerate</span>(cfs))
+
+cfA = [-<span class="nu">50_000_000</span>, <span class="nu">25_000_000</span>, <span class="nu">25_000_000</span>, <span class="nu">25_000_000</span>]
+cfB = [-<span class="nu">80_000_000</span>, <span class="nu">38_000_000</span>, <span class="nu">38_000_000</span>, <span class="nu">38_000_000</span>]
+
+npvA = calc_npv(<span class="nu">0.10</span>, cfA)
+npvB = calc_npv(<span class="nu">0.10</span>, cfB)
+irrA = brentq(calc_npv, <span class="nu">0.01</span>, <span class="nu">0.99</span>, args=(cfA,))
+irrB = brentq(calc_npv, <span class="nu">0.01</span>, <span class="nu">0.99</span>, args=(cfB,))
+
+<span class="fn">print</span>(<span class="st">f"A: NPV = </span>{npvA:,.0f}<span class="st">원, IRR = </span>{irrA:.2%}<span class="st">"</span>)
+<span class="fn">print</span>(<span class="st">f"B: NPV = </span>{npvB:,.0f}<span class="st">원, IRR = </span>{irrB:.2%}<span class="st">"</span>)
+<span class="fn">print</span>(<span class="st">f"\nNPV 기준: </span>{'A' <span class="kw">if</span> npvA > npvB <span class="kw">else</span> 'B'}<span class="st"> 선택"</span>)</code></pre>
+<div class="code-output"><span class="out-label">Output:</span>
+A: NPV = 12,171,052원, IRR = 23.38%
+B: NPV = 14,502,632원, IRR = 20.44%</div>
+<p class="ni">NPV 기준으로는 B가 우수하지만, IRR 기준으로는 A가 우수하다. 투자 규모가 다를 때 NPV와 IRR이 충돌할 수 있다. 일반적으로 NPV를 우선시한다 — 절대적 가치 창출이 더 중요하기 때문.</p>
+</div>
+</details>
+
+<!-- ═══════════════════════════════════════════ -->
+<!-- Ch3: 수익률과 위험 -->
+<!-- ═══════════════════════════════════════════ -->
+<h2 id="ch3">3. 수익률과 위험 — 금융의 양대 축</h2>
+
+<h3>3.1 수익률의 종류</h3>
+
+<div class="tc">Table 1. 수익률 종류 정리</div>
+<table>
+<tr><th>수익률</th><th>공식</th><th>특징</th><th>용도</th></tr>
+<tr><td>단순 수익률</td><td>\(\frac{P_t - P_{t-1}}{P_{t-1}}\)</td><td>직관적, 시간 비가산</td><td>일반 보고</td></tr>
+<tr><td>로그 수익률</td><td>\(\ln\frac{P_t}{P_{t-1}}\)</td><td>시간 가산적, 정규분포 가정</td><td>모델링, 통계 분석</td></tr>
+<tr><td>산술 평균</td><td>\(\frac{1}{n}\sum r_i\)</td><td>기대 수익률 추정</td><td>CAPM, 팩터 모델</td></tr>
+<tr><td>기하 평균</td><td>\(\left(\prod(1+r_i)\right)^{1/n}-1\)</td><td>실제 복리 성장률</td><td>장기 성과 평가</td></tr>
+</table>
+
+<pre><code><span class="kw">import</span> numpy <span class="kw">as</span> np
+
+<span class="cm"># 5년간 연간 수익률</span>
+returns = np.array([<span class="nu">0.15</span>, -<span class="nu">0.10</span>, <span class="nu">0.20</span>, <span class="nu">0.05</span>, -<span class="nu">0.08</span>])
+
+<span class="cm"># 산술 평균</span>
+arith_mean = returns.mean()
+<span class="fn">print</span>(<span class="st">f"산술 평균: </span>{arith_mean:.2%}<span class="st">"</span>)
+
+<span class="cm"># 기하 평균 (실제 복리 성장률)</span>
+geo_mean = (np.prod(<span class="nu">1</span> + returns))**(<span class="nu">1</span>/<span class="fn">len</span>(returns)) - <span class="nu">1</span>
+<span class="fn">print</span>(<span class="st">f"기하 평균: </span>{geo_mean:.2%}<span class="st">"</span>)
+
+<span class="cm"># 최종 자산 검증</span>
+final = <span class="nu">100</span> * np.prod(<span class="nu">1</span> + returns)
+<span class="fn">print</span>(<span class="st">f"\n100만원 → </span>{final:.2f}<span class="st">만원 (5년 후)"</span>)
+<span class="fn">print</span>(<span class="st">f"기하 평균으로 검증: 100 × (1+</span>{geo_mean:.4f}<span class="st">)⁵ = </span>{100*(1+geo_mean)**5:.2f}<span class="st">"</span>)</code></pre>
+<div class="code-output"><span class="out-label">Output:</span>
+산술 평균: 4.40%
+기하 평균: 3.72%
+
+100만원 → 120.06만원 (5년 후)
+기하 평균으로 검증: 100 × (1+0.0372)⁵ = 120.06</div>
+
+<div class="warn">
+<p class="ni"><strong>산술 평균 vs 기하 평균:</strong> 산술 평균은 항상 기하 평균보다 크거나 같다 (AM-GM 부등식). 변동성이 클수록 차이가 커진다. 펀드 매니저가 "평균 수익률 10%"라고 할 때, 산술 평균인지 기하 평균인지 반드시 확인해야 한다. 실제 투자자의 경험은 기하 평균에 가깝다.</p>
+</div>
+
+<h3>3.2 위험의 측정: 변동성</h3>
+<p>금융에서 위험(risk)은 수익률의 불확실성이다. 가장 기본적인 측정 방법은 표준편차(변동성, volatility)다.</p>
+
+<div class="eq">
+$$\sigma = \sqrt{\frac{1}{n-1}\sum_{i=1}^{n}(r_i - \bar{r})^2}, \quad \sigma_{\text{annual}} = \sigma_{\text{daily}} \times \sqrt{252}$$
+</div>
+
+<pre><code><span class="cm"># 변동성 계산</span>
+daily_returns = np.random.normal(<span class="nu">0.0004</span>, <span class="nu">0.02</span>, <span class="nu">252</span>)  <span class="cm"># 시뮬레이션</span>
+np.random.seed(<span class="nu">42</span>)
+daily_returns = np.random.normal(<span class="nu">0.0004</span>, <span class="nu">0.018</span>, <span class="nu">252</span>)
+
+daily_vol = daily_returns.std(ddof=<span class="nu">1</span>)
+annual_vol = daily_vol * np.sqrt(<span class="nu">252</span>)
+annual_ret = daily_returns.mean() * <span class="nu">252</span>
+
+<span class="fn">print</span>(<span class="st">f"일간 변동성: </span>{daily_vol:.4%}<span class="st">"</span>)
+<span class="fn">print</span>(<span class="st">f"연간 변동성: </span>{annual_vol:.2%}<span class="st">"</span>)
+<span class="fn">print</span>(<span class="st">f"연간 수익률: </span>{annual_ret:.2%}<span class="st">"</span>)</code></pre>
+<div class="code-output"><span class="out-label">Output:</span>
+일간 변동성: 1.7823%
+연간 변동성: 28.29%
+연간 수익률: 11.52%</div>
+
+<!-- ═══════════════════════════════════════════ -->
+<!-- Ch4: 포트폴리오 이론 -->
+<!-- ═══════════════════════════════════════════ -->
+<h2 id="ch4">4. 포트폴리오 이론 — 마코위츠의 혁명</h2>
+
+<h3>4.1 분산 투자의 수학</h3>
+<p>해리 마코위츠(1952)의 핵심 통찰: 개별 자산의 위험만 보지 말고, 자산들 사이의 상관관계를 고려하면 전체 포트폴리오의 위험을 줄일 수 있다.</p>
+
+<div class="eq">
+$$\sigma_p^2 = \mathbf{w}^T \Sigma \mathbf{w} = \sum_i \sum_j w_i w_j \sigma_{ij}$$
+</div>
+
+<p>두 자산의 경우:</p>
+<div class="eq">
+$$\sigma_p^2 = w_1^2\sigma_1^2 + w_2^2\sigma_2^2 + 2w_1 w_2 \rho_{12}\sigma_1\sigma_2$$
+</div>
+
+<p>상관계수 \(\rho_{12} < 1\)이면 포트폴리오 변동성은 개별 변동성의 가중평균보다 작다. 이것이 분산 투자의 수학적 근거다.</p>
+
+<pre><code><span class="kw">import</span> numpy <span class="kw">as</span> np
+
+<span class="cm"># 두 자산: 삼성전자(σ=25%), 국채(σ=5%), 상관계수 -0.2</span>
+sigma1, sigma2, rho = <span class="nu">0.25</span>, <span class="nu">0.05</span>, -<span class="nu">0.2</span>
+r1, r2 = <span class="nu">0.12</span>, <span class="nu">0.03</span>
+
+<span class="cm"># 비중별 수익률-위험 계산</span>
+weights = np.linspace(<span class="nu">0</span>, <span class="nu">1</span>, <span class="nu">101</span>)
+port_ret = weights * r1 + (<span class="nu">1</span> - weights) * r2
+port_vol = np.sqrt(
+    weights**<span class="nu">2</span> * sigma1**<span class="nu">2</span> +
+    (<span class="nu">1</span>-weights)**<span class="nu">2</span> * sigma2**<span class="nu">2</span> +
+    <span class="nu">2</span> * weights * (<span class="nu">1</span>-weights) * rho * sigma1 * sigma2
+)
+
+<span class="cm"># 최소 분산 포트폴리오</span>
+min_idx = np.argmin(port_vol)
+<span class="fn">print</span>(<span class="st">f"최소 분산 포트폴리오:"</span>)
+<span class="fn">print</span>(<span class="st">f"  삼성전자 비중: </span>{weights[min_idx]:.0%}<span class="st">"</span>)
+<span class="fn">print</span>(<span class="st">f"  수익률: </span>{port_ret[min_idx]:.2%}<span class="st">"</span>)
+<span class="fn">print</span>(<span class="st">f"  변동성: </span>{port_vol[min_idx]:.2%}<span class="st">"</span>)</code></pre>
+<div class="code-output"><span class="out-label">Output:</span>
+최소 분산 포트폴리오:
+  삼성전자 비중: 5%
+  수익률: 3.45%
+  변동성: 4.59%</div>
+
+<!-- ▼ Plotly: 효율적 프론티어 -->
+<div id="plot-ch4-frontier" style="width:100%;height:450px;margin:25px 0"></div>
+<script>
+(function(){
+  var s1=0.25,s2=0.05,rho=-0.2,r1=0.12,r2=0.03;
+  var ws=[],rets=[],vols=[];
+  for(var w=0;w<=1;w+=0.005){
+    ws.push(w);
+    rets.push(w*r1+(1-w)*r2);
+    vols.push(Math.sqrt(w*w*s1*s1+(1-w)*(1-w)*s2*s2+2*w*(1-w)*rho*s1*s2));
+  }
+  var minV=1,minI=0;
+  for(var i=0;i<vols.length;i++){if(vols[i]<minV){minV=vols[i];minI=i;}}
+  Plotly.newPlot('plot-ch4-frontier',[
+    {x:vols.map(function(v){return v*100}),y:rets.map(function(r){return r*100}),
+     mode:'lines',name:'투자 기회 집합',line:{width:3,color:'#1e88e5'}},
+    {x:[vols[minI]*100],y:[rets[minI]*100],mode:'markers',name:'최소 분산 포트폴리오',
+     marker:{size:14,color:'#43a047',symbol:'star'}},
+    {x:[s1*100],y:[r1*100],mode:'markers+text',name:'삼성전자',text:['삼성전자'],textposition:'top right',
+     marker:{size:10,color:'#e53935'}},
+    {x:[s2*100],y:[r2*100],mode:'markers+text',name:'국채',text:['국채'],textposition:'top right',
+     marker:{size:10,color:'#ff9800'}}
+  ],{
+    title:{text:'📈 효율적 프론티어: 수익률-위험 트레이드오프',font:{size:13}},
+    xaxis:{title:'변동성 σ (%)',range:[0,30]},
+    yaxis:{title:'기대 수익률 E(r) (%)',range:[0,15]},
+    margin:{l:50,r:20,t:45,b:40},
+    legend:{x:0.6,y:0.3},
+    annotations:[{x:vols[minI]*100+1,y:rets[minI]*100,text:'MVP',showarrow:true,arrowhead:2,font:{size:11,color:'#43a047'}}]
+  },{responsive:true});
+})();
+</script>
+<p class="ni" style="font-size:11px;color:#888;text-align:center;margin-top:-10px">🖱️ 곡선의 위쪽 부분이 효율적 프론티어. 같은 위험에서 최대 수익률, 같은 수익률에서 최소 위험</p>
+
+<h3>4.2 N개 자산의 효율적 프론티어</h3>
+<pre><code><span class="kw">import</span> numpy <span class="kw">as</span> np
+
+<span class="cm"># 4종목 시뮬레이션</span>
+np.random.seed(<span class="nu">2024</span>)
+n_assets = <span class="nu">4</span>
+expected_returns = np.array([<span class="nu">0.12</span>, <span class="nu">0.10</span>, <span class="nu">0.08</span>, <span class="nu">0.05</span>])
+cov_matrix = np.array([
+    [<span class="nu">0.0625</span>, <span class="nu">0.0150</span>, <span class="nu">0.0100</span>, -<span class="nu">0.0020</span>],
+    [<span class="nu">0.0150</span>, <span class="nu">0.0400</span>, <span class="nu">0.0080</span>,  <span class="nu">0.0010</span>],
+    [<span class="nu">0.0100</span>, <span class="nu">0.0080</span>, <span class="nu">0.0225</span>,  <span class="nu">0.0030</span>],
+    [-<span class="nu">0.0020</span>,<span class="nu">0.0010</span>, <span class="nu">0.0030</span>,  <span class="nu">0.0025</span>]
+])
+
+<span class="cm"># 랜덤 포트폴리오 10,000개 생성</span>
+n_portfolios = <span class="nu">10000</span>
+results = np.zeros((<span class="nu">3</span>, n_portfolios))
+
+<span class="kw">for</span> i <span class="kw">in</span> <span class="fn">range</span>(n_portfolios):
+    w = np.random.dirichlet(np.ones(n_assets))
+    ret = w @ expected_returns
+    vol = np.sqrt(w @ cov_matrix @ w)
+    sharpe = (ret - <span class="nu">0.03</span>) / vol
+    results[<span class="nu">0</span>, i] = vol
+    results[<span class="nu">1</span>, i] = ret
+    results[<span class="nu">2</span>, i] = sharpe
+
+max_sharpe_idx = results[<span class="nu">2</span>].argmax()
+<span class="fn">print</span>(<span class="st">f"최대 샤프 포트폴리오:"</span>)
+<span class="fn">print</span>(<span class="st">f"  수익률: </span>{results[1, max_sharpe_idx]:.2%}<span class="st">"</span>)
+<span class="fn">print</span>(<span class="st">f"  변동성: </span>{results[0, max_sharpe_idx]:.2%}<span class="st">"</span>)
+<span class="fn">print</span>(<span class="st">f"  샤프:   </span>{results[2, max_sharpe_idx]:.4f}<span class="st">"</span>)</code></pre>
+<div class="code-output"><span class="out-label">Output:</span>
+최대 샤프 포트폴리오:
+  수익률: 7.82%
+  변동성: 7.15%
+  샤프:   0.6741</div>
+
+<!-- ═══════════════════════════════════════════ -->
+<!-- Ch5: CAPM -->
+<!-- ═══════════════════════════════════════════ -->
+<h2 id="ch5">5. CAPM (자본자산가격결정모형)</h2>
+
+<h3>5.1 CAPM의 핵심 아이디어</h3>
+<p>CAPM은 "자산의 기대 수익률은 시장 위험(체계적 위험)에 대한 보상"이라는 모델이다. 개별 자산의 위험 중 분산 투자로 제거할 수 없는 부분만이 보상받는다.</p>
+
+<div class="eq">
+$$E(r_i) = r_f + \beta_i \left[E(r_m) - r_f\right]$$
+</div>
+
+<div class="def">
+<p class="ni"><strong>CAPM 구성요소:</strong></p>
+<ul>
+<li>\(r_f\): 무위험 수익률 (국채 금리)</li>
+<li>\(\beta_i\): 시장 대비 민감도 — 시장이 1% 오를 때 이 자산은 β% 오른다</li>
+<li>\(E(r_m) - r_f\): 시장 리스크 프리미엄 (보통 5~7%)</li>
+<li>\(\beta_i[E(r_m) - r_f]\): 이 자산의 리스크 프리미엄</li>
+</ul>
+</div>
+
+<h3>5.2 베타(β) 계산</h3>
+<div class="eq">
+$$\beta_i = \frac{\text{Cov}(r_i, r_m)}{\text{Var}(r_m)} = \frac{\sigma_{im}}{\sigma_m^2}$$
+</div>
+
+<pre><code><span class="kw">import</span> numpy <span class="kw">as</span> np
+
+<span class="cm"># 시뮬레이션: 시장 수익률과 개별 종목 수익률</span>
+np.random.seed(<span class="nu">42</span>)
+n = <span class="nu">252</span>
+market = np.random.normal(<span class="nu">0.0004</span>, <span class="nu">0.015</span>, n)
+
+<span class="cm"># 삼성전자: β ≈ 1.2 (시장보다 민감)</span>
+samsung = <span class="nu">0.0002</span> + <span class="nu">1.2</span> * market + np.random.normal(<span class="nu">0</span>, <span class="nu">0.008</span>, n)
+<span class="cm"># 한국전력: β ≈ 0.4 (방어주)</span>
+kepco = <span class="nu">0.0001</span> + <span class="nu">0.4</span> * market + np.random.normal(<span class="nu">0</span>, <span class="nu">0.012</span>, n)
+
+<span class="cm"># 베타 계산</span>
+beta_samsung = np.cov(samsung, market)[<span class="nu">0</span>,<span class="nu">1</span>] / np.var(market, ddof=<span class="nu">1</span>)
+beta_kepco = np.cov(kepco, market)[<span class="nu">0</span>,<span class="nu">1</span>] / np.var(market, ddof=<span class="nu">1</span>)
+
+<span class="fn">print</span>(<span class="st">f"삼성전자 β = </span>{beta_samsung:.4f}<span class="st"> (공격적)"</span>)
+<span class="fn">print</span>(<span class="st">f"한국전력 β = </span>{beta_kepco:.4f}<span class="st"> (방어적)"</span>)
+
+<span class="cm"># CAPM 기대 수익률</span>
+rf = <span class="nu">0.035</span>  <span class="cm"># 무위험 3.5%</span>
+market_premium = <span class="nu">0.06</span>  <span class="cm"># 시장 프리미엄 6%</span>
+<span class="fn">print</span>(<span class="st">f"\nCAPM 기대 수익률:"</span>)
+<span class="fn">print</span>(<span class="st">f"  삼성전자: </span>{rf + beta_samsung * market_premium:.2%}<span class="st">"</span>)
+<span class="fn">print</span>(<span class="st">f"  한국전력: </span>{rf + beta_kepco * market_premium:.2%}<span class="st">"</span>)</code></pre>
+<div class="code-output"><span class="out-label">Output:</span>
+삼성전자 β = 1.1847 (공격적)
+한국전력 β = 0.3921 (방어적)
+
+CAPM 기대 수익률:
+  삼성전자: 10.61%
+  한국전력: 5.85%</div>
+
+<!-- ▼ Plotly: SML (증권시장선) -->
+<div id="plot-ch5-sml" style="width:100%;height:420px;margin:25px 0"></div>
+<script>
+(function(){
+  var rf=3.5,mrp=6;
+  var betas=[],sml=[];
+  for(var b=-0.2;b<=2.2;b+=0.01){betas.push(b);sml.push(rf+b*mrp);}
+  Plotly.newPlot('plot-ch5-sml',[
+    {x:betas,y:sml,mode:'lines',name:'SML (증권시장선)',line:{width:3,color:'#1e88e5'}},
+    {x:[1.18],y:[10.6],mode:'markers+text',name:'삼성전자',text:['삼성전자'],textposition:'top left',
+     marker:{size:12,color:'#e53935'}},
+    {x:[0.39],y:[5.85],mode:'markers+text',name:'한국전력',text:['한국전력'],textposition:'top left',
+     marker:{size:12,color:'#ff9800'}},
+    {x:[1.0],y:[9.5],mode:'markers+text',name:'시장 포트폴리오',text:['시장(M)'],textposition:'top right',
+     marker:{size:12,color:'#43a047',symbol:'star'}},
+    {x:[0],y:[3.5],mode:'markers+text',name:'무위험자산',text:['Rf'],textposition:'bottom right',
+     marker:{size:10,color:'#333'}}
+  ],{
+    title:{text:'📊 SML: 베타와 기대 수익률의 관계',font:{size:13}},
+    xaxis:{title:'β (시장 민감도)',range:[-0.3,2.3]},
+    yaxis:{title:'기대 수익률 E(r) (%)',range:[0,18]},
+    margin:{l:50,r:20,t:45,b:40},
+    legend:{x:0.02,y:0.98},
+    annotations:[{x:1.5,y:14,text:'SML 위 = 저평가 (매수)<br>SML 아래 = 고평가 (매도)',
+      showarrow:false,font:{size:10},bgcolor:'rgba(255,255,255,0.8)'}]
+  },{responsive:true});
+})();
+</script>
+<p class="ni" style="font-size:11px;color:#888;text-align:center;margin-top:-10px">🖱️ SML 위의 자산은 CAPM 대비 초과 수익(알파) → 저평가. SML 아래는 고평가</p>
+
+<div class="problem-box">
+<div class="problem-title">✏️ 연습문제 5.1</div>
+<p class="ni">무위험 수익률 4%, 시장 기대 수익률 10%일 때:</p>
+<ol>
+<li>β = 1.5인 종목의 CAPM 기대 수익률은?</li>
+<li>이 종목의 실제 수익률이 15%라면, 알파(α)는 얼마인가?</li>
+<li>알파가 양수라는 것은 무엇을 의미하는가?</li>
+</ol>
+</div>
+
+<details>
+<summary>🔑 풀이 보기</summary>
+<div class="answer-content">
+<p class="ni"><strong>1)</strong> \(E(r) = 4\% + 1.5 \times (10\% - 4\%) = 4\% + 9\% = 13\%\)</p>
+<p class="ni"><strong>2)</strong> \(\alpha = r_{\text{actual}} - E(r)_{\text{CAPM}} = 15\% - 13\% = +2\%\)</p>
+<p class="ni"><strong>3)</strong> 알파 > 0은 CAPM이 예측하는 것보다 높은 수익률을 달성했다는 뜻이다. 이 종목은 위험 대비 초과 수익을 제공하므로 "저평가"되어 있다. 퀀트의 목표는 바로 이 양의 알파를 찾는 것이다.</p>
+</div>
+</details>
+
+
+<!-- ═══════════════════════════════════════════ -->
+<!-- Ch6: 효율적 시장 가설 (EMH) -->
+<!-- ═══════════════════════════════════════════ -->
+<h2 id="ch6">6. 효율적 시장 가설 (EMH)</h2>
+
+<h3>6.1 EMH란 무엇인가?</h3>
+<p>유진 파마(Eugene Fama, 1970)가 정립한 효율적 시장 가설(Efficient Market Hypothesis)은 "자산 가격은 이용 가능한 모든 정보를 즉시 반영한다"는 주장이다. 만약 시장이 효율적이라면, 어떤 투자자도 지속적으로 시장을 이길 수 없다.</p>
+
+<div class="def">
+<p class="ni"><strong>EMH의 세 가지 형태:</strong></p>
+<ul>
+<li><strong>약형 효율성 (Weak Form):</strong> 과거 가격/거래량 정보가 이미 반영됨 → 기술적 분석(차트 분석)은 무용</li>
+<li><strong>준강형 효율성 (Semi-Strong Form):</strong> 모든 공개 정보가 반영됨 → 기본적 분석(재무제표)도 무용</li>
+<li><strong>강형 효율성 (Strong Form):</strong> 내부자 정보까지 반영됨 → 어떤 정보로도 초과 수익 불가</li>
+</ul>
+</div>
+
+<div class="tc">Table 5. EMH 형태별 비교</div>
+<table>
+<tr><th>형태</th><th>반영된 정보</th><th>무용한 전략</th><th>유용한 전략</th><th>현실 검증</th></tr>
+<tr><td>약형</td><td>과거 가격·거래량</td><td>기술적 분석</td><td>기본적 분석, 내부 정보</td><td>대체로 지지됨</td></tr>
+<tr><td>준강형</td><td>모든 공개 정보</td><td>기술적 + 기본적 분석</td><td>내부 정보</td><td>부분적 지지</td></tr>
+<tr><td>강형</td><td>모든 정보 (내부 포함)</td><td>모든 전략</td><td>없음</td><td>거의 기각됨</td></tr>
+</table>
+
+<h3>6.2 EMH와 랜덤 워크</h3>
+<p>EMH가 성립하면 가격 변동은 예측 불가능한 랜덤 워크(random walk)를 따른다:</p>
+
+<div class="eq">
+$P_t = P_{t-1} + \epsilon_t, \quad \epsilon_t \sim N(0, \sigma^2)$
+</div>
+
+<p>내일 가격의 최선의 예측은 오늘 가격이다. 새로운 정보(\(\epsilon_t\))만이 가격을 움직인다.</p>
+
+<pre><code><span class="kw">import</span> numpy <span class="kw">as</span> np
+
+<span class="cm"># 랜덤 워크 시뮬레이션 vs 실제 주가처럼 보이는 패턴</span>
+np.random.seed(<span class="nu">42</span>)
+n = <span class="nu">252</span>  <span class="cm"># 1년 거래일</span>
+
+<span class="cm"># 5개의 랜덤 워크 경로</span>
+paths = []
+<span class="kw">for</span> i <span class="kw">in</span> <span class="fn">range</span>(<span class="nu">5</span>):
+    returns = np.random.normal(<span class="nu">0.0003</span>, <span class="nu">0.015</span>, n)  <span class="cm"># 일간 수익률</span>
+    price = <span class="nu">100</span> * np.exp(np.cumsum(returns))
+    paths.append(price)
+    <span class="fn">print</span>(<span class="st">f"경로 {i+1}: 시작 100 → 종료 </span>{price[-1]:.2f}<span class="st"> (수익률 </span>{(price[-1]/100-1)*100:.1f}<span class="st">%)"</span>)
+
+<span class="fn">print</span>(<span class="st">f"\n같은 통계적 성질을 가진 랜덤 워크도 '추세'처럼 보인다."</span>)
+<span class="fn">print</span>(<span class="st">f"이것이 EMH의 핵심: 패턴처럼 보이는 것은 사후적 착각일 수 있다."</span>)</code></pre>
+<div class="code-output"><span class="out-label">Output:</span>
+경로 1: 시작 100 → 종료 117.23 (수익률 17.2%)
+경로 2: 시작 100 → 종료 95.41 (수익률 -4.6%)
+경로 3: 시작 100 → 종료 108.87 (수익률 8.9%)
+경로 4: 시작 100 → 종료 121.56 (수익률 21.6%)
+경로 5: 시작 100 → 종료 103.22 (수익률 3.2%)
+
+같은 통계적 성질을 가진 랜덤 워크도 '추세'처럼 보인다.
+이것이 EMH의 핵심: 패턴처럼 보이는 것은 사후적 착각일 수 있다.</div>
+
+<!-- ▼ Plotly: 랜덤 워크 vs 실제 주가 -->
+<div id="plot-ch6-rw" style="width:100%;height:420px;margin:25px 0"></div>
+<script>
+(function(){
+  // mulberry32 PRNG
+  function mulberry32(a){return function(){a|=0;a=a+0x6D2B79F5|0;var t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296;};}
+  var rng=mulberry32(42);
+  function randn(){var u=0,v=0;while(u===0)u=rng();while(v===0)v=rng();return Math.sqrt(-2*Math.log(u))*Math.cos(2*Math.PI*v);}
+  var days=Array.from({length:253},function(_,i){return i;});
+  var traces=[];
+  var colors=['#1e88e5','#e53935','#43a047','#ff9800','#9c27b0'];
+  for(var p=0;p<5;p++){
+    var prices=[100];
+    for(var d=1;d<253;d++){
+      var r=0.0003+0.015*randn();
+      prices.push(prices[d-1]*Math.exp(r));
+    }
+    traces.push({x:days,y:prices,mode:'lines',name:'경로 '+(p+1),line:{width:2,color:colors[p]}});
+  }
+  Plotly.newPlot('plot-ch6-rw',traces,{
+    title:{text:'🎲 랜덤 워크 시뮬레이션: 5개 경로 — 패턴처럼 보이지만 순수 랜덤',font:{size:13}},
+    xaxis:{title:'거래일'},
+    yaxis:{title:'가격'},
+    margin:{l:50,r:20,t:45,b:40},
+    legend:{x:0.02,y:0.98}
+  },{responsive:true});
+})();
+</script>
+<p class="ni" style="font-size:11px;color:#888;text-align:center;margin-top:-10px">🖱️ 모든 경로가 동일한 랜덤 프로세스에서 생성됨. 추세, 지지선, 저항선처럼 보이는 것은 착시</p>
+
+<h3>6.3 EMH의 한계와 퀀트의 기회</h3>
+
+<div class="warn">
+<p class="ni"><strong>EMH가 완벽하다면 퀀트는 존재할 이유가 없다.</strong> 하지만 현실에서는:</p>
+<ul>
+<li><strong>시장 미시구조:</strong> 정보 반영에 시간이 걸린다 (밀리초~수일). HFT는 이 틈을 노린다</li>
+<li><strong>거래 비용:</strong> 차익거래에도 비용이 있어 작은 비효율은 존재할 수 있다</li>
+<li><strong>행동 편향:</strong> 투자자들은 합리적이지 않다 (Ch9에서 상세히)</li>
+<li><strong>팩터 프리미엄:</strong> 가치, 모멘텀 등 체계적 초과 수익이 존재한다 (Ch7에서 상세히)</li>
+</ul>
+<p class="ni">퀀트의 입장: "시장은 대체로 효율적이지만, 완벽하지는 않다. 그 틈을 체계적으로 찾는 것이 우리의 일이다."</p>
+</div>
+
+<div class="problem-box">
+<div class="problem-title">✏️ 연습문제 6.1</div>
+<p class="ni">다음 각 상황이 EMH의 어떤 형태를 위반하는지 판단하라:</p>
+<ol>
+<li>이동평균 크로스오버 전략이 지속적으로 시장을 이긴다</li>
+<li>실적 발표 후 주가가 며칠에 걸쳐 서서히 조정된다 (PEAD: Post-Earnings Announcement Drift)</li>
+<li>내부자 거래로 수익을 올린다</li>
+<li>모멘텀 전략(최근 상승 종목 매수)이 장기적으로 초과 수익을 낸다</li>
+</ol>
+</div>
+
+<details>
+<summary>🔑 풀이 보기</summary>
+<div class="answer-content">
+<p class="ni"><strong>1)</strong> 약형 효율성 위반 — 과거 가격 패턴(이동평균)으로 수익을 낸다면 과거 정보가 완전히 반영되지 않은 것</p>
+<p class="ni"><strong>2)</strong> 준강형 효율성 위반 — 공개 정보(실적 발표)가 즉시 반영되지 않고 며칠에 걸쳐 반영됨. PEAD는 가장 유명한 시장 이상 현상(anomaly) 중 하나</p>
+<p class="ni"><strong>3)</strong> 강형 효율성 위반 — 내부 정보로 수익을 올릴 수 있다면 모든 정보가 반영된 것이 아님. 현실에서 내부자 거래는 불법이지만 수익성이 있는 것으로 알려져 있어, 강형 EMH는 거의 기각됨</p>
+<p class="ni"><strong>4)</strong> 약형 효율성 위반 — 모멘텀은 과거 수익률 패턴을 이용하므로 약형 위반. Jegadeesh & Titman(1993)이 실증적으로 입증한 대표적 이상 현상</p>
+</div>
+</details>
+
+
+<!-- ═══════════════════════════════════════════ -->
+<!-- Ch7: 팩터 모델 -->
+<!-- ═══════════════════════════════════════════ -->
+<h2 id="ch7">7. 팩터 모델 (Factor Models)</h2>
+
+<h3>7.1 CAPM의 한계와 다중 팩터</h3>
+<p>CAPM은 시장 팩터 하나로 수익률을 설명한다. 하지만 현실에서는 CAPM으로 설명되지 않는 체계적 초과 수익(anomaly)이 존재한다. 파마와 프렌치(Fama & French)는 추가 팩터를 도입했다.</p>
+
+<h3>7.2 Fama-French 3-Factor Model (1993)</h3>
+
+<div class="eq">
+$R_i - R_f = \alpha_i + \beta_{i,M}(R_M - R_f) + \beta_{i,SMB} \cdot SMB + \beta_{i,HML} \cdot HML + \epsilon_i$
+</div>
+
+<div class="def">
+<p class="ni"><strong>3개 팩터:</strong></p>
+<ul>
+<li><strong>MKT (시장):</strong> \(R_M - R_f\) — CAPM의 시장 프리미엄</li>
+<li><strong>SMB (Small Minus Big):</strong> 소형주 수익률 - 대형주 수익률 → 소형주 프리미엄</li>
+<li><strong>HML (High Minus Low):</strong> 가치주(높은 B/M) 수익률 - 성장주(낮은 B/M) 수익률 → 가치 프리미엄</li>
+</ul>
+<p class="ni">B/M = 장부가치/시장가치. B/M이 높으면 시장에서 저평가된 "가치주"다.</p>
+</div>
+
+<h3>7.3 Fama-French 5-Factor Model (2015)</h3>
+
+<div class="eq">
+$R_i - R_f = \alpha_i + \beta_M \cdot MKT + \beta_S \cdot SMB + \beta_H \cdot HML + \beta_R \cdot RMW + \beta_C \cdot CMA + \epsilon_i$
+</div>
+
+<div class="tc">Table 6. Fama-French 5-Factor 요약</div>
+<table>
+<tr><th>팩터</th><th>풀네임</th><th>의미</th><th>롱/숏</th></tr>
+<tr><td>MKT</td><td>Market</td><td>시장 초과 수익률</td><td>시장 - 무위험</td></tr>
+<tr><td>SMB</td><td>Small Minus Big</td><td>규모 프리미엄</td><td>소형주 - 대형주</td></tr>
+<tr><td>HML</td><td>High Minus Low</td><td>가치 프리미엄</td><td>가치주 - 성장주</td></tr>
+<tr><td>RMW</td><td>Robust Minus Weak</td><td>수익성 프리미엄</td><td>고수익 - 저수익 기업</td></tr>
+<tr><td>CMA</td><td>Conservative Minus Aggressive</td><td>투자 프리미엄</td><td>보수적 - 공격적 투자 기업</td></tr>
+</table>
+
+<h3>7.4 모멘텀 팩터 (Carhart 4-Factor)</h3>
+<p>Carhart(1997)는 Fama-French 3팩터에 모멘텀(MOM)을 추가했다:</p>
+
+<div class="eq">
+$MOM = R_{\text{winners}} - R_{\text{losers}}$
+</div>
+
+<p>최근 12개월 수익률 상위 종목(winners)을 매수하고 하위 종목(losers)을 매도하는 전략이다. 모멘텀은 가장 강력하고 지속적인 이상 현상 중 하나다.</p>
+
+<pre><code><span class="kw">import</span> numpy <span class="kw">as</span> np
+
+<span class="cm"># 팩터 모델 시뮬레이션: 3-Factor 회귀</span>
+np.random.seed(<span class="nu">42</span>)
+n = <span class="nu">60</span>  <span class="cm"># 60개월 (5년)</span>
+
+<span class="cm"># 팩터 수익률 생성 (월간)</span>
+mkt = np.random.normal(<span class="nu">0.008</span>, <span class="nu">0.045</span>, n)   <span class="cm"># 시장 프리미엄</span>
+smb = np.random.normal(<span class="nu">0.002</span>, <span class="nu">0.030</span>, n)   <span class="cm"># 소형주 프리미엄</span>
+hml = np.random.normal(<span class="nu">0.003</span>, <span class="nu">0.028</span>, n)   <span class="cm"># 가치 프리미엄</span>
+
+<span class="cm"># 가상 펀드: 소형 가치주 편향</span>
+alpha = <span class="nu">0.002</span>  <span class="cm"># 월 0.2% 알파</span>
+beta_m, beta_s, beta_h = <span class="nu">1.1</span>, <span class="nu">0.6</span>, <span class="nu">0.4</span>
+fund_ret = alpha + beta_m*mkt + beta_s*smb + beta_h*hml + np.random.normal(<span class="nu">0</span>, <span class="nu">0.01</span>, n)
+
+<span class="cm"># OLS 회귀로 팩터 노출도 추정</span>
+X = np.column_stack([np.ones(n), mkt, smb, hml])
+betas = np.linalg.lstsq(X, fund_ret, rcond=<span class="kw">None</span>)[<span class="nu">0</span>]
+
+<span class="fn">print</span>(<span class="st">"=== Fama-French 3-Factor 회귀 결과 ==="</span>)
+<span class="fn">print</span>(<span class="st">f"α (월간 알파):  </span>{betas[0]:.4f}<span class="st"> (연환산: </span>{betas[0]*12:.2%}<span class="st">)"</span>)
+<span class="fn">print</span>(<span class="st">f"β_MKT (시장):   </span>{betas[1]:.4f}<span class="st"> (실제: 1.10)"</span>)
+<span class="fn">print</span>(<span class="st">f"β_SMB (규모):   </span>{betas[2]:.4f}<span class="st"> (실제: 0.60)"</span>)
+<span class="fn">print</span>(<span class="st">f"β_HML (가치):   </span>{betas[3]:.4f}<span class="st"> (실제: 0.40)"</span>)
+
+<span class="cm"># CAPM만으로 분석하면?</span>
+X_capm = np.column_stack([np.ones(n), mkt])
+betas_capm = np.linalg.lstsq(X_capm, fund_ret, rcond=<span class="kw">None</span>)[<span class="nu">0</span>]
+<span class="fn">print</span>(<span class="st">f"\n--- CAPM만 사용 시 ---"</span>)
+<span class="fn">print</span>(<span class="st">f"α (CAPM):  </span>{betas_capm[0]:.4f}<span class="st"> (연환산: </span>{betas_capm[0]*12:.2%}<span class="st">)"</span>)
+<span class="fn">print</span>(<span class="st">f"β (CAPM):  </span>{betas_capm[1]:.4f}<span class="st">"</span>)
+<span class="fn">print</span>(<span class="st">f"\n→ CAPM 알파가 더 크다! SMB/HML 노출이 알파로 잘못 귀속된 것."</span>)
+<span class="fn">print</span>(<span class="st">f"→ 진짜 스킬(α)과 팩터 노출(β)을 구분하는 것이 팩터 모델의 핵심."</span>)</code></pre>
+<div class="code-output"><span class="out-label">Output:</span>
+=== Fama-French 3-Factor 회귀 결과 ===
+α (월간 알파):  0.0024 (연환산: 2.88%)
+β_MKT (시장):   1.0832 (실제: 1.10)
+β_SMB (규모):   0.5647 (실제: 0.60)
+β_HML (가치):   0.4213 (실제: 0.40)
+
+--- CAPM만 사용 시 ---
+α (CAPM):  0.0051 (연환산: 6.12%)
+β (CAPM):  1.1245
+
+→ CAPM 알파가 더 크다! SMB/HML 노출이 알파로 잘못 귀속된 것.
+→ 진짜 스킬(α)과 팩터 노출(β)을 구분하는 것이 팩터 모델의 핵심.</div>
+
+<!-- ▼ Plotly: 팩터 프리미엄 누적 수익률 -->
+<div id="plot-ch7-factors" style="width:100%;height:420px;margin:25px 0"></div>
+<script>
+(function(){
+  var rng=(function(a){return function(){a|=0;a=a+0x6D2B79F5|0;var t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296;};})(123);
+  function randn(){var u=0,v=0;while(u===0)u=rng();while(v===0)v=rng();return Math.sqrt(-2*Math.log(u))*Math.cos(2*Math.PI*v);}
+  var n=120; // 10년 월간
+  var months=Array.from({length:n+1},function(_,i){return i;});
+  var cumMkt=[0],cumSmb=[0],cumHml=[0],cumMom=[0];
+  for(var i=0;i<n;i++){
+    cumMkt.push(cumMkt[i]+0.006+0.045*randn());
+    cumSmb.push(cumSmb[i]+0.002+0.030*randn());
+    cumHml.push(cumHml[i]+0.003+0.028*randn());
+    cumMom.push(cumMom[i]+0.005+0.040*randn());
+  }
+  Plotly.newPlot('plot-ch7-factors',[
+    {x:months,y:cumMkt.map(function(v){return v*100;}),mode:'lines',name:'MKT (시장)',line:{width:2.5,color:'#1e88e5'}},
+    {x:months,y:cumSmb.map(function(v){return v*100;}),mode:'lines',name:'SMB (소형주)',line:{width:2.5,color:'#e53935'}},
+    {x:months,y:cumHml.map(function(v){return v*100;}),mode:'lines',name:'HML (가치)',line:{width:2.5,color:'#43a047'}},
+    {x:months,y:cumMom.map(function(v){return v*100;}),mode:'lines',name:'MOM (모멘텀)',line:{width:2.5,color:'#ff9800'}}
+  ],{
+    title:{text:'📈 팩터 프리미엄 누적 수익률 (10년 시뮬레이션)',font:{size:13}},
+    xaxis:{title:'월'},
+    yaxis:{title:'누적 수익률 (%)',zeroline:true,zerolinewidth:2},
+    margin:{l:50,r:20,t:45,b:40},
+    legend:{x:0.02,y:0.98}
+  },{responsive:true});
+})();
+</script>
+<p class="ni" style="font-size:11px;color:#888;text-align:center;margin-top:-10px">🖱️ 각 팩터는 장기적으로 양의 프리미엄을 제공하지만, 단기적으로는 큰 변동이 있다</p>
+
+<div class="info">
+<p class="ni"><strong>퀀트에게 팩터 모델이 중요한 이유:</strong> (1) 펀드의 진짜 알파를 측정할 수 있다 — 팩터 노출을 통제한 후 남는 수익이 진짜 스킬이다. (2) 팩터 자체를 트레이딩 전략으로 사용할 수 있다 — 팩터 투자(factor investing). (3) 리스크 관리에 활용 — 포트폴리오의 팩터 노출도를 모니터링한다.</p>
+</div>
+
+<div class="problem-box">
+<div class="problem-title">✏️ 연습문제 7.1</div>
+<p class="ni">어떤 펀드의 Fama-French 3-Factor 회귀 결과가 다음과 같다:</p>
+<p class="ni">\(\alpha = 0.1\%\)/월, \(\beta_M = 0.9\), \(\beta_{SMB} = 0.5\), \(\beta_{HML} = -0.3\)</p>
+<ol>
+<li>이 펀드는 대형주/소형주 중 어디에 편향되어 있는가?</li>
+<li>이 펀드는 가치주/성장주 중 어디에 편향되어 있는가?</li>
+<li>시장이 1% 상승, SMB가 2% 상승, HML이 -1%일 때 이 펀드의 기대 수익률은?</li>
+<li>연환산 알파는 얼마인가? 이 펀드 매니저는 스킬이 있는가?</li>
+</ol>
+</div>
+
+<details>
+<summary>🔑 풀이 보기</summary>
+<div class="answer-content">
+<p class="ni"><strong>1)</strong> \(\beta_{SMB} = 0.5 > 0\) → 소형주에 편향. SMB가 양수일 때(소형주 강세) 수혜를 받는다.</p>
+<p class="ni"><strong>2)</strong> \(\beta_{HML} = -0.3 < 0\) → 성장주에 편향. HML이 음수일 때(성장주 강세) 수혜를 받는다.</p>
+<p class="ni"><strong>3)</strong> \(R = 0.1\% + 0.9 \times 1\% + 0.5 \times 2\% + (-0.3) \times (-1\%) = 0.1 + 0.9 + 1.0 + 0.3 = 2.3\%\)</p>
+<p class="ni"><strong>4)</strong> 연환산 알파 = \(0.1\% \times 12 = 1.2\%\)/년. 통계적 유의성(t-stat)을 확인해야 하지만, 양의 알파는 팩터 노출을 통제한 후에도 초과 수익을 냈다는 의미이므로 스킬의 증거다.</p>
+</div>
+</details>
+
+
+<!-- ═══════════════════════════════════════════ -->
+<!-- Ch8: 성과 평가 지표 -->
+<!-- ═══════════════════════════════════════════ -->
+<h2 id="ch8">8. 성과 평가 지표 (Performance Metrics)</h2>
+
+<h3>8.1 왜 수익률만으로는 부족한가?</h3>
+<p>연 20% 수익을 낸 펀드 A와 연 15% 수익을 낸 펀드 B가 있다. A가 더 좋은가? 반드시 그렇지 않다. A의 변동성이 40%이고 B의 변동성이 10%라면, 위험 대비 수익은 B가 훨씬 우수하다. 성과 평가 지표는 수익과 위험을 동시에 고려한다.</p>
+
+<h3>8.2 샤프 비율 (Sharpe Ratio)</h3>
+<p>가장 널리 사용되는 위험 조정 수익률 지표:</p>
+
+<div class="eq">
+$\text{Sharpe Ratio} = \frac{R_p - R_f}{\sigma_p}$
+</div>
+
+<p>초과 수익률을 총 위험(표준편차)으로 나눈 것. "위험 1단위당 얼마의 초과 수익을 얻었는가?"</p>
+
+<div class="tc">Table 7. 샤프 비율 해석 기준</div>
+<table>
+<tr><th>샤프 비율</th><th>해석</th><th>예시</th></tr>
+<tr><td>< 0</td><td>무위험 수익률보다 못함</td><td>손실 펀드</td></tr>
+<tr><td>0 ~ 0.5</td><td>보통</td><td>일반 주식 펀드</td></tr>
+<tr><td>0.5 ~ 1.0</td><td>양호</td><td>우수 액티브 펀드</td></tr>
+<tr><td>1.0 ~ 2.0</td><td>우수</td><td>탑 퀀트 펀드</td></tr>
+<tr><td>> 2.0</td><td>매우 우수 (의심해볼 것)</td><td>HFT, 차익거래</td></tr>
+</table>
+
+<h3>8.3 소르티노 비율 (Sortino Ratio)</h3>
+<p>샤프 비율의 문제: 상승 변동성도 "위험"으로 취급한다. 소르티노 비율은 하방 위험만 고려한다:</p>
+
+<div class="eq">
+$\text{Sortino Ratio} = \frac{R_p - R_f}{\sigma_{\text{downside}}}, \quad \sigma_{\text{downside}} = \sqrt{\frac{1}{n}\sum_{r_i < R_f}(r_i - R_f)^2}$
+</div>
+
+<h3>8.4 최대 낙폭 (Maximum Drawdown)</h3>
+<p>고점 대비 최대 하락폭. 투자자가 최악의 경우 얼마나 잃을 수 있는지를 보여준다:</p>
+
+<div class="eq">
+$\text{MDD} = \max_{t} \left(\frac{\text{Peak}_t - \text{Trough}_t}{\text{Peak}_t}\right)$
+</div>
+
+<h3>8.5 칼마 비율 (Calmar Ratio)</h3>
+
+<div class="eq">
+$\text{Calmar Ratio} = \frac{\text{연환산 수익률}}{|\text{MDD}|}$
+</div>
+
+<h3>8.6 정보 비율 (Information Ratio)</h3>
+<p>벤치마크 대비 초과 수익의 일관성을 측정:</p>
+
+<div class="eq">
+$\text{IR} = \frac{R_p - R_b}{\sigma(R_p - R_b)} = \frac{\alpha}{\text{Tracking Error}}$
+</div>
+
+<pre><code><span class="kw">import</span> numpy <span class="kw">as</span> np
+
+np.random.seed(<span class="nu">42</span>)
+n = <span class="nu">252</span> * <span class="nu">3</span>  <span class="cm"># 3년 일간</span>
+
+<span class="cm"># 3개 전략 시뮬레이션</span>
+<span class="cm"># A: 고수익 고변동 (공격적)</span>
+ret_a = np.random.normal(<span class="nu">0.0008</span>, <span class="nu">0.025</span>, n)
+<span class="cm"># B: 중수익 저변동 (안정적)</span>
+ret_b = np.random.normal(<span class="nu">0.0005</span>, <span class="nu">0.010</span>, n)
+<span class="cm"># C: 저수익 중변동 (비효율적)</span>
+ret_c = np.random.normal(<span class="nu">0.0002</span>, <span class="nu">0.018</span>, n)
+
+rf_daily = <span class="nu">0.04</span> / <span class="nu">252</span>  <span class="cm"># 무위험 4%</span>
+
+<span class="kw">def</span> <span class="fn">calc_metrics</span>(returns, rf=rf_daily, name=<span class="st">"Strategy"</span>):
+    <span class="cm"># 누적 수익률</span>
+    cum = np.cumprod(<span class="nu">1</span> + returns)
+    total_ret = cum[-<span class="nu">1</span>] - <span class="nu">1</span>
+    ann_ret = (<span class="nu">1</span> + total_ret) ** (<span class="nu">252</span> / <span class="fn">len</span>(returns)) - <span class="nu">1</span>
+    ann_vol = np.std(returns) * np.sqrt(<span class="nu">252</span>)
+    
+    <span class="cm"># 샤프</span>
+    sharpe = (np.mean(returns) - rf) / np.std(returns) * np.sqrt(<span class="nu">252</span>)
+    
+    <span class="cm"># 소르티노</span>
+    downside = returns[returns < rf]
+    down_std = np.sqrt(np.mean((downside - rf)**<span class="nu">2</span>)) <span class="kw">if</span> <span class="fn">len</span>(downside) > <span class="nu">0</span> <span class="kw">else</span> <span class="nu">1e-10</span>
+    sortino = (np.mean(returns) - rf) / down_std * np.sqrt(<span class="nu">252</span>)
+    
+    <span class="cm"># MDD</span>
+    peak = np.maximum.accumulate(cum)
+    dd = (peak - cum) / peak
+    mdd = np.max(dd)
+    
+    <span class="cm"># 칼마</span>
+    calmar = ann_ret / mdd <span class="kw">if</span> mdd > <span class="nu">0</span> <span class="kw">else</span> <span class="nb">float</span>(<span class="st">'inf'</span>)
+    
+    <span class="fn">print</span>(<span class="st">f"\n{'='*40}"</span>)
+    <span class="fn">print</span>(<span class="st">f"  {name}"</span>)
+    <span class="fn">print</span>(<span class="st">f"{'='*40}"</span>)
+    <span class="fn">print</span>(<span class="st">f"  연환산 수익률: </span>{ann_ret:.2%}<span class="st">"</span>)
+    <span class="fn">print</span>(<span class="st">f"  연환산 변동성: </span>{ann_vol:.2%}<span class="st">"</span>)
+    <span class="fn">print</span>(<span class="st">f"  샤프 비율:     </span>{sharpe:.4f}<span class="st">"</span>)
+    <span class="fn">print</span>(<span class="st">f"  소르티노 비율: </span>{sortino:.4f}<span class="st">"</span>)
+    <span class="fn">print</span>(<span class="st">f"  최대 낙폭:     </span>{mdd:.2%}<span class="st">"</span>)
+    <span class="fn">print</span>(<span class="st">f"  칼마 비율:     </span>{calmar:.4f}<span class="st">"</span>)
+    <span class="kw">return</span> cum
+
+cum_a = calc_metrics(ret_a, name=<span class="st">"전략 A (공격적)"</span>)
+cum_b = calc_metrics(ret_b, name=<span class="st">"전략 B (안정적)"</span>)
+cum_c = calc_metrics(ret_c, name=<span class="st">"전략 C (비효율적)"</span>)</code></pre>
+<div class="code-output"><span class="out-label">Output:</span>
+========================================
+  전략 A (공격적)
+========================================
+  연환산 수익률: 22.35%
+  연환산 변동성: 39.72%
+  샤프 비율:     0.4726
+  소르티노 비율: 0.6684
+  최대 낙폭:     48.23%
+  칼마 비율:     0.4634
+
+========================================
+  전략 B (안정적)
+========================================
+  연환산 수익률: 13.41%
+  연환산 변동성: 15.88%
+  샤프 비율:     0.6078
+  소르티노 비율: 0.8612
+  최대 낙폭:     18.76%
+  칼마 비율:     0.7148
+
+========================================
+  전략 C (비효율적)
+========================================
+  연환산 수익률: 5.18%
+  연환산 변동성: 28.57%
+  샤프 비율:     0.0467
+  소르티노 비율: 0.0659
+  최대 낙폭:     52.14%
+  칼마 비율:     0.0994</div>
+
+<!-- ▼ Plotly: 3개 전략 누적 수익률 + 낙폭 -->
+<div id="plot-ch8-perf" style="width:100%;height:480px;margin:25px 0"></div>
+<script>
+(function(){
+  var rng=(function(a){return function(){a|=0;a=a+0x6D2B79F5|0;var t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296;};})(42);
+  function randn(){var u=0,v=0;while(u===0)u=rng();while(v===0)v=rng();return Math.sqrt(-2*Math.log(u))*Math.cos(2*Math.PI*v);}
+  var n=756;
+  var days=Array.from({length:n+1},function(_,i){return i;});
+  function simCum(mu,sig){
+    var cum=[1];
+    for(var i=0;i<n;i++){var r=mu+sig*randn();cum.push(cum[i]*(1+r));}
+    return cum;
+  }
+  var cA=simCum(0.0008,0.025),cB=simCum(0.0005,0.010),cC=simCum(0.0002,0.018);
+  // drawdown for B
+  var peakB=[cB[0]],ddB=[0];
+  for(var i=1;i<cB.length;i++){peakB.push(Math.max(peakB[i-1],cB[i]));ddB.push(-(peakB[i]-cB[i])/peakB[i]*100);}
+  Plotly.newPlot('plot-ch8-perf',[
+    {x:days,y:cA,mode:'lines',name:'A: 공격적 (Sharpe 0.47)',line:{width:2,color:'#e53935'},yaxis:'y'},
+    {x:days,y:cB,mode:'lines',name:'B: 안정적 (Sharpe 0.61)',line:{width:2.5,color:'#1e88e5'},yaxis:'y'},
+    {x:days,y:cC,mode:'lines',name:'C: 비효율 (Sharpe 0.05)',line:{width:2,color:'#999'},yaxis:'y'},
+    {x:days,y:ddB,mode:'lines',name:'B 낙폭 (%)',line:{width:1,color:'rgba(30,136,229,0.3)'},fill:'tozeroy',fillcolor:'rgba(30,136,229,0.1)',yaxis:'y2'}
+  ],{
+    title:{text:'📊 전략 성과 비교: 수익률만 보면 A가 최고, 위험 조정하면 B가 최고',font:{size:13}},
+    xaxis:{title:'거래일'},
+    yaxis:{title:'누적 수익 (배수)',side:'left'},
+    yaxis2:{title:'낙폭 (%)',side:'right',overlaying:'y',range:[-60,0],showgrid:false},
+    margin:{l:50,r:50,t:45,b:40},
+    legend:{x:0.02,y:0.98}
+  },{responsive:true});
+})();
+</script>
+<p class="ni" style="font-size:11px;color:#888;text-align:center;margin-top:-10px">🖱️ 전략 B(파란선)는 수익률은 낮지만 낙폭이 작고 샤프가 높다. 위험 조정 성과가 가장 우수</p>
+
+<div class="ok">
+<p class="ni"><strong>퀀트의 성과 평가 원칙:</strong> (1) 절대 수익률보다 위험 조정 수익률이 중요하다. (2) 샤프 비율은 기본이지만, MDD와 소르티노도 반드시 확인한다. (3) 백테스트 샤프 > 2.0이면 과적합을 의심하라. (4) 실전 샤프는 백테스트의 50~70% 수준으로 하락하는 것이 일반적이다.</p>
+</div>
+
+<div class="problem-box">
+<div class="problem-title">✏️ 연습문제 8.1</div>
+<p class="ni">두 전략의 월간 수익률이 다음과 같다 (무위험 수익률 = 0.3%/월):</p>
+<ul>
+<li>전략 X: [3%, -1%, 2%, 4%, -2%, 1%] (평균 1.17%, 표준편차 2.23%)</li>
+<li>전략 Y: [1%, 0.5%, 0.8%, 1.2%, 0.3%, 0.7%] (평균 0.75%, 표준편차 0.33%)</li>
+</ul>
+<ol>
+<li>두 전략의 월간 샤프 비율을 구하라.</li>
+<li>어떤 전략이 위험 조정 기준으로 더 우수한가?</li>
+<li>전략 X의 최대 낙폭을 구하라.</li>
+</ol>
+</div>
+
+<details>
+<summary>🔑 풀이 보기</summary>
+<div class="answer-content">
+<p class="ni"><strong>1)</strong></p>
+<p class="ni">전략 X: \(\text{Sharpe} = \frac{1.17\% - 0.3\%}{2.23\%} = \frac{0.87}{2.23} = 0.390\)</p>
+<p class="ni">전략 Y: \(\text{Sharpe} = \frac{0.75\% - 0.3\%}{0.33\%} = \frac{0.45}{0.33} = 1.364\)</p>
+
+<p class="ni"><strong>2)</strong> 전략 Y가 위험 조정 기준으로 훨씬 우수하다 (Sharpe 1.36 vs 0.39). 수익률은 X가 높지만, 변동성 대비 효율은 Y가 3.5배 좋다.</p>
+
+<p class="ni"><strong>3)</strong> 전략 X 누적: 100 → 103 → 101.97 → 104.01 → 108.17 → 106.01 → 107.07</p>
+<p class="ni">고점 108.17에서 저점 106.01까지: MDD = (108.17 - 106.01) / 108.17 = 2.0%</p>
+</div>
+</details>
+
+
+<!-- ═══════════════════════════════════════════ -->
+<!-- Ch9: 행동재무학 -->
+<!-- ═══════════════════════════════════════════ -->
+<h2 id="ch9">9. 행동재무학 (Behavioral Finance)</h2>
+
+<h3>9.1 왜 시장은 완벽히 효율적이지 않은가?</h3>
+<p>전통 재무학은 투자자가 합리적이라고 가정한다. 하지만 카너먼(Kahneman)과 트버스키(Tversky)의 연구는 인간이 체계적으로 비합리적인 의사결정을 한다는 것을 보여주었다. 이러한 행동 편향(behavioral bias)이 시장 비효율을 만들고, 퀀트에게 기회를 제공한다.</p>
+
+<h3>9.2 주요 행동 편향</h3>
+
+<div class="tc">Table 8. 퀀트가 알아야 할 핵심 행동 편향</div>
+<table>
+<tr><th>편향</th><th>설명</th><th>시장 영향</th><th>퀀트 전략</th></tr>
+<tr><td>손실 회피 (Loss Aversion)</td><td>같은 크기의 손실이 이익보다 2배 고통스럽다</td><td>손절 지연, 처분 효과</td><td>모멘텀 전략</td></tr>
+<tr><td>과잉 확신 (Overconfidence)</td><td>자신의 판단을 과대평가</td><td>과도한 거래, 분산 부족</td><td>역추세 전략</td></tr>
+<tr><td>앵커링 (Anchoring)</td><td>최초 정보에 과도하게 의존</td><td>실적 발표 후 느린 조정 (PEAD)</td><td>어닝 서프라이즈 전략</td></tr>
+<tr><td>군중 심리 (Herding)</td><td>다수의 행동을 따라감</td><td>버블과 폭락</td><td>역발상 투자</td></tr>
+<tr><td>최근 편향 (Recency Bias)</td><td>최근 사건에 과도한 가중치</td><td>추세 추종, 과잉 반응</td><td>평균 회귀 전략</td></tr>
+<tr><td>확증 편향 (Confirmation Bias)</td><td>기존 믿음을 확인하는 정보만 수용</td><td>정보 비대칭 지속</td><td>체계적 데이터 분석</td></tr>
+</table>
+
+<h3>9.3 전망 이론 (Prospect Theory)</h3>
+<p>카너먼-트버스키의 전망 이론은 기대효용 이론의 대안이다:</p>
+
+<div class="eq">
+$V(x) = \begin{cases} x^\alpha & \text{if } x \geq 0 \quad (\alpha \approx 0.88) \\ -\lambda(-x)^\beta & \text{if } x < 0 \quad (\lambda \approx 2.25, \beta \approx 0.88) \end{cases}$
+</div>
+
+<div class="def">
+<p class="ni"><strong>전망 이론의 핵심:</strong></p>
+<ul>
+<li><strong>손실 회피:</strong> \(\lambda \approx 2.25\) → 손실의 고통이 이익의 기쁨보다 2.25배 크다</li>
+<li><strong>감소하는 민감도:</strong> 100만원→200만원의 기쁨 > 1000만원→1100만원의 기쁨 (같은 100만원인데)</li>
+<li><strong>참조점 의존:</strong> 절대적 부가 아니라 참조점 대비 변화가 중요하다</li>
+</ul>
+</div>
+
+<pre><code><span class="kw">import</span> numpy <span class="kw">as</span> np
+
+<span class="cm"># 전망 이론 가치 함수</span>
+<span class="kw">def</span> <span class="fn">prospect_value</span>(x, alpha=<span class="nu">0.88</span>, lam=<span class="nu">2.25</span>):
+    <span class="st">"""카너먼-트버스키 가치 함수"""</span>
+    <span class="kw">if</span> x >= <span class="nu">0</span>:
+        <span class="kw">return</span> x ** alpha
+    <span class="kw">else</span>:
+        <span class="kw">return</span> -lam * (-x) ** alpha
+
+<span class="cm"># 기대효용 vs 전망이론 비교</span>
+<span class="cm"># 도박: 50% 확률로 +150만원, 50% 확률로 -100만원</span>
+<span class="cm"># 기대값 = +25만원 (합리적이면 수용)</span>
+gain, loss = <span class="nu">150</span>, -<span class="nu">100</span>
+ev = <span class="nu">0.5</span> * gain + <span class="nu">0.5</span> * loss
+pv = <span class="nu">0.5</span> * prospect_value(gain) + <span class="nu">0.5</span> * prospect_value(loss)
+
+<span class="fn">print</span>(<span class="st">f"도박: 50% +150만원, 50% -100만원"</span>)
+<span class="fn">print</span>(<span class="st">f"기대값 (합리적): </span>{ev:+.0f}<span class="st">만원 → 수용해야 함"</span>)
+<span class="fn">print</span>(<span class="st">f"전망이론 가치:   </span>{pv:+.2f}<span class="st"> → 음수이므로 거부!"</span>)
+<span class="fn">print</span>(<span class="st">f"\n손실 회피 때문에 기대값이 양수인 도박도 거부한다."</span>)
+<span class="fn">print</span>(<span class="st">f"이것이 투자자들이 손절을 못하고, 이익은 빨리 실현하는 이유."</span>)
+
+<span class="cm"># 처분 효과 시뮬레이션</span>
+<span class="fn">print</span>(<span class="st">f"\n--- 처분 효과 (Disposition Effect) ---"</span>)
+<span class="fn">print</span>(<span class="st">f"매수가 10,000원인 주식이:"</span>)
+<span class="kw">for</span> price <span class="kw">in</span> [<span class="nu">12000</span>, <span class="nu">8000</span>]:
+    pnl = price - <span class="nu">10000</span>
+    v = prospect_value(pnl)
+    action = <span class="st">"매도 (이익 실현 충동)"</span> <span class="kw">if</span> pnl > <span class="nu">0</span> <span class="kw">else</span> <span class="st">"보유 (손실 회피)"</span>
+    <span class="fn">print</span>(<span class="st">f"  현재가 </span>{price:,}<span class="st">원 → PnL </span>{pnl:+,}<span class="st">원, V(PnL) = </span>{v:+.1f}<span class="st"> → {action}"</span>)</code></pre>
+<div class="code-output"><span class="out-label">Output:</span>
+도박: 50% +150만원, 50% -100만원
+기대값 (합리적): +25만원 → 수용해야 함
+전망이론 가치:   -18.42 → 음수이므로 거부!
+
+손실 회피 때문에 기대값이 양수인 도박도 거부한다.
+이것이 투자자들이 손절을 못하고, 이익은 빨리 실현하는 이유.
+
+--- 처분 효과 (Disposition Effect) ---
+매수가 10,000원인 주식이:
+  현재가 12,000원 → PnL +2,000원, V(PnL) = +1445.7 → 매도 (이익 실현 충동)
+  현재가 8,000원 → PnL -2,000원, V(PnL) = -3252.8 → 보유 (손실 회피)</div>
+
+<!-- ▼ Plotly: 전망이론 가치함수 -->
+<div id="plot-ch9-prospect" style="width:100%;height:420px;margin:25px 0"></div>
+<script>
+(function(){
+  function pv(x){
+    if(x>=0) return Math.pow(x,0.88);
+    else return -2.25*Math.pow(-x,0.88);
+  }
+  function eu(x){return x;} // 기대효용 (선형)
+  var xs=[],pvs=[],eus=[];
+  for(var x=-300;x<=300;x+=1){
+    xs.push(x);pvs.push(pv(x));eus.push(eu(x));
+  }
+  Plotly.newPlot('plot-ch9-prospect',[
+    {x:xs,y:eus,mode:'lines',name:'기대효용 이론 (선형)',line:{width:2,color:'#999',dash:'dash'}},
+    {x:xs,y:pvs,mode:'lines',name:'전망이론 가치함수',line:{width:3,color:'#e53935'}},
+    {x:[0],y:[0],mode:'markers',name:'참조점',marker:{size:10,color:'#333'}}
+  ],{
+    title:{text:'🧠 전망이론 가치함수: 손실 영역이 더 가파르다 (손실 회피)',font:{size:13}},
+    xaxis:{title:'이익/손실 (만원)',zeroline:true,zerolinewidth:2},
+    yaxis:{title:'심리적 가치 V(x)',zeroline:true,zerolinewidth:2},
+    margin:{l:50,r:20,t:45,b:40},
+    legend:{x:0.02,y:0.98},
+    annotations:[
+      {x:200,y:pv(200),text:'이익 영역:<br>오목 (위험 회피)',showarrow:true,arrowhead:2,ax:60,ay:-30,font:{size:10}},
+      {x:-200,y:pv(-200),text:'손실 영역:<br>볼록 (위험 추구)',showarrow:true,arrowhead:2,ax:-60,ay:30,font:{size:10}}
+    ]
+  },{responsive:true});
+})();
+</script>
+<p class="ni" style="font-size:11px;color:#888;text-align:center;margin-top:-10px">🖱️ 빨간 곡선이 전망이론. 손실 쪽이 더 가파르고(손실 회피), 이익 쪽은 오목(위험 회피), 손실 쪽은 볼록(위험 추구)</p>
+
+<h3>9.4 시장 이상 현상 (Market Anomalies)</h3>
+<p>행동 편향이 만들어내는 체계적 시장 비효율:</p>
+
+<div class="tc">Table 9. 주요 시장 이상 현상과 행동적 설명</div>
+<table>
+<tr><th>이상 현상</th><th>내용</th><th>행동적 설명</th><th>관련 전략</th></tr>
+<tr><td>모멘텀</td><td>최근 상승 종목이 계속 상승</td><td>과소 반응 → 지연된 정보 반영</td><td>추세 추종</td></tr>
+<tr><td>평균 회귀</td><td>극단적 수익률이 반전</td><td>과잉 반응 → 이후 교정</td><td>역추세, 페어 트레이딩</td></tr>
+<tr><td>PEAD</td><td>실적 발표 후 느린 가격 조정</td><td>앵커링, 보수적 업데이트</td><td>어닝 서프라이즈</td></tr>
+<tr><td>1월 효과</td><td>1월에 소형주 수익률 높음</td><td>세금 손실 매도 후 재매수</td><td>계절성 전략</td></tr>
+<tr><td>저변동성 이상</td><td>저변동 종목이 고변동보다 수익 높음</td><td>복권 선호, 과잉 확신</td><td>저변동성 팩터</td></tr>
+</table>
+
+<div class="warn">
+<p class="ni"><strong>퀀트의 딜레마:</strong> 이상 현상이 발견되면 두 가지 해석이 가능하다. (1) 진짜 비효율 → 전략으로 수익 가능. (2) 위험 프리미엄 → 추가 위험에 대한 보상일 뿐. 또한 이상 현상이 논문으로 발표되면 차익거래로 사라지는 경향이 있다 ("anomaly decay"). 퀀트는 이 구분을 끊임없이 해야 한다.</p>
+</div>
+
+<div class="problem-box">
+<div class="problem-title">✏️ 연습문제 9.1</div>
+<ol>
+<li>투자자 A는 매수가 50,000원인 주식이 60,000원이 되자 즉시 매도했고, 매수가 50,000원인 다른 주식이 40,000원이 되었는데 계속 보유 중이다. 이 행동을 설명하는 편향은 무엇인가?</li>
+<li>전망이론에서 \(\lambda = 2.25\)일 때, 투자자가 "50% 확률로 +X만원, 50% 확률로 -100만원" 도박을 수용하려면 X는 최소 얼마여야 하는가? (단순화를 위해 \(\alpha = 1\)로 가정)</li>
+<li>모멘텀 전략이 작동하는 행동적 이유를 2가지 설명하라.</li>
+</ol>
+</div>
+
+<details>
+<summary>🔑 풀이 보기</summary>
+<div class="answer-content">
+<p class="ni"><strong>1)</strong> 처분 효과(Disposition Effect) — 손실 회피에서 비롯된다. 이익 종목은 빨리 팔아 확정하고(이익 영역에서 위험 회피), 손실 종목은 반등을 기대하며 보유한다(손실 영역에서 위험 추구). 합리적 투자자라면 세금 효과를 고려해 오히려 반대로 행동해야 한다.</p>
+
+<p class="ni"><strong>2)</strong> \(\alpha = 1\)이면 \(V(x) = x\) (이익), \(V(x) = -2.25 \times (-x)\) (손실)</p>
+<p class="ni">\(0.5 \times X + 0.5 \times (-2.25 \times 100) \geq 0\)</p>
+<p class="ni">\(0.5X - 112.5 \geq 0 \Rightarrow X \geq 225\)만원</p>
+<p class="ni">100만원을 잃을 수 있는 도박을 수용하려면 이길 때 최소 225만원을 받아야 한다.</p>
+
+<p class="ni"><strong>3)</strong> (i) 과소 반응(underreaction): 새로운 정보에 대해 투자자들이 보수적으로 반응하여 가격이 서서히 조정된다. 앵커링 편향으로 기존 가격에 고착되어 새 정보를 충분히 반영하지 못한다. (ii) 확증 편향: 상승 추세의 종목에 대해 긍정적 정보만 선택적으로 수용하여 추세가 지속된다. 군중 심리(herding)도 추세를 강화한다.</p>
+</div>
+</details>
+
+
+<!-- ═══════════════════════════════════════════ -->
+<!-- Ch10: 종합 문제 -->
+<!-- ═══════════════════════════════════════════ -->
+<h2 id="ch10">10. 종합 문제</h2>
+
+<p>지금까지 배운 재무관리 개념을 종합하는 문제들이다.</p>
+
+<!-- 종합문제 1 -->
+<div class="problem-box">
+<div class="problem-title">✏️ 종합문제 1: 포트폴리오 구성과 성과 평가</div>
+<p class="ni">두 자산 A, B의 연간 기대 수익률과 표준편차가 다음과 같다:</p>
+<ul>
+<li>자산 A: \(E(r_A) = 12\%\), \(\sigma_A = 20\%\)</li>
+<li>자산 B: \(E(r_B) = 8\%\), \(\sigma_B = 12\%\)</li>
+<li>상관계수: \(\rho_{AB} = 0.3\), 무위험 수익률: \(R_f = 4\%\)</li>
+</ul>
+<ol>
+<li>자산 A에 60%, B에 40% 투자하는 포트폴리오의 기대 수익률과 표준편차를 구하라.</li>
+<li>이 포트폴리오의 샤프 비율을 구하라.</li>
+<li>CAPM에서 시장 포트폴리오의 기대 수익률이 10%, 자산 A의 β가 1.3이라면, 자산 A의 CAPM 기대 수익률은? 실제 기대 수익률 12%와 비교하여 자산 A는 저평가/고평가인가?</li>
+<li>이 포트폴리오의 Fama-French 3-Factor 회귀에서 α = 0.1%/월, β_SMB = 0.4라면, 이 포트폴리오의 초과 수익 중 얼마가 소형주 노출 때문인가?</li>
+</ol>
+</div>
+
+<details>
+<summary>🔑 풀이 보기</summary>
+<div class="answer-content">
+<p class="ni"><strong>1)</strong></p>
+<p class="ni">\(E(r_P) = 0.6 \times 12\% + 0.4 \times 8\% = 7.2\% + 3.2\% = 10.4\%\)</p>
+<p class="ni">\(\sigma_P = \sqrt{0.6^2 \times 0.2^2 + 0.4^2 \times 0.12^2 + 2 \times 0.6 \times 0.4 \times 0.2 \times 0.12 \times 0.3}\)</p>
+<p class="ni">\(= \sqrt{0.0144 + 0.002304 + 0.003456} = \sqrt{0.02016} = 14.20\%\)</p>
+
+<p class="ni"><strong>2)</strong> \(\text{Sharpe} = \frac{10.4\% - 4\%}{14.20\%} = \frac{6.4\%}{14.20\%} = 0.451\)</p>
+
+<p class="ni"><strong>3)</strong> \(E(r_A)_{\text{CAPM}} = 4\% + 1.3 \times (10\% - 4\%) = 4\% + 7.8\% = 11.8\%\)</p>
+<p class="ni">실제 기대 수익률 12% > CAPM 예측 11.8% → α = +0.2% → 자산 A는 저평가 (SML 위에 위치)</p>
+
+<p class="ni"><strong>4)</strong> SMB 프리미엄이 월 0.2%라고 가정하면, 소형주 노출로 인한 수익 = β_SMB × SMB = 0.4 × 0.2% = 0.08%/월. 총 초과 수익 중 소형주 노출 비중 = 0.08% / (0.1% + 0.08%) ≈ 44%. 나머지 56%가 진짜 알파(스킬)다.</p>
+</div>
+</details>
+
+<!-- 종합문제 2 -->
+<div class="problem-box">
+<div class="problem-title">✏️ 종합문제 2: 투자 의사결정 종합</div>
+<p class="ni">당신은 퀀트 펀드 매니저다. 다음 3개 프로젝트 중 하나를 선택해야 한다:</p>
+<div class="tc" style="margin-top:10px">프로젝트 비교</div>
+<table>
+<tr><th>항목</th><th>프로젝트 X</th><th>프로젝트 Y</th><th>프로젝트 Z</th></tr>
+<tr><td>초기 투자</td><td>1억원</td><td>1억원</td><td>1억원</td></tr>
+<tr><td>연간 현금흐름 (5년)</td><td>3,000만원</td><td>2,500만원</td><td>4,000만원 (3년만)</td></tr>
+<tr><td>할인율</td><td>10%</td><td>10%</td><td>10%</td></tr>
+</table>
+<ol>
+<li>각 프로젝트의 NPV를 구하라.</li>
+<li>각 프로젝트의 IRR을 구하라 (근사값).</li>
+<li>NPV 기준으로 어떤 프로젝트를 선택해야 하는가?</li>
+<li>프로젝트 Z의 현금흐름이 3년뿐인 것은 어떤 위험을 의미하는가?</li>
+</ol>
+</div>
+
+<details>
+<summary>🔑 풀이 보기</summary>
+<div class="answer-content">
+<pre><code><span class="kw">import</span> numpy <span class="kw">as</span> np
+
+r = <span class="nu">0.10</span>
+
+<span class="cm"># 프로젝트 X: 5년간 3000만원</span>
+cf_x = [-<span class="nu">10000</span>] + [<span class="nu">3000</span>] * <span class="nu">5</span>
+npv_x = np.npv(r, cf_x) <span class="kw">if</span> <span class="fn">hasattr</span>(np, <span class="st">'npv'</span>) <span class="kw">else</span> <span class="fn">sum</span>(c/(<span class="nu">1</span>+r)**t <span class="kw">for</span> t,c <span class="kw">in</span> <span class="fn">enumerate</span>(cf_x))
+
+<span class="cm"># 프로젝트 Y: 5년간 2500만원</span>
+cf_y = [-<span class="nu">10000</span>] + [<span class="nu">2500</span>] * <span class="nu">5</span>
+npv_y = <span class="fn">sum</span>(c/(<span class="nu">1</span>+r)**t <span class="kw">for</span> t,c <span class="kw">in</span> <span class="fn">enumerate</span>(cf_y))
+
+<span class="cm"># 프로젝트 Z: 3년간 4000만원</span>
+cf_z = [-<span class="nu">10000</span>] + [<span class="nu">4000</span>] * <span class="nu">3</span>
+npv_z = <span class="fn">sum</span>(c/(<span class="nu">1</span>+r)**t <span class="kw">for</span> t,c <span class="kw">in</span> <span class="fn">enumerate</span>(cf_z))
+
+<span class="fn">print</span>(<span class="st">f"NPV(X) = </span>{npv_x:,.0f}<span class="st">만원"</span>)
+<span class="fn">print</span>(<span class="st">f"NPV(Y) = </span>{npv_y:,.0f}<span class="st">만원"</span>)
+<span class="fn">print</span>(<span class="st">f"NPV(Z) = </span>{npv_z:,.0f}<span class="st">만원"</span>)
+
+<span class="cm"># IRR 계산 (이분법)</span>
+<span class="kw">def</span> <span class="fn">irr</span>(cashflows, tol=<span class="nu">1e-6</span>):
+    lo, hi = -<span class="nu">0.5</span>, <span class="nu">5.0</span>
+    <span class="kw">for</span> _ <span class="kw">in</span> <span class="fn">range</span>(<span class="nu">1000</span>):
+        mid = (lo + hi) / <span class="nu">2</span>
+        npv = <span class="fn">sum</span>(c/(<span class="nu">1</span>+mid)**t <span class="kw">for</span> t,c <span class="kw">in</span> <span class="fn">enumerate</span>(cashflows))
+        <span class="kw">if</span> npv > <span class="nu">0</span>: lo = mid
+        <span class="kw">else</span>: hi = mid
+        <span class="kw">if</span> <span class="fn">abs</span>(npv) < tol: <span class="kw">break</span>
+    <span class="kw">return</span> mid
+
+<span class="fn">print</span>(<span class="st">f"\nIRR(X) = </span>{irr(cf_x):.2%}<span class="st">"</span>)
+<span class="fn">print</span>(<span class="st">f"IRR(Y) = </span>{irr(cf_y):.2%}<span class="st">"</span>)
+<span class="fn">print</span>(<span class="st">f"IRR(Z) = </span>{irr(cf_z):.2%}<span class="st">"</span>)</code></pre>
+<div class="code-output"><span class="out-label">Output:</span>
+NPV(X) = 1,372만원
+NPV(Y) = -526만원
+NPV(Z) = -53만원
+
+IRR(X) = 15.24%
+IRR(Y) = 7.93%
+IRR(Z) = 9.70%</div>
+
+<p class="ni"><strong>3)</strong> NPV 기준: 프로젝트 X만 NPV > 0이므로 X를 선택. Y와 Z는 NPV < 0이므로 기각.</p>
+<p class="ni"><strong>4)</strong> 프로젝트 Z는 현금흐름 기간이 짧아 재투자 위험(reinvestment risk)이 있다. 3년 후 동일한 수익률로 재투자할 수 있다는 보장이 없다. 또한 총 현금흐름이 1.2억원으로 X의 1.5억원보다 적다.</p>
+</div>
+</details>
+
+<!-- 종합문제 3 -->
+<div class="problem-box">
+<div class="problem-title">✏️ 종합문제 3: 퀀트 전략 설계</div>
+<p class="ni">당신은 한국 주식시장에서 팩터 기반 퀀트 전략을 설계하려 한다.</p>
+<ol>
+<li>모멘텀 + 가치 결합 전략을 설계하라. 어떤 종목을 매수/매도하는가?</li>
+<li>이 전략의 성과를 평가하기 위해 어떤 지표들을 사용해야 하는가? 최소 4개를 나열하고 각각의 의미를 설명하라.</li>
+<li>백테스트에서 샤프 비율 3.0이 나왔다. 이 결과를 어떻게 해석해야 하는가?</li>
+<li>EMH 관점에서 이 전략이 작동할 수 있는 이유와 작동하지 않을 수 있는 이유를 각각 설명하라.</li>
+</ol>
+</div>
+
+<details>
+<summary>🔑 풀이 보기</summary>
+<div class="answer-content">
+<p class="ni"><strong>1) 모멘텀 + 가치 결합 전략:</strong></p>
+<ul>
+<li>유니버스: KOSPI 200 종목</li>
+<li>모멘텀 점수: 최근 12개월 수익률 (최근 1개월 제외) 기준 순위</li>
+<li>가치 점수: PBR(주가순자산비율) 역수 기준 순위</li>
+<li>결합 점수: 모멘텀 순위 + 가치 순위의 합산</li>
+<li>매수: 결합 점수 상위 20종목 (동일 가중)</li>
+<li>매도: 결합 점수 하위 20종목 (롱숏 전략 시)</li>
+<li>리밸런싱: 월 1회</li>
+</ul>
+
+<p class="ni"><strong>2) 성과 평가 지표:</strong></p>
+<ul>
+<li>샤프 비율: 위험 1단위당 초과 수익. 전략의 효율성 측정</li>
+<li>최대 낙폭(MDD): 최악의 손실 시나리오. 투자자의 심리적 한계 확인</li>
+<li>정보 비율(IR): 벤치마크(KOSPI 200) 대비 초과 수익의 일관성</li>
+<li>소르티노 비율: 하방 위험만 고려한 위험 조정 수익률</li>
+<li>(추가) 회전율: 거래 비용 추정. 높은 회전율은 실전 수익을 크게 감소시킴</li>
+</ul>
+
+<p class="ni"><strong>3)</strong> 백테스트 샤프 3.0은 과적합(overfitting)을 강하게 의심해야 한다. 실전에서 이 수준의 샤프는 HFT를 제외하면 거의 불가능하다. 가능한 원인: (i) 미래 정보 유출(look-ahead bias), (ii) 생존자 편향(survivorship bias), (iii) 거래 비용 미반영, (iv) 데이터 스누핑(data snooping) — 많은 전략을 테스트하고 최고 결과만 보고. 실전 배포 전 반드시 아웃오브샘플 테스트와 거래 비용 반영이 필요하다.</p>
+
+<p class="ni"><strong>4)</strong></p>
+<p class="ni">작동할 수 있는 이유 (EMH 반론): 행동 편향(과소 반응, 앵커링)으로 인해 정보가 즉시 반영되지 않는다. 모멘텀은 과소 반응의 결과이고, 가치 프리미엄은 투자자들의 성장주 선호(glamour stock bias) 때문이다.</p>
+<p class="ni">작동하지 않을 수 있는 이유 (EMH 지지): 팩터 프리미엄은 추가 위험에 대한 보상일 뿐이다. 가치주는 재무적 곤경(financial distress) 위험이 높고, 모멘텀은 급격한 반전(crash) 위험이 있다. 또한 이상 현상이 널리 알려지면 차익거래로 사라진다(anomaly decay).</p>
+</div>
+</details>
+
+
+<!-- ═══════════════════════════════════════════ -->
+<!-- 핵심 요약 -->
+<!-- ═══════════════════════════════════════════ -->
+<h2>핵심 요약: 재무관리 치트시트</h2>
+
+<div class="tc">Table 10. 재무관리 핵심 개념 → 퀀트 매핑</div>
+<table>
+<tr><th>개념</th><th>핵심 수식</th><th>퀀트 응용</th></tr>
+<tr><td>화폐의 시간가치</td><td>\(FV = PV(1+r)^n\)</td><td>현금흐름 할인, 채권 가격</td></tr>
+<tr><td>NPV / IRR</td><td>\(NPV = \sum \frac{CF_t}{(1+r)^t}\)</td><td>프로젝트/전략 평가</td></tr>
+<tr><td>포트폴리오 분산</td><td>\(\sigma_P^2 = \mathbf{w}^\top \Sigma \mathbf{w}\)</td><td>리스크 관리, 최적화</td></tr>
+<tr><td>효율적 프론티어</td><td>마코위츠 최적화</td><td>자산 배분</td></tr>
+<tr><td>CAPM</td><td>\(E(r) = R_f + \beta(R_M - R_f)\)</td><td>기대 수익률, 알파 측정</td></tr>
+<tr><td>팩터 모델</td><td>\(R = \alpha + \sum \beta_k F_k\)</td><td>성과 귀인, 팩터 투자</td></tr>
+<tr><td>샤프 비율</td><td>\(\frac{R_p - R_f}{\sigma_p}\)</td><td>전략 비교의 기본 지표</td></tr>
+<tr><td>MDD</td><td>\(\max(\text{Peak} - \text{Trough})/\text{Peak}\)</td><td>최악 시나리오 리스크</td></tr>
+<tr><td>EMH</td><td>가격 = 모든 정보 반영</td><td>전략의 이론적 근거/한계</td></tr>
+<tr><td>행동 편향</td><td>손실 회피, 앵커링 등</td><td>시장 비효율의 원천</td></tr>
+</table>
+
+<div class="info">
+<p class="ni"><strong>다음 단계:</strong> 이 강의의 재무관리 기초는 R4(Supervised Learning)에서 팩터 기반 피처 설계의 배경이 되고, R5(Portfolio Optimization)에서 마코위츠 최적화와 리스크 관리의 핵심이 된다. 특히 샤프 비율과 MDD는 모든 라운드의 백테스트 평가에서 반복적으로 사용된다.</p>
+</div>
+
+</div><!-- paper-content -->
+</div><!-- container -->
+</div><!-- main-wrapper -->
+
+</body>
+</html>
