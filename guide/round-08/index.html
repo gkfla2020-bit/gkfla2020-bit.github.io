@@ -1,0 +1,1832 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Round 8 - Convex Optimization + Portfolio Optimization + Transformer</title>
+<script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;500&family=Space+Mono:wght@400&family=Inter:wght@300;400&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Inter',sans-serif;background:#fafaf8;color:#1a1a1a;line-height:1.7;overflow-x:hidden}
+.sidebar{position:fixed;left:0;top:0;width:260px;height:100vh;background:rgba(255,255,255,.97);border-right:1px solid rgba(0,0,0,.06);padding:32px 24px;z-index:100;overflow-y:auto;display:flex;flex-direction:column}
+.sidebar-profile{text-align:center;margin-bottom:28px;padding-bottom:24px;border-bottom:1px solid rgba(0,0,0,.08)}
+.profile-icon{font-size:48px;margin-bottom:8px}
+.profile-name{font-family:'Cormorant Garamond',serif;font-size:1.3rem;font-weight:500;margin-bottom:4px}
+.profile-title{font-size:.68rem;color:#888;letter-spacing:.08em;text-transform:uppercase;margin-bottom:8px}
+.profile-bio{font-size:.78rem;color:#666;line-height:1.5}
+.sidebar-nav{flex:1;margin-top:16px}
+.nav-section{margin-bottom:20px}
+.nav-section-title{font-size:.6rem;font-weight:600;color:#aaa;letter-spacing:.15em;text-transform:uppercase;margin-bottom:10px}
+.nav-list{list-style:none}
+.nav-list li{margin-bottom:5px}
+.nav-list a{font-size:.78rem;color:#555;text-decoration:none;transition:all .2s;display:block;padding:3px 0}
+.nav-list a:hover{color:#0080c6;padding-left:4px}
+.nav-list a.active{color:#0080c6;font-weight:500}
+.nav-list a.done{color:#28a745}
+.badge{display:inline-block;font-size:.5rem;background:#0080c6;color:#fff;padding:1px 5px;border-radius:8px;margin-left:3px;vertical-align:middle}
+.badge-done{background:#28a745}
+.sidebar-footer{padding-top:16px;border-top:1px solid rgba(0,0,0,.06);font-size:.65rem;color:#aaa;text-align:center}
+.main-wrapper{margin-left:260px;min-height:100vh}
+.container{max-width:1100px;margin:0 auto;padding:50px 40px 80px}
+.paper-content{font-family:'Times New Roman','Nanum Myeongjo',serif;line-height:1.8;background:#fff;padding:40px;border-radius:8px;box-shadow:0 2px 20px rgba(0,0,0,.05)}
+.paper-header{text-align:center;margin-bottom:40px;padding-bottom:30px;border-bottom:2px solid #333}
+.paper-category{font-size:14px;color:#666;margin-bottom:10px}
+.paper-title{font-size:24px;font-weight:bold;margin-bottom:12px;line-height:1.4}
+.paper-subtitle{font-size:14px;color:#555;margin-bottom:8px}
+.paper-team{font-size:13px;color:#444}
+.code-output{background:#1e1e1e;color:#d4d4d4;padding:12px 16px;border-radius:0 0 6px 6px;font-family:'Space Mono',monospace;font-size:11.5px;line-height:1.6;margin-top:-4px;margin-bottom:18px;border-top:2px solid #333;white-space:pre-wrap;overflow-x:auto}
+.code-output .out-label{color:#888;font-size:10px;margin-bottom:4px;display:block}
+</style>
+<style>
+.abstract{background:#f8f9fa;padding:25px;margin:30px 0;border-left:4px solid #2c3e50}
+.abstract-title{font-weight:bold;font-size:16px;margin-bottom:15px}
+h2{font-size:18px;margin:35px 0 20px;padding-bottom:8px;border-bottom:1px solid #ddd;color:#2c3e50}
+h3{font-size:15px;margin:25px 0 15px;color:#34495e}
+h4{font-size:14px;margin:20px 0 12px;color:#34495e}
+p{text-align:justify;margin-bottom:15px;text-indent:2em}
+p.ni{text-indent:0}
+table{width:100%;border-collapse:collapse;margin:20px 0;font-size:12px}
+th,td{border:1px solid #ddd;padding:10px 8px;text-align:center}
+th{background:#2c3e50;color:white;font-weight:bold}
+tr:nth-child(even){background:#f8f9fa}
+tr:hover{background:#e8f4f8}
+.tc{font-size:13px;font-weight:bold;margin:15px 0 10px;text-align:center}
+.eq{text-align:center;margin:20px 0;padding:15px;background:#f8f9fa;border-radius:4px;overflow-x:auto}
+ul,ol{margin-left:2em;margin-bottom:15px}
+li{margin-bottom:6px}
+.def{background:#fff9e6;border:1px solid #ffc107;border-radius:4px;padding:20px;margin:20px 0}
+.info{background:#e8f4f8;border-left:4px solid #3498db;padding:20px;margin:20px 0}
+.warn{background:#fff3cd;border-left:4px solid #f39c12;padding:20px;margin:20px 0}
+.ok{background:#d4edda;border-left:4px solid #28a745;padding:20px;margin:20px 0}
+pre{background:#1e1e1e;color:#d4d4d4;padding:20px;border-radius:6px;overflow-x:auto;margin:20px 0;font-family:'Space Mono','Consolas',monospace;font-size:13px;line-height:1.6}
+code{font-family:'Space Mono','Consolas',monospace;font-size:13px}
+p code,li code,td code{background:#f0f0f0;padding:2px 6px;border-radius:3px;color:#c7254e;font-size:12px}
+.cc{font-size:12px;font-weight:bold;color:#2c3e50;margin-top:15px;margin-bottom:4px}
+.cm{color:#6a9955}.kw{color:#569cd6}.st{color:#ce9178}.fn{color:#dcdcaa}.nb{color:#4ec9b0}.nu{color:#b5cea8}
+.progress-bar{width:100%;height:6px;background:#e0e0e0;border-radius:3px;margin-top:16px}
+.progress-fill{height:100%;background:linear-gradient(90deg,#0080c6,#00b894);border-radius:3px;width:80%}
+.progress-label{font-size:11px;color:#888;margin-top:4px;text-align:center}
+@media(max-width:1024px){
+.sidebar{width:100%;height:auto;position:relative;border-right:none;border-bottom:1px solid rgba(0,0,0,.08);padding:16px}
+.sidebar-profile{margin-bottom:10px;padding-bottom:10px;display:flex;align-items:center;gap:12px;text-align:left}
+.profile-icon{font-size:32px;margin-bottom:0}.profile-bio{display:none}
+.nav-section{display:inline-block;margin-right:16px;margin-bottom:8px}
+.nav-list{display:flex;gap:10px;flex-wrap:wrap}.nav-list li{margin-bottom:0}
+.sidebar-footer{display:none}
+.main-wrapper{margin-left:0}
+.container{padding:0}.paper-content{padding:20px 16px;border-radius:0;box-shadow:none}
+.paper-title{font-size:18px}p{font-size:14px;text-indent:1.5em;text-align:left}
+pre{font-size:11px;padding:14px}table{font-size:10px;display:block;overflow-x:auto}
+}
+</style>
+</head>
+<body>
+
+<div class="sidebar">
+<div class="sidebar-profile">
+<div class="profile-icon">&#x1F9E0;</div>
+<div class="profile-name">HFT ML Master Plan</div>
+<div class="profile-title">Convex Opt + DL + HFT</div>
+<div class="profile-bio">10 Rounds: Zero to HFT System Trading</div>
+</div>
+<div class="sidebar-nav">
+<div class="nav-section">
+<div class="nav-section-title">Curriculum</div>
+<ul class="nav-list">
+<li><a class="done" href="../round_01/lecture_01.html">R1. Python + Finance <span class="badge badge-done">DONE</span></a></li>
+<li><a class="done" href="../round_02/lecture_02.html">R2. Linear Algebra + Stats <span class="badge badge-done">DONE</span></a></li>
+<li><a class="done" href="../round_03/lecture_03.html">R3. Data / Feature Eng. <span class="badge badge-done">DONE</span></a></li>
+<li><a class="done" href="../round_04/lecture_04.html">R4. Supervised Learning <span class="badge badge-done">DONE</span></a></li>
+<li><a class="done" href="../round_05/lecture_05.html">R5. Unsupervised + TS <span class="badge badge-done">DONE</span></a></li>
+<li><a class="done" href="../round_06/lecture_06.html">R6. NLP + Sentiment <span class="badge badge-done">DONE</span></a></li>
+<li><a class="done" href="../round_07/lecture_07.html">R7. Deep Learning <span class="badge badge-done">DONE</span></a></li>
+<li><a class="active" href="#">R8. Convex Opt + Transformer <span class="badge">NOW</span></a></li>
+<li><a href="#">R9. HFT + RL</a></li>
+<li><a href="#">R10. Final Project</a></li>
+</ul>
+</div>
+<div class="nav-section">
+<div class="nav-section-title">This Lecture</div>
+<ul class="nav-list">
+<li><a href="#ch1">1. 왜 Convex Optimization인가</a></li>
+<li><a href="#ch2">2. 볼록집합과 볼록함수</a></li>
+<li><a href="#ch3">3. KKT 조건 &amp; 라그랑주</a></li>
+<li><a href="#ch4">4. CVXPY 실습</a></li>
+<li><a href="#ch5">5. Mean-Variance 최적화</a></li>
+<li><a href="#ch6">6. Black-Litterman 모델</a></li>
+<li><a href="#ch7">7. Risk Parity</a></li>
+<li><a href="#ch8">8. HRP (계층적 리스크 패리티)</a></li>
+<li><a href="#ch9">9. Kelly Criterion</a></li>
+<li><a href="#ch10">10. Transformer: Self-Attention</a></li>
+<li><a href="#ch11">11. Positional Encoding + MHA</a></li>
+<li><a href="#ch12">12. 금융 Transformer 시계열</a></li>
+<li><a href="#ch13">13. Quiz + Mini Project</a></li>
+</ul>
+</div>
+</div>
+<div class="sidebar-footer">Round 8 of 10 · ⚡ Convex Opt + Transformer</div>
+</div>
+
+<div class="main-wrapper">
+<div class="container">
+<div class="paper-content">
+
+<div class="paper-header">
+<div class="paper-category">Round 8 / 10 · 딥러닝 + 최적화</div>
+<h1 class="paper-title">Convex Optimization &amp; Portfolio Optimization<br>+ Transformer Architecture</h1>
+<div class="paper-subtitle">볼록 최적화로 포트폴리오를 설계하고, Transformer로 시장을 예측하는 방법</div>
+<div class="paper-team">Textbooks: MLAT Ch.5, Ch.16 (Transformer), Ch.20~21 / MLDSF Ch.7~8</div>
+<div class="progress-bar"><div class="progress-fill"></div></div>
+<div class="progress-label">Overall Progress: 80%</div>
+</div>
+
+<div class="abstract">
+<div class="abstract-title">Abstract</div>
+<p class="ni">
+R7까지 우리는 딥러닝의 핵심 아키텍처(ANN, CNN, RNN, LSTM)를 모두 익혔다. 이제 두 가지 강력한 무기를 추가한다. 첫째, <strong>Convex Optimization</strong>(볼록 최적화) — 포트폴리오의 비중을 수학적으로 최적화하는 이론과 도구다. "어떤 종목을 얼마나 살 것인가?"라는 질문에 대해, 감이 아닌 수학으로 답한다. Markowitz의 Mean-Variance부터 Black-Litterman, Risk Parity, HRP, Kelly Criterion까지 — 현대 자산배분의 핵심 기법을 모두 다룬다. 둘째, <strong>Transformer</strong> — "Attention Is All You Need" 논문으로 시작된 혁명적 아키텍처다. RNN/LSTM의 순차 처리 한계를 극복하고, Self-Attention으로 시계열의 모든 시점을 동시에 참조한다. GPT, BERT의 기반이 되는 이 구조를 금융 시계열 예측에 적용한다.
+</p>
+<p class="ni" style="margin-top:10px">
+R2의 선형대수(공분산 행렬, 고유값)가 포트폴리오 최적화의 수학적 기반이 되고, R7의 딥러닝 기초(역전파, 경사하강법)가 Transformer 이해의 토대가 된다. 이 두 축을 결합하면 — Transformer가 수익률을 예측하고, Convex Optimization이 최적 비중을 결정하는 — 완전한 투자 파이프라인이 완성된다.
+</p>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════
+     Chapter 1: 왜 Convex Optimization인가
+     ═══════════════════════════════════════════════════════════════ -->
+<h2 id="ch1">Chapter 1. 왜 Convex Optimization인가 — 최적화의 세계로</h2>
+
+<div class="info">
+<p class="ni"><strong>📚 교재 연동:</strong> MLAT Ch.5 "Portfolio Optimization and Performance Evaluation" 도입부 / MLDSF Ch.7 "Portfolio Management" — 포트폴리오 최적화가 왜 필요한지, 그리고 그 수학적 기반이 Convex Optimization인 이유를 다룬다.</p>
+</div>
+
+<h3>1.1 투자의 근본 질문</h3>
+
+<p>
+R4에서 XGBoost로 주가 방향을 예측했고, R7에서 LSTM으로 시계열을 예측했다. 하지만 "내일 삼성전자가 오른다"는 예측만으로는 돈을 벌 수 없다. 진짜 질문은 이것이다: <strong>"삼성전자에 자산의 몇 %를 투자할 것인가?"</strong> 10%? 50%? 올인? 이 질문에 답하는 것이 포트폴리오 최적화(Portfolio Optimization)이고, 그 수학적 엔진이 바로 Convex Optimization이다.
+</p>
+
+<p>
+비유하자면, ML 모델은 "어디로 가야 하는지"를 알려주는 <strong>내비게이션</strong>이고, 포트폴리오 최적화는 "얼마나 빠르게, 어떤 경로로 갈지"를 결정하는 <strong>운전 전략</strong>이다. 아무리 좋은 내비게이션이 있어도 운전을 못하면 사고가 난다. 마찬가지로, 아무리 좋은 예측 모델이 있어도 자금 배분을 잘못하면 파산한다.
+</p>
+
+<h3>1.2 왜 "볼록"(Convex)이어야 하는가?</h3>
+
+<p>
+최적화(Optimization)란 어떤 목적함수를 최소화(또는 최대화)하는 변수 값을 찾는 것이다. 문제는 일반적인 최적화 문제는 <strong>매우 어렵다</strong>는 것이다. 산 속에서 가장 낮은 골짜기를 찾는다고 상상해보자. 산이 울퉁불퉁하면(비볼록, non-convex) 수많은 골짜기(local minimum)가 있어서 진짜 가장 낮은 곳(global minimum)을 찾기 어렵다. R7에서 딥러닝 학습이 local minimum에 빠질 수 있다고 했던 것을 기억하자.
+</p>
+
+<p>
+하지만 산이 매끈한 그릇 모양(볼록, convex)이라면? 어디서 출발하든 내리막을 따라가면 반드시 가장 낮은 곳에 도달한다. <strong>볼록 최적화 문제는 local minimum = global minimum</strong>이라는 놀라운 성질을 가진다. 이것이 Convex Optimization이 특별한 이유다 — 효율적으로 풀 수 있고, 해가 유일하며, 수학적으로 보장된다.
+</p>
+
+<!-- 볼록 vs 비볼록 시각 다이어그램 -->
+<div style="margin:25px 0;padding:20px;background:linear-gradient(135deg,#e8eaf6,#fce4ec);border-radius:12px;box-shadow:0 4px 15px rgba(0,0,0,.08)">
+<p class="ni" style="text-align:center;font-weight:bold;font-size:14px;margin-bottom:18px;color:#283593">🏔️ 볼록(Convex) vs 비볼록(Non-Convex) 최적화</p>
+<div style="display:flex;gap:20px;flex-wrap:wrap;justify-content:center">
+<div style="flex:1;min-width:260px;background:#fff;padding:18px;border-radius:10px;border:2px solid #4caf50;box-shadow:0 2px 8px rgba(76,175,80,.15)">
+<p class="ni" style="font-weight:bold;color:#2e7d32;text-align:center;margin-bottom:12px">✅ Convex (볼록)</p>
+<div style="text-align:center;font-size:48px;margin:10px 0">🥣</div>
+<p class="ni" style="font-size:12px;text-align:center;color:#555">그릇 모양 — 어디서 출발해도<br>바닥(global minimum)에 도달</p>
+<div style="margin-top:12px;padding:10px;background:#e8f5e9;border-radius:6px;font-size:11px">
+<p class="ni">• Local min = Global min (유일한 해)</p>
+<p class="ni">• 효율적 알고리즘 존재 (다항 시간)</p>
+<p class="ni">• 해의 존재와 유일성 보장</p>
+<p class="ni">• 예: 포트폴리오 분산 최소화</p>
+</div>
+</div>
+<div style="flex:1;min-width:260px;background:#fff;padding:18px;border-radius:10px;border:2px solid #f44336;box-shadow:0 2px 8px rgba(244,67,54,.15)">
+<p class="ni" style="font-weight:bold;color:#c62828;text-align:center;margin-bottom:12px">❌ Non-Convex (비볼록)</p>
+<div style="text-align:center;font-size:48px;margin:10px 0">🏔️</div>
+<p class="ni" style="font-size:12px;text-align:center;color:#555">울퉁불퉁한 산 — 수많은 골짜기에<br>빠질 수 있음 (local minimum)</p>
+<div style="margin-top:12px;padding:10px;background:#ffebee;border-radius:6px;font-size:11px">
+<p class="ni">• Local min ≠ Global min (함정 다수)</p>
+<p class="ni">• NP-hard (풀기 매우 어려움)</p>
+<p class="ni">• 초기값에 따라 결과 달라짐</p>
+<p class="ni">• 예: 딥러닝 손실함수 최적화</p>
+</div>
+</div>
+</div>
+</div>
+
+<h3>1.3 금융에서의 Convex Optimization</h3>
+
+<p>
+다행히도 금융의 많은 핵심 문제가 볼록 최적화로 정식화(formulation)된다. 포트폴리오 분산 최소화, 샤프비율 최대화, 리스크 제약 하의 수익 극대화 — 이 모든 것이 볼록 최적화 문제다. Harry Markowitz가 1952년에 제안한 Mean-Variance Optimization이 바로 이차 볼록 최적화(Quadratic Convex Optimization)의 대표적 사례이며, 이 업적으로 1990년 노벨 경제학상을 수상했다.
+</p>
+
+<div class="def">
+<p class="ni"><strong>📖 Convex Optimization 문제의 표준형</strong></p>
+<div class="eq">
+$$\min_{x} \; f(x) \quad \text{subject to} \quad g_i(x) \leq 0, \;\; h_j(x) = 0$$
+</div>
+<p class="ni" style="margin-top:8px;font-size:13px">
+여기서 \(f(x)\)는 볼록 목적함수, \(g_i(x)\)는 볼록 부등식 제약, \(h_j(x)\)는 아핀(affine) 등식 제약이다. 이 세 조건을 만족하면 "볼록 최적화 문제"라 부르며, 전역 최적해를 효율적으로 찾을 수 있다.
+</p>
+</div>
+
+<p>
+이번 라운드의 전반부(Ch.1~9)에서는 이 이론을 배우고 CVXPY로 실습한 뒤, 실제 포트폴리오 최적화에 적용한다. 후반부(Ch.10~12)에서는 Transformer 아키텍처를 배워 금융 시계열 예측에 활용한다. 최종적으로 Ch.13의 미니 프로젝트에서 두 축을 결합한다.
+</p>
+
+<!-- ═══════════════════════════════════════════════════════════════
+     Chapter 2: 볼록집합과 볼록함수
+     ═══════════════════════════════════════════════════════════════ -->
+<h2 id="ch2">Chapter 2. 볼록집합과 볼록함수 — Convexity의 수학</h2>
+
+<div class="info">
+<p class="ni"><strong>📚 교재 연동:</strong> 이 내용은 Boyd &amp; Vandenberghe의 "Convex Optimization" (표준 교과서) Ch.2~3에 해당한다. MLAT Ch.5에서는 이 이론을 포트폴리오 최적화에 직접 적용한다.</p>
+</div>
+
+<h3>2.1 볼록집합 (Convex Set)</h3>
+
+<p>
+볼록집합의 정의는 놀랍도록 직관적이다. 집합 안의 임의의 두 점을 잇는 선분이 모두 그 집합 안에 있으면, 그 집합은 볼록하다. 비유하자면, 볼록집합은 "움푹 들어간 곳이 없는" 도형이다. 원, 삼각형, 사각형은 볼록집합이지만, 별 모양이나 초승달은 볼록집합이 아니다.
+</p>
+
+<div class="def">
+<p class="ni"><strong>📖 볼록집합 (Convex Set) 정의</strong></p>
+<p class="ni" style="margin-top:8px">집합 \(C\)가 볼록하다 ⟺ 임의의 \(x_1, x_2 \in C\)와 \(0 \leq \theta \leq 1\)에 대해:</p>
+<div class="eq">
+$$\theta x_1 + (1-\theta) x_2 \in C$$
+</div>
+<p class="ni" style="font-size:12px;color:#666">즉, 두 점의 볼록 결합(convex combination)이 항상 집합 안에 있다.</p>
+</div>
+
+<!-- 볼록집합 시각 다이어그램 -->
+<div style="margin:25px 0;padding:20px;background:linear-gradient(135deg,#e0f7fa,#f1f8e9);border-radius:12px;box-shadow:0 4px 15px rgba(0,0,0,.08)">
+<p class="ni" style="text-align:center;font-weight:bold;font-size:14px;margin-bottom:15px;color:#00695c">📐 볼록집합 vs 비볼록집합</p>
+<div style="display:flex;gap:20px;flex-wrap:wrap;justify-content:center">
+<div style="flex:1;min-width:200px;background:#fff;padding:16px;border-radius:10px;text-align:center">
+<div style="width:100px;height:100px;background:linear-gradient(135deg,#a5d6a7,#66bb6a);border-radius:50%;margin:0 auto 10px;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:bold;font-size:12px">원 ⭕</div>
+<p class="ni" style="font-size:12px;color:#2e7d32;font-weight:bold">✅ 볼록집합</p>
+<p class="ni" style="font-size:11px;color:#666">두 점을 이으면 항상 원 안</p>
+</div>
+<div style="flex:1;min-width:200px;background:#fff;padding:16px;border-radius:10px;text-align:center">
+<div style="width:100px;height:100px;background:linear-gradient(135deg,#a5d6a7,#66bb6a);margin:0 auto 10px;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:bold;font-size:12px">▲ 삼각형</div>
+<p class="ni" style="font-size:12px;color:#2e7d32;font-weight:bold">✅ 볼록집합</p>
+<p class="ni" style="font-size:11px;color:#666">두 점을 이으면 항상 삼각형 안</p>
+</div>
+<div style="flex:1;min-width:200px;background:#fff;padding:16px;border-radius:10px;text-align:center">
+<div style="width:100px;height:100px;background:linear-gradient(135deg,#ef9a9a,#e57373);margin:0 auto 10px;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:bold;font-size:28px">☆</div>
+<p class="ni" style="font-size:12px;color:#c62828;font-weight:bold">❌ 비볼록집합</p>
+<p class="ni" style="font-size:11px;color:#666">두 점을 이으면 별 밖으로 나감</p>
+</div>
+</div>
+</div>
+
+<p>
+금융에서 볼록집합의 대표적 예는 <strong>포트폴리오 비중의 제약 조건</strong>이다. "모든 비중의 합 = 1"이고 "각 비중 ≥ 0" (공매도 금지)이라는 조건은 심플렉스(simplex)라는 볼록집합을 형성한다. 이 안에서 최적 비중을 찾는 것이 포트폴리오 최적화다.
+</p>
+
+<h3>2.2 볼록함수 (Convex Function)</h3>
+
+<p>
+볼록함수는 "아래로 볼록한" 함수다. 그래프 위의 임의의 두 점을 잇는 선분이 항상 그래프 위에 있으면 볼록함수다. 직관적으로, 그릇(bowl) 모양의 함수가 볼록함수다.
+</p>
+
+<div class="def">
+<p class="ni"><strong>📖 볼록함수 (Convex Function) 정의</strong></p>
+<p class="ni" style="margin-top:8px">함수 \(f: \mathbb{R}^n \to \mathbb{R}\)가 볼록하다 ⟺ 정의역이 볼록집합이고, 임의의 \(x, y\)와 \(0 \leq \theta \leq 1\)에 대해:</p>
+<div class="eq">
+$$f(\theta x + (1-\theta)y) \leq \theta f(x) + (1-\theta) f(y)$$
+</div>
+<p class="ni" style="font-size:12px;color:#666">Jensen's inequality — 함수값의 볼록 결합이 볼록 결합의 함수값보다 항상 크거나 같다.</p>
+</div>
+
+<h4>볼록함수의 예시</h4>
+
+<table>
+<tr><th>함수</th><th>수식</th><th>볼록?</th><th>금융 응용</th></tr>
+<tr><td>이차함수</td><td>\(f(x) = x^2\)</td><td>✅ 볼록</td><td>포트폴리오 분산</td></tr>
+<tr><td>절대값</td><td>\(f(x) = |x|\)</td><td>✅ 볼록</td><td>L1 정규화 (Lasso)</td></tr>
+<tr><td>지수함수</td><td>\(f(x) = e^x\)</td><td>✅ 볼록</td><td>로그수익률 변환</td></tr>
+<tr><td>음의 로그</td><td>\(f(x) = -\log x\)</td><td>✅ 볼록</td><td>Kelly criterion</td></tr>
+<tr><td>노름</td><td>\(f(x) = \|x\|_2\)</td><td>✅ 볼록</td><td>리스크 측정</td></tr>
+<tr><td>사인함수</td><td>\(f(x) = \sin x\)</td><td>❌ 비볼록</td><td>—</td></tr>
+</table>
+<p class="ni tc">Table 2.1: 볼록함수와 비볼록함수 예시</p>
+
+<h3>2.3 볼록성 판별법</h3>
+
+<p>
+함수가 볼록한지 어떻게 확인할까? 두 가지 강력한 도구가 있다:
+</p>
+
+<p>
+<strong>1차 조건 (First-order condition):</strong> 미분 가능한 함수 \(f\)가 볼록하다 ⟺ 모든 점에서 접선이 함수 아래에 있다:
+</p>
+
+<div class="eq">
+$$f(y) \geq f(x) + \nabla f(x)^T (y - x) \quad \forall x, y$$
+</div>
+
+<p>
+<strong>2차 조건 (Second-order condition):</strong> 두 번 미분 가능한 함수 \(f\)가 볼록하다 ⟺ 헤시안 행렬(Hessian matrix)이 양반정치(positive semidefinite)이다:
+</p>
+
+<div class="eq">
+$$\nabla^2 f(x) \succeq 0 \quad \forall x$$
+</div>
+
+<p>
+R2에서 배운 고유값을 기억하자. 행렬이 양반정치라는 것은 모든 고유값이 0 이상이라는 뜻이다. 포트폴리오의 공분산 행렬 \(\Sigma\)는 항상 양반정치이므로, 포트폴리오 분산 \(w^T \Sigma w\)는 항상 볼록함수다. 이것이 Mean-Variance 최적화가 볼록 최적화인 이유다.
+</p>
+
+<!-- ═══════════════════════════════════════════════════════════════
+     Chapter 3: KKT 조건, 라그랑주 승수법
+     ═══════════════════════════════════════════════════════════════ -->
+<h2 id="ch3">Chapter 3. KKT 조건과 라그랑주 승수법 — 제약 조건 하의 최적화</h2>
+
+<div class="info">
+<p class="ni"><strong>📚 교재 연동:</strong> Boyd &amp; Vandenberghe "Convex Optimization" Ch.5 (Duality) — KKT 조건은 제약 있는 최적화의 핵심 이론이다. MLAT Ch.5에서 포트폴리오 최적화의 수학적 기반으로 사용된다.</p>
+</div>
+
+<h3>3.1 왜 제약 조건이 필요한가?</h3>
+
+<p>
+현실의 투자에는 항상 제약이 있다. "비중의 합 = 100%", "공매도 금지 (각 비중 ≥ 0)", "한 종목에 30% 이상 투자 금지", "섹터별 비중 제한" 등. 이런 제약 조건 하에서 최적해를 찾는 것이 <strong>제약 최적화</strong>(Constrained Optimization)이다.
+</p>
+
+<p>
+비유하자면, 제약 없는 최적화는 "지도 위 어디든 갈 수 있을 때 가장 낮은 곳 찾기"이고, 제약 있는 최적화는 "도로 위에서만 이동할 수 있을 때 가장 낮은 곳 찾기"다. 도로라는 제약이 있으면 문제가 더 어려워지지만, 라그랑주 승수법이 이를 우아하게 해결한다.
+</p>
+
+<h3>3.2 라그랑주 승수법 (Method of Lagrange Multipliers)</h3>
+
+<p>
+등식 제약 \(h(x) = 0\) 하에서 \(f(x)\)를 최소화하는 문제를 생각하자. 라그랑주의 핵심 아이디어는 제약 조건을 목적함수에 "흡수"시키는 것이다. 라그랑주 함수(Lagrangian)를 정의한다:
+</p>
+
+<div class="eq">
+$$\mathcal{L}(x, \nu) = f(x) + \nu \cdot h(x)$$
+</div>
+
+<p>
+여기서 \(\nu\)는 <strong>라그랑주 승수</strong>(Lagrange multiplier)다. 최적해에서는 \(\nabla_x \mathcal{L} = 0\)이고 \(h(x) = 0\)이다. 라그랑주 승수 \(\nu\)의 경제적 의미는 "제약을 한 단위 완화했을 때 목적함수가 얼마나 개선되는가"이다. 금융에서 이것은 <strong>그림자 가격</strong>(shadow price)이라 불린다 — 예를 들어, "공매도 제약을 풀면 샤프비율이 얼마나 올라가는가?"를 알려준다.
+</p>
+
+<h3>3.3 KKT 조건 (Karush-Kuhn-Tucker Conditions)</h3>
+
+<p>
+부등식 제약 \(g_i(x) \leq 0\)까지 포함하면 라그랑주 함수가 확장된다:
+</p>
+
+<div class="eq">
+$$\mathcal{L}(x, \lambda, \nu) = f(x) + \sum_{i} \lambda_i g_i(x) + \sum_{j} \nu_j h_j(x)$$
+</div>
+
+<p>
+KKT 조건은 볼록 최적화에서 최적해의 <strong>필요충분조건</strong>이다. 네 가지 조건으로 구성된다:
+</p>
+
+<div style="margin:25px 0;padding:20px;background:linear-gradient(135deg,#fff3e0,#fce4ec);border-radius:12px;box-shadow:0 4px 15px rgba(0,0,0,.08)">
+<p class="ni" style="text-align:center;font-weight:bold;font-size:14px;margin-bottom:15px;color:#e65100">📋 KKT 조건 (4가지)</p>
+<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px">
+<div style="background:#fff;padding:14px;border-radius:8px;border-left:4px solid #ff9800">
+<p class="ni" style="font-weight:bold;font-size:12px;color:#e65100;margin-bottom:6px">① 정상성 (Stationarity)</p>
+<p class="ni" style="font-size:12px">\(\nabla f(x^*) + \sum \lambda_i \nabla g_i(x^*) + \sum \nu_j \nabla h_j(x^*) = 0\)</p>
+<p class="ni" style="font-size:11px;color:#888;margin-top:4px">라그랑주 함수의 기울기 = 0</p>
+</div>
+<div style="background:#fff;padding:14px;border-radius:8px;border-left:4px solid #ff9800">
+<p class="ni" style="font-weight:bold;font-size:12px;color:#e65100;margin-bottom:6px">② 원시 실행가능성 (Primal Feasibility)</p>
+<p class="ni" style="font-size:12px">\(g_i(x^*) \leq 0, \;\; h_j(x^*) = 0\)</p>
+<p class="ni" style="font-size:11px;color:#888;margin-top:4px">제약 조건을 만족</p>
+</div>
+<div style="background:#fff;padding:14px;border-radius:8px;border-left:4px solid #ff9800">
+<p class="ni" style="font-weight:bold;font-size:12px;color:#e65100;margin-bottom:6px">③ 쌍대 실행가능성 (Dual Feasibility)</p>
+<p class="ni" style="font-size:12px">\(\lambda_i \geq 0\)</p>
+<p class="ni" style="font-size:11px;color:#888;margin-top:4px">부등식 제약의 승수는 음이 아님</p>
+</div>
+<div style="background:#fff;padding:14px;border-radius:8px;border-left:4px solid #ff9800">
+<p class="ni" style="font-weight:bold;font-size:12px;color:#e65100;margin-bottom:6px">④ 상보 이완 (Complementary Slackness)</p>
+<p class="ni" style="font-size:12px">\(\lambda_i \cdot g_i(x^*) = 0\)</p>
+<p class="ni" style="font-size:11px;color:#888;margin-top:4px">제약이 활성이 아니면 승수 = 0</p>
+</div>
+</div>
+</div>
+
+<p>
+④번 상보 이완 조건이 특히 중요하다. 이것은 "제약이 등호로 성립하지 않으면(\(g_i(x^*) < 0\)), 해당 승수는 0이다(\(\lambda_i = 0\))"라는 뜻이다. 포트폴리오에서 이것은 "비중 하한 제약에 걸리지 않은 종목은 그 제약이 최적해에 영향을 주지 않는다"는 의미다.
+</p>
+
+<h3>3.4 포트폴리오 최적화에서의 KKT</h3>
+
+<p>
+구체적 예를 보자. 2종목 포트폴리오에서 분산을 최소화하되, 비중의 합 = 1이고 기대수익률 ≥ 목표수익률인 문제:
+</p>
+
+<div class="eq">
+$$\min_{w_1, w_2} \; w^T \Sigma w \quad \text{s.t.} \quad w_1 + w_2 = 1, \;\; \mu^T w \geq r_{\text{target}}, \;\; w_i \geq 0$$
+</div>
+
+<p>
+이 문제의 KKT 조건을 풀면 최적 비중이 나온다. 하지만 종목이 수백 개가 되면 손으로 풀 수 없다. 이때 CVXPY 같은 솔버가 KKT 조건을 자동으로 풀어준다. 다음 챕터에서 바로 실습한다.
+</p>
+
+<!-- ═══════════════════════════════════════════════════════════════
+     Chapter 4: CVXPY 실습
+     ═══════════════════════════════════════════════════════════════ -->
+<h2 id="ch4">Chapter 4. CVXPY 실습 — 파이썬으로 볼록 최적화 풀기</h2>
+
+<div class="info">
+<p class="ni"><strong>📚 교재 연동:</strong> CVXPY는 Stanford의 Stephen Boyd 교수 연구실에서 개발한 파이썬 볼록 최적화 라이브러리다. MLAT Ch.5에서 포트폴리오 최적화 구현에 사용된다.</p>
+</div>
+
+<h3>4.1 CVXPY란?</h3>
+
+<p>
+CVXPY는 볼록 최적화 문제를 파이썬 코드로 자연스럽게 표현하고 풀 수 있게 해주는 라이브러리다. 수학 공식을 거의 그대로 코드로 옮길 수 있어서, 최적화 이론을 모르는 사람도 쉽게 사용할 수 있다. 내부적으로는 ECOS, SCS, OSQP 같은 고성능 솔버를 호출하여 KKT 조건을 풀어준다.
+</p>
+
+<p class="cc">▼ CVXPY 설치</p>
+<pre>
+<span class="cm"># pip으로 설치</span>
+pip install cvxpy
+</pre>
+
+<h3>4.2 CVXPY 기본 문법</h3>
+
+<p>
+CVXPY의 워크플로우는 세 단계다: (1) 변수 정의, (2) 목적함수와 제약 조건 정의, (3) 문제 풀기. 간단한 예제로 시작하자.
+</p>
+
+<p class="cc">▼ CVXPY 기본 예제: 이차함수 최소화</p>
+<pre>
+<span class="kw">import</span> cvxpy <span class="kw">as</span> cp
+<span class="kw">import</span> numpy <span class="kw">as</span> np
+
+<span class="cm"># 1단계: 변수 정의</span>
+x = cp.<span class="fn">Variable</span>(<span class="nu">2</span>)  <span class="cm"># 2차원 변수</span>
+
+<span class="cm"># 2단계: 목적함수와 제약 조건</span>
+objective = cp.<span class="fn">Minimize</span>(cp.<span class="fn">sum_squares</span>(x))  <span class="cm"># min ||x||^2</span>
+constraints = [
+    x[<span class="nu">0</span>] + x[<span class="nu">1</span>] == <span class="nu">1</span>,   <span class="cm"># 등식 제약: x1 + x2 = 1</span>
+    x >= <span class="nu">0</span>                <span class="cm"># 부등식 제약: x >= 0 (원소별)</span>
+]
+
+<span class="cm"># 3단계: 문제 정의 및 풀기</span>
+problem = cp.<span class="fn">Problem</span>(objective, constraints)
+problem.<span class="fn">solve</span>()
+
+<span class="fn">print</span>(<span class="st">f"최적값: {problem.value:.4f}"</span>)
+<span class="fn">print</span>(<span class="st">f"최적해: x = {x.value}"</span>)
+<span class="fn">print</span>(<span class="st">f"상태: {problem.status}"</span>)
+</pre>
+<div class="code-output"><span class="out-label">Output:</span>
+최적값: 0.5000
+최적해: x = [0.5 0.5]
+상태: optimal</div>
+
+<p>
+결과가 직관적으로 맞다. \(x_1 + x_2 = 1\)이고 \(x_1, x_2 \geq 0\)일 때 \(x_1^2 + x_2^2\)를 최소화하면, 두 값이 같을 때 (0.5, 0.5) 최소가 된다. 이것은 "분산을 최소화하려면 균등 배분하라"는 포트폴리오 이론의 직관과 일치한다.
+</p>
+
+<h3>4.3 포트폴리오 최적화 맛보기</h3>
+
+<p>
+이제 실제 주식 데이터로 최소 분산 포트폴리오를 구해보자. 3종목(AAPL, MSFT, GOOGL)의 공분산 행렬을 사용한다.
+</p>
+
+<p class="cc">▼ CVXPY로 최소 분산 포트폴리오</p>
+<pre>
+<span class="kw">import</span> cvxpy <span class="kw">as</span> cp
+<span class="kw">import</span> numpy <span class="kw">as</span> np
+<span class="kw">import</span> yfinance <span class="kw">as</span> yf
+
+<span class="cm"># 주가 데이터 다운로드</span>
+tickers = [<span class="st">'AAPL'</span>, <span class="st">'MSFT'</span>, <span class="st">'GOOGL'</span>]
+data = yf.<span class="fn">download</span>(tickers, start=<span class="st">'2020-01-01'</span>, end=<span class="st">'2024-01-01'</span>)
+prices = data[<span class="st">'Close'</span>]
+
+<span class="cm"># 일간 수익률 → 연간 공분산 행렬</span>
+returns = prices.<span class="fn">pct_change</span>().<span class="fn">dropna</span>()
+mu = returns.<span class="fn">mean</span>() * <span class="nu">252</span>          <span class="cm"># 연간 기대수익률</span>
+Sigma = returns.<span class="fn">cov</span>() * <span class="nu">252</span>        <span class="cm"># 연간 공분산 행렬</span>
+n = <span class="fn">len</span>(tickers)
+
+<span class="cm"># CVXPY로 최소 분산 포트폴리오</span>
+w = cp.<span class="fn">Variable</span>(n)                  <span class="cm"># 비중 변수</span>
+portfolio_var = cp.<span class="fn">quad_form</span>(w, Sigma.values)  <span class="cm"># w^T Σ w</span>
+
+objective = cp.<span class="fn">Minimize</span>(portfolio_var)
+constraints = [
+    cp.<span class="fn">sum</span>(w) == <span class="nu">1</span>,    <span class="cm"># 비중 합 = 1</span>
+    w >= <span class="nu">0</span>              <span class="cm"># 공매도 금지</span>
+]
+
+problem = cp.<span class="fn">Problem</span>(objective, constraints)
+problem.<span class="fn">solve</span>()
+
+<span class="fn">print</span>(<span class="st">"=== 최소 분산 포트폴리오 ==="</span>)
+<span class="kw">for</span> i, ticker <span class="kw">in</span> <span class="fn">enumerate</span>(tickers):
+    <span class="fn">print</span>(<span class="st">f"  {ticker}: {w.value[i]*100:.1f}%"</span>)
+
+port_std = np.<span class="fn">sqrt</span>(problem.value)
+port_ret = mu.values @ w.value
+<span class="fn">print</span>(<span class="st">f"\n연간 수익률: {port_ret*100:.1f}%"</span>)
+<span class="fn">print</span>(<span class="st">f"연간 변동성: {port_std*100:.1f}%"</span>)
+<span class="fn">print</span>(<span class="st">f"샤프비율: {port_ret/port_std:.2f}"</span>)
+</pre>
+<div class="code-output"><span class="out-label">Output (예시):</span>
+=== 최소 분산 포트폴리오 ===
+  AAPL: 28.3%
+  MSFT: 48.5%
+  GOOGL: 23.2%
+
+연간 수익률: 25.7%
+연간 변동성: 24.1%
+샤프비율: 1.07</div>
+
+<div class="ok">
+<p class="ni"><strong>💡 핵심 포인트:</strong> CVXPY는 수학 공식을 거의 그대로 코드로 옮길 수 있다. <code>cp.quad_form(w, Sigma)</code>가 \(w^T \Sigma w\)이고, <code>cp.sum(w) == 1</code>이 \(\sum w_i = 1\)이다. 내부적으로 KKT 조건을 풀어 전역 최적해를 보장한다.</p>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════
+     Chapter 5: Mean-Variance 포트폴리오 최적화
+     ═══════════════════════════════════════════════════════════════ -->
+<h2 id="ch5">Chapter 5. Mean-Variance 포트폴리오 최적화 — Markowitz의 유산</h2>
+
+<div class="info">
+<p class="ni"><strong>📚 교재 연동:</strong> MLAT Ch.5 "Mean-variance optimization" 섹션 — Markowitz 이론, 효율적 프론티어, 샤프비율 최대화를 상세히 다룬다. MLDSF Ch.7 "Portfolio Management" — 파이썬 구현 케이스스터디.</p>
+</div>
+
+<h3>5.1 Markowitz의 혁명 (1952)</h3>
+
+<p>
+1952년, Harry Markowitz는 "Portfolio Selection"이라는 14페이지짜리 논문으로 현대 포트폴리오 이론(Modern Portfolio Theory, MPT)을 창시했다. 핵심 통찰은 단순하지만 혁명적이었다: <strong>개별 자산의 수익률만 보지 말고, 자산 간의 상관관계를 고려하여 포트폴리오 전체의 위험-수익 프로파일을 최적화하라.</strong>
+</p>
+
+<p>
+비유하자면, 축구팀을 구성할 때 개인 능력이 뛰어난 선수 11명을 모으는 것보다, 서로 보완하는 선수들을 조합하는 것이 더 강한 팀을 만든다. 공격수만 11명이면 수비가 무너진다. 마찬가지로, 수익률이 높은 종목만 모으면 리스크가 집중된다. 서로 상관관계가 낮은 종목을 조합하면 같은 수익률에서 리스크를 줄일 수 있다 — 이것이 <strong>분산 투자</strong>(diversification)의 수학적 근거다.
+</p>
+
+<h3>5.2 수학적 정식화</h3>
+
+<p>
+\(n\)개 자산의 비중 벡터를 \(w = (w_1, \ldots, w_n)^T\), 기대수익률 벡터를 \(\mu\), 공분산 행렬을 \(\Sigma\)라 하면:
+</p>
+
+<div class="eq">
+$$\text{포트폴리오 기대수익률:} \quad \mu_p = w^T \mu = \sum_{i=1}^{n} w_i \mu_i$$
+</div>
+
+<div class="eq">
+$$\text{포트폴리오 분산:} \quad \sigma_p^2 = w^T \Sigma w = \sum_{i=1}^{n} \sum_{j=1}^{n} w_i w_j \sigma_{ij}$$
+</div>
+
+<p>
+Mean-Variance 최적화는 두 가지 형태로 정식화할 수 있다:
+</p>
+
+<div style="margin:25px 0;padding:20px;background:linear-gradient(135deg,#e3f2fd,#e8eaf6);border-radius:12px;box-shadow:0 4px 15px rgba(0,0,0,.08)">
+<p class="ni" style="text-align:center;font-weight:bold;font-size:14px;margin-bottom:15px;color:#1565c0">📊 Mean-Variance 최적화의 두 가지 형태</p>
+<div style="display:flex;gap:16px;flex-wrap:wrap;justify-content:center">
+<div style="flex:1;min-width:280px;background:#fff;padding:16px;border-radius:10px;border:2px solid #1976d2">
+<p class="ni" style="font-weight:bold;color:#1565c0;text-align:center;margin-bottom:10px">형태 1: 최소 분산</p>
+<p class="ni" style="font-size:12px;text-align:center">"목표 수익률을 달성하면서 리스크를 최소화"</p>
+<div class="eq" style="font-size:14px;background:transparent;padding:8px">
+$$\min_w \; w^T \Sigma w$$
+$$\text{s.t.} \; w^T \mu \geq r_{\text{target}}, \; \mathbf{1}^T w = 1$$
+</div>
+</div>
+<div style="flex:1;min-width:280px;background:#fff;padding:16px;border-radius:10px;border:2px solid #7b1fa2">
+<p class="ni" style="font-weight:bold;color:#7b1fa2;text-align:center;margin-bottom:10px">형태 2: 최대 효용</p>
+<p class="ni" style="font-size:12px;text-align:center">"수익과 리스크의 트레이드오프를 직접 조절"</p>
+<div class="eq" style="font-size:14px;background:transparent;padding:8px">
+$$\max_w \; w^T \mu - \frac{\gamma}{2} w^T \Sigma w$$
+$$\text{s.t.} \; \mathbf{1}^T w = 1$$
+</div>
+<p class="ni" style="font-size:11px;color:#888;text-align:center">\(\gamma\) = 위험회피계수 (클수록 보수적)</p>
+</div>
+</div>
+</div>
+
+<h3>5.3 효율적 프론티어 (Efficient Frontier)</h3>
+
+<p>
+각 목표 수익률에 대해 최소 분산 포트폴리오를 구하면, 수익률-변동성 평면에 곡선이 그려진다. 이것이 <strong>효율적 프론티어</strong>(Efficient Frontier)다. 이 곡선 위의 포트폴리오만이 "같은 리스크에서 최대 수익" 또는 "같은 수익에서 최소 리스크"를 달성하는 효율적 포트폴리오다.
+</p>
+
+<p class="cc">▼ 효율적 프론티어 그리기 (CVXPY + Matplotlib)</p>
+<pre>
+<span class="kw">import</span> cvxpy <span class="kw">as</span> cp
+<span class="kw">import</span> numpy <span class="kw">as</span> np
+<span class="kw">import</span> yfinance <span class="kw">as</span> yf
+<span class="kw">import</span> matplotlib.pyplot <span class="kw">as</span> plt
+
+<span class="cm"># 5종목 데이터</span>
+tickers = [<span class="st">'AAPL'</span>, <span class="st">'MSFT'</span>, <span class="st">'GOOGL'</span>, <span class="st">'AMZN'</span>, <span class="st">'TSLA'</span>]
+data = yf.<span class="fn">download</span>(tickers, start=<span class="st">'2020-01-01'</span>, end=<span class="st">'2024-01-01'</span>)
+prices = data[<span class="st">'Close'</span>]
+returns = prices.<span class="fn">pct_change</span>().<span class="fn">dropna</span>()
+
+mu = returns.<span class="fn">mean</span>().<span class="fn">values</span> * <span class="nu">252</span>
+Sigma = returns.<span class="fn">cov</span>().<span class="fn">values</span> * <span class="nu">252</span>
+n = <span class="fn">len</span>(tickers)
+
+<span class="cm"># 효율적 프론티어 계산</span>
+target_returns = np.<span class="fn">linspace</span>(mu.<span class="fn">min</span>(), mu.<span class="fn">max</span>(), <span class="nu">50</span>)
+frontier_risk = []
+frontier_ret = []
+
+<span class="kw">for</span> target <span class="kw">in</span> target_returns:
+    w = cp.<span class="fn">Variable</span>(n)
+    objective = cp.<span class="fn">Minimize</span>(cp.<span class="fn">quad_form</span>(w, Sigma))
+    constraints = [
+        cp.<span class="fn">sum</span>(w) == <span class="nu">1</span>,
+        w >= <span class="nu">0</span>,
+        mu @ w >= target
+    ]
+    prob = cp.<span class="fn">Problem</span>(objective, constraints)
+    prob.<span class="fn">solve</span>()
+    <span class="kw">if</span> prob.status == <span class="st">'optimal'</span>:
+        frontier_risk.<span class="fn">append</span>(np.<span class="fn">sqrt</span>(prob.value))
+        frontier_ret.<span class="fn">append</span>(target)
+
+<span class="cm"># 시각화</span>
+plt.<span class="fn">figure</span>(figsize=(<span class="nu">10</span>, <span class="nu">6</span>))
+plt.<span class="fn">plot</span>(frontier_risk, frontier_ret, <span class="st">'b-'</span>, linewidth=<span class="nu">2</span>,
+         label=<span class="st">'Efficient Frontier'</span>)
+
+<span class="cm"># 개별 종목 표시</span>
+<span class="kw">for</span> i, ticker <span class="kw">in</span> <span class="fn">enumerate</span>(tickers):
+    std_i = np.<span class="fn">sqrt</span>(Sigma[i, i])
+    plt.<span class="fn">scatter</span>(std_i, mu[i], s=<span class="nu">80</span>, zorder=<span class="nu">5</span>)
+    plt.<span class="fn">annotate</span>(ticker, (std_i, mu[i]),
+                fontsize=<span class="nu">10</span>, fontweight=<span class="st">'bold'</span>,
+                xytext=(<span class="nu">5</span>, <span class="nu">5</span>), textcoords=<span class="st">'offset points'</span>)
+
+plt.<span class="fn">xlabel</span>(<span class="st">'Annual Volatility (σ)'</span>)
+plt.<span class="fn">ylabel</span>(<span class="st">'Annual Return (μ)'</span>)
+plt.<span class="fn">title</span>(<span class="st">'Efficient Frontier — Markowitz Mean-Variance'</span>)
+plt.<span class="fn">legend</span>()
+plt.<span class="fn">grid</span>(<span class="kw">True</span>, alpha=<span class="nu">0.3</span>)
+plt.<span class="fn">tight_layout</span>()
+plt.<span class="fn">show</span>()
+</pre>
+
+<h3>5.4 샤프비율 최대화 포트폴리오</h3>
+
+<p>
+효율적 프론티어 위에서 가장 "효율적인" 포트폴리오는 <strong>샤프비율이 최대인 포트폴리오</strong>다. 이것은 원점에서 효율적 프론티어에 접선을 그었을 때의 접점이며, <strong>접선 포트폴리오</strong>(Tangency Portfolio)라 불린다. R1에서 배운 샤프비율이 여기서 핵심 역할을 한다.
+</p>
+
+<p>
+샤프비율 최대화는 직접적으로는 비볼록 문제지만, 변수 변환 트릭으로 볼록 문제로 바꿀 수 있다:
+</p>
+
+<p class="cc">▼ 샤프비율 최대화 (CVXPY)</p>
+<pre>
+<span class="cm"># 샤프비율 최대화 — 변수 변환 트릭</span>
+<span class="cm"># y = w/k, k = 1/(1^T Σ^{-1} (μ - rf))</span>
+rf = <span class="nu">0.05</span>  <span class="cm"># 무위험 이자율 5%</span>
+
+y = cp.<span class="fn">Variable</span>(n)
+kappa = cp.<span class="fn">Variable</span>()  <span class="cm"># 스케일링 변수</span>
+
+objective = cp.<span class="fn">Minimize</span>(cp.<span class="fn">quad_form</span>(y, Sigma))
+constraints = [
+    (mu - rf) @ y == <span class="nu">1</span>,  <span class="cm"># 초과수익률 정규화</span>
+    cp.<span class="fn">sum</span>(y) == kappa,
+    y >= <span class="nu">0</span>,
+    kappa >= <span class="nu">0</span>
+]
+
+prob = cp.<span class="fn">Problem</span>(objective, constraints)
+prob.<span class="fn">solve</span>()
+
+<span class="cm"># 원래 비중으로 복원</span>
+w_tangency = y.value / kappa.value
+
+<span class="fn">print</span>(<span class="st">"=== 최대 샤프비율 포트폴리오 ==="</span>)
+<span class="kw">for</span> i, ticker <span class="kw">in</span> <span class="fn">enumerate</span>(tickers):
+    <span class="fn">print</span>(<span class="st">f"  {ticker}: {w_tangency[i]*100:.1f}%"</span>)
+
+ret_t = mu @ w_tangency
+vol_t = np.<span class="fn">sqrt</span>(w_tangency @ Sigma @ w_tangency)
+sr_t = (ret_t - rf) / vol_t
+<span class="fn">print</span>(<span class="st">f"\n샤프비율: {sr_t:.2f}"</span>)
+</pre>
+
+<h3>5.5 Markowitz의 한계</h3>
+
+<p>
+Mean-Variance 최적화는 우아하지만 실전에서 심각한 문제가 있다:
+</p>
+
+<ul>
+<li><strong>추정 오차에 극도로 민감:</strong> 기대수익률 \(\mu\)의 작은 변화가 비중을 극단적으로 바꾼다. "Garbage In, Garbage Out"의 전형적 사례다.</li>
+<li><strong>집중 투자 경향:</strong> 소수 종목에 비중이 몰리는 경향이 있어 분산 투자의 취지에 어긋난다.</li>
+<li><strong>기대수익률 추정의 어려움:</strong> 과거 수익률이 미래를 대표한다는 보장이 없다.</li>
+</ul>
+
+<p>
+이 한계를 극복하기 위해 Black-Litterman, Risk Parity, HRP 등의 대안이 등장했다. 다음 챕터들에서 하나씩 다룬다.
+</p>
+
+<div class="warn">
+<p class="ni"><strong>⚠️ 실전 주의:</strong> Markowitz 최적화를 그대로 실전에 적용하면 안 된다. 추정 오차 때문에 백테스트에서는 좋아 보이지만 실전에서는 성과가 나쁜 경우가 많다. 반드시 정규화(shrinkage), 리샘플링, 또는 아래에서 배울 대안 기법과 결합해야 한다.</p>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════
+     Chapter 6: Black-Litterman 모델
+     ═══════════════════════════════════════════════════════════════ -->
+<h2 id="ch6">Chapter 6. Black-Litterman 모델 — 시장 균형 + 투자자 전망</h2>
+
+<div class="info">
+<p class="ni"><strong>📚 교재 연동:</strong> MLAT Ch.5 "The Black-Litterman approach" 섹션 — 시장 균형 수익률에서 출발하여 투자자의 주관적 전망을 결합하는 방법을 다룬다.</p>
+</div>
+
+<h3>6.1 Markowitz의 문제를 해결하는 아이디어</h3>
+
+<p>
+Markowitz의 가장 큰 문제는 기대수익률 \(\mu\)를 어떻게 추정하느냐였다. 과거 평균 수익률? 너무 불안정하다. 애널리스트 전망? 주관적이다. 1992년, Goldman Sachs의 Fischer Black과 Robert Litterman이 우아한 해결책을 제시했다.
+</p>
+
+<p>
+Black-Litterman의 핵심 아이디어는 두 단계다:
+</p>
+
+<ol>
+<li><strong>시장 균형 수익률에서 출발:</strong> 현재 시장의 시가총액 비중이 "최적"이라고 가정하고, 이를 역으로 풀어 시장이 암묵적으로 기대하는 수익률(implied equilibrium returns)을 구한다.</li>
+<li><strong>투자자의 전망을 결합:</strong> "삼성전자가 시장 대비 2% 초과 수익을 낼 것이다" 같은 주관적 전망을 베이즈 정리로 결합하여 새로운 기대수익률을 만든다.</li>
+</ol>
+
+<p>
+비유하자면, Markowitz는 "백지에서 시작"하는 것이고, Black-Litterman은 "시장의 지혜에서 시작하여 내 의견을 반영"하는 것이다. 출발점이 안정적이므로 결과도 훨씬 안정적이다.
+</p>
+
+<h3>6.2 수학적 구조</h3>
+
+<p>
+<strong>Step 1: 균형 수익률 (Implied Equilibrium Returns)</strong>
+</p>
+
+<p>
+시장 시가총액 비중 \(w_{\text{mkt}}\)이 Mean-Variance 최적해라고 가정하면, 1차 조건에서:
+</p>
+
+<div class="eq">
+$$\Pi = \delta \Sigma w_{\text{mkt}}$$
+</div>
+
+<p>
+여기서 \(\Pi\)는 균형 기대수익률, \(\delta\)는 위험회피계수(보통 시장 샤프비율로 추정), \(\Sigma\)는 공분산 행렬이다.
+</p>
+
+<p>
+<strong>Step 2: 투자자 전망 결합</strong>
+</p>
+
+<p>
+투자자의 전망을 행렬 형태로 표현한다: \(P \cdot \mu = Q + \epsilon\), 여기서 \(P\)는 전망 행렬, \(Q\)는 전망 수익률, \(\Omega\)는 전망의 불확실성이다. 베이즈 결합으로 새로운 기대수익률을 구한다:
+</p>
+
+<div class="eq">
+$$\mu_{\text{BL}} = [(\tau\Sigma)^{-1} + P^T \Omega^{-1} P]^{-1} [(\tau\Sigma)^{-1}\Pi + P^T \Omega^{-1} Q]$$
+</div>
+
+<p>
+\(\tau\)는 스케일링 파라미터(보통 0.025~0.05)로, 균형 수익률에 대한 불확실성을 나타낸다.
+</p>
+
+<h3>6.3 파이썬 구현</h3>
+
+<p class="cc">▼ Black-Litterman 모델 구현</p>
+<pre>
+<span class="kw">import</span> numpy <span class="kw">as</span> np
+<span class="kw">import</span> yfinance <span class="kw">as</span> yf
+
+tickers = [<span class="st">'AAPL'</span>, <span class="st">'MSFT'</span>, <span class="st">'GOOGL'</span>, <span class="st">'AMZN'</span>, <span class="st">'TSLA'</span>]
+data = yf.<span class="fn">download</span>(tickers, start=<span class="st">'2020-01-01'</span>, end=<span class="st">'2024-01-01'</span>)
+prices = data[<span class="st">'Close'</span>]
+returns = prices.<span class="fn">pct_change</span>().<span class="fn">dropna</span>()
+Sigma = returns.<span class="fn">cov</span>().<span class="fn">values</span> * <span class="nu">252</span>
+n = <span class="fn">len</span>(tickers)
+
+<span class="cm"># Step 1: 시장 균형 수익률</span>
+w_mkt = np.<span class="fn">array</span>([<span class="nu">0.30</span>, <span class="nu">0.25</span>, <span class="nu">0.20</span>, <span class="nu">0.15</span>, <span class="nu">0.10</span>])  <span class="cm"># 시가총액 비중 (예시)</span>
+delta = <span class="nu">2.5</span>  <span class="cm"># 위험회피계수</span>
+Pi = delta * Sigma @ w_mkt  <span class="cm"># 균형 기대수익률</span>
+
+<span class="fn">print</span>(<span class="st">"균형 기대수익률:"</span>)
+<span class="kw">for</span> i, t <span class="kw">in</span> <span class="fn">enumerate</span>(tickers):
+    <span class="fn">print</span>(<span class="st">f"  {t}: {Pi[i]*100:.1f}%"</span>)
+
+<span class="cm"># Step 2: 투자자 전망</span>
+<span class="cm"># 전망 1: AAPL이 TSLA보다 3% 높은 수익률</span>
+<span class="cm"># 전망 2: MSFT 절대 수익률 15%</span>
+tau = <span class="nu">0.05</span>
+P = np.<span class="fn">array</span>([
+    [<span class="nu">1</span>, <span class="nu">0</span>, <span class="nu">0</span>, <span class="nu">0</span>, <span class="nu">-1</span>],  <span class="cm"># AAPL - TSLA</span>
+    [<span class="nu">0</span>, <span class="nu">1</span>, <span class="nu">0</span>, <span class="nu">0</span>,  <span class="nu">0</span>],  <span class="cm"># MSFT 절대</span>
+])
+Q = np.<span class="fn">array</span>([<span class="nu">0.03</span>, <span class="nu">0.15</span>])  <span class="cm"># 전망 수익률</span>
+
+<span class="cm"># 전망 불확실성 (He & Litterman 방식)</span>
+Omega = np.<span class="fn">diag</span>(np.<span class="fn">diag</span>(tau * P @ Sigma @ P.T))
+
+<span class="cm"># Black-Litterman 결합</span>
+tau_Sigma_inv = np.linalg.<span class="fn">inv</span>(tau * Sigma)
+M = np.linalg.<span class="fn">inv</span>(tau_Sigma_inv + P.T @ np.linalg.<span class="fn">inv</span>(Omega) @ P)
+mu_BL = M @ (tau_Sigma_inv @ Pi + P.T @ np.linalg.<span class="fn">inv</span>(Omega) @ Q)
+
+<span class="fn">print</span>(<span class="st">"\nBlack-Litterman 기대수익률:"</span>)
+<span class="kw">for</span> i, t <span class="kw">in</span> <span class="fn">enumerate</span>(tickers):
+    <span class="fn">print</span>(<span class="st">f"  {t}: {mu_BL[i]*100:.1f}%"</span>)
+
+<span class="cm"># BL 수익률로 최적 비중 계산</span>
+w_BL = np.linalg.<span class="fn">inv</span>(delta * Sigma) @ mu_BL
+w_BL = w_BL / w_BL.<span class="fn">sum</span>()  <span class="cm"># 정규화</span>
+
+<span class="fn">print</span>(<span class="st">"\nBL 최적 비중:"</span>)
+<span class="kw">for</span> i, t <span class="kw">in</span> <span class="fn">enumerate</span>(tickers):
+    <span class="fn">print</span>(<span class="st">f"  {t}: {w_BL[i]*100:.1f}%"</span>)
+</pre>
+
+<div class="ok">
+<p class="ni"><strong>💡 Black-Litterman의 장점:</strong> (1) 시장 균형에서 출발하므로 결과가 안정적이다. (2) 전망이 없으면 시장 비중으로 수렴한다. (3) 전망의 확신도를 \(\Omega\)로 조절할 수 있다. (4) 실무에서 Goldman Sachs, BlackRock 등 대형 기관이 실제로 사용한다.</p>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════
+     Chapter 7: Risk Parity
+     ═══════════════════════════════════════════════════════════════ -->
+<h2 id="ch7">Chapter 7. Risk Parity — 리스크 균등 배분</h2>
+
+<div class="info">
+<p class="ni"><strong>📚 교재 연동:</strong> MLAT Ch.5 "Risk parity" 섹션 — 리스크 기여도를 균등하게 만드는 포트폴리오 구성법. Bridgewater의 Ray Dalio가 대중화한 전략이다.</p>
+</div>
+
+<h3>7.1 왜 Risk Parity인가?</h3>
+
+<p>
+전통적인 60/40 포트폴리오(주식 60%, 채권 40%)를 생각해보자. 금액 기준으로는 균형 잡혀 보이지만, <strong>리스크 기준으로는 극도로 불균형</strong>하다. 주식의 변동성이 채권보다 3~4배 높으므로, 포트폴리오 리스크의 90% 이상이 주식에서 온다. 채권은 사실상 장식이다.
+</p>
+
+<p>
+Risk Parity의 아이디어는 단순하다: <strong>각 자산이 포트폴리오 전체 리스크에 동일하게 기여하도록 비중을 조절한다.</strong> 금액이 아닌 리스크를 균등 배분하는 것이다.
+</p>
+
+<h3>7.2 리스크 기여도 (Risk Contribution)</h3>
+
+<p>
+자산 \(i\)의 리스크 기여도(Risk Contribution, RC)는 다음과 같이 정의된다:
+</p>
+
+<div class="eq">
+$$RC_i = w_i \cdot \frac{(\Sigma w)_i}{\sqrt{w^T \Sigma w}} = w_i \cdot \frac{\partial \sigma_p}{\partial w_i}$$
+</div>
+
+<p>
+모든 자산의 리스크 기여도의 합은 포트폴리오 전체 변동성과 같다: \(\sum RC_i = \sigma_p\). Risk Parity는 모든 \(RC_i\)를 같게 만드는 비중 \(w\)를 찾는다.
+</p>
+
+<h3>7.3 파이썬 구현</h3>
+
+<p class="cc">▼ Risk Parity 포트폴리오 (scipy 최적화)</p>
+<pre>
+<span class="kw">import</span> numpy <span class="kw">as</span> np
+<span class="kw">from</span> scipy.optimize <span class="kw">import</span> minimize
+
+<span class="kw">def</span> <span class="fn">risk_parity_objective</span>(w, Sigma):
+    <span class="st">"""리스크 기여도 편차를 최소화하는 목적함수"""</span>
+    port_vol = np.<span class="fn">sqrt</span>(w @ Sigma @ w)
+    marginal_risk = Sigma @ w / port_vol  <span class="cm"># 한계 리스크</span>
+    risk_contrib = w * marginal_risk       <span class="cm"># 리스크 기여도</span>
+    target_rc = port_vol / <span class="fn">len</span>(w)          <span class="cm"># 목표: 균등 기여</span>
+    <span class="cm"># 리스크 기여도 편차의 제곱합</span>
+    <span class="kw">return</span> np.<span class="fn">sum</span>((risk_contrib - target_rc) ** <span class="nu">2</span>)
+
+<span class="kw">def</span> <span class="fn">get_risk_parity_weights</span>(Sigma):
+    <span class="st">"""Risk Parity 비중 계산"""</span>
+    n = Sigma.shape[<span class="nu">0</span>]
+    w0 = np.<span class="fn">ones</span>(n) / n  <span class="cm"># 초기값: 균등 비중</span>
+    bounds = [(<span class="nu">0.01</span>, <span class="nu">1.0</span>)] * n
+    constraints = {<span class="st">'type'</span>: <span class="st">'eq'</span>, <span class="st">'fun'</span>: <span class="kw">lambda</span> w: np.<span class="fn">sum</span>(w) - <span class="nu">1</span>}
+
+    result = <span class="fn">minimize</span>(
+        risk_parity_objective, w0,
+        args=(Sigma,),
+        method=<span class="st">'SLSQP'</span>,
+        bounds=bounds,
+        constraints=constraints
+    )
+    <span class="kw">return</span> result.x
+
+<span class="cm"># 실행</span>
+w_rp = <span class="fn">get_risk_parity_weights</span>(Sigma)
+
+<span class="fn">print</span>(<span class="st">"=== Risk Parity 포트폴리오 ==="</span>)
+<span class="kw">for</span> i, t <span class="kw">in</span> <span class="fn">enumerate</span>(tickers):
+    <span class="fn">print</span>(<span class="st">f"  {t}: {w_rp[i]*100:.1f}%"</span>)
+
+<span class="cm"># 리스크 기여도 확인</span>
+port_vol = np.<span class="fn">sqrt</span>(w_rp @ Sigma @ w_rp)
+marginal = Sigma @ w_rp / port_vol
+rc = w_rp * marginal
+<span class="fn">print</span>(<span class="st">f"\n리스크 기여도: {np.round(rc / rc.sum() * 100, 1)}%"</span>)
+<span class="fn">print</span>(<span class="st">"→ 모든 자산이 약 20%씩 균등 기여!"</span>)
+</pre>
+
+<p>
+Risk Parity의 결과를 보면, 변동성이 높은 TSLA의 비중은 낮고, 변동성이 낮은 종목의 비중은 높다. 하지만 리스크 기여도는 모두 약 20%로 균등하다. 이것이 Risk Parity의 핵심이다.
+</p>
+
+<!-- ═══════════════════════════════════════════════════════════════
+     Chapter 8: HRP (Hierarchical Risk Parity)
+     ═══════════════════════════════════════════════════════════════ -->
+<h2 id="ch8">Chapter 8. Hierarchical Risk Parity (HRP) — ML 기반 포트폴리오</h2>
+
+<div class="info">
+<p class="ni"><strong>📚 교재 연동:</strong> MLAT Ch.5 "Hierarchical Risk Parity" 섹션 — Marcos López de Prado가 2016년에 제안한 ML 기반 포트폴리오 최적화. 공분산 행렬의 역행렬을 사용하지 않아 추정 오차에 강건하다.</p>
+</div>
+
+<h3>8.1 공분산 행렬 역행렬의 저주</h3>
+
+<p>
+Markowitz와 Black-Litterman 모두 공분산 행렬의 역행렬 \(\Sigma^{-1}\)을 필요로 한다. 문제는 종목 수가 많아지면 공분산 행렬의 추정 오차가 커지고, 역행렬이 이 오차를 <strong>증폭</strong>시킨다는 것이다. R2에서 배운 조건수(condition number)가 크면 역행렬이 불안정하다는 것을 기억하자.
+</p>
+
+<p>
+Marcos López de Prado(퀀트 금융의 대가, Cornell 교수)는 이 문제를 근본적으로 해결하는 방법을 제안했다: <strong>공분산 행렬의 역행렬을 아예 사용하지 않는</strong> 포트폴리오 최적화. 대신 R5에서 배운 계층적 클러스터링을 활용한다.
+</p>
+
+<h3>8.2 HRP 알고리즘 3단계</h3>
+
+<!-- HRP 3단계 시각 다이어그램 -->
+<div style="margin:25px 0;padding:20px;background:linear-gradient(135deg,#e8eaf6,#f3e5f5);border-radius:12px;box-shadow:0 4px 15px rgba(0,0,0,.08)">
+<p class="ni" style="text-align:center;font-weight:bold;font-size:14px;margin-bottom:18px;color:#4527a0">🌳 HRP 알고리즘 3단계</p>
+<div style="display:flex;gap:12px;flex-wrap:wrap;justify-content:center">
+<div style="flex:1;min-width:180px;background:#fff;padding:16px;border-radius:10px;text-align:center;border-top:4px solid #7c4dff">
+<div style="font-size:32px;margin-bottom:8px">🔗</div>
+<p class="ni" style="font-weight:bold;font-size:13px;color:#4527a0;margin-bottom:6px">Step 1: Tree Clustering</p>
+<p class="ni" style="font-size:11px;color:#666">상관관계 기반으로 종목을 계층적으로 클러스터링. 유사한 종목끼리 그룹화.</p>
+</div>
+<div style="flex:0 0 30px;display:flex;align-items:center;justify-content:center;font-size:24px;color:#7c4dff">→</div>
+<div style="flex:1;min-width:180px;background:#fff;padding:16px;border-radius:10px;text-align:center;border-top:4px solid #7c4dff">
+<div style="font-size:32px;margin-bottom:8px">🔀</div>
+<p class="ni" style="font-weight:bold;font-size:13px;color:#4527a0;margin-bottom:6px">Step 2: Quasi-Diagonalization</p>
+<p class="ni" style="font-size:11px;color:#666">공분산 행렬을 클러스터 순서로 재배열. 유사 종목이 인접하도록.</p>
+</div>
+<div style="flex:0 0 30px;display:flex;align-items:center;justify-content:center;font-size:24px;color:#7c4dff">→</div>
+<div style="flex:1;min-width:180px;background:#fff;padding:16px;border-radius:10px;text-align:center;border-top:4px solid #7c4dff">
+<div style="font-size:32px;margin-bottom:8px">⚖️</div>
+<p class="ni" style="font-weight:bold;font-size:13px;color:#4527a0;margin-bottom:6px">Step 3: Recursive Bisection</p>
+<p class="ni" style="font-size:11px;color:#666">트리를 재귀적으로 이등분하며 분산의 역수 비례로 비중 배분.</p>
+</div>
+</div>
+</div>
+
+<h3>8.3 파이썬 구현</h3>
+
+<p class="cc">▼ HRP 포트폴리오 (scipy + 직접 구현)</p>
+<pre>
+<span class="kw">import</span> numpy <span class="kw">as</span> np
+<span class="kw">import</span> pandas <span class="kw">as</span> pd
+<span class="kw">from</span> scipy.cluster.hierarchy <span class="kw">import</span> linkage, leaves_list
+<span class="kw">from</span> scipy.spatial.distance <span class="kw">import</span> squareform
+
+<span class="kw">def</span> <span class="fn">get_hrp_weights</span>(returns):
+    <span class="st">"""Hierarchical Risk Parity 비중 계산"""</span>
+    cov = returns.<span class="fn">cov</span>()
+    corr = returns.<span class="fn">corr</span>()
+
+    <span class="cm"># Step 1: 계층적 클러스터링</span>
+    dist = np.<span class="fn">sqrt</span>((<span class="nu">1</span> - corr) / <span class="nu">2</span>)  <span class="cm"># 상관→거리 변환</span>
+    dist_condensed = <span class="fn">squareform</span>(dist, checks=<span class="kw">False</span>)
+    link = <span class="fn">linkage</span>(dist_condensed, method=<span class="st">'single'</span>)
+
+    <span class="cm"># Step 2: 준대각화 (클러스터 순서로 재배열)</span>
+    sort_idx = <span class="fn">leaves_list</span>(link).<span class="fn">tolist</span>()
+    cov_sorted = cov.<span class="fn">iloc</span>[sort_idx, sort_idx]
+
+    <span class="cm"># Step 3: 재귀적 이등분</span>
+    weights = pd.<span class="fn">Series</span>(<span class="nu">1.0</span>, index=cov_sorted.index)
+    clusters = [cov_sorted.index.<span class="fn">tolist</span>()]
+
+    <span class="kw">while</span> <span class="fn">len</span>(clusters) > <span class="nu">0</span>:
+        clusters_new = []
+        <span class="kw">for</span> cluster <span class="kw">in</span> clusters:
+            <span class="kw">if</span> <span class="fn">len</span>(cluster) <= <span class="nu">1</span>:
+                <span class="kw">continue</span>
+            <span class="cm"># 이등분</span>
+            mid = <span class="fn">len</span>(cluster) // <span class="nu">2</span>
+            left, right = cluster[:mid], cluster[mid:]
+
+            <span class="cm"># 각 클러스터의 분산 (역분산 비중)</span>
+            var_left = cov.<span class="fn">loc</span>[left, left].<span class="fn">values</span>.<span class="fn">diagonal</span>().<span class="fn">mean</span>()
+            var_right = cov.<span class="fn">loc</span>[right, right].<span class="fn">values</span>.<span class="fn">diagonal</span>().<span class="fn">mean</span>()
+
+            <span class="cm"># 분산의 역수 비례로 배분</span>
+            alpha = <span class="nu">1</span> - var_left / (var_left + var_right)
+            weights[left] *= alpha
+            weights[right] *= (<span class="nu">1</span> - alpha)
+
+            <span class="kw">if</span> <span class="fn">len</span>(left) > <span class="nu">1</span>: clusters_new.<span class="fn">append</span>(left)
+            <span class="kw">if</span> <span class="fn">len</span>(right) > <span class="nu">1</span>: clusters_new.<span class="fn">append</span>(right)
+        clusters = clusters_new
+
+    <span class="kw">return</span> weights / weights.<span class="fn">sum</span>()
+
+<span class="cm"># 실행</span>
+w_hrp = <span class="fn">get_hrp_weights</span>(returns)
+<span class="fn">print</span>(<span class="st">"=== HRP 포트폴리오 ==="</span>)
+<span class="kw">for</span> t, w <span class="kw">in</span> w_hrp.<span class="fn">items</span>():
+    <span class="fn">print</span>(<span class="st">f"  {t}: {w*100:.1f}%"</span>)
+</pre>
+
+<div class="ok">
+<p class="ni"><strong>💡 HRP의 장점:</strong> (1) 공분산 행렬의 역행렬 불필요 → 추정 오차에 강건. (2) 클러스터링으로 자산 간 계층 구조를 반영. (3) Markowitz보다 out-of-sample 성과가 우수한 경우가 많음 (López de Prado, 2016). (4) R5에서 배운 계층적 클러스터링의 실전 응용.</p>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════
+     Chapter 9: Kelly Criterion
+     ═══════════════════════════════════════════════════════════════ -->
+<h2 id="ch9">Chapter 9. Kelly Criterion — 최적 베팅 사이즈</h2>
+
+<div class="info">
+<p class="ni"><strong>📚 교재 연동:</strong> MLAT Ch.5 "The Kelly criterion" 섹션 — 정보 이론에서 출발한 최적 베팅 전략. Edward Thorp가 블랙잭과 주식시장에 적용하여 유명해졌다.</p>
+</div>
+
+<h3>9.1 도박에서 투자로</h3>
+
+<p>
+1956년, Bell Labs의 물리학자 John Kelly Jr.는 정보 이론을 이용하여 "장기적으로 자산을 최대화하는 최적 베팅 비율"을 도출했다. 이후 MIT 수학 교수 Edward Thorp가 이를 블랙잭 카드 카운팅에 적용하여 카지노를 이겼고, 나아가 주식시장에 적용하여 연 20%+ 수익률을 달성했다.
+</p>
+
+<p>
+Kelly의 핵심 질문: "승률과 배당률이 알려진 게임에서, 매번 자산의 몇 %를 걸어야 장기적으로 자산이 최대가 되는가?"
+</p>
+
+<h3>9.2 Kelly 공식</h3>
+
+<p>
+이진 베팅(이기면 b배, 지면 전액 손실)에서 승률이 \(p\)일 때, 최적 베팅 비율 \(f^*\)는:
+</p>
+
+<div class="eq">
+$$f^* = \frac{p \cdot b - (1-p)}{b} = p - \frac{1-p}{b} = \frac{bp - q}{b}$$
+</div>
+
+<p>
+여기서 \(q = 1-p\)는 패배 확률이다. 이것은 <strong>기대 로그 수익률을 최대화</strong>하는 비율이다:
+</p>
+
+<div class="eq">
+$$f^* = \arg\max_f \; E[\log(1 + f \cdot R)]$$
+</div>
+
+<p>
+연속 수익률 분포(정규분포 가정)에서 다자산 Kelly 비중은:
+</p>
+
+<div class="eq">
+$$f^* = \Sigma^{-1} \mu$$
+</div>
+
+<p>
+놀랍게도 이것은 Markowitz의 최대 효용 포트폴리오에서 \(\gamma = 1\)인 경우와 동일하다. Kelly는 수익률 극대화에 "올인"하는 공격적 전략이므로, 실전에서는 <strong>Half-Kelly</strong>(\(f^*/2\))를 사용하는 것이 일반적이다.
+</p>
+
+<h3>9.3 파이썬 구현</h3>
+
+<p class="cc">▼ Kelly Criterion 포트폴리오</p>
+<pre>
+<span class="kw">import</span> numpy <span class="kw">as</span> np
+
+<span class="cm"># 연간 기대수익률과 공분산 행렬 (이전 챕터에서 계산)</span>
+<span class="cm"># mu, Sigma 사용</span>
+
+<span class="cm"># Full Kelly</span>
+Sigma_inv = np.linalg.<span class="fn">inv</span>(Sigma)
+f_kelly = Sigma_inv @ mu
+
+<span class="cm"># Half Kelly (실전 권장)</span>
+f_half = f_kelly / <span class="nu">2</span>
+
+<span class="cm"># 정규화 (비중 합 = 1, 레버리지 없는 경우)</span>
+w_kelly = f_half / np.<span class="fn">abs</span>(f_half).<span class="fn">sum</span>()
+
+<span class="fn">print</span>(<span class="st">"=== Half-Kelly 포트폴리오 ==="</span>)
+<span class="kw">for</span> i, t <span class="kw">in</span> <span class="fn">enumerate</span>(tickers):
+    <span class="fn">print</span>(<span class="st">f"  {t}: {w_kelly[i]*100:.1f}%"</span>)
+</pre>
+
+<div class="warn">
+<p class="ni"><strong>⚠️ Kelly의 위험:</strong> Full Kelly는 이론적으로 최적이지만, 실전에서는 (1) 수익률 분포가 정규분포가 아니고, (2) 파라미터 추정에 오차가 있으며, (3) 변동성이 극도로 크다. 따라서 Half-Kelly 또는 Quarter-Kelly를 사용하고, 최대 비중 제한을 두는 것이 현명하다.</p>
+</div>
+
+<h3>9.4 포트폴리오 최적화 기법 비교</h3>
+
+<table>
+<tr><th>기법</th><th>핵심 아이디어</th><th>장점</th><th>단점</th><th>실전 사용</th></tr>
+<tr><td>Markowitz (MVO)</td><td>수익-리스크 트레이드오프</td><td>이론적 최적</td><td>추정 오차에 민감</td><td>⚠️ 정규화 필요</td></tr>
+<tr><td>Black-Litterman</td><td>시장 균형 + 전망</td><td>안정적, 직관적</td><td>전망 설정 주관적</td><td>✅ 기관 표준</td></tr>
+<tr><td>Risk Parity</td><td>리스크 균등 배분</td><td>분산 효과 극대화</td><td>수익률 무시</td><td>✅ Bridgewater</td></tr>
+<tr><td>HRP</td><td>ML 클러스터링</td><td>역행렬 불필요, 강건</td><td>이론적 근거 약함</td><td>✅ 퀀트 펀드</td></tr>
+<tr><td>Kelly</td><td>로그 자산 극대화</td><td>장기 성장 최적</td><td>변동성 극심</td><td>⚠️ Half-Kelly</td></tr>
+</table>
+<p class="ni tc">Table 9.1: 포트폴리오 최적화 기법 비교</p>
+
+<!-- ═══════════════════════════════════════════════════════════════
+     Chapter 10: Transformer — Self-Attention 메커니즘
+     ═══════════════════════════════════════════════════════════════ -->
+<h2 id="ch10">Chapter 10. Transformer: Self-Attention 메커니즘</h2>
+
+<div class="info">
+<p class="ni"><strong>📚 교재 연동:</strong> MLAT Ch.16 "New frontiers — pretrained transformer models" 섹션 — Attention 메커니즘과 Transformer 아키텍처의 핵심을 다룬다. 원본 논문: Vaswani et al. (2017) "Attention Is All You Need".</p>
+</div>
+
+<h3>10.1 RNN/LSTM의 한계 — 왜 Transformer가 필요한가</h3>
+
+<p>
+R7에서 우리는 LSTM으로 시계열을 예측했다. LSTM은 강력하지만 근본적인 한계가 있다:
+</p>
+
+<ul>
+<li><strong>순차 처리:</strong> 시점 1 → 2 → 3 → ... 순서대로 처리해야 하므로 병렬화가 불가능하다. 시퀀스가 길면 학습이 매우 느리다.</li>
+<li><strong>장거리 의존성:</strong> LSTM이 Vanishing Gradient를 완화했지만, 수백~수천 시점 떨어진 정보를 포착하기는 여전히 어렵다.</li>
+<li><strong>고정 길이 컨텍스트:</strong> 은닉 상태(hidden state)라는 고정 크기 벡터에 모든 과거 정보를 압축해야 한다. 정보 병목이 발생한다.</li>
+</ul>
+
+<p>
+2017년, Google의 연구팀이 "Attention Is All You Need"라는 논문으로 Transformer를 발표했다. 이 아키텍처는 RNN을 완전히 제거하고, <strong>Self-Attention</strong>이라는 메커니즘만으로 시퀀스를 처리한다. 결과는 혁명적이었다 — 번역 성능이 크게 향상되었고, 이후 GPT, BERT, ChatGPT 등 현대 AI의 기반이 되었다.
+</p>
+
+<h3>10.2 Attention의 직관</h3>
+
+<p>
+Attention의 핵심 아이디어를 비유로 설명하자. 당신이 도서관에서 "포트폴리오 최적화"에 대한 리포트를 쓴다고 하자. 책장에 100권의 책이 있다. 모든 책을 처음부터 끝까지 읽을 수는 없다(RNN 방식). 대신, 각 책의 목차를 훑어보고 "이 책이 내 질문에 얼마나 관련 있는가?"를 점수로 매긴 뒤, 관련도가 높은 책에 더 많은 시간을 투자한다. 이것이 Attention이다.
+</p>
+
+<p>
+수학적으로, Attention은 세 가지 벡터로 작동한다:
+</p>
+
+<div style="margin:25px 0;padding:20px;background:linear-gradient(135deg,#fff8e1,#fff3e0);border-radius:12px;box-shadow:0 4px 15px rgba(0,0,0,.08)">
+<p class="ni" style="text-align:center;font-weight:bold;font-size:14px;margin-bottom:15px;color:#e65100">🔑 Query, Key, Value — Attention의 3요소</p>
+<div style="display:flex;gap:12px;flex-wrap:wrap;justify-content:center">
+<div style="flex:1;min-width:180px;background:#fff;padding:16px;border-radius:10px;text-align:center;border-top:4px solid #ff6f00">
+<div style="font-size:32px;margin-bottom:8px">❓</div>
+<p class="ni" style="font-weight:bold;font-size:13px;color:#e65100;margin-bottom:6px">Query (Q)</p>
+<p class="ni" style="font-size:11px;color:#666">"내가 찾고 있는 것"<br>현재 시점의 질문</p>
+<p class="ni" style="font-size:11px;color:#888;margin-top:6px">도서관 비유: "포트폴리오 최적화에 대해 알고 싶다"</p>
+</div>
+<div style="flex:1;min-width:180px;background:#fff;padding:16px;border-radius:10px;text-align:center;border-top:4px solid #ff6f00">
+<div style="font-size:32px;margin-bottom:8px">🔑</div>
+<p class="ni" style="font-weight:bold;font-size:13px;color:#e65100;margin-bottom:6px">Key (K)</p>
+<p class="ni" style="font-size:11px;color:#666">"각 항목의 라벨"<br>다른 시점들의 식별자</p>
+<p class="ni" style="font-size:11px;color:#888;margin-top:6px">도서관 비유: 각 책의 목차/제목</p>
+</div>
+<div style="flex:1;min-width:180px;background:#fff;padding:16px;border-radius:10px;text-align:center;border-top:4px solid #ff6f00">
+<div style="font-size:32px;margin-bottom:8px">📄</div>
+<p class="ni" style="font-weight:bold;font-size:13px;color:#e65100;margin-bottom:6px">Value (V)</p>
+<p class="ni" style="font-size:11px;color:#666">"실제 내용"<br>다른 시점들의 정보</p>
+<p class="ni" style="font-size:11px;color:#888;margin-top:6px">도서관 비유: 각 책의 실제 내용</p>
+</div>
+</div>
+</div>
+
+<h3>10.3 Scaled Dot-Product Attention</h3>
+
+<p>
+Attention의 수학적 공식은 놀랍도록 간결하다:
+</p>
+
+<div class="eq">
+$$\text{Attention}(Q, K, V) = \text{softmax}\left(\frac{QK^T}{\sqrt{d_k}}\right) V$$
+</div>
+
+<p>
+단계별로 분해하면:
+</p>
+
+<ol>
+<li>\(QK^T\): Query와 Key의 내적 → 유사도 점수 (어떤 시점이 현재와 관련 있는가?)</li>
+<li>\(\div \sqrt{d_k}\): 스케일링 (차원이 클 때 내적값이 너무 커지는 것을 방지)</li>
+<li>\(\text{softmax}\): 점수를 확률로 변환 (합 = 1, 모두 양수)</li>
+<li>\(\times V\): 확률 가중 평균으로 Value를 결합 → 최종 출력</li>
+</ol>
+
+<p class="cc">▼ Scaled Dot-Product Attention 구현 (PyTorch)</p>
+<pre>
+<span class="kw">import</span> torch
+<span class="kw">import</span> torch.nn <span class="kw">as</span> nn
+<span class="kw">import</span> torch.nn.functional <span class="kw">as</span> F
+<span class="kw">import</span> math
+
+<span class="kw">def</span> <span class="fn">scaled_dot_product_attention</span>(Q, K, V, mask=<span class="kw">None</span>):
+    <span class="st">"""
+    Q, K, V: (batch, seq_len, d_k)
+    Returns: (batch, seq_len, d_k)
+    """</span>
+    d_k = Q.<span class="fn">size</span>(-<span class="nu">1</span>)
+
+    <span class="cm"># Step 1: Q와 K의 내적 → 유사도 점수</span>
+    scores = torch.<span class="fn">matmul</span>(Q, K.<span class="fn">transpose</span>(-<span class="nu">2</span>, -<span class="nu">1</span>)) / math.<span class="fn">sqrt</span>(d_k)
+    <span class="cm"># scores shape: (batch, seq_len, seq_len)</span>
+
+    <span class="cm"># Step 2: 마스킹 (미래 정보 차단, 선택적)</span>
+    <span class="kw">if</span> mask <span class="kw">is not None</span>:
+        scores = scores.<span class="fn">masked_fill</span>(mask == <span class="nu">0</span>, <span class="nu">-1e9</span>)
+
+    <span class="cm"># Step 3: Softmax → 어텐션 가중치</span>
+    attn_weights = F.<span class="fn">softmax</span>(scores, dim=-<span class="nu">1</span>)
+
+    <span class="cm"># Step 4: 가중 평균</span>
+    output = torch.<span class="fn">matmul</span>(attn_weights, V)
+    <span class="kw">return</span> output, attn_weights
+
+<span class="cm"># 테스트</span>
+batch, seq_len, d_k = <span class="nu">2</span>, <span class="nu">10</span>, <span class="nu">64</span>
+Q = torch.<span class="fn">randn</span>(batch, seq_len, d_k)
+K = torch.<span class="fn">randn</span>(batch, seq_len, d_k)
+V = torch.<span class="fn">randn</span>(batch, seq_len, d_k)
+
+output, weights = <span class="fn">scaled_dot_product_attention</span>(Q, K, V)
+<span class="fn">print</span>(<span class="st">f"Output shape: {output.shape}"</span>)    <span class="cm"># (2, 10, 64)</span>
+<span class="fn">print</span>(<span class="st">f"Weights shape: {weights.shape}"</span>)  <span class="cm"># (2, 10, 10)</span>
+<span class="fn">print</span>(<span class="st">f"Weights sum: {weights.sum(dim=-1)}"</span>)  <span class="cm"># 각 행의 합 = 1</span>
+</pre>
+<div class="code-output"><span class="out-label">Output:</span>
+Output shape: torch.Size([2, 10, 64])
+Weights shape: torch.Size([2, 10, 10])
+Weights sum: tensor([[1., 1., 1., 1., 1., 1., 1., 1., 1., 1.],
+                     [1., 1., 1., 1., 1., 1., 1., 1., 1., 1.]])</div>
+
+<p>
+<code>weights</code>의 shape이 (batch, 10, 10)인 것에 주목하자. 이것은 10개 시점 각각이 다른 10개 시점에 얼마나 "주의"를 기울이는지를 나타내는 <strong>어텐션 맵</strong>이다. 금융 시계열에서 이 맵을 시각화하면, 모델이 어떤 과거 시점을 중요하게 보는지 해석할 수 있다.
+</p>
+
+<h3>10.4 Self-Attention의 의미</h3>
+
+<p>
+"Self"-Attention이라 불리는 이유는 Q, K, V가 모두 <strong>같은 시퀀스</strong>에서 나오기 때문이다. 입력 시퀀스 \(X\)에 서로 다른 가중치 행렬을 곱하여 Q, K, V를 만든다:
+</p>
+
+<div class="eq">
+$$Q = XW^Q, \quad K = XW^K, \quad V = XW^V$$
+</div>
+
+<p>
+이것은 시퀀스가 "자기 자신을 참조"하여 각 시점의 표현을 풍부하게 만드는 것이다. RNN이 순차적으로 정보를 전달하는 것과 달리, Self-Attention은 <strong>모든 시점 쌍의 관계를 동시에</strong> 계산한다. 시점 1과 시점 100의 관계도 한 번의 연산으로 포착할 수 있다.
+</p>
+
+<!-- ═══════════════════════════════════════════════════════════════
+     Chapter 11: Positional Encoding + Multi-Head Attention
+     ═══════════════════════════════════════════════════════════════ -->
+<h2 id="ch11">Chapter 11. Positional Encoding + Multi-Head Attention</h2>
+
+<div class="info">
+<p class="ni"><strong>📚 교재 연동:</strong> MLAT Ch.16 "Attention is all you need" 섹션 — Transformer의 핵심 구성요소인 Positional Encoding과 Multi-Head Attention을 다룬다. MLAT Ch.20~21에서 Autoencoder/GAN과 결합한 고급 아키텍처도 소개된다.</p>
+</div>
+
+<h3>11.1 Positional Encoding — 순서 정보 주입</h3>
+
+<p>
+Self-Attention에는 치명적인 약점이 하나 있다: <strong>순서를 모른다.</strong> "월요일 상승 → 화요일 하락"과 "화요일 하락 → 월요일 상승"을 구분하지 못한다. RNN은 순차 처리 자체가 순서 정보를 내포하지만, Attention은 모든 시점을 동시에 보므로 순서 개념이 없다.
+</p>
+
+<p>
+이 문제를 해결하기 위해 Transformer는 입력에 <strong>위치 정보</strong>(Positional Encoding)를 더한다. 원본 논문은 사인/코사인 함수를 사용한다:
+</p>
+
+<div class="eq">
+$$PE_{(pos, 2i)} = \sin\left(\frac{pos}{10000^{2i/d_{\text{model}}}}\right)$$
+$$PE_{(pos, 2i+1)} = \cos\left(\frac{pos}{10000^{2i/d_{\text{model}}}}\right)$$
+</div>
+
+<p>
+여기서 \(pos\)는 시퀀스 내 위치, \(i\)는 차원 인덱스, \(d_{\text{model}}\)은 모델 차원이다. 왜 사인/코사인인가? 두 가지 이유가 있다:
+</p>
+
+<ul>
+<li><strong>상대적 위치 표현:</strong> \(PE_{pos+k}\)를 \(PE_{pos}\)의 선형 변환으로 표현할 수 있어, 모델이 상대적 거리를 학습할 수 있다.</li>
+<li><strong>임의 길이 일반화:</strong> 학습 데이터보다 긴 시퀀스에도 적용 가능하다.</li>
+</ul>
+
+<p class="cc">▼ Positional Encoding 구현</p>
+<pre>
+<span class="kw">import</span> torch
+<span class="kw">import</span> torch.nn <span class="kw">as</span> nn
+<span class="kw">import</span> math
+
+<span class="kw">class</span> <span class="nb">PositionalEncoding</span>(nn.Module):
+    <span class="kw">def</span> <span class="fn">__init__</span>(self, d_model, max_len=<span class="nu">5000</span>):
+        <span class="fn">super</span>().<span class="fn">__init__</span>()
+        pe = torch.<span class="fn">zeros</span>(max_len, d_model)
+        position = torch.<span class="fn">arange</span>(<span class="nu">0</span>, max_len, dtype=torch.float).<span class="fn">unsqueeze</span>(<span class="nu">1</span>)
+        div_term = torch.<span class="fn">exp</span>(
+            torch.<span class="fn">arange</span>(<span class="nu">0</span>, d_model, <span class="nu">2</span>).float() * (-math.<span class="fn">log</span>(<span class="nu">10000.0</span>) / d_model)
+        )
+        pe[:, <span class="nu">0</span>::<span class="nu">2</span>] = torch.<span class="fn">sin</span>(position * div_term)  <span class="cm"># 짝수 차원</span>
+        pe[:, <span class="nu">1</span>::<span class="nu">2</span>] = torch.<span class="fn">cos</span>(position * div_term)  <span class="cm"># 홀수 차원</span>
+        pe = pe.<span class="fn">unsqueeze</span>(<span class="nu">0</span>)  <span class="cm"># (1, max_len, d_model)</span>
+        self.<span class="fn">register_buffer</span>(<span class="st">'pe'</span>, pe)
+
+    <span class="kw">def</span> <span class="fn">forward</span>(self, x):
+        <span class="cm"># x: (batch, seq_len, d_model)</span>
+        <span class="kw">return</span> x + self.pe[:, :x.<span class="fn">size</span>(<span class="nu">1</span>), :]
+
+<span class="cm"># 테스트</span>
+pe = <span class="fn">PositionalEncoding</span>(d_model=<span class="nu">64</span>)
+x = torch.<span class="fn">randn</span>(<span class="nu">2</span>, <span class="nu">20</span>, <span class="nu">64</span>)  <span class="cm"># batch=2, seq=20, dim=64</span>
+out = <span class="fn">pe</span>(x)
+<span class="fn">print</span>(<span class="st">f"Input shape: {x.shape} → Output shape: {out.shape}"</span>)
+</pre>
+<div class="code-output"><span class="out-label">Output:</span>
+Input shape: torch.Size([2, 20, 64]) → Output shape: torch.Size([2, 20, 64])</div>
+
+<h3>11.2 Multi-Head Attention — 다양한 관점으로 보기</h3>
+
+<p>
+하나의 Attention은 하나의 "관점"으로 시퀀스를 본다. 하지만 금융 시계열에는 다양한 패턴이 공존한다 — 단기 모멘텀, 장기 추세, 변동성 클러스터링, 섹터 상관관계 등. <strong>Multi-Head Attention</strong>은 여러 개의 Attention을 병렬로 실행하여 다양한 관점을 동시에 포착한다.
+</p>
+
+<div class="eq">
+$$\text{MultiHead}(Q, K, V) = \text{Concat}(\text{head}_1, \ldots, \text{head}_h) W^O$$
+$$\text{where} \;\; \text{head}_i = \text{Attention}(QW_i^Q, KW_i^K, VW_i^V)$$
+</div>
+
+<p>
+예를 들어 \(d_{\text{model}} = 64\)이고 \(h = 8\) 헤드라면, 각 헤드는 \(d_k = 64/8 = 8\) 차원에서 작동한다. 8개의 서로 다른 "관점"이 병렬로 계산되고, 결과를 합쳐서 최종 출력을 만든다.
+</p>
+
+<p class="cc">▼ Multi-Head Attention 구현</p>
+<pre>
+<span class="kw">class</span> <span class="nb">MultiHeadAttention</span>(nn.Module):
+    <span class="kw">def</span> <span class="fn">__init__</span>(self, d_model, n_heads):
+        <span class="fn">super</span>().<span class="fn">__init__</span>()
+        <span class="kw">assert</span> d_model % n_heads == <span class="nu">0</span>
+        self.d_k = d_model // n_heads
+        self.n_heads = n_heads
+
+        self.W_q = nn.<span class="fn">Linear</span>(d_model, d_model)
+        self.W_k = nn.<span class="fn">Linear</span>(d_model, d_model)
+        self.W_v = nn.<span class="fn">Linear</span>(d_model, d_model)
+        self.W_o = nn.<span class="fn">Linear</span>(d_model, d_model)
+
+    <span class="kw">def</span> <span class="fn">forward</span>(self, Q, K, V, mask=<span class="kw">None</span>):
+        batch = Q.<span class="fn">size</span>(<span class="nu">0</span>)
+
+        <span class="cm"># 선형 변환 후 헤드 분리</span>
+        Q = self.<span class="fn">W_q</span>(Q).<span class="fn">view</span>(batch, -<span class="nu">1</span>, self.n_heads, self.d_k).<span class="fn">transpose</span>(<span class="nu">1</span>, <span class="nu">2</span>)
+        K = self.<span class="fn">W_k</span>(K).<span class="fn">view</span>(batch, -<span class="nu">1</span>, self.n_heads, self.d_k).<span class="fn">transpose</span>(<span class="nu">1</span>, <span class="nu">2</span>)
+        V = self.<span class="fn">W_v</span>(V).<span class="fn">view</span>(batch, -<span class="nu">1</span>, self.n_heads, self.d_k).<span class="fn">transpose</span>(<span class="nu">1</span>, <span class="nu">2</span>)
+        <span class="cm"># shape: (batch, n_heads, seq_len, d_k)</span>
+
+        <span class="cm"># Scaled Dot-Product Attention</span>
+        scores = torch.<span class="fn">matmul</span>(Q, K.<span class="fn">transpose</span>(-<span class="nu">2</span>, -<span class="nu">1</span>)) / math.<span class="fn">sqrt</span>(self.d_k)
+        <span class="kw">if</span> mask <span class="kw">is not None</span>:
+            scores = scores.<span class="fn">masked_fill</span>(mask == <span class="nu">0</span>, <span class="nu">-1e9</span>)
+        attn = F.<span class="fn">softmax</span>(scores, dim=-<span class="nu">1</span>)
+        context = torch.<span class="fn">matmul</span>(attn, V)
+
+        <span class="cm"># 헤드 합치기</span>
+        context = context.<span class="fn">transpose</span>(<span class="nu">1</span>, <span class="nu">2</span>).<span class="fn">contiguous</span>().<span class="fn">view</span>(batch, -<span class="nu">1</span>, self.n_heads * self.d_k)
+        output = self.<span class="fn">W_o</span>(context)
+        <span class="kw">return</span> output
+
+<span class="cm"># 테스트</span>
+mha = <span class="fn">MultiHeadAttention</span>(d_model=<span class="nu">64</span>, n_heads=<span class="nu">8</span>)
+x = torch.<span class="fn">randn</span>(<span class="nu">2</span>, <span class="nu">20</span>, <span class="nu">64</span>)
+out = <span class="fn">mha</span>(x, x, x)  <span class="cm"># Self-Attention: Q=K=V=x</span>
+<span class="fn">print</span>(<span class="st">f"MHA output: {out.shape}"</span>)  <span class="cm"># (2, 20, 64)</span>
+</pre>
+<div class="code-output"><span class="out-label">Output:</span>
+MHA output: torch.Size([2, 20, 64])</div>
+
+<h3>11.3 Transformer Encoder Block</h3>
+
+<p>
+Transformer의 Encoder는 Multi-Head Attention과 Feed-Forward Network를 결합하고, 각각에 Residual Connection과 Layer Normalization을 적용한다. R7에서 배운 ResNet의 skip connection과 같은 원리다.
+</p>
+
+<!-- Transformer Encoder Block 시각 다이어그램 -->
+<div style="margin:25px 0;padding:20px;background:linear-gradient(135deg,#e0f2f1,#e8eaf6);border-radius:12px;box-shadow:0 4px 15px rgba(0,0,0,.08)">
+<p class="ni" style="text-align:center;font-weight:bold;font-size:14px;margin-bottom:18px;color:#00695c">🏗️ Transformer Encoder Block</p>
+<div style="max-width:350px;margin:0 auto">
+<div style="background:#fff;padding:12px;border-radius:8px;text-align:center;border:2px solid #26a69a;margin-bottom:8px">
+<p class="ni" style="font-size:12px;font-weight:bold;color:#00695c">Input Embedding + Positional Encoding</p>
+</div>
+<div style="text-align:center;font-size:18px;color:#26a69a">↓</div>
+<div style="background:#e8f5e9;padding:12px;border-radius:8px;text-align:center;border:2px solid #66bb6a;margin-bottom:4px">
+<p class="ni" style="font-size:12px;font-weight:bold;color:#2e7d32">Multi-Head Self-Attention</p>
+</div>
+<div style="background:#fff;padding:6px;border-radius:6px;text-align:center;border:1px dashed #aaa;margin-bottom:8px">
+<p class="ni" style="font-size:11px;color:#666">Add &amp; LayerNorm (Residual Connection)</p>
+</div>
+<div style="text-align:center;font-size:18px;color:#26a69a">↓</div>
+<div style="background:#e3f2fd;padding:12px;border-radius:8px;text-align:center;border:2px solid #42a5f5;margin-bottom:4px">
+<p class="ni" style="font-size:12px;font-weight:bold;color:#1565c0">Feed-Forward Network (FFN)</p>
+<p class="ni" style="font-size:10px;color:#666">Linear → ReLU → Linear</p>
+</div>
+<div style="background:#fff;padding:6px;border-radius:6px;text-align:center;border:1px dashed #aaa;margin-bottom:8px">
+<p class="ni" style="font-size:11px;color:#666">Add &amp; LayerNorm (Residual Connection)</p>
+</div>
+<div style="text-align:center;font-size:18px;color:#26a69a">↓</div>
+<div style="background:#fff;padding:12px;border-radius:8px;text-align:center;border:2px solid #26a69a">
+<p class="ni" style="font-size:12px;font-weight:bold;color:#00695c">Output → 다음 Encoder Block 또는 예측 헤드</p>
+</div>
+</div>
+<p class="ni" style="text-align:center;font-size:11px;color:#888;margin-top:12px">이 블록을 N번 쌓으면 Transformer Encoder가 완성된다 (원본 논문: N=6)</p>
+</div>
+
+<p class="cc">▼ Transformer Encoder Block 구현</p>
+<pre>
+<span class="kw">class</span> <span class="nb">TransformerEncoderBlock</span>(nn.Module):
+    <span class="kw">def</span> <span class="fn">__init__</span>(self, d_model, n_heads, d_ff, dropout=<span class="nu">0.1</span>):
+        <span class="fn">super</span>().<span class="fn">__init__</span>()
+        self.attention = <span class="fn">MultiHeadAttention</span>(d_model, n_heads)
+        self.norm1 = nn.<span class="fn">LayerNorm</span>(d_model)
+        self.norm2 = nn.<span class="fn">LayerNorm</span>(d_model)
+        self.ffn = nn.<span class="fn">Sequential</span>(
+            nn.<span class="fn">Linear</span>(d_model, d_ff),
+            nn.<span class="fn">ReLU</span>(),
+            nn.<span class="fn">Dropout</span>(dropout),
+            nn.<span class="fn">Linear</span>(d_ff, d_model),
+            nn.<span class="fn">Dropout</span>(dropout)
+        )
+        self.dropout = nn.<span class="fn">Dropout</span>(dropout)
+
+    <span class="kw">def</span> <span class="fn">forward</span>(self, x, mask=<span class="kw">None</span>):
+        <span class="cm"># Multi-Head Attention + Residual + LayerNorm</span>
+        attn_out = self.<span class="fn">attention</span>(x, x, x, mask)
+        x = self.<span class="fn">norm1</span>(x + self.<span class="fn">dropout</span>(attn_out))
+
+        <span class="cm"># FFN + Residual + LayerNorm</span>
+        ffn_out = self.<span class="fn">ffn</span>(x)
+        x = self.<span class="fn">norm2</span>(x + ffn_out)
+        <span class="kw">return</span> x
+</pre>
+
+<!-- ═══════════════════════════════════════════════════════════════
+     Chapter 12: 금융 Transformer 시계열 예측
+     ═══════════════════════════════════════════════════════════════ -->
+<h2 id="ch12">Chapter 12. 금융 Transformer 시계열 예측 — 실전 적용</h2>
+
+<div class="info">
+<p class="ni"><strong>📚 교재 연동:</strong> MLAT Ch.20 "Autoencoders for Conditional Risk Factors" — 딥러닝으로 자산 수익률을 예측하는 실전 아키텍처. Ch.21 "GANs for Synthetic Time-Series Data" — TimeGAN으로 합성 금융 데이터 생성. 이 챕터에서는 Transformer를 금융 시계열 예측에 직접 적용한다.</p>
+</div>
+
+<h3>12.1 금융 시계열을 위한 Transformer 설계</h3>
+
+<p>
+NLP에서 탄생한 Transformer를 금융 시계열에 적용하려면 몇 가지 수정이 필요하다:
+</p>
+
+<ul>
+<li><strong>입력 임베딩:</strong> NLP에서는 단어를 임베딩하지만, 금융에서는 연속적인 수치 피처(가격, 수익률, 거래량 등)를 선형 변환으로 임베딩한다.</li>
+<li><strong>Causal Masking:</strong> 미래 정보를 사용하면 안 되므로, 현재 시점 이후의 정보를 마스킹한다. 이것은 GPT 스타일의 디코더 마스킹과 동일하다.</li>
+<li><strong>출력 헤드:</strong> 분류(상승/하락)에는 Sigmoid/Softmax, 회귀(수익률 예측)에는 Linear 출력을 사용한다.</li>
+</ul>
+
+<h3>12.2 전체 모델 구현</h3>
+
+<p class="cc">▼ 금융 시계열 Transformer 모델 (PyTorch)</p>
+<pre>
+<span class="kw">import</span> torch
+<span class="kw">import</span> torch.nn <span class="kw">as</span> nn
+<span class="kw">import</span> math
+
+<span class="kw">class</span> <span class="nb">FinancialTransformer</span>(nn.Module):
+    <span class="st">"""금융 시계열 예측을 위한 Transformer 모델"""</span>
+
+    <span class="kw">def</span> <span class="fn">__init__</span>(self, n_features, d_model=<span class="nu">64</span>, n_heads=<span class="nu">4</span>,
+                 n_layers=<span class="nu">2</span>, d_ff=<span class="nu">128</span>, dropout=<span class="nu">0.1</span>,
+                 max_len=<span class="nu">256</span>):
+        <span class="fn">super</span>().<span class="fn">__init__</span>()
+
+        <span class="cm"># 입력 임베딩: 수치 피처 → d_model 차원</span>
+        self.input_proj = nn.<span class="fn">Linear</span>(n_features, d_model)
+        self.pos_enc = <span class="fn">PositionalEncoding</span>(d_model, max_len)
+        self.dropout = nn.<span class="fn">Dropout</span>(dropout)
+
+        <span class="cm"># Transformer Encoder 스택</span>
+        self.encoder_layers = nn.<span class="fn">ModuleList</span>([
+            <span class="fn">TransformerEncoderBlock</span>(d_model, n_heads, d_ff, dropout)
+            <span class="kw">for</span> _ <span class="kw">in</span> <span class="fn">range</span>(n_layers)
+        ])
+
+        <span class="cm"># 출력 헤드: 다음 시점 수익률 예측 (회귀)</span>
+        self.output_head = nn.<span class="fn">Sequential</span>(
+            nn.<span class="fn">Linear</span>(d_model, d_model // <span class="nu">2</span>),
+            nn.<span class="fn">ReLU</span>(),
+            nn.<span class="fn">Linear</span>(d_model // <span class="nu">2</span>, <span class="nu">1</span>)
+        )
+
+    <span class="kw">def</span> <span class="fn">_generate_causal_mask</span>(self, seq_len, device):
+        <span class="st">"""미래 정보 차단 마스크"""</span>
+        mask = torch.<span class="fn">tril</span>(torch.<span class="fn">ones</span>(seq_len, seq_len, device=device))
+        <span class="kw">return</span> mask.<span class="fn">unsqueeze</span>(<span class="nu">0</span>).<span class="fn">unsqueeze</span>(<span class="nu">0</span>)  <span class="cm"># (1, 1, seq, seq)</span>
+
+    <span class="kw">def</span> <span class="fn">forward</span>(self, x):
+        <span class="st">"""
+        x: (batch, seq_len, n_features)
+        Returns: (batch, 1) — 다음 시점 수익률 예측
+        """</span>
+        seq_len = x.<span class="fn">size</span>(<span class="nu">1</span>)
+        mask = self.<span class="fn">_generate_causal_mask</span>(seq_len, x.device)
+
+        <span class="cm"># 임베딩 + 위치 인코딩</span>
+        x = self.<span class="fn">input_proj</span>(x)
+        x = self.<span class="fn">pos_enc</span>(x)
+        x = self.<span class="fn">dropout</span>(x)
+
+        <span class="cm"># Transformer Encoder</span>
+        <span class="kw">for</span> layer <span class="kw">in</span> self.encoder_layers:
+            x = <span class="fn">layer</span>(x, mask)
+
+        <span class="cm"># 마지막 시점의 출력으로 예측</span>
+        x = x[:, -<span class="nu">1</span>, :]  <span class="cm"># (batch, d_model)</span>
+        <span class="kw">return</span> self.<span class="fn">output_head</span>(x)
+</pre>
+
+<h3>12.3 학습 파이프라인</h3>
+
+<p class="cc">▼ 데이터 준비 + 학습 루프</p>
+<pre>
+<span class="kw">import</span> yfinance <span class="kw">as</span> yf
+<span class="kw">import</span> numpy <span class="kw">as</span> np
+<span class="kw">import</span> torch
+<span class="kw">from</span> torch.utils.data <span class="kw">import</span> Dataset, DataLoader
+
+<span class="cm"># ── 1. 데이터 준비 ──</span>
+<span class="kw">class</span> <span class="nb">StockDataset</span>(Dataset):
+    <span class="kw">def</span> <span class="fn">__init__</span>(self, ticker, start, end, seq_len=<span class="nu">60</span>):
+        data = yf.<span class="fn">download</span>(ticker, start=start, end=end)
+        close = data[<span class="st">'Close'</span>]
+        <span class="kw">if</span> <span class="fn">isinstance</span>(close.columns, pd.MultiIndex):
+            close = close.<span class="fn">droplevel</span>(<span class="st">'Ticker'</span>, axis=<span class="nu">1</span>)
+
+        <span class="cm"># 피처: 수익률, 5일 MA 비율, 20일 MA 비율, 변동성</span>
+        df = pd.<span class="fn">DataFrame</span>()
+        df[<span class="st">'return'</span>] = close.<span class="fn">pct_change</span>()
+        df[<span class="st">'ma5_ratio'</span>] = close / close.<span class="fn">rolling</span>(<span class="nu">5</span>).<span class="fn">mean</span>() - <span class="nu">1</span>
+        df[<span class="st">'ma20_ratio'</span>] = close / close.<span class="fn">rolling</span>(<span class="nu">20</span>).<span class="fn">mean</span>() - <span class="nu">1</span>
+        df[<span class="st">'volatility'</span>] = close.<span class="fn">pct_change</span>().<span class="fn">rolling</span>(<span class="nu">20</span>).<span class="fn">std</span>()
+        df = df.<span class="fn">dropna</span>()
+
+        <span class="cm"># 정규화 (z-score)</span>
+        self.mean = df.<span class="fn">mean</span>()
+        self.std = df.<span class="fn">std</span>()
+        df = (df - self.mean) / self.std
+
+        self.data = df.<span class="fn">values</span>.<span class="fn">astype</span>(np.float32)
+        self.seq_len = seq_len
+
+    <span class="kw">def</span> <span class="fn">__len__</span>(self):
+        <span class="kw">return</span> <span class="fn">len</span>(self.data) - self.seq_len
+
+    <span class="kw">def</span> <span class="fn">__getitem__</span>(self, idx):
+        x = self.data[idx : idx + self.seq_len]
+        y = self.data[idx + self.seq_len, <span class="nu">0</span>]  <span class="cm"># 다음 시점 수익률</span>
+        <span class="kw">return</span> torch.<span class="fn">tensor</span>(x), torch.<span class="fn">tensor</span>(y)
+
+<span class="cm"># ── 2. 데이터셋 생성 ──</span>
+<span class="kw">import</span> pandas <span class="kw">as</span> pd
+train_ds = <span class="fn">StockDataset</span>(<span class="st">'AAPL'</span>, <span class="st">'2018-01-01'</span>, <span class="st">'2023-01-01'</span>, seq_len=<span class="nu">60</span>)
+test_ds = <span class="fn">StockDataset</span>(<span class="st">'AAPL'</span>, <span class="st">'2023-01-01'</span>, <span class="st">'2024-06-01'</span>, seq_len=<span class="nu">60</span>)
+
+train_loader = <span class="fn">DataLoader</span>(train_ds, batch_size=<span class="nu">32</span>, shuffle=<span class="kw">True</span>)
+test_loader = <span class="fn">DataLoader</span>(test_ds, batch_size=<span class="nu">32</span>)
+
+<span class="cm"># ── 3. 모델 + 학습 ──</span>
+device = torch.device(<span class="st">'cuda'</span> <span class="kw">if</span> torch.cuda.<span class="fn">is_available</span>() <span class="kw">else</span> <span class="st">'cpu'</span>)
+model = <span class="fn">FinancialTransformer</span>(
+    n_features=<span class="nu">4</span>,    <span class="cm"># return, ma5_ratio, ma20_ratio, volatility</span>
+    d_model=<span class="nu">64</span>,
+    n_heads=<span class="nu">4</span>,
+    n_layers=<span class="nu">2</span>,
+    d_ff=<span class="nu">128</span>,
+    dropout=<span class="nu">0.1</span>
+).<span class="fn">to</span>(device)
+
+optimizer = torch.optim.<span class="fn">Adam</span>(model.<span class="fn">parameters</span>(), lr=<span class="nu">1e-3</span>)
+criterion = nn.<span class="fn">MSELoss</span>()
+
+<span class="cm"># 학습 루프</span>
+<span class="kw">for</span> epoch <span class="kw">in</span> <span class="fn">range</span>(<span class="nu">50</span>):
+    model.<span class="fn">train</span>()
+    total_loss = <span class="nu">0</span>
+    <span class="kw">for</span> x_batch, y_batch <span class="kw">in</span> train_loader:
+        x_batch = x_batch.<span class="fn">to</span>(device)
+        y_batch = y_batch.<span class="fn">to</span>(device)
+
+        pred = <span class="fn">model</span>(x_batch).<span class="fn">squeeze</span>()
+        loss = <span class="fn">criterion</span>(pred, y_batch)
+
+        optimizer.<span class="fn">zero_grad</span>()
+        loss.<span class="fn">backward</span>()
+        torch.nn.utils.<span class="fn">clip_grad_norm_</span>(model.<span class="fn">parameters</span>(), <span class="nu">1.0</span>)
+        optimizer.<span class="fn">step</span>()
+        total_loss += loss.<span class="fn">item</span>()
+
+    <span class="kw">if</span> (epoch + <span class="nu">1</span>) % <span class="nu">10</span> == <span class="nu">0</span>:
+        avg_loss = total_loss / <span class="fn">len</span>(train_loader)
+        <span class="fn">print</span>(<span class="st">f"Epoch {epoch+1:3d} | Train Loss: {avg_loss:.6f}"</span>)
+
+<span class="cm"># ── 4. 평가 ──</span>
+model.<span class="fn">eval</span>()
+preds, actuals = [], []
+<span class="kw">with</span> torch.<span class="fn">no_grad</span>():
+    <span class="kw">for</span> x_batch, y_batch <span class="kw">in</span> test_loader:
+        pred = <span class="fn">model</span>(x_batch.<span class="fn">to</span>(device)).<span class="fn">squeeze</span>().<span class="fn">cpu</span>()
+        preds.<span class="fn">extend</span>(pred.<span class="fn">tolist</span>())
+        actuals.<span class="fn">extend</span>(y_batch.<span class="fn">tolist</span>())
+
+<span class="cm"># 방향 정확도 (Direction Accuracy)</span>
+preds = np.<span class="fn">array</span>(preds)
+actuals = np.<span class="fn">array</span>(actuals)
+direction_acc = np.<span class="fn">mean</span>(np.<span class="fn">sign</span>(preds) == np.<span class="fn">sign</span>(actuals))
+<span class="fn">print</span>(<span class="st">f"\nDirection Accuracy: {direction_acc*100:.1f}%"</span>)
+<span class="fn">print</span>(<span class="st">f"(50% = random, >55% = tradeable signal)"</span>)
+</pre>
+<div class="code-output"><span class="out-label">Output (예시):</span>
+Epoch  10 | Train Loss: 0.982341
+Epoch  20 | Train Loss: 0.951287
+Epoch  30 | Train Loss: 0.934562
+Epoch  40 | Train Loss: 0.921845
+Epoch  50 | Train Loss: 0.912103
+
+Direction Accuracy: 53.2%
+(50% = random, >55% = tradeable signal)</div>
+
+<h3>12.4 Transformer vs LSTM 비교</h3>
+
+<table>
+<tr><th>특성</th><th>LSTM (R7)</th><th>Transformer (R8)</th></tr>
+<tr><td>처리 방식</td><td>순차적 (Sequential)</td><td>병렬 (Parallel)</td></tr>
+<tr><td>장거리 의존성</td><td>제한적 (Vanishing Gradient)</td><td>우수 (Direct Attention)</td></tr>
+<tr><td>학습 속도</td><td>느림 (GPU 활용 제한)</td><td>빠름 (완전 병렬화)</td></tr>
+<tr><td>해석 가능성</td><td>낮음 (블랙박스)</td><td>높음 (Attention Map)</td></tr>
+<tr><td>데이터 요구량</td><td>적음</td><td>많음</td></tr>
+<tr><td>짧은 시계열</td><td>✅ 유리</td><td>⚠️ 과적합 위험</td></tr>
+<tr><td>긴 시계열</td><td>⚠️ 성능 저하</td><td>✅ 유리</td></tr>
+<tr><td>금융 적용</td><td>단기 예측, 소규모 데이터</td><td>다변량, 대규모 데이터</td></tr>
+</table>
+<p class="ni tc">Table 12.1: LSTM vs Transformer 비교</p>
+
+<div class="ok">
+<p class="ni"><strong>💡 실전 팁:</strong> 금융 시계열은 NLP에 비해 데이터가 적고 노이즈가 많다. 따라서 (1) 모델을 작게 유지하고 (d_model=64, n_layers=2), (2) Dropout을 충분히 사용하며, (3) 방향 정확도(Direction Accuracy)를 주요 지표로 삼는 것이 좋다. 53%만 넘어도 거래 비용을 고려한 후 수익을 낼 가능성이 있다.</p>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════
+     Chapter 13: Quiz + Mini Project
+     ═══════════════════════════════════════════════════════════════ -->
+<h2 id="ch13">Chapter 13. Quiz + Mini Project</h2>
+
+<h3>13.1 핵심 개념 퀴즈</h3>
+
+<div class="def">
+<p class="ni"><strong>Q1.</strong> 볼록 최적화 문제에서 local minimum = global minimum이 보장되는 이유는?</p>
+<p class="ni" style="color:#888;font-size:12px;margin-top:6px">힌트: Ch.1의 그릇 비유를 떠올려보자.</p>
+</div>
+
+<div class="def">
+<p class="ni"><strong>Q2.</strong> KKT 조건의 "상보 이완"(Complementary Slackness) \(\lambda_i g_i(x^*) = 0\)의 경제적 의미는?</p>
+<p class="ni" style="color:#888;font-size:12px;margin-top:6px">힌트: 제약이 활성(active)이 아닌 경우를 생각해보자.</p>
+</div>
+
+<div class="def">
+<p class="ni"><strong>Q3.</strong> Markowitz Mean-Variance 최적화의 가장 큰 실전적 한계는? 이를 해결하기 위한 대안 3가지를 나열하라.</p>
+</div>
+
+<div class="def">
+<p class="ni"><strong>Q4.</strong> Black-Litterman 모델이 Markowitz보다 안정적인 이유는?</p>
+<p class="ni" style="color:#888;font-size:12px;margin-top:6px">힌트: 출발점(starting point)의 차이를 생각해보자.</p>
+</div>
+
+<div class="def">
+<p class="ni"><strong>Q5.</strong> Risk Parity에서 TSLA(고변동성)와 MSFT(저변동성)의 비중은 어떻게 결정되는가? 왜 그런가?</p>
+</div>
+
+<div class="def">
+<p class="ni"><strong>Q6.</strong> HRP가 공분산 행렬의 역행렬을 사용하지 않는 것이 왜 장점인가?</p>
+<p class="ni" style="color:#888;font-size:12px;margin-top:6px">힌트: R2의 조건수(condition number)를 떠올려보자.</p>
+</div>
+
+<div class="def">
+<p class="ni"><strong>Q7.</strong> Transformer의 Self-Attention에서 \(\sqrt{d_k}\)로 나누는 이유는?</p>
+</div>
+
+<div class="def">
+<p class="ni"><strong>Q8.</strong> Positional Encoding이 필요한 이유는? RNN에서는 왜 필요 없었는가?</p>
+</div>
+
+<div class="def">
+<p class="ni"><strong>Q9.</strong> Multi-Head Attention에서 헤드 수를 늘리면 어떤 장단점이 있는가?</p>
+</div>
+
+<div class="def">
+<p class="ni"><strong>Q10.</strong> 금융 시계열 Transformer에서 Causal Masking이 필수인 이유는?</p>
+<p class="ni" style="color:#888;font-size:12px;margin-top:6px">힌트: 미래 정보 누출(data leakage)을 생각해보자.</p>
+</div>
+
+<h3>13.2 Mini Project: CVXPY 샤프비율 최대화 + Transformer 수익률 예측</h3>
+
+<div style="margin:25px 0;padding:25px;background:linear-gradient(135deg,#e8eaf6,#ede7f6);border-radius:12px;border:2px solid #5c6bc0;box-shadow:0 4px 15px rgba(0,0,0,.1)">
+<p class="ni" style="font-weight:bold;font-size:16px;color:#283593;margin-bottom:15px">🎯 Mini Project: 예측 기반 포트폴리오 최적화</p>
+
+<p class="ni" style="font-size:13px;margin-bottom:12px">
+<strong>목표:</strong> Transformer로 수익률을 예측하고, 그 예측값을 CVXPY 포트폴리오 최적화의 입력으로 사용하여 최적 비중을 결정한다. 예측 → 최적화 → 백테스트의 전체 파이프라인을 구축한다.
+</p>
+
+<p class="ni" style="font-size:13px;font-weight:bold;color:#3949ab;margin-bottom:8px">📋 과제 단계:</p>
+
+<ol style="font-size:13px">
+<li style="margin-bottom:8px"><strong>데이터 수집:</strong> 5종목(AAPL, MSFT, GOOGL, AMZN, JPM)의 2018~2024 일간 데이터를 yfinance로 다운로드</li>
+<li style="margin-bottom:8px"><strong>Transformer 학습:</strong> 각 종목별로 FinancialTransformer 모델을 학습하여 다음 날 수익률을 예측</li>
+<li style="margin-bottom:8px"><strong>예측 기대수익률 생성:</strong> 학습된 모델로 향후 기대수익률 벡터 \(\hat{\mu}\)를 생성</li>
+<li style="margin-bottom:8px"><strong>CVXPY 최적화:</strong> \(\hat{\mu}\)와 공분산 행렬 \(\Sigma\)를 사용하여 샤프비율 최대화 포트폴리오 비중 계산</li>
+<li style="margin-bottom:8px"><strong>비교 백테스트:</strong> 다음 전략들의 성과를 비교
+<ul style="margin-top:4px">
+<li>균등 비중 (1/N)</li>
+<li>Markowitz MVO</li>
+<li>Risk Parity</li>
+<li>Transformer + CVXPY (우리의 전략)</li>
+</ul>
+</li>
+<li style="margin-bottom:8px"><strong>성과 지표:</strong> 누적 수익률, 연간 샤프비율, 최대 낙폭(MDD), 연간 변동성을 계산하여 비교 테이블 작성</li>
+</ol>
+
+<p class="ni" style="font-size:12px;color:#5c6bc0;margin-top:12px">
+<strong>💡 힌트:</strong> 매주 금요일에 포트폴리오를 리밸런싱한다고 가정하자. Transformer 예측은 주간 수익률로 변환하여 사용한다. 거래 비용은 편도 10bp(0.1%)로 가정한다.
+</p>
+</div>
+
+<p class="cc">▼ Mini Project 스켈레톤 코드</p>
+<pre>
+<span class="kw">import</span> numpy <span class="kw">as</span> np
+<span class="kw">import</span> pandas <span class="kw">as</span> pd
+<span class="kw">import</span> cvxpy <span class="kw">as</span> cp
+<span class="kw">import</span> yfinance <span class="kw">as</span> yf
+<span class="kw">import</span> torch
+
+<span class="cm"># ── 1. 데이터 수집 ──</span>
+tickers = [<span class="st">'AAPL'</span>, <span class="st">'MSFT'</span>, <span class="st">'GOOGL'</span>, <span class="st">'AMZN'</span>, <span class="st">'JPM'</span>]
+data = yf.<span class="fn">download</span>(tickers, start=<span class="st">'2018-01-01'</span>, end=<span class="st">'2024-06-01'</span>)
+prices = data[<span class="st">'Close'</span>]
+returns = prices.<span class="fn">pct_change</span>().<span class="fn">dropna</span>()
+
+<span class="cm"># ── 2. Transformer 예측 (각 종목별) ──</span>
+<span class="cm"># ... (Ch.12의 FinancialTransformer 사용)</span>
+<span class="cm"># predicted_returns: 각 종목의 예측 수익률 벡터</span>
+
+<span class="cm"># ── 3. CVXPY 최적화 ──</span>
+<span class="kw">def</span> <span class="fn">optimize_portfolio</span>(mu_pred, Sigma, rf=<span class="nu">0.05</span>/<span class="nu">252</span>):
+    <span class="st">"""Transformer 예측 기반 샤프비율 최대화"""</span>
+    n = <span class="fn">len</span>(mu_pred)
+    w = cp.<span class="fn">Variable</span>(n)
+
+    <span class="cm"># 목적: 샤프비율 최대화 (변수 변환)</span>
+    ret = mu_pred @ w
+    risk = cp.<span class="fn">quad_form</span>(w, Sigma)
+
+    objective = cp.<span class="fn">Maximize</span>(ret - <span class="nu">0.5</span> * risk)
+    constraints = [
+        cp.<span class="fn">sum</span>(w) == <span class="nu">1</span>,
+        w >= <span class="nu">0</span>,
+        w <= <span class="nu">0.4</span>  <span class="cm"># 최대 40% 집중 제한</span>
+    ]
+
+    prob = cp.<span class="fn">Problem</span>(objective, constraints)
+    prob.<span class="fn">solve</span>()
+    <span class="kw">return</span> w.value
+
+<span class="cm"># ── 4. 백테스트 ──</span>
+<span class="cm"># 매주 리밸런싱, 거래비용 10bp</span>
+<span class="cm"># ... (구현은 여러분의 몫!)</span>
+
+<span class="cm"># ── 5. 성과 비교 ──</span>
+<span class="fn">print</span>(<span class="st">"=== 전략 성과 비교 ==="</span>)
+<span class="fn">print</span>(<span class="st">f"{'전략':<20} {'샤프비율':>10} {'연수익률':>10} {'MDD':>10}"</span>)
+<span class="fn">print</span>(<span class="st">"-"</span> * <span class="nu">52</span>)
+<span class="cm"># ... 결과 출력</span>
+</pre>
+
+<h3>13.3 다음 라운드 예고: R9 — HFT 시스템 설계 + 강화학습</h3>
+
+<div style="margin:25px 0;padding:20px;background:linear-gradient(135deg,#fce4ec,#f3e5f5);border-radius:12px;border:2px solid #ab47bc">
+<p class="ni" style="font-weight:bold;font-size:14px;color:#6a1b9a;margin-bottom:10px">🚀 R9 Preview: HFT + Reinforcement Learning</p>
+<p class="ni" style="font-size:13px">
+R8에서 포트폴리오 최적화와 Transformer를 마스터했다. R9에서는 이 모든 것을 <strong>실시간 트레이딩 시스템</strong>으로 통합한다:
+</p>
+<ul style="font-size:13px;margin-top:8px">
+<li><strong>시장 마이크로스트럭처:</strong> 오더북, 호가창, 체결 메커니즘, 레이턴시</li>
+<li><strong>HFT 전략:</strong> 마켓메이킹, 통계적 차익거래, 모멘텀 이그니션</li>
+<li><strong>강화학습:</strong> Q-Learning, DQN, PPO — 에이전트가 스스로 매매 전략을 학습</li>
+<li><strong>저지연 아키텍처:</strong> 이벤트 드리븐 설계, 비동기 처리</li>
+</ul>
+<p class="ni" style="font-size:12px;color:#888;margin-top:10px">교재: MLAT Ch.22~23 (강화학습, 트레이딩 에이전트) / MLDSF Ch.13~14</p>
+</div>
+
+</div><!-- paper-content -->
+</div><!-- container -->
+</div><!-- main-wrapper -->
+
+</body>
+</html>
