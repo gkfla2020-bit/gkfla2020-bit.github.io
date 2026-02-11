@@ -7,6 +7,7 @@
 <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
 <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;500&family=Space+Mono:wght@400&family=Inter:wght@300;400&display=swap" rel="stylesheet">
+<script src="https://cdn.plot.ly/plotly-2.27.0.min.js"></script>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
 body{font-family:'Inter',sans-serif;background:#fafaf8;color:#1a1a1a;line-height:1.7;overflow-x:hidden}
@@ -95,13 +96,13 @@ pre{font-size:11px;padding:14px}table{font-size:10px;display:block;overflow-x:au
 <div class="nav-section">
 <div class="nav-section-title">Curriculum</div>
 <ul class="nav-list">
-<li><a class="done" href="../round-01/">R1. Python + Finance <span class="badge badge-done">DONE</span></a></li>
-<li><a class="done" href="../round-02/">R2. Linear Algebra + Stats <span class="badge badge-done">DONE</span></a></li>
+<li><a class="done" href="../round_01/lecture_01.html">R1. Python + Finance <span class="badge badge-done">DONE</span></a></li>
+<li><a class="done" href="../round_02/lecture_02.html">R2. Linear Algebra + Stats <span class="badge badge-done">DONE</span></a></li>
 <li><a class="active" href="#">R3. Data / Feature Eng. <span class="badge">NOW</span></a></li>
 <li><a href="#">R4. Supervised Learning</a></li>
 <li><a href="#">R5. Unsupervised + TS</a></li>
-<li><a class="done" href="../round-06/">R6. NLP + Sentiment <span class="badge badge-done">DONE</span></a></li>
-<li><a href="#">R7. Deep Learning</a></li>
+<li><a class="done" href="../round_06/lecture_06.html">R6. NLP + Sentiment <span class="badge badge-done">DONE</span></a></li>
+<li><a class="done" href="../round_07/lecture_07.html">R7. Deep Learning <span class="badge badge-done">DONE</span></a></li>
 <li><a href="#">R8. Convex Opt + Transformer</a></li>
 <li><a href="#">R9. HFT + RL</a></li>
 <li><a href="#">R10. Final Project</a></li>
@@ -589,6 +590,53 @@ plt.show()</code></pre>
 <div class="warn">
 <p class="ni"><strong>로그 수익률 vs 단순 수익률:</strong> 금융 ML에서는 로그 수익률 \(r_t = \ln(P_t / P_{t-1})\)을 주로 사용한다. 이유는 세 가지다: (1) 시간 가산성 — 여러 기간의 로그 수익률을 더하면 전체 기간 수익률이 된다, (2) 정규분포에 더 가까움, (3) 수학적으로 다루기 편함. 단순 수익률 \(R_t = (P_t - P_{t-1})/P_{t-1}\)은 직관적이지만 이런 성질이 없다.</p>
 </div>
+
+<!-- ══ Plotly: 다종목 누적 수익률 비교 ══ -->
+<div id="plot-ch2-cumret" style="width:100%;height:480px;margin:25px 0"></div>
+<p class="ni" style="font-size:12px;color:#888;text-align:center">🖱️ 범례 클릭으로 종목 on/off · 드래그로 구간 확대 · 더블클릭으로 리셋</p>
+<script>
+(function(){
+  // 시드 기반 PRNG (mulberry32)
+  function mulberry32(a){return function(){a|=0;a=a+0x6D2B79F5|0;var t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296}}
+  var rng=mulberry32(2024);
+  function randn(){var u=0,v=0;while(u===0)u=rng();while(v===0)v=rng();return Math.sqrt(-2*Math.log(u))*Math.cos(2*Math.PI*v)}
+
+  var stocks=[
+    {name:'삼성전자',mu:0.0003,sig:0.018,color:'#e74c3c'},
+    {name:'SK하이닉스',mu:0.0005,sig:0.025,color:'#3498db'},
+    {name:'NAVER',mu:0.0002,sig:0.022,color:'#2ecc71'},
+    {name:'카카오',mu:-0.0001,sig:0.024,color:'#f39c12'},
+    {name:'현대차',mu:0.0004,sig:0.019,color:'#9b59b6'}
+  ];
+  var N=252; // 1년 거래일
+  var dates=[];
+  var d=new Date(2024,0,2);
+  for(var i=0;i<N;i++){dates.push(new Date(d));d.setDate(d.getDate()+(d.getDay()===5?3:1))}
+
+  var traces=[];
+  stocks.forEach(function(s){
+    var cum=[0];
+    for(var i=1;i<N;i++){cum.push(cum[i-1]+s.mu+s.sig*randn())}
+    var cumRet=cum.map(function(v){return(Math.exp(v)-1)*100});
+    traces.push({x:dates,y:cumRet,mode:'lines',name:s.name,line:{color:s.color,width:2}});
+  });
+  // KOSPI 벤치마크
+  var bench=[0];
+  for(var i=1;i<N;i++){bench.push(bench[i-1]+0.0002+0.012*randn())}
+  var benchRet=bench.map(function(v){return(Math.exp(v)-1)*100});
+  traces.push({x:dates,y:benchRet,mode:'lines',name:'KOSPI (벤치마크)',line:{color:'#555',width:2.5,dash:'dash'}});
+
+  Plotly.newPlot('plot-ch2-cumret',traces,{
+    title:{text:'📈 다종목 누적 수익률 비교 (1년 시뮬레이션)',font:{size:15}},
+    xaxis:{title:'날짜',gridcolor:'#eee'},
+    yaxis:{title:'누적 수익률 (%)',gridcolor:'#eee',zeroline:true,zerolinecolor:'#999'},
+    legend:{orientation:'h',y:-0.15},
+    hovermode:'x unified',
+    plot_bgcolor:'#fafafa',paper_bgcolor:'#fff',
+    margin:{t:50,b:60}
+  },{responsive:true});
+})();
+</script>
 
 <!-- ═══════════════════════════════════════════ -->
 <!-- Ch3: FRED & 거시경제 데이터 -->
@@ -1180,6 +1228,88 @@ comparison = pd.DataFrame({
 </ul>
 </div>
 
+<!-- ══ Plotly: 결측치 패턴 히트맵 + ffill vs 보간 비교 ══ -->
+<div id="plot-ch5-missing" style="width:100%;height:380px;margin:25px 0"></div>
+<p class="ni" style="font-size:12px;color:#888;text-align:center">🖱️ 결측치 패턴 히트맵 — 노란색=결측, 보라색=존재 · 마우스 오버로 상세 확인</p>
+<div id="plot-ch5-fill" style="width:100%;height:400px;margin:25px 0"></div>
+<p class="ni" style="font-size:12px;color:#888;text-align:center">🖱️ ffill vs 선형보간 비교 — 결측 구간에서 두 방법의 차이를 확인하세요</p>
+<script>
+(function(){
+  function mulberry32(a){return function(){a|=0;a=a+0x6D2B79F5|0;var t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296}}
+  var rng=mulberry32(777);
+
+  // 히트맵: 5종목 × 60일 결측 패턴
+  var cols=['삼성전자','SK하이닉스','NAVER','카카오','현대차'];
+  var days=[];for(var i=1;i<=60;i++)days.push('Day '+i);
+  var z=[];
+  var missPct=[0.05,0.12,0.08,0.20,0.03]; // 결측 비율
+  for(var c=0;c<5;c++){
+    var row=[];
+    for(var d=0;d<60;d++){
+      // 연속 결측 패턴 시뮬레이션
+      if(rng()<missPct[c]){row.push(0);if(rng()<0.6&&d+1<60){d++;days[d]=days[d]||'Day '+(d+1);row.push(0)}}
+      else row.push(1);
+    }
+    while(row.length<60)row.push(1);
+    z.push(row.slice(0,60));
+  }
+  Plotly.newPlot('plot-ch5-missing',[{
+    z:z,x:days,y:cols,type:'heatmap',
+    colorscale:[[0,'#f1c40f'],[1,'#8e44ad']],
+    showscale:true,colorbar:{title:'존재',tickvals:[0,1],ticktext:['결측','존재']},
+    hovertemplate:'%{y}<br>%{x}<br>%{z:.0f} (0=결측, 1=존재)<extra></extra>'
+  }],{
+    title:{text:'📊 다종목 결측치 패턴 히트맵 (60일)',font:{size:14}},
+    xaxis:{title:'거래일',dtick:5},yaxis:{title:''},
+    plot_bgcolor:'#fafafa',paper_bgcolor:'#fff',margin:{t:50,l:100,b:50}
+  },{responsive:true});
+
+  // ffill vs 선형보간 비교
+  var N=60,price=[50000];
+  for(var i=1;i<N;i++)price.push(price[i-1]*(1+(rng()-0.48)*0.03));
+  // 결측 구간 만들기
+  var missIdx=[10,11,12,13,14, 30,31,32, 45,46,47,48,49];
+  var original=price.slice();
+  var withMiss=price.slice();
+  missIdx.forEach(function(i){withMiss[i]=null});
+
+  // ffill
+  var ffilled=withMiss.slice();
+  for(var i=1;i<N;i++){if(ffilled[i]===null)ffilled[i]=ffilled[i-1]}
+
+  // 선형보간
+  var interp=withMiss.slice();
+  var i=0;
+  while(i<N){
+    if(interp[i]===null){
+      var start=i-1,end=i;
+      while(end<N&&interp[end]===null)end++;
+      if(end<N&&start>=0){
+        for(var j=start+1;j<end;j++){
+          interp[j]=interp[start]+(interp[end]-interp[start])*(j-start)/(end-start);
+        }
+      }
+      i=end;
+    }else i++;
+  }
+
+  var xd=[];for(var i=0;i<N;i++)xd.push('Day '+(i+1));
+  Plotly.newPlot('plot-ch5-fill',[
+    {x:xd,y:original,mode:'lines',name:'원본 (실제값)',line:{color:'#2c3e50',width:2}},
+    {x:xd,y:ffilled,mode:'lines+markers',name:'ffill (전방채움)',line:{color:'#e74c3c',width:2,dash:'dot'},marker:{size:3}},
+    {x:xd,y:interp,mode:'lines+markers',name:'선형보간',line:{color:'#3498db',width:2,dash:'dash'},marker:{size:3}},
+    {x:missIdx.map(function(i){return xd[i]}),y:missIdx.map(function(i){return original[i]}),mode:'markers',name:'결측 위치 (실제값)',marker:{color:'#f39c12',size:10,symbol:'x',line:{width:2}}}
+  ],{
+    title:{text:'🔧 결측치 처리 비교: ffill vs 선형보간',font:{size:14}},
+    xaxis:{title:'거래일',gridcolor:'#eee'},
+    yaxis:{title:'주가 (원)',gridcolor:'#eee'},
+    legend:{orientation:'h',y:-0.18},
+    hovermode:'x unified',
+    plot_bgcolor:'#fafafa',paper_bgcolor:'#fff',margin:{t:50,b:70}
+  },{responsive:true});
+})();
+</script>
+
 <!-- ═══════════════════════════════════════════ -->
 <!-- Ch6: 이상치 탐지 -->
 <!-- ═══════════════════════════════════════════ -->
@@ -1348,6 +1478,85 @@ plt.show()</code></pre>
 <tr><td>로그 변환</td><td>log(x)로 스케일 축소</td><td>왜도 감소</td><td>음수 불가</td><td>가격 데이터에 적합</td></tr>
 <tr><td>MAD</td><td>중앙값 기반 편차</td><td>로버스트</td><td>덜 알려짐</td><td>○</td></tr>
 </table>
+
+<!-- ══ Plotly: 이상치 탐지 시각화 (Z-score + IQR + Winsorization) ══ -->
+<div id="plot-ch6-outlier" style="width:100%;height:450px;margin:25px 0"></div>
+<p class="ni" style="font-size:12px;color:#888;text-align:center">🖱️ 일간 수익률 분포에서 Z-score(±3σ)와 IQR(1.5×) 경계를 확인하세요 · 범례 클릭으로 토글</p>
+<div id="plot-ch6-winsor" style="width:100%;height:400px;margin:25px 0"></div>
+<p class="ni" style="font-size:12px;color:#888;text-align:center">🖱️ Winsorization 전후 비교 — 극단값이 어떻게 깎이는지 확인</p>
+<script>
+(function(){
+  function mulberry32(a){return function(){a|=0;a=a+0x6D2B79F5|0;var t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296}}
+  var rng=mulberry32(42);
+  function randn(){var u=0,v=0;while(u===0)u=rng();while(v===0)v=rng();return Math.sqrt(-2*Math.log(u))*Math.cos(2*Math.PI*v)}
+
+  // 250일 일간 수익률 (팻테일 포함)
+  var N=250,rets=[];
+  for(var i=0;i<N;i++){
+    var r=randn()*0.018; // 기본 변동성 1.8%
+    if(rng()<0.03)r+=randn()*0.05; // 3% 확률로 극단 이벤트
+    rets.push(r*100); // %로 변환
+  }
+  rets.sort(function(a,b){return a-b});
+
+  var mean=rets.reduce(function(s,v){return s+v},0)/N;
+  var std=Math.sqrt(rets.reduce(function(s,v){return s+(v-mean)*(v-mean)},0)/N);
+
+  // IQR
+  var q1=rets[Math.floor(N*0.25)],q3=rets[Math.floor(N*0.75)];
+  var iqr=q3-q1;
+  var iqrLow=q1-1.5*iqr,iqrHigh=q3+1.5*iqr;
+
+  // Z-score 경계
+  var zLow=mean-3*std,zHigh=mean+3*std;
+
+  var xIdx=[];for(var i=0;i<N;i++)xIdx.push(i+1);
+
+  // 색상: 정상=파랑, Z이상치=빨강, IQR이상치=주황
+  var colors=rets.map(function(r){
+    if(r<zLow||r>zHigh)return '#e74c3c';
+    if(r<iqrLow||r>iqrHigh)return '#f39c12';
+    return '#3498db';
+  });
+
+  Plotly.newPlot('plot-ch6-outlier',[
+    {x:xIdx,y:rets,mode:'markers',marker:{color:colors,size:7,opacity:0.7},
+     name:'일간 수익률',hovertemplate:'수익률: %{y:.2f}%<extra></extra>'},
+    {x:[0,N+1],y:[zHigh,zHigh],mode:'lines',name:'Z-score ±3σ',line:{color:'#e74c3c',width:2,dash:'dash'}},
+    {x:[0,N+1],y:[zLow,zLow],mode:'lines',showlegend:false,line:{color:'#e74c3c',width:2,dash:'dash'}},
+    {x:[0,N+1],y:[iqrHigh,iqrHigh],mode:'lines',name:'IQR ×1.5',line:{color:'#f39c12',width:2,dash:'dot'}},
+    {x:[0,N+1],y:[iqrLow,iqrLow],mode:'lines',showlegend:false,line:{color:'#f39c12',width:2,dash:'dot'}},
+    {x:[0,N+1],y:[mean,mean],mode:'lines',name:'평균',line:{color:'#2ecc71',width:1.5}}
+  ],{
+    title:{text:'🔍 이상치 탐지: Z-score vs IQR 경계',font:{size:14}},
+    xaxis:{title:'관측치 (정렬됨)',gridcolor:'#eee'},
+    yaxis:{title:'일간 수익률 (%)',gridcolor:'#eee'},
+    legend:{orientation:'h',y:-0.15},
+    plot_bgcolor:'#fafafa',paper_bgcolor:'#fff',margin:{t:50,b:60},
+    annotations:[
+      {x:N*0.95,y:zHigh,text:'3σ='+zHigh.toFixed(1)+'%',showarrow:false,font:{size:10,color:'#e74c3c'}},
+      {x:N*0.95,y:iqrHigh,text:'IQR='+iqrHigh.toFixed(1)+'%',showarrow:false,font:{size:10,color:'#f39c12'}}
+    ]
+  },{responsive:true});
+
+  // Winsorization 비교
+  var pct1=rets[Math.floor(N*0.01)],pct99=rets[Math.floor(N*0.99)];
+  var pct5=rets[Math.floor(N*0.05)],pct95=rets[Math.floor(N*0.95)];
+  var win1=rets.map(function(r){return Math.max(pct1,Math.min(pct99,r))});
+  var win5=rets.map(function(r){return Math.max(pct5,Math.min(pct95,r))});
+
+  Plotly.newPlot('plot-ch6-winsor',[
+    {y:rets,type:'box',name:'원본',marker:{color:'#3498db'},boxpoints:'all',jitter:0.3,pointpos:-1.5},
+    {y:win1,type:'box',name:'Winsor 1%',marker:{color:'#e67e22'},boxpoints:'all',jitter:0.3,pointpos:-1.5},
+    {y:win5,type:'box',name:'Winsor 5%',marker:{color:'#27ae60'},boxpoints:'all',jitter:0.3,pointpos:-1.5}
+  ],{
+    title:{text:'📦 Winsorization 전후 비교 (Box Plot)',font:{size:14}},
+    yaxis:{title:'일간 수익률 (%)',gridcolor:'#eee'},
+    plot_bgcolor:'#fafafa',paper_bgcolor:'#fff',margin:{t:50,b:40},
+    legend:{orientation:'h',y:-0.12}
+  },{responsive:true});
+})();
+</script>
 
 <!-- ═══════════════════════════════════════════ -->
 <!-- Ch7: 정규화와 표준화 -->
@@ -1569,6 +1778,73 @@ test_right = scaler_right.transform(test_data)         <span class="cm"># transf
 <li>교차검증(CV)에서도 각 fold마다 이 과정을 반복해야 한다 → <code>Pipeline</code> 사용 권장</li>
 </ol>
 </div>
+
+<!-- ══ Plotly: 스케일링 비교 (Raw vs MinMax vs Z-Score vs Robust) ══ -->
+<div id="plot-ch7-scaling" style="width:100%;height:500px;margin:25px 0"></div>
+<p class="ni" style="font-size:12px;color:#888;text-align:center">🖱️ 4가지 스케일링 방법 비교 — 드롭다운으로 피처 전환 · 이상치가 있을 때 Robust의 강건함을 확인</p>
+<script>
+(function(){
+  function mulberry32(a){return function(){a|=0;a=a+0x6D2B79F5|0;var t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296}}
+  var rng=mulberry32(123);
+  function randn(){var u=0,v=0;while(u===0)u=rng();while(v===0)v=rng();return Math.sqrt(-2*Math.log(u))*Math.cos(2*Math.PI*v)}
+
+  // 3개 피처: 주가(만원대), RSI(0~100), 거래량(백만대)
+  var N=100;
+  var features={
+    '주가 (원)':{data:[],color:'#e74c3c'},
+    'RSI (0~100)':{data:[],color:'#3498db'},
+    '거래량 (주)':{data:[],color:'#2ecc71'}
+  };
+  for(var i=0;i<N;i++){
+    features['주가 (원)'].data.push(60000+randn()*8000+(rng()<0.03?randn()*30000:0));
+    features['RSI (0~100)'].data.push(Math.max(5,Math.min(95,50+randn()*18)));
+    features['거래량 (주)'].data.push(Math.max(100000,2000000+randn()*800000+(rng()<0.05?5000000:0)));
+  }
+
+  function minmax(arr){var mn=Math.min.apply(null,arr),mx=Math.max.apply(null,arr);return arr.map(function(v){return(v-mn)/(mx-mn)})}
+  function zscore(arr){var m=arr.reduce(function(s,v){return s+v},0)/arr.length;var s=Math.sqrt(arr.reduce(function(s,v){return s+(v-m)*(v-m)},0)/arr.length);return arr.map(function(v){return(v-m)/s})}
+  function robust(arr){var sorted=arr.slice().sort(function(a,b){return a-b});var med=sorted[Math.floor(sorted.length/2)];var q1=sorted[Math.floor(sorted.length*0.25)];var q3=sorted[Math.floor(sorted.length*0.75)];var iqr=q3-q1;return arr.map(function(v){return(v-med)/iqr})}
+
+  var names=Object.keys(features);
+  var xIdx=[];for(var i=0;i<N;i++)xIdx.push(i+1);
+
+  // 모든 피처를 한 차트에 4가지 스케일링으로
+  var methods=['Raw','Min-Max [0,1]','Z-Score (μ=0,σ=1)','Robust (IQR)'];
+  var methodColors=['#e74c3c','#3498db','#2ecc71','#9b59b6'];
+
+  var allTraces=[];
+  var buttons=[];
+
+  names.forEach(function(fname,fi){
+    var raw=features[fname].data;
+    var scaled=[raw,minmax(raw),zscore(raw),robust(raw)];
+    scaled.forEach(function(d,mi){
+      allTraces.push({
+        x:xIdx,y:d,mode:'lines',name:methods[mi],
+        line:{color:methodColors[mi],width:2},
+        visible:fi===0,
+        hovertemplate:methods[mi]+': %{y:.4f}<extra></extra>'
+      });
+    });
+    var vis=[];for(var j=0;j<names.length*4;j++)vis.push(j>=fi*4&&j<(fi+1)*4);
+    buttons.push({method:'update',args:[{visible:vis}],label:fname});
+  });
+
+  Plotly.newPlot('plot-ch7-scaling',allTraces,{
+    title:{text:'⚖️ 스케일링 4종 비교',font:{size:14}},
+    xaxis:{title:'관측치',gridcolor:'#eee'},
+    yaxis:{title:'값',gridcolor:'#eee'},
+    legend:{orientation:'h',y:-0.15},
+    hovermode:'x unified',
+    plot_bgcolor:'#fafafa',paper_bgcolor:'#fff',margin:{t:80,b:60},
+    updatemenus:[{
+      buttons:buttons,direction:'down',showactive:true,
+      x:0.02,xanchor:'left',y:1.12,yanchor:'top',
+      bgcolor:'#f0f0f0',bordercolor:'#ccc'
+    }]
+  },{responsive:true});
+})();
+</script>
 
 <!-- ═══════════════════════════════════════════ -->
 <!-- Ch8: 기술적 지표 피처 -->
@@ -1942,6 +2218,104 @@ features[<span class="st">"bb_bandwidth"</span>] = bandwidth
 features[<span class="st">"bb_squeeze"</span>] = (bandwidth < bandwidth.rolling(<span class="nu">120</span>).quantile(<span class="nu">0.1</span>)).astype(<span class="nb">int</span>)
 <span class="cm"># 밴드폭이 최근 120일 중 하위 10%이면 "스퀴즈" — 큰 움직임 예고</span></code></pre>
 
+<!-- ══ Plotly: 인터랙티브 캔들스틱 + RSI + MACD + 볼린저밴드 ══ -->
+<div id="plot-ch8-candle" style="width:100%;height:600px;margin:25px 0"></div>
+<p class="ni" style="font-size:12px;color:#888;text-align:center">🖱️ 캔들스틱 + 볼린저밴드 + SMA · 하단 패널: RSI(과매수/과매도) + MACD 히스토그램 · 드래그로 확대</p>
+<script>
+(function(){
+  function mulberry32(a){return function(){a|=0;a=a+0x6D2B79F5|0;var t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296}}
+  var rng=mulberry32(2024);
+  function randn(){var u=0,v=0;while(u===0)u=rng();while(v===0)v=rng();return Math.sqrt(-2*Math.log(u))*Math.cos(2*Math.PI*v)}
+
+  var N=180; // 180 거래일
+  var dates=[],open=[],high=[],low=[],close=[];
+  var d=new Date(2024,0,2);
+  var p=70000; // 시작가
+  for(var i=0;i<N;i++){
+    dates.push(new Date(d));
+    var ret=0.0002+randn()*0.018;
+    if(i>60&&i<90)ret-=0.003; // 하락 구간
+    if(i>120&&i<150)ret+=0.004; // 상승 구간
+    var o=p,c=p*(1+ret);
+    var h=Math.max(o,c)*(1+Math.abs(randn()*0.008));
+    var l=Math.min(o,c)*(1-Math.abs(randn()*0.008));
+    open.push(Math.round(o));close.push(Math.round(c));
+    high.push(Math.round(h));low.push(Math.round(l));
+    p=c;
+    d.setDate(d.getDate()+(d.getDay()===5?3:1));
+  }
+
+  // SMA 20, 60
+  function sma(arr,w){var r=[];for(var i=0;i<arr.length;i++){if(i<w-1){r.push(null)}else{var s=0;for(var j=0;j<w;j++)s+=arr[i-j];r.push(s/w)}}return r}
+  var sma20=sma(close,20),sma60=sma(close,60);
+
+  // 볼린저밴드
+  var bbU=[],bbL=[];
+  for(var i=0;i<N;i++){
+    if(i<19){bbU.push(null);bbL.push(null);continue}
+    var s=0,ss=0;
+    for(var j=0;j<20;j++){s+=close[i-j];ss+=close[i-j]*close[i-j]}
+    var m=s/20,sd=Math.sqrt(ss/20-m*m);
+    bbU.push(m+2*sd);bbL.push(m-2*sd);
+  }
+
+  // RSI 14
+  var rsi=[];
+  for(var i=0;i<N;i++){
+    if(i<14){rsi.push(null);continue}
+    var ag=0,al=0;
+    for(var j=1;j<=14;j++){
+      var diff=close[i-14+j]-close[i-14+j-1];
+      if(diff>0)ag+=diff;else al-=diff;
+    }
+    ag/=14;al/=14;
+    rsi.push(al===0?100:100-100/(1+ag/al));
+  }
+
+  // MACD
+  function ema(arr,span){var k=2/(span+1),r=[arr[0]];for(var i=1;i<arr.length;i++)r.push(arr[i]*k+r[i-1]*(1-k));return r}
+  var ema12=ema(close,12),ema26=ema(close,26);
+  var macd=[],macdSig,macdHist=[];
+  for(var i=0;i<N;i++)macd.push(ema12[i]-ema26[i]);
+  macdSig=ema(macd,9);
+  for(var i=0;i<N;i++)macdHist.push(macd[i]-macdSig[i]);
+
+  // 캔들스틱 + 볼린저 + SMA (상단 70%)
+  var trace1={x:dates,open:open,high:high,low:low,close:close,type:'candlestick',name:'캔들스틱',
+    increasing:{line:{color:'#e74c3c'}},decreasing:{line:{color:'#3498db'}},yaxis:'y'};
+  var trace2={x:dates,y:sma20,mode:'lines',name:'SMA 20',line:{color:'#f39c12',width:1.5},yaxis:'y'};
+  var trace3={x:dates,y:sma60,mode:'lines',name:'SMA 60',line:{color:'#9b59b6',width:1.5},yaxis:'y'};
+  var trace4={x:dates,y:bbU,mode:'lines',name:'BB Upper',line:{color:'#95a5a6',width:1,dash:'dot'},yaxis:'y'};
+  var trace5={x:dates,y:bbL,mode:'lines',name:'BB Lower',line:{color:'#95a5a6',width:1,dash:'dot'},showlegend:false,yaxis:'y'};
+
+  // RSI (중단 15%)
+  var trace6={x:dates,y:rsi,mode:'lines',name:'RSI 14',line:{color:'#8e44ad',width:1.5},yaxis:'y2'};
+
+  // MACD 히스토그램 (하단 15%)
+  var histColors=macdHist.map(function(v){return v>=0?'rgba(46,204,113,0.7)':'rgba(231,76,60,0.7)'});
+  var trace7={x:dates,y:macdHist,type:'bar',name:'MACD Hist',marker:{color:histColors},yaxis:'y3'};
+  var trace8={x:dates,y:macd,mode:'lines',name:'MACD',line:{color:'#2980b9',width:1.2},yaxis:'y3'};
+  var trace9={x:dates,y:macdSig,mode:'lines',name:'Signal',line:{color:'#e67e22',width:1.2,dash:'dash'},yaxis:'y3'};
+
+  Plotly.newPlot('plot-ch8-candle',[trace1,trace2,trace3,trace4,trace5,trace6,trace7,trace8,trace9],{
+    title:{text:'📊 삼성전자 시뮬레이션: 캔들스틱 + 볼린저밴드 + RSI + MACD',font:{size:14}},
+    xaxis:{rangeslider:{visible:false},gridcolor:'#eee'},
+    yaxis:{domain:[0.38,1],title:'주가 (원)',gridcolor:'#eee'},
+    yaxis2:{domain:[0.2,0.35],title:'RSI',gridcolor:'#eee',range:[0,100],
+      shapes:[{type:'line',y0:70,y1:70,x0:0,x1:1,xref:'paper',line:{color:'red',width:1,dash:'dot'}},
+              {type:'line',y0:30,y1:30,x0:0,x1:1,xref:'paper',line:{color:'green',width:1,dash:'dot'}}]},
+    yaxis3:{domain:[0,0.17],title:'MACD',gridcolor:'#eee'},
+    legend:{orientation:'h',y:-0.08,font:{size:10}},
+    plot_bgcolor:'#fafafa',paper_bgcolor:'#fff',
+    margin:{t:50,b:50,l:60,r:20},
+    shapes:[
+      {type:'line',yref:'y2',y0:70,y1:70,xref:'paper',x0:0,x1:1,line:{color:'#e74c3c',width:1,dash:'dot'}},
+      {type:'line',yref:'y2',y0:30,y1:30,xref:'paper',x0:0,x1:1,line:{color:'#27ae60',width:1,dash:'dot'}}
+    ]
+  },{responsive:true});
+})();
+</script>
+
 <!-- ═══════════════════════════════════════════ -->
 <!-- Ch9: 변동성 & 모멘텀 피처 -->
 <!-- ═══════════════════════════════════════════ -->
@@ -2142,6 +2516,82 @@ features[<span class="st">"volume_volatility"</span>] = volume.rolling(<span cla
 <tr><td>obv_slope</td><td>OBV 변화율</td><td>(-∞, +∞)</td></tr>
 <tr><td>price_vwap_ratio</td><td>가격/VWAP 비율</td><td>0.9~1.1</td></tr>
 </table>
+
+<!-- ══ Plotly: 롤링 변동성 + 모멘텀 히트맵 ══ -->
+<div id="plot-ch9-vol" style="width:100%;height:450px;margin:25px 0"></div>
+<p class="ni" style="font-size:12px;color:#888;text-align:center">🖱️ 5일/20일/60일 롤링 변동성 비교 — 변동성 클러스터링(큰 변동 뒤에 큰 변동)을 관찰하세요</p>
+<div id="plot-ch9-mom" style="width:100%;height:420px;margin:25px 0"></div>
+<p class="ni" style="font-size:12px;color:#888;text-align:center">🖱️ 다기간 모멘텀 히트맵 — 5종목 × 6기간 모멘텀 비교 · 마우스 오버로 수치 확인</p>
+<script>
+(function(){
+  function mulberry32(a){return function(){a|=0;a=a+0x6D2B79F5|0;var t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296}}
+  var rng=mulberry32(999);
+  function randn(){var u=0,v=0;while(u===0)u=rng();while(v===0)v=rng();return Math.sqrt(-2*Math.log(u))*Math.cos(2*Math.PI*v)}
+
+  // 롤링 변동성
+  var N=300,rets=[];
+  var vol=0.015; // 초기 변동성
+  for(var i=0;i<N;i++){
+    // GARCH-like: 변동성 클러스터링
+    vol=0.012+0.7*(vol-0.012)+0.15*Math.abs(rets[i-1]||0);
+    rets.push(randn()*vol);
+  }
+
+  function rollingStd(arr,w){
+    var r=[];
+    for(var i=0;i<arr.length;i++){
+      if(i<w-1){r.push(null);continue}
+      var s=0,ss=0;
+      for(var j=0;j<w;j++){s+=arr[i-j];ss+=arr[i-j]*arr[i-j]}
+      var m=s/w;r.push(Math.sqrt(ss/w-m*m)*Math.sqrt(252)*100);
+    }
+    return r;
+  }
+  var vol5=rollingStd(rets,5),vol20=rollingStd(rets,20),vol60=rollingStd(rets,60);
+  var dates=[];var d=new Date(2023,0,2);
+  for(var i=0;i<N;i++){dates.push(new Date(d));d.setDate(d.getDate()+(d.getDay()===5?3:1))}
+
+  Plotly.newPlot('plot-ch9-vol',[
+    {x:dates,y:vol5,mode:'lines',name:'5일 변동성',line:{color:'#e74c3c',width:1},opacity:0.6},
+    {x:dates,y:vol20,mode:'lines',name:'20일 변동성',line:{color:'#3498db',width:2}},
+    {x:dates,y:vol60,mode:'lines',name:'60일 변동성',line:{color:'#2c3e50',width:2.5}}
+  ],{
+    title:{text:'📉 롤링 변동성 (연환산 %) — 변동성 클러스터링 관찰',font:{size:14}},
+    xaxis:{title:'날짜',gridcolor:'#eee'},
+    yaxis:{title:'변동성 (%)',gridcolor:'#eee'},
+    legend:{orientation:'h',y:-0.12},
+    hovermode:'x unified',
+    plot_bgcolor:'#fafafa',paper_bgcolor:'#fff',margin:{t:50,b:55}
+  },{responsive:true});
+
+  // 모멘텀 히트맵: 5종목 × 6기간
+  var stocks=['삼성전자','SK하이닉스','NAVER','카카오','현대차'];
+  var periods=['5일','20일','60일','120일','180일','250일'];
+  var momData=[];
+  var baseMom=[[2.1,5.3,12.5,8.2,15.1,22.3],
+               [3.5,8.1,18.2,25.3,20.1,35.2],
+               [-1.2,2.1,-5.3,-8.1,-3.2,5.5],
+               [-2.5,-6.3,-15.2,-22.1,-18.5,-12.3],
+               [1.8,4.2,9.8,14.5,18.2,28.1]];
+  for(var i=0;i<5;i++){
+    var row=[];
+    for(var j=0;j<6;j++)row.push(baseMom[i][j]+(rng()-0.5)*3);
+    momData.push(row);
+  }
+
+  Plotly.newPlot('plot-ch9-mom',[{
+    z:momData,x:periods,y:stocks,type:'heatmap',
+    colorscale:[[0,'#c0392b'],[0.5,'#f5f5f5'],[1,'#27ae60']],
+    zmid:0,
+    hovertemplate:'%{y}<br>%{x} 모멘텀: %{z:.1f}%<extra></extra>',
+    colorbar:{title:'수익률 (%)'}
+  }],{
+    title:{text:'🔥 다기간 모멘텀 히트맵 (종목 × 기간)',font:{size:14}},
+    xaxis:{title:'모멘텀 기간'},yaxis:{title:''},
+    plot_bgcolor:'#fafafa',paper_bgcolor:'#fff',margin:{t:50,l:100,b:50}
+  },{responsive:true});
+})();
+</script>
 
 <!-- ═══════════════════════════════════════════ -->
 <!-- Ch10: 알파팩터 기초 -->
@@ -2456,6 +2906,84 @@ factor_data[<span class="st">"mom_neutral"</span>] = factor_data.groupby(<span c
 <span class="cm"># IT 섹터 내에서 C가 가장 높고, 금융 섹터 내에서 F가 가장 높음</span>
 <span class="cm"># 섹터 간 수준 차이가 제거됨</span></code></pre>
 
+<!-- ══ Plotly: Alpha Decay + IC 시계열 ══ -->
+<div id="plot-ch10-ic" style="width:100%;height:420px;margin:25px 0"></div>
+<p class="ni" style="font-size:12px;color:#888;text-align:center">🖱️ 일별 IC 시계열 — 녹색=양수(예측 성공), 빨강=음수(예측 실패) · 누적 IC가 우상향이면 유효한 팩터</p>
+<div id="plot-ch10-decay" style="width:100%;height:400px;margin:25px 0"></div>
+<p class="ni" style="font-size:12px;color:#888;text-align:center">🖱️ Alpha Decay — 예측 기간이 길어질수록 IC가 감소하는 패턴 · 3개 팩터 비교</p>
+<script>
+(function(){
+  function mulberry32(a){return function(){a|=0;a=a+0x6D2B79F5|0;var t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296}}
+  var rng=mulberry32(314);
+  function randn(){var u=0,v=0;while(u===0)u=rng();while(v===0)v=rng();return Math.sqrt(-2*Math.log(u))*Math.cos(2*Math.PI*v)}
+
+  // IC 시계열 (250일)
+  var N=250,ics=[],cumIc=[0];
+  var dates=[];var d=new Date(2024,0,2);
+  for(var i=0;i<N;i++){
+    dates.push(new Date(d));
+    var ic=0.04+randn()*0.15; // 평균 IC ≈ 0.04
+    ics.push(ic);
+    cumIc.push(cumIc[i]+ic);
+    d.setDate(d.getDate()+(d.getDay()===5?3:1));
+  }
+  cumIc.shift();
+
+  var icColors=ics.map(function(v){return v>=0?'rgba(46,204,113,0.7)':'rgba(231,76,60,0.7)'});
+
+  Plotly.newPlot('plot-ch10-ic',[
+    {x:dates,y:ics,type:'bar',name:'일별 IC',marker:{color:icColors},yaxis:'y'},
+    {x:dates,y:cumIc,mode:'lines',name:'누적 IC',line:{color:'#2c3e50',width:2.5},yaxis:'y2'}
+  ],{
+    title:{text:'📊 모멘텀 팩터 IC 시계열 (1년)',font:{size:14}},
+    xaxis:{gridcolor:'#eee'},
+    yaxis:{title:'일별 IC',gridcolor:'#eee',side:'left'},
+    yaxis2:{title:'누적 IC',overlaying:'y',side:'right',gridcolor:'#eee'},
+    legend:{orientation:'h',y:-0.12},
+    hovermode:'x unified',
+    plot_bgcolor:'#fafafa',paper_bgcolor:'#fff',margin:{t:50,b:55},
+    annotations:[{
+      x:dates[N-1],y:cumIc[N-1],yref:'y2',
+      text:'누적 IC='+cumIc[N-1].toFixed(1),
+      showarrow:true,arrowhead:2,font:{size:11,color:'#2c3e50'}
+    }]
+  },{responsive:true});
+
+  // Alpha Decay: 3개 팩터 비교
+  var horizons=[1,2,5,10,20,40,60,120];
+  var factors=[
+    {name:'단기 모멘텀 (5일)',halflife:5,ic0:0.08,color:'#e74c3c'},
+    {name:'RSI 반전',halflife:15,ic0:0.06,color:'#3498db'},
+    {name:'밸류 (PBR)',halflife:60,ic0:0.04,color:'#2ecc71'}
+  ];
+
+  var traces=[];
+  factors.forEach(function(f){
+    var ys=horizons.map(function(h){return f.ic0*Math.exp(-0.693*h/f.halflife)+(rng()-0.5)*0.003});
+    traces.push({
+      x:horizons,y:ys,mode:'lines+markers',name:f.name,
+      line:{color:f.color,width:2.5},marker:{size:8},
+      hovertemplate:f.name+'<br>%{x}일 후 IC: %{y:.4f}<extra></extra>'
+    });
+  });
+  // 유의 수준 선
+  traces.push({x:[0,130],y:[0.03,0.03],mode:'lines',name:'유의 수준 (IC=0.03)',
+    line:{color:'#999',width:1.5,dash:'dash'}});
+
+  Plotly.newPlot('plot-ch10-decay',traces,{
+    title:{text:'⏳ Alpha Decay — 예측 기간별 IC 감소 패턴',font:{size:14}},
+    xaxis:{title:'예측 기간 (거래일)',gridcolor:'#eee',type:'log',dtick:null},
+    yaxis:{title:'IC (Information Coefficient)',gridcolor:'#eee',range:[0,0.1]},
+    legend:{orientation:'h',y:-0.15},
+    plot_bgcolor:'#fafafa',paper_bgcolor:'#fff',margin:{t:50,b:60},
+    annotations:[{
+      x:1.3,y:0.032,xref:'x',yref:'y',text:'IC < 0.03 → 예측력 없음',
+      showarrow:false,font:{size:10,color:'#999'}
+    }]
+  },{responsive:true});
+})();
+</script>
+
 <!-- ═══════════════════════════════════════════ -->
 <!-- Ch11: 실전 피처 테이블 구축 -->
 <!-- ═══════════════════════════════════════════ -->
@@ -2651,6 +3179,97 @@ plt.show()
 <div class="ok">
 <p class="ni"><strong>Round 3 → Round 4 연결:</strong> 이 피처 테이블이 바로 Round 4에서 지도학습 모델(선형회귀, XGBoost 등)의 입력이 된다. <code>target_5d</code>는 회귀 문제의 타겟, <code>target_dir</code>은 분류 문제의 타겟이다. 피처 엔지니어링의 품질이 모델 성능의 80%를 결정한다는 것을 기억하자.</p>
 </div>
+
+<!-- ══ Plotly: 피처 상관관계 히트맵 + 피처-타겟 상관 바차트 ══ -->
+<div id="plot-ch11-corr" style="width:100%;height:520px;margin:25px 0"></div>
+<p class="ni" style="font-size:12px;color:#888;text-align:center">🖱️ 피처 간 상관관계 히트맵 — 빨강=양의 상관, 파랑=음의 상관 · |r| > 0.8이면 다중공선성 주의</p>
+<div id="plot-ch11-target" style="width:100%;height:450px;margin:25px 0"></div>
+<p class="ni" style="font-size:12px;color:#888;text-align:center">🖱️ 피처-타겟(미래 5일 수익률) 상관계수 — 녹색=양의 예측력, 빨강=음의 예측력</p>
+<script>
+(function(){
+  function mulberry32(a){return function(){a|=0;a=a+0x6D2B79F5|0;var t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296}}
+  var rng=mulberry32(555);
+
+  // 피처 이름
+  var feats=['ret_1d','ret_5d','ret_20d','price_sma20','rsi_14','macd_hist','bb_pct_b','bb_width','vol_20d','vol_ratio','atr_pct','vol_ma_ratio','mom_60d','dist_52w_high','body_ratio'];
+  var n=feats.length;
+
+  // 상관행렬 (현실적인 값)
+  var corr=[];
+  // 기본: 대각선=1, 나머지는 그룹별 상관
+  for(var i=0;i<n;i++){
+    corr[i]=[];
+    for(var j=0;j<n;j++){
+      if(i===j){corr[i][j]=1;continue}
+      // 수익률 그룹 (0,1,2) 높은 상관
+      if(i<3&&j<3){corr[i][j]=0.5+rng()*0.35;continue}
+      // 추세 그룹 (3,4,5,6) 중간 상관
+      if(i>=3&&i<=6&&j>=3&&j<=6){corr[i][j]=0.3+rng()*0.3;continue}
+      // 변동성 그룹 (7,8,9,10) 높은 상관
+      if(i>=7&&i<=10&&j>=7&&j<=10){corr[i][j]=0.4+rng()*0.4;continue}
+      // 모멘텀-수익률 상관
+      if((i<3&&j>=12&&j<=13)||(j<3&&i>=12&&i<=13)){corr[i][j]=0.3+rng()*0.3;continue}
+      // 나머지: 약한 상관
+      corr[i][j]=(rng()-0.5)*0.3;
+    }
+  }
+  // 대칭화
+  for(var i=0;i<n;i++)for(var j=i+1;j<n;j++)corr[j][i]=corr[i][j];
+
+  var annots=[];
+  for(var i=0;i<n;i++){
+    for(var j=0;j<n;j++){
+      annots.push({
+        x:feats[j],y:feats[i],text:corr[i][j].toFixed(2),
+        showarrow:false,font:{size:8,color:Math.abs(corr[i][j])>0.5?'white':'black'}
+      });
+    }
+  }
+
+  Plotly.newPlot('plot-ch11-corr',[{
+    z:corr,x:feats,y:feats,type:'heatmap',
+    colorscale:[[0,'#2980b9'],[0.5,'#f5f5f5'],[1,'#c0392b']],
+    zmid:0,zmin:-1,zmax:1,
+    hovertemplate:'%{x} vs %{y}<br>상관계수: %{z:.3f}<extra></extra>',
+    colorbar:{title:'ρ'}
+  }],{
+    title:{text:'🔗 피처 간 상관관계 히트맵 (15 Features)',font:{size:14}},
+    xaxis:{tickangle:45,tickfont:{size:9}},
+    yaxis:{tickfont:{size:9},autorange:'reversed'},
+    plot_bgcolor:'#fff',paper_bgcolor:'#fff',
+    margin:{t:50,l:100,b:100,r:20},
+    annotations:annots
+  },{responsive:true});
+
+  // 피처-타겟 상관 바차트
+  var targetCorr=feats.map(function(f,i){
+    // 현실적인 피처-타겟 상관 (대부분 약함)
+    var base=[0.02,-0.01,0.04,0.03,-0.05,0.06,-0.04,0.02,-0.07,0.03,-0.02,0.01,0.05,-0.06,0.01];
+    return{name:f,corr:base[i]+(rng()-0.5)*0.04};
+  });
+  targetCorr.sort(function(a,b){return a.corr-b.corr});
+
+  var barColors=targetCorr.map(function(d){return d.corr>=0?'#27ae60':'#e74c3c'});
+
+  Plotly.newPlot('plot-ch11-target',[{
+    x:targetCorr.map(function(d){return d.corr}),
+    y:targetCorr.map(function(d){return d.name}),
+    type:'bar',orientation:'h',
+    marker:{color:barColors,opacity:0.8},
+    hovertemplate:'%{y}: %{x:.4f}<extra></extra>'
+  }],{
+    title:{text:'🎯 피처-타겟(5일 수익률) 상관계수',font:{size:14}},
+    xaxis:{title:'Correlation',gridcolor:'#eee',zeroline:true,zerolinecolor:'#333',zerolinewidth:1},
+    yaxis:{tickfont:{size:10}},
+    plot_bgcolor:'#fafafa',paper_bgcolor:'#fff',
+    margin:{t:50,l:110,b:50,r:20},
+    annotations:[
+      {x:0.06,y:feats.length-1,text:'→ 양의 예측력',showarrow:false,font:{size:10,color:'#27ae60'}},
+      {x:-0.06,y:0,text:'← 음의 예측력',showarrow:false,font:{size:10,color:'#e74c3c'}}
+    ]
+  },{responsive:true});
+})();
+</script>
 
 <!-- ═══════════════════════════════════════════ -->
 <!-- Ch12: 피드백 세션 + Quiz -->
