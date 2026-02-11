@@ -7,6 +7,7 @@
 <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
 <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;500&family=Space+Mono:wght@400&family=Inter:wght@300;400&display=swap" rel="stylesheet">
+<script src="https://cdn.plot.ly/plotly-2.27.0.min.js"></script>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
 body{font-family:'Inter',sans-serif;background:#fafaf8;color:#1a1a1a;line-height:1.7;overflow-x:hidden}
@@ -210,6 +211,36 @@ R4에서 XGBoost로 주가 방향을 예측했고, R7에서 LSTM으로 시계열
 </div>
 </div>
 
+<!-- ▼ Plotly 3D: Convex vs Non-Convex Surface -->
+<div id="plot-ch1-convex" style="width:100%;height:420px;margin:25px 0"></div>
+<script>
+(function(){
+  var N=50, x=[], y=[], zConvex=[], zNonConvex=[];
+  for(var i=0;i<N;i++){
+    var xi=-3+6*i/(N-1); x.push(xi);
+    var yi=-3+6*i/(N-1); y.push(yi);
+  }
+  for(var i=0;i<N;i++){
+    var rc=[], rn=[];
+    for(var j=0;j<N;j++){
+      rc.push(x[i]*x[i]+y[j]*y[j]);
+      rn.push(x[i]*x[i]+y[j]*y[j]+3*Math.sin(2*x[i])*Math.cos(2*y[j]));
+    }
+    zConvex.push(rc); zNonConvex.push(rn);
+  }
+  var trace1={z:zConvex,x:x,y:y,type:'surface',colorscale:'Greens',opacity:0.9,name:'Convex (볼록)',showscale:false};
+  var trace2={z:zNonConvex,x:x,y:y,type:'surface',colorscale:'Reds',opacity:0.9,name:'Non-Convex',showscale:false,visible:'legendonly'};
+  Plotly.newPlot('plot-ch1-convex',[trace1,trace2],{
+    title:{text:'🏔️ 3D Surface: Convex f(x,y)=x²+y² vs Non-Convex (toggle legend)',font:{size:13}},
+    scene:{xaxis:{title:'x'},yaxis:{title:'y'},zaxis:{title:'f(x,y)'},
+      camera:{eye:{x:1.5,y:1.5,z:1.2}}},
+    margin:{l:0,r:0,t:40,b:0},
+    legend:{x:0.01,y:0.99,bgcolor:'rgba(255,255,255,0.8)'}
+  },{responsive:true});
+})();
+</script>
+<p class="ni" style="font-size:11px;color:#888;text-align:center;margin-top:-10px">🖱️ 드래그로 회전, 스크롤로 줌. Legend 클릭으로 Convex/Non-Convex 전환.</p>
+
 <h3>1.3 금융에서의 Convex Optimization</h3>
 
 <p>
@@ -279,6 +310,39 @@ $$\theta x_1 + (1-\theta) x_2 \in C$$
 <p>
 금융에서 볼록집합의 대표적 예는 <strong>포트폴리오 비중의 제약 조건</strong>이다. "모든 비중의 합 = 1"이고 "각 비중 ≥ 0" (공매도 금지)이라는 조건은 심플렉스(simplex)라는 볼록집합을 형성한다. 이 안에서 최적 비중을 찾는 것이 포트폴리오 최적화다.
 </p>
+
+<!-- ▼ Plotly: Convex Set Line Segment Test + Convex Function -->
+<div id="plot-ch2-convex-fn" style="width:100%;height:400px;margin:25px 0"></div>
+<script>
+(function(){
+  // Convex function f(x)=x^2 with tangent line at x=1
+  var xArr=[], fArr=[], tangArr=[];
+  for(var i=0;i<=100;i++){
+    var xi=-3+6*i/100; xArr.push(xi);
+    fArr.push(xi*xi);
+    tangArr.push(2*(xi-1)+1); // f'(1)=2, tangent at x=1: y=2(x-1)+1
+  }
+  // Jensen's inequality: chord between x=-2 and x=2
+  var chordX=[-2,2], chordY=[4,4];
+  // Midpoint
+  var midX=0, midF=0, midChord=4;
+
+  var traceF={x:xArr,y:fArr,mode:'lines',name:'f(x) = x²',line:{color:'#1976d2',width:3}};
+  var traceTan={x:xArr,y:tangArr,mode:'lines',name:'접선 at x=1',line:{color:'#e53935',width:2,dash:'dash'}};
+  var traceChord={x:chordX,y:chordY,mode:'lines+markers',name:'현 (chord)',line:{color:'#ff9800',width:2},marker:{size:8}};
+  var traceMid={x:[midX],y:[midF],mode:'markers',name:'f(midpoint)=0',marker:{size:12,color:'#4caf50',symbol:'diamond'}};
+  var traceMidChord={x:[midX],y:[midChord],mode:'markers',name:'chord midpoint=4',marker:{size:12,color:'#ff9800',symbol:'diamond'}};
+  // Arrow annotation for Jensen gap
+  Plotly.newPlot('plot-ch2-convex-fn',[traceF,traceTan,traceChord,traceMid,traceMidChord],{
+    title:{text:'📐 볼록함수: Jensen 부등식 & 1차 조건 (접선이 항상 함수 아래)',font:{size:13}},
+    xaxis:{title:'x',range:[-3.2,3.2]},yaxis:{title:'f(x)',range:[-2,10]},
+    margin:{l:50,r:20,t:45,b:40},
+    annotations:[{x:0,y:2,ax:0,ay:-40,text:'Jensen Gap:<br>f(mid) ≤ chord',showarrow:true,arrowhead:2,font:{size:10,color:'#e65100'}}],
+    legend:{x:0.01,y:0.99,bgcolor:'rgba(255,255,255,0.8)'}
+  },{responsive:true});
+})();
+</script>
+<p class="ni" style="font-size:11px;color:#888;text-align:center;margin-top:-10px">🖱️ 파란 곡선(f=x²) 위 두 점을 잇는 주황 현(chord)이 항상 곡선 위에 있다 = 볼록함수. 빨간 접선은 항상 곡선 아래 = 1차 조건.</p>
 
 <h3>2.2 볼록함수 (Convex Function)</h3>
 
@@ -425,6 +489,47 @@ $$\min_{w_1, w_2} \; w^T \Sigma w \quad \text{s.t.} \quad w_1 + w_2 = 1, \;\; \m
 이 문제의 KKT 조건을 풀면 최적 비중이 나온다. 하지만 종목이 수백 개가 되면 손으로 풀 수 없다. 이때 CVXPY 같은 솔버가 KKT 조건을 자동으로 풀어준다. 다음 챕터에서 바로 실습한다.
 </p>
 
+<!-- ▼ Plotly: Lagrange Multiplier Geometric Visualization -->
+<div id="plot-ch3-lagrange" style="width:100%;height:440px;margin:25px 0"></div>
+<script>
+(function(){
+  // Objective: f(x,y)=x^2+y^2 (minimize), Constraint: x+y=1
+  var N=60, x=[], y=[], z=[];
+  for(var i=0;i<N;i++){
+    var xi=-1+3*i/(N-1); x.push(xi);
+    var yi=-1+3*i/(N-1); y.push(yi);
+  }
+  for(var i=0;i<N;i++){
+    var row=[];
+    for(var j=0;j<N;j++) row.push(x[i]*x[i]+y[j]*y[j]);
+    z.push(row);
+  }
+  // Constraint line x+y=1
+  var cx=[], cy=[];
+  for(var i=0;i<=50;i++){var xi=-0.5+2*i/50; cx.push(xi); cy.push(1-xi);}
+  // Constraint on surface
+  var cz=cx.map(function(xi,i){return xi*xi+cy[i]*cy[i];});
+  // Optimal point
+  var optX=0.5, optY=0.5, optZ=0.5;
+  // Gradient arrows at optimal
+  var surface={z:z,x:x,y:y,type:'surface',colorscale:'Blues',opacity:0.7,showscale:false,name:'f(x,y)=x²+y²'};
+  var constraint={x:cx,y:cy,z:cz,type:'scatter3d',mode:'lines',line:{color:'#e53935',width:6},name:'제약: x+y=1'};
+  var optimal={x:[optX],y:[optY],z:[optZ],type:'scatter3d',mode:'markers',marker:{size:8,color:'#ff9800',symbol:'diamond'},name:'최적해 (0.5, 0.5)'};
+  // Contour lines on z=0 plane
+  var contourTrace={z:z,x:x,y:y,type:'contour',colorscale:'Blues',showscale:false,
+    contours:{coloring:'lines',showlabels:true},opacity:0.5,name:'등고선'};
+
+  Plotly.newPlot('plot-ch3-lagrange',[surface,constraint,optimal],{
+    title:{text:'🎯 라그랑주 승수법: 목적함수 f=x²+y² 위에서 제약 x+y=1의 최적점',font:{size:13}},
+    scene:{xaxis:{title:'x (w₁)'},yaxis:{title:'y (w₂)'},zaxis:{title:'f(x,y)'},
+      camera:{eye:{x:1.8,y:1.2,z:1.0}}},
+    margin:{l:0,r:0,t:45,b:0},
+    legend:{x:0.01,y:0.99,bgcolor:'rgba(255,255,255,0.8)'}
+  },{responsive:true});
+})();
+</script>
+<p class="ni" style="font-size:11px;color:#888;text-align:center;margin-top:-10px">🖱️ 파란 그릇(목적함수) 위의 빨간 선(제약조건)을 따라 가장 낮은 점(주황 다이아몬드)이 최적해. 포트폴리오에서 w₁+w₂=1 제약 하의 분산 최소화와 동일.</p>
+
 <!-- ═══════════════════════════════════════════════════════════════
      Chapter 4: CVXPY 실습
      ═══════════════════════════════════════════════════════════════ -->
@@ -544,6 +649,62 @@ port_ret = mu.values @ w.value
 <p class="ni"><strong>💡 핵심 포인트:</strong> CVXPY는 수학 공식을 거의 그대로 코드로 옮길 수 있다. <code>cp.quad_form(w, Sigma)</code>가 \(w^T \Sigma w\)이고, <code>cp.sum(w) == 1</code>이 \(\sum w_i = 1\)이다. 내부적으로 KKT 조건을 풀어 전역 최적해를 보장한다.</p>
 </div>
 
+<!-- ▼ Plotly: CVXPY Feasible Region + Optimal Point (2D simplex) -->
+<div id="plot-ch4-feasible" style="width:100%;height:420px;margin:25px 0"></div>
+<script>
+(function(){
+  // 2-asset simplex: w1+w2=1, w1>=0, w2>=0 → line from (0,1) to (1,0)
+  // Objective contours: f(w1,w2) = w1^2*s11 + 2*w1*w2*s12 + w2^2*s22
+  // Use example: s11=0.04, s22=0.09, s12=0.01
+  var s11=0.04,s22=0.09,s12=0.01;
+  var N=80, w1=[], w2=[], zGrid=[];
+  for(var i=0;i<N;i++) w1.push(i/(N-1));
+  for(var j=0;j<N;j++) w2.push(j/(N-1));
+  for(var i=0;i<N;i++){
+    var row=[];
+    for(var j=0;j<N;j++){
+      row.push(w1[i]*w1[i]*s11+2*w1[i]*w2[j]*s12+w2[j]*w2[j]*s22);
+    }
+    zGrid.push(row);
+  }
+  // Feasible line: w2=1-w1
+  var fW1=[], fW2=[], fZ=[];
+  for(var i=0;i<=50;i++){
+    var a=i/50; fW1.push(a); fW2.push(1-a);
+    fZ.push(a*a*s11+2*a*(1-a)*s12+(1-a)*(1-a)*s22);
+  }
+  // Optimal: minimize on simplex → derivative = 0
+  // d/dw1 [w1^2*s11 + 2*w1*(1-w1)*s12 + (1-w1)^2*s22] = 0
+  // 2*w1*s11 + 2*(1-2*w1)*s12 - 2*(1-w1)*s22 = 0
+  // w1*(s11-2*s12+s22) = s22-s12 → w1 = (s22-s12)/(s11-2*s12+s22)
+  var optW1=(s22-s12)/(s11-2*s12+s22);
+  var optW2=1-optW1;
+  var optZ=optW1*optW1*s11+2*optW1*optW2*s12+optW2*optW2*s22;
+
+  var contour={z:zGrid,x:w1,y:w2,type:'contour',colorscale:'Blues',
+    contours:{coloring:'heatmap',showlabels:true,labelfont:{size:10}},
+    showscale:true,colorbar:{title:'σ²',titleside:'right'},name:'포트폴리오 분산'};
+  var feasible={x:fW1,y:fW2,mode:'lines',line:{color:'#e53935',width:3},name:'실행가능 영역 (w₁+w₂=1)'};
+  var opt={x:[optW1],y:[optW2],mode:'markers+text',marker:{size:14,color:'#ff9800',symbol:'star'},
+    text:['최적해'],textposition:'top right',textfont:{size:12,color:'#e65100'},name:'CVXPY 최적해'};
+  // Shade feasible triangle
+  var triangle={x:[0,1,0,0],y:[0,0,1,0],fill:'toself',fillcolor:'rgba(76,175,80,0.1)',
+    line:{color:'#4caf50',width:1,dash:'dot'},name:'w≥0 영역'};
+
+  Plotly.newPlot('plot-ch4-feasible',[contour,triangle,feasible,opt],{
+    title:{text:'📊 CVXPY 최적화: 실행가능 영역 위의 분산 등고선 + 최적해',font:{size:13}},
+    xaxis:{title:'w₁ (종목 1 비중)',range:[-0.05,1.05]},
+    yaxis:{title:'w₂ (종목 2 비중)',range:[-0.05,1.05]},
+    margin:{l:55,r:20,t:45,b:45},
+    legend:{x:0.55,y:0.99,bgcolor:'rgba(255,255,255,0.8)'},
+    annotations:[{x:optW1,y:optW2,ax:50,ay:-40,
+      text:'w₁='+optW1.toFixed(2)+', w₂='+optW2.toFixed(2)+'<br>σ²='+optZ.toFixed(4),
+      showarrow:true,arrowhead:2,font:{size:10,color:'#e65100'},bgcolor:'rgba(255,255,255,0.9)'}]
+  },{responsive:true});
+})();
+</script>
+<p class="ni" style="font-size:11px;color:#888;text-align:center;margin-top:-10px">🖱️ 파란 등고선 = 포트폴리오 분산. 빨간 선 = 비중 합=1 제약. 별 = CVXPY가 찾은 최적해. 등고선이 가장 작은 곳에서 빨간 선과 만나는 점.</p>
+
 <!-- ═══════════════════════════════════════════════════════════════
      Chapter 5: Mean-Variance 포트폴리오 최적화
      ═══════════════════════════════════════════════════════════════ -->
@@ -609,6 +770,90 @@ $$\text{s.t.} \; \mathbf{1}^T w = 1$$
 <p>
 각 목표 수익률에 대해 최소 분산 포트폴리오를 구하면, 수익률-변동성 평면에 곡선이 그려진다. 이것이 <strong>효율적 프론티어</strong>(Efficient Frontier)다. 이 곡선 위의 포트폴리오만이 "같은 리스크에서 최대 수익" 또는 "같은 수익에서 최소 리스크"를 달성하는 효율적 포트폴리오다.
 </p>
+
+<!-- ▼ Plotly: Interactive Efficient Frontier -->
+<div id="plot-ch5-frontier" style="width:100%;height:450px;margin:25px 0"></div>
+<script>
+(function(){
+  // Simulate 5 stocks and efficient frontier
+  var stocks=[
+    {name:'AAPL',ret:0.28,vol:0.30},
+    {name:'MSFT',ret:0.25,vol:0.26},
+    {name:'GOOGL',ret:0.22,vol:0.29},
+    {name:'AMZN',ret:0.20,vol:0.35},
+    {name:'TSLA',ret:0.35,vol:0.55}
+  ];
+  // Generate random portfolios (Monte Carlo)
+  var pRet=[],pVol=[],pSR=[];
+  var rf=0.05;
+  // Simple covariance approximation
+  for(var k=0;k<3000;k++){
+    var w=[];
+    var s=0;
+    for(var i=0;i<5;i++){w.push(Math.random()); s+=w[i];}
+    for(var i=0;i<5;i++) w[i]/=s;
+    var r=0,v=0;
+    for(var i=0;i<5;i++){
+      r+=w[i]*stocks[i].ret;
+      v+=w[i]*w[i]*stocks[i].vol*stocks[i].vol;
+      for(var j=i+1;j<5;j++){
+        v+=2*w[i]*w[j]*stocks[i].vol*stocks[j].vol*0.4; // corr≈0.4
+      }
+    }
+    v=Math.sqrt(v);
+    pRet.push(r); pVol.push(v); pSR.push((r-rf)/v);
+  }
+  // Color by Sharpe
+  var randPorts={x:pVol,y:pRet,mode:'markers',type:'scatter',
+    marker:{size:3,color:pSR,colorscale:'Viridis',showscale:true,
+      colorbar:{title:'Sharpe',titleside:'right',thickness:12}},
+    name:'랜덤 포트폴리오',hovertemplate:'σ=%{x:.2%}<br>μ=%{y:.2%}<br>SR=%{marker.color:.2f}'};
+  // Individual stocks
+  var sVol=stocks.map(function(s){return s.vol;});
+  var sRet=stocks.map(function(s){return s.ret;});
+  var sName=stocks.map(function(s){return s.name;});
+  var indiv={x:sVol,y:sRet,mode:'markers+text',text:sName,textposition:'top center',
+    textfont:{size:11,color:'#c62828'},
+    marker:{size:12,color:'#e53935',symbol:'diamond',line:{width:2,color:'#fff'}},
+    name:'개별 종목'};
+  // Approximate efficient frontier (upper envelope)
+  var sorted=[];
+  for(var k=0;k<pVol.length;k++) sorted.push({v:pVol[k],r:pRet[k]});
+  sorted.sort(function(a,b){return a.v-b.v;});
+  var efV=[],efR=[],maxR=-999;
+  // Bin by volatility
+  var bins=40;
+  for(var b=0;b<bins;b++){
+    var lo=0.15+b*(0.45-0.15)/bins, hi=lo+(0.45-0.15)/bins;
+    var best=-999,bestV=0;
+    for(var k=0;k<sorted.length;k++){
+      if(sorted[k].v>=lo && sorted[k].v<hi && sorted[k].r>best){
+        best=sorted[k].r; bestV=sorted[k].v;
+      }
+    }
+    if(best>-999 && best>=maxR){efV.push(bestV);efR.push(best);maxR=best;}
+  }
+  var frontier={x:efV,y:efR,mode:'lines',line:{color:'#1565c0',width:3},name:'효율적 프론티어'};
+  // Max Sharpe point
+  var maxSR=-999,msV=0,msR=0;
+  for(var k=0;k<pVol.length;k++){
+    if(pSR[k]>maxSR){maxSR=pSR[k];msV=pVol[k];msR=pRet[k];}
+  }
+  var tangency={x:[msV],y:[msR],mode:'markers',marker:{size:16,color:'#ff9800',symbol:'star',line:{width:2,color:'#fff'}},
+    name:'접선 포트폴리오 (Max Sharpe)',
+    hovertemplate:'σ='+msV.toFixed(3)+'<br>μ='+msR.toFixed(3)+'<br>SR='+maxSR.toFixed(2)};
+
+  Plotly.newPlot('plot-ch5-frontier',[randPorts,frontier,indiv,tangency],{
+    title:{text:'📈 효율적 프론티어 + 3000개 랜덤 포트폴리오 (색상=샤프비율)',font:{size:13}},
+    xaxis:{title:'연간 변동성 (σ)',tickformat:'.0%'},
+    yaxis:{title:'연간 기대수익률 (μ)',tickformat:'.0%'},
+    margin:{l:60,r:20,t:45,b:45},
+    legend:{x:0.01,y:0.01,bgcolor:'rgba(255,255,255,0.8)'},
+    hovermode:'closest'
+  },{responsive:true});
+})();
+</script>
+<p class="ni" style="font-size:11px;color:#888;text-align:center;margin-top:-10px">🖱️ 각 점 위에 마우스를 올리면 수익률/변동성/샤프비율 확인. 노란 별 = 샤프비율 최대 포트폴리오. 빨간 다이아몬드 = 개별 종목.</p>
 
 <p class="cc">▼ 효율적 프론티어 그리기 (CVXPY + Matplotlib)</p>
 <pre>
@@ -851,6 +1096,41 @@ w_BL = w_BL / w_BL.<span class="fn">sum</span>()  <span class="cm"># 정규화</
 <p class="ni"><strong>💡 Black-Litterman의 장점:</strong> (1) 시장 균형에서 출발하므로 결과가 안정적이다. (2) 전망이 없으면 시장 비중으로 수렴한다. (3) 전망의 확신도를 \(\Omega\)로 조절할 수 있다. (4) 실무에서 Goldman Sachs, BlackRock 등 대형 기관이 실제로 사용한다.</p>
 </div>
 
+<!-- ▼ Plotly: Black-Litterman Returns Comparison -->
+<div id="plot-ch6-bl" style="width:100%;height:400px;margin:25px 0"></div>
+<script>
+(function(){
+  var tickers=['AAPL','MSFT','GOOGL','AMZN','TSLA'];
+  // Simulated equilibrium returns (from market cap weights)
+  var piReturns=[12.5, 10.8, 9.2, 8.5, 15.3];
+  // BL-adjusted returns (after views: AAPL>TSLA by 3%, MSFT absolute 15%)
+  var blReturns=[14.1, 14.8, 9.5, 8.7, 11.2];
+  // Market weights vs BL weights
+  var mktWeights=[30, 25, 20, 15, 10];
+  var blWeights=[28, 35, 18, 12, 7];
+
+  var trace1={x:tickers,y:piReturns,type:'bar',name:'균형 수익률 (Π)',
+    marker:{color:'rgba(25,118,210,0.7)',line:{width:1,color:'#1565c0'}},
+    hovertemplate:'%{x}: %{y:.1f}%'};
+  var trace2={x:tickers,y:blReturns,type:'bar',name:'BL 수익률 (μ_BL)',
+    marker:{color:'rgba(255,152,0,0.7)',line:{width:1,color:'#e65100'}},
+    hovertemplate:'%{x}: %{y:.1f}%'};
+
+  Plotly.newPlot('plot-ch6-bl',[trace1,trace2],{
+    title:{text:'📊 Black-Litterman: 균형 수익률 vs BL 조정 수익률',font:{size:13}},
+    xaxis:{title:'종목'},yaxis:{title:'연간 기대수익률 (%)',range:[0,18]},
+    barmode:'group',
+    margin:{l:50,r:20,t:45,b:40},
+    legend:{x:0.01,y:0.99,bgcolor:'rgba(255,255,255,0.8)'},
+    annotations:[
+      {x:'MSFT',y:14.8,text:'전망 반영↑',showarrow:true,arrowhead:2,ax:0,ay:-25,font:{size:10,color:'#e65100'}},
+      {x:'TSLA',y:11.2,text:'전망 반영↓',showarrow:true,arrowhead:2,ax:0,ay:-25,font:{size:10,color:'#1565c0'}}
+    ]
+  },{responsive:true});
+})();
+</script>
+<p class="ni" style="font-size:11px;color:#888;text-align:center;margin-top:-10px">🖱️ 파란 막대 = 시장 균형 수익률(Π). 주황 막대 = 투자자 전망 반영 후 BL 수익률. MSFT↑(절대 전망 15%), TSLA↓(AAPL 대비 열위 전망).</p>
+
 <!-- ═══════════════════════════════════════════════════════════════
      Chapter 7: Risk Parity
      ═══════════════════════════════════════════════════════════════ -->
@@ -934,6 +1214,53 @@ rc = w_rp * marginal
 <p>
 Risk Parity의 결과를 보면, 변동성이 높은 TSLA의 비중은 낮고, 변동성이 낮은 종목의 비중은 높다. 하지만 리스크 기여도는 모두 약 20%로 균등하다. 이것이 Risk Parity의 핵심이다.
 </p>
+
+<!-- ▼ Plotly: Risk Parity — Weight vs Risk Contribution -->
+<div id="plot-ch7-rp" style="width:100%;height:420px;margin:25px 0"></div>
+<script>
+(function(){
+  var tickers=['AAPL','MSFT','GOOGL','AMZN','TSLA'];
+  // Equal weight
+  var eqW=[20,20,20,20,20];
+  var eqRC=[18,15,17,22,28]; // risk contribution unequal
+  // Risk Parity weight
+  var rpW=[22,26,21,18,13];
+  var rpRC=[20,20,20,20,20]; // risk contribution equal
+
+  var trace1={x:tickers,y:eqW,type:'bar',name:'균등비중 Weight',
+    marker:{color:'rgba(66,165,245,0.7)'},width:0.35,offset:-0.2};
+  var trace2={x:tickers,y:eqRC,type:'bar',name:'균등비중 Risk Contrib.',
+    marker:{color:'rgba(66,165,245,0.3)',pattern:{shape:'/'}},width:0.35,offset:-0.2};
+  var trace3={x:tickers,y:rpW,type:'bar',name:'Risk Parity Weight',
+    marker:{color:'rgba(255,152,0,0.7)'},width:0.35,offset:0.2};
+  var trace4={x:tickers,y:rpRC,type:'bar',name:'Risk Parity Risk Contrib.',
+    marker:{color:'rgba(255,152,0,0.3)',pattern:{shape:'/'}},width:0.35,offset:0.2};
+
+  // Use subplot approach: side by side comparison
+  var categories=['AAPL\n(σ=30%)','MSFT\n(σ=26%)','GOOGL\n(σ=29%)','AMZN\n(σ=35%)','TSLA\n(σ=55%)'];
+
+  var t1={x:categories,y:eqW,type:'bar',name:'균등비중: 비중(%)',marker:{color:'#42a5f5'},
+    hovertemplate:'%{x}<br>비중: %{y}%'};
+  var t2={x:categories,y:eqRC,type:'bar',name:'균등비중: 리스크기여(%)',marker:{color:'#90caf9'},
+    hovertemplate:'%{x}<br>리스크기여: %{y}%'};
+  var t3={x:categories,y:rpW,type:'bar',name:'Risk Parity: 비중(%)',marker:{color:'#ff9800'},
+    hovertemplate:'%{x}<br>비중: %{y}%'};
+  var t4={x:categories,y:rpRC,type:'bar',name:'Risk Parity: 리스크기여(%)',marker:{color:'#ffcc80'},
+    hovertemplate:'%{x}<br>리스크기여: %{y}%'};
+
+  Plotly.newPlot('plot-ch7-rp',[t1,t2,t3,t4],{
+    title:{text:'⚖️ Risk Parity: 비중 vs 리스크 기여도 비교',font:{size:13}},
+    xaxis:{title:''},yaxis:{title:'%',range:[0,32]},
+    barmode:'group',
+    margin:{l:45,r:20,t:45,b:60},
+    legend:{x:0.01,y:0.99,bgcolor:'rgba(255,255,255,0.8)',font:{size:10}},
+    annotations:[{x:'TSLA\n(σ=55%)',y:28,text:'균등비중: TSLA가<br>리스크의 28% 차지!',
+      showarrow:true,arrowhead:2,ax:0,ay:-30,font:{size:10,color:'#c62828'}}],
+    shapes:[{type:'line',x0:-0.5,x1:4.5,y0:20,y1:20,line:{color:'#e53935',width:2,dash:'dash'}}]
+  },{responsive:true});
+})();
+</script>
+<p class="ni" style="font-size:11px;color:#888;text-align:center;margin-top:-10px">🖱️ 파란 = 균등비중(1/N), 주황 = Risk Parity. 빨간 점선 = 목표 20%. 균등비중에서 TSLA는 리스크의 28%를 차지하지만, Risk Parity에서는 모두 20%로 균등.</p>
 
 <!-- ═══════════════════════════════════════════════════════════════
      Chapter 8: HRP (Hierarchical Risk Parity)
@@ -1042,6 +1369,50 @@ w_hrp = <span class="fn">get_hrp_weights</span>(returns)
 <p class="ni"><strong>💡 HRP의 장점:</strong> (1) 공분산 행렬의 역행렬 불필요 → 추정 오차에 강건. (2) 클러스터링으로 자산 간 계층 구조를 반영. (3) Markowitz보다 out-of-sample 성과가 우수한 경우가 많음 (López de Prado, 2016). (4) R5에서 배운 계층적 클러스터링의 실전 응용.</p>
 </div>
 
+<!-- ▼ Plotly: HRP Dendrogram + Correlation Heatmap -->
+<div id="plot-ch8-hrp" style="width:100%;height:420px;margin:25px 0"></div>
+<script>
+(function(){
+  // Correlation matrix for 5 stocks (simulated)
+  var tickers=['AAPL','MSFT','GOOGL','AMZN','TSLA'];
+  var corr=[
+    [1.00, 0.72, 0.65, 0.58, 0.35],
+    [0.72, 1.00, 0.68, 0.55, 0.30],
+    [0.65, 0.68, 1.00, 0.62, 0.28],
+    [0.58, 0.55, 0.62, 1.00, 0.40],
+    [0.35, 0.30, 0.28, 0.40, 1.00]
+  ];
+  // Reordered by HRP clustering: AAPL,MSFT,GOOGL,AMZN,TSLA → MSFT,AAPL,GOOGL,AMZN,TSLA
+  var order=[1,0,2,3,4];
+  var reordered=[], reLabels=[];
+  for(var i=0;i<5;i++){
+    var row=[];
+    for(var j=0;j<5;j++) row.push(corr[order[i]][order[j]]);
+    reordered.push(row);
+    reLabels.push(tickers[order[i]]);
+  }
+
+  var heatmap={z:reordered,x:reLabels,y:reLabels,type:'heatmap',
+    colorscale:[[0,'#1565c0'],[0.5,'#fff'],[1,'#e53935']],
+    zmin:0,zmax:1,
+    text:reordered.map(function(r){return r.map(function(v){return v.toFixed(2)});}),
+    texttemplate:'%{text}',textfont:{size:11},
+    hovertemplate:'%{x} ↔ %{y}<br>상관계수: %{z:.2f}',
+    showscale:true,colorbar:{title:'ρ',titleside:'right'}};
+
+  Plotly.newPlot('plot-ch8-hrp',[heatmap],{
+    title:{text:'🌳 HRP: 클러스터링 순서로 재배열된 상관행렬 (Quasi-Diagonalization)',font:{size:13}},
+    xaxis:{side:'bottom'},yaxis:{autorange:'reversed'},
+    margin:{l:70,r:20,t:45,b:70},
+    annotations:[
+      {x:0.5,y:-0.15,xref:'paper',yref:'paper',text:'유사한 종목(MSFT↔AAPL, 높은 상관)이 인접 → 클러스터 내 분산 배분 → 클러스터 간 분산 배분',
+       showarrow:false,font:{size:10,color:'#666'}}
+    ]
+  },{responsive:true});
+})();
+</script>
+<p class="ni" style="font-size:11px;color:#888;text-align:center;margin-top:-10px">🖱️ HRP Step 2 결과: 상관관계가 높은 종목(MSFT-AAPL)이 인접하도록 재배열. 대각선 근처에 높은 상관(빨강)이 모이는 준대각 구조.</p>
+
 <!-- ═══════════════════════════════════════════════════════════════
      Chapter 9: Kelly Criterion
      ═══════════════════════════════════════════════════════════════ -->
@@ -1118,6 +1489,61 @@ w_kelly = f_half / np.<span class="fn">abs</span>(f_half).<span class="fn">sum</
 <div class="warn">
 <p class="ni"><strong>⚠️ Kelly의 위험:</strong> Full Kelly는 이론적으로 최적이지만, 실전에서는 (1) 수익률 분포가 정규분포가 아니고, (2) 파라미터 추정에 오차가 있으며, (3) 변동성이 극도로 크다. 따라서 Half-Kelly 또는 Quarter-Kelly를 사용하고, 최대 비중 제한을 두는 것이 현명하다.</p>
 </div>
+
+<!-- ▼ Plotly: Kelly Criterion Growth Curves -->
+<div id="plot-ch9-kelly" style="width:100%;height:420px;margin:25px 0"></div>
+<script>
+(function(){
+  // Simulate coin flip: p=0.55, b=1 (even money)
+  // Kelly fraction: f* = 2p-1 = 0.10
+  var p=0.55, b=1, fKelly=2*p-1; // 0.10
+  var fHalf=fKelly/2; // 0.05
+  var fFixed=0.20; // over-betting
+  var fQuarter=fKelly/4; // 0.025
+  var N=500, nSims=1;
+
+  // Use expected growth for smooth curves
+  // E[log(1+f*R)] where R=+1 with prob p, R=-1 with prob 1-p
+  function growthRate(f){return p*Math.log(1+f*b)+(1-p)*Math.log(1-f);}
+
+  // Simulate one path with seed
+  function simulate(f,seed){
+    var wealth=[1];
+    var rng=seed;
+    for(var i=0;i<N;i++){
+      rng=(rng*1103515245+12345)&0x7fffffff;
+      var win=(rng%1000)/1000<p;
+      var w=wealth[wealth.length-1];
+      if(win) w*=(1+f*b); else w*=(1-f);
+      wealth.push(w);
+    }
+    return wealth;
+  }
+
+  var steps=[];for(var i=0;i<=N;i++) steps.push(i);
+  var seed=42;
+  var wFull=simulate(fKelly,seed);
+  var wHalf=simulate(fHalf,seed);
+  var wOver=simulate(fFixed,seed);
+  var wQuarter=simulate(fQuarter,seed);
+
+  var tFull={x:steps,y:wFull,mode:'lines',name:'Full Kelly (f=10%)',line:{color:'#e53935',width:2}};
+  var tHalf={x:steps,y:wHalf,mode:'lines',name:'Half Kelly (f=5%) ✅',line:{color:'#4caf50',width:3}};
+  var tOver={x:steps,y:wOver,mode:'lines',name:'Over-bet (f=20%) ⚠️',line:{color:'#ff9800',width:2,dash:'dash'}};
+  var tQuarter={x:steps,y:wQuarter,mode:'lines',name:'Quarter Kelly (f=2.5%)',line:{color:'#42a5f5',width:2}};
+
+  Plotly.newPlot('plot-ch9-kelly',[tFull,tHalf,tOver,tQuarter],{
+    title:{text:'🎰 Kelly Criterion: 베팅 비율별 자산 성장 곡선 (p=55%, b=1:1)',font:{size:13}},
+    xaxis:{title:'베팅 횟수'},yaxis:{title:'자산 (초기=1)',type:'log'},
+    margin:{l:60,r:20,t:45,b:40},
+    legend:{x:0.01,y:0.99,bgcolor:'rgba(255,255,255,0.8)'},
+    annotations:[{x:N*0.7,y:Math.log10(wOver[Math.floor(N*0.7)]),
+      text:'과도한 베팅 →<br>변동성 극심',showarrow:true,arrowhead:2,ax:40,ay:-30,
+      font:{size:10,color:'#e65100'}}]
+  },{responsive:true});
+})();
+</script>
+<p class="ni" style="font-size:11px;color:#888;text-align:center;margin-top:-10px">🖱️ Y축 로그 스케일. 초록(Half Kelly)이 가장 안정적 성장. 빨강(Full Kelly)은 성장률 최대지만 변동 극심. 주황(Over-bet)은 파산 위험.</p>
 
 <h3>9.4 포트폴리오 최적화 기법 비교</h3>
 
@@ -1261,6 +1687,54 @@ Weights sum: tensor([[1., 1., 1., 1., 1., 1., 1., 1., 1., 1.],
 <code>weights</code>의 shape이 (batch, 10, 10)인 것에 주목하자. 이것은 10개 시점 각각이 다른 10개 시점에 얼마나 "주의"를 기울이는지를 나타내는 <strong>어텐션 맵</strong>이다. 금융 시계열에서 이 맵을 시각화하면, 모델이 어떤 과거 시점을 중요하게 보는지 해석할 수 있다.
 </p>
 
+<!-- ▼ Plotly: Attention Heatmap -->
+<div id="plot-ch10-attn" style="width:100%;height:440px;margin:25px 0"></div>
+<script>
+(function(){
+  // Simulate attention weights for 10 timesteps (financial context)
+  var labels=['t-9<br>(2주전)','t-8','t-7','t-6','t-5<br>(1주전)','t-4','t-3','t-2','t-1<br>(어제)','t<br>(오늘)'];
+  var N=10;
+  // Simulated attention: recent timesteps get more attention, with some long-range
+  var attn=[];
+  for(var i=0;i<N;i++){
+    var row=[];
+    var sum=0;
+    for(var j=0;j<N;j++){
+      var v=0;
+      if(j<=i){
+        // Causal: can only attend to past
+        v=Math.exp(-0.3*(i-j)); // recency bias
+        if(j===0) v+=0.15; // long-range attention to first timestep
+        if(Math.abs(i-j)===5) v+=0.12; // weekly pattern
+      }
+      row.push(v); sum+=v;
+    }
+    // Normalize (softmax-like)
+    for(var j=0;j<N;j++) row[j]=sum>0?row[j]/sum:0;
+    attn.push(row);
+  }
+
+  var heatmap={z:attn,x:labels,y:labels,type:'heatmap',
+    colorscale:[[0,'#fff'],[0.3,'#bbdefb'],[0.6,'#42a5f5'],[1,'#0d47a1']],
+    hovertemplate:'Query: %{y}<br>Key: %{x}<br>Attention: %{z:.3f}',
+    showscale:true,colorbar:{title:'α',titleside:'right'}};
+
+  Plotly.newPlot('plot-ch10-attn',[heatmap],{
+    title:{text:'🔍 Self-Attention Heatmap: 각 시점이 어떤 과거 시점에 주의를 기울이는가',font:{size:13}},
+    xaxis:{title:'Key (참조되는 시점)',side:'bottom'},
+    yaxis:{title:'Query (현재 시점)',autorange:'reversed'},
+    margin:{l:80,r:20,t:45,b:80},
+    annotations:[
+      {x:'t-1<br>(어제)',y:'t<br>(오늘)',text:'최근 시점에<br>높은 attention',
+       showarrow:true,arrowhead:2,ax:50,ay:-20,font:{size:10,color:'#0d47a1'}},
+      {x:'t-9<br>(2주전)',y:'t<br>(오늘)',text:'장거리 attention<br>(2주 전 패턴)',
+       showarrow:true,arrowhead:2,ax:-50,ay:-20,font:{size:10,color:'#e65100'}}
+    ]
+  },{responsive:true});
+})();
+</script>
+<p class="ni" style="font-size:11px;color:#888;text-align:center;margin-top:-10px">🖱️ 진한 파란색 = 높은 attention. 대각선 아래만 값이 있음 = Causal Masking (미래 참조 불가). 최근 시점 + 주기적 패턴에 attention 집중.</p>
+
 <h3>10.4 Self-Attention의 의미</h3>
 
 <p>
@@ -1339,6 +1813,40 @@ out = <span class="fn">pe</span>(x)
 </pre>
 <div class="code-output"><span class="out-label">Output:</span>
 Input shape: torch.Size([2, 20, 64]) → Output shape: torch.Size([2, 20, 64])</div>
+
+<!-- ▼ Plotly: Positional Encoding Heatmap -->
+<div id="plot-ch11-pe" style="width:100%;height:420px;margin:25px 0"></div>
+<script>
+(function(){
+  var maxLen=50, dModel=32;
+  var pe=[];
+  for(var pos=0;pos<maxLen;pos++){
+    var row=[];
+    for(var i=0;i<dModel;i++){
+      var divTerm=Math.pow(10000, (2*Math.floor(i/2))/dModel);
+      if(i%2===0) row.push(Math.sin(pos/divTerm));
+      else row.push(Math.cos(pos/divTerm));
+    }
+    pe.push(row);
+  }
+  var dims=[];for(var i=0;i<dModel;i++) dims.push('d'+i);
+  var positions=[];for(var i=0;i<maxLen;i++) positions.push(i);
+
+  var heatmap={z:pe,x:dims,y:positions,type:'heatmap',
+    colorscale:[[0,'#0d47a1'],[0.25,'#42a5f5'],[0.5,'#fff'],[0.75,'#ef5350'],[1,'#b71c1c']],
+    zmin:-1,zmax:1,
+    hovertemplate:'Position: %{y}<br>Dimension: %{x}<br>PE value: %{z:.3f}',
+    showscale:true,colorbar:{title:'PE',titleside:'right'}};
+
+  Plotly.newPlot('plot-ch11-pe',[heatmap],{
+    title:{text:'🌊 Positional Encoding: sin/cos 패턴 (50 positions × 32 dimensions)',font:{size:13}},
+    xaxis:{title:'차원 인덱스 (짝수=sin, 홀수=cos)',dtick:4},
+    yaxis:{title:'시퀀스 위치 (pos)',autorange:'reversed'},
+    margin:{l:55,r:20,t:45,b:50}
+  },{responsive:true});
+})();
+</script>
+<p class="ni" style="font-size:11px;color:#888;text-align:center;margin-top:-10px">🖱️ 낮은 차원(왼쪽)은 고주파 진동, 높은 차원(오른쪽)은 저주파 진동. 각 위치(pos)가 고유한 패턴을 가져 Transformer가 순서를 구분할 수 있다.</p>
 
 <h3>11.2 Multi-Head Attention — 다양한 관점으로 보기</h3>
 
@@ -1673,6 +2181,58 @@ Direction Accuracy: 53.2%
 <div class="ok">
 <p class="ni"><strong>💡 실전 팁:</strong> 금융 시계열은 NLP에 비해 데이터가 적고 노이즈가 많다. 따라서 (1) 모델을 작게 유지하고 (d_model=64, n_layers=2), (2) Dropout을 충분히 사용하며, (3) 방향 정확도(Direction Accuracy)를 주요 지표로 삼는 것이 좋다. 53%만 넘어도 거래 비용을 고려한 후 수익을 낼 가능성이 있다.</p>
 </div>
+
+<!-- ▼ Plotly: Transformer Prediction vs Actual Returns -->
+<div id="plot-ch12-pred" style="width:100%;height:420px;margin:25px 0"></div>
+<script>
+(function(){
+  // Simulate predicted vs actual returns (60 test days)
+  var N=60, days=[], actual=[], predicted=[];
+  var rng=12345;
+  for(var i=0;i<N;i++){
+    days.push('Day '+(i+1));
+    rng=(rng*1103515245+12345)&0x7fffffff;
+    var a=((rng%2000)-1000)/50000; // actual return ~[-2%, +2%]
+    rng=(rng*1103515245+12345)&0x7fffffff;
+    var noise=((rng%1000)-500)/100000;
+    var p=a*0.4+noise; // prediction = noisy version of actual
+    actual.push(a*100); predicted.push(p*100);
+  }
+  // Direction accuracy
+  var correct=0;
+  for(var i=0;i<N;i++) if(actual[i]*predicted[i]>0) correct++;
+  var dirAcc=(correct/N*100).toFixed(1);
+
+  // Scatter plot
+  var scatter={x:actual,y:predicted,mode:'markers',type:'scatter',
+    marker:{size:7,color:actual.map(function(a,i){return a*predicted[i]>0?'#4caf50':'#e53935';}),
+      line:{width:1,color:'#fff'}},
+    hovertemplate:'실제: %{x:.2f}%<br>예측: %{y:.2f}%',
+    name:'예측 vs 실제'};
+  // Perfect prediction line
+  var minV=Math.min.apply(null,actual.concat(predicted));
+  var maxV=Math.max.apply(null,actual.concat(predicted));
+  var perfLine={x:[minV,maxV],y:[minV,maxV],mode:'lines',
+    line:{color:'#888',width:1,dash:'dash'},name:'완벽한 예측 (y=x)'};
+  // Zero lines
+  var hLine={x:[minV,maxV],y:[0,0],mode:'lines',line:{color:'#ccc',width:1},showlegend:false};
+  var vLine={x:[0,0],y:[minV,maxV],mode:'lines',line:{color:'#ccc',width:1},showlegend:false};
+
+  Plotly.newPlot('plot-ch12-pred',[hLine,vLine,perfLine,scatter],{
+    title:{text:'🎯 Transformer 예측 vs 실제 수익률 (Direction Accuracy: '+dirAcc+'%)',font:{size:13}},
+    xaxis:{title:'실제 수익률 (%)',zeroline:true},
+    yaxis:{title:'예측 수익률 (%)',zeroline:true},
+    margin:{l:55,r:20,t:45,b:45},
+    legend:{x:0.01,y:0.99,bgcolor:'rgba(255,255,255,0.8)'},
+    annotations:[
+      {x:0.75,y:0.15,xref:'paper',yref:'paper',
+       text:'🟢 초록 = 방향 일치<br>🔴 빨강 = 방향 불일치',
+       showarrow:false,font:{size:10},bgcolor:'rgba(255,255,255,0.9)',bordercolor:'#ccc',borderwidth:1}
+    ]
+  },{responsive:true});
+})();
+</script>
+<p class="ni" style="font-size:11px;color:#888;text-align:center;margin-top:-10px">🖱️ 1·3사분면(초록) = 방향 맞춤, 2·4사분면(빨강) = 방향 틀림. 점선 = 완벽한 예측. 금융에서는 크기보다 방향이 중요.</p>
 
 <!-- ═══════════════════════════════════════════════════════════════
      Chapter 13: Quiz + Mini Project
