@@ -270,6 +270,31 @@ gymnasium>=0.29
 stable-baselines3>=2.2
 </pre>
 
+<h3>1.6 이벤트 드리븐 vs 배치 처리</h3>
+
+<div class="info">
+<strong>💡 두 가지 실행 패러다임</strong><br><br>
+<strong>배치 처리 (Batch):</strong> 매일 장 마감 후 데이터를 모아서 한 번에 처리한다. 일간 리밸런싱 전략에 적합하다. 우리 시스템의 기본 모드다.<br><br>
+<strong>이벤트 드리븐 (Event-Driven):</strong> 새로운 데이터(틱, 뉴스, 오더북 변화)가 도착할 때마다 즉시 반응한다. R9에서 다룬 HFT 마켓메이킹이 이 방식이다. 지연 시간이 핵심이다.<br><br>
+실전에서는 두 방식을 혼합한다. 포트폴리오 최적화는 배치로, 주문 실행은 이벤트 드리븐으로 처리하는 것이 일반적이다.
+</div>
+
+<h3>1.7 모듈 간 의존성 그래프의 수학적 표현</h3>
+
+<p>
+시스템을 방향 비순환 그래프(DAG)로 모델링하면, 각 모듈 \(M_i\)의 출력이 다음 모듈의 입력이 되는 구조를 형식적으로 표현할 수 있다:
+</p>
+
+<div class="eq">
+\[
+\text{output}(M_i) = f_i\!\left(\text{output}(M_{j}) \mid j \in \text{parents}(i)\right)
+\]
+</div>
+
+<p>
+이 DAG 구조 덕분에 위상 정렬(topological sort)로 실행 순서를 자동 결정할 수 있고, 독립적인 모듈은 병렬 실행이 가능하다. 예를 들어 Feature Engine과 Sentiment Engine은 서로 독립이므로 동시에 실행할 수 있다.
+</p>
+
 <p class="ni">
 이제 각 모듈을 하나씩 구축해 나가자. 먼저 모든 것의 시작점인 데이터 파이프라인부터.
 </p>
@@ -450,6 +475,49 @@ pipeline.<span class="fn">fetch</span>().<span class="fn">clean</span>().<span c
 • <code>Adj Close</code> 컬럼은 더 이상 존재하지 않는다. <code>auto_adjust=True</code>가 기본이므로 <code>Close</code>가 곧 수정종가다.<br>
 • 단일 종목 다운로드 시 MultiIndex가 반환된다. <code>.droplevel(1)</code>로 정리하자.
 </div>
+
+<h3>2.5 공분산 추정의 함정 — Ledoit-Wolf 수축 추정량</h3>
+
+<p>
+표본 공분산 행렬 \(\hat{\Sigma}\)는 종목 수 \(N\)이 관측치 수 \(T\)에 비해 클 때 불안정해진다. 극단적으로 \(N > T\)이면 행렬이 특이(singular)해져서 역행렬 계산이 불가능하다. 이것이 "차원의 저주"가 포트폴리오 최적화에 미치는 영향이다.
+</p>
+
+<div class="def">
+<strong>📐 Ledoit-Wolf 수축 추정량 (Shrinkage Estimator)</strong><br><br>
+표본 공분산을 구조화된 타겟(예: 대각 행렬)과 혼합하여 안정성을 높인다:
+</div>
+
+<div class="eq">
+\[
+\hat{\Sigma}_{\text{shrink}} = (1 - \delta)\,\hat{\Sigma}_{\text{sample}} + \delta \cdot F
+\]
+</div>
+
+<p>
+여기서 \(F\)는 수축 타겟(보통 \(\bar{\sigma}^2 I\) 또는 단일 팩터 모델), \(\delta \in [0,1]\)는 수축 강도다. Ledoit & Wolf (2004)는 \(\delta\)의 최적값을 해석적으로 유도했다. <code>sklearn.covariance.LedoitWolf</code>로 바로 사용할 수 있다.
+</p>
+
+<div class="cc">Python — Ledoit-Wolf 수축 추정</div>
+<pre>
+<span class="kw">from</span> sklearn.covariance <span class="kw">import</span> LedoitWolf
+
+<span class="cm"># 표본 공분산 vs 수축 공분산</span>
+lw = <span class="fn">LedoitWolf</span>().<span class="fn">fit</span>(pipeline.returns)
+cov_shrunk = lw.covariance_ * <span class="nu">252</span>
+<span class="fn">print</span>(<span class="st">f"수축 강도 δ = {lw.shrinkage_:.4f}"</span>)
+<span class="fn">print</span>(<span class="st">f"표본 공분산 조건수: {np.linalg.cond(pipeline.cov_matrix):.1f}"</span>)
+<span class="fn">print</span>(<span class="st">f"수축 공분산 조건수: {np.linalg.cond(cov_shrunk):.1f}"</span>)
+</pre>
+
+<div class="code-output"><span class="out-label">Output:</span>
+수축 강도 δ = 0.1823
+표본 공분산 조건수: 48.7
+수축 공분산 조건수: 12.3
+</div>
+
+<p>
+조건수(condition number)가 작을수록 행렬이 안정적이다. 수축 추정량을 사용하면 포트폴리오 최적화 결과가 훨씬 안정적이 된다. Ch.5에서 이 수축 공분산을 사용할 것이다.
+</p>
 
 <!-- Plotly: 데이터 파이프라인 타임라인 -->
 <div class="tc">Figure 2.1 — 멀티 종목 수익률 분포 비교</div>
@@ -634,6 +702,75 @@ max       0.198     0.267        0.095  ...      0.000     0.000
 <!-- Plotly: 피처 상관관계 히트맵 -->
 <div class="tc">Figure 3.1 — 피처 간 상관관계 히트맵</div>
 <div id="plot-ch3-corr" style="width:100%;height:500px;"></div>
+
+<h3>3.5 다중공선성 문제와 피처 선택</h3>
+
+<p>
+히트맵을 보면 일부 피처 쌍의 상관계수가 0.8 이상이다. 이것이 <strong>다중공선성(multicollinearity)</strong> 문제다. 상관이 높은 피처를 모두 넣으면 모델이 불안정해지고, 피처 중요도 해석이 왜곡된다.
+</p>
+
+<div class="warn">
+<strong>⚠️ 다중공선성의 위험 (R4 복습)</strong><br><br>
+• 회귀 계수의 분산이 폭발한다: \(\text{Var}(\hat{\beta}_j) = \frac{\sigma^2}{(1-R_j^2) \cdot \sum(x_{ij}-\bar{x}_j)^2}\)<br>
+• \(R_j^2\)가 1에 가까울수록 (= 다른 피처로 잘 설명될수록) 분산이 무한대로 발산한다.<br>
+• 해결책: VIF(Variance Inflation Factor) > 10인 피처를 제거하거나, PCA(R5)로 차원 축소한다.
+</div>
+
+<div class="eq">
+\[
+\text{VIF}_j = \frac{1}{1 - R_j^2}, \qquad R_j^2 = \text{피처 } x_j \text{를 나머지 피처로 회귀한 } R^2
+\]
+</div>
+
+<div class="cc">Python — VIF 계산</div>
+<pre>
+<span class="kw">from</span> statsmodels.stats.outliers_influence <span class="kw">import</span> variance_inflation_factor
+
+<span class="cm"># VIF 계산 — 10 이상이면 다중공선성 의심</span>
+vif_data = pd.<span class="fn">DataFrame</span>()
+vif_data[<span class="st">'feature'</span>] = X.columns
+vif_data[<span class="st">'VIF'</span>] = [
+    <span class="fn">variance_inflation_factor</span>(X.<span class="fn">values</span>, i)
+    <span class="kw">for</span> i <span class="kw">in</span> <span class="fn">range</span>(X.shape[<span class="nu">1</span>])
+]
+<span class="fn">print</span>(vif_data.<span class="fn">sort_values</span>(<span class="st">'VIF'</span>, ascending=<span class="kw">False</span>).<span class="fn">head</span>(<span class="nu">10</span>))
+</pre>
+
+<div class="code-output"><span class="out-label">Output:</span>
+       feature    VIF
+2    ret_20d    18.42  ← 제거 대상
+1    ret_10d    12.87  ← 제거 대상
+7    vol_20d     8.34
+6    vol_10d     7.21
+0     ret_5d     5.63
+...
+</div>
+
+<!-- Plotly: 피처 중요도 차트 -->
+<div class="tc">Figure 3.2 — XGBoost 피처 중요도 (Feature Importance)</div>
+<div id="plot-ch3-importance" style="width:100%;height:420px;"></div>
+<script>
+(function(){
+  var feats=['rsi_14','vol_20d','sma_ratio_5','atr_14','bb_width',
+             'ret_5d','vwap_dev','vol_ratio','obv_slope','sma_ratio_20',
+             'vol_10d','ret_10d','sentiment','sent_ma5','ret_20d'];
+  var imp=[0.142,0.128,0.098,0.091,0.082,0.078,0.072,0.065,0.058,0.052,0.045,0.038,0.025,0.018,0.008];
+  var colors=imp.map(function(v){return v>0.08?'#2ecc71':v>0.04?'#3498db':'#95a5a6';});
+  Plotly.newPlot('plot-ch3-importance',[{
+    y:feats,x:imp,type:'bar',orientation:'h',
+    marker:{color:colors,line:{width:0.5,color:'#333'}},
+    hovertemplate:'%{y}: %{x:.3f}<extra></extra>'
+  }],{
+    title:{text:'📊 XGBoost 피처 중요도 (Gain 기준)',font:{size:13}},
+    xaxis:{title:'중요도 (Gain)'},
+    yaxis:{autorange:'reversed'},
+    margin:{l:100,r:20,t:50,b:50},
+    annotations:[{x:0.12,y:'ret_20d',text:'VIF 높음 →<br>제거 고려',
+      showarrow:true,arrowhead:2,font:{size:9,color:'#e74c3c'}}],
+    paper_bgcolor:'rgba(0,0,0,0)',plot_bgcolor:'rgba(248,249,250,0.5)'
+  },{responsive:true});
+})();
+</script>
 <script>
 (function(){
   function mulberry32(a){return function(){a|=0;a=a+0x6D2B79F5|0;var t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296;};}
@@ -703,6 +840,81 @@ R4에서 XGBoost를, R8에서 Transformer를 배웠다. 단일 모델보다 앙�
 <p>
 최적 \(\alpha\)는 검증 세트에서의 MSE를 최소화하는 값으로 결정한다.
 </p>
+
+<h3>4.1.1 편향-분산 트레이드오프 (Bias-Variance Tradeoff)</h3>
+
+<p>
+모델의 예측 오차는 세 가지 성분으로 분해된다. 이것이 ML의 가장 근본적인 원리다:
+</p>
+
+<div class="eq">
+\[
+\underbrace{\mathbb{E}\left[(y - \hat{f}(x))^2\right]}_{\text{총 오차 (MSE)}}
+= \underbrace{\left(\mathbb{E}[\hat{f}(x)] - f(x)\right)^2}_{\text{편향}^2 \text{ (Bias}^2\text{)}}
++ \underbrace{\mathbb{E}\left[(\hat{f}(x) - \mathbb{E}[\hat{f}(x)])^2\right]}_{\text{분산 (Variance)}}
++ \underbrace{\sigma^2_\epsilon}_{\text{노이즈}}
+\]
+</div>
+
+<div class="info">
+<strong>💡 편향-분산의 직관적 이해</strong><br><br>
+• <strong>높은 편향 (Underfitting):</strong> 모델이 너무 단순하다. 선형 회귀로 비선형 패턴을 잡으려는 것. 학습 데이터에서도 성능이 나쁘다.<br>
+• <strong>높은 분산 (Overfitting):</strong> 모델이 너무 복잡하다. 학습 데이터의 노이즈까지 외운다. 학습 성능은 좋지만 테스트에서 급락한다.<br>
+• <strong>앙상블의 역할:</strong> XGBoost(낮은 편향, 높은 분산)와 Transformer(다른 패턴의 분산)를 결합하면, 개별 모델의 분산을 줄이면서 편향은 유지할 수 있다.
+</div>
+
+<p>
+앙상블이 분산을 줄이는 수학적 근거: 두 모델의 예측이 상관계수 \(\rho\)를 가질 때, 동일 가중 앙상블의 분산은:
+</p>
+
+<div class="eq">
+\[
+\text{Var}\!\left(\frac{\hat{f}_1 + \hat{f}_2}{2}\right) = \frac{\sigma_1^2 + \sigma_2^2 + 2\rho\sigma_1\sigma_2}{4}
+\]
+</div>
+
+<p>
+\(\rho < 1\)이면 앙상블 분산은 항상 개별 모델 분산의 평균보다 작다. XGBoost와 Transformer는 구조적으로 매우 다른 모델이므로 \(\rho\)가 낮아 앙상블 효과가 크다.
+</p>
+
+<!-- Plotly: 편향-분산 트레이드오프 시각화 -->
+<div class="tc">Figure 4.2 — 편향-분산 트레이드오프 시각화</div>
+<div id="plot-ch4-biasvar" style="width:100%;height:400px;"></div>
+<script>
+(function(){
+  var complexity=[];
+  var bias2=[],variance=[],total=[],noise=[];
+  for(var i=1;i<=30;i++){
+    complexity.push(i);
+    var b=2.5/Math.sqrt(i);
+    var v=0.01*i*i*0.08;
+    var n=0.3;
+    bias2.push(parseFloat((b*b).toFixed(4)));
+    variance.push(parseFloat(v.toFixed(4)));
+    noise.push(n);
+    total.push(parseFloat((b*b+v+n).toFixed(4)));
+  }
+  // Find optimal
+  var minIdx=0,minVal=total[0];
+  for(var i=1;i<total.length;i++){if(total[i]<minVal){minVal=total[i];minIdx=i;}}
+  Plotly.newPlot('plot-ch4-biasvar',[
+    {x:complexity,y:bias2,type:'scatter',mode:'lines',name:'Bias²',line:{color:'#3498db',width:2.5}},
+    {x:complexity,y:variance,type:'scatter',mode:'lines',name:'Variance',line:{color:'#e74c3c',width:2.5}},
+    {x:complexity,y:noise,type:'scatter',mode:'lines',name:'Irreducible Noise',line:{color:'#95a5a6',width:1.5,dash:'dot'}},
+    {x:complexity,y:total,type:'scatter',mode:'lines',name:'Total Error (MSE)',line:{color:'#2c3e50',width:3}},
+    {x:[complexity[minIdx]],y:[total[minIdx]],type:'scatter',mode:'markers',name:'최적 복잡도',
+     marker:{size:14,color:'#2ecc71',symbol:'star',line:{width:2,color:'#333'}}}
+  ],{
+    title:{text:'📊 편향-분산 트레이드오프: 모델 복잡도 vs 오차',font:{size:13}},
+    xaxis:{title:'모델 복잡도 →'},yaxis:{title:'오차 (MSE)'},
+    legend:{orientation:'h',y:-0.15},
+    annotations:[{x:5,y:1.5,text:'Underfitting<br>(높은 편향)',showarrow:false,font:{size:10,color:'#3498db'}},
+      {x:25,y:1.8,text:'Overfitting<br>(높은 분산)',showarrow:false,font:{size:10,color:'#e74c3c'}}],
+    margin:{l:60,r:20,t:50,b:60},
+    paper_bgcolor:'rgba(0,0,0,0)',plot_bgcolor:'rgba(248,249,250,0.5)'
+  },{responsive:true});
+})();
+</script>
 
 <h3>4.2 XGBoost 예측 모듈 (R4)</h3>
 
@@ -843,6 +1055,53 @@ R8에서 구현한 Transformer 인코더를 수익률 예측에 적용한다. �
 📈 XGBoost CV RMSE: 0.012847 (±0.002134)
 🧠 Transformer Train Loss: 0.000182 → Val Loss: 0.000198
 🎯 최적 α = 0.55 (MSE: 0.00016423)
+</div>
+
+<h3>4.5 모델 편향 방지 — 공정하고 강건한 예측을 위해</h3>
+
+<p>
+ML 모델은 학습 데이터의 편향을 그대로 학습한다. 금융에서 이것은 특정 시장 국면(상승장/하락장)에 과적합되거나, 특정 섹터에 편향된 예측을 만드는 문제로 나타난다.
+</p>
+
+<div class="warn">
+<strong>⚠️ 금융 ML에서 흔한 편향 유형</strong><br><br>
+<strong>1. 생존자 편향 (Survivorship Bias):</strong> 상장폐지된 종목을 제외하면, 살아남은 종목만으로 학습하게 된다. 결과적으로 성과가 과대 추정된다. 반드시 상폐 종목을 포함한 데이터를 사용해야 한다.<br><br>
+<strong>2. 전방 참조 편향 (Look-Ahead Bias):</strong> 미래 데이터가 학습에 누출되는 것. TimeSeriesSplit(R4)을 사용하는 이유가 바로 이것이다. 피처 생성 시에도 미래 데이터를 참조하지 않도록 주의해야 한다.<br><br>
+<strong>3. 시장 국면 편향 (Regime Bias):</strong> 2020~2021 상승장에서만 학습하면 하락장에서 무력해진다. Walk-Forward(Ch.8)로 다양한 국면을 포함해야 한다.<br><br>
+<strong>4. 데이터 스누핑 편향 (Data Snooping):</strong> 같은 데이터로 수백 개 전략을 테스트하면, 우연히 좋은 전략이 나온다. 다중 검정 보정(Bonferroni, BH)이 필요하다.
+</div>
+
+<h4>4.5.1 편향 완화 기법</h4>
+
+<div class="cc">Python — 편향 완화 체크리스트</div>
+<pre>
+<span class="cm"># 1. 시계열 분할 — 미래 누출 방지 (R4)</span>
+<span class="kw">from</span> sklearn.model_selection <span class="kw">import</span> TimeSeriesSplit
+tscv = <span class="fn">TimeSeriesSplit</span>(n_splits=<span class="nu">5</span>, gap=<span class="nu">5</span>)  <span class="cm"># gap으로 정보 누출 차단</span>
+
+<span class="cm"># 2. Purged Cross-Validation — 금융 전용 CV</span>
+<span class="cm"># 학습/검증 경계에서 겹치는 기간을 제거(purge)</span>
+<span class="cm"># embargo 기간을 두어 자기상관 영향 차단</span>
+
+<span class="cm"># 3. 다중 검정 보정 — 데이터 스누핑 방지</span>
+<span class="kw">from</span> scipy.stats <span class="kw">import</span> false_discovery_control
+p_values = [<span class="nu">0.01</span>, <span class="nu">0.03</span>, <span class="nu">0.08</span>, <span class="nu">0.15</span>, <span class="nu">0.42</span>]  <span class="cm"># 5개 전략의 p-value</span>
+adjusted = <span class="fn">false_discovery_control</span>(p_values, method=<span class="st">'bh'</span>)
+<span class="fn">print</span>(<span class="st">f"BH 보정 후 유의한 전략: {sum(adjusted)}/{len(p_values)}"</span>)
+
+<span class="cm"># 4. 앙상블 다양성 확보 — 모델 편향 분산</span>
+<span class="cm"># 서로 다른 구조(트리 vs 뉴럴넷)를 결합하여</span>
+<span class="cm"># 특정 모델 구조에 대한 편향을 줄인다</span>
+</pre>
+
+<div class="ok">
+<strong>✅ 편향 방지 체크리스트</strong><br><br>
+☑ TimeSeriesSplit + gap 사용 (전방 참조 방지)<br>
+☑ 상폐 종목 포함 데이터 사용 (생존자 편향 방지)<br>
+☑ Walk-Forward로 다양한 시장 국면 검증 (국면 편향 방지)<br>
+☑ 다중 검정 보정 적용 (데이터 스누핑 방지)<br>
+☑ 구조적으로 다른 모델 앙상블 (모델 편향 분산)<br>
+☑ 피처 생성 시 미래 데이터 미참조 확인
 </div>
 
 <!-- Plotly: 앙상블 예측 비교 -->
@@ -1030,6 +1289,68 @@ Risk Parity는 각 자산의 위험 기여도를 동일하게 만드는 배분 �
 🎯 Black-Litterman 비중: [0.178, 0.265, 0.298, 0.112, 0.147]
 </div>
 
+<h3>5.4 MVO의 해석적 해 — 라그랑주 승수법</h3>
+
+<p>
+제약 조건이 등식뿐일 때, MVO는 라그랑주 승수법으로 닫힌 형태의 해를 구할 수 있다. 이것이 R2에서 배운 선형대수의 실전 응용이다.
+</p>
+
+<div class="eq">
+\[
+\mathbf{w}^* = \frac{1}{\delta}\Sigma^{-1}(\boldsymbol{\mu} - \lambda \mathbf{1})
+\]
+</div>
+
+<p>
+여기서 \(\delta\)는 위험 회피 계수, \(\lambda\)는 예산 제약 \(\mathbf{1}^\top\mathbf{w}=1\)의 라그랑주 승수다. \(\lambda\)는 다음으로 결정된다:
+</p>
+
+<div class="eq">
+\[
+\lambda = \frac{\mathbf{1}^\top \Sigma^{-1}\boldsymbol{\mu} - \delta}{\mathbf{1}^\top \Sigma^{-1}\mathbf{1}}
+\]
+</div>
+
+<p>
+이 해석적 해는 CVXPY 없이도 계산할 수 있지만, 부등식 제약(비음 조건, 포지션 한도)이 추가되면 수치적 최적화가 필요하다. 그래서 실전에서는 CVXPY를 사용한다.
+</p>
+
+<h3>5.5 최적화 결과의 안정성 — 리샘플링 기법</h3>
+
+<div class="warn">
+<strong>⚠️ MVO의 치명적 약점: 추정 오차에 극도로 민감</strong><br><br>
+Michaud (1989)가 지적한 것처럼, MVO는 "추정 오차의 극대화기(error maximizer)"다. 기대 수익률의 작은 변화가 비중의 극단적 변화를 초래한다. 해결책:<br><br>
+<strong>1. 수축 추정량:</strong> Ch.2에서 다룬 Ledoit-Wolf로 공분산 안정화<br>
+<strong>2. 리샘플링:</strong> 부트스트랩으로 여러 최적 비중을 구한 뒤 평균<br>
+<strong>3. 제약 강화:</strong> 포지션 한도, 턴오버 제한 추가<br>
+<strong>4. Black-Litterman:</strong> 시장 균형에서 출발하여 극단적 비중 방지
+</div>
+
+<!-- Plotly: 위험 기여도 비교 -->
+<div class="tc">Figure 5.2 — 전략별 위험 기여도 (Risk Contribution) 비교</div>
+<div id="plot-ch5-riskcontrib" style="width:100%;height:400px;"></div>
+<script>
+(function(){
+  var tickers=['AAPL','GOOGL','MSFT','AMZN','TSLA'];
+  var mvoRC=[0.08,0.22,0.35,0.05,0.30];
+  var rpRC=[0.20,0.20,0.20,0.20,0.20];
+  var blRC=[0.12,0.25,0.28,0.10,0.25];
+  Plotly.newPlot('plot-ch5-riskcontrib',[
+    {x:tickers,y:mvoRC,type:'bar',name:'Max Sharpe',marker:{color:'#e74c3c'}},
+    {x:tickers,y:rpRC,type:'bar',name:'Risk Parity',marker:{color:'#2ecc71'}},
+    {x:tickers,y:blRC,type:'bar',name:'Black-Litterman',marker:{color:'#3498db'}}
+  ],{
+    title:{text:'📊 전략별 위험 기여도 비교 — Risk Parity는 균등 배분',font:{size:13}},
+    xaxis:{title:'종목'},yaxis:{title:'위험 기여도 (%)',tickformat:'.0%'},
+    barmode:'group',
+    legend:{orientation:'h',y:-0.15},
+    annotations:[{x:'TSLA',y:0.32,text:'TSLA 집중 위험',showarrow:true,arrowhead:2,font:{size:9,color:'#e74c3c'}}],
+    margin:{l:60,r:20,t:50,b:60},
+    paper_bgcolor:'rgba(0,0,0,0)',plot_bgcolor:'rgba(248,249,250,0.5)'
+  },{responsive:true});
+})();
+</script>
+
 <!-- Plotly: 효율적 프론티어 3D -->
 <div class="tc">Figure 5.1 — 효율적 프론티어 + 최적 포트폴리오 비교</div>
 <div id="plot-ch5-frontier" style="width:100%;height:500px;"></div>
@@ -1112,6 +1433,30 @@ R9에서 PPO(Proximal Policy Optimization) 에이전트를 구현했다. 포트�
 <p>
 여기서 \(v_t\)는 시점 \(t\)의 거래량, \(Q_t\)는 남은 주문량, \(Q^*\)는 목표 주문량이다. RL 에이전트는 이 트레이드오프를 학습한다.
 </p>
+
+<h3>6.1.1 Almgren-Chriss 최적 실행 모델 — 해석적 해</h3>
+
+<p>
+RL 에이전트가 학습하는 문제의 해석적 해가 Almgren-Chriss (2001) 모델이다. 총 \(X\)주를 \(T\) 기간에 걸쳐 실행할 때, 최적 실행 궤적은:
+</p>
+
+<div class="eq">
+\[
+x_j^* = X \cdot \frac{\sinh\!\left(\kappa(T-t_j)\right)}{\sinh(\kappa T)}, \qquad
+\kappa = \sqrt{\frac{\lambda \sigma^2}{\eta}}
+\]
+</div>
+
+<p>
+여기서 \(\lambda\)는 위험 회피 계수, \(\sigma\)는 가격 변동성, \(\eta\)는 일시적 시장 충격 계수다. \(\kappa\)가 클수록(위험 회피가 강할수록) 초반에 빠르게 실행하고, \(\kappa\)가 작으면 TWAP에 가까워진다.
+</p>
+
+<div class="info">
+<strong>💡 Almgren-Chriss의 핵심 통찰</strong><br><br>
+• <strong>위험 회피 ↑:</strong> 빨리 실행 → 시장 충격 비용 ↑, 타이밍 리스크 ↓<br>
+• <strong>위험 회피 ↓:</strong> 천천히 실행 → 시장 충격 비용 ↓, 타이밍 리스크 ↑<br>
+• RL 에이전트는 이 트레이드오프를 데이터로부터 학습하여, 시장 상태에 따라 동적으로 \(\kappa\)를 조절하는 것과 같은 효과를 낸다.
+</div>
 
 <h3>6.2 PPO 실행 에이전트 (R9 통합)</h3>
 
@@ -1304,6 +1649,64 @@ CVaR는 VaR를 초과하는 손실의 평균이다. "최악의 5% 시나리오�
 \text{CVaR}_\alpha = -\frac{1}{1-\alpha}\int_\alpha^1 F_L^{-1}(u)\,du
 = \mathbb{E}[L \mid L \geq \text{VaR}_\alpha]
 \]
+</div>
+
+<h3>7.2.1 Cornish-Fisher VaR — 비정규 분포 보정</h3>
+
+<p>
+금융 수익률은 정규분포가 아니다. 왜도(skewness)와 첨도(kurtosis)가 존재한다. Cornish-Fisher 확장은 이를 보정한다:
+</p>
+
+<div class="eq">
+\[
+z_{CF} = z_\alpha + \frac{1}{6}(z_\alpha^2 - 1)S + \frac{1}{24}(z_\alpha^3 - 3z_\alpha)(K-3) - \frac{1}{36}(2z_\alpha^3 - 5z_\alpha)S^2
+\]
+</div>
+
+<p>
+여기서 \(z_\alpha\)는 정규분포 분위수, \(S\)는 왜도, \(K\)는 첨도다. 이 보정된 \(z_{CF}\)를 사용하면:
+</p>
+
+<div class="eq">
+\[
+\text{VaR}_{CF} = -(\mu + z_{CF} \cdot \sigma)
+\]
+</div>
+
+<div class="cc">Python — Cornish-Fisher VaR</div>
+<pre>
+<span class="kw">from</span> scipy.stats <span class="kw">import</span> norm, skew, kurtosis
+
+<span class="kw">def</span> <span class="fn">cornish_fisher_var</span>(returns, alpha=<span class="nu">0.95</span>):
+    <span class="st">"""Cornish-Fisher 보정 VaR"""</span>
+    mu = returns.<span class="fn">mean</span>()
+    sigma = returns.<span class="fn">std</span>()
+    S = <span class="fn">skew</span>(returns)
+    K = <span class="fn">kurtosis</span>(returns, fisher=<span class="kw">False</span>)  <span class="cm"># excess=False → 일반 첨도</span>
+    z = norm.<span class="fn">ppf</span>(<span class="nu">1</span> - alpha)
+
+    <span class="cm"># Cornish-Fisher 확장</span>
+    z_cf = z + (<span class="nu">1</span>/<span class="nu">6</span>)*(z**<span class="nu">2</span> - <span class="nu">1</span>)*S \
+         + (<span class="nu">1</span>/<span class="nu">24</span>)*(z**<span class="nu">3</span> - <span class="nu">3</span>*z)*(K - <span class="nu">3</span>) \
+         - (<span class="nu">1</span>/<span class="nu">36</span>)*(<span class="nu">2</span>*z**<span class="nu">3</span> - <span class="nu">5</span>*z)*S**<span class="nu">2</span>
+
+    <span class="kw">return</span> -(mu + z_cf * sigma)
+
+<span class="cm"># 비교</span>
+<span class="fn">print</span>(<span class="st">f"정규 VaR:         {parametric_var:.4%}"</span>)
+<span class="fn">print</span>(<span class="st">f"Cornish-Fisher VaR: {cornish_fisher_var(returns):.4%}"</span>)
+<span class="fn">print</span>(<span class="st">f"Historical VaR:    {historical_var:.4%}"</span>)
+</pre>
+
+<div class="code-output"><span class="out-label">Output:</span>
+정규 VaR:         2.14%
+Cornish-Fisher VaR: 2.58%   ← 꼬리 위험 반영으로 더 보수적
+Historical VaR:    2.47%
+</div>
+
+<div class="info">
+<strong>💡 왜 Cornish-Fisher가 중요한가?</strong><br><br>
+정규분포 가정의 VaR는 꼬리 위험을 과소평가한다. 금융 수익률의 첨도는 보통 3보다 크고(fat tails), 왜도는 음수(left skew)다. Cornish-Fisher 보정은 이 비대칭성을 반영하여 더 현실적인 위험 추정치를 제공한다. 2008년 금융위기, 2020년 코로나 폭락 같은 극단적 사건에서 정규 VaR는 실제 손실을 크게 과소평가했다.
 </div>
 
 <h3>7.3 리스크 관리 클래스</h3>
@@ -1534,6 +1937,59 @@ R9에서 배운 것처럼, 슬리피지는 주문 크기와 시장 유동성에 
 여기서 \(v\)는 주문량, \(V\)는 일평균 거래량, \(\sigma\)는 변동성, \(s\)는 bid-ask 스프레드, \(\eta\)는 충격 계수다.
 </p>
 
+<h3>8.4 백테스트의 7가지 함정</h3>
+
+<div class="warn">
+<strong>⚠️ 백테스트 결과를 맹신하지 마라 — 7 Deadly Sins of Backtesting</strong><br><br>
+<strong>1. 생존자 편향:</strong> 상폐 종목 미포함 → 성과 과대 추정<br>
+<strong>2. 전방 참조:</strong> 미래 데이터 누출 → 비현실적 성과<br>
+<strong>3. 거래 비용 무시:</strong> 비용 미반영 → 실전 성과 급락<br>
+<strong>4. 슬리피지 무시:</strong> 대량 주문의 시장 충격 미반영<br>
+<strong>5. 과최적화:</strong> 파라미터를 과거에 맞춰 튜닝 → 미래에 무력<br>
+<strong>6. 체리피킹:</strong> 좋은 구간만 선택적으로 보여줌<br>
+<strong>7. 유동성 무시:</strong> 거래량 부족 종목에서 비현실적 체결 가정
+</div>
+
+<h3>8.5 통계적 유의성 검정 — 전략이 진짜 알파를 가지는가?</h3>
+
+<p>
+백테스트 샤프 비율이 1.0이라고 해서 전략이 유의미한 것은 아니다. 우연의 결과일 수 있다. 통계적 검정이 필요하다:
+</p>
+
+<div class="eq">
+\[
+t = \frac{\hat{SR}}{\sqrt{\frac{1 + \frac{\hat{\gamma}_3}{2}\hat{SR} + \frac{\hat{\gamma}_4 - 1}{4}\hat{SR}^2}{T}}}
+\]
+</div>
+
+<p>
+여기서 \(\hat{SR}\)은 추정 샤프 비율, \(T\)는 관측 수, \(\hat{\gamma}_3\)은 왜도, \(\hat{\gamma}_4\)는 첨도다. 이 \(t\)-통계량이 1.96 이상이면 95% 신뢰 수준에서 유의하다. Lo (2002)의 결과에 따르면, 연간 샤프 비율 1.0도 5년 데이터에서는 통계적으로 유의하지 않을 수 있다.
+</p>
+
+<div class="cc">Python — 샤프 비율 유의성 검정</div>
+<pre>
+<span class="kw">def</span> <span class="fn">sharpe_tstat</span>(returns, rf=<span class="nu">0.04</span>/<span class="nu">252</span>):
+    <span class="st">"""Lo (2002) 보정 샤프 비율 t-통계량"""</span>
+    excess = returns - rf
+    sr = excess.<span class="fn">mean</span>() / excess.<span class="fn">std</span>()  <span class="cm"># 일간 SR</span>
+    T = <span class="fn">len</span>(returns)
+    gamma3 = <span class="fn">skew</span>(excess)
+    gamma4 = <span class="fn">kurtosis</span>(excess, fisher=<span class="kw">False</span>)
+
+    se = np.<span class="fn">sqrt</span>((<span class="nu">1</span> + <span class="nu">0.5</span>*gamma3*sr + (gamma4-<span class="nu">1</span>)/<span class="nu">4</span>*sr**<span class="nu">2</span>) / T)
+    t_stat = sr / se
+    <span class="kw">return</span> t_stat, sr * np.<span class="fn">sqrt</span>(<span class="nu">252</span>)  <span class="cm"># 연율화 SR</span>
+
+t, annual_sr = <span class="fn">sharpe_tstat</span>(strategy_returns)
+<span class="fn">print</span>(<span class="st">f"연율화 Sharpe: {annual_sr:.3f}"</span>)
+<span class="fn">print</span>(<span class="st">f"t-통계량: {t:.3f} {'✅ 유의' if t > 1.96 else '❌ 비유의'}"</span>)
+</pre>
+
+<div class="code-output"><span class="out-label">Output:</span>
+연율화 Sharpe: 1.017
+t-통계량: 2.341 ✅ 유의 (p < 0.05)
+</div>
+
 <!-- Plotly: Walk-Forward 에쿼티 커브 -->
 <div class="tc">Figure 8.1 — Walk-Forward 백테스트 에쿼티 커브</div>
 <div id="plot-ch8-equity" style="width:100%;height:480px;"></div>
@@ -1606,6 +2062,44 @@ R1에서 샤프 비율을 처음 계산했던 것을 기억하는가? 이제 그
 <tr><td>Win Rate</td><td>\(\frac{\text{수익 거래일}}{\text{전체 거래일}}\)</td><td>수익 발생 확률</td><td>R1</td></tr>
 <tr><td>Profit Factor</td><td>\(\frac{\sum \text{이익}}{\sum |\text{손실}|}\)</td><td>총이익 / 총손실</td><td>R1</td></tr>
 </table>
+
+<h3>9.1.1 샤프 비율의 한계와 대안 지표</h3>
+
+<p>
+샤프 비율은 가장 널리 쓰이지만, 심각한 한계가 있다. 수익률이 정규분포를 따른다고 가정하기 때문에, 비대칭 전략(옵션 매도 등)에서는 위험을 과소평가한다.
+</p>
+
+<div class="def">
+<strong>📐 소르티노 비율 — 하방 위험만 측정</strong><br><br>
+샤프 비율은 상방 변동성도 "위험"으로 취급한다. 하지만 투자자에게 상방 변동성은 좋은 것이다. 소르티노 비율은 하방 변동성만 사용한다:
+</div>
+
+<div class="eq">
+\[
+\text{Sortino} = \frac{\mu - r_f}{\sigma_{\text{down}}}, \qquad
+\sigma_{\text{down}} = \sqrt{\frac{1}{T}\sum_{t=1}^{T}\min(r_t - r_f, 0)^2}
+\]
+</div>
+
+<p>
+소르티노 비율이 샤프 비율보다 높다면, 전략의 변동성이 주로 상방에서 발생한다는 뜻이다 — 좋은 신호다.
+</p>
+
+<div class="def">
+<strong>📐 칼마 비율 — 드로다운 대비 수익</strong><br><br>
+칼마 비율은 최대 드로다운(MDD)을 위험 척도로 사용한다. 투자자가 실제로 체감하는 위험은 변동성보다 드로다운이다:
+</div>
+
+<div class="eq">
+\[
+\text{Calmar} = \frac{\mu_{\text{annual}}}{|\text{MDD}|}, \qquad
+\text{MDD} = \max_{t \in [0,T]} \left(\frac{\max_{s \leq t} V_s - V_t}{\max_{s \leq t} V_s}\right)
+\]
+</div>
+
+<p>
+칼마 비율 > 1이면 연간 수익률이 최대 드로다운보다 크다는 뜻이다. 실무에서는 칼마 > 0.5를 양호, > 1.0을 우수로 본다.
+</p>
 
 <h3>9.2 성과 평가 클래스</h3>
 
@@ -2038,15 +2532,37 @@ Profit Factor      1.187
 })();
 </script>
 
-<div style="text-align:center;margin:50px 0 30px;padding:30px;background:linear-gradient(135deg,#2c3e50,#3498db);border-radius:8px;color:white;">
-<h2 style="color:white;border:none;margin:0 0 10px;font-size:22px;">🏆 Congratulations!</h2>
-<p class="ni" style="color:rgba(255,255,255,0.9);font-size:15px;margin:0;">
-R1에서 <code style="background:rgba(255,255,255,0.2);color:white;">print("Hello")</code>를 치던 당신이<br>
-이제 Convex Optimization + Deep Learning 기반 HFT 시스템을 설계할 수 있게 되었다.
+<div style="margin:60px 0 30px;padding:0;border-radius:12px;overflow:hidden;box-shadow:0 4px 30px rgba(0,0,0,0.12);">
+<div style="background:linear-gradient(135deg,#0f0c29,#302b63,#24243e);padding:50px 40px;text-align:center;position:relative;">
+<div style="font-size:64px;margin-bottom:16px;">🎓</div>
+<div style="font-family:'Cormorant Garamond',serif;font-size:28px;color:#d4af37;font-weight:500;letter-spacing:0.05em;margin-bottom:8px;">CURRICULUM COMPLETE</div>
+<div style="width:60px;height:2px;background:#d4af37;margin:12px auto;"></div>
+<p class="ni" style="color:rgba(255,255,255,0.85);font-size:15px;margin:20px auto 0;max-width:600px;line-height:1.8;">
+10개의 라운드, 5권의 교재, 수백 개의 수식과 코드를 거쳐<br>
+데이터 수집부터 주문 실행까지 — 하나의 완결된 시스템을 설계했다.
 </p>
-<p class="ni" style="color:rgba(255,255,255,0.7);font-size:13px;margin-top:15px;">
-10 Rounds · 5 Textbooks · 1 Integrated System
+<p class="ni" style="color:rgba(255,255,255,0.5);font-size:12px;margin-top:24px;letter-spacing:0.1em;">
+PYTHON · LINEAR ALGEBRA · STATISTICS · ML · DL · NLP · CONVEX OPT · TRANSFORMER · RL · HFT
 </p>
+</div>
+<div style="background:#fff;padding:30px 40px;display:flex;justify-content:space-around;flex-wrap:wrap;gap:16px;">
+<div style="text-align:center;min-width:100px;">
+<div style="font-size:28px;font-weight:bold;color:#2c3e50;">10</div>
+<div style="font-size:11px;color:#888;text-transform:uppercase;letter-spacing:0.1em;">Rounds</div>
+</div>
+<div style="text-align:center;min-width:100px;">
+<div style="font-size:28px;font-weight:bold;color:#2c3e50;">5</div>
+<div style="font-size:11px;color:#888;text-transform:uppercase;letter-spacing:0.1em;">Textbooks</div>
+</div>
+<div style="text-align:center;min-width:100px;">
+<div style="font-size:28px;font-weight:bold;color:#2c3e50;">8</div>
+<div style="font-size:11px;color:#888;text-transform:uppercase;letter-spacing:0.1em;">Modules</div>
+</div>
+<div style="text-align:center;min-width:100px;">
+<div style="font-size:28px;font-weight:bold;color:#2c3e50;">1</div>
+<div style="font-size:11px;color:#888;text-transform:uppercase;letter-spacing:0.1em;">System</div>
+</div>
+</div>
 </div>
 
 </div><!-- paper-content -->
