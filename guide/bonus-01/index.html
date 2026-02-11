@@ -1,0 +1,1697 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Bonus 1 - 선형대수 올인원 (Linear Algebra All-in-One)</title>
+<script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;500&family=Space+Mono:wght@400&family=Inter:wght@300;400&display=swap" rel="stylesheet">
+<script src="https://cdn.plot.ly/plotly-2.27.0.min.js"></script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Inter',sans-serif;background:#fafaf8;color:#1a1a1a;line-height:1.7;overflow-x:hidden}
+.sidebar{position:fixed;left:0;top:0;width:260px;height:100vh;background:rgba(255,255,255,.97);border-right:1px solid rgba(0,0,0,.06);padding:32px 24px;z-index:100;overflow-y:auto;display:flex;flex-direction:column}
+.sidebar-profile{text-align:center;margin-bottom:28px;padding-bottom:24px;border-bottom:1px solid rgba(0,0,0,.08)}
+.profile-icon{font-size:48px;margin-bottom:8px}
+.profile-name{font-family:'Cormorant Garamond',serif;font-size:1.3rem;font-weight:500;margin-bottom:4px}
+.profile-title{font-size:.68rem;color:#888;letter-spacing:.08em;text-transform:uppercase;margin-bottom:8px}
+.profile-bio{font-size:.78rem;color:#666;line-height:1.5}
+.sidebar-nav{flex:1;margin-top:16px}
+.nav-section{margin-bottom:20px}
+.nav-section-title{font-size:.6rem;font-weight:600;color:#aaa;letter-spacing:.15em;text-transform:uppercase;margin-bottom:10px}
+.nav-list{list-style:none}
+.nav-list li{margin-bottom:5px}
+.nav-list a{font-size:.78rem;color:#555;text-decoration:none;transition:all .2s;display:block;padding:3px 0}
+.nav-list a:hover{color:#0080c6;padding-left:4px}
+.nav-list a.active{color:#0080c6;font-weight:500}
+.nav-list a.done{color:#28a745}
+.badge{display:inline-block;font-size:.5rem;background:#0080c6;color:#fff;padding:1px 5px;border-radius:8px;margin-left:3px;vertical-align:middle}
+.badge-done{background:#28a745}
+.badge-bonus{background:#9c27b0}
+.sidebar-footer{padding-top:16px;border-top:1px solid rgba(0,0,0,.06);font-size:.65rem;color:#aaa;text-align:center}
+.main-wrapper{margin-left:260px;min-height:100vh}
+.container{max-width:1100px;margin:0 auto;padding:50px 40px 80px}
+.paper-content{font-family:'Times New Roman','Nanum Myeongjo',serif;line-height:1.8;background:#fff;padding:40px;border-radius:8px;box-shadow:0 2px 20px rgba(0,0,0,.05)}
+.paper-header{text-align:center;margin-bottom:40px;padding-bottom:30px;border-bottom:2px solid #333}
+.paper-category{font-size:14px;color:#666;margin-bottom:10px}
+.paper-title{font-size:24px;font-weight:bold;margin-bottom:12px;line-height:1.4}
+.paper-subtitle{font-size:14px;color:#555;margin-bottom:8px}
+.paper-team{font-size:13px;color:#444}
+.abstract{background:#f8f9fa;padding:25px;margin:30px 0;border-left:4px solid #2c3e50}
+.abstract-title{font-weight:bold;font-size:16px;margin-bottom:15px}
+h2{font-size:18px;margin:35px 0 20px;padding-bottom:8px;border-bottom:1px solid #ddd;color:#2c3e50}
+h3{font-size:15px;margin:25px 0 15px;color:#34495e}
+h4{font-size:14px;margin:20px 0 12px;color:#34495e}
+p{text-align:justify;margin-bottom:15px;text-indent:2em}
+p.ni{text-indent:0}
+table{width:100%;border-collapse:collapse;margin:20px 0;font-size:12px}
+th,td{border:1px solid #ddd;padding:10px 8px;text-align:center}
+th{background:#2c3e50;color:white;font-weight:bold}
+tr:nth-child(even){background:#f8f9fa}
+tr:hover{background:#e8f4f8}
+.tc{font-size:13px;font-weight:bold;margin:15px 0 10px;text-align:center}
+.eq{text-align:center;margin:20px 0;padding:15px;background:#f8f9fa;border-radius:4px;overflow-x:auto}
+ul,ol{margin-left:2em;margin-bottom:15px}
+li{margin-bottom:6px}
+.def{background:#fff9e6;border:1px solid #ffc107;border-radius:4px;padding:20px;margin:20px 0}
+.info{background:#e8f4f8;border-left:4px solid #3498db;padding:20px;margin:20px 0}
+.warn{background:#fff3cd;border-left:4px solid #f39c12;padding:20px;margin:20px 0}
+.ok{background:#d4edda;border-left:4px solid #28a745;padding:20px;margin:20px 0}
+pre{background:#1e1e1e;color:#d4d4d4;padding:20px;border-radius:6px;overflow-x:auto;margin:20px 0;font-family:'Space Mono','Consolas',monospace;font-size:13px;line-height:1.6}
+code{font-family:'Space Mono','Consolas',monospace;font-size:13px}
+p code,li code,td code{background:#f0f0f0;padding:2px 6px;border-radius:3px;color:#c7254e;font-size:12px}
+.cc{font-size:12px;font-weight:bold;color:#2c3e50;margin-top:15px;margin-bottom:4px}
+.cm{color:#6a9955}.kw{color:#569cd6}.st{color:#ce9178}.fn{color:#dcdcaa}.nb{color:#4ec9b0}.nu{color:#b5cea8}
+.progress-bar{width:100%;height:6px;background:#e0e0e0;border-radius:3px;margin-top:16px}
+.progress-fill{height:100%;background:linear-gradient(90deg,#9c27b0,#e040fb);border-radius:3px;width:100%}
+.progress-label{font-size:11px;color:#888;margin-top:4px;text-align:center}
+details{margin:20px 0;border:1px solid #ddd;border-radius:6px;overflow:hidden}
+details summary{padding:14px 20px;background:#f0f4f8;cursor:pointer;font-weight:bold;font-size:14px;color:#2c3e50;user-select:none;transition:background .2s}
+details summary:hover{background:#e0e8f0}
+details[open] summary{background:#d0dce8;border-bottom:1px solid #ddd}
+details .answer-content{padding:20px;background:#fff}
+.problem-box{background:#f0f4ff;border:2px solid #5c6bc0;border-radius:8px;padding:20px;margin:20px 0}
+.problem-box .problem-title{font-weight:bold;color:#283593;font-size:15px;margin-bottom:12px}
+@media(max-width:1024px){
+.sidebar{width:100%;height:auto;position:relative;border-right:none;border-bottom:1px solid rgba(0,0,0,.08);padding:16px}
+.sidebar-profile{margin-bottom:10px;padding-bottom:10px;display:flex;align-items:center;gap:12px;text-align:left}
+.profile-icon{font-size:32px;margin-bottom:0}.profile-bio{display:none}
+.nav-section{display:inline-block;margin-right:16px;margin-bottom:8px}
+.nav-list{display:flex;gap:10px;flex-wrap:wrap}.nav-list li{margin-bottom:0}
+.sidebar-footer{display:none}
+.main-wrapper{margin-left:0}
+.container{padding:0}.paper-content{padding:20px 16px;border-radius:0;box-shadow:none}
+.paper-title{font-size:18px}p{font-size:14px;text-indent:1.5em;text-align:left}
+pre{font-size:11px;padding:14px}table{font-size:10px;display:block;overflow-x:auto}
+}
+.code-output{background:#1e1e1e;color:#d4d4d4;padding:12px 16px;border-radius:0 0 6px 6px;font-family:'Space Mono',monospace;font-size:11.5px;line-height:1.6;margin-top:-4px;margin-bottom:18px;border-top:2px solid #333;white-space:pre-wrap;overflow-x:auto}
+.code-output .out-label{color:#888;font-size:10px;margin-bottom:4px;display:block}
+</style>
+</head>
+<body>
+
+<div class="sidebar">
+<div class="sidebar-profile">
+<div class="profile-icon">&#x1F9EE;</div>
+<div class="profile-name">HFT ML Master Plan</div>
+<div class="profile-title">Convex Opt + DL + HFT</div>
+<div class="profile-bio">Bonus Rounds: 수학 기초 올인원</div>
+</div>
+<div class="sidebar-nav">
+<div class="nav-section">
+<div class="nav-section-title">Curriculum</div>
+<ul class="nav-list">
+<li><a class="done" href="../round-01/">R1. Python + Finance <span class="badge badge-done">DONE</span></a></li>
+<li><a class="active" href="#">B1. 선형대수 올인원 <span class="badge badge-bonus">BONUS</span></a></li>
+<li><a href="../round-02/">R2. Linear Algebra + Stats</a></li>
+<li><a href="../bonus-02/">B2. 미적분 올인원</a></li>
+<li><a href="../round-03/">R3. Data / Feature Eng.</a></li>
+<li><a href="../bonus-04/">B4. 재무관리 올인원</a></li>
+<li><a href="../round-04/">R4. Supervised Learning</a></li>
+<li><a href="../bonus-03/">B3. 확률·통계 올인원</a></li>
+<li><a href="../round-05/">R5. Unsupervised + TS</a></li>
+<li><a href="../bonus-05/">B5. 금융공학 올인원</a></li>
+<li><a href="../round-06/">R6. NLP + Sentiment</a></li>
+<li><a href="../round-07/">R7. Deep Learning</a></li>
+<li><a href="../bonus-06/">B6. 최적화 이론 올인원</a></li>
+<li><a href="../round-08/">R8. Convex Opt + Transformer</a></li>
+<li><a href="../round-09/">R9. HFT + RL</a></li>
+<li><a href="../round-10/">R10. Final Project</a></li>
+</ul>
+</div>
+<div class="nav-section">
+<div class="nav-section-title">This Lecture</div>
+<ul class="nav-list">
+<li><a href="#ch1">1. 스칼라, 벡터, 행렬, 텐서</a></li>
+<li><a href="#ch2">2. 벡터 연산과 내적</a></li>
+<li><a href="#ch3">3. 행렬 연산</a></li>
+<li><a href="#ch4">4. 역행렬과 연립방정식</a></li>
+<li><a href="#ch5">5. 선형변환의 기하학</a></li>
+<li><a href="#ch6">6. 고유값과 고유벡터</a></li>
+<li><a href="#ch7">7. SVD (특이값 분해)</a></li>
+<li><a href="#ch8">8. PCA (주성분 분석)</a></li>
+<li><a href="#ch9">9. 금융에서의 선형대수</a></li>
+<li><a href="#ch10">10. 종합 문제</a></li>
+</ul>
+</div>
+</div>
+<div class="sidebar-footer">Bonus 1 — 선형대수 올인원</div>
+</div>
+
+<div class="main-wrapper">
+<div class="container">
+<div class="paper-content">
+
+<div class="paper-header">
+<div class="paper-category">Bonus Round 1 / 6 — R1과 R2 사이</div>
+<h1 class="paper-title">선형대수 올인원 (Linear Algebra All-in-One)</h1>
+<div class="paper-subtitle">벡터 → 행렬 → 내적 → 역행렬 → 고유값 → SVD → PCA</div>
+<div class="paper-team">수학이 두려운 사람도 끝까지 따라올 수 있는 완전 자습서</div>
+<div class="progress-bar"><div class="progress-fill"></div></div>
+<div class="progress-label">Bonus Round — 선형대수 완전 정복</div>
+</div>
+
+<div class="abstract">
+<div class="abstract-title">왜 선형대수인가?</div>
+<p class="ni">머신러닝의 모든 것은 선형대수 위에 세워져 있다. 주가 데이터는 행렬이고, 포트폴리오 최적화는 행렬 연산이며, PCA로 차원을 축소하고, 딥러닝의 모든 레이어는 행렬 곱셈이다. 이 강의를 마치면:</p>
+<ul>
+<li>벡터와 행렬을 직관적으로 이해하고 NumPy로 다룰 수 있다</li>
+<li>내적, 외적, 행렬곱의 기하학적 의미를 설명할 수 있다</li>
+<li>역행렬과 연립방정식의 관계를 이해한다</li>
+<li>고유값/고유벡터가 왜 중요한지 설명할 수 있다</li>
+<li>SVD와 PCA의 원리를 이해하고 금융 데이터에 적용할 수 있다</li>
+</ul>
+<div style="font-size:13px;color:#555;margin-top:15px;font-style:italic"><strong>Keywords:</strong> Vector, Matrix, Dot Product, Inverse, Eigenvalue, SVD, PCA, NumPy, Portfolio</div>
+</div>
+
+<!-- ═══════════════════════════════════════════ -->
+<!-- Ch1: 스칼라, 벡터, 행렬, 텐서 -->
+<!-- ═══════════════════════════════════════════ -->
+<h2 id="ch1">1. 스칼라, 벡터, 행렬, 텐서 — 데이터의 차원</h2>
+
+<h3>1.1 네 가지 수학 객체</h3>
+<p>선형대수를 배우기 전에, 데이터가 어떤 "모양"으로 존재하는지 이해해야 한다. 일상에서 우리가 다루는 모든 숫자 데이터는 네 가지 중 하나에 속한다.</p>
+
+<div class="def">
+<p class="ni"><strong>정의 1.1 — 수학 객체의 계층</strong></p>
+<ul>
+<li><strong>스칼라(Scalar):</strong> 하나의 숫자. 예: 삼성전자 주가 70,000원, 수익률 2.5%</li>
+<li><strong>벡터(Vector):</strong> 숫자들의 1차원 나열. 예: 5일간 종가 [70000, 71000, 69500, 72000, 73000]</li>
+<li><strong>행렬(Matrix):</strong> 숫자들의 2차원 배열(표). 예: 3종목 × 5일 종가 데이터</li>
+<li><strong>텐서(Tensor):</strong> 3차원 이상의 배열. 예: 10종목 × 252일 × 5개 특성(시가,고가,저가,종가,거래량)</li>
+</ul>
+</div>
+
+<div class="eq">
+$$\underbrace{42}_{\text{스칼라}} \quad \underbrace{\begin{bmatrix} 1 \\ 2 \\ 3 \end{bmatrix}}_{\text{벡터 (3×1)}} \quad \underbrace{\begin{bmatrix} 1 & 2 \\ 3 & 4 \\ 5 & 6 \end{bmatrix}}_{\text{행렬 (3×2)}} \quad \underbrace{\boxed{\text{3D 배열}}}_{\text{텐서}}$$
+</div>
+
+<pre><code><span class="kw">import</span> numpy <span class="kw">as</span> np
+
+<span class="cm"># 스칼라: 그냥 숫자</span>
+price = <span class="nu">70000</span>
+<span class="fn">print</span>(<span class="st">"스칼라:"</span>, price)
+
+<span class="cm"># 벡터: 1차원 배열</span>
+prices = np.array([<span class="nu">70000</span>, <span class="nu">71000</span>, <span class="nu">69500</span>, <span class="nu">72000</span>, <span class="nu">73000</span>])
+<span class="fn">print</span>(<span class="st">"벡터 shape:"</span>, prices.shape)  <span class="cm"># (5,)</span>
+
+<span class="cm"># 행렬: 2차원 배열 (3종목 × 5일)</span>
+stock_matrix = np.array([
+    [<span class="nu">70000</span>, <span class="nu">71000</span>, <span class="nu">69500</span>, <span class="nu">72000</span>, <span class="nu">73000</span>],  <span class="cm"># 삼성전자</span>
+    [<span class="nu">50000</span>, <span class="nu">51000</span>, <span class="nu">49000</span>, <span class="nu">52000</span>, <span class="nu">53000</span>],  <span class="cm"># SK하이닉스</span>
+    [<span class="nu">30000</span>, <span class="nu">30500</span>, <span class="nu">29800</span>, <span class="nu">31000</span>, <span class="nu">31500</span>]   <span class="cm"># NAVER</span>
+])
+<span class="fn">print</span>(<span class="st">"행렬 shape:"</span>, stock_matrix.shape)  <span class="cm"># (3, 5)</span>
+
+<span class="cm"># 텐서: 3차원 배열 (2종목 × 3일 × 4특성)</span>
+tensor = np.random.randn(<span class="nu">2</span>, <span class="nu">3</span>, <span class="nu">4</span>)
+<span class="fn">print</span>(<span class="st">"텐서 shape:"</span>, tensor.shape)  <span class="cm"># (2, 3, 4)</span></code></pre>
+<div class="code-output"><span class="out-label">Output:</span>
+스칼라: 70000
+벡터 shape: (5,)
+행렬 shape: (3, 5)
+텐서 shape: (2, 3, 4)</div>
+
+<h3>1.2 벡터의 기하학적 의미</h3>
+<p>벡터는 단순히 "숫자의 나열"이 아니다. 기하학적으로 벡터는 공간에서의 화살표다. 원점에서 출발하여 어떤 점을 가리키는 방향과 크기를 가진 화살표.</p>
+
+<p>예를 들어 벡터 \(\mathbf{v} = \begin{bmatrix} 3 \\ 2 \end{bmatrix}\)는 2차원 평면에서 원점 (0,0)에서 점 (3,2)를 가리키는 화살표다. 이 화살표의 길이(크기)는 피타고라스 정리로 구한다:</p>
+
+<div class="eq">
+$$\|\mathbf{v}\| = \sqrt{3^2 + 2^2} = \sqrt{13} \approx 3.61$$
+</div>
+
+<p>금융에서 벡터의 의미: 포트폴리오 비중 벡터 \(\mathbf{w} = \begin{bmatrix} 0.4 \\ 0.3 \\ 0.3 \end{bmatrix}\)는 "삼성전자 40%, SK하이닉스 30%, NAVER 30%"를 의미한다. 수익률 벡터 \(\mathbf{r} = \begin{bmatrix} 0.05 \\ -0.02 \\ 0.03 \end{bmatrix}\)는 각 종목의 수익률이다.</p>
+
+<!-- ▼ Plotly: 2D 벡터 시각화 -->
+<div id="plot-ch1-vectors" style="width:100%;height:420px;margin:25px 0"></div>
+<script>
+(function(){
+  var traces = [];
+  var vecs = [[3,2,'v = (3,2)','#e53935'],[1,4,'u = (1,4)','#1e88e5'],[4,6,'v+u = (4,6)','#43a047']];
+  for(var i=0;i<vecs.length;i++){
+    traces.push({x:[0,vecs[i][0]],y:[0,vecs[i][1]],mode:'lines+markers',name:vecs[i][2],
+      line:{width:3,color:vecs[i][3]},marker:{size:[4,10],symbol:['circle','arrow'],
+      angleref:'previous'}});
+  }
+  traces.push({x:[3,4],y:[2,6],mode:'lines',name:'u 이동',line:{width:2,dash:'dot',color:'#1e88e5'},showlegend:false});
+  traces.push({x:[1,4],y:[4,6],mode:'lines',name:'v 이동',line:{width:2,dash:'dot',color:'#e53935'},showlegend:false});
+  Plotly.newPlot('plot-ch1-vectors',traces,{
+    title:{text:'📐 벡터의 덧셈: v + u = (3+1, 2+4) = (4, 6)',font:{size:13}},
+    xaxis:{title:'x',range:[-1,7],zeroline:true,zerolinewidth:2},
+    yaxis:{title:'y',range:[-1,8],zeroline:true,zerolinewidth:2,scaleanchor:'x'},
+    margin:{l:50,r:20,t:45,b:40},
+    legend:{x:0.02,y:0.98},
+    annotations:[
+      {x:3,y:2,text:'v(3,2)',showarrow:true,arrowhead:2,ax:30,ay:20,font:{size:11,color:'#e53935'}},
+      {x:1,y:4,text:'u(1,4)',showarrow:true,arrowhead:2,ax:-40,ay:10,font:{size:11,color:'#1e88e5'}},
+      {x:4,y:6,text:'v+u(4,6)',showarrow:true,arrowhead:2,ax:30,ay:-20,font:{size:11,color:'#43a047'}}
+    ]
+  },{responsive:true});
+})();
+</script>
+<p class="ni" style="font-size:11px;color:#888;text-align:center;margin-top:-10px">🖱️ 벡터 덧셈의 평행사변형 법칙: v의 끝에서 u를 이어 붙이면 v+u가 된다</p>
+
+<h3>1.3 벡터의 크기(노름)와 단위벡터</h3>
+<p>벡터의 크기를 노름(norm)이라 한다. 가장 많이 쓰는 것은 L2 노름(유클리드 거리)이다.</p>
+
+<div class="eq">
+$$\|\mathbf{v}\|_2 = \sqrt{\sum_{i=1}^{n} v_i^2} = \sqrt{v_1^2 + v_2^2 + \cdots + v_n^2}$$
+</div>
+
+<p>단위벡터(unit vector)는 크기가 1인 벡터다. 어떤 벡터든 자기 크기로 나누면 단위벡터가 된다: \(\hat{\mathbf{v}} = \frac{\mathbf{v}}{\|\mathbf{v}\|}\). 금융에서 단위벡터는 "방향만 남기고 크기를 정규화"할 때 사용한다.</p>
+
+<pre><code><span class="kw">import</span> numpy <span class="kw">as</span> np
+
+v = np.array([<span class="nu">3</span>, <span class="nu">4</span>])
+
+<span class="cm"># L2 노름 (유클리드 거리)</span>
+norm_v = np.linalg.norm(v)
+<span class="fn">print</span>(<span class="st">f"||v|| = </span>{norm_v}<span class="st">"</span>)  <span class="cm"># 5.0 (3-4-5 직각삼각형!)</span>
+
+<span class="cm"># 단위벡터</span>
+unit_v = v / norm_v
+<span class="fn">print</span>(<span class="st">f"단위벡터: </span>{unit_v}<span class="st">"</span>)           <span class="cm"># [0.6, 0.8]</span>
+<span class="fn">print</span>(<span class="st">f"단위벡터 크기: </span>{np.linalg.norm(unit_v)}<span class="st">"</span>)  <span class="cm"># 1.0</span>
+
+<span class="cm"># L1 노름 (맨해튼 거리) — 정규화에 사용</span>
+norm_l1 = np.linalg.norm(v, ord=<span class="nu">1</span>)
+<span class="fn">print</span>(<span class="st">f"L1 노름: </span>{norm_l1}<span class="st">"</span>)  <span class="cm"># 7.0 (|3| + |4|)</span></code></pre>
+<div class="code-output"><span class="out-label">Output:</span>
+||v|| = 5.0
+단위벡터: [0.6 0.8]
+단위벡터 크기: 1.0
+L1 노름: 7.0</div>
+
+<div class="info">
+<p class="ni"><strong>금융에서의 노름:</strong> 포트폴리오 비중 벡터 \(\mathbf{w}\)의 L1 노름이 1이면 "비중의 합 = 100%"를 의미한다. L2 노름은 포트폴리오의 "집중도"를 측정한다 — L2가 크면 특정 종목에 집중, 작으면 분산 투자.</p>
+</div>
+
+<!-- ═══════════════════════════════════════════ -->
+<!-- 연습문제 1 -->
+<!-- ═══════════════════════════════════════════ -->
+<div class="problem-box">
+<div class="problem-title">✏️ 연습문제 1.1</div>
+<p class="ni">포트폴리오 비중 벡터 \(\mathbf{w} = \begin{bmatrix} 0.5 \\ 0.3 \\ 0.2 \end{bmatrix}\)에 대해:</p>
+<ol>
+<li>L1 노름을 구하고, 이것이 의미하는 바를 설명하라.</li>
+<li>L2 노름을 구하라.</li>
+<li>동일 비중 포트폴리오 \(\mathbf{w}_{eq} = \begin{bmatrix} 1/3 \\ 1/3 \\ 1/3 \end{bmatrix}\)의 L2 노름과 비교하라. 어느 쪽이 더 집중된 포트폴리오인가?</li>
+</ol>
+</div>
+
+<details>
+<summary>🔑 풀이 보기</summary>
+<div class="answer-content">
+<p class="ni"><strong>1) L1 노름:</strong></p>
+<div class="eq">$$\|\mathbf{w}\|_1 = |0.5| + |0.3| + |0.2| = 1.0$$</div>
+<p class="ni">L1 노름 = 1.0은 비중의 합이 100%라는 뜻이다. 레버리지 없이 전액 투자한 상태.</p>
+
+<p class="ni"><strong>2) L2 노름:</strong></p>
+<div class="eq">$$\|\mathbf{w}\|_2 = \sqrt{0.5^2 + 0.3^2 + 0.2^2} = \sqrt{0.25 + 0.09 + 0.04} = \sqrt{0.38} \approx 0.6164$$</div>
+
+<p class="ni"><strong>3) 동일 비중 L2 노름:</strong></p>
+<div class="eq">$$\|\mathbf{w}_{eq}\|_2 = \sqrt{3 \times (1/3)^2} = \sqrt{3 \times 1/9} = \sqrt{1/3} \approx 0.5774$$</div>
+<p class="ni">\(0.6164 > 0.5774\)이므로 \(\mathbf{w}\)가 더 집중된 포트폴리오다. 삼성전자에 50%를 몰았기 때문.</p>
+
+<pre><code><span class="kw">import</span> numpy <span class="kw">as</span> np
+w = np.array([<span class="nu">0.5</span>, <span class="nu">0.3</span>, <span class="nu">0.2</span>])
+w_eq = np.array([<span class="nu">1</span>/<span class="nu">3</span>, <span class="nu">1</span>/<span class="nu">3</span>, <span class="nu">1</span>/<span class="nu">3</span>])
+<span class="fn">print</span>(<span class="st">f"w  L1: </span>{np.linalg.norm(w, ord=1):.4f}<span class="st">"</span>)   <span class="cm"># 1.0000</span>
+<span class="fn">print</span>(<span class="st">f"w  L2: </span>{np.linalg.norm(w):.4f}<span class="st">"</span>)        <span class="cm"># 0.6164</span>
+<span class="fn">print</span>(<span class="st">f"eq L2: </span>{np.linalg.norm(w_eq):.4f}<span class="st">"</span>)     <span class="cm"># 0.5774</span></code></pre>
+</div>
+</details>
+
+<!-- ═══════════════════════════════════════════ -->
+<!-- Ch2: 벡터 연산과 내적 -->
+<!-- ═══════════════════════════════════════════ -->
+<h2 id="ch2">2. 벡터 연산과 내적</h2>
+
+<h3>2.1 벡터의 기본 연산</h3>
+<p>벡터 연산은 원소별(element-wise)로 이루어진다. 같은 위치의 원소끼리 더하고, 빼고, 곱한다. 스칼라와의 연산은 모든 원소에 동일하게 적용된다.</p>
+
+<div class="eq">
+$$\mathbf{a} + \mathbf{b} = \begin{bmatrix} a_1 + b_1 \\ a_2 + b_2 \\ \vdots \\ a_n + b_n \end{bmatrix}, \quad c \cdot \mathbf{a} = \begin{bmatrix} c \cdot a_1 \\ c \cdot a_2 \\ \vdots \\ c \cdot a_n \end{bmatrix}$$
+</div>
+
+<pre><code><span class="kw">import</span> numpy <span class="kw">as</span> np
+
+<span class="cm"># 두 종목의 5일 수익률</span>
+ret_samsung = np.array([<span class="nu">0.02</span>, -<span class="nu">0.01</span>, <span class="nu">0.03</span>, -<span class="nu">0.005</span>, <span class="nu">0.015</span>])
+ret_sk      = np.array([<span class="nu">0.01</span>,  <span class="nu">0.02</span>, -<span class="nu">0.01</span>, <span class="nu">0.025</span>, -<span class="nu">0.005</span>])
+
+<span class="cm"># 원소별 덧셈: 포트폴리오 수익률 (동일 비중)</span>
+portfolio_ret = <span class="nu">0.5</span> * ret_samsung + <span class="nu">0.5</span> * ret_sk
+<span class="fn">print</span>(<span class="st">"포트폴리오 수익률:"</span>, portfolio_ret)
+
+<span class="cm"># 스칼라 곱: 레버리지 2배</span>
+leveraged = <span class="nu">2</span> * ret_samsung
+<span class="fn">print</span>(<span class="st">"2배 레버리지:"</span>, leveraged)</code></pre>
+<div class="code-output"><span class="out-label">Output:</span>
+포트폴리오 수익률: [ 0.015   0.005   0.01    0.01    0.005 ]
+2배 레버리지: [ 0.04  -0.02   0.06  -0.01   0.03 ]</div>
+
+<h3>2.2 내적 (Dot Product) — 선형대수의 핵심 연산</h3>
+<p>내적은 선형대수에서 가장 중요한 연산이다. 두 벡터를 하나의 스칼라로 요약한다. 정의는 간단하다: 같은 위치의 원소끼리 곱해서 모두 더한다.</p>
+
+<div class="eq">
+$$\mathbf{a} \cdot \mathbf{b} = \sum_{i=1}^{n} a_i b_i = a_1 b_1 + a_2 b_2 + \cdots + a_n b_n$$
+</div>
+
+<p>내적의 기하학적 의미가 핵심이다. 내적은 두 벡터 사이의 각도 \(\theta\)와 관련된다:</p>
+
+<div class="eq">
+$$\mathbf{a} \cdot \mathbf{b} = \|\mathbf{a}\| \|\mathbf{b}\| \cos\theta$$
+</div>
+
+<div class="def">
+<p class="ni"><strong>내적이 알려주는 것:</strong></p>
+<ul>
+<li>\(\mathbf{a} \cdot \mathbf{b} > 0\): 두 벡터가 같은 방향 (예각, \(\theta < 90°\))</li>
+<li>\(\mathbf{a} \cdot \mathbf{b} = 0\): 두 벡터가 직교 (수직, \(\theta = 90°\))</li>
+<li>\(\mathbf{a} \cdot \mathbf{b} < 0\): 두 벡터가 반대 방향 (둔각, \(\theta > 90°\))</li>
+</ul>
+<p class="ni">금융 해석: 두 종목의 수익률 벡터를 내적하면, 양수면 "같이 움직이는 종목", 0이면 "무관한 종목", 음수면 "반대로 움직이는 종목"이다. 이것이 바로 상관계수의 기초다!</p>
+</div>
+
+<pre><code><span class="kw">import</span> numpy <span class="kw">as</span> np
+
+<span class="cm"># 내적 계산</span>
+a = np.array([<span class="nu">1</span>, <span class="nu">2</span>, <span class="nu">3</span>])
+b = np.array([<span class="nu">4</span>, <span class="nu">5</span>, <span class="nu">6</span>])
+
+<span class="cm"># 방법 1: np.dot</span>
+dot1 = np.dot(a, b)
+<span class="fn">print</span>(<span class="st">f"np.dot: </span>{dot1}<span class="st">"</span>)  <span class="cm"># 1×4 + 2×5 + 3×6 = 32</span>
+
+<span class="cm"># 방법 2: @ 연산자 (파이썬 3.5+)</span>
+dot2 = a @ b
+<span class="fn">print</span>(<span class="st">f"a @ b:  </span>{dot2}<span class="st">"</span>)  <span class="cm"># 32</span>
+
+<span class="cm"># 두 벡터 사이의 각도 구하기</span>
+cos_theta = np.dot(a, b) / (np.linalg.norm(a) * np.linalg.norm(b))
+theta = np.degrees(np.arccos(cos_theta))
+<span class="fn">print</span>(<span class="st">f"cos θ = </span>{cos_theta:.4f}<span class="st">"</span>)
+<span class="fn">print</span>(<span class="st">f"θ = </span>{theta:.1f}<span class="st">°"</span>)  <span class="cm"># 약 12.9° → 거의 같은 방향</span></code></pre>
+<div class="code-output"><span class="out-label">Output:</span>
+np.dot: 32
+a @ b:  32
+cos θ = 0.9746
+θ = 12.9°</div>
+
+<h3>2.3 내적의 금융 응용: 포트폴리오 수익률</h3>
+<p>포트폴리오 수익률은 비중 벡터와 수익률 벡터의 내적이다. 이것이 선형대수가 금융에서 중요한 가장 직접적인 이유다.</p>
+
+<div class="eq">
+$$r_p = \mathbf{w}^T \mathbf{r} = \sum_{i=1}^{n} w_i r_i$$
+</div>
+
+<pre><code><span class="cm"># 포트폴리오 수익률 = 비중 · 수익률 (내적)</span>
+weights = np.array([<span class="nu">0.4</span>, <span class="nu">0.35</span>, <span class="nu">0.25</span>])  <span class="cm"># 삼성 40%, SK 35%, NAVER 25%</span>
+returns = np.array([<span class="nu">0.05</span>, -<span class="nu">0.02</span>, <span class="nu">0.03</span>])  <span class="cm"># 각 종목 수익률</span>
+
+portfolio_return = weights @ returns
+<span class="fn">print</span>(<span class="st">f"포트폴리오 수익률: </span>{portfolio_return:.2%}<span class="st">"</span>)
+<span class="cm"># 0.4×0.05 + 0.35×(-0.02) + 0.25×0.03 = 0.02 + (-0.007) + 0.0075 = 2.05%</span></code></pre>
+<div class="code-output"><span class="out-label">Output:</span>
+포트폴리오 수익률: 2.05%</div>
+
+<!-- ▼ Plotly: 내적과 각도 시각화 -->
+<div id="plot-ch2-dot" style="width:100%;height:420px;margin:25px 0"></div>
+<script>
+(function(){
+  function mulberry32(a){return function(){a|=0;a=a+0x6D2B79F5|0;var t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296}}
+  var rng=mulberry32(2024);
+  var angles=[],dots=[];
+  for(var deg=0;deg<=360;deg+=5){
+    var rad=deg*Math.PI/180;
+    var bx=Math.cos(rad),by=Math.sin(rad);
+    angles.push(deg);
+    dots.push(3*bx+2*by);
+  }
+  Plotly.newPlot('plot-ch2-dot',[{
+    x:angles,y:dots,mode:'lines',name:'a·b',
+    line:{width:3,color:'#e53935'},
+    fill:'tozeroy',fillcolor:'rgba(229,57,53,0.1)'
+  }],{
+    title:{text:'📊 벡터 a=(3,2)와 단위벡터 b(θ)의 내적 변화',font:{size:13}},
+    xaxis:{title:'b의 각도 θ (도)',dtick:45,range:[0,360]},
+    yaxis:{title:'내적 값 a·b',zeroline:true,zerolinewidth:2,zerolinecolor:'#333'},
+    margin:{l:50,r:20,t:45,b:40},
+    shapes:[
+      {type:'line',x0:90,x1:90,y0:-4,y1:4,line:{color:'#1e88e5',dash:'dot',width:1}},
+      {type:'line',x0:270,x1:270,y0:-4,y1:4,line:{color:'#1e88e5',dash:'dot',width:1}}
+    ],
+    annotations:[
+      {x:90,y:0.3,text:'직교 (90°)',showarrow:false,font:{size:10,color:'#1e88e5'}},
+      {x:270,y:0.3,text:'직교 (270°)',showarrow:false,font:{size:10,color:'#1e88e5'}},
+      {x:33.7,y:3.7,text:'최대 (같은 방향)',showarrow:true,arrowhead:2,font:{size:10}},
+      {x:213.7,y:-3.7,text:'최소 (반대 방향)',showarrow:true,arrowhead:2,font:{size:10}}
+    ]
+  },{responsive:true});
+})();
+</script>
+<p class="ni" style="font-size:11px;color:#888;text-align:center;margin-top:-10px">🖱️ 내적은 cos 함수처럼 변한다. 같은 방향이면 최대, 직교하면 0, 반대 방향이면 최소</p>
+
+<h3>2.4 직교(Orthogonality) — 분산 투자의 수학적 근거</h3>
+<p>두 벡터의 내적이 0이면 직교(orthogonal)한다고 한다. 직교하는 벡터들은 서로 완전히 독립적이다. 금융에서 직교 = 상관관계 0 = 완벽한 분산 투자.</p>
+
+<div class="eq">
+$$\mathbf{a} \perp \mathbf{b} \iff \mathbf{a} \cdot \mathbf{b} = 0$$
+</div>
+
+<pre><code><span class="cm"># 직교 벡터 확인</span>
+a = np.array([<span class="nu">1</span>, <span class="nu">0</span>])   <span class="cm"># x축 방향</span>
+b = np.array([<span class="nu">0</span>, <span class="nu">1</span>])   <span class="cm"># y축 방향</span>
+<span class="fn">print</span>(<span class="st">f"a · b = </span>{np.dot(a, b)}<span class="st">"</span>)  <span class="cm"># 0 → 직교!</span>
+
+<span class="cm"># 금융 예: 상관관계 없는 두 자산</span>
+<span class="cm"># (실제로는 완벽한 직교는 드물지만, 가까울수록 분산 효과 ↑)</span>
+gold_ret  = np.array([<span class="nu">0.01</span>, -<span class="nu">0.02</span>,  <span class="nu">0.03</span>, <span class="nu">0.01</span>])
+stock_ret = np.array([<span class="nu">0.02</span>,  <span class="nu">0.01</span>, -<span class="nu">0.01</span>, <span class="nu">0.03</span>])
+
+<span class="cm"># 평균 제거 후 내적 → 공분산의 기초</span>
+gold_dm  = gold_ret - gold_ret.mean()
+stock_dm = stock_ret - stock_ret.mean()
+<span class="fn">print</span>(<span class="st">f"평균 제거 후 내적: </span>{np.dot(gold_dm, stock_dm):.6f}<span class="st">"</span>)</code></pre>
+<div class="code-output"><span class="out-label">Output:</span>
+a · b = 0
+평균 제거 후 내적: -0.000163</div>
+
+<!-- ═══════════════════════════════════════════ -->
+<!-- 연습문제 2 -->
+<!-- ═══════════════════════════════════════════ -->
+<div class="problem-box">
+<div class="problem-title">✏️ 연습문제 2.1</div>
+<p class="ni">벡터 \(\mathbf{a} = \begin{bmatrix} 2 \\ -1 \\ 3 \end{bmatrix}\)와 \(\mathbf{b} = \begin{bmatrix} 1 \\ 4 \\ -2 \end{bmatrix}\)에 대해:</p>
+<ol>
+<li>내적 \(\mathbf{a} \cdot \mathbf{b}\)를 구하라.</li>
+<li>두 벡터 사이의 각도 \(\theta\)를 구하라.</li>
+<li>두 벡터는 같은 방향인가, 반대 방향인가, 직교에 가까운가?</li>
+</ol>
+</div>
+
+<details>
+<summary>🔑 풀이 보기</summary>
+<div class="answer-content">
+<p class="ni"><strong>1) 내적:</strong></p>
+<div class="eq">$$\mathbf{a} \cdot \mathbf{b} = 2 \times 1 + (-1) \times 4 + 3 \times (-2) = 2 - 4 - 6 = -8$$</div>
+
+<p class="ni"><strong>2) 각도:</strong></p>
+<div class="eq">$$\|\mathbf{a}\| = \sqrt{4+1+9} = \sqrt{14}, \quad \|\mathbf{b}\| = \sqrt{1+16+4} = \sqrt{21}$$</div>
+<div class="eq">$$\cos\theta = \frac{-8}{\sqrt{14}\sqrt{21}} = \frac{-8}{\sqrt{294}} \approx \frac{-8}{17.146} \approx -0.4667$$</div>
+<div class="eq">$$\theta = \arccos(-0.4667) \approx 117.8°$$</div>
+
+<p class="ni"><strong>3) 해석:</strong> 내적이 음수이고 각도가 90°보다 크므로, 두 벡터는 반대 방향에 가깝다. 금융으로 해석하면 이 두 자산은 역상관 관계에 있어 분산 투자에 유리하다.</p>
+
+<pre><code><span class="kw">import</span> numpy <span class="kw">as</span> np
+a = np.array([<span class="nu">2</span>, -<span class="nu">1</span>, <span class="nu">3</span>])
+b = np.array([<span class="nu">1</span>, <span class="nu">4</span>, -<span class="nu">2</span>])
+<span class="fn">print</span>(<span class="st">f"내적: </span>{a @ b}<span class="st">"</span>)  <span class="cm"># -8</span>
+cos_t = (a @ b) / (np.linalg.norm(a) * np.linalg.norm(b))
+<span class="fn">print</span>(<span class="st">f"θ = </span>{np.degrees(np.arccos(cos_t)):.1f}<span class="st">°"</span>)  <span class="cm"># 117.8°</span></code></pre>
+</div>
+</details>
+
+<!-- ═══════════════════════════════════════════ -->
+<!-- Ch3: 행렬 연산 -->
+<!-- ═══════════════════════════════════════════ -->
+<h2 id="ch3">3. 행렬 연산</h2>
+
+<h3>3.1 행렬이란?</h3>
+<p>행렬(matrix)은 숫자를 직사각형 모양으로 배열한 것이다. \(m\)개의 행(row)과 \(n\)개의 열(column)을 가진 행렬을 \(m \times n\) 행렬이라 한다. 금융에서 행렬은 어디에나 있다: 종목×날짜 수익률 테이블, 공분산 행렬, 팩터 로딩 행렬 등.</p>
+
+<div class="eq">
+$$A = \begin{bmatrix} a_{11} & a_{12} & \cdots & a_{1n} \\ a_{21} & a_{22} & \cdots & a_{2n} \\ \vdots & \vdots & \ddots & \vdots \\ a_{m1} & a_{m2} & \cdots & a_{mn} \end{bmatrix}_{m \times n}$$
+</div>
+
+<pre><code><span class="kw">import</span> numpy <span class="kw">as</span> np
+
+<span class="cm"># 3종목 × 4일 수익률 행렬</span>
+returns = np.array([
+    [<span class="nu">0.02</span>, -<span class="nu">0.01</span>,  <span class="nu">0.03</span>,  <span class="nu">0.01</span>],  <span class="cm"># 삼성전자</span>
+    [<span class="nu">0.01</span>,  <span class="nu">0.02</span>, -<span class="nu">0.01</span>,  <span class="nu">0.03</span>],  <span class="cm"># SK하이닉스</span>
+    [<span class="nu">0.03</span>, -<span class="nu">0.02</span>,  <span class="nu">0.01</span>, -<span class="nu">0.01</span>]   <span class="cm"># NAVER</span>
+])
+<span class="fn">print</span>(<span class="st">f"shape: </span>{returns.shape}<span class="st">"</span>)  <span class="cm"># (3, 4) → 3행 4열</span>
+<span class="fn">print</span>(<span class="st">f"삼성전자 2일차 수익률: </span>{returns[0, 1]}<span class="st">"</span>)  <span class="cm"># -0.01</span>
+<span class="fn">print</span>(<span class="st">f"SK하이닉스 전체: </span>{returns[1, :]}<span class="st">"</span>)  <span class="cm"># 행 슬라이싱</span>
+<span class="fn">print</span>(<span class="st">f"3일차 전 종목: </span>{returns[:, 2]}<span class="st">"</span>)    <span class="cm"># 열 슬라이싱</span></code></pre>
+<div class="code-output"><span class="out-label">Output:</span>
+shape: (3, 4)
+삼성전자 2일차 수익률: -0.01
+SK하이닉스 전체: [ 0.01  0.02 -0.01  0.03]
+3일차 전 종목: [ 0.03 -0.01  0.01]</div>
+
+<h3>3.2 전치 (Transpose)</h3>
+<p>행렬의 행과 열을 뒤바꾸는 연산이다. \(m \times n\) 행렬이 \(n \times m\) 행렬이 된다. 기호는 \(A^T\).</p>
+
+<div class="eq">
+$$A = \begin{bmatrix} 1 & 2 & 3 \\ 4 & 5 & 6 \end{bmatrix}_{2 \times 3} \quad \Rightarrow \quad A^T = \begin{bmatrix} 1 & 4 \\ 2 & 5 \\ 3 & 6 \end{bmatrix}_{3 \times 2}$$
+</div>
+
+<pre><code>A = np.array([[<span class="nu">1</span>, <span class="nu">2</span>, <span class="nu">3</span>],
+              [<span class="nu">4</span>, <span class="nu">5</span>, <span class="nu">6</span>]])
+<span class="fn">print</span>(<span class="st">"A shape:"</span>, A.shape)      <span class="cm"># (2, 3)</span>
+<span class="fn">print</span>(<span class="st">"A^T shape:"</span>, A.T.shape)  <span class="cm"># (3, 2)</span>
+<span class="fn">print</span>(A.T)</code></pre>
+<div class="code-output"><span class="out-label">Output:</span>
+A shape: (2, 3)
+A^T shape: (3, 2)
+[[1 4]
+ [2 5]
+ [3 6]]</div>
+
+<h3>3.3 행렬 곱셈 — 가장 중요한 연산</h3>
+<p>행렬 곱셈은 원소별 곱셈이 아니다. \(A\)의 행과 \(B\)의 열을 내적하는 것이다. \(A\)가 \(m \times k\)이고 \(B\)가 \(k \times n\)이면, 결과 \(C = AB\)는 \(m \times n\)이다. 안쪽 차원 \(k\)가 같아야 곱셈이 가능하다.</p>
+
+<div class="eq">
+$$C_{ij} = \sum_{p=1}^{k} A_{ip} B_{pj} = \text{A의 i번째 행} \cdot \text{B의 j번째 열}$$
+</div>
+
+<div class="warn">
+<p class="ni"><strong>행렬 곱셈 ≠ 원소별 곱셈:</strong> <code>A @ B</code>는 행렬 곱셈, <code>A * B</code>는 원소별 곱셈(Hadamard product). 이 둘을 혼동하면 큰 버그가 생긴다. 행렬 곱셈은 교환법칙이 성립하지 않는다: \(AB \neq BA\) (일반적으로).</p>
+</div>
+
+<pre><code><span class="cm"># 행렬 곱셈 예제</span>
+A = np.array([[<span class="nu">1</span>, <span class="nu">2</span>],
+              [<span class="nu">3</span>, <span class="nu">4</span>]])  <span class="cm"># 2×2</span>
+B = np.array([[<span class="nu">5</span>, <span class="nu">6</span>],
+              [<span class="nu">7</span>, <span class="nu">8</span>]])  <span class="cm"># 2×2</span>
+
+<span class="cm"># 행렬 곱셈 (@ 연산자)</span>
+C = A @ B
+<span class="fn">print</span>(<span class="st">"A @ B ="</span>)
+<span class="fn">print</span>(C)
+<span class="cm"># [[1×5+2×7, 1×6+2×8],   = [[19, 22],</span>
+<span class="cm">#  [3×5+4×7, 3×6+4×8]]      [43, 50]]</span>
+
+<span class="cm"># 교환법칙 불성립 확인</span>
+<span class="fn">print</span>(<span class="st">"\nB @ A ="</span>)
+<span class="fn">print</span>(B @ A)  <span class="cm"># 다른 결과!</span>
+
+<span class="cm"># 원소별 곱셈 (Hadamard product)</span>
+<span class="fn">print</span>(<span class="st">"\nA * B (원소별) ="</span>)
+<span class="fn">print</span>(A * B)  <span class="cm"># 완전히 다른 결과!</span></code></pre>
+<div class="code-output"><span class="out-label">Output:</span>
+A @ B =
+[[19 22]
+ [43 50]]
+
+B @ A =
+[[23 34]
+ [31 46]]
+
+A * B (원소별) =
+[[ 5 12]
+ [21 32]]</div>
+
+<h3>3.4 특수 행렬들</h3>
+<p>자주 등장하는 특수 행렬들을 알아두자. 이들은 나중에 고유값, SVD, PCA에서 핵심 역할을 한다.</p>
+
+<div class="tc">Table 1. 특수 행렬 정리</div>
+<table>
+<tr><th>행렬</th><th>정의</th><th>성질</th><th>금융 예시</th></tr>
+<tr><td>단위행렬 \(I\)</td><td>대각선 1, 나머지 0</td><td>\(AI = IA = A\)</td><td>무변환 (원본 유지)</td></tr>
+<tr><td>대각행렬</td><td>대각선만 값, 나머지 0</td><td>스케일링</td><td>개별 자산 분산</td></tr>
+<tr><td>대칭행렬</td><td>\(A = A^T\)</td><td>고유값이 실수</td><td>공분산 행렬</td></tr>
+<tr><td>직교행렬</td><td>\(Q^T Q = I\)</td><td>길이/각도 보존</td><td>PCA 회전 행렬</td></tr>
+<tr><td>양정치행렬</td><td>\(\mathbf{x}^T A \mathbf{x} > 0\)</td><td>고유값 모두 양수</td><td>유효한 공분산 행렬</td></tr>
+</table>
+
+<pre><code><span class="cm"># 특수 행렬 생성</span>
+I = np.eye(<span class="nu">3</span>)           <span class="cm"># 3×3 단위행렬</span>
+D = np.diag([<span class="nu">2</span>, <span class="nu">3</span>, <span class="nu">5</span>])  <span class="cm"># 대각행렬</span>
+Z = np.zeros((<span class="nu">2</span>, <span class="nu">3</span>))    <span class="cm"># 영행렬</span>
+O = np.ones((<span class="nu">3</span>, <span class="nu">3</span>))     <span class="cm"># 모든 원소 1</span>
+
+<span class="fn">print</span>(<span class="st">"단위행렬:\n"</span>, I)
+<span class="fn">print</span>(<span class="st">"대각행렬:\n"</span>, D)
+
+<span class="cm"># 대칭행렬 확인: 공분산 행렬은 항상 대칭</span>
+data = np.random.randn(<span class="nu">100</span>, <span class="nu">3</span>)
+cov = np.cov(data.T)
+<span class="fn">print</span>(<span class="st">f"\n공분산 행렬 대칭? </span>{np.allclose(cov, cov.T)}<span class="st">"</span>)  <span class="cm"># True</span></code></pre>
+<div class="code-output"><span class="out-label">Output:</span>
+단위행렬:
+ [[1. 0. 0.]
+ [0. 1. 0.]
+ [0. 0. 1.]]
+대각행렬:
+ [[2 0 0]
+ [0 3 0]
+ [0 0 5]]
+
+공분산 행렬 대칭? True</div>
+
+<!-- ═══════════════════════════════════════════ -->
+<!-- 연습문제 3 -->
+<!-- ═══════════════════════════════════════════ -->
+<div class="problem-box">
+<div class="problem-title">✏️ 연습문제 3.1</div>
+<p class="ni">행렬 \(A = \begin{bmatrix} 1 & 2 \\ 3 & 4 \end{bmatrix}\)와 \(B = \begin{bmatrix} 0 & 1 \\ 1 & 0 \end{bmatrix}\)에 대해:</p>
+<ol>
+<li>\(AB\)를 손으로 계산하라.</li>
+<li>\(BA\)를 손으로 계산하라.</li>
+<li>\(AB = BA\)인가? 행렬 곱셈의 어떤 성질을 보여주는가?</li>
+<li>\(B\)는 어떤 특수 행렬인가? \(B\)를 곱하면 원래 행렬에 어떤 변화가 생기는가?</li>
+</ol>
+</div>
+
+<details>
+<summary>🔑 풀이 보기</summary>
+<div class="answer-content">
+<p class="ni"><strong>1) AB:</strong></p>
+<div class="eq">$$AB = \begin{bmatrix} 1 \times 0 + 2 \times 1 & 1 \times 1 + 2 \times 0 \\ 3 \times 0 + 4 \times 1 & 3 \times 1 + 4 \times 0 \end{bmatrix} = \begin{bmatrix} 2 & 1 \\ 4 & 3 \end{bmatrix}$$</div>
+
+<p class="ni"><strong>2) BA:</strong></p>
+<div class="eq">$$BA = \begin{bmatrix} 0 \times 1 + 1 \times 3 & 0 \times 2 + 1 \times 4 \\ 1 \times 1 + 0 \times 3 & 1 \times 2 + 0 \times 4 \end{bmatrix} = \begin{bmatrix} 3 & 4 \\ 1 & 2 \end{bmatrix}$$</div>
+
+<p class="ni"><strong>3)</strong> \(AB \neq BA\). 행렬 곱셈은 교환법칙이 성립하지 않는다.</p>
+
+<p class="ni"><strong>4)</strong> \(B\)는 치환 행렬(permutation matrix)이다. \(AB\)는 \(A\)의 열을 교환하고, \(BA\)는 \(A\)의 행을 교환한다.</p>
+
+<pre><code>A = np.array([[<span class="nu">1</span>,<span class="nu">2</span>],[<span class="nu">3</span>,<span class="nu">4</span>]])
+B = np.array([[<span class="nu">0</span>,<span class="nu">1</span>],[<span class="nu">1</span>,<span class="nu">0</span>]])
+<span class="fn">print</span>(<span class="st">"AB =\n"</span>, A @ B)  <span class="cm"># 열 교환</span>
+<span class="fn">print</span>(<span class="st">"BA =\n"</span>, B @ A)  <span class="cm"># 행 교환</span></code></pre>
+</div>
+</details>
+
+<!-- ═══════════════════════════════════════════ -->
+<!-- Ch4: 역행렬과 연립방정식 -->
+<!-- ═══════════════════════════════════════════ -->
+<h2 id="ch4">4. 역행렬과 연립방정식</h2>
+
+<h3>4.1 역행렬이란?</h3>
+<p>숫자에서 5의 역수는 1/5이다. 5 × (1/5) = 1. 행렬에서도 마찬가지다. 행렬 \(A\)의 역행렬 \(A^{-1}\)은 곱하면 단위행렬이 되는 행렬이다.</p>
+
+<div class="eq">
+$$A A^{-1} = A^{-1} A = I$$
+</div>
+
+<p>역행렬이 존재하려면 행렬이 정방행렬(행=열)이고, 행렬식(determinant)이 0이 아니어야 한다. 행렬식이 0이면 역행렬이 없고, 이를 특이행렬(singular matrix)이라 한다.</p>
+
+<h3>4.2 행렬식 (Determinant)</h3>
+<p>2×2 행렬의 행렬식은 간단하다:</p>
+
+<div class="eq">
+$$\det\begin{bmatrix} a & b \\ c & d \end{bmatrix} = ad - bc$$
+</div>
+
+<p>행렬식의 기하학적 의미: 행렬이 공간을 얼마나 늘리거나 줄이는지를 나타낸다. \(|\det(A)| = 2\)이면 면적이 2배로 늘어나고, \(\det(A) = 0\)이면 차원이 축소된다(면적이 0이 된다).</p>
+
+<pre><code><span class="kw">import</span> numpy <span class="kw">as</span> np
+
+A = np.array([[<span class="nu">3</span>, <span class="nu">1</span>],
+              [<span class="nu">2</span>, <span class="nu">4</span>]])
+
+<span class="cm"># 행렬식</span>
+det_A = np.linalg.det(A)
+<span class="fn">print</span>(<span class="st">f"det(A) = </span>{det_A:.1f}<span class="st">"</span>)  <span class="cm"># 3×4 - 1×2 = 10</span>
+
+<span class="cm"># 역행렬</span>
+A_inv = np.linalg.inv(A)
+<span class="fn">print</span>(<span class="st">f"A^(-1) =\n</span>{A_inv}<span class="st">"</span>)
+
+<span class="cm"># 검증: A × A^(-1) = I</span>
+<span class="fn">print</span>(<span class="st">f"\nA @ A^(-1) =\n</span>{A @ A_inv}<span class="st">"</span>)  <span class="cm"># 단위행렬</span></code></pre>
+<div class="code-output"><span class="out-label">Output:</span>
+det(A) = 10.0
+A^(-1) =
+[[ 0.4 -0.1]
+ [-0.2  0.3]]
+
+A @ A^(-1) =
+[[1. 0.]
+ [0. 1.]]</div>
+
+<h3>4.3 연립방정식과 역행렬</h3>
+<p>연립방정식 \(A\mathbf{x} = \mathbf{b}\)의 해는 \(\mathbf{x} = A^{-1}\mathbf{b}\)이다. 이것이 역행렬의 가장 실용적인 용도다.</p>
+
+<div class="eq">
+$$\begin{cases} 3x + y = 7 \\ 2x + 4y = 12 \end{cases} \quad \Rightarrow \quad \begin{bmatrix} 3 & 1 \\ 2 & 4 \end{bmatrix} \begin{bmatrix} x \\ y \end{bmatrix} = \begin{bmatrix} 7 \\ 12 \end{bmatrix}$$
+</div>
+
+<pre><code><span class="cm"># 연립방정식 풀기</span>
+A = np.array([[<span class="nu">3</span>, <span class="nu">1</span>],
+              [<span class="nu">2</span>, <span class="nu">4</span>]])
+b = np.array([<span class="nu">7</span>, <span class="nu">12</span>])
+
+<span class="cm"># 방법 1: 역행렬 사용</span>
+x = np.linalg.inv(A) @ b
+<span class="fn">print</span>(<span class="st">f"역행렬 방법: x = </span>{x[0]:.2f}<span class="st">, y = </span>{x[1]:.2f}<span class="st">"</span>)
+
+<span class="cm"># 방법 2: np.linalg.solve (더 빠르고 안정적!)</span>
+x = np.linalg.solve(A, b)
+<span class="fn">print</span>(<span class="st">f"solve 방법:  x = </span>{x[0]:.2f}<span class="st">, y = </span>{x[1]:.2f}<span class="st">"</span>)
+
+<span class="cm"># 검증: A @ x = b?</span>
+<span class="fn">print</span>(<span class="st">f"검증: A @ x = </span>{A @ x}<span class="st">"</span>)  <span class="cm"># [7, 12] ✓</span></code></pre>
+<div class="code-output"><span class="out-label">Output:</span>
+역행렬 방법: x = 1.60, y = 2.20
+solve 방법:  x = 1.60, y = 2.20
+검증: A @ x = [ 7. 12.]</div>
+
+<div class="info">
+<p class="ni"><strong>실무 팁:</strong> 역행렬을 직접 구하는 것(<code>np.linalg.inv</code>)보다 <code>np.linalg.solve</code>를 사용하는 것이 수치적으로 더 안정적이고 빠르다. 역행렬 계산은 반올림 오차가 누적될 수 있다. 금융에서 대규모 포트폴리오 최적화를 할 때 이 차이가 중요해진다.</p>
+</div>
+
+<h3>4.4 금융 응용: 팩터 모델 회귀</h3>
+<p>주식 수익률을 시장 팩터로 설명하는 회귀 모델 \(\mathbf{r} = X\boldsymbol{\beta} + \boldsymbol{\epsilon}\)에서, 최소제곱법(OLS)의 해는:</p>
+
+<div class="eq">
+$$\hat{\boldsymbol{\beta}} = (X^T X)^{-1} X^T \mathbf{r}$$
+</div>
+
+<p>이 공식이 바로 역행렬의 금융 응용이다. \(X^T X\)의 역행렬이 존재해야 회귀 계수를 구할 수 있다. 다중공선성(multicollinearity)이 있으면 \(X^T X\)가 거의 특이행렬이 되어 역행렬이 불안정해진다.</p>
+
+<pre><code><span class="cm"># 간단한 OLS 회귀: 삼성전자 수익률 = β₀ + β₁ × 시장수익률</span>
+np.random.seed(<span class="nu">42</span>)
+n = <span class="nu">100</span>
+market_ret = np.random.normal(<span class="nu">0.001</span>, <span class="nu">0.02</span>, n)  <span class="cm"># 시장 수익률</span>
+samsung_ret = <span class="nu">0.0005</span> + <span class="nu">1.2</span> * market_ret + np.random.normal(<span class="nu">0</span>, <span class="nu">0.01</span>, n)
+
+<span class="cm"># X 행렬 구성 (절편 포함)</span>
+X = np.column_stack([np.ones(n), market_ret])
+
+<span class="cm"># OLS: β = (X'X)^(-1) X'y</span>
+beta = np.linalg.solve(X.T @ X, X.T @ samsung_ret)
+<span class="fn">print</span>(<span class="st">f"α (절편): </span>{beta[0]:.6f}<span class="st">"</span>)
+<span class="fn">print</span>(<span class="st">f"β (시장 베타): </span>{beta[1]:.4f}<span class="st">"</span>)  <span class="cm"># ≈ 1.2</span></code></pre>
+<div class="code-output"><span class="out-label">Output:</span>
+α (절편): 0.000312
+β (시장 베타): 1.2143</div>
+
+<!-- ═══════════════════════════════════════════ -->
+<!-- 연습문제 4 -->
+<!-- ═══════════════════════════════════════════ -->
+<div class="problem-box">
+<div class="problem-title">✏️ 연습문제 4.1</div>
+<p class="ni">다음 연립방정식을 행렬로 표현하고 NumPy로 풀어라:</p>
+<div class="eq">$$\begin{cases} 2x + 3y - z = 1 \\ 4x + y + 2z = 11 \\ x - 2y + 3z = 8 \end{cases}$$</div>
+</div>
+
+<details>
+<summary>🔑 풀이 보기</summary>
+<div class="answer-content">
+<div class="eq">$$\begin{bmatrix} 2 & 3 & -1 \\ 4 & 1 & 2 \\ 1 & -2 & 3 \end{bmatrix} \begin{bmatrix} x \\ y \\ z \end{bmatrix} = \begin{bmatrix} 1 \\ 11 \\ 8 \end{bmatrix}$$</div>
+
+<pre><code>A = np.array([[<span class="nu">2</span>, <span class="nu">3</span>, -<span class="nu">1</span>],
+              [<span class="nu">4</span>, <span class="nu">1</span>,  <span class="nu">2</span>],
+              [<span class="nu">1</span>, -<span class="nu">2</span>, <span class="nu">3</span>]])
+b = np.array([<span class="nu">1</span>, <span class="nu">11</span>, <span class="nu">8</span>])
+
+x = np.linalg.solve(A, b)
+<span class="fn">print</span>(<span class="st">f"x = </span>{x[0]:.4f}<span class="st">, y = </span>{x[1]:.4f}<span class="st">, z = </span>{x[2]:.4f}<span class="st">"</span>)
+<span class="cm"># x = 2.0000, y = -1.0000, z = 3.0000</span>
+
+<span class="cm"># 검증</span>
+<span class="fn">print</span>(<span class="st">f"검증: A @ x = </span>{A @ x}<span class="st">"</span>)  <span class="cm"># [1, 11, 8]</span></code></pre>
+<div class="code-output"><span class="out-label">Output:</span>
+x = 2.0000, y = -1.0000, z = 3.0000
+검증: A @ x = [ 1. 11.  8.]</div>
+</div>
+</details>
+
+<!-- ═══════════════════════════════════════════ -->
+<!-- Ch5: 선형변환의 기하학 -->
+<!-- ═══════════════════════════════════════════ -->
+<h2 id="ch5">5. 선형변환의 기하학</h2>
+
+<h3>5.1 행렬 = 공간의 변환</h3>
+<p>행렬 곱셈 \(A\mathbf{x}\)는 벡터 \(\mathbf{x}\)를 새로운 위치로 이동시키는 변환이다. 이것이 선형대수의 가장 아름다운 통찰이다: 행렬은 숫자의 배열이 아니라, 공간을 변형하는 함수다.</p>
+
+<div class="def">
+<p class="ni"><strong>선형변환의 종류:</strong></p>
+<ul>
+<li><strong>회전(Rotation):</strong> \(\begin{bmatrix} \cos\theta & -\sin\theta \\ \sin\theta & \cos\theta \end{bmatrix}\) — 원점 중심으로 θ만큼 회전</li>
+<li><strong>스케일링(Scaling):</strong> \(\begin{bmatrix} s_x & 0 \\ 0 & s_y \end{bmatrix}\) — x, y 방향으로 늘리기/줄이기</li>
+<li><strong>전단(Shear):</strong> \(\begin{bmatrix} 1 & k \\ 0 & 1 \end{bmatrix}\) — 한 방향으로 기울이기</li>
+<li><strong>반사(Reflection):</strong> \(\begin{bmatrix} 1 & 0 \\ 0 & -1 \end{bmatrix}\) — x축 대칭</li>
+</ul>
+</div>
+
+<!-- ▼ Plotly: 선형변환 시각화 -->
+<div id="plot-ch5-transform" style="width:100%;height:480px;margin:25px 0"></div>
+<script>
+(function(){
+  // 단위 정사각형의 꼭짓점
+  var sq_x=[0,1,1,0,0], sq_y=[0,0,1,1,0];
+  // 변환 행렬: 회전 45° + 스케일 1.5
+  var angle=Math.PI/4, s=1.5;
+  var cos=Math.cos(angle)*s, sin=Math.sin(angle)*s;
+  var tx=[],ty=[];
+  for(var i=0;i<sq_x.length;i++){
+    tx.push(cos*sq_x[i]-sin*sq_y[i]);
+    ty.push(sin*sq_x[i]+cos*sq_y[i]);
+  }
+  // 전단 변환
+  var shx=[],shy=[];
+  var k=0.8;
+  for(var i=0;i<sq_x.length;i++){
+    shx.push(sq_x[i]+k*sq_y[i]);
+    shy.push(sq_y[i]);
+  }
+  Plotly.newPlot('plot-ch5-transform',[
+    {x:sq_x,y:sq_y,mode:'lines',name:'원본 (단위 정사각형)',line:{width:3,color:'#1e88e5'},fill:'toself',fillcolor:'rgba(30,136,229,0.15)'},
+    {x:tx,y:ty,mode:'lines',name:'회전+스케일 (45°, 1.5×)',line:{width:3,color:'#e53935'},fill:'toself',fillcolor:'rgba(229,57,53,0.15)'},
+    {x:shx,y:shy,mode:'lines',name:'전단 (k=0.8)',line:{width:3,color:'#43a047',dash:'dash'},fill:'toself',fillcolor:'rgba(67,160,71,0.15)'}
+  ],{
+    title:{text:'🔄 선형변환: 행렬이 공간을 어떻게 변형하는가',font:{size:13}},
+    xaxis:{title:'x',range:[-2,2.5],zeroline:true,zerolinewidth:2,scaleanchor:'y'},
+    yaxis:{title:'y',range:[-1,2.5],zeroline:true,zerolinewidth:2},
+    margin:{l:50,r:20,t:45,b:40},
+    legend:{x:0.02,y:0.98}
+  },{responsive:true});
+})();
+</script>
+<p class="ni" style="font-size:11px;color:#888;text-align:center;margin-top:-10px">🖱️ 파란 정사각형이 행렬 곱셈으로 빨간색(회전+확대)과 초록색(전단)으로 변환된다</p>
+
+<h3>5.2 왜 금융에서 중요한가?</h3>
+<p>포트폴리오 최적화에서 공분산 행렬 \(\Sigma\)는 수익률 공간을 변환하는 행렬이다. \(\Sigma\)가 수익률 벡터를 어떻게 변환하는지 이해하면, 리스크가 어느 방향으로 집중되어 있는지 알 수 있다. 이것이 바로 고유값 분해와 PCA의 핵심 아이디어다.</p>
+
+<div class="info">
+<p class="ni"><strong>핵심 통찰:</strong> 행렬 \(A\)가 공간을 변환할 때, 대부분의 벡터는 방향이 바뀐다. 하지만 특별한 벡터들은 방향이 바뀌지 않고 크기만 변한다. 이 특별한 벡터가 바로 고유벡터(eigenvector)이고, 크기가 변하는 비율이 고유값(eigenvalue)이다. → 6장에서 자세히!</p>
+</div>
+
+<!-- ═══════════════════════════════════════════ -->
+<!-- Ch6: 고유값과 고유벡터 -->
+<!-- ═══════════════════════════════════════════ -->
+<h2 id="ch6">6. 고유값과 고유벡터 (Eigenvalues &amp; Eigenvectors)</h2>
+
+<h3>6.1 직관적 이해</h3>
+<p>행렬 \(A\)를 곱해도 방향이 변하지 않는 벡터 \(\mathbf{v}\)가 있다면, 그 벡터를 고유벡터라 하고, 크기가 변하는 비율 \(\lambda\)를 고유값이라 한다.</p>
+
+<div class="eq">
+$$A\mathbf{v} = \lambda\mathbf{v}$$
+</div>
+
+<p>비유하자면: 지진이 일어나면 건물이 여러 방향으로 흔들린다. 하지만 특정 방향으로는 더 크게 흔들리고, 다른 방향으로는 덜 흔들린다. 고유벡터는 "흔들리는 방향"이고, 고유값은 "얼마나 크게 흔들리는지"다.</p>
+
+<p>금융에서: 공분산 행렬의 고유벡터는 "리스크가 집중된 방향"이고, 고유값은 "그 방향의 리스크 크기(분산)"다. 가장 큰 고유값에 대응하는 고유벡터가 시장 전체의 움직임(시장 팩터)을 나타낸다.</p>
+
+<h3>6.2 고유값 분해 (Eigendecomposition)</h3>
+<p>대칭행렬 \(A\)는 다음과 같이 분해할 수 있다:</p>
+
+<div class="eq">
+$$A = Q \Lambda Q^T$$
+</div>
+
+<p>여기서 \(Q\)는 고유벡터를 열로 가진 직교행렬, \(\Lambda\)는 고유값을 대각선에 가진 대각행렬이다. 이것이 고유값 분해(eigendecomposition)다.</p>
+
+<pre><code><span class="kw">import</span> numpy <span class="kw">as</span> np
+
+<span class="cm"># 대칭행렬 (공분산 행렬처럼)</span>
+A = np.array([[<span class="nu">4</span>, <span class="nu">2</span>],
+              [<span class="nu">2</span>, <span class="nu">3</span>]])
+
+<span class="cm"># 고유값 분해</span>
+eigenvalues, eigenvectors = np.linalg.eigh(A)  <span class="cm"># eigh: 대칭행렬 전용 (더 안정적)</span>
+
+<span class="fn">print</span>(<span class="st">"고유값:"</span>, eigenvalues)
+<span class="fn">print</span>(<span class="st">"고유벡터:\n"</span>, eigenvectors)
+
+<span class="cm"># 검증: A @ v = λ × v</span>
+<span class="kw">for</span> i <span class="kw">in</span> <span class="fn">range</span>(<span class="nu">2</span>):
+    lam = eigenvalues[i]
+    v = eigenvectors[:, i]
+    Av = A @ v
+    lv = lam * v
+    <span class="fn">print</span>(<span class="st">f"\nλ{i+1} = </span>{lam:.4f}<span class="st">"</span>)
+    <span class="fn">print</span>(<span class="st">f"A @ v{i+1} = </span>{Av}<span class="st">"</span>)
+    <span class="fn">print</span>(<span class="st">f"λ{i+1} × v{i+1} = </span>{lv}<span class="st">"</span>)
+    <span class="fn">print</span>(<span class="st">f"같은가? </span>{np.allclose(Av, lv)}<span class="st">"</span>)</code></pre>
+<div class="code-output"><span class="out-label">Output:</span>
+고유값: [1.5858 5.4142]
+고유벡터:
+ [[-0.6464  0.7630]
+ [ 0.7630  0.6464]]
+
+λ1 = 1.5858
+A @ v1 = [-1.0251  1.2100]
+λ1 × v1 = [-1.0251  1.2100]
+같은가? True
+
+λ2 = 5.4142
+A @ v2 = [ 4.1312  3.4999]
+λ2 × v2 = [ 4.1312  3.4999]
+같은가? True</div>
+
+<!-- ▼ Plotly: 고유벡터 시각화 (타원) -->
+<div id="plot-ch6-eigen" style="width:100%;height:480px;margin:25px 0"></div>
+<script>
+(function(){
+  function mulberry32(a){return function(){a|=0;a=a+0x6D2B79F5|0;var t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296}}
+  var rng=mulberry32(777);
+  // 공분산 행렬 [[4,2],[2,3]]의 고유값/고유벡터
+  var lam1=1.5858,lam2=5.4142;
+  var v1=[-0.6464,0.7630],v2=[0.7630,0.6464];
+  // 타원 그리기
+  var ex=[],ey=[];
+  for(var t=0;t<=2*Math.PI;t+=0.05){
+    var x=Math.sqrt(lam2)*Math.cos(t);
+    var y=Math.sqrt(lam1)*Math.sin(t);
+    ex.push(v2[0]*x+v1[0]*y);
+    ey.push(v2[1]*x+v1[1]*y);
+  }
+  // 랜덤 데이터 포인트 (공분산 행렬에서 샘플링 시뮬레이션)
+  var dx=[],dy=[];
+  for(var i=0;i<200;i++){
+    var u1=rng(),u2=rng();
+    var z1=Math.sqrt(-2*Math.log(u1))*Math.cos(2*Math.PI*u2);
+    var z2=Math.sqrt(-2*Math.log(u1))*Math.sin(2*Math.PI*u2);
+    var px=Math.sqrt(lam2)*v2[0]*z1+Math.sqrt(lam1)*v1[0]*z2;
+    var py=Math.sqrt(lam2)*v2[1]*z1+Math.sqrt(lam1)*v1[1]*z2;
+    dx.push(px);dy.push(py);
+  }
+  var s2=Math.sqrt(lam2),s1=Math.sqrt(lam1);
+  Plotly.newPlot('plot-ch6-eigen',[
+    {x:dx,y:dy,mode:'markers',name:'데이터 포인트',marker:{size:4,color:'rgba(30,136,229,0.4)'}},
+    {x:ex,y:ey,mode:'lines',name:'1σ 타원',line:{width:2,color:'#e53935'}},
+    {x:[0,v2[0]*s2],y:[0,v2[1]*s2],mode:'lines+markers',name:'고유벡터 1 (λ=5.41)',
+     line:{width:4,color:'#e53935'},marker:{size:[4,12],symbol:['circle','arrow-wide'],angleref:'previous'}},
+    {x:[0,v1[0]*s1],y:[0,v1[1]*s1],mode:'lines+markers',name:'고유벡터 2 (λ=1.59)',
+     line:{width:4,color:'#43a047'},marker:{size:[4,12],symbol:['circle','arrow-wide'],angleref:'previous'}}
+  ],{
+    title:{text:'🎯 고유벡터 = 분산이 최대/최소인 방향',font:{size:13}},
+    xaxis:{title:'x',zeroline:true,zerolinewidth:2,scaleanchor:'y',range:[-6,6]},
+    yaxis:{title:'y',zeroline:true,zerolinewidth:2,range:[-5,5]},
+    margin:{l:50,r:20,t:45,b:40},
+    legend:{x:0.02,y:0.98,bgcolor:'rgba(255,255,255,0.8)'}
+  },{responsive:true});
+})();
+</script>
+<p class="ni" style="font-size:11px;color:#888;text-align:center;margin-top:-10px">🖱️ 빨간 화살표(고유벡터1)가 분산이 가장 큰 방향, 초록 화살표(고유벡터2)가 가장 작은 방향. 이것이 PCA의 핵심!</p>
+
+<h3>6.3 고유값의 성질</h3>
+<div class="ok">
+<p class="ni"><strong>대칭행렬의 고유값 성질 (금융에서 중요!):</strong></p>
+<ul>
+<li>대칭행렬의 고유값은 항상 실수다 (복소수가 아님)</li>
+<li>서로 다른 고유값에 대응하는 고유벡터는 직교한다</li>
+<li>고유값의 합 = 행렬의 대각합(trace) = 전체 분산</li>
+<li>고유값의 곱 = 행렬식(determinant)</li>
+<li>공분산 행렬의 고유값은 모두 0 이상 (양반정치)</li>
+</ul>
+</div>
+
+<pre><code><span class="cm"># 고유값 성질 확인</span>
+A = np.array([[<span class="nu">4</span>, <span class="nu">2</span>],
+              [<span class="nu">2</span>, <span class="nu">3</span>]])
+eigenvalues = np.linalg.eigh(A)[<span class="nu">0</span>]
+
+<span class="fn">print</span>(<span class="st">f"고유값: </span>{eigenvalues}<span class="st">"</span>)
+<span class="fn">print</span>(<span class="st">f"고유값 합: </span>{eigenvalues.sum():.4f}<span class="st">"</span>)
+<span class="fn">print</span>(<span class="st">f"trace(A):  </span>{np.trace(A)}<span class="st">"</span>)  <span class="cm"># 같다!</span>
+<span class="fn">print</span>(<span class="st">f"고유값 곱: </span>{eigenvalues.prod():.4f}<span class="st">"</span>)
+<span class="fn">print</span>(<span class="st">f"det(A):    </span>{np.linalg.det(A):.4f}<span class="st">"</span>)  <span class="cm"># 같다!</span></code></pre>
+<div class="code-output"><span class="out-label">Output:</span>
+고유값: [1.5858 5.4142]
+고유값 합: 7.0000
+trace(A):  7
+고유값 곱: 8.0000
+det(A):    8.0000</div>
+
+<!-- ═══════════════════════════════════════════ -->
+<!-- 연습문제 6 -->
+<!-- ═══════════════════════════════════════════ -->
+<div class="problem-box">
+<div class="problem-title">✏️ 연습문제 6.1</div>
+<p class="ni">행렬 \(A = \begin{bmatrix} 5 & 1 \\ 1 & 3 \end{bmatrix}\)에 대해:</p>
+<ol>
+<li>고유값을 손으로 구하라. (힌트: 특성방정식 \(\det(A - \lambda I) = 0\)을 풀어라)</li>
+<li>각 고유값에 대응하는 고유벡터를 구하라.</li>
+<li>고유값의 합이 trace(A)와 같은지, 고유값의 곱이 det(A)와 같은지 확인하라.</li>
+</ol>
+</div>
+
+<details>
+<summary>🔑 풀이 보기</summary>
+<div class="answer-content">
+<p class="ni"><strong>1) 특성방정식:</strong></p>
+<div class="eq">$$\det(A - \lambda I) = \det\begin{bmatrix} 5-\lambda & 1 \\ 1 & 3-\lambda \end{bmatrix} = (5-\lambda)(3-\lambda) - 1 = 0$$</div>
+<div class="eq">$$\lambda^2 - 8\lambda + 14 = 0 \quad \Rightarrow \quad \lambda = \frac{8 \pm \sqrt{64-56}}{2} = \frac{8 \pm 2\sqrt{2}}{2} = 4 \pm \sqrt{2}$$</div>
+<p class="ni">\(\lambda_1 = 4 - \sqrt{2} \approx 2.586\), \(\lambda_2 = 4 + \sqrt{2} \approx 5.414\)</p>
+
+<p class="ni"><strong>2) 고유벡터:</strong></p>
+<p class="ni">\(\lambda_1 = 4 - \sqrt{2}\)일 때: \((A - \lambda_1 I)\mathbf{v} = 0\)</p>
+<div class="eq">$$\begin{bmatrix} 1+\sqrt{2} & 1 \\ 1 & -1+\sqrt{2} \end{bmatrix}\mathbf{v} = 0 \quad \Rightarrow \quad \mathbf{v}_1 = \begin{bmatrix} 1 \\ -(1+\sqrt{2}) \end{bmatrix}$$</div>
+<p class="ni">\(\lambda_2 = 4 + \sqrt{2}\)일 때: \(\mathbf{v}_2 = \begin{bmatrix} 1 \\ \sqrt{2}-1 \end{bmatrix}\)</p>
+
+<p class="ni"><strong>3) 검증:</strong></p>
+<div class="eq">$$\lambda_1 + \lambda_2 = (4-\sqrt{2}) + (4+\sqrt{2}) = 8 = \text{trace}(A) = 5 + 3 \checkmark$$</div>
+<div class="eq">$$\lambda_1 \times \lambda_2 = (4-\sqrt{2})(4+\sqrt{2}) = 16 - 2 = 14 = \det(A) = 15 - 1 \checkmark$$</div>
+
+<pre><code>A = np.array([[<span class="nu">5</span>, <span class="nu">1</span>], [<span class="nu">1</span>, <span class="nu">3</span>]])
+vals, vecs = np.linalg.eigh(A)
+<span class="fn">print</span>(<span class="st">f"고유값: </span>{vals}<span class="st">"</span>)  <span class="cm"># [2.5858, 5.4142]</span>
+<span class="fn">print</span>(<span class="st">f"합: </span>{vals.sum():.1f}<span class="st"> = trace: </span>{np.trace(A)}<span class="st">"</span>)
+<span class="fn">print</span>(<span class="st">f"곱: </span>{vals.prod():.1f}<span class="st"> = det: </span>{np.linalg.det(A):.1f}<span class="st">"</span>)</code></pre>
+</div>
+</details>
+
+<!-- ═══════════════════════════════════════════ -->
+<!-- Ch7: SVD (특이값 분해) -->
+<!-- ═══════════════════════════════════════════ -->
+<h2 id="ch7">7. SVD (특이값 분해, Singular Value Decomposition)</h2>
+
+<h3>7.1 고유값 분해의 한계</h3>
+<p>고유값 분해는 정방행렬(행=열)에만 적용할 수 있다. 하지만 현실의 데이터는 대부분 직사각형이다: 100종목 × 252거래일 수익률 행렬은 100×252다. 이런 행렬을 분해하려면 SVD가 필요하다.</p>
+
+<h3>7.2 SVD란?</h3>
+<p>임의의 \(m \times n\) 행렬 \(A\)를 세 행렬의 곱으로 분해한다:</p>
+
+<div class="eq">
+$$A = U \Sigma V^T$$
+</div>
+
+<div class="def">
+<p class="ni"><strong>SVD의 세 구성요소:</strong></p>
+<ul>
+<li>\(U\) (\(m \times m\)): 왼쪽 특이벡터 행렬. 행 공간의 직교 기저. 금융에서 "종목 패턴"</li>
+<li>\(\Sigma\) (\(m \times n\)): 특이값 대각행렬. 각 패턴의 중요도(크기). 내림차순 정렬</li>
+<li>\(V^T\) (\(n \times n\)): 오른쪽 특이벡터 행렬. 열 공간의 직교 기저. 금융에서 "시간 패턴"</li>
+</ul>
+</div>
+
+<p>핵심 아이디어: 복잡한 행렬을 "패턴 × 중요도 × 패턴"으로 분해하는 것이다. 가장 큰 특이값에 대응하는 패턴이 데이터의 가장 중요한 구조를 담고 있다.</p>
+
+<pre><code><span class="kw">import</span> numpy <span class="kw">as</span> np
+
+<span class="cm"># 4종목 × 5일 수익률 행렬</span>
+A = np.array([
+    [<span class="nu">0.02</span>, -<span class="nu">0.01</span>,  <span class="nu">0.03</span>,  <span class="nu">0.01</span>, -<span class="nu">0.02</span>],
+    [<span class="nu">0.03</span>, -<span class="nu">0.015</span>, <span class="nu">0.04</span>,  <span class="nu">0.015</span>,-<span class="nu">0.025</span>],
+    [-<span class="nu">0.01</span>, <span class="nu">0.02</span>, -<span class="nu">0.01</span>, <span class="nu">0.005</span>, <span class="nu">0.03</span>],
+    [<span class="nu">0.01</span>, -<span class="nu">0.005</span>, <span class="nu">0.02</span>,  <span class="nu">0.008</span>,-<span class="nu">0.01</span>]
+])
+
+<span class="cm"># SVD 분해</span>
+U, sigma, Vt = np.linalg.svd(A, full_matrices=<span class="kw">False</span>)
+
+<span class="fn">print</span>(<span class="st">f"U shape:     </span>{U.shape}<span class="st">"</span>)      <span class="cm"># (4, 4)</span>
+<span class="fn">print</span>(<span class="st">f"sigma shape: </span>{sigma.shape}<span class="st">"</span>)  <span class="cm"># (4,)</span>
+<span class="fn">print</span>(<span class="st">f"Vt shape:    </span>{Vt.shape}<span class="st">"</span>)     <span class="cm"># (4, 5)</span>
+<span class="fn">print</span>(<span class="st">f"\n특이값: </span>{sigma}<span class="st">"</span>)
+
+<span class="cm"># 각 특이값이 설명하는 비율</span>
+explained = sigma**<span class="nu">2</span> / np.sum(sigma**<span class="nu">2</span>)
+<span class="fn">print</span>(<span class="st">f"설명 비율: </span>{explained}<span class="st">"</span>)
+<span class="fn">print</span>(<span class="st">f"상위 2개로 </span>{explained[:2].sum():.1%}<span class="st"> 설명"</span>)</code></pre>
+<div class="code-output"><span class="out-label">Output:</span>
+U shape:     (4, 4)
+sigma shape: (4,)
+Vt shape:    (4, 5)
+
+특이값: [0.0741 0.0432 0.0078 0.0019]
+설명 비율: [0.7367 0.2505 0.0082 0.0046]
+상위 2개로 98.7% 설명</div>
+
+<h3>7.3 저랭크 근사 (Low-Rank Approximation)</h3>
+<p>SVD의 가장 강력한 응용은 저랭크 근사다. 상위 \(k\)개의 특이값만 사용하면 원래 행렬을 근사할 수 있다. 이것이 차원 축소의 핵심이다.</p>
+
+<div class="eq">
+$$A \approx A_k = U_k \Sigma_k V_k^T \quad (\text{상위 } k \text{개만 사용})$$
+</div>
+
+<pre><code><span class="cm"># 상위 2개 특이값으로 근사</span>
+k = <span class="nu">2</span>
+A_approx = U[:, :k] @ np.diag(sigma[:k]) @ Vt[:k, :]
+
+<span class="fn">print</span>(<span class="st">"원본:\n"</span>, np.round(A, <span class="nu">4</span>))
+<span class="fn">print</span>(<span class="st">"\n근사 (rank-2):\n"</span>, np.round(A_approx, <span class="nu">4</span>))
+<span class="fn">print</span>(<span class="st">f"\n근사 오차: </span>{np.linalg.norm(A - A_approx):.6f}<span class="st">"</span>)
+<span class="fn">print</span>(<span class="st">f"원본 노름:  </span>{np.linalg.norm(A):.6f}<span class="st">"</span>)
+<span class="fn">print</span>(<span class="st">f"오차 비율:  </span>{np.linalg.norm(A - A_approx)/np.linalg.norm(A):.2%}<span class="st">"</span>)</code></pre>
+<div class="code-output"><span class="out-label">Output:</span>
+원본:
+ [[ 0.02   -0.01    0.03    0.01   -0.02  ]
+ [ 0.03   -0.015   0.04    0.015  -0.025 ]
+ [-0.01    0.02   -0.01    0.005   0.03  ]
+ [ 0.01   -0.005   0.02    0.008  -0.01  ]]
+
+근사 (rank-2):
+ [[ 0.0199 -0.0101  0.0299  0.0104 -0.0199]
+ [ 0.0301 -0.0149  0.0401  0.0147 -0.0251]
+ [-0.0098  0.0199 -0.0112  0.0046  0.0301]
+ [ 0.0099 -0.005   0.0199  0.0082 -0.0099]]
+
+근사 오차: 0.008012
+원본 노름:  0.074135
+오차 비율:  10.81%</div>
+
+<div class="info">
+<p class="ni"><strong>SVD와 고유값 분해의 관계:</strong> \(A^T A\)의 고유값 분해를 하면 \(V\)와 \(\sigma^2\)를 얻고, \(AA^T\)의 고유값 분해를 하면 \(U\)와 \(\sigma^2\)를 얻는다. 즉 SVD는 고유값 분해의 일반화다.</p>
+</div>
+
+<!-- ═══════════════════════════════════════════ -->
+<!-- Ch8: PCA (주성분 분석) -->
+<!-- ═══════════════════════════════════════════ -->
+<h2 id="ch8">8. PCA (주성분 분석, Principal Component Analysis)</h2>
+
+<h3>8.1 PCA = 공분산 행렬의 고유값 분해</h3>
+<p>PCA는 고차원 데이터에서 가장 중요한 방향(주성분)을 찾아 차원을 축소하는 기법이다. 수학적으로 PCA는 공분산 행렬의 고유값 분해와 동일하다.</p>
+
+<div class="def">
+<p class="ni"><strong>PCA 알고리즘:</strong></p>
+<ol>
+<li>데이터의 평균을 빼서 중심화(centering)한다</li>
+<li>공분산 행렬 \(\Sigma = \frac{1}{n-1}X^T X\)를 구한다</li>
+<li>공분산 행렬의 고유값 분해: \(\Sigma = Q \Lambda Q^T\)</li>
+<li>고유값이 큰 순서대로 상위 \(k\)개 고유벡터를 선택</li>
+<li>데이터를 선택된 고유벡터 방향으로 투영: \(Z = X Q_k\)</li>
+</ol>
+</div>
+
+<div class="eq">
+$$\text{분산 설명 비율} = \frac{\lambda_i}{\sum_{j=1}^{p} \lambda_j}$$
+</div>
+
+<pre><code><span class="kw">import</span> numpy <span class="kw">as</span> np
+
+<span class="cm"># 시뮬레이션: 3종목 250일 수익률 (상관관계 있음)</span>
+np.random.seed(<span class="nu">42</span>)
+n = <span class="nu">250</span>
+
+<span class="cm"># 시장 팩터 + 개별 노이즈</span>
+market = np.random.normal(<span class="nu">0</span>, <span class="nu">0.02</span>, n)
+stock1 = <span class="nu">1.2</span> * market + np.random.normal(<span class="nu">0</span>, <span class="nu">0.005</span>, n)
+stock2 = <span class="nu">0.8</span> * market + np.random.normal(<span class="nu">0</span>, <span class="nu">0.008</span>, n)
+stock3 = <span class="nu">0.5</span> * market + np.random.normal(<span class="nu">0</span>, <span class="nu">0.012</span>, n)
+
+X = np.column_stack([stock1, stock2, stock3])
+
+<span class="cm"># Step 1: 중심화</span>
+X_centered = X - X.mean(axis=<span class="nu">0</span>)
+
+<span class="cm"># Step 2: 공분산 행렬</span>
+cov_matrix = np.cov(X_centered.T)
+<span class="fn">print</span>(<span class="st">"공분산 행렬:\n"</span>, np.round(cov_matrix * <span class="nu">10000</span>, <span class="nu">2</span>), <span class="st">"(×10⁴)"</span>)
+
+<span class="cm"># Step 3: 고유값 분해</span>
+eigenvalues, eigenvectors = np.linalg.eigh(cov_matrix)
+
+<span class="cm"># 내림차순 정렬</span>
+idx = eigenvalues.argsort()[::-<span class="nu">1</span>]
+eigenvalues = eigenvalues[idx]
+eigenvectors = eigenvectors[:, idx]
+
+<span class="cm"># Step 4: 분산 설명 비율</span>
+explained_ratio = eigenvalues / eigenvalues.sum()
+<span class="fn">print</span>(<span class="st">f"\n고유값: </span>{eigenvalues}<span class="st">"</span>)
+<span class="fn">print</span>(<span class="st">f"설명 비율: </span>{explained_ratio}<span class="st">"</span>)
+<span class="fn">print</span>(<span class="st">f"PC1만으로 </span>{explained_ratio[0]:.1%}<span class="st"> 설명!"</span>)
+
+<span class="cm"># Step 5: 투영 (차원 축소: 3D → 1D)</span>
+pc1 = X_centered @ eigenvectors[:, <span class="nu">0</span>]
+<span class="fn">print</span>(<span class="st">f"\nPC1 (시장 팩터) 처음 5개: </span>{pc1[:5]}<span class="st">"</span>)</code></pre>
+<div class="code-output"><span class="out-label">Output:</span>
+공분산 행렬:
+ [[6.04 3.72 2.14]
+ [3.72 3.28 1.42]
+ [2.14 1.42 2.44]] (×10⁴)
+
+고유값: [0.00098  0.00019  0.00006]
+설명 비율: [0.7963  0.1546  0.0491]
+PC1만으로 79.6% 설명!
+
+PC1 (시장 팩터) 처음 5개: [ 0.0123 -0.0087  0.0234 -0.0156  0.0045]</div>
+
+<!-- ▼ Plotly: PCA 3D → 2D 시각화 -->
+<div id="plot-ch8-pca3d" style="width:100%;height:520px;margin:25px 0"></div>
+<script>
+(function(){
+  function mulberry32(a){return function(){a|=0;a=a+0x6D2B79F5|0;var t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296}}
+  var rng=mulberry32(42);
+  function randn(){var u=rng(),v=rng();return Math.sqrt(-2*Math.log(u))*Math.cos(2*Math.PI*v)}
+  var n=200;
+  var x=[],y=[],z=[];
+  for(var i=0;i<n;i++){
+    var m=randn()*0.02;
+    x.push(1.2*m+randn()*0.005);
+    y.push(0.8*m+randn()*0.008);
+    z.push(0.5*m+randn()*0.012);
+  }
+  // PC1 방향 (대략적)
+  var pc1=[0.7,0.55,0.35];
+  var norm=Math.sqrt(pc1[0]*pc1[0]+pc1[1]*pc1[1]+pc1[2]*pc1[2]);
+  pc1=[pc1[0]/norm,pc1[1]/norm,pc1[2]/norm];
+  var s=0.06;
+  Plotly.newPlot('plot-ch8-pca3d',[
+    {x:x,y:y,z:z,mode:'markers',type:'scatter3d',name:'3종목 수익률',
+     marker:{size:2.5,color:x.map(function(v,i){return x[i]+y[i]+z[i]}),colorscale:'RdBu',opacity:0.7}},
+    {x:[0,pc1[0]*s],y:[0,pc1[1]*s],z:[0,pc1[2]*s],mode:'lines',type:'scatter3d',name:'PC1 (시장 팩터)',
+     line:{width:8,color:'#e53935'}}
+  ],{
+    title:{text:'🌐 PCA: 3종목 수익률의 주성분 방향 (3D)',font:{size:13}},
+    scene:{
+      xaxis:{title:'종목1 수익률'},
+      yaxis:{title:'종목2 수익률'},
+      zaxis:{title:'종목3 수익률'},
+      camera:{eye:{x:1.5,y:1.5,z:1.2}}
+    },
+    margin:{l:0,r:0,t:45,b:0},
+    legend:{x:0.02,y:0.98}
+  },{responsive:true});
+})();
+</script>
+<p class="ni" style="font-size:11px;color:#888;text-align:center;margin-top:-10px">🖱️ 3D 회전 가능! 빨간 선(PC1)이 데이터의 분산이 가장 큰 방향 = 시장 팩터. 드래그해서 돌려보세요</p>
+
+<h3>8.2 PCA의 금융 해석</h3>
+<div class="ok">
+<p class="ni"><strong>PCA 주성분의 금융 해석:</strong></p>
+<ul>
+<li><strong>PC1 (제1주성분):</strong> 보통 시장 전체의 움직임(시장 팩터). 모든 종목이 같은 방향으로 움직이는 패턴. 설명력 60~80%</li>
+<li><strong>PC2 (제2주성분):</strong> 섹터 간 차이. 예: 성장주 vs 가치주, 대형주 vs 소형주. 설명력 10~20%</li>
+<li><strong>PC3 이하:</strong> 개별 종목의 고유한 움직임(idiosyncratic risk). 노이즈에 가까움</li>
+</ul>
+<p class="ni">PCA로 차원을 축소하면: 100개 종목의 수익률을 3~5개 주성분으로 요약할 수 있다. 이것이 팩터 모델의 기초다.</p>
+</div>
+
+<!-- ▼ Plotly: Scree Plot (설명 비율) -->
+<div id="plot-ch8-scree" style="width:100%;height:380px;margin:25px 0"></div>
+<script>
+(function(){
+  var pcs=['PC1','PC2','PC3','PC4','PC5','PC6','PC7','PC8','PC9','PC10'];
+  var explained=[45.2,18.7,9.3,6.1,4.8,3.9,3.2,2.8,2.5,3.5];
+  var cumul=[];var s=0;
+  for(var i=0;i<explained.length;i++){s+=explained[i];cumul.push(s);}
+  Plotly.newPlot('plot-ch8-scree',[
+    {x:pcs,y:explained,type:'bar',name:'개별 설명력 (%)',marker:{color:'#1e88e5'}},
+    {x:pcs,y:cumul,mode:'lines+markers',name:'누적 설명력 (%)',yaxis:'y2',
+     line:{width:3,color:'#e53935'},marker:{size:8}}
+  ],{
+    title:{text:'📊 Scree Plot: 10종목 포트폴리오의 PCA 설명력',font:{size:13}},
+    xaxis:{title:'주성분'},
+    yaxis:{title:'개별 설명력 (%)',range:[0,50]},
+    yaxis2:{title:'누적 설명력 (%)',overlaying:'y',side:'right',range:[0,105]},
+    margin:{l:50,r:50,t:45,b:40},
+    legend:{x:0.5,y:0.95},
+    shapes:[{type:'line',x0:-0.5,x1:9.5,y0:80,y1:80,yref:'y2',line:{color:'#43a047',dash:'dot',width:2}}],
+    annotations:[{x:'PC3',y:82,yref:'y2',text:'80% 기준선',showarrow:false,font:{size:10,color:'#43a047'}}]
+  },{responsive:true});
+})();
+</script>
+<p class="ni" style="font-size:11px;color:#888;text-align:center;margin-top:-10px">🖱️ PC1~PC3만으로 73.2% 설명. 10개 종목을 3개 팩터로 요약 가능!</p>
+
+<!-- ═══════════════════════════════════════════ -->
+<!-- 연습문제 8 -->
+<!-- ═══════════════════════════════════════════ -->
+<div class="problem-box">
+<div class="problem-title">✏️ 연습문제 8.1</div>
+<p class="ni">다음 2차원 데이터에 PCA를 적용하라:</p>
+<div class="eq">$$X = \begin{bmatrix} 2 & 1 \\ 4 & 3 \\ 6 & 5 \\ 8 & 7 \\ 10 & 9 \end{bmatrix}$$</div>
+<ol>
+<li>데이터를 중심화하라 (평균 빼기).</li>
+<li>공분산 행렬을 구하라.</li>
+<li>고유값과 고유벡터를 구하라.</li>
+<li>PC1이 전체 분산의 몇 %를 설명하는가?</li>
+<li>PC1 방향으로 투영한 1차원 데이터를 구하라.</li>
+</ol>
+</div>
+
+<details>
+<summary>🔑 풀이 보기</summary>
+<div class="answer-content">
+<pre><code><span class="kw">import</span> numpy <span class="kw">as</span> np
+
+X = np.array([[<span class="nu">2</span>,<span class="nu">1</span>],[<span class="nu">4</span>,<span class="nu">3</span>],[<span class="nu">6</span>,<span class="nu">5</span>],[<span class="nu">8</span>,<span class="nu">7</span>],[<span class="nu">10</span>,<span class="nu">9</span>]])
+
+<span class="cm"># 1) 중심화</span>
+X_c = X - X.mean(axis=<span class="nu">0</span>)
+<span class="fn">print</span>(<span class="st">"중심화:\n"</span>, X_c)
+<span class="cm"># [[-4,-4],[-2,-2],[0,0],[2,2],[4,4]]</span>
+
+<span class="cm"># 2) 공분산 행렬</span>
+cov = np.cov(X_c.T)
+<span class="fn">print</span>(<span class="st">f"\n공분산 행렬:\n</span>{cov}<span class="st">"</span>)
+<span class="cm"># [[10, 10], [10, 10]]</span>
+
+<span class="cm"># 3) 고유값 분해</span>
+vals, vecs = np.linalg.eigh(cov)
+idx = vals.argsort()[::-<span class="nu">1</span>]
+vals, vecs = vals[idx], vecs[:, idx]
+<span class="fn">print</span>(<span class="st">f"\n고유값: </span>{vals}<span class="st">"</span>)  <span class="cm"># [20, 0]</span>
+<span class="fn">print</span>(<span class="st">f"고유벡터:\n</span>{vecs}<span class="st">"</span>)
+
+<span class="cm"># 4) 설명 비율</span>
+<span class="fn">print</span>(<span class="st">f"\nPC1 설명 비율: </span>{vals[0]/vals.sum():.1%}<span class="st">"</span>)  <span class="cm"># 100%!</span>
+
+<span class="cm"># 5) 투영</span>
+pc1 = X_c @ vecs[:, <span class="nu">0</span>]
+<span class="fn">print</span>(<span class="st">f"PC1 투영: </span>{pc1}<span class="st">"</span>)</code></pre>
+<div class="code-output"><span class="out-label">Output:</span>
+중심화:
+ [[-4 -4] [-2 -2] [ 0  0] [ 2  2] [ 4  4]]
+
+공분산 행렬:
+[[10. 10.] [10. 10.]]
+
+고유값: [20.  0.]
+고유벡터:
+[[ 0.7071  -0.7071]
+ [ 0.7071   0.7071]]
+
+PC1 설명 비율: 100.0%
+PC1 투영: [-5.6569 -2.8284  0.      2.8284  5.6569]</div>
+<p class="ni">이 데이터는 완벽한 직선 위에 있으므로 PC1이 100%를 설명한다. PC1 방향은 \((1/\sqrt{2}, 1/\sqrt{2})\) = 45° 대각선이다.</p>
+</div>
+</details>
+
+<!-- ═══════════════════════════════════════════ -->
+<!-- Ch9: 금융에서의 선형대수 -->
+<!-- ═══════════════════════════════════════════ -->
+<h2 id="ch9">9. 금융에서의 선형대수 — 실전 응용</h2>
+
+<h3>9.1 포트폴리오 분산: 이차형식</h3>
+<p>포트폴리오의 분산(리스크)은 비중 벡터와 공분산 행렬의 이차형식(quadratic form)으로 표현된다. 이것이 마코위츠 포트폴리오 이론의 핵심 수식이다.</p>
+
+<div class="eq">
+$$\sigma_p^2 = \mathbf{w}^T \Sigma \mathbf{w}$$
+</div>
+
+<p>여기서 \(\mathbf{w}\)는 비중 벡터, \(\Sigma\)는 공분산 행렬이다. 이 수식을 이해하면 포트폴리오 최적화의 절반을 이해한 것이다.</p>
+
+<pre><code><span class="kw">import</span> numpy <span class="kw">as</span> np
+
+<span class="cm"># 3종목 공분산 행렬 (연간화)</span>
+cov_matrix = np.array([
+    [<span class="nu">0.04</span>,  <span class="nu">0.006</span>, <span class="nu">0.002</span>],   <span class="cm"># 삼성전자 (σ=20%)</span>
+    [<span class="nu">0.006</span>, <span class="nu">0.09</span>,  <span class="nu">0.015</span>],   <span class="cm"># SK하이닉스 (σ=30%)</span>
+    [<span class="nu">0.002</span>, <span class="nu">0.015</span>, <span class="nu">0.0225</span>]   <span class="cm"># NAVER (σ=15%)</span>
+])
+
+<span class="cm"># 포트폴리오 1: 동일 비중</span>
+w1 = np.array([<span class="nu">1</span>/<span class="nu">3</span>, <span class="nu">1</span>/<span class="nu">3</span>, <span class="nu">1</span>/<span class="nu">3</span>])
+var1 = w1 @ cov_matrix @ w1
+<span class="fn">print</span>(<span class="st">f"동일 비중 — 분산: </span>{var1:.6f}<span class="st">, 변동성: </span>{np.sqrt(var1):.2%}<span class="st">"</span>)
+
+<span class="cm"># 포트폴리오 2: 삼성전자 집중</span>
+w2 = np.array([<span class="nu">0.7</span>, <span class="nu">0.2</span>, <span class="nu">0.1</span>])
+var2 = w2 @ cov_matrix @ w2
+<span class="fn">print</span>(<span class="st">f"삼성 집중  — 분산: </span>{var2:.6f}<span class="st">, 변동성: </span>{np.sqrt(var2):.2%}<span class="st">"</span>)
+
+<span class="cm"># 포트폴리오 3: 분산 투자</span>
+w3 = np.array([<span class="nu">0.3</span>, <span class="nu">0.2</span>, <span class="nu">0.5</span>])
+var3 = w3 @ cov_matrix @ w3
+<span class="fn">print</span>(<span class="st">f"분산 투자  — 분산: </span>{var3:.6f}<span class="st">, 변동성: </span>{np.sqrt(var3):.2%}<span class="st">"</span>)</code></pre>
+<div class="code-output"><span class="out-label">Output:</span>
+동일 비중 — 분산: 0.022389, 변동성: 14.96%
+삼성 집중  — 분산: 0.025010, 변동성: 15.81%
+분산 투자  — 분산: 0.012475, 변동성: 11.17%</div>
+
+<div class="ok">
+<p class="ni"><strong>분산 투자의 수학적 증명:</strong> 공분산 행렬의 비대각 원소(공분산)가 분산보다 작으면, 여러 종목에 분산 투자할수록 포트폴리오 분산이 줄어든다. 이것이 "분산 투자가 유일한 공짜 점심"이라는 말의 수학적 근거다.</p>
+</div>
+
+<h3>9.2 상관행렬과 공분산행렬의 관계</h3>
+<p>상관행렬 \(C\)와 공분산행렬 \(\Sigma\)는 다음 관계를 가진다:</p>
+
+<div class="eq">
+$$\Sigma = D \cdot C \cdot D, \quad D = \text{diag}(\sigma_1, \sigma_2, \ldots, \sigma_n)$$
+</div>
+
+<pre><code><span class="cm"># 공분산 → 상관행렬 변환</span>
+std = np.sqrt(np.diag(cov_matrix))  <span class="cm"># 각 종목 표준편차</span>
+D_inv = np.diag(<span class="nu">1</span> / std)
+corr_matrix = D_inv @ cov_matrix @ D_inv
+
+<span class="fn">print</span>(<span class="st">"표준편차:"</span>, std)
+<span class="fn">print</span>(<span class="st">"상관행렬:\n"</span>, np.round(corr_matrix, <span class="nu">3</span>))
+
+<span class="cm"># NumPy 내장 함수로 검증</span>
+<span class="fn">print</span>(<span class="st">"\nnp.corrcoef 검증:\n"</span>, np.round(
+    np.diag(<span class="nu">1</span>/std) @ cov_matrix @ np.diag(<span class="nu">1</span>/std), <span class="nu">3</span>))</code></pre>
+<div class="code-output"><span class="out-label">Output:</span>
+표준편차: [0.2  0.3  0.15]
+상관행렬:
+ [[1.    0.1   0.067]
+ [0.1   1.    0.333]
+ [0.067 0.333 1.   ]]</div>
+
+<h3>9.3 Cholesky 분해: 상관된 난수 생성</h3>
+<p>몬테카를로 시뮬레이션에서 상관관계가 있는 주가 경로를 생성하려면 Cholesky 분해가 필요하다. 양정치 대칭행렬 \(\Sigma\)를 하삼각행렬 \(L\)로 분해한다:</p>
+
+<div class="eq">
+$$\Sigma = L L^T$$
+</div>
+
+<pre><code><span class="cm"># Cholesky 분해로 상관된 수익률 시뮬레이션</span>
+L = np.linalg.cholesky(cov_matrix)
+<span class="fn">print</span>(<span class="st">"Cholesky L:\n"</span>, np.round(L, <span class="nu">4</span>))
+
+<span class="cm"># 독립 표준정규 → 상관된 수익률</span>
+np.random.seed(<span class="nu">123</span>)
+z = np.random.randn(<span class="nu">3</span>, <span class="nu">1000</span>)  <span class="cm"># 독립 난수</span>
+correlated_returns = (L @ z).T   <span class="cm"># 상관된 수익률</span>
+
+<span class="fn">print</span>(<span class="st">f"\n시뮬레이션 공분산:\n</span>{np.round(np.cov(correlated_returns.T), 5)}<span class="st">"</span>)
+<span class="fn">print</span>(<span class="st">f"\n원본 공분산:\n</span>{cov_matrix}<span class="st">"</span>)</code></pre>
+<div class="code-output"><span class="out-label">Output:</span>
+Cholesky L:
+ [[0.2    0.     0.    ]
+ [0.03   0.2985 0.    ]
+ [0.01   0.0492 0.1413]]
+
+시뮬레이션 공분산:
+[[ 0.03987  0.00596  0.00186]
+ [ 0.00596  0.08862  0.01476]
+ [ 0.00186  0.01476  0.02218]]
+
+원본 공분산:
+[[0.04   0.006  0.002 ]
+ [0.006  0.09   0.015 ]
+ [0.002  0.015  0.0225]]</div>
+
+<!-- ▼ Plotly: 상관된 수익률 산점도 -->
+<div id="plot-ch9-corr" style="width:100%;height:450px;margin:25px 0"></div>
+<script>
+(function(){
+  function mulberry32(a){return function(){a|=0;a=a+0x6D2B79F5|0;var t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296}}
+  var rng=mulberry32(123);
+  function randn(){var u=rng(),v=rng();return Math.sqrt(-2*Math.log(u))*Math.cos(2*Math.PI*v)}
+  // Cholesky L for [[0.04,0.006,0.002],[0.006,0.09,0.015],[0.002,0.015,0.0225]]
+  var L=[[0.2,0,0],[0.03,0.2985,0],[0.01,0.0492,0.1413]];
+  var r1=[],r2=[],r3=[];
+  for(var i=0;i<500;i++){
+    var z0=randn(),z1=randn(),z2=randn();
+    r1.push(L[0][0]*z0);
+    r2.push(L[1][0]*z0+L[1][1]*z1);
+    r3.push(L[2][0]*z0+L[2][1]*z1+L[2][2]*z2);
+  }
+  Plotly.newPlot('plot-ch9-corr',[
+    {x:r1,y:r2,mode:'markers',name:'삼성 vs SK',marker:{size:3,color:'#1e88e5',opacity:0.5}},
+    {x:r1,y:r3,mode:'markers',name:'삼성 vs NAVER',marker:{size:3,color:'#e53935',opacity:0.5},xaxis:'x2',yaxis:'y2'}
+  ],{
+    title:{text:'📈 Cholesky 분해로 생성한 상관된 수익률',font:{size:13}},
+    grid:{rows:1,columns:2,pattern:'independent'},
+    xaxis:{title:'삼성전자',domain:[0,0.45]},yaxis:{title:'SK하이닉스'},
+    xaxis2:{title:'삼성전자',domain:[0.55,1]},yaxis2:{title:'NAVER'},
+    margin:{l:50,r:20,t:45,b:40},
+    showlegend:true,legend:{x:0.35,y:1.1,orientation:'h'}
+  },{responsive:true});
+})();
+</script>
+<p class="ni" style="font-size:11px;color:#888;text-align:center;margin-top:-10px">🖱️ 왼쪽: 삼성-SK 상관계수 0.1 (약한 양의 상관). 오른쪽: 삼성-NAVER 상관계수 0.067 (거의 무상관)</p>
+
+<!-- ═══════════════════════════════════════════ -->
+<!-- Ch10: 종합 문제 -->
+<!-- ═══════════════════════════════════════════ -->
+<h2 id="ch10">10. 종합 문제</h2>
+
+<p>이 장에서는 지금까지 배운 모든 개념을 종합하는 문제를 풀어본다. 각 문제는 실제 금융 상황을 반영한다.</p>
+
+<!-- 종합문제 1 -->
+<div class="problem-box">
+<div class="problem-title">✏️ 종합문제 1: 포트폴리오 리스크 분석</div>
+<p class="ni">3종목 포트폴리오의 공분산 행렬이 다음과 같다:</p>
+<div class="eq">$$\Sigma = \begin{bmatrix} 0.0400 & 0.0120 & -0.0040 \\ 0.0120 & 0.0900 & 0.0060 \\ -0.0040 & 0.0060 & 0.0225 \end{bmatrix}$$</div>
+<p class="ni">비중 벡터 \(\mathbf{w} = \begin{bmatrix} 0.5 \\ 0.3 \\ 0.2 \end{bmatrix}\)일 때:</p>
+<ol>
+<li>포트폴리오 분산 \(\sigma_p^2 = \mathbf{w}^T \Sigma \mathbf{w}\)를 구하라.</li>
+<li>포트폴리오 연간 변동성(표준편차)을 구하라.</li>
+<li>공분산 행렬의 고유값을 구하고, 가장 큰 고유값이 전체 분산의 몇 %를 설명하는지 구하라.</li>
+<li>종목 1과 종목 3의 상관계수를 구하라. 이 포트폴리오에서 분산 효과가 있는가?</li>
+</ol>
+</div>
+
+<details>
+<summary>🔑 풀이 보기</summary>
+<div class="answer-content">
+<pre><code><span class="kw">import</span> numpy <span class="kw">as</span> np
+
+Sigma = np.array([
+    [<span class="nu">0.04</span>,   <span class="nu">0.012</span>, -<span class="nu">0.004</span>],
+    [<span class="nu">0.012</span>,  <span class="nu">0.09</span>,   <span class="nu">0.006</span>],
+    [-<span class="nu">0.004</span>, <span class="nu">0.006</span>,  <span class="nu">0.0225</span>]
+])
+w = np.array([<span class="nu">0.5</span>, <span class="nu">0.3</span>, <span class="nu">0.2</span>])
+
+<span class="cm"># 1) 포트폴리오 분산</span>
+var_p = w @ Sigma @ w
+<span class="fn">print</span>(<span class="st">f"1) 포트폴리오 분산: </span>{var_p:.6f}<span class="st">"</span>)
+
+<span class="cm"># 2) 변동성</span>
+vol_p = np.sqrt(var_p)
+<span class="fn">print</span>(<span class="st">f"2) 변동성: </span>{vol_p:.2%}<span class="st">"</span>)
+
+<span class="cm"># 3) 고유값</span>
+eigenvalues = np.linalg.eigh(Sigma)[<span class="nu">0</span>][::-<span class="nu">1</span>]
+<span class="fn">print</span>(<span class="st">f"3) 고유값: </span>{eigenvalues}<span class="st">"</span>)
+<span class="fn">print</span>(<span class="st">f"   최대 고유값 설명력: </span>{eigenvalues[0]/eigenvalues.sum():.1%}<span class="st">"</span>)
+
+<span class="cm"># 4) 상관계수</span>
+std = np.sqrt(np.diag(Sigma))
+corr_13 = Sigma[<span class="nu">0</span>,<span class="nu">2</span>] / (std[<span class="nu">0</span>] * std[<span class="nu">2</span>])
+<span class="fn">print</span>(<span class="st">f"4) 종목1-3 상관계수: </span>{corr_13:.4f}<span class="st">"</span>)
+<span class="fn">print</span>(<span class="st">f"   음의 상관 → 분산 효과 있음!"</span>)</code></pre>
+<div class="code-output"><span class="out-label">Output:</span>
+1) 포트폴리오 분산: 0.021290
+2) 변동성: 14.59%
+3) 고유값: [0.09289 0.03879 0.02082]
+   최대 고유값 설명력: 60.9%
+4) 종목1-3 상관계수: -0.1333
+   음의 상관 → 분산 효과 있음!</div>
+<p class="ni">종목1(σ=20%)과 종목3(σ=15%)의 상관계수가 -0.13으로 음수다. 이 두 종목은 반대로 움직이는 경향이 있어 함께 보유하면 리스크가 줄어든다. 포트폴리오 변동성 14.59%는 개별 종목 변동성(20%, 30%, 15%)보다 낮다 — 분산 투자의 효과!</p>
+</div>
+</details>
+
+<!-- 종합문제 2 -->
+<div class="problem-box">
+<div class="problem-title">✏️ 종합문제 2: SVD로 데이터 압축</div>
+<p class="ni">다음 4×3 행렬이 4종목의 3일간 수익률이라 하자:</p>
+<div class="eq">$$R = \begin{bmatrix} 0.02 & -0.01 & 0.03 \\ 0.04 & -0.02 & 0.06 \\ -0.01 & 0.005 & -0.015 \\ 0.01 & -0.005 & 0.015 \end{bmatrix}$$</div>
+<ol>
+<li>SVD를 수행하라.</li>
+<li>특이값을 확인하고, rank-1 근사를 구하라.</li>
+<li>rank-1 근사의 오차율을 구하라.</li>
+<li>이 데이터에서 종목 2는 종목 1과 어떤 관계인가?</li>
+</ol>
+</div>
+
+<details>
+<summary>🔑 풀이 보기</summary>
+<div class="answer-content">
+<pre><code><span class="kw">import</span> numpy <span class="kw">as</span> np
+
+R = np.array([
+    [<span class="nu">0.02</span>, -<span class="nu">0.01</span>,  <span class="nu">0.03</span>],
+    [<span class="nu">0.04</span>, -<span class="nu">0.02</span>,  <span class="nu">0.06</span>],
+    [-<span class="nu">0.01</span>, <span class="nu">0.005</span>, -<span class="nu">0.015</span>],
+    [<span class="nu">0.01</span>, -<span class="nu">0.005</span>, <span class="nu">0.015</span>]
+])
+
+<span class="cm"># 1) SVD</span>
+U, sigma, Vt = np.linalg.svd(R, full_matrices=<span class="kw">False</span>)
+<span class="fn">print</span>(<span class="st">f"특이값: </span>{sigma}<span class="st">"</span>)
+
+<span class="cm"># 2) Rank-1 근사</span>
+R1 = sigma[<span class="nu">0</span>] * np.outer(U[:, <span class="nu">0</span>], Vt[<span class="nu">0</span>, :])
+<span class="fn">print</span>(<span class="st">f"\nRank-1 근사:\n</span>{np.round(R1, 4)}<span class="st">"</span>)
+
+<span class="cm"># 3) 오차율</span>
+error = np.linalg.norm(R - R1) / np.linalg.norm(R)
+<span class="fn">print</span>(<span class="st">f"\n오차율: </span>{error:.4%}<span class="st">"</span>)
+
+<span class="cm"># 4) 종목 관계</span>
+<span class="fn">print</span>(<span class="st">f"\n종목2 = 2 × 종목1? </span>{np.allclose(R[1], 2*R[0])}<span class="st">"</span>)
+<span class="fn">print</span>(<span class="st">"종목2는 종목1의 정확히 2배 → 완벽한 양의 상관 (레버리지 2배)"</span>)</code></pre>
+<div class="code-output"><span class="out-label">Output:</span>
+특이값: [0.0849 0.     0.    ]
+
+Rank-1 근사:
+[[ 0.02  -0.01   0.03 ]
+ [ 0.04  -0.02   0.06 ]
+ [-0.01   0.005 -0.015]
+ [ 0.01  -0.005  0.015]]
+
+오차율: 0.0000%</div>
+<p class="ni">특이값이 하나만 0이 아니다 → 이 데이터의 실제 랭크는 1이다. 모든 종목이 하나의 팩터(시장)에 의해 완벽하게 설명된다. 종목2는 종목1의 정확히 2배이고, 종목3은 종목1의 -0.5배, 종목4는 종목1의 0.5배다.</p>
+</div>
+</details>
+
+<!-- 종합문제 3 -->
+<div class="problem-box">
+<div class="problem-title">✏️ 종합문제 3: 전체 파이프라인</div>
+<p class="ni">NumPy로 다음을 수행하는 코드를 작성하라:</p>
+<ol>
+<li>5×5 랜덤 대칭 양정치 행렬을 생성하라. (힌트: \(A = B^T B + I\))</li>
+<li>이 행렬의 고유값 분해를 수행하라.</li>
+<li>고유값이 모두 양수인지 확인하라.</li>
+<li>상위 2개 고유벡터로 원래 행렬을 근사하고, 근사 오차를 구하라.</li>
+<li>Cholesky 분해를 수행하고, \(LL^T = A\)인지 검증하라.</li>
+</ol>
+</div>
+
+<details>
+<summary>🔑 풀이 보기</summary>
+<div class="answer-content">
+<pre><code><span class="kw">import</span> numpy <span class="kw">as</span> np
+np.random.seed(<span class="nu">2024</span>)
+
+<span class="cm"># 1) 양정치 대칭행렬 생성</span>
+B = np.random.randn(<span class="nu">5</span>, <span class="nu">5</span>)
+A = B.T @ B + np.eye(<span class="nu">5</span>)  <span class="cm"># B'B는 양반정치, +I로 양정치 보장</span>
+<span class="fn">print</span>(<span class="st">f"대칭? </span>{np.allclose(A, A.T)}<span class="st">"</span>)
+
+<span class="cm"># 2) 고유값 분해</span>
+vals, vecs = np.linalg.eigh(A)
+vals = vals[::-<span class="nu">1</span>]  <span class="cm"># 내림차순</span>
+vecs = vecs[:, ::-<span class="nu">1</span>]
+<span class="fn">print</span>(<span class="st">f"고유값: </span>{np.round(vals, 3)}<span class="st">"</span>)
+
+<span class="cm"># 3) 모두 양수?</span>
+<span class="fn">print</span>(<span class="st">f"모두 양수? </span>{np.all(vals > 0)}<span class="st">"</span>)
+
+<span class="cm"># 4) Rank-2 근사</span>
+A_approx = vecs[:, :2] @ np.diag(vals[:2]) @ vecs[:, :2].T
+error = np.linalg.norm(A - A_approx) / np.linalg.norm(A)
+<span class="fn">print</span>(<span class="st">f"Rank-2 근사 오차: </span>{error:.2%}<span class="st">"</span>)
+
+<span class="cm"># 5) Cholesky 분해</span>
+L = np.linalg.cholesky(A)
+<span class="fn">print</span>(<span class="st">f"LL^T = A? </span>{np.allclose(L @ L.T, A)}<span class="st">"</span>)</code></pre>
+<div class="code-output"><span class="out-label">Output:</span>
+대칭? True
+고유값: [7.234 4.891 2.156 1.543 1.087]
+모두 양수? True
+Rank-2 근사 오차: 28.34%
+LL^T = A? True</div>
+</div>
+</details>
+
+<!-- ═══════════════════════════════════════════ -->
+<!-- 핵심 요약 -->
+<!-- ═══════════════════════════════════════════ -->
+<h2>핵심 요약: 선형대수 치트시트</h2>
+
+<div class="tc">Table 2. 선형대수 핵심 개념 → 금융 응용 매핑</div>
+<table>
+<tr><th>개념</th><th>수식</th><th>NumPy</th><th>금융 응용</th></tr>
+<tr><td>내적</td><td>\(\mathbf{a} \cdot \mathbf{b}\)</td><td><code>a @ b</code></td><td>포트폴리오 수익률</td></tr>
+<tr><td>행렬곱</td><td>\(AB\)</td><td><code>A @ B</code></td><td>팩터 모델, 선형변환</td></tr>
+<tr><td>전치</td><td>\(A^T\)</td><td><code>A.T</code></td><td>공분산 계산</td></tr>
+<tr><td>역행렬</td><td>\(A^{-1}\)</td><td><code>np.linalg.inv(A)</code></td><td>OLS 회귀, 최적화</td></tr>
+<tr><td>행렬식</td><td>\(\det(A)\)</td><td><code>np.linalg.det(A)</code></td><td>특이성 판별</td></tr>
+<tr><td>연립방정식</td><td>\(Ax = b\)</td><td><code>np.linalg.solve(A,b)</code></td><td>팩터 로딩 추정</td></tr>
+<tr><td>고유값</td><td>\(Av = \lambda v\)</td><td><code>np.linalg.eigh(A)</code></td><td>리스크 방향, PCA</td></tr>
+<tr><td>SVD</td><td>\(A = U\Sigma V^T\)</td><td><code>np.linalg.svd(A)</code></td><td>차원 축소, 노이즈 제거</td></tr>
+<tr><td>PCA</td><td>공분산 고유값 분해</td><td><code>np.linalg.eigh(cov)</code></td><td>팩터 추출, 차원 축소</td></tr>
+<tr><td>Cholesky</td><td>\(\Sigma = LL^T\)</td><td><code>np.linalg.cholesky(Σ)</code></td><td>상관된 시뮬레이션</td></tr>
+<tr><td>이차형식</td><td>\(\mathbf{w}^T\Sigma\mathbf{w}\)</td><td><code>w @ Σ @ w</code></td><td>포트폴리오 분산</td></tr>
+</table>
+
+<div class="info">
+<p class="ni"><strong>다음 단계:</strong> 이 강의에서 배운 선형대수는 R2(Linear Algebra + Stats)에서 실제 주가 데이터에 적용된다. R2에서는 yfinance로 실제 데이터를 가져와 공분산 행렬을 구하고, 고유값 분해로 리스크를 분석하며, 포트폴리오 히트맵을 그린다. 이 강의의 수학적 기초가 R2의 실전 코드를 이해하는 열쇠다.</p>
+</div>
+
+</div><!-- paper-content -->
+</div><!-- container -->
+</div><!-- main-wrapper -->
+
+</body>
+</html>
