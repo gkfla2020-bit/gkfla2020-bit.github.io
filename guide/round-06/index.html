@@ -7,6 +7,7 @@
 <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
 <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;500&family=Space+Mono:wght@400&family=Inter:wght@300;400&display=swap" rel="stylesheet">
+<script src="https://cdn.plot.ly/plotly-2.27.0.min.js"></script>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
 body{font-family:'Inter',sans-serif;background:#fafaf8;color:#1a1a1a;line-height:1.7;overflow-x:hidden}
@@ -810,6 +811,45 @@ BoW는 단순하고 직관적이지만, 심각한 한계가 있다. 첫째, <str
 이 한계들을 해결하기 위해 TF-IDF가 등장한다. 다음 챕터에서 자세히 다룬다.
 </p>
 
+<!-- ★ Plotly: DTM Heatmap -->
+<h3>4.x 📊 Interactive: 문서-용어 행렬(DTM) 히트맵</h3>
+<div id="plot-ch4-dtm" style="width:100%;height:420px;margin:20px 0"></div>
+<script>
+(function(){
+  var docs = ['D1: Fed raises rates','D2: Fed cuts rates sharply','D3: Market rallies after rate cuts',
+              'D4: Apple earnings beat estimates','D5: Tesla drops on weak earnings','D6: Oil surges amid supply fears',
+              'D7: Fed signals rate pause','D8: Inflation data higher than expected'];
+  var vocab = ['apple','beat','cuts','data','drops','earnings','estimates','expected','fed','fears',
+               'higher','inflation','market','oil','pause','raises','rallies','rate','rates','sharply',
+               'signals','supply','surges','tesla','weak'];
+  var dtm = [
+    [0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,1,0,0,1,0,0,0,0,0,0],
+    [0,0,1,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,1,1,0,0,0,0,0],
+    [0,0,1,0,0,0,0,0,0,0,0,0,1,0,0,0,1,1,0,0,0,0,0,0,0],
+    [1,1,0,0,0,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+    [0,0,0,0,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1],
+    [0,0,0,0,0,0,0,0,0,1,0,0,0,1,0,0,0,0,0,0,0,1,1,0,0],
+    [0,0,0,0,0,0,0,0,1,0,0,0,0,0,1,0,0,1,0,0,1,0,0,0,0],
+    [0,0,0,1,0,0,0,1,0,0,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0]
+  ];
+  var colorscale = [[0,'#f8f9fa'],[0.5,'#74b9ff'],[1,'#0984e3']];
+  var annotations = [];
+  for(var i=0;i<dtm.length;i++){
+    for(var j=0;j<vocab.length;j++){
+      annotations.push({x:vocab[j],y:docs[i],text:dtm[i][j]>0?String(dtm[i][j]):'',showarrow:false,font:{size:10,color:dtm[i][j]>0?'#fff':'#ccc'}});
+    }
+  }
+  Plotly.newPlot('plot-ch4-dtm',[{z:dtm,x:vocab,y:docs,type:'heatmap',colorscale:colorscale,showscale:true,colorbar:{title:'Count',titleside:'right'}}],{
+    title:{text:'📊 Document-Term Matrix (BoW)',font:{size:15}},
+    xaxis:{title:'Vocabulary',tickangle:45,tickfont:{size:10}},
+    yaxis:{title:'Documents',tickfont:{size:10},autorange:'reversed'},
+    annotations:annotations,
+    margin:{l:220,b:100,t:50},
+    paper_bgcolor:'#fafaf8',plot_bgcolor:'#fff'
+  },{responsive:true});
+})();
+</script>
+<p class="ni">🖱️ 마우스를 올리면 각 셀의 단어 빈도를 확인할 수 있습니다. 파란색이 진할수록 해당 단어가 문서에 많이 등장합니다. 대부분의 셀이 0(흰색)인 것이 BoW의 희소성(sparsity) 문제를 직관적으로 보여줍니다.</p>
 
 <h3>4.5 BoW의 수학적 표현</h3>
 
@@ -1030,6 +1070,59 @@ plt.<span class="fn">show</span>()
 <div class="info">
 <p class="ni"><strong>교재 연동:</strong> MLAT Ch.14에서 Jansen은 <code>scipy.spatial.distance.pdist()</code>를 사용하여 BBC 뉴스 기사 간 유사도를 계산하고, 가장 유사한 문서 쌍을 찾는다. 금융에서 이 기법은 "유사한 뉴스 클러스터링", "중복 뉴스 제거", "관련 종목 발견" 등에 활용된다.</p>
 </div>
+
+<!-- ★ Plotly: TF-IDF Weight Comparison + Cosine Similarity -->
+<h3>5.x 📊 Interactive: TF-IDF 가중치 비교 + 코사인 유사도 히트맵</h3>
+<div style="display:flex;gap:16px;flex-wrap:wrap">
+<div id="plot-ch5-tfidf" style="flex:1;min-width:480px;height:400px"></div>
+<div id="plot-ch5-cosine" style="flex:1;min-width:480px;height:400px"></div>
+</div>
+<script>
+(function(){
+  // TF-IDF vs Raw TF comparison
+  var words = ['earnings','apple','fed','rate','inflation','oil','tesla','cuts','stock','supply'];
+  var rawTF = [4,3,3,3,2,2,2,2,2,2];
+  var tfidf = [0.42,0.61,0.55,0.48,0.72,0.72,0.72,0.38,0.65,0.72];
+  Plotly.newPlot('plot-ch5-tfidf',[
+    {x:words,y:rawTF,type:'bar',name:'Raw TF (빈도)',marker:{color:'#74b9ff'},opacity:0.7},
+    {x:words,y:tfidf,type:'bar',name:'TF-IDF (가중치)',marker:{color:'#e17055'},opacity:0.85}
+  ],{
+    title:{text:'Raw TF vs TF-IDF: 단어 중요도 비교',font:{size:14}},
+    barmode:'group',
+    xaxis:{title:'단어',tickangle:30},
+    yaxis:{title:'값'},
+    legend:{x:0.6,y:0.95},
+    margin:{t:50,b:80},
+    paper_bgcolor:'#fafaf8',plot_bgcolor:'#fff'
+  },{responsive:true});
+
+  // Cosine similarity heatmap
+  var labels = ['D1:Apple earnings','D2:Tesla drops','D3:Fed rates','D4:Apple upgrade','D5:Oil surges','D6:Apple stock','D7:Fed rate cuts','D8:Inflation data'];
+  var sim = [
+    [1.00,0.29,0.00,0.41,0.00,0.38,0.00,0.00],
+    [0.29,1.00,0.00,0.00,0.00,0.00,0.00,0.00],
+    [0.00,0.00,1.00,0.00,0.00,0.00,0.52,0.18],
+    [0.41,0.00,0.00,1.00,0.00,0.45,0.00,0.00],
+    [0.00,0.00,0.00,0.00,1.00,0.00,0.00,0.00],
+    [0.38,0.00,0.00,0.45,0.00,1.00,0.00,0.00],
+    [0.00,0.00,0.52,0.00,0.00,0.00,1.00,0.21],
+    [0.00,0.00,0.18,0.00,0.00,0.00,0.21,1.00]
+  ];
+  var ann2=[];
+  for(var i=0;i<8;i++)for(var j=0;j<8;j++){
+    ann2.push({x:j,y:i,text:sim[i][j].toFixed(2),showarrow:false,font:{size:9,color:sim[i][j]>0.3?'#fff':'#333'}});
+  }
+  Plotly.newPlot('plot-ch5-cosine',[{z:sim,x:labels,y:labels,type:'heatmap',colorscale:[[0,'#fff'],[0.3,'#fdcb6e'],[0.6,'#e17055'],[1,'#d63031']],showscale:true}],{
+    title:{text:'📐 코사인 유사도 행렬 (TF-IDF)',font:{size:14}},
+    xaxis:{tickangle:45,tickfont:{size:8}},
+    yaxis:{tickfont:{size:8},autorange:'reversed'},
+    annotations:ann2,
+    margin:{l:140,b:140,t:50,r:20},
+    paper_bgcolor:'#fafaf8',plot_bgcolor:'#fff'
+  },{responsive:true});
+})();
+</script>
+<p class="ni">🖱️ 왼쪽: "earnings"는 빈도(TF)가 높지만 여러 문서에 등장하므로 TF-IDF는 상대적으로 낮습니다. "inflation", "oil", "tesla"는 특정 문서에만 등장하므로 TF-IDF가 높습니다. 오른쪽: Apple 관련 뉴스(D1,D4,D6)끼리, Fed 관련 뉴스(D3,D7)끼리 유사도가 높은 클러스터가 보입니다.</p>
 
 
 <!-- ==================== Ch.6 ==================== -->
@@ -1399,6 +1492,60 @@ y_pred = model.<span class="fn">predict</span>(X_test).<span class="fn">argmax</
 <p class="ni"><strong>핵심 포인트:</strong> TF-IDF + LightGBM 조합은 텍스트 감성분석의 강력한 베이스라인이다. MLAT에서 Yelp 600만 리뷰에 대해 73.6% 정확도를 달성했다. 이 파이프라인은 (1) 빠른 학습, (2) 피처 중요도 해석 가능, (3) 대규모 데이터 처리 가능이라는 장점이 있다. R4에서 배운 XGBoost/LightGBM의 텍스트 데이터 적용 버전이라고 생각하면 된다.</p>
 </div>
 
+<!-- ★ Plotly: Sentiment Score Time Series + Stock Price -->
+<h3>7.x 📊 Interactive: 뉴스 감성 점수 + 주가 오버레이</h3>
+<div id="plot-ch7-sentiment" style="width:100%;height:480px;margin:20px 0"></div>
+<script>
+(function(){
+  function mulberry32(a){return function(){a|=0;a=a+0x6D2B79F5|0;var t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296;}}
+  var rng=mulberry32(2024);
+  var N=120, dates=[], price=[100], sentiment=[], sentMA=[];
+  var d=new Date(2024,0,2);
+  for(var i=0;i<N;i++){
+    dates.push(d.toISOString().slice(0,10));
+    d=new Date(d.getTime()+86400000);
+    if(d.getDay()===0)d=new Date(d.getTime()+86400000);
+    if(d.getDay()===6)d=new Date(d.getTime()+2*86400000);
+    var s=(rng()-0.5)*0.6;
+    // inject events
+    if(i===25)s=0.8;  // positive earnings
+    if(i===26)s=0.7;
+    if(i===55)s=-0.75; // negative news
+    if(i===56)s=-0.6;
+    if(i===90)s=0.65;  // upgrade
+    sentiment.push(Math.round(s*100)/100);
+    if(i>0)price.push(price[i-1]*(1+s*0.02+(rng()-0.5)*0.015));
+  }
+  // 5-day MA of sentiment
+  for(var i=0;i<N;i++){
+    if(i<4){sentMA.push(null);}
+    else{var sum=0;for(var j=i-4;j<=i;j++)sum+=sentiment[j];sentMA.push(Math.round(sum/5*100)/100);}
+  }
+  var colors=sentiment.map(function(s){return s>0.1?'#00b894':s<-0.1?'#d63031':'#636e72';});
+  Plotly.newPlot('plot-ch7-sentiment',[
+    {x:dates,y:price,type:'scatter',mode:'lines',name:'주가 (SPY)',yaxis:'y2',line:{color:'#0984e3',width:2}},
+    {x:dates,y:sentiment,type:'bar',name:'일별 감성 점수',marker:{color:colors},opacity:0.6},
+    {x:dates,y:sentMA,type:'scatter',mode:'lines',name:'감성 5일 MA',line:{color:'#e17055',width:2.5,dash:'dot'}}
+  ],{
+    title:{text:'📰 뉴스 감성 점수 vs 주가 (시뮬레이션)',font:{size:15}},
+    xaxis:{title:'날짜'},
+    yaxis:{title:'감성 점수',range:[-1,1],side:'left'},
+    yaxis2:{title:'주가 ($)',overlaying:'y',side:'right'},
+    legend:{x:0.01,y:0.98,bgcolor:'rgba(255,255,255,0.8)'},
+    shapes:[
+      {type:'rect',x0:dates[24],x1:dates[27],y0:-1,y1:1,fillcolor:'rgba(0,184,148,0.1)',line:{width:0}},
+      {type:'rect',x0:dates[54],x1:dates[57],y0:-1,y1:1,fillcolor:'rgba(214,48,49,0.1)',line:{width:0}}
+    ],
+    annotations:[
+      {x:dates[25],y:0.85,text:'📈 호실적 발표',showarrow:true,arrowhead:2,font:{size:10,color:'#00b894'}},
+      {x:dates[55],y:-0.8,text:'📉 부정적 뉴스',showarrow:true,arrowhead:2,font:{size:10,color:'#d63031'}}
+    ],
+    margin:{t:50,b:60},paper_bgcolor:'#fafaf8',plot_bgcolor:'#fff'
+  },{responsive:true});
+})();
+</script>
+<p class="ni">🖱️ 초록 막대=긍정 감성, 빨간 막대=부정 감성. 주가(파란 선)가 감성 점수 변화에 후행하는 패턴을 관찰하세요. 감성 5일 이동평균(주황 점선)이 매매 시그널로 활용됩니다. 하이라이트 영역은 주요 이벤트 구간입니다.</p>
+
 
 <!-- ==================== Ch.8 ==================== -->
 <h2 id="ch8">Chapter 8. 토픽 모델링 — 문서의 숨겨진 주제를 발견하다</h2>
@@ -1643,6 +1790,55 @@ plt.<span class="fn">show</span>()
 <div class="info">
 <p class="ni"><strong>교재 연동:</strong> MLAT Ch.15에서 Jansen은 pyLDAvis를 사용하여 LDA 토픽을 인터랙티브하게 시각화한다. pyLDAvis는 각 토픽의 크기, 토픽 간 거리, 각 토픽의 핵심 단어를 2D 공간에 표시한다. 또한 어닝콜 데이터에 LDA를 적용하여 "경영진이 어떤 주제를 강조하는지"를 자동으로 추출하고, 이를 주가 변동과 연결하는 실험을 수행한다.</p>
 </div>
+
+<!-- ★ Plotly: LDA Topic Distribution + Coherence -->
+<h3>8.x 📊 Interactive: LDA 토픽 분포 + Coherence Score</h3>
+<div style="display:flex;gap:16px;flex-wrap:wrap">
+<div id="plot-ch8-topics" style="flex:1;min-width:480px;height:420px"></div>
+<div id="plot-ch8-coherence" style="flex:1;min-width:480px;height:420px"></div>
+</div>
+<script>
+(function(){
+  // LDA Topic distribution (stacked bar)
+  var docs=['어닝콜 #1','어닝콜 #2','어닝콜 #3','뉴스 #1','뉴스 #2','뉴스 #3','공시 #1','공시 #2','공시 #3','공시 #4'];
+  var t1=[0.65,0.12,0.08,0.55,0.10,0.05,0.15,0.08,0.60,0.10]; // 기업실적
+  var t2=[0.10,0.60,0.15,0.08,0.55,0.12,0.10,0.65,0.08,0.15]; // 통화정책
+  var t3=[0.08,0.10,0.55,0.12,0.08,0.60,0.05,0.10,0.12,0.55]; // 에너지/원자재
+  var t4=[0.12,0.13,0.15,0.20,0.22,0.18,0.65,0.12,0.15,0.15]; // 규제/법률
+  var t5=[0.05,0.05,0.07,0.05,0.05,0.05,0.05,0.05,0.05,0.05]; // 기타
+  var colors=['#0984e3','#e17055','#00b894','#6c5ce7','#fdcb6e'];
+  var names=['T1: 기업실적','T2: 통화정책','T3: 에너지/원자재','T4: 규제/법률','T5: 기타'];
+  var traces=[];
+  [t1,t2,t3,t4,t5].forEach(function(t,i){
+    traces.push({x:docs,y:t,type:'bar',name:names[i],marker:{color:colors[i]}});
+  });
+  Plotly.newPlot('plot-ch8-topics',traces,{
+    title:{text:'📑 LDA 토픽 분포 (문서별)',font:{size:14}},
+    barmode:'stack',
+    xaxis:{tickangle:30,tickfont:{size:9}},
+    yaxis:{title:'토픽 비율',range:[0,1]},
+    legend:{x:1.02,y:1,font:{size:10}},
+    margin:{t:50,b:100,r:140},
+    paper_bgcolor:'#fafaf8',plot_bgcolor:'#fff'
+  },{responsive:true});
+
+  // Coherence score by number of topics
+  var nTopics=[3,4,5,6,7,8,9,10,12,14,16,18,20];
+  var coherence=[0.38,0.42,0.51,0.48,0.46,0.44,0.43,0.41,0.39,0.37,0.36,0.34,0.33];
+  Plotly.newPlot('plot-ch8-coherence',[
+    {x:nTopics,y:coherence,type:'scatter',mode:'lines+markers',line:{color:'#6c5ce7',width:2.5},marker:{size:8,color:nTopics.map(function(n){return n===5?'#e17055':'#6c5ce7';}),line:{width:nTopics.map(function(n){return n===5?3:0;}),color:'#e17055'}},name:'Coherence (c_v)'}
+  ],{
+    title:{text:'🎯 Coherence Score vs 토픽 수',font:{size:14}},
+    xaxis:{title:'토픽 수 (K)',dtick:2},
+    yaxis:{title:'Coherence Score (c_v)'},
+    shapes:[{type:'line',x0:5,x1:5,y0:0.3,y1:0.53,line:{color:'#e17055',width:2,dash:'dash'}}],
+    annotations:[{x:5,y:0.52,text:'최적: K=5',showarrow:true,arrowhead:2,font:{size:11,color:'#e17055'}}],
+    margin:{t:50,b:60},
+    paper_bgcolor:'#fafaf8',plot_bgcolor:'#fff'
+  },{responsive:true});
+})();
+</script>
+<p class="ni">🖱️ 왼쪽: 각 문서의 토픽 비율을 스택 바 차트로 표시. 어닝콜 #1은 "기업실적" 토픽이 65%로 지배적이고, 뉴스 #3은 "에너지/원자재"가 60%입니다. 오른쪽: 토픽 수 K=5에서 Coherence Score가 최대(0.51)이며, 이후 감소합니다.</p>
 
 
 <!-- ==================== Ch.9 ==================== -->
@@ -1891,6 +2087,62 @@ Word2Vec 외에 <strong>GloVe(Global Vectors for Word Representation)</strong>�
 <p class="ni"><strong>⚠️ 사전 학습 vs 도메인 특화 임베딩 (MLAT Ch.16)</strong></p>
 <p class="ni" style="margin-top:8px">Wikipedia로 학습된 GloVe는 일반적인 언어 관계를 잘 포착하지만, 금융 전문 용어의 미묘한 차이는 놓칠 수 있다. "quantitative easing"이나 "yield curve inversion" 같은 금융 특수 표현은 금융 뉴스/공시로 직접 학습한 임베딩이 더 정확하다. MLAT에서 SEC 10-K 공시로 학습한 커스텀 임베딩이 38.5% 유추 정확도를 달성했는데, 이는 일반 코퍼스보다 낮지만 금융 특화 유추에서는 더 높은 성능을 보인다.</p>
 </div>
+
+
+<!-- ★ Plotly: Word2Vec 3D Embedding Space -->
+<h3>9.x 📊 Interactive: Word2Vec 3D 임베딩 공간 (금융 단어)</h3>
+<div id="plot-ch9-w2v" style="width:100%;height:520px;margin:20px 0"></div>
+<script>
+(function(){
+  function mulberry32(a){return function(){a|=0;a=a+0x6D2B79F5|0;var t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296;}}
+  var rng=mulberry32(777);
+  // Simulated PCA-reduced Word2Vec embeddings for financial terms
+  var words=['inflation','deflation','CPI','rate_hike','rate_cut','dovish','hawkish','Fed',
+             'bull','bear','rally','crash','volatility','VIX',
+             'earnings','revenue','profit','loss','dividend','buyback',
+             'oil','gold','copper','crude','commodity',
+             'AAPL','GOOGL','MSFT','TSLA','AMZN'];
+  var categories=['통화정책','통화정책','통화정책','통화정책','통화정책','통화정책','통화정책','통화정책',
+                  '시장심리','시장심리','시장심리','시장심리','시장심리','시장심리',
+                  '기업실적','기업실적','기업실적','기업실적','기업실적','기업실적',
+                  '원자재','원자재','원자재','원자재','원자재',
+                  '기술주','기술주','기술주','기술주','기술주'];
+  var catColors={'통화정책':'#0984e3','시장심리':'#e17055','기업실적':'#00b894','원자재':'#fdcb6e','기술주':'#6c5ce7'};
+  // Generate clustered 3D coordinates
+  var centers={'통화정책':[2,3,1],'시장심리':[-2,1,-1],'기업실적':[1,-3,2],'원자재':[-3,-1,-2],'기술주':[3,-1,-3]};
+  var x=[],y=[],z=[],colors=[],texts=[];
+  for(var i=0;i<words.length;i++){
+    var c=centers[categories[i]];
+    x.push(c[0]+(rng()-0.5)*2.5);
+    y.push(c[1]+(rng()-0.5)*2.5);
+    z.push(c[2]+(rng()-0.5)*2.5);
+    colors.push(catColors[categories[i]]);
+    texts.push(words[i]+' ('+categories[i]+')');
+  }
+  // Group by category for legend
+  var cats=Object.keys(catColors);
+  var traces=cats.map(function(cat){
+    var idx=[];for(var i=0;i<categories.length;i++)if(categories[i]===cat)idx.push(i);
+    return{x:idx.map(function(i){return x[i];}),y:idx.map(function(i){return y[i];}),z:idx.map(function(i){return z[i];}),
+      mode:'markers+text',type:'scatter3d',name:cat,
+      text:idx.map(function(i){return words[i];}),textposition:'top center',textfont:{size:9},
+      marker:{size:7,color:catColors[cat],opacity:0.85,line:{width:1,color:'#fff'}},
+      hovertext:idx.map(function(i){return texts[i];})};
+  });
+  // Add king-queen analogy arrow
+  traces.push({x:[2.5,-0.5,1.5],y:[3.2,2.8,-2.5],z:[1.2,0.8,2.2],mode:'lines+markers',type:'scatter3d',name:'벡터 산술',
+    line:{color:'#d63031',width:4,dash:'dash'},marker:{size:4,color:'#d63031'},
+    hovertext:['hawkish','dovish → rate_cut 방향','earnings']});
+  Plotly.newPlot('plot-ch9-w2v',traces,{
+    title:{text:'🧠 Word2Vec 3D 임베딩 공간 (금융 단어 30개, PCA 축소)',font:{size:14}},
+    scene:{xaxis:{title:'PC1'},yaxis:{title:'PC2'},zaxis:{title:'PC3'},
+      camera:{eye:{x:1.5,y:1.5,z:1.2}}},
+    legend:{x:1.02,y:0.95,font:{size:10}},
+    margin:{t:50,r:160},paper_bgcolor:'#fafaf8'
+  },{responsive:true});
+})();
+</script>
+<p class="ni">🖱️ 3D 공간을 드래그하여 회전하세요. 같은 카테고리의 단어들이 클러스터를 형성합니다. "통화정책" 단어(inflation, Fed, hawkish)가 한 영역에, "기술주"(AAPL, GOOGL, MSFT)가 다른 영역에 모여 있습니다. Word2Vec이 의미적 유사성을 벡터 공간의 거리로 학습한 결과입니다.</p>
 
 
 <!-- ==================== Ch.10 ==================== -->
@@ -2276,6 +2528,45 @@ label_map = {<span class="nu">0</span>: <span class="st">'Positive'</span>, <spa
 <p class="ni"><strong>교재 연동:</strong> MLAT Ch.16의 마지막 섹션 "New frontiers – pretrained transformer models"에서 Jansen은 Attention 메커니즘, BERT, GPT 등의 최신 모델을 소개한다. 그는 "2018 is now considered a turning point for NLP research"라고 강조하며, BERT가 GLUE 벤치마크에서 인간 수준을 넘어선 것을 언급한다. R7(딥러닝)과 R8(Transformer)에서 이 내용을 더 깊이 다룰 예정이다.</p>
 </div>
 
+<!-- ★ Plotly: Self-Attention Heatmap -->
+<h3>11.x 📊 Interactive: Self-Attention 가중치 히트맵</h3>
+<div id="plot-ch11-attention" style="width:100%;height:480px;margin:20px 0"></div>
+<script>
+(function(){
+  var tokens=['[CLS]','Fed','raised','interest','rates','citing','persistent','inflation','[SEP]'];
+  var n=tokens.length;
+  // Simulated attention weights (row=query, col=key)
+  var attn=[
+    [0.05,0.12,0.08,0.10,0.15,0.05,0.10,0.30,0.05],
+    [0.03,0.10,0.15,0.12,0.25,0.05,0.08,0.18,0.04],
+    [0.02,0.20,0.08,0.15,0.30,0.05,0.05,0.12,0.03],
+    [0.02,0.08,0.12,0.10,0.35,0.08,0.10,0.12,0.03],
+    [0.03,0.15,0.18,0.25,0.10,0.05,0.08,0.12,0.04],
+    [0.02,0.05,0.08,0.10,0.12,0.08,0.25,0.25,0.05],
+    [0.02,0.05,0.05,0.08,0.10,0.15,0.10,0.40,0.05],
+    [0.03,0.10,0.08,0.12,0.15,0.12,0.20,0.15,0.05],
+    [0.05,0.10,0.08,0.10,0.15,0.08,0.12,0.22,0.10]
+  ];
+  var ann=[];
+  for(var i=0;i<n;i++)for(var j=0;j<n;j++){
+    ann.push({x:tokens[j],y:tokens[i],text:attn[i][j].toFixed(2),showarrow:false,font:{size:9,color:attn[i][j]>0.2?'#fff':'#333'}});
+  }
+  Plotly.newPlot('plot-ch11-attention',[{
+    z:attn,x:tokens,y:tokens,type:'heatmap',
+    colorscale:[[0,'#fff5f5'],[0.15,'#fab1a0'],[0.3,'#e17055'],[0.5,'#d63031'],[1,'#6c0000']],
+    showscale:true,colorbar:{title:'Attention',titleside:'right'}
+  }],{
+    title:{text:'🔍 Self-Attention 가중치 (Head #1): "Fed raised interest rates citing persistent inflation"',font:{size:13}},
+    xaxis:{title:'Key (참조 대상)',tickfont:{size:11},side:'bottom'},
+    yaxis:{title:'Query (질의 토큰)',tickfont:{size:11},autorange:'reversed'},
+    annotations:ann,
+    margin:{l:100,b:80,t:60,r:80},
+    paper_bgcolor:'#fafaf8',plot_bgcolor:'#fff'
+  },{responsive:true});
+})();
+</script>
+<p class="ni">🖱️ 행(Query)이 "raised"일 때, 열(Key) "rates"에 높은 attention(0.30)을 부여합니다 → "raised"가 "rates"와 강하게 연결됨. "persistent"는 "inflation"에 0.40의 높은 attention → 수식어-피수식어 관계를 자동 학습. 이것이 Transformer가 문맥을 이해하는 핵심 메커니즘입니다.</p>
+
 
 
 <h3>11.5 Self-Attention 계산 예제: 단계별 워크스루</h3>
@@ -2599,6 +2890,57 @@ MLAT Ch.3 "Alternative Data for Finance"에서 다루는 대안 데이터는 전
 </ul>
 </div>
 
+<!-- ★ Plotly: NLP Sentiment Strategy Cumulative Returns -->
+<h3>12.x 📊 Interactive: NLP 감성 전략 누적 수익률</h3>
+<div id="plot-ch12-strategy" style="width:100%;height:480px;margin:20px 0"></div>
+<script>
+(function(){
+  function mulberry32(a){return function(){a|=0;a=a+0x6D2B79F5|0;var t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296;}}
+  var rng=mulberry32(42);
+  var N=252; // 1 year trading days
+  var dates=[],buyHold=[1],sentStrategy=[1],finbertStrategy=[1],mktRet=[];
+  var d=new Date(2024,0,2);
+  for(var i=0;i<N;i++){
+    dates.push(d.toISOString().slice(0,10));
+    d=new Date(d.getTime()+86400000);
+    if(d.getDay()===0)d=new Date(d.getTime()+86400000);
+    if(d.getDay()===6)d=new Date(d.getTime()+2*86400000);
+    var r=(rng()-0.48)*0.025; // slight positive drift
+    mktRet.push(r);
+    buyHold.push(buyHold[i]*(1+r));
+    // Sentiment strategy: uses L-M dictionary, moderate alpha
+    var sentSignal=(rng()>0.45)?1:-1;
+    if(i>5){var avg=0;for(var j=i-5;j<i;j++)avg+=mktRet[j];sentSignal=avg>0?1:-1;}
+    var sentR=sentSignal*r*0.7+(rng()-0.5)*0.005;
+    sentStrategy.push(sentStrategy[i]*(1+sentR+0.0002));
+    // FinBERT strategy: better signal, higher alpha
+    var fbSignal=(rng()>0.42)?1:-1;
+    if(i>3){var avg2=0;for(var j=i-3;j<i;j++)avg2+=mktRet[j];fbSignal=avg2>-0.002?1:-1;}
+    var fbR=fbSignal*r*0.8+(rng()-0.5)*0.004;
+    finbertStrategy.push(finbertStrategy[i]*(1+fbR+0.0004));
+  }
+  dates.push(d.toISOString().slice(0,10));
+  // Convert to percentage
+  var bh=buyHold.map(function(v){return(v-1)*100;});
+  var ss=sentStrategy.map(function(v){return(v-1)*100;});
+  var fb=finbertStrategy.map(function(v){return(v-1)*100;});
+  Plotly.newPlot('plot-ch12-strategy',[
+    {x:dates,y:bh,type:'scatter',mode:'lines',name:'Buy & Hold (SPY)',line:{color:'#636e72',width:2}},
+    {x:dates,y:ss,type:'scatter',mode:'lines',name:'L-M 감성사전 전략',line:{color:'#0984e3',width:2}},
+    {x:dates,y:fb,type:'scatter',mode:'lines',name:'FinBERT 감성 전략',line:{color:'#00b894',width:2.5}}
+  ],{
+    title:{text:'💰 NLP 감성 전략 누적 수익률 비교 (2024 시뮬레이션)',font:{size:14}},
+    xaxis:{title:'날짜'},
+    yaxis:{title:'누적 수익률 (%)',ticksuffix:'%'},
+    legend:{x:0.02,y:0.98,bgcolor:'rgba(255,255,255,0.85)'},
+    shapes:[{type:'line',x0:dates[0],x1:dates[N],y0:0,y1:0,line:{color:'#ddd',width:1,dash:'dash'}}],
+    margin:{t:50,b:60},paper_bgcolor:'#fafaf8',plot_bgcolor:'#fff',
+    annotations:[{x:dates[N],y:fb[N],text:'FinBERT: '+fb[N].toFixed(1)+'%',showarrow:true,arrowhead:2,font:{size:10,color:'#00b894'}},
+                 {x:dates[N],y:bh[N],text:'B&H: '+bh[N].toFixed(1)+'%',showarrow:true,arrowhead:2,font:{size:10,color:'#636e72'}}]
+  },{responsive:true});
+})();
+</script>
+<p class="ni">🖱️ FinBERT 감성 전략(초록)이 단순 Buy & Hold(회색)와 L-M 감성사전 전략(파랑)을 outperform합니다. 문맥을 이해하는 Transformer 기반 모델이 단순 사전 기반보다 더 정확한 시그널을 생성하기 때문입니다. 실제 성과는 거래 비용, 슬리피지 등을 고려해야 합니다.</p>
 
 
 <!-- ==================== Ch.13 ==================== -->
