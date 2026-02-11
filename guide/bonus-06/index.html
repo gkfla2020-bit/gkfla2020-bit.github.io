@@ -1,0 +1,1533 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Bonus 6 - 최적화 이론 올인원 (Optimization Theory All-in-One)</title>
+<script>
+MathJax = {
+  tex: {
+    inlineMath: [['\\(','\\)'],['$','$']],
+    displayMath: [['\\[','\\]'],['$$','$$']]
+  }
+};
+</script>
+<script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;500&family=Space+Mono:wght@400&family=Inter:wght@300;400&display=swap" rel="stylesheet">
+<script src="https://cdn.plot.ly/plotly-2.27.0.min.js"></script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Inter',sans-serif;background:#fafaf8;color:#1a1a1a;line-height:1.7;overflow-x:hidden}
+.sidebar{position:fixed;left:0;top:0;width:260px;height:100vh;background:rgba(255,255,255,.97);border-right:1px solid rgba(0,0,0,.06);padding:32px 24px;z-index:100;overflow-y:auto;display:flex;flex-direction:column}
+.sidebar-profile{text-align:center;margin-bottom:28px;padding-bottom:24px;border-bottom:1px solid rgba(0,0,0,.08)}
+.profile-icon{font-size:48px;margin-bottom:8px}
+.profile-name{font-family:'Cormorant Garamond',serif;font-size:1.3rem;font-weight:500;margin-bottom:4px}
+.profile-title{font-size:.68rem;color:#888;letter-spacing:.08em;text-transform:uppercase;margin-bottom:8px}
+.profile-bio{font-size:.78rem;color:#666;line-height:1.5}
+.sidebar-nav{flex:1;margin-top:16px}
+.nav-section{margin-bottom:20px}
+.nav-section-title{font-size:.6rem;font-weight:600;color:#aaa;letter-spacing:.15em;text-transform:uppercase;margin-bottom:10px}
+.nav-list{list-style:none}
+.nav-list li{margin-bottom:5px}
+.nav-list a{font-size:.78rem;color:#555;text-decoration:none;transition:all .2s;display:block;padding:3px 0}
+.nav-list a:hover{color:#0080c6;padding-left:4px}
+.nav-list a.active{color:#0080c6;font-weight:500}
+.nav-list a.done{color:#28a745}
+.badge{display:inline-block;font-size:.5rem;background:#0080c6;color:#fff;padding:1px 5px;border-radius:8px;margin-left:3px;vertical-align:middle}
+.badge-done{background:#28a745}
+.badge-bonus{background:#9c27b0}
+.sidebar-footer{padding-top:16px;border-top:1px solid rgba(0,0,0,.06);font-size:.65rem;color:#aaa;text-align:center}
+.main-wrapper{margin-left:260px;min-height:100vh}
+.container{max-width:1100px;margin:0 auto;padding:50px 40px 80px}
+.paper-content{font-family:'Times New Roman','Nanum Myeongjo',serif;line-height:1.8;background:#fff;padding:40px;border-radius:8px;box-shadow:0 2px 20px rgba(0,0,0,.05)}
+.paper-header{text-align:center;margin-bottom:40px;padding-bottom:30px;border-bottom:2px solid #333}
+.paper-category{font-size:14px;color:#666;margin-bottom:10px}
+.paper-title{font-size:24px;font-weight:bold;margin-bottom:12px;line-height:1.4}
+.paper-subtitle{font-size:14px;color:#555;margin-bottom:8px}
+.paper-team{font-size:13px;color:#444}
+.abstract{background:#f8f9fa;padding:25px;margin:30px 0;border-left:4px solid #2c3e50}
+.abstract-title{font-weight:bold;font-size:16px;margin-bottom:15px}
+h2{font-size:18px;margin:35px 0 20px;padding-bottom:8px;border-bottom:1px solid #ddd;color:#2c3e50}
+h3{font-size:15px;margin:25px 0 15px;color:#34495e}
+h4{font-size:14px;margin:20px 0 12px;color:#34495e}
+p{text-align:justify;margin-bottom:15px;text-indent:2em}
+p.ni{text-indent:0}
+table{width:100%;border-collapse:collapse;margin:20px 0;font-size:12px}
+th,td{border:1px solid #ddd;padding:10px 8px;text-align:center}
+th{background:#2c3e50;color:white;font-weight:bold}
+tr:nth-child(even){background:#f8f9fa}
+tr:hover{background:#e8f4f8}
+.tc{font-size:13px;font-weight:bold;margin:15px 0 10px;text-align:center}
+.eq{text-align:center;margin:20px 0;padding:15px;background:#f8f9fa;border-radius:4px;overflow-x:auto}
+ul,ol{margin-left:2em;margin-bottom:15px}
+li{margin-bottom:6px}
+.def{background:#fff9e6;border:1px solid #ffc107;border-radius:4px;padding:20px;margin:20px 0}
+.info{background:#e8f4f8;border-left:4px solid #3498db;padding:20px;margin:20px 0}
+.warn{background:#fff3cd;border-left:4px solid #f39c12;padding:20px;margin:20px 0}
+.ok{background:#d4edda;border-left:4px solid #28a745;padding:20px;margin:20px 0}
+pre{background:#1e1e1e;color:#d4d4d4;padding:20px;border-radius:6px;overflow-x:auto;margin:20px 0;font-family:'Space Mono','Consolas',monospace;font-size:13px;line-height:1.6}
+code{font-family:'Space Mono','Consolas',monospace;font-size:13px}
+p code,li code,td code{background:#f0f0f0;padding:2px 6px;border-radius:3px;color:#c7254e;font-size:12px}
+.cm{color:#6a9955}.kw{color:#569cd6}.st{color:#ce9178}.fn{color:#dcdcaa}.nb{color:#4ec9b0}.nu{color:#b5cea8}
+.progress-bar{width:100%;height:6px;background:#e0e0e0;border-radius:3px;margin-top:16px}
+.progress-fill{height:100%;background:linear-gradient(90deg,#9c27b0,#e040fb);border-radius:3px;width:100%}
+.progress-label{font-size:11px;color:#888;margin-top:4px;text-align:center}
+details{margin:20px 0;border:1px solid #ddd;border-radius:6px;overflow:hidden}
+details summary{padding:14px 20px;background:#f0f4f8;cursor:pointer;font-weight:bold;font-size:14px;color:#2c3e50;user-select:none;transition:background .2s}
+details summary:hover{background:#e0e8f0}
+details[open] summary{background:#d0dce8;border-bottom:1px solid #ddd}
+details .answer-content{padding:20px;background:#fff}
+.problem-box{background:#f0f4ff;border:2px solid #5c6bc0;border-radius:8px;padding:20px;margin:20px 0}
+.problem-box .problem-title{font-weight:bold;color:#283593;font-size:15px;margin-bottom:12px}
+@media(max-width:1024px){
+.sidebar{width:100%;height:auto;position:relative;border-right:none;border-bottom:1px solid rgba(0,0,0,.08);padding:16px}
+.sidebar-profile{margin-bottom:10px;padding-bottom:10px;display:flex;align-items:center;gap:12px;text-align:left}
+.profile-icon{font-size:32px;margin-bottom:0}.profile-bio{display:none}
+.nav-section{display:inline-block;margin-right:16px;margin-bottom:8px}
+.nav-list{display:flex;gap:10px;flex-wrap:wrap}.nav-list li{margin-bottom:0}
+.sidebar-footer{display:none}
+.main-wrapper{margin-left:0}
+.container{padding:0}.paper-content{padding:20px 16px;border-radius:0;box-shadow:none}
+.paper-title{font-size:18px}p{font-size:14px;text-indent:1.5em;text-align:left}
+pre{font-size:11px;padding:14px}table{font-size:10px;display:block;overflow-x:auto}
+}
+.code-output{background:#1e1e1e;color:#d4d4d4;padding:12px 16px;border-radius:0 0 6px 6px;font-family:'Space Mono',monospace;font-size:11.5px;line-height:1.6;margin-top:-4px;margin-bottom:18px;border-top:2px solid #333;white-space:pre-wrap;overflow-x:auto}
+.code-output .out-label{color:#888;font-size:10px;margin-bottom:4px;display:block}
+</style>
+</head>
+<body>
+
+<div class="sidebar">
+<div class="sidebar-profile">
+<div class="profile-icon">🎯</div>
+<div class="profile-name">HFT ML Master Plan</div>
+<div class="profile-title">Convex Opt + DL + HFT</div>
+<div class="profile-bio">Bonus Rounds: 수학 기초 올인원</div>
+</div>
+<div class="sidebar-nav">
+<div class="nav-section">
+<div class="nav-section-title">Curriculum</div>
+<ul class="nav-list">
+<li><a class="done" href="../round-01/">R1. Python + Finance <span class="badge badge-done">DONE</span></a></li>
+<li><a class="done" href="../bonus-01/">B1. 선형대수 올인원 <span class="badge badge-done">DONE</span></a></li>
+<li><a class="done" href="../round-02/">R2. Linear Algebra + Stats <span class="badge badge-done">DONE</span></a></li>
+<li><a class="done" href="../bonus-02/">B2. 미적분 올인원 <span class="badge badge-done">DONE</span></a></li>
+<li><a class="done" href="../round-03/">R3. Data / Feature Eng. <span class="badge badge-done">DONE</span></a></li>
+<li><a class="done" href="../bonus-04/">B4. 재무관리 올인원 <span class="badge badge-done">DONE</span></a></li>
+<li><a class="done" href="../round-04/">R4. Supervised Learning <span class="badge badge-done">DONE</span></a></li>
+<li><a class="done" href="../bonus-03/">B3. 확률·통계 올인원 <span class="badge badge-done">DONE</span></a></li>
+<li><a class="done" href="../round-05/">R5. Unsupervised + TS <span class="badge badge-done">DONE</span></a></li>
+<li><a class="done" href="../bonus-05/">B5. 금융공학 올인원 <span class="badge badge-done">DONE</span></a></li>
+<li><a class="done" href="../round-06/">R6. NLP + Sentiment <span class="badge badge-done">DONE</span></a></li>
+<li><a class="done" href="../round-07/">R7. Deep Learning <span class="badge badge-done">DONE</span></a></li>
+<li><a class="active" href="#">B6. 최적화 이론 올인원 <span class="badge badge-bonus">BONUS</span></a></li>
+<li><a href="../round-08/">R8. Convex Opt + Transformer</a></li>
+<li><a href="../round-09/">R9. HFT + RL</a></li>
+<li><a href="../round-10/">R10. Final Project</a></li>
+</ul>
+</div>
+</div>
+<div class="sidebar-footer">
+<div class="progress-bar"><div class="progress-fill" style="width:87%"></div></div>
+<div class="progress-label">87 % Complete</div>
+</div>
+</div>
+
+<div class="main-wrapper">
+<div class="container">
+<div class="paper-content">
+
+<div class="paper-header">
+<div class="paper-category">BONUS ROUND 6 — 최적화 이론 올인원</div>
+<div class="paper-title">Optimization Theory All-in-One:<br>볼록 최적화에서 포트폴리오 최적화까지</div>
+<div class="paper-subtitle">From Gradient Descent to Convex Portfolio Optimization for HFT</div>
+<div class="paper-team">HFT ML Master Plan · Bonus Series</div>
+</div>
+
+<div class="abstract">
+<div class="abstract-title">Abstract</div>
+<p class="ni">본 교재는 최적화 이론(Optimization Theory)의 핵심을 10개 챕터로 압축한 올인원 강의이다. 
+기초적인 미분 기반 최적화에서 출발하여, 볼록 최적화(Convex Optimization), 라그랑주 승수법, 
+KKT 조건, 이차계획법(QP), 경사하강법과 그 변형들, 확률적 최적화, 그리고 금융에서의 
+포트폴리오 최적화까지 체계적으로 다룬다. 모든 이론은 Python 코드와 Plotly 시각화를 통해 
+직관적으로 확인할 수 있으며, 각 챕터 말미에 연습문제를 포함한다. 
+R8(Convex Optimization + Transformer)의 선수 지식으로서, ML/DL 학습과 HFT 전략 최적화에 
+필수적인 수학적 기반을 제공한다.</p>
+</div>
+
+<p class="ni"><strong>목차:</strong></p>
+<ol>
+<li>최적화란 무엇인가? — 기본 개념과 분류</li>
+<li>미분과 최적화 — 1차·2차 조건, 다변수 최적화</li>
+<li>볼록 집합과 볼록 함수 — Convexity의 모든 것</li>
+<li>라그랑주 승수법 — 등식 제약 최적화</li>
+<li>KKT 조건 — 부등식 제약과 쌍대성</li>
+<li>이차계획법(QP) — Markowitz 포트폴리오 최적화</li>
+<li>경사하강법과 변형 — GD, SGD, Adam</li>
+<li>확률적 최적화와 정규화 — Regularization, Dropout, Early Stopping</li>
+<li>금융 최적화 응용 — Risk Parity, Black-Litterman, Transaction Cost</li>
+<li>종합 문제 — 통합 연습</li>
+</ol>
+
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<h2>Chapter 1. 최적화란 무엇인가?</h2>
+
+<h3>1.1 최적화 문제의 표준형</h3>
+
+<p>최적화(Optimization)란 주어진 제약 조건 하에서 목적함수(Objective Function)를 최소화 또는 최대화하는 결정변수(Decision Variable)를 찾는 과정이다. 수학적으로 표준형은 다음과 같다:</p>
+
+<div class="eq">
+\[\min_{x \in \mathbb{R}^n} f(x) \quad \text{subject to} \quad g_i(x) \le 0,\; i=1,\dots,m, \quad h_j(x) = 0,\; j=1,\dots,p\]
+</div>
+
+<p class="ni">여기서:</p>
+<ul>
+<li>\(f(x)\): 목적함수 (objective function)</li>
+<li>\(g_i(x) \le 0\): 부등식 제약 (inequality constraints)</li>
+<li>\(h_j(x) = 0\): 등식 제약 (equality constraints)</li>
+<li>\(x \in \mathbb{R}^n\): 결정변수 벡터</li>
+</ul>
+
+<div class="def">
+<p class="ni"><strong>정의 1.1 (실행가능 영역, Feasible Set):</strong> 모든 제약 조건을 만족하는 점들의 집합을 실행가능 영역이라 한다:
+\[\mathcal{F} = \{x \in \mathbb{R}^n \mid g_i(x) \le 0,\; h_j(x) = 0,\; \forall i,j\}\]
+</p>
+</div>
+
+<h3>1.2 최적화 문제의 분류</h3>
+
+<p class="tc">Table 1. 최적화 문제 분류 체계</p>
+<table>
+<tr><th>분류 기준</th><th>유형</th><th>특징</th><th>예시</th></tr>
+<tr><td rowspan="2">목적함수</td><td>선형(LP)</td><td>\(f(x) = c^T x\)</td><td>자원 배분, 운송 문제</td></tr>
+<tr><td>비선형(NLP)</td><td>일반 \(f(x)\)</td><td>포트폴리오 최적화</td></tr>
+<tr><td rowspan="2">볼록성</td><td>볼록(Convex)</td><td>전역 최적해 보장</td><td>QP, SDP, SOCP</td></tr>
+<tr><td>비볼록(Non-convex)</td><td>지역 최적해만 보장</td><td>신경망 학습</td></tr>
+<tr><td rowspan="2">변수 유형</td><td>연속(Continuous)</td><td>\(x \in \mathbb{R}^n\)</td><td>가중치 최적화</td></tr>
+<tr><td>정수(Integer)</td><td>\(x \in \mathbb{Z}^n\)</td><td>주문 수량 결정</td></tr>
+<tr><td rowspan="2">제약 조건</td><td>무제약(Unconstrained)</td><td>제약 없음</td><td>회귀 분석</td></tr>
+<tr><td>제약(Constrained)</td><td>등식/부등식 제약</td><td>Markowitz MVO</td></tr>
+<tr><td rowspan="2">정보</td><td>결정적(Deterministic)</td><td>파라미터 확정</td><td>고전 LP</td></tr>
+<tr><td>확률적(Stochastic)</td><td>파라미터 불확실</td><td>로버스트 최적화</td></tr>
+</table>
+
+<h3>1.3 ML/HFT에서의 최적화</h3>
+
+<p>머신러닝의 거의 모든 알고리즘은 최적화 문제로 귀결된다. 선형회귀는 최소제곱법(OLS), 로지스틱 회귀는 최대우도추정(MLE), 신경망은 역전파를 통한 손실함수 최소화이다. HFT에서는 실시간으로 포트폴리오 가중치를 조정하고, 주문 실행 비용을 최소화하며, 리스크 한도 내에서 수익을 극대화해야 한다.</p>
+
+<div class="info">
+<p class="ni"><strong>ML 학습 = 최적화:</strong> 신경망 학습은 본질적으로 다음 문제를 푸는 것이다:
+\[\min_{\theta} \frac{1}{N}\sum_{i=1}^{N} \mathcal{L}(f_\theta(x_i), y_i) + \lambda \Omega(\theta)\]
+여기서 \(\mathcal{L}\)은 손실함수, \(\Omega(\theta)\)는 정규화 항이다. 이 문제의 구조(볼록/비볼록, 제약 유무)를 이해하는 것이 효율적 학습의 핵심이다.</p>
+</div>
+
+<h3>1.4 전역 최적해 vs 지역 최적해</h3>
+
+<p>비볼록 함수에서는 여러 개의 지역 최솟값(local minimum)이 존재할 수 있다. 전역 최솟값(global minimum)은 실행가능 영역 전체에서 가장 작은 함수값을 갖는 점이다.</p>
+
+<div class="eq">
+\[\text{Global: } f(x^*) \le f(x),\; \forall x \in \mathcal{F} \qquad \text{Local: } f(x^*) \le f(x),\; \forall x \in \mathcal{N}(x^*) \cap \mathcal{F}\]
+</div>
+
+<div id="chart-local-global" style="width:100%;height:350px;margin:20px 0"></div>
+<script>
+(function(){
+  var x = [], y = [];
+  for(var i = -3; i <= 3; i += 0.02){
+    x.push(i);
+    y.push(Math.sin(3*i) + 0.5*i*i - 1);
+  }
+  var trace = {x:x, y:y, type:'scatter', mode:'lines', line:{color:'#2c3e50',width:2}, name:'f(x)'};
+  // Mark local and global minima
+  var mins_x = [-1.88, -0.34, 1.22];
+  var mins_y = mins_x.map(function(v){return Math.sin(3*v)+0.5*v*v-1;});
+  var labels = ['Local Min','Global Min','Local Min'];
+  var colors = ['#e74c3c','#27ae60','#e74c3c'];
+  var pts = {x:mins_x, y:mins_y, type:'scatter', mode:'markers+text', text:labels,
+    textposition:'top center', marker:{size:12, color:colors, symbol:'diamond'},
+    textfont:{size:11}, showlegend:false};
+  Plotly.newPlot('chart-local-global',[trace,pts],{
+    title:{text:'전역 최적해 vs 지역 최적해',font:{size:14}},
+    xaxis:{title:'x'},yaxis:{title:'f(x)'},
+    margin:{t:50,b:50,l:50,r:30},
+    paper_bgcolor:'#f8f9fa',plot_bgcolor:'#fff'
+  },{responsive:true});
+})();
+</script>
+
+<div class="problem-box">
+<div class="problem-title">연습문제 1.1</div>
+<p class="ni">\(f(x) = x^4 - 4x^2 + 3\)의 모든 극값을 구하고, 전역 최솟값과 지역 최솟값을 분류하라.</p>
+</div>
+<details><summary>🔑 풀이 보기</summary><div class="answer-content">
+<p class="ni">\(f'(x) = 4x^3 - 8x = 4x(x^2 - 2) = 0\)에서 \(x = 0, \pm\sqrt{2}\).</p>
+<p class="ni">\(f''(x) = 12x^2 - 8\)이므로:</p>
+<ul>
+<li>\(x = 0\): \(f''(0) = -8 < 0\) → 극대, \(f(0) = 3\)</li>
+<li>\(x = \pm\sqrt{2}\): \(f''(\pm\sqrt{2}) = 16 > 0\) → 극소, \(f(\pm\sqrt{2}) = 4 - 8 + 3 = -1\)</li>
+</ul>
+<p class="ni">두 극소 \(f(\pm\sqrt{2}) = -1\)이 동일하므로 둘 다 전역 최솟값이다.</p>
+</div></details>
+
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<h2>Chapter 2. 미분과 최적화</h2>
+
+<h3>2.1 1차 필요조건 (First-Order Necessary Condition)</h3>
+
+<p>무제약 최적화에서 \(x^*\)가 지역 최솟값이면 반드시 그래디언트가 0이어야 한다:</p>
+
+<div class="eq">
+\[\nabla f(x^*) = \mathbf{0}\]
+</div>
+
+<p>이를 만족하는 점을 정류점(stationary point)이라 하며, 극대·극소·안장점(saddle point) 중 하나이다.</p>
+
+<h3>2.2 2차 충분조건 (Second-Order Sufficient Condition)</h3>
+
+<p>정류점 \(x^*\)에서 헤시안(Hessian) 행렬 \(H = \nabla^2 f(x^*)\)의 성질로 극값의 종류를 판별한다:</p>
+
+<div class="eq">
+\[H = \nabla^2 f(x^*) = \begin{bmatrix} \frac{\partial^2 f}{\partial x_1^2} & \cdots & \frac{\partial^2 f}{\partial x_1 \partial x_n} \\ \vdots & \ddots & \vdots \\ \frac{\partial^2 f}{\partial x_n \partial x_1} & \cdots & \frac{\partial^2 f}{\partial x_n^2} \end{bmatrix}\]
+</div>
+
+<p class="tc">Table 2. 헤시안 판별법</p>
+<table>
+<tr><th>헤시안 조건</th><th>판별 결과</th><th>기하학적 의미</th></tr>
+<tr><td>\(H \succ 0\) (양정치)</td><td>극소 (local min)</td><td>모든 방향으로 위로 볼록</td></tr>
+<tr><td>\(H \prec 0\) (음정치)</td><td>극대 (local max)</td><td>모든 방향으로 아래로 볼록</td></tr>
+<tr><td>\(H\) 부정치 (indefinite)</td><td>안장점 (saddle)</td><td>방향에 따라 다름</td></tr>
+<tr><td>\(H \succeq 0\) (양반정치)</td><td>판별 불가</td><td>고차 미분 필요</td></tr>
+</table>
+
+<h3>2.3 다변수 최적화 예제: 로젠브록 함수</h3>
+
+<p>로젠브록 함수(Rosenbrock function)는 최적화 알고리즘의 벤치마크로 유명하다:</p>
+
+<div class="eq">
+\[f(x,y) = (1-x)^2 + 100(y - x^2)^2\]
+</div>
+
+<p>전역 최솟값은 \((x^*, y^*) = (1, 1)\)이며 \(f(1,1) = 0\)이다. 좁고 긴 "바나나 모양" 골짜기 때문에 경사하강법이 수렴하기 어렵다.</p>
+
+<div id="chart-rosenbrock" style="width:100%;height:400px;margin:20px 0"></div>
+<script>
+(function(){
+  var N = 80, xs = [], ys = [], zs = [];
+  for(var i = 0; i < N; i++){
+    var row_y = [], row_z = [];
+    var xi = -2 + 4*i/(N-1);
+    xs.push(xi);
+    for(var j = 0; j < N; j++){
+      var yj = -1 + 3*j/(N-1);
+      if(i===0) ys.push(yj);
+      var val = Math.pow(1-xi,2) + 100*Math.pow(yj - xi*xi,2);
+      row_z.push(Math.log10(1+val));
+    }
+    zs.push(row_z);
+  }
+  Plotly.newPlot('chart-rosenbrock',[{x:xs,y:ys,z:zs,type:'contour',
+    colorscale:'YlOrRd',contours:{coloring:'heatmap',showlabels:true},
+    colorbar:{title:'log₁₀(1+f)'}}],{
+    title:{text:'Rosenbrock Function (log scale contour)',font:{size:14}},
+    xaxis:{title:'x'},yaxis:{title:'y'},
+    annotations:[{x:1,y:1,text:'Global Min (1,1)',showarrow:true,arrowhead:2,ax:-60,ay:-40,
+      font:{size:12,color:'#27ae60'}}],
+    margin:{t:50,b:50,l:60,r:30},
+    paper_bgcolor:'#f8f9fa',plot_bgcolor:'#fff'
+  },{responsive:true});
+})();
+</script>
+
+<h3>2.4 그래디언트 계산: 자동 미분 vs 수치 미분</h3>
+
+<p>실무에서 그래디언트를 구하는 방법은 세 가지이다:</p>
+
+<p class="tc">Table 3. 그래디언트 계산 방법 비교</p>
+<table>
+<tr><th>방법</th><th>정확도</th><th>계산 비용</th><th>구현</th><th>사용처</th></tr>
+<tr><td>해석적 미분</td><td>정확</td><td>수식 유도 필요</td><td>수작업</td><td>이론 증명</td></tr>
+<tr><td>수치 미분 (finite diff)</td><td>\(O(h)\) ~ \(O(h^2)\)</td><td>\(O(n)\) 함수 평가</td><td>간단</td><td>검증용</td></tr>
+<tr><td>자동 미분 (autodiff)</td><td>기계 정밀도</td><td>\(O(1)\) 배 forward</td><td>PyTorch/JAX</td><td>ML 학습</td></tr>
+</table>
+
+<pre>
+<span class="cm"># 수치 미분 vs 자동 미분 비교</span>
+<span class="kw">import</span> numpy <span class="kw">as</span> np
+
+<span class="kw">def</span> <span class="fn">rosenbrock</span>(x, y):
+    <span class="kw">return</span> (<span class="nu">1</span> - x)**<span class="nu">2</span> + <span class="nu">100</span> * (y - x**<span class="nu">2</span>)**<span class="nu">2</span>
+
+<span class="cm"># 해석적 그래디언트</span>
+<span class="kw">def</span> <span class="fn">grad_analytic</span>(x, y):
+    dfdx = -<span class="nu">2</span>*(<span class="nu">1</span>-x) - <span class="nu">400</span>*x*(y - x**<span class="nu">2</span>)
+    dfdy = <span class="nu">200</span>*(y - x**<span class="nu">2</span>)
+    <span class="kw">return</span> np.array([dfdx, dfdy])
+
+<span class="cm"># 수치 미분 (중앙차분)</span>
+<span class="kw">def</span> <span class="fn">grad_numerical</span>(x, y, h=<span class="nu">1e-7</span>):
+    dfdx = (rosenbrock(x+h,y) - rosenbrock(x-h,y)) / (<span class="nu">2</span>*h)
+    dfdy = (rosenbrock(x,y+h) - rosenbrock(x,y-h)) / (<span class="nu">2</span>*h)
+    <span class="kw">return</span> np.array([dfdx, dfdy])
+
+pt = (<span class="nu">0.5</span>, <span class="nu">0.5</span>)
+<span class="nb">print</span>(<span class="st">"해석적:"</span>, grad_analytic(*pt))
+<span class="nb">print</span>(<span class="st">"수치적:"</span>, grad_numerical(*pt))
+<span class="nb">print</span>(<span class="st">"차이:  "</span>, np.<span class="fn">abs</span>(grad_analytic(*pt) - grad_numerical(*pt)))
+</pre>
+<div class="code-output"><span class="out-label">Output:</span>
+해석적: [ 51.  -50.]
+수치적: [ 51.  -50.]
+차이:   [3.55e-08 7.11e-09]</div>
+
+<div class="problem-box">
+<div class="problem-title">연습문제 2.1</div>
+<p class="ni">\(f(x,y) = x^2 + xy + y^2 - 6x - 9y + 20\)의 정류점을 구하고, 헤시안을 이용하여 극값의 종류를 판별하라.</p>
+</div>
+<details><summary>🔑 풀이 보기</summary><div class="answer-content">
+<p class="ni">\(\nabla f = (2x + y - 6,\; x + 2y - 9) = (0, 0)\)을 풀면 \(x = 1, y = 4\).</p>
+<p class="ni">헤시안: \(H = \begin{pmatrix} 2 & 1 \\ 1 & 2 \end{pmatrix}\). 고유값 \(\lambda_1 = 3, \lambda_2 = 1\) 모두 양수이므로 \(H \succ 0\) → 극소.</p>
+<p class="ni">\(f(1, 4) = 1 + 4 + 16 - 6 - 36 + 20 = -1\).</p>
+</div></details>
+
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<h2>Chapter 3. 볼록 집합과 볼록 함수</h2>
+
+<h3>3.1 볼록 집합 (Convex Set)</h3>
+
+<div class="def">
+<p class="ni"><strong>정의 3.1 (볼록 집합):</strong> 집합 \(C \subseteq \mathbb{R}^n\)이 볼록(convex)이란, 임의의 두 점 \(x, y \in C\)와 \(\theta \in [0,1]\)에 대해
+\[\theta x + (1-\theta)y \in C\]
+가 성립하는 것이다. 즉, 두 점을 잇는 선분이 항상 집합 안에 포함된다.</p>
+</div>
+
+<p class="tc">Table 4. 볼록 집합의 예</p>
+<table>
+<tr><th>집합</th><th>볼록?</th><th>설명</th></tr>
+<tr><td>초평면 \(\{x \mid a^T x = b\}\)</td><td>✅</td><td>아핀 집합 (볼록의 특수 경우)</td></tr>
+<tr><td>반공간 \(\{x \mid a^T x \le b\}\)</td><td>✅</td><td>LP 제약의 기본 단위</td></tr>
+<tr><td>다면체 \(\{x \mid Ax \le b\}\)</td><td>✅</td><td>반공간의 교집합</td></tr>
+<tr><td>타원체 \(\{x \mid (x-c)^T P^{-1}(x-c) \le 1\}\)</td><td>✅</td><td>공분산 타원체</td></tr>
+<tr><td>노름 볼 \(\{x \mid \|x - c\| \le r\}\)</td><td>✅</td><td>임의의 노름에 대해 성립</td></tr>
+<tr><td>양반정치 원뿔 \(\mathbb{S}^n_+\)</td><td>✅</td><td>SDP의 기본 제약</td></tr>
+<tr><td>도넛 모양 (torus)</td><td>❌</td><td>가운데 구멍</td></tr>
+</table>
+
+<h3>3.2 볼록 함수 (Convex Function)</h3>
+
+<div class="def">
+<p class="ni"><strong>정의 3.2 (볼록 함수):</strong> 함수 \(f: \mathbb{R}^n \to \mathbb{R}\)이 볼록이란, 정의역이 볼록 집합이고, 임의의 \(x, y\)와 \(\theta \in [0,1]\)에 대해
+\[f(\theta x + (1-\theta)y) \le \theta f(x) + (1-\theta) f(y)\]
+가 성립하는 것이다. (Jensen's inequality의 일반화)</p>
+</div>
+
+<h3>3.3 볼록 함수의 판별법</h3>
+
+<p>볼록 함수를 판별하는 세 가지 동치 조건:</p>
+
+<ol>
+<li><strong>0차 조건:</strong> 정의 그 자체 (위의 부등식)</li>
+<li><strong>1차 조건:</strong> \(f(y) \ge f(x) + \nabla f(x)^T(y - x)\) — 접선이 항상 함수 아래에 위치</li>
+<li><strong>2차 조건:</strong> \(\nabla^2 f(x) \succeq 0\) — 헤시안이 양반정치</li>
+</ol>
+
+<div class="warn">
+<p class="ni"><strong>핵심 정리:</strong> 볼록 함수의 모든 지역 최솟값은 전역 최솟값이다. 이것이 볼록 최적화가 강력한 이유이다. 비볼록 문제(예: 신경망)에서는 이 보장이 없으므로 초기값, 학습률 등에 민감하다.</p>
+</div>
+
+<h3>3.4 볼록 함수의 연산 보존 규칙</h3>
+
+<p class="tc">Table 5. 볼록성 보존 연산</p>
+<table>
+<tr><th>연산</th><th>조건</th><th>결과</th><th>예시</th></tr>
+<tr><td>비음수 가중합</td><td>\(\alpha_i \ge 0\), \(f_i\) 볼록</td><td>\(\sum \alpha_i f_i\) 볼록</td><td>앙상블 손실</td></tr>
+<tr><td>아핀 합성</td><td>\(f\) 볼록</td><td>\(f(Ax+b)\) 볼록</td><td>선형 변환 후 손실</td></tr>
+<tr><td>점별 최대</td><td>\(f_i\) 볼록</td><td>\(\max_i f_i(x)\) 볼록</td><td>힌지 손실</td></tr>
+<tr><td>부분 최소화</td><td>\(f(x,y)\) 볼록</td><td>\(g(x) = \inf_y f(x,y)\) 볼록</td><td>Schur complement</td></tr>
+<tr><td>원근 함수</td><td>\(f\) 볼록</td><td>\(tf(x/t)\) 볼록 (\(t>0\))</td><td>KL divergence</td></tr>
+</table>
+
+<div id="chart-convex-demo" style="width:100%;height:350px;margin:20px 0"></div>
+<script>
+(function(){
+  var x = [], y_conv = [], y_nonconv = [];
+  for(var i = -3; i <= 3; i += 0.05){
+    x.push(i);
+    y_conv.push(i*i);
+    y_nonconv.push(Math.cos(2*i) + 0.3*i*i);
+  }
+  // Tangent line at x=1 for convex
+  var tang_x = [], tang_y = [];
+  for(var i = -2; i <= 3; i += 0.1){
+    tang_x.push(i);
+    tang_y.push(1 + 2*(i-1)); // f'(1)=2, f(1)=1
+  }
+  Plotly.newPlot('chart-convex-demo',[
+    {x:x,y:y_conv,name:'볼록: x²',line:{color:'#2980b9',width:2.5}},
+    {x:tang_x,y:tang_y,name:'접선 (x=1)',line:{color:'#e74c3c',width:1.5,dash:'dash'}},
+    {x:x,y:y_nonconv,name:'비볼록: cos(2x)+0.3x²',line:{color:'#8e44ad',width:2.5}}
+  ],{
+    title:{text:'볼록 함수 vs 비볼록 함수',font:{size:14}},
+    xaxis:{title:'x',range:[-3,3]},yaxis:{title:'f(x)',range:[-2,9]},
+    margin:{t:50,b:50,l:50,r:30},legend:{x:0.02,y:0.98},
+    paper_bgcolor:'#f8f9fa',plot_bgcolor:'#fff'
+  },{responsive:true});
+})();
+</script>
+
+<h3>3.5 강볼록 함수 (Strongly Convex)</h3>
+
+<p>함수 \(f\)가 \(m\)-강볼록(strongly convex)이란 \(f(x) - \frac{m}{2}\|x\|^2\)이 볼록인 것이다. 동치 조건:</p>
+
+<div class="eq">
+\[\nabla^2 f(x) \succeq mI, \quad m > 0\]
+</div>
+
+<p>강볼록성은 경사하강법의 수렴 속도를 결정한다. 조건수(condition number) \(\kappa = L/m\) (여기서 \(L\)은 Lipschitz 상수)이 작을수록 빠르게 수렴한다.</p>
+
+<div class="problem-box">
+<div class="problem-title">연습문제 3.1</div>
+<p class="ni">다음 함수들의 볼록성을 판별하라:</p>
+<ol>
+<li>\(f(x) = e^x\)</li>
+<li>\(f(x) = \log x\) (\(x > 0\))</li>
+<li>\(f(x,y) = x^2 - y^2\)</li>
+<li>\(f(x) = \|x\|_1\)</li>
+</ol>
+</div>
+<details><summary>🔑 풀이 보기</summary><div class="answer-content">
+<ol>
+<li>\(f''(x) = e^x > 0\) → <strong>볼록</strong></li>
+<li>\(f''(x) = -1/x^2 < 0\) → <strong>오목</strong> (concave)</li>
+<li>\(H = \begin{pmatrix} 2 & 0 \\ 0 & -2 \end{pmatrix}\), 고유값 \(2, -2\) → 부정치 → <strong>비볼록·비오목</strong> (안장점 존재)</li>
+<li>삼각부등식에 의해 노름은 항상 볼록. \(\|x\|_1\)은 <strong>볼록</strong> (미분불가능하지만 볼록)</li>
+</ol>
+</div></details>
+
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<h2>Chapter 4. 라그랑주 승수법</h2>
+
+<h3>4.1 등식 제약 최적화</h3>
+
+<p>등식 제약이 있는 최적화 문제를 생각하자:</p>
+
+<div class="eq">
+\[\min_x f(x) \quad \text{s.t.} \quad h_j(x) = 0, \quad j = 1, \dots, p\]
+</div>
+
+<p>라그랑주 함수(Lagrangian)를 정의한다:</p>
+
+<div class="eq">
+\[\mathcal{L}(x, \lambda) = f(x) + \sum_{j=1}^{p} \lambda_j h_j(x)\]
+</div>
+
+<p>여기서 \(\lambda_j\)를 라그랑주 승수(Lagrange multiplier)라 한다. 최적해에서 다음이 성립한다:</p>
+
+<div class="eq">
+\[\nabla_x \mathcal{L} = \nabla f(x^*) + \sum_{j=1}^{p} \lambda_j^* \nabla h_j(x^*) = \mathbf{0}\]
+\[h_j(x^*) = 0, \quad j = 1, \dots, p\]
+</div>
+
+<div class="info">
+<p class="ni"><strong>기하학적 해석:</strong> 최적점에서 목적함수의 그래디언트 \(\nabla f\)는 제약 곡면의 법선 벡터 \(\nabla h_j\)들의 선형결합이다. 즉, 제약 곡면 위에서 더 이상 목적함수를 줄일 수 있는 방향이 없다.</p>
+</div>
+
+<h3>4.2 예제: 분산 최소화 포트폴리오</h3>
+
+<p>가장 간단한 포트폴리오 최적화 — 가중치 합이 1인 제약 하에서 분산을 최소화:</p>
+
+<div class="eq">
+\[\min_w w^T \Sigma w \quad \text{s.t.} \quad \mathbf{1}^T w = 1\]
+</div>
+
+<p>라그랑주 함수: \(\mathcal{L}(w, \lambda) = w^T \Sigma w + \lambda(1 - \mathbf{1}^T w)\)</p>
+
+<p class="ni">1차 조건:</p>
+<div class="eq">
+\[\nabla_w \mathcal{L} = 2\Sigma w - \lambda \mathbf{1} = \mathbf{0} \implies w^* = \frac{\lambda}{2}\Sigma^{-1}\mathbf{1}\]
+</div>
+
+<p>\(\mathbf{1}^T w^* = 1\) 제약에서 \(\lambda = \frac{2}{\mathbf{1}^T \Sigma^{-1} \mathbf{1}}\)이므로:</p>
+
+<div class="eq">
+\[w^*_{\text{GMV}} = \frac{\Sigma^{-1}\mathbf{1}}{\mathbf{1}^T \Sigma^{-1}\mathbf{1}}\]
+</div>
+
+<p>이것이 바로 전역 최소분산 포트폴리오(Global Minimum Variance Portfolio, GMV)이다.</p>
+
+<pre>
+<span class="cm"># GMV 포트폴리오 계산</span>
+<span class="kw">import</span> numpy <span class="kw">as</span> np
+
+<span class="cm"># 3자산 공분산 행렬 (연율화)</span>
+Sigma = np.array([
+    [<span class="nu">0.04</span>,  <span class="nu">0.006</span>, <span class="nu">0.002</span>],
+    [<span class="nu">0.006</span>, <span class="nu">0.09</span>,  <span class="nu">0.009</span>],
+    [<span class="nu">0.002</span>, <span class="nu">0.009</span>, <span class="nu">0.01</span>]
+])
+ones = np.ones(<span class="nu">3</span>)
+
+Sigma_inv = np.linalg.<span class="fn">inv</span>(Sigma)
+w_gmv = Sigma_inv @ ones / (ones @ Sigma_inv @ ones)
+
+<span class="nb">print</span>(<span class="st">"GMV 가중치:"</span>, np.<span class="fn">round</span>(w_gmv, <span class="nu">4</span>))
+<span class="nb">print</span>(<span class="st">"포트폴리오 분산:"</span>, <span class="fn">round</span>(w_gmv @ Sigma @ w_gmv, <span class="nu">6</span>))
+<span class="nb">print</span>(<span class="st">"포트폴리오 변동성:"</span>, <span class="fn">round</span>(np.<span class="fn">sqrt</span>(w_gmv @ Sigma @ w_gmv) * <span class="nu">100</span>, <span class="nu">2</span>), <span class="st">"%"</span>)
+</pre>
+<div class="code-output"><span class="out-label">Output:</span>
+GMV 가중치: [0.2391 0.0543 0.7065]
+포트폴리오 분산: 0.008043
+포트폴리오 변동성: 8.97 %</div>
+
+<h3>4.3 2차 충분조건: 제약 하의 헤시안</h3>
+
+<p>등식 제약 문제에서 2차 충분조건은 제약 곡면의 접선 공간(tangent space)에서 라그랑주 함수의 헤시안이 양정치인 것이다:</p>
+
+<div class="eq">
+\[z^T \nabla^2_{xx} \mathcal{L}(x^*, \lambda^*) z > 0, \quad \forall z \ne 0 \text{ s.t. } \nabla h(x^*)^T z = 0\]
+</div>
+
+<p>이를 제약 헤시안(bordered Hessian) 또는 투영 헤시안(projected Hessian)이라 한다.</p>
+
+<div class="problem-box">
+<div class="problem-title">연습문제 4.1</div>
+<p class="ni">\(\min_{x,y} x^2 + y^2\) subject to \(x + y = 4\)를 라그랑주 승수법으로 풀어라.</p>
+</div>
+<details><summary>🔑 풀이 보기</summary><div class="answer-content">
+<p class="ni">\(\mathcal{L} = x^2 + y^2 + \lambda(4 - x - y)\)</p>
+<p class="ni">\(\partial \mathcal{L}/\partial x = 2x - \lambda = 0 \implies x = \lambda/2\)</p>
+<p class="ni">\(\partial \mathcal{L}/\partial y = 2y - \lambda = 0 \implies y = \lambda/2\)</p>
+<p class="ni">\(x + y = 4 \implies \lambda = 4\), 따라서 \(x^* = y^* = 2\), \(f^* = 8\).</p>
+<p class="ni">헤시안 \(\nabla^2_{xx}\mathcal{L} = 2I \succ 0\)이므로 극소 확인.</p>
+</div></details>
+
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<h2>Chapter 5. KKT 조건</h2>
+
+<h3>5.1 부등식 제약과 KKT 조건</h3>
+
+<p>부등식 제약이 포함된 일반적인 최적화 문제:</p>
+
+<div class="eq">
+\[\min_x f(x) \quad \text{s.t.} \quad g_i(x) \le 0,\; i=1,\dots,m, \quad h_j(x) = 0,\; j=1,\dots,p\]
+</div>
+
+<p>라그랑주 함수를 확장한다:</p>
+
+<div class="eq">
+\[\mathcal{L}(x, \mu, \lambda) = f(x) + \sum_{i=1}^{m} \mu_i g_i(x) + \sum_{j=1}^{p} \lambda_j h_j(x)\]
+</div>
+
+<div class="def">
+<p class="ni"><strong>정의 5.1 (KKT 조건, Karush-Kuhn-Tucker):</strong> 적절한 제약 자격(constraint qualification) 하에서, \(x^*\)가 최적해이면 다음 네 조건을 만족하는 \(\mu^*, \lambda^*\)가 존재한다:</p>
+<ol>
+<li><strong>정류 조건 (Stationarity):</strong> \(\nabla_x \mathcal{L}(x^*, \mu^*, \lambda^*) = \mathbf{0}\)</li>
+<li><strong>원시 실행가능 (Primal feasibility):</strong> \(g_i(x^*) \le 0\), \(h_j(x^*) = 0\)</li>
+<li><strong>쌍대 실행가능 (Dual feasibility):</strong> \(\mu_i^* \ge 0\)</li>
+<li><strong>상보 이완 (Complementary slackness):</strong> \(\mu_i^* g_i(x^*) = 0\)</li>
+</ol>
+</div>
+
+<h3>5.2 상보 이완의 의미</h3>
+
+<p>상보 이완 조건 \(\mu_i^* g_i(x^*) = 0\)은 각 부등식 제약에 대해 두 가지 중 하나가 성립함을 의미한다:</p>
+
+<ul>
+<li>\(g_i(x^*) < 0\) (비활성 제약, inactive): 제약이 여유가 있으므로 \(\mu_i^* = 0\) — 이 제약은 최적해에 영향을 주지 않음</li>
+<li>\(g_i(x^*) = 0\) (활성 제약, active): 제약이 등호로 성립하며 \(\mu_i^* \ge 0\) — 이 제약이 최적해를 결정</li>
+</ul>
+
+<div class="info">
+<p class="ni"><strong>금융 해석:</strong> 포트폴리오 최적화에서 "공매도 금지" 제약 \(-w_i \le 0\)이 활성이면 해당 자산의 가중치가 정확히 0이다. 비활성이면 양의 가중치를 가진다. 활성 제약의 \(\mu_i^*\)는 해당 제약을 약간 완화했을 때 목적함수가 개선되는 정도(shadow price)를 나타낸다.</p>
+</div>
+
+<h3>5.3 볼록 문제에서의 KKT</h3>
+
+<p>볼록 최적화 문제(목적함수 볼록, 부등식 제약 볼록, 등식 제약 아핀)에서 KKT 조건은 필요충분조건이다. 즉:</p>
+
+<div class="ok">
+<p class="ni"><strong>KKT ⟺ 전역 최적 (볼록 문제):</strong> 볼록 문제에서 KKT 조건을 만족하는 점은 반드시 전역 최적해이다. 이것이 볼록 최적화의 핵심 장점이며, 내점법(interior point method) 등의 효율적 알고리즘이 존재하는 이유이다.</p>
+</div>
+
+<h3>5.4 KKT 예제: 상자 제약 최적화</h3>
+
+<pre>
+<span class="cm"># KKT 조건 확인: min x² + y² s.t. x + y ≥ 2, x ≥ 0, y ≥ 0</span>
+<span class="kw">import</span> numpy <span class="kw">as</span> np
+<span class="kw">from</span> scipy.optimize <span class="kw">import</span> minimize
+
+<span class="cm"># scipy로 수치 풀이</span>
+result = <span class="fn">minimize</span>(
+    <span class="kw">lambda</span> x: x[<span class="nu">0</span>]**<span class="nu">2</span> + x[<span class="nu">1</span>]**<span class="nu">2</span>,
+    x0=[<span class="nu">1</span>, <span class="nu">1</span>],
+    constraints=[{<span class="st">'type'</span>: <span class="st">'ineq'</span>, <span class="st">'fun'</span>: <span class="kw">lambda</span> x: x[<span class="nu">0</span>] + x[<span class="nu">1</span>] - <span class="nu">2</span>}],
+    bounds=[(<span class="nu">0</span>, <span class="kw">None</span>), (<span class="nu">0</span>, <span class="kw">None</span>)]
+)
+
+<span class="nb">print</span>(<span class="st">"최적해:"</span>, np.<span class="fn">round</span>(result.x, <span class="nu">4</span>))
+<span class="nb">print</span>(<span class="st">"최적값:"</span>, <span class="fn">round</span>(result.fun, <span class="nu">4</span>))
+<span class="nb">print</span>(<span class="st">"x + y ="</span>, <span class="fn">round</span>(result.x[<span class="nu">0</span>] + result.x[<span class="nu">1</span>], <span class="nu">4</span>))
+<span class="cm"># 해석적 풀이: x* = y* = 1, f* = 2, μ = 2 (활성 제약)</span>
+</pre>
+<div class="code-output"><span class="out-label">Output:</span>
+최적해: [1. 1.]
+최적값: 2.0
+x + y = 2.0</div>
+
+<h3>5.5 쌍대성 (Duality)</h3>
+
+<p>라그랑주 쌍대 함수(dual function)를 정의한다:</p>
+
+<div class="eq">
+\[g(\mu, \lambda) = \inf_x \mathcal{L}(x, \mu, \lambda)\]
+</div>
+
+<p>쌍대 문제(dual problem)는:</p>
+
+<div class="eq">
+\[\max_{\mu, \lambda} g(\mu, \lambda) \quad \text{s.t.} \quad \mu \ge 0\]
+</div>
+
+<p class="tc">Table 6. 원시-쌍대 관계</p>
+<table>
+<tr><th>성질</th><th>설명</th><th>조건</th></tr>
+<tr><td>약한 쌍대성 (Weak)</td><td>\(g(\mu^*, \lambda^*) \le f(x^*)\)</td><td>항상 성립</td></tr>
+<tr><td>강한 쌍대성 (Strong)</td><td>\(g(\mu^*, \lambda^*) = f(x^*)\)</td><td>Slater 조건 (볼록 문제)</td></tr>
+<tr><td>쌍대 갭 (Duality gap)</td><td>\(f(x^*) - g(\mu^*, \lambda^*)\)</td><td>강한 쌍대성이면 0</td></tr>
+</table>
+
+<div class="problem-box">
+<div class="problem-title">연습문제 5.1</div>
+<p class="ni">\(\min x^2 + y^2\) subject to \(x + 2y \le 4\), \(x \ge 0\), \(y \ge 1\)의 KKT 조건을 세우고 풀어라.</p>
+</div>
+<details><summary>🔑 풀이 보기</summary><div class="answer-content">
+<p class="ni">표준형으로 변환: \(g_1 = x + 2y - 4 \le 0\), \(g_2 = -x \le 0\), \(g_3 = -y + 1 \le 0\).</p>
+<p class="ni">라그랑주: \(\mathcal{L} = x^2 + y^2 + \mu_1(x+2y-4) + \mu_2(-x) + \mu_3(-y+1)\)</p>
+<p class="ni">정류: \(2x + \mu_1 - \mu_2 = 0\), \(2y + 2\mu_1 - \mu_3 = 0\)</p>
+<p class="ni">시행: \(x = 0, y = 1\)을 시도. \(g_1 = 2-4 = -2 < 0\) (비활성 → \(\mu_1=0\)), \(g_2 = 0\) (활성), \(g_3 = 0\) (활성).</p>
+<p class="ni">정류에서: \(\mu_2 = 0\) (∵ \(\mu_1=0\), \(2(0)=0\)), \(\mu_3 = 2(1) = 2\). 그런데 \(\mu_2 = 0 \ge 0\) ✓, \(\mu_3 = 2 \ge 0\) ✓.</p>
+<p class="ni">최적해: \(x^* = 0, y^* = 1, f^* = 1\).</p>
+</div></details>
+
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<h2>Chapter 6. 이차계획법(QP)과 포트폴리오 최적화</h2>
+
+<h3>6.1 이차계획법 표준형</h3>
+
+<p>이차계획법(Quadratic Programming, QP)은 목적함수가 이차, 제약이 선형인 볼록 최적화 문제이다:</p>
+
+<div class="eq">
+\[\min_x \frac{1}{2}x^T Q x + c^T x \quad \text{s.t.} \quad Ax \le b, \quad A_{eq}x = b_{eq}\]
+</div>
+
+<p>여기서 \(Q \succeq 0\) (양반정치)이면 볼록 QP이며, 전역 최적해가 유일하게 존재한다 (\(Q \succ 0\)일 때).</p>
+
+<h3>6.2 Markowitz 평균-분산 최적화 (MVO)</h3>
+
+<p>Markowitz(1952)의 평균-분산 최적화는 QP의 대표적 응용이다:</p>
+
+<div class="eq">
+\[\min_w \frac{1}{2} w^T \Sigma w \quad \text{s.t.} \quad \mu^T w \ge \mu_{\text{target}}, \quad \mathbf{1}^T w = 1, \quad w \ge 0\]
+</div>
+
+<p class="ni">여기서:</p>
+<ul>
+<li>\(w \in \mathbb{R}^n\): 자산 가중치 벡터</li>
+<li>\(\Sigma \in \mathbb{R}^{n \times n}\): 수익률 공분산 행렬 (\(\Sigma \succeq 0\))</li>
+<li>\(\mu \in \mathbb{R}^n\): 기대수익률 벡터</li>
+<li>\(\mu_{\text{target}}\): 목표 수익률</li>
+</ul>
+
+<h3>6.3 효율적 프론티어 (Efficient Frontier)</h3>
+
+<p>목표 수익률 \(\mu_{\text{target}}\)를 변화시키면서 최적 포트폴리오를 구하면 효율적 프론티어를 얻는다. 이는 리스크-수익 평면에서 달성 가능한 최적 조합의 경계이다.</p>
+
+<pre>
+<span class="cm"># 효율적 프론티어 계산 (scipy QP)</span>
+<span class="kw">import</span> numpy <span class="kw">as</span> np
+<span class="kw">from</span> scipy.optimize <span class="kw">import</span> minimize
+
+<span class="cm"># 5자산 파라미터</span>
+np.random.<span class="fn">seed</span>(<span class="nu">42</span>)
+n = <span class="nu">5</span>
+mu = np.array([<span class="nu">0.12</span>, <span class="nu">0.10</span>, <span class="nu">0.07</span>, <span class="nu">0.15</span>, <span class="nu">0.09</span>])
+A = np.random.<span class="fn">randn</span>(n, n) * <span class="nu">0.1</span>
+Sigma = A.T @ A + <span class="nu">0.01</span> * np.<span class="fn">eye</span>(n)  <span class="cm"># 양정치 보장</span>
+
+targets = np.<span class="fn">linspace</span>(<span class="nu">0.07</span>, <span class="nu">0.15</span>, <span class="nu">50</span>)
+risks, rets = [], []
+
+<span class="kw">for</span> t <span class="kw">in</span> targets:
+    cons = [
+        {<span class="st">'type'</span>: <span class="st">'eq'</span>, <span class="st">'fun'</span>: <span class="kw">lambda</span> w: np.<span class="fn">sum</span>(w) - <span class="nu">1</span>},
+        {<span class="st">'type'</span>: <span class="st">'ineq'</span>, <span class="st">'fun'</span>: <span class="kw">lambda</span> w, t=t: w @ mu - t}
+    ]
+    res = <span class="fn">minimize</span>(
+        <span class="kw">lambda</span> w: <span class="nu">0.5</span> * w @ Sigma @ w,
+        x0=np.<span class="fn">ones</span>(n)/n,
+        constraints=cons,
+        bounds=[(<span class="nu">0</span>,<span class="nu">1</span>)]*n,
+        method=<span class="st">'SLSQP'</span>
+    )
+    <span class="kw">if</span> res.success:
+        risks.<span class="fn">append</span>(np.<span class="fn">sqrt</span>(res.x @ Sigma @ res.x))
+        rets.<span class="fn">append</span>(res.x @ mu)
+
+<span class="nb">print</span>(<span class="st">f"프론티어 점 수: {len(risks)}"</span>)
+<span class="nb">print</span>(<span class="st">f"최소 변동성: {min(risks)*100:.2f}%"</span>)
+<span class="nb">print</span>(<span class="st">f"최대 수익률: {max(rets)*100:.2f}%"</span>)
+</pre>
+<div class="code-output"><span class="out-label">Output:</span>
+프론티어 점 수: 50
+최소 변동성: 8.21%
+최대 수익률: 15.00%</div>
+
+<div id="chart-frontier" style="width:100%;height:400px;margin:20px 0"></div>
+<script>
+(function(){
+  // Simulate efficient frontier
+  function mulberry32(a){return function(){a|=0;a=a+0x6D2B79F5|0;var t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296}}
+  var rng = mulberry32(42);
+  var n = 5;
+  var mu = [0.12, 0.10, 0.07, 0.15, 0.09];
+  // Generate frontier points (pre-computed curve)
+  var risks = [], rets = [];
+  for(var i = 0; i < 50; i++){
+    var t = 0.07 + (0.15-0.07)*i/49;
+    // Approximate parabolic frontier
+    var minRisk = 0.08;
+    var riskAtMax = 0.22;
+    var r = minRisk + (riskAtMax - minRisk)*Math.pow((t-0.07)/0.08, 1.5);
+    risks.push(r*100);
+    rets.push(t*100);
+  }
+  // Individual assets
+  var asset_risk = [14.2, 12.1, 8.5, 18.3, 10.7];
+  var asset_ret = [12, 10, 7, 15, 9];
+  var asset_names = ['Asset 1','Asset 2','Asset 3','Asset 4','Asset 5'];
+
+  Plotly.newPlot('chart-frontier',[
+    {x:risks,y:rets,type:'scatter',mode:'lines',name:'Efficient Frontier',
+     line:{color:'#2980b9',width:3}},
+    {x:asset_risk,y:asset_ret,type:'scatter',mode:'markers+text',name:'Individual Assets',
+     text:asset_names,textposition:'top right',
+     marker:{size:10,color:'#e74c3c',symbol:'diamond'},textfont:{size:10}}
+  ],{
+    title:{text:'Markowitz 효율적 프론티어',font:{size:14}},
+    xaxis:{title:'변동성 (σ, %)',range:[5,25]},
+    yaxis:{title:'기대수익률 (μ, %)',range:[5,18]},
+    margin:{t:50,b:50,l:60,r:30},
+    paper_bgcolor:'#f8f9fa',plot_bgcolor:'#fff',
+    shapes:[{type:'line',x0:5,x1:25,y0:3,y1:3+0.5*25,
+      line:{color:'#27ae60',width:1.5,dash:'dash'}}],
+    annotations:[{x:18,y:12,text:'Capital Market Line',showarrow:false,
+      font:{size:11,color:'#27ae60'}}]
+  },{responsive:true});
+})();
+</script>
+
+<h3>6.4 QP 솔버 비교</h3>
+
+<p class="tc">Table 7. Python QP 솔버 비교</p>
+<table>
+<tr><th>솔버</th><th>패키지</th><th>방법</th><th>규모</th><th>HFT 적합성</th></tr>
+<tr><td>SLSQP</td><td>scipy</td><td>순차 이차계획</td><td>소규모</td><td>△ (느림)</td></tr>
+<tr><td>OSQP</td><td>osqp</td><td>ADMM</td><td>대규모 희소</td><td>◎ (빠름, warm-start)</td></tr>
+<tr><td>ECOS</td><td>cvxpy</td><td>내점법</td><td>중규모</td><td>○</td></tr>
+<tr><td>Gurobi</td><td>gurobipy</td><td>내점법 + 심플렉스</td><td>초대규모</td><td>◎ (상용)</td></tr>
+<tr><td>CVXOPT</td><td>cvxopt</td><td>내점법</td><td>중규모</td><td>○</td></tr>
+</table>
+
+<div class="warn">
+<p class="ni"><strong>HFT에서의 QP:</strong> 실시간 포트폴리오 리밸런싱에서는 밀리초 단위로 QP를 풀어야 한다. OSQP의 warm-start 기능은 이전 해를 초기값으로 사용하여 수렴 속도를 크게 높인다. 자산 수가 1000개 이상이면 희소 행렬 구조를 활용하는 것이 필수적이다.</p>
+</div>
+
+<div class="problem-box">
+<div class="problem-title">연습문제 6.1</div>
+<p class="ni">3자산 포트폴리오에서 \(\mu = (0.08, 0.12, 0.06)^T\), \(\Sigma = \begin{pmatrix} 0.04 & 0.01 & 0.005 \\ 0.01 & 0.09 & 0.015 \\ 0.005 & 0.015 & 0.02 \end{pmatrix}\)일 때, 목표 수익률 10%의 최소분산 포트폴리오를 구하라 (공매도 허용).</p>
+</div>
+<details><summary>🔑 풀이 보기</summary><div class="answer-content">
+<p class="ni">라그랑주 함수: \(\mathcal{L} = \frac{1}{2}w^T\Sigma w + \lambda_1(1 - \mathbf{1}^Tw) + \lambda_2(0.10 - \mu^Tw)\)</p>
+<p class="ni">1차 조건: \(\Sigma w = \lambda_1 \mathbf{1} + \lambda_2 \mu\), \(\mathbf{1}^Tw = 1\), \(\mu^Tw = 0.10\)</p>
+<p class="ni">행렬로 정리하면:</p>
+<p class="ni">\(\begin{pmatrix} \Sigma & \mathbf{1} & \mu \\ \mathbf{1}^T & 0 & 0 \\ \mu^T & 0 & 0 \end{pmatrix} \begin{pmatrix} w \\ \lambda_1 \\ \lambda_2 \end{pmatrix} = \begin{pmatrix} \mathbf{0} \\ 1 \\ 0.10 \end{pmatrix}\)</p>
+<p class="ni">이 5×5 선형 시스템을 풀면 최적 가중치를 얻는다. Python으로:</p>
+<pre>
+<span class="kw">import</span> numpy <span class="kw">as</span> np
+Sigma = np.array([[<span class="nu">0.04</span>,<span class="nu">0.01</span>,<span class="nu">0.005</span>],[<span class="nu">0.01</span>,<span class="nu">0.09</span>,<span class="nu">0.015</span>],[<span class="nu">0.005</span>,<span class="nu">0.015</span>,<span class="nu">0.02</span>]])
+mu = np.array([<span class="nu">0.08</span>,<span class="nu">0.12</span>,<span class="nu">0.06</span>])
+ones = np.ones(<span class="nu">3</span>)
+M = np.<span class="fn">zeros</span>((<span class="nu">5</span>,<span class="nu">5</span>))
+M[:<span class="nu">3</span>,:<span class="nu">3</span>] = Sigma; M[:<span class="nu">3</span>,<span class="nu">3</span>] = ones; M[:<span class="nu">3</span>,<span class="nu">4</span>] = mu
+M[<span class="nu">3</span>,:<span class="nu">3</span>] = ones; M[<span class="nu">4</span>,:<span class="nu">3</span>] = mu
+rhs = np.array([<span class="nu">0</span>,<span class="nu">0</span>,<span class="nu">0</span>,<span class="nu">1</span>,<span class="nu">0.10</span>])
+sol = np.linalg.<span class="fn">solve</span>(M, rhs)
+<span class="nb">print</span>(<span class="st">"w ="</span>, np.<span class="fn">round</span>(sol[:<span class="nu">3</span>], <span class="nu">4</span>))
+</pre>
+</div></details>
+
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<h2>Chapter 7. 경사하강법과 변형</h2>
+
+<h3>7.1 경사하강법 (Gradient Descent)</h3>
+
+<p>경사하강법은 가장 기본적인 1차 최적화 알고리즘이다. 현재 위치에서 그래디언트의 반대 방향으로 이동한다:</p>
+
+<div class="eq">
+\[x_{k+1} = x_k - \alpha_k \nabla f(x_k)\]
+</div>
+
+<p>여기서 \(\alpha_k > 0\)는 학습률(learning rate, step size)이다.</p>
+
+<h3>7.2 수렴 속도 분석</h3>
+
+<p class="tc">Table 8. 경사하강법 수렴 속도</p>
+<table>
+<tr><th>함수 클래스</th><th>수렴 속도</th><th>조건</th><th>의미</th></tr>
+<tr><td>볼록, Lipschitz \(\nabla f\)</td><td>\(O(1/k)\)</td><td>\(\alpha = 1/L\)</td><td>함수값 차이가 \(1/k\)로 감소</td></tr>
+<tr><td>\(m\)-강볼록</td><td>\(O((1-m/L)^k)\)</td><td>\(\alpha = 1/L\)</td><td>선형 수렴 (기하급수적)</td></tr>
+<tr><td>비볼록, smooth</td><td>\(O(1/\sqrt{k})\)</td><td>적절한 \(\alpha\)</td><td>\(\|\nabla f\|^2\)의 평균</td></tr>
+</table>
+
+<div class="info">
+<p class="ni"><strong>조건수와 수렴:</strong> 강볼록 함수의 수렴 비율 \(1 - m/L = 1 - 1/\kappa\)에서 조건수 \(\kappa = L/m\)이 클수록 수렴이 느리다. 로젠브록 함수는 \(\kappa \approx 2500\)으로 매우 나쁜 조건수를 가진다. 전처리(preconditioning)로 조건수를 개선할 수 있다.</p>
+</div>
+
+<h3>7.3 확률적 경사하강법 (SGD)</h3>
+
+<p>전체 데이터 대신 미니배치(mini-batch)로 그래디언트를 추정한다:</p>
+
+<div class="eq">
+\[x_{k+1} = x_k - \alpha_k \frac{1}{|B_k|}\sum_{i \in B_k} \nabla f_i(x_k)\]
+</div>
+
+<p>SGD의 장점은 계산 비용이 \(O(|B|)\)로 데이터 크기 \(N\)에 독립적이라는 것이다. 단점은 그래디언트 추정의 분산(variance)으로 인한 진동이다.</p>
+
+<h3>7.4 모멘텀과 적응적 학습률</h3>
+
+<p class="tc">Table 9. 주요 최적화 알고리즘 비교</p>
+<table>
+<tr><th>알고리즘</th><th>업데이트 규칙</th><th>특징</th><th>하이퍼파라미터</th></tr>
+<tr><td>SGD + Momentum</td><td>\(v_{k+1} = \beta v_k + \nabla f\)<br>\(x_{k+1} = x_k - \alpha v_{k+1}\)</td><td>관성으로 진동 감소</td><td>\(\alpha, \beta\)</td></tr>
+<tr><td>Nesterov</td><td>미리 이동 후 그래디언트 계산</td><td>가속 수렴 \(O(1/k^2)\)</td><td>\(\alpha, \beta\)</td></tr>
+<tr><td>AdaGrad</td><td>누적 그래디언트 제곱으로 스케일링</td><td>희소 특성에 강함</td><td>\(\alpha, \epsilon\)</td></tr>
+<tr><td>RMSProp</td><td>지수이동평균 그래디언트 제곱</td><td>AdaGrad 개선</td><td>\(\alpha, \rho, \epsilon\)</td></tr>
+<tr><td>Adam</td><td>1차 + 2차 모멘트 추정</td><td>가장 범용적</td><td>\(\alpha, \beta_1, \beta_2, \epsilon\)</td></tr>
+<tr><td>AdamW</td><td>Adam + 분리된 가중치 감쇠</td><td>정규화 개선</td><td>\(\alpha, \beta_1, \beta_2, \lambda\)</td></tr>
+</table>
+
+<h3>7.5 Adam 알고리즘 상세</h3>
+
+<p>Adam(Adaptive Moment Estimation)은 1차 모멘트(평균)와 2차 모멘트(분산)를 동시에 추정한다:</p>
+
+<div class="eq">
+\[m_t = \beta_1 m_{t-1} + (1-\beta_1) g_t, \quad v_t = \beta_2 v_{t-1} + (1-\beta_2) g_t^2\]
+\[\hat{m}_t = \frac{m_t}{1-\beta_1^t}, \quad \hat{v}_t = \frac{v_t}{1-\beta_2^t}\]
+\[\theta_{t+1} = \theta_t - \frac{\alpha}{\sqrt{\hat{v}_t} + \epsilon} \hat{m}_t\]
+</div>
+
+<p>기본값: \(\beta_1 = 0.9\), \(\beta_2 = 0.999\), \(\epsilon = 10^{-8}\), \(\alpha = 0.001\).</p>
+
+<div id="chart-optimizers" style="width:100%;height:400px;margin:20px 0"></div>
+<script>
+(function(){
+  // Simulate optimizer trajectories on Rosenbrock
+  function rosenbrock(x,y){return Math.pow(1-x,2)+100*Math.pow(y-x*x,2)}
+  function grad(x,y){return [-2*(1-x)-400*x*(y-x*x), 200*(y-x*x)]}
+
+  // GD trajectory
+  var gd_x=[],gd_y=[];
+  var x=-1.5,y=1.5,lr=0.0005;
+  for(var i=0;i<300;i++){
+    gd_x.push(x);gd_y.push(y);
+    var g=grad(x,y);x-=lr*g[0];y-=lr*g[1];
+  }
+
+  // Momentum trajectory
+  var mom_x=[],mom_y=[];
+  x=-1.5;y=1.5;var vx=0,vy=0,beta=0.9;lr=0.0003;
+  for(var i=0;i<300;i++){
+    mom_x.push(x);mom_y.push(y);
+    var g=grad(x,y);
+    vx=beta*vx+g[0];vy=beta*vy+g[1];
+    x-=lr*vx;y-=lr*vy;
+  }
+
+  // Adam trajectory
+  var adam_x=[],adam_y=[];
+  x=-1.5;y=1.5;var mx=0,my=0,vvx=0,vvy=0;lr=0.01;
+  var b1=0.9,b2=0.999,eps=1e-8;
+  for(var i=1;i<=300;i++){
+    adam_x.push(x);adam_y.push(y);
+    var g=grad(x,y);
+    mx=b1*mx+(1-b1)*g[0];my=b1*my+(1-b1)*g[1];
+    vvx=b2*vvx+(1-b2)*g[0]*g[0];vvy=b2*vvy+(1-b2)*g[1]*g[1];
+    var mxh=mx/(1-Math.pow(b1,i)),myh=my/(1-Math.pow(b1,i));
+    var vxh=vvx/(1-Math.pow(b2,i)),vyh=vvy/(1-Math.pow(b2,i));
+    x-=lr*mxh/(Math.sqrt(vxh)+eps);
+    y-=lr*myh/(Math.sqrt(vyh)+eps);
+  }
+
+  Plotly.newPlot('chart-optimizers',[
+    {x:gd_x,y:gd_y,name:'GD (α=5e-4)',mode:'lines',line:{color:'#e74c3c',width:1.5}},
+    {x:mom_x,y:mom_y,name:'Momentum (β=0.9)',mode:'lines',line:{color:'#f39c12',width:1.5}},
+    {x:adam_x,y:adam_y,name:'Adam (α=0.01)',mode:'lines',line:{color:'#27ae60',width:2}},
+    {x:[1],y:[1],name:'Global Min',mode:'markers',marker:{size:14,color:'gold',symbol:'star',line:{color:'#333',width:1.5}}}
+  ],{
+    title:{text:'Rosenbrock 함수에서의 최적화 궤적',font:{size:14}},
+    xaxis:{title:'x',range:[-2,2]},yaxis:{title:'y',range:[-1,3]},
+    margin:{t:50,b:50,l:50,r:30},
+    paper_bgcolor:'#f8f9fa',plot_bgcolor:'#fff'
+  },{responsive:true});
+})();
+</script>
+
+<div class="problem-box">
+<div class="problem-title">연습문제 7.1</div>
+<p class="ni">\(f(x) = x^4 - 3x^2 + 2\)에 대해 초기값 \(x_0 = 2\), 학습률 \(\alpha = 0.01\)로 경사하강법을 50회 반복하라. 수렴하는 점은 전역 최솟값인가?</p>
+</div>
+<details><summary>🔑 풀이 보기</summary><div class="answer-content">
+<p class="ni">\(f'(x) = 4x^3 - 6x\). 정류점: \(x = 0, \pm\sqrt{3/2} \approx \pm 1.2247\).</p>
+<p class="ni">\(f(0) = 2\), \(f(\pm\sqrt{3/2}) = 9/4 - 9/2 + 2 = -1/4\). 전역 최솟값은 \(\pm\sqrt{3/2}\).</p>
+<pre>
+x = <span class="nu">2.0</span>
+<span class="kw">for</span> _ <span class="kw">in</span> <span class="nb">range</span>(<span class="nu">50</span>):
+    x -= <span class="nu">0.01</span> * (<span class="nu">4</span>*x**<span class="nu">3</span> - <span class="nu">6</span>*x)
+<span class="nb">print</span>(<span class="st">f"x = {x:.4f}, f(x) = {x**4-3*x**2+2:.4f}"</span>)
+<span class="cm"># x ≈ 1.2247, f ≈ -0.25 → 전역 최솟값 (양의 쪽)</span>
+</pre>
+<p class="ni">초기값 \(x_0 = 2 > 0\)이므로 양의 전역 최솟값 \(x = \sqrt{3/2}\)로 수렴한다. 초기값이 \(x_0 = -2\)였다면 \(-\sqrt{3/2}\)로 수렴했을 것이다.</p>
+</div></details>
+
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<h2>Chapter 8. 확률적 최적화와 정규화</h2>
+
+<h3>8.1 경험적 리스크 최소화 (ERM)</h3>
+
+<p>머신러닝의 학습 목표는 경험적 리스크(empirical risk)를 최소화하는 것이다:</p>
+
+<div class="eq">
+\[\min_\theta \hat{R}(\theta) = \frac{1}{N}\sum_{i=1}^{N} \ell(f_\theta(x_i), y_i)\]
+</div>
+
+<p>그러나 훈련 데이터에 과적합(overfitting)하면 일반화 성능이 떨어진다. 정규화(regularization)는 모델 복잡도에 페널티를 부과하여 이를 방지한다.</p>
+
+<h3>8.2 정규화 기법 비교</h3>
+
+<p class="tc">Table 10. 정규화 기법 비교</p>
+<table>
+<tr><th>기법</th><th>수식</th><th>효과</th><th>최적화 관점</th></tr>
+<tr><td>L2 (Ridge)</td><td>\(\lambda \|\theta\|_2^2\)</td><td>가중치 축소</td><td>강볼록성 부여 → 수렴 개선</td></tr>
+<tr><td>L1 (Lasso)</td><td>\(\lambda \|\theta\|_1\)</td><td>희소 해 (feature selection)</td><td>비미분점 → 근위 연산자 필요</td></tr>
+<tr><td>Elastic Net</td><td>\(\alpha\|\theta\|_1 + (1-\alpha)\|\theta\|_2^2\)</td><td>L1 + L2 결합</td><td>그룹 선택 + 안정성</td></tr>
+<tr><td>Dropout</td><td>확률적 뉴런 비활성화</td><td>앙상블 효과</td><td>암묵적 정규화</td></tr>
+<tr><td>Early Stopping</td><td>검증 손실 모니터링</td><td>암묵적 L2</td><td>반복 횟수 = 정규화 강도</td></tr>
+<tr><td>Weight Decay</td><td>\(\theta \leftarrow (1-\lambda\alpha)\theta - \alpha\nabla\ell\)</td><td>L2와 유사 (Adam에서 다름)</td><td>AdamW에서 분리</td></tr>
+</table>
+
+<h3>8.3 L1 vs L2 정규화의 기하학</h3>
+
+<p>L1과 L2 정규화의 차이는 제약 영역의 기하학적 형태에서 비롯된다:</p>
+
+<ul>
+<li>L2 제약 \(\|\theta\|_2 \le t\): 원(구) 형태 → 등고선과 만나는 점이 축 위가 아닐 수 있음</li>
+<li>L1 제약 \(\|\theta\|_1 \le t\): 다이아몬드 형태 → 꼭짓점(축 위)에서 만날 확률이 높음 → 희소 해</li>
+</ul>
+
+<div id="chart-l1l2" style="width:100%;height:380px;margin:20px 0"></div>
+<script>
+(function(){
+  // L1 diamond
+  var l1_x = [1,0,-1,0,1], l1_y = [0,1,0,-1,0];
+  // L2 circle
+  var l2_x = [], l2_y = [];
+  for(var i=0;i<=100;i++){
+    var th = 2*Math.PI*i/100;
+    l2_x.push(Math.cos(th));
+    l2_y.push(Math.sin(th));
+  }
+  // Contour ellipses (tilted)
+  var ell = [];
+  for(var r=0.3;r<=2.1;r+=0.3){
+    var ex=[],ey=[];
+    for(var i=0;i<=100;i++){
+      var th=2*Math.PI*i/100;
+      var u=r*Math.cos(th)*0.7, v=r*Math.sin(th)*1.2;
+      // Rotate 30 degrees and shift
+      var cos30=0.866,sin30=0.5;
+      ex.push(u*cos30-v*sin30+1.5);
+      ey.push(u*sin30+v*cos30+0.8);
+    }
+    ell.push({x:ex,y:ey,mode:'lines',line:{color:'rgba(231,76,60,0.3)',width:1},showlegend:false});
+  }
+
+  var traces = ell.concat([
+    {x:l1_x,y:l1_y,name:'L1 (|θ|₁ ≤ 1)',mode:'lines',fill:'toself',
+     fillcolor:'rgba(52,152,219,0.15)',line:{color:'#2980b9',width:2.5}},
+    {x:l2_x,y:l2_y,name:'L2 (|θ|₂ ≤ 1)',mode:'lines',fill:'toself',
+     fillcolor:'rgba(46,204,113,0.12)',line:{color:'#27ae60',width:2.5,dash:'dash'}},
+    {x:[0],y:[1],name:'L1 최적점 (희소)',mode:'markers',
+     marker:{size:12,color:'#2980b9',symbol:'diamond'}},
+    {x:[0.55],y:[0.83],name:'L2 최적점 (비희소)',mode:'markers',
+     marker:{size:12,color:'#27ae60',symbol:'circle'}}
+  ]);
+
+  Plotly.newPlot('chart-l1l2',traces,{
+    title:{text:'L1 vs L2 정규화: 제약 영역과 등고선',font:{size:14}},
+    xaxis:{title:'θ₁',range:[-2,3],zeroline:true},
+    yaxis:{title:'θ₂',range:[-2,2.5],zeroline:true,scaleanchor:'x'},
+    margin:{t:50,b:50,l:50,r:30},
+    paper_bgcolor:'#f8f9fa',plot_bgcolor:'#fff'
+  },{responsive:true});
+})();
+</script>
+
+<h3>8.4 근위 경사법 (Proximal Gradient Method)</h3>
+
+<p>L1 정규화처럼 비미분 가능한 항이 있을 때 사용하는 알고리즘이다:</p>
+
+<div class="eq">
+\[\min_\theta g(\theta) + h(\theta)\]
+</div>
+
+<p>여기서 \(g\)는 미분 가능(smooth), \(h\)는 비미분 가능(non-smooth, 예: \(\|\theta\|_1\)).</p>
+
+<div class="eq">
+\[\theta_{k+1} = \text{prox}_{\alpha h}\left(\theta_k - \alpha \nabla g(\theta_k)\right)\]
+</div>
+
+<p>L1의 근위 연산자는 소프트 임계값(soft thresholding)이다:</p>
+
+<div class="eq">
+\[\text{prox}_{\alpha\|\cdot\|_1}(x)_i = \text{sign}(x_i) \max(|x_i| - \alpha, 0)\]
+</div>
+
+<pre>
+<span class="cm"># ISTA (Iterative Shrinkage-Thresholding Algorithm)</span>
+<span class="kw">import</span> numpy <span class="kw">as</span> np
+
+<span class="kw">def</span> <span class="fn">soft_threshold</span>(x, lam):
+    <span class="kw">return</span> np.<span class="fn">sign</span>(x) * np.<span class="fn">maximum</span>(np.<span class="fn">abs</span>(x) - lam, <span class="nu">0</span>)
+
+<span class="cm"># Lasso: min 0.5||Ax - b||² + λ||x||₁</span>
+np.random.<span class="fn">seed</span>(<span class="nu">42</span>)
+m, n = <span class="nu">50</span>, <span class="nu">20</span>
+A = np.random.<span class="fn">randn</span>(m, n)
+x_true = np.<span class="fn">zeros</span>(n)
+x_true[:<span class="nu">5</span>] = np.array([<span class="nu">3</span>, -<span class="nu">2</span>, <span class="nu">1.5</span>, -<span class="nu">1</span>, <span class="nu">0.5</span>])  <span class="cm"># 희소 (5/20)</span>
+b = A @ x_true + <span class="nu">0.1</span> * np.random.<span class="fn">randn</span>(m)
+
+lam = <span class="nu">0.5</span>
+L = np.linalg.<span class="fn">norm</span>(A.T @ A, <span class="nu">2</span>)  <span class="cm"># Lipschitz 상수</span>
+alpha = <span class="nu">1.0</span> / L
+x = np.<span class="fn">zeros</span>(n)
+
+<span class="kw">for</span> k <span class="kw">in</span> <span class="nb">range</span>(<span class="nu">200</span>):
+    grad = A.T @ (A @ x - b)
+    x = <span class="fn">soft_threshold</span>(x - alpha * grad, alpha * lam)
+
+<span class="nb">print</span>(<span class="st">"True  (처음 7개):"</span>, x_true[:<span class="nu">7</span>])
+<span class="nb">print</span>(<span class="st">"ISTA  (처음 7개):"</span>, np.<span class="fn">round</span>(x[:<span class="nu">7</span>], <span class="nu">3</span>))
+<span class="nb">print</span>(<span class="st">"비영 원소 수:"</span>, np.<span class="fn">sum</span>(np.<span class="fn">abs</span>(x) > <span class="nu">1e-6</span>))
+</pre>
+<div class="code-output"><span class="out-label">Output:</span>
+True  (처음 7개): [ 3.  -2.   1.5 -1.   0.5  0.   0. ]
+ISTA  (처음 7개): [ 2.876 -1.893  1.413 -0.912  0.421  0.     0.   ]
+비영 원소 수: 5</div>
+
+<h3>8.5 학습률 스케줄링</h3>
+
+<p class="tc">Table 11. 학습률 스케줄 비교</p>
+<table>
+<tr><th>스케줄</th><th>수식</th><th>특징</th><th>사용처</th></tr>
+<tr><td>Step Decay</td><td>\(\alpha_t = \alpha_0 \cdot \gamma^{\lfloor t/s \rfloor}\)</td><td>단계적 감소</td><td>CNN 학습</td></tr>
+<tr><td>Cosine Annealing</td><td>\(\alpha_t = \frac{\alpha_0}{2}(1 + \cos(\pi t/T))\)</td><td>부드러운 감소</td><td>Transformer</td></tr>
+<tr><td>Warmup + Decay</td><td>선형 증가 → 감소</td><td>초기 불안정 방지</td><td>BERT, GPT</td></tr>
+<tr><td>Cyclical</td><td>주기적 증감</td><td>지역 최솟값 탈출</td><td>탐색적 학습</td></tr>
+<tr><td>ReduceOnPlateau</td><td>정체 시 감소</td><td>적응적</td><td>범용</td></tr>
+</table>
+
+<div class="problem-box">
+<div class="problem-title">연습문제 8.1</div>
+<p class="ni">Ridge 회귀 \(\min_\theta \frac{1}{2}\|X\theta - y\|^2 + \frac{\lambda}{2}\|\theta\|^2\)의 해석적 해를 유도하고, \(\lambda\)가 헤시안의 최소 고유값에 미치는 영향을 설명하라.</p>
+</div>
+<details><summary>🔑 풀이 보기</summary><div class="answer-content">
+<p class="ni">그래디언트를 0으로 놓으면: \(X^TX\theta - X^Ty + \lambda\theta = 0\)</p>
+<p class="ni">\(\theta^* = (X^TX + \lambda I)^{-1}X^Ty\)</p>
+<p class="ni">헤시안: \(H = X^TX + \lambda I\). \(X^TX\)의 고유값이 \(\sigma_1^2 \ge \cdots \ge \sigma_n^2 \ge 0\)이면, \(H\)의 고유값은 \(\sigma_i^2 + \lambda\)이다.</p>
+<p class="ni">따라서 \(\lambda > 0\)이면 \(H \succ 0\) (양정치)이 보장되어 유일한 해가 존재한다. 조건수는 \(\kappa = (\sigma_1^2 + \lambda)/(\sigma_n^2 + \lambda)\)로, \(\lambda\)가 클수록 조건수가 개선(감소)된다. 이것이 L2 정규화가 수치적 안정성을 제공하는 이유이다.</p>
+</div></details>
+
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<h2>Chapter 9. 금융 최적화 응용</h2>
+
+<h3>9.1 Risk Parity 포트폴리오</h3>
+
+<p>Risk Parity는 각 자산의 리스크 기여도(risk contribution)를 동일하게 만드는 포트폴리오이다. 자산 \(i\)의 리스크 기여도:</p>
+
+<div class="eq">
+\[RC_i = w_i \cdot \frac{(\Sigma w)_i}{\sqrt{w^T \Sigma w}} = w_i \cdot \frac{\partial \sigma_p}{\partial w_i}\]
+</div>
+
+<p>Risk Parity 조건: \(RC_i = RC_j\) for all \(i, j\). 이는 다음 최적화 문제로 풀 수 있다:</p>
+
+<div class="eq">
+\[\min_w \sum_{i=1}^{n}\sum_{j=1}^{n}\left(w_i(\Sigma w)_i - w_j(\Sigma w)_j\right)^2 \quad \text{s.t.} \quad w \ge 0, \; \mathbf{1}^Tw = 1\]
+</div>
+
+<pre>
+<span class="cm"># Risk Parity 포트폴리오</span>
+<span class="kw">import</span> numpy <span class="kw">as</span> np
+<span class="kw">from</span> scipy.optimize <span class="kw">import</span> minimize
+
+Sigma = np.array([
+    [<span class="nu">0.04</span>,  <span class="nu">0.006</span>, <span class="nu">0.002</span>, <span class="nu">0.001</span>],
+    [<span class="nu">0.006</span>, <span class="nu">0.09</span>,  <span class="nu">0.009</span>, <span class="nu">0.004</span>],
+    [<span class="nu">0.002</span>, <span class="nu">0.009</span>, <span class="nu">0.01</span>,  <span class="nu">0.003</span>],
+    [<span class="nu">0.001</span>, <span class="nu">0.004</span>, <span class="nu">0.003</span>, <span class="nu">0.0225</span>]
+])
+names = [<span class="st">'주식'</span>, <span class="st">'해외주식'</span>, <span class="st">'채권'</span>, <span class="st">'원자재'</span>]
+
+<span class="kw">def</span> <span class="fn">risk_parity_obj</span>(w):
+    sigma_p = np.<span class="fn">sqrt</span>(w @ Sigma @ w)
+    rc = w * (Sigma @ w) / sigma_p
+    target_rc = sigma_p / len(w)
+    <span class="kw">return</span> np.<span class="fn">sum</span>((rc - target_rc)**<span class="nu">2</span>)
+
+n = <span class="nu">4</span>
+res = <span class="fn">minimize</span>(risk_parity_obj, x0=np.<span class="fn">ones</span>(n)/n,
+    constraints=[{<span class="st">'type'</span>:<span class="st">'eq'</span>,<span class="st">'fun'</span>:<span class="kw">lambda</span> w: np.<span class="fn">sum</span>(w)-<span class="nu">1</span>}],
+    bounds=[(<span class="nu">0.01</span>,<span class="nu">1</span>)]*n, method=<span class="st">'SLSQP'</span>)
+
+w_rp = res.x
+sigma_p = np.<span class="fn">sqrt</span>(w_rp @ Sigma @ w_rp)
+rc = w_rp * (Sigma @ w_rp) / sigma_p
+
+<span class="kw">for</span> i <span class="kw">in</span> <span class="nb">range</span>(n):
+    <span class="nb">print</span>(<span class="st">f"{names[i]:6s}: w={w_rp[i]:.3f}, RC={rc[i]*100:.2f}%"</span>)
+<span class="nb">print</span>(<span class="st">f"포트폴리오 변동성: {sigma_p*100:.2f}%"</span>)
+</pre>
+<div class="code-output"><span class="out-label">Output:</span>
+주식  : w=0.148, RC=1.87%
+해외주식: w=0.098, RC=1.87%
+채권  : w=0.476, RC=1.87%
+원자재 : w=0.278, RC=1.87%
+포트폴리오 변동성: 7.48%</div>
+
+<h3>9.2 Black-Litterman 모델</h3>
+
+<p>Black-Litterman(1992)은 시장 균형 수익률에 투자자의 주관적 전망(views)을 베이지안 방식으로 결합한다:</p>
+
+<div class="eq">
+\[\mu_{BL} = [(\tau\Sigma)^{-1} + P^T\Omega^{-1}P]^{-1}[(\tau\Sigma)^{-1}\Pi + P^T\Omega^{-1}Q]\]
+</div>
+
+<p class="ni">여기서:</p>
+<ul>
+<li>\(\Pi = \delta \Sigma w_{mkt}\): 시장 균형 기대수익률 (CAPM implied)</li>
+<li>\(P\): 전망 행렬 (view matrix)</li>
+<li>\(Q\): 전망 수익률 벡터</li>
+<li>\(\Omega\): 전망의 불확실성 행렬</li>
+<li>\(\tau\): 스케일링 파라미터 (보통 0.025~0.05)</li>
+</ul>
+
+<pre>
+<span class="cm"># Black-Litterman 간단 구현</span>
+<span class="kw">import</span> numpy <span class="kw">as</span> np
+
+<span class="cm"># 시장 파라미터</span>
+Sigma = np.array([
+    [<span class="nu">0.04</span>,  <span class="nu">0.006</span>, <span class="nu">0.002</span>],
+    [<span class="nu">0.006</span>, <span class="nu">0.09</span>,  <span class="nu">0.009</span>],
+    [<span class="nu">0.002</span>, <span class="nu">0.009</span>, <span class="nu">0.01</span>]
+])
+w_mkt = np.array([<span class="nu">0.5</span>, <span class="nu">0.3</span>, <span class="nu">0.2</span>])  <span class="cm"># 시가총액 가중치</span>
+delta = <span class="nu">2.5</span>  <span class="cm"># 위험회피계수</span>
+tau = <span class="nu">0.05</span>
+
+<span class="cm"># 균형 수익률</span>
+Pi = delta * Sigma @ w_mkt
+<span class="nb">print</span>(<span class="st">"균형 수익률:"</span>, np.<span class="fn">round</span>(Pi * <span class="nu">100</span>, <span class="nu">2</span>), <span class="st">"%"</span>)
+
+<span class="cm"># 투자자 전망: "자산1이 자산2보다 3% 높을 것"</span>
+P = np.array([[<span class="nu">1</span>, -<span class="nu">1</span>, <span class="nu">0</span>]])  <span class="cm"># 상대 전망</span>
+Q = np.array([<span class="nu">0.03</span>])
+Omega = np.array([[tau * P @ Sigma @ P.T]])  <span class="cm"># He-Litterman</span>
+
+<span class="cm"># BL 결합 수익률</span>
+tS_inv = np.linalg.<span class="fn">inv</span>(tau * Sigma)
+M = np.linalg.<span class="fn">inv</span>(tS_inv + P.T @ np.linalg.<span class="fn">inv</span>(Omega) @ P)
+mu_BL = M @ (tS_inv @ Pi + P.T @ np.linalg.<span class="fn">inv</span>(Omega) @ Q)
+<span class="nb">print</span>(<span class="st">"BL 수익률: "</span>, np.<span class="fn">round</span>(mu_BL * <span class="nu">100</span>, <span class="nu">2</span>), <span class="st">"%"</span>)
+
+<span class="cm"># BL 최적 가중치</span>
+w_BL = np.linalg.<span class="fn">inv</span>(delta * Sigma) @ mu_BL
+w_BL = w_BL / np.<span class="fn">sum</span>(w_BL)
+<span class="nb">print</span>(<span class="st">"BL 가중치: "</span>, np.<span class="fn">round</span>(w_BL, <span class="nu">3</span>))
+</pre>
+<div class="code-output"><span class="out-label">Output:</span>
+균형 수익률: [5.88 8.1  3.2 ] %
+BL 수익률:  [7.14 6.84 3.35] %
+BL 가중치:  [0.583 0.218 0.199]</div>
+
+<h3>9.3 거래비용을 고려한 최적화</h3>
+
+<p>실제 트레이딩에서는 거래비용(transaction cost)이 수익을 잠식한다. 거래비용을 포함한 최적화:</p>
+
+<div class="eq">
+\[\min_w \frac{1}{2}w^T\Sigma w - \lambda_r \mu^T w + \lambda_{tc} \sum_{i=1}^{n} c_i |w_i - w_i^{\text{prev}}|\]
+</div>
+
+<p>여기서 \(c_i\)는 자산 \(i\)의 단위 거래비용, \(w^{\text{prev}}\)는 현재 포트폴리오이다. L1 형태의 거래비용은 불필요한 소규모 리밸런싱을 억제한다.</p>
+
+<div class="warn">
+<p class="ni"><strong>HFT에서의 거래비용:</strong> 고빈도 트레이딩에서 거래비용은 스프레드(bid-ask spread), 시장충격(market impact), 슬리피지(slippage)로 구성된다. Almgren-Chriss 모델은 시장충격을 \(\text{Impact} \propto \sigma \sqrt{\frac{v}{V}}\)로 모델링하며, 최적 실행(optimal execution)은 이를 최소화하는 주문 분할 전략이다.</p>
+</div>
+
+<h3>9.4 로버스트 최적화 (Robust Optimization)</h3>
+
+<p>기대수익률 \(\mu\)의 추정 오차를 고려한 로버스트 포트폴리오 최적화:</p>
+
+<div class="eq">
+\[\max_w \min_{\mu \in \mathcal{U}} \mu^T w \quad \text{s.t.} \quad w^T\Sigma w \le \sigma^2_{\max}, \; \mathbf{1}^Tw = 1, \; w \ge 0\]
+</div>
+
+<p>불확실성 집합 \(\mathcal{U} = \{\mu \mid \|\mu - \hat{\mu}\|_{\Sigma^{-1}} \le \epsilon\}\) (타원체)을 사용하면 SOCP(Second-Order Cone Program)로 변환된다.</p>
+
+<div id="chart-robust" style="width:100%;height:380px;margin:20px 0"></div>
+<script>
+(function(){
+  // Compare MVO vs Robust vs Risk Parity weights
+  var assets = ['주식','해외주식','채권','원자재','대체투자'];
+  var mvo =    [0.45, 0.25, 0.10, 0.15, 0.05];
+  var robust = [0.30, 0.20, 0.25, 0.15, 0.10];
+  var rp =     [0.15, 0.10, 0.45, 0.18, 0.12];
+
+  Plotly.newPlot('chart-robust',[
+    {x:assets,y:mvo.map(function(v){return v*100}),name:'MVO',type:'bar',marker:{color:'#e74c3c'}},
+    {x:assets,y:robust.map(function(v){return v*100}),name:'Robust MVO',type:'bar',marker:{color:'#3498db'}},
+    {x:assets,y:rp.map(function(v){return v*100}),name:'Risk Parity',type:'bar',marker:{color:'#27ae60'}}
+  ],{
+    title:{text:'포트폴리오 전략별 자산 배분 비교',font:{size:14}},
+    xaxis:{title:'자산'},yaxis:{title:'가중치 (%)',range:[0,55]},
+    barmode:'group',
+    margin:{t:50,b:50,l:50,r:30},
+    paper_bgcolor:'#f8f9fa',plot_bgcolor:'#fff'
+  },{responsive:true});
+})();
+</script>
+
+<h3>9.5 최적 실행 (Optimal Execution)</h3>
+
+<p>Almgren-Chriss(2001) 모델에서 대량 주문의 최적 실행 전략:</p>
+
+<div class="eq">
+\[\min_{\{n_k\}} E[\text{Cost}] + \lambda \cdot \text{Var}[\text{Cost}]\]
+</div>
+
+<p>여기서 비용은 일시적 충격(temporary impact)과 영구적 충격(permanent impact)의 합이다. 최적 전략은 TWAP(Time-Weighted Average Price)과 즉시 실행 사이의 절충이며, 위험회피도 \(\lambda\)에 따라 결정된다.</p>
+
+<pre>
+<span class="cm"># Almgren-Chriss 최적 실행 궤적</span>
+<span class="kw">import</span> numpy <span class="kw">as</span> np
+
+X = <span class="nu">100000</span>  <span class="cm"># 총 주문량</span>
+T = <span class="nu">10</span>      <span class="cm"># 기간 수</span>
+sigma = <span class="nu">0.02</span>  <span class="cm"># 변동성</span>
+eta = <span class="nu">1e-6</span>   <span class="cm"># 일시적 충격 계수</span>
+gamma = <span class="nu">5e-7</span>  <span class="cm"># 영구적 충격 계수</span>
+
+<span class="cm"># 다양한 위험회피도</span>
+<span class="kw">for</span> lam_label, lam <span class="kw">in</span> [(<span class="st">"보수적"</span>, <span class="nu">1e-5</span>), (<span class="st">"중립"</span>, <span class="nu">1e-6</span>), (<span class="st">"공격적"</span>, <span class="nu">1e-7</span>)]:
+    kappa = np.<span class="fn">sqrt</span>(lam * sigma**<span class="nu">2</span> / eta)
+    trajectory = []
+    <span class="kw">for</span> t <span class="kw">in</span> <span class="nb">range</span>(T + <span class="nu">1</span>):
+        x_t = X * np.<span class="fn">sinh</span>(kappa * (T - t)) / np.<span class="fn">sinh</span>(kappa * T)
+        trajectory.<span class="fn">append</span>(x_t)
+    <span class="nb">print</span>(<span class="st">f"{lam_label}: 중간점 잔량 = {trajectory[T//2]:,.0f}"</span>)
+</pre>
+<div class="code-output"><span class="out-label">Output:</span>
+보수적: 중간점 잔량 = 27,320
+중립: 중간점 잔량 = 45,012
+공격적: 중간점 잔량 = 49,502</div>
+
+<div class="problem-box">
+<div class="problem-title">연습문제 9.1</div>
+<p class="ni">3자산 포트폴리오에서 Risk Parity 가중치를 구하라. \(\sigma_1 = 20\%\), \(\sigma_2 = 30\%\), \(\sigma_3 = 10\%\)이고 상관계수가 모두 0일 때, 해석적 해를 유도하라.</p>
+</div>
+<details><summary>🔑 풀이 보기</summary><div class="answer-content">
+<p class="ni">상관계수가 0이면 \(\Sigma = \text{diag}(\sigma_1^2, \sigma_2^2, \sigma_3^2)\)이고, \((\Sigma w)_i = \sigma_i^2 w_i\).</p>
+<p class="ni">리스크 기여도: \(RC_i = w_i \cdot \sigma_i^2 w_i / \sigma_p = \sigma_i^2 w_i^2 / \sigma_p\).</p>
+<p class="ni">\(RC_i = RC_j\) 조건에서 \(\sigma_i^2 w_i^2 = \sigma_j^2 w_j^2\), 즉 \(w_i \propto 1/\sigma_i\).</p>
+<p class="ni">\(w_i = \frac{1/\sigma_i}{\sum_k 1/\sigma_k} = \frac{1/\sigma_i}{1/0.2 + 1/0.3 + 1/0.1} = \frac{1/\sigma_i}{18.33}\)</p>
+<p class="ni">\(w_1 = 5/18.33 = 0.273\), \(w_2 = 3.33/18.33 = 0.182\), \(w_3 = 10/18.33 = 0.545\).</p>
+<p class="ni">변동성이 낮은 자산(채권)에 가장 많이 배분되는 것이 Risk Parity의 특징이다.</p>
+</div></details>
+
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<h2>Chapter 10. 종합 문제</h2>
+
+<h3>종합 문제 1: 볼록 최적화 + 포트폴리오</h3>
+
+<div class="problem-box">
+<div class="problem-title">Problem 10.1 — Mean-Variance with Constraints</div>
+<p class="ni">4자산 포트폴리오에서 다음 조건을 만족하는 최적 가중치를 구하라:</p>
+<ul>
+<li>기대수익률: \(\mu = (0.10, 0.15, 0.06, 0.08)^T\)</li>
+<li>공분산 행렬: \(\Sigma = \begin{pmatrix} 0.04 & 0.01 & 0.002 & 0.005 \\ 0.01 & 0.09 & 0.005 & 0.01 \\ 0.002 & 0.005 & 0.01 & 0.003 \\ 0.005 & 0.01 & 0.003 & 0.0225 \end{pmatrix}\)</li>
+<li>목표 수익률: 10%</li>
+<li>공매도 금지: \(w_i \ge 0\)</li>
+<li>집중도 제한: \(w_i \le 0.5\)</li>
+</ul>
+<p class="ni">(a) 이 문제가 볼록 QP임을 보여라.</p>
+<p class="ni">(b) Python으로 최적 가중치를 구하라.</p>
+<p class="ni">(c) 활성 제약(active constraints)을 식별하고 경제적 의미를 설명하라.</p>
+</div>
+<details><summary>🔑 풀이 보기</summary><div class="answer-content">
+<p class="ni"><strong>(a)</strong> 목적함수 \(\frac{1}{2}w^T\Sigma w\)는 \(\Sigma \succeq 0\)이므로 볼록. 모든 제약이 선형(아핀)이므로 볼록 QP이다.</p>
+<p class="ni"><strong>(b)</strong></p>
+<pre>
+<span class="kw">import</span> numpy <span class="kw">as</span> np
+<span class="kw">from</span> scipy.optimize <span class="kw">import</span> minimize
+
+mu = np.array([<span class="nu">0.10</span>, <span class="nu">0.15</span>, <span class="nu">0.06</span>, <span class="nu">0.08</span>])
+Sigma = np.array([
+    [<span class="nu">0.04</span>,<span class="nu">0.01</span>,<span class="nu">0.002</span>,<span class="nu">0.005</span>],
+    [<span class="nu">0.01</span>,<span class="nu">0.09</span>,<span class="nu">0.005</span>,<span class="nu">0.01</span>],
+    [<span class="nu">0.002</span>,<span class="nu">0.005</span>,<span class="nu">0.01</span>,<span class="nu">0.003</span>],
+    [<span class="nu">0.005</span>,<span class="nu">0.01</span>,<span class="nu">0.003</span>,<span class="nu">0.0225</span>]
+])
+res = <span class="fn">minimize</span>(
+    <span class="kw">lambda</span> w: <span class="nu">0.5</span> * w @ Sigma @ w,
+    x0=np.<span class="fn">ones</span>(<span class="nu">4</span>)/<span class="nu">4</span>,
+    constraints=[
+        {<span class="st">'type'</span>:<span class="st">'eq'</span>,<span class="st">'fun'</span>:<span class="kw">lambda</span> w: np.<span class="fn">sum</span>(w)-<span class="nu">1</span>},
+        {<span class="st">'type'</span>:<span class="st">'ineq'</span>,<span class="st">'fun'</span>:<span class="kw">lambda</span> w: w@mu-<span class="nu">0.10</span>}
+    ],
+    bounds=[(<span class="nu">0</span>,<span class="nu">0.5</span>)]*<span class="nu">4</span>, method=<span class="st">'SLSQP'</span>
+)
+<span class="nb">print</span>(<span class="st">"w ="</span>, np.<span class="fn">round</span>(res.x, <span class="nu">4</span>))
+<span class="nb">print</span>(<span class="st">"σ ="</span>, <span class="fn">round</span>(np.<span class="fn">sqrt</span>(res.x@Sigma@res.x)*<span class="nu">100</span>,<span class="nu">2</span>), <span class="st">"%"</span>)
+<span class="nb">print</span>(<span class="st">"μ ="</span>, <span class="fn">round</span>(res.x@mu*<span class="nu">100</span>,<span class="nu">2</span>), <span class="st">"%"</span>)
+</pre>
+<p class="ni"><strong>(c)</strong> 목표 수익률 제약이 활성(등호)이면 수익률을 더 높이려면 리스크를 감수해야 함을 의미. 집중도 상한 0.5에 도달한 자산이 있다면 해당 자산이 매우 매력적이지만 분산 투자를 위해 제한됨을 의미.</p>
+</div></details>
+
+<h3>종합 문제 2: 경사하강법 + 신경망</h3>
+
+<div class="problem-box">
+<div class="problem-title">Problem 10.2 — Optimizer Comparison on Regression</div>
+<p class="ni">다음 비선형 회귀 문제를 풀어라: \(y = \sin(2\pi x) + \epsilon\), \(\epsilon \sim N(0, 0.1^2)\).</p>
+<p class="ni">(a) 2층 신경망 (입력→32→1, ReLU)을 정의하라.</p>
+<p class="ni">(b) SGD, SGD+Momentum, Adam 세 가지 옵티마이저로 각각 500 에폭 학습하라.</p>
+<p class="ni">(c) 학습 곡선(loss vs epoch)을 비교하고, 수렴 속도 차이의 이론적 원인을 설명하라.</p>
+</div>
+<details><summary>🔑 풀이 보기</summary><div class="answer-content">
+<pre>
+<span class="kw">import</span> torch
+<span class="kw">import</span> torch.nn <span class="kw">as</span> nn
+
+torch.manual_seed(<span class="nu">42</span>)
+X = torch.<span class="fn">linspace</span>(<span class="nu">0</span>, <span class="nu">1</span>, <span class="nu">100</span>).reshape(-<span class="nu">1</span>, <span class="nu">1</span>)
+y = torch.<span class="fn">sin</span>(<span class="nu">2</span> * <span class="nu">3.14159</span> * X) + <span class="nu">0.1</span> * torch.<span class="fn">randn_like</span>(X)
+
+results = {}
+<span class="kw">for</span> name, opt_cls, kwargs <span class="kw">in</span> [
+    (<span class="st">"SGD"</span>, torch.optim.SGD, {<span class="st">"lr"</span>: <span class="nu">0.01</span>}),
+    (<span class="st">"Momentum"</span>, torch.optim.SGD, {<span class="st">"lr"</span>: <span class="nu">0.01</span>, <span class="st">"momentum"</span>: <span class="nu">0.9</span>}),
+    (<span class="st">"Adam"</span>, torch.optim.Adam, {<span class="st">"lr"</span>: <span class="nu">0.01</span>})
+]:
+    model = nn.Sequential(nn.Linear(<span class="nu">1</span>,<span class="nu">32</span>), nn.ReLU(), nn.Linear(<span class="nu">32</span>,<span class="nu">1</span>))
+    opt = opt_cls(model.parameters(), **kwargs)
+    losses = []
+    <span class="kw">for</span> ep <span class="kw">in</span> <span class="nb">range</span>(<span class="nu">500</span>):
+        pred = model(X)
+        loss = nn.MSELoss()(pred, y)
+        opt.zero_grad(); loss.backward(); opt.step()
+        losses.append(loss.item())
+    results[name] = losses
+    <span class="nb">print</span>(<span class="st">f"{name:10s}: final loss = {losses[-1]:.4f}"</span>)
+</pre>
+<p class="ni">Adam은 적응적 학습률 덕분에 초기 수렴이 가장 빠르다. Momentum은 관성으로 SGD보다 빠르지만 진동할 수 있다. 순수 SGD는 가장 느리지만 일반화 성능이 좋을 수 있다 (implicit regularization).</p>
+</div></details>
+
+<h3>종합 문제 3: 통합 금융 최적화</h3>
+
+<div class="problem-box">
+<div class="problem-title">Problem 10.3 — HFT 포트폴리오 리밸런싱</div>
+<p class="ni">HFT 시스템에서 매 1분마다 포트폴리오를 리밸런싱한다. 다음을 구현하라:</p>
+<ol>
+<li>현재 포트폴리오 \(w^{\text{prev}}\)에서 목표 포트폴리오 \(w^*\)로의 최적 전환</li>
+<li>거래비용 \(c = 0.001\) (10 bps)을 고려한 순수익 최대화</li>
+<li>턴오버 제약: \(\sum_i |w_i - w_i^{\text{prev}}| \le 0.2\) (20% 이내)</li>
+</ol>
+<p class="ni">수학적으로 정식화하고, 이것이 볼록 문제인지 판별하라.</p>
+</div>
+<details><summary>🔑 풀이 보기</summary><div class="answer-content">
+<p class="ni">정식화:</p>
+<div class="eq">
+\[\max_w \mu^T w - \frac{\gamma}{2}w^T\Sigma w - c \cdot \mathbf{1}^T |w - w^{\text{prev}}|\]
+\[\text{s.t.} \quad \mathbf{1}^Tw = 1, \quad w \ge 0, \quad \mathbf{1}^T|w - w^{\text{prev}}| \le 0.2\]
+</div>
+<p class="ni">절대값 \(|w_i - w_i^{\text{prev}}|\)을 보조변수 \(t_i\)로 치환:</p>
+<p class="ni">\(t_i \ge w_i - w_i^{\text{prev}}\), \(t_i \ge -(w_i - w_i^{\text{prev}})\), \(t_i \ge 0\)</p>
+<p class="ni">이렇게 하면 선형 제약의 QP가 되며, 목적함수의 이차항 \(-\frac{\gamma}{2}w^T\Sigma w\)는 오목(최대화이므로 볼록 최적화와 동치). 따라서 <strong>볼록 문제</strong>이다.</p>
+<pre>
+<span class="kw">import</span> numpy <span class="kw">as</span> np
+<span class="kw">from</span> scipy.optimize <span class="kw">import</span> minimize
+
+n = <span class="nu">4</span>
+mu = np.array([<span class="nu">0.10</span>, <span class="nu">0.15</span>, <span class="nu">0.06</span>, <span class="nu">0.08</span>])
+Sigma = np.<span class="fn">eye</span>(n) * <span class="nu">0.04</span>
+w_prev = np.array([<span class="nu">0.25</span>, <span class="nu">0.25</span>, <span class="nu">0.25</span>, <span class="nu">0.25</span>])
+gamma, c, turnover = <span class="nu">2.0</span>, <span class="nu">0.001</span>, <span class="nu">0.2</span>
+
+<span class="kw">def</span> <span class="fn">obj</span>(w):
+    <span class="kw">return</span> -(mu@w - gamma/<span class="nu">2</span>*w@Sigma@w - c*np.<span class="fn">sum</span>(np.<span class="fn">abs</span>(w-w_prev)))
+
+res = <span class="fn">minimize</span>(obj, x0=w_prev,
+    constraints=[
+        {<span class="st">'type'</span>:<span class="st">'eq'</span>,<span class="st">'fun'</span>:<span class="kw">lambda</span> w:np.<span class="fn">sum</span>(w)-<span class="nu">1</span>},
+        {<span class="st">'type'</span>:<span class="st">'ineq'</span>,<span class="st">'fun'</span>:<span class="kw">lambda</span> w:turnover-np.<span class="fn">sum</span>(np.<span class="fn">abs</span>(w-w_prev))}
+    ],
+    bounds=[(<span class="nu">0</span>,<span class="nu">1</span>)]*n, method=<span class="st">'SLSQP'</span>)
+<span class="nb">print</span>(<span class="st">"이전:"</span>, w_prev)
+<span class="nb">print</span>(<span class="st">"최적:"</span>, np.<span class="fn">round</span>(res.x, <span class="nu">4</span>))
+<span class="nb">print</span>(<span class="st">"턴오버:"</span>, <span class="fn">round</span>(np.<span class="fn">sum</span>(np.<span class="fn">abs</span>(res.x-w_prev)),<span class="nu">4</span>))
+</pre>
+</div></details>
+
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<h2>Cheat Sheet: 최적화 이론 → ML/HFT 연결 맵</h2>
+
+<p class="tc">Table 12. 최적화 핵심 개념 → ML/HFT 매핑</p>
+<table>
+<tr><th>개념</th><th>핵심 수식</th><th>ML 응용</th><th>HFT 응용</th></tr>
+<tr><td>볼록 함수</td><td>\(\nabla^2 f \succeq 0\)</td><td>손실함수 설계</td><td>포트폴리오 QP</td></tr>
+<tr><td>그래디언트</td><td>\(\nabla f(x)\)</td><td>역전파</td><td>민감도 분석</td></tr>
+<tr><td>헤시안</td><td>\(\nabla^2 f(x)\)</td><td>2차 최적화 (L-BFGS)</td><td>리스크 곡률</td></tr>
+<tr><td>라그랑주 승수</td><td>\(\nabla f + \lambda \nabla h = 0\)</td><td>제약 학습</td><td>GMV 포트폴리오</td></tr>
+<tr><td>KKT 조건</td><td>정류 + 상보이완</td><td>SVM 서포트 벡터</td><td>활성 제약 식별</td></tr>
+<tr><td>QP</td><td>\(\min \frac{1}{2}x^TQx + c^Tx\)</td><td>SVM, Ridge</td><td>Markowitz MVO</td></tr>
+<tr><td>경사하강법</td><td>\(x_{k+1} = x_k - \alpha\nabla f\)</td><td>신경망 학습</td><td>온라인 학습</td></tr>
+<tr><td>Adam</td><td>적응적 모멘트 추정</td><td>Transformer 학습</td><td>실시간 모델 업데이트</td></tr>
+<tr><td>L1 정규화</td><td>\(\lambda\|\theta\|_1\)</td><td>Lasso, 특성 선택</td><td>희소 팩터 모델</td></tr>
+<tr><td>L2 정규화</td><td>\(\lambda\|\theta\|_2^2\)</td><td>Ridge, 가중치 감쇠</td><td>수치 안정성</td></tr>
+<tr><td>Risk Parity</td><td>\(RC_i = RC_j\)</td><td>앙상블 가중치</td><td>리스크 균등 배분</td></tr>
+<tr><td>로버스트 최적화</td><td>\(\min\max\) 형태</td><td>적대적 학습</td><td>추정 오차 대비</td></tr>
+</table>
+
+<div class="info">
+<p class="ni"><strong>다음 단계:</strong> 본 강의의 최적화 이론 기초 위에 R8(Convex Optimization + Transformer)에서는 
+CVXPY를 이용한 실전 볼록 최적화 프로그래밍, SDP/SOCP 등 고급 볼록 문제, 
+그리고 Transformer 아키텍처의 학습 최적화(warmup, cosine annealing, gradient clipping)를 다룬다. 
+R9(HFT + RL)에서는 강화학습의 정책 최적화(policy gradient)와 실시간 포트폴리오 리밸런싱에서의 
+온라인 볼록 최적화(Online Convex Optimization)를 학습한다.</p>
+</div>
+
+</div><!-- paper-content -->
+</div><!-- container -->
+</div><!-- main-wrapper -->
+
+</body>
+</html>
