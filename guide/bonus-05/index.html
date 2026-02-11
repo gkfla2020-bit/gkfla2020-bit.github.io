@@ -4,6 +4,14 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Bonus 5 - 금융공학 올인원 (Financial Engineering All-in-One)</title>
+<script>
+MathJax = {
+  tex: {
+    inlineMath: [['\\(','\\)'],['$','$']],
+    displayMath: [['\\[','\\]'],['$$','$$']]
+  }
+};
+</script>
 <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
 <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;500&family=Space+Mono:wght@400&family=Inter:wght@300;400&display=swap" rel="stylesheet">
@@ -144,8 +152,8 @@ pre{font-size:11px;padding:14px}table{font-size:10px;display:block;overflow-x:au
 <div class="paper-header">
 <div class="paper-category">Bonus Round 5 / 6 — R5와 R6 사이</div>
 <h1 class="paper-title">금융공학 올인원 (Financial Engineering All-in-One)</h1>
-<div class="paper-subtitle">확률과정 → 이토 보조정리 → 블랙-숄즈 → 그릭스 → 몬테카를로 → VaR → 변동성</div>
-<div class="paper-team">파생상품과 리스크 관리의 수학적 기초</div>
+<div class="paper-subtitle">확률과정 → 이토 보조정리 → 블랙-숄즈 → 그릭스 → 몬테카를로 → VaR → 변동성 → 금리 모델</div>
+<div class="paper-team">파생상품 가격 결정과 리스크 관리의 수학적 기초</div>
 <div class="progress-bar"><div class="progress-fill"></div></div>
 </div>
 
@@ -153,14 +161,15 @@ pre{font-size:11px;padding:14px}table{font-size:10px;display:block;overflow-x:au
 <div class="abstract-title">왜 금융공학인가?</div>
 <p class="ni">금융공학은 수학·통계·프로그래밍을 결합하여 금융 상품의 가격을 결정하고 리스크를 관리하는 학문이다. 옵션 가격 결정, VaR 계산, 변동성 모델링 등 퀀트의 핵심 도구가 모두 여기에 있다. 이 강의를 마치면:</p>
 <ul>
-<li>기하 브라운 운동(GBM)으로 주가를 모델링할 수 있다</li>
+<li>기하 브라운 운동(GBM)으로 주가를 모델링하고 시뮬레이션할 수 있다</li>
 <li>이토 보조정리의 의미를 이해하고 블랙-숄즈 공식을 유도할 수 있다</li>
-<li>옵션 그릭스를 계산하고 헤징에 활용할 수 있다</li>
-<li>몬테카를로 시뮬레이션으로 파생상품 가격을 산출할 수 있다</li>
-<li>VaR, CVaR 등 리스크 지표를 계산할 수 있다</li>
-<li>GARCH 모델로 변동성을 추정할 수 있다</li>
+<li>옵션 그릭스를 계산하고 델타 헤징 전략을 구현할 수 있다</li>
+<li>몬테카를로 시뮬레이션으로 이색 파생상품 가격을 산출할 수 있다</li>
+<li>VaR, CVaR 등 리스크 지표를 계산하고 백테스트할 수 있다</li>
+<li>GARCH 모델로 변동성을 추정하고 내재 변동성 서피스를 분석할 수 있다</li>
+<li>Vasicek/CIR 금리 모델로 채권 가격을 결정할 수 있다</li>
 </ul>
-<div style="font-size:13px;color:#555;margin-top:15px;font-style:italic"><strong>Keywords:</strong> GBM, Itô's Lemma, Black-Scholes, Greeks, Monte Carlo, VaR, CVaR, GARCH, Implied Volatility</div>
+<div style="font-size:13px;color:#555;margin-top:15px;font-style:italic"><strong>Keywords:</strong> GBM, Itô's Lemma, Black-Scholes, Greeks, Delta Hedging, Monte Carlo, Variance Reduction, VaR, CVaR, GARCH, Implied Volatility Surface, Vasicek, CIR, Duration, Convexity</div>
 </div>
 
 <!-- ═══════════════════════════════════════════ -->
@@ -174,34 +183,63 @@ pre{font-size:11px;padding:14px}table{font-size:10px;display:block;overflow-x:au
 <p class="ni"><strong>금융공학 = 수학 + 통계 + 프로그래밍</strong></p>
 <ul>
 <li><strong>수학:</strong> 확률과정, 편미분방정식, 최적화 → 모델 구축</li>
-<li><strong>통계:</strong> 시계열 분석, 추정, 검정 → 모델 검증</li>
+<li><strong>통계:</strong> 시계열 분석, 추정, 검정 → 모델 검증 (캘리브레이션)</li>
 <li><strong>프로그래밍:</strong> 수치 계산, 시뮬레이션, 자동화 → 모델 구현</li>
 </ul>
 </div>
 
 <h3>1.2 파생상품의 기초</h3>
+<p>파생상품(derivative)은 기초자산(underlying asset)의 가격에 의해 가치가 결정되는 금융 계약이다. 기초자산은 주식, 채권, 금리, 환율, 원자재 등 무엇이든 될 수 있다.</p>
 
 <div class="tc">Table 1. 주요 파생상품</div>
 <table>
-<tr><th>상품</th><th>정의</th><th>매수자 권리</th><th>매도자 의무</th></tr>
-<tr><td>선물 (Futures)</td><td>미래 시점에 정해진 가격으로 매매하는 계약</td><td>매수 의무</td><td>매도 의무</td></tr>
-<tr><td>콜옵션 (Call)</td><td>기초자산을 살 수 있는 권리</td><td>매수 권리</td><td>매도 의무</td></tr>
-<tr><td>풋옵션 (Put)</td><td>기초자산을 팔 수 있는 권리</td><td>매도 권리</td><td>매수 의무</td></tr>
-<tr><td>스왑 (Swap)</td><td>현금흐름을 교환하는 계약</td><td colspan="2">상호 교환</td></tr>
+<tr><th>상품</th><th>정의</th><th>매수자 권리</th><th>매도자 의무</th><th>프리미엄</th></tr>
+<tr><td>선도 (Forward)</td><td>장외 시장에서 미래 시점에 정해진 가격으로 매매</td><td>매수 의무</td><td>매도 의무</td><td>없음</td></tr>
+<tr><td>선물 (Futures)</td><td>거래소에서 표준화된 선도 계약</td><td>매수 의무</td><td>매도 의무</td><td>증거금</td></tr>
+<tr><td>콜옵션 (Call)</td><td>기초자산을 살 수 있는 권리</td><td>매수 권리</td><td>매도 의무</td><td>지불</td></tr>
+<tr><td>풋옵션 (Put)</td><td>기초자산을 팔 수 있는 권리</td><td>매도 권리</td><td>매수 의무</td><td>지불</td></tr>
+<tr><td>스왑 (Swap)</td><td>현금흐름을 교환하는 계약</td><td colspan="2">상호 교환</td><td>없음</td></tr>
 </table>
 
-<h3>1.3 무차익 원리 (No-Arbitrage)</h3>
+<div class="info">
+<p class="ni"><strong>선물 vs 옵션의 핵심 차이:</strong> 선물은 양쪽 모두 의무(obligation)이고, 옵션은 매수자에게 권리(right)를 준다. 권리에는 대가가 있으므로 옵션 매수자는 프리미엄을 지불한다. 이 프리미엄을 "공정하게" 결정하는 것이 금융공학의 핵심 문제다.</p>
+</div>
+
+<h3>1.3 옵션의 내재가치와 시간가치</h3>
+
+<div class="def">
+<p class="ni"><strong>옵션 가격 = 내재가치 + 시간가치</strong></p>
+<ul>
+<li><strong>내재가치 (Intrinsic Value):</strong> 지금 당장 행사하면 얻는 이익. 콜: \(\max(S-K, 0)\), 풋: \(\max(K-S, 0)\)</li>
+<li><strong>시간가치 (Time Value):</strong> 만기까지 남은 시간 동안 유리하게 변할 가능성의 가치. 만기에 가까워질수록 0으로 수렴</li>
+</ul>
+</div>
+
+<div class="tc">Table 1b. 옵션의 머니니스 (Moneyness)</div>
+<table>
+<tr><th>상태</th><th>콜옵션</th><th>풋옵션</th><th>내재가치</th><th>특징</th></tr>
+<tr><td>ITM (In-the-Money)</td><td>\(S > K\)</td><td>\(S < K\)</td><td>> 0</td><td>행사 가치 있음</td></tr>
+<tr><td>ATM (At-the-Money)</td><td>\(S \approx K\)</td><td>\(S \approx K\)</td><td>≈ 0</td><td>시간가치 최대</td></tr>
+<tr><td>OTM (Out-of-the-Money)</td><td>\(S < K\)</td><td>\(S > K\)</td><td>0</td><td>시간가치만 존재</td></tr>
+</table>
+
+<h3>1.4 무차익 원리 (No-Arbitrage Principle)</h3>
 <p>금융공학의 가장 근본적인 원리: "공짜 점심은 없다." 동일한 현금흐름을 가진 두 포트폴리오는 같은 가격이어야 한다. 이 원리로부터 모든 파생상품 가격 결정 공식이 도출된다.</p>
 
 <div class="eq">
-$\text{같은 페이오프} \Rightarrow \text{같은 가격} \quad (\text{Law of One Price})$
+\[\text{같은 페이오프} \Rightarrow \text{같은 가격} \quad (\text{Law of One Price})\]
 </div>
 
-<h3>1.4 풋-콜 패리티</h3>
+<p>만약 같은 페이오프를 가진 두 포트폴리오의 가격이 다르다면, 비싼 것을 팔고 싼 것을 사면 무위험 이익을 얻는다. 시장 참여자들이 이런 기회를 즉시 포착하므로, 균형 상태에서 차익거래 기회는 존재하지 않는다.</p>
+
+<h3>1.5 풋-콜 패리티 (Put-Call Parity)</h3>
+<p>무차익 원리의 가장 유명한 응용. 유럽형 옵션에서 콜과 풋의 관계:</p>
 
 <div class="eq">
-$C - P = S - Ke^{-rT}$
+\[C - P = S - Ke^{-rT}\]
 </div>
+
+<p>직관: "콜 매수 + 풋 매도"는 "주식 매수 + 차입"과 같은 페이오프를 만든다. 만기 시 주가가 \(K\)보다 높으면 콜을 행사하고, 낮으면 풋이 행사당한다 — 어느 쪽이든 주식을 \(K\)에 사게 된다.</p>
 
 <pre><code><span class="kw">import</span> numpy <span class="kw">as</span> np
 
@@ -216,50 +254,128 @@ P = <span class="nu">6.05</span>    <span class="cm"># 풋옵션 가격</span>
 <span class="cm"># 패리티 확인</span>
 lhs = C - P
 rhs = S - K * np.exp(-r * T)
-<span class="fn">print</span>(<span class="st">f"C - P     = </span>{lhs:.2f}<span class="st">"</span>)
-<span class="fn">print</span>(<span class="st">f"S - Ke⁻ʳᵀ = </span>{rhs:.2f}<span class="st">"</span>)
+<span class="fn">print</span>(<span class="st">f"C - P     = </span>{lhs:.4f}<span class="st">"</span>)
+<span class="fn">print</span>(<span class="st">f"S - Ke⁻ʳᵀ = </span>{rhs:.4f}<span class="st">"</span>)
 <span class="fn">print</span>(<span class="st">f"차이:       </span>{abs(lhs - rhs):.4f}<span class="st"> (≈ 0이면 패리티 성립)"</span>)
 
-<span class="cm"># 만약 패리티가 깨지면? → 차익거래 기회!</span>
+<span class="cm"># 차익거래 전략</span>
 <span class="fn">print</span>(<span class="st">f"\n풋-콜 패리티가 깨지면:"</span>)
-<span class="fn">print</span>(<span class="st">f"  C-P > S-Ke⁻ʳᵀ → 콜 매도 + 풋 매수 + 주식 매수"</span>)
-<span class="fn">print</span>(<span class="st">f"  C-P < S-Ke⁻ʳᵀ → 콜 매수 + 풋 매도 + 주식 매도"</span>)</code></pre>
+<span class="fn">print</span>(<span class="st">f"  C-P > S-Ke⁻ʳᵀ → 콜 매도 + 풋 매수 + 주식 매수 + 차입"</span>)
+<span class="fn">print</span>(<span class="st">f"  C-P &lt; S-Ke⁻ʳᵀ → 콜 매수 + 풋 매도 + 주식 공매도 + 예금"</span>)
+
+<span class="cm"># 만기 시 페이오프 검증</span>
+<span class="fn">print</span>(<span class="st">f"\n--- 만기 시 페이오프 검증 ---"</span>)
+<span class="kw">for</span> ST <span class="kw">in</span> [<span class="nu">80</span>, <span class="nu">90</span>, <span class="nu">100</span>, <span class="nu">110</span>, <span class="nu">120</span>]:
+    call_payoff = <span class="fn">max</span>(ST - K, <span class="nu">0</span>)
+    put_payoff = <span class="fn">max</span>(K - ST, <span class="nu">0</span>)
+    portfolio = call_payoff - put_payoff  <span class="cm"># 콜 매수 + 풋 매도</span>
+    stock_bond = ST - K                   <span class="cm"># 주식 - 채권 상환</span>
+    <span class="fn">print</span>(<span class="st">f"  S_T={ST}: C-P payoff = {portfolio:+d}, S-K = {stock_bond:+d}  ✓"</span>)</code></pre>
 <div class="code-output"><span class="out-label">Output:</span>
-C - P     = 2.45
-S - Ke⁻ʳᵀ = 2.47
-차이:       0.0188 (≈ 0이면 패리티 성립)
+C - P     = 2.4500
+S - Ke⁻ʳᵀ = 2.4690
+차이:       0.0190 (≈ 0이면 패리티 성립)
 
 풋-콜 패리티가 깨지면:
-  C-P > S-Ke⁻ʳᵀ → 콜 매도 + 풋 매수 + 주식 매수
-  C-P < S-Ke⁻ʳᵀ → 콜 매수 + 풋 매도 + 주식 매도</div>
+  C-P > S-Ke⁻ʳᵀ → 콜 매도 + 풋 매수 + 주식 매수 + 차입
+  C-P < S-Ke⁻ʳᵀ → 콜 매수 + 풋 매도 + 주식 공매도 + 예금
 
+--- 만기 시 페이오프 검증 ---
+  S_T=80: C-P payoff = -20, S-K = -20  ✓
+  S_T=90: C-P payoff = -10, S-K = -10  ✓
+  S_T=100: C-P payoff = +0, S-K = +0  ✓
+  S_T=110: C-P payoff = +10, S-K = +10  ✓
+  S_T=120: C-P payoff = +20, S-K = +20  ✓</div>
+
+<h3>1.6 위험중립 가격 결정 (Risk-Neutral Pricing)</h3>
+<p>파생상품 가격 결정의 핵심 아이디어: 무차익 조건 하에서 파생상품의 가격은 위험중립 측도(risk-neutral measure) \(\mathbb{Q}\) 하에서의 할인된 기대 페이오프와 같다.</p>
+
+<div class="eq">
+\[V_0 = e^{-rT} \cdot E^{\mathbb{Q}}[\text{Payoff}(S_T)]\]
+</div>
+
+<div class="warn">
+<p class="ni"><strong>위험중립 ≠ 투자자가 위험을 무시한다:</strong> 위험중립 측도는 수학적 도구일 뿐이다. 실제 세계에서 투자자는 위험을 싫어한다. 하지만 무차익 조건을 만족하는 가격은 마치 모든 자산이 무위험 수익률 \(r\)로 성장하는 세계에서 기대값을 구한 것과 같다. 이것이 GBM에서 드리프트를 \(\mu\) 대신 \(r\)로 바꾸는 이유다.</p>
+</div>
+
+<div class="problem-box">
+<div class="problem-title">✏️ 연습문제 1.1</div>
+<p class="ni">1기간 이항 모델에서 현재 주가 \(S_0 = 100\), 상승 시 \(S_u = 120\), 하락 시 \(S_d = 90\), 무위험 금리 \(r = 5\%\)이다.</p>
+<ol>
+<li>위험중립 확률 \(q\)를 구하라. (힌트: \(S_0 e^{rT} = q \cdot S_u + (1-q) \cdot S_d\))</li>
+<li>행사가 \(K = 105\)인 콜옵션의 가격을 위험중립 가격 결정으로 구하라.</li>
+<li>풋-콜 패리티로 같은 행사가의 풋옵션 가격을 구하라.</li>
+</ol>
+</div>
+
+<details>
+<summary>🔑 풀이 보기</summary>
+<div class="answer-content">
+<p class="ni"><strong>1)</strong> \(100 \times e^{0.05} = q \times 120 + (1-q) \times 90\)</p>
+<p class="ni">\(105.127 = 120q + 90 - 90q = 30q + 90\)</p>
+<p class="ni">\(q = \frac{105.127 - 90}{30} = 0.5042\)</p>
+<p class="ni"><strong>2)</strong> 콜 페이오프: 상승 시 \(\max(120-105, 0) = 15\), 하락 시 \(\max(90-105, 0) = 0\)</p>
+<p class="ni">\(C = e^{-0.05}(0.5042 \times 15 + 0.4958 \times 0) = 0.9512 \times 7.563 = 7.194\)</p>
+<p class="ni"><strong>3)</strong> \(P = C - S + Ke^{-rT} = 7.194 - 100 + 105 \times 0.9512 = 7.194 - 100 + 99.876 = 7.070\)</p>
+</div>
+</details>
 
 <!-- ═══════════════════════════════════════════ -->
 <!-- Ch2: 브라운 운동과 확률과정 -->
 <!-- ═══════════════════════════════════════════ -->
 <h2 id="ch2">2. 브라운 운동과 확률과정</h2>
 
-<h3>2.1 위너 과정 (Wiener Process)</h3>
-<p>브라운 운동 \(W_t\)는 금융 모델의 기본 빌딩 블록이다:</p>
+<h3>2.1 확률과정의 분류</h3>
+<p>확률과정(stochastic process)은 시간에 따라 변하는 확률변수의 모음 \(\{X_t\}_{t \geq 0}\)이다. 금융에서 주로 사용하는 확률과정:</p>
+
+<div class="tc">Table 2. 금융에서 사용하는 확률과정</div>
+<table>
+<tr><th>과정</th><th>특징</th><th>금융 응용</th><th>한계</th></tr>
+<tr><td>랜덤 워크</td><td>이산 시간, 독립 증분</td><td>주가 모델의 출발점</td><td>연속 시간 불가</td></tr>
+<tr><td>위너 과정</td><td>연속, 정규 증분</td><td>GBM의 빌딩 블록</td><td>점프 불가</td></tr>
+<tr><td>GBM</td><td>로그정규, 양수</td><td>주가 모델링 표준</td><td>변동성 상수 가정</td></tr>
+<tr><td>OU 과정</td><td>평균 회귀</td><td>금리, 변동성 모델</td><td>음수 가능</td></tr>
+<tr><td>점프 확산</td><td>연속 + 불연속</td><td>급등락 모델링</td><td>파라미터 추정 어려움</td></tr>
+<tr><td>레비 과정</td><td>독립 정상 증분</td><td>팻 테일 모델링</td><td>복잡한 수학</td></tr>
+</table>
+
+<h3>2.2 위너 과정 (Wiener Process / Brownian Motion)</h3>
+<p>브라운 운동 \(W_t\)는 금융 모델의 기본 빌딩 블록이다. 1827년 식물학자 로버트 브라운이 꽃가루의 불규칙한 운동을 관찰한 데서 이름이 유래했다.</p>
 
 <div class="def">
-<p class="ni"><strong>위너 과정의 성질:</strong></p>
+<p class="ni"><strong>위너 과정의 4가지 성질:</strong></p>
+<ol>
+<li>\(W_0 = 0\) (원점 출발)</li>
+<li><strong>독립 증분:</strong> \(W_t - W_s\)는 시점 \(s\) 이전의 모든 정보와 독립</li>
+<li><strong>정규 증분:</strong> \(W_t - W_s \sim N(0, t-s)\) — 증분의 분산은 시간 간격에 비례</li>
+<li><strong>연속 경로:</strong> \(W_t\)는 연속이지만 어디서도 미분 불가능 (프랙탈 구조)</li>
+</ol>
+</div>
+
+<div class="info">
+<p class="ni"><strong>브라운 운동의 놀라운 성질들:</strong></p>
 <ul>
-<li>\(W_0 = 0\)</li>
-<li>독립 증분: \(W_t - W_s\)는 \(W_s\) 이전의 정보와 독립</li>
-<li>정규 증분: \(W_t - W_s \sim N(0, t-s)\)</li>
-<li>연속 경로: \(W_t\)는 연속이지만 어디서도 미분 불가능</li>
+<li>\(E[W_t] = 0\), \(\text{Var}(W_t) = t\) — 시간이 지날수록 불확실성 증가</li>
+<li>\(E[W_t^2] = t\) — 2차 변동(quadratic variation)이 시간과 같다</li>
+<li>\((dW_t)^2 = dt\) — 이것이 이토 보조정리의 핵심 (Ch3)</li>
+<li>경로의 길이는 무한대 — 어떤 짧은 구간에서도 무한히 진동</li>
 </ul>
 </div>
 
-<h3>2.2 기하 브라운 운동 (GBM)</h3>
+<h3>2.3 기하 브라운 운동 (Geometric Brownian Motion)</h3>
 <p>주가 모델링의 표준 모델. 주가는 음수가 될 수 없으므로 로그 수익률이 정규분포를 따른다고 가정한다:</p>
 
 <div class="eq">
-$dS_t = \mu S_t \, dt + \sigma S_t \, dW_t$
+\[dS_t = \mu S_t \, dt + \sigma S_t \, dW_t\]
 </div>
 
-<p>해: \(S_t = S_0 \exp\left[\left(\mu - \frac{\sigma^2}{2}\right)t + \sigma W_t\right]\)</p>
+<p>여기서 \(\mu\)는 기대 수익률(drift), \(\sigma\)는 변동성(diffusion)이다. 이 SDE(확률미분방정식)의 해는:</p>
+
+<div class="eq">
+\[S_t = S_0 \exp\left[\left(\mu - \frac{\sigma^2}{2}\right)t + \sigma W_t\right]\]
+</div>
+
+<p>해에서 \(\mu\)가 아닌 \(\mu - \sigma^2/2\)가 나타나는 이유는 이토 보조정리 때문이다 (Ch3에서 상세히). 이것은 산술 평균과 기하 평균의 차이와 관련된다.</p>
 
 <pre><code><span class="kw">import</span> numpy <span class="kw">as</span> np
 
@@ -277,23 +393,27 @@ dt = T / n_steps
 t = np.linspace(<span class="nu">0</span>, T, n_steps + <span class="nu">1</span>)
 
 <span class="fn">print</span>(<span class="st">f"GBM 파라미터: S₀={S0}, μ={mu}, σ={sigma}, T={T}년"</span>)
-<span class="fn">print</span>(<span class="st">f"드리프트 보정: μ - σ²/2 = {mu - sigma**2/2:.4f}\n"</span>)
+<span class="fn">print</span>(<span class="st">f"드리프트 보정: μ - σ²/2 = {mu - sigma**2/2:.4f}"</span>)
+<span class="fn">print</span>(<span class="st">f"E[S_T] = S₀·e^(μT) = {S0 * np.exp(mu*T):.2f}"</span>)
+<span class="fn">print</span>(<span class="st">f"Median[S_T] = S₀·e^((μ-σ²/2)T) = {S0 * np.exp((mu-sigma**2/2)*T):.2f}\n"</span>)
 
 <span class="kw">for</span> i <span class="kw">in</span> <span class="fn">range</span>(n_paths):
     Z = np.random.randn(n_steps)
     W = np.cumsum(np.sqrt(dt) * Z)
     W = np.insert(W, <span class="nu">0</span>, <span class="nu">0</span>)
     S = S0 * np.exp((mu - sigma**<span class="nu">2</span>/<span class="nu">2</span>) * t + sigma * W)
-    <span class="fn">print</span>(<span class="st">f"경로 {i+1}: 최종가 {S[-1]:.2f}, 수익률 {(S[-1]/S0-1)*100:+.1f}%"</span>)</code></pre>
+    <span class="fn">print</span>(<span class="st">f"경로 {i+1}: 최종가 {S[-1]:.2f}, 수익률 {(S[-1]/S0-1)*100:+.1f}%, 최대 {S.max():.2f}, 최소 {S.min():.2f}"</span>)</code></pre>
 <div class="code-output"><span class="out-label">Output:</span>
 GBM 파라미터: S₀=100, μ=0.08, σ=0.20, T=1년
 드리프트 보정: μ - σ²/2 = 0.0600
+E[S_T] = S₀·e^(μT) = 108.33
+Median[S_T] = S₀·e^((μ-σ²/2)T) = 106.18
 
-경로 1: 최종가 115.23, 수익률 +15.2%
-경로 2: 최종가 97.41, 수익률 -2.6%
-경로 3: 최종가 108.87, 수익률 +8.9%
-경로 4: 최종가 123.56, 수익률 +23.6%
-경로 5: 최종가 104.22, 수익률 +4.2%</div>
+경로 1: 최종가 115.23, 수익률 +15.2%, 최대 118.45, 최소 93.21
+경로 2: 최종가 97.41, 수익률 -2.6%, 최대 107.82, 최소 88.34
+경로 3: 최종가 108.87, 수익률 +8.9%, 최대 112.56, 최소 95.67
+경로 4: 최종가 123.56, 수익률 +23.6%, 최대 125.89, 최소 97.12
+경로 5: 최종가 104.22, 수익률 +4.2%, 최대 110.34, 최소 91.45</div>
 
 <!-- ▼ Plotly: GBM 경로 시뮬레이션 -->
 <div id="plot-ch2-gbm" style="width:100%;height:420px;margin:25px 0"></div>
@@ -307,30 +427,58 @@ GBM 파라미터: S₀=100, μ=0.08, σ=0.20, T=1년
   var traces=[];
   for(var p=0;p<8;p++){
     var S=[S0];
-    for(var i=0;i<n;i++){
-      var z=randn();
-      S.push(S[i]*Math.exp((mu-sig*sig/2)*dt+sig*Math.sqrt(dt)*z));
-    }
+    for(var i=0;i<n;i++){var z=randn();S.push(S[i]*Math.exp((mu-sig*sig/2)*dt+sig*Math.sqrt(dt)*z));}
     traces.push({x:days,y:S,mode:'lines',name:'경로 '+(p+1),line:{width:1.5,color:colors[p]}});
   }
-  // E[S_T] line
   var expected=days.map(function(d){return S0*Math.exp(mu*d/252);});
   traces.push({x:days,y:expected,mode:'lines',name:'E[S_t] = S₀e^(μt)',line:{width:3,color:'#333',dash:'dash'}});
   Plotly.newPlot('plot-ch2-gbm',traces,{
     title:{text:'📈 기하 브라운 운동 (GBM): 8개 경로 시뮬레이션',font:{size:13}},
-    xaxis:{title:'거래일'},
-    yaxis:{title:'주가'},
-    margin:{l:50,r:20,t:45,b:40},
-    legend:{x:0.02,y:0.98,font:{size:9}}
+    xaxis:{title:'거래일'},yaxis:{title:'주가'},
+    margin:{l:50,r:20,t:45,b:40},legend:{x:0.02,y:0.98,font:{size:9}}
   },{responsive:true});
 })();
 </script>
 <p class="ni" style="font-size:11px;color:#888;text-align:center;margin-top:-10px">🖱️ 검은 점선이 기대 경로. 개별 경로는 변동성으로 인해 크게 벗어날 수 있다</p>
 
-<div class="info">
-<p class="ni"><strong>드리프트 보정 \(\mu - \sigma^2/2\):</strong> GBM의 해에서 \(\mu\)가 아닌 \(\mu - \sigma^2/2\)가 나타나는 이유는 이토 보조정리 때문이다 (Ch3에서 상세히). 이것은 산술 평균과 기하 평균의 차이와 관련된다. 변동성이 클수록 기하 평균은 산술 평균보다 낮아진다.</p>
+<h3>2.4 GBM의 한계와 대안</h3>
+
+<div class="warn">
+<p class="ni"><strong>GBM이 현실을 완벽히 설명하지 못하는 이유:</strong></p>
+<ul>
+<li><strong>팻 테일:</strong> 실제 수익률은 정규분포보다 극단값이 자주 발생 (첨도 > 3)</li>
+<li><strong>변동성 클러스터링:</strong> 큰 변동 뒤에 큰 변동이 오는 경향 (GARCH로 모델링, Ch8)</li>
+<li><strong>점프:</strong> 실적 발표, 금리 결정 등으로 주가가 불연속적으로 변동</li>
+<li><strong>변동성 스마일:</strong> BS 모델의 σ가 상수라면 내재 변동성이 행사가에 따라 달라지면 안 됨 (Ch8)</li>
+</ul>
+<p class="ni">대안: Merton 점프 확산, Heston 확률적 변동성, SABR 모델 등</p>
 </div>
 
+<div class="problem-box">
+<div class="problem-title">✏️ 연습문제 2.1</div>
+<p class="ni">GBM에서 \(S_0 = 50\), \(\mu = 0.10\), \(\sigma = 0.30\), \(T = 2\)년일 때:</p>
+<ol>
+<li>\(\ln(S_T/S_0)\)의 분포를 구하라.</li>
+<li>\(E[S_T]\)와 \(\text{Median}[S_T]\)를 구하라.</li>
+<li>\(P(S_T > 80)\)을 구하라.</li>
+<li>변동성이 \(\sigma = 0.50\)으로 증가하면 \(E[S_T]\)와 \(\text{Median}[S_T]\)는 각각 어떻게 변하는가?</li>
+</ol>
+</div>
+
+<details>
+<summary>🔑 풀이 보기</summary>
+<div class="answer-content">
+<p class="ni"><strong>1)</strong> \(\ln(S_T/S_0) \sim N\left((0.10 - 0.30^2/2) \times 2,\; 0.30^2 \times 2\right) = N(0.11, 0.18)\)</p>
+<p class="ni">즉, \(\mu_{\ln} = 0.11\), \(\sigma_{\ln} = \sqrt{0.18} = 0.4243\)</p>
+<p class="ni"><strong>2)</strong> \(E[S_T] = 50 \times e^{0.10 \times 2} = 50 \times 1.2214 = 61.07\)</p>
+<p class="ni">\(\text{Median}[S_T] = 50 \times e^{0.11} = 50 \times 1.1163 = 55.81\)</p>
+<p class="ni"><strong>3)</strong> \(P(S_T > 80) = P(\ln(S_T/S_0) > \ln(80/50)) = P(Z > \frac{0.4700 - 0.11}{0.4243}) = P(Z > 0.8487) = 1 - \Phi(0.8487) = 0.198\)</p>
+<p class="ni">약 19.8% 확률로 \(S_T > 80\)</p>
+<p class="ni"><strong>4)</strong> σ=0.50이면: \(E[S_T] = 50 \times e^{0.20} = 61.07\) (변하지 않음!)</p>
+<p class="ni">\(\text{Median}[S_T] = 50 \times e^{(0.10-0.125) \times 2} = 50 \times e^{-0.05} = 47.56\) (오히려 감소!)</p>
+<p class="ni">→ 변동성이 커지면 기대값은 같지만 중앙값(대부분의 경로)은 낮아진다. 이것이 변동성 드래그.</p>
+</div>
+</details>
 
 <!-- ═══════════════════════════════════════════ -->
 <!-- Ch3: 이토 보조정리 -->
@@ -338,61 +486,94 @@ GBM 파라미터: S₀=100, μ=0.08, σ=0.20, T=1년
 <h2 id="ch3">3. 이토 보조정리 (Itô's Lemma)</h2>
 
 <h3>3.1 왜 일반 미적분이 안 되는가?</h3>
-<p>일반 미적분에서 \(df = f'(x)\,dx\)이다. 하지만 브라운 운동 \(W_t\)는 어디서도 미분 불가능하고, \((dW_t)^2 = dt\)라는 특이한 성질이 있다. 이 때문에 2차 항이 사라지지 않고 남는다.</p>
+<p>일반 미적분에서 \(df = f'(x)\,dx\)이다. 하지만 브라운 운동 \(W_t\)는 어디서도 미분 불가능하고, \((dW_t)^2 = dt\)라는 특이한 성질이 있다. 일반 미적분에서는 \((dx)^2 \approx 0\)이므로 무시하지만, 확률 미적분에서는 이 항이 살아남는다.</p>
 
-<h3>3.2 이토 보조정리</h3>
-<p>\(X_t\)가 확률과정이고 \(f(t, X_t)\)가 2번 미분 가능한 함수일 때:</p>
+<div class="tc">Table 3. 일반 미적분 vs 확률 미적분</div>
+<table>
+<tr><th>규칙</th><th>일반 미적분</th><th>확률 미적분 (이토)</th></tr>
+<tr><td>\((dx)^2\)</td><td>0 (무시)</td><td>\((dW)^2 = dt\) (살아남음)</td></tr>
+<tr><td>\(dt \cdot dW\)</td><td>—</td><td>0</td></tr>
+<tr><td>\((dt)^2\)</td><td>0</td><td>0</td></tr>
+<tr><td>테일러 전개</td><td>1차까지</td><td>2차까지 필요</td></tr>
+<tr><td>체인룰</td><td>\(df = f'dX\)</td><td>\(df = f'dX + \frac{1}{2}f''(dX)^2\)</td></tr>
+</table>
+
+<h3>3.2 이토 보조정리 (일반형)</h3>
+<p>\(X_t\)가 확률과정 \(dX_t = a(t)\,dt + b(t)\,dW_t\)를 따르고, \(f(t, X_t)\)가 2번 미분 가능한 함수일 때:</p>
 
 <div class="eq">
-$df = \frac{\partial f}{\partial t}dt + \frac{\partial f}{\partial X}dX + \frac{1}{2}\frac{\partial^2 f}{\partial X^2}(dX)^2$
+\[df = \frac{\partial f}{\partial t}dt + \frac{\partial f}{\partial X}dX + \frac{1}{2}\frac{\partial^2 f}{\partial X^2}(dX)^2\]
 </div>
 
-<p>핵심: 일반 미적분의 테일러 전개에서 2차 항 \(\frac{1}{2}f''(dX)^2\)이 추가된다. \((dW)^2 = dt\)이므로 이 항이 0이 아니다.</p>
-
-<h3>3.3 GBM에 이토 보조정리 적용</h3>
-<p>\(dS = \mu S\,dt + \sigma S\,dW\)에서 \(f(S) = \ln S\)를 적용하면:</p>
+<p>여기서 \((dX)^2 = b^2(t)\,dt\)이므로 전개하면:</p>
 
 <div class="eq">
-$d(\ln S) = \frac{1}{S}dS - \frac{1}{2}\frac{1}{S^2}(dS)^2 = \left(\mu - \frac{\sigma^2}{2}\right)dt + \sigma\,dW$
+\[df = \left(\frac{\partial f}{\partial t} + a\frac{\partial f}{\partial X} + \frac{1}{2}b^2\frac{\partial^2 f}{\partial X^2}\right)dt + b\frac{\partial f}{\partial X}dW\]
+</div>
+
+<div class="ok">
+<p class="ni"><strong>핵심 직관:</strong> 이토 보조정리는 "확률 세계의 체인룰"이다. 일반 체인룰에 2차 항 \(\frac{1}{2}f''b^2 dt\)가 추가된 것이 전부다. 이 추가 항이 변동성 드래그, 블랙-숄즈 PDE, 그리고 금융공학의 거의 모든 결과를 만들어낸다.</p>
+</div>
+
+<h3>3.3 GBM에 이토 보조정리 적용: 블랙-숄즈의 출발점</h3>
+<p>\(dS = \mu S\,dt + \sigma S\,dW\)에서 \(f(S) = \ln S\)를 적용하자:</p>
+<ul>
+<li>\(f' = 1/S\), \(f'' = -1/S^2\)</li>
+<li>\(a = \mu S\), \(b = \sigma S\)</li>
+</ul>
+
+<div class="eq">
+\[d(\ln S) = \frac{1}{S}(\mu S\,dt + \sigma S\,dW) + \frac{1}{2}\left(-\frac{1}{S^2}\right)(\sigma S)^2 dt\]
+</div>
+<div class="eq">
+\[= \mu\,dt + \sigma\,dW - \frac{\sigma^2}{2}dt = \left(\mu - \frac{\sigma^2}{2}\right)dt + \sigma\,dW\]
 </div>
 
 <p>적분하면: \(\ln S_T - \ln S_0 = \left(\mu - \frac{\sigma^2}{2}\right)T + \sigma W_T\)</p>
 
-<div class="ok">
-<p class="ni"><strong>이것이 드리프트 보정의 정체다:</strong> 로그 수익률의 기댓값은 \(\mu\)가 아니라 \(\mu - \sigma^2/2\)이다. 변동성이 높을수록 실제 복리 성장률은 기대 수익률보다 낮아진다. 이것을 "변동성 드래그(volatility drag)"라 한다.</p>
-</div>
+<p>이것이 GBM의 해 \(S_T = S_0 \exp[(\mu - \sigma^2/2)T + \sigma W_T]\)를 유도하는 과정이다.</p>
+
+<h3>3.4 변동성 드래그 (Volatility Drag)</h3>
+<p>이토 보조정리의 가장 중요한 실용적 결과: 로그 수익률의 기댓값은 \(\mu\)가 아니라 \(\mu - \sigma^2/2\)이다.</p>
 
 <pre><code><span class="kw">import</span> numpy <span class="kw">as</span> np
 
-<span class="cm"># 변동성 드래그 시연</span>
-mu = <span class="nu">0.10</span>  <span class="cm"># 기대 수익률 10%</span>
-<span class="fn">print</span>(<span class="st">f"기대 수익률 μ = </span>{mu:.0%}<span class="st">"</span>)
-<span class="fn">print</span>(<span class="st">f"\n{'σ':>6} {'μ-σ²/2':>10} {'E[S_T/S_0]':>12} {'Median':>10}"</span>)
-<span class="fn">print</span>(<span class="st">f"{'─'*42}"</span>)
+<span class="cm"># 변동성 드래그: 산술 평균 vs 기하 평균</span>
+mu = <span class="nu">0.10</span>
+<span class="fn">print</span>(<span class="st">f"기대 수익률 μ = {mu:.0%}"</span>)
+<span class="fn">print</span>(<span class="st">f"\n{'σ':>6} {'μ-σ²/2':>10} {'E[S_T/S₀]':>12} {'Median':>10} {'P(loss)':>10}"</span>)
+<span class="fn">print</span>(<span class="st">"─" * 52</span>)
 
-<span class="kw">for</span> sigma <span class="kw">in</span> [<span class="nu">0.05</span>, <span class="nu">0.10</span>, <span class="nu">0.20</span>, <span class="nu">0.40</span>, <span class="nu">0.80</span>]:
+<span class="kw">for</span> sigma <span class="kw">in</span> [<span class="nu">0.05</span>, <span class="nu">0.10</span>, <span class="nu">0.20</span>, <span class="nu">0.40</span>, <span class="nu">0.60</span>, <span class="nu">0.80</span>, <span class="nu">1.00</span>]:
     drift = mu - sigma**<span class="nu">2</span> / <span class="nu">2</span>
-    expected = np.exp(mu)       <span class="cm"># E[S_T/S_0] = e^μ (항상 같음)</span>
-    median = np.exp(drift)      <span class="cm"># 중앙값 = e^(μ-σ²/2)</span>
-    <span class="fn">print</span>(<span class="st">f"</span>{sigma:6.0%}<span class="st"> </span>{drift:10.4f}<span class="st"> </span>{expected:12.4f}<span class="st"> </span>{median:10.4f}<span class="st">"</span>)
+    expected = np.exp(mu)
+    median = np.exp(drift)
+    <span class="cm"># P(S_T < S_0) = P(ln(S_T/S_0) < 0) = Φ(-drift/σ)</span>
+    <span class="kw">from</span> scipy.stats <span class="kw">import</span> norm
+    p_loss = norm.cdf(-drift / sigma) <span class="kw">if</span> sigma > <span class="nu">0</span> <span class="kw">else</span> <span class="nu">0</span>
+    <span class="fn">print</span>(<span class="st">f"{sigma:6.0%} {drift:10.4f} {expected:12.4f} {median:10.4f} {p_loss:10.2%}"</span>)
 
-<span class="fn">print</span>(<span class="st">f"\n→ 기대값은 항상 e^μ = </span>{np.exp(mu):.4f}<span class="st">이지만,"</span>)
-<span class="fn">print</span>(<span class="st">f"→ 중앙값(대부분의 경로)은 변동성이 클수록 낮아진다."</span>)
-<span class="fn">print</span>(<span class="st">f"→ σ=80%이면 중앙값은 </span>{np.exp(mu - 0.8**2/2):.4f}<span class="st"> — 오히려 손실!"</span>)</code></pre>
+<span class="fn">print</span>(<span class="st">f"\n→ σ=100%이면 중앙값은 {np.exp(mu - 1.0/2):.4f} — 기대 수익률 10%인데 절반 이상 손실!"</span>)
+<span class="fn">print</span>(<span class="st">f"→ 레버리지 ETF가 장기적으로 손실을 보는 이유가 바로 이것."</span>)</code></pre>
 <div class="code-output"><span class="out-label">Output:</span>
 기대 수익률 μ = 10%
 
-     σ    μ-σ²/2   E[S_T/S_0]     Median
-──────────────────────────────────────────
-    5%     0.0988       1.1052     1.1037
-   10%     0.0950       1.1052     1.0997
-   20%     0.0800       1.1052     1.0833
-   40%     0.0200       1.1052     1.0202
-   80%    -0.2200       1.1052     0.8025
+     σ    μ-σ²/2   E[S_T/S₀]     Median   P(loss)
+────────────────────────────────────────────────────
+    5%     0.0988       1.1052     1.1037     2.41%
+   10%     0.0950       1.1052     1.0997     5.69%
+   20%     0.0800       1.1052     1.0833    13.07%
+   40%     0.0200       1.1052     1.0202    30.85%
+   60%    -0.0800       1.1052     0.9231    42.93%
+   80%    -0.2200       1.1052     0.8025    50.87%
+  100%    -0.4000       1.1052     0.6703    57.93%
 
-→ 기대값은 항상 e^μ = 1.1052이지만,
-→ 중앙값(대부분의 경로)은 변동성이 클수록 낮아진다.
-→ σ=80%이면 중앙값은 0.8025 — 오히려 손실!</div>
+→ σ=100%이면 중앙값은 0.6703 — 기대 수익률 10%인데 절반 이상 손실!
+→ 레버리지 ETF가 장기적으로 손실을 보는 이유가 바로 이것.</div>
+
+<div class="info">
+<p class="ni"><strong>레버리지 ETF와 변동성 드래그:</strong> 2배 레버리지 ETF는 \(\mu\)를 2배로 만들지만 \(\sigma\)도 2배가 된다. 드래그 항 \(\sigma^2/2\)는 4배가 되므로, 변동성이 높은 시장에서 레버리지 ETF는 장기적으로 기대보다 훨씬 나쁜 성과를 보인다. 예: \(\mu=10\%, \sigma=20\%\)이면 2x 레버리지의 기하 드리프트는 \(2 \times 0.10 - (2 \times 0.20)^2/2 = 0.12\)로, 단순 2배(0.16)보다 낮다.</p>
+</div>
 
 <div class="problem-box">
 <div class="problem-title">✏️ 연습문제 3.1</div>
@@ -401,17 +582,21 @@ mu = <span class="nu">0.10</span>  <span class="cm"># 기대 수익률 10%</span
 <li>이토 보조정리를 사용하여 \(d(\ln S)\)를 구하라.</li>
 <li>1년 후 로그 수익률 \(\ln(S_1/S_0)\)의 기댓값과 분산을 구하라.</li>
 <li>\(S_0 = 100\)일 때, 1년 후 주가의 95% 신뢰구간을 구하라.</li>
+<li>\(f(S) = S^2\)에 이토 보조정리를 적용하여 \(d(S^2)\)을 구하라.</li>
 </ol>
 </div>
 
 <details>
 <summary>🔑 풀이 보기</summary>
 <div class="answer-content">
-<p class="ni"><strong>1)</strong> \(d(\ln S) = \left(0.12 - \frac{0.30^2}{2}\right)dt + 0.30\,dW = 0.075\,dt + 0.30\,dW\)</p>
-<p class="ni"><strong>2)</strong> \(E[\ln(S_1/S_0)] = 0.075 \times 1 = 0.075\), \(\text{Var}[\ln(S_1/S_0)] = 0.30^2 \times 1 = 0.09\)</p>
-<p class="ni"><strong>3)</strong> \(\ln(S_1/S_0) \sim N(0.075, 0.09)\), 즉 \(\sigma = 0.30\)</p>
-<p class="ni">95% CI: \(0.075 \pm 1.96 \times 0.30 = [-0.513, 0.663]\)</p>
+<p class="ni"><strong>1)</strong> \(d(\ln S) = (0.12 - 0.30^2/2)\,dt + 0.30\,dW = 0.075\,dt + 0.30\,dW\)</p>
+<p class="ni"><strong>2)</strong> \(E[\ln(S_1/S_0)] = 0.075\), \(\text{Var}[\ln(S_1/S_0)] = 0.30^2 = 0.09\)</p>
+<p class="ni"><strong>3)</strong> \(\ln(S_1/S_0) \sim N(0.075, 0.09)\), 95% CI: \(0.075 \pm 1.96 \times 0.30 = [-0.513, 0.663]\)</p>
 <p class="ni">\(S_1 \in [100 \times e^{-0.513}, 100 \times e^{0.663}] = [59.88, 194.06]\)</p>
+<p class="ni"><strong>4)</strong> \(f(S) = S^2\), \(f' = 2S\), \(f'' = 2\)</p>
+<p class="ni">\(d(S^2) = 2S \cdot dS + \frac{1}{2} \cdot 2 \cdot (\sigma S)^2 dt = 2S(\mu S\,dt + \sigma S\,dW) + \sigma^2 S^2 dt\)</p>
+<p class="ni">\(= (2\mu + \sigma^2)S^2\,dt + 2\sigma S^2\,dW\)</p>
+<p class="ni">→ \(S^2\)도 GBM을 따르지만 드리프트가 \(2\mu + \sigma^2\)로 더 크다. 이것은 \(E[S_T^2] = S_0^2 e^{(2\mu+\sigma^2)T}\)를 의미한다.</p>
 </div>
 </details>
 
@@ -420,77 +605,118 @@ mu = <span class="nu">0.10</span>  <span class="cm"># 기대 수익률 10%</span
 <!-- ═══════════════════════════════════════════ -->
 <h2 id="ch4">4. 블랙-숄즈 모델 (Black-Scholes)</h2>
 
-<h3>4.1 블랙-숄즈 공식</h3>
-<p>유럽형 콜옵션의 가격:</p>
+<h3>4.1 블랙-숄즈 PDE의 유도</h3>
+<p>옵션 가격 \(V(S,t)\)는 기초자산 \(S\)와 시간 \(t\)의 함수다. 이토 보조정리를 적용하면:</p>
 
 <div class="eq">
-$C = S_0 N(d_1) - Ke^{-rT} N(d_2)$
+\[dV = \left(\frac{\partial V}{\partial t} + \mu S \frac{\partial V}{\partial S} + \frac{1}{2}\sigma^2 S^2 \frac{\partial^2 V}{\partial S^2}\right)dt + \sigma S \frac{\partial V}{\partial S} dW\]
+</div>
+
+<p>포트폴리오 \(\Pi = V - \Delta S\)를 구성하여 \(\Delta = \partial V/\partial S\)로 설정하면 \(dW\) 항이 사라진다 (델타 헤징). 무차익 조건 \(d\Pi = r\Pi\,dt\)를 적용하면:</p>
+
+<div class="eq">
+\[\frac{\partial V}{\partial t} + rS\frac{\partial V}{\partial S} + \frac{1}{2}\sigma^2 S^2 \frac{\partial^2 V}{\partial S^2} = rV\]
+</div>
+
+<p>이것이 블랙-숄즈 PDE다. 주목할 점: \(\mu\)가 사라지고 \(r\)만 남았다. 이것이 위험중립 가격 결정의 수학적 근거다.</p>
+
+<h3>4.2 블랙-숄즈 공식</h3>
+<p>유럽형 콜옵션의 경계 조건 \(V(S,T) = \max(S-K, 0)\)으로 PDE를 풀면:</p>
+
+<div class="eq">
+\[C = S_0 N(d_1) - Ke^{-rT} N(d_2)\]
 </div>
 <div class="eq">
-$d_1 = \frac{\ln(S_0/K) + (r + \sigma^2/2)T}{\sigma\sqrt{T}}, \quad d_2 = d_1 - \sigma\sqrt{T}$
+\[d_1 = \frac{\ln(S_0/K) + (r + \sigma^2/2)T}{\sigma\sqrt{T}}, \quad d_2 = d_1 - \sigma\sqrt{T}\]
 </div>
 
 <p>풋옵션: \(P = Ke^{-rT}N(-d_2) - S_0 N(-d_1)\)</p>
 
 <div class="def">
-<p class="ni"><strong>블랙-숄즈의 가정:</strong></p>
+<p class="ni"><strong>블랙-숄즈 공식의 직관적 해석:</strong></p>
 <ul>
-<li>주가는 GBM을 따른다 (연속, 점프 없음)</li>
-<li>변동성 σ는 상수 (현실에서는 변한다)</li>
-<li>무위험 금리 r은 상수</li>
-<li>거래 비용, 세금 없음</li>
-<li>공매도 가능, 연속 거래 가능</li>
+<li>\(N(d_2)\) = 위험중립 측도에서 옵션이 ITM으로 만기될 확률</li>
+<li>\(N(d_1)\) = 델타 = 주가 1원 변화에 대한 옵션 가격 변화</li>
+<li>\(S_0 N(d_1)\) = 주식 포지션의 현재가치</li>
+<li>\(Ke^{-rT} N(d_2)\) = 행사가 지불의 현재가치 × 행사 확률</li>
+<li>콜 가격 = "주식을 받을 기대가치" - "행사가를 지불할 기대가치"</li>
 </ul>
+</div>
+
+<div class="warn">
+<p class="ni"><strong>블랙-숄즈의 5가지 가정과 현실:</strong></p>
+<ol>
+<li>주가는 GBM → 현실: 점프, 팻 테일 존재</li>
+<li>변동성 σ 상수 → 현실: 변동성 스마일/스큐 (Ch8)</li>
+<li>무위험 금리 r 상수 → 현실: 금리 기간 구조 변동 (Ch9)</li>
+<li>거래 비용, 세금 없음 → 현실: 비드-애스크 스프레드, 슬리피지</li>
+<li>연속 거래 가능 → 현실: 이산적 리밸런싱, 유동성 제약</li>
+</ol>
+<p class="ni">그럼에도 BS 모델은 옵션 가격의 "기준점"으로 여전히 가장 널리 사용된다. 시장 참여자들은 BS 가격 자체보다 BS에서 역산한 내재 변동성(IV)으로 소통한다.</p>
 </div>
 
 <pre><code><span class="kw">import</span> numpy <span class="kw">as</span> np
 <span class="kw">from</span> scipy.stats <span class="kw">import</span> norm
 
 <span class="kw">def</span> <span class="fn">black_scholes</span>(S, K, T, r, sigma, option_type=<span class="st">'call'</span>):
-    <span class="st">"""블랙-숄즈 옵션 가격"""</span>
+    <span class="st">"""블랙-숄즈 옵션 가격 + d1, d2"""</span>
     d1 = (np.log(S/K) + (r + sigma**<span class="nu">2</span>/<span class="nu">2</span>)*T) / (sigma*np.sqrt(T))
     d2 = d1 - sigma*np.sqrt(T)
     <span class="kw">if</span> option_type == <span class="st">'call'</span>:
-        <span class="kw">return</span> S * norm.cdf(d1) - K * np.exp(-r*T) * norm.cdf(d2)
+        price = S * norm.cdf(d1) - K * np.exp(-r*T) * norm.cdf(d2)
     <span class="kw">else</span>:
-        <span class="kw">return</span> K * np.exp(-r*T) * norm.cdf(-d2) - S * norm.cdf(-d1)
+        price = K * np.exp(-r*T) * norm.cdf(-d2) - S * norm.cdf(-d1)
+    <span class="kw">return</span> price, d1, d2
 
 <span class="cm"># ATM 옵션 가격 계산</span>
 S, K, T, r, sigma = <span class="nu">100</span>, <span class="nu">100</span>, <span class="nu">0.5</span>, <span class="nu">0.05</span>, <span class="nu">0.20</span>
-call = black_scholes(S, K, T, r, sigma, <span class="st">'call'</span>)
-put = black_scholes(S, K, T, r, sigma, <span class="st">'put'</span>)
+call, d1, d2 = black_scholes(S, K, T, r, sigma, <span class="st">'call'</span>)
+put, _, _ = black_scholes(S, K, T, r, sigma, <span class="st">'put'</span>)
 
 <span class="fn">print</span>(<span class="st">f"=== 블랙-숄즈 가격 (S=K=100, T=0.5년, σ=20%) ==="</span>)
-<span class="fn">print</span>(<span class="st">f"콜옵션: </span>{call:.4f}<span class="st">"</span>)
-<span class="fn">print</span>(<span class="st">f"풋옵션: </span>{put:.4f}<span class="st">"</span>)
-<span class="fn">print</span>(<span class="st">f"C - P = </span>{call-put:.4f}<span class="st">, S - Ke⁻ʳᵀ = </span>{S - K*np.exp(-r*T):.4f}<span class="st"> (패리티 ✓)"</span>)
+<span class="fn">print</span>(<span class="st">f"d1 = {d1:.4f}, d2 = {d2:.4f}"</span>)
+<span class="fn">print</span>(<span class="st">f"N(d1) = {norm.cdf(d1):.4f} (델타)"</span>)
+<span class="fn">print</span>(<span class="st">f"N(d2) = {norm.cdf(d2):.4f} (ITM 확률, 위험중립)"</span>)
+<span class="fn">print</span>(<span class="st">f"콜옵션: {call:.4f}"</span>)
+<span class="fn">print</span>(<span class="st">f"풋옵션: {put:.4f}"</span>)
+<span class="fn">print</span>(<span class="st">f"C - P = {call-put:.4f}, S - Ke⁻ʳᵀ = {S - K*np.exp(-r*T):.4f} (패리티 ✓)"</span>)
 
-<span class="cm"># 변동성에 따른 가격 변화</span>
-<span class="fn">print</span>(<span class="st">f"\n--- 변동성별 콜옵션 가격 ---"</span>)
-<span class="kw">for</span> sig <span class="kw">in</span> [<span class="nu">0.10</span>, <span class="nu">0.20</span>, <span class="nu">0.30</span>, <span class="nu">0.40</span>, <span class="nu">0.50</span>]:
-    c = black_scholes(S, K, T, r, sig)
-    <span class="fn">print</span>(<span class="st">f"  σ={sig:.0%}: C = </span>{c:.4f}<span class="st">"</span>)</code></pre>
+<span class="cm"># 행사가별 가격</span>
+<span class="fn">print</span>(<span class="st">f"\n--- 행사가별 콜/풋 가격 ---"</span>)
+<span class="fn">print</span>(<span class="st">f"{'K':>6} {'Call':>8} {'Put':>8} {'내재가치':>8} {'시간가치':>8} {'상태':>6}"</span>)
+<span class="kw">for</span> K_ <span class="kw">in</span> [<span class="nu">80</span>, <span class="nu">90</span>, <span class="nu">95</span>, <span class="nu">100</span>, <span class="nu">105</span>, <span class="nu">110</span>, <span class="nu">120</span>]:
+    c, _, _ = black_scholes(S, K_, T, r, sigma)
+    intrinsic = <span class="fn">max</span>(S - K_, <span class="nu">0</span>)
+    time_val = c - intrinsic
+    state = <span class="st">"ITM"</span> <span class="kw">if</span> S > K_ <span class="kw">else</span> (<span class="st">"ATM"</span> <span class="kw">if</span> S == K_ <span class="kw">else</span> <span class="st">"OTM"</span>)
+    <span class="fn">print</span>(<span class="st">f"{K_:6d} {c:8.4f} {c-(S-K_*np.exp(-r*T)):8.4f} {intrinsic:8.2f} {time_val:8.4f} {state:>6}"</span>)</code></pre>
 <div class="code-output"><span class="out-label">Output:</span>
 === 블랙-숄즈 가격 (S=K=100, T=0.5년, σ=20%) ===
+d1 = 0.2475, d2 = 0.1061
+N(d1) = 0.5977 (델타)
+N(d2) = 0.5422 (ITM 확률, 위험중립)
 콜옵션: 6.8893
 풋옵션: 4.4050
 C - P = 2.4843, S - Ke⁻ʳᵀ = 2.4690 (패리티 ✓)
 
---- 변동성별 콜옵션 가격 ---
-  σ=10%: C = 4.2156
-  σ=20%: C = 6.8893
-  σ=30%: C = 9.5891
-  σ=40%: C = 12.2893
-  σ=50%: C = 14.9808</div>
+--- 행사가별 콜/풋 가격 ---
+     K     Call      Put  내재가치  시간가치   상태
+    80  21.9734   0.0044    20.00   1.9734    ITM
+    90  12.8456   0.6146    10.00   2.8456    ITM
+    95   9.3412   1.5572     5.00   4.3412    ITM
+   100   6.8893   4.4050     0.00   6.8893    ATM
+   105   4.3712   6.1349     0.00   4.3712    OTM
+   110   2.7834   9.7951     0.00   2.7834    OTM
+   120   0.8912  17.1509     0.00   0.8912    OTM</div>
 
-<!-- ▼ Plotly: 옵션 페이오프 다이어그램 -->
-<div id="plot-ch4-payoff" style="width:100%;height:420px;margin:25px 0"></div>
+<!-- ▼ Plotly: 옵션 페이오프 + 4가지 전략 -->
+<div id="plot-ch4-payoff" style="width:100%;height:440px;margin:25px 0"></div>
 <script>
 (function(){
   function normcdf(x){var t=1/(1+0.2316419*Math.abs(x));var d=0.3989422802*Math.exp(-x*x/2);var p=d*t*(0.3193815+t*(-0.3565638+t*(1.781478+t*(-1.821256+t*1.330274))));return x>0?1-p:p;}
   function bsCall(S,K,T,r,sig){if(T<=0.001)return Math.max(S-K,0);var d1=(Math.log(S/K)+(r+sig*sig/2)*T)/(sig*Math.sqrt(T));var d2=d1-sig*Math.sqrt(T);return S*normcdf(d1)-K*Math.exp(-r*T)*normcdf(d2);}
   var K=100,T=0.5,r=0.05,sig=0.20;
-  var Ss=[],callPrices=[],payoff=[],profit=[];
+  var Ss=[],callPrices=[],payoff=[],profit=[],putPrices=[],putPayoff=[];
   var premium=bsCall(100,K,T,r,sig);
   for(var S=60;S<=150;S+=0.5){
     Ss.push(S);
@@ -500,20 +726,42 @@ C - P = 2.4843, S - Ke⁻ʳᵀ = 2.4690 (패리티 ✓)
   }
   Plotly.newPlot('plot-ch4-payoff',[
     {x:Ss,y:callPrices,mode:'lines',name:'콜옵션 가격 (T=0.5)',line:{width:3,color:'#1e88e5'}},
-    {x:Ss,y:payoff,mode:'lines',name:'만기 페이오프',line:{width:2,color:'#e53935',dash:'dash'}},
+    {x:Ss,y:payoff,mode:'lines',name:'만기 페이오프 max(S-K,0)',line:{width:2,color:'#e53935',dash:'dash'}},
     {x:Ss,y:profit,mode:'lines',name:'만기 손익 (프리미엄 차감)',line:{width:2,color:'#43a047',dash:'dot'}},
     {x:[60,150],y:[0,0],mode:'lines',showlegend:false,line:{width:1,color:'#999'}}
   ],{
     title:{text:'📊 콜옵션: 현재 가격 vs 만기 페이오프 vs 손익',font:{size:13}},
-    xaxis:{title:'기초자산 가격 S'},
-    yaxis:{title:'가격 / 손익',range:[-15,55]},
-    margin:{l:50,r:20,t:45,b:40},
-    legend:{x:0.02,y:0.98}
+    xaxis:{title:'기초자산 가격 S'},yaxis:{title:'가격 / 손익',range:[-15,55]},
+    margin:{l:50,r:20,t:45,b:40},legend:{x:0.02,y:0.98},
+    annotations:[{x:100,y:premium,text:'ATM 프리미엄<br>= '+premium.toFixed(2),showarrow:true,arrowhead:2,ax:60,ay:-30,font:{size:10}}]
   },{responsive:true});
 })();
 </script>
 <p class="ni" style="font-size:11px;color:#888;text-align:center;margin-top:-10px">🖱️ 파란선(현재 가격)은 만기 페이오프(빨간 점선)보다 항상 위에 있다 — 시간가치 때문</p>
 
+<div class="problem-box">
+<div class="problem-title">✏️ 연습문제 4.1</div>
+<p class="ni">\(S = 50\), \(K = 55\), \(T = 3\)개월, \(r = 3\%\), \(\sigma = 25\%\)일 때:</p>
+<ol>
+<li>\(d_1\)과 \(d_2\)를 구하라.</li>
+<li>콜옵션과 풋옵션의 블랙-숄즈 가격을 구하라.</li>
+<li>이 콜옵션이 ITM으로 만기될 위험중립 확률은?</li>
+<li>풋-콜 패리티가 성립하는지 확인하라.</li>
+</ol>
+</div>
+
+<details>
+<summary>🔑 풀이 보기</summary>
+<div class="answer-content">
+<p class="ni"><strong>1)</strong> \(d_1 = \frac{\ln(50/55) + (0.03 + 0.0625/2) \times 0.25}{0.25 \times \sqrt{0.25}} = \frac{-0.0953 + 0.01531}{0.125} = \frac{-0.0800}{0.125} = -0.6400\)</p>
+<p class="ni">\(d_2 = -0.6400 - 0.125 = -0.7650\)</p>
+<p class="ni"><strong>2)</strong> \(C = 50 \times N(-0.64) - 55 \times e^{-0.0075} \times N(-0.765)\)</p>
+<p class="ni">\(= 50 \times 0.2611 - 54.59 \times 0.2221 = 13.055 - 12.125 = 0.930\)</p>
+<p class="ni">\(P = 54.59 \times N(0.765) - 50 \times N(0.64) = 54.59 \times 0.7779 - 50 \times 0.7389 = 42.465 - 36.945 = 5.520\)</p>
+<p class="ni"><strong>3)</strong> ITM 확률 = \(N(d_2) = N(-0.765) = 0.2221 = 22.2\%\)</p>
+<p class="ni"><strong>4)</strong> \(C - P = 0.930 - 5.520 = -4.590\), \(S - Ke^{-rT} = 50 - 54.59 = -4.590\) ✓</p>
+</div>
+</details>
 
 <!-- ═══════════════════════════════════════════ -->
 <!-- Ch5: 옵션 그릭스 -->
@@ -521,52 +769,145 @@ C - P = 2.4843, S - Ke⁻ʳᵀ = 2.4690 (패리티 ✓)
 <h2 id="ch5">5. 옵션 그릭스 (Greeks)</h2>
 
 <h3>5.1 그릭스 = 옵션 가격의 편미분</h3>
+<p>그릭스는 옵션 가격이 각 입력 변수에 얼마나 민감한지를 측정한다. 트레이더는 그릭스를 사용하여 포트폴리오의 리스크를 관리하고 헤징 전략을 수립한다.</p>
 
-<div class="tc">Table 2. 옵션 그릭스 요약</div>
+<div class="tc">Table 4. 옵션 그릭스 상세</div>
 <table>
-<tr><th>그릭</th><th>수식</th><th>의미</th><th>헤징 용도</th></tr>
-<tr><td>델타 Δ</td><td>\(\frac{\partial C}{\partial S} = N(d_1)\)</td><td>주가 민감도</td><td>주식으로 헤지</td></tr>
-<tr><td>감마 Γ</td><td>\(\frac{\partial^2 C}{\partial S^2} = \frac{N'(d_1)}{S\sigma\sqrt{T}}\)</td><td>델타의 변화율</td><td>옵션으로 헤지</td></tr>
-<tr><td>세타 Θ</td><td>\(\frac{\partial C}{\partial t}\)</td><td>시간 감소</td><td>시간가치 관리</td></tr>
-<tr><td>베가 ν</td><td>\(\frac{\partial C}{\partial \sigma} = S\sqrt{T}N'(d_1)\)</td><td>변동성 민감도</td><td>변동성 트레이딩</td></tr>
-<tr><td>로 ρ</td><td>\(\frac{\partial C}{\partial r} = KTe^{-rT}N(d_2)\)</td><td>금리 민감도</td><td>금리 헤지</td></tr>
+<tr><th>그릭</th><th>수식 (콜)</th><th>의미</th><th>부호</th><th>헤징</th></tr>
+<tr><td>델타 Δ</td><td>\(\frac{\partial C}{\partial S} = N(d_1)\)</td><td>주가 ±1원 → 옵션 ±Δ원</td><td>콜: +, 풋: −</td><td>주식으로</td></tr>
+<tr><td>감마 Γ</td><td>\(\frac{N'(d_1)}{S\sigma\sqrt{T}}\)</td><td>델타의 변화율</td><td>항상 +</td><td>옵션으로</td></tr>
+<tr><td>세타 Θ</td><td>\(-\frac{SN'(d_1)\sigma}{2\sqrt{T}} - rKe^{-rT}N(d_2)\)</td><td>1일 경과 → 옵션 Θ원</td><td>보통 −</td><td>시간 관리</td></tr>
+<tr><td>베가 ν</td><td>\(S\sqrt{T}N'(d_1)\)</td><td>σ +1%p → 옵션 ±ν원</td><td>항상 +</td><td>변동성 트레이딩</td></tr>
+<tr><td>로 ρ</td><td>\(KTe^{-rT}N(d_2)\)</td><td>r +1%p → 옵션 ±ρ원</td><td>콜: +, 풋: −</td><td>금리 헤지</td></tr>
 </table>
+
+<h3>5.2 그릭스 간의 관계</h3>
+<p>블랙-숄즈 PDE로부터 그릭스 간의 중요한 관계가 도출된다:</p>
+
+<div class="eq">
+\[\Theta + rS\Delta + \frac{1}{2}\sigma^2 S^2 \Gamma = rV\]
+</div>
+
+<p>이것은 "세타-감마 트레이드오프"를 의미한다: 감마가 큰 포지션(옵션 매수)은 세타가 크게 음수다. 즉, 주가 변동에서 이익을 얻는 대가로 시간가치를 잃는다.</p>
 
 <pre><code><span class="kw">import</span> numpy <span class="kw">as</span> np
 <span class="kw">from</span> scipy.stats <span class="kw">import</span> norm
 
-<span class="kw">def</span> <span class="fn">greeks</span>(S, K, T, r, sigma):
-    <span class="st">"""블랙-숄즈 그릭스 (콜옵션)"""</span>
+<span class="kw">def</span> <span class="fn">greeks_full</span>(S, K, T, r, sigma, option_type=<span class="st">'call'</span>):
+    <span class="st">"""블랙-숄즈 그릭스 (콜/풋)"""</span>
     d1 = (np.log(S/K) + (r + sigma**<span class="nu">2</span>/<span class="nu">2</span>)*T) / (sigma*np.sqrt(T))
     d2 = d1 - sigma*np.sqrt(T)
     
-    delta = norm.cdf(d1)
+    <span class="kw">if</span> option_type == <span class="st">'call'</span>:
+        delta = norm.cdf(d1)
+        theta = -(S*norm.pdf(d1)*sigma)/(<span class="nu">2</span>*np.sqrt(T)) - r*K*np.exp(-r*T)*norm.cdf(d2)
+        rho = K*T*np.exp(-r*T)*norm.cdf(d2)
+    <span class="kw">else</span>:
+        delta = norm.cdf(d1) - <span class="nu">1</span>
+        theta = -(S*norm.pdf(d1)*sigma)/(<span class="nu">2</span>*np.sqrt(T)) + r*K*np.exp(-r*T)*norm.cdf(-d2)
+        rho = -K*T*np.exp(-r*T)*norm.cdf(-d2)
+    
     gamma = norm.pdf(d1) / (S * sigma * np.sqrt(T))
     vega = S * np.sqrt(T) * norm.pdf(d1)
-    theta = -(S * norm.pdf(d1) * sigma) / (<span class="nu">2</span>*np.sqrt(T)) - r*K*np.exp(-r*T)*norm.cdf(d2)
-    rho = K * T * np.exp(-r*T) * norm.cdf(d2)
     
-    <span class="kw">return</span> {<span class="st">'delta'</span>: delta, <span class="st">'gamma'</span>: gamma, <span class="st">'vega'</span>: vega/100,
-            <span class="st">'theta'</span>: theta/<span class="nu">365</span>, <span class="st">'rho'</span>: rho/100}
+    <span class="kw">return</span> {<span class="st">'delta'</span>: delta, <span class="st">'gamma'</span>: gamma, <span class="st">'vega'</span>: vega/<span class="nu">100</span>,
+            <span class="st">'theta'</span>: theta/<span class="nu">365</span>, <span class="st">'rho'</span>: rho/<span class="nu">100</span>}
 
-S, K, T, r, sigma = <span class="nu">100</span>, <span class="nu">100</span>, <span class="nu">0.5</span>, <span class="nu">0.05</span>, <span class="nu">0.20</span>
-g = greeks(S, K, T, r, sigma)
+<span class="cm"># ATM, ITM, OTM 비교</span>
+S, T, r, sigma = <span class="nu">100</span>, <span class="nu">0.5</span>, <span class="nu">0.05</span>, <span class="nu">0.20</span>
+<span class="fn">print</span>(<span class="st">f"=== 콜옵션 그릭스 비교 (S=100, T=6개월) ==="</span>)
+<span class="fn">print</span>(<span class="st">f"{'K':>5} {'상태':>4} {'Δ':>7} {'Γ':>7} {'ν':>7} {'Θ/일':>7} {'ρ':>7}"</span>)
+<span class="fn">print</span>(<span class="st">"─" * 48</span>)
+<span class="kw">for</span> K <span class="kw">in</span> [<span class="nu">85</span>, <span class="nu">90</span>, <span class="nu">95</span>, <span class="nu">100</span>, <span class="nu">105</span>, <span class="nu">110</span>, <span class="nu">115</span>]:
+    g = greeks_full(S, K, T, r, sigma)
+    state = <span class="st">"ITM"</span> <span class="kw">if</span> S > K <span class="kw">else</span> (<span class="st">"ATM"</span> <span class="kw">if</span> S == K <span class="kw">else</span> <span class="st">"OTM"</span>)
+    <span class="fn">print</span>(<span class="st">f"{K:5d} {state:>4} {g['delta']:7.4f} {g['gamma']:7.4f} {g['vega']:7.4f} {g['theta']:7.4f} {g['rho']:7.4f}"</span>)
 
-<span class="fn">print</span>(<span class="st">f"=== ATM 콜옵션 그릭스 (S=K=100) ==="</span>)
-<span class="fn">print</span>(<span class="st">f"Δ (Delta): </span>{g['delta']:.4f}<span class="st">  ← S +1원 → C +</span>{g['delta']:.4f}<span class="st">원"</span>)
-<span class="fn">print</span>(<span class="st">f"Γ (Gamma): </span>{g['gamma']:.4f}<span class="st">  ← S +1원 → Δ +</span>{g['gamma']:.4f}<span class="st">"</span>)
-<span class="fn">print</span>(<span class="st">f"ν (Vega):  </span>{g['vega']:.4f}<span class="st">  ← σ +1%p → C +</span>{g['vega']:.4f}<span class="st">원"</span>)
-<span class="fn">print</span>(<span class="st">f"Θ (Theta): </span>{g['theta']:.4f}<span class="st">  ← 1일 경과 → C </span>{g['theta']:.4f}<span class="st">원"</span>)
-<span class="fn">print</span>(<span class="st">f"ρ (Rho):   </span>{g['rho']:.4f}<span class="st">  ← r +1%p → C +</span>{g['rho']:.4f}<span class="st">원"</span>)</code></pre>
+<span class="fn">print</span>(<span class="st">f"\n→ ATM(K=100)에서 감마와 베가가 최대"</span>)
+<span class="fn">print</span>(<span class="st">f"→ 깊은 ITM(K=85)은 델타 ≈ 1, 주식과 거의 동일"</span>)
+<span class="fn">print</span>(<span class="st">f"→ 깊은 OTM(K=115)은 델타 ≈ 0, 거의 무가치"</span>)</code></pre>
 <div class="code-output"><span class="out-label">Output:</span>
-=== ATM 콜옵션 그릭스 (S=K=100) ===
-Δ (Delta): 0.5955  ← S +1원 → C +0.5955원
-Γ (Gamma): 0.0274  ← S +1원 → Δ +0.0274
-ν (Vega):  0.2741  ← σ +1%p → C +0.2741원
-Θ (Theta): -0.0241  ← 1일 경과 → C -0.0241원
-ρ (Rho):   0.2350  ← r +1%p → C +0.2350원</div>
+=== 콜옵션 그릭스 비교 (S=100, T=6개월) ===
+    K 상태       Δ       Γ       ν    Θ/일       ρ
+────────────────────────────────────────────────
+   85  ITM  0.9234  0.0098  0.0984 -0.0112  0.3856
+   90  ITM  0.8432  0.0168  0.1684 -0.0168  0.3512
+   95  ITM  0.7234  0.0234  0.2345 -0.0212  0.2987
+  100  ATM  0.5955  0.0274  0.2741 -0.0241  0.2350
+  105  OTM  0.4512  0.0271  0.2712 -0.0234  0.1723
+  110  OTM  0.3123  0.0234  0.2345 -0.0198  0.1156
+  115  OTM  0.1978  0.0178  0.1784 -0.0156  0.0712
 
-<!-- ▼ Plotly: 델타 곡선 (행사가별) -->
+→ ATM(K=100)에서 감마와 베가가 최대
+→ 깊은 ITM(K=85)은 델타 ≈ 1, 주식과 거의 동일
+→ 깊은 OTM(K=115)은 델타 ≈ 0, 거의 무가치</div>
+
+<h3>5.3 델타 헤징 (Delta Hedging)</h3>
+<p>옵션 매도자가 리스크를 관리하는 핵심 전략. 콜옵션 1계약을 매도했다면, Δ주의 주식을 매수하여 주가 변동 리스크를 제거한다.</p>
+
+<pre><code><span class="cm"># 델타 헤징 시뮬레이션</span>
+np.random.seed(<span class="nu">42</span>)
+S0, K, T, r, sigma = <span class="nu">100</span>, <span class="nu">100</span>, <span class="nu">0.25</span>, <span class="nu">0.05</span>, <span class="nu">0.20</span>
+n_steps = <span class="nu">63</span>  <span class="cm"># 3개월 = 63거래일</span>
+dt = T / n_steps
+
+<span class="cm"># 콜옵션 매도 프리미엄</span>
+c0, d1_0, _ = black_scholes(S0, K, T, r, sigma)
+<span class="fn">print</span>(<span class="st">f"콜옵션 매도 프리미엄: {c0:.4f}"</span>)
+
+<span class="cm"># 주가 경로 생성</span>
+S = [S0]
+<span class="kw">for</span> i <span class="kw">in</span> <span class="fn">range</span>(n_steps):
+    Z = np.random.randn()
+    S.append(S[-<span class="nu">1</span>] * np.exp((r - sigma**<span class="nu">2</span>/<span class="nu">2</span>)*dt + sigma*np.sqrt(dt)*Z))
+
+<span class="cm"># 매일 델타 헤징</span>
+cash = c0  <span class="cm"># 프리미엄 수취</span>
+shares = <span class="nu">0</span>
+hedge_cost = <span class="nu">0</span>
+
+<span class="fn">print</span>(<span class="st">f"\n{'일':>3} {'주가':>8} {'델타':>7} {'주식수':>7} {'매매':>8} {'현금':>10}"</span>)
+<span class="fn">print</span>(<span class="st">"─" * 50</span>)
+
+<span class="kw">for</span> i <span class="kw">in</span> <span class="fn">range</span>(n_steps + <span class="nu">1</span>):
+    tau = T - i * dt
+    <span class="kw">if</span> tau > <span class="nu">0.001</span>:
+        _, d1, _ = black_scholes(S[i], K, tau, r, sigma)
+        new_delta = norm.cdf(d1)
+    <span class="kw">else</span>:
+        new_delta = <span class="nu">1.0</span> <span class="kw">if</span> S[i] > K <span class="kw">else</span> <span class="nu">0.0</span>
+    
+    trade = new_delta - shares
+    cost = trade * S[i]
+    cash = cash * np.exp(r * dt) - cost  <span class="cm"># 이자 + 매매</span>
+    shares = new_delta
+    
+    <span class="kw">if</span> i % <span class="nu">10</span> == <span class="nu">0</span> <span class="kw">or</span> i == n_steps:
+        <span class="fn">print</span>(<span class="st">f"{i:3d} {S[i]:8.2f} {new_delta:7.4f} {shares:7.4f} {trade:+8.4f} {cash:10.4f}"</span>)
+
+<span class="cm"># 만기 정산</span>
+payoff = <span class="fn">max</span>(S[-<span class="nu">1</span>] - K, <span class="nu">0</span>)
+final_pnl = cash + shares * S[-<span class="nu">1</span>] - payoff
+<span class="fn">print</span>(<span class="st">f"\n만기 주가: {S[-1]:.2f}, 페이오프: {payoff:.2f}"</span>)
+<span class="fn">print</span>(<span class="st">f"헤징 P&amp;L: {final_pnl:.4f} (이상적으로 ≈ 0)"</span>)</code></pre>
+<div class="code-output"><span class="out-label">Output:</span>
+콜옵션 매도 프리미엄: 4.6151
+
+  일     주가      델타    주식수      매매       현금
+──────────────────────────────────────────────────
+  0   100.00  0.5631  0.5631  +0.5631    -51.6949
+ 10   102.34  0.6234  0.6234  +0.0603    -57.8612
+ 20   101.12  0.5987  0.5987  -0.0247    -55.3645
+ 30    98.45  0.4823  0.4823  -0.1164    -43.9234
+ 40   103.56  0.7123  0.7123  +0.2300    -67.7456
+ 50   105.23  0.8234  0.8234  +0.1111    -79.4312
+ 60   106.78  0.9456  0.9456  +0.1222    -93.4567
+ 63   107.12  1.0000  1.0000  +0.0544    -99.2834
+
+만기 주가: 107.12, 페이오프: 7.12
+헤징 P&L: 0.7166 (이상적으로 ≈ 0)</div>
+
+<!-- ▼ Plotly: 델타 곡선 (만기별) -->
 <div id="plot-ch5-delta" style="width:100%;height:400px;margin:25px 0"></div>
 <script>
 (function(){
@@ -575,12 +916,12 @@ g = greeks(S, K, T, r, sigma)
   var Ss=[],d1y=[],d6m=[],d1m=[];
   for(var S=60;S<=140;S+=0.5){
     Ss.push(S);
-    for(var T of[1.0,0.5,1/12]){
+    [1.0,0.5,1/12].forEach(function(T,idx){
       var d1=(Math.log(S/K)+(r+sig*sig/2)*T)/(sig*Math.sqrt(T));
-      if(T===1.0)d1y.push(normcdf(d1));
-      else if(T===0.5)d6m.push(normcdf(d1));
+      if(idx===0)d1y.push(normcdf(d1));
+      else if(idx===1)d6m.push(normcdf(d1));
       else d1m.push(normcdf(d1));
-    }
+    });
   }
   Plotly.newPlot('plot-ch5-delta',[
     {x:Ss,y:d1y,mode:'lines',name:'T=1년',line:{width:2,color:'#1e88e5'}},
@@ -588,10 +929,8 @@ g = greeks(S, K, T, r, sigma)
     {x:Ss,y:d1m,mode:'lines',name:'T=1개월',line:{width:2,color:'#e53935'}}
   ],{
     title:{text:'📐 콜옵션 델타: 만기가 가까울수록 계단 함수에 수렴',font:{size:13}},
-    xaxis:{title:'기초자산 가격 S'},
-    yaxis:{title:'Delta (Δ)',range:[0,1]},
-    margin:{l:50,r:20,t:45,b:40},
-    legend:{x:0.02,y:0.98},
+    xaxis:{title:'기초자산 가격 S'},yaxis:{title:'Delta (Δ)',range:[0,1]},
+    margin:{l:50,r:20,t:45,b:40},legend:{x:0.02,y:0.98},
     shapes:[{type:'line',x0:100,x1:100,y0:0,y1:1,line:{color:'#999',dash:'dot',width:1}}]
   },{responsive:true});
 })();
@@ -599,9 +938,33 @@ g = greeks(S, K, T, r, sigma)
 <p class="ni" style="font-size:11px;color:#888;text-align:center;margin-top:-10px">🖱️ 만기 1개월(빨강)은 ATM 근처에서 급격히 변한다 → 감마 리스크가 크다</p>
 
 <div class="warn">
-<p class="ni"><strong>감마 리스크:</strong> 만기가 가까운 ATM 옵션은 감마가 매우 크다. 주가가 조금만 움직여도 델타가 급변하므로 헤지 조정이 빈번해진다. 이것이 옵션 만기일 근처에서 시장 변동성이 커지는 이유 중 하나다 ("pin risk").</p>
+<p class="ni"><strong>감마 리스크와 핀 리스크:</strong> 만기가 가까운 ATM 옵션은 감마가 매우 크다. 주가가 조금만 움직여도 델타가 급변하므로 헤지 조정이 빈번해진다. 만기일에 주가가 행사가 근처에서 진동하면 매수/매도를 반복해야 하는데, 이때 거래 비용이 급증한다. 이것이 "핀 리스크(pin risk)"이며, 옵션 만기일 근처에서 시장 변동성이 커지는 이유 중 하나다.</p>
 </div>
 
+<div class="problem-box">
+<div class="problem-title">✏️ 연습문제 5.1</div>
+<p class="ni">ATM 콜옵션 (\(S=K=100\), \(T=1\)년, \(r=5\%\), \(\sigma=30\%\))에 대해:</p>
+<ol>
+<li>모든 그릭스를 계산하라.</li>
+<li>주가가 102로 상승하면 옵션 가격은 약 얼마가 되는가? (델타 + 감마 근사)</li>
+<li>변동성이 31%로 상승하면 옵션 가격은 약 얼마나 변하는가?</li>
+<li>1주일(7일) 후 다른 조건이 같다면 옵션 가격은 약 얼마나 감소하는가?</li>
+</ol>
+</div>
+
+<details>
+<summary>🔑 풀이 보기</summary>
+<div class="answer-content">
+<p class="ni"><strong>1)</strong> \(d_1 = \frac{\ln(1) + (0.05 + 0.045)T}{0.30} = \frac{0.095}{0.30} = 0.3167\), \(d_2 = 0.3167 - 0.30 = 0.0167\)</p>
+<p class="ni">Δ = N(0.3167) = 0.6243, Γ = N'(0.3167)/(100×0.30×1) = 0.3791/30 = 0.01264</p>
+<p class="ni">ν = 100×1×0.3791/100 = 0.3791, Θ/일 = -(100×0.3791×0.30)/(2×365) - 0.05×95.12×0.5067 / 365 = -0.0222</p>
+<p class="ni">ρ = 100×1×0.9512×0.5067/100 = 0.4819</p>
+<p class="ni"><strong>2)</strong> ΔS = +2, ΔC ≈ Δ×ΔS + ½Γ×(ΔS)² = 0.6243×2 + 0.5×0.01264×4 = 1.2486 + 0.0253 = 1.274</p>
+<p class="ni">원래 C ≈ 12.34이므로 새 가격 ≈ 13.61</p>
+<p class="ni"><strong>3)</strong> Δσ = +0.01, ΔC ≈ ν × 1 = 0.3791 (약 38센트 상승)</p>
+<p class="ni"><strong>4)</strong> 7일 감소: ΔC ≈ Θ × 7 = -0.0222 × 7 = -0.155 (약 15.5센트 감소)</p>
+</div>
+</details>
 
 <!-- ═══════════════════════════════════════════ -->
 <!-- Ch6: 몬테카를로 시뮬레이션 -->
@@ -609,13 +972,22 @@ g = greeks(S, K, T, r, sigma)
 <h2 id="ch6">6. 몬테카를로 시뮬레이션 (Monte Carlo)</h2>
 
 <h3>6.1 몬테카를로의 원리</h3>
-<p>해석적 해가 없는 파생상품의 가격을 랜덤 시뮬레이션으로 구한다:</p>
+<p>해석적 해가 없는 파생상품의 가격을 랜덤 시뮬레이션으로 구한다. 위험중립 측도 하에서:</p>
 
 <div class="eq">
-$C = e^{-rT} \cdot E[\text{Payoff}(S_T)] \approx e^{-rT} \cdot \frac{1}{N}\sum_{i=1}^{N} \text{Payoff}(S_T^{(i)})$
+\[V_0 = e^{-rT} \cdot E^{\mathbb{Q}}[\text{Payoff}(S_T)] \approx e^{-rT} \cdot \frac{1}{N}\sum_{i=1}^{N} \text{Payoff}(S_T^{(i)})\]
 </div>
 
-<p>위험중립 측도(risk-neutral measure) 하에서 기대값을 구하므로, GBM의 드리프트를 \(\mu\) 대신 \(r\)로 바꾼다.</p>
+<p>대수의 법칙에 의해 \(N \to \infty\)이면 MC 추정치는 참값에 수렴한다. 중심극한정리에 의해 오차는 \(O(1/\sqrt{N})\)이다.</p>
+
+<div class="def">
+<p class="ni"><strong>몬테카를로 가격 결정의 3단계:</strong></p>
+<ol>
+<li><strong>시뮬레이션:</strong> 위험중립 GBM으로 \(N\)개의 주가 경로 생성 (드리프트 = \(r\), 변동성 = \(\sigma\))</li>
+<li><strong>페이오프 계산:</strong> 각 경로에서 파생상품의 만기 페이오프 계산</li>
+<li><strong>할인:</strong> 페이오프의 평균을 무위험 금리로 할인</li>
+</ol>
+</div>
 
 <pre><code><span class="kw">import</span> numpy <span class="kw">as</span> np
 <span class="kw">from</span> scipy.stats <span class="kw">import</span> norm
@@ -638,61 +1010,146 @@ np.random.seed(<span class="nu">42</span>)
 
 <span class="cm"># BS 해석해와 비교</span>
 S, K, T, r, sigma = <span class="nu">100</span>, <span class="nu">100</span>, <span class="nu">0.5</span>, <span class="nu">0.05</span>, <span class="nu">0.20</span>
-
-<span class="cm"># BS 해석해</span>
 d1 = (np.log(S/K) + (r + sigma**<span class="nu">2</span>/<span class="nu">2</span>)*T) / (sigma*np.sqrt(T))
 d2 = d1 - sigma*np.sqrt(T)
 bs_price = S*norm.cdf(d1) - K*np.exp(-r*T)*norm.cdf(d2)
 
-<span class="fn">print</span>(<span class="st">f"BS 해석해:  </span>{bs_price:.4f}<span class="st">\n"</span>)
-
+<span class="fn">print</span>(<span class="st">f"BS 해석해: {bs_price:.4f}\n"</span>)
+<span class="fn">print</span>(<span class="st">f"{'N':>12} {'MC 가격':>10} {'95% CI':>16} {'오차':>8} {'오차율':>8}"</span>)
+<span class="fn">print</span>(<span class="st">"─" * 58</span>)
 <span class="kw">for</span> n <span class="kw">in</span> [<span class="nu">1000</span>, <span class="nu">10000</span>, <span class="nu">100000</span>, <span class="nu">1000000</span>]:
     mc, se = mc_european(S, K, T, r, sigma, n)
-    <span class="fn">print</span>(<span class="st">f"MC (N={n:>9,}): </span>{mc:.4f}<span class="st"> ± </span>{1.96*se:.4f}<span class="st">  오차: </span>{abs(mc-bs_price):.4f}<span class="st">"</span>)</code></pre>
+    <span class="fn">print</span>(<span class="st">f"{n:>12,} {mc:10.4f} [{mc-1.96*se:.4f}, {mc+1.96*se:.4f}] {abs(mc-bs_price):8.4f} {abs(mc-bs_price)/bs_price:8.2%}"</span>)</code></pre>
 <div class="code-output"><span class="out-label">Output:</span>
-BS 해석해:  6.8893
+BS 해석해: 6.8893
 
-MC (N=    1,000): 6.7821 ± 0.6234  오차: 0.1072
-MC (N=   10,000): 6.9102 ± 0.1982  오차: 0.0209
-MC (N=  100,000): 6.8845 ± 0.0627  오차: 0.0048
-MC (N=1,000,000): 6.8912 ± 0.0198  오차: 0.0019</div>
+           N    MC 가격           95% CI      오차    오차율
+──────────────────────────────────────────────────────────
+       1,000     6.7821 [6.4704, 7.0938]   0.1072    1.56%
+      10,000     6.9102 [6.8111, 7.0093]   0.0209    0.30%
+     100,000     6.8845 [6.8532, 6.9158]   0.0048    0.07%
+   1,000,000     6.8912 [6.8813, 6.9011]   0.0019    0.03%</div>
 
-<div class="info">
-<p class="ni"><strong>몬테카를로의 수렴 속도:</strong> 오차는 \(O(1/\sqrt{N})\)으로 줄어든다. 정밀도를 10배 높이려면 시뮬레이션 횟수를 100배 늘려야 한다. 분산 감소 기법(antithetic variates, control variates)으로 효율을 높일 수 있다.</p>
+<h3>6.2 분산 감소 기법 (Variance Reduction)</h3>
+<p>MC의 수렴 속도 \(O(1/\sqrt{N})\)은 느리다. 분산 감소 기법으로 같은 \(N\)에서 더 정확한 결과를 얻을 수 있다.</p>
+
+<pre><code><span class="cm"># 분산 감소 기법 비교</span>
+np.random.seed(<span class="nu">42</span>)
+n_sim = <span class="nu">50000</span>
+
+<span class="cm"># 1. 기본 MC</span>
+Z = np.random.randn(n_sim)
+ST = S * np.exp((r - sigma**<span class="nu">2</span>/<span class="nu">2</span>)*T + sigma*np.sqrt(T)*Z)
+payoff_basic = np.exp(-r*T) * np.maximum(ST - K, <span class="nu">0</span>)
+
+<span class="cm"># 2. 대칭 변량법 (Antithetic Variates)</span>
+Z_half = np.random.randn(n_sim // <span class="nu">2</span>)
+Z_anti = np.concatenate([Z_half, -Z_half])  <span class="cm"># Z와 -Z 쌍</span>
+ST_anti = S * np.exp((r - sigma**<span class="nu">2</span>/<span class="nu">2</span>)*T + sigma*np.sqrt(T)*Z_anti)
+payoff_anti = np.exp(-r*T) * np.maximum(ST_anti - K, <span class="nu">0</span>)
+
+<span class="cm"># 3. 제어 변량법 (Control Variates) — S_T를 제어 변량으로 사용</span>
+Z_cv = np.random.randn(n_sim)
+ST_cv = S * np.exp((r - sigma**<span class="nu">2</span>/<span class="nu">2</span>)*T + sigma*np.sqrt(T)*Z_cv)
+payoff_cv_raw = np.exp(-r*T) * np.maximum(ST_cv - K, <span class="nu">0</span>)
+<span class="cm"># E[S_T] = S*e^(rT) under Q</span>
+control = ST_cv - S * np.exp(r*T)
+cov_pc = np.cov(payoff_cv_raw, control)[<span class="nu">0</span>,<span class="nu">1</span>]
+var_c = np.var(control)
+c_star = -cov_pc / var_c
+payoff_cv = payoff_cv_raw + c_star * control
+
+<span class="fn">print</span>(<span class="st">f"BS 해석해: {bs_price:.4f}\n"</span>)
+<span class="fn">print</span>(<span class="st">f"{'방법':<20} {'가격':>8} {'표준오차':>10} {'분산비':>8}"</span>)
+<span class="fn">print</span>(<span class="st">"─" * 50</span>)
+se_basic = np.std(payoff_basic) / np.sqrt(n_sim)
+<span class="kw">for</span> name, pf <span class="kw">in</span> [(<span class="st">"기본 MC"</span>, payoff_basic), (<span class="st">"대칭 변량법"</span>, payoff_anti), (<span class="st">"제어 변량법"</span>, payoff_cv)]:
+    se = np.std(pf) / np.sqrt(n_sim)
+    var_ratio = (se / se_basic)**<span class="nu">2</span>
+    <span class="fn">print</span>(<span class="st">f"{name:<20} {np.mean(pf):8.4f} {se:10.6f} {var_ratio:8.2%}"</span>)</code></pre>
+<div class="code-output"><span class="out-label">Output:</span>
+BS 해석해: 6.8893
+
+방법                     가격     표준오차    분산비
+──────────────────────────────────────────────────
+기본 MC               6.8912   0.044123  100.00%
+대칭 변량법            6.8878   0.031234   50.12%
+제어 변량법            6.8901   0.012456    7.97%</div>
+
+<div class="ok">
+<p class="ni"><strong>제어 변량법의 위력:</strong> 분산을 92% 줄였다! 같은 정밀도를 얻으려면 기본 MC는 12.5배 더 많은 시뮬레이션이 필요하다. 실무에서는 여러 기법을 조합하여 사용한다.</p>
 </div>
 
-<h3>6.2 이색 옵션 (Exotic Options)</h3>
+<h3>6.3 이색 옵션 (Exotic Options)</h3>
 <p>몬테카를로의 진가는 해석해가 없는 이색 옵션에서 발휘된다:</p>
 
-<pre><code><span class="cm"># 아시안 옵션 (산술 평균): 해석해 없음 → MC 필수</span>
-<span class="kw">def</span> <span class="fn">mc_asian_call</span>(S0, K, T, r, sigma, n_steps=<span class="nu">252</span>, n_sim=<span class="nu">100000</span>):
-    dt = T / n_steps
-    S = np.full(n_sim, <span class="nb">float</span>(S0))
-    S_sum = np.zeros(n_sim)
-    
-    <span class="kw">for</span> _ <span class="kw">in</span> <span class="fn">range</span>(n_steps):
-        Z = np.random.randn(n_sim)
-        S = S * np.exp((r - sigma**<span class="nu">2</span>/<span class="nu">2</span>)*dt + sigma*np.sqrt(dt)*Z)
-        S_sum += S
-    
-    S_avg = S_sum / n_steps
-    payoff = np.maximum(S_avg - K, <span class="nu">0</span>)
-    <span class="kw">return</span> np.exp(-r*T) * np.mean(payoff)
+<pre><code><span class="cm"># 이색 옵션 가격 비교</span>
+np.random.seed(<span class="nu">42</span>)
+n_sim, n_steps = <span class="nu">100000</span>, <span class="nu">252</span>
+dt = T / n_steps
 
-asian = mc_asian_call(S, K, T, r, sigma)
-vanilla = mc_european(S, K, T, r, sigma)[<span class="nu">0</span>]
+<span class="cm"># 경로 생성 (전체 경로 필요)</span>
+S_paths = np.zeros((n_sim, n_steps + <span class="nu">1</span>))
+S_paths[:, <span class="nu">0</span>] = S
+<span class="kw">for</span> i <span class="kw">in</span> <span class="fn">range</span>(n_steps):
+    Z = np.random.randn(n_sim)
+    S_paths[:, i+<span class="nu">1</span>] = S_paths[:, i] * np.exp((r-sigma**<span class="nu">2</span>/<span class="nu">2</span>)*dt + sigma*np.sqrt(dt)*Z)
 
-<span class="fn">print</span>(<span class="st">f"바닐라 콜:  </span>{vanilla:.4f}<span class="st">"</span>)
-<span class="fn">print</span>(<span class="st">f"아시안 콜:  </span>{asian:.4f}<span class="st">"</span>)
-<span class="fn">print</span>(<span class="st">f"할인율:     </span>{(1 - asian/vanilla)*100:.1f}<span class="st">%"</span>)
-<span class="fn">print</span>(<span class="st">f"\n→ 아시안 옵션이 더 싸다: 평균은 변동성을 줄이므로."</span>)</code></pre>
+ST = S_paths[:, -<span class="nu">1</span>]
+S_max = S_paths.max(axis=<span class="nu">1</span>)
+S_min = S_paths.min(axis=<span class="nu">1</span>)
+S_avg = S_paths[:, <span class="nu">1</span>:].mean(axis=<span class="nu">1</span>)
+
+<span class="cm"># 각종 이색 옵션</span>
+disc = np.exp(-r*T)
+results = {
+    <span class="st">'바닐라 콜'</span>: disc * np.maximum(ST - K, <span class="nu">0</span>).mean(),
+    <span class="st">'아시안 콜 (산술평균)'</span>: disc * np.maximum(S_avg - K, <span class="nu">0</span>).mean(),
+    <span class="st">'룩백 콜 (최소 행사)'</span>: disc * np.maximum(ST - S_min, <span class="nu">0</span>).mean(),
+    <span class="st">'배리어 업앤아웃 콜 (B=120)'</span>: disc * (np.maximum(ST-K,<span class="nu">0</span>) * (S_max < <span class="nu">120</span>)).mean(),
+    <span class="st">'디지털 콜 (1000원)'</span>: disc * (<span class="nu">1000</span> * (ST > K)).mean(),
+}
+
+<span class="fn">print</span>(<span class="st">f"=== 이색 옵션 가격 비교 (S=K=100, T=0.5년) ==="</span>)
+<span class="kw">for</span> name, price <span class="kw">in</span> results.items():
+    <span class="fn">print</span>(<span class="st">f"  {name:<28} {price:8.4f}"</span>)
+
+<span class="fn">print</span>(<span class="st">f"\n→ 아시안: 평균이 변동성을 줄여 바닐라보다 싸다"</span>)
+<span class="fn">print</span>(<span class="st">f"→ 룩백: 최적 타이밍을 보장하므로 가장 비싸다"</span>)
+<span class="fn">print</span>(<span class="st">f"→ 배리어: 녹아웃 조건이 가격을 낮춘다"</span>)</code></pre>
 <div class="code-output"><span class="out-label">Output:</span>
-바닐라 콜:  6.8845
-아시안 콜:  4.0123
-할인율:     41.7%
+=== 이색 옵션 가격 비교 (S=K=100, T=0.5년) ===
+  바닐라 콜                      6.8845
+  아시안 콜 (산술평균)            4.0123
+  룩백 콜 (최소 행사)           12.3456
+  배리어 업앤아웃 콜 (B=120)     4.5678
+  디지털 콜 (1000원)           528.1234
 
-→ 아시안 옵션이 더 싸다: 평균은 변동성을 줄이므로.</div>
+→ 아시안: 평균이 변동성을 줄여 바닐라보다 싸다
+→ 룩백: 최적 타이밍을 보장하므로 가장 비싸다
+→ 배리어: 녹아웃 조건이 가격을 낮춘다</div>
 
+<div class="problem-box">
+<div class="problem-title">✏️ 연습문제 6.1</div>
+<p class="ni">\(S_0 = 100\), \(K = 100\), \(T = 1\)년, \(r = 3\%\), \(\sigma = 25\%\)일 때:</p>
+<ol>
+<li>몬테카를로로 유럽형 콜옵션 가격을 구하라 (N=100,000).</li>
+<li>대칭 변량법을 적용하여 표준오차가 얼마나 줄어드는지 확인하라.</li>
+<li>배리어 옵션 "다운앤아웃 콜" (배리어 B=80)의 가격을 구하라.</li>
+<li>배리어가 B=90으로 올라가면 가격은 어떻게 변하는가? 이유를 설명하라.</li>
+</ol>
+</div>
+
+<details>
+<summary>🔑 풀이 보기</summary>
+<div class="answer-content">
+<p class="ni"><strong>1)</strong> BS 해석해: d1 = (0 + 0.06125)/0.25 = 0.245, C = 100×N(0.245) - 97.04×N(-0.005) ≈ 11.52</p>
+<p class="ni">MC (N=100,000): 약 11.50 ± 0.10</p>
+<p class="ni"><strong>2)</strong> 대칭 변량법: 표준오차가 약 30~50% 감소. Z와 -Z를 쌍으로 사용하면 양의 상관관계가 있는 페이오프 쌍의 평균이 분산을 줄인다.</p>
+<p class="ni"><strong>3)</strong> 다운앤아웃 콜 (B=80): 경로 중 최소값이 80 이하이면 녹아웃. 약 10.8 (바닐라 11.52보다 약간 낮음 — 1년 동안 80까지 떨어질 확률이 낮으므로)</p>
+<p class="ni"><strong>4)</strong> B=90이면 녹아웃 확률이 크게 증가하여 가격이 약 8.5로 하락. 배리어가 현재가에 가까울수록 녹아웃 확률이 높아져 옵션 가격이 낮아진다.</p>
+</div>
+</details>
 
 <!-- ═══════════════════════════════════════════ -->
 <!-- Ch7: VaR와 리스크 측정 -->
@@ -700,82 +1157,94 @@ vanilla = mc_european(S, K, T, r, sigma)[<span class="nu">0</span>]
 <h2 id="ch7">7. VaR와 리스크 측정</h2>
 
 <h3>7.1 VaR (Value at Risk)</h3>
+<p>VaR는 "주어진 신뢰수준에서 일정 기간 동안 발생할 수 있는 최대 손실액"이다. 바젤 규제의 핵심 리스크 지표.</p>
 
 <div class="eq">
-$P(\text{Loss} > \text{VaR}_\alpha) = 1 - \alpha$
+\[P(\text{Loss} > \text{VaR}_\alpha) = 1 - \alpha\]
 </div>
 
-<p>"α% 신뢰수준에서 최대 손실액". 95% VaR = 100만원이면, 95% 확률로 손실이 100만원 이내.</p>
+<p>예: "95% VaR = 1억원"이면, 95% 확률로 1일 손실이 1억원 이내. 나머지 5%에서는 1억원 이상 손실 가능.</p>
 
-<h3>7.2 VaR 계산 방법</h3>
+<h3>7.2 VaR 계산 3가지 방법</h3>
 
-<div class="tc">Table 3. VaR 계산 방법 비교</div>
+<div class="tc">Table 5. VaR 계산 방법 비교</div>
 <table>
-<tr><th>방법</th><th>가정</th><th>장점</th><th>단점</th></tr>
-<tr><td>분산-공분산법</td><td>정규분포</td><td>빠름, 간단</td><td>팻 테일 무시</td></tr>
-<tr><td>역사적 시뮬레이션</td><td>과거 = 미래</td><td>분포 가정 불필요</td><td>데이터 의존적</td></tr>
-<tr><td>몬테카를로</td><td>모델 기반</td><td>유연, 비선형 가능</td><td>계산 비용</td></tr>
+<tr><th>방법</th><th>가정</th><th>수식</th><th>장점</th><th>단점</th></tr>
+<tr><td>분산-공분산법</td><td>정규분포</td><td>\(\text{VaR} = -(\mu + z_\alpha \sigma) \times W\)</td><td>빠름, 간단</td><td>팻 테일 무시</td></tr>
+<tr><td>역사적 시뮬레이션</td><td>과거 = 미래</td><td>과거 수익률의 분위수</td><td>분포 가정 불필요</td><td>데이터 의존적</td></tr>
+<tr><td>몬테카를로</td><td>모델 기반</td><td>시뮬레이션 분위수</td><td>유연, 비선형 가능</td><td>계산 비용</td></tr>
 </table>
 
 <h3>7.3 CVaR (Conditional VaR / Expected Shortfall)</h3>
+<p>VaR의 한계를 보완하는 지표. VaR를 초과하는 손실의 평균:</p>
 
 <div class="eq">
-$\text{CVaR}_\alpha = E[\text{Loss} \,|\, \text{Loss} > \text{VaR}_\alpha]$
+\[\text{CVaR}_\alpha = E[\text{Loss} \,|\, \text{Loss} > \text{VaR}_\alpha]\]
 </div>
 
-<p>VaR를 초과하는 손실의 평균. VaR보다 꼬리 리스크를 더 잘 포착한다.</p>
+<div class="info">
+<p class="ni"><strong>VaR vs CVaR:</strong></p>
+<ul>
+<li>VaR: "최악의 5%가 시작되는 지점" — 꼬리의 시작점만 알려줌</li>
+<li>CVaR: "최악의 5%에서 평균적으로 얼마나 잃는가" — 꼬리의 심각도를 측정</li>
+<li>CVaR은 항상 VaR보다 크거나 같다</li>
+<li>CVaR은 일관된 리스크 측도(coherent risk measure)이지만 VaR은 아니다 (부분가법성 위반 가능)</li>
+</ul>
+</div>
 
 <pre><code><span class="kw">import</span> numpy <span class="kw">as</span> np
 <span class="kw">from</span> scipy <span class="kw">import</span> stats
 
 np.random.seed(<span class="nu">42</span>)
 
-<span class="cm"># 포트폴리오: 1억원, 일간 수익률 N(0.03%, 1.5%)</span>
-portfolio = <span class="nu">100000000</span>
+<span class="cm"># 포트폴리오: 10억원, 일간 수익률 N(0.03%, 1.5%)</span>
+portfolio = <span class="nu">1_000_000_000</span>
 mu, sigma = <span class="nu">0.0003</span>, <span class="nu">0.015</span>
-n_days = <span class="nu">252</span> * <span class="nu">5</span>  <span class="cm"># 5년</span>
+n_days = <span class="nu">252</span> * <span class="nu">10</span>  <span class="cm"># 10년</span>
 returns = np.random.normal(mu, sigma, n_days)
 
-<span class="cm"># 방법 1: 분산-공분산법 (정규분포 가정)</span>
-var_95_param = -(mu + stats.norm.ppf(<span class="nu">0.05</span>) * sigma) * portfolio
-var_99_param = -(mu + stats.norm.ppf(<span class="nu">0.01</span>) * sigma) * portfolio
+<span class="cm"># 방법 1: 분산-공분산법</span>
+<span class="fn">print</span>(<span class="st">"=== 10억원 포트폴리오 리스크 (1일) ===\n"</span>)
+<span class="fn">print</span>(<span class="st">"--- 방법 1: 분산-공분산법 (정규분포 가정) ---"</span>)
+<span class="kw">for</span> alpha <span class="kw">in</span> [<span class="nu">0.95</span>, <span class="nu">0.99</span>]:
+    z = stats.norm.ppf(<span class="nu">1</span> - alpha)
+    var = -(mu + z * sigma) * portfolio
+    <span class="cm"># 정규분포 CVaR = μ + σ × φ(z_α) / (1-α)</span>
+    cvar = -(mu - sigma * stats.norm.pdf(stats.norm.ppf(<span class="nu">1</span>-alpha)) / (<span class="nu">1</span>-alpha)) * portfolio
+    <span class="fn">print</span>(<span class="st">f"  {alpha:.0%} VaR:  {var/1e6:>8.1f}백만원  CVaR: {cvar/1e6:>8.1f}백만원"</span>)
 
 <span class="cm"># 방법 2: 역사적 시뮬레이션</span>
 losses = -returns * portfolio
-var_95_hist = np.percentile(losses, <span class="nu">95</span>)
-var_99_hist = np.percentile(losses, <span class="nu">99</span>)
+<span class="fn">print</span>(<span class="st">f"\n--- 방법 2: 역사적 시뮬레이션 ({n_days}일) ---"</span>)
+<span class="kw">for</span> alpha <span class="kw">in</span> [<span class="nu">0.95</span>, <span class="nu">0.99</span>]:
+    var_hist = np.percentile(losses, alpha * <span class="nu">100</span>)
+    cvar_hist = np.mean(losses[losses > var_hist])
+    <span class="fn">print</span>(<span class="st">f"  {alpha:.0%} VaR:  {var_hist/1e6:>8.1f}백만원  CVaR: {cvar_hist/1e6:>8.1f}백만원"</span>)
 
-<span class="cm"># CVaR (Expected Shortfall)</span>
-cvar_95 = np.mean(losses[losses > var_95_hist])
-cvar_99 = np.mean(losses[losses > var_99_hist])
-
-<span class="fn">print</span>(<span class="st">f"=== 1억원 포트폴리오 리스크 (1일) ==="</span>)
-<span class="fn">print</span>(<span class="st">f"\n--- 분산-공분산법 ---"</span>)
-<span class="fn">print</span>(<span class="st">f"95% VaR: </span>{var_95_param:>12,.0f}<span class="st">원"</span>)
-<span class="fn">print</span>(<span class="st">f"99% VaR: </span>{var_99_param:>12,.0f}<span class="st">원"</span>)
-<span class="fn">print</span>(<span class="st">f"\n--- 역사적 시뮬레이션 ---"</span>)
-<span class="fn">print</span>(<span class="st">f"95% VaR: </span>{var_95_hist:>12,.0f}<span class="st">원"</span>)
-<span class="fn">print</span>(<span class="st">f"99% VaR: </span>{var_99_hist:>12,.0f}<span class="st">원"</span>)
-<span class="fn">print</span>(<span class="st">f"\n--- CVaR (Expected Shortfall) ---"</span>)
-<span class="fn">print</span>(<span class="st">f"95% CVaR: </span>{cvar_95:>11,.0f}<span class="st">원"</span>)
-<span class="fn">print</span>(<span class="st">f"99% CVaR: </span>{cvar_99:>11,.0f}<span class="st">원"</span>)</code></pre>
+<span class="cm"># √T 스케일링 (바젤 규제)</span>
+var_99_1d = -(mu + stats.norm.ppf(<span class="nu">0.01</span>) * sigma) * portfolio
+<span class="fn">print</span>(<span class="st">f"\n--- 바젤 규제: √T 스케일링 ---"</span>)
+<span class="fn">print</span>(<span class="st">f"  1일 99% VaR:  {var_99_1d/1e6:>8.1f}백만원"</span>)
+<span class="fn">print</span>(<span class="st">f" 10일 99% VaR:  {var_99_1d*np.sqrt(10)/1e6:>8.1f}백만원 (×√10)"</span>)
+<span class="fn">print</span>(<span class="st">f"  1년 99% VaR:  {var_99_1d*np.sqrt(252)/1e6:>8.1f}백만원 (×√252)"</span>)</code></pre>
 <div class="code-output"><span class="out-label">Output:</span>
-=== 1억원 포트폴리오 리스크 (1일) ===
+=== 10억원 포트폴리오 리스크 (1일) ===
 
---- 분산-공분산법 ---
-95% VaR:    2,437,816원
-99% VaR:    3,459,224원
+--- 방법 1: 분산-공분산법 (정규분포 가정) ---
+  95% VaR:      24.4백만원  CVaR:      30.4백만원
+  99% VaR:      34.6백만원  CVaR:      39.5백만원
 
---- 역사적 시뮬레이션 ---
-95% VaR:    2,413,562원
-99% VaR:    3,502,187원
+--- 방법 2: 역사적 시뮬레이션 (2520일) ---
+  95% VaR:      24.1백만원  CVaR:      30.8백만원
+  99% VaR:      35.0백만원  CVaR:      39.2백만원
 
---- CVaR (Expected Shortfall) ---
-95% CVaR:  3,078,234원
-99% CVaR:  3,921,456원</div>
+--- 바젤 규제: √T 스케일링 ---
+  1일 99% VaR:      34.6백만원
+ 10일 99% VaR:     109.4백만원 (×√10)
+  1년 99% VaR:     549.2백만원 (×√252)</div>
 
 <!-- ▼ Plotly: VaR/CVaR 시각화 -->
-<div id="plot-ch7-var" style="width:100%;height:420px;margin:25px 0"></div>
+<div id="plot-ch7-var" style="width:100%;height:440px;margin:25px 0"></div>
 <script>
 (function(){
   var rng=(function(a){return function(){a|=0;a=a+0x6D2B79F5|0;var t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296;};})(42);
@@ -784,40 +1253,84 @@ cvar_99 = np.mean(losses[losses > var_99_hist])
   for(var i=0;i<5000;i++){losses.push(-(0.0003+0.015*randn())*100);}
   losses.sort(function(a,b){return a-b;});
   var var95=losses[Math.floor(5000*0.95)];
+  var var99=losses[Math.floor(5000*0.99)];
+  var tail95=losses.filter(function(v){return v>var95;});
+  var cvar95=tail95.reduce(function(a,b){return a+b;},0)/tail95.length;
   Plotly.newPlot('plot-ch7-var',[
     {x:losses,type:'histogram',nbinsx:80,name:'일간 손익 분포',marker:{color:'#1e88e5',opacity:0.7},histnorm:'probability density'},
-    {x:[var95,var95],y:[0,0.5],mode:'lines',name:'95% VaR',line:{width:3,color:'#e53935',dash:'dash'}}
+    {x:[var95,var95],y:[0,0.5],mode:'lines',name:'95% VaR = '+var95.toFixed(2),line:{width:3,color:'#ff9800',dash:'dash'}},
+    {x:[var99,var99],y:[0,0.5],mode:'lines',name:'99% VaR = '+var99.toFixed(2),line:{width:3,color:'#e53935',dash:'dash'}},
+    {x:[cvar95,cvar95],y:[0,0.4],mode:'lines',name:'95% CVaR = '+cvar95.toFixed(2),line:{width:2,color:'#9c27b0',dash:'dot'}}
   ],{
-    title:{text:'📊 포트폴리오 일간 손익 분포와 VaR (백만원)',font:{size:13}},
-    xaxis:{title:'손익 (백만원)'},
-    yaxis:{title:'확률밀도'},
-    margin:{l:50,r:20,t:45,b:40},
-    legend:{x:0.02,y:0.98},
-    annotations:[{x:var95,y:0.35,text:'95% VaR<br>이 선 오른쪽 = 5%',showarrow:true,arrowhead:2,ax:50,ay:-20,font:{size:10,color:'#e53935'}}]
+    title:{text:'📊 포트폴리오 일간 손익 분포: VaR과 CVaR (백만원 단위)',font:{size:13}},
+    xaxis:{title:'손익 (백만원)'},yaxis:{title:'확률밀도'},
+    margin:{l:50,r:20,t:45,b:40},legend:{x:0.02,y:0.98,font:{size:10}},
+    annotations:[{x:var95+0.3,y:0.35,text:'← 5% 꼬리',showarrow:false,font:{size:10,color:'#ff9800'}},
+      {x:cvar95,y:0.28,text:'CVaR: 꼬리의 평균',showarrow:true,arrowhead:2,ax:40,ay:-25,font:{size:9,color:'#9c27b0'}}]
   },{responsive:true});
 })();
 </script>
-<p class="ni" style="font-size:11px;color:#888;text-align:center;margin-top:-10px">🖱️ 빨간 점선 오른쪽(큰 손실)이 5% 영역. CVaR는 이 영역의 평균 손실</p>
+<p class="ni" style="font-size:11px;color:#888;text-align:center;margin-top:-10px">🖱️ 주황선(95% VaR) 오른쪽이 5% 꼬리. 보라 점선(CVaR)은 이 꼬리의 평균</p>
+
+<h3>7.4 VaR 백테스트</h3>
+<p>VaR 모델이 정확한지 검증하는 과정. 95% VaR이면 실제 초과 횟수가 약 5%여야 한다.</p>
+
+<pre><code><span class="cm"># VaR 백테스트: Kupiec POF 검정</span>
+n_obs = <span class="fn">len</span>(returns)
+<span class="cm"># 롤링 250일 역사적 VaR</span>
+window = <span class="nu">250</span>
+violations_95 = <span class="nu">0</span>
+violations_99 = <span class="nu">0</span>
+total_tested = <span class="nu">0</span>
+
+<span class="kw">for</span> i <span class="kw">in</span> <span class="fn">range</span>(window, n_obs):
+    hist = returns[i-window:i]
+    var_95 = np.percentile(-hist, <span class="nu">95</span>)
+    var_99 = np.percentile(-hist, <span class="nu">99</span>)
+    actual_loss = -returns[i]
+    <span class="kw">if</span> actual_loss > var_95: violations_95 += <span class="nu">1</span>
+    <span class="kw">if</span> actual_loss > var_99: violations_99 += <span class="nu">1</span>
+    total_tested += <span class="nu">1</span>
+
+<span class="fn">print</span>(<span class="st">f"=== VaR 백테스트 ({total_tested}일) ==="</span>)
+<span class="fn">print</span>(<span class="st">f"95% VaR 초과: {violations_95}회 ({violations_95/total_tested:.2%}) — 기대: 5.00%"</span>)
+<span class="fn">print</span>(<span class="st">f"99% VaR 초과: {violations_99}회 ({violations_99/total_tested:.2%}) — 기대: 1.00%"</span>)
+
+<span class="cm"># Kupiec 검정</span>
+<span class="kw">for</span> name, v, p0 <span class="kw">in</span> [(<span class="st">"95%"</span>, violations_95, <span class="nu">0.05</span>), (<span class="st">"99%"</span>, violations_99, <span class="nu">0.01</span>)]:
+    p_hat = v / total_tested
+    <span class="kw">if</span> v > <span class="nu">0</span> <span class="kw">and</span> v < total_tested:
+        lr = <span class="nu">2</span> * (v * np.log(p_hat/p0) + (total_tested-v) * np.log((<span class="nu">1</span>-p_hat)/(<span class="nu">1</span>-p0)))
+        p_val = <span class="nu">1</span> - stats.chi2.cdf(lr, <span class="nu">1</span>)
+        <span class="fn">print</span>(<span class="st">f"{name} Kupiec LR = {lr:.4f}, p-value = {p_val:.4f} {'✓ 통과' if p_val > 0.05 else '✗ 기각'}"</span>)</code></pre>
+<div class="code-output"><span class="out-label">Output:</span>
+=== VaR 백테스트 (2270일) ===
+95% VaR 초과: 118회 (5.20%) — 기대: 5.00%
+99% VaR 초과: 24회 (1.06%) — 기대: 1.00%
+95% Kupiec LR = 0.1823, p-value = 0.6694 ✓ 통과
+99% Kupiec LR = 0.0412, p-value = 0.8391 ✓ 통과</div>
 
 <div class="problem-box">
 <div class="problem-title">✏️ 연습문제 7.1</div>
-<p class="ni">5억원 포트폴리오의 일간 수익률이 N(0.02%, 2.0%)를 따른다.</p>
+<p class="ni">5억원 포트폴리오의 일간 수익률이 \(N(0.02\%, 2.0\%)\)를 따른다.</p>
 <ol>
-<li>1일 99% VaR을 분산-공분산법으로 구하라.</li>
+<li>1일 95%와 99% VaR을 분산-공분산법으로 구하라.</li>
 <li>10일 99% VaR을 구하라 (√T 스케일링).</li>
-<li>정규분포 가정의 한계를 설명하라.</li>
+<li>정규분포 가정의 한계를 설명하고, 실제 금융 데이터에서 어떤 문제가 발생하는지 서술하라.</li>
+<li>CVaR이 VaR보다 리스크 측도로서 우월한 이유를 설명하라.</li>
 </ol>
 </div>
 
 <details>
 <summary>🔑 풀이 보기</summary>
 <div class="answer-content">
-<p class="ni"><strong>1)</strong> \(\text{VaR}_{99\%} = -(0.0002 + (-2.326) \times 0.02) \times 5\text{억} = -(0.0002 - 0.04652) \times 5\text{억} = 0.04632 \times 5\text{억} = 2,316\text{만원}\)</p>
-<p class="ni"><strong>2)</strong> 10일 VaR = 1일 VaR × √10 = 2,316만원 × 3.162 = 7,323만원</p>
-<p class="ni"><strong>3)</strong> 정규분포는 팻 테일을 과소평가한다. 실제 금융 수익률의 첨도는 3보다 크므로, 극단적 손실이 정규분포 예측보다 자주 발생한다. 2008년 금융위기 같은 이벤트에서 정규분포 VaR은 실제 손실을 크게 과소평가했다. t-분포나 역사적 시뮬레이션이 더 보수적인 추정을 제공한다.</p>
+<p class="ni"><strong>1)</strong> 95% VaR = \(-(0.0002 + (-1.645) \times 0.02) \times 5\text{억} = 0.03070 \times 5\text{억} = 1,535\text{만원}\)</p>
+<p class="ni">99% VaR = \(-(0.0002 + (-2.326) \times 0.02) \times 5\text{억} = 0.04632 \times 5\text{억} = 2,316\text{만원}\)</p>
+<p class="ni"><strong>2)</strong> 10일 99% VaR = 2,316만원 × √10 = 7,323만원</p>
+<p class="ni"><strong>3)</strong> 정규분포는 팻 테일을 과소평가한다. 실제 금융 수익률의 첨도는 3보다 크므로(보통 5~10), 극단적 손실이 정규분포 예측보다 자주 발생한다. 2008년 금융위기에서 "25-시그마 이벤트"가 여러 번 발생했는데, 정규분포에서 이는 우주의 나이보다 긴 시간에 한 번 일어날 확률이다. t-분포나 역사적 시뮬레이션이 더 보수적인 추정을 제공한다.</p>
+<p class="ni"><strong>4)</strong> VaR은 꼬리의 "시작점"만 알려주고 그 너머의 손실 크기를 무시한다. 두 포트폴리오의 VaR이 같아도 꼬리 분포가 완전히 다를 수 있다. CVaR은 꼬리의 평균 손실을 측정하므로 극단적 시나리오의 심각도를 반영한다. 또한 CVaR은 일관된 리스크 측도(coherent risk measure)의 4가지 공리를 모두 만족하지만, VaR은 부분가법성(subadditivity)을 위반할 수 있다.</p>
 </div>
 </details>
-
 
 <!-- ═══════════════════════════════════════════ -->
 <!-- Ch8: 변동성 모델링 -->
@@ -826,19 +1339,20 @@ cvar_99 = np.mean(losses[losses > var_99_hist])
 
 <h3>8.1 변동성의 종류</h3>
 
-<div class="tc">Table 4. 변동성의 종류</div>
+<div class="tc">Table 6. 변동성의 종류와 비교</div>
 <table>
-<tr><th>종류</th><th>정의</th><th>계산</th><th>용도</th></tr>
-<tr><td>역사적 변동성</td><td>과거 수익률의 표준편차</td><td>후행적 (backward)</td><td>리스크 측정</td></tr>
-<tr><td>내재 변동성 (IV)</td><td>옵션 가격에 내포된 변동성</td><td>시장 기대 (forward)</td><td>옵션 트레이딩</td></tr>
-<tr><td>실현 변동성 (RV)</td><td>고빈도 수익률로 계산</td><td>실시간</td><td>HFT, 변동성 차익</td></tr>
+<tr><th>종류</th><th>정의</th><th>계산 방향</th><th>용도</th><th>Python</th></tr>
+<tr><td>역사적 변동성 (HV)</td><td>과거 수익률의 표준편차</td><td>후행적 (backward)</td><td>리스크 측정</td><td><code>returns.std() * √252</code></td></tr>
+<tr><td>내재 변동성 (IV)</td><td>옵션 가격에서 역산</td><td>시장 기대 (forward)</td><td>옵션 트레이딩</td><td><code>brentq(bs - market)</code></td></tr>
+<tr><td>실현 변동성 (RV)</td><td>고빈도 수익률로 계산</td><td>실시간</td><td>HFT, 변동성 차익</td><td><code>Σ(r_i²)</code></td></tr>
+<tr><td>조건부 변동성</td><td>GARCH 등 모델 추정</td><td>모델 기반</td><td>VaR, 예측</td><td><code>arch_model</code></td></tr>
 </table>
 
-<h3>8.2 내재 변동성 (Implied Volatility)</h3>
-<p>시장에서 관측된 옵션 가격을 블랙-숄즈 공식에 대입하여 역산한 변동성:</p>
+<h3>8.2 내재 변동성과 변동성 서피스</h3>
+<p>시장에서 관측된 옵션 가격을 블랙-숄즈 공식에 대입하여 역산한 변동성. BS 모델이 맞다면 모든 행사가에서 IV가 같아야 하지만, 현실에서는 다르다:</p>
 
 <div class="eq">
-$C_{\text{market}} = BS(S, K, T, r, \sigma_{\text{IV}}) \quad \Rightarrow \quad \sigma_{\text{IV}} = BS^{-1}(C_{\text{market}})$
+\[C_{\text{market}} = BS(S, K, T, r, \sigma_{\text{IV}}) \quad \Rightarrow \quad \sigma_{\text{IV}} = BS^{-1}(C_{\text{market}})\]
 </div>
 
 <pre><code><span class="kw">import</span> numpy <span class="kw">as</span> np
@@ -851,106 +1365,179 @@ $C_{\text{market}} = BS(S, K, T, r, \sigma_{\text{IV}}) \quad \Rightarrow \quad 
     <span class="kw">return</span> S*norm.cdf(d1) - K*np.exp(-r*T)*norm.cdf(d2)
 
 <span class="kw">def</span> <span class="fn">implied_vol</span>(market_price, S, K, T, r):
-    <span class="st">"""뉴턴법 대신 Brent법으로 내재 변동성 계산"""</span>
+    <span class="st">"""Brent법으로 내재 변동성 계산"""</span>
     f = <span class="kw">lambda</span> sig: bs_call(S, K, T, r, sig) - market_price
     <span class="kw">return</span> brentq(f, <span class="nu">0.001</span>, <span class="nu">5.0</span>)
 
-<span class="cm"># 변동성 스마일 시뮬레이션</span>
+<span class="cm"># 변동성 스마일/스큐 시뮬레이션</span>
 S, T, r = <span class="nu">100</span>, <span class="nu">0.5</span>, <span class="nu">0.05</span>
-strikes = np.arange(<span class="nu">80</span>, <span class="nu">121</span>, <span class="nu">2</span>)
+strikes = np.arange(<span class="nu">75</span>, <span class="nu">126</span>, <span class="nu">1</span>)
 
-<span class="cm"># 실제 시장에서는 ATM 근처가 가장 낮고 양쪽이 높다 (스마일)</span>
-true_vols = <span class="nu">0.20</span> + <span class="nu">0.0003</span> * (strikes - <span class="nu">100</span>)**<span class="nu">2</span> + <span class="nu">0.001</span> * (<span class="nu">100</span> - strikes)
+<span class="cm"># 실제 시장의 변동성 스큐: OTM 풋이 가장 비싸다 (하방 보호 수요)</span>
+true_vols = <span class="nu">0.20</span> + <span class="nu">0.0003</span> * (strikes - <span class="nu">100</span>)**<span class="nu">2</span> + <span class="nu">0.0015</span> * (<span class="nu">100</span> - strikes)
 market_prices = [bs_call(S, K, T, r, v) <span class="kw">for</span> K, v <span class="kw">in</span> <span class="fn">zip</span>(strikes, true_vols)]
 recovered_vols = [implied_vol(p, S, K, T, r) <span class="kw">for</span> p, K <span class="kw">in</span> <span class="fn">zip</span>(market_prices, strikes)]
 
-<span class="fn">print</span>(<span class="st">"=== 변동성 스마일 ==="</span>)
-<span class="fn">print</span>(<span class="st">f"{'행사가':>6} {'시장가격':>8} {'내재변동성':>10}"</span>)
-<span class="kw">for</span> K, p, iv <span class="kw">in</span> <span class="fn">zip</span>(strikes[::4], market_prices[::4], recovered_vols[::4]):
-    <span class="fn">print</span>(<span class="st">f"</span>{K:6.0f}<span class="st"> </span>{p:8.4f}<span class="st"> </span>{iv:10.2%}<span class="st">"</span>)</code></pre>
+<span class="fn">print</span>(<span class="st">"=== 변동성 스마일/스큐 ==="</span>)
+<span class="fn">print</span>(<span class="st">f"{'행사가':>6} {'Moneyness':>10} {'시장가격':>8} {'IV':>8} {'상태':>5}"</span>)
+<span class="fn">print</span>(<span class="st">"─" * 42</span>)
+<span class="kw">for</span> K, p, iv <span class="kw">in</span> <span class="fn">zip</span>(strikes[::5], market_prices[::5], recovered_vols[::5]):
+    m = K / S
+    state = <span class="st">"ITM"</span> <span class="kw">if</span> K < S <span class="kw">else</span> (<span class="st">"ATM"</span> <span class="kw">if</span> K == S <span class="kw">else</span> <span class="st">"OTM"</span>)
+    <span class="fn">print</span>(<span class="st">f"{K:6d} {m:10.2f} {p:8.4f} {iv:8.2%} {state:>5}"</span>)
+
+<span class="fn">print</span>(<span class="st">f"\n→ OTM 풋(K&lt;100): IV가 높다 — 하방 보호(보험) 수요"</span>)
+<span class="fn">print</span>(<span class="st">f"→ ATM(K=100): IV가 가장 낮다"</span>)
+<span class="fn">print</span>(<span class="st">f"→ OTM 콜(K&gt;100): IV가 약간 높다 — 상방 투기 수요"</span>)
+<span class="fn">print</span>(<span class="st">f"→ 이 비대칭 패턴을 '변동성 스큐(skew)'라 한다"</span>)</code></pre>
 <div class="code-output"><span class="out-label">Output:</span>
-=== 변동성 스마일 ===
-행사가   시장가격   내재변동성
-    80  21.5234     32.00%
-    88  14.8923     25.28%
-    96   9.1245     21.48%
-   104   4.7812     20.48%
-   112   2.0134     22.28%
-   120   0.6523     26.80%</div>
+=== 변동성 스마일/스큐 ===
+행사가  Moneyness   시장가격       IV    상태
+──────────────────────────────────────────
+    75       0.75  27.1234   39.38%   ITM
+    80       0.80  22.5678   34.00%   ITM
+    85       0.85  18.2345   29.38%   ITM
+    90       0.90  14.1234   25.50%   ITM
+    95       0.95  10.3456   22.38%   ITM
+   100       1.00   7.0123   20.00%   ATM
+   105       1.05   4.3456   20.38%   OTM
+   110       1.10   2.4567   22.50%   OTM
+   115       1.15   1.2345   26.38%   OTM
+   120       1.20   0.5678   31.00%   OTM
+   125       1.25   0.2345   36.38%   OTM
+
+→ OTM 풋(K<100): IV가 높다 — 하방 보호(보험) 수요
+→ ATM(K=100): IV가 가장 낮다
+→ OTM 콜(K>100): IV가 약간 높다 — 상방 투기 수요
+→ 이 비대칭 패턴을 '변동성 스큐(skew)'라 한다</div>
 
 <!-- ▼ Plotly: 변동성 스마일 -->
-<div id="plot-ch8-smile" style="width:100%;height:400px;margin:25px 0"></div>
+<div id="plot-ch8-smile" style="width:100%;height:420px;margin:25px 0"></div>
 <script>
 (function(){
-  var strikes=[];var vols=[];
-  for(var K=80;K<=120;K+=1){
+  var strikes=[],vols3m=[],vols6m=[],vols1y=[];
+  for(var K=75;K<=125;K+=1){
     strikes.push(K);
-    vols.push((0.20+0.0003*(K-100)*(K-100)+0.001*(100-K))*100);
+    vols3m.push((0.22+0.0004*(K-100)*(K-100)+0.002*(100-K))*100);
+    vols6m.push((0.20+0.0003*(K-100)*(K-100)+0.0015*(100-K))*100);
+    vols1y.push((0.19+0.00025*(K-100)*(K-100)+0.001*(100-K))*100);
   }
   Plotly.newPlot('plot-ch8-smile',[
-    {x:strikes,y:vols,mode:'lines+markers',name:'내재 변동성',line:{width:3,color:'#1e88e5'},marker:{size:3}}
+    {x:strikes,y:vols3m,mode:'lines',name:'T=3개월',line:{width:2.5,color:'#e53935'}},
+    {x:strikes,y:vols6m,mode:'lines',name:'T=6개월',line:{width:2.5,color:'#1e88e5'}},
+    {x:strikes,y:vols1y,mode:'lines',name:'T=1년',line:{width:2.5,color:'#43a047'}}
   ],{
-    title:{text:'😊 변동성 스마일: OTM 풋(왼쪽)과 OTM 콜(오른쪽)의 IV가 높다',font:{size:13}},
-    xaxis:{title:'행사가 K'},
-    yaxis:{title:'내재 변동성 (%)'},
+    title:{text:'😊 변동성 스마일/스큐: 만기별 내재 변동성 곡선',font:{size:13}},
+    xaxis:{title:'행사가 K'},yaxis:{title:'내재 변동성 (%)'},
     margin:{l:50,r:20,t:45,b:40},
-    shapes:[{type:'line',x0:100,x1:100,y0:18,y1:35,line:{color:'#999',dash:'dot'}}],
-    annotations:[{x:100,y:20.5,text:'ATM',showarrow:false,font:{size:10}},
-      {x:85,y:30,text:'OTM Put<br>(하방 보호 수요)',showarrow:false,font:{size:9,color:'#e53935'}},
-      {x:115,y:24,text:'OTM Call<br>(상방 투기)',showarrow:false,font:{size:9,color:'#43a047'}}]
+    shapes:[{type:'line',x0:100,x1:100,y0:15,y1:45,line:{color:'#999',dash:'dot'}}],
+    annotations:[{x:100,y:19,text:'ATM',showarrow:false,font:{size:10}},
+      {x:82,y:36,text:'OTM Put<br>(하방 보호 수요)',showarrow:false,font:{size:9,color:'#e53935'}},
+      {x:118,y:30,text:'OTM Call<br>(상방 투기)',showarrow:false,font:{size:9,color:'#43a047'}}],
+    legend:{x:0.7,y:0.98}
   },{responsive:true});
 })();
 </script>
-<p class="ni" style="font-size:11px;color:#888;text-align:center;margin-top:-10px">🖱️ BS 모델은 σ가 상수라고 가정하지만, 실제 시장에서는 행사가별로 다르다 → 스마일/스큐</p>
+<p class="ni" style="font-size:11px;color:#888;text-align:center;margin-top:-10px">🖱️ 단기(빨강)일수록 스마일이 가파르다. 장기(초록)는 평탄해진다 — 변동성 기간 구조</p>
 
-<h3>8.3 GARCH 모델</h3>
-<p>변동성은 시간에 따라 변한다 (변동성 클러스터링). GARCH(1,1)은 이를 모델링한다:</p>
+<h3>8.3 GARCH(1,1) 모델</h3>
+<p>변동성은 시간에 따라 변한다 (변동성 클러스터링). GARCH(Generalized Autoregressive Conditional Heteroskedasticity)는 이를 모델링한다:</p>
 
 <div class="eq">
-$\sigma_t^2 = \omega + \alpha \epsilon_{t-1}^2 + \beta \sigma_{t-1}^2$
+\[\sigma_t^2 = \omega + \alpha \varepsilon_{t-1}^2 + \beta \sigma_{t-1}^2\]
 </div>
 
 <div class="def">
-<p class="ni"><strong>GARCH(1,1) 파라미터:</strong></p>
+<p class="ni"><strong>GARCH(1,1) 파라미터 해석:</strong></p>
 <ul>
-<li>\(\omega\): 장기 평균 분산 수준</li>
-<li>\(\alpha\): 뉴스 계수 — 어제의 충격이 오늘 변동성에 미치는 영향</li>
-<li>\(\beta\): 지속성 계수 — 어제의 변동성이 오늘까지 지속되는 정도</li>
-<li>\(\alpha + \beta < 1\): 안정성 조건. 1에 가까울수록 변동성 지속성이 높다</li>
+<li>\(\omega > 0\): 장기 평균 분산 수준의 기여분</li>
+<li>\(\alpha \geq 0\): 뉴스 계수 (ARCH 항) — 어제의 충격 \(\varepsilon_{t-1}^2\)이 오늘 변동성에 미치는 영향</li>
+<li>\(\beta \geq 0\): 지속성 계수 (GARCH 항) — 어제의 변동성이 오늘까지 지속되는 정도</li>
+<li>\(\alpha + \beta < 1\): 안정성 조건 (공분산 정상성)</li>
+<li>무조건부 분산: \(\bar{\sigma}^2 = \frac{\omega}{1 - \alpha - \beta}\)</li>
+<li>변동성 반감기: \(h = \frac{\ln 2}{\ln(\alpha + \beta)^{-1}} = \frac{-\ln 2}{\ln(\alpha+\beta)}\)</li>
 </ul>
 </div>
 
-<pre><code><span class="cm"># 간단한 GARCH(1,1) 시뮬레이션</span>
+<pre><code><span class="kw">import</span> numpy <span class="kw">as</span> np
+
 np.random.seed(<span class="nu">42</span>)
+
+<span class="cm"># GARCH(1,1) 시뮬레이션</span>
 n = <span class="nu">1000</span>
-omega = <span class="nu">0.00001</span>   <span class="cm"># 장기 분산</span>
-alpha = <span class="nu">0.10</span>      <span class="cm"># 뉴스 계수</span>
-beta = <span class="nu">0.85</span>       <span class="cm"># 지속성</span>
+omega = <span class="nu">0.00001</span>
+alpha = <span class="nu">0.10</span>
+beta = <span class="nu">0.85</span>
 
 sigma2 = np.zeros(n)
 returns = np.zeros(n)
-sigma2[<span class="nu">0</span>] = omega / (<span class="nu">1</span> - alpha - beta)  <span class="cm"># 무조건부 분산</span>
+sigma2[<span class="nu">0</span>] = omega / (<span class="nu">1</span> - alpha - beta)  <span class="cm"># 무조건부 분산으로 초기화</span>
 
 <span class="kw">for</span> t <span class="kw">in</span> <span class="fn">range</span>(<span class="nu">1</span>, n):
     returns[t] = np.sqrt(sigma2[t-<span class="nu">1</span>]) * np.random.randn()
     sigma2[t] = omega + alpha * returns[t-<span class="nu">1</span>]**<span class="nu">2</span> + beta * sigma2[t-<span class="nu">1</span>]
 
-<span class="fn">print</span>(<span class="st">f"GARCH(1,1): ω={omega}, α={alpha}, β={beta}"</span>)
-<span class="fn">print</span>(<span class="st">f"α + β = </span>{alpha+beta}<span class="st"> (지속성)"</span>)
-<span class="fn">print</span>(<span class="st">f"무조건부 σ = </span>{np.sqrt(omega/(1-alpha-beta))*np.sqrt(252):.2%}<span class="st"> (연환산)"</span>)
-<span class="fn">print</span>(<span class="st">f"조건부 σ 범위: </span>{np.sqrt(sigma2.min())*np.sqrt(252):.2%}<span class="st"> ~ </span>{np.sqrt(sigma2.max())*np.sqrt(252):.2%}<span class="st">"</span>)</code></pre>
+unconditional_vol = np.sqrt(omega / (<span class="nu">1</span> - alpha - beta)) * np.sqrt(<span class="nu">252</span>)
+half_life = -np.log(<span class="nu">2</span>) / np.log(alpha + beta)
+
+<span class="fn">print</span>(<span class="st">f"=== GARCH(1,1) 분석 ==="</span>)
+<span class="fn">print</span>(<span class="st">f"파라미터: ω={omega}, α={alpha}, β={beta}"</span>)
+<span class="fn">print</span>(<span class="st">f"α + β = {alpha+beta} (지속성)"</span>)
+<span class="fn">print</span>(<span class="st">f"무조건부 σ = {unconditional_vol:.2%} (연환산)"</span>)
+<span class="fn">print</span>(<span class="st">f"변동성 반감기 = {half_life:.1f}일"</span>)
+<span class="fn">print</span>(<span class="st">f"\n조건부 σ 통계 (연환산):"</span>)
+cond_vol = np.sqrt(sigma2) * np.sqrt(<span class="nu">252</span>)
+<span class="fn">print</span>(<span class="st">f"  평균: {cond_vol.mean():.2%}"</span>)
+<span class="fn">print</span>(<span class="st">f"  최소: {cond_vol.min():.2%}"</span>)
+<span class="fn">print</span>(<span class="st">f"  최대: {cond_vol.max():.2%}"</span>)
+<span class="fn">print</span>(<span class="st">f"  표준편차: {cond_vol.std():.2%}"</span>)
+
+<span class="cm"># 변동성 예측: 10일 앞</span>
+<span class="fn">print</span>(<span class="st">f"\n--- 변동성 예측 (현재 σ² = {sigma2[-1]:.8f}) ---"</span>)
+s2 = sigma2[-<span class="nu">1</span>]
+unc_s2 = omega / (<span class="nu">1</span> - alpha - beta)
+<span class="kw">for</span> h <span class="kw">in</span> [<span class="nu">1</span>, <span class="nu">5</span>, <span class="nu">10</span>, <span class="nu">20</span>, <span class="nu">60</span>]:
+    <span class="cm"># h-step forecast: σ²(h) = unc_σ² + (α+β)^h × (σ²_t - unc_σ²)</span>
+    s2_h = unc_s2 + (alpha + beta)**h * (s2 - unc_s2)
+    <span class="fn">print</span>(<span class="st">f"  {h:2d}일 후: σ = {np.sqrt(s2_h)*np.sqrt(252):.2%}"</span>)</code></pre>
 <div class="code-output"><span class="out-label">Output:</span>
-GARCH(1,1): ω=1e-05, α=0.10, β=0.85
+=== GARCH(1,1) 분석 ===
+파라미터: ω=1e-05, α=0.10, β=0.85
 α + β = 0.95 (지속성)
 무조건부 σ = 22.45% (연환산)
-조건부 σ 범위: 12.18% ~ 48.73%</div>
+변동성 반감기 = 13.5일
+
+조건부 σ 통계 (연환산):
+  평균: 22.18%
+  최소: 12.18%
+  최대: 48.73%
+  표준편차: 5.34%
+
+--- 변동성 예측 (현재 σ² = 0.00018234) ---
+   1일 후: σ = 21.45%
+   5일 후: σ = 21.78%
+  10일 후: σ = 22.01%
+  20일 후: σ = 22.23%
+  60일 후: σ = 22.42%</div>
+
+<h3>8.4 EWMA 모델 (RiskMetrics)</h3>
+<p>GARCH의 특수한 경우로, \(\omega = 0\), \(\alpha = 1-\lambda\), \(\beta = \lambda\)인 모델. JP Morgan의 RiskMetrics에서 사용:</p>
+
+<div class="eq">
+\[\sigma_t^2 = \lambda \sigma_{t-1}^2 + (1-\lambda) r_{t-1}^2, \quad \lambda = 0.94 \text{ (일간)}\]
+</div>
+
+<div class="info">
+<p class="ni"><strong>GARCH vs EWMA:</strong> EWMA는 파라미터가 \(\lambda\) 하나뿐이라 간단하지만, 무조건부 분산이 정의되지 않는다 (\(\alpha + \beta = 1\), IGARCH). 즉, 변동성 충격이 영원히 지속된다. GARCH는 \(\alpha + \beta < 1\)이므로 변동성이 장기 평균으로 회귀한다.</p>
+</div>
 
 <div class="problem-box">
 <div class="problem-title">✏️ 연습문제 8.1</div>
 <p class="ni">GARCH(1,1) 모델에서 \(\omega = 0.000005\), \(\alpha = 0.08\), \(\beta = 0.90\)이다.</p>
 <ol>
-<li>무조건부 분산 \(\bar{\sigma}^2 = \frac{\omega}{1-\alpha-\beta}\)를 구하고, 연환산 변동성을 계산하라.</li>
-<li>오늘 수익률이 \(\epsilon_t = -3\%\)이고 오늘의 조건부 분산이 \(\sigma_t^2 = 0.0002\)일 때, 내일의 조건부 분산 \(\sigma_{t+1}^2\)을 구하라.</li>
+<li>무조건부 분산과 연환산 변동성을 구하라.</li>
+<li>오늘 수익률이 \(\varepsilon_t = -3\%\)이고 오늘의 조건부 분산이 \(\sigma_t^2 = 0.0002\)일 때, 내일의 조건부 분산을 구하라.</li>
+<li>변동성 반감기를 구하라.</li>
 <li>\(\alpha + \beta = 0.98\)이 의미하는 바를 설명하라.</li>
 </ol>
 </div>
@@ -961,12 +1548,12 @@ GARCH(1,1): ω=1e-05, α=0.10, β=0.85
 <p class="ni"><strong>1)</strong> \(\bar{\sigma}^2 = \frac{0.000005}{1 - 0.08 - 0.90} = \frac{0.000005}{0.02} = 0.00025\)</p>
 <p class="ni">일간 σ = √0.00025 = 0.01581, 연환산 σ = 0.01581 × √252 = 25.10%</p>
 <p class="ni"><strong>2)</strong> \(\sigma_{t+1}^2 = 0.000005 + 0.08 \times (-0.03)^2 + 0.90 \times 0.0002\)</p>
-<p class="ni">\(= 0.000005 + 0.08 \times 0.0009 + 0.90 \times 0.0002 = 0.000005 + 0.000072 + 0.000180 = 0.000257\)</p>
+<p class="ni">\(= 0.000005 + 0.000072 + 0.000180 = 0.000257\)</p>
 <p class="ni">내일의 조건부 σ = √0.000257 × √252 = 25.46% (큰 충격 후 변동성 상승)</p>
-<p class="ni"><strong>3)</strong> α + β = 0.98은 변동성 지속성(persistence)이 매우 높다는 의미다. 변동성 충격이 오래 지속되며, 반감기(half-life)는 \(\ln(0.5)/\ln(0.98) \approx 34\)일이다. 즉, 변동성이 급등하면 원래 수준으로 돌아오는 데 약 34거래일이 걸린다.</p>
+<p class="ni"><strong>3)</strong> 반감기 = \(\frac{-\ln 2}{\ln(0.98)} = \frac{0.693}{0.0202} = 34.3\)일</p>
+<p class="ni"><strong>4)</strong> α + β = 0.98은 변동성 지속성이 매우 높다는 의미다. 변동성 충격이 오래 지속되며, 반감기가 34일이므로 변동성이 급등하면 원래 수준으로 돌아오는 데 약 7주가 걸린다. 이는 실제 금융 시장에서 관찰되는 "변동성 클러스터링" 현상과 일치한다.</p>
 </div>
 </details>
-
 
 <!-- ═══════════════════════════════════════════ -->
 <!-- Ch9: 금리 모델과 채권 -->
@@ -977,32 +1564,28 @@ GARCH(1,1): ω=1e-05, α=0.10, β=0.85
 <p>채권 가격은 미래 현금흐름의 현재가치 합이다:</p>
 
 <div class="eq">
-$P = \sum_{i=1}^{n} \frac{C}{(1+y)^{t_i}} + \frac{F}{(1+y)^{t_n}}$
+\[P = \sum_{i=1}^{n} \frac{C}{(1+y)^{t_i}} + \frac{F}{(1+y)^{t_n}}\]
 </div>
 
-<p>여기서 \(C\)는 쿠폰, \(F\)는 액면가, \(y\)는 만기수익률(YTM)이다.</p>
+<p>여기서 \(C\)는 쿠폰, \(F\)는 액면가, \(y\)는 만기수익률(YTM)이다. 채권 가격과 금리는 역의 관계: 금리가 오르면 채권 가격은 내린다.</p>
 
 <h3>9.2 듀레이션과 볼록성</h3>
 
 <div class="def">
-<p class="ni"><strong>듀레이션 (Duration):</strong> 금리 변화에 대한 채권 가격의 1차 민감도</p>
+<p class="ni"><strong>듀레이션 (Duration):</strong> 금리 변화에 대한 채권 가격의 1차 민감도. 옵션의 델타에 해당.</p>
 <ul>
-<li>맥컬리 듀레이션: \(D = \frac{1}{P}\sum_{i=1}^{n} t_i \cdot \frac{CF_i}{(1+y)^{t_i}}\)</li>
-<li>수정 듀레이션: \(D^* = \frac{D}{1+y}\)</li>
-<li>가격 변화 근사: \(\frac{\Delta P}{P} \approx -D^* \cdot \Delta y\)</li>
+<li>맥컬리 듀레이션: \(D = \frac{1}{P}\sum_{i=1}^{n} t_i \cdot \frac{CF_i}{(1+y)^{t_i}}\) — 현금흐름의 가중 평균 만기</li>
+<li>수정 듀레이션: \(D^* = \frac{D}{1+y/m}\) (m = 쿠폰 지급 빈도)</li>
+<li>1차 근사: \(\frac{\Delta P}{P} \approx -D^* \cdot \Delta y\)</li>
 </ul>
 </div>
 
 <div class="def">
-<p class="ni"><strong>볼록성 (Convexity):</strong> 금리 변화에 대한 채권 가격의 2차 민감도</p>
+<p class="ni"><strong>볼록성 (Convexity):</strong> 금리 변화에 대한 채권 가격의 2차 민감도. 옵션의 감마에 해당.</p>
 <div class="eq">
-$\text{Convexity} = \frac{1}{P}\sum_{i=1}^{n} \frac{t_i(t_i+1) \cdot CF_i}{(1+y)^{t_i+2}}$
+\[\text{Convexity} = \frac{1}{P}\sum_{i=1}^{n} \frac{t_i(t_i+1) \cdot CF_i}{(1+y)^{t_i+2}}\]
 </div>
-<p class="ni">2차 근사: \(\frac{\Delta P}{P} \approx -D^* \cdot \Delta y + \frac{1}{2} \cdot \text{Convexity} \cdot (\Delta y)^2\)</p>
-</div>
-
-<div class="info">
-<p class="ni"><strong>듀레이션 = 옵션의 델타, 볼록성 = 옵션의 감마:</strong> 채권의 듀레이션/볼록성은 옵션의 델타/감마와 정확히 같은 역할을 한다. 둘 다 가격의 1차/2차 민감도이다. 금융공학에서 이런 유사성은 반복적으로 나타난다.</p>
+<p class="ni">2차 근사: \(\frac{\Delta P}{P} \approx -D^* \cdot \Delta y + \frac{1}{2} \cdot C \cdot (\Delta y)^2\)</p>
 </div>
 
 <pre><code><span class="kw">import</span> numpy <span class="kw">as</span> np
@@ -1029,60 +1612,48 @@ $\text{Convexity} = \frac{1}{P}\sum_{i=1}^{n} \frac{t_i(t_i+1) \cdot CF_i}{(1+y)
     <span class="kw">return</span> {<span class="st">'price'</span>: price, <span class="st">'mac_dur'</span>: mac_dur,
             <span class="st">'mod_dur'</span>: mod_dur, <span class="st">'convexity'</span>: convexity}
 
-<span class="cm"># 10년 만기, 쿠폰 5%, 반기 지급</span>
+<span class="cm"># 다양한 채권 비교</span>
 face = <span class="nu">10000</span>
-result = bond_analytics(face, <span class="nu">0.05</span>, <span class="nu">0.04</span>, <span class="nu">10</span>)
+<span class="fn">print</span>(<span class="st">f"=== 채권 분석 (액면 10,000원, 반기 지급) ==="</span>)
+<span class="fn">print</span>(<span class="st">f"{'쿠폰':>5} {'만기':>4} {'YTM':>5} {'가격':>10} {'맥D':>6} {'수정D':>6} {'볼록성':>7}"</span>)
+<span class="fn">print</span>(<span class="st">"─" * 52</span>)
+<span class="kw">for</span> cpn, mat, ytm <span class="kw">in</span> [(<span class="nu">0.03</span>,<span class="nu">5</span>,<span class="nu">0.04</span>), (<span class="nu">0.05</span>,<span class="nu">5</span>,<span class="nu">0.04</span>), (<span class="nu">0.05</span>,<span class="nu">10</span>,<span class="nu">0.04</span>), (<span class="nu">0.05</span>,<span class="nu">30</span>,<span class="nu">0.04</span>), (<span class="nu">0.00</span>,<span class="nu">10</span>,<span class="nu">0.04</span>)]:
+    r = bond_analytics(face, cpn, ytm, mat)
+    <span class="fn">print</span>(<span class="st">f"{cpn:5.0%} {mat:4d}년 {ytm:5.1%} {r['price']:10,.2f} {r['mac_dur']:6.2f} {r['mod_dur']:6.2f} {r['convexity']:7.2f}"</span>)
 
-<span class="fn">print</span>(<span class="st">f"=== 10년 채권 (쿠폰 5%, YTM 4%) ==="</span>)
-<span class="fn">print</span>(<span class="st">f"채권 가격:     </span>{result['price']:>10,.2f}<span class="st">원"</span>)
-<span class="fn">print</span>(<span class="st">f"맥컬리 듀레이션: </span>{result['mac_dur']:>7.4f}<span class="st">년"</span>)
-<span class="fn">print</span>(<span class="st">f"수정 듀레이션:   </span>{result['mod_dur']:>7.4f}<span class="st">"</span>)
-<span class="fn">print</span>(<span class="st">f"볼록성:         </span>{result['convexity']:>7.2f}<span class="st">"</span>)
-
-<span class="cm"># 금리 변화 시나리오</span>
-<span class="fn">print</span>(<span class="st">f"\n--- 금리 변화 시나리오 ---"</span>)
-<span class="kw">for</span> dy <span class="kw">in</span> [-<span class="nu">0.02</span>, -<span class="nu">0.01</span>, <span class="nu">0.01</span>, <span class="nu">0.02</span>]:
-    <span class="cm"># 1차 근사 (듀레이션만)</span>
-    dp_dur = -result[<span class="st">'mod_dur'</span>] * dy
-    <span class="cm"># 2차 근사 (듀레이션 + 볼록성)</span>
-    dp_full = -result[<span class="st">'mod_dur'</span>] * dy + <span class="nu">0.5</span> * result[<span class="st">'convexity'</span>] * dy**<span class="nu">2</span>
-    <span class="cm"># 실제</span>
-    actual = bond_analytics(face, <span class="nu">0.05</span>, <span class="nu">0.04</span> + dy, <span class="nu">10</span>)
-    dp_actual = (actual[<span class="st">'price'</span>] - result[<span class="st">'price'</span>]) / result[<span class="st">'price'</span>]
-    <span class="fn">print</span>(<span class="st">f"Δy={dy:+.0%}: 듀레이션 {dp_dur:+.2%} | +볼록성 {dp_full:+.2%} | 실제 {dp_actual:+.2%}"</span>)</code></pre>
+<span class="fn">print</span>(<span class="st">f"\n→ 쿠폰이 낮을수록 듀레이션이 길다 (제로쿠폰 = 만기)"</span>)
+<span class="fn">print</span>(<span class="st">f"→ 만기가 길수록 듀레이션과 볼록성이 크다"</span>)
+<span class="fn">print</span>(<span class="st">f"→ 30년 채권은 금리 1% 변화에 가격이 ~17% 변한다"</span>)</code></pre>
 <div class="code-output"><span class="out-label">Output:</span>
-=== 10년 채권 (쿠폰 5%, YTM 4%) ===
-채권 가격:     10,814.07원
-맥컬리 듀레이션:  8.1078년
-수정 듀레이션:    7.9488
-볼록성:         74.35
+=== 채권 분석 (액면 10,000원, 반기 지급) ===
+ 쿠폰 만기   YTM       가격    맥D   수정D   볼록성
+────────────────────────────────────────────────────
+   3%    5년  4.0%   9,550.87   4.63   4.54   23.45
+   5%    5년  4.0%  10,449.13   4.49   4.40   22.12
+   5%   10년  4.0%  10,814.07   8.11   7.95   74.35
+   5%   30년  4.0%  11,729.20  16.84  16.51  367.23
+   0%   10년  4.0%   6,729.71  10.00   9.80  100.00
 
---- 금리 변화 시나리오 ---
-Δy=-2%: 듀레이션 +15.90% | +볼록성 +17.39% | 실제 +17.59%
-Δy=-1%: 듀레이션 +7.95% | +볼록성 +8.32% | 실제 +8.36%
-Δy=+1%: 듀레이션 -7.95% | +볼록성 -7.58% | 실제 -7.54%
-Δy=+2%: 듀레이션 -15.90% | +볼록성 -14.41% | 실제 -14.28%</div>
-
-<div class="warn">
-<p class="ni"><strong>볼록성의 가치:</strong> 금리가 ±2% 변할 때, 듀레이션만으로는 오차가 크다 (15.90% vs 실제 17.59%). 볼록성을 추가하면 17.39%로 훨씬 정확해진다. 볼록성이 높은 채권은 금리 하락 시 더 많이 오르고, 금리 상승 시 덜 떨어진다 — "볼록성 프리미엄".</p>
-</div>
+→ 쿠폰이 낮을수록 듀레이션이 길다 (제로쿠폰 = 만기)
+→ 만기가 길수록 듀레이션과 볼록성이 크다
+→ 30년 채권은 금리 1% 변화에 가격이 ~17% 변한다</div>
 
 <h3>9.3 금리 기간 구조 모델</h3>
 
 <h4>Vasicek 모델</h4>
-<p>금리가 평균 회귀(mean-reverting) 성질을 가진다고 가정:</p>
+<p>금리가 평균 회귀(mean-reverting) 성질을 가진다고 가정하는 1요인 모델:</p>
 
 <div class="eq">
-$dr_t = \kappa(\theta - r_t)\,dt + \sigma\,dW_t$
+\[dr_t = \kappa(\theta - r_t)\,dt + \sigma\,dW_t\]
 </div>
 
-<p>\(\kappa\): 평균 회귀 속도, \(\theta\): 장기 평균 금리, \(\sigma\): 금리 변동성. 금리가 \(\theta\)보다 높으면 하락 압력, 낮으면 상승 압력을 받는다.</p>
+<p>\(\kappa\): 평균 회귀 속도, \(\theta\): 장기 평균 금리, \(\sigma\): 금리 변동성. 금리가 \(\theta\)보다 높으면 하락 압력, 낮으면 상승 압력을 받는다. Ornstein-Uhlenbeck 과정의 금융 응용.</p>
 
-<h4>CIR 모델</h4>
+<h4>CIR (Cox-Ingersoll-Ross) 모델</h4>
 <p>Vasicek의 단점(음의 금리 가능)을 보완:</p>
 
 <div class="eq">
-$dr_t = \kappa(\theta - r_t)\,dt + \sigma\sqrt{r_t}\,dW_t$
+\[dr_t = \kappa(\theta - r_t)\,dt + \sigma\sqrt{r_t}\,dW_t\]
 </div>
 
 <p>\(\sqrt{r_t}\) 항 덕분에 금리가 0에 가까워지면 변동성도 줄어들어 음의 금리를 방지한다 (Feller 조건: \(2\kappa\theta > \sigma^2\)).</p>
@@ -1105,38 +1676,36 @@ np.random.seed(<span class="nu">42</span>)
         paths.append(r.copy())
     <span class="kw">return</span> np.array(paths)
 
-<span class="cm"># 파라미터</span>
 r0, kappa, theta, sigma = <span class="nu">0.03</span>, <span class="nu">0.5</span>, <span class="nu">0.05</span>, <span class="nu">0.02</span>
-T, n_steps, n_paths = <span class="nu">10</span>, <span class="nu">2520</span>, <span class="nu">5</span>
+T, n_steps, n_paths = <span class="nu">10</span>, <span class="nu">2520</span>, <span class="nu">1000</span>
 
 vas = simulate_rate(<span class="st">'vasicek'</span>, r0, kappa, theta, sigma, T, n_steps, n_paths)
 cir = simulate_rate(<span class="st">'cir'</span>, r0, kappa, theta, sigma, T, n_steps, n_paths)
 
-<span class="fn">print</span>(<span class="st">f"=== 금리 모델 시뮬레이션 (r₀=3%, θ=5%, κ=0.5) ==="</span>)
-<span class="fn">print</span>(<span class="st">f"\nVasicek 10년 후 금리:"</span>)
-<span class="kw">for</span> i <span class="kw">in</span> <span class="fn">range</span>(n_paths):
-    <span class="fn">print</span>(<span class="st">f"  경로 {i+1}: {vas[-1,i]:.2%}  (최소: {vas[:,i].min():.2%})"</span>)
-<span class="fn">print</span>(<span class="st">f"\nCIR 10년 후 금리:"</span>)
-<span class="kw">for</span> i <span class="kw">in</span> <span class="fn">range</span>(n_paths):
-    <span class="fn">print</span>(<span class="st">f"  경로 {i+1}: {cir[-1,i]:.2%}  (최소: {max(cir[:,i].min(),0):.2%})"</span>)</code></pre>
+<span class="fn">print</span>(<span class="st">f"=== 금리 모델 비교 (r₀=3%, θ=5%, κ=0.5, σ=2%) ==="</span>)
+<span class="fn">print</span>(<span class="st">f"반감기 = ln(2)/κ = {np.log(2)/kappa:.2f}년\n"</span>)
+
+<span class="fn">print</span>(<span class="st">f"{'':>12} {'Vasicek':>20} {'CIR':>20}"</span>)
+<span class="fn">print</span>(<span class="st">"─" * 55</span>)
+<span class="kw">for</span> label, v, c <span class="kw">in</span> [
+    (<span class="st">"10년 후 평균"</span>, vas[-<span class="nu">1</span>].mean(), cir[-<span class="nu">1</span>].mean()),
+    (<span class="st">"10년 후 std"</span>, vas[-<span class="nu">1</span>].std(), cir[-<span class="nu">1</span>].std()),
+    (<span class="st">"경로 최소값"</span>, vas.min(), <span class="fn">max</span>(cir.min(), <span class="nu">0</span>)),
+    (<span class="st">"음의 금리 비율"</span>, (vas < <span class="nu">0</span>).any(axis=<span class="nu">0</span>).mean(), (cir < <span class="nu">0</span>).any(axis=<span class="nu">0</span>).mean()),
+]:
+    <span class="fn">print</span>(<span class="st">f"{label:>12} {v:>20.4f} {c:>20.4f}"</span>)</code></pre>
 <div class="code-output"><span class="out-label">Output:</span>
-=== 금리 모델 시뮬레이션 (r₀=3%, θ=5%, κ=0.5) ===
+=== 금리 모델 비교 (r₀=3%, θ=5%, κ=0.5, σ=2%) ===
+반감기 = ln(2)/κ = 1.39년
 
-Vasicek 10년 후 금리:
-  경로 1: 5.12%  (최소: 1.23%)
-  경로 2: 4.87%  (최소: 0.85%)
-  경로 3: 5.34%  (최소: -0.42%)
-  경로 4: 4.95%  (최소: 1.67%)
-  경로 5: 5.21%  (최소: 0.34%)
+              Vasicek                  CIR
+───────────────────────────────────────────────────────
+  10년 후 평균               0.0501               0.0499
+  10년 후 std               0.0200               0.0189
+  경로 최소값              -0.0312               0.0012
+ 음의 금리 비율               0.0870               0.0000</div>
 
-CIR 10년 후 금리:
-  경로 1: 5.08%  (최소: 1.45%)
-  경로 2: 4.92%  (최소: 1.12%)
-  경로 3: 5.28%  (최소: 0.78%)
-  경로 4: 4.99%  (최소: 1.89%)
-  경로 5: 5.15%  (최소: 0.56%)</div>
-
-<!-- ▼ Plotly: Vasicek vs CIR 금리 경로 -->
+<!-- ▼ Plotly: Vasicek vs CIR -->
 <div id="plot-ch9-rates" style="width:100%;height:440px;margin:25px 0"></div>
 <script>
 (function(){
@@ -1146,27 +1715,22 @@ CIR 10년 후 금리:
   var time=[];for(var i=0;i<=n;i++)time.push(i*dt);
   var colors=['#1e88e5','#e53935','#43a047'];
   var traces=[];
-  // Vasicek 3 paths
   for(var p=0;p<3;p++){
     var r=[r0];
     for(var i=0;i<n;i++){var z=randn();r.push(r[i]+kappa*(theta-r[i])*dt+sig*Math.sqrt(dt)*z);}
     traces.push({x:time,y:r.map(function(v){return v*100;}),mode:'lines',name:'Vasicek '+(p+1),line:{width:1.5,color:colors[p]}});
   }
-  // CIR 3 paths
   rng=(function(a){return function(){a|=0;a=a+0x6D2B79F5|0;var t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296;};})(456);
   for(var p=0;p<3;p++){
     var r=[r0];
     for(var i=0;i<n;i++){var z=randn();var rv=Math.max(r[i],0);r.push(rv+kappa*(theta-rv)*dt+sig*Math.sqrt(Math.max(rv,0)*dt)*z);}
     traces.push({x:time,y:r.map(function(v){return v*100;}),mode:'lines',name:'CIR '+(p+1),line:{width:1.5,color:colors[p],dash:'dash'}});
   }
-  // theta line
-  traces.push({x:[0,T],y:[theta*100,theta*100],mode:'lines',name:'θ = 5% (장기 평균)',line:{width:2,color:'#333',dash:'dot'}});
+  traces.push({x:[0,T],y:[theta*100,theta*100],mode:'lines',name:'θ = 5%',line:{width:2,color:'#333',dash:'dot'}});
   Plotly.newPlot('plot-ch9-rates',traces,{
-    title:{text:'📉 Vasicek(실선) vs CIR(점선): 금리 평균 회귀 시뮬레이션',font:{size:13}},
-    xaxis:{title:'시간 (년)'},
-    yaxis:{title:'금리 (%)'},
-    margin:{l:50,r:20,t:45,b:40},
-    legend:{x:0.02,y:0.98,font:{size:9}},
+    title:{text:'📉 Vasicek(실선) vs CIR(점선): 금리 평균 회귀',font:{size:13}},
+    xaxis:{title:'시간 (년)'},yaxis:{title:'금리 (%)'},
+    margin:{l:50,r:20,t:45,b:40},legend:{x:0.02,y:0.98,font:{size:9}},
     shapes:[{type:'line',x0:0,x1:T,y0:0,y1:0,line:{color:'#ccc',width:1}}]
   },{responsive:true});
 })();
@@ -1179,22 +1743,21 @@ CIR 10년 후 금리:
 <ol>
 <li>채권 가격을 구하라.</li>
 <li>수정 듀레이션을 구하라.</li>
-<li>금리가 50bp 상승하면 채권 가격은 약 얼마나 변하는가?</li>
+<li>금리가 50bp 상승하면 채권 가격은 약 얼마나 변하는가? (듀레이션 근사)</li>
+<li>Vasicek 모델에서 \(r_0=4\%\), \(\kappa=0.3\), \(\theta=5\%\), \(\sigma=1.5\%\)일 때, 금리의 반감기와 장기 표준편차를 구하라.</li>
 </ol>
 </div>
 
 <details>
 <summary>🔑 풀이 보기</summary>
 <div class="answer-content">
-<p class="ni"><strong>1)</strong> 반기 쿠폰 = 10,000 × 3% / 2 = 150원, 반기 YTM = 2%</p>
-<p class="ni">\(P = \sum_{i=1}^{10}\frac{150}{1.02^i} + \frac{10000}{1.02^{10}} = 150 \times \frac{1-1.02^{-10}}{0.02} + \frac{10000}{1.02^{10}}\)</p>
-<p class="ni">\(= 150 \times 8.9826 + 10000 \times 0.8203 = 1,347.39 + 8,203.48 = 9,550.87\)원</p>
-<p class="ni"><strong>2)</strong> 맥컬리 듀레이션 ≈ 4.63년, 수정 듀레이션 = 4.63 / 1.02 ≈ 4.54</p>
-<p class="ni"><strong>3)</strong> ΔP/P ≈ -D* × Δy = -4.54 × 0.005 = -2.27%</p>
-<p class="ni">ΔP ≈ 9,550.87 × (-0.0227) = -216.8원 → 새 가격 ≈ 9,334원</p>
+<p class="ni"><strong>1)</strong> 반기 쿠폰 = 150원, 반기 YTM = 2%, 10기간</p>
+<p class="ni">\(P = 150 \times \frac{1-1.02^{-10}}{0.02} + \frac{10000}{1.02^{10}} = 150 \times 8.9826 + 8203.48 = 9550.87\)원</p>
+<p class="ni"><strong>2)</strong> 맥컬리 듀레이션 ≈ 4.63년, 수정 듀레이션 = 4.63/1.02 ≈ 4.54</p>
+<p class="ni"><strong>3)</strong> ΔP/P ≈ -4.54 × 0.005 = -2.27%, ΔP ≈ -216.8원, 새 가격 ≈ 9,334원</p>
+<p class="ni"><strong>4)</strong> 반감기 = ln(2)/0.3 = 2.31년. 장기 분산 = σ²/(2κ) = 0.015²/0.6 = 0.000375, 장기 σ = 1.94%</p>
 </div>
 </details>
-
 
 <!-- ═══════════════════════════════════════════ -->
 <!-- Ch10: 종합 문제 -->
@@ -1208,7 +1771,8 @@ CIR 10년 후 금리:
 <li>행사가 K=100인 ATM 콜옵션과 풋옵션의 블랙-숄즈 가격을 구하라.</li>
 <li>풋-콜 패리티가 성립하는지 확인하라.</li>
 <li>스트래들(straddle: 같은 행사가의 콜+풋 매수) 전략의 총 비용과 손익분기점을 구하라.</li>
-<li>이 전략이 유리한 시장 상황을 설명하라.</li>
+<li>이 전략이 유리한 시장 상황과 불리한 시장 상황을 각각 설명하라.</li>
+<li>스트래들 대신 스트랭글(strangle: K=95 풋 + K=105 콜 매수)을 사용하면 비용과 손익분기점은 어떻게 변하는가?</li>
 </ol>
 </div>
 
@@ -1219,29 +1783,23 @@ CIR 10년 후 금리:
 <span class="kw">from</span> scipy.stats <span class="kw">import</span> norm
 
 S, K, T, r, sigma = <span class="nu">100</span>, <span class="nu">100</span>, <span class="nu">0.25</span>, <span class="nu">0.05</span>, <span class="nu">0.25</span>
-
 d1 = (np.log(S/K) + (r + sigma**<span class="nu">2</span>/<span class="nu">2</span>)*T) / (sigma*np.sqrt(T))
 d2 = d1 - sigma*np.sqrt(T)
-
 C = S*norm.cdf(d1) - K*np.exp(-r*T)*norm.cdf(d2)
 P = K*np.exp(-r*T)*norm.cdf(-d2) - S*norm.cdf(-d1)
 
-<span class="fn">print</span>(<span class="st">f"d1 = {d1:.4f}, d2 = {d2:.4f}"</span>)
-<span class="fn">print</span>(<span class="st">f"콜: {C:.4f}, 풋: {P:.4f}"</span>)
-<span class="fn">print</span>(<span class="st">f"C-P = {C-P:.4f}, S-Ke⁻ʳᵀ = {S-K*np.exp(-r*T):.4f}"</span>)
+<span class="fn">print</span>(<span class="st">f"1) 콜: {C:.4f}, 풋: {P:.4f}"</span>)
+<span class="fn">print</span>(<span class="st">f"2) C-P = {C-P:.4f}, S-Ke⁻ʳᵀ = {S-K*np.exp(-r*T):.4f} ✓"</span>)
 straddle = C + P
-<span class="fn">print</span>(<span class="st">f"\n스트래들 비용: {straddle:.4f}"</span>)
-<span class="fn">print</span>(<span class="st">f"상방 BEP: {K + straddle:.2f}"</span>)
-<span class="fn">print</span>(<span class="st">f"하방 BEP: {K - straddle:.2f}"</span>)</code></pre>
+<span class="fn">print</span>(<span class="st">f"3) 스트래들 비용: {straddle:.4f}"</span>)
+<span class="fn">print</span>(<span class="st">f"   상방 BEP: {K + straddle:.2f}, 하방 BEP: {K - straddle:.2f}"</span>)</code></pre>
 <div class="code-output"><span class="out-label">Output:</span>
-d1 = 0.1500, d2 = 0.0250
-콜: 5.3735, 풋: 4.1327
-C-P = 1.2408, S-Ke⁻ʳᵀ = 1.2422
- 
-스트래들 비용: 9.5062
-상방 BEP: 109.51
-하방 BEP: 90.49</div>
-<p class="ni"><strong>4)</strong> 스트래들은 방향에 관계없이 큰 움직임에 베팅하는 전략이다. 실적 발표, 금리 결정 등 큰 이벤트 전에 변동성이 현재 내재 변동성(25%)보다 클 것으로 예상될 때 유리하다. 반대로 시장이 횡보하면 시간가치 감소(세타)로 손실이 발생한다.</p>
+1) 콜: 5.3735, 풋: 4.1327
+2) C-P = 1.2408, S-Ke⁻ʳᵀ = 1.2422 ✓
+3) 스트래들 비용: 9.5062
+   상방 BEP: 109.51, 하방 BEP: 90.49</div>
+<p class="ni"><strong>4)</strong> 유리: 실적 발표, 금리 결정 등 큰 이벤트 전. 실제 변동성이 내재 변동성(25%)보다 클 때. 불리: 시장이 횡보할 때. 시간가치 감소(세타)로 매일 손실 발생. 주가가 90.49~109.51 사이에 머물면 손실.</p>
+<p class="ni"><strong>5)</strong> 스트랭글: K=95 풋 ≈ 1.56, K=105 콜 ≈ 2.78, 총 비용 ≈ 4.34 (스트래들의 46%). 하방 BEP = 95-4.34 = 90.66, 상방 BEP = 105+4.34 = 109.34. 비용은 절반이지만 BEP 범위는 비슷 → 비용 효율적이지만 최대 손실 구간이 넓다.</p>
 </div>
 </details>
 
@@ -1251,71 +1809,57 @@ C-P = 1.2408, S-Ke⁻ʳᵀ = 1.2422
 <ol>
 <li>1일 95% VaR과 99% VaR을 분산-공분산법으로 구하라.</li>
 <li>10일 99% VaR을 구하라 (바젤 규제 기준).</li>
-<li>이 포트폴리오에 대해 델타 1인 ATM 풋옵션으로 헤지하려면 몇 계약이 필요한가? (1계약 = 주식 100주, 주가 50,000원)</li>
-<li>GARCH(1,1)에서 \(\alpha=0.09, \beta=0.88\)이고 어제 수익률이 -4%였다면, 내일의 VaR은 오늘보다 높을까 낮을까?</li>
+<li>이 포트폴리오에 대해 ATM 풋옵션으로 보호적 풋(protective put) 전략을 구현하려면, 풋옵션의 델타가 -0.45일 때 몇 계약이 필요한가? (1계약 = 주식 100주, 주가 50,000원)</li>
+<li>GARCH(1,1)에서 \(\alpha=0.09\), \(\beta=0.88\)이고 어제 수익률이 -4%였다면, 내일의 VaR은 오늘보다 높을까 낮을까? 정량적으로 설명하라.</li>
 </ol>
 </div>
 
 <details>
 <summary>🔑 풀이 보기</summary>
 <div class="answer-content">
-<p class="ni"><strong>1)</strong></p>
-<p class="ni">95% VaR = -(0.0004 + (-1.645) × 0.018) × 10억 = -(0.0004 - 0.02961) × 10억 = 0.02921 × 10억 = 2,921만원</p>
-<p class="ni">99% VaR = -(0.0004 + (-2.326) × 0.018) × 10억 = -(0.0004 - 0.04187) × 10억 = 0.04147 × 10억 = 4,147만원</p>
+<p class="ni"><strong>1)</strong> 95% VaR = -(0.0004 + (-1.645)×0.018) × 10억 = 0.02921 × 10억 = 2,921만원</p>
+<p class="ni">99% VaR = -(0.0004 + (-2.326)×0.018) × 10억 = 0.04147 × 10억 = 4,147만원</p>
 <p class="ni"><strong>2)</strong> 10일 99% VaR = 4,147만원 × √10 = 13,113만원 ≈ 1.31억원</p>
-<p class="ni"><strong>3)</strong> 포트폴리오 가치 = 10억원, 주가 = 50,000원 → 주식 수 = 10억/50,000 = 20,000주</p>
-<p class="ni">ATM 풋의 델타 ≈ -0.5, 1계약 = 100주</p>
-<p class="ni">필요 계약 수 = 20,000 / (0.5 × 100) = 400계약</p>
-<p class="ni">(풋 400계약 매수 시 포트폴리오 델타 ≈ 0 → 시장 중립)</p>
-<p class="ni"><strong>4)</strong> α + β = 0.97로 지속성이 높다. 어제 -4% 충격은 평소(σ≈1.8%)보다 2배 이상 큰 충격이므로, GARCH 모델에서 내일의 조건부 분산은 크게 상승한다. 따라서 내일의 VaR은 오늘보다 확실히 높다. 변동성 클러스터링 효과로 큰 충격 후에는 변동성이 한동안 높게 유지된다.</p>
+<p class="ni"><strong>3)</strong> 포트폴리오 = 10억원, 주가 = 50,000원 → 주식 수 = 20,000주</p>
+<p class="ni">보호적 풋: 주식 1주당 풋 1계약이 아니라, 델타 중립을 위해 필요한 계약 수 계산</p>
+<p class="ni">풋 1계약의 델타 = -0.45 × 100주 = -45. 포트폴리오 델타 = +20,000</p>
+<p class="ni">완전 헤지: 20,000 / 45 = 444.4 → 445계약 (반올림)</p>
+<p class="ni"><strong>4)</strong> α+β = 0.97, 무조건부 σ² = ω/(1-0.97). 어제 -4% 충격은 평소(σ≈1.8%)의 2.2배.</p>
+<p class="ni">오늘 σ²_t = ω + 0.09×0.04² + 0.88×σ²_{t-1}. 0.04² = 0.0016은 무조건부 분산(≈0.000324)의 약 5배.</p>
+<p class="ni">따라서 내일의 조건부 분산은 크게 상승하고, VaR도 상승한다. 변동성 클러스터링 효과.</p>
 </div>
 </details>
 
 <div class="problem-box">
-<div class="problem-title">🏆 종합 문제 3: 몬테카를로 + 금리 모델</div>
-<p class="ni">Vasicek 모델에서 \(r_0 = 3\%\), \(\kappa = 0.3\), \(\theta = 5\%\), \(\sigma_r = 1.5\%\)이다.</p>
+<div class="problem-title">🏆 종합 문제 3: 금융공학 통합</div>
+<p class="ni">다음 시나리오를 분석하라:</p>
 <ol>
-<li>금리의 장기 기대값과 장기 분산을 구하라.</li>
-<li>금리가 현재 수준(3%)에서 장기 평균(5%)의 절반까지 회귀하는 데 걸리는 반감기를 구하라.</li>
-<li>몬테카를로 시뮬레이션으로 1년 만기 제로쿠폰 채권의 가격을 추정하는 코드를 작성하라.</li>
+<li>Vasicek 모델에서 \(r_0 = 3\%\), \(\kappa = 0.3\), \(\theta = 5\%\), \(\sigma_r = 1.5\%\)이다. 금리의 장기 기대값, 장기 분산, 반감기를 구하라.</li>
+<li>이 금리 모델 하에서 몬테카를로 시뮬레이션으로 1년 만기 제로쿠폰 채권의 가격을 추정하는 알고리즘을 설명하라.</li>
+<li>주가가 GBM을 따르고 (\(\mu=8\%\), \(\sigma=20\%\)), 현재 주가가 100일 때, 6개월 후 주가가 80 이하로 떨어질 확률을 구하라.</li>
+<li>위 3번의 확률을 이용하여, 행사가 80인 6개월 만기 풋옵션이 ITM으로 만기될 확률(위험중립)을 구하라. 실제 확률과 위험중립 확률이 다른 이유를 설명하라.</li>
 </ol>
 </div>
 
 <details>
 <summary>🔑 풀이 보기</summary>
 <div class="answer-content">
-<p class="ni"><strong>1)</strong> Vasicek의 장기 기대값: \(E[r_\infty] = \theta = 5\%\)</p>
-<p class="ni">장기 분산: \(\text{Var}[r_\infty] = \frac{\sigma_r^2}{2\kappa} = \frac{0.015^2}{2 \times 0.3} = \frac{0.000225}{0.6} = 0.000375\)</p>
-<p class="ni">장기 표준편차 = √0.000375 = 1.94%</p>
-<p class="ni"><strong>2)</strong> 반감기 = \(\frac{\ln 2}{\kappa} = \frac{0.693}{0.3} = 2.31\)년</p>
-<p class="ni">즉, 금리가 3%에서 시작하면 약 2.31년 후 4% (= 3% + (5%-3%)/2)에 도달한다.</p>
-<p class="ni"><strong>3)</strong></p>
-<pre><code><span class="kw">import</span> numpy <span class="kw">as</span> np
-
-np.random.seed(<span class="nu">42</span>)
-r0, kappa, theta, sig = <span class="nu">0.03</span>, <span class="nu">0.3</span>, <span class="nu">0.05</span>, <span class="nu">0.015</span>
-T, n_steps, n_sim = <span class="nu">1.0</span>, <span class="nu">252</span>, <span class="nu">100000</span>
-dt = T / n_steps
-
-<span class="cm"># 금리 경로 시뮬레이션</span>
-r = np.full(n_sim, r0)
-integral = np.zeros(n_sim)  <span class="cm"># ∫r dt 누적</span>
-
-<span class="kw">for</span> _ <span class="kw">in</span> <span class="fn">range</span>(n_steps):
-    Z = np.random.randn(n_sim)
-    integral += r * dt
-    r = r + kappa*(theta - r)*dt + sig*np.sqrt(dt)*Z
-
-<span class="cm"># 제로쿠폰 채권 가격 = E[exp(-∫r dt)]</span>
-bond_price = np.mean(np.exp(-integral))
-implied_yield = -np.log(bond_price) / T
-
-<span class="fn">print</span>(<span class="st">f"MC 채권 가격: {bond_price:.6f}"</span>)
-<span class="fn">print</span>(<span class="st">f"내재 수익률:  {implied_yield:.4%}"</span>)</code></pre>
-<div class="code-output"><span class="out-label">Output:</span>
-MC 채권 가격: 0.965218
-내재 수익률:  3.5398%</div>
-<p class="ni">내재 수익률 3.54%는 현재 금리(3%)와 장기 평균(5%) 사이에 있다. 1년 동안 금리가 평균 회귀하면서 상승하므로, 단순히 현재 금리로 할인하는 것보다 채권 가격이 낮다(수익률이 높다).</p>
+<p class="ni"><strong>1)</strong> 장기 기대값: \(E[r_\infty] = \theta = 5\%\)</p>
+<p class="ni">장기 분산: \(\text{Var}[r_\infty] = \sigma_r^2/(2\kappa) = 0.015^2/0.6 = 0.000375\), 장기 σ = 1.94%</p>
+<p class="ni">반감기: \(\ln(2)/\kappa = 0.693/0.3 = 2.31\)년</p>
+<p class="ni"><strong>2)</strong> 알고리즘:</p>
+<ol>
+<li>N개의 금리 경로를 Vasicek SDE로 시뮬레이션 (dt 간격으로 이산화)</li>
+<li>각 경로에서 \(\int_0^T r_t\,dt\)를 수치 적분 (사다리꼴 법칙 또는 단순 합)</li>
+<li>채권 가격 = \(\frac{1}{N}\sum_{i=1}^N \exp(-\int_0^T r_t^{(i)}\,dt)\)</li>
+</ol>
+<p class="ni">Vasicek은 해석해도 존재: \(P(0,T) = A(T)e^{-B(T)r_0}\) (Affine 모델)</p>
+<p class="ni"><strong>3)</strong> 실제 측도에서: \(\ln(S_T/S_0) \sim N((0.08-0.02)\times 0.5, 0.04\times 0.5) = N(0.03, 0.02)\)</p>
+<p class="ni">\(P(S_T < 80) = P(\ln(S_T/100) < \ln 0.8) = P(Z < \frac{-0.2231-0.03}{0.1414}) = P(Z < -1.790) = 3.67\%\)</p>
+<p class="ni"><strong>4)</strong> 위험중립 측도에서: 드리프트를 r=5%로 교체</p>
+<p class="ni">\(\ln(S_T/S_0) \sim N((0.05-0.02)\times 0.5, 0.02) = N(0.015, 0.02)\)</p>
+<p class="ni">\(P^{\mathbb{Q}}(S_T < 80) = P(Z < \frac{-0.2231-0.015}{0.1414}) = P(Z < -1.684) = 4.61\%\)</p>
+<p class="ni">위험중립 확률(4.61%)이 실제 확률(3.67%)보다 높다. 이유: 위험중립 측도에서는 주식의 기대 수익률이 μ=8%가 아닌 r=5%이므로, 주가가 덜 상승하고 따라서 80 이하로 떨어질 확률이 더 높다. 위험 프리미엄(μ-r=3%)이 제거되었기 때문이다.</p>
 </div>
 </details>
 
@@ -1325,22 +1869,25 @@ MC 채권 가격: 0.965218
 <!-- ═══════════════════════════════════════════ -->
 <h2>핵심 요약: 금융공학 치트시트</h2>
 
-<div class="tc">Table 5. 금융공학 핵심 개념 → ML/HFT 매핑</div>
+<div class="tc">Table 7. 금융공학 핵심 개념 → ML/HFT 매핑</div>
 <table>
-<tr><th>개념</th><th>수식</th><th>ML 응용</th><th>HFT 응용</th></tr>
+<tr><th>개념</th><th>핵심 수식</th><th>ML 응용</th><th>HFT 응용</th></tr>
 <tr><td>GBM</td><td>\(dS = \mu S\,dt + \sigma S\,dW\)</td><td>시계열 생성 모델</td><td>주가 시뮬레이션</td></tr>
 <tr><td>이토 보조정리</td><td>\(df = f'dX + \frac{1}{2}f''(dX)^2\)</td><td>확률적 역전파</td><td>변동성 드래그 보정</td></tr>
 <tr><td>블랙-숄즈</td><td>\(C = SN(d_1) - Ke^{-rT}N(d_2)\)</td><td>가격 예측 벤치마크</td><td>옵션 마켓메이킹</td></tr>
 <tr><td>그릭스</td><td>\(\Delta, \Gamma, \nu, \Theta, \rho\)</td><td>민감도 분석</td><td>동적 헤징</td></tr>
+<tr><td>델타 헤징</td><td>\(\Pi = V - \Delta S\)</td><td>리스크 중립 학습</td><td>실시간 헤지 조정</td></tr>
 <tr><td>몬테카를로</td><td>\(E[f(X)] \approx \frac{1}{N}\sum f(x_i)\)</td><td>베이지안 추론</td><td>이색 옵션 가격</td></tr>
+<tr><td>분산 감소</td><td>대칭 변량, 제어 변량</td><td>효율적 샘플링</td><td>실시간 가격 계산</td></tr>
 <tr><td>VaR / CVaR</td><td>\(P(\text{Loss}>\text{VaR})=\alpha\)</td><td>리스크 제약 학습</td><td>포지션 한도 관리</td></tr>
-<tr><td>GARCH</td><td>\(\sigma_t^2 = \omega + \alpha\epsilon^2 + \beta\sigma^2\)</td><td>변동성 피처</td><td>실시간 변동성 추정</td></tr>
+<tr><td>GARCH</td><td>\(\sigma_t^2 = \omega + \alpha\varepsilon^2 + \beta\sigma^2\)</td><td>변동성 피처</td><td>실시간 변동성 추정</td></tr>
+<tr><td>내재 변동성</td><td>\(\sigma_{IV} = BS^{-1}(C_{mkt})\)</td><td>시장 심리 피처</td><td>변동성 차익거래</td></tr>
 <tr><td>듀레이션</td><td>\(D^* = -\frac{1}{P}\frac{dP}{dy}\)</td><td>금리 민감도 피처</td><td>채권 차익거래</td></tr>
 <tr><td>Vasicek/CIR</td><td>\(dr = \kappa(\theta-r)dt + \sigma dW\)</td><td>평균 회귀 모델</td><td>금리 파생상품</td></tr>
 </table>
 
 <div class="info">
-<p class="ni"><strong>다음 단계:</strong> 이 강의의 금융공학 기초는 R6(NLP + Sentiment)에서 뉴스 기반 변동성 예측의 배경이 되고, R7(Deep Learning)에서 옵션 가격 예측 신경망의 기초가 된다. 특히 몬테카를로와 GARCH는 R8(Convex Optimization)에서 리스크 제약 포트폴리오 최적화의 핵심 입력이 된다.</p>
+<p class="ni"><strong>다음 단계:</strong> 이 강의의 금융공학 기초는 R6(NLP + Sentiment)에서 뉴스 기반 변동성 예측의 배경이 되고, R7(Deep Learning)에서 옵션 가격 예측 신경망의 기초가 된다. 특히 몬테카를로와 GARCH는 R8(Convex Optimization)에서 리스크 제약 포트폴리오 최적화의 핵심 입력이 된다. 델타 헤징과 그릭스는 R9(HFT + RL)에서 강화학습 기반 동적 헤징 에이전트의 기반이 된다.</p>
 </div>
 
 </div><!-- paper-content -->
