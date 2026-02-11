@@ -7,6 +7,7 @@
 <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
 <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;500&family=Space+Mono:wght@400&family=Inter:wght@300;400&display=swap" rel="stylesheet">
+<script src="https://cdn.plot.ly/plotly-2.27.0.min.js"></script>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
 body{font-family:'Inter',sans-serif;background:#fafaf8;color:#1a1a1a;line-height:1.7;overflow-x:hidden}
@@ -94,12 +95,12 @@ pre{font-size:11px;padding:14px}table{font-size:10px;display:block;overflow-x:au
 <div class="nav-section-title">Curriculum</div>
 <ul class="nav-list">
 <li><a class="active" href="#">R1. Python + Finance <span class="badge">NOW</span></a></li>
-<li><a href="../round-02/">R2. Linear Algebra + Stats</a></li>
+<li><a href="../round_02/lecture_02.html">R2. Linear Algebra + Stats</a></li>
 <li><a href="#">R3. Data / Feature Eng.</a></li>
 <li><a href="#">R4. Supervised Learning</a></li>
 <li><a href="#">R5. Unsupervised + TS</a></li>
-<li><a class="done" href="../round-06/">R6. NLP + Sentiment <span class="badge badge-done">DONE</span></a></li>
-<li><a href="#">R7. Deep Learning</a></li>
+<li><a class="done" href="../round_06/lecture_06.html">R6. NLP + Sentiment <span class="badge badge-done">DONE</span></a></li>
+<li><a class="done" href="../round_07/lecture_07.html">R7. Deep Learning <span class="badge badge-done">DONE</span></a></li>
 <li><a href="#">R8. Convex Opt + Transformer</a></li>
 <li><a href="#">R9. HFT + RL</a></li>
 <li><a href="#">R10. Final Project</a></li>
@@ -501,6 +502,36 @@ rate = <span class="nu">0.07</span>           <span class="cm"># 연 7%</span>
     <span class="fn">print</span>(<span class="st">f"</span>{year}<span class="st">년차: </span>{principal:>15,.0f}<span class="st">원"</span>)</code></pre>
 
 <h3>6.3 while 반복문 — "조건이 참인 동안 반복"</h3>
+
+<!-- ▼ Plotly: Interactive Compound Growth -->
+<div id="plot-ch6-compound" style="width:100%;height:400px;margin:25px 0"></div>
+<script>
+(function(){
+  var years=[], g5=[],g7=[],g10=[],g15=[];
+  var p5=10,p7=10,p10=10,p15=10;
+  for(var y=0;y<=30;y++){
+    years.push(y);
+    g5.push(p5); g7.push(p7); g10.push(p10); g15.push(p15);
+    p5*=1.05; p7*=1.07; p10*=1.10; p15*=1.15;
+  }
+  Plotly.newPlot('plot-ch6-compound',[
+    {x:years,y:g5,mode:'lines',name:'연 5%',line:{width:2}},
+    {x:years,y:g7,mode:'lines',name:'연 7%',line:{width:2}},
+    {x:years,y:g10,mode:'lines',name:'연 10%',line:{width:2,color:'#e53935'}},
+    {x:years,y:g15,mode:'lines',name:'연 15%',line:{width:2,color:'#ff9800'}}
+  ],{
+    title:{text:'💰 복리의 마법: 1000만원을 30년간 투자하면?',font:{size:13}},
+    xaxis:{title:'투자 기간 (년)'},
+    yaxis:{title:'자산 (백만원)',tickprefix:'₩',tickformat:',.0f'},
+    margin:{l:70,r:20,t:45,b:40},
+    legend:{x:0.05,y:0.95,bgcolor:'rgba(255,255,255,0.8)'},
+    hovermode:'x unified',
+    shapes:[{type:'line',x0:0,x1:30,y0:20,y1:20,line:{color:'#888',dash:'dot',width:1}}],
+    annotations:[{x:15,y:22,text:'원금 2배 라인',showarrow:false,font:{size:10,color:'#888'}}]
+  },{responsive:true});
+})();
+</script>
+<p class="ni" style="font-size:11px;color:#888;text-align:center;margin-top:-10px">🖱️ 마우스를 올리면 각 이율별 자산 확인. 연 10%로 30년 투자하면 1000만원 → 1억 7천만원. 복리의 힘!</p>
 <pre><code><span class="cm"># 주가가 목표가에 도달할 때까지 시뮬레이션</span>
 <span class="kw">import</span> random
 random.seed(<span class="nu">42</span>)
@@ -793,6 +824,47 @@ data = np.array([
 <p class="ni"><strong>axis 이해하기:</strong> <code>axis=0</code>은 "행 방향으로 연산" (결과: 열 개수만큼), <code>axis=1</code>은 "열 방향으로 연산" (결과: 행 개수만큼). 헷갈리면 "axis=0은 행을 없앤다, axis=1은 열을 없앤다"로 외우자. Round 2에서 행렬을 본격적으로 다룬다.</p>
 </div>
 
+<!-- ▼ Plotly: Simulated Return Distribution -->
+<div id="plot-ch9-dist" style="width:100%;height:400px;margin:25px 0"></div>
+<script>
+(function(){
+  // Generate 252 random daily returns ~ N(0.0005, 0.02)
+  function boxMuller(){
+    var u1=Math.random(),u2=Math.random();
+    return Math.sqrt(-2*Math.log(u1))*Math.cos(2*Math.PI*u2);
+  }
+  var returns=[], cumWealth=[1];
+  for(var i=0;i<252;i++){
+    var r=0.0005+0.02*boxMuller();
+    returns.push(r*100);
+    cumWealth.push(cumWealth[cumWealth.length-1]*(1+r));
+  }
+  var days=[];for(var i=0;i<=252;i++) days.push(i);
+
+  // Histogram
+  var hist={x:returns,type:'histogram',nbinsx:40,
+    marker:{color:'rgba(25,118,210,0.6)',line:{color:'#1565c0',width:1}},
+    name:'일간 수익률 분포',xaxis:'x',yaxis:'y'};
+
+  // Cumulative wealth on secondary plot
+  var wealth={x:days,y:cumWealth,mode:'lines',
+    line:{color:'#e53935',width:2},name:'누적 자산 (초기=1)',
+    xaxis:'x2',yaxis:'y2'};
+
+  Plotly.newPlot('plot-ch9-dist',[hist,wealth],{
+    grid:{rows:1,columns:2,pattern:'independent'},
+    title:{text:'📊 NumPy 시뮬레이션: 252일 랜덤 수익률 분포 + 누적 자산',font:{size:13}},
+    xaxis:{title:'일간 수익률 (%)',domain:[0,0.47]},
+    yaxis:{title:'빈도'},
+    xaxis2:{title:'거래일',domain:[0.55,1]},
+    yaxis2:{title:'자산 (초기=1)'},
+    margin:{l:50,r:20,t:45,b:45},
+    showlegend:true,legend:{x:0.55,y:0.95,bgcolor:'rgba(255,255,255,0.8)'}
+  },{responsive:true});
+})();
+</script>
+<p class="ni" style="font-size:11px;color:#888;text-align:center;margin-top:-10px">🖱️ 왼쪽: 수익률 분포 (정규분포 형태). 오른쪽: 랜덤 워크로 생성된 1년 자산 곡선. 새로고침할 때마다 다른 결과!</p>
+
 <!-- ═══════════════════════════════════════════ -->
 <!-- Ch10: Pandas -->
 <!-- ═══════════════════════════════════════════ -->
@@ -1050,6 +1122,32 @@ sharpe = (ann_return - risk_free_rate) / ann_vol
 
 <span class="fn">print</span>(<span class="st">f"삼성전자 샤프비율: </span>{calc_sharpe(returns):.3f}<span class="st">"</span>)</code></pre>
 
+<!-- ▼ Plotly: Sharpe Ratio Comparison -->
+<div id="plot-ch12-sharpe" style="width:100%;height:380px;margin:25px 0"></div>
+<script>
+(function(){
+  var names=['AAPL','MSFT','GOOGL','AMZN','NVDA'];
+  var sharpes=[0.96,1.05,0.65,0.43,1.45];
+  var colors=sharpes.map(function(s){return s>=1?'#4caf50':s>=0.5?'#ff9800':'#e53935';});
+
+  Plotly.newPlot('plot-ch12-sharpe',[{
+    x:names,y:sharpes,type:'bar',
+    marker:{color:colors,line:{width:1,color:'#fff'}},
+    text:sharpes.map(function(s){return s.toFixed(2);}),textposition:'outside',
+    hovertemplate:'%{x}<br>Sharpe: %{y:.2f}'
+  }],{
+    title:{text:'📏 샤프비율 비교: 위험 대비 수익 효율성',font:{size:13}},
+    xaxis:{title:'종목'},yaxis:{title:'Sharpe Ratio',range:[0,1.8]},
+    margin:{l:50,r:20,t:45,b:40},
+    shapes:[{type:'line',x0:-0.5,x1:4.5,y0:1,y1:1,line:{color:'#4caf50',dash:'dash',width:2}},
+            {type:'line',x0:-0.5,x1:4.5,y0:0.5,y1:0.5,line:{color:'#ff9800',dash:'dot',width:1}}],
+    annotations:[{x:4.5,y:1.05,text:'Good (≥1)',showarrow:false,font:{size:10,color:'#4caf50'}},
+                 {x:4.5,y:0.55,text:'OK (≥0.5)',showarrow:false,font:{size:10,color:'#ff9800'}}]
+  },{responsive:true});
+})();
+</script>
+<p class="ni" style="font-size:11px;color:#888;text-align:center;margin-top:-10px">🖱️ 초록 = 샤프 ≥ 1 (좋음), 주황 = 0.5~1 (보통), 빨강 = < 0.5 (나쁨). NVDA가 가장 효율적!</p>
+
 <h3>12.4 다종목 비교 분석</h3>
 <pre><code><span class="cm"># 여러 종목 한 번에 다운로드</span>
 tickers = [<span class="st">"AAPL"</span>, <span class="st">"MSFT"</span>, <span class="st">"GOOGL"</span>, <span class="st">"AMZN"</span>, <span class="st">"NVDA"</span>]
@@ -1085,6 +1183,44 @@ plt.tight_layout()
 plt.show()</code></pre>
 
 <h3>12.5 이동평균과 볼린저 밴드 맛보기</h3>
+
+<!-- ▼ Plotly: Risk-Return Scatter (5 stocks) -->
+<div id="plot-ch12-riskret" style="width:100%;height:400px;margin:25px 0"></div>
+<script>
+(function(){
+  var names=['AAPL','MSFT','GOOGL','AMZN','NVDA','GLD','BTC-USD'];
+  var annRet=[28,25,22,18,85,12,120];
+  var annVol=[24,22,26,30,55,14,60];
+  var sharpe=annRet.map(function(r,i){return ((r-5)/annVol[i]).toFixed(2);});
+  var colors=['#1565c0','#2e7d32','#e53935','#ff9800','#7b1fa2','#ffd600','#ff6f00'];
+  var sizes=annRet.map(function(r){return Math.max(15,r/2);});
+
+  var scatter={x:annVol,y:annRet,mode:'markers+text',text:names,
+    textposition:'top center',textfont:{size:11},
+    marker:{size:sizes,color:colors,line:{width:2,color:'#fff'},opacity:0.85},
+    hovertemplate:'%{text}<br>수익률: %{y}%<br>변동성: %{x}%<br>Sharpe: '+
+      sharpe.map(function(s){return s;}).join('<br>')+'<extra></extra>',
+    customdata:sharpe,
+    name:'종목'};
+
+  // Sharpe=1 line (ret = vol + rf)
+  var shX=[10,70],shY=[15,75];
+
+  Plotly.newPlot('plot-ch12-riskret',[scatter,
+    {x:shX,y:shY,mode:'lines',line:{color:'#ccc',dash:'dash',width:1},name:'Sharpe=1 기준선',showlegend:true}
+  ],{
+    title:{text:'📊 위험-수익 산점도: 높은 수익 = 높은 위험?',font:{size:13}},
+    xaxis:{title:'연간 변동성 (%)',range:[5,70]},
+    yaxis:{title:'연간 수익률 (%)',range:[-5,130]},
+    margin:{l:50,r:20,t:45,b:45},
+    legend:{x:0.01,y:0.99,bgcolor:'rgba(255,255,255,0.8)'},
+    hovermode:'closest',
+    annotations:[{x:55,y:85,text:'NVDA: 높은 수익<br>높은 변동성',showarrow:true,arrowhead:2,ax:40,ay:20,font:{size:10,color:'#7b1fa2'}},
+      {x:14,y:12,text:'GLD: 안전자산<br>낮은 변동성',showarrow:true,arrowhead:2,ax:-40,ay:-20,font:{size:10,color:'#888'}}]
+  },{responsive:true});
+})();
+</script>
+<p class="ni" style="font-size:11px;color:#888;text-align:center;margin-top:-10px">🖱️ 점 크기 = 수익률 크기. 점선 위 = 샤프비율 > 1. 오른쪽 위 = 고수익·고위험, 왼쪽 아래 = 저수익·저위험.</p>
 <pre><code><span class="cm"># 삼성전자 이동평균</span>
 samsung_close = samsung[<span class="st">"Close"</span>]
 ma20 = samsung_close.rolling(window=<span class="nu">20</span>).mean()   <span class="cm"># 20일 이동평균</span>
@@ -1111,6 +1247,66 @@ plt.show()</code></pre>
 <div class="info">
 <p class="ni"><strong>Round 3 미리보기:</strong> 이동평균, 볼린저 밴드, RSI, MACD 등 기술적 지표를 직접 구현하고 백테스팅하는 것은 Round 3의 핵심 내용이다. 여기서는 맛보기만 한다.</p>
 </div>
+
+<!-- ▼ Plotly: Interactive Candlestick + Bollinger Bands -->
+<div id="plot-ch12-candle" style="width:100%;height:450px;margin:25px 0"></div>
+<script>
+(function(){
+  // Generate 60 days of simulated OHLCV data
+  var dates=[],open=[],high=[],low=[],close=[],vol=[];
+  var p=70000, rng=42;
+  for(var i=0;i<60;i++){
+    var d=new Date(2024,0,2+i); // skip weekends roughly
+    if(d.getDay()===0||d.getDay()===6) continue;
+    dates.push(d.toISOString().slice(0,10));
+    rng=(rng*1103515245+12345)&0x7fffffff;
+    var ret=((rng%2000)-900)/100000;
+    var o=p, c=p*(1+ret);
+    rng=(rng*1103515245+12345)&0x7fffffff;
+    var h=Math.max(o,c)*(1+Math.abs((rng%500)/100000));
+    var l=Math.min(o,c)*(1-Math.abs((rng%500)/100000));
+    open.push(Math.round(o));high.push(Math.round(h));
+    low.push(Math.round(l));close.push(Math.round(c));
+    vol.push(10000000+Math.floor((rng%10000000)));
+    p=c;
+  }
+  // MA20
+  var ma20=[];
+  for(var i=0;i<close.length;i++){
+    if(i<19){ma20.push(null);continue;}
+    var s=0;for(var j=i-19;j<=i;j++) s+=close[j];
+    ma20.push(s/20);
+  }
+  // Bollinger
+  var bbU=[],bbL=[];
+  for(var i=0;i<close.length;i++){
+    if(i<19){bbU.push(null);bbL.push(null);continue;}
+    var s=0,arr=[];
+    for(var j=i-19;j<=i;j++){s+=close[j];arr.push(close[j]);}
+    var m=s/20,v=0;
+    for(var j=0;j<arr.length;j++) v+=(arr[j]-m)*(arr[j]-m);
+    var std=Math.sqrt(v/19);
+    bbU.push(m+2*std); bbL.push(m-2*std);
+  }
+
+  var candle={x:dates,open:open,high:high,low:low,close:close,
+    type:'candlestick',name:'삼성전자',
+    increasing:{line:{color:'#2e7d32'}},decreasing:{line:{color:'#c62828'}}};
+  var maLine={x:dates,y:ma20,mode:'lines',name:'MA20',line:{color:'#1565c0',width:1.5}};
+  var bbUp={x:dates,y:bbU,mode:'lines',name:'BB Upper',line:{color:'#90caf9',width:1,dash:'dot'}};
+  var bbLo={x:dates,y:bbL,mode:'lines',name:'BB Lower',line:{color:'#90caf9',width:1,dash:'dot'},fill:'tonexty',fillcolor:'rgba(144,202,249,0.1)'};
+
+  Plotly.newPlot('plot-ch12-candle',[candle,maLine,bbLo,bbUp],{
+    title:{text:'🕯️ 인터랙티브 캔들차트 + 이동평균 + 볼린저 밴드',font:{size:13}},
+    xaxis:{title:'날짜',rangeslider:{visible:false}},
+    yaxis:{title:'주가 (원)'},
+    margin:{l:60,r:20,t:45,b:40},
+    legend:{x:0.01,y:0.99,bgcolor:'rgba(255,255,255,0.8)',font:{size:10}},
+    hovermode:'x unified'
+  },{responsive:true});
+})();
+</script>
+<p class="ni" style="font-size:11px;color:#888;text-align:center;margin-top:-10px">🖱️ 드래그로 범위 선택, 더블클릭으로 리셋. 초록=양봉(상승), 빨강=음봉(하락). 파란선=20일 이동평균, 점선=볼린저 밴드.</p>
 
 
 <h3>12.6 캔들차트 — 트레이더의 눈으로 주가를 본다</h3>
