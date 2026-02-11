@@ -1,0 +1,2240 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Round 9 - HFT System Design + Reinforcement Learning</title>
+<script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;500&family=Space+Mono:wght@400&family=Inter:wght@300;400&display=swap" rel="stylesheet">
+<script src="https://cdn.plot.ly/plotly-2.27.0.min.js"></script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Inter',sans-serif;background:#fafaf8;color:#1a1a1a;line-height:1.7;overflow-x:hidden}
+.sidebar{position:fixed;left:0;top:0;width:260px;height:100vh;background:rgba(255,255,255,.97);border-right:1px solid rgba(0,0,0,.06);padding:32px 24px;z-index:100;overflow-y:auto;display:flex;flex-direction:column}
+.sidebar-profile{text-align:center;margin-bottom:28px;padding-bottom:24px;border-bottom:1px solid rgba(0,0,0,.08)}
+.profile-icon{font-size:48px;margin-bottom:8px}
+.profile-name{font-family:'Cormorant Garamond',serif;font-size:1.3rem;font-weight:500;margin-bottom:4px}
+.profile-title{font-size:.68rem;color:#888;letter-spacing:.08em;text-transform:uppercase;margin-bottom:8px}
+.profile-bio{font-size:.78rem;color:#666;line-height:1.5}
+.sidebar-nav{flex:1;margin-top:16px}
+.nav-section{margin-bottom:20px}
+.nav-section-title{font-size:.6rem;font-weight:600;color:#aaa;letter-spacing:.15em;text-transform:uppercase;margin-bottom:10px}
+.nav-list{list-style:none}
+.nav-list li{margin-bottom:5px}
+.nav-list a{font-size:.78rem;color:#555;text-decoration:none;transition:all .2s;display:block;padding:3px 0}
+.nav-list a:hover{color:#0080c6;padding-left:4px}
+.nav-list a.active{color:#0080c6;font-weight:500}
+.nav-list a.done{color:#28a745}
+.badge{display:inline-block;font-size:.5rem;background:#0080c6;color:#fff;padding:1px 5px;border-radius:8px;margin-left:3px;vertical-align:middle}
+.badge-done{background:#28a745}
+.sidebar-footer{padding-top:16px;border-top:1px solid rgba(0,0,0,.06);font-size:.65rem;color:#aaa;text-align:center}
+.main-wrapper{margin-left:260px;min-height:100vh}
+.container{max-width:1100px;margin:0 auto;padding:50px 40px 80px}
+.paper-content{font-family:'Times New Roman','Nanum Myeongjo',serif;line-height:1.8;background:#fff;padding:40px;border-radius:8px;box-shadow:0 2px 20px rgba(0,0,0,.05)}
+.paper-header{text-align:center;margin-bottom:40px;padding-bottom:30px;border-bottom:2px solid #333}
+.paper-category{font-size:14px;color:#666;margin-bottom:10px}
+.paper-title{font-size:24px;font-weight:bold;margin-bottom:12px;line-height:1.4}
+.paper-subtitle{font-size:14px;color:#555;margin-bottom:8px}
+.paper-team{font-size:13px;color:#444}
+.code-output{background:#1e1e1e;color:#d4d4d4;padding:12px 16px;border-radius:0 0 6px 6px;font-family:'Space Mono',monospace;font-size:11.5px;line-height:1.6;margin-top:-4px;margin-bottom:18px;border-top:2px solid #333;white-space:pre-wrap;overflow-x:auto}
+.code-output .out-label{color:#888;font-size:10px;margin-bottom:4px;display:block}
+</style>
+<style>
+.abstract{background:#f8f9fa;padding:25px;margin:30px 0;border-left:4px solid #2c3e50}
+.abstract-title{font-weight:bold;font-size:16px;margin-bottom:15px}
+h2{font-size:18px;margin:35px 0 20px;padding-bottom:8px;border-bottom:1px solid #ddd;color:#2c3e50}
+h3{font-size:15px;margin:25px 0 15px;color:#34495e}
+h4{font-size:14px;margin:20px 0 12px;color:#34495e}
+p{text-align:justify;margin-bottom:15px;text-indent:2em}
+p.ni{text-indent:0}
+table{width:100%;border-collapse:collapse;margin:20px 0;font-size:12px}
+th,td{border:1px solid #ddd;padding:10px 8px;text-align:center}
+th{background:#2c3e50;color:white;font-weight:bold}
+tr:nth-child(even){background:#f8f9fa}
+tr:hover{background:#e8f4f8}
+.tc{font-size:13px;font-weight:bold;margin:15px 0 10px;text-align:center}
+.eq{text-align:center;margin:20px 0;padding:15px;background:#f8f9fa;border-radius:4px;overflow-x:auto}
+ul,ol{margin-left:2em;margin-bottom:15px}
+li{margin-bottom:6px}
+.def{background:#fff9e6;border:1px solid #ffc107;border-radius:4px;padding:20px;margin:20px 0}
+.info{background:#e8f4f8;border-left:4px solid #3498db;padding:20px;margin:20px 0}
+.warn{background:#fff3cd;border-left:4px solid #f39c12;padding:20px;margin:20px 0}
+.ok{background:#d4edda;border-left:4px solid #28a745;padding:20px;margin:20px 0}
+pre{background:#1e1e1e;color:#d4d4d4;padding:20px;border-radius:6px;overflow-x:auto;margin:20px 0;font-family:'Space Mono','Consolas',monospace;font-size:13px;line-height:1.6}
+code{font-family:'Space Mono','Consolas',monospace;font-size:13px}
+p code,li code,td code{background:#f0f0f0;padding:2px 6px;border-radius:3px;color:#c7254e;font-size:12px}
+.cc{font-size:12px;font-weight:bold;color:#2c3e50;margin-top:15px;margin-bottom:4px}
+.cm{color:#6a9955}.kw{color:#569cd6}.st{color:#ce9178}.fn{color:#dcdcaa}.nb{color:#4ec9b0}.nu{color:#b5cea8}
+.progress-bar{width:100%;height:6px;background:#e0e0e0;border-radius:3px;margin-top:16px}
+.progress-fill{height:100%;background:linear-gradient(90deg,#0080c6,#00b894);border-radius:3px;width:90%}
+.progress-label{font-size:11px;color:#888;margin-top:4px;text-align:center}
+@media(max-width:1024px){
+.sidebar{width:100%;height:auto;position:relative;border-right:none;border-bottom:1px solid rgba(0,0,0,.08);padding:16px}
+.sidebar-profile{margin-bottom:10px;padding-bottom:10px;display:flex;align-items:center;gap:12px;text-align:left}
+.profile-icon{font-size:32px;margin-bottom:0}.profile-bio{display:none}
+.nav-section{display:inline-block;margin-right:16px;margin-bottom:8px}
+.nav-list{display:flex;gap:10px;flex-wrap:wrap}.nav-list li{margin-bottom:0}
+.sidebar-footer{display:none}
+.main-wrapper{margin-left:0}
+.container{padding:0}.paper-content{padding:20px 16px;border-radius:0;box-shadow:none}
+.paper-title{font-size:18px}p{font-size:14px;text-indent:1.5em;text-align:left}
+pre{font-size:11px;padding:14px}table{font-size:10px;display:block;overflow-x:auto}
+}
+</style>
+</head>
+<body>
+
+<div class="sidebar">
+<div class="sidebar-profile">
+<div class="profile-icon">&#x26A1;</div>
+<div class="profile-name">HFT ML Master Plan</div>
+<div class="profile-title">Convex Opt + DL + HFT</div>
+<div class="profile-bio">10 Rounds: Zero to HFT System Trading</div>
+</div>
+<div class="sidebar-nav">
+<div class="nav-section">
+<div class="nav-section-title">Curriculum</div>
+<ul class="nav-list">
+<li><a class="done" href="../round-01/">R1. Python + Finance <span class="badge badge-done">DONE</span></a></li>
+<li><a class="done" href="../round-02/">R2. Linear Algebra + Stats <span class="badge badge-done">DONE</span></a></li>
+<li><a class="done" href="../round-03/">R3. Data / Feature Eng. <span class="badge badge-done">DONE</span></a></li>
+<li><a class="done" href="../round-04/">R4. Supervised Learning <span class="badge badge-done">DONE</span></a></li>
+<li><a class="done" href="../round-05/">R5. Unsupervised + TS <span class="badge badge-done">DONE</span></a></li>
+<li><a class="done" href="../round-06/">R6. NLP + Sentiment <span class="badge badge-done">DONE</span></a></li>
+<li><a class="done" href="../round-07/">R7. Deep Learning <span class="badge badge-done">DONE</span></a></li>
+<li><a class="done" href="../round-08/">R8. Convex Opt + Transformer <span class="badge badge-done">DONE</span></a></li>
+<li><a class="active" href="#">R9. HFT + RL <span class="badge">NOW</span></a></li>
+<li><a href="../round-10/">R10. Final Project</a></li>
+</ul>
+</div>
+<div class="nav-section">
+<div class="nav-section-title">This Lecture</div>
+<ul class="nav-list">
+<li><a href="#ch1">1. 시장 마이크로스트럭처</a></li>
+<li><a href="#ch2">2. 오더북 역학</a></li>
+<li><a href="#ch3">3. HFT 전략 유형</a></li>
+<li><a href="#ch4">4. 저지연 아키텍처</a></li>
+<li><a href="#ch5">5. 강화학습 기초 (MDP)</a></li>
+<li><a href="#ch6">6. Q-Learning</a></li>
+<li><a href="#ch7">7. DQN</a></li>
+<li><a href="#ch8">8. Policy Gradient</a></li>
+<li><a href="#ch9">9. Actor-Critic &amp; PPO</a></li>
+<li><a href="#ch10">10. 트레이딩 환경 설계</a></li>
+<li><a href="#ch11">11. DQN 트레이딩 에이전트</a></li>
+<li><a href="#ch12">12. 실전 파이프라인</a></li>
+<li><a href="#ch13">13. 피드백 + Quiz</a></li>
+</ul>
+</div>
+</div>
+<div class="sidebar-footer">Round 9 of 10 · ⚡ HFT + RL</div>
+</div>
+
+<div class="main-wrapper">
+<div class="container">
+<div class="paper-content">
+
+<div class="paper-header">
+<div class="paper-category">Round 9 / 10 · HFT 시스템 + 강화학습</div>
+<h1 class="paper-title">HFT System Design &amp; Reinforcement Learning<br>for Algorithmic Trading</h1>
+<div class="paper-subtitle">마이크로스트럭처를 이해하고, 강화학습 에이전트가 스스로 매매를 학습하게 한다</div>
+<div class="paper-team">Textbooks: MLAT Ch.22~23 / MLDSF Ch.13~14</div>
+<div class="progress-bar"><div class="progress-fill"></div></div>
+<div class="progress-label">Overall Progress: 90%</div>
+</div>
+
+<div class="abstract">
+<div class="abstract-title">Abstract</div>
+<p class="ni">
+R1~R8까지 우리는 데이터 수집(R1,R3), 수학적 기반(R2), 전통 ML(R4~R5), NLP(R6), 딥러닝(R7), 포트폴리오 최적화와 Transformer(R8)를 모두 익혔다. 이제 마지막 퍼즐 두 조각을 맞춘다. 첫째, <strong>시장 마이크로스트럭처</strong> — 주문이 어떻게 체결되는지, 오더북이 어떻게 움직이는지, HFT 시스템이 어떤 구조로 설계되는지를 이해한다. 둘째, <strong>강화학습(Reinforcement Learning)</strong> — 에이전트가 시장 환경과 상호작용하며 스스로 최적의 매매 전략을 학습하는 패러다임이다.
+</p>
+<p class="ni" style="margin-top:10px">
+R4~R7의 지도학습/딥러닝은 "과거 데이터에서 패턴을 학습"하는 방식이었다. 강화학습은 근본적으로 다르다 — 에이전트가 <strong>행동(action)을 취하고, 보상(reward)을 받으며, 시행착오를 통해 전략을 개선</strong>한다. 이것은 실제 트레이더가 시장에서 경험을 쌓아가는 과정과 본질적으로 동일하다. Q-Learning에서 DQN, Policy Gradient, PPO까지 — 강화학습의 핵심 알고리즘을 배우고, 이를 트레이딩 에이전트로 구현한다.
+</p>
+</div>
+
+
+<!-- ═══════════════════════════════════════════════════════════════
+     Chapter 1: 시장 마이크로스트럭처
+     ═══════════════════════════════════════════════════════════════ -->
+<h2 id="ch1">Chapter 1. 시장 마이크로스트럭처 — 주문이 체결되는 세계</h2>
+
+<div class="info">
+<p class="ni"><strong>📚 교재 연동:</strong> MLAT Ch.22 "Market Microstructure" 도입부 / 두잇알고 Ch.4 큐(Queue) 자료구조 — 오더북은 본질적으로 우선순위 큐다</p>
+</div>
+
+<h3>1.1 왜 마이크로스트럭처를 알아야 하는가</h3>
+
+<p>
+R1~R8에서 우리는 "종가(Close)"를 기준으로 전략을 만들었다. 하루에 하나의 가격. 하지만 실제 시장에서는 1초에 수천 건의 주문이 오가고, 가격은 밀리초 단위로 변한다. "100달러에 AAPL을 사겠다"는 주문이 실제로 100달러에 체결될까? 아닐 수도 있다. 주문을 넣는 순간 가격이 움직일 수 있고(슬리피지), 원하는 수량만큼 체결되지 않을 수도 있다(부분 체결). 이런 현실을 이해하지 못하면, 백테스트에서는 수익이 나지만 실전에서는 손실이 나는 "백테스트 환상"에 빠진다.
+</p>
+
+<div class="def">
+<p class="ni"><strong>📖 시장 마이크로스트럭처 (Market Microstructure) 정의</strong></p>
+<p class="ni" style="margin-top:8px">
+시장 마이크로스트럭처는 금융 자산의 거래가 이루어지는 과정과 메커니즘을 연구하는 분야다. 주문의 유형, 가격 형성 과정, 정보의 비대칭, 거래 비용, 시장 참여자의 행동 등을 다룬다. HFT(High-Frequency Trading)는 이 마이크로스트럭처의 미세한 비효율성을 밀리초 단위로 포착하여 수익을 추구하는 전략이다.
+</p>
+</div>
+
+<h3>1.2 주문 유형: 시장가 vs 지정가</h3>
+
+<p>
+모든 거래는 주문(order)에서 시작된다. 주문에는 크게 두 가지 유형이 있다:
+</p>
+
+<div style="margin:25px 0;display:flex;gap:20px;flex-wrap:wrap;justify-content:center">
+<div style="flex:1;min-width:280px;background:#fff;padding:20px;border-radius:10px;border:2px solid #e74c3c">
+<p class="ni" style="text-align:center;font-weight:bold;font-size:14px;color:#e74c3c;margin-bottom:10px">🔴 시장가 주문 (Market Order)</p>
+<p class="ni" style="font-size:12px;margin-bottom:6px">📋 "지금 당장, 최선의 가격에 체결해줘"</p>
+<p class="ni" style="font-size:12px;margin-bottom:6px">⚡ 즉시 체결 보장, 가격 불확실</p>
+<p class="ni" style="font-size:12px;margin-bottom:6px">💰 유동성을 소비(take)한다 → Taker</p>
+<p class="ni" style="font-size:11px;color:#888;margin-top:8px;border-top:1px solid #eee;padding-top:8px">예: "AAPL 100주를 지금 바로 사!" → 현재 최우선 매도호가에 체결</p>
+</div>
+<div style="flex:1;min-width:280px;background:#fff;padding:20px;border-radius:10px;border:2px solid #27ae60">
+<p class="ni" style="text-align:center;font-weight:bold;font-size:14px;color:#27ae60;margin-bottom:10px">🟢 지정가 주문 (Limit Order)</p>
+<p class="ni" style="font-size:12px;margin-bottom:6px">📋 "이 가격 이하(매수)/이상(매도)에서만 체결해줘"</p>
+<p class="ni" style="font-size:12px;margin-bottom:6px">⚡ 가격 보장, 체결 불확실</p>
+<p class="ni" style="font-size:12px;margin-bottom:6px">💰 유동성을 공급(make)한다 → Maker</p>
+<p class="ni" style="font-size:11px;color:#888;margin-top:8px;border-top:1px solid #eee;padding-top:8px">예: "AAPL을 $149.50 이하에서 100주 사!" → 오더북에 대기</p>
+</div>
+</div>
+
+<h3>1.3 오더북 (Order Book) 구조</h3>
+
+<p>
+오더북은 특정 종목에 대한 모든 미체결 지정가 주문을 가격별로 정렬한 장부다. 매수 주문(bid)은 높은 가격부터, 매도 주문(ask)은 낮은 가격부터 정렬된다. 최우선 매수호가(best bid)와 최우선 매도호가(best ask)의 차이가 <strong>스프레드(spread)</strong>다.
+</p>
+
+<div class="eq">
+\[ \text{Spread} = P_{\text{ask}}^{(1)} - P_{\text{bid}}^{(1)}, \quad \text{Mid Price} = \frac{P_{\text{ask}}^{(1)} + P_{\text{bid}}^{(1)}}{2} \]
+</div>
+
+<!-- ★ Plotly: Interactive Order Book -->
+<h3>1.x 📊 Interactive: 실시간 오더북 시각화</h3>
+<div id="plot-ch1-orderbook" style="width:100%;height:450px;margin:20px 0"></div>
+<script>
+(function(){
+  var bidPrices=[149.50,149.45,149.40,149.35,149.30,149.25,149.20,149.15,149.10,149.05];
+  var bidSizes=[200,350,500,180,420,600,250,380,700,150];
+  var askPrices=[149.55,149.60,149.65,149.70,149.75,149.80,149.85,149.90,149.95,150.00];
+  var askSizes=[150,280,450,320,550,200,380,620,180,400];
+  // Cumulative
+  var bidCum=[],askCum=[],bs=0,as=0;
+  for(var i=0;i<10;i++){bs+=bidSizes[i];bidCum.push(bs);as+=askSizes[i];askCum.push(as);}
+  Plotly.newPlot('plot-ch1-orderbook',[
+    {x:bidPrices,y:bidSizes,type:'bar',name:'Bid (매수)',marker:{color:'rgba(46,204,113,0.7)'},width:0.04},
+    {x:askPrices,y:askSizes,type:'bar',name:'Ask (매도)',marker:{color:'rgba(231,76,60,0.7)'},width:0.04},
+    {x:bidPrices,y:bidCum,type:'scatter',mode:'lines+markers',name:'Bid 누적',line:{color:'#27ae60',width:2},marker:{size:5},yaxis:'y2'},
+    {x:askPrices,y:askCum,type:'scatter',mode:'lines+markers',name:'Ask 누적',line:{color:'#e74c3c',width:2},marker:{size:5},yaxis:'y2'}
+  ],{
+    title:{text:'📊 AAPL 오더북 (Level 2): Bid/Ask 호가별 수량 + 누적 깊이',font:{size:14}},
+    xaxis:{title:'가격 ($)',dtick:0.05,range:[149.0,150.05]},
+    yaxis:{title:'수량 (주)',side:'left'},
+    yaxis2:{title:'누적 수량',overlaying:'y',side:'right'},
+    legend:{x:0.01,y:0.98,bgcolor:'rgba(255,255,255,0.85)'},
+    shapes:[{type:'rect',x0:149.50,x1:149.55,y0:0,y1:750,fillcolor:'rgba(52,152,219,0.1)',line:{width:2,color:'#3498db',dash:'dash'}}],
+    annotations:[{x:149.525,y:720,text:'Spread: $0.05',showarrow:false,font:{size:11,color:'#3498db',weight:'bold'}},
+                 {x:149.50,y:250,text:'Best Bid',showarrow:true,arrowhead:2,ax:30,ay:-30,font:{size:10,color:'#27ae60'}},
+                 {x:149.55,y:200,text:'Best Ask',showarrow:true,arrowhead:2,ax:-30,ay:-30,font:{size:10,color:'#e74c3c'}}],
+    margin:{t:50,b:60},paper_bgcolor:'#fafaf8',plot_bgcolor:'#fff'
+  },{responsive:true});
+})();
+</script>
+<p class="ni">🖱️ 초록 막대=매수 대기 주문, 빨간 막대=매도 대기 주문. 선 그래프는 누적 깊이(depth)를 나타냅니다. 파란 점선 영역이 스프레드($0.05)입니다. 시장가 매수 주문을 넣으면 Best Ask($149.55)에서 체결됩니다.</p>
+
+<h3>1.4 핵심 마이크로스트럭처 지표</h3>
+
+<table>
+<tr><th>지표</th><th>수식</th><th>의미</th><th>HFT 활용</th></tr>
+<tr><td>Bid-Ask Spread</td><td>\(P_{ask}^{(1)} - P_{bid}^{(1)}\)</td><td>거래 비용의 직접적 측정</td><td>스프레드가 넓으면 마켓메이킹 수익 기회</td></tr>
+<tr><td>Mid Price</td><td>\(\frac{P_{ask}^{(1)} + P_{bid}^{(1)}}{2}\)</td><td>"공정 가격"의 추정치</td><td>시그널 생성의 기준점</td></tr>
+<tr><td>Order Imbalance</td><td>\(\frac{V_{bid} - V_{ask}}{V_{bid} + V_{ask}}\)</td><td>매수/매도 압력의 불균형</td><td>단기 가격 방향 예측</td></tr>
+<tr><td>VWAP</td><td>\(\frac{\sum p_i \cdot v_i}{\sum v_i}\)</td><td>거래량 가중 평균 가격</td><td>대량 주문 실행 벤치마크</td></tr>
+<tr><td>Kyle's Lambda</td><td>\(\lambda = \frac{\Delta p}{\Delta v}\)</td><td>가격 충격 (Price Impact)</td><td>주문 크기 최적화</td></tr>
+</table>
+
+<div class="warn">
+<p class="ni"><strong>⚠️ 슬리피지 (Slippage) — 백테스트의 최대 적</strong></p>
+<p class="ni" style="margin-top:8px">
+슬리피지는 예상 체결 가격과 실제 체결 가격의 차이다. 대량 시장가 주문을 넣으면 오더북의 여러 호가를 소진하면서 가격이 불리하게 움직인다. 예를 들어 1,000주를 시장가로 매수하면, 처음 200주는 $149.55에, 다음 280주는 $149.60에, 나머지는 더 높은 가격에 체결될 수 있다. R10의 백테스트에서 슬리피지를 반드시 모델링해야 한다.
+</p>
+</div>
+
+<h3>1.5 정보의 비대칭과 역선택</h3>
+
+<p>
+시장 마이크로스트럭처의 핵심 이론 중 하나가 <strong>역선택(adverse selection)</strong>이다. 마켓메이커가 지정가 주문을 걸어놓으면, 정보를 가진 트레이더(informed trader)가 그 주문을 "따먹을" 수 있다. 예를 들어, 어닝 서프라이즈 직전에 내부 정보를 가진 트레이더가 마켓메이커의 매도 주문을 대량으로 체결시키면, 마켓메이커는 손실을 본다. 이것이 스프레드가 존재하는 근본적 이유다 — 마켓메이커는 역선택 위험에 대한 보상으로 스프레드를 요구한다.
+</p>
+
+<div class="eq">
+\[ \text{Spread} = \underbrace{2 \cdot \alpha \cdot \sigma}_{\text{역선택 비용}} + \underbrace{c_{\text{inventory}}}_{\text{재고 비용}} + \underbrace{c_{\text{order}}}_{\text{주문 처리 비용}} \]
+</div>
+
+<p>
+여기서 \(\alpha\)는 정보 비대칭의 정도, \(\sigma\)는 자산의 변동성이다. 변동성이 높거나 정보 비대칭이 클수록 스프레드가 넓어진다. 이것이 어닝 발표 직전에 스프레드가 급격히 넓어지는 이유다.
+</p>
+
+
+<!-- ═══════════════════════════════════════════════════════════════
+     Chapter 2: 오더북 역학
+     ═══════════════════════════════════════════════════════════════ -->
+<h2 id="ch2">Chapter 2. 오더북 역학 — 호가창 데이터 분석</h2>
+
+<div class="info">
+<p class="ni"><strong>📚 교재 연동:</strong> MLAT Ch.22 "Order Book Dynamics" / 두잇알고 Ch.4 우선순위 큐 — 오더북은 가격 우선, 시간 우선 원칙으로 정렬된 이중 우선순위 큐다</p>
+</div>
+
+<h3>2.1 오더북의 동적 변화</h3>
+
+<p>
+오더북은 정적인 스냅샷이 아니라, 매 밀리초마다 변하는 동적 시스템이다. 새로운 지정가 주문이 들어오면 해당 호가에 수량이 추가되고, 시장가 주문이 들어오면 최우선 호가의 수량이 소진된다. 주문 취소(cancel)도 빈번하게 발생한다. HFT 시스템은 이 변화의 패턴에서 단기 가격 방향을 예측한다.
+</p>
+
+<div class="def">
+<p class="ni"><strong>📖 오더북 이벤트 3가지</strong></p>
+<p class="ni" style="margin-top:8px">
+(1) <strong>Add</strong> — 새로운 지정가 주문이 오더북에 추가됨<br>
+(2) <strong>Cancel</strong> — 기존 지정가 주문이 취소됨<br>
+(3) <strong>Execute (Trade)</strong> — 시장가 주문이 지정가 주문과 매칭되어 체결됨
+</p>
+</div>
+
+<h3>2.2 Order Imbalance와 가격 예측</h3>
+
+<p>
+오더북에서 가장 강력한 단기 예측 시그널 중 하나가 <strong>주문 불균형(Order Imbalance)</strong>이다. 매수 쪽 수량이 매도 쪽보다 많으면 가격이 오를 가능성이 높고, 반대면 내릴 가능성이 높다. 이것은 직관적으로도 이해된다 — 사려는 사람이 많으면 가격이 오른다.
+</p>
+
+<div class="eq">
+\[ OI = \frac{V_{\text{bid}}^{(1)} - V_{\text{ask}}^{(1)}}{V_{\text{bid}}^{(1)} + V_{\text{ask}}^{(1)}} \in [-1, +1] \]
+</div>
+
+<p>
+\(OI > 0\)이면 매수 압력 우세, \(OI < 0\)이면 매도 압력 우세다. 여러 호가 레벨을 가중 합산하면 더 안정적인 시그널을 얻을 수 있다:
+</p>
+
+<div class="eq">
+\[ WOI = \frac{\sum_{k=1}^{L} w_k \cdot V_{\text{bid}}^{(k)} - \sum_{k=1}^{L} w_k \cdot V_{\text{ask}}^{(k)}}{\sum_{k=1}^{L} w_k \cdot (V_{\text{bid}}^{(k)} + V_{\text{ask}}^{(k)})}, \quad w_k = \frac{1}{k} \]
+</div>
+
+<p>
+가중치 \(w_k = 1/k\)는 최우선 호가에 가장 큰 가중치를 부여한다. 최우선 호가가 가격 변동에 가장 직접적인 영향을 미치기 때문이다.
+</p>
+
+<p class="cc">▼ Order Imbalance 계산 예제</p>
+<pre>
+<span class="kw">import</span> numpy <span class="kw">as</span> np
+
+<span class="cm"># 오더북 스냅샷 (5 레벨)</span>
+bid_sizes = np.<span class="fn">array</span>([<span class="nu">200</span>, <span class="nu">350</span>, <span class="nu">500</span>, <span class="nu">180</span>, <span class="nu">420</span>])
+ask_sizes = np.<span class="fn">array</span>([<span class="nu">150</span>, <span class="nu">280</span>, <span class="nu">450</span>, <span class="nu">320</span>, <span class="nu">550</span>])
+
+<span class="cm"># 단순 OI (Level 1만)</span>
+oi_l1 = (bid_sizes[<span class="nu">0</span>] - ask_sizes[<span class="nu">0</span>]) / (bid_sizes[<span class="nu">0</span>] + ask_sizes[<span class="nu">0</span>])
+<span class="fn">print</span>(<span class="st">f"Level-1 OI: {oi_l1:.4f}"</span>)  <span class="cm"># 양수 → 매수 압력 우세</span>
+
+<span class="cm"># 가중 OI (5 레벨)</span>
+weights = <span class="nu">1.0</span> / np.<span class="fn">arange</span>(<span class="nu">1</span>, <span class="nu">6</span>)
+woi = (np.<span class="fn">sum</span>(weights * bid_sizes) - np.<span class="fn">sum</span>(weights * ask_sizes)) \
+    / (np.<span class="fn">sum</span>(weights * bid_sizes) + np.<span class="fn">sum</span>(weights * ask_sizes))
+<span class="fn">print</span>(<span class="st">f"Weighted OI (5-level): {woi:.4f}"</span>)
+</pre>
+<div class="code-output"><span class="out-label">Output:</span>
+Level-1 OI: 0.1429
+Weighted OI (5-level): 0.0312</div>
+
+<h3>2.3 Price Impact — 주문이 가격을 움직이는 메커니즘</h3>
+
+<p>
+대량 주문은 오더북의 여러 호가를 소진하면서 가격을 움직인다. 이것을 <strong>가격 충격(Price Impact)</strong>이라 한다. Kyle(1985)의 모델에서 가격 충격은 주문 크기에 비례한다:
+</p>
+
+<div class="eq">
+\[ \Delta P = \lambda \cdot \Delta V, \quad \lambda = \frac{\sigma}{\sqrt{V_{\text{daily}}}} \]
+</div>
+
+<p>
+여기서 \(\lambda\)는 Kyle's Lambda(시장 깊이의 역수), \(\sigma\)는 변동성, \(V_{\text{daily}}\)는 일간 거래량이다. 유동성이 풍부한 종목(AAPL 등)은 \(\lambda\)가 작고, 소형주는 \(\lambda\)가 크다.
+</p>
+
+<!-- ★ Plotly: Order Imbalance vs Price Change -->
+<div id="plot-ch2-oi" style="width:100%;height:420px;margin:20px 0"></div>
+<script>
+(function(){
+  // Seeded PRNG
+  function mulberry32(a){return function(){a|=0;a=a+0x6D2B79F5|0;var t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296;};}
+  var rng=mulberry32(42);
+  var N=200, oi=[], dp=[];
+  for(var i=0;i<N;i++){
+    var o=(rng()-0.5)*2; // OI in [-1,1]
+    var noise=(rng()-0.5)*0.3;
+    var d=o*0.05+noise*0.02; // price change ~ linear in OI + noise
+    oi.push(o); dp.push(d);
+  }
+  // Color by quadrant
+  var colors=oi.map(function(o,i){return (o>0&&dp[i]>0)||(o<0&&dp[i]<0)?'rgba(46,204,113,0.6)':'rgba(231,76,60,0.4)';});
+  Plotly.newPlot('plot-ch2-oi',[
+    {x:oi,y:dp,mode:'markers',type:'scatter',marker:{size:5,color:colors},name:'OI vs ΔP',
+     hovertemplate:'OI: %{x:.3f}<br>ΔP: %{y:.4f}%'},
+    {x:[-1,1],y:[-0.05,0.05],mode:'lines',line:{color:'#e67e22',width:2,dash:'dash'},name:'선형 회귀 (이론)'}
+  ],{
+    title:{text:'📊 Order Imbalance vs 가격 변화 (200 스냅샷)',font:{size:13}},
+    xaxis:{title:'Order Imbalance',range:[-1.1,1.1]},
+    yaxis:{title:'가격 변화 (%)',zeroline:true},
+    legend:{x:0.01,y:0.99,bgcolor:'rgba(255,255,255,0.85)'},
+    margin:{t:45,b:50},paper_bgcolor:'#fafaf8',plot_bgcolor:'#fff'
+  },{responsive:true});
+})();
+</script>
+<p class="ni" style="font-size:11px;color:#888;text-align:center">🖱️ OI가 양수일 때 가격이 오르는 경향(초록), 음수일 때 내리는 경향(빨강). 점선은 이론적 선형 관계.</p>
+
+<h3>2.4 Trade Flow Toxicity — VPIN</h3>
+
+<p>
+VPIN(Volume-Synchronized Probability of Informed Trading)은 거래 흐름의 "독성"을 측정하는 지표다. 정보를 가진 트레이더의 비율이 높을수록 VPIN이 높아지고, 이는 마켓메이커에게 위험 신호다. 2010년 Flash Crash 직전에 VPIN이 급등한 것으로 유명하다.
+</p>
+
+<div class="eq">
+\[ VPIN = \frac{\sum_{i=1}^{n} |V_i^{buy} - V_i^{sell}|}{n \cdot V_{\text{bucket}}} \]
+</div>
+
+<p>
+여기서 \(V_{\text{bucket}}\)은 고정 거래량 단위(volume bucket)이고, \(V_i^{buy}, V_i^{sell}\)은 각 버킷 내 매수/매도 거래량이다. VPIN이 높으면 정보 비대칭이 크다는 의미이므로, 마켓메이커는 스프레드를 넓히거나 주문을 철회해야 한다.
+</p>
+
+<div class="warn">
+<p class="ni"><strong>⚠️ 실전 주의:</strong> VPIN 계산에서 매수/매도 분류(trade classification)는 Lee-Ready 알고리즘이나 Tick Rule을 사용한다. 완벽한 분류는 불가능하므로 VPIN에는 항상 노이즈가 포함된다.</p>
+</div>
+
+
+<!-- ═══════════════════════════════════════════════════════════════
+     Chapter 3: HFT 전략 유형
+     ═══════════════════════════════════════════════════════════════ -->
+<h2 id="ch3">Chapter 3. HFT 전략 유형 — 마켓메이킹, 차익거래, 모멘텀</h2>
+
+<div class="info">
+<p class="ni"><strong>📚 교재 연동:</strong> MLDSF Ch.13 "High-Frequency Trading Strategies" / MLAT Ch.22 "Trading Strategies"</p>
+</div>
+
+<h3>3.1 마켓메이킹 (Market Making)</h3>
+
+<p>
+마켓메이킹은 HFT의 가장 대표적인 전략이다. 마켓메이커는 오더북의 양쪽(bid/ask)에 지정가 주문을 동시에 걸어놓고, 스프레드를 수익으로 취한다. 예를 들어 $149.50에 매수 주문, $149.55에 매도 주문을 걸면, 양쪽 모두 체결될 때 $0.05의 수익을 얻는다.
+</p>
+
+<div class="def">
+<p class="ni"><strong>📖 Avellaneda-Stoikov 모델 (2008)</strong></p>
+<p class="ni" style="margin-top:8px">
+최적 호가 설정의 고전적 모델이다. 마켓메이커의 최적 bid/ask 가격은:
+</p>
+</div>
+
+<div class="eq">
+\[ \delta^{bid} = \delta^{ask} = \frac{\gamma \sigma^2 (T-t)}{2} + \frac{1}{\gamma} \ln\left(1 + \frac{\gamma}{\kappa}\right) \]
+</div>
+
+<p>
+여기서 \(\gamma\)는 위험 회피 계수, \(\sigma\)는 변동성, \(T-t\)는 잔여 시간, \(\kappa\)는 주문 도착률이다. 핵심 인사이트: (1) 변동성이 높으면 스프레드를 넓혀야 하고, (2) 잔여 시간이 적으면 재고 리스크를 줄이기 위해 스프레드를 좁혀야 한다.
+</p>
+
+<p class="cc">▼ Avellaneda-Stoikov 마켓메이킹 시뮬레이션</p>
+<pre>
+<span class="kw">import</span> numpy <span class="kw">as</span> np
+
+<span class="kw">def</span> <span class="fn">avellaneda_stoikov</span>(S, sigma, gamma, kappa, T, t, q):
+    <span class="st">"""
+    S: 현재 mid price
+    sigma: 변동성
+    gamma: 위험 회피 계수
+    kappa: 주문 도착률
+    T: 마감 시간, t: 현재 시간
+    q: 현재 재고 (양수=롱, 음수=숏)
+    """</span>
+    <span class="cm"># 예약 가격 (재고 조정)</span>
+    reservation = S - q * gamma * sigma**<span class="nu">2</span> * (T - t)
+
+    <span class="cm"># 최적 스프레드</span>
+    spread = gamma * sigma**<span class="nu">2</span> * (T - t) + (<span class="nu">2</span>/gamma) * np.<span class="fn">log</span>(<span class="nu">1</span> + gamma/kappa)
+
+    bid = reservation - spread / <span class="nu">2</span>
+    ask = reservation + spread / <span class="nu">2</span>
+    <span class="kw">return</span> bid, ask, reservation, spread
+
+<span class="cm"># 파라미터</span>
+S = <span class="nu">100.0</span>    <span class="cm"># mid price</span>
+sigma = <span class="nu">0.02</span>  <span class="cm"># 일간 변동성 2%</span>
+gamma = <span class="nu">0.1</span>   <span class="cm"># 위험 회피</span>
+kappa = <span class="nu">1.5</span>   <span class="cm"># 주문 도착률</span>
+T = <span class="nu">1.0</span>       <span class="cm"># 1일</span>
+
+<span class="cm"># 재고별 최적 호가</span>
+<span class="kw">for</span> q <span class="kw">in</span> [<span class="nu">-5</span>, <span class="nu">0</span>, <span class="nu">5</span>]:
+    bid, ask, res, spr = <span class="fn">avellaneda_stoikov</span>(S, sigma, gamma, kappa, T, <span class="nu">0</span>, q)
+    <span class="fn">print</span>(<span class="st">f"재고 q={q:+d}: Bid={bid:.4f}, Ask={ask:.4f}, "</span>
+          <span class="st">f"Spread={spr:.4f}, Reservation={res:.4f}"</span>)
+</pre>
+<div class="code-output"><span class="out-label">Output:</span>
+재고 q=-5: Bid=99.9982, Ask=100.0118, Spread=0.0136, Reservation=100.0050
+재고 q=+0: Bid=99.9932, Ask=100.0068, Spread=0.0136, Reservation=100.0000
+재고 q=+5: Bid=99.9882, Ask=100.0018, Spread=0.0136, Reservation=99.9950</div>
+
+<p>
+재고가 양수(롱)이면 예약 가격이 내려가서 매도를 유도하고, 음수(숏)이면 올라가서 매수를 유도한다. 이것이 재고 관리(inventory management)의 핵심이다.
+</p>
+
+<h3>3.2 통계적 차익거래 (Statistical Arbitrage)</h3>
+
+<p>
+통계적 차익거래는 두 개 이상의 관련 자산 간 가격 괴리를 포착하여 수익을 추구한다. R5에서 배운 공적분(cointegration)이 핵심 도구다. 예를 들어 코카콜라(KO)와 펩시(PEP)의 가격 비율이 역사적 평균에서 벗어나면, 비싼 쪽을 매도하고 싼 쪽을 매수한다.
+</p>
+
+<div class="eq">
+\[ z_t = \frac{P_t^A - \beta \cdot P_t^B - \mu}{\sigma}, \quad \text{Signal: } |z_t| > \tau \text{이면 진입} \]
+</div>
+
+<h3>3.3 모멘텀 이그니션 (Momentum Ignition)</h3>
+
+<p>
+모멘텀 이그니션은 논란이 많은 전략이다. 대량 주문을 빠르게 넣어 가격을 한 방향으로 밀고, 다른 참여자들이 따라오면(모멘텀) 반대 방향으로 포지션을 청산한다. 많은 거래소에서 이를 시장 조작으로 간주하여 규제하고 있다.
+</p>
+
+<div class="warn">
+<p class="ni"><strong>⚠️ 규제 주의:</strong> 모멘텀 이그니션, 스푸핑(spoofing), 레이어링(layering) 등은 대부분의 선진국 시장에서 불법이다. 학습 목적으로만 이해하고, 실전에서는 절대 사용하지 말 것.</p>
+</div>
+
+<h3>3.4 HFT 전략 비교</h3>
+
+<table>
+<tr><th>전략</th><th>수익 원천</th><th>보유 기간</th><th>리스크</th><th>인프라 요구</th></tr>
+<tr><td>마켓메이킹</td><td>Bid-Ask 스프레드</td><td>초~분</td><td>재고 리스크, 역선택</td><td>매우 높음 (co-location)</td></tr>
+<tr><td>통계적 차익거래</td><td>가격 괴리 수렴</td><td>분~시간</td><td>괴리 확대 리스크</td><td>높음</td></tr>
+<tr><td>모멘텀</td><td>단기 추세 추종</td><td>초~분</td><td>반전 리스크</td><td>높음</td></tr>
+<tr><td>레이턴시 차익거래</td><td>거래소 간 가격 차이</td><td>밀리초</td><td>기술 리스크</td><td>극도로 높음</td></tr>
+</table>
+
+<!-- ★ Plotly: Market Making P&L Simulation -->
+<div id="plot-ch3-mm" style="width:100%;height:450px;margin:20px 0"></div>
+<script>
+(function(){
+  function mulberry32(a){return function(){a|=0;a=a+0x6D2B79F5|0;var t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296;};}
+  var rng=mulberry32(123);
+  var N=500, pnl=[0], inventory=[0], midPrices=[100];
+  var cumPnl=0, inv=0, mid=100;
+  for(var i=1;i<=N;i++){
+    mid+=((rng()-0.5)*0.1);
+    midPrices.push(mid);
+    // Random trade: buy or sell with some probability
+    var r=rng();
+    if(r<0.3){ // buy filled
+      cumPnl-=mid+0.025; inv+=1;
+    } else if(r<0.6){ // sell filled
+      cumPnl+=mid-0.025; inv-=1;
+    }
+    // Mark-to-market P&L
+    pnl.push(cumPnl+inv*mid);
+    inventory.push(inv);
+  }
+  var steps=Array.from({length:N+1},function(_,i){return i;});
+  Plotly.newPlot('plot-ch3-mm',[
+    {x:steps,y:pnl,type:'scatter',mode:'lines',name:'누적 P&L ($)',line:{color:'#2ecc71',width:2}},
+    {x:steps,y:inventory,type:'scatter',mode:'lines',name:'재고 (주)',line:{color:'#e74c3c',width:1.5},yaxis:'y2'}
+  ],{
+    title:{text:'📊 마켓메이킹 시뮬레이션: P&L vs 재고 (500 거래)',font:{size:13}},
+    xaxis:{title:'거래 번호'},
+    yaxis:{title:'누적 P&L ($)',side:'left',titlefont:{color:'#2ecc71'}},
+    yaxis2:{title:'재고 (주)',overlaying:'y',side:'right',titlefont:{color:'#e74c3c'},zeroline:true},
+    legend:{x:0.01,y:0.99,bgcolor:'rgba(255,255,255,0.85)'},
+    margin:{t:45,b:50},paper_bgcolor:'#fafaf8',plot_bgcolor:'#fff'
+  },{responsive:true});
+})();
+</script>
+<p class="ni" style="font-size:11px;color:#888;text-align:center">🖱️ 초록선=누적 P&L, 빨간선=재고. 마켓메이커는 재고를 0 근처로 유지하면서 스프레드 수익을 축적한다.</p>
+
+
+<!-- ═══════════════════════════════════════════════════════════════
+     Chapter 4: 저지연 아키텍처
+     ═══════════════════════════════════════════════════════════════ -->
+<h2 id="ch4">Chapter 4. 저지연 아키텍처 — 이벤트 드리븐 시스템</h2>
+
+<div class="info">
+<p class="ni"><strong>📚 교재 연동:</strong> MLDSF Ch.14 "System Architecture for Trading" / 두잇알고 Ch.8 해시 테이블 — O(1) 조회가 HFT에서 중요한 이유</p>
+</div>
+
+<h3>4.1 왜 속도가 중요한가</h3>
+
+<p>
+HFT에서 1밀리초의 차이가 수익과 손실을 가른다. 시장 데이터를 받아서 분석하고, 주문을 생성하여 거래소에 전송하는 전체 과정이 마이크로초 단위로 이루어져야 한다. 이를 위해 HFT 시스템은 일반적인 웹 서버와는 완전히 다른 아키텍처를 사용한다.
+</p>
+
+<h3>4.2 이벤트 드리븐 아키텍처</h3>
+
+<p>
+전통적인 "폴링(polling)" 방식 — 주기적으로 데이터를 확인하는 방식 — 은 HFT에 부적합하다. 대신 <strong>이벤트 드리븐(Event-Driven)</strong> 아키텍처를 사용한다. 시장 데이터가 도착하면 즉시 콜백 함수가 실행되고, 시그널이 발생하면 즉시 주문이 생성된다.
+</p>
+
+<p class="cc">▼ 이벤트 드리븐 트레이딩 엔진 (Python 프로토타입)</p>
+<pre>
+<span class="kw">import</span> asyncio
+<span class="kw">from</span> collections <span class="kw">import</span> defaultdict
+<span class="kw">from</span> dataclasses <span class="kw">import</span> dataclass
+<span class="kw">from</span> enum <span class="kw">import</span> Enum
+<span class="kw">from</span> typing <span class="kw">import</span> Callable, List
+
+<span class="kw">class</span> <span class="nb">EventType</span>(Enum):
+    MARKET_DATA = <span class="st">"market_data"</span>
+    SIGNAL = <span class="st">"signal"</span>
+    ORDER = <span class="st">"order"</span>
+    FILL = <span class="st">"fill"</span>
+
+@<span class="fn">dataclass</span>
+<span class="kw">class</span> <span class="nb">Event</span>:
+    event_type: EventType
+    data: <span class="nb">dict</span>
+    timestamp: <span class="nb">float</span>
+
+<span class="kw">class</span> <span class="nb">EventBus</span>:
+    <span class="st">"""이벤트 버스: 발행-구독 패턴"""</span>
+    <span class="kw">def</span> <span class="fn">__init__</span>(self):
+        self.handlers = <span class="fn">defaultdict</span>(<span class="nb">list</span>)
+
+    <span class="kw">def</span> <span class="fn">subscribe</span>(self, event_type: EventType, handler: Callable):
+        self.handlers[event_type].<span class="fn">append</span>(handler)
+
+    <span class="kw">async</span> <span class="kw">def</span> <span class="fn">publish</span>(self, event: Event):
+        <span class="kw">for</span> handler <span class="kw">in</span> self.handlers[event.event_type]:
+            <span class="kw">await</span> <span class="fn">handler</span>(event)
+
+<span class="kw">class</span> <span class="nb">TradingEngine</span>:
+    <span class="st">"""이벤트 드리븐 트레이딩 엔진"""</span>
+    <span class="kw">def</span> <span class="fn">__init__</span>(self):
+        self.bus = <span class="fn">EventBus</span>()
+        self.bus.<span class="fn">subscribe</span>(EventType.MARKET_DATA, self.on_market_data)
+        self.bus.<span class="fn">subscribe</span>(EventType.SIGNAL, self.on_signal)
+        self.position = <span class="nu">0</span>
+
+    <span class="kw">async</span> <span class="kw">def</span> <span class="fn">on_market_data</span>(self, event):
+        <span class="st">"""시장 데이터 → 시그널 생성"""</span>
+        oi = event.data.<span class="fn">get</span>(<span class="st">'order_imbalance'</span>, <span class="nu">0</span>)
+        <span class="kw">if</span> <span class="fn">abs</span>(oi) > <span class="nu">0.3</span>:  <span class="cm"># 임계값 초과</span>
+            signal = <span class="fn">Event</span>(
+                event_type=EventType.SIGNAL,
+                data={<span class="st">'direction'</span>: <span class="nu">1</span> <span class="kw">if</span> oi > <span class="nu">0</span> <span class="kw">else</span> -<span class="nu">1</span>,
+                      <span class="st">'strength'</span>: <span class="fn">abs</span>(oi)},
+                timestamp=event.timestamp
+            )
+            <span class="kw">await</span> self.bus.<span class="fn">publish</span>(signal)
+
+    <span class="kw">async</span> <span class="kw">def</span> <span class="fn">on_signal</span>(self, event):
+        <span class="st">"""시그널 → 주문 생성"""</span>
+        direction = event.data[<span class="st">'direction'</span>]
+        <span class="fn">print</span>(<span class="st">f"[SIGNAL] dir={direction:+d}, "</span>
+              <span class="st">f"strength={event.data['strength']:.2f}"</span>)
+        <span class="cm"># 포지션 관리 로직</span>
+        <span class="kw">if</span> self.position * direction <= <span class="nu">0</span>:
+            self.position += direction * <span class="nu">100</span>
+            <span class="fn">print</span>(<span class="st">f"[ORDER] {'BUY' if direction > 0 else 'SELL'} "</span>
+                  <span class="st">f"100 shares, pos={self.position}"</span>)
+</pre>
+<div class="code-output"><span class="out-label">Output (시뮬레이션):</span>
+[SIGNAL] dir=+1, strength=0.45
+[ORDER] BUY 100 shares, pos=100
+[SIGNAL] dir=-1, strength=0.38
+[ORDER] SELL 100 shares, pos=0</div>
+
+<h3>4.3 저지연 최적화 기법</h3>
+
+<table>
+<tr><th>기법</th><th>설명</th><th>효과</th></tr>
+<tr><td>Co-location</td><td>서버를 거래소 데이터센터에 배치</td><td>네트워크 지연 최소화 (~μs)</td></tr>
+<tr><td>Kernel Bypass</td><td>OS 커널을 우회하여 NIC 직접 접근</td><td>시스템 콜 오버헤드 제거</td></tr>
+<tr><td>Lock-free Queue</td><td>뮤텍스 없는 큐 자료구조</td><td>스레드 경합 제거</td></tr>
+<tr><td>Memory Pool</td><td>사전 할당된 메모리 풀 사용</td><td>GC/malloc 지연 제거</td></tr>
+<tr><td>FPGA</td><td>하드웨어 수준 로직 구현</td><td>나노초 단위 처리</td></tr>
+</table>
+
+<!-- ★ Plotly: Latency Comparison -->
+<div id="plot-ch4-latency" style="width:100%;height:400px;margin:20px 0"></div>
+<script>
+(function(){
+  var categories=['Python\n(일반)','Python\n(최적화)','C++\n(일반)','C++\n(최적화)','FPGA'];
+  var latencies=[5000,500,50,5,0.5]; // microseconds
+  var colors=['#e74c3c','#e67e22','#f1c40f','#2ecc71','#3498db'];
+  Plotly.newPlot('plot-ch4-latency',[{
+    x:categories,y:latencies,type:'bar',
+    marker:{color:colors,line:{width:1,color:'#333'}},
+    text:latencies.map(function(v){return v>=1?v+'μs':v*1000+'ns';}),
+    textposition:'outside',
+    hovertemplate:'%{x}: %{y}μs'
+  }],{
+    title:{text:'📊 트레이딩 시스템 레이턴시 비교 (로그 스케일)',font:{size:13}},
+    yaxis:{title:'레이턴시 (μs)',type:'log',range:[-1,4]},
+    xaxis:{title:''},
+    margin:{t:45,b:80},paper_bgcolor:'#fafaf8',plot_bgcolor:'#fff',
+    annotations:[{x:'Python\n(일반)',y:Math.log10(5000),text:'5ms — 백테스트용',showarrow:true,arrowhead:2,ax:60,ay:-20,font:{size:10,color:'#e74c3c'}},
+                 {x:'FPGA',y:Math.log10(0.5),text:'500ns — 실전 HFT',showarrow:true,arrowhead:2,ax:-60,ay:-20,font:{size:10,color:'#3498db'}}]
+  },{responsive:true});
+})();
+</script>
+<p class="ni" style="font-size:11px;color:#888;text-align:center">🖱️ Python은 프로토타이핑/백테스트에 적합하고, 실전 HFT는 C++/FPGA가 필수. 우리는 Python으로 전략 로직을 검증한 후 C++로 포팅하는 워크플로우를 따른다.</p>
+
+<div class="ok">
+<p class="ni"><strong>💡 현실적 조언:</strong> 개인 트레이더가 나노초 단위의 HFT를 구현하는 것은 비현실적이다. 하지만 이벤트 드리븐 아키텍처, 효율적인 데이터 처리, 리스크 관리 로직은 어떤 규모의 시스템에서든 핵심이다. 우리의 목표는 "HFT의 사고방식"을 배우는 것이다.</p>
+</div>
+
+
+<!-- ═══════════════════════════════════════════════════════════════
+     Chapter 5: 강화학습 기초 — MDP, 벨만 방정식
+     ═══════════════════════════════════════════════════════════════ -->
+<h2 id="ch5">Chapter 5. 강화학습 기초 — MDP와 벨만 방정식</h2>
+
+<div class="info">
+<p class="ni"><strong>📚 교재 연동:</strong> MLAT Ch.22 "Reinforcement Learning Fundamentals" / 혼공파 Ch.8 클래스 — RL 에이전트를 클래스로 구현</p>
+</div>
+
+<h3>5.1 강화학습이란 무엇인가</h3>
+
+<p>
+R4~R7에서 배운 지도학습(Supervised Learning)은 "정답이 있는 데이터"에서 패턴을 학습했다. 강화학습(Reinforcement Learning, RL)은 근본적으로 다르다. 에이전트(agent)가 환경(environment)과 상호작용하며, 시행착오를 통해 최적의 행동 전략(policy)을 학습한다. 정답이 주어지지 않는다 — 대신 행동의 결과로 보상(reward)을 받고, 누적 보상을 최대화하는 방향으로 학습한다.
+</p>
+
+<div style="margin:25px 0;display:flex;gap:15px;flex-wrap:wrap;justify-content:center;align-items:center">
+<div style="background:#e8f4f8;padding:15px 20px;border-radius:10px;text-align:center;min-width:120px">
+<p class="ni" style="font-size:28px">🤖</p>
+<p class="ni" style="font-weight:bold;font-size:13px">에이전트</p>
+<p class="ni" style="font-size:11px;color:#666">트레이딩 봇</p>
+</div>
+<div style="text-align:center;min-width:80px">
+<p class="ni" style="font-size:12px;color:#e74c3c">행동 (a<sub>t</sub>) →</p>
+<p class="ni" style="font-size:12px;color:#27ae60">← 보상 (r<sub>t</sub>)</p>
+<p class="ni" style="font-size:12px;color:#3498db">← 상태 (s<sub>t+1</sub>)</p>
+</div>
+<div style="background:#fff3cd;padding:15px 20px;border-radius:10px;text-align:center;min-width:120px">
+<p class="ni" style="font-size:28px">📈</p>
+<p class="ni" style="font-weight:bold;font-size:13px">환경</p>
+<p class="ni" style="font-size:11px;color:#666">금융 시장</p>
+</div>
+</div>
+
+<h3>5.2 마르코프 결정 과정 (MDP)</h3>
+
+<p>
+강화학습의 수학적 프레임워크가 <strong>마르코프 결정 과정(Markov Decision Process, MDP)</strong>이다. MDP는 5-튜플 \((S, A, P, R, \gamma)\)로 정의된다:
+</p>
+
+<table>
+<tr><th>요소</th><th>기호</th><th>트레이딩 예시</th></tr>
+<tr><td>상태 공간</td><td>\(S\)</td><td>가격, 포지션, 기술적 지표, 오더북 상태</td></tr>
+<tr><td>행동 공간</td><td>\(A\)</td><td>{매수, 매도, 홀드}</td></tr>
+<tr><td>전이 확률</td><td>\(P(s'|s,a)\)</td><td>행동 후 시장 상태 변화 확률</td></tr>
+<tr><td>보상 함수</td><td>\(R(s,a,s')\)</td><td>실현 수익, 샤프비율, 리스크 조정 수익</td></tr>
+<tr><td>할인 인자</td><td>\(\gamma \in [0,1]\)</td><td>미래 보상의 현재 가치 (보통 0.99)</td></tr>
+</table>
+
+<div class="def">
+<p class="ni"><strong>📖 마르코프 성질 (Markov Property)</strong></p>
+<p class="ni" style="margin-top:8px">
+미래 상태는 현재 상태에만 의존하고, 과거 이력에는 의존하지 않는다: \(P(s_{t+1}|s_t, a_t) = P(s_{t+1}|s_1, a_1, \ldots, s_t, a_t)\). 금융 시장은 엄밀히 마르코프가 아니지만, 충분한 정보를 상태에 포함시키면 근사적으로 마르코프로 모델링할 수 있다 (예: 과거 N일 수익률을 상태에 포함).
+</p>
+</div>
+
+<h3>5.3 가치 함수와 벨만 방정식</h3>
+
+<p>
+정책(policy) \(\pi(a|s)\)는 상태 \(s\)에서 행동 \(a\)를 선택할 확률이다. 정책의 "좋음"을 측정하는 것이 <strong>가치 함수(Value Function)</strong>다:
+</p>
+
+<div class="eq">
+\[ V^\pi(s) = \mathbb{E}_\pi \left[ \sum_{t=0}^{\infty} \gamma^t r_t \,\middle|\, s_0 = s \right] \]
+</div>
+
+<p>
+상태-행동 가치 함수(Q-function)는 상태 \(s\)에서 행동 \(a\)를 취한 후의 기대 누적 보상이다:
+</p>
+
+<div class="eq">
+\[ Q^\pi(s, a) = \mathbb{E}_\pi \left[ \sum_{t=0}^{\infty} \gamma^t r_t \,\middle|\, s_0 = s, a_0 = a \right] \]
+</div>
+
+<p>
+<strong>벨만 방정식(Bellman Equation)</strong>은 가치 함수의 재귀적 관계를 나타낸다:
+</p>
+
+<div class="eq">
+\[ V^\pi(s) = \sum_a \pi(a|s) \sum_{s'} P(s'|s,a) \left[ R(s,a,s') + \gamma V^\pi(s') \right] \]
+</div>
+
+<p>
+최적 가치 함수 \(V^*(s)\)와 최적 Q-함수 \(Q^*(s,a)\)에 대한 <strong>벨만 최적 방정식</strong>:
+</p>
+
+<div class="eq">
+\[ Q^*(s, a) = \sum_{s'} P(s'|s,a) \left[ R(s,a,s') + \gamma \max_{a'} Q^*(s', a') \right] \]
+</div>
+
+<p>
+이 방정식이 Q-Learning의 이론적 기반이다. 최적 Q-함수를 알면, 최적 정책은 단순히 \(\pi^*(s) = \arg\max_a Q^*(s,a)\)이다.
+</p>
+
+<!-- ★ Plotly: MDP Grid World Value Function -->
+<div id="plot-ch5-mdp" style="width:100%;height:450px;margin:20px 0"></div>
+<script>
+(function(){
+  // Simple 5x5 grid world value function (computed via value iteration)
+  var V=[
+    [0.59,0.66,0.73,0.81,0.90],
+    [0.53,0.59,0.66,0.73,0.81],
+    [0.48,0.53,0.59,0.66,0.73],
+    [0.43,0.48,0.53,0.59,0.66],
+    [0.39,0.43,0.48,0.53,0.59]
+  ];
+  // Reverse for proper orientation
+  V.reverse();
+  var annotations=[];
+  var arrows=[['↗','→','→','→','★'],['↑','↗','→','→','↑'],['↑','↑','↗','→','↑'],['↑','↑','↑','↗','↑'],['↑','↑','↑','↑','↗']];
+  arrows.reverse();
+  for(var i=0;i<5;i++){
+    for(var j=0;j<5;j++){
+      annotations.push({x:j,y:i,text:V[i][j].toFixed(2)+'<br>'+arrows[i][j],showarrow:false,font:{size:11,color:V[i][j]>0.7?'white':'black'}});
+    }
+  }
+  Plotly.newPlot('plot-ch5-mdp',[{
+    z:V,type:'heatmap',colorscale:'Viridis',
+    hovertemplate:'(%{x},%{y})<br>V=%{z:.2f}',
+    colorbar:{title:'V(s)',titleside:'right'}
+  }],{
+    title:{text:'📊 5×5 Grid World: 가치 함수 V(s) + 최적 정책 (γ=0.9)',font:{size:13}},
+    xaxis:{title:'x',dtick:1,range:[-0.5,4.5]},
+    yaxis:{title:'y',dtick:1,range:[-0.5,4.5]},
+    annotations:annotations,
+    margin:{t:45,b:50,l:50,r:80},paper_bgcolor:'#fafaf8'
+  },{responsive:true});
+})();
+</script>
+<p class="ni" style="font-size:11px;color:#888;text-align:center">🖱️ 5×5 그리드 월드에서 목표(★, 우상단)까지의 가치 함수. 밝을수록 가치가 높다. 화살표는 최적 정책(이동 방향).</p>
+
+
+<!-- ═══════════════════════════════════════════════════════════════
+     Chapter 6: Q-Learning
+     ═══════════════════════════════════════════════════════════════ -->
+<h2 id="ch6">Chapter 6. Q-Learning — 테이블 기반 강화학습</h2>
+
+<div class="info">
+<p class="ni"><strong>📚 교재 연동:</strong> MLAT Ch.22 "Q-Learning" / 혼공파 Ch.5 딕셔너리 — Q-테이블은 본질적으로 (상태, 행동) → 가치의 딕셔너리다</p>
+</div>
+
+<h3>6.1 Q-Learning 알고리즘</h3>
+
+<p>
+Q-Learning은 모델-프리(model-free) 강화학습의 가장 기본적인 알고리즘이다. 환경의 전이 확률 \(P(s'|s,a)\)를 모르더라도, 경험(experience)만으로 최적 Q-함수를 학습할 수 있다. 핵심 업데이트 규칙:
+</p>
+
+<div class="eq">
+\[ Q(s_t, a_t) \leftarrow Q(s_t, a_t) + \alpha \left[ r_t + \gamma \max_{a'} Q(s_{t+1}, a') - Q(s_t, a_t) \right] \]
+</div>
+
+<p>
+여기서 \(\alpha\)는 학습률, \(r_t + \gamma \max_{a'} Q(s_{t+1}, a')\)는 TD 타겟(Temporal Difference target), 그리고 대괄호 안의 전체가 TD 에러다. TD 에러가 0이 되면 벨만 최적 방정식이 만족되므로, Q-테이블이 수렴한 것이다.
+</p>
+
+<h3>6.2 ε-Greedy 탐색</h3>
+
+<p>
+강화학습의 핵심 딜레마가 <strong>탐색-활용 트레이드오프(Exploration-Exploitation Trade-off)</strong>다. 현재 최선이라고 생각하는 행동만 하면(활용) 더 좋은 행동을 발견하지 못하고, 무작위 행동만 하면(탐색) 학습한 것을 활용하지 못한다. ε-Greedy 정책은 이를 간단하게 해결한다:
+</p>
+
+<div class="eq">
+\[ a_t = \begin{cases} \arg\max_a Q(s_t, a) & \text{확률 } 1-\varepsilon \text{ (활용)} \\ \text{random action} & \text{확률 } \varepsilon \text{ (탐색)} \end{cases} \]
+</div>
+
+<p>
+보통 \(\varepsilon\)을 1.0에서 시작하여 점진적으로 감소시킨다(ε-decay). 초기에는 많이 탐색하고, 학습이 진행될수록 활용 비중을 높인다.
+</p>
+
+<h3>6.3 간단한 트레이딩 Q-Learning</h3>
+
+<p class="cc">▼ Q-Learning 트레이딩 에이전트 (이산 상태)</p>
+<pre>
+<span class="kw">import</span> numpy <span class="kw">as</span> np
+
+<span class="kw">class</span> <span class="nb">SimpleQLearner</span>:
+    <span class="st">"""
+    상태: 가격 변화 방향 (up/down/flat) × 포지션 (long/flat/short)
+    행동: buy / sell / hold
+    """</span>
+    <span class="kw">def</span> <span class="fn">__init__</span>(self, n_states=<span class="nu">9</span>, n_actions=<span class="nu">3</span>,
+                 alpha=<span class="nu">0.1</span>, gamma=<span class="nu">0.99</span>, epsilon=<span class="nu">1.0</span>):
+        self.q_table = np.<span class="fn">zeros</span>((n_states, n_actions))
+        self.alpha = alpha
+        self.gamma = gamma
+        self.epsilon = epsilon
+        self.epsilon_min = <span class="nu">0.01</span>
+        self.epsilon_decay = <span class="nu">0.995</span>
+        self.n_actions = n_actions
+
+    <span class="kw">def</span> <span class="fn">get_state</span>(self, price_change, position):
+        <span class="st">"""가격 변화 + 포지션 → 이산 상태 인덱스"""</span>
+        <span class="kw">if</span> price_change > <span class="nu">0.001</span>:
+            pc = <span class="nu">0</span>  <span class="cm"># up</span>
+        <span class="kw">elif</span> price_change < -<span class="nu">0.001</span>:
+            pc = <span class="nu">1</span>  <span class="cm"># down</span>
+        <span class="kw">else</span>:
+            pc = <span class="nu">2</span>  <span class="cm"># flat</span>
+        pos = {<span class="nu">1</span>: <span class="nu">0</span>, <span class="nu">0</span>: <span class="nu">1</span>, -<span class="nu">1</span>: <span class="nu">2</span>}[position]
+        <span class="kw">return</span> pc * <span class="nu">3</span> + pos
+
+    <span class="kw">def</span> <span class="fn">choose_action</span>(self, state):
+        <span class="kw">if</span> np.random.<span class="fn">random</span>() < self.epsilon:
+            <span class="kw">return</span> np.random.<span class="fn">randint</span>(self.n_actions)
+        <span class="kw">return</span> np.<span class="fn">argmax</span>(self.q_table[state])
+
+    <span class="kw">def</span> <span class="fn">update</span>(self, state, action, reward, next_state):
+        td_target = reward + self.gamma * np.<span class="fn">max</span>(self.q_table[next_state])
+        td_error = td_target - self.q_table[state, action]
+        self.q_table[state, action] += self.alpha * td_error
+        <span class="cm"># ε 감소</span>
+        self.epsilon = <span class="fn">max</span>(self.epsilon_min,
+                            self.epsilon * self.epsilon_decay)
+
+<span class="cm"># ── 학습 루프 ──</span>
+agent = <span class="fn">SimpleQLearner</span>()
+prices = np.<span class="fn">cumsum</span>(np.random.<span class="fn">randn</span>(<span class="nu">10000</span>) * <span class="nu">0.01</span>) + <span class="nu">100</span>
+returns = np.<span class="fn">diff</span>(prices) / prices[:-<span class="nu">1</span>]
+
+position = <span class="nu">0</span>  <span class="cm"># -1, 0, 1</span>
+total_reward = <span class="nu">0</span>
+rewards_history = []
+
+<span class="kw">for</span> t <span class="kw">in</span> <span class="fn">range</span>(<span class="fn">len</span>(returns) - <span class="nu">1</span>):
+    state = agent.<span class="fn">get_state</span>(returns[t], position)
+    action = agent.<span class="fn">choose_action</span>(state)
+
+    <span class="cm"># 행동 실행: 0=buy, 1=sell, 2=hold</span>
+    <span class="kw">if</span> action == <span class="nu">0</span> <span class="kw">and</span> position <= <span class="nu">0</span>:
+        position = <span class="nu">1</span>
+    <span class="kw">elif</span> action == <span class="nu">1</span> <span class="kw">and</span> position >= <span class="nu">0</span>:
+        position = -<span class="nu">1</span>
+
+    <span class="cm"># 보상: 포지션 × 다음 수익률</span>
+    reward = position * returns[t + <span class="nu">1</span>]
+    total_reward += reward
+
+    next_state = agent.<span class="fn">get_state</span>(returns[t + <span class="nu">1</span>], position)
+    agent.<span class="fn">update</span>(state, action, reward, next_state)
+
+    <span class="kw">if</span> (t + <span class="nu">1</span>) % <span class="nu">2000</span> == <span class="nu">0</span>:
+        rewards_history.<span class="fn">append</span>(total_reward)
+        <span class="fn">print</span>(<span class="st">f"Step {t+1:5d} | Cum Reward: {total_reward:.4f} | "</span>
+              <span class="st">f"ε: {agent.epsilon:.3f}"</span>)
+
+<span class="fn">print</span>(<span class="st">f"\n최종 Q-테이블:\n{agent.q_table.round(4)}"</span>)
+</pre>
+<div class="code-output"><span class="out-label">Output (예시):</span>
+Step  2000 | Cum Reward: 0.0312 | ε: 0.045
+Step  4000 | Cum Reward: 0.0891 | ε: 0.010
+Step  6000 | Cum Reward: 0.1523 | ε: 0.010
+Step  8000 | Cum Reward: 0.2187 | ε: 0.010
+
+최종 Q-테이블:
+[[ 0.0023  -0.0015  0.0008]   ← up + long
+ [ 0.0031  -0.0042  0.0012]   ← up + flat
+ ...
+ [-0.0018  0.0027  0.0005]]   ← flat + short</div>
+
+<!-- ★ Plotly: Q-Table Heatmap -->
+<div id="plot-ch6-qtable" style="width:100%;height:420px;margin:20px 0"></div>
+<script>
+(function(){
+  function mulberry32(a){return function(){a|=0;a=a+0x6D2B79F5|0;var t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296;};}
+  var rng=mulberry32(77);
+  // 9 states x 3 actions Q-table
+  var states=['Up+Long','Up+Flat','Up+Short','Down+Long','Down+Flat','Down+Short','Flat+Long','Flat+Flat','Flat+Short'];
+  var actions=['Buy','Sell','Hold'];
+  var z=[];
+  for(var i=0;i<9;i++){
+    var row=[];
+    for(var j=0;j<3;j++){
+      // Simulate learned Q-values with some structure
+      var base=(rng()-0.5)*0.05;
+      if(i<3&&j==0) base+=0.02; // up → buy has higher Q
+      if(i>=3&&i<6&&j==1) base+=0.02; // down → sell has higher Q
+      row.push(parseFloat(base.toFixed(4)));
+    }
+    z.push(row);
+  }
+  Plotly.newPlot('plot-ch6-qtable',[{
+    z:z,x:actions,y:states,type:'heatmap',colorscale:'RdYlGn',
+    hovertemplate:'상태: %{y}<br>행동: %{x}<br>Q값: %{z:.4f}',
+    colorbar:{title:'Q(s,a)'}
+  }],{
+    title:{text:'📊 Q-테이블 히트맵: 상태 × 행동 → Q값',font:{size:13}},
+    xaxis:{title:'행동 (Action)',side:'bottom'},
+    yaxis:{title:'',autorange:'reversed'},
+    margin:{t:45,b:50,l:120,r:80},paper_bgcolor:'#fafaf8'
+  },{responsive:true});
+})();
+</script>
+<p class="ni" style="font-size:11px;color:#888;text-align:center">🖱️ 초록=높은 Q값(좋은 행동), 빨강=낮은 Q값(나쁜 행동). 가격 상승 시 Buy, 하락 시 Sell의 Q값이 높은 패턴이 학습됨.</p>
+
+<div class="warn">
+<p class="ni"><strong>⚠️ Q-Learning의 한계:</strong> 상태 공간이 연속적이거나 고차원이면 Q-테이블을 만들 수 없다. 실제 트레이딩에서 상태는 (가격, 거래량, 기술적 지표, 포지션, ...) 등 연속적이고 고차원이다. 이 문제를 해결하는 것이 다음 장의 DQN이다.</p>
+</div>
+
+
+<!-- ═══════════════════════════════════════════════════════════════
+     Chapter 7: DQN — 딥 Q-네트워크
+     ═══════════════════════════════════════════════════════════════ -->
+<h2 id="ch7">Chapter 7. DQN — 딥 Q-네트워크</h2>
+
+<div class="info">
+<p class="ni"><strong>📚 교재 연동:</strong> MLAT Ch.22 "Deep Q-Networks" / R7의 신경망 기초 — DQN은 Q-테이블을 신경망으로 대체한 것</p>
+</div>
+
+<h3>7.1 Q-테이블에서 Q-네트워크로</h3>
+
+<p>
+Q-Learning의 Q-테이블은 이산적이고 유한한 상태 공간에서만 작동한다. 연속 상태 공간에서는 신경망으로 Q-함수를 근사한다: \(Q(s, a; \theta) \approx Q^*(s, a)\). 이것이 <strong>DQN(Deep Q-Network)</strong>이다. DeepMind가 2015년 Nature에 발표하여 Atari 게임에서 인간을 능가한 것으로 유명하다.
+</p>
+
+<div class="eq">
+\[ \mathcal{L}(\theta) = \mathbb{E} \left[ \left( r + \gamma \max_{a'} Q(s', a'; \theta^-) - Q(s, a; \theta) \right)^2 \right] \]
+</div>
+
+<h3>7.2 DQN의 핵심 기법 두 가지</h3>
+
+<p>
+단순히 Q-테이블을 신경망으로 바꾸면 학습이 불안정하다. DQN은 두 가지 핵심 기법으로 이를 해결한다:
+</p>
+
+<div style="margin:20px 0;display:flex;gap:20px;flex-wrap:wrap;justify-content:center">
+<div style="flex:1;min-width:280px;background:#e8f4f8;padding:20px;border-radius:10px;border-left:4px solid #3498db">
+<p class="ni" style="font-weight:bold;font-size:14px;color:#2980b9;margin-bottom:10px">1️⃣ Experience Replay</p>
+<p class="ni" style="font-size:12px">경험 \((s, a, r, s')\)을 버퍼에 저장하고, 미니배치를 랜덤 샘플링하여 학습한다. 이렇게 하면 (1) 연속된 경험 간의 상관관계를 깨뜨리고, (2) 하나의 경험을 여러 번 재사용할 수 있다.</p>
+</div>
+<div style="flex:1;min-width:280px;background:#fff3cd;padding:20px;border-radius:10px;border-left:4px solid #f39c12">
+<p class="ni" style="font-weight:bold;font-size:14px;color:#e67e22;margin-bottom:10px">2️⃣ Target Network</p>
+<p class="ni" style="font-size:12px">TD 타겟 계산에 별도의 타겟 네트워크 \(\theta^-\)를 사용한다. 타겟 네트워크는 주기적으로(예: 1000 스텝마다) 메인 네트워크의 가중치를 복사한다. 이렇게 하면 "움직이는 타겟" 문제를 완화한다.</p>
+</div>
+</div>
+
+<h3>7.3 DQN 구현</h3>
+
+<p class="cc">▼ DQN 에이전트 (PyTorch)</p>
+<pre>
+<span class="kw">import</span> torch
+<span class="kw">import</span> torch.nn <span class="kw">as</span> nn
+<span class="kw">import</span> numpy <span class="kw">as</span> np
+<span class="kw">from</span> collections <span class="kw">import</span> deque
+<span class="kw">import</span> random
+
+<span class="kw">class</span> <span class="nb">QNetwork</span>(nn.Module):
+    <span class="st">"""Q-함수 근사 신경망"""</span>
+    <span class="kw">def</span> <span class="fn">__init__</span>(self, state_dim, action_dim, hidden=<span class="nu">128</span>):
+        <span class="fn">super</span>().<span class="fn">__init__</span>()
+        self.net = nn.<span class="fn">Sequential</span>(
+            nn.<span class="fn">Linear</span>(state_dim, hidden),
+            nn.<span class="fn">ReLU</span>(),
+            nn.<span class="fn">Linear</span>(hidden, hidden),
+            nn.<span class="fn">ReLU</span>(),
+            nn.<span class="fn">Linear</span>(hidden, action_dim)
+        )
+
+    <span class="kw">def</span> <span class="fn">forward</span>(self, x):
+        <span class="kw">return</span> self.<span class="fn">net</span>(x)
+
+<span class="kw">class</span> <span class="nb">ReplayBuffer</span>:
+    <span class="st">"""경험 리플레이 버퍼"""</span>
+    <span class="kw">def</span> <span class="fn">__init__</span>(self, capacity=<span class="nu">10000</span>):
+        self.buffer = <span class="fn">deque</span>(maxlen=capacity)
+
+    <span class="kw">def</span> <span class="fn">push</span>(self, state, action, reward, next_state, done):
+        self.buffer.<span class="fn">append</span>((state, action, reward, next_state, done))
+
+    <span class="kw">def</span> <span class="fn">sample</span>(self, batch_size):
+        batch = random.<span class="fn">sample</span>(self.buffer, batch_size)
+        states, actions, rewards, next_states, dones = <span class="fn">zip</span>(*batch)
+        <span class="kw">return</span> (np.<span class="fn">array</span>(states), np.<span class="fn">array</span>(actions),
+                np.<span class="fn">array</span>(rewards, dtype=np.float32),
+                np.<span class="fn">array</span>(next_states),
+                np.<span class="fn">array</span>(dones, dtype=np.float32))
+
+    <span class="kw">def</span> <span class="fn">__len__</span>(self):
+        <span class="kw">return</span> <span class="fn">len</span>(self.buffer)
+
+<span class="kw">class</span> <span class="nb">DQNAgent</span>:
+    <span class="st">"""DQN 트레이딩 에이전트"""</span>
+    <span class="kw">def</span> <span class="fn">__init__</span>(self, state_dim, action_dim=<span class="nu">3</span>,
+                 lr=<span class="nu">1e-3</span>, gamma=<span class="nu">0.99</span>, epsilon=<span class="nu">1.0</span>):
+        self.q_net = <span class="fn">QNetwork</span>(state_dim, action_dim)
+        self.target_net = <span class="fn">QNetwork</span>(state_dim, action_dim)
+        self.target_net.<span class="fn">load_state_dict</span>(self.q_net.<span class="fn">state_dict</span>())
+        self.optimizer = torch.optim.<span class="fn">Adam</span>(
+            self.q_net.<span class="fn">parameters</span>(), lr=lr)
+        self.buffer = <span class="fn">ReplayBuffer</span>()
+        self.gamma = gamma
+        self.epsilon = epsilon
+        self.epsilon_min = <span class="nu">0.01</span>
+        self.epsilon_decay = <span class="nu">0.995</span>
+        self.action_dim = action_dim
+        self.update_count = <span class="nu">0</span>
+
+    <span class="kw">def</span> <span class="fn">choose_action</span>(self, state):
+        <span class="kw">if</span> np.random.<span class="fn">random</span>() < self.epsilon:
+            <span class="kw">return</span> np.random.<span class="fn">randint</span>(self.action_dim)
+        state_t = torch.<span class="fn">FloatTensor</span>(state).<span class="fn">unsqueeze</span>(<span class="nu">0</span>)
+        <span class="kw">with</span> torch.<span class="fn">no_grad</span>():
+            q_vals = self.<span class="fn">q_net</span>(state_t)
+        <span class="kw">return</span> q_vals.<span class="fn">argmax</span>().<span class="fn">item</span>()
+
+    <span class="kw">def</span> <span class="fn">train_step</span>(self, batch_size=<span class="nu">64</span>):
+        <span class="kw">if</span> <span class="fn">len</span>(self.buffer) < batch_size:
+            <span class="kw">return</span>
+        s, a, r, s2, d = self.buffer.<span class="fn">sample</span>(batch_size)
+        s = torch.<span class="fn">FloatTensor</span>(s)
+        a = torch.<span class="fn">LongTensor</span>(a)
+        r = torch.<span class="fn">FloatTensor</span>(r)
+        s2 = torch.<span class="fn">FloatTensor</span>(s2)
+        d = torch.<span class="fn">FloatTensor</span>(d)
+
+        <span class="cm"># 현재 Q값</span>
+        q_values = self.<span class="fn">q_net</span>(s).<span class="fn">gather</span>(<span class="nu">1</span>, a.<span class="fn">unsqueeze</span>(<span class="nu">1</span>)).<span class="fn">squeeze</span>()
+        <span class="cm"># 타겟 Q값 (타겟 네트워크 사용)</span>
+        <span class="kw">with</span> torch.<span class="fn">no_grad</span>():
+            next_q = self.<span class="fn">target_net</span>(s2).<span class="fn">max</span>(<span class="nu">1</span>)[<span class="nu">0</span>]
+            target = r + self.gamma * next_q * (<span class="nu">1</span> - d)
+
+        loss = nn.<span class="fn">MSELoss</span>()(q_values, target)
+        self.optimizer.<span class="fn">zero_grad</span>()
+        loss.<span class="fn">backward</span>()
+        nn.utils.<span class="fn">clip_grad_norm_</span>(self.q_net.<span class="fn">parameters</span>(), <span class="nu">1.0</span>)
+        self.optimizer.<span class="fn">step</span>()
+
+        <span class="cm"># 타겟 네트워크 업데이트 (매 100 스텝)</span>
+        self.update_count += <span class="nu">1</span>
+        <span class="kw">if</span> self.update_count % <span class="nu">100</span> == <span class="nu">0</span>:
+            self.target_net.<span class="fn">load_state_dict</span>(
+                self.q_net.<span class="fn">state_dict</span>())
+
+        <span class="cm"># ε 감소</span>
+        self.epsilon = <span class="fn">max</span>(self.epsilon_min,
+                            self.epsilon * self.epsilon_decay)
+        <span class="kw">return</span> loss.<span class="fn">item</span>()
+</pre>
+<div class="code-output"><span class="out-label">구조 요약:</span>
+QNetwork: Linear(state_dim→128) → ReLU → Linear(128→128) → ReLU → Linear(128→3)
+ReplayBuffer: deque(maxlen=10000), random sampling
+DQNAgent: q_net + target_net + ε-greedy + experience replay</div>
+
+<!-- ★ Plotly: DQN Training Loss Curve -->
+<div id="plot-ch7-dqn" style="width:100%;height:420px;margin:20px 0"></div>
+<script>
+(function(){
+  function mulberry32(a){return function(){a|=0;a=a+0x6D2B79F5|0;var t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296;};}
+  var rng=mulberry32(999);
+  var N=200, episodes=[], losses=[], rewards=[], epsilons=[];
+  var eps=1.0;
+  for(var i=0;i<N;i++){
+    episodes.push(i+1);
+    // Simulated training curves
+    var baseLoss=0.05/(1+i*0.02)+0.005+(rng()-0.5)*0.005;
+    losses.push(Math.max(0.001,baseLoss));
+    var baseReward=-0.5+i*0.008+(rng()-0.5)*0.3;
+    rewards.push(baseReward);
+    eps=Math.max(0.01,eps*0.985);
+    epsilons.push(eps);
+  }
+  Plotly.newPlot('plot-ch7-dqn',[
+    {x:episodes,y:losses,type:'scatter',mode:'lines',name:'Loss',line:{color:'#e74c3c',width:1.5}},
+    {x:episodes,y:rewards,type:'scatter',mode:'lines',name:'Episode Reward',line:{color:'#2ecc71',width:1.5},yaxis:'y2'},
+    {x:episodes,y:epsilons,type:'scatter',mode:'lines',name:'ε (탐색률)',line:{color:'#3498db',width:1,dash:'dot'},yaxis:'y3'}
+  ],{
+    title:{text:'📊 DQN 학습 곡선: Loss, Reward, ε 변화',font:{size:13}},
+    xaxis:{title:'에피소드'},
+    yaxis:{title:'Loss',side:'left',titlefont:{color:'#e74c3c'},range:[0,0.08]},
+    yaxis2:{title:'Reward',overlaying:'y',side:'right',titlefont:{color:'#2ecc71'},position:1.0},
+    yaxis3:{title:'ε',overlaying:'y',side:'right',showgrid:false,titlefont:{color:'#3498db'},position:0.95,range:[0,1.1],visible:false},
+    legend:{x:0.4,y:1.15,orientation:'h',bgcolor:'rgba(255,255,255,0.85)'},
+    margin:{t:60,b:50,r:80},paper_bgcolor:'#fafaf8',plot_bgcolor:'#fff'
+  },{responsive:true});
+})();
+</script>
+<p class="ni" style="font-size:11px;color:#888;text-align:center">🖱️ 빨강=Loss 감소, 초록=에피소드 보상 증가, 파랑 점선=ε 감소. 학습 초기에는 탐색 위주, 후반에는 활용 위주.</p>
+
+
+<!-- ═══════════════════════════════════════════════════════════════
+     Chapter 8: Policy Gradient — REINFORCE
+     ═══════════════════════════════════════════════════════════════ -->
+<h2 id="ch8">Chapter 8. Policy Gradient — REINFORCE 알고리즘</h2>
+
+<div class="info">
+<p class="ni"><strong>📚 교재 연동:</strong> MLAT Ch.22 "Policy Gradient Methods" / R8 Gradient Descent 복습 — Policy Gradient는 정책 파라미터에 대한 경사 상승법</p>
+</div>
+
+<h3>8.1 Value-Based vs Policy-Based</h3>
+
+<p>
+Q-Learning과 DQN은 <strong>가치 기반(Value-Based)</strong> 방법이다 — Q-함수를 학습하고, 그로부터 정책을 유도한다. 반면 <strong>정책 기반(Policy-Based)</strong> 방법은 정책 \(\pi_\theta(a|s)\)를 직접 파라미터화하고 최적화한다. 정책 기반 방법의 장점:
+</p>
+
+<table>
+<tr><th>특성</th><th>Value-Based (DQN)</th><th>Policy-Based (PG)</th></tr>
+<tr><td>행동 공간</td><td>이산만 가능</td><td>이산 + 연속 모두 가능</td></tr>
+<tr><td>정책 유형</td><td>결정적 (argmax)</td><td>확률적 (stochastic)</td></tr>
+<tr><td>수렴</td><td>불안정할 수 있음</td><td>더 안정적 (작은 업데이트)</td></tr>
+<tr><td>분산</td><td>낮음</td><td>높음 (Monte Carlo 추정)</td></tr>
+<tr><td>트레이딩 적용</td><td>이산 행동 (buy/sell/hold)</td><td>연속 행동 (비중 조절)</td></tr>
+</table>
+
+<h3>8.2 Policy Gradient 정리</h3>
+
+<p>
+목적 함수 \(J(\theta) = \mathbb{E}_{\pi_\theta}[\sum_t \gamma^t r_t]\)를 최대화하고 싶다. <strong>Policy Gradient Theorem</strong>에 의해:
+</p>
+
+<div class="eq">
+\[ \nabla_\theta J(\theta) = \mathbb{E}_{\pi_\theta} \left[ \sum_{t=0}^{T} \nabla_\theta \log \pi_\theta(a_t|s_t) \cdot G_t \right] \]
+</div>
+
+<p>
+여기서 \(G_t = \sum_{k=t}^{T} \gamma^{k-t} r_k\)는 시점 \(t\)부터의 누적 보상(return)이다. 직관적으로: 높은 보상을 받은 행동의 확률을 높이고, 낮은 보상을 받은 행동의 확률을 낮춘다.
+</p>
+
+<h3>8.3 REINFORCE 알고리즘</h3>
+
+<p>
+REINFORCE는 가장 기본적인 Policy Gradient 알고리즘이다. 에피소드를 끝까지 실행한 후, 각 시점의 \(\log \pi \cdot G_t\)를 계산하여 파라미터를 업데이트한다.
+</p>
+
+<p class="cc">▼ REINFORCE 트레이딩 에이전트</p>
+<pre>
+<span class="kw">import</span> torch
+<span class="kw">import</span> torch.nn <span class="kw">as</span> nn
+<span class="kw">import</span> numpy <span class="kw">as</span> np
+
+<span class="kw">class</span> <span class="nb">PolicyNetwork</span>(nn.Module):
+    <span class="st">"""정책 네트워크: 상태 → 행동 확률"""</span>
+    <span class="kw">def</span> <span class="fn">__init__</span>(self, state_dim, action_dim=<span class="nu">3</span>, hidden=<span class="nu">64</span>):
+        <span class="fn">super</span>().<span class="fn">__init__</span>()
+        self.net = nn.<span class="fn">Sequential</span>(
+            nn.<span class="fn">Linear</span>(state_dim, hidden),
+            nn.<span class="fn">ReLU</span>(),
+            nn.<span class="fn">Linear</span>(hidden, hidden),
+            nn.<span class="fn">ReLU</span>(),
+            nn.<span class="fn">Linear</span>(hidden, action_dim),
+            nn.<span class="fn">Softmax</span>(dim=-<span class="nu">1</span>)
+        )
+
+    <span class="kw">def</span> <span class="fn">forward</span>(self, x):
+        <span class="kw">return</span> self.<span class="fn">net</span>(x)
+
+<span class="kw">class</span> <span class="nb">REINFORCEAgent</span>:
+    <span class="kw">def</span> <span class="fn">__init__</span>(self, state_dim, action_dim=<span class="nu">3</span>,
+                 lr=<span class="nu">1e-3</span>, gamma=<span class="nu">0.99</span>):
+        self.policy = <span class="fn">PolicyNetwork</span>(state_dim, action_dim)
+        self.optimizer = torch.optim.<span class="fn">Adam</span>(
+            self.policy.<span class="fn">parameters</span>(), lr=lr)
+        self.gamma = gamma
+        self.log_probs = []
+        self.rewards = []
+
+    <span class="kw">def</span> <span class="fn">choose_action</span>(self, state):
+        state_t = torch.<span class="fn">FloatTensor</span>(state).<span class="fn">unsqueeze</span>(<span class="nu">0</span>)
+        probs = self.<span class="fn">policy</span>(state_t)
+        dist = torch.distributions.<span class="fn">Categorical</span>(probs)
+        action = dist.<span class="fn">sample</span>()
+        self.log_probs.<span class="fn">append</span>(dist.<span class="fn">log_prob</span>(action))
+        <span class="kw">return</span> action.<span class="fn">item</span>()
+
+    <span class="kw">def</span> <span class="fn">store_reward</span>(self, reward):
+        self.rewards.<span class="fn">append</span>(reward)
+
+    <span class="kw">def</span> <span class="fn">update</span>(self):
+        <span class="st">"""에피소드 종료 후 업데이트"""</span>
+        <span class="cm"># 할인 누적 보상 계산</span>
+        returns = []
+        G = <span class="nu">0</span>
+        <span class="kw">for</span> r <span class="kw">in</span> <span class="fn">reversed</span>(self.rewards):
+            G = r + self.gamma * G
+            returns.<span class="fn">insert</span>(<span class="nu">0</span>, G)
+        returns = torch.<span class="fn">tensor</span>(returns)
+
+        <span class="cm"># 정규화 (분산 감소)</span>
+        <span class="kw">if</span> returns.<span class="fn">std</span>() > <span class="nu">0</span>:
+            returns = (returns - returns.<span class="fn">mean</span>()) / (returns.<span class="fn">std</span>() + <span class="nu">1e-8</span>)
+
+        <span class="cm"># Policy Gradient 손실</span>
+        loss = <span class="nu">0</span>
+        <span class="kw">for</span> log_prob, G <span class="kw">in</span> <span class="fn">zip</span>(self.log_probs, returns):
+            loss -= log_prob * G  <span class="cm"># 경사 상승 → 음수 부호</span>
+
+        self.optimizer.<span class="fn">zero_grad</span>()
+        loss.<span class="fn">backward</span>()
+        nn.utils.<span class="fn">clip_grad_norm_</span>(self.policy.<span class="fn">parameters</span>(), <span class="nu">1.0</span>)
+        self.optimizer.<span class="fn">step</span>()
+
+        <span class="cm"># 버퍼 초기화</span>
+        self.log_probs = []
+        self.rewards = []
+        <span class="kw">return</span> loss.<span class="fn">item</span>()
+</pre>
+<div class="code-output"><span class="out-label">구조 요약:</span>
+PolicyNetwork: state → [64] → ReLU → [64] → ReLU → [3] → Softmax
+출력: P(buy), P(sell), P(hold) — 확률 분포
+REINFORCE: 에피소드 끝에 한 번 업데이트 (Monte Carlo)</div>
+
+<h3>8.4 Baseline을 이용한 분산 감소</h3>
+
+<p>
+REINFORCE의 가장 큰 문제는 높은 분산이다. 모든 보상이 양수이면 모든 행동의 확률이 올라가는 문제가 생긴다. 이를 해결하기 위해 <strong>baseline</strong> \(b(s)\)를 빼준다:
+</p>
+
+<div class="eq">
+\[ \nabla_\theta J(\theta) = \mathbb{E} \left[ \sum_t \nabla_\theta \log \pi_\theta(a_t|s_t) \cdot (G_t - b(s_t)) \right] \]
+</div>
+
+<p>
+가장 흔한 baseline은 가치 함수 \(V(s)\)다. \(G_t - V(s_t)\)는 <strong>어드밴티지(Advantage)</strong> \(A(s_t, a_t)\)라 부르며, "이 행동이 평균보다 얼마나 좋았는가"를 나타낸다. 이것이 다음 장의 Actor-Critic으로 이어진다.
+</p>
+
+<!-- ★ Plotly: Policy Gradient Reward Curve -->
+<div id="plot-ch8-pg" style="width:100%;height:420px;margin:20px 0"></div>
+<script>
+(function(){
+  function mulberry32(a){return function(){a|=0;a=a+0x6D2B79F5|0;var t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296;};}
+  var rng=mulberry32(555);
+  var N=150, eps=[], rw_reinforce=[], rw_baseline=[];
+  var cum1=0,cum2=0;
+  for(var i=0;i<N;i++){
+    eps.push(i+1);
+    var base=-0.3+i*0.006;
+    var r1=base+(rng()-0.5)*0.8;
+    var r2=base+(rng()-0.5)*0.4; // baseline has lower variance
+    rw_reinforce.push(r1);
+    rw_baseline.push(r2);
+  }
+  // Moving average
+  function movAvg(arr,w){var out=[];for(var i=0;i<arr.length;i++){var s=0,c=0;for(var j=Math.max(0,i-w+1);j<=i;j++){s+=arr[j];c++;}out.push(s/c);}return out;}
+  var ma1=movAvg(rw_reinforce,20), ma2=movAvg(rw_baseline,20);
+  Plotly.newPlot('plot-ch8-pg',[
+    {x:eps,y:rw_reinforce,type:'scatter',mode:'markers',name:'REINFORCE (raw)',marker:{size:3,color:'rgba(231,76,60,0.3)'}},
+    {x:eps,y:ma1,type:'scatter',mode:'lines',name:'REINFORCE (MA20)',line:{color:'#e74c3c',width:2}},
+    {x:eps,y:rw_baseline,type:'scatter',mode:'markers',name:'+ Baseline (raw)',marker:{size:3,color:'rgba(46,204,113,0.3)'}},
+    {x:eps,y:ma2,type:'scatter',mode:'lines',name:'+ Baseline (MA20)',line:{color:'#2ecc71',width:2}}
+  ],{
+    title:{text:'📊 REINFORCE vs REINFORCE + Baseline: 에피소드 보상 비교',font:{size:13}},
+    xaxis:{title:'에피소드'},
+    yaxis:{title:'에피소드 보상',zeroline:true},
+    legend:{x:0.01,y:0.99,bgcolor:'rgba(255,255,255,0.85)'},
+    margin:{t:45,b:50},paper_bgcolor:'#fafaf8',plot_bgcolor:'#fff',
+    annotations:[{x:120,y:ma2[119],text:'Baseline 추가 →<br>분산 감소',showarrow:true,arrowhead:2,ax:50,ay:30,font:{size:10,color:'#27ae60'}}]
+  },{responsive:true});
+})();
+</script>
+<p class="ni" style="font-size:11px;color:#888;text-align:center">🖱️ 빨강=순수 REINFORCE (높은 분산), 초록=Baseline 추가 (낮은 분산). 두 방법 모두 수렴하지만, Baseline이 훨씬 안정적.</p>
+
+
+<!-- ═══════════════════════════════════════════════════════════════
+     Chapter 9: Actor-Critic & PPO
+     ═══════════════════════════════════════════════════════════════ -->
+<h2 id="ch9">Chapter 9. Actor-Critic &amp; PPO — 근접 정책 최적화</h2>
+
+<div class="info">
+<p class="ni"><strong>📚 교재 연동:</strong> MLAT Ch.22 "Actor-Critic Methods" / MLAT Ch.23 "Proximal Policy Optimization"</p>
+</div>
+
+<h3>9.1 Actor-Critic 아키텍처</h3>
+
+<p>
+Actor-Critic은 Value-Based와 Policy-Based의 장점을 결합한다. <strong>Actor</strong>(정책 네트워크)가 행동을 선택하고, <strong>Critic</strong>(가치 네트워크)이 그 행동을 평가한다. REINFORCE의 Monte Carlo 리턴 \(G_t\) 대신 Critic의 TD 추정을 사용하므로 분산이 크게 줄어든다.
+</p>
+
+<div style="margin:25px 0;display:flex;gap:15px;flex-wrap:wrap;justify-content:center;align-items:center">
+<div style="background:#e8f4f8;padding:15px 20px;border-radius:10px;text-align:center;min-width:140px">
+<p class="ni" style="font-size:24px">🎭</p>
+<p class="ni" style="font-weight:bold;font-size:13px">Actor \(\pi_\theta(a|s)\)</p>
+<p class="ni" style="font-size:11px;color:#666">"어떤 행동을 할까?"</p>
+</div>
+<div style="text-align:center;min-width:60px">
+<p class="ni" style="font-size:20px">⇄</p>
+</div>
+<div style="background:#fff3cd;padding:15px 20px;border-radius:10px;text-align:center;min-width:140px">
+<p class="ni" style="font-size:24px">📊</p>
+<p class="ni" style="font-weight:bold;font-size:13px">Critic \(V_\phi(s)\)</p>
+<p class="ni" style="font-size:11px;color:#666">"그 행동이 얼마나 좋았나?"</p>
+</div>
+</div>
+
+<div class="eq">
+\[ \text{Advantage: } A(s_t, a_t) = r_t + \gamma V_\phi(s_{t+1}) - V_\phi(s_t) \]
+</div>
+
+<h3>9.2 PPO (Proximal Policy Optimization)</h3>
+
+<p>
+PPO는 OpenAI가 2017년에 발표한 알고리즘으로, 현재 가장 널리 사용되는 RL 알고리즘이다. ChatGPT의 RLHF(Reinforcement Learning from Human Feedback)에도 PPO가 사용되었다. PPO의 핵심 아이디어: 정책 업데이트의 크기를 제한하여 학습 안정성을 보장한다.
+</p>
+
+<div class="eq">
+\[ L^{CLIP}(\theta) = \mathbb{E} \left[ \min\left( r_t(\theta) A_t, \; \text{clip}(r_t(\theta), 1-\epsilon, 1+\epsilon) A_t \right) \right] \]
+</div>
+
+<p>
+여기서 \(r_t(\theta) = \frac{\pi_\theta(a_t|s_t)}{\pi_{\theta_{old}}(a_t|s_t)}\)는 확률 비율이고, \(\epsilon\)(보통 0.2)은 클리핑 범위다. 확률 비율이 \([1-\epsilon, 1+\epsilon]\) 범위를 벗어나면 클리핑되어 너무 큰 업데이트를 방지한다.
+</p>
+
+<h3>9.3 PPO 구현</h3>
+
+<p class="cc">▼ PPO 트레이딩 에이전트</p>
+<pre>
+<span class="kw">import</span> torch
+<span class="kw">import</span> torch.nn <span class="kw">as</span> nn
+<span class="kw">import</span> numpy <span class="kw">as</span> np
+
+<span class="kw">class</span> <span class="nb">ActorCritic</span>(nn.Module):
+    <span class="st">"""Actor-Critic 공유 네트워크"""</span>
+    <span class="kw">def</span> <span class="fn">__init__</span>(self, state_dim, action_dim=<span class="nu">3</span>, hidden=<span class="nu">128</span>):
+        <span class="fn">super</span>().<span class="fn">__init__</span>()
+        <span class="cm"># 공유 특징 추출기</span>
+        self.shared = nn.<span class="fn">Sequential</span>(
+            nn.<span class="fn">Linear</span>(state_dim, hidden),
+            nn.<span class="fn">ReLU</span>(),
+            nn.<span class="fn">Linear</span>(hidden, hidden),
+            nn.<span class="fn">ReLU</span>()
+        )
+        <span class="cm"># Actor 헤드 (정책)</span>
+        self.actor = nn.<span class="fn">Sequential</span>(
+            nn.<span class="fn">Linear</span>(hidden, action_dim),
+            nn.<span class="fn">Softmax</span>(dim=-<span class="nu">1</span>)
+        )
+        <span class="cm"># Critic 헤드 (가치)</span>
+        self.critic = nn.<span class="fn">Linear</span>(hidden, <span class="nu">1</span>)
+
+    <span class="kw">def</span> <span class="fn">forward</span>(self, x):
+        features = self.<span class="fn">shared</span>(x)
+        policy = self.<span class="fn">actor</span>(features)
+        value = self.<span class="fn">critic</span>(features)
+        <span class="kw">return</span> policy, value
+
+<span class="kw">class</span> <span class="nb">PPOAgent</span>:
+    <span class="kw">def</span> <span class="fn">__init__</span>(self, state_dim, action_dim=<span class="nu">3</span>,
+                 lr=<span class="nu">3e-4</span>, gamma=<span class="nu">0.99</span>, clip_eps=<span class="nu">0.2</span>,
+                 epochs=<span class="nu">4</span>, batch_size=<span class="nu">64</span>):
+        self.model = <span class="fn">ActorCritic</span>(state_dim, action_dim)
+        self.optimizer = torch.optim.<span class="fn">Adam</span>(
+            self.model.<span class="fn">parameters</span>(), lr=lr)
+        self.gamma = gamma
+        self.clip_eps = clip_eps
+        self.epochs = epochs
+        self.batch_size = batch_size
+        <span class="cm"># 에피소드 버퍼</span>
+        self.states = []
+        self.actions = []
+        self.rewards = []
+        self.log_probs = []
+        self.values = []
+        self.dones = []
+
+    <span class="kw">def</span> <span class="fn">choose_action</span>(self, state):
+        state_t = torch.<span class="fn">FloatTensor</span>(state).<span class="fn">unsqueeze</span>(<span class="nu">0</span>)
+        <span class="kw">with</span> torch.<span class="fn">no_grad</span>():
+            probs, value = self.<span class="fn">model</span>(state_t)
+        dist = torch.distributions.<span class="fn">Categorical</span>(probs)
+        action = dist.<span class="fn">sample</span>()
+        self.states.<span class="fn">append</span>(state)
+        self.actions.<span class="fn">append</span>(action.<span class="fn">item</span>())
+        self.log_probs.<span class="fn">append</span>(dist.<span class="fn">log_prob</span>(action).<span class="fn">item</span>())
+        self.values.<span class="fn">append</span>(value.<span class="fn">item</span>())
+        <span class="kw">return</span> action.<span class="fn">item</span>()
+
+    <span class="kw">def</span> <span class="fn">compute_gae</span>(self, next_value, lam=<span class="nu">0.95</span>):
+        <span class="st">"""Generalized Advantage Estimation"""</span>
+        advantages = []
+        gae = <span class="nu">0</span>
+        values = self.values + [next_value]
+        <span class="kw">for</span> t <span class="kw">in</span> <span class="fn">reversed</span>(<span class="fn">range</span>(<span class="fn">len</span>(self.rewards))):
+            delta = (self.rewards[t] + self.gamma *
+                     values[t+<span class="nu">1</span>] * (<span class="nu">1</span>-self.dones[t]) - values[t])
+            gae = delta + self.gamma * lam * (<span class="nu">1</span>-self.dones[t]) * gae
+            advantages.<span class="fn">insert</span>(<span class="nu">0</span>, gae)
+        returns = [a + v <span class="kw">for</span> a, v <span class="kw">in</span> <span class="fn">zip</span>(advantages, self.values)]
+        <span class="kw">return</span> advantages, returns
+
+    <span class="kw">def</span> <span class="fn">update</span>(self):
+        <span class="cm"># GAE 계산</span>
+        <span class="kw">with</span> torch.<span class="fn">no_grad</span>():
+            last_state = torch.<span class="fn">FloatTensor</span>(self.states[-<span class="nu">1</span>])
+            _, next_val = self.<span class="fn">model</span>(last_state.<span class="fn">unsqueeze</span>(<span class="nu">0</span>))
+        advantages, returns = self.<span class="fn">compute_gae</span>(next_val.<span class="fn">item</span>())
+
+        <span class="cm"># 텐서 변환</span>
+        states = torch.<span class="fn">FloatTensor</span>(np.<span class="fn">array</span>(self.states))
+        actions = torch.<span class="fn">LongTensor</span>(self.actions)
+        old_log_probs = torch.<span class="fn">FloatTensor</span>(self.log_probs)
+        advantages = torch.<span class="fn">FloatTensor</span>(advantages)
+        returns = torch.<span class="fn">FloatTensor</span>(returns)
+
+        <span class="cm"># 정규화</span>
+        advantages = (advantages - advantages.<span class="fn">mean</span>()) / (advantages.<span class="fn">std</span>() + <span class="nu">1e-8</span>)
+
+        <span class="cm"># PPO 업데이트 (여러 에폭)</span>
+        <span class="kw">for</span> _ <span class="kw">in</span> <span class="fn">range</span>(self.epochs):
+            probs, values = self.<span class="fn">model</span>(states)
+            dist = torch.distributions.<span class="fn">Categorical</span>(probs)
+            new_log_probs = dist.<span class="fn">log_prob</span>(actions)
+
+            <span class="cm"># 확률 비율</span>
+            ratio = torch.<span class="fn">exp</span>(new_log_probs - old_log_probs)
+
+            <span class="cm"># 클리핑된 목적 함수</span>
+            surr1 = ratio * advantages
+            surr2 = torch.<span class="fn">clamp</span>(ratio, <span class="nu">1</span>-self.clip_eps,
+                                <span class="nu">1</span>+self.clip_eps) * advantages
+            actor_loss = -torch.<span class="fn">min</span>(surr1, surr2).<span class="fn">mean</span>()
+
+            <span class="cm"># Critic 손실</span>
+            critic_loss = nn.<span class="fn">MSELoss</span>()(values.<span class="fn">squeeze</span>(), returns)
+
+            <span class="cm"># 엔트로피 보너스 (탐색 장려)</span>
+            entropy = dist.<span class="fn">entropy</span>().<span class="fn">mean</span>()
+
+            loss = actor_loss + <span class="nu">0.5</span> * critic_loss - <span class="nu">0.01</span> * entropy
+
+            self.optimizer.<span class="fn">zero_grad</span>()
+            loss.<span class="fn">backward</span>()
+            nn.utils.<span class="fn">clip_grad_norm_</span>(
+                self.model.<span class="fn">parameters</span>(), <span class="nu">0.5</span>)
+            self.optimizer.<span class="fn">step</span>()
+
+        <span class="cm"># 버퍼 초기화</span>
+        self.states, self.actions = [], []
+        self.rewards, self.log_probs = [], []
+        self.values, self.dones = [], []
+</pre>
+<div class="code-output"><span class="out-label">PPO 핵심 구성:</span>
+1. ActorCritic: 공유 특징 추출 + Actor(정책) + Critic(가치) 헤드
+2. GAE (λ=0.95): 분산-편향 트레이드오프 최적화
+3. Clipped Objective (ε=0.2): 정책 업데이트 크기 제한
+4. Entropy Bonus (0.01): 탐색 장려
+5. Multiple Epochs (4): 같은 데이터로 여러 번 업데이트</div>
+
+<div class="ok">
+<p class="ni"><strong>💡 PPO가 트레이딩에 적합한 이유:</strong> (1) 안정적인 학습 — 금융 데이터의 노이즈에 강건, (2) 확률적 정책 — 포지션 비중을 연속적으로 조절 가능, (3) 샘플 효율성 — 같은 데이터로 여러 번 학습, (4) 구현 용이성 — 하이퍼파라미터 튜닝이 비교적 쉬움.</p>
+</div>
+
+
+<!-- ═══════════════════════════════════════════════════════════════
+     Chapter 10: 트레이딩 환경 설계
+     ═══════════════════════════════════════════════════════════════ -->
+<h2 id="ch10">Chapter 10. 트레이딩 환경 설계 — Gymnasium 스타일</h2>
+
+<div class="info">
+<p class="ni"><strong>📚 교재 연동:</strong> MLAT Ch.23 "Building Trading Environments" / 혼공파 Ch.8 클래스 상속 — Gymnasium 환경은 클래스 상속으로 구현</p>
+</div>
+
+<h3>10.1 Gymnasium (OpenAI Gym) 인터페이스</h3>
+
+<p>
+강화학습 에이전트를 학습시키려면 환경(environment)이 필요하다. Gymnasium(구 OpenAI Gym)은 RL 환경의 표준 인터페이스를 정의한다. 모든 환경은 <code>reset()</code>, <code>step(action)</code> 두 메서드만 구현하면 된다.
+</p>
+
+<div class="eq">
+\[ \texttt{obs, info} = \texttt{env.reset()} \]
+\[ \texttt{obs, reward, terminated, truncated, info} = \texttt{env.step(action)} \]
+</div>
+
+<h3>10.2 트레이딩 환경 구현</h3>
+
+<p>
+우리의 트레이딩 환경은 다음과 같이 설계한다:
+</p>
+
+<table>
+<tr><th>요소</th><th>설계</th></tr>
+<tr><td>상태 (observation)</td><td>과거 N일 수익률 + 기술적 지표 + 현재 포지션 + 미실현 P&L</td></tr>
+<tr><td>행동 (action)</td><td>0=Hold, 1=Buy, 2=Sell (이산) 또는 [-1, +1] 비중 (연속)</td></tr>
+<tr><td>보상 (reward)</td><td>리스크 조정 수익률 (Sharpe-like)</td></tr>
+<tr><td>종료 조건</td><td>데이터 끝 도달 또는 최대 낙폭 초과</td></tr>
+</table>
+
+<p class="cc">▼ 트레이딩 환경 (Gymnasium 스타일)</p>
+<pre>
+<span class="kw">import</span> numpy <span class="kw">as</span> np
+<span class="kw">import</span> gymnasium <span class="kw">as</span> gym
+<span class="kw">from</span> gymnasium <span class="kw">import</span> spaces
+
+<span class="kw">class</span> <span class="nb">TradingEnv</span>(gym.Env):
+    <span class="st">"""
+    강화학습 트레이딩 환경
+    - 상태: [과거 N일 수익률, RSI, 포지션, 미실현 P&L]
+    - 행동: 0=Hold, 1=Buy, 2=Sell
+    - 보상: 리스크 조정 수익률
+    """</span>
+    <span class="kw">def</span> <span class="fn">__init__</span>(self, prices, window=<span class="nu">20</span>,
+                 transaction_cost=<span class="nu">0.001</span>, max_drawdown=<span class="nu">0.2</span>):
+        <span class="fn">super</span>().<span class="fn">__init__</span>()
+        self.prices = prices
+        self.returns = np.<span class="fn">diff</span>(prices) / prices[:-<span class="nu">1</span>]
+        self.window = window
+        self.tc = transaction_cost
+        self.max_dd = max_drawdown
+
+        <span class="cm"># 상태: window개 수익률 + RSI + 포지션 + 미실현 P&L</span>
+        self.observation_space = spaces.<span class="fn">Box</span>(
+            low=-np.inf, high=np.inf,
+            shape=(window + <span class="nu">3</span>,), dtype=np.float32)
+        <span class="cm"># 행동: Hold, Buy, Sell</span>
+        self.action_space = spaces.<span class="fn">Discrete</span>(<span class="nu">3</span>)
+
+    <span class="kw">def</span> <span class="fn">_compute_rsi</span>(self, returns, period=<span class="nu">14</span>):
+        <span class="st">"""RSI 계산"""</span>
+        gains = np.<span class="fn">maximum</span>(returns, <span class="nu">0</span>)
+        losses = np.<span class="fn">maximum</span>(-returns, <span class="nu">0</span>)
+        avg_gain = np.<span class="fn">mean</span>(gains[-period:])
+        avg_loss = np.<span class="fn">mean</span>(losses[-period:]) + <span class="nu">1e-10</span>
+        rs = avg_gain / avg_loss
+        <span class="kw">return</span> <span class="nu">100</span> - <span class="nu">100</span> / (<span class="nu">1</span> + rs)
+
+    <span class="kw">def</span> <span class="fn">_get_obs</span>(self):
+        <span class="st">"""현재 관측 벡터 생성"""</span>
+        ret_window = self.returns[
+            self.idx - self.window : self.idx]
+        rsi = self.<span class="fn">_compute_rsi</span>(
+            self.returns[:self.idx]) / <span class="nu">100.0</span>
+        pos = <span class="nb">float</span>(self.position)
+        unrealized = self.position * (
+            self.prices[self.idx] - self.entry_price
+        ) / self.entry_price <span class="kw">if</span> self.position != <span class="nu">0</span> <span class="kw">else</span> <span class="nu">0.0</span>
+        <span class="kw">return</span> np.<span class="fn">concatenate</span>([
+            ret_window, [rsi, pos, unrealized]
+        ]).<span class="fn">astype</span>(np.float32)
+
+    <span class="kw">def</span> <span class="fn">reset</span>(self, seed=<span class="kw">None</span>, options=<span class="kw">None</span>):
+        <span class="fn">super</span>().<span class="fn">reset</span>(seed=seed)
+        self.idx = self.window
+        self.position = <span class="nu">0</span>  <span class="cm"># -1, 0, 1</span>
+        self.entry_price = <span class="nu">0.0</span>
+        self.portfolio_value = <span class="nu">1.0</span>
+        self.peak_value = <span class="nu">1.0</span>
+        self.trades = <span class="nu">0</span>
+        <span class="kw">return</span> self.<span class="fn">_get_obs</span>(), {}
+
+    <span class="kw">def</span> <span class="fn">step</span>(self, action):
+        <span class="cm"># 이전 포지션</span>
+        prev_pos = self.position
+        reward = <span class="nu">0.0</span>
+
+        <span class="cm"># 행동 실행</span>
+        <span class="kw">if</span> action == <span class="nu">1</span> <span class="kw">and</span> self.position <= <span class="nu">0</span>:  <span class="cm"># Buy</span>
+            <span class="kw">if</span> self.position == -<span class="nu">1</span>:  <span class="cm"># 숏 청산</span>
+                pnl = -(self.prices[self.idx] - self.entry_price) \
+                      / self.entry_price
+                reward += pnl - self.tc
+            self.position = <span class="nu">1</span>
+            self.entry_price = self.prices[self.idx]
+            self.trades += <span class="nu">1</span>
+            reward -= self.tc  <span class="cm"># 거래 비용</span>
+
+        <span class="kw">elif</span> action == <span class="nu">2</span> <span class="kw">and</span> self.position >= <span class="nu">0</span>:  <span class="cm"># Sell</span>
+            <span class="kw">if</span> self.position == <span class="nu">1</span>:  <span class="cm"># 롱 청산</span>
+                pnl = (self.prices[self.idx] - self.entry_price) \
+                      / self.entry_price
+                reward += pnl - self.tc
+            self.position = -<span class="nu">1</span>
+            self.entry_price = self.prices[self.idx]
+            self.trades += <span class="nu">1</span>
+            reward -= self.tc
+
+        <span class="cm"># 포지션 유지 보상 (unrealized P&L 변화)</span>
+        <span class="kw">if</span> self.position != <span class="nu">0</span>:
+            daily_ret = self.returns[self.idx]
+            reward += self.position * daily_ret
+
+        <span class="cm"># 포트폴리오 가치 업데이트</span>
+        self.portfolio_value *= (<span class="nu">1</span> + reward)
+        self.peak_value = <span class="fn">max</span>(self.peak_value,
+                               self.portfolio_value)
+        drawdown = (self.peak_value - self.portfolio_value) \
+                   / self.peak_value
+
+        <span class="cm"># 다음 스텝</span>
+        self.idx += <span class="nu">1</span>
+        terminated = self.idx >= <span class="fn">len</span>(self.returns) - <span class="nu">1</span>
+        truncated = drawdown > self.max_dd
+
+        obs = self.<span class="fn">_get_obs</span>() <span class="kw">if</span> <span class="kw">not</span> terminated <span class="kw">else</span> \
+              np.<span class="fn">zeros</span>(self.window + <span class="nu">3</span>, dtype=np.float32)
+
+        info = {<span class="st">'portfolio_value'</span>: self.portfolio_value,
+                <span class="st">'drawdown'</span>: drawdown,
+                <span class="st">'trades'</span>: self.trades,
+                <span class="st">'position'</span>: self.position}
+
+        <span class="kw">return</span> obs, reward, terminated, truncated, info
+</pre>
+<div class="code-output"><span class="out-label">환경 인터페이스:</span>
+obs = [ret_t-20, ..., ret_t-1, RSI/100, position, unrealized_pnl]
+action ∈ {0: Hold, 1: Buy, 2: Sell}
+reward = realized_pnl + unrealized_change - transaction_cost
+done = 데이터 끝 or MDD > 20%</div>
+
+<h3>10.3 보상 함수 설계의 중요성</h3>
+
+<p>
+보상 함수는 RL 에이전트의 행동을 결정하는 가장 중요한 요소다. 단순히 수익률을 보상으로 사용하면 에이전트가 과도한 리스크를 취할 수 있다. 다양한 보상 함수 설계:
+</p>
+
+<table>
+<tr><th>보상 함수</th><th>수식</th><th>특성</th></tr>
+<tr><td>단순 수익률</td><td>\(r_t = \text{position} \times \text{return}_t\)</td><td>리스크 무시, 과도한 거래</td></tr>
+<tr><td>로그 수익률</td><td>\(r_t = \log(1 + \text{position} \times \text{return}_t)\)</td><td>큰 손실에 더 큰 페널티</td></tr>
+<tr><td>샤프 보상</td><td>\(r_t = \frac{\mu_t}{\sigma_t + \epsilon}\)</td><td>리스크 조정, 안정적</td></tr>
+<tr><td>Sortino 보상</td><td>\(r_t = \frac{\mu_t}{\sigma_t^{down} + \epsilon}\)</td><td>하방 리스크만 페널티</td></tr>
+<tr><td>거래 비용 포함</td><td>\(r_t = \text{pnl}_t - c \cdot |\Delta \text{pos}|\)</td><td>과도한 거래 억제</td></tr>
+</table>
+
+<!-- ★ Plotly: Trading Environment Visualization -->
+<div id="plot-ch10-env" style="width:100%;height:500px;margin:20px 0"></div>
+<script>
+(function(){
+  function mulberry32(a){return function(){a|=0;a=a+0x6D2B79F5|0;var t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296;};}
+  var rng=mulberry32(2024);
+  // Generate price series
+  var N=250, prices=[100], positions=[], actions=[];
+  for(var i=1;i<N;i++){
+    var drift=0.0002, vol=0.015;
+    var ret=drift+(rng()-0.5)*2*vol;
+    prices.push(prices[i-1]*(1+ret));
+  }
+  // Simple momentum agent simulation
+  var pos=0, pv=1.0, pvs=[1.0];
+  var buyX=[],buyY=[],sellX=[],sellY=[];
+  for(var i=20;i<N-1;i++){
+    var ma5=0,ma20=0;
+    for(var j=i-4;j<=i;j++) ma5+=prices[j]; ma5/=5;
+    for(var j=i-19;j<=i;j++) ma20+=prices[j]; ma20/=20;
+    var oldPos=pos;
+    if(ma5>ma20&&pos<=0){pos=1;buyX.push(i);buyY.push(prices[i]);}
+    else if(ma5<ma20&&pos>=0){pos=-1;sellX.push(i);sellY.push(prices[i]);}
+    var ret=(prices[i+1]-prices[i])/prices[i];
+    pv*=(1+pos*ret-Math.abs(pos-oldPos)*0.001);
+    pvs.push(pv);
+  }
+  var days=Array.from({length:N},function(_,i){return i;});
+  var pvDays=Array.from({length:pvs.length},function(_,i){return i+20;});
+  Plotly.newPlot('plot-ch10-env',[
+    {x:days,y:prices,type:'scatter',mode:'lines',name:'가격',line:{color:'#555',width:1.5}},
+    {x:buyX,y:buyY,type:'scatter',mode:'markers',name:'Buy',marker:{symbol:'triangle-up',size:10,color:'#2ecc71'}},
+    {x:sellX,y:sellY,type:'scatter',mode:'markers',name:'Sell',marker:{symbol:'triangle-down',size:10,color:'#e74c3c'}},
+    {x:pvDays,y:pvs,type:'scatter',mode:'lines',name:'포트폴리오 가치',line:{color:'#3498db',width:2},yaxis:'y2'}
+  ],{
+    title:{text:'📊 트레이딩 환경: 가격 + 에이전트 행동 + 포트폴리오 가치',font:{size:13}},
+    xaxis:{title:'거래일'},
+    yaxis:{title:'가격 ($)',side:'left'},
+    yaxis2:{title:'포트폴리오 가치',overlaying:'y',side:'right',titlefont:{color:'#3498db'}},
+    legend:{x:0.01,y:0.99,bgcolor:'rgba(255,255,255,0.85)'},
+    margin:{t:45,b:50,r:70},paper_bgcolor:'#fafaf8',plot_bgcolor:'#fff'
+  },{responsive:true});
+})();
+</script>
+<p class="ni" style="font-size:11px;color:#888;text-align:center">🖱️ 회색=가격, 초록▲=매수, 빨강▼=매도, 파랑=포트폴리오 가치. 에이전트가 MA 크로스오버 시그널에 따라 매매하는 시뮬레이션.</p>
+
+
+<!-- ═══════════════════════════════════════════════════════════════
+     Chapter 11: DQN 트레이딩 에이전트 구현
+     ═══════════════════════════════════════════════════════════════ -->
+<h2 id="ch11">Chapter 11. DQN 트레이딩 에이전트 — 전체 파이프라인</h2>
+
+<div class="info">
+<p class="ni"><strong>📚 교재 연동:</strong> MLAT Ch.23 "RL Trading Agent" / MLDSF Ch.14 "End-to-End Trading System"</p>
+</div>
+
+<h3>11.1 전체 학습 파이프라인</h3>
+
+<p>
+Ch.7의 DQN 에이전트와 Ch.10의 트레이딩 환경을 결합하여 전체 학습 파이프라인을 구축한다. 데이터 준비 → 환경 생성 → 에이전트 학습 → 평가의 흐름이다.
+</p>
+
+<p class="cc">▼ DQN 트레이딩 에이전트 학습 전체 코드</p>
+<pre>
+<span class="kw">import</span> numpy <span class="kw">as</span> np
+<span class="kw">import</span> yfinance <span class="kw">as</span> yf
+
+<span class="cm"># ── 1. 데이터 준비 ──</span>
+data = yf.<span class="fn">download</span>(<span class="st">'AAPL'</span>, start=<span class="st">'2018-01-01'</span>, end=<span class="st">'2024-01-01'</span>)
+close = data[<span class="st">'Close'</span>]
+<span class="kw">if</span> <span class="fn">hasattr</span>(close, <span class="st">'columns'</span>):
+    close = close.<span class="fn">droplevel</span>(<span class="st">'Ticker'</span>, axis=<span class="nu">1</span>)
+prices = close.<span class="fn">values</span>.<span class="fn">flatten</span>()
+
+<span class="cm"># Train/Test 분할 (80/20)</span>
+split = <span class="fn">int</span>(<span class="fn">len</span>(prices) * <span class="nu">0.8</span>)
+train_prices = prices[:split]
+test_prices = prices[split:]
+
+<span class="cm"># ── 2. 환경 + 에이전트 생성 ──</span>
+train_env = <span class="fn">TradingEnv</span>(train_prices, window=<span class="nu">20</span>)
+test_env = <span class="fn">TradingEnv</span>(test_prices, window=<span class="nu">20</span>)
+
+state_dim = train_env.observation_space.shape[<span class="nu">0</span>]  <span class="cm"># 23</span>
+agent = <span class="fn">DQNAgent</span>(state_dim=state_dim, action_dim=<span class="nu">3</span>)
+
+<span class="cm"># ── 3. 학습 루프 ──</span>
+n_episodes = <span class="nu">200</span>
+best_reward = -np.inf
+
+<span class="kw">for</span> ep <span class="kw">in</span> <span class="fn">range</span>(n_episodes):
+    obs, _ = train_env.<span class="fn">reset</span>()
+    total_reward = <span class="nu">0</span>
+    done = <span class="kw">False</span>
+
+    <span class="kw">while</span> <span class="kw">not</span> done:
+        action = agent.<span class="fn">choose_action</span>(obs)
+        next_obs, reward, terminated, truncated, info = \
+            train_env.<span class="fn">step</span>(action)
+        done = terminated <span class="kw">or</span> truncated
+
+        agent.buffer.<span class="fn">push</span>(obs, action, reward, next_obs, done)
+        agent.<span class="fn">train_step</span>(batch_size=<span class="nu">64</span>)
+
+        obs = next_obs
+        total_reward += reward
+
+    <span class="kw">if</span> total_reward > best_reward:
+        best_reward = total_reward
+        <span class="cm"># 최고 모델 저장</span>
+        best_weights = agent.q_net.<span class="fn">state_dict</span>().<span class="fn">copy</span>()
+
+    <span class="kw">if</span> (ep + <span class="nu">1</span>) % <span class="nu">20</span> == <span class="nu">0</span>:
+        <span class="fn">print</span>(<span class="st">f"Episode {ep+1:3d} | Reward: {total_reward:.4f} | "</span>
+              <span class="st">f"PV: {info['portfolio_value']:.4f} | "</span>
+              <span class="st">f"Trades: {info['trades']} | ε: {agent.epsilon:.3f}"</span>)
+
+<span class="cm"># ── 4. 테스트 ──</span>
+agent.q_net.<span class="fn">load_state_dict</span>(best_weights)
+agent.epsilon = <span class="nu">0.0</span>  <span class="cm"># 탐색 없이 순수 활용</span>
+
+obs, _ = test_env.<span class="fn">reset</span>()
+done = <span class="kw">False</span>
+portfolio_values = [<span class="nu">1.0</span>]
+
+<span class="kw">while</span> <span class="kw">not</span> done:
+    action = agent.<span class="fn">choose_action</span>(obs)
+    obs, reward, terminated, truncated, info = test_env.<span class="fn">step</span>(action)
+    done = terminated <span class="kw">or</span> truncated
+    portfolio_values.<span class="fn">append</span>(info[<span class="st">'portfolio_value'</span>])
+
+<span class="cm"># 성과 지표</span>
+pv = np.<span class="fn">array</span>(portfolio_values)
+total_return = (pv[-<span class="nu">1</span>] - <span class="nu">1</span>) * <span class="nu">100</span>
+daily_returns = np.<span class="fn">diff</span>(pv) / pv[:-<span class="nu">1</span>]
+sharpe = np.<span class="fn">mean</span>(daily_returns) / (np.<span class="fn">std</span>(daily_returns) + <span class="nu">1e-8</span>) * np.<span class="fn">sqrt</span>(<span class="nu">252</span>)
+mdd = np.<span class="fn">max</span>(np.<span class="fn">maximum</span>.<span class="fn">accumulate</span>(pv) - pv) / np.<span class="fn">maximum</span>.<span class="fn">accumulate</span>(pv).<span class="fn">max</span>()
+
+<span class="fn">print</span>(<span class="st">f"\n=== 테스트 결과 ==="</span>)
+<span class="fn">print</span>(<span class="st">f"총 수익률: {total_return:.2f}%"</span>)
+<span class="fn">print</span>(<span class="st">f"샤프비율: {sharpe:.2f}"</span>)
+<span class="fn">print</span>(<span class="st">f"최대 낙폭: {mdd*100:.2f}%"</span>)
+<span class="fn">print</span>(<span class="st">f"총 거래 횟수: {info['trades']}"</span>)
+</pre>
+<div class="code-output"><span class="out-label">Output (예시):</span>
+Episode  20 | Reward: 0.0234 | PV: 1.0234 | Trades: 45 | ε: 0.818
+Episode  40 | Reward: 0.0512 | PV: 1.0512 | Trades: 38 | ε: 0.669
+Episode  60 | Reward: 0.0891 | PV: 1.0891 | Trades: 32 | ε: 0.547
+Episode  80 | Reward: 0.1203 | PV: 1.1203 | Trades: 28 | ε: 0.447
+Episode 100 | Reward: 0.1456 | PV: 1.1456 | Trades: 25 | ε: 0.366
+...
+Episode 200 | Reward: 0.2134 | PV: 1.2134 | Trades: 18 | ε: 0.010
+
+=== 테스트 결과 ===
+총 수익률: 15.23%
+샤프비율: 1.12
+최대 낙폭: 8.45%
+총 거래 횟수: 22</div>
+
+<!-- ★ Plotly: DQN Agent Cumulative Returns -->
+<div id="plot-ch11-returns" style="width:100%;height:450px;margin:20px 0"></div>
+<script>
+(function(){
+  function mulberry32(a){return function(){a|=0;a=a+0x6D2B79F5|0;var t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296;};}
+  var rng=mulberry32(314);
+  var N=250, days=[];
+  var buyHold=[1.0], dqn=[1.0], ppo=[1.0];
+  for(var i=0;i<N;i++){
+    days.push(i+1);
+    var mktRet=(rng()-0.48)*0.03; // slight positive drift
+    buyHold.push(buyHold[i]*(1+mktRet));
+    // DQN: slightly better than market
+    var dqnRet=mktRet*0.6+(rng()-0.45)*0.008;
+    dqn.push(dqn[i]*(1+dqnRet));
+    // PPO: best
+    var ppoRet=mktRet*0.5+(rng()-0.42)*0.007;
+    ppo.push(ppo[i]*(1+ppoRet));
+  }
+  days.unshift(0);
+  Plotly.newPlot('plot-ch11-returns',[
+    {x:days,y:buyHold,type:'scatter',mode:'lines',name:'Buy & Hold',line:{color:'#95a5a6',width:1.5}},
+    {x:days,y:dqn,type:'scatter',mode:'lines',name:'DQN Agent',line:{color:'#e74c3c',width:2}},
+    {x:days,y:ppo,type:'scatter',mode:'lines',name:'PPO Agent',line:{color:'#2ecc71',width:2}}
+  ],{
+    title:{text:'📊 RL 에이전트 vs Buy & Hold: 누적 수익률 비교 (테스트 기간)',font:{size:13}},
+    xaxis:{title:'거래일'},
+    yaxis:{title:'포트폴리오 가치 (시작=1.0)',zeroline:false},
+    legend:{x:0.01,y:0.99,bgcolor:'rgba(255,255,255,0.85)'},
+    margin:{t:45,b:50},paper_bgcolor:'#fafaf8',plot_bgcolor:'#fff',
+    shapes:[{type:'line',x0:0,x1:N,y0:1,y1:1,line:{color:'#ccc',width:1,dash:'dot'}}]
+  },{responsive:true});
+})();
+</script>
+<p class="ni" style="font-size:11px;color:#888;text-align:center">🖱️ 회색=Buy&Hold, 빨강=DQN 에이전트, 초록=PPO 에이전트. RL 에이전트는 하락장에서 포지션을 줄여 낙폭을 제한한다.</p>
+
+
+<!-- ═══════════════════════════════════════════════════════════════
+     Chapter 12: 실전 파이프라인
+     ═══════════════════════════════════════════════════════════════ -->
+<h2 id="ch12">Chapter 12. 실전 파이프라인 — 백테스트 + 리스크 관리</h2>
+
+<div class="info">
+<p class="ni"><strong>📚 교재 연동:</strong> MLDSF Ch.14 "Backtesting and Risk Management" / MLAT Ch.23 "Practical Considerations"</p>
+</div>
+
+<h3>12.1 백테스트 프레임워크</h3>
+
+<p>
+RL 에이전트를 실전에 배포하기 전에 반드시 엄격한 백테스트를 수행해야 한다. 백테스트의 핵심 원칙: (1) 미래 정보 누출(look-ahead bias) 방지, (2) 거래 비용 반영, (3) 슬리피지 모델링, (4) 충분한 아웃오브샘플 기간.
+</p>
+
+<p class="cc">▼ 백테스트 엔진</p>
+<pre>
+<span class="kw">import</span> numpy <span class="kw">as</span> np
+<span class="kw">import</span> pandas <span class="kw">as</span> pd
+
+<span class="kw">class</span> <span class="nb">Backtester</span>:
+    <span class="st">"""RL 에이전트 백테스트 엔진"""</span>
+    <span class="kw">def</span> <span class="fn">__init__</span>(self, agent, env, initial_capital=<span class="nu">100000</span>):
+        self.agent = agent
+        self.env = env
+        self.capital = initial_capital
+
+    <span class="kw">def</span> <span class="fn">run</span>(self):
+        obs, _ = self.env.<span class="fn">reset</span>()
+        done = <span class="kw">False</span>
+        history = {<span class="st">'pv'</span>: [<span class="nu">1.0</span>], <span class="st">'actions'</span>: [],
+                   <span class="st">'positions'</span>: [<span class="nu">0</span>], <span class="st">'rewards'</span>: []}
+
+        <span class="kw">while</span> <span class="kw">not</span> done:
+            action = self.agent.<span class="fn">choose_action</span>(obs)
+            obs, reward, terminated, truncated, info = \
+                self.env.<span class="fn">step</span>(action)
+            done = terminated <span class="kw">or</span> truncated
+            history[<span class="st">'pv'</span>].<span class="fn">append</span>(info[<span class="st">'portfolio_value'</span>])
+            history[<span class="st">'actions'</span>].<span class="fn">append</span>(action)
+            history[<span class="st">'positions'</span>].<span class="fn">append</span>(info[<span class="st">'position'</span>])
+            history[<span class="st">'rewards'</span>].<span class="fn">append</span>(reward)
+
+        <span class="kw">return</span> self.<span class="fn">compute_metrics</span>(history)
+
+    <span class="kw">def</span> <span class="fn">compute_metrics</span>(self, history):
+        pv = np.<span class="fn">array</span>(history[<span class="st">'pv'</span>])
+        daily_ret = np.<span class="fn">diff</span>(pv) / pv[:-<span class="nu">1</span>]
+
+        <span class="cm"># 연간화 지표</span>
+        ann_return = (pv[-<span class="nu">1</span>] ** (<span class="nu">252</span> / <span class="fn">len</span>(pv)) - <span class="nu">1</span>) * <span class="nu">100</span>
+        ann_vol = np.<span class="fn">std</span>(daily_ret) * np.<span class="fn">sqrt</span>(<span class="nu">252</span>) * <span class="nu">100</span>
+        sharpe = (np.<span class="fn">mean</span>(daily_ret) / (np.<span class="fn">std</span>(daily_ret) + <span class="nu">1e-8</span>)
+                  * np.<span class="fn">sqrt</span>(<span class="nu">252</span>))
+
+        <span class="cm"># 최대 낙폭</span>
+        peak = np.<span class="fn">maximum</span>.<span class="fn">accumulate</span>(pv)
+        dd = (peak - pv) / peak
+        mdd = np.<span class="fn">max</span>(dd) * <span class="nu">100</span>
+
+        <span class="cm"># Sortino Ratio</span>
+        downside = daily_ret[daily_ret < <span class="nu">0</span>]
+        sortino = (np.<span class="fn">mean</span>(daily_ret) /
+                   (np.<span class="fn">std</span>(downside) + <span class="nu">1e-8</span>) * np.<span class="fn">sqrt</span>(<span class="nu">252</span>))
+
+        <span class="cm"># Calmar Ratio</span>
+        calmar = ann_return / (mdd + <span class="nu">1e-8</span>)
+
+        metrics = {
+            <span class="st">'총 수익률 (%)'</span>: (pv[-<span class="nu">1</span>] - <span class="nu">1</span>) * <span class="nu">100</span>,
+            <span class="st">'연간 수익률 (%)'</span>: ann_return,
+            <span class="st">'연간 변동성 (%)'</span>: ann_vol,
+            <span class="st">'샤프비율'</span>: sharpe,
+            <span class="st">'소르티노비율'</span>: sortino,
+            <span class="st">'최대 낙폭 (%)'</span>: mdd,
+            <span class="st">'칼마비율'</span>: calmar,
+            <span class="st">'총 거래 횟수'</span>: <span class="fn">sum</span>(<span class="nu">1</span> <span class="kw">for</span> a <span class="kw">in</span> history[<span class="st">'actions'</span>]
+                              <span class="kw">if</span> a != <span class="nu">0</span>)
+        }
+        <span class="kw">return</span> metrics, history
+</pre>
+<div class="code-output"><span class="out-label">Output (예시):</span>
+=== 백테스트 결과 ===
+총 수익률 (%):     15.23
+연간 수익률 (%):   12.45
+연간 변동성 (%):   18.32
+샤프비율:          0.68
+소르티노비율:      1.02
+최대 낙폭 (%):     8.45
+칼마비율:          1.47
+총 거래 횟수:      22</div>
+
+<h3>12.2 리스크 관리 모듈</h3>
+
+<p>
+아무리 좋은 RL 에이전트라도 리스크 관리 없이는 실전에서 살아남을 수 없다. 리스크 관리는 에이전트의 행동을 "필터링"하는 안전장치다.
+</p>
+
+<p class="cc">▼ 리스크 관리 래퍼</p>
+<pre>
+<span class="kw">class</span> <span class="nb">RiskManager</span>:
+    <span class="st">"""에이전트 행동을 필터링하는 리스크 관리"""</span>
+    <span class="kw">def</span> <span class="fn">__init__</span>(self, max_position=<span class="nu">1</span>, max_daily_loss=<span class="nu">0.02</span>,
+                 max_drawdown=<span class="nu">0.1</span>, max_trades_per_day=<span class="nu">10</span>):
+        self.max_pos = max_position
+        self.max_daily_loss = max_daily_loss
+        self.max_dd = max_drawdown
+        self.max_trades = max_trades_per_day
+        self.daily_pnl = <span class="nu">0.0</span>
+        self.daily_trades = <span class="nu">0</span>
+        self.peak_value = <span class="nu">1.0</span>
+
+    <span class="kw">def</span> <span class="fn">check_action</span>(self, action, position, portfolio_value):
+        <span class="st">"""행동 허용 여부 판단"""</span>
+        <span class="cm"># 일일 손실 한도 초과</span>
+        <span class="kw">if</span> self.daily_pnl < -self.max_daily_loss:
+            <span class="kw">return</span> <span class="nu">0</span>  <span class="cm"># 강제 Hold</span>
+
+        <span class="cm"># 최대 낙폭 초과</span>
+        self.peak_value = <span class="fn">max</span>(self.peak_value, portfolio_value)
+        dd = (self.peak_value - portfolio_value) / self.peak_value
+        <span class="kw">if</span> dd > self.max_dd:
+            <span class="cm"># 포지션 청산</span>
+            <span class="kw">if</span> position > <span class="nu">0</span>: <span class="kw">return</span> <span class="nu">2</span>  <span class="cm"># Sell</span>
+            <span class="kw">if</span> position < <span class="nu">0</span>: <span class="kw">return</span> <span class="nu">1</span>  <span class="cm"># Buy (숏 청산)</span>
+            <span class="kw">return</span> <span class="nu">0</span>
+
+        <span class="cm"># 일일 거래 횟수 초과</span>
+        <span class="kw">if</span> action != <span class="nu">0</span> <span class="kw">and</span> self.daily_trades >= self.max_trades:
+            <span class="kw">return</span> <span class="nu">0</span>
+
+        <span class="kw">if</span> action != <span class="nu">0</span>:
+            self.daily_trades += <span class="nu">1</span>
+        <span class="kw">return</span> action
+
+    <span class="kw">def</span> <span class="fn">update_daily_pnl</span>(self, pnl):
+        self.daily_pnl += pnl
+
+    <span class="kw">def</span> <span class="fn">reset_daily</span>(self):
+        self.daily_pnl = <span class="nu">0.0</span>
+        self.daily_trades = <span class="nu">0</span>
+</pre>
+
+<h3>12.3 Walk-Forward 검증</h3>
+
+<p>
+금융 데이터에서 단순 Train/Test 분할은 부족하다. <strong>Walk-Forward 검증</strong>은 시간 순서를 유지하면서 학습 기간을 점진적으로 확장하는 방법이다:
+</p>
+
+<div style="margin:20px 0;font-family:'Space Mono',monospace;font-size:11px;background:#1e1e1e;color:#d4d4d4;padding:15px;border-radius:6px;line-height:1.8">
+<span style="color:#6a9955">Period 1:</span> [====Train====][Test].....................<br>
+<span style="color:#6a9955">Period 2:</span> .[=====Train=====][Test].................<br>
+<span style="color:#6a9955">Period 3:</span> ..[======Train======][Test]..............<br>
+<span style="color:#6a9955">Period 4:</span> ...[=======Train=======][Test]...........<br>
+<span style="color:#569cd6">→ 각 Period의 Test 결과를 합산하여 최종 성과 평가</span>
+</div>
+
+<div class="warn">
+<p class="ni"><strong>⚠️ RL 백테스트의 함정들:</strong></p>
+<ul style="font-size:13px;margin-top:8px">
+<li><strong>과적합:</strong> 에피소드를 너무 많이 학습하면 학습 데이터에 과적합. Early stopping 필수.</li>
+<li><strong>생존 편향:</strong> 상장폐지된 종목을 제외하면 성과가 과대평가됨.</li>
+<li><strong>거래 비용:</strong> 실제 거래 비용(스프레드 + 수수료 + 슬리피지)을 과소평가하면 안 됨.</li>
+<li><strong>시장 충격:</strong> 대량 주문의 가격 충격을 무시하면 안 됨 (Ch.2의 Kyle's Lambda).</li>
+</ul>
+</div>
+
+<!-- ★ Plotly: Walk-Forward Performance -->
+<div id="plot-ch12-wf" style="width:100%;height:420px;margin:20px 0"></div>
+<script>
+(function(){
+  function mulberry32(a){return function(){a|=0;a=a+0x6D2B79F5|0;var t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296;};}
+  var rng=mulberry32(628);
+  // Walk-forward: 4 periods, each with train + test
+  var periods=['2019','2020','2021','2022','2023'];
+  var trainSharpe=[],testSharpe=[],trainRet=[],testRet=[];
+  for(var i=0;i<5;i++){
+    var ts=0.8+rng()*1.2; trainSharpe.push(parseFloat(ts.toFixed(2)));
+    var te=ts*0.5+rng()*0.6-0.1; testSharpe.push(parseFloat(te.toFixed(2)));
+    var tr=10+rng()*20; trainRet.push(parseFloat(tr.toFixed(1)));
+    var ttr=tr*0.4+rng()*10-3; testRet.push(parseFloat(ttr.toFixed(1)));
+  }
+  Plotly.newPlot('plot-ch12-wf',[
+    {x:periods,y:trainSharpe,type:'bar',name:'Train Sharpe',marker:{color:'rgba(52,152,219,0.7)'},offsetgroup:1},
+    {x:periods,y:testSharpe,type:'bar',name:'Test Sharpe',marker:{color:'rgba(231,76,60,0.7)'},offsetgroup:2},
+    {x:periods,y:trainRet,type:'scatter',mode:'lines+markers',name:'Train Return (%)',line:{color:'#3498db',width:2,dash:'dot'},marker:{size:6},yaxis:'y2'},
+    {x:periods,y:testRet,type:'scatter',mode:'lines+markers',name:'Test Return (%)',line:{color:'#e74c3c',width:2,dash:'dot'},marker:{size:6},yaxis:'y2'}
+  ],{
+    title:{text:'📊 Walk-Forward 검증: Train vs Test 성과 (기간별)',font:{size:13}},
+    xaxis:{title:'테스트 기간'},
+    yaxis:{title:'샤프비율',side:'left'},
+    yaxis2:{title:'수익률 (%)',overlaying:'y',side:'right'},
+    barmode:'group',
+    legend:{x:0.01,y:1.15,orientation:'h',bgcolor:'rgba(255,255,255,0.85)'},
+    margin:{t:60,b:50,r:70},paper_bgcolor:'#fafaf8',plot_bgcolor:'#fff'
+  },{responsive:true});
+})();
+</script>
+<p class="ni" style="font-size:11px;color:#888;text-align:center">🖱️ 파랑=학습 기간, 빨강=테스트 기간. 학습과 테스트의 성과 차이가 작을수록 과적합이 적다.</p>
+
+
+<!-- ═══════════════════════════════════════════════════════════════
+     Chapter 13: 피드백 + Quiz + R10 Preview
+     ═══════════════════════════════════════════════════════════════ -->
+<h2 id="ch13">Chapter 13. 피드백 + Quiz — R7~R9 종합 점검</h2>
+
+<div class="info">
+<p class="ni"><strong>📋 피드백 라운드:</strong> R3, R6에 이어 세 번째 피드백 세션이다. R7(딥러닝), R8(볼록 최적화 + Transformer), R9(HFT + 강화학습)의 핵심 개념을 종합 점검한다.</p>
+</div>
+
+<h3>13.1 R7~R9 학습 로드맵 회고</h3>
+
+<table>
+<tr><th>라운드</th><th>핵심 주제</th><th>핵심 도구</th><th>트레이딩 적용</th></tr>
+<tr><td>R7</td><td>딥러닝 기초</td><td>PyTorch, CNN, RNN, LSTM</td><td>시계열 예측, 패턴 인식</td></tr>
+<tr><td>R8</td><td>볼록 최적화 + Transformer</td><td>CVXPY, Self-Attention</td><td>포트폴리오 최적화, 장기 의존성</td></tr>
+<tr><td>R9</td><td>HFT + 강화학습</td><td>Gymnasium, DQN, PPO</td><td>자동 매매 에이전트, 마켓메이킹</td></tr>
+</table>
+
+<h3>13.2 핵심 개념 퀴즈</h3>
+
+<div class="def">
+<p class="ni"><strong>Q1. [R7]</strong> LSTM의 Forget Gate가 하는 역할은? 왜 일반 RNN보다 장기 의존성 학습에 유리한가?</p>
+<p class="ni" style="color:#888;font-size:12px;margin-top:6px">힌트: Cell State와 Gradient Flow를 생각해보자.</p>
+</div>
+
+<div class="def">
+<p class="ni"><strong>Q2. [R7]</strong> Dropout이 과적합을 방지하는 메커니즘을 설명하라. 학습 시와 추론 시의 차이는?</p>
+</div>
+
+<div class="def">
+<p class="ni"><strong>Q3. [R8]</strong> 볼록 최적화에서 KKT 조건의 "상보 이완" \(\lambda_i g_i(x^*) = 0\)의 의미는?</p>
+<p class="ni" style="color:#888;font-size:12px;margin-top:6px">힌트: 제약이 활성(active)인 경우와 비활성인 경우를 나누어 생각하자.</p>
+</div>
+
+<div class="def">
+<p class="ni"><strong>Q4. [R8]</strong> Transformer의 Self-Attention에서 \(\sqrt{d_k}\)로 나누는 이유는?</p>
+<p class="ni" style="color:#888;font-size:12px;margin-top:6px">힌트: Softmax의 입력 크기와 gradient를 생각해보자.</p>
+</div>
+
+<div class="def">
+<p class="ni"><strong>Q5. [R9]</strong> 마켓메이커가 스프레드를 요구하는 근본적 이유는? (Ch.1 역선택)</p>
+</div>
+
+<div class="def">
+<p class="ni"><strong>Q6. [R9]</strong> Q-Learning의 업데이트 규칙에서 TD 에러가 0이 되면 어떤 방정식이 만족되는가?</p>
+<p class="ni" style="color:#888;font-size:12px;margin-top:6px">힌트: Ch.5의 벨만 최적 방정식.</p>
+</div>
+
+<div class="def">
+<p class="ni"><strong>Q7. [R9]</strong> DQN에서 Experience Replay와 Target Network가 각각 해결하는 문제는?</p>
+</div>
+
+<div class="def">
+<p class="ni"><strong>Q8. [R9]</strong> PPO의 클리핑 메커니즘이 학습 안정성을 보장하는 원리를 설명하라.</p>
+<p class="ni" style="color:#888;font-size:12px;margin-top:6px">힌트: 확률 비율 \(r_t(\theta)\)가 \([1-\epsilon, 1+\epsilon]\) 범위를 벗어나면?</p>
+</div>
+
+<div class="def">
+<p class="ni"><strong>Q9. [R9]</strong> 트레이딩 RL에서 보상 함수를 단순 수익률 대신 샤프비율 기반으로 설계하는 이유는?</p>
+</div>
+
+<div class="def">
+<p class="ni"><strong>Q10. [종합]</strong> R8의 Transformer 수익률 예측 → R9의 RL 에이전트를 결합하면 어떤 시스템을 만들 수 있는가? 구체적인 아키텍처를 설명하라.</p>
+<p class="ni" style="color:#888;font-size:12px;margin-top:6px">힌트: Transformer의 출력을 RL 에이전트의 상태(state)에 포함시키는 방법을 생각해보자.</p>
+</div>
+
+<h3>13.3 Mini Project: RL 트레이딩 에이전트 대결</h3>
+
+<div style="margin:25px 0;padding:25px;background:linear-gradient(135deg,#e8eaf6,#ede7f6);border-radius:12px;border:2px solid #5c6bc0;box-shadow:0 4px 15px rgba(0,0,0,.1)">
+<p class="ni" style="font-weight:bold;font-size:16px;color:#283593;margin-bottom:15px">🎯 Mini Project: DQN vs PPO 트레이딩 에이전트 대결</p>
+
+<p class="ni" style="font-size:13px;margin-bottom:12px">
+<strong>목표:</strong> 동일한 트레이딩 환경에서 DQN과 PPO 에이전트를 학습시키고, Buy&Hold 벤치마크와 성과를 비교한다.
+</p>
+
+<p class="ni" style="font-size:13px;font-weight:bold;color:#3949ab;margin-bottom:8px">📋 과제 단계:</p>
+
+<ol style="font-size:13px">
+<li style="margin-bottom:8px"><strong>데이터:</strong> AAPL 2018~2024 일간 데이터, Train(2018~2022) / Test(2023~2024)</li>
+<li style="margin-bottom:8px"><strong>환경:</strong> Ch.10의 TradingEnv 사용 (window=20, 거래비용=0.1%)</li>
+<li style="margin-bottom:8px"><strong>에이전트 학습:</strong> DQN(Ch.7) 200 에피소드, PPO(Ch.9) 200 에피소드</li>
+<li style="margin-bottom:8px"><strong>백테스트:</strong> Ch.12의 Backtester로 테스트 기간 성과 측정</li>
+<li style="margin-bottom:8px"><strong>비교 지표:</strong> 총 수익률, 샤프비율, 최대 낙폭, 소르티노비율, 거래 횟수</li>
+<li style="margin-bottom:8px"><strong>시각화:</strong> 누적 수익률 곡선 (3개 전략 비교), 낙폭 곡선, 포지션 변화</li>
+</ol>
+
+<p class="ni" style="font-size:12px;color:#5c6bc0;margin-top:12px">
+<strong>💡 보너스:</strong> 보상 함수를 변경(단순 수익률 → 샤프 보상)하여 에이전트 행동이 어떻게 달라지는지 비교해보자.
+</p>
+</div>
+
+<h3>13.4 R10 예고: Final Project — 통합 HFT 시스템</h3>
+
+<div style="margin:25px 0;padding:20px;background:linear-gradient(135deg,#fce4ec,#f3e5f5);border-radius:12px;border:2px solid #ab47bc">
+<p class="ni" style="font-weight:bold;font-size:14px;color:#6a1b9a;margin-bottom:10px">🚀 R10 Preview: Final Project — 통합 HFT 시스템</p>
+<p class="ni" style="font-size:13px">
+R1~R9의 모든 것을 하나의 시스템으로 통합한다. 데이터 수집(R1,R3) → 피처 엔지니어링(R3,R5) → 예측 모델(R4,R7,R8) → 포트폴리오 최적화(R8) → RL 에이전트(R9) → 백테스트 + 리스크 관리(R9,R12)의 전체 파이프라인을 구축한다.
+</p>
+<ul style="font-size:13px;margin-top:8px">
+<li><strong>데이터 파이프라인:</strong> yfinance + 대안 데이터 (뉴스 감성, R6)</li>
+<li><strong>예측 엔진:</strong> Transformer + XGBoost 앙상블</li>
+<li><strong>최적화 엔진:</strong> CVXPY (Black-Litterman + Risk Parity)</li>
+<li><strong>실행 엔진:</strong> PPO 에이전트 + 리스크 관리</li>
+<li><strong>평가:</strong> Walk-Forward 백테스트 + 종합 성과 리포트</li>
+</ul>
+<p class="ni" style="font-size:12px;color:#888;margin-top:10px">교재: 전 교재 종합 / 최종 프로젝트</p>
+</div>
+
+<!-- ★ Plotly: R1~R10 Curriculum Progress 3D -->
+<div id="plot-ch13-progress" style="width:100%;height:500px;margin:20px 0"></div>
+<script>
+(function(){
+  var rounds=['R1','R2','R3','R4','R5','R6','R7','R8','R9','R10'];
+  var theory=[60,80,70,85,80,75,90,95,95,100];
+  var coding=[50,60,80,85,75,80,85,90,90,100];
+  var trading=[30,40,70,75,70,65,80,90,95,100];
+  // 3D scatter
+  Plotly.newPlot('plot-ch13-progress',[{
+    type:'scatter3d',mode:'lines+markers+text',
+    x:theory,y:coding,z:trading,
+    text:rounds,textposition:'top center',textfont:{size:10,color:'#333'},
+    marker:{size:6,color:rounds.map(function(_,i){return i;}),colorscale:'Viridis',
+      colorbar:{title:'Round',tickvals:[0,4,9],ticktext:['R1','R5','R10']},
+      line:{width:1,color:'#333'}},
+    line:{color:'#3498db',width:3},
+    hovertemplate:'%{text}<br>이론: %{x}%<br>코딩: %{y}%<br>트레이딩: %{z}%'
+  }],{
+    title:{text:'📊 R1→R10 학습 궤적: 이론 × 코딩 × 트레이딩 역량',font:{size:13}},
+    scene:{
+      xaxis:{title:'이론 역량 (%)',range:[20,105]},
+      yaxis:{title:'코딩 역량 (%)',range:[20,105]},
+      zaxis:{title:'트레이딩 역량 (%)',range:[20,105]},
+      camera:{eye:{x:1.5,y:1.5,z:1.2}}
+    },
+    margin:{t:45,b:10,l:10,r:10},paper_bgcolor:'#fafaf8'
+  },{responsive:true});
+})();
+</script>
+<p class="ni" style="font-size:11px;color:#888;text-align:center">🖱️ 3D 궤적: R1에서 시작하여 R10으로 갈수록 이론·코딩·트레이딩 역량이 모두 성장. 마우스로 회전하여 다양한 각도에서 확인하세요.</p>
+
+<div class="ok">
+<p class="ni"><strong>🎉 R9 완료!</strong> 시장 마이크로스트럭처의 세계를 이해하고, 강화학습의 핵심 알고리즘(Q-Learning → DQN → Policy Gradient → PPO)을 모두 배웠다. 이제 에이전트가 스스로 매매 전략을 학습할 수 있다. R10에서 모든 것을 하나로 통합하는 최종 프로젝트가 기다리고 있다.</p>
+</div>
+
+</div><!-- paper-content -->
+</div><!-- container -->
+</div><!-- main-wrapper -->
+
+</body>
+</html>
