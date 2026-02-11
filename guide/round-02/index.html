@@ -7,6 +7,7 @@
 <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
 <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;500&family=Space+Mono:wght@400&family=Inter:wght@300;400&display=swap" rel="stylesheet">
+<script src="https://cdn.plot.ly/plotly-2.27.0.min.js"></script>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
 body{font-family:'Inter',sans-serif;background:#fafaf8;color:#1a1a1a;line-height:1.7;overflow-x:hidden}
@@ -93,13 +94,13 @@ pre{font-size:11px;padding:14px}table{font-size:10px;display:block;overflow-x:au
 <div class="nav-section">
 <div class="nav-section-title">Curriculum</div>
 <ul class="nav-list">
-<li><a class="done" href="../round-01/">R1. Python + Finance <span class="badge badge-done">DONE</span></a></li>
+<li><a class="done" href="../round_01/lecture_01.html">R1. Python + Finance <span class="badge badge-done">DONE</span></a></li>
 <li><a class="active" href="#">R2. Linear Algebra + Stats <span class="badge">NOW</span></a></li>
 <li><a href="#">R3. Data / Feature Eng.</a></li>
 <li><a href="#">R4. Supervised Learning</a></li>
 <li><a href="#">R5. Unsupervised + TS</a></li>
-<li><a class="done" href="../round-06/">R6. NLP + Sentiment <span class="badge badge-done">DONE</span></a></li>
-<li><a href="#">R7. Deep Learning</a></li>
+<li><a class="done" href="../round_06/lecture_06.html">R6. NLP + Sentiment <span class="badge badge-done">DONE</span></a></li>
+<li><a class="done" href="../round_07/lecture_07.html">R7. Deep Learning <span class="badge badge-done">DONE</span></a></li>
 <li><a href="#">R8. Convex Opt + Transformer</a></li>
 <li><a href="#">R9. HFT + RL</a></li>
 <li><a href="#">R10. Final Project</a></li>
@@ -482,6 +483,61 @@ unit_v = v / np.linalg.norm(v)
 
 <p>금융에서 단위벡터의 의미: 포트폴리오 비중 벡터를 정규화하면 "방향"(어떤 종목에 상대적으로 더 투자하는가)만 남고 "크기"(총 투자금액)는 사라진다. 이것이 바로 "전략의 방향성"이다.</p>
 
+<!-- ═══ Plotly: Ch.1/2 벡터 연산 인터랙티브 시각화 ═══ -->
+<div id="plot-ch2-vectors" style="width:100%;height:500px;margin:25px 0"></div>
+<p class="ni" style="font-size:12px;color:#888;text-align:center">🖱️ 드래그로 회전, 스크롤로 확대/축소. 벡터 a, b, a+b, 내적 방향을 3D로 확인하세요.</p>
+<script>
+(function(){
+  // 3D 벡터 시각화: a, b, a+b, 내적 관계
+  var a = [3, 2, 1], b = [1, 4, 2];
+  var apb = [a[0]+b[0], a[1]+b[1], a[2]+b[2]];
+  
+  function arrow3d(start, end, color, name) {
+    return {
+      x: [start[0], end[0]], y: [start[1], end[1]], z: [start[2], end[2]],
+      mode: 'lines+markers', type: 'scatter3d',
+      line: {color: color, width: 6},
+      marker: {size: [3, 6], color: color, symbol: ['circle','diamond']},
+      name: name
+    };
+  }
+  
+  var traces = [
+    arrow3d([0,0,0], a, '#3498db', 'a = [3, 2, 1]'),
+    arrow3d([0,0,0], b, '#e74c3c', 'b = [1, 4, 2]'),
+    arrow3d([0,0,0], apb, '#27ae60', 'a+b = [4, 6, 3]'),
+    // a의 끝에서 b를 이어붙인 점선
+    {x:[a[0],apb[0]], y:[a[1],apb[1]], z:[a[2],apb[2]],
+     mode:'lines', type:'scatter3d',
+     line:{color:'#e74c3c', width:3, dash:'dash'}, name:'b (이동)', showlegend:false},
+    // 내적 = 3*1+2*4+1*2 = 13
+    {x:[0], y:[0], z:[0], mode:'markers', type:'scatter3d',
+     marker:{size:8, color:'#f39c12'}, name:'dot(a,b) = 13', showlegend:true}
+  ];
+  
+  var layout = {
+    title: {text:'3D 벡터 연산: a, b, a+b (벡터 덧셈의 기하학)', font:{size:14}},
+    scene: {
+      xaxis: {title:'x', range:[-1,6]},
+      yaxis: {title:'y', range:[-1,7]},
+      zaxis: {title:'z', range:[-1,5]},
+      camera: {eye:{x:1.5, y:1.5, z:1.2}}
+    },
+    legend: {x:0.01, y:0.99, font:{size:11}},
+    margin: {l:0, r:0, t:40, b:0},
+    paper_bgcolor: 'rgba(0,0,0,0)',
+    plot_bgcolor: 'rgba(0,0,0,0)',
+    annotations: [{
+      text: '내적 a·b = 3×1 + 2×4 + 1×2 = 13 (양수 → 같은 방향)',
+      showarrow: false, x: 0.5, y: -0.05, xref:'paper', yref:'paper',
+      font:{size:12, color:'#e67e22'}
+    }]
+  };
+  
+  Plotly.newPlot('plot-ch2-vectors', traces, layout, {responsive:true});
+})();
+</script>
+
 <div class="tc">Table 1. 벡터 연산 요약</div>
 <table>
 <tr><th>연산</th><th>수학 표기</th><th>NumPy 코드</th><th>결과 타입</th><th>금융 의미</th></tr>
@@ -720,6 +776,52 @@ C = A @ B  <span class="cm"># 2×2</span>
 <li><code>A * B</code>는 원소별 곱이고, <code>A @ B</code>가 행렬곱이다. 절대 헷갈리지 말 것!</li>
 </ul>
 </div>
+
+<!-- ═══ Plotly: Ch.3/4 행렬 변환 시각화 (원→타원) ═══ -->
+<div id="plot-ch4-transform" style="width:100%;height:480px;margin:25px 0"></div>
+<p class="ni" style="font-size:12px;color:#888;text-align:center">🖱️ 호버로 좌표 확인. 파란 원이 행렬 A를 곱하면 빨간 타원으로 변환됩니다. 타원의 장축 = 고유벡터 방향!</p>
+<script>
+(function(){
+  var N = 200;
+  var cx = [], cy = [], ex = [], ey = [];
+  var A = [[2, 1],[1, 3]]; // 변환 행렬 (공분산 행렬처럼)
+  
+  for(var i=0; i<N; i++){
+    var t = 2*Math.PI*i/N;
+    var x0 = Math.cos(t), y0 = Math.sin(t);
+    cx.push(x0); cy.push(y0);
+    // 행렬 곱: A @ [x0, y0]
+    ex.push(A[0][0]*x0 + A[0][1]*y0);
+    ey.push(A[1][0]*x0 + A[1][1]*y0);
+  }
+  
+  // 고유벡터 방향 (수동 계산: λ1≈3.618, v1≈[0.526,0.851])
+  var ev1 = {x:[0, 0.526*3.618], y:[0, 0.851*3.618]};
+  var ev2 = {x:[0, 0.851*1.382], y:[0, -0.526*1.382]};
+  
+  var traces = [
+    {x:cx, y:cy, mode:'lines', name:'원래: 단위 원', line:{color:'#3498db', width:3}},
+    {x:ex, y:ey, mode:'lines', name:'변환 후: 타원 (A×원)', line:{color:'#e74c3c', width:3}},
+    {x:ev1.x, y:ev1.y, mode:'lines+markers', name:'고유벡터 1 (λ≈3.62)',
+     line:{color:'#f39c12', width:4, dash:'dash'}, marker:{size:[4,10], symbol:['circle','arrow-up']}},
+    {x:ev2.x, y:ev2.y, mode:'lines+markers', name:'고유벡터 2 (λ≈1.38)',
+     line:{color:'#27ae60', width:4, dash:'dash'}, marker:{size:[4,10], symbol:['circle','arrow-up']}}
+  ];
+  
+  var layout = {
+    title:{text:'행렬 = 변환: 단위 원 → 타원 (고유벡터 = 장축/단축 방향)', font:{size:14}},
+    xaxis:{title:'x', range:[-5,5], zeroline:true, zerolinecolor:'#ccc'},
+    yaxis:{title:'y', range:[-5,5], zeroline:true, zerolinecolor:'#ccc', scaleanchor:'x'},
+    legend:{x:0.01, y:0.99, font:{size:11}},
+    margin:{l:50, r:20, t:50, b:50},
+    paper_bgcolor:'rgba(0,0,0,0)', plot_bgcolor:'rgba(248,249,250,0.5)',
+    shapes:[{type:'line',x0:-5,y0:0,x1:5,y1:0,line:{color:'#ddd',width:1}},
+            {type:'line',x0:0,y0:-5,x1:0,y1:5,line:{color:'#ddd',width:1}}]
+  };
+  
+  Plotly.newPlot('plot-ch4-transform', traces, layout, {responsive:true});
+})();
+</script>
 
 <!-- ── 보충 4.2+ 왜 이 순서로 곱하는가 ── -->
 <div class="info">
@@ -1183,6 +1285,72 @@ plt.show()</code></pre>
 <p class="ni">Round 5에서 PCA를 본격적으로 다루며, t-SNE와 함께 차원 축소와 팩터 모델에 활용한다.</p>
 </div>
 
+<!-- ═══ Plotly: Ch.5 PCA 시각화 — 2D 데이터의 주성분 ═══ -->
+<div id="plot-ch5-pca" style="width:100%;height:500px;margin:25px 0"></div>
+<p class="ni" style="font-size:12px;color:#888;text-align:center">🖱️ 호버로 각 데이터 포인트 확인. 빨간 화살표(PC1)가 데이터 분산을 가장 많이 설명하는 방향입니다.</p>
+<script>
+(function(){
+  // 상관관계 있는 2D 데이터 생성 (시드 고정)
+  function mulberry32(a){return function(){a|=0;a=a+0x6D2B79F5|0;var t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296;}}
+  var rng = mulberry32(42);
+  function randn(){var u=0,v=0;while(u===0)u=rng();while(v===0)v=rng();return Math.sqrt(-2*Math.log(u))*Math.cos(2*Math.PI*v);}
+  
+  var N=150, px=[], py=[];
+  for(var i=0;i<N;i++){
+    var x1=randn()*2, x2=0.7*x1+randn()*1.2;
+    px.push(x1); py.push(x2);
+  }
+  
+  // 수동 PCA: 평균 빼기
+  var mx=0,my=0;
+  for(var i=0;i<N;i++){mx+=px[i];my+=py[i];}
+  mx/=N; my/=N;
+  var cx=[],cy=[];
+  for(var i=0;i<N;i++){cx.push(px[i]-mx);cy.push(py[i]-my);}
+  
+  // 공분산 계산
+  var cxx=0,cyy=0,cxy=0;
+  for(var i=0;i<N;i++){cxx+=cx[i]*cx[i];cyy+=cy[i]*cy[i];cxy+=cx[i]*cy[i];}
+  cxx/=(N-1);cyy/=(N-1);cxy/=(N-1);
+  
+  // 2x2 고유값 분해
+  var tr=cxx+cyy, det=cxx*cyy-cxy*cxy;
+  var l1=(tr+Math.sqrt(tr*tr-4*det))/2;
+  var l2=(tr-Math.sqrt(tr*tr-4*det))/2;
+  var vx1=cxy, vy1=l1-cxx;
+  var len1=Math.sqrt(vx1*vx1+vy1*vy1);
+  vx1/=len1; vy1/=len1;
+  var vx2=cxy, vy2=l2-cxx;
+  var len2=Math.sqrt(vx2*vx2+vy2*vy2);
+  vx2/=len2; vy2/=len2;
+  
+  var sc = 3; // 화살표 스케일
+  var traces = [
+    {x:px, y:py, mode:'markers', name:'데이터 (N=150)',
+     marker:{size:6, color:'#3498db', opacity:0.6}},
+    // PC1 화살표
+    {x:[mx-vx1*sc, mx+vx1*sc], y:[my-vy1*sc, my+vy1*sc],
+     mode:'lines', name:'PC1 (설명비율: '+(l1/(l1+l2)*100).toFixed(1)+'%)',
+     line:{color:'#e74c3c', width:4}},
+    // PC2 화살표
+    {x:[mx-vx2*sc*0.6, mx+vx2*sc*0.6], y:[my-vy2*sc*0.6, my+vy2*sc*0.6],
+     mode:'lines', name:'PC2 (설명비율: '+(l2/(l1+l2)*100).toFixed(1)+'%)',
+     line:{color:'#f39c12', width:3, dash:'dash'}}
+  ];
+  
+  var layout = {
+    title:{text:'PCA: 데이터의 주성분 방향 (고유벡터 = 분산 최대 방향)', font:{size:14}},
+    xaxis:{title:'Feature 1', zeroline:true, zerolinecolor:'#ddd'},
+    yaxis:{title:'Feature 2', zeroline:true, zerolinecolor:'#ddd', scaleanchor:'x'},
+    legend:{x:0.01, y:0.99, font:{size:11}},
+    margin:{l:50, r:20, t:50, b:50},
+    paper_bgcolor:'rgba(0,0,0,0)', plot_bgcolor:'rgba(248,249,250,0.5)'
+  };
+  
+  Plotly.newPlot('plot-ch5-pca', traces, layout, {responsive:true});
+})();
+</script>
+
 <!-- old PCA code replaced by expanded 5.5~5.8 above -->
 
 <h3>5.9 양정치 행렬 (Positive Definite)</h3>
@@ -1458,6 +1626,115 @@ n_3sigma = (np.abs(btc_ret) > <span class="nu">3</span> * btc_ret.std()).sum()
 </div>
 
 <div class="tc">Table 3. 주요 확률분포와 금융 활용</div>
+
+<!-- ═══ Plotly: Ch.6 정규분포 vs t-분포 + GBM 시뮬레이션 ═══ -->
+<div id="plot-ch6-dist" style="width:100%;height:460px;margin:25px 0"></div>
+<p class="ni" style="font-size:12px;color:#888;text-align:center">🖱️ 범례 클릭으로 분포 on/off. 꼬리 부분(±3σ 이상)에서 t-분포가 정규분포보다 확률이 높은 것을 확인하세요.</p>
+
+<div id="plot-ch6-gbm" style="width:100%;height:460px;margin:25px 0"></div>
+<p class="ni" style="font-size:12px;color:#888;text-align:center">🖱️ 호버로 각 경로의 가격 확인. 같은 파라미터에서도 경로마다 결과가 크게 다릅니다 (불확실성!).</p>
+<script>
+(function(){
+  // (1) 정규분포 vs t-분포 비교
+  function normPdf(x, mu, sig){
+    return Math.exp(-0.5*Math.pow((x-mu)/sig,2))/(sig*Math.sqrt(2*Math.PI));
+  }
+  // t-분포 PDF 근사 (Stirling)
+  function tPdf(x, df){
+    var g1 = 1, g2 = 1;
+    // gamma((df+1)/2) / gamma(df/2) 근사
+    var a = (df+1)/2, b = df/2;
+    // 간단한 비율 근사
+    var coeff = 1/(Math.sqrt(df*Math.PI));
+    // Beta function 근사
+    for(var k=0; k<20; k++){
+      coeff *= (a+k-1)/(b+k-1) * (k>0?1:1);
+    }
+    // 직접 계산
+    return (1/Math.sqrt(df*Math.PI)) * 
+           (Math.exp(lgamma((df+1)/2) - lgamma(df/2))) *
+           Math.pow(1+x*x/df, -(df+1)/2);
+  }
+  function lgamma(z){
+    // Lanczos approximation
+    var g=7, c=[0.99999999999980993,676.5203681218851,-1259.1392167224028,
+    771.32342877765313,-176.61502916214059,12.507343278686905,
+    -0.13857109526572012,9.9843695780195716e-6,1.5056327351493116e-7];
+    if(z<0.5) return Math.log(Math.PI/Math.sin(Math.PI*z))-lgamma(1-z);
+    z-=1; var x=c[0];
+    for(var i=1;i<g+2;i++) x+=c[i]/(z+i);
+    var t=z+g+0.5;
+    return 0.5*Math.log(2*Math.PI)+(z+0.5)*Math.log(t)-t+Math.log(x);
+  }
+  
+  var xArr=[], yNorm=[], yT3=[], yT5=[], yT30=[];
+  for(var i=-50;i<=50;i++){
+    var x=i*0.1;
+    xArr.push(x);
+    yNorm.push(normPdf(x,0,1));
+    yT3.push(tPdf(x,3));
+    yT5.push(tPdf(x,5));
+    yT30.push(tPdf(x,30));
+  }
+  
+  Plotly.newPlot('plot-ch6-dist', [
+    {x:xArr, y:yNorm, mode:'lines', name:'정규분포 (N(0,1))', line:{color:'#3498db', width:3}},
+    {x:xArr, y:yT3, mode:'lines', name:'t-분포 (ν=3) — 팻테일', line:{color:'#e74c3c', width:2, dash:'dash'}},
+    {x:xArr, y:yT5, mode:'lines', name:'t-분포 (ν=5)', line:{color:'#f39c12', width:2, dash:'dot'}},
+    {x:xArr, y:yT30, mode:'lines', name:'t-분포 (ν=30) ≈ 정규', line:{color:'#27ae60', width:2, dash:'dashdot'}}
+  ], {
+    title:{text:'정규분포 vs t-분포: 꼬리 두께 비교 (ν↓ → 팻테일↑)', font:{size:14}},
+    xaxis:{title:'x (표준편차 단위)', range:[-5,5]},
+    yaxis:{title:'확률밀도 f(x)', range:[0,0.45]},
+    legend:{x:0.6, y:0.95, font:{size:11}},
+    margin:{l:60, r:20, t:50, b:50},
+    paper_bgcolor:'rgba(0,0,0,0)', plot_bgcolor:'rgba(248,249,250,0.5)',
+    shapes:[{type:'rect',x0:-1,x1:1,y0:0,y1:0.45,fillcolor:'rgba(52,152,219,0.05)',line:{width:0}},
+            {type:'line',x0:-3,y0:0,x1:-3,y1:0.01,line:{color:'#e74c3c',width:1,dash:'dot'}},
+            {type:'line',x0:3,y0:0,x1:3,y1:0.01,line:{color:'#e74c3c',width:1,dash:'dot'}}],
+    annotations:[{x:0,y:0.42,text:'68% 영역 (±1σ)',showarrow:false,font:{size:10,color:'#3498db'}},
+                 {x:3.5,y:0.015,text:'팻테일 영역',showarrow:false,font:{size:10,color:'#e74c3c'}}]
+  }, {responsive:true});
+  
+  // (2) GBM 시뮬레이션
+  function mulberry32(a){return function(){a|=0;a=a+0x6D2B79F5|0;var t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296;}}
+  function boxMuller(rng){var u=0,v=0;while(u===0)u=rng();while(v===0)v=rng();return Math.sqrt(-2*Math.log(u))*Math.cos(2*Math.PI*v);}
+  
+  var S0=70000, mu=0.10, sig=0.30, dt=1/252, nDays=252, nPaths=8;
+  var colors = ['#3498db','#e74c3c','#27ae60','#f39c12','#8e44ad','#1abc9c','#e67e22','#2c3e50'];
+  var gbmTraces = [];
+  
+  for(var p=0; p<nPaths; p++){
+    var rng = mulberry32(42+p*17);
+    var prices = [S0], days = [0];
+    var S = S0;
+    for(var d=1; d<=nDays; d++){
+      var Z = boxMuller(rng);
+      S = S * Math.exp((mu-0.5*sig*sig)*dt + sig*Math.sqrt(dt)*Z);
+      prices.push(Math.round(S));
+      days.push(d);
+    }
+    gbmTraces.push({
+      x:days, y:prices, mode:'lines', name:'경로 '+(p+1)+' (최종: ₩'+prices[nDays].toLocaleString()+')',
+      line:{color:colors[p], width:1.5}, opacity:0.8
+    });
+  }
+  
+  gbmTraces.push({
+    x:[0,252], y:[S0,S0], mode:'lines', name:'초기가격 ₩70,000',
+    line:{color:'black', width:2, dash:'dash'}, showlegend:true
+  });
+  
+  Plotly.newPlot('plot-ch6-gbm', gbmTraces, {
+    title:{text:'GBM 시뮬레이션: 삼성전자 1년 주가 경로 (μ=10%, σ=30%)', font:{size:14}},
+    xaxis:{title:'거래일'},
+    yaxis:{title:'주가 (원)', tickformat:','},
+    legend:{x:0.01, y:0.99, font:{size:10}},
+    margin:{l:80, r:20, t:50, b:50},
+    paper_bgcolor:'rgba(0,0,0,0)', plot_bgcolor:'rgba(248,249,250,0.5)'
+  }, {responsive:true});
+})();
+</script>
 <table>
 <tr><th>분포</th><th>파라미터</th><th>특징</th><th>금융 활용</th></tr>
 <tr><td>정규분포</td><td>μ, σ</td><td>종 모양, 대칭</td><td>수익률 모델링 (기본 가정)</td></tr>
@@ -1701,6 +1978,83 @@ sample_corr = np.corrcoef(returns_4.T)
 <p class="ni"><strong>핵심 정리:</strong> 공분산 행렬은 포트폴리오 이론의 심장이다. 이 행렬 하나로 (1) 포트폴리오 분산 계산, (2) 최소분산 포트폴리오 도출, (3) 효율적 프론티어 그리기, (4) PCA로 팩터 추출이 모두 가능하다. Round 8에서 Convex Optimization으로 이 행렬을 활용한 최적 포트폴리오를 구한다.</p>
 </div>
 
+<!-- ═══ Plotly: Ch.7 상관계수별 산점도 + 포트폴리오 변동성 ═══ -->
+<div id="plot-ch7-corr" style="width:100%;height:460px;margin:25px 0"></div>
+<p class="ni" style="font-size:12px;color:#888;text-align:center">🖱️ 범례 클릭으로 상관계수별 산점도 on/off. ρ가 음수일수록 점들이 반대 방향으로 퍼집니다.</p>
+
+<div id="plot-ch7-diveff" style="width:100%;height:420px;margin:25px 0"></div>
+<p class="ni" style="font-size:12px;color:#888;text-align:center">🖱️ 호버로 정확한 값 확인. 상관계수가 낮을수록 포트폴리오 변동성이 감소합니다 (분산 효과!).</p>
+<script>
+(function(){
+  // (1) 상관계수별 산점도
+  function mulberry32(a){return function(){a|=0;a=a+0x6D2B79F5|0;var t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296;}}
+  function boxMuller(rng){var u=0,v=0;while(u===0)u=rng();while(v===0)v=rng();return Math.sqrt(-2*Math.log(u))*Math.cos(2*Math.PI*v);}
+  
+  var rhos = [0.9, 0.5, 0.0, -0.5, -0.9];
+  var colors = ['#e74c3c','#f39c12','#888888','#3498db','#8e44ad'];
+  var labels = ['ρ=+0.9 (강한 양)','ρ=+0.5 (중간 양)','ρ=0 (무상관)','ρ=-0.5 (중간 음)','ρ=-0.9 (강한 음)'];
+  var corrTraces = [];
+  
+  for(var r=0; r<rhos.length; r++){
+    var rng = mulberry32(100+r*31);
+    var xs=[], ys=[];
+    for(var i=0;i<80;i++){
+      var z1=boxMuller(rng), z2=boxMuller(rng);
+      xs.push(z1);
+      ys.push(rhos[r]*z1 + Math.sqrt(1-rhos[r]*rhos[r])*z2);
+    }
+    corrTraces.push({
+      x:xs, y:ys, mode:'markers', name:labels[r],
+      marker:{size:5, color:colors[r], opacity:0.7},
+      visible: (r===0||r===2||r===4) ? true : 'legendonly'
+    });
+  }
+  
+  Plotly.newPlot('plot-ch7-corr', corrTraces, {
+    title:{text:'상관계수(ρ)에 따른 산점도 패턴', font:{size:14}},
+    xaxis:{title:'종목 A 수익률', range:[-4,4]},
+    yaxis:{title:'종목 B 수익률', range:[-4,4], scaleanchor:'x'},
+    legend:{x:0.01, y:0.99, font:{size:11}},
+    margin:{l:60, r:20, t:50, b:50},
+    paper_bgcolor:'rgba(0,0,0,0)', plot_bgcolor:'rgba(248,249,250,0.5)'
+  }, {responsive:true});
+  
+  // (2) 상관계수 vs 포트폴리오 변동성
+  var rhoRange=[], portVols=[];
+  var sigA=0.20, sigB=0.30, wA=0.5, wB=0.5;
+  for(var rho=-100; rho<=100; rho++){
+    var r = rho/100;
+    rhoRange.push(r);
+    var covAB = r*sigA*sigB;
+    var pVar = wA*wA*sigA*sigA + wB*wB*sigB*sigB + 2*wA*wB*covAB;
+    portVols.push(Math.sqrt(pVar)*100);
+  }
+  
+  // 개별 가중평균 변동성 (상한선)
+  var simpleAvg = (wA*sigA + wB*sigB)*100;
+  
+  Plotly.newPlot('plot-ch7-diveff', [
+    {x:rhoRange, y:portVols, mode:'lines', name:'포트폴리오 변동성 (50:50)',
+     line:{color:'#e74c3c', width:3}, fill:'tozeroy', fillcolor:'rgba(231,76,60,0.1)'},
+    {x:[-1,1], y:[simpleAvg,simpleAvg], mode:'lines', name:'단순 가중평균 변동성 ('+simpleAvg.toFixed(1)+'%)',
+     line:{color:'#3498db', width:2, dash:'dash'}},
+    {x:[0], y:[Math.sqrt(wA*wA*sigA*sigA+wB*wB*sigB*sigB)*100], mode:'markers',
+     name:'ρ=0일 때', marker:{size:12, color:'#27ae60', symbol:'star'}},
+    {x:[-1], y:[Math.abs(wA*sigA-wB*sigB)*100], mode:'markers',
+     name:'ρ=-1 (완벽 헤지)', marker:{size:12, color:'#8e44ad', symbol:'diamond'}}
+  ], {
+    title:{text:'상관계수(ρ) vs 포트폴리오 변동성 — 분산 투자의 수학적 증명', font:{size:14}},
+    xaxis:{title:'상관계수 (ρ)', range:[-1.05,1.05]},
+    yaxis:{title:'포트폴리오 변동성 (%)', range:[0,28]},
+    legend:{x:0.5, y:0.95, font:{size:11}},
+    margin:{l:60, r:20, t:50, b:50},
+    paper_bgcolor:'rgba(0,0,0,0)', plot_bgcolor:'rgba(248,249,250,0.5)',
+    annotations:[{x:0.5,y:simpleAvg+1,text:'↑ 분산 효과 없음 (ρ=1)',showarrow:false,font:{size:10,color:'#3498db'}},
+                 {x:-0.5,y:10,text:'분산 효과 ↓',showarrow:true,ax:0,ay:-30,font:{size:11,color:'#e74c3c'}}]
+  }, {responsive:true});
+})();
+</script>
+
 <!-- ── 보충 7.3+ 공분산 행렬 → 포트폴리오 분산 step-by-step ── -->
 <div class="def">
 <p class="ni"><strong>🔍 보충: 공분산 행렬 → 포트폴리오 분산, 작은 숫자로 한 걸음씩</strong></p>
@@ -1875,6 +2229,58 @@ p_up_given_rsi = (p_rsi_given_up * p_up) / p_rsi
 <li>HFT에서는 주문 흐름(order flow) 데이터를 베이즈 업데이트로 실시간 분석한다</li>
 </ul>
 </div>
+
+<!-- ═══ Plotly: Ch.8 베이즈 순차 업데이트 시각화 ═══ -->
+<div id="plot-ch8-bayes" style="width:100%;height:460px;margin:25px 0"></div>
+<p class="ni" style="font-size:12px;color:#888;text-align:center">🖱️ 호버로 각 단계의 확률 확인. 시그널이 쌓일수록 사후확률이 업데이트됩니다.</p>
+<script>
+(function(){
+  // 베이즈 순차 업데이트: 사전확률 → RSI → 거래량 → MACD
+  var prior = 0.52;
+  
+  // 시그널 1: RSI < 30
+  var p_rsi_up = 0.15, p_rsi_down = 0.05;
+  var p_rsi = p_rsi_up*prior + p_rsi_down*(1-prior);
+  var post1 = (p_rsi_up*prior)/p_rsi;
+  
+  // 시그널 2: 거래량 급증
+  var p_vol_up = 0.30, p_vol_down = 0.10;
+  var p_vol = p_vol_up*post1 + p_vol_down*(1-post1);
+  var post2 = (p_vol_up*post1)/p_vol;
+  
+  // 시그널 3: MACD 골든크로스
+  var p_macd_up = 0.25, p_macd_down = 0.08;
+  var p_macd = p_macd_up*post2 + p_macd_down*(1-post2);
+  var post3 = (p_macd_up*post2)/p_macd;
+  
+  var stages = ['사전확률<br>(기본)', 'RSI < 30<br>시그널 후', '+ 거래량 급증<br>시그널 후', '+ MACD 골든크로스<br>시그널 후'];
+  var probs = [prior, post1, post2, post3];
+  var probsPct = probs.map(function(p){return (p*100).toFixed(1);});
+  var barColors = ['#95a5a6', '#3498db', '#e67e22', '#e74c3c'];
+  
+  Plotly.newPlot('plot-ch8-bayes', [
+    {x: stages, y: probs.map(function(p){return p*100;}),
+     type:'bar', marker:{color:barColors, line:{color:'#2c3e50', width:1.5}},
+     text: probsPct.map(function(p){return p+'%';}),
+     textposition:'outside', textfont:{size:16, color:'#2c3e50'},
+     hovertemplate:'%{x}<br>P(상승) = %{y:.1f}%<extra></extra>'},
+    // 50% 기준선
+    {x:[stages[0], stages[3]], y:[50,50], mode:'lines',
+     line:{color:'#aaa', width:2, dash:'dash'}, name:'50% (동전 던지기)', showlegend:true}
+  ], {
+    title:{text:'베이즈 순차 업데이트: 시그널이 쌓일수록 확신 ↑', font:{size:14}},
+    yaxis:{title:'P(상승) %', range:[0,105]},
+    xaxis:{title:''},
+    showlegend:true, legend:{x:0.6, y:0.3, font:{size:11}},
+    margin:{l:60, r:20, t:50, b:80},
+    paper_bgcolor:'rgba(0,0,0,0)', plot_bgcolor:'rgba(248,249,250,0.5)',
+    annotations:[
+      {x:stages[0], y:prior*100+6, text:'Prior', showarrow:false, font:{size:10, color:'#95a5a6'}},
+      {x:stages[3], y:post3*100+6, text:'Posterior', showarrow:false, font:{size:10, color:'#e74c3c'}}
+    ]
+  }, {responsive:true});
+})();
+</script>
 
 <h3>8.4 다중 시그널 결합</h3>
 <pre><code><span class="cm"># 시그널 2개를 순차적으로 적용</span>
@@ -2199,6 +2605,65 @@ numerical = (z(x+h) - z(x-h)) / (<span class="nu">2</span>*h)
 <p class="ni">\(f(x,y) = x^2 + 2y^2\)는 볼록함수(convex function)다. 볼록함수의 핵심 성질: 지역 최솟값 = 전역 최솟값. 따라서 경사하강법이 반드시 최적해에 수렴한다. 포트폴리오 최적화의 목적함수 \(\mathbf{w}^T\boldsymbol{\Sigma}\mathbf{w}\)도 볼록함수이므로, Convex Optimization으로 전역 최적 포트폴리오를 구할 수 있다.</p>
 </div>
 
+<!-- ═══ Plotly: Ch.9 3D 경사하강법 시각화 ═══ -->
+<div id="plot-ch9-gd3d" style="width:100%;height:550px;margin:25px 0"></div>
+<p class="ni" style="font-size:12px;color:#888;text-align:center">🖱️ 드래그로 3D 회전, 스크롤로 확대. 빨간 경로가 경사하강법으로 최솟값(0,0)을 향해 내려가는 과정입니다.</p>
+<script>
+(function(){
+  // f(x,y) = x^2 + 2y^2 의 3D surface + 경사하강법 경로
+  var N = 40;
+  var xGrid = [], yGrid = [], zGrid = [];
+  for(var i=0; i<N; i++){
+    var row_x = [], row_y = [], row_z = [];
+    for(var j=0; j<N; j++){
+      var x = -5 + 10*i/(N-1);
+      var y = -5 + 10*j/(N-1);
+      row_x.push(x);
+      row_y.push(y);
+      row_z.push(x*x + 2*y*y);
+    }
+    xGrid.push(row_x);
+    yGrid.push(row_y);
+    zGrid.push(row_z);
+  }
+  
+  // 경사하강법 경로
+  var lr = 0.1, steps = 30;
+  var gx = [4], gy = [4], gz = [4*4+2*4*4]; // 시작점 (4,4)
+  for(var s=0; s<steps; s++){
+    var cx = gx[gx.length-1], cy = gy[gy.length-1];
+    var dx = 2*cx, dy = 4*cy; // 그래디언트
+    var nx = cx - lr*dx, ny = cy - lr*dy;
+    gx.push(nx); gy.push(ny); gz.push(nx*nx+2*ny*ny);
+  }
+  
+  Plotly.newPlot('plot-ch9-gd3d', [
+    {x:xGrid, y:yGrid, z:zGrid, type:'surface', colorscale:'Viridis',
+     opacity:0.7, showscale:false, name:'f(x,y) = x² + 2y²',
+     contours:{z:{show:true, usecolormap:true, highlightcolor:'#fff', project:{z:true}}}},
+    {x:gx, y:gy, z:gz, type:'scatter3d', mode:'lines+markers',
+     name:'경사하강법 경로 (lr=0.1)',
+     line:{color:'#e74c3c', width:5},
+     marker:{size:4, color:gz.map(function(_,i){return i;}), colorscale:'Reds', showscale:false}},
+    {x:[gx[0]], y:[gy[0]], z:[gz[0]], type:'scatter3d', mode:'markers',
+     name:'시작점 (4, 4)', marker:{size:8, color:'#e74c3c', symbol:'diamond'}},
+    {x:[gx[gx.length-1]], y:[gy[gy.length-1]], z:[gz[gz.length-1]], type:'scatter3d', mode:'markers',
+     name:'수렴점 ≈ (0, 0)', marker:{size:8, color:'#27ae60', symbol:'circle'}}
+  ], {
+    title:{text:'3D 경사하강법: f(x,y) = x² + 2y² 의 최솟값 찾기', font:{size:14}},
+    scene:{
+      xaxis:{title:'x', range:[-5,5]},
+      yaxis:{title:'y', range:[-5,5]},
+      zaxis:{title:'f(x,y)', range:[0,50]},
+      camera:{eye:{x:1.8, y:1.8, z:1.0}}
+    },
+    legend:{x:0.01, y:0.99, font:{size:10}},
+    margin:{l:0, r:0, t:50, b:0},
+    paper_bgcolor:'rgba(0,0,0,0)'
+  }, {responsive:true});
+})();
+</script>
+
 <!-- ═══════════════════════════════════════════ -->
 <!-- Ch10: 실전 포트폴리오 분석 -->
 <!-- ═══════════════════════════════════════════ -->
@@ -2364,6 +2829,110 @@ plt.show()
 <div class="warn">
 <p class="ni"><strong>Monte Carlo vs Convex Optimization:</strong> 여기서는 랜덤 시뮬레이션으로 근사적인 프론티어를 그렸다. 하지만 이 방법은 정확하지 않다 — 10,000개 포트폴리오로는 진짜 최적해를 놓칠 수 있다. Round 8에서 배울 Convex Optimization(<code>cvxpy</code>)은 수학적으로 정확한 최적해를 구한다.</p>
 </div>
+
+<!-- ═══ Plotly: Ch.10 효율적 프론티어 + 자산 배치 ═══ -->
+<div id="plot-ch10-frontier" style="width:100%;height:520px;margin:25px 0"></div>
+<p class="ni" style="font-size:12px;color:#888;text-align:center">🖱️ 호버로 각 포트폴리오의 수익률/변동성/샤프비율 확인. 색상이 밝을수록 샤프비율이 높습니다.</p>
+<script>
+(function(){
+  // 5종목 시뮬레이션 데이터 (실제 데이터 근사)
+  // AAPL, MSFT, GOOGL, GLD, TLT
+  var meanRet = [0.28, 0.32, 0.25, 0.12, -0.02]; // 연간 수익률
+  var vols = [0.24, 0.26, 0.28, 0.15, 0.16]; // 연간 변동성
+  var names = ['Apple','Microsoft','Google','Gold ETF','US Bond 20Y'];
+  
+  // 상관행렬 (근사)
+  var corr = [
+    [1.0, 0.82, 0.78, 0.05, -0.25],
+    [0.82, 1.0, 0.75, 0.08, -0.20],
+    [0.78, 0.75, 1.0, 0.03, -0.22],
+    [0.05, 0.08, 0.03, 1.0, 0.30],
+    [-0.25, -0.20, -0.22, 0.30, 1.0]
+  ];
+  
+  // 공분산 행렬 구성
+  var cov = [];
+  for(var i=0;i<5;i++){
+    cov[i]=[];
+    for(var j=0;j<5;j++){
+      cov[i][j] = corr[i][j]*vols[i]*vols[j];
+    }
+  }
+  
+  // 랜덤 포트폴리오 생성
+  function mulberry32(a){return function(){a|=0;a=a+0x6D2B79F5|0;var t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296;}}
+  var rng = mulberry32(42);
+  
+  var pVols=[], pRets=[], pSharpes=[];
+  var nSim = 5000;
+  var maxSharpe = -999, maxIdx = 0;
+  var minVol = 999, minVolIdx = 0;
+  
+  for(var s=0; s<nSim; s++){
+    var w = [];
+    var wSum = 0;
+    for(var i=0;i<5;i++){w.push(rng()); wSum+=w[i];}
+    for(var i=0;i<5;i++) w[i]/=wSum;
+    
+    // 포트폴리오 수익률
+    var pRet = 0;
+    for(var i=0;i<5;i++) pRet += w[i]*meanRet[i];
+    
+    // 포트폴리오 변동성
+    var pVar = 0;
+    for(var i=0;i<5;i++){
+      for(var j=0;j<5;j++){
+        pVar += w[i]*w[j]*cov[i][j];
+      }
+    }
+    var pVol = Math.sqrt(pVar);
+    var sharpe = pRet/pVol;
+    
+    pVols.push(pVol*100);
+    pRets.push(pRet*100);
+    pSharpes.push(sharpe);
+    
+    if(sharpe > maxSharpe){maxSharpe=sharpe; maxIdx=s;}
+    if(pVol < minVol){minVol=pVol; minVolIdx=s;}
+  }
+  
+  var traces = [
+    {x:pVols, y:pRets, mode:'markers', name:'랜덤 포트폴리오 (5,000개)',
+     marker:{size:3, color:pSharpes, colorscale:'Viridis', showscale:true,
+             colorbar:{title:'Sharpe', thickness:15, len:0.6}},
+     text:pSharpes.map(function(s){return 'Sharpe: '+s.toFixed(3);}),
+     hovertemplate:'변동성: %{x:.1f}%<br>수익률: %{y:.1f}%<br>%{text}<extra></extra>'},
+    // 최대 샤프
+    {x:[pVols[maxIdx]], y:[pRets[maxIdx]], mode:'markers',
+     name:'★ Max Sharpe ('+maxSharpe.toFixed(2)+')',
+     marker:{size:16, color:'#e74c3c', symbol:'star', line:{color:'white',width:2}}},
+    // 최소 변동성
+    {x:[pVols[minVolIdx]], y:[pRets[minVolIdx]], mode:'markers',
+     name:'◆ Min Volatility',
+     marker:{size:14, color:'#3498db', symbol:'diamond', line:{color:'white',width:2}}}
+  ];
+  
+  // 개별 자산 표시
+  for(var i=0;i<5;i++){
+    traces.push({
+      x:[vols[i]*100], y:[meanRet[i]*100], mode:'markers+text',
+      name:names[i], text:[names[i]], textposition:'top center',
+      marker:{size:10, color:['#ff6b6b','#4ecdc4','#45b7d1','#f9ca24','#6c5ce7'][i],
+              line:{color:'#2c3e50',width:1.5}},
+      textfont:{size:10}
+    });
+  }
+  
+  Plotly.newPlot('plot-ch10-frontier', traces, {
+    title:{text:'효율적 프론티어: 5,000개 랜덤 포트폴리오 (AAPL+MSFT+GOOGL+GLD+TLT)', font:{size:13}},
+    xaxis:{title:'연간 변동성 (%)', range:[8,30]},
+    yaxis:{title:'연간 수익률 (%)', range:[-5,35]},
+    legend:{x:0.01, y:0.99, font:{size:10}},
+    margin:{l:60, r:20, t:50, b:50},
+    paper_bgcolor:'rgba(0,0,0,0)', plot_bgcolor:'rgba(248,249,250,0.5)'
+  }, {responsive:true});
+})();
+</script>
 
 <!-- ═══════════════════════════════════════════ -->
 <!-- Ch11: Mini Project + Quiz -->
