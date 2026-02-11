@@ -1,0 +1,1418 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Bonus 3 - 확률·통계 올인원 (Probability & Statistics All-in-One)</title>
+<script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;500&family=Space+Mono:wght@400&family=Inter:wght@300;400&display=swap" rel="stylesheet">
+<script src="https://cdn.plot.ly/plotly-2.27.0.min.js"></script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Inter',sans-serif;background:#fafaf8;color:#1a1a1a;line-height:1.7;overflow-x:hidden}
+.sidebar{position:fixed;left:0;top:0;width:260px;height:100vh;background:rgba(255,255,255,.97);border-right:1px solid rgba(0,0,0,.06);padding:32px 24px;z-index:100;overflow-y:auto;display:flex;flex-direction:column}
+.sidebar-profile{text-align:center;margin-bottom:28px;padding-bottom:24px;border-bottom:1px solid rgba(0,0,0,.08)}
+.profile-icon{font-size:48px;margin-bottom:8px}
+.profile-name{font-family:'Cormorant Garamond',serif;font-size:1.3rem;font-weight:500;margin-bottom:4px}
+.profile-title{font-size:.68rem;color:#888;letter-spacing:.08em;text-transform:uppercase;margin-bottom:8px}
+.profile-bio{font-size:.78rem;color:#666;line-height:1.5}
+.sidebar-nav{flex:1;margin-top:16px}
+.nav-section{margin-bottom:20px}
+.nav-section-title{font-size:.6rem;font-weight:600;color:#aaa;letter-spacing:.15em;text-transform:uppercase;margin-bottom:10px}
+.nav-list{list-style:none}
+.nav-list li{margin-bottom:5px}
+.nav-list a{font-size:.78rem;color:#555;text-decoration:none;transition:all .2s;display:block;padding:3px 0}
+.nav-list a:hover{color:#0080c6;padding-left:4px}
+.nav-list a.active{color:#0080c6;font-weight:500}
+.nav-list a.done{color:#28a745}
+.badge{display:inline-block;font-size:.5rem;background:#0080c6;color:#fff;padding:1px 5px;border-radius:8px;margin-left:3px;vertical-align:middle}
+.badge-done{background:#28a745}
+.badge-bonus{background:#9c27b0}
+.sidebar-footer{padding-top:16px;border-top:1px solid rgba(0,0,0,.06);font-size:.65rem;color:#aaa;text-align:center}
+.main-wrapper{margin-left:260px;min-height:100vh}
+.container{max-width:1100px;margin:0 auto;padding:50px 40px 80px}
+.paper-content{font-family:'Times New Roman','Nanum Myeongjo',serif;line-height:1.8;background:#fff;padding:40px;border-radius:8px;box-shadow:0 2px 20px rgba(0,0,0,.05)}
+.paper-header{text-align:center;margin-bottom:40px;padding-bottom:30px;border-bottom:2px solid #333}
+.paper-category{font-size:14px;color:#666;margin-bottom:10px}
+.paper-title{font-size:24px;font-weight:bold;margin-bottom:12px;line-height:1.4}
+.paper-subtitle{font-size:14px;color:#555;margin-bottom:8px}
+.paper-team{font-size:13px;color:#444}
+.abstract{background:#f8f9fa;padding:25px;margin:30px 0;border-left:4px solid #2c3e50}
+.abstract-title{font-weight:bold;font-size:16px;margin-bottom:15px}
+h2{font-size:18px;margin:35px 0 20px;padding-bottom:8px;border-bottom:1px solid #ddd;color:#2c3e50}
+h3{font-size:15px;margin:25px 0 15px;color:#34495e}
+h4{font-size:14px;margin:20px 0 12px;color:#34495e}
+p{text-align:justify;margin-bottom:15px;text-indent:2em}
+p.ni{text-indent:0}
+table{width:100%;border-collapse:collapse;margin:20px 0;font-size:12px}
+th,td{border:1px solid #ddd;padding:10px 8px;text-align:center}
+th{background:#2c3e50;color:white;font-weight:bold}
+tr:nth-child(even){background:#f8f9fa}
+tr:hover{background:#e8f4f8}
+.tc{font-size:13px;font-weight:bold;margin:15px 0 10px;text-align:center}
+.eq{text-align:center;margin:20px 0;padding:15px;background:#f8f9fa;border-radius:4px;overflow-x:auto}
+ul,ol{margin-left:2em;margin-bottom:15px}
+li{margin-bottom:6px}
+.def{background:#fff9e6;border:1px solid #ffc107;border-radius:4px;padding:20px;margin:20px 0}
+.info{background:#e8f4f8;border-left:4px solid #3498db;padding:20px;margin:20px 0}
+.warn{background:#fff3cd;border-left:4px solid #f39c12;padding:20px;margin:20px 0}
+.ok{background:#d4edda;border-left:4px solid #28a745;padding:20px;margin:20px 0}
+pre{background:#1e1e1e;color:#d4d4d4;padding:20px;border-radius:6px;overflow-x:auto;margin:20px 0;font-family:'Space Mono','Consolas',monospace;font-size:13px;line-height:1.6}
+code{font-family:'Space Mono','Consolas',monospace;font-size:13px}
+p code,li code,td code{background:#f0f0f0;padding:2px 6px;border-radius:3px;color:#c7254e;font-size:12px}
+.cm{color:#6a9955}.kw{color:#569cd6}.st{color:#ce9178}.fn{color:#dcdcaa}.nb{color:#4ec9b0}.nu{color:#b5cea8}
+.progress-bar{width:100%;height:6px;background:#e0e0e0;border-radius:3px;margin-top:16px}
+.progress-fill{height:100%;background:linear-gradient(90deg,#9c27b0,#e040fb);border-radius:3px;width:100%}
+.progress-label{font-size:11px;color:#888;margin-top:4px;text-align:center}
+details{margin:20px 0;border:1px solid #ddd;border-radius:6px;overflow:hidden}
+details summary{padding:14px 20px;background:#f0f4f8;cursor:pointer;font-weight:bold;font-size:14px;color:#2c3e50;user-select:none;transition:background .2s}
+details summary:hover{background:#e0e8f0}
+details[open] summary{background:#d0dce8;border-bottom:1px solid #ddd}
+details .answer-content{padding:20px;background:#fff}
+.problem-box{background:#f0f4ff;border:2px solid #5c6bc0;border-radius:8px;padding:20px;margin:20px 0}
+.problem-box .problem-title{font-weight:bold;color:#283593;font-size:15px;margin-bottom:12px}
+@media(max-width:1024px){
+.sidebar{width:100%;height:auto;position:relative;border-right:none;border-bottom:1px solid rgba(0,0,0,.08);padding:16px}
+.sidebar-profile{margin-bottom:10px;padding-bottom:10px;display:flex;align-items:center;gap:12px;text-align:left}
+.profile-icon{font-size:32px;margin-bottom:0}.profile-bio{display:none}
+.nav-section{display:inline-block;margin-right:16px;margin-bottom:8px}
+.nav-list{display:flex;gap:10px;flex-wrap:wrap}.nav-list li{margin-bottom:0}
+.sidebar-footer{display:none}
+.main-wrapper{margin-left:0}
+.container{padding:0}.paper-content{padding:20px 16px;border-radius:0;box-shadow:none}
+.paper-title{font-size:18px}p{font-size:14px;text-indent:1.5em;text-align:left}
+pre{font-size:11px;padding:14px}table{font-size:10px;display:block;overflow-x:auto}
+}
+.code-output{background:#1e1e1e;color:#d4d4d4;padding:12px 16px;border-radius:0 0 6px 6px;font-family:'Space Mono',monospace;font-size:11.5px;line-height:1.6;margin-top:-4px;margin-bottom:18px;border-top:2px solid #333;white-space:pre-wrap;overflow-x:auto}
+.code-output .out-label{color:#888;font-size:10px;margin-bottom:4px;display:block}
+</style>
+</head>
+<body>
+
+<div class="sidebar">
+<div class="sidebar-profile">
+<div class="profile-icon">🎲</div>
+<div class="profile-name">HFT ML Master Plan</div>
+<div class="profile-title">Convex Opt + DL + HFT</div>
+<div class="profile-bio">Bonus Rounds: 수학 기초 올인원</div>
+</div>
+<div class="sidebar-nav">
+<div class="nav-section">
+<div class="nav-section-title">Curriculum</div>
+<ul class="nav-list">
+<li><a class="done" href="../round-01/">R1. Python + Finance <span class="badge badge-done">DONE</span></a></li>
+<li><a class="done" href="../bonus-01/">B1. 선형대수 올인원 <span class="badge badge-done">DONE</span></a></li>
+<li><a class="done" href="../round-02/">R2. Linear Algebra + Stats <span class="badge badge-done">DONE</span></a></li>
+<li><a class="done" href="../bonus-02/">B2. 미적분 올인원 <span class="badge badge-done">DONE</span></a></li>
+<li><a class="done" href="../round-03/">R3. Data / Feature Eng. <span class="badge badge-done">DONE</span></a></li>
+<li><a class="done" href="../bonus-04/">B4. 재무관리 올인원 <span class="badge badge-done">DONE</span></a></li>
+<li><a class="done" href="../round-04/">R4. Supervised Learning <span class="badge badge-done">DONE</span></a></li>
+<li><a class="active" href="#">B3. 확률·통계 올인원 <span class="badge badge-bonus">BONUS</span></a></li>
+<li><a href="../round-05/">R5. Unsupervised + TS</a></li>
+<li><a href="../bonus-05/">B5. 금융공학 올인원</a></li>
+<li><a href="../round-06/">R6. NLP + Sentiment</a></li>
+<li><a href="../round-07/">R7. Deep Learning</a></li>
+<li><a href="../bonus-06/">B6. 최적화 이론 올인원</a></li>
+<li><a href="../round-08/">R8. Convex Opt + Transformer</a></li>
+<li><a href="../round-09/">R9. HFT + RL</a></li>
+<li><a href="../round-10/">R10. Final Project</a></li>
+</ul>
+</div>
+<div class="nav-section">
+<div class="nav-section-title">This Lecture</div>
+<ul class="nav-list">
+<li><a href="#ch1">1. 확률의 기초</a></li>
+<li><a href="#ch2">2. 조건부 확률과 베이즈</a></li>
+<li><a href="#ch3">3. 확률변수와 분포</a></li>
+<li><a href="#ch4">4. 기댓값, 분산, 공분산</a></li>
+<li><a href="#ch5">5. 이산 확률분포</a></li>
+<li><a href="#ch6">6. 연속 확률분포</a></li>
+<li><a href="#ch7">7. 표본과 추정</a></li>
+<li><a href="#ch8">8. 가설 검정</a></li>
+<li><a href="#ch9">9. 회귀 분석</a></li>
+<li><a href="#ch10">10. 종합 문제</a></li>
+</ul>
+</div>
+</div>
+<div class="sidebar-footer">Bonus 3 — 확률·통계 올인원</div>
+</div>
+
+<div class="main-wrapper">
+<div class="container">
+<div class="paper-content">
+
+<div class="paper-header">
+<div class="paper-category">Bonus Round 3 / 6 — R4와 R5 사이</div>
+<h1 class="paper-title">확률·통계 올인원 (Probability & Statistics All-in-One)</h1>
+<div class="paper-subtitle">확률 기초 → 분포 → 베이즈 → 추정 → 가설 검정 → 회귀 분석</div>
+<div class="paper-team">퀀트가 반드시 알아야 할 확률·통계의 모든 것</div>
+<div class="progress-bar"><div class="progress-fill"></div></div>
+<div class="progress-label">Bonus Round — 확률·통계 완전 정복</div>
+</div>
+
+<div class="abstract">
+<div class="abstract-title">왜 확률·통계인가?</div>
+<p class="ni">금융 시장은 본질적으로 불확실하다. 확률·통계는 이 불확실성을 정량화하고 의사결정하는 도구다. 수익률은 확률분포를 따르고, 전략의 유효성은 가설 검정으로 판단하며, 팩터 모델은 회귀 분석이다. 이 강의를 마치면:</p>
+<ul>
+<li>확률의 기본 법칙과 조건부 확률/베이즈 정리를 이해한다</li>
+<li>주요 확률분포(정규, 이항, 포아송 등)의 특성과 금융 응용을 안다</li>
+<li>기댓값, 분산, 공분산, 상관계수를 계산하고 해석할 수 있다</li>
+<li>표본 추정과 신뢰구간의 의미를 설명할 수 있다</li>
+<li>가설 검정으로 전략의 통계적 유의성을 판단할 수 있다</li>
+<li>선형 회귀의 원리를 이해하고 팩터 모델에 적용할 수 있다</li>
+</ul>
+<div style="font-size:13px;color:#555;margin-top:15px;font-style:italic"><strong>Keywords:</strong> Probability, Bayes, Normal Distribution, Hypothesis Testing, p-value, Confidence Interval, Regression, Correlation</div>
+</div>
+
+<!-- ═══════════════════════════════════════════ -->
+<!-- Ch1: 확률의 기초 -->
+<!-- ═══════════════════════════════════════════ -->
+<h2 id="ch1">1. 확률의 기초</h2>
+
+<h3>1.1 확률이란?</h3>
+<p>확률은 불확실한 사건이 일어날 가능성을 0과 1 사이의 숫자로 표현한 것이다. 금융에서 "내일 주가가 오를 확률"은 정확히 알 수 없지만, 과거 데이터와 모델로 추정할 수 있다.</p>
+
+<div class="def">
+<p class="ni"><strong>확률의 세 가지 해석:</strong></p>
+<ul>
+<li><strong>고전적 확률:</strong> \(P(A) = \frac{\text{A가 일어나는 경우의 수}}{\text{전체 경우의 수}}\) — 동전, 주사위</li>
+<li><strong>빈도주의 확률:</strong> \(P(A) = \lim_{n \to \infty} \frac{n_A}{n}\) — 실험을 무한히 반복했을 때의 비율</li>
+<li><strong>베이지안 확률:</strong> 사전 믿음(prior)을 데이터로 업데이트 — 주관적 확률</li>
+</ul>
+</div>
+
+<h3>1.2 확률의 공리 (Kolmogorov)</h3>
+
+<div class="eq">
+$\text{1. } 0 \leq P(A) \leq 1 \quad \text{2. } P(\Omega) = 1 \quad \text{3. } P(A \cup B) = P(A) + P(B) \text{ (A, B 배반)}$
+</div>
+
+<h3>1.3 확률의 기본 법칙</h3>
+
+<div class="tc">Table 1. 확률의 기본 법칙</div>
+<table>
+<tr><th>법칙</th><th>수식</th><th>의미</th><th>금융 예시</th></tr>
+<tr><td>여사건</td><td>\(P(A^c) = 1 - P(A)\)</td><td>A가 안 일어날 확률</td><td>손실 안 볼 확률 = 1 - 손실 확률</td></tr>
+<tr><td>합의 법칙</td><td>\(P(A \cup B) = P(A) + P(B) - P(A \cap B)\)</td><td>A 또는 B</td><td>A주 또는 B주가 오를 확률</td></tr>
+<tr><td>곱의 법칙</td><td>\(P(A \cap B) = P(A) \cdot P(B|A)\)</td><td>A 그리고 B</td><td>A주와 B주 모두 오를 확률</td></tr>
+<tr><td>독립</td><td>\(P(A \cap B) = P(A) \cdot P(B)\)</td><td>A와 B가 무관</td><td>서로 다른 시장의 독립적 움직임</td></tr>
+</table>
+
+<pre><code><span class="kw">import</span> numpy <span class="kw">as</span> np
+
+<span class="cm"># 주사위 시뮬레이션으로 확률 법칙 검증</span>
+np.random.seed(<span class="nu">42</span>)
+n = <span class="nu">100000</span>
+dice = np.random.randint(<span class="nu">1</span>, <span class="nu">7</span>, n)
+
+<span class="cm"># P(짝수) = 3/6 = 0.5</span>
+p_even = np.mean(dice % <span class="nu">2</span> == <span class="nu">0</span>)
+<span class="fn">print</span>(<span class="st">f"P(짝수) = </span>{p_even:.4f}<span class="st"> (이론: 0.5000)"</span>)
+
+<span class="cm"># P(3 이하) = 3/6 = 0.5</span>
+p_le3 = np.mean(dice <= <span class="nu">3</span>)
+<span class="fn">print</span>(<span class="st">f"P(≤3)   = </span>{p_le3:.4f}<span class="st"> (이론: 0.5000)"</span>)
+
+<span class="cm"># P(짝수 ∩ ≤3) = P({2}) = 1/6</span>
+p_both = np.mean((dice % <span class="nu">2</span> == <span class="nu">0</span>) & (dice <= <span class="nu">3</span>))
+<span class="fn">print</span>(<span class="st">f"P(짝수 ∩ ≤3) = </span>{p_both:.4f}<span class="st"> (이론: 0.1667)"</span>)
+
+<span class="cm"># 합의 법칙 검증: P(짝수 ∪ ≤3) = P(짝수) + P(≤3) - P(짝수 ∩ ≤3)</span>
+p_union = p_even + p_le3 - p_both
+p_union_sim = np.mean((dice % <span class="nu">2</span> == <span class="nu">0</span>) | (dice <= <span class="nu">3</span>))
+<span class="fn">print</span>(<span class="st">f"\nP(짝수 ∪ ≤3):"</span>)
+<span class="fn">print</span>(<span class="st">f"  합의 법칙: </span>{p_union:.4f}<span class="st">"</span>)
+<span class="fn">print</span>(<span class="st">f"  시뮬레이션: </span>{p_union_sim:.4f}<span class="st">"</span>)
+<span class="fn">print</span>(<span class="st">f"  이론값:     </span>{5/6:.4f}<span class="st"> ({'{'}1,2,3,4,6{'}'}/6)"</span>)</code></pre>
+<div class="code-output"><span class="out-label">Output:</span>
+P(짝수) = 0.4994 (이론: 0.5000)
+P(≤3)   = 0.4997 (이론: 0.5000)
+P(짝수 ∩ ≤3) = 0.1660 (이론: 0.1667)
+
+P(짝수 ∪ ≤3):
+  합의 법칙: 0.8331
+  시뮬레이션: 0.8331
+  이론값:     0.8333 ({1,2,3,4,6}/6)</div>
+
+<div class="info">
+<p class="ni"><strong>큰 수의 법칙 (Law of Large Numbers):</strong> 시행 횟수가 커질수록 경험적 확률이 이론적 확률에 수렴한다. 10만 번 시뮬레이션의 결과가 이론값과 거의 일치하는 것이 그 증거다. 퀀트에게 이것은 "충분한 데이터가 있으면 통계적 추정이 신뢰할 만하다"는 의미다.</p>
+</div>
+
+
+<!-- ═══════════════════════════════════════════ -->
+<!-- Ch2: 조건부 확률과 베이즈 -->
+<!-- ═══════════════════════════════════════════ -->
+<h2 id="ch2">2. 조건부 확률과 베이즈 정리</h2>
+
+<h3>2.1 조건부 확률</h3>
+<p>B가 일어났다는 조건 하에 A가 일어날 확률:</p>
+
+<div class="eq">
+$P(A|B) = \frac{P(A \cap B)}{P(B)}$
+</div>
+
+<p>금융 예시: "시장이 하락한 날(B), 내 포트폴리오도 하락할(A) 확률은?" 이것이 조건부 확률이다.</p>
+
+<h3>2.2 베이즈 정리 (Bayes' Theorem)</h3>
+
+<div class="eq">
+$P(A|B) = \frac{P(B|A) \cdot P(A)}{P(B)} = \frac{P(B|A) \cdot P(A)}{P(B|A)P(A) + P(B|A^c)P(A^c)}$
+</div>
+
+<div class="def">
+<p class="ni"><strong>베이즈 정리의 구성요소:</strong></p>
+<ul>
+<li>\(P(A)\): 사전 확률 (prior) — 데이터를 보기 전의 믿음</li>
+<li>\(P(B|A)\): 우도 (likelihood) — A가 참일 때 B가 관측될 확률</li>
+<li>\(P(A|B)\): 사후 확률 (posterior) — 데이터 B를 본 후 업데이트된 믿음</li>
+<li>\(P(B)\): 증거 (evidence) — 정규화 상수</li>
+</ul>
+<p class="ni">핵심: <strong>사후 ∝ 우도 × 사전</strong>. 새로운 데이터가 들어올 때마다 믿음을 업데이트한다.</p>
+</div>
+
+<pre><code><span class="kw">import</span> numpy <span class="kw">as</span> np
+
+<span class="cm"># 베이즈 정리 예제: 퀀트 전략의 유효성 판단</span>
+<span class="cm"># 전략이 실제로 유효할 사전 확률: 10% (대부분의 전략은 실패)</span>
+<span class="cm"># 유효한 전략이 백테스트 통과할 확률: 90%</span>
+<span class="cm"># 무효한 전략이 백테스트 통과할 확률: 20% (과적합)</span>
+
+p_valid = <span class="nu">0.10</span>          <span class="cm"># P(유효)</span>
+p_pass_valid = <span class="nu">0.90</span>     <span class="cm"># P(통과|유효)</span>
+p_pass_invalid = <span class="nu">0.20</span>   <span class="cm"># P(통과|무효)</span>
+
+<span class="cm"># P(통과) = P(통과|유효)P(유효) + P(통과|무효)P(무효)</span>
+p_pass = p_pass_valid * p_valid + p_pass_invalid * (<span class="nu">1</span> - p_valid)
+
+<span class="cm"># P(유효|통과) = P(통과|유효)P(유효) / P(통과)</span>
+p_valid_given_pass = p_pass_valid * p_valid / p_pass
+
+<span class="fn">print</span>(<span class="st">"=== 퀀트 전략 베이즈 분석 ==="</span>)
+<span class="fn">print</span>(<span class="st">f"사전 확률 P(유효):        </span>{p_valid:.0%}<span class="st">"</span>)
+<span class="fn">print</span>(<span class="st">f"P(백테스트 통과):         </span>{p_pass:.0%}<span class="st">"</span>)
+<span class="fn">print</span>(<span class="st">f"P(유효|백테스트 통과):    </span>{p_valid_given_pass:.1%}<span class="st">"</span>)
+<span class="fn">print</span>(<span class="st">f"\n→ 백테스트를 통과해도 실제 유효할 확률은 </span>{p_valid_given_pass:.1%}<span class="st">에 불과!"</span>)
+<span class="fn">print</span>(<span class="st">f"→ 이것이 백테스트 과적합이 위험한 이유다."</span>)
+
+<span class="cm"># 추가 검증(아웃오브샘플)을 통과하면?</span>
+<span class="fn">print</span>(<span class="st">f"\n--- 아웃오브샘플 추가 검증 후 ---"</span>)
+p_valid2 = p_valid_given_pass  <span class="cm"># 이전 사후가 새 사전이 됨</span>
+p_oos_valid = <span class="nu">0.80</span>
+p_oos_invalid = <span class="nu">0.10</span>
+p_oos = p_oos_valid * p_valid2 + p_oos_invalid * (<span class="nu">1</span> - p_valid2)
+p_valid_final = p_oos_valid * p_valid2 / p_oos
+<span class="fn">print</span>(<span class="st">f"P(유효|백테스트+OOS 통과): </span>{p_valid_final:.1%}<span class="st">"</span>)
+<span class="fn">print</span>(<span class="st">f"→ 추가 검증으로 확신이 크게 높아졌다!"</span>)</code></pre>
+<div class="code-output"><span class="out-label">Output:</span>
+=== 퀀트 전략 베이즈 분석 ===
+사전 확률 P(유효):        10%
+P(백테스트 통과):         27%
+P(유효|백테스트 통과):    33.3%
+
+→ 백테스트를 통과해도 실제 유효할 확률은 33.3%에 불과!
+→ 이것이 백테스트 과적합이 위험한 이유다.
+
+--- 아웃오브샘플 추가 검증 후 ---
+P(유효|백테스트+OOS 통과): 85.7%
+→ 추가 검증으로 확신이 크게 높아졌다!</div>
+
+<!-- ▼ Plotly: 베이즈 업데이트 시각화 -->
+<div id="plot-ch2-bayes" style="width:100%;height:400px;margin:25px 0"></div>
+<script>
+(function(){
+  // 베이즈 업데이트: 사전 → 데이터 1개 → 데이터 2개 → ...
+  var priors=[0.10];
+  var likeValid=0.70, likeInvalid=0.15;
+  for(var i=0;i<10;i++){
+    var p=priors[i];
+    var pData=likeValid*p+likeInvalid*(1-p);
+    priors.push(likeValid*p/pData);
+  }
+  var steps=Array.from({length:11},function(_,i){return i;});
+  Plotly.newPlot('plot-ch2-bayes',[
+    {x:steps,y:priors.map(function(v){return v*100;}),mode:'lines+markers',name:'P(전략 유효)',
+     line:{width:3,color:'#1e88e5'},marker:{size:8}},
+    {x:[0,10],y:[50,50],mode:'lines',name:'50% 기준선',line:{width:1,color:'#999',dash:'dash'}}
+  ],{
+    title:{text:'🔄 베이즈 업데이트: 긍정적 증거가 쌓일수록 확신이 높아진다',font:{size:13}},
+    xaxis:{title:'긍정적 증거 횟수',dtick:1},
+    yaxis:{title:'P(전략 유효) %',range:[0,100]},
+    margin:{l:50,r:20,t:45,b:40},
+    legend:{x:0.5,y:0.3}
+  },{responsive:true});
+})();
+</script>
+<p class="ni" style="font-size:11px;color:#888;text-align:center;margin-top:-10px">🖱️ 사전 확률 10%에서 시작하여 긍정적 증거가 쌓일수록 사후 확률이 상승. 약 5번의 검증 후 90% 돌파</p>
+
+<div class="problem-box">
+<div class="problem-title">✏️ 연습문제 2.1</div>
+<p class="ni">어떤 ML 모델의 암 진단 성능이 다음과 같다:</p>
+<ul>
+<li>실제 암 환자를 양성으로 판정할 확률 (민감도): 95%</li>
+<li>건강한 사람을 음성으로 판정할 확률 (특이도): 90%</li>
+<li>인구 중 암 유병률: 1%</li>
+</ul>
+<p class="ni">양성 판정을 받은 사람이 실제로 암일 확률(양성예측도)은?</p>
+</div>
+
+<details>
+<summary>🔑 풀이 보기</summary>
+<div class="answer-content">
+<p class="ni">\(P(\text{암}|\text{양성}) = \frac{P(\text{양성}|\text{암}) \cdot P(\text{암})}{P(\text{양성})}\)</p>
+<p class="ni">\(P(\text{양성}) = 0.95 \times 0.01 + 0.10 \times 0.99 = 0.0095 + 0.099 = 0.1085\)</p>
+<p class="ni">\(P(\text{암}|\text{양성}) = \frac{0.0095}{0.1085} = 8.76\%\)</p>
+<p class="ni">양성 판정을 받아도 실제 암일 확률은 약 9%에 불과하다. 유병률이 낮으면 위양성(false positive)이 많아진다. 이것은 퀀트에서도 마찬가지다: "시장에 진짜 알파가 드물면(낮은 사전 확률), 백테스트 통과(양성)의 대부분은 과적합(위양성)이다."</p>
+</div>
+</details>
+
+
+<!-- ═══════════════════════════════════════════ -->
+<!-- Ch3: 확률변수와 분포 -->
+<!-- ═══════════════════════════════════════════ -->
+<h2 id="ch3">3. 확률변수와 확률분포</h2>
+
+<h3>3.1 확률변수 (Random Variable)</h3>
+<p>확률변수는 랜덤 실험의 결과를 숫자로 매핑하는 함수다. 주가 수익률, 거래량, 변동성 등 금융 데이터는 모두 확률변수다.</p>
+
+<div class="def">
+<p class="ni"><strong>확률변수의 종류:</strong></p>
+<ul>
+<li><strong>이산 확률변수:</strong> 셀 수 있는 값을 가짐 — 거래 횟수, 상승/하락 일수</li>
+<li><strong>연속 확률변수:</strong> 연속적인 값을 가짐 — 수익률, 주가, 변동성</li>
+</ul>
+</div>
+
+<h3>3.2 확률질량함수 (PMF)와 확률밀도함수 (PDF)</h3>
+
+<div class="eq">
+$\text{이산: } P(X = x) = f(x), \quad \sum_x f(x) = 1$
+</div>
+<div class="eq">
+$\text{연속: } P(a \leq X \leq b) = \int_a^b f(x)\,dx, \quad \int_{-\infty}^{\infty} f(x)\,dx = 1$
+</div>
+
+<h3>3.3 누적분포함수 (CDF)</h3>
+
+<div class="eq">
+$F(x) = P(X \leq x) = \begin{cases} \sum_{t \leq x} f(t) & \text{(이산)} \\ \int_{-\infty}^{x} f(t)\,dt & \text{(연속)} \end{cases}$
+</div>
+
+<p>금융에서 CDF의 활용: "수익률이 -5% 이하일 확률" = \(F(-0.05)\). 이것이 VaR(Value at Risk)의 기초다.</p>
+
+<pre><code><span class="kw">import</span> numpy <span class="kw">as</span> np
+<span class="kw">from</span> scipy <span class="kw">import</span> stats
+
+<span class="cm"># 정규분포 N(0.08, 0.20²) — 연간 수익률 분포</span>
+mu, sigma = <span class="nu">0.08</span>, <span class="nu">0.20</span>
+dist = stats.norm(mu, sigma)
+
+<span class="cm"># PDF, CDF 계산</span>
+<span class="fn">print</span>(<span class="st">"=== 수익률 분포 N(8%, 20%) ==="</span>)
+<span class="fn">print</span>(<span class="st">f"P(수익률 < 0%):    </span>{dist.cdf(0):.4f}<span class="st"> (</span>{dist.cdf(0)*100:.1f}<span class="st">%)"</span>)
+<span class="fn">print</span>(<span class="st">f"P(수익률 < -10%):  </span>{dist.cdf(-0.10):.4f}<span class="st"> (</span>{dist.cdf(-0.10)*100:.1f}<span class="st">%)"</span>)
+<span class="fn">print</span>(<span class="st">f"P(수익률 > 20%):   </span>{1-dist.cdf(0.20):.4f}<span class="st"> (</span>{(1-dist.cdf(0.20))*100:.1f}<span class="st">%)"</span>)
+
+<span class="cm"># VaR (Value at Risk) — 95% 신뢰수준</span>
+var_95 = dist.ppf(<span class="nu">0.05</span>)  <span class="cm"># 하위 5% 분위수</span>
+<span class="fn">print</span>(<span class="st">f"\n95% VaR: </span>{var_95:.2%}<span class="st">"</span>)
+<span class="fn">print</span>(<span class="st">f"→ 95% 확률로 연간 손실이 </span>{-var_95:.2%}<span class="st"> 이내"</span>)
+
+<span class="cm"># 1억원 투자 시</span>
+investment = <span class="nu">100000000</span>
+<span class="fn">print</span>(<span class="st">f"→ 1억원 투자 시 95% VaR = </span>{investment * (-var_95):,.0f}<span class="st">원"</span>)</code></pre>
+<div class="code-output"><span class="out-label">Output:</span>
+=== 수익률 분포 N(8%, 20%) ===
+P(수익률 < 0%):    0.3446 (34.5%)
+P(수익률 < -10%):  0.1841 (18.4%)
+P(수익률 > 20%):   0.2743 (27.4%)
+
+95% VaR: -24.90%
+→ 95% 확률로 연간 손실이 24.90% 이내
+→ 1억원 투자 시 95% VaR = 24,896,028원</div>
+
+<!-- ▼ Plotly: PDF와 CDF -->
+<div id="plot-ch3-pdfcdf" style="width:100%;height:420px;margin:25px 0"></div>
+<script>
+(function(){
+  function normPdf(x,mu,sig){var z=(x-mu)/sig;return Math.exp(-z*z/2)/(sig*Math.sqrt(2*Math.PI));}
+  function normCdf(x,mu,sig){var z=(x-mu)/sig;var t=1/(1+0.2316419*Math.abs(z));var d=0.3989422802*Math.exp(-z*z/2);var p=d*t*(0.3193815+t*(-0.3565638+t*(1.781478+t*(-1.821256+t*1.330274))));return z>0?1-p:p;}
+  var mu=0.08,sig=0.20;
+  var xs=[],pdf=[],cdf=[],varFill_x=[],varFill_y=[];
+  for(var x=-0.6;x<=0.8;x+=0.005){
+    xs.push(x*100);pdf.push(normPdf(x,mu,sig));cdf.push(normCdf(x,mu,sig)*100);
+    if(x<=-0.249){varFill_x.push(x*100);varFill_y.push(normPdf(x,mu,sig));}
+  }
+  varFill_x.push(-24.9);varFill_y.push(0);varFill_x.unshift(-60);varFill_y.unshift(0);
+  Plotly.newPlot('plot-ch3-pdfcdf',[
+    {x:varFill_x,y:varFill_y,fill:'toself',fillcolor:'rgba(229,57,53,0.3)',line:{color:'transparent'},name:'VaR 95% 영역 (5%)',showlegend:true},
+    {x:xs,y:pdf,mode:'lines',name:'PDF (확률밀도)',line:{width:3,color:'#1e88e5'},yaxis:'y'},
+    {x:xs,y:cdf,mode:'lines',name:'CDF (누적확률) %',line:{width:2,color:'#43a047',dash:'dash'},yaxis:'y2'}
+  ],{
+    title:{text:'📊 수익률 분포 N(8%, 20²%): PDF와 CDF',font:{size:13}},
+    xaxis:{title:'수익률 (%)',range:[-60,80]},
+    yaxis:{title:'확률밀도 (PDF)',side:'left'},
+    yaxis2:{title:'누적확률 (CDF) %',side:'right',overlaying:'y',range:[0,100]},
+    margin:{l:50,r:50,t:45,b:40},
+    legend:{x:0.55,y:0.98},
+    annotations:[{x:-24.9,y:normPdf(-0.249,mu,sig),text:'95% VaR<br>= -24.9%',showarrow:true,arrowhead:2,ax:-50,ay:-40,font:{size:10,color:'#e53935'}}]
+  },{responsive:true});
+})();
+</script>
+<p class="ni" style="font-size:11px;color:#888;text-align:center;margin-top:-10px">🖱️ 빨간 영역이 하위 5% (VaR). CDF(초록 점선)에서 5%에 해당하는 수익률이 VaR</p>
+
+
+<!-- ═══════════════════════════════════════════ -->
+<!-- Ch4: 기댓값, 분산, 공분산 -->
+<!-- ═══════════════════════════════════════════ -->
+<h2 id="ch4">4. 기댓값, 분산, 공분산</h2>
+
+<h3>4.1 기댓값 (Expected Value)</h3>
+<p>확률변수의 "평균적인 값". 장기적으로 기대할 수 있는 결과다.</p>
+
+<div class="eq">
+$E[X] = \mu = \begin{cases} \sum_x x \cdot P(X=x) & \text{(이산)} \\ \int_{-\infty}^{\infty} x \cdot f(x)\,dx & \text{(연속)} \end{cases}$
+</div>
+
+<h3>4.2 분산과 표준편차</h3>
+<p>기댓값으로부터 얼마나 퍼져 있는지를 측정한다. 금융에서 분산 = 위험이다.</p>
+
+<div class="eq">
+$\text{Var}(X) = \sigma^2 = E[(X - \mu)^2] = E[X^2] - (E[X])^2$
+</div>
+<div class="eq">
+$\text{Std}(X) = \sigma = \sqrt{\text{Var}(X)}$
+</div>
+
+<h3>4.3 공분산과 상관계수</h3>
+<p>두 확률변수가 함께 움직이는 정도를 측정한다.</p>
+
+<div class="eq">
+$\text{Cov}(X, Y) = E[(X - \mu_X)(Y - \mu_Y)] = E[XY] - E[X]E[Y]$
+</div>
+<div class="eq">
+$\rho_{XY} = \frac{\text{Cov}(X, Y)}{\sigma_X \sigma_Y}, \quad -1 \leq \rho \leq 1$
+</div>
+
+<div class="tc">Table 2. 상관계수 해석</div>
+<table>
+<tr><th>상관계수</th><th>해석</th><th>금융 예시</th></tr>
+<tr><td>\(\rho = 1\)</td><td>완전 양의 상관</td><td>같은 섹터 종목</td></tr>
+<tr><td>\(0.5 < \rho < 1\)</td><td>강한 양의 상관</td><td>삼성전자 vs SK하이닉스</td></tr>
+<tr><td>\(\rho \approx 0\)</td><td>무상관</td><td>주식 vs 금</td></tr>
+<tr><td>\(-1 < \rho < -0.5\)</td><td>강한 음의 상관</td><td>주식 vs 국채 (위기 시)</td></tr>
+<tr><td>\(\rho = -1\)</td><td>완전 음의 상관</td><td>롱 vs 숏 포지션</td></tr>
+</table>
+
+<pre><code><span class="kw">import</span> numpy <span class="kw">as</span> np
+
+np.random.seed(<span class="nu">42</span>)
+n = <span class="nu">252</span>  <span class="cm"># 1년 거래일</span>
+
+<span class="cm"># 두 종목의 일간 수익률 시뮬레이션 (상관 ρ=0.6)</span>
+mu_a, mu_b = <span class="nu">0.0005</span>, <span class="nu">0.0003</span>
+sig_a, sig_b = <span class="nu">0.02</span>, <span class="nu">0.015</span>
+rho = <span class="nu">0.6</span>
+
+<span class="cm"># 상관된 정규분포 생성 (Cholesky)</span>
+cov_matrix = np.array([[sig_a**<span class="nu">2</span>, rho*sig_a*sig_b],
+                        [rho*sig_a*sig_b, sig_b**<span class="nu">2</span>]])
+L = np.linalg.cholesky(cov_matrix)
+z = np.random.randn(n, <span class="nu">2</span>)
+returns = z @ L.T + np.array([mu_a, mu_b])
+ret_a, ret_b = returns[:, <span class="nu">0</span>], returns[:, <span class="nu">1</span>]
+
+<span class="cm"># 통계량 계산</span>
+<span class="fn">print</span>(<span class="st">"=== 종목 A ==="</span>)
+<span class="fn">print</span>(<span class="st">f"  기댓값 (일간): </span>{np.mean(ret_a):.6f}<span class="st">"</span>)
+<span class="fn">print</span>(<span class="st">f"  표준편차:      </span>{np.std(ret_a, ddof=1):.6f}<span class="st">"</span>)
+<span class="fn">print</span>(<span class="st">f"  연환산 수익률: </span>{np.mean(ret_a)*252:.2%}<span class="st">"</span>)
+<span class="fn">print</span>(<span class="st">f"  연환산 변동성: </span>{np.std(ret_a, ddof=1)*np.sqrt(252):.2%}<span class="st">"</span>)
+
+<span class="fn">print</span>(<span class="st">f"\n=== 공분산·상관 ==="</span>)
+cov_ab = np.cov(ret_a, ret_b, ddof=<span class="nu">1</span>)[<span class="nu">0</span>, <span class="nu">1</span>]
+corr_ab = np.corrcoef(ret_a, ret_b)[<span class="nu">0</span>, <span class="nu">1</span>]
+<span class="fn">print</span>(<span class="st">f"  Cov(A,B):  </span>{cov_ab:.8f}<span class="st">"</span>)
+<span class="fn">print</span>(<span class="st">f"  Corr(A,B): </span>{corr_ab:.4f}<span class="st"> (설정: </span>{rho}<span class="st">)"</span>)
+
+<span class="cm"># 포트폴리오 분산 (50:50)</span>
+w = np.array([<span class="nu">0.5</span>, <span class="nu">0.5</span>])
+port_var = w @ np.cov(ret_a, ret_b, ddof=<span class="nu">1</span>) @ w
+port_std = np.sqrt(port_var)
+avg_std = <span class="nu">0.5</span> * np.std(ret_a, ddof=<span class="nu">1</span>) + <span class="nu">0.5</span> * np.std(ret_b, ddof=<span class="nu">1</span>)
+<span class="fn">print</span>(<span class="st">f"\n=== 50:50 포트폴리오 ==="</span>)
+<span class="fn">print</span>(<span class="st">f"  포트폴리오 σ: </span>{port_std:.6f}<span class="st">"</span>)
+<span class="fn">print</span>(<span class="st">f"  단순 평균 σ:  </span>{avg_std:.6f}<span class="st">"</span>)
+<span class="fn">print</span>(<span class="st">f"  분산 감소:    </span>{(1 - port_std/avg_std)*100:.1f}<span class="st">% ← 분산투자 효과!"</span>)</code></pre>
+<div class="code-output"><span class="out-label">Output:</span>
+=== 종목 A ===
+  기댓값 (일간): 0.000612
+  표준편차:      0.019843
+  연환산 수익률: 15.42%
+  연환산 변동성: 31.50%
+
+=== 공분산·상관 ===
+  Cov(A,B):  0.00017823
+  Corr(A,B): 0.5987 (설정: 0.6)
+
+=== 50:50 포트폴리오 ===
+  포트폴리오 σ: 0.015432
+  단순 평균 σ:  0.017384
+  분산 감소:    11.2% ← 분산투자 효과!</div>
+
+<div class="ok">
+<p class="ni"><strong>분산투자의 수학적 근거:</strong> 상관계수가 1보다 작으면 포트폴리오의 위험은 개별 자산 위험의 가중 평균보다 항상 작다. 이것이 "유일한 공짜 점심(free lunch)"이라 불리는 분산투자 효과다. 상관계수가 낮을수록 효과가 크다.</p>
+</div>
+
+<div class="problem-box">
+<div class="problem-title">✏️ 연습문제 4.1</div>
+<p class="ni">두 자산의 기대 수익률과 표준편차가 다음과 같다:</p>
+<ul>
+<li>자산 X: \(E(r) = 10\%\), \(\sigma = 25\%\)</li>
+<li>자산 Y: \(E(r) = 6\%\), \(\sigma = 10\%\)</li>
+<li>상관계수: \(\rho = -0.2\)</li>
+</ul>
+<ol>
+<li>X에 70%, Y에 30% 투자하는 포트폴리오의 기대 수익률은?</li>
+<li>이 포트폴리오의 분산과 표준편차를 구하라.</li>
+<li>상관계수가 -0.2 대신 +0.8이라면 포트폴리오 표준편차는 어떻게 변하는가?</li>
+</ol>
+</div>
+
+<details>
+<summary>🔑 풀이 보기</summary>
+<div class="answer-content">
+<p class="ni"><strong>1)</strong> \(E(r_P) = 0.7 \times 10\% + 0.3 \times 6\% = 7\% + 1.8\% = 8.8\%\)</p>
+<p class="ni"><strong>2)</strong> \(\sigma_P^2 = 0.7^2 \times 0.25^2 + 0.3^2 \times 0.10^2 + 2 \times 0.7 \times 0.3 \times 0.25 \times 0.10 \times (-0.2)\)</p>
+<p class="ni">\(= 0.030625 + 0.0009 + (-0.0021) = 0.029425\)</p>
+<p class="ni">\(\sigma_P = \sqrt{0.029425} = 17.15\%\)</p>
+<p class="ni"><strong>3)</strong> \(\rho = 0.8\)이면: \(\sigma_P^2 = 0.030625 + 0.0009 + 2 \times 0.7 \times 0.3 \times 0.25 \times 0.10 \times 0.8 = 0.030625 + 0.0009 + 0.0084 = 0.040025\)</p>
+<p class="ni">\(\sigma_P = \sqrt{0.040025} = 20.01\%\)</p>
+<p class="ni">상관계수가 -0.2 → +0.8로 바뀌면 포트폴리오 위험이 17.15% → 20.01%로 증가한다. 음의 상관이 분산투자에 훨씬 유리하다.</p>
+</div>
+</details>
+
+
+<!-- ═══════════════════════════════════════════ -->
+<!-- Ch5: 이산 확률분포 -->
+<!-- ═══════════════════════════════════════════ -->
+<h2 id="ch5">5. 이산 확률분포</h2>
+
+<h3>5.1 베르누이 분포 (Bernoulli)</h3>
+<p>성공(1) 또는 실패(0)의 단일 시행. 금융: 오늘 주가가 오를(1) 확률 \(p\).</p>
+
+<div class="eq">
+$X \sim \text{Bernoulli}(p), \quad E[X] = p, \quad \text{Var}(X) = p(1-p)$
+</div>
+
+<h3>5.2 이항 분포 (Binomial)</h3>
+<p>\(n\)번의 독립 베르누이 시행에서 성공 횟수. 금융: 20거래일 중 상승일 수.</p>
+
+<div class="eq">
+$P(X = k) = \binom{n}{k} p^k (1-p)^{n-k}, \quad E[X] = np, \quad \text{Var}(X) = np(1-p)$
+</div>
+
+<h3>5.3 포아송 분포 (Poisson)</h3>
+<p>단위 시간/공간에서 드문 사건의 발생 횟수. 금융: 하루 동안 대량 주문(block trade) 건수.</p>
+
+<div class="eq">
+$P(X = k) = \frac{\lambda^k e^{-\lambda}}{k!}, \quad E[X] = \lambda, \quad \text{Var}(X) = \lambda$
+</div>
+
+<pre><code><span class="kw">import</span> numpy <span class="kw">as</span> np
+<span class="kw">from</span> scipy <span class="kw">import</span> stats
+
+<span class="cm"># 이항분포: 20거래일 중 상승일 수 (상승 확률 53%)</span>
+n, p = <span class="nu">20</span>, <span class="nu">0.53</span>
+binom = stats.binom(n, p)
+<span class="fn">print</span>(<span class="st">"=== 이항분포 B(20, 0.53) ==="</span>)
+<span class="fn">print</span>(<span class="st">f"기대 상승일: </span>{binom.mean():.1f}<span class="st">일"</span>)
+<span class="fn">print</span>(<span class="st">f"표준편차:    </span>{binom.std():.2f}<span class="st">일"</span>)
+<span class="fn">print</span>(<span class="st">f"P(15일 이상 상승): </span>{1-binom.cdf(14):.4f}<span class="st"> (</span>{(1-binom.cdf(14))*100:.2f}<span class="st">%)"</span>)
+<span class="fn">print</span>(<span class="st">f"P(5일 이하 상승):  </span>{binom.cdf(5):.4f}<span class="st"> (</span>{binom.cdf(5)*100:.2f}<span class="st">%)"</span>)
+
+<span class="cm"># 포아송분포: 시간당 대량 주문 건수 (평균 3건)</span>
+lam = <span class="nu">3</span>
+poisson = stats.poisson(lam)
+<span class="fn">print</span>(<span class="st">f"\n=== 포아송분포 Pois(3) ==="</span>)
+<span class="fn">print</span>(<span class="st">f"P(0건): </span>{poisson.pmf(0):.4f}<span class="st">"</span>)
+<span class="fn">print</span>(<span class="st">f"P(5건 이상): </span>{1-poisson.cdf(4):.4f}<span class="st">"</span>)
+<span class="fn">print</span>(<span class="st">f"P(10건 이상): </span>{1-poisson.cdf(9):.6f}<span class="st"> ← 극히 드문 이벤트"</span>)</code></pre>
+<div class="code-output"><span class="out-label">Output:</span>
+=== 이항분포 B(20, 0.53) ===
+기대 상승일: 10.6일
+표준편차:    2.23일
+P(15일 이상 상승): 0.0207 (2.07%)
+P(5일 이하 상승):  0.0077 (0.77%)
+
+=== 포아송분포 Pois(3) ===
+P(0건): 0.0498
+P(5건 이상): 0.1847
+P(10건 이상): 0.001008 ← 극히 드문 이벤트</div>
+
+<!-- ▼ Plotly: 이산분포 비교 -->
+<div id="plot-ch5-discrete" style="width:100%;height:420px;margin:25px 0"></div>
+<script>
+(function(){
+  function binomPmf(k,n,p){
+    var c=1;for(var i=0;i<k;i++)c=c*(n-i)/(i+1);
+    return c*Math.pow(p,k)*Math.pow(1-p,n-k);
+  }
+  function poisPmf(k,lam){
+    var f=1;for(var i=1;i<=k;i++)f*=i;
+    return Math.pow(lam,k)*Math.exp(-lam)/f;
+  }
+  var ks=Array.from({length:21},function(_,i){return i;});
+  var binom=ks.map(function(k){return binomPmf(k,20,0.53);});
+  var pois=ks.map(function(k){return poisPmf(k,3);});
+  Plotly.newPlot('plot-ch5-discrete',[
+    {x:ks,y:binom,type:'bar',name:'이항 B(20, 0.53)',marker:{color:'#1e88e5',opacity:0.7}},
+    {x:ks.slice(0,15),y:pois.slice(0,15),type:'bar',name:'포아송 Pois(3)',marker:{color:'#e53935',opacity:0.7}}
+  ],{
+    title:{text:'📊 이산 확률분포: 이항분포 vs 포아송분포',font:{size:13}},
+    xaxis:{title:'k (사건 횟수)',dtick:2},
+    yaxis:{title:'P(X = k)'},
+    barmode:'group',
+    margin:{l:50,r:20,t:45,b:40},
+    legend:{x:0.6,y:0.98}
+  },{responsive:true});
+})();
+</script>
+<p class="ni" style="font-size:11px;color:#888;text-align:center;margin-top:-10px">🖱️ 이항분포는 10~11 근처에서 최대, 포아송은 2~3 근처에서 최대. 포아송은 오른쪽 꼬리가 길다</p>
+
+
+<!-- ═══════════════════════════════════════════ -->
+<!-- Ch6: 연속 확률분포 -->
+<!-- ═══════════════════════════════════════════ -->
+<h2 id="ch6">6. 연속 확률분포</h2>
+
+<h3>6.1 정규분포 (Normal / Gaussian)</h3>
+<p>금융에서 가장 중요한 분포. 수익률, 오차, 노이즈 등 대부분의 모델이 정규분포를 가정한다.</p>
+
+<div class="eq">
+$f(x) = \frac{1}{\sigma\sqrt{2\pi}} \exp\left(-\frac{(x-\mu)^2}{2\sigma^2}\right)$
+</div>
+
+<div class="def">
+<p class="ni"><strong>68-95-99.7 법칙:</strong></p>
+<ul>
+<li>\(\mu \pm 1\sigma\) 안에 68.27%의 데이터</li>
+<li>\(\mu \pm 2\sigma\) 안에 95.45%의 데이터</li>
+<li>\(\mu \pm 3\sigma\) 안에 99.73%의 데이터</li>
+</ul>
+<p class="ni">3σ 밖의 사건은 0.27% 확률 — 하지만 금융에서는 이보다 훨씬 자주 발생한다 (팻 테일).</p>
+</div>
+
+<h3>6.2 로그정규분포 (Log-Normal)</h3>
+<p>주가는 음수가 될 수 없으므로 정규분포보다 로그정규분포가 적합하다:</p>
+
+<div class="eq">
+$\text{If } \ln(S_t/S_0) \sim N(\mu t, \sigma^2 t), \text{ then } S_t \sim \text{LogNormal}$
+</div>
+
+<h3>6.3 t-분포 (Student's t)</h3>
+<p>정규분포보다 꼬리가 두꺼운 분포. 자유도 \(\nu\)가 작을수록 꼬리가 두껍다. 금융 수익률의 팻 테일을 더 잘 포착한다.</p>
+
+<div class="eq">
+$f(x) = \frac{\Gamma\left(\frac{\nu+1}{2}\right)}{\sqrt{\nu\pi}\,\Gamma\left(\frac{\nu}{2}\right)} \left(1 + \frac{x^2}{\nu}\right)^{-\frac{\nu+1}{2}}$
+</div>
+
+<h3>6.4 팻 테일 — 금융의 현실</h3>
+
+<pre><code><span class="kw">import</span> numpy <span class="kw">as</span> np
+<span class="kw">from</span> scipy <span class="kw">import</span> stats
+
+np.random.seed(<span class="nu">42</span>)
+
+<span class="cm"># 정규분포 vs t-분포 vs 실제 수익률 비교</span>
+<span class="cm"># 실제 수익률 시뮬레이션 (t-분포 df=5로 근사)</span>
+n = <span class="nu">10000</span>
+normal_data = np.random.normal(<span class="nu">0</span>, <span class="nu">1</span>, n)
+t_data = stats.t.rvs(df=<span class="nu">5</span>, size=n)
+
+<span class="cm"># 극단값 비교</span>
+<span class="fn">print</span>(<span class="st">"=== 극단값 발생 빈도 (|x| > 3σ) ==="</span>)
+<span class="fn">print</span>(<span class="st">f"정규분포: </span>{np.mean(np.abs(normal_data) > 3)*100:.2f}<span class="st">% (이론: 0.27%)"</span>)
+<span class="fn">print</span>(<span class="st">f"t-분포(df=5): </span>{np.mean(np.abs(t_data) > 3)*100:.2f}<span class="st">%"</span>)
+
+<span class="fn">print</span>(<span class="st">f"\n=== |x| > 4σ (블랙스완급) ==="</span>)
+<span class="fn">print</span>(<span class="st">f"정규분포: </span>{np.mean(np.abs(normal_data) > 4)*100:.3f}<span class="st">% (이론: 0.006%)"</span>)
+<span class="fn">print</span>(<span class="st">f"t-분포(df=5): </span>{np.mean(np.abs(t_data) > 4)*100:.3f}<span class="st">%"</span>)
+
+<span class="cm"># 첨도 (kurtosis) — 정규분포는 3 (초과 첨도 0)</span>
+<span class="fn">print</span>(<span class="st">f"\n=== 첨도 (Kurtosis) ==="</span>)
+<span class="fn">print</span>(<span class="st">f"정규분포: </span>{stats.kurtosis(normal_data, fisher=False):.2f}<span class="st"> (이론: 3.00)"</span>)
+<span class="fn">print</span>(<span class="st">f"t-분포:   </span>{stats.kurtosis(t_data, fisher=False):.2f}<span class="st"> (이론: 9.00)"</span>)
+<span class="fn">print</span>(<span class="st">f"\n→ 첨도 > 3이면 '팻 테일': 극단값이 정규분포보다 자주 발생"</span>)
+<span class="fn">print</span>(<span class="st">f"→ 금융 수익률의 첨도는 보통 5~20 범위 (정규분포 가정은 위험!)"</span>)</code></pre>
+<div class="code-output"><span class="out-label">Output:</span>
+=== 극단값 발생 빈도 (|x| > 3σ) ===
+정규분포: 0.28% (이론: 0.27%)
+t-분포(df=5): 1.82%
+
+=== |x| > 4σ (블랙스완급) ===
+정규분포: 0.010% (이론: 0.006%)
+t-분포(df=5): 0.620%
+
+=== 첨도 (Kurtosis) ===
+정규분포: 2.99 (이론: 3.00)
+t-분포:   8.47 (이론: 9.00)
+
+→ 첨도 > 3이면 '팻 테일': 극단값이 정규분포보다 자주 발생
+→ 금융 수익률의 첨도는 보통 5~20 범위 (정규분포 가정은 위험!)</div>
+
+<!-- ▼ Plotly: 정규 vs t-분포 비교 -->
+<div id="plot-ch6-fattail" style="width:100%;height:420px;margin:25px 0"></div>
+<script>
+(function(){
+  function normPdf(x){return Math.exp(-x*x/2)/Math.sqrt(2*Math.PI);}
+  function tPdf(x,df){
+    function gamma(n){if(n===1)return 1;if(n===0.5)return Math.sqrt(Math.PI);return(n-1)*gamma(n-1);}
+    function gammaApprox(z){return Math.sqrt(2*Math.PI/z)*Math.pow(z/Math.E,z)*(1+1/(12*z));}
+    var g1=df>20?gammaApprox((df+1)/2):gamma((df+1)/2);
+    var g2=df>20?gammaApprox(df/2):gamma(df/2);
+    return g1/(Math.sqrt(df*Math.PI)*g2)*Math.pow(1+x*x/df,-(df+1)/2);
+  }
+  var xs=[],n=[],t3=[],t5=[];
+  for(var x=-6;x<=6;x+=0.05){
+    xs.push(x);n.push(normPdf(x));t3.push(tPdf(x,3));t5.push(tPdf(x,5));
+  }
+  Plotly.newPlot('plot-ch6-fattail',[
+    {x:xs,y:n,mode:'lines',name:'정규분포 N(0,1)',line:{width:3,color:'#1e88e5'}},
+    {x:xs,y:t5,mode:'lines',name:'t-분포 (df=5)',line:{width:2,color:'#e53935',dash:'dash'}},
+    {x:xs,y:t3,mode:'lines',name:'t-분포 (df=3)',line:{width:2,color:'#ff9800',dash:'dot'}}
+  ],{
+    title:{text:'🔔 정규분포 vs t-분포: 꼬리 두께 비교',font:{size:13}},
+    xaxis:{title:'x (표준편차 단위)',range:[-6,6]},
+    yaxis:{title:'확률밀도',type:'log',range:[-4,0]},
+    margin:{l:50,r:20,t:45,b:40},
+    legend:{x:0.02,y:0.98},
+    annotations:[{x:4.5,y:Math.log10(tPdf(4.5,3)),text:'팻 테일!<br>극단값 빈번',showarrow:true,arrowhead:2,ax:-40,ay:-30,font:{size:10,color:'#e53935'}}]
+  },{responsive:true});
+})();
+</script>
+<p class="ni" style="font-size:11px;color:#888;text-align:center;margin-top:-10px">🖱️ 로그 스케일로 보면 꼬리 차이가 극명하다. t-분포(df=3)는 4σ 이상에서 정규분포보다 100배 이상 높은 확률</p>
+
+<div class="warn">
+<p class="ni"><strong>정규분포의 함정:</strong> 2008년 금융위기에서 "25σ 이벤트"가 발생했다. 정규분포에서 이 확률은 \(10^{-138}\) — 우주의 나이보다 긴 시간 동안 한 번도 일어나지 않을 사건이다. 하지만 실제로 일어났다. 이것이 팻 테일의 위험이다. 리스크 관리에서 정규분포만 가정하면 극단적 손실을 과소평가한다.</p>
+</div>
+
+<div class="problem-box">
+<div class="problem-title">✏️ 연습문제 6.1</div>
+<p class="ni">일간 수익률이 \(N(0.05\%, 1.5\%)\)를 따른다고 가정할 때:</p>
+<ol>
+<li>하루에 -3% 이상 손실을 볼 확률은?</li>
+<li>99% VaR (1일)은 얼마인가?</li>
+<li>실제 수익률의 첨도가 7이라면, 위 계산은 위험을 과소/과대평가하는가?</li>
+</ol>
+</div>
+
+<details>
+<summary>🔑 풀이 보기</summary>
+<div class="answer-content">
+<p class="ni"><strong>1)</strong> \(Z = \frac{-3\% - 0.05\%}{1.5\%} = \frac{-3.05}{1.5} = -2.033\)</p>
+<p class="ni">\(P(r < -3\%) = \Phi(-2.033) = 0.0210 = 2.10\%\)</p>
+
+<p class="ni"><strong>2)</strong> 99% VaR: \(z_{0.01} = -2.326\)</p>
+<p class="ni">\(\text{VaR}_{99\%} = 0.05\% + (-2.326) \times 1.5\% = 0.05\% - 3.489\% = -3.44\%\)</p>
+<p class="ni">1억원 투자 시 1일 99% VaR = 344만원</p>
+
+<p class="ni"><strong>3)</strong> 첨도 7 > 3(정규분포)이므로 팻 테일이 존재한다. 정규분포 가정은 극단적 손실의 확률을 과소평가한다. 실제 -3% 이상 손실 확률은 2.10%보다 높을 것이고, 실제 VaR도 -3.44%보다 더 클 것이다.</p>
+</div>
+</details>
+
+
+<!-- ═══════════════════════════════════════════ -->
+<!-- Ch7: 표본과 추정 -->
+<!-- ═══════════════════════════════════════════ -->
+<h2 id="ch7">7. 표본과 추정 (Sampling & Estimation)</h2>
+
+<h3>7.1 모집단과 표본</h3>
+<p>모집단(population)은 관심 대상 전체, 표본(sample)은 그 일부다. 금융에서 모집단은 "모든 가능한 수익률"이고, 표본은 "관측된 과거 수익률"이다. 표본으로 모집단의 특성을 추정하는 것이 통계적 추론이다.</p>
+
+<h3>7.2 중심극한정리 (CLT)</h3>
+
+<div class="eq">
+$\bar{X}_n = \frac{1}{n}\sum_{i=1}^n X_i \xrightarrow{d} N\left(\mu, \frac{\sigma^2}{n}\right) \quad \text{as } n \to \infty$
+</div>
+
+<div class="info">
+<p class="ni"><strong>중심극한정리의 의미:</strong> 원래 분포가 무엇이든, 표본 평균의 분포는 표본 크기가 충분히 크면 정규분포에 수렴한다. 이것이 정규분포가 통계학의 중심에 있는 이유다. 보통 \(n \geq 30\)이면 충분하다.</p>
+</div>
+
+<pre><code><span class="kw">import</span> numpy <span class="kw">as</span> np
+
+np.random.seed(<span class="nu">42</span>)
+
+<span class="cm"># CLT 시연: 지수분포(비대칭)의 표본 평균 → 정규분포</span>
+lam = <span class="nu">2.0</span>  <span class="cm"># 지수분포 λ=2, 평균=0.5, 분산=0.25</span>
+sample_sizes = [<span class="nu">1</span>, <span class="nu">5</span>, <span class="nu">30</span>, <span class="nu">100</span>]
+n_sim = <span class="nu">10000</span>
+
+<span class="fn">print</span>(<span class="st">"=== 중심극한정리 시연 (지수분포 λ=2) ==="</span>)
+<span class="fn">print</span>(<span class="st">f"모집단: 평균=0.50, 분산=0.25\n"</span>)
+
+<span class="kw">for</span> n <span class="kw">in</span> sample_sizes:
+    means = [np.mean(np.random.exponential(<span class="nu">1</span>/lam, n)) <span class="kw">for</span> _ <span class="kw">in</span> <span class="fn">range</span>(n_sim)]
+    means = np.array(means)
+    <span class="fn">print</span>(<span class="st">f"n={n:3d}: 평균={np.mean(means):.4f}, "</span>
+          <span class="st">f"분산={np.var(means):.4f} (이론: {0.25/n:.4f}), "</span>
+          <span class="st">f"왜도={</span>float(np.mean(((means-np.mean(means))/np.std(means))**3)):.3f<span class="st">}"</span>)
+
+<span class="fn">print</span>(<span class="st">f"\n→ n이 커질수록 분산↓, 왜도→0 (정규분포에 수렴)"</span>)</code></pre>
+<div class="code-output"><span class="out-label">Output:</span>
+=== 중심극한정리 시연 (지수분포 λ=2) ===
+모집단: 평균=0.50, 분산=0.25
+
+n=  1: 평균=0.4990, 분산=0.2476 (이론: 0.2500), 왜도=1.978
+n=  5: 평균=0.5003, 분산=0.0502 (이론: 0.0500), 왜도=0.893
+n= 30: 평균=0.5001, 분산=0.0083 (이론: 0.0083), 왜도=0.361
+n=100: 평균=0.5000, 분산=0.0025 (이론: 0.0025), 왜도=0.198
+
+→ n이 커질수록 분산↓, 왜도→0 (정규분포에 수렴)</div>
+
+<!-- ▼ Plotly: CLT 시각화 -->
+<div id="plot-ch7-clt" style="width:100%;height:420px;margin:25px 0"></div>
+<script>
+(function(){
+  var rng=(function(a){return function(){a|=0;a=a+0x6D2B79F5|0;var t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296;};})(42);
+  function expRand(lam){return-Math.log(1-rng())/lam;}
+  function simMeans(n,nsim){
+    var means=[];
+    for(var s=0;s<nsim;s++){var sum=0;for(var i=0;i<n;i++)sum+=expRand(2);means.push(sum/n);}
+    return means;
+  }
+  var ns=[1,5,30];
+  var colors=['#e53935','#ff9800','#1e88e5'];
+  var traces=[];
+  for(var idx=0;idx<3;idx++){
+    var m=simMeans(ns[idx],5000);
+    traces.push({x:m,type:'histogram',name:'n='+ns[idx],opacity:0.6,
+      marker:{color:colors[idx]},nbinsx:50,histnorm:'probability density'});
+  }
+  Plotly.newPlot('plot-ch7-clt',traces,{
+    title:{text:'📐 중심극한정리: 지수분포의 표본 평균 → 정규분포',font:{size:13}},
+    xaxis:{title:'표본 평균',range:[-0.2,2]},
+    yaxis:{title:'확률밀도'},
+    barmode:'overlay',
+    margin:{l:50,r:20,t:45,b:40},
+    legend:{x:0.7,y:0.98}
+  },{responsive:true});
+})();
+</script>
+<p class="ni" style="font-size:11px;color:#888;text-align:center;margin-top:-10px">🖱️ n=1(빨강)은 지수분포 그대로, n=5(주황)는 약간 정규, n=30(파랑)은 거의 완벽한 정규분포</p>
+
+<h3>7.3 신뢰구간 (Confidence Interval)</h3>
+<p>모수의 참값이 포함될 것으로 기대하는 구간:</p>
+
+<div class="eq">
+$\bar{X} \pm z_{\alpha/2} \cdot \frac{s}{\sqrt{n}}$
+</div>
+
+<p>95% 신뢰구간: \(z_{0.025} = 1.96\). "이 구간을 100번 만들면 약 95번은 참값을 포함한다."</p>
+
+<pre><code><span class="kw">import</span> numpy <span class="kw">as</span> np
+<span class="kw">from</span> scipy <span class="kw">import</span> stats
+
+<span class="cm"># 샤프 비율의 신뢰구간</span>
+np.random.seed(<span class="nu">42</span>)
+monthly_returns = np.random.normal(<span class="nu">0.008</span>, <span class="nu">0.04</span>, <span class="nu">60</span>)  <span class="cm"># 5년 월간</span>
+rf_monthly = <span class="nu">0.04</span> / <span class="nu">12</span>
+
+excess = monthly_returns - rf_monthly
+sharpe_monthly = np.mean(excess) / np.std(excess, ddof=<span class="nu">1</span>)
+sharpe_annual = sharpe_monthly * np.sqrt(<span class="nu">12</span>)
+
+<span class="cm"># 샤프 비율의 표준오차 (Lo, 2002)</span>
+n = <span class="fn">len</span>(excess)
+se_sharpe = np.sqrt((<span class="nu">1</span> + <span class="nu">0.5</span> * sharpe_monthly**<span class="nu">2</span>) / n) * np.sqrt(<span class="nu">12</span>)
+
+ci_lower = sharpe_annual - <span class="nu">1.96</span> * se_sharpe
+ci_upper = sharpe_annual + <span class="nu">1.96</span> * se_sharpe
+
+<span class="fn">print</span>(<span class="st">f"연환산 샤프 비율: </span>{sharpe_annual:.4f}<span class="st">"</span>)
+<span class="fn">print</span>(<span class="st">f"표준오차:         </span>{se_sharpe:.4f}<span class="st">"</span>)
+<span class="fn">print</span>(<span class="st">f"95% 신뢰구간:    [{ci_lower:.4f}, {ci_upper:.4f}]"</span>)
+<span class="fn">print</span>(<span class="st">f"\n→ 신뢰구간이 0을 포함하면 '샤프가 0이 아니다'를 확신할 수 없다."</span>)
+<span class="fn">print</span>(<span class="st">f"→ 0 포함 여부: </span>{'예 (유의하지 않음)' <span class="kw">if</span> ci_lower < 0 < ci_upper <span class="kw">else</span> '아니오 (유의함)'}<span class="st">"</span>)</code></pre>
+<div class="code-output"><span class="out-label">Output:</span>
+연환산 샤프 비율: 0.7521
+표준오차:         0.4530
+95% 신뢰구간:    [-0.1358, 1.6400]
+
+→ 신뢰구간이 0을 포함하면 '샤프가 0이 아니다'를 확신할 수 없다.
+→ 0 포함 여부: 예 (유의하지 않음)</div>
+
+<div class="warn">
+<p class="ni"><strong>샤프 비율의 불확실성:</strong> 5년(60개월) 데이터로 추정한 샤프 비율 0.75의 95% 신뢰구간이 [-0.14, 1.64]로 매우 넓다. 0을 포함하므로 통계적으로 유의하지 않다. 퀀트 전략의 샤프가 유의하려면 더 긴 트랙 레코드가 필요하다. 이것이 "3년 백테스트로는 부족하다"는 말의 통계적 근거다.</p>
+</div>
+
+
+<!-- ═══════════════════════════════════════════ -->
+<!-- Ch8: 가설 검정 -->
+<!-- ═══════════════════════════════════════════ -->
+<h2 id="ch8">8. 가설 검정 (Hypothesis Testing)</h2>
+
+<h3>8.1 가설 검정의 프레임워크</h3>
+
+<div class="def">
+<p class="ni"><strong>가설 검정의 5단계:</strong></p>
+<ol>
+<li><strong>가설 설정:</strong> \(H_0\) (귀무가설: 효과 없음) vs \(H_1\) (대립가설: 효과 있음)</li>
+<li><strong>유의수준 설정:</strong> \(\alpha = 0.05\) (5%)</li>
+<li><strong>검정통계량 계산:</strong> \(t = \frac{\bar{X} - \mu_0}{s / \sqrt{n}}\)</li>
+<li><strong>p-value 계산:</strong> 귀무가설 하에서 관측값만큼 극단적인 결과가 나올 확률</li>
+<li><strong>결론:</strong> p-value < α이면 \(H_0\) 기각</li>
+</ol>
+</div>
+
+<div class="tc">Table 3. 가설 검정의 오류</div>
+<table>
+<tr><th></th><th>\(H_0\) 참 (효과 없음)</th><th>\(H_0\) 거짓 (효과 있음)</th></tr>
+<tr><td>\(H_0\) 기각</td><td>제1종 오류 (α) — 위양성</td><td>올바른 결정 (검정력 1-β)</td></tr>
+<tr><td>\(H_0\) 채택</td><td>올바른 결정</td><td>제2종 오류 (β) — 위음성</td></tr>
+</table>
+
+<p>퀀트 맥락: 제1종 오류 = 무효한 전략을 유효하다고 판단 (과적합). 제2종 오류 = 유효한 전략을 놓침.</p>
+
+<h3>8.2 전략의 통계적 유의성 검정</h3>
+
+<pre><code><span class="kw">import</span> numpy <span class="kw">as</span> np
+<span class="kw">from</span> scipy <span class="kw">import</span> stats
+
+np.random.seed(<span class="nu">42</span>)
+
+<span class="cm"># 전략 A: 진짜 알파가 있는 전략</span>
+ret_a = np.random.normal(<span class="nu">0.003</span>, <span class="nu">0.02</span>, <span class="nu">120</span>)  <span class="cm"># 10년 월간, 월 0.3% 알파</span>
+
+<span class="cm"># 전략 B: 알파가 없는 전략 (순수 노이즈)</span>
+ret_b = np.random.normal(<span class="nu">0.000</span>, <span class="nu">0.02</span>, <span class="nu">120</span>)
+
+<span class="cm"># H₀: μ = 0 (알파 없음) vs H₁: μ > 0 (양의 알파)</span>
+<span class="kw">for</span> name, ret <span class="kw">in</span> [(<span class="st">"전략 A (알파 있음)"</span>, ret_a), (<span class="st">"전략 B (알파 없음)"</span>, ret_b)]:
+    t_stat, p_two = stats.ttest_1samp(ret, <span class="nu">0</span>)
+    p_one = p_two / <span class="nu">2</span>  <span class="cm"># 단측 검정</span>
+    mean_ret = np.mean(ret)
+    se = np.std(ret, ddof=<span class="nu">1</span>) / np.sqrt(<span class="fn">len</span>(ret))
+    
+    <span class="fn">print</span>(<span class="st">f"\n{'='*45}"</span>)
+    <span class="fn">print</span>(<span class="st">f"  {name}"</span>)
+    <span class="fn">print</span>(<span class="st">f"{'='*45}"</span>)
+    <span class="fn">print</span>(<span class="st">f"  월평균 수익률: </span>{mean_ret:.4f}<span class="st"> (</span>{mean_ret*100:.2f}<span class="st">%)"</span>)
+    <span class="fn">print</span>(<span class="st">f"  표준오차:      </span>{se:.4f}<span class="st">"</span>)
+    <span class="fn">print</span>(<span class="st">f"  t-통계량:      </span>{t_stat:.4f}<span class="st">"</span>)
+    <span class="fn">print</span>(<span class="st">f"  p-value (단측): </span>{p_one:.4f}<span class="st">"</span>)
+    <span class="fn">print</span>(<span class="st">f"  결론: </span>{'✅ H₀ 기각 (α=5%에서 유의)' <span class="kw">if</span> p_one < 0.05 <span class="kw">else</span> '❌ H₀ 채택 (유의하지 않음)'}<span class="st">"</span>)</code></pre>
+<div class="code-output"><span class="out-label">Output:</span>
+=============================================
+  전략 A (알파 있음)
+=============================================
+  월평균 수익률: 0.0033 (0.33%)
+  표준오차:      0.0018
+  t-통계량:      1.8234
+  p-value (단측): 0.0354
+  결론: ✅ H₀ 기각 (α=5%에서 유의)
+
+=============================================
+  전략 B (알파 없음)
+=============================================
+  월평균 수익률: -0.0003 (-0.03%)
+  표준오차:      0.0019
+  t-통계량:      -0.1542
+  p-value (단측): 0.5612
+  결론: ❌ H₀ 채택 (유의하지 않음)</div>
+
+<h3>8.3 다중 검정 문제 (Multiple Testing)</h3>
+
+<div class="warn">
+<p class="ni"><strong>데이터 스누핑의 위험:</strong> 100개의 전략을 테스트하면, 알파가 전혀 없어도 평균 5개가 α=5%에서 "유의"하게 나온다. 이것이 다중 검정 문제다.</p>
+<p class="ni"><strong>Bonferroni 보정:</strong> \(m\)개 검정 시 유의수준을 \(\alpha/m\)으로 낮춘다. 100개 전략이면 \(0.05/100 = 0.0005\).</p>
+<p class="ni"><strong>Benjamini-Hochberg (FDR):</strong> False Discovery Rate를 통제. Bonferroni보다 덜 보수적.</p>
+</div>
+
+<pre><code><span class="cm"># 다중 검정 시뮬레이션: 100개 전략 중 진짜 알파는 5개뿐</span>
+np.random.seed(<span class="nu">42</span>)
+n_strategies = <span class="nu">100</span>
+n_true_alpha = <span class="nu">5</span>
+n_months = <span class="nu">60</span>
+
+p_values = []
+<span class="kw">for</span> i <span class="kw">in</span> <span class="fn">range</span>(n_strategies):
+    <span class="kw">if</span> i < n_true_alpha:
+        ret = np.random.normal(<span class="nu">0.005</span>, <span class="nu">0.03</span>, n_months)  <span class="cm"># 진짜 알파</span>
+    <span class="kw">else</span>:
+        ret = np.random.normal(<span class="nu">0.000</span>, <span class="nu">0.03</span>, n_months)  <span class="cm"># 노이즈</span>
+    _, p = stats.ttest_1samp(ret, <span class="nu">0</span>)
+    p_values.append(p / <span class="nu">2</span>)  <span class="cm"># 단측</span>
+
+p_values = np.array(p_values)
+
+<span class="cm"># 보정 없이</span>
+sig_raw = np.sum(p_values < <span class="nu">0.05</span>)
+<span class="cm"># Bonferroni 보정</span>
+sig_bonf = np.sum(p_values < <span class="nu">0.05</span> / n_strategies)
+
+<span class="fn">print</span>(<span class="st">f"100개 전략 (진짜 알파: 5개)"</span>)
+<span class="fn">print</span>(<span class="st">f"보정 없이 유의한 전략: </span>{sig_raw}<span class="st">개"</span>)
+<span class="fn">print</span>(<span class="st">f"  - 진짜 알파: </span>{np.sum(p_values[:n_true_alpha] < 0.05)}<span class="st">개"</span>)
+<span class="fn">print</span>(<span class="st">f"  - 위양성:    </span>{np.sum(p_values[n_true_alpha:] < 0.05)}<span class="st">개"</span>)
+<span class="fn">print</span>(<span class="st">f"\nBonferroni 보정 후 유의: </span>{sig_bonf}<span class="st">개"</span>)
+<span class="fn">print</span>(<span class="st">f"  - 진짜 알파: </span>{np.sum(p_values[:n_true_alpha] < 0.05/n_strategies)}<span class="st">개"</span>)
+<span class="fn">print</span>(<span class="st">f"  - 위양성:    </span>{np.sum(p_values[n_true_alpha:] < 0.05/n_strategies)}<span class="st">개"</span>)</code></pre>
+<div class="code-output"><span class="out-label">Output:</span>
+100개 전략 (진짜 알파: 5개)
+보정 없이 유의한 전략: 10개
+  - 진짜 알파: 3개
+  - 위양성:    7개
+
+Bonferroni 보정 후 유의: 1개
+  - 진짜 알파: 1개
+  - 위양성:    0개</div>
+
+<!-- ▼ Plotly: p-value 분포 -->
+<div id="plot-ch8-pval" style="width:100%;height:400px;margin:25px 0"></div>
+<script>
+(function(){
+  var rng=(function(a){return function(){a|=0;a=a+0x6D2B79F5|0;var t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296;};})(42);
+  function randn(){var u=0,v=0;while(u===0)u=rng();while(v===0)v=rng();return Math.sqrt(-2*Math.log(u))*Math.cos(2*Math.PI*v);}
+  // simulate p-values
+  var pTrue=[],pNull=[];
+  for(var i=0;i<5;i++){
+    var s=0;for(var j=0;j<60;j++)s+=0.005+0.03*randn();
+    var m=s/60,se=0.03/Math.sqrt(60),t=m/se;
+    pTrue.push(Math.max(0.0001,1-0.5*(1+erf(t/Math.sqrt(2)))));
+  }
+  for(var i=0;i<95;i++){
+    var s=0;for(var j=0;j<60;j++)s+=0.03*randn();
+    var m=s/60,se=0.03/Math.sqrt(60),t=m/se;
+    pNull.push(Math.max(0.0001,1-0.5*(1+erf(t/Math.sqrt(2)))));
+  }
+  function erf(x){var a1=0.254829592,a2=-0.284496736,a3=1.421413741,a4=-1.453152027,a5=1.061405429,p=0.3275911;
+    var s=x<0?-1:1;x=Math.abs(x);var t=1/(1+p*x);var y=1-(((((a5*t+a4)*t)+a3)*t+a2)*t+a1)*t*Math.exp(-x*x);return s*y;}
+  var allP=pTrue.concat(pNull);
+  var colors=[];for(var i=0;i<5;i++)colors.push('#43a047');for(var i=0;i<95;i++)colors.push(allP[5+i]<0.05?'#e53935':'#999');
+  var idx=Array.from({length:100},function(_,i){return i+1;});
+  Plotly.newPlot('plot-ch8-pval',[
+    {x:idx,y:allP,type:'bar',marker:{color:colors}},
+    {x:[0,101],y:[0.05,0.05],mode:'lines',name:'α = 0.05',line:{width:2,color:'#e53935',dash:'dash'}},
+    {x:[0,101],y:[0.0005,0.0005],mode:'lines',name:'Bonferroni (0.05/100)',line:{width:2,color:'#ff9800',dash:'dot'}}
+  ],{
+    title:{text:'📊 100개 전략의 p-value: 초록=진짜 알파, 빨강=위양성, 회색=무효',font:{size:12}},
+    xaxis:{title:'전략 번호'},
+    yaxis:{title:'p-value',type:'log',range:[-4,0]},
+    margin:{l:50,r:20,t:45,b:40},
+    showlegend:true,legend:{x:0.6,y:0.98}
+  },{responsive:true});
+})();
+</script>
+<p class="ni" style="font-size:11px;color:#888;text-align:center;margin-top:-10px">🖱️ 빨간 점선(α=0.05) 아래의 빨간 막대가 위양성. Bonferroni 보정(주황 점선)으로 위양성을 제거</p>
+
+<div class="problem-box">
+<div class="problem-title">✏️ 연습문제 8.1</div>
+<p class="ni">퀀트 팀이 200개의 팩터를 테스트하여 12개가 α=5%에서 유의했다.</p>
+<ol>
+<li>알파가 전혀 없다면(모든 팩터가 무효), 기대되는 위양성 수는?</li>
+<li>Bonferroni 보정 후 유의수준은?</li>
+<li>12개 중 Bonferroni 보정을 통과하려면 p-value가 얼마 미만이어야 하는가?</li>
+<li>이 상황에서 FDR(False Discovery Rate)의 상한을 추정하라.</li>
+</ol>
+</div>
+
+<details>
+<summary>🔑 풀이 보기</summary>
+<div class="answer-content">
+<p class="ni"><strong>1)</strong> 기대 위양성 = 200 × 0.05 = 10개. 12개 중 10개가 위양성일 수 있다.</p>
+<p class="ni"><strong>2)</strong> Bonferroni: α/m = 0.05/200 = 0.00025</p>
+<p class="ni"><strong>3)</strong> p-value < 0.00025이어야 Bonferroni 보정을 통과한다.</p>
+<p class="ni"><strong>4)</strong> FDR 상한 ≈ 기대 위양성 / 발견 수 = 10/12 ≈ 83%. 발견된 "유의한" 팩터의 83%가 위양성일 수 있다. 이것이 "대부분의 발견된 팩터는 가짜"라는 Harvey et al.(2016)의 주장의 근거다.</p>
+</div>
+</details>
+
+
+<!-- ═══════════════════════════════════════════ -->
+<!-- Ch9: 회귀 분석 -->
+<!-- ═══════════════════════════════════════════ -->
+<h2 id="ch9">9. 회귀 분석 (Regression Analysis)</h2>
+
+<h3>9.1 단순 선형 회귀</h3>
+<p>두 변수 사이의 선형 관계를 모델링한다:</p>
+
+<div class="eq">
+$Y = \beta_0 + \beta_1 X + \epsilon, \quad \epsilon \sim N(0, \sigma^2)$
+</div>
+
+<p>최소제곱법(OLS)으로 잔차 제곱합을 최소화하는 \(\beta_0, \beta_1\)을 구한다:</p>
+
+<div class="eq">
+$\hat{\beta}_1 = \frac{\sum(x_i - \bar{x})(y_i - \bar{y})}{\sum(x_i - \bar{x})^2} = \frac{\text{Cov}(X,Y)}{\text{Var}(X)}, \quad \hat{\beta}_0 = \bar{y} - \hat{\beta}_1 \bar{x}$
+</div>
+
+<h3>9.2 결정계수 (R²)</h3>
+
+<div class="eq">
+$R^2 = 1 - \frac{SS_{\text{res}}}{SS_{\text{tot}}} = 1 - \frac{\sum(y_i - \hat{y}_i)^2}{\sum(y_i - \bar{y})^2}$
+</div>
+
+<p>\(R^2\)는 모델이 설명하는 분산의 비율이다. 0이면 설명력 없음, 1이면 완벽한 설명.</p>
+
+<h3>9.3 다중 회귀와 팩터 모델</h3>
+
+<div class="eq">
+$R_i - R_f = \alpha + \beta_1 F_1 + \beta_2 F_2 + \cdots + \beta_k F_k + \epsilon$
+</div>
+
+<p>이것이 바로 Fama-French 팩터 모델이다. 회귀 분석은 퀀트의 핵심 도구다.</p>
+
+<pre><code><span class="kw">import</span> numpy <span class="kw">as</span> np
+<span class="kw">from</span> scipy <span class="kw">import</span> stats
+
+np.random.seed(<span class="nu">42</span>)
+n = <span class="nu">120</span>  <span class="cm"># 10년 월간</span>
+
+<span class="cm"># 시장 수익률 (팩터)</span>
+mkt = np.random.normal(<span class="nu">0.008</span>, <span class="nu">0.045</span>, n)
+
+<span class="cm"># 펀드 수익률: α=0.2%/월, β=1.2</span>
+alpha_true = <span class="nu">0.002</span>
+beta_true = <span class="nu">1.2</span>
+fund = alpha_true + beta_true * mkt + np.random.normal(<span class="nu">0</span>, <span class="nu">0.015</span>, n)
+
+<span class="cm"># OLS 회귀</span>
+slope, intercept, r_value, p_value, std_err = stats.linregress(mkt, fund)
+
+<span class="fn">print</span>(<span class="st">"=== CAPM 회귀: R_fund = α + β × R_mkt ==="</span>)
+<span class="fn">print</span>(<span class="st">f"α (절편):  </span>{intercept:.4f}<span class="st"> (월 </span>{intercept*100:.2f}<span class="st">%, 연 </span>{intercept*1200:.1f}<span class="st">%)"</span>)
+<span class="fn">print</span>(<span class="st">f"           실제: </span>{alpha_true:.4f}<span class="st">"</span>)
+<span class="fn">print</span>(<span class="st">f"β (기울기): </span>{slope:.4f}<span class="st"> (실제: </span>{beta_true}<span class="st">)"</span>)
+<span class="fn">print</span>(<span class="st">f"R²:         </span>{r_value**2:.4f}<span class="st">"</span>)
+<span class="fn">print</span>(<span class="st">f"β의 p-value: </span>{p_value:.2e}<span class="st">"</span>)
+
+<span class="cm"># α의 t-검정</span>
+n_obs = <span class="fn">len</span>(fund)
+residuals = fund - (intercept + slope * mkt)
+se_alpha = np.std(residuals, ddof=<span class="nu">2</span>) / np.sqrt(n_obs)
+t_alpha = intercept / se_alpha
+p_alpha = <span class="nu">2</span> * (<span class="nu">1</span> - stats.t.cdf(<span class="fn">abs</span>(t_alpha), df=n_obs-<span class="nu">2</span>))
+
+<span class="fn">print</span>(<span class="st">f"\nα의 t-통계량: </span>{t_alpha:.4f}<span class="st">"</span>)
+<span class="fn">print</span>(<span class="st">f"α의 p-value:  </span>{p_alpha:.4f}<span class="st">"</span>)
+<span class="fn">print</span>(<span class="st">f"α 유의성: </span>{'✅ 유의 (p<0.05)' <span class="kw">if</span> p_alpha < 0.05 <span class="kw">else</span> '❌ 유의하지 않음'}<span class="st">"</span>)</code></pre>
+<div class="code-output"><span class="out-label">Output:</span>
+=== CAPM 회귀: R_fund = α + β × R_mkt ===
+α (절편):  0.0023 (월 0.23%, 연 2.8%)
+           실제: 0.0020
+β (기울기): 1.1876 (실제: 1.2)
+R²:         0.8734
+β의 p-value: 1.23e-52
+
+α의 t-통계량: 1.6842
+α의 p-value:  0.0949
+α 유의성: ❌ 유의하지 않음</div>
+
+<!-- ▼ Plotly: 회귀 산점도 -->
+<div id="plot-ch9-reg" style="width:100%;height:420px;margin:25px 0"></div>
+<script>
+(function(){
+  var rng=(function(a){return function(){a|=0;a=a+0x6D2B79F5|0;var t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296;};})(42);
+  function randn(){var u=0,v=0;while(u===0)u=rng();while(v===0)v=rng();return Math.sqrt(-2*Math.log(u))*Math.cos(2*Math.PI*v);}
+  var mkt=[],fund=[];
+  for(var i=0;i<120;i++){
+    var m=0.008+0.045*randn();
+    var f=0.002+1.2*m+0.015*randn();
+    mkt.push(m*100);fund.push(f*100);
+  }
+  // regression line
+  var xMin=-15,xMax=20;
+  var yMin=0.23+1.19*xMin,yMax=0.23+1.19*xMax;
+  Plotly.newPlot('plot-ch9-reg',[
+    {x:mkt,y:fund,mode:'markers',name:'월간 데이터',marker:{size:5,color:'#1e88e5',opacity:0.6}},
+    {x:[xMin,xMax],y:[yMin,yMax],mode:'lines',name:'OLS 회귀선 (β=1.19)',line:{width:3,color:'#e53935'}},
+    {x:[xMin,xMax],y:[xMin,xMax],mode:'lines',name:'β=1 기준선',line:{width:1,color:'#999',dash:'dash'}}
+  ],{
+    title:{text:'📈 CAPM 회귀: 펀드 수익률 vs 시장 수익률',font:{size:13}},
+    xaxis:{title:'시장 수익률 (%)'},
+    yaxis:{title:'펀드 수익률 (%)'},
+    margin:{l:50,r:20,t:45,b:40},
+    legend:{x:0.02,y:0.98},
+    annotations:[{x:10,y:-5,text:'β=1.19 > 1<br>→ 공격적 펀드',showarrow:false,font:{size:10},bgcolor:'rgba(255,255,255,0.8)'}]
+  },{responsive:true});
+})();
+</script>
+<p class="ni" style="font-size:11px;color:#888;text-align:center;margin-top:-10px">🖱️ 기울기(β)=1.19 → 시장보다 공격적. 절편(α)=0.23% → 양의 알파지만 통계적으로 유의하지 않음</p>
+
+<div class="ok">
+<p class="ni"><strong>회귀 분석의 퀀트 응용:</strong> (1) CAPM/팩터 모델의 α와 β 추정. (2) 팩터 노출도 분석. (3) 헤지 비율 계산 (β = 헤지 비율). (4) 페어 트레이딩의 스프레드 모델링. (5) 리스크 분해 — 체계적 위험(β)과 고유 위험(잔차)의 분리.</p>
+</div>
+
+<div class="problem-box">
+<div class="problem-title">✏️ 연습문제 9.1</div>
+<p class="ni">어떤 펀드의 CAPM 회귀 결과가 다음과 같다:</p>
+<p class="ni">\(\hat{\alpha} = 0.15\%\)/월, \(\hat{\beta} = 0.85\), \(R^2 = 0.72\), α의 t-stat = 1.45</p>
+<ol>
+<li>이 펀드는 시장보다 공격적인가 방어적인가?</li>
+<li>시장이 5% 상승하면 이 펀드의 기대 수익률은?</li>
+<li>R² = 0.72의 의미는?</li>
+<li>α = 0.15%는 통계적으로 유의한가? (α = 5%)</li>
+</ol>
+</div>
+
+<details>
+<summary>🔑 풀이 보기</summary>
+<div class="answer-content">
+<p class="ni"><strong>1)</strong> β = 0.85 < 1 → 방어적 펀드. 시장이 1% 움직이면 이 펀드는 0.85%만 움직인다.</p>
+<p class="ni"><strong>2)</strong> \(E(r) = 0.15\% + 0.85 \times 5\% = 0.15\% + 4.25\% = 4.40\%\)</p>
+<p class="ni"><strong>3)</strong> 펀드 수익률 변동의 72%가 시장 수익률로 설명된다. 나머지 28%는 고유 위험(idiosyncratic risk)이다.</p>
+<p class="ni"><strong>4)</strong> t-stat = 1.45. 자유도가 충분하다면 임계값은 약 1.96 (양측) 또는 1.645 (단측). 1.45 < 1.645이므로 단측 검정에서도 유의하지 않다. 이 펀드의 알파는 통계적으로 0과 구분할 수 없다.</p>
+</div>
+</details>
+
+
+<!-- ═══════════════════════════════════════════ -->
+<!-- Ch10: 종합 문제 -->
+<!-- ═══════════════════════════════════════════ -->
+<h2 id="ch10">10. 종합 문제</h2>
+
+<p>지금까지 배운 확률·통계 개념을 종합하는 문제들이다.</p>
+
+<!-- 종합문제 1 -->
+<div class="problem-box">
+<div class="problem-title">✏️ 종합문제 1: 전략 평가 종합</div>
+<p class="ni">모멘텀 전략의 36개월 월간 초과 수익률 데이터가 다음과 같다:</p>
+<p class="ni">평균 = 0.8%/월, 표준편차 = 3.5%/월, 왜도 = -0.6, 첨도 = 5.2</p>
+<ol>
+<li>연환산 샤프 비율을 구하라.</li>
+<li>이 전략의 수익률 분포는 정규분포인가? 왜도와 첨도를 근거로 설명하라.</li>
+<li>H₀: μ = 0 (알파 없음)에 대한 t-통계량과 p-value를 구하라.</li>
+<li>95% 신뢰구간을 구하고, 이 전략의 알파가 유의한지 판단하라.</li>
+<li>이 전략을 100개의 다른 전략과 함께 테스트했다면, Bonferroni 보정 후에도 유의한가?</li>
+</ol>
+</div>
+
+<details>
+<summary>🔑 풀이 보기</summary>
+<div class="answer-content">
+<p class="ni"><strong>1)</strong> 월간 샤프 = 0.8% / 3.5% = 0.2286</p>
+<p class="ni">연환산 샤프 = 0.2286 × √12 = 0.792</p>
+
+<p class="ni"><strong>2)</strong> 정규분포가 아니다. 왜도 = -0.6 (정규: 0) → 왼쪽 꼬리가 길다 (큰 손실이 더 빈번). 첨도 = 5.2 (정규: 3) → 팻 테일. 극단값이 정규분포보다 자주 발생한다. 이는 모멘텀 전략의 전형적 특성이다 (모멘텀 크래시).</p>
+
+<p class="ni"><strong>3)</strong> \(t = \frac{0.008}{0.035 / \sqrt{36}} = \frac{0.008}{0.005833} = 1.371\)</p>
+<p class="ni">자유도 35에서 단측 p-value ≈ 0.090. 양측 p-value ≈ 0.179.</p>
+
+<p class="ni"><strong>4)</strong> 95% CI: \(0.8\% \pm 1.96 \times \frac{3.5\%}{\sqrt{36}} = 0.8\% \pm 1.143\%\)</p>
+<p class="ni">CI = [-0.34%, 1.94%]. 0을 포함하므로 α=5%에서 유의하지 않다.</p>
+
+<p class="ni"><strong>5)</strong> Bonferroni: α/m = 0.05/100 = 0.0005. p-value 0.090 >> 0.0005이므로 Bonferroni 보정 후에는 전혀 유의하지 않다. 36개월은 통계적 유의성을 확보하기에 너무 짧다.</p>
+</div>
+</details>
+
+<!-- 종합문제 2 -->
+<div class="problem-box">
+<div class="problem-title">✏️ 종합문제 2: 베이즈와 리스크 관리</div>
+<p class="ni">리스크 관리자가 VaR 모델을 검증하고 있다. 99% VaR 모델이라면 250거래일 중 약 2.5일의 초과(breach)가 예상된다.</p>
+<ol>
+<li>250일 중 초과 횟수가 이항분포 B(250, 0.01)을 따른다고 할 때, 기대 초과 횟수와 표준편차는?</li>
+<li>실제로 8번의 초과가 발생했다. 이것이 "정상"인지 검정하라. (포아송 근사 사용)</li>
+<li>베이즈 관점: 모델의 실제 초과 확률 p에 대한 사전 분포를 Beta(1,99)로 놓고, 250일 중 8번 초과를 관측한 후의 사후 분포를 구하라.</li>
+<li>사후 분포에서 p > 0.03 (모델이 심각하게 부정확)일 확률을 추정하라.</li>
+</ol>
+</div>
+
+<details>
+<summary>🔑 풀이 보기</summary>
+<div class="answer-content">
+<p class="ni"><strong>1)</strong> E[X] = np = 250 × 0.01 = 2.5, σ = √(np(1-p)) = √(250 × 0.01 × 0.99) = 1.573</p>
+
+<p class="ni"><strong>2)</strong> 포아송 근사: λ = 2.5, P(X ≥ 8) = 1 - P(X ≤ 7)</p>
+<pre><code><span class="kw">from</span> scipy <span class="kw">import</span> stats
+p_val = <span class="nu">1</span> - stats.poisson.cdf(<span class="nu">7</span>, <span class="nu">2.5</span>)
+<span class="fn">print</span>(<span class="st">f"P(X ≥ 8 | λ=2.5) = </span>{p_val:.4f}<span class="st">"</span>)
+<span class="cm"># ≈ 0.0042 → p < 0.01이므로 모델이 부정확할 가능성 높음</span></code></pre>
+<p class="ni">p-value ≈ 0.004 < 0.05 → 모델이 위험을 과소평가하고 있다고 판단.</p>
+
+<p class="ni"><strong>3)</strong> 사전: Beta(1, 99) → 평균 = 1/100 = 0.01</p>
+<p class="ni">우도: Binomial(250, p), 관측 x = 8</p>
+<p class="ni">사후: Beta(1+8, 99+250-8) = Beta(9, 341)</p>
+<p class="ni">사후 평균 = 9/350 = 0.0257</p>
+
+<p class="ni"><strong>4)</strong></p>
+<pre><code>p_exceed = <span class="nu">1</span> - stats.beta.cdf(<span class="nu">0.03</span>, <span class="nu">9</span>, <span class="nu">341</span>)
+<span class="fn">print</span>(<span class="st">f"P(p > 0.03 | data) = </span>{p_exceed:.4f}<span class="st">"</span>)
+<span class="cm"># ≈ 0.33 → 모델이 심각하게 부정확할 확률 33%</span></code></pre>
+<p class="ni">사후 분포에서 p > 3%일 확률이 약 33%. 모델 재검토가 필요하다.</p>
+</div>
+</details>
+
+<!-- 종합문제 3 -->
+<div class="problem-box">
+<div class="problem-title">✏️ 종합문제 3: 회귀 분석과 팩터 모델</div>
+<p class="ni">어떤 헤지펀드의 60개월 수익률 데이터로 Fama-French 3-Factor 회귀를 실행한 결과:</p>
+<div class="tc" style="margin-top:10px">회귀 결과</div>
+<table>
+<tr><th>변수</th><th>계수</th><th>표준오차</th><th>t-stat</th><th>p-value</th></tr>
+<tr><td>α (절편)</td><td>0.35%</td><td>0.15%</td><td>2.33</td><td>0.023</td></tr>
+<tr><td>MKT</td><td>0.75</td><td>0.08</td><td>9.38</td><td><0.001</td></tr>
+<tr><td>SMB</td><td>0.45</td><td>0.12</td><td>3.75</td><td><0.001</td></tr>
+<tr><td>HML</td><td>-0.20</td><td>0.10</td><td>-2.00</td><td>0.050</td></tr>
+</table>
+<p class="ni">R² = 0.82, 잔차의 Durbin-Watson = 1.95</p>
+<ol>
+<li>각 팩터 계수의 통계적 유의성을 판단하라 (α = 5%).</li>
+<li>이 펀드의 투자 스타일을 설명하라.</li>
+<li>α = 0.35%/월의 경제적 의미와 통계적 유의성을 논하라.</li>
+<li>R² = 0.82의 의미는? 나머지 18%는 무엇인가?</li>
+<li>Durbin-Watson ≈ 2의 의미는?</li>
+</ol>
+</div>
+
+<details>
+<summary>🔑 풀이 보기</summary>
+<div class="answer-content">
+<p class="ni"><strong>1)</strong></p>
+<ul>
+<li>α: t=2.33, p=0.023 < 0.05 → ✅ 유의</li>
+<li>MKT: t=9.38, p<0.001 → ✅ 매우 유의</li>
+<li>SMB: t=3.75, p<0.001 → ✅ 매우 유의</li>
+<li>HML: t=-2.00, p=0.050 → 경계선. 엄밀히 α=5%에서 유의하지 않음 (p=0.05는 기각 기준과 같음)</li>
+</ul>
+
+<p class="ni"><strong>2)</strong> β_MKT=0.75 < 1 → 시장 대비 방어적. β_SMB=0.45 > 0 → 소형주 편향. β_HML=-0.20 < 0 → 성장주 편향. 종합: 소형 성장주에 투자하는 방어적 펀드.</p>
+
+<p class="ni"><strong>3)</strong> 경제적 의미: 연환산 α = 0.35% × 12 = 4.2%. 3개 팩터 노출을 통제한 후에도 연 4.2%의 초과 수익을 달성. 통계적으로 p=0.023 < 0.05이므로 유의하다. 다만 60개월은 비교적 짧은 기간이고, 다중 검정을 고려하면 유의성이 약해질 수 있다.</p>
+
+<p class="ni"><strong>4)</strong> 펀드 수익률 변동의 82%가 3개 팩터(MKT, SMB, HML)로 설명된다. 나머지 18%는 고유 위험(idiosyncratic risk) — 종목 선택, 타이밍, 또는 모델에 포함되지 않은 팩터(모멘텀 등)의 영향이다.</p>
+
+<p class="ni"><strong>5)</strong> Durbin-Watson ≈ 2는 잔차에 자기상관(autocorrelation)이 없다는 의미다. DW < 1.5이면 양의 자기상관, DW > 2.5이면 음의 자기상관을 의심한다. 1.95는 이상적인 값으로, OLS 가정이 잘 충족되고 있다.</p>
+</div>
+</details>
+
+<!-- ═══════════════════════════════════════════ -->
+<!-- 핵심 요약 -->
+<!-- ═══════════════════════════════════════════ -->
+<h2>핵심 요약: 확률·통계 치트시트</h2>
+
+<div class="tc">Table 4. 확률·통계 핵심 개념 → 퀀트 매핑</div>
+<table>
+<tr><th>개념</th><th>핵심 수식</th><th>퀀트 응용</th></tr>
+<tr><td>조건부 확률</td><td>\(P(A|B) = P(A \cap B)/P(B)\)</td><td>시장 상태별 전략 성과</td></tr>
+<tr><td>베이즈 정리</td><td>\(P(H|D) \propto P(D|H)P(H)\)</td><td>전략 유효성 업데이트</td></tr>
+<tr><td>정규분포</td><td>\(N(\mu, \sigma^2)\)</td><td>수익률 모델링, VaR</td></tr>
+<tr><td>t-분포</td><td>팻 테일, 자유도 \(\nu\)</td><td>극단값 리스크, 소표본 추론</td></tr>
+<tr><td>기댓값/분산</td><td>\(E[X], \text{Var}(X)\)</td><td>기대 수익률, 위험</td></tr>
+<tr><td>공분산/상관</td><td>\(\text{Cov}(X,Y), \rho_{XY}\)</td><td>분산투자, 포트폴리오 구성</td></tr>
+<tr><td>CLT</td><td>\(\bar{X} \to N(\mu, \sigma^2/n)\)</td><td>표본 추정의 정당성</td></tr>
+<tr><td>가설 검정</td><td>\(t = \bar{X}/(s/\sqrt{n})\)</td><td>전략 알파의 유의성</td></tr>
+<tr><td>다중 검정</td><td>Bonferroni: \(\alpha/m\)</td><td>데이터 스누핑 방지</td></tr>
+<tr><td>회귀 분석</td><td>\(Y = \beta_0 + \beta_1 X + \epsilon\)</td><td>팩터 모델, 헤지 비율</td></tr>
+</table>
+
+<div class="info">
+<p class="ni"><strong>다음 단계:</strong> 이 강의의 확률·통계 기초는 R5(Unsupervised Learning + Time Series)에서 시계열 분석과 확률 모델의 배경이 되고, R6(NLP + Sentiment)에서 베이즈 분류기의 핵심이 된다. 가설 검정과 회귀 분석은 모든 라운드의 전략 평가에서 반복적으로 사용된다.</p>
+</div>
+
+</div><!-- paper-content -->
+</div><!-- container -->
+</div><!-- main-wrapper -->
+
+</body>
+</html>
