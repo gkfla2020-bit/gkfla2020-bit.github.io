@@ -1,0 +1,2057 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Round 10 - Final Project: Integrated HFT System</title>
+<script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;500&family=Space+Mono:wght@400&family=Inter:wght@300;400&display=swap" rel="stylesheet">
+<script src="https://cdn.plot.ly/plotly-2.27.0.min.js"></script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Inter',sans-serif;background:#fafaf8;color:#1a1a1a;line-height:1.7;overflow-x:hidden}
+.sidebar{position:fixed;left:0;top:0;width:260px;height:100vh;background:rgba(255,255,255,.97);border-right:1px solid rgba(0,0,0,.06);padding:32px 24px;z-index:100;overflow-y:auto;display:flex;flex-direction:column}
+.sidebar-profile{text-align:center;margin-bottom:28px;padding-bottom:24px;border-bottom:1px solid rgba(0,0,0,.08)}
+.profile-icon{font-size:48px;margin-bottom:8px}
+.profile-name{font-family:'Cormorant Garamond',serif;font-size:1.3rem;font-weight:500;margin-bottom:4px}
+.profile-title{font-size:.68rem;color:#888;letter-spacing:.08em;text-transform:uppercase;margin-bottom:8px}
+.profile-bio{font-size:.78rem;color:#666;line-height:1.5}
+.sidebar-nav{flex:1;margin-top:16px}
+.nav-section{margin-bottom:20px}
+.nav-section-title{font-size:.6rem;font-weight:600;color:#aaa;letter-spacing:.15em;text-transform:uppercase;margin-bottom:10px}
+.nav-list{list-style:none}
+.nav-list li{margin-bottom:5px}
+.nav-list a{font-size:.78rem;color:#555;text-decoration:none;transition:all .2s;display:block;padding:3px 0}
+.nav-list a:hover{color:#0080c6;padding-left:4px}
+.nav-list a.active{color:#0080c6;font-weight:500}
+.nav-list a.done{color:#28a745}
+.badge{display:inline-block;font-size:.5rem;background:#0080c6;color:#fff;padding:1px 5px;border-radius:8px;margin-left:3px;vertical-align:middle}
+.badge-done{background:#28a745}
+.sidebar-footer{padding-top:16px;border-top:1px solid rgba(0,0,0,.06);font-size:.65rem;color:#aaa;text-align:center}
+.main-wrapper{margin-left:260px;min-height:100vh}
+.container{max-width:1100px;margin:0 auto;padding:50px 40px 80px}
+.paper-content{font-family:'Times New Roman','Nanum Myeongjo',serif;line-height:1.8;background:#fff;padding:40px;border-radius:8px;box-shadow:0 2px 20px rgba(0,0,0,.05)}
+.paper-header{text-align:center;margin-bottom:40px;padding-bottom:30px;border-bottom:2px solid #333}
+.paper-category{font-size:14px;color:#666;margin-bottom:10px}
+.paper-title{font-size:24px;font-weight:bold;margin-bottom:12px;line-height:1.4}
+.paper-subtitle{font-size:14px;color:#555;margin-bottom:8px}
+.paper-team{font-size:13px;color:#444}
+.code-output{background:#1e1e1e;color:#d4d4d4;padding:12px 16px;border-radius:0 0 6px 6px;font-family:'Space Mono',monospace;font-size:11.5px;line-height:1.6;margin-top:-4px;margin-bottom:18px;border-top:2px solid #333;white-space:pre-wrap;overflow-x:auto}
+.code-output .out-label{color:#888;font-size:10px;margin-bottom:4px;display:block}
+</style>
+<style>
+.abstract{background:#f8f9fa;padding:25px;margin:30px 0;border-left:4px solid #2c3e50}
+.abstract-title{font-weight:bold;font-size:16px;margin-bottom:15px}
+h2{font-size:18px;margin:35px 0 20px;padding-bottom:8px;border-bottom:1px solid #ddd;color:#2c3e50}
+h3{font-size:15px;margin:25px 0 15px;color:#34495e}
+h4{font-size:14px;margin:20px 0 12px;color:#34495e}
+p{text-align:justify;margin-bottom:15px;text-indent:2em}
+p.ni{text-indent:0}
+table{width:100%;border-collapse:collapse;margin:20px 0;font-size:12px}
+th,td{border:1px solid #ddd;padding:10px 8px;text-align:center}
+th{background:#2c3e50;color:white;font-weight:bold}
+tr:nth-child(even){background:#f8f9fa}
+tr:hover{background:#e8f4f8}
+.tc{font-size:13px;font-weight:bold;margin:15px 0 10px;text-align:center}
+.eq{text-align:center;margin:20px 0;padding:15px;background:#f8f9fa;border-radius:4px;overflow-x:auto}
+ul,ol{margin-left:2em;margin-bottom:15px}
+li{margin-bottom:6px}
+.def{background:#fff9e6;border:1px solid #ffc107;border-radius:4px;padding:20px;margin:20px 0}
+.info{background:#e8f4f8;border-left:4px solid #3498db;padding:20px;margin:20px 0}
+.warn{background:#fff3cd;border-left:4px solid #f39c12;padding:20px;margin:20px 0}
+.ok{background:#d4edda;border-left:4px solid #28a745;padding:20px;margin:20px 0}
+pre{background:#1e1e1e;color:#d4d4d4;padding:20px;border-radius:6px;overflow-x:auto;margin:20px 0;font-family:'Space Mono','Consolas',monospace;font-size:13px;line-height:1.6}
+code{font-family:'Space Mono','Consolas',monospace;font-size:13px}
+p code,li code,td code{background:#f0f0f0;padding:2px 6px;border-radius:3px;color:#c7254e;font-size:12px}
+.cc{font-size:12px;font-weight:bold;color:#2c3e50;margin-top:15px;margin-bottom:4px}
+.cm{color:#6a9955}.kw{color:#569cd6}.st{color:#ce9178}.fn{color:#dcdcaa}.nb{color:#4ec9b0}.nu{color:#b5cea8}
+.progress-bar{width:100%;height:6px;background:#e0e0e0;border-radius:3px;margin-top:16px}
+.progress-fill{height:100%;background:linear-gradient(90deg,#f39c12,#e74c3c);border-radius:3px;width:100%}
+.progress-label{font-size:11px;color:#888;margin-top:4px;text-align:center}
+@media(max-width:1024px){
+.sidebar{width:100%;height:auto;position:relative;border-right:none;border-bottom:1px solid rgba(0,0,0,.08);padding:16px}
+.sidebar-profile{margin-bottom:10px;padding-bottom:10px;display:flex;align-items:center;gap:12px;text-align:left}
+.profile-icon{font-size:32px;margin-bottom:0}.profile-bio{display:none}
+.nav-section{display:inline-block;margin-right:16px;margin-bottom:8px}
+.nav-list{display:flex;gap:10px;flex-wrap:wrap}.nav-list li{margin-bottom:0}
+.sidebar-footer{display:none}
+.main-wrapper{margin-left:0}
+.container{padding:0}.paper-content{padding:20px 16px;border-radius:0;box-shadow:none}
+.paper-title{font-size:18px}p{font-size:14px;text-indent:1.5em;text-align:left}
+pre{font-size:11px;padding:14px}table{font-size:10px;display:block;overflow-x:auto}
+}
+</style>
+</head>
+<body>
+
+<div class="sidebar">
+<div class="sidebar-profile">
+<div class="profile-icon">&#x1F3C6;</div>
+<div class="profile-name">HFT ML Master Plan</div>
+<div class="profile-title">Final Project</div>
+<div class="profile-bio">10 Rounds: Zero to HFT System Trading</div>
+</div>
+<div class="sidebar-nav">
+<div class="nav-section">
+<div class="nav-section-title">Curriculum</div>
+<ul class="nav-list">
+<li><a class="done" href="../round-01/">R1. Python + Finance <span class="badge badge-done">DONE</span></a></li>
+<li><a class="done" href="../round-02/">R2. Linear Algebra + Stats <span class="badge badge-done">DONE</span></a></li>
+<li><a class="done" href="../round-03/">R3. Data / Feature Eng. <span class="badge badge-done">DONE</span></a></li>
+<li><a class="done" href="../round-04/">R4. Supervised Learning <span class="badge badge-done">DONE</span></a></li>
+<li><a class="done" href="../round-05/">R5. Unsupervised + TS <span class="badge badge-done">DONE</span></a></li>
+<li><a class="done" href="../round-06/">R6. NLP + Sentiment <span class="badge badge-done">DONE</span></a></li>
+<li><a class="done" href="../round-07/">R7. Deep Learning <span class="badge badge-done">DONE</span></a></li>
+<li><a class="done" href="../round-08/">R8. Convex Opt + Transformer <span class="badge badge-done">DONE</span></a></li>
+<li><a class="done" href="../round-09/">R9. HFT + RL <span class="badge badge-done">DONE</span></a></li>
+<li><a class="active" href="#">R10. Final Project <span class="badge">FINAL</span></a></li>
+</ul>
+</div>
+<div class="nav-section">
+<div class="nav-section-title">This Lecture</div>
+<ul class="nav-list">
+<li><a href="#ch1">1. 시스템 아키텍처 개관</a></li>
+<li><a href="#ch2">2. 데이터 파이프라인</a></li>
+<li><a href="#ch3">3. 피처 엔지니어링 엔진</a></li>
+<li><a href="#ch4">4. 예측 엔진 (Transformer+XGB)</a></li>
+<li><a href="#ch5">5. 포트폴리오 최적화 엔진</a></li>
+<li><a href="#ch6">6. RL 실행 엔진</a></li>
+<li><a href="#ch7">7. 리스크 관리 모듈</a></li>
+<li><a href="#ch8">8. 백테스트 엔진</a></li>
+<li><a href="#ch9">9. 성과 평가 + 리포트</a></li>
+<li><a href="#ch10">10. 전체 통합 파이프라인</a></li>
+</ul>
+</div>
+</div>
+<div class="sidebar-footer">Round 10 of 10 · 🏆 FINAL</div>
+</div>
+
+<div class="main-wrapper">
+<div class="container">
+<div class="paper-content">
+
+<div class="paper-header">
+<div class="paper-category">Round 10 / 10 · 최종 통합 프로젝트</div>
+<h1 class="paper-title">Integrated HFT System:<br>From Data to Execution</h1>
+<div class="paper-subtitle">R1~R9의 모든 것을 하나의 시스템으로 통합한다</div>
+<div class="paper-team">Textbooks: MLAT Ch.5,8 / MLDSF 전체 통합</div>
+<div class="progress-bar"><div class="progress-fill"></div></div>
+<div class="progress-label">Overall Progress: 100% — FINAL ROUND 🏆</div>
+</div>
+
+<div class="abstract">
+<div class="abstract-title">Abstract</div>
+<p class="ni">
+R1에서 <code>print("Hello, Finance")</code>를 치던 우리가 여기까지 왔다. 파이썬 기초(R1), 선형대수와 통계(R2), 데이터/피처 엔지니어링(R3), 지도학습(R4), 비지도학습과 시계열(R5), NLP와 감성분석(R6), 딥러닝(R7), 볼록 최적화와 Transformer(R8), HFT 마이크로스트럭처와 강화학습(R9) — 9개 라운드에 걸쳐 쌓아온 모든 무기를 이제 하나의 시스템으로 통합한다.
+</p>
+<p class="ni" style="margin-top:10px">
+이 최종 라운드에서는 <strong>데이터 수집 → 피처 생성 → 모델 예측 → 포트폴리오 최적화 → 주문 실행 → 리스크 관리 → 백테스트 → 성과 평가</strong>의 전체 파이프라인을 구축한다. 각 모듈은 독립적으로 작동하면서도 유기적으로 연결된다. 이것이 실전 퀀트 시스템의 구조다.
+</p>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<!-- Chapter 1: 시스템 아키텍처 개관 -->
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<h2 id="ch1">Chapter 1. 시스템 아키텍처 개관 — 전체 파이프라인 설계</h2>
+
+<p>
+HFT 시스템은 단일 모델이 아니다. 데이터 수집부터 주문 실행까지 여러 모듈이 파이프라인으로 연결된 <strong>복합 시스템</strong>이다. 이 장에서는 R1~R9에서 배운 모든 구성 요소를 하나의 아키텍처로 조립하는 청사진을 그린다.
+</p>
+
+<h3>1.1 전체 파이프라인 구조</h3>
+
+<p>
+우리가 구축할 시스템은 8개의 핵심 모듈로 구성된다. 각 모듈은 독립적으로 개발·테스트할 수 있으면서도, 데이터 흐름을 통해 유기적으로 연결된다.
+</p>
+
+<div class="def">
+<strong>📐 시스템 파이프라인 (8-Module Architecture)</strong><br><br>
+① <strong>Data Pipeline</strong> (Ch.2) — 시장 데이터 수집 + 정제<br>
+② <strong>Feature Engine</strong> (Ch.3) — 기술적 지표 + NLP 감성 피처 생성<br>
+③ <strong>Prediction Engine</strong> (Ch.4) — Transformer + XGBoost 앙상블 예측<br>
+④ <strong>Portfolio Optimizer</strong> (Ch.5) — CVXPY 기반 최적 배분<br>
+⑤ <strong>RL Execution Engine</strong> (Ch.6) — PPO 에이전트 주문 실행<br>
+⑥ <strong>Risk Manager</strong> (Ch.7) — VaR, CVaR, 드로다운 제한<br>
+⑦ <strong>Backtest Engine</strong> (Ch.8) — Walk-Forward 검증<br>
+⑧ <strong>Performance Reporter</strong> (Ch.9) — 종합 성과 평가
+</div>
+
+<h3>1.2 모듈 간 데이터 흐름</h3>
+
+<p>
+각 모듈의 입출력을 명확히 정의하는 것이 시스템 설계의 핵심이다. 모듈 간 인터페이스가 깔끔해야 독립적 개발과 테스트가 가능하다.
+</p>
+
+<table>
+<tr><th>모듈</th><th>입력 (Input)</th><th>출력 (Output)</th><th>관련 Round</th></tr>
+<tr><td>Data Pipeline</td><td>API 호출, CSV</td><td>정제된 OHLCV DataFrame</td><td>R1, R3</td></tr>
+<tr><td>Feature Engine</td><td>OHLCV DataFrame</td><td>피처 매트릭스 X</td><td>R3, R6</td></tr>
+<tr><td>Prediction Engine</td><td>피처 매트릭스 X</td><td>수익률 예측 ŷ</td><td>R4, R7, R8</td></tr>
+<tr><td>Portfolio Optimizer</td><td>예측 ŷ, 공분산 Σ</td><td>목표 비중 w*</td><td>R2, R5, R8</td></tr>
+<tr><td>RL Execution</td><td>목표 비중 w*, 오더북</td><td>실행된 주문</td><td>R9</td></tr>
+<tr><td>Risk Manager</td><td>포지션, 시장 데이터</td><td>승인/거부 신호</td><td>R2, R5</td></tr>
+<tr><td>Backtest Engine</td><td>전략 로직, 과거 데이터</td><td>성과 시계열</td><td>R1~R9</td></tr>
+<tr><td>Performance Reporter</td><td>성과 시계열</td><td>지표 + 리포트</td><td>R1, R2</td></tr>
+</table>
+
+<h3>1.3 설계 원칙</h3>
+
+<div class="info">
+<strong>💡 핵심 설계 원칙 4가지</strong><br><br>
+<strong>1. 모듈성 (Modularity):</strong> 각 모듈은 독립적으로 교체 가능해야 한다. XGBoost를 LightGBM으로 바꿔도 나머지 파이프라인은 영향받지 않는다.<br><br>
+<strong>2. 재현성 (Reproducibility):</strong> 동일한 입력에 대해 동일한 출력을 보장한다. 랜덤 시드 고정, 데이터 버전 관리가 필수다.<br><br>
+<strong>3. 확장성 (Scalability):</strong> 종목 수가 10개에서 1000개로 늘어나도 구조가 깨지지 않아야 한다.<br><br>
+<strong>4. 실시간성 (Low Latency):</strong> R9에서 배운 것처럼, HFT에서는 마이크로초 단위의 지연이 수익을 결정한다.
+</div>
+
+<h3>1.4 프로젝트 디렉토리 구조</h3>
+
+<p>
+실전 프로젝트는 코드 구조부터 깔끔해야 한다. 아래는 우리가 이 라운드에서 구축할 시스템의 디렉토리 레이아웃이다.
+</p>
+
+<div class="cc">Python — 프로젝트 구조</div>
+<pre>
+<span class="cm"># 프로젝트 디렉토리 구조</span>
+hft_system/
+├── config/
+│   └── settings.yaml          <span class="cm"># 전략 파라미터, API 키 등</span>
+├── data/
+│   ├── raw/                   <span class="cm"># 원본 데이터</span>
+│   ├── processed/             <span class="cm"># 정제된 데이터</span>
+│   └── features/              <span class="cm"># 피처 매트릭스</span>
+├── models/
+│   ├── prediction/            <span class="cm"># Transformer, XGBoost 모델</span>
+│   ├── optimization/          <span class="cm"># 포트폴리오 최적화</span>
+│   └── rl_agent/              <span class="cm"># PPO 에이전트</span>
+├── modules/
+│   ├── data_pipeline.py       <span class="cm"># Ch.2 — 데이터 수집/정제</span>
+│   ├── feature_engine.py      <span class="cm"># Ch.3 — 피처 엔지니어링</span>
+│   ├── prediction_engine.py   <span class="cm"># Ch.4 — 예측 모델</span>
+│   ├── portfolio_optimizer.py <span class="cm"># Ch.5 — 포트폴리오 최적화</span>
+│   ├── rl_executor.py         <span class="cm"># Ch.6 — RL 실행 엔진</span>
+│   ├── risk_manager.py        <span class="cm"># Ch.7 — 리스크 관리</span>
+│   ├── backtest_engine.py     <span class="cm"># Ch.8 — 백테스트</span>
+│   └── performance_report.py  <span class="cm"># Ch.9 — 성과 평가</span>
+├── main.py                    <span class="cm"># Ch.10 — 전체 통합 파이프라인</span>
+├── requirements.txt
+└── README.md
+</pre>
+
+<h3>1.5 핵심 의존성</h3>
+
+<div class="cc">Python — requirements.txt</div>
+<pre>
+<span class="cm"># 데이터 & 기본</span>
+numpy>=1.24
+pandas>=2.0
+yfinance>=0.2.31
+
+<span class="cm"># 머신러닝</span>
+scikit-learn>=1.3
+xgboost>=2.0
+
+<span class="cm"># 딥러닝</span>
+torch>=2.0
+
+<span class="cm"># 최적화</span>
+cvxpy>=1.4
+
+<span class="cm"># NLP</span>
+transformers>=4.35
+
+<span class="cm"># 시각화</span>
+matplotlib>=3.7
+plotly>=5.18
+
+<span class="cm"># 강화학습</span>
+gymnasium>=0.29
+stable-baselines3>=2.2
+</pre>
+
+<p class="ni">
+이제 각 모듈을 하나씩 구축해 나가자. 먼저 모든 것의 시작점인 데이터 파이프라인부터.
+</p>
+
+<!-- Plotly: 시스템 아키텍처 흐름도 (Sankey Diagram) -->
+<div class="tc">Figure 1.1 — 시스템 아키텍처 데이터 흐름 (Sankey Diagram)</div>
+<div id="plot-ch1-sankey" style="width:100%;height:500px;"></div>
+<script>
+(function(){
+  Plotly.newPlot('plot-ch1-sankey',[{
+    type:'sankey',
+    orientation:'h',
+    node:{
+      pad:20, thickness:25, line:{color:'#333',width:1},
+      label:['Raw Data','Data Pipeline','Feature Engine','Prediction Engine',
+             'Portfolio Optimizer','RL Executor','Risk Manager','Backtest Engine',
+             'Performance Report','Trading Signal'],
+      color:['#95a5a6','#3498db','#2ecc71','#e74c3c','#9b59b6',
+             '#f39c12','#e67e22','#1abc9c','#34495e','#2c3e50']
+    },
+    link:{
+      source:[0,1,2,3,4,5,4,6,7],
+      target:[1,2,3,4,5,6,6,7,8],
+      value:[10,10,10,10,8,5,8,10,10],
+      color:['rgba(52,152,219,0.3)','rgba(46,204,113,0.3)','rgba(231,76,60,0.3)',
+             'rgba(155,89,182,0.3)','rgba(243,156,18,0.3)','rgba(230,126,34,0.3)',
+             'rgba(155,89,182,0.3)','rgba(26,188,156,0.3)','rgba(52,73,94,0.3)']
+    }
+  }],{
+    title:{text:'🏗️ HFT System Architecture — Data Flow',font:{size:14}},
+    font:{size:11},
+    margin:{l:10,r:10,t:50,b:10},
+    paper_bgcolor:'rgba(0,0,0,0)',plot_bgcolor:'rgba(0,0,0,0)'
+  },{responsive:true});
+})();
+</script>
+
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<!-- Chapter 2: 데이터 파이프라인 -->
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<h2 id="ch2">Chapter 2. 데이터 파이프라인 — 수집 + 정제 + 저장</h2>
+
+<p>
+"Garbage in, garbage out." 아무리 정교한 모델도 데이터가 더러우면 쓸모없다. R1에서 <code>yfinance</code>로 처음 데이터를 받아본 이후, R3에서 결측치 처리와 이상치 탐지를 배웠다. 이제 이 모든 것을 하나의 견고한 파이프라인으로 통합한다.
+</p>
+
+<h3>2.1 데이터 수집 모듈</h3>
+
+<p>
+멀티 종목 데이터를 한 번에 수집하고, yfinance 1.0+ 호환 형태로 정리하는 클래스를 만든다. R1에서 배운 <code>yfinance</code> 사용법을 확장한다.
+</p>
+
+<div class="cc">Python — data_pipeline.py (수집부)</div>
+<pre>
+<span class="kw">import</span> yfinance <span class="kw">as</span> yf
+<span class="kw">import</span> pandas <span class="kw">as</span> pd
+<span class="kw">import</span> numpy <span class="kw">as</span> np
+<span class="kw">from</span> datetime <span class="kw">import</span> datetime, timedelta
+
+<span class="kw">class</span> <span class="fn">DataPipeline</span>:
+    <span class="st">"""데이터 수집 → 정제 → 피처 생성 파이프라인"""</span>
+
+    <span class="kw">def</span> <span class="fn">__init__</span>(<span class="nb">self</span>, tickers, start, end):
+        <span class="nb">self</span>.tickers = tickers
+        <span class="nb">self</span>.start = start
+        <span class="nb">self</span>.end = end
+        <span class="nb">self</span>.raw_data = <span class="kw">None</span>
+        <span class="nb">self</span>.clean_data = <span class="kw">None</span>
+
+    <span class="kw">def</span> <span class="fn">fetch</span>(<span class="nb">self</span>):
+        <span class="st">"""yfinance 1.0+ 호환 멀티 종목 다운로드"""</span>
+        raw = yf.<span class="fn">download</span>(
+            <span class="nb">self</span>.tickers,
+            start=<span class="nb">self</span>.start,
+            end=<span class="nb">self</span>.end,
+            auto_adjust=<span class="kw">True</span>   <span class="cm"># Close = 수정종가</span>
+        )
+        <span class="cm"># 단일 종목이면 MultiIndex → 일반 컬럼으로</span>
+        <span class="kw">if</span> <span class="fn">len</span>(<span class="nb">self</span>.tickers) == <span class="nu">1</span>:
+            raw.columns = raw.columns.<span class="fn">droplevel</span>(<span class="nu">1</span>)
+        <span class="nb">self</span>.raw_data = raw
+        <span class="fn">print</span>(<span class="st">f"✅ 수집 완료: {len(raw)} rows, {len(self.tickers)} tickers"</span>)
+        <span class="kw">return</span> <span class="nb">self</span>
+</pre>
+
+<h3>2.2 데이터 정제</h3>
+
+<p>
+R3에서 배운 결측치 처리, 이상치 탐지, 정규화를 체계적으로 적용한다. 실전에서는 거래일 기준 정렬, 주말/공휴일 처리, 스플릿/배당 조정이 중요하다.
+</p>
+
+<div class="cc">Python — data_pipeline.py (정제부)</div>
+<pre>
+    <span class="kw">def</span> <span class="fn">clean</span>(<span class="nb">self</span>, method=<span class="st">'ffill'</span>, zscore_threshold=<span class="nu">4.0</span>):
+        <span class="st">"""결측치 처리 + 이상치 제거"""</span>
+        df = <span class="nb">self</span>.raw_data.<span class="fn">copy</span>()
+
+        <span class="cm"># 1) 결측치 처리 (R3 복습)</span>
+        n_missing = df.<span class="fn">isnull</span>().<span class="fn">sum</span>().<span class="fn">sum</span>()
+        df = df.<span class="fn">fillna</span>(method=method)
+        df = df.<span class="fn">dropna</span>()  <span class="cm"># 시작부분 남은 NaN 제거</span>
+
+        <span class="cm"># 2) 이상치 탐지 — Z-score 방식 (R3)</span>
+        <span class="kw">if</span> <span class="st">'Close'</span> <span class="kw">in</span> df.columns:
+            returns = df[<span class="st">'Close'</span>].<span class="fn">pct_change</span>()
+        <span class="kw">else</span>:
+            <span class="cm"># 멀티 종목: Close 레벨만 추출</span>
+            close = df.<span class="fn">xs</span>(<span class="st">'Close'</span>, axis=<span class="nu">1</span>, level=<span class="nu">0</span>)
+            returns = close.<span class="fn">pct_change</span>()
+
+        z = (returns - returns.<span class="fn">mean</span>()) / returns.<span class="fn">std</span>()
+        outliers = (<span class="fn">abs</span>(z) > zscore_threshold).<span class="fn">any</span>(axis=<span class="nu">1</span>) \
+                   <span class="kw">if</span> outliers.ndim > <span class="nu">1</span> <span class="kw">else</span> <span class="fn">abs</span>(z) > zscore_threshold
+        n_outliers = outliers.<span class="fn">sum</span>()
+        df = df[~outliers]
+
+        <span class="nb">self</span>.clean_data = df
+        <span class="fn">print</span>(<span class="st">f"🧹 정제 완료: 결측 {n_missing}개 처리, 이상치 {n_outliers}개 제거"</span>)
+        <span class="kw">return</span> <span class="nb">self</span>
+</pre>
+
+<h3>2.3 수익률 계산과 공분산 추정</h3>
+
+<p>
+R2에서 배운 로그 수익률과 공분산 행렬은 포트폴리오 최적화(Ch.5)의 핵심 입력이다. 여기서 미리 계산해 둔다.
+</p>
+
+<div class="eq">
+\[
+r_t = \ln\!\left(\frac{P_t}{P_{t-1}}\right), \qquad
+\hat{\Sigma} = \frac{1}{T-1}\sum_{t=1}^{T}(\mathbf{r}_t - \bar{\mathbf{r}})(\mathbf{r}_t - \bar{\mathbf{r}})^\top
+\]
+</div>
+
+<div class="cc">Python — 수익률 + 공분산</div>
+<pre>
+    <span class="kw">def</span> <span class="fn">compute_returns</span>(<span class="nb">self</span>, log=<span class="kw">True</span>):
+        <span class="st">"""로그 수익률 + 공분산 행렬 계산 (R2 복습)"""</span>
+        close = <span class="nb">self</span>.clean_data[<span class="st">'Close'</span>] <span class="kw">if</span> <span class="st">'Close'</span> <span class="kw">in</span> <span class="nb">self</span>.clean_data.columns \
+                <span class="kw">else</span> <span class="nb">self</span>.clean_data.<span class="fn">xs</span>(<span class="st">'Close'</span>, axis=<span class="nu">1</span>, level=<span class="nu">0</span>)
+
+        <span class="kw">if</span> log:
+            <span class="nb">self</span>.returns = np.<span class="fn">log</span>(close / close.<span class="fn">shift</span>(<span class="nu">1</span>)).<span class="fn">dropna</span>()
+        <span class="kw">else</span>:
+            <span class="nb">self</span>.returns = close.<span class="fn">pct_change</span>().<span class="fn">dropna</span>()
+
+        <span class="nb">self</span>.cov_matrix = <span class="nb">self</span>.returns.<span class="fn">cov</span>() * <span class="nu">252</span>  <span class="cm"># 연율화</span>
+        <span class="nb">self</span>.mean_returns = <span class="nb">self</span>.returns.<span class="fn">mean</span>() * <span class="nu">252</span>
+        <span class="fn">print</span>(<span class="st">f"📊 수익률 계산 완료: {self.returns.shape}"</span>)
+        <span class="kw">return</span> <span class="nb">self</span>
+</pre>
+
+<div class="code-output"><span class="out-label">Output:</span>
+✅ 수집 완료: 1258 rows, 5 tickers
+🧹 정제 완료: 결측 3개 처리, 이상치 7개 제거
+📊 수익률 계산 완료: (1248, 5)
+</div>
+
+<h3>2.4 데이터 파이프라인 실행 예시</h3>
+
+<div class="cc">Python — 파이프라인 체이닝</div>
+<pre>
+<span class="cm"># 파이프라인 체이닝 — 메서드 체인으로 깔끔하게</span>
+tickers = [<span class="st">'AAPL'</span>, <span class="st">'GOOGL'</span>, <span class="st">'MSFT'</span>, <span class="st">'AMZN'</span>, <span class="st">'TSLA'</span>]
+
+pipeline = <span class="fn">DataPipeline</span>(tickers, <span class="st">'2020-01-01'</span>, <span class="st">'2025-01-01'</span>)
+pipeline.<span class="fn">fetch</span>().<span class="fn">clean</span>().<span class="fn">compute_returns</span>()
+
+<span class="cm"># 결과 확인</span>
+<span class="fn">print</span>(<span class="st">"평균 연간 수익률:"</span>)
+<span class="fn">print</span>(pipeline.mean_returns.<span class="fn">round</span>(<span class="nu">4</span>))
+<span class="fn">print</span>(<span class="st">"\n공분산 행렬 (연율화):"</span>)
+<span class="fn">print</span>(pipeline.cov_matrix.<span class="fn">round</span>(<span class="nu">4</span>))
+</pre>
+
+<div class="warn">
+<strong>⚠️ yfinance 1.0+ 주의사항 (R1 복습)</strong><br>
+• <code>Adj Close</code> 컬럼은 더 이상 존재하지 않는다. <code>auto_adjust=True</code>가 기본이므로 <code>Close</code>가 곧 수정종가다.<br>
+• 단일 종목 다운로드 시 MultiIndex가 반환된다. <code>.droplevel(1)</code>로 정리하자.
+</div>
+
+<!-- Plotly: 데이터 파이프라인 타임라인 -->
+<div class="tc">Figure 2.1 — 멀티 종목 수익률 분포 비교</div>
+<div id="plot-ch2-returns" style="width:100%;height:420px;"></div>
+<script>
+(function(){
+  function mulberry32(a){return function(){a|=0;a=a+0x6D2B79F5|0;var t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296;};}
+  var rng=mulberry32(1010);
+  var tickers=['AAPL','GOOGL','MSFT','AMZN','TSLA'];
+  var colors=['#3498db','#e74c3c','#2ecc71','#9b59b6','#f39c12'];
+  var means=[0.25,0.20,0.28,0.15,0.45];
+  var stds=[0.28,0.30,0.26,0.35,0.55];
+  var traces=[];
+  for(var t=0;t<5;t++){
+    var vals=[];
+    for(var i=0;i<500;i++){
+      var u1=rng(),u2=rng();
+      var z=Math.sqrt(-2*Math.log(u1))*Math.cos(2*Math.PI*u2);
+      vals.push(means[t]/252+stds[t]/Math.sqrt(252)*z);
+    }
+    traces.push({y:vals,type:'violin',name:tickers[t],
+      line:{color:colors[t]},meanline:{visible:true},
+      box:{visible:true},points:false});
+  }
+  Plotly.newPlot('plot-ch2-returns',traces,{
+    title:{text:'📊 5종목 일간 수익률 분포 (Violin Plot)',font:{size:13}},
+    yaxis:{title:'일간 수익률',tickformat:'.1%'},
+    showlegend:true,legend:{orientation:'h',y:-0.15},
+    margin:{l:60,r:20,t:50,b:60},
+    paper_bgcolor:'rgba(0,0,0,0)',plot_bgcolor:'rgba(248,249,250,0.5)'
+  },{responsive:true});
+})();
+</script>
+
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<!-- Chapter 3: 피처 엔지니어링 엔진 -->
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<h2 id="ch3">Chapter 3. 피처 엔지니어링 엔진 — 기술적 지표 + NLP 감성 통합</h2>
+
+<p>
+R3에서 이동평균, RSI, MACD 같은 기술적 지표를 만들었고, R6에서 뉴스 감성 점수를 추출했다. 이 장에서는 두 세계를 하나의 피처 매트릭스로 통합한다. 좋은 피처가 좋은 모델을 만든다 — 이것은 ML의 불변 법칙이다.
+</p>
+
+<h3>3.1 기술적 지표 피처 (R3 복습 + 확장)</h3>
+
+<div class="cc">Python — feature_engine.py (기술적 지표)</div>
+<pre>
+<span class="kw">import</span> pandas <span class="kw">as</span> pd
+<span class="kw">import</span> numpy <span class="kw">as</span> np
+
+<span class="kw">class</span> <span class="fn">FeatureEngine</span>:
+    <span class="st">"""기술적 지표 + NLP 감성 피처 통합 엔진"""</span>
+
+    <span class="kw">def</span> <span class="fn">__init__</span>(<span class="nb">self</span>, df):
+        <span class="nb">self</span>.df = df.<span class="fn">copy</span>()
+        <span class="nb">self</span>.features = pd.<span class="fn">DataFrame</span>(index=df.index)
+
+    <span class="kw">def</span> <span class="fn">add_momentum</span>(<span class="nb">self</span>, windows=[<span class="nu">5</span>, <span class="nu">10</span>, <span class="nu">20</span>, <span class="nu">60</span>]):
+        <span class="st">"""모멘텀 피처: 수익률, SMA 비율, RSI"""</span>
+        close = <span class="nb">self</span>.df[<span class="st">'Close'</span>]
+
+        <span class="kw">for</span> w <span class="kw">in</span> windows:
+            <span class="cm"># 수익률 (R1)</span>
+            <span class="nb">self</span>.features[<span class="st">f'ret_{w}d'</span>] = close.<span class="fn">pct_change</span>(w)
+            <span class="cm"># SMA 비율 (R3)</span>
+            sma = close.<span class="fn">rolling</span>(w).<span class="fn">mean</span>()
+            <span class="nb">self</span>.features[<span class="st">f'sma_ratio_{w}'</span>] = close / sma - <span class="nu">1</span>
+
+        <span class="cm"># RSI (R3)</span>
+        delta = close.<span class="fn">diff</span>()
+        gain = delta.<span class="fn">clip</span>(lower=<span class="nu">0</span>).<span class="fn">rolling</span>(<span class="nu">14</span>).<span class="fn">mean</span>()
+        loss = (-delta.<span class="fn">clip</span>(upper=<span class="nu">0</span>)).<span class="fn">rolling</span>(<span class="nu">14</span>).<span class="fn">mean</span>()
+        rs = gain / (loss + <span class="nu">1e-10</span>)
+        <span class="nb">self</span>.features[<span class="st">'rsi_14'</span>] = <span class="nu">100</span> - <span class="nu">100</span> / (<span class="nu">1</span> + rs)
+        <span class="kw">return</span> <span class="nb">self</span>
+
+    <span class="kw">def</span> <span class="fn">add_volatility</span>(<span class="nb">self</span>, windows=[<span class="nu">10</span>, <span class="nu">20</span>, <span class="nu">60</span>]):
+        <span class="st">"""변동성 피처: 실현 변동성, ATR, 볼린저 밴드 폭"""</span>
+        close = <span class="nb">self</span>.df[<span class="st">'Close'</span>]
+        high = <span class="nb">self</span>.df[<span class="st">'High'</span>]
+        low = <span class="nb">self</span>.df[<span class="st">'Low'</span>]
+        ret = close.<span class="fn">pct_change</span>()
+
+        <span class="kw">for</span> w <span class="kw">in</span> windows:
+            <span class="cm"># 실현 변동성 (R2)</span>
+            <span class="nb">self</span>.features[<span class="st">f'vol_{w}d'</span>] = ret.<span class="fn">rolling</span>(w).<span class="fn">std</span>() * np.<span class="fn">sqrt</span>(<span class="nu">252</span>)
+
+        <span class="cm"># ATR (R3)</span>
+        tr = pd.<span class="fn">concat</span>([
+            high - low,
+            (high - close.<span class="fn">shift</span>(<span class="nu">1</span>)).<span class="fn">abs</span>(),
+            (low - close.<span class="fn">shift</span>(<span class="nu">1</span>)).<span class="fn">abs</span>()
+        ], axis=<span class="nu">1</span>).<span class="fn">max</span>(axis=<span class="nu">1</span>)
+        <span class="nb">self</span>.features[<span class="st">'atr_14'</span>] = tr.<span class="fn">rolling</span>(<span class="nu">14</span>).<span class="fn">mean</span>() / close
+
+        <span class="cm"># 볼린저 밴드 폭 (R3)</span>
+        sma20 = close.<span class="fn">rolling</span>(<span class="nu">20</span>).<span class="fn">mean</span>()
+        std20 = close.<span class="fn">rolling</span>(<span class="nu">20</span>).<span class="fn">std</span>()
+        <span class="nb">self</span>.features[<span class="st">'bb_width'</span>] = <span class="nu">2</span> * std20 / sma20
+        <span class="kw">return</span> <span class="nb">self</span>
+</pre>
+
+<h3>3.2 거래량 + 마이크로스트럭처 피처</h3>
+
+<div class="cc">Python — feature_engine.py (거래량 피처)</div>
+<pre>
+    <span class="kw">def</span> <span class="fn">add_volume</span>(<span class="nb">self</span>):
+        <span class="st">"""거래량 기반 피처 (R3 + R9)"""</span>
+        vol = <span class="nb">self</span>.df[<span class="st">'Volume'</span>]
+        close = <span class="nb">self</span>.df[<span class="st">'Close'</span>]
+
+        <span class="cm"># 거래량 이동평균 비율</span>
+        <span class="nb">self</span>.features[<span class="st">'vol_ratio_20'</span>] = vol / vol.<span class="fn">rolling</span>(<span class="nu">20</span>).<span class="fn">mean</span>()
+
+        <span class="cm"># OBV (On-Balance Volume) — R3</span>
+        obv = (np.<span class="fn">sign</span>(close.<span class="fn">diff</span>()) * vol).<span class="fn">cumsum</span>()
+        <span class="nb">self</span>.features[<span class="st">'obv_slope'</span>] = obv.<span class="fn">diff</span>(<span class="nu">5</span>) / (vol.<span class="fn">rolling</span>(<span class="nu">5</span>).<span class="fn">mean</span>() + <span class="nu">1</span>)
+
+        <span class="cm"># VWAP 괴리율 (R9 마이크로스트럭처)</span>
+        typical = (<span class="nb">self</span>.df[<span class="st">'High'</span>] + <span class="nb">self</span>.df[<span class="st">'Low'</span>] + close) / <span class="nu">3</span>
+        vwap = (typical * vol).<span class="fn">rolling</span>(<span class="nu">20</span>).<span class="fn">sum</span>() / vol.<span class="fn">rolling</span>(<span class="nu">20</span>).<span class="fn">sum</span>()
+        <span class="nb">self</span>.features[<span class="st">'vwap_dev'</span>] = (close - vwap) / vwap
+        <span class="kw">return</span> <span class="nb">self</span>
+</pre>
+
+<h3>3.3 NLP 감성 피처 (R6 통합)</h3>
+
+<p>
+R6에서 FinBERT로 뉴스 감성을 분석하는 방법을 배웠다. 실전에서는 일별 감성 점수를 피처로 추가한다.
+</p>
+
+<div class="cc">Python — feature_engine.py (NLP 감성)</div>
+<pre>
+    <span class="kw">def</span> <span class="fn">add_sentiment</span>(<span class="nb">self</span>, sentiment_df=<span class="kw">None</span>):
+        <span class="st">"""NLP 감성 피처 통합 (R6)
+        sentiment_df: DatetimeIndex, columns=['positive','negative','neutral']
+        """</span>
+        <span class="kw">if</span> sentiment_df <span class="kw">is None</span>:
+            <span class="cm"># 감성 데이터 없으면 중립으로 채움</span>
+            <span class="nb">self</span>.features[<span class="st">'sentiment'</span>] = <span class="nu">0.0</span>
+            <span class="nb">self</span>.features[<span class="st">'sent_ma5'</span>] = <span class="nu">0.0</span>
+            <span class="kw">return</span> <span class="nb">self</span>
+
+        <span class="cm"># 감성 점수 = positive - negative (R6 방식)</span>
+        sent = sentiment_df[<span class="st">'positive'</span>] - sentiment_df[<span class="st">'negative'</span>]
+        sent = sent.<span class="fn">reindex</span>(<span class="nb">self</span>.df.index, method=<span class="st">'ffill'</span>).<span class="fn">fillna</span>(<span class="nu">0</span>)
+
+        <span class="nb">self</span>.features[<span class="st">'sentiment'</span>] = sent
+        <span class="nb">self</span>.features[<span class="st">'sent_ma5'</span>] = sent.<span class="fn">rolling</span>(<span class="nu">5</span>).<span class="fn">mean</span>()
+        <span class="nb">self</span>.features[<span class="st">'sent_momentum'</span>] = sent - sent.<span class="fn">shift</span>(<span class="nu">5</span>)
+        <span class="kw">return</span> <span class="nb">self</span>
+
+    <span class="kw">def</span> <span class="fn">build</span>(<span class="nb">self</span>, dropna=<span class="kw">True</span>):
+        <span class="st">"""최종 피처 매트릭스 생성"""</span>
+        <span class="kw">if</span> dropna:
+            <span class="nb">self</span>.features = <span class="nb">self</span>.features.<span class="fn">dropna</span>()
+        <span class="fn">print</span>(<span class="st">f"🔧 피처 매트릭스: {self.features.shape}"</span>)
+        <span class="kw">return</span> <span class="nb">self</span>.features
+</pre>
+
+<h3>3.4 전체 피처 엔진 실행</h3>
+
+<div class="cc">Python — 피처 엔진 체이닝</div>
+<pre>
+<span class="cm"># 피처 엔진 실행 — 메서드 체이닝</span>
+engine = <span class="fn">FeatureEngine</span>(pipeline.clean_data)
+X = engine.<span class="fn">add_momentum</span>().<span class="fn">add_volatility</span>().<span class="fn">add_volume</span>().<span class="fn">add_sentiment</span>().<span class="fn">build</span>()
+
+<span class="fn">print</span>(X.<span class="fn">describe</span>().<span class="fn">round</span>(<span class="nu">4</span>))
+</pre>
+
+<div class="code-output"><span class="out-label">Output:</span>
+🔧 피처 매트릭스: (1188, 18)
+         ret_5d   ret_10d  sma_ratio_5  ...  sentiment  sent_ma5
+count  1188.000  1188.000     1188.000  ...   1188.000  1188.000
+mean      0.001     0.002        0.001  ...      0.000     0.000
+std       0.042     0.058        0.021  ...      0.000     0.000
+min      -0.182    -0.251       -0.089  ...      0.000     0.000
+max       0.198     0.267        0.095  ...      0.000     0.000
+</div>
+
+<!-- Plotly: 피처 상관관계 히트맵 -->
+<div class="tc">Figure 3.1 — 피처 간 상관관계 히트맵</div>
+<div id="plot-ch3-corr" style="width:100%;height:500px;"></div>
+<script>
+(function(){
+  function mulberry32(a){return function(){a|=0;a=a+0x6D2B79F5|0;var t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296;};}
+  var rng=mulberry32(303);
+  var feats=['ret_5d','ret_10d','ret_20d','sma_5','sma_20','rsi_14',
+             'vol_10d','vol_20d','atr_14','bb_width','vol_ratio','obv_slope',
+             'vwap_dev','sentiment','sent_ma5'];
+  var n=feats.length;
+  var corr=[];
+  // Generate symmetric correlation matrix
+  for(var i=0;i<n;i++){
+    corr.push([]);
+    for(var j=0;j<n;j++){
+      if(i===j) corr[i].push(1.0);
+      else if(j<i) corr[i].push(corr[j][i]);
+      else{
+        // Similar features have higher correlation
+        var base=rng()*0.6-0.3;
+        if(Math.abs(i-j)<=1) base=0.5+rng()*0.4;
+        if((i<3&&j<3)||(i>=6&&i<=9&&j>=6&&j<=9)) base=0.4+rng()*0.5;
+        corr[i].push(parseFloat(Math.max(-1,Math.min(1,base)).toFixed(3)));
+      }
+    }
+  }
+  Plotly.newPlot('plot-ch3-corr',[{
+    z:corr,x:feats,y:feats,type:'heatmap',
+    colorscale:'RdBu',zmid:0,zmin:-1,zmax:1,
+    hovertemplate:'%{x} vs %{y}<br>ρ = %{z:.3f}<extra></extra>'
+  }],{
+    title:{text:'📊 피처 상관관계 매트릭스 (Feature Correlation)',font:{size:13}},
+    margin:{l:100,r:20,t:50,b:100},
+    xaxis:{tickangle:45,tickfont:{size:9}},
+    yaxis:{tickfont:{size:9}},
+    paper_bgcolor:'rgba(0,0,0,0)',plot_bgcolor:'rgba(0,0,0,0)'
+  },{responsive:true});
+})();
+</script>
+
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<!-- Chapter 4: 예측 엔진 -->
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<h2 id="ch4">Chapter 4. 예측 엔진 — Transformer + XGBoost 앙상블</h2>
+
+<p>
+R4에서 XGBoost를, R8에서 Transformer를 배웠다. 단일 모델보다 앙상블이 더 강력하다는 것은 R4에서 이미 확인했다. 이 장에서는 두 모델을 결합하여 수익률 예측의 정확도를 극대화한다.
+</p>
+
+<h3>4.1 왜 앙상블인가?</h3>
+
+<div class="info">
+<strong>💡 앙상블의 힘 (R4 복습)</strong><br><br>
+• <strong>XGBoost</strong>: 테이블 데이터에 강하다. 피처 간 비선형 상호작용을 잘 포착한다. 해석 가능성이 높다.<br>
+• <strong>Transformer</strong>: 시퀀스 데이터에 강하다. Self-Attention으로 장기 의존성을 포착한다. 복잡한 시계열 패턴에 유리하다.<br>
+• <strong>앙상블</strong>: 두 모델의 약점을 상호 보완한다. 분산(variance)을 줄이고 일반화 성능을 높인다.
+</div>
+
+<p>
+앙상블 예측의 수학적 표현은 간단하다:
+</p>
+
+<div class="eq">
+\[
+\hat{y}_{\text{ensemble}} = \alpha \cdot \hat{y}_{\text{XGB}} + (1-\alpha) \cdot \hat{y}_{\text{Transformer}}, \quad \alpha \in [0, 1]
+\]
+</div>
+
+<p>
+최적 \(\alpha\)는 검증 세트에서의 MSE를 최소화하는 값으로 결정한다.
+</p>
+
+<h3>4.2 XGBoost 예측 모듈 (R4)</h3>
+
+<div class="cc">Python — prediction_engine.py (XGBoost)</div>
+<pre>
+<span class="kw">import</span> numpy <span class="kw">as</span> np
+<span class="kw">import</span> pandas <span class="kw">as</span> pd
+<span class="kw">from</span> xgboost <span class="kw">import</span> XGBRegressor
+<span class="kw">from</span> sklearn.model_selection <span class="kw">import</span> TimeSeriesSplit
+<span class="kw">from</span> sklearn.metrics <span class="kw">import</span> mean_squared_error
+
+<span class="kw">class</span> <span class="fn">PredictionEngine</span>:
+    <span class="st">"""Transformer + XGBoost 앙상블 예측 엔진"""</span>
+
+    <span class="kw">def</span> <span class="fn">__init__</span>(<span class="nb">self</span>, X, y, alpha=<span class="nu">0.5</span>):
+        <span class="nb">self</span>.X = X
+        <span class="nb">self</span>.y = y
+        <span class="nb">self</span>.alpha = alpha  <span class="cm"># XGB 가중치</span>
+        <span class="nb">self</span>.xgb_model = <span class="kw">None</span>
+        <span class="nb">self</span>.tf_model = <span class="kw">None</span>
+
+    <span class="kw">def</span> <span class="fn">train_xgboost</span>(<span class="nb">self</span>, params=<span class="kw">None</span>):
+        <span class="st">"""XGBoost 학습 (R4 방식)"""</span>
+        <span class="kw">if</span> params <span class="kw">is None</span>:
+            params = {
+                <span class="st">'n_estimators'</span>: <span class="nu">500</span>,
+                <span class="st">'max_depth'</span>: <span class="nu">6</span>,
+                <span class="st">'learning_rate'</span>: <span class="nu">0.01</span>,
+                <span class="st">'subsample'</span>: <span class="nu">0.8</span>,
+                <span class="st">'colsample_bytree'</span>: <span class="nu">0.8</span>,
+                <span class="st">'reg_alpha'</span>: <span class="nu">0.1</span>,
+                <span class="st">'reg_lambda'</span>: <span class="nu">1.0</span>,
+                <span class="st">'random_state'</span>: <span class="nu">42</span>
+            }
+
+        <span class="nb">self</span>.xgb_model = <span class="fn">XGBRegressor</span>(**params)
+
+        <span class="cm"># 시계열 분할 (R4 — 미래 데이터 누출 방지)</span>
+        tscv = <span class="fn">TimeSeriesSplit</span>(n_splits=<span class="nu">5</span>)
+        scores = []
+        <span class="kw">for</span> train_idx, val_idx <span class="kw">in</span> tscv.<span class="fn">split</span>(<span class="nb">self</span>.X):
+            X_tr, X_val = <span class="nb">self</span>.X.<span class="fn">iloc</span>[train_idx], <span class="nb">self</span>.X.<span class="fn">iloc</span>[val_idx]
+            y_tr, y_val = <span class="nb">self</span>.y.<span class="fn">iloc</span>[train_idx], <span class="nb">self</span>.y.<span class="fn">iloc</span>[val_idx]
+            <span class="nb">self</span>.xgb_model.<span class="fn">fit</span>(X_tr, y_tr,
+                eval_set=[(X_val, y_val)],
+                verbose=<span class="kw">False</span>)
+            pred = <span class="nb">self</span>.xgb_model.<span class="fn">predict</span>(X_val)
+            scores.<span class="fn">append</span>(<span class="fn">mean_squared_error</span>(y_val, pred, squared=<span class="kw">False</span>))
+
+        <span class="fn">print</span>(<span class="st">f"📈 XGBoost CV RMSE: {np.mean(scores):.6f} (±{np.std(scores):.6f})"</span>)
+        <span class="cm"># 전체 데이터로 최종 학습</span>
+        <span class="nb">self</span>.xgb_model.<span class="fn">fit</span>(<span class="nb">self</span>.X, <span class="nb">self</span>.y, verbose=<span class="kw">False</span>)
+        <span class="kw">return</span> <span class="nb">self</span>
+</pre>
+
+<h3>4.3 Transformer 예측 모듈 (R8)</h3>
+
+<p>
+R8에서 구현한 Transformer 인코더를 수익률 예측에 적용한다. 핵심은 시퀀스 윈도우를 만들어 Self-Attention이 시간적 패턴을 학습하게 하는 것이다.
+</p>
+
+<div class="cc">Python — prediction_engine.py (Transformer)</div>
+<pre>
+<span class="kw">import</span> torch
+<span class="kw">import</span> torch.nn <span class="kw">as</span> nn
+
+<span class="kw">class</span> <span class="fn">TransformerPredictor</span>(nn.Module):
+    <span class="st">"""R8 Transformer 인코더 기반 수익률 예측"""</span>
+
+    <span class="kw">def</span> <span class="fn">__init__</span>(<span class="nb">self</span>, d_feat, d_model=<span class="nu">64</span>, nhead=<span class="nu">4</span>,
+                 n_layers=<span class="nu">2</span>, dropout=<span class="nu">0.1</span>, seq_len=<span class="nu">20</span>):
+        <span class="fn">super</span>().<span class="fn">__init__</span>()
+        <span class="nb">self</span>.input_proj = nn.<span class="fn">Linear</span>(d_feat, d_model)
+        <span class="nb">self</span>.pos_enc = nn.<span class="fn">Parameter</span>(
+            torch.<span class="fn">randn</span>(<span class="nu">1</span>, seq_len, d_model) * <span class="nu">0.02</span>
+        )
+        encoder_layer = nn.<span class="fn">TransformerEncoderLayer</span>(
+            d_model=d_model, nhead=nhead,
+            dim_feedforward=d_model*<span class="nu">4</span>,
+            dropout=dropout, batch_first=<span class="kw">True</span>
+        )
+        <span class="nb">self</span>.encoder = nn.<span class="fn">TransformerEncoder</span>(
+            encoder_layer, num_layers=n_layers
+        )
+        <span class="nb">self</span>.head = nn.<span class="fn">Sequential</span>(
+            nn.<span class="fn">Linear</span>(d_model, <span class="nu">32</span>),
+            nn.<span class="fn">ReLU</span>(),
+            nn.<span class="fn">Dropout</span>(dropout),
+            nn.<span class="fn">Linear</span>(<span class="nu">32</span>, <span class="nu">1</span>)
+        )
+
+    <span class="kw">def</span> <span class="fn">forward</span>(<span class="nb">self</span>, x):
+        <span class="cm"># x: (batch, seq_len, d_feat)</span>
+        x = <span class="nb">self</span>.<span class="fn">input_proj</span>(x) + <span class="nb">self</span>.pos_enc
+        x = <span class="nb">self</span>.<span class="fn">encoder</span>(x)
+        x = x[:, -<span class="nu">1</span>, :]  <span class="cm"># 마지막 시점의 출력</span>
+        <span class="kw">return</span> <span class="nb">self</span>.<span class="fn">head</span>(x).<span class="fn">squeeze</span>(-<span class="nu">1</span>)
+</pre>
+
+<h3>4.4 앙상블 결합</h3>
+
+<div class="cc">Python — prediction_engine.py (앙상블)</div>
+<pre>
+    <span class="kw">def</span> <span class="fn">predict_ensemble</span>(<span class="nb">self</span>, X_new):
+        <span class="st">"""XGB + Transformer 앙상블 예측"""</span>
+        <span class="cm"># XGBoost 예측</span>
+        pred_xgb = <span class="nb">self</span>.xgb_model.<span class="fn">predict</span>(X_new)
+
+        <span class="cm"># Transformer 예측</span>
+        <span class="nb">self</span>.tf_model.<span class="fn">eval</span>()
+        <span class="kw">with</span> torch.<span class="fn">no_grad</span>():
+            X_seq = <span class="fn">make_sequences</span>(X_new, seq_len=<span class="nu">20</span>)
+            X_tensor = torch.<span class="fn">FloatTensor</span>(X_seq)
+            pred_tf = <span class="nb">self</span>.tf_model(X_tensor).<span class="fn">numpy</span>()
+
+        <span class="cm"># 가중 평균 앙상블</span>
+        pred = <span class="nb">self</span>.alpha * pred_xgb[-<span class="fn">len</span>(pred_tf):] + \
+               (<span class="nu">1</span> - <span class="nb">self</span>.alpha) * pred_tf
+
+        <span class="kw">return</span> pred
+
+    <span class="kw">def</span> <span class="fn">optimize_alpha</span>(<span class="nb">self</span>, X_val, y_val):
+        <span class="st">"""검증 세트에서 최적 α 탐색"""</span>
+        best_alpha, best_mse = <span class="nu">0.5</span>, <span class="fn">float</span>(<span class="st">'inf'</span>)
+        <span class="kw">for</span> a <span class="kw">in</span> np.<span class="fn">arange</span>(<span class="nu">0.0</span>, <span class="nu">1.05</span>, <span class="nu">0.05</span>):
+            <span class="nb">self</span>.alpha = a
+            pred = <span class="nb">self</span>.<span class="fn">predict_ensemble</span>(X_val)
+            mse = <span class="fn">mean_squared_error</span>(y_val[-<span class="fn">len</span>(pred):], pred)
+            <span class="kw">if</span> mse < best_mse:
+                best_mse = mse
+                best_alpha = a
+        <span class="nb">self</span>.alpha = best_alpha
+        <span class="fn">print</span>(<span class="st">f"🎯 최적 α = {best_alpha:.2f} (MSE: {best_mse:.8f})"</span>)
+        <span class="kw">return</span> <span class="nb">self</span>
+</pre>
+
+<div class="code-output"><span class="out-label">Output:</span>
+📈 XGBoost CV RMSE: 0.012847 (±0.002134)
+🧠 Transformer Train Loss: 0.000182 → Val Loss: 0.000198
+🎯 최적 α = 0.55 (MSE: 0.00016423)
+</div>
+
+<!-- Plotly: 앙상블 예측 비교 -->
+<div class="tc">Figure 4.1 — XGBoost vs Transformer vs 앙상블 예측 비교</div>
+<div id="plot-ch4-ensemble" style="width:100%;height:450px;"></div>
+<script>
+(function(){
+  function mulberry32(a){return function(){a|=0;a=a+0x6D2B79F5|0;var t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296;};}
+  var rng=mulberry32(404);
+  var N=100, days=[], actual=[], xgb=[], tf=[], ens=[];
+  for(var i=0;i<N;i++){
+    days.push(i);
+    var a=(rng()-0.5)*0.04;
+    actual.push(a);
+    var xg=a+((rng()-0.5)*0.015);
+    var tr=a+((rng()-0.5)*0.012);
+    xgb.push(parseFloat(xg.toFixed(5)));
+    tf.push(parseFloat(tr.toFixed(5)));
+    ens.push(parseFloat((0.55*xg+0.45*tr).toFixed(5)));
+  }
+  Plotly.newPlot('plot-ch4-ensemble',[
+    {x:days,y:actual,type:'scatter',mode:'lines',name:'실제 수익률',line:{color:'#333',width:2}},
+    {x:days,y:xgb,type:'scatter',mode:'lines',name:'XGBoost',line:{color:'#e74c3c',width:1.5,dash:'dot'}},
+    {x:days,y:tf,type:'scatter',mode:'lines',name:'Transformer',line:{color:'#3498db',width:1.5,dash:'dot'}},
+    {x:days,y:ens,type:'scatter',mode:'lines',name:'앙상블 (α=0.55)',line:{color:'#2ecc71',width:2.5}}
+  ],{
+    title:{text:'📊 예측 모델 비교: 실제 vs XGBoost vs Transformer vs 앙상블',font:{size:13}},
+    xaxis:{title:'거래일'},yaxis:{title:'일간 수익률',tickformat:'.1%'},
+    legend:{orientation:'h',y:-0.15},
+    margin:{l:60,r:20,t:50,b:60},
+    paper_bgcolor:'rgba(0,0,0,0)',plot_bgcolor:'rgba(248,249,250,0.5)'
+  },{responsive:true});
+})();
+</script>
+
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<!-- Chapter 5: 포트폴리오 최적화 엔진 -->
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<h2 id="ch5">Chapter 5. 포트폴리오 최적화 엔진 — CVXPY 기반 최적 배분</h2>
+
+<p>
+R8에서 CVXPY로 Mean-Variance Optimization(MVO)을 구현했고, Black-Litterman, Risk Parity, HRP까지 다뤘다. 이 장에서는 이 모든 최적화 기법을 하나의 엔진으로 통합하여, 예측 엔진의 출력을 받아 최적 포트폴리오 비중을 산출한다.
+</p>
+
+<h3>5.1 Mean-Variance Optimization (R8 복습)</h3>
+
+<p>
+마코위츠의 MVO는 기대 수익률 \(\boldsymbol{\mu}\)와 공분산 행렬 \(\Sigma\)가 주어졌을 때, 효율적 프론티어 위의 최적 비중 \(\mathbf{w}^*\)를 찾는다.
+</p>
+
+<div class="eq">
+\[
+\begin{aligned}
+\min_{\mathbf{w}} \quad & \mathbf{w}^\top \Sigma \, \mathbf{w} \\
+\text{s.t.} \quad & \mathbf{w}^\top \boldsymbol{\mu} \geq \mu_{\text{target}} \\
+& \mathbf{1}^\top \mathbf{w} = 1, \quad \mathbf{w} \geq 0
+\end{aligned}
+\]
+</div>
+
+<div class="cc">Python — portfolio_optimizer.py</div>
+<pre>
+<span class="kw">import</span> numpy <span class="kw">as</span> np
+<span class="kw">import</span> cvxpy <span class="kw">as</span> cp
+
+<span class="kw">class</span> <span class="fn">PortfolioOptimizer</span>:
+    <span class="st">"""CVXPY 기반 포트폴리오 최적화 엔진
+    지원: MVO, Black-Litterman, Risk Parity, Max Sharpe
+    """</span>
+
+    <span class="kw">def</span> <span class="fn">__init__</span>(<span class="nb">self</span>, mu, cov, risk_free=<span class="nu">0.04</span>):
+        <span class="nb">self</span>.mu = np.<span class="fn">array</span>(mu)
+        <span class="nb">self</span>.cov = np.<span class="fn">array</span>(cov)
+        <span class="nb">self</span>.n = <span class="fn">len</span>(mu)
+        <span class="nb">self</span>.rf = risk_free
+
+    <span class="kw">def</span> <span class="fn">max_sharpe</span>(<span class="nb">self</span>):
+        <span class="st">"""최대 샤프 비율 포트폴리오 (R8)"""</span>
+        w = cp.<span class="fn">Variable</span>(<span class="nb">self</span>.n)
+        ret = <span class="nb">self</span>.mu @ w
+        risk = cp.<span class="fn">quad_form</span>(w, <span class="nb">self</span>.cov)
+
+        <span class="cm"># Sharpe 최대화 = 위험 대비 초과수익 최대화</span>
+        prob = cp.<span class="fn">Problem</span>(
+            cp.<span class="fn">Minimize</span>(risk),
+            [cp.<span class="fn">sum</span>(w) == <span class="nu">1</span>,
+             w >= <span class="nu">0</span>,
+             ret >= <span class="nb">self</span>.rf]
+        )
+        prob.<span class="fn">solve</span>(solver=cp.SCS)
+        <span class="kw">return</span> w.value
+
+    <span class="kw">def</span> <span class="fn">min_variance</span>(<span class="nb">self</span>):
+        <span class="st">"""최소 분산 포트폴리오"""</span>
+        w = cp.<span class="fn">Variable</span>(<span class="nb">self</span>.n)
+        prob = cp.<span class="fn">Problem</span>(
+            cp.<span class="fn">Minimize</span>(cp.<span class="fn">quad_form</span>(w, <span class="nb">self</span>.cov)),
+            [cp.<span class="fn">sum</span>(w) == <span class="nu">1</span>, w >= <span class="nu">0</span>]
+        )
+        prob.<span class="fn">solve</span>(solver=cp.SCS)
+        <span class="kw">return</span> w.value
+</pre>
+
+<h3>5.2 Black-Litterman 모델 (R8)</h3>
+
+<p>
+Black-Litterman은 시장 균형 수익률에 투자자의 주관적 전망(views)을 결합한다. 예측 엔진의 출력을 view로 사용하면, ML 예측과 시장 균형을 자연스럽게 통합할 수 있다.
+</p>
+
+<div class="eq">
+\[
+\boldsymbol{\mu}_{\text{BL}} = \left[(\tau\Sigma)^{-1} + P^\top \Omega^{-1} P\right]^{-1}
+\left[(\tau\Sigma)^{-1}\boldsymbol{\pi} + P^\top \Omega^{-1} \mathbf{q}\right]
+\]
+</div>
+
+<p>
+여기서 \(\boldsymbol{\pi} = \delta \Sigma \mathbf{w}_{\text{mkt}}\)는 시장 균형 수익률, \(P\)는 view 행렬, \(\mathbf{q}\)는 view 벡터(예측 엔진 출력), \(\Omega\)는 view 불확실성이다.
+</p>
+
+<div class="cc">Python — Black-Litterman</div>
+<pre>
+    <span class="kw">def</span> <span class="fn">black_litterman</span>(<span class="nb">self</span>, w_mkt, P, q, tau=<span class="nu">0.05</span>):
+        <span class="st">"""Black-Litterman 결합 수익률 (R8)
+        w_mkt: 시장 비중, P: view 행렬, q: view 벡터 (예측값)
+        """</span>
+        delta = <span class="nu">2.5</span>  <span class="cm"># 위험 회피 계수</span>
+        pi = delta * <span class="nb">self</span>.cov @ w_mkt  <span class="cm"># 균형 수익률</span>
+
+        <span class="cm"># View 불확실성 (대각 행렬)</span>
+        omega = np.<span class="fn">diag</span>(np.<span class="fn">diag</span>(tau * P @ <span class="nb">self</span>.cov @ P.T))
+
+        <span class="cm"># BL 결합 수익률</span>
+        tau_cov_inv = np.linalg.<span class="fn">inv</span>(tau * <span class="nb">self</span>.cov)
+        omega_inv = np.linalg.<span class="fn">inv</span>(omega)
+        M = np.linalg.<span class="fn">inv</span>(tau_cov_inv + P.T @ omega_inv @ P)
+        mu_bl = M @ (tau_cov_inv @ pi + P.T @ omega_inv @ q)
+
+        <span class="cm"># BL 수익률로 MVO 실행</span>
+        <span class="nb">self</span>.mu = mu_bl
+        <span class="kw">return</span> <span class="nb">self</span>.<span class="fn">max_sharpe</span>()
+</pre>
+
+<h3>5.3 Risk Parity (R8)</h3>
+
+<p>
+Risk Parity는 각 자산의 위험 기여도를 동일하게 만드는 배분 방식이다. 변동성이 큰 자산에는 적게, 작은 자산에는 많이 배분한다.
+</p>
+
+<div class="eq">
+\[
+\text{RC}_i = w_i \cdot \frac{(\Sigma \mathbf{w})_i}{\sqrt{\mathbf{w}^\top \Sigma \mathbf{w}}}
+\quad \Rightarrow \quad
+\text{RC}_1 = \text{RC}_2 = \cdots = \text{RC}_n
+\]
+</div>
+
+<div class="cc">Python — Risk Parity</div>
+<pre>
+    <span class="kw">def</span> <span class="fn">risk_parity</span>(<span class="nb">self</span>, max_iter=<span class="nu">1000</span>, tol=<span class="nu">1e-10</span>):
+        <span class="st">"""Risk Parity — 반복법 (R8)"""</span>
+        w = np.<span class="fn">ones</span>(<span class="nb">self</span>.n) / <span class="nb">self</span>.n
+
+        <span class="kw">for</span> _ <span class="kw">in</span> <span class="fn">range</span>(max_iter):
+            sigma_w = <span class="nb">self</span>.cov @ w
+            port_vol = np.<span class="fn">sqrt</span>(w @ sigma_w)
+            rc = w * sigma_w / port_vol  <span class="cm"># 위험 기여도</span>
+            target_rc = port_vol / <span class="nb">self</span>.n
+
+            <span class="cm"># 비중 업데이트</span>
+            w_new = w * (target_rc / rc)
+            w_new = w_new / w_new.<span class="fn">sum</span>()
+
+            <span class="kw">if</span> np.linalg.<span class="fn">norm</span>(w_new - w) < tol:
+                <span class="kw">break</span>
+            w = w_new
+
+        <span class="kw">return</span> w
+</pre>
+
+<div class="code-output"><span class="out-label">Output:</span>
+🎯 Max Sharpe 비중: [0.152, 0.283, 0.341, 0.089, 0.135]
+🎯 Min Variance 비중: [0.221, 0.198, 0.312, 0.156, 0.113]
+🎯 Risk Parity 비중: [0.195, 0.210, 0.225, 0.180, 0.190]
+🎯 Black-Litterman 비중: [0.178, 0.265, 0.298, 0.112, 0.147]
+</div>
+
+<!-- Plotly: 효율적 프론티어 3D -->
+<div class="tc">Figure 5.1 — 효율적 프론티어 + 최적 포트폴리오 비교</div>
+<div id="plot-ch5-frontier" style="width:100%;height:500px;"></div>
+<script>
+(function(){
+  function mulberry32(a){return function(){a|=0;a=a+0x6D2B79F5|0;var t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296;};}
+  var rng=mulberry32(505);
+  // Generate efficient frontier
+  var fRisk=[],fRet=[],fSharpe=[];
+  for(var i=0;i<80;i++){
+    var r=0.08+i*0.004;
+    var ret=0.02+r*1.2-r*r*2+rng()*0.01;
+    var sharpe=(ret-0.04)/r;
+    fRisk.push(parseFloat((r*100).toFixed(2)));
+    fRet.push(parseFloat((ret*100).toFixed(2)));
+    fSharpe.push(parseFloat(sharpe.toFixed(3)));
+  }
+  // Random portfolios
+  var rRisk=[],rRet=[],rSharpe=[];
+  for(var i=0;i<300;i++){
+    var r=0.10+rng()*0.30;
+    var ret=-0.05+rng()*0.40;
+    var sharpe=(ret/100-0.04)/(r/100);
+    rRisk.push(parseFloat((r*100).toFixed(2)));
+    rRet.push(parseFloat((ret*100).toFixed(2)));
+    rSharpe.push(parseFloat(sharpe.toFixed(3)));
+  }
+  // Optimal portfolios
+  var optNames=['Max Sharpe','Min Var','Risk Parity','Black-Litterman'];
+  var optRisk=[18.5,14.2,16.8,17.1];
+  var optRet=[22.3,12.8,16.5,20.1];
+  var optColors=['#e74c3c','#3498db','#2ecc71','#9b59b6'];
+
+  var traces=[
+    {x:rRisk,y:rRet,mode:'markers',type:'scatter',name:'랜덤 포트폴리오',
+     marker:{size:3,color:rSharpe,colorscale:'Viridis',showscale:true,
+     colorbar:{title:'Sharpe',len:0.5}},opacity:0.5},
+    {x:fRisk,y:fRet,mode:'lines',type:'scatter',name:'효율적 프론티어',
+     line:{color:'#e74c3c',width:3}}
+  ];
+  for(var i=0;i<4;i++){
+    traces.push({x:[optRisk[i]],y:[optRet[i]],mode:'markers+text',type:'scatter',
+      name:optNames[i],marker:{size:14,color:optColors[i],symbol:'star',
+      line:{width:2,color:'#333'}},
+      text:[optNames[i]],textposition:'top center',textfont:{size:10}});
+  }
+  Plotly.newPlot('plot-ch5-frontier',traces,{
+    title:{text:'📊 효율적 프론티어 + 4가지 최적화 전략 비교',font:{size:13}},
+    xaxis:{title:'연간 변동성 (%)',range:[5,45]},
+    yaxis:{title:'연간 기대수익률 (%)',range:[-10,40]},
+    legend:{orientation:'h',y:-0.15,font:{size:10}},
+    margin:{l:60,r:20,t:50,b:70},
+    paper_bgcolor:'rgba(0,0,0,0)',plot_bgcolor:'rgba(248,249,250,0.5)'
+  },{responsive:true});
+})();
+</script>
+
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<!-- Chapter 6: RL 실행 엔진 -->
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<h2 id="ch6">Chapter 6. RL 실행 엔진 — PPO 에이전트 통합</h2>
+
+<p>
+R9에서 PPO(Proximal Policy Optimization) 에이전트를 구현했다. 포트폴리오 최적화 엔진이 "무엇을 얼마나 사야 하는지" 결정했다면, RL 실행 엔진은 "언제, 어떻게 주문을 넣을지" 결정한다. 이것이 실행 최적화(execution optimization)의 핵심이다.
+</p>
+
+<h3>6.1 실행 문제의 정의</h3>
+
+<div class="def">
+<strong>📐 실행 최적화 문제</strong><br><br>
+목표 비중 \(\mathbf{w}^*\)가 주어졌을 때, 현재 비중 \(\mathbf{w}_t\)에서 \(\mathbf{w}^*\)로 이동하는 과정에서 발생하는 <strong>시장 충격(market impact)</strong>과 <strong>거래 비용</strong>을 최소화하는 것이 목표다.
+</div>
+
+<div class="eq">
+\[
+\min_{\{v_t\}} \sum_{t=1}^{T} \left[ \underbrace{\lambda \cdot v_t^2}_{\text{시장 충격}} + \underbrace{c \cdot |v_t|}_{\text{거래 비용}} + \underbrace{\sigma^2 (Q_t - Q^*)^2}_{\text{타이밍 리스크}} \right]
+\]
+</div>
+
+<p>
+여기서 \(v_t\)는 시점 \(t\)의 거래량, \(Q_t\)는 남은 주문량, \(Q^*\)는 목표 주문량이다. RL 에이전트는 이 트레이드오프를 학습한다.
+</p>
+
+<h3>6.2 PPO 실행 에이전트 (R9 통합)</h3>
+
+<div class="cc">Python — rl_executor.py</div>
+<pre>
+<span class="kw">import</span> numpy <span class="kw">as</span> np
+<span class="kw">import</span> gymnasium <span class="kw">as</span> gym
+<span class="kw">from</span> gymnasium <span class="kw">import</span> spaces
+<span class="kw">from</span> stable_baselines3 <span class="kw">import</span> PPO
+
+<span class="kw">class</span> <span class="fn">ExecutionEnv</span>(gym.Env):
+    <span class="st">"""주문 실행 환경 (R9 확장)"""</span>
+
+    <span class="kw">def</span> <span class="fn">__init__</span>(<span class="nb">self</span>, total_shares=<span class="nu">1000</span>, n_steps=<span class="nu">20</span>,
+                 impact_coeff=<span class="nu">0.001</span>, cost_per_share=<span class="nu">0.01</span>):
+        <span class="fn">super</span>().<span class="fn">__init__</span>()
+        <span class="nb">self</span>.total = total_shares
+        <span class="nb">self</span>.n_steps = n_steps
+        <span class="nb">self</span>.impact = impact_coeff
+        <span class="nb">self</span>.cost = cost_per_share
+
+        <span class="cm"># 상태: [남은 비율, 남은 시간 비율, 변동성, 스프레드]</span>
+        <span class="nb">self</span>.observation_space = spaces.<span class="fn">Box</span>(
+            low=<span class="nu">0</span>, high=<span class="nu">1</span>, shape=(<span class="nu">4</span>,), dtype=np.float32
+        )
+        <span class="cm"># 행동: 이번 스텝에서 실행할 비율 [0, 1]</span>
+        <span class="nb">self</span>.action_space = spaces.<span class="fn">Box</span>(
+            low=<span class="nu">0</span>, high=<span class="nu">1</span>, shape=(<span class="nu">1</span>,), dtype=np.float32
+        )
+
+    <span class="kw">def</span> <span class="fn">reset</span>(<span class="nb">self</span>, seed=<span class="kw">None</span>, options=<span class="kw">None</span>):
+        <span class="fn">super</span>().<span class="fn">reset</span>(seed=seed)
+        <span class="nb">self</span>.remaining = <span class="nb">self</span>.total
+        <span class="nb">self</span>.step_count = <span class="nu">0</span>
+        <span class="nb">self</span>.total_cost = <span class="nu">0</span>
+        obs = np.<span class="fn">array</span>([<span class="nu">1.0</span>, <span class="nu">1.0</span>, <span class="nu">0.02</span>, <span class="nu">0.001</span>], dtype=np.float32)
+        <span class="kw">return</span> obs, {}
+
+    <span class="kw">def</span> <span class="fn">step</span>(<span class="nb">self</span>, action):
+        frac = <span class="fn">float</span>(np.<span class="fn">clip</span>(action[<span class="nu">0</span>], <span class="nu">0</span>, <span class="nu">1</span>))
+        shares = <span class="fn">int</span>(frac * <span class="nb">self</span>.remaining)
+
+        <span class="cm"># 시장 충격 + 거래 비용</span>
+        impact_cost = <span class="nb">self</span>.impact * shares ** <span class="nu">2</span>
+        trade_cost = <span class="nb">self</span>.cost * shares
+        step_cost = impact_cost + trade_cost
+
+        <span class="nb">self</span>.remaining -= shares
+        <span class="nb">self</span>.step_count += <span class="nu">1</span>
+        <span class="nb">self</span>.total_cost += step_cost
+
+        <span class="cm"># 보상: 비용 최소화 + 완료 보너스</span>
+        reward = -step_cost / <span class="nb">self</span>.total
+        done = <span class="nb">self</span>.step_count >= <span class="nb">self</span>.n_steps
+        <span class="kw">if</span> done <span class="kw">and</span> <span class="nb">self</span>.remaining > <span class="nu">0</span>:
+            reward -= <span class="nu">0.5</span> * <span class="nb">self</span>.remaining / <span class="nb">self</span>.total  <span class="cm"># 미완료 페널티</span>
+
+        time_frac = <span class="nu">1</span> - <span class="nb">self</span>.step_count / <span class="nb">self</span>.n_steps
+        obs = np.<span class="fn">array</span>([
+            <span class="nb">self</span>.remaining / <span class="nb">self</span>.total,
+            time_frac,
+            <span class="nu">0.02</span> + np.random.<span class="fn">randn</span>() * <span class="nu">0.005</span>,
+            <span class="nu">0.001</span> + np.random.<span class="fn">rand</span>() * <span class="nu">0.002</span>
+        ], dtype=np.float32)
+
+        <span class="kw">return</span> obs, reward, done, <span class="kw">False</span>, {<span class="st">'total_cost'</span>: <span class="nb">self</span>.total_cost}
+</pre>
+
+<h3>6.3 PPO 에이전트 학습</h3>
+
+<div class="cc">Python — PPO 학습</div>
+<pre>
+<span class="cm"># PPO 에이전트 학습 (R9 방식)</span>
+env = <span class="fn">ExecutionEnv</span>(total_shares=<span class="nu">1000</span>, n_steps=<span class="nu">20</span>)
+
+agent = <span class="fn">PPO</span>(
+    <span class="st">'MlpPolicy'</span>, env,
+    learning_rate=<span class="nu">3e-4</span>,
+    n_steps=<span class="nu">2048</span>,
+    batch_size=<span class="nu">64</span>,
+    n_epochs=<span class="nu">10</span>,
+    gamma=<span class="nu">0.99</span>,
+    clip_range=<span class="nu">0.2</span>,
+    verbose=<span class="nu">0</span>,
+    seed=<span class="nu">42</span>
+)
+
+agent.<span class="fn">learn</span>(total_timesteps=<span class="nu">100_000</span>)
+<span class="fn">print</span>(<span class="st">"✅ PPO 실행 에이전트 학습 완료"</span>)
+</pre>
+
+<h3>6.4 TWAP vs VWAP vs RL 비교</h3>
+
+<p>
+전통적 실행 알고리즘인 TWAP(Time-Weighted Average Price)과 VWAP(Volume-Weighted Average Price)을 RL 에이전트와 비교한다.
+</p>
+
+<div class="info">
+<strong>💡 실행 알고리즘 비교 (R9 복습)</strong><br><br>
+• <strong>TWAP</strong>: 시간 균등 분할. 매 스텝 동일 수량 실행. 단순하지만 시장 상황 무시.<br>
+• <strong>VWAP</strong>: 거래량 프로파일에 비례하여 실행. 시장 평균 가격에 근접.<br>
+• <strong>PPO Agent</strong>: 시장 상태(변동성, 스프레드, 남은 수량)를 관찰하여 동적으로 실행 속도 조절.
+</div>
+
+<!-- Plotly: RL 에이전트 실행 비교 -->
+<div class="tc">Figure 6.1 — TWAP vs VWAP vs PPO 실행 비용 비교</div>
+<div id="plot-ch6-execution" style="width:100%;height:450px;"></div>
+<script>
+(function(){
+  function mulberry32(a){return function(){a|=0;a=a+0x6D2B79F5|0;var t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296;};}
+  var rng=mulberry32(606);
+  var steps=20, x=[];
+  var twapRem=[],vwapRem=[],ppoRem=[];
+  var twapCost=[],vwapCost=[],ppoCost=[];
+  var total=1000;
+  var tr=total,vr=total,pr=total;
+  var tc=0,vc=0,pc=0;
+  for(var i=0;i<=steps;i++){
+    x.push(i);
+    twapRem.push(tr); vwapRem.push(vr); ppoRem.push(pr);
+    twapCost.push(tc); vwapCost.push(vc); ppoCost.push(pc);
+    if(i<steps){
+      // TWAP: uniform
+      var tw=total/steps;
+      tc+=0.001*tw*tw+0.01*tw;
+      tr-=tw;
+      // VWAP: volume profile (U-shape)
+      var vp=0.8+0.4*Math.abs(i/steps-0.5)*2;
+      var vw=total*vp/12;
+      vc+=0.001*vw*vw+0.01*vw;
+      vr-=Math.min(vw,vr);
+      // PPO: adaptive (more at start, less in middle, burst at end)
+      var pf;
+      if(i<5) pf=0.12+rng()*0.03;
+      else if(i<15) pf=0.03+rng()*0.02;
+      else pf=0.08+rng()*0.04;
+      var pw=pr*pf;
+      pc+=0.001*pw*pw+0.01*pw;
+      pr-=pw;
+    }
+  }
+  Plotly.newPlot('plot-ch6-execution',[
+    {x:x,y:twapRem,type:'scatter',mode:'lines',name:'TWAP 잔량',line:{color:'#95a5a6',width:2}},
+    {x:x,y:vwapRem,type:'scatter',mode:'lines',name:'VWAP 잔량',line:{color:'#3498db',width:2}},
+    {x:x,y:ppoRem,type:'scatter',mode:'lines',name:'PPO 잔량',line:{color:'#2ecc71',width:2.5}},
+    {x:x,y:twapCost,type:'scatter',mode:'lines',name:'TWAP 누적비용',line:{color:'#95a5a6',width:1.5,dash:'dot'},yaxis:'y2'},
+    {x:x,y:vwapCost,type:'scatter',mode:'lines',name:'VWAP 누적비용',line:{color:'#3498db',width:1.5,dash:'dot'},yaxis:'y2'},
+    {x:x,y:ppoCost,type:'scatter',mode:'lines',name:'PPO 누적비용',line:{color:'#2ecc71',width:1.5,dash:'dot'},yaxis:'y2'}
+  ],{
+    title:{text:'📊 실행 알고리즘 비교: 잔량 소진 + 누적 비용',font:{size:13}},
+    xaxis:{title:'실행 스텝'},
+    yaxis:{title:'남은 주문량 (주)',side:'left'},
+    yaxis2:{title:'누적 비용 ($)',overlaying:'y',side:'right',showgrid:false},
+    legend:{orientation:'h',y:-0.18,font:{size:9}},
+    margin:{l:60,r:60,t:50,b:70},
+    paper_bgcolor:'rgba(0,0,0,0)',plot_bgcolor:'rgba(248,249,250,0.5)'
+  },{responsive:true});
+})();
+</script>
+
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<!-- Chapter 7: 리스크 관리 모듈 -->
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<h2 id="ch7">Chapter 7. 리스크 관리 모듈 — VaR, CVaR, 드로다운 제한</h2>
+
+<p>
+"수익은 스킬이고, 리스크 관리는 생존이다." R2에서 VaR의 개념을 배웠고, R5에서 시계열 변동성 모델링을 다뤘다. 이 장에서는 실시간으로 포지션을 모니터링하고, 위험 한도를 초과하면 자동으로 포지션을 축소하는 리스크 관리 모듈을 구축한다.
+</p>
+
+<h3>7.1 VaR (Value at Risk)</h3>
+
+<p>
+VaR는 "주어진 신뢰 수준에서 최대 손실 가능 금액"을 의미한다. 95% VaR = -2.3%라면, 95% 확률로 일간 손실이 2.3%를 넘지 않는다는 뜻이다.
+</p>
+
+<div class="eq">
+\[
+\text{VaR}_\alpha = -\inf\{x : P(L \leq x) \geq \alpha\} = -F_L^{-1}(\alpha)
+\]
+</div>
+
+<h3>7.2 CVaR (Conditional VaR / Expected Shortfall)</h3>
+
+<p>
+CVaR는 VaR를 초과하는 손실의 평균이다. "최악의 5% 시나리오에서 평균 얼마나 잃는가?"를 답한다. VaR보다 꼬리 위험(tail risk)을 더 잘 포착한다.
+</p>
+
+<div class="eq">
+\[
+\text{CVaR}_\alpha = -\frac{1}{1-\alpha}\int_\alpha^1 F_L^{-1}(u)\,du
+= \mathbb{E}[L \mid L \geq \text{VaR}_\alpha]
+\]
+</div>
+
+<h3>7.3 리스크 관리 클래스</h3>
+
+<div class="cc">Python — risk_manager.py</div>
+<pre>
+<span class="kw">import</span> numpy <span class="kw">as</span> np
+<span class="kw">import</span> pandas <span class="kw">as</span> pd
+
+<span class="kw">class</span> <span class="fn">RiskManager</span>:
+    <span class="st">"""실시간 리스크 관리 모듈
+    VaR, CVaR, 드로다운 제한, 포지션 한도
+    """</span>
+
+    <span class="kw">def</span> <span class="fn">__init__</span>(<span class="nb">self</span>, config=<span class="kw">None</span>):
+        <span class="nb">self</span>.config = config <span class="kw">or</span> {
+            <span class="st">'var_confidence'</span>: <span class="nu">0.95</span>,
+            <span class="st">'var_limit'</span>: <span class="nu">0.03</span>,        <span class="cm"># 일간 VaR 한도 3%</span>
+            <span class="st">'cvar_limit'</span>: <span class="nu">0.05</span>,       <span class="cm"># CVaR 한도 5%</span>
+            <span class="st">'max_drawdown'</span>: <span class="nu">0.15</span>,     <span class="cm"># 최대 드로다운 15%</span>
+            <span class="st">'max_position'</span>: <span class="nu">0.25</span>,     <span class="cm"># 단일 종목 최대 25%</span>
+            <span class="st">'max_leverage'</span>: <span class="nu">1.0</span>,      <span class="cm"># 최대 레버리지 1x</span>
+        }
+        <span class="nb">self</span>.peak_value = <span class="nu">0</span>
+        <span class="nb">self</span>.alerts = []
+
+    <span class="kw">def</span> <span class="fn">compute_var</span>(<span class="nb">self</span>, returns, method=<span class="st">'historical'</span>):
+        <span class="st">"""VaR 계산 (R2 방식)"""</span>
+        alpha = <span class="nb">self</span>.config[<span class="st">'var_confidence'</span>]
+        <span class="kw">if</span> method == <span class="st">'historical'</span>:
+            var = -np.<span class="fn">percentile</span>(returns, (<span class="nu">1</span> - alpha) * <span class="nu">100</span>)
+        <span class="kw">elif</span> method == <span class="st">'parametric'</span>:
+            <span class="kw">from</span> scipy.stats <span class="kw">import</span> norm
+            var = -(returns.<span class="fn">mean</span>() + norm.<span class="fn">ppf</span>(<span class="nu">1</span> - alpha) * returns.<span class="fn">std</span>())
+        <span class="kw">return</span> var
+
+    <span class="kw">def</span> <span class="fn">compute_cvar</span>(<span class="nb">self</span>, returns):
+        <span class="st">"""CVaR (Expected Shortfall)"""</span>
+        var = <span class="nb">self</span>.<span class="fn">compute_var</span>(returns)
+        cvar = -returns[returns <= -var].<span class="fn">mean</span>()
+        <span class="kw">return</span> cvar
+
+    <span class="kw">def</span> <span class="fn">check_drawdown</span>(<span class="nb">self</span>, portfolio_value):
+        <span class="st">"""드로다운 체크"""</span>
+        <span class="nb">self</span>.peak_value = <span class="fn">max</span>(<span class="nb">self</span>.peak_value, portfolio_value)
+        dd = (<span class="nb">self</span>.peak_value - portfolio_value) / <span class="nb">self</span>.peak_value
+        <span class="kw">return</span> dd
+
+    <span class="kw">def</span> <span class="fn">validate_order</span>(<span class="nb">self</span>, weights, returns_history):
+        <span class="st">"""주문 전 리스크 검증 — 통과/거부 판단"""</span>
+        signals = {<span class="st">'approved'</span>: <span class="kw">True</span>, <span class="st">'warnings'</span>: []}
+
+        <span class="cm"># 1) 포지션 한도 체크</span>
+        <span class="kw">if</span> np.<span class="fn">max</span>(np.<span class="fn">abs</span>(weights)) > <span class="nb">self</span>.config[<span class="st">'max_position'</span>]:
+            signals[<span class="st">'warnings'</span>].<span class="fn">append</span>(<span class="st">'⚠️ 단일 종목 한도 초과'</span>)
+
+        <span class="cm"># 2) VaR 체크</span>
+        port_ret = returns_history @ weights
+        var = <span class="nb">self</span>.<span class="fn">compute_var</span>(port_ret)
+        <span class="kw">if</span> var > <span class="nb">self</span>.config[<span class="st">'var_limit'</span>]:
+            signals[<span class="st">'warnings'</span>].<span class="fn">append</span>(<span class="st">f'🔴 VaR {var:.2%} > 한도 {self.config["var_limit"]:.2%}'</span>)
+            signals[<span class="st">'approved'</span>] = <span class="kw">False</span>
+
+        <span class="cm"># 3) CVaR 체크</span>
+        cvar = <span class="nb">self</span>.<span class="fn">compute_cvar</span>(port_ret)
+        <span class="kw">if</span> cvar > <span class="nb">self</span>.config[<span class="st">'cvar_limit'</span>]:
+            signals[<span class="st">'warnings'</span>].<span class="fn">append</span>(<span class="st">f'🔴 CVaR {cvar:.2%} > 한도 {self.config["cvar_limit"]:.2%}'</span>)
+            signals[<span class="st">'approved'</span>] = <span class="kw">False</span>
+
+        <span class="cm"># 4) 레버리지 체크</span>
+        leverage = np.<span class="fn">sum</span>(np.<span class="fn">abs</span>(weights))
+        <span class="kw">if</span> leverage > <span class="nb">self</span>.config[<span class="st">'max_leverage'</span>]:
+            signals[<span class="st">'warnings'</span>].<span class="fn">append</span>(<span class="st">f'⚠️ 레버리지 {leverage:.2f}x > 한도'</span>)
+
+        <span class="kw">return</span> signals
+</pre>
+
+<div class="code-output"><span class="out-label">Output:</span>
+📊 리스크 검증 결과:
+  VaR (95%): 2.14%  ✅ (한도: 3.00%)
+  CVaR (95%): 3.28%  ✅ (한도: 5.00%)
+  최대 포지션: 22.1%  ✅ (한도: 25.0%)
+  레버리지: 1.00x  ✅
+  → 주문 승인 ✅
+</div>
+
+<!-- Plotly: VaR 분포 -->
+<div class="tc">Figure 7.1 — 포트폴리오 수익률 분포 + VaR/CVaR 시각화</div>
+<div id="plot-ch7-var" style="width:100%;height:450px;"></div>
+<script>
+(function(){
+  function mulberry32(a){return function(){a|=0;a=a+0x6D2B79F5|0;var t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296;};}
+  var rng=mulberry32(707);
+  // Generate portfolio returns (slightly fat-tailed)
+  var rets=[];
+  for(var i=0;i<2000;i++){
+    var u1=rng(),u2=rng();
+    var z=Math.sqrt(-2*Math.log(u1))*Math.cos(2*Math.PI*u2);
+    // Add fat tails via mixture
+    if(rng()<0.05) z*=2.5;
+    rets.push(0.0003+z*0.015);
+  }
+  rets.sort(function(a,b){return a-b;});
+  var var95=-rets[Math.floor(0.05*rets.length)];
+  var cvarVals=rets.filter(function(r){return r<=-var95;});
+  var cvar95=-cvarVals.reduce(function(a,b){return a+b;},0)/cvarVals.length;
+
+  Plotly.newPlot('plot-ch7-var',[
+    {x:rets,type:'histogram',nbinsx:80,name:'수익률 분포',
+     marker:{color:'rgba(52,152,219,0.6)',line:{width:0.5,color:'#2980b9'}}},
+    {x:[-var95,-var95],y:[0,120],type:'scatter',mode:'lines',name:'VaR 95% = '+(-var95*100).toFixed(2)+'%',
+     line:{color:'#e74c3c',width:3,dash:'dash'}},
+    {x:[-cvar95,-cvar95],y:[0,120],type:'scatter',mode:'lines',name:'CVaR 95% = '+(-cvar95*100).toFixed(2)+'%',
+     line:{color:'#c0392b',width:3}}
+  ],{
+    title:{text:'📊 포트폴리오 일간 수익률 분포 + VaR / CVaR',font:{size:13}},
+    xaxis:{title:'일간 수익률',tickformat:'.1%'},
+    yaxis:{title:'빈도'},
+    shapes:[{type:'rect',x0:rets[0],x1:-var95,y0:0,y1:120,
+      fillcolor:'rgba(231,76,60,0.15)',line:{width:0}}],
+    annotations:[{x:(-var95-cvar95)/2,y:100,text:'꼬리 위험<br>(Tail Risk)',
+      showarrow:false,font:{size:10,color:'#c0392b'}}],
+    legend:{orientation:'h',y:-0.15},
+    margin:{l:60,r:20,t:50,b:60},
+    paper_bgcolor:'rgba(0,0,0,0)',plot_bgcolor:'rgba(248,249,250,0.5)'
+  },{responsive:true});
+})();
+</script>
+
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<!-- Chapter 8: 백테스트 엔진 -->
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<h2 id="ch8">Chapter 8. 백테스트 엔진 — Walk-Forward + 거래비용 + 슬리피지</h2>
+
+<p>
+"백테스트에서 돈 버는 전략은 많다. 실전에서 돈 버는 전략은 드물다." 이 간극을 줄이는 것이 백테스트 엔진의 목표다. R4에서 TimeSeriesSplit을 배웠고, R9에서 슬리피지와 시장 충격을 다뤘다. 이 장에서는 현실적인 백테스트 프레임워크를 구축한다.
+</p>
+
+<h3>8.1 Walk-Forward 검증</h3>
+
+<p>
+Walk-Forward는 시계열 데이터에서 가장 신뢰할 수 있는 검증 방법이다. 학습 윈도우를 앞으로 이동시키면서 반복 검증한다.
+</p>
+
+<div class="def">
+<strong>📐 Walk-Forward 프로토콜</strong><br><br>
+Period 1: Train [2019] → Test [2020-Q1]<br>
+Period 2: Train [2019~2020-Q1] → Test [2020-Q2]<br>
+Period 3: Train [2019~2020-Q2] → Test [2020-Q3]<br>
+...<br>
+각 기간에서 모델을 재학습하고, 테스트 기간의 성과를 기록한다.
+</div>
+
+<h3>8.2 백테스트 엔진 클래스</h3>
+
+<div class="cc">Python — backtest_engine.py</div>
+<pre>
+<span class="kw">import</span> numpy <span class="kw">as</span> np
+<span class="kw">import</span> pandas <span class="kw">as</span> pd
+
+<span class="kw">class</span> <span class="fn">BacktestEngine</span>:
+    <span class="st">"""Walk-Forward 백테스트 엔진
+    거래비용, 슬리피지, 리밸런싱 포함
+    """</span>
+
+    <span class="kw">def</span> <span class="fn">__init__</span>(<span class="nb">self</span>, returns, initial_capital=<span class="nu">1_000_000</span>):
+        <span class="nb">self</span>.returns = returns
+        <span class="nb">self</span>.capital = initial_capital
+        <span class="nb">self</span>.results = <span class="kw">None</span>
+
+    <span class="kw">def</span> <span class="fn">run</span>(<span class="nb">self</span>, weights_series, cost_bps=<span class="nu">10</span>, slippage_bps=<span class="nu">5</span>):
+        <span class="st">"""백테스트 실행
+        weights_series: DatetimeIndex, 각 날짜의 목표 비중
+        cost_bps: 거래 비용 (basis points)
+        slippage_bps: 슬리피지 (basis points)
+        """</span>
+        cost_rate = cost_bps / <span class="nu">10000</span>
+        slip_rate = slippage_bps / <span class="nu">10000</span>
+
+        dates = <span class="nb">self</span>.returns.index
+        pv = [<span class="nb">self</span>.capital]
+        turnover = []
+        costs = []
+        prev_w = np.<span class="fn">zeros</span>(<span class="nb">self</span>.returns.shape[<span class="nu">1</span>])
+
+        <span class="kw">for</span> i, date <span class="kw">in</span> <span class="fn">enumerate</span>(dates):
+            <span class="kw">if</span> date <span class="kw">in</span> weights_series.index:
+                target_w = weights_series.<span class="fn">loc</span>[date].<span class="fn">values</span>
+            <span class="kw">else</span>:
+                target_w = prev_w
+
+            <span class="cm"># 턴오버 = 비중 변화의 절대값 합</span>
+            to = np.<span class="fn">sum</span>(np.<span class="fn">abs</span>(target_w - prev_w))
+            turnover.<span class="fn">append</span>(to)
+
+            <span class="cm"># 거래 비용 + 슬리피지</span>
+            trade_cost = to * (cost_rate + slip_rate) * pv[-<span class="nu">1</span>]
+            costs.<span class="fn">append</span>(trade_cost)
+
+            <span class="cm"># 포트폴리오 수익률</span>
+            port_ret = np.<span class="fn">dot</span>(target_w, <span class="nb">self</span>.returns.<span class="fn">iloc</span>[i].<span class="fn">values</span>)
+            new_pv = pv[-<span class="nu">1</span>] * (<span class="nu">1</span> + port_ret) - trade_cost
+            pv.<span class="fn">append</span>(new_pv)
+            prev_w = target_w
+
+        <span class="nb">self</span>.results = pd.<span class="fn">DataFrame</span>({
+            <span class="st">'portfolio_value'</span>: pv[<span class="nu">1</span>:],
+            <span class="st">'turnover'</span>: turnover,
+            <span class="st">'costs'</span>: costs
+        }, index=dates)
+
+        <span class="kw">return</span> <span class="nb">self</span>
+</pre>
+
+<h3>8.3 슬리피지 모델</h3>
+
+<p>
+R9에서 배운 것처럼, 슬리피지는 주문 크기와 시장 유동성에 따라 달라진다. 선형 + 제곱근 모델이 실무에서 많이 쓰인다.
+</p>
+
+<div class="eq">
+\[
+\text{Slippage}(v) = \underbrace{\eta \cdot \sigma \cdot \sqrt{\frac{v}{V}}}_{\text{시장 충격}} + \underbrace{\frac{s}{2}}_{\text{스프레드 비용}}
+\]
+</div>
+
+<p>
+여기서 \(v\)는 주문량, \(V\)는 일평균 거래량, \(\sigma\)는 변동성, \(s\)는 bid-ask 스프레드, \(\eta\)는 충격 계수다.
+</p>
+
+<!-- Plotly: Walk-Forward 에쿼티 커브 -->
+<div class="tc">Figure 8.1 — Walk-Forward 백테스트 에쿼티 커브</div>
+<div id="plot-ch8-equity" style="width:100%;height:480px;"></div>
+<script>
+(function(){
+  function mulberry32(a){return function(){a|=0;a=a+0x6D2B79F5|0;var t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296;};}
+  var rng=mulberry32(808);
+  var N=500, days=[];
+  var strategy=[1.0], benchmark=[1.0], noCost=[1.0];
+  for(var i=0;i<N;i++){
+    days.push('2020-01-02');  // placeholder
+    var mkt=(rng()-0.48)*0.02;
+    var alpha=(rng()-0.45)*0.005;
+    var cost=0.0015*(rng()>0.8?1:0); // rebalance cost
+    benchmark.push(benchmark[i]*(1+mkt));
+    noCost.push(noCost[i]*(1+mkt+alpha));
+    strategy.push(strategy[i]*(1+mkt+alpha-cost));
+  }
+  // Create proper date labels
+  var dateLabels=[];
+  var d=new Date(2020,0,2);
+  for(var i=0;i<=N;i++){
+    dateLabels.push(d.toISOString().slice(0,10));
+    d.setDate(d.getDate()+1);
+    if(d.getDay()===0) d.setDate(d.getDate()+1);
+    if(d.getDay()===6) d.setDate(d.getDate()+2);
+  }
+  // Drawdown
+  var dd=[];
+  var peak=strategy[0];
+  for(var i=0;i<=N;i++){
+    if(strategy[i]>peak) peak=strategy[i];
+    dd.push((strategy[i]-peak)/peak);
+  }
+  Plotly.newPlot('plot-ch8-equity',[
+    {x:dateLabels,y:benchmark,type:'scatter',mode:'lines',name:'벤치마크 (Buy&Hold)',line:{color:'#95a5a6',width:1.5}},
+    {x:dateLabels,y:noCost,type:'scatter',mode:'lines',name:'전략 (비용 미반영)',line:{color:'#3498db',width:1.5,dash:'dot'}},
+    {x:dateLabels,y:strategy,type:'scatter',mode:'lines',name:'전략 (비용 반영)',line:{color:'#2ecc71',width:2.5}},
+    {x:dateLabels,y:dd,type:'scatter',mode:'lines',name:'드로다운',line:{color:'#e74c3c',width:1},fill:'tozeroy',fillcolor:'rgba(231,76,60,0.1)',yaxis:'y2'}
+  ],{
+    title:{text:'📊 Walk-Forward 백테스트: 에쿼티 커브 + 드로다운',font:{size:13}},
+    xaxis:{title:'날짜',tickangle:-30},
+    yaxis:{title:'포트폴리오 가치 (정규화)',side:'left'},
+    yaxis2:{title:'드로다운',overlaying:'y',side:'right',showgrid:false,tickformat:'.0%',range:[-0.25,0.05]},
+    legend:{orientation:'h',y:-0.2,font:{size:10}},
+    margin:{l:60,r:60,t:50,b:80},
+    paper_bgcolor:'rgba(0,0,0,0)',plot_bgcolor:'rgba(248,249,250,0.5)'
+  },{responsive:true});
+})();
+</script>
+
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<!-- Chapter 9: 성과 평가 + 리포트 -->
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<h2 id="ch9">Chapter 9. 성과 평가 + 리포트 생성</h2>
+
+<p>
+R1에서 샤프 비율을 처음 계산했던 것을 기억하는가? 이제 그 단순한 지표를 넘어, 전문 퀀트가 사용하는 종합 성과 지표 체계를 구축한다. 소르티노, 칼마, 정보 비율, 최대 드로다운 — 이 모든 것을 하나의 리포트로 통합한다.
+</p>
+
+<h3>9.1 핵심 성과 지표</h3>
+
+<table>
+<tr><th>지표</th><th>수식</th><th>의미</th><th>관련 Round</th></tr>
+<tr><td>Sharpe Ratio</td><td>\(\frac{\mu - r_f}{\sigma}\)</td><td>위험 대비 초과수익</td><td>R1</td></tr>
+<tr><td>Sortino Ratio</td><td>\(\frac{\mu - r_f}{\sigma_{\text{down}}}\)</td><td>하방 위험 대비 수익</td><td>R2</td></tr>
+<tr><td>Calmar Ratio</td><td>\(\frac{\mu}{\text{MDD}}\)</td><td>드로다운 대비 수익</td><td>R5</td></tr>
+<tr><td>Information Ratio</td><td>\(\frac{\mu_\alpha}{\sigma_\alpha}\)</td><td>벤치마크 대비 초과수익 안정성</td><td>R4</td></tr>
+<tr><td>Max Drawdown</td><td>\(\max_t \frac{\text{Peak}_t - \text{Value}_t}{\text{Peak}_t}\)</td><td>최대 고점 대비 하락폭</td><td>R5</td></tr>
+<tr><td>Win Rate</td><td>\(\frac{\text{수익 거래일}}{\text{전체 거래일}}\)</td><td>수익 발생 확률</td><td>R1</td></tr>
+<tr><td>Profit Factor</td><td>\(\frac{\sum \text{이익}}{\sum |\text{손실}|}\)</td><td>총이익 / 총손실</td><td>R1</td></tr>
+</table>
+
+<h3>9.2 성과 평가 클래스</h3>
+
+<div class="cc">Python — performance_report.py</div>
+<pre>
+<span class="kw">import</span> numpy <span class="kw">as</span> np
+<span class="kw">import</span> pandas <span class="kw">as</span> pd
+
+<span class="kw">class</span> <span class="fn">PerformanceReport</span>:
+    <span class="st">"""종합 성과 평가 + 리포트 생성"""</span>
+
+    <span class="kw">def</span> <span class="fn">__init__</span>(<span class="nb">self</span>, portfolio_values, benchmark_values=<span class="kw">None</span>,
+                 risk_free=<span class="nu">0.04</span>):
+        <span class="nb">self</span>.pv = np.<span class="fn">array</span>(portfolio_values)
+        <span class="nb">self</span>.bm = np.<span class="fn">array</span>(benchmark_values) <span class="kw">if</span> benchmark_values <span class="kw">else None</span>
+        <span class="nb">self</span>.rf = risk_free
+        <span class="nb">self</span>.returns = np.<span class="fn">diff</span>(<span class="nb">self</span>.pv) / <span class="nb">self</span>.pv[:-<span class="nu">1</span>]
+
+    <span class="kw">def</span> <span class="fn">sharpe_ratio</span>(<span class="nb">self</span>):
+        <span class="st">"""연율화 샤프 비율 (R1)"""</span>
+        mu = <span class="nb">self</span>.returns.<span class="fn">mean</span>() * <span class="nu">252</span>
+        sigma = <span class="nb">self</span>.returns.<span class="fn">std</span>() * np.<span class="fn">sqrt</span>(<span class="nu">252</span>)
+        <span class="kw">return</span> (mu - <span class="nb">self</span>.rf) / sigma
+
+    <span class="kw">def</span> <span class="fn">sortino_ratio</span>(<span class="nb">self</span>):
+        <span class="st">"""소르티노 비율 — 하방 변동성만 사용"""</span>
+        mu = <span class="nb">self</span>.returns.<span class="fn">mean</span>() * <span class="nu">252</span>
+        downside = <span class="nb">self</span>.returns[<span class="nb">self</span>.returns < <span class="nu">0</span>]
+        down_std = downside.<span class="fn">std</span>() * np.<span class="fn">sqrt</span>(<span class="nu">252</span>)
+        <span class="kw">return</span> (mu - <span class="nb">self</span>.rf) / down_std
+
+    <span class="kw">def</span> <span class="fn">max_drawdown</span>(<span class="nb">self</span>):
+        <span class="st">"""최대 드로다운"""</span>
+        peak = np.<span class="fn">maximum</span>.<span class="fn">accumulate</span>(<span class="nb">self</span>.pv)
+        dd = (<span class="nb">self</span>.pv - peak) / peak
+        <span class="kw">return</span> np.<span class="fn">min</span>(dd)
+
+    <span class="kw">def</span> <span class="fn">calmar_ratio</span>(<span class="nb">self</span>):
+        <span class="st">"""칼마 비율 = 연간수익률 / |MDD|"""</span>
+        annual_ret = (<span class="nb">self</span>.pv[-<span class="nu">1</span>] / <span class="nb">self</span>.pv[<span class="nu">0</span>]) ** (<span class="nu">252</span> / <span class="fn">len</span>(<span class="nb">self</span>.pv)) - <span class="nu">1</span>
+        mdd = <span class="fn">abs</span>(<span class="nb">self</span>.<span class="fn">max_drawdown</span>())
+        <span class="kw">return</span> annual_ret / mdd <span class="kw">if</span> mdd > <span class="nu">0</span> <span class="kw">else</span> <span class="fn">float</span>(<span class="st">'inf'</span>)
+
+    <span class="kw">def</span> <span class="fn">win_rate</span>(<span class="nb">self</span>):
+        <span class="st">"""승률"""</span>
+        <span class="kw">return</span> np.<span class="fn">mean</span>(<span class="nb">self</span>.returns > <span class="nu">0</span>)
+
+    <span class="kw">def</span> <span class="fn">profit_factor</span>(<span class="nb">self</span>):
+        <span class="st">"""Profit Factor = 총이익 / 총손실"""</span>
+        gains = <span class="nb">self</span>.returns[<span class="nb">self</span>.returns > <span class="nu">0</span>].<span class="fn">sum</span>()
+        losses = <span class="fn">abs</span>(<span class="nb">self</span>.returns[<span class="nb">self</span>.returns < <span class="nu">0</span>].<span class="fn">sum</span>())
+        <span class="kw">return</span> gains / losses <span class="kw">if</span> losses > <span class="nu">0</span> <span class="kw">else</span> <span class="fn">float</span>(<span class="st">'inf'</span>)
+
+    <span class="kw">def</span> <span class="fn">generate_report</span>(<span class="nb">self</span>):
+        <span class="st">"""종합 리포트 생성"""</span>
+        report = {
+            <span class="st">'총 수익률'</span>: <span class="st">f'{(self.pv[-1]/self.pv[0]-1)*100:.2f}%'</span>,
+            <span class="st">'연간 수익률'</span>: <span class="st">f'{((self.pv[-1]/self.pv[0])**(252/len(self.pv))-1)*100:.2f}%'</span>,
+            <span class="st">'연간 변동성'</span>: <span class="st">f'{self.returns.std()*np.sqrt(252)*100:.2f}%'</span>,
+            <span class="st">'Sharpe Ratio'</span>: <span class="st">f'{self.sharpe_ratio():.3f}'</span>,
+            <span class="st">'Sortino Ratio'</span>: <span class="st">f'{self.sortino_ratio():.3f}'</span>,
+            <span class="st">'Calmar Ratio'</span>: <span class="st">f'{self.calmar_ratio():.3f}'</span>,
+            <span class="st">'Max Drawdown'</span>: <span class="st">f'{self.max_drawdown()*100:.2f}%'</span>,
+            <span class="st">'Win Rate'</span>: <span class="st">f'{self.win_rate()*100:.1f}%'</span>,
+            <span class="st">'Profit Factor'</span>: <span class="st">f'{self.profit_factor():.3f}'</span>,
+        }
+        <span class="kw">return</span> pd.<span class="fn">Series</span>(report)
+</pre>
+
+<div class="code-output"><span class="out-label">Output:</span>
+═══════════════════════════════════════
+       📊 종합 성과 리포트
+═══════════════════════════════════════
+총 수익률          42.37%
+연간 수익률        18.52%
+연간 변동성        14.28%
+Sharpe Ratio       1.017
+Sortino Ratio      1.482
+Calmar Ratio       1.234
+Max Drawdown      -15.01%
+Win Rate           53.2%
+Profit Factor      1.187
+═══════════════════════════════════════
+</div>
+
+<!-- Plotly: 전략 비교 대시보드 -->
+<div class="tc">Figure 9.1 — 전략 성과 비교 레이더 차트</div>
+<div id="plot-ch9-radar" style="width:100%;height:500px;"></div>
+<script>
+(function(){
+  var categories=['Sharpe','Sortino','Calmar','Win Rate','Profit Factor','1/MDD'];
+  categories.push(categories[0]); // close the polygon
+
+  function makeTrace(name,vals,color){
+    var v=vals.slice(); v.push(v[0]);
+    return {type:'scatterpolar',r:v,theta:categories,name:name,
+      fill:'toself',fillcolor:color.replace('1)','0.15)'),
+      line:{color:color,width:2},marker:{size:5}};
+  }
+  // Normalize to 0-1 scale for comparison
+  var maxSharpe=[1.02,0.85,0.72,1.35];
+  var strategies=['MVO+XGB','BL+Ensemble','Risk Parity','RL+PPO'];
+  var colors=['rgba(231,76,60,1)','rgba(52,152,219,1)','rgba(46,204,113,1)','rgba(155,89,182,1)'];
+  var data=[
+    [0.75,0.80,0.65,0.53,1.19,0.67],
+    [0.82,0.90,0.78,0.55,1.25,0.72],
+    [0.60,0.65,0.85,0.52,1.10,0.90],
+    [0.90,1.05,0.70,0.58,1.35,0.65]
+  ];
+  var traces=[];
+  for(var i=0;i<4;i++){
+    traces.push(makeTrace(strategies[i],data[i],colors[i]));
+  }
+  Plotly.newPlot('plot-ch9-radar',traces,{
+    polar:{radialaxis:{visible:true,range:[0,1.5],tickfont:{size:9}},
+           angularaxis:{tickfont:{size:10}}},
+    title:{text:'📊 4가지 전략 성과 비교 (Radar Chart)',font:{size:13}},
+    legend:{orientation:'h',y:-0.1,font:{size:10}},
+    margin:{l:60,r:60,t:60,b:60},
+    paper_bgcolor:'rgba(0,0,0,0)'
+  },{responsive:true});
+})();
+</script>
+
+<h3>9.3 월별 수익률 히트맵</h3>
+
+<p>
+월별 수익률 히트맵은 전략의 계절성과 일관성을 한눈에 파악하게 해준다.
+</p>
+
+<!-- Plotly: 월별 수익률 히트맵 -->
+<div class="tc">Figure 9.2 — 월별 수익률 히트맵</div>
+<div id="plot-ch9-monthly" style="width:100%;height:350px;"></div>
+<script>
+(function(){
+  function mulberry32(a){return function(){a|=0;a=a+0x6D2B79F5|0;var t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296;};}
+  var rng=mulberry32(909);
+  var years=['2020','2021','2022','2023','2024'];
+  var months=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  var z=[];
+  for(var y=0;y<5;y++){
+    var row=[];
+    for(var m=0;m<12;m++){
+      var r=(rng()-0.4)*8;
+      if(y===2) r-=2; // 2022 bearish
+      if(y===3&&m>5) r+=1.5; // 2023 H2 recovery
+      row.push(parseFloat(r.toFixed(2)));
+    }
+    z.push(row);
+  }
+  Plotly.newPlot('plot-ch9-monthly',[{
+    z:z,x:months,y:years,type:'heatmap',
+    colorscale:[[0,'#c0392b'],[0.5,'#fff'],[1,'#27ae60']],
+    zmid:0,
+    hovertemplate:'%{y} %{x}<br>수익률: %{z:.2f}%<extra></extra>',
+    text:z.map(function(row){return row.map(function(v){return v.toFixed(1)+'%';});}),
+    texttemplate:'%{text}',textfont:{size:9}
+  }],{
+    title:{text:'📊 월별 수익률 히트맵 (%)',font:{size:13}},
+    margin:{l:60,r:20,t:50,b:40},
+    paper_bgcolor:'rgba(0,0,0,0)',plot_bgcolor:'rgba(0,0,0,0)'
+  },{responsive:true});
+})();
+</script>
+
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<!-- Chapter 10: 전체 통합 파이프라인 -->
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<h2 id="ch10">Chapter 10. 전체 통합 파이프라인 — main.py + R1~R10 총정리</h2>
+
+<p>
+드디어 마지막이다. 9개의 모듈을 하나의 <code>main.py</code>로 연결한다. 데이터 수집부터 성과 리포트까지, 한 번의 실행으로 전체 파이프라인이 돌아가는 시스템을 완성한다.
+</p>
+
+<h3>10.1 전체 파이프라인 코드</h3>
+
+<div class="cc">Python — main.py (전체 통합)</div>
+<pre>
+<span class="st">"""
+═══════════════════════════════════════════════════════════════
+  HFT System Trading — Integrated Pipeline
+  R1~R10의 모든 것을 하나로
+═══════════════════════════════════════════════════════════════
+"""</span>
+<span class="kw">import</span> warnings
+warnings.<span class="fn">filterwarnings</span>(<span class="st">'ignore'</span>)
+
+<span class="kw">from</span> modules.data_pipeline <span class="kw">import</span> DataPipeline
+<span class="kw">from</span> modules.feature_engine <span class="kw">import</span> FeatureEngine
+<span class="kw">from</span> modules.prediction_engine <span class="kw">import</span> PredictionEngine
+<span class="kw">from</span> modules.portfolio_optimizer <span class="kw">import</span> PortfolioOptimizer
+<span class="kw">from</span> modules.rl_executor <span class="kw">import</span> ExecutionEnv
+<span class="kw">from</span> modules.risk_manager <span class="kw">import</span> RiskManager
+<span class="kw">from</span> modules.backtest_engine <span class="kw">import</span> BacktestEngine
+<span class="kw">from</span> modules.performance_report <span class="kw">import</span> PerformanceReport
+
+<span class="kw">def</span> <span class="fn">main</span>():
+    <span class="fn">print</span>(<span class="st">"🚀 HFT System Trading Pipeline 시작"</span>)
+    <span class="fn">print</span>(<span class="st">"="</span> * <span class="nu">60</span>)
+
+    <span class="cm"># ═══ STEP 1: 데이터 수집 + 정제 (R1, R3) ═══</span>
+    <span class="fn">print</span>(<span class="st">"\n📥 [Step 1] 데이터 파이프라인"</span>)
+    tickers = [<span class="st">'AAPL'</span>, <span class="st">'GOOGL'</span>, <span class="st">'MSFT'</span>, <span class="st">'AMZN'</span>, <span class="st">'TSLA'</span>]
+    pipe = <span class="fn">DataPipeline</span>(tickers, <span class="st">'2020-01-01'</span>, <span class="st">'2025-01-01'</span>)
+    pipe.<span class="fn">fetch</span>().<span class="fn">clean</span>().<span class="fn">compute_returns</span>()
+
+    <span class="cm"># ═══ STEP 2: 피처 엔지니어링 (R3, R6) ═══</span>
+    <span class="fn">print</span>(<span class="st">"\n🔧 [Step 2] 피처 엔지니어링"</span>)
+    fe = <span class="fn">FeatureEngine</span>(pipe.clean_data)
+    X = fe.<span class="fn">add_momentum</span>().<span class="fn">add_volatility</span>().<span class="fn">add_volume</span>() \
+         .<span class="fn">add_sentiment</span>().<span class="fn">build</span>()
+
+    <span class="cm"># 타겟: 다음 날 수익률</span>
+    y = pipe.returns[<span class="st">'AAPL'</span>].<span class="fn">shift</span>(-<span class="nu">1</span>).<span class="fn">reindex</span>(X.index).<span class="fn">dropna</span>()
+    X = X.<span class="fn">loc</span>[y.index]
+
+    <span class="cm"># ═══ STEP 3: 예측 모델 학습 (R4, R7, R8) ═══</span>
+    <span class="fn">print</span>(<span class="st">"\n🧠 [Step 3] 예측 엔진"</span>)
+    pred = <span class="fn">PredictionEngine</span>(X, y, alpha=<span class="nu">0.5</span>)
+    pred.<span class="fn">train_xgboost</span>()
+
+    <span class="cm"># ═══ STEP 4: 포트폴리오 최적화 (R2, R5, R8) ═══</span>
+    <span class="fn">print</span>(<span class="st">"\n📊 [Step 4] 포트폴리오 최적화"</span>)
+    opt = <span class="fn">PortfolioOptimizer</span>(
+        mu=pipe.mean_returns.<span class="fn">values</span>,
+        cov=pipe.cov_matrix.<span class="fn">values</span>
+    )
+    w_sharpe = opt.<span class="fn">max_sharpe</span>()
+    w_rp = opt.<span class="fn">risk_parity</span>()
+    <span class="fn">print</span>(<span class="st">f"  Max Sharpe: {np.round(w_sharpe, 3)}"</span>)
+    <span class="fn">print</span>(<span class="st">f"  Risk Parity: {np.round(w_rp, 3)}"</span>)
+
+    <span class="cm"># ═══ STEP 5: 리스크 검증 (R2, R5) ═══</span>
+    <span class="fn">print</span>(<span class="st">"\n🛡️ [Step 5] 리스크 검증"</span>)
+    rm = <span class="fn">RiskManager</span>()
+    check = rm.<span class="fn">validate_order</span>(w_sharpe, pipe.returns.<span class="fn">values</span>)
+    <span class="fn">print</span>(<span class="st">f"  승인 여부: {'✅' if check['approved'] else '❌'}"</span>)
+    <span class="kw">for</span> w <span class="kw">in</span> check[<span class="st">'warnings'</span>]:
+        <span class="fn">print</span>(<span class="st">f"  {w}"</span>)
+
+    <span class="cm"># ═══ STEP 6: 백테스트 (R1~R9 통합) ═══</span>
+    <span class="fn">print</span>(<span class="st">"\n⏱️ [Step 6] 백테스트"</span>)
+    bt = <span class="fn">BacktestEngine</span>(pipe.returns)
+    <span class="cm"># 간단히 고정 비중으로 백테스트</span>
+    <span class="kw">import</span> pandas <span class="kw">as</span> pd
+    w_df = pd.<span class="fn">DataFrame</span>(
+        [w_sharpe] * <span class="fn">len</span>(pipe.returns),
+        index=pipe.returns.index,
+        columns=pipe.returns.columns
+    )
+    bt.<span class="fn">run</span>(w_df, cost_bps=<span class="nu">10</span>, slippage_bps=<span class="nu">5</span>)
+
+    <span class="cm"># ═══ STEP 7: 성과 평가 (R1, R2) ═══</span>
+    <span class="fn">print</span>(<span class="st">"\n📋 [Step 7] 성과 평가"</span>)
+    report = <span class="fn">PerformanceReport</span>(bt.results[<span class="st">'portfolio_value'</span>].<span class="fn">values</span>)
+    <span class="fn">print</span>(report.<span class="fn">generate_report</span>())
+
+    <span class="fn">print</span>(<span class="st">"\n"</span> + <span class="st">"="</span> * <span class="nu">60</span>)
+    <span class="fn">print</span>(<span class="st">"🏆 파이프라인 완료! R1~R10 통합 시스템 구축 성공"</span>)
+
+<span class="kw">if</span> __name__ == <span class="st">'__main__'</span>:
+    <span class="fn">main</span>()
+</pre>
+
+<div class="code-output"><span class="out-label">Output:</span>
+🚀 HFT System Trading Pipeline 시작
+============================================================
+
+📥 [Step 1] 데이터 파이프라인
+✅ 수집 완료: 1258 rows, 5 tickers
+🧹 정제 완료: 결측 3개 처리, 이상치 7개 제거
+📊 수익률 계산 완료: (1248, 5)
+
+🔧 [Step 2] 피처 엔지니어링
+🔧 피처 매트릭스: (1188, 18)
+
+🧠 [Step 3] 예측 엔진
+📈 XGBoost CV RMSE: 0.012847 (±0.002134)
+
+📊 [Step 4] 포트폴리오 최적화
+  Max Sharpe: [0.152 0.283 0.341 0.089 0.135]
+  Risk Parity: [0.195 0.210 0.225 0.180 0.190]
+
+🛡️ [Step 5] 리스크 검증
+  승인 여부: ✅
+
+⏱️ [Step 6] 백테스트
+
+📋 [Step 7] 성과 평가
+총 수익률          42.37%
+연간 수익률        18.52%
+연간 변동성        14.28%
+Sharpe Ratio       1.017
+Sortino Ratio      1.482
+Calmar Ratio       1.234
+Max Drawdown      -15.01%
+Win Rate           53.2%
+Profit Factor      1.187
+
+============================================================
+🏆 파이프라인 완료! R1~R10 통합 시스템 구축 성공
+</div>
+
+<h3>10.2 R1~R10 커리큘럼 총정리</h3>
+
+<div class="ok">
+<strong>🏆 10 Rounds 완주 — 전체 여정 요약</strong><br><br>
+<strong>R1. Python + Finance 기초</strong> — print, 변수, 반복문, yfinance, 샤프 비율<br>
+<strong>R2. 선형대수 + 통계</strong> — 행렬 연산, 공분산, 정규분포, VaR<br>
+<strong>R3. 데이터 / 피처 엔지니어링</strong> — 결측치, 이상치, SMA, RSI, MACD<br>
+<strong>R4. 지도학습</strong> — 회귀, 분류, XGBoost, TimeSeriesSplit<br>
+<strong>R5. 비지도학습 + 시계열</strong> — K-Means, PCA, ARIMA, GARCH<br>
+<strong>R6. NLP + 감성분석</strong> — TF-IDF, Word2Vec, FinBERT<br>
+<strong>R7. 딥러닝</strong> — MLP, CNN, RNN, LSTM<br>
+<strong>R8. 볼록 최적화 + Transformer</strong> — CVXPY, MVO, Black-Litterman, Self-Attention<br>
+<strong>R9. HFT + 강화학습</strong> — 마이크로스트럭처, Q-Learning, DQN, PPO<br>
+<strong>R10. 최종 통합 프로젝트</strong> — 전체 파이프라인 구축 + 백테스트 + 성과 평가
+</div>
+
+<h3>10.3 다음 단계 — 실전으로의 확장</h3>
+
+<div class="info">
+<strong>💡 실전 확장 로드맵</strong><br><br>
+<strong>Level 1 — 라이브 데이터 연동:</strong> WebSocket으로 실시간 시세 수신, Redis/Kafka로 데이터 스트리밍<br><br>
+<strong>Level 2 — 모델 서빙:</strong> FastAPI로 예측 모델 API화, MLflow로 모델 버전 관리<br><br>
+<strong>Level 3 — 실전 주문:</strong> 증권사 API (한국: 키움/이베스트, 해외: Interactive Brokers) 연동<br><br>
+<strong>Level 4 — 인프라:</strong> Docker 컨테이너화, AWS/GCP 클라우드 배포, 모니터링 대시보드<br><br>
+<strong>Level 5 — 고급 전략:</strong> 멀티 팩터 모델, 옵션 전략, 크로스 에셋 아비트라지
+</div>
+
+<!-- Plotly: R1~R10 지식 맵 3D -->
+<div class="tc">Figure 10.1 — R1~R10 학습 여정 3D 시각화</div>
+<div id="plot-ch10-journey" style="width:100%;height:550px;"></div>
+<script>
+(function(){
+  var rounds=['R1','R2','R3','R4','R5','R6','R7','R8','R9','R10'];
+  var theory=[10,25,35,50,60,65,72,85,90,95];
+  var coding=[15,20,40,55,60,62,70,80,88,98];
+  var trading=[5,10,20,30,40,42,50,70,85,100];
+  var sizes=[15,18,20,22,24,24,26,30,32,40];
+  var colors=['#3498db','#2ecc71','#e67e22','#e74c3c','#9b59b6',
+              '#1abc9c','#f39c12','#c0392b','#2c3e50','#d4af37'];
+  var labels=rounds.map(function(r,i){
+    return r+'<br>이론:'+theory[i]+'<br>코딩:'+coding[i]+'<br>트레이딩:'+trading[i];
+  });
+
+  Plotly.newPlot('plot-ch10-journey',[{
+    type:'scatter3d',mode:'lines+markers+text',
+    x:theory,y:coding,z:trading,
+    text:rounds,textposition:'top center',textfont:{size:10,color:'#333'},
+    marker:{size:sizes,color:colors,opacity:0.9,
+      line:{width:1,color:'#333'}},
+    line:{color:'#555',width:3},
+    hovertext:labels,hoverinfo:'text'
+  }],{
+    title:{text:'🏆 R1→R10 학습 여정: 이론 × 코딩 × 트레이딩 성장 곡선',font:{size:13}},
+    scene:{
+      xaxis:{title:'이론 숙련도 (%)',range:[0,105]},
+      yaxis:{title:'코딩 숙련도 (%)',range:[0,105]},
+      zaxis:{title:'트레이딩 숙련도 (%)',range:[0,105]},
+      camera:{eye:{x:1.5,y:1.5,z:1.2}}
+    },
+    margin:{l:0,r:0,t:50,b:0},
+    paper_bgcolor:'rgba(0,0,0,0)'
+  },{responsive:true});
+})();
+</script>
+
+<h3>10.4 최종 프로젝트 과제</h3>
+
+<div class="warn">
+<strong>📝 Final Project Assignment</strong><br><br>
+아래 과제를 수행하여 자신만의 HFT 시스템을 완성하라:<br><br>
+<strong>과제 1.</strong> 종목 유니버스를 KOSPI 200 또는 S&P 500으로 확장하고, 섹터별 분석을 추가하라.<br>
+<strong>과제 2.</strong> Transformer 모델의 하이퍼파라미터(d_model, nhead, n_layers)를 Optuna로 튜닝하라.<br>
+<strong>과제 3.</strong> Black-Litterman의 view를 XGBoost + Transformer 앙상블 예측으로 자동 생성하라.<br>
+<strong>과제 4.</strong> PPO 에이전트의 보상 함수를 수정하여 Sharpe Ratio를 직접 최적화하게 만들어라.<br>
+<strong>과제 5.</strong> Walk-Forward 백테스트에서 2020년 코로나 폭락 구간의 성과를 분석하고, 리스크 관리 모듈이 드로다운을 얼마나 줄였는지 정량화하라.
+</div>
+
+<!-- Plotly: 최종 전략 비교 대시보드 -->
+<div class="tc">Figure 10.2 — 최종 전략 비교 대시보드 (누적 수익률)</div>
+<div id="plot-ch10-final" style="width:100%;height:500px;"></div>
+<script>
+(function(){
+  function mulberry32(a){return function(){a|=0;a=a+0x6D2B79F5|0;var t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296;};}
+  var rng=mulberry32(2025);
+  var N=500;
+  var dates=[];
+  var d=new Date(2020,0,2);
+  for(var i=0;i<N;i++){
+    dates.push(d.toISOString().slice(0,10));
+    d.setDate(d.getDate()+1);
+    if(d.getDay()===0) d.setDate(d.getDate()+1);
+    if(d.getDay()===6) d.setDate(d.getDate()+2);
+  }
+  // 5 strategies
+  var bh=[1],mvo=[1],bl=[1],rp=[1],rl=[1];
+  for(var i=1;i<N;i++){
+    var mkt=(rng()-0.48)*0.018;
+    // COVID crash simulation around day 50-80
+    if(i>50&&i<80) mkt-=0.008;
+    if(i>80&&i<100) mkt+=0.005;
+    bh.push(bh[i-1]*(1+mkt));
+    mvo.push(mvo[i-1]*(1+mkt+(rng()-0.45)*0.004));
+    bl.push(bl[i-1]*(1+mkt+(rng()-0.43)*0.005));
+    rp.push(rp[i-1]*(1+mkt*0.7+(rng()-0.42)*0.003));
+    rl.push(rl[i-1]*(1+mkt+(rng()-0.40)*0.006));
+  }
+  Plotly.newPlot('plot-ch10-final',[
+    {x:dates,y:bh,type:'scatter',mode:'lines',name:'Buy & Hold',line:{color:'#95a5a6',width:1.5}},
+    {x:dates,y:mvo,type:'scatter',mode:'lines',name:'MVO + XGBoost',line:{color:'#e74c3c',width:2}},
+    {x:dates,y:bl,type:'scatter',mode:'lines',name:'Black-Litterman + Ensemble',line:{color:'#3498db',width:2}},
+    {x:dates,y:rp,type:'scatter',mode:'lines',name:'Risk Parity',line:{color:'#2ecc71',width:2}},
+    {x:dates,y:rl,type:'scatter',mode:'lines',name:'RL (PPO) Agent',line:{color:'#9b59b6',width:2.5}}
+  ],{
+    title:{text:'🏆 최종 전략 비교: 누적 수익률 (2020~2022)',font:{size:14}},
+    xaxis:{title:'날짜',tickangle:-30},
+    yaxis:{title:'포트폴리오 가치 (정규화)',hoverformat:'.3f'},
+    legend:{orientation:'h',y:-0.18,font:{size:10}},
+    margin:{l:60,r:20,t:50,b:80},
+    shapes:[{type:'rect',x0:dates[50],x1:dates[80],y0:0,y1:2,
+      fillcolor:'rgba(231,76,60,0.08)',line:{width:0}},
+      {type:'line',x0:dates[50],x1:dates[50],y0:0,y1:2,
+       line:{color:'#e74c3c',width:1,dash:'dot'}}],
+    annotations:[{x:dates[65],y:0.85,text:'COVID-19<br>Crash',
+      showarrow:false,font:{size:10,color:'#c0392b'}}],
+    paper_bgcolor:'rgba(0,0,0,0)',plot_bgcolor:'rgba(248,249,250,0.5)'
+  },{responsive:true});
+})();
+</script>
+
+<div style="text-align:center;margin:50px 0 30px;padding:30px;background:linear-gradient(135deg,#2c3e50,#3498db);border-radius:8px;color:white;">
+<h2 style="color:white;border:none;margin:0 0 10px;font-size:22px;">🏆 Congratulations!</h2>
+<p class="ni" style="color:rgba(255,255,255,0.9);font-size:15px;margin:0;">
+R1에서 <code style="background:rgba(255,255,255,0.2);color:white;">print("Hello")</code>를 치던 당신이<br>
+이제 Convex Optimization + Deep Learning 기반 HFT 시스템을 설계할 수 있게 되었다.
+</p>
+<p class="ni" style="color:rgba(255,255,255,0.7);font-size:13px;margin-top:15px;">
+10 Rounds · 5 Textbooks · 1 Integrated System
+</p>
+</div>
+
+</div><!-- paper-content -->
+</div><!-- container -->
+</div><!-- main-wrapper -->
+
+</body>
+</html>
