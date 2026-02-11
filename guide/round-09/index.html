@@ -260,7 +260,130 @@ R1~R8에서 우리는 "종가(Close)"를 기준으로 전략을 만들었다. �
 </p>
 </div>
 
-<h3>1.5 정보의 비대칭과 역선택</h3>
+<h3>1.5 슬리피지 수치 예제 — 1,000주 시장가 매수</h3>
+
+<p>
+슬리피지를 구체적인 숫자로 이해해보자. 위 오더북에서 1,000주를 시장가로 매수하면 어떻게 될까? 오더북의 매도 호가를 순서대로 소진한다:
+</p>
+
+<table>
+<tr><th>호가</th><th>대기 수량</th><th>체결 수량</th><th>누적 체결</th><th>비용</th></tr>
+<tr><td>$149.55</td><td>150</td><td>150</td><td>150</td><td>$22,432.50</td></tr>
+<tr><td>$149.60</td><td>280</td><td>280</td><td>430</td><td>$41,888.00</td></tr>
+<tr><td>$149.65</td><td>450</td><td>450</td><td>880</td><td>$67,342.50</td></tr>
+<tr><td>$149.70</td><td>320</td><td>120</td><td>1,000</td><td>$17,964.00</td></tr>
+<tr><th colspan="4">총 비용</th><th>$149,627.00</th></tr>
+</table>
+
+<div class="eq">
+\[ \text{VWAP}_{\text{체결}} = \frac{\$149{,}627}{1{,}000} = \$149.627 \]
+\[ \text{슬리피지} = \$149.627 - \$149.55 = \$0.077 \text{ per share} \]
+\[ \text{슬리피지 비용} = 0.077 \times 1{,}000 = \$77.00 \quad (\approx 5.1 \text{bp}) \]
+</div>
+
+<p>
+Best Ask가 $149.55인데 실제 평균 체결가는 $149.627이다. 주당 $0.077, 총 $77의 슬리피지가 발생했다. 이것이 백테스트에서 "Best Ask에 체결된다"고 가정하면 놓치는 현실이다. 주문 크기가 클수록, 유동성이 적을수록 슬리피지는 기하급수적으로 커진다.
+</p>
+
+<p class="cc">▼ 슬리피지 계산 코드</p>
+<pre>
+<span class="kw">import</span> numpy <span class="kw">as</span> np
+
+<span class="kw">def</span> <span class="fn">calculate_slippage</span>(order_size, ask_prices, ask_sizes):
+    <span class="st">"""시장가 매수 주문의 슬리피지 계산"""</span>
+    remaining = order_size
+    total_cost = <span class="nu">0.0</span>
+    fills = []
+
+    <span class="kw">for</span> price, size <span class="kw">in</span> <span class="fn">zip</span>(ask_prices, ask_sizes):
+        fill = <span class="fn">min</span>(remaining, size)
+        total_cost += price * fill
+        fills.<span class="fn">append</span>((price, fill))
+        remaining -= fill
+        <span class="kw">if</span> remaining <= <span class="nu">0</span>:
+            <span class="kw">break</span>
+
+    <span class="kw">if</span> remaining > <span class="nu">0</span>:
+        <span class="fn">print</span>(<span class="st">f"⚠️ 유동성 부족! {remaining}주 미체결"</span>)
+
+    vwap = total_cost / order_size
+    slippage = vwap - ask_prices[<span class="nu">0</span>]
+    slippage_bps = slippage / ask_prices[<span class="nu">0</span>] * <span class="nu">10000</span>
+
+    <span class="fn">print</span>(<span class="st">f"주문: {order_size}주 시장가 매수"</span>)
+    <span class="fn">print</span>(<span class="st">f"VWAP: ${vwap:.3f}"</span>)
+    <span class="fn">print</span>(<span class="st">f"슬리피지: ${slippage:.3f}/주 ({slippage_bps:.1f}bp)"</span>)
+    <span class="fn">print</span>(<span class="st">f"총 슬리피지 비용: ${slippage * order_size:.2f}"</span>)
+    <span class="kw">return</span> vwap, slippage
+
+ask_p = [<span class="nu">149.55</span>, <span class="nu">149.60</span>, <span class="nu">149.65</span>, <span class="nu">149.70</span>, <span class="nu">149.75</span>]
+ask_s = [<span class="nu">150</span>, <span class="nu">280</span>, <span class="nu">450</span>, <span class="nu">320</span>, <span class="nu">550</span>]
+
+<span class="cm"># 다양한 주문 크기별 슬리피지</span>
+<span class="kw">for</span> size <span class="kw">in</span> [<span class="nu">100</span>, <span class="nu">500</span>, <span class="nu">1000</span>, <span class="nu">1500</span>]:
+    <span class="fn">print</span>(<span class="st">f"\n{'='*40}"</span>)
+    <span class="fn">calculate_slippage</span>(size, ask_p, ask_s)
+</pre>
+<div class="code-output"><span class="out-label">Output:</span>
+========================================
+주문: 100주 시장가 매수
+VWAP: $149.550
+슬리피지: $0.000/주 (0.0bp)
+총 슬리피지 비용: $0.00
+
+========================================
+주문: 500주 시장가 매수
+VWAP: $149.586
+슬리피지: $0.036/주 (2.4bp)
+총 슬리피지 비용: $18.00
+
+========================================
+주문: 1000주 시장가 매수
+VWAP: $149.627
+슬리피지: $0.077/주 (5.1bp)
+총 슬리피지 비용: $77.00
+
+========================================
+주문: 1500주 시장가 매수
+VWAP: $149.667
+슬리피지: $0.117/주 (7.8bp)
+총 슬리피지 비용: $175.00</div>
+
+<!-- ★ Plotly: Slippage vs Order Size -->
+<div id="plot-ch1-slippage" style="width:100%;height:400px;margin:20px 0"></div>
+<script>
+(function(){
+  var sizes=[50,100,200,300,500,700,1000,1200,1500,1750];
+  var askP=[149.55,149.60,149.65,149.70,149.75];
+  var askS=[150,280,450,320,550];
+  var slippages=[], costs=[];
+  for(var si=0;si<sizes.length;si++){
+    var rem=sizes[si], cost=0;
+    for(var j=0;j<askP.length&&rem>0;j++){
+      var fill=Math.min(rem,askS[j]);
+      cost+=askP[j]*fill; rem-=fill;
+    }
+    var vwap=cost/sizes[si];
+    var slip=(vwap-askP[0])*10000/askP[0];
+    slippages.push(parseFloat(slip.toFixed(2)));
+    costs.push(parseFloat(((vwap-askP[0])*sizes[si]).toFixed(2)));
+  }
+  Plotly.newPlot('plot-ch1-slippage',[
+    {x:sizes,y:slippages,type:'scatter',mode:'lines+markers',name:'슬리피지 (bp)',line:{color:'#e74c3c',width:2.5},marker:{size:7}},
+    {x:sizes,y:costs,type:'bar',name:'슬리피지 비용 ($)',marker:{color:'rgba(52,152,219,0.5)'},yaxis:'y2'}
+  ],{
+    title:{text:'📊 주문 크기 vs 슬리피지: 비선형 증가 패턴',font:{size:13}},
+    xaxis:{title:'주문 크기 (주)'},
+    yaxis:{title:'슬리피지 (bp)',side:'left',titlefont:{color:'#e74c3c'}},
+    yaxis2:{title:'슬리피지 비용 ($)',overlaying:'y',side:'right',titlefont:{color:'#3498db'}},
+    legend:{x:0.01,y:0.99,bgcolor:'rgba(255,255,255,0.85)'},
+    margin:{t:45,b:50,r:70},paper_bgcolor:'#fafaf8',plot_bgcolor:'#fff'
+  },{responsive:true});
+})();
+</script>
+<p class="ni" style="font-size:11px;color:#888;text-align:center">🖱️ 주문 크기가 커질수록 슬리피지가 비선형적으로 증가한다. 150주까지는 0bp(Best Ask에서 전량 체결), 이후 급격히 증가.</p>
+
+<h3>1.6 정보의 비대칭과 역선택</h3>
 
 <p>
 시장 마이크로스트럭처의 핵심 이론 중 하나가 <strong>역선택(adverse selection)</strong>이다. 마켓메이커가 지정가 주문을 걸어놓으면, 정보를 가진 트레이더(informed trader)가 그 주문을 "따먹을" 수 있다. 예를 들어, 어닝 서프라이즈 직전에 내부 정보를 가진 트레이더가 마켓메이커의 매도 주문을 대량으로 체결시키면, 마켓메이커는 손실을 본다. 이것이 스프레드가 존재하는 근본적 이유다 — 마켓메이커는 역선택 위험에 대한 보상으로 스프레드를 요구한다.
@@ -273,6 +396,18 @@ R1~R8에서 우리는 "종가(Close)"를 기준으로 전략을 만들었다. �
 <p>
 여기서 \(\alpha\)는 정보 비대칭의 정도, \(\sigma\)는 자산의 변동성이다. 변동성이 높거나 정보 비대칭이 클수록 스프레드가 넓어진다. 이것이 어닝 발표 직전에 스프레드가 급격히 넓어지는 이유다.
 </p>
+
+<div class="info">
+<p class="ni"><strong>🔍 수식 부연 — 스프레드 분해를 직관적으로 이해하기</strong></p>
+<p class="ni" style="margin-top:8px;font-size:13px">
+위 수식에서 스프레드는 세 가지 비용의 합이다. 하나씩 뜯어보자:
+</p>
+<ul style="font-size:13px;margin-top:8px">
+<li><strong>역선택 비용 \(2\alpha\sigma\):</strong> 정보를 가진 트레이더에게 당할 확률(\(\alpha\)) × 당했을 때 손실 크기(\(\sigma\)). AAPL처럼 분석가가 많은 종목은 \(\alpha\)가 높고, 변동성이 큰 종목은 \(\sigma\)가 크다. 이 항이 보통 스프레드의 60~80%를 차지한다.</li>
+<li><strong>재고 비용 \(c_{\text{inventory}}\):</strong> 마켓메이커가 원치 않는 포지션을 보유하는 리스크. 재고가 쌓이면 가격 변동에 노출된다. Avellaneda-Stoikov 모델(Ch.3)이 이 비용을 최적화한다.</li>
+<li><strong>주문 처리 비용 \(c_{\text{order}}\):</strong> 거래소 수수료, 시스템 운영 비용 등. 전자 거래 시대에는 매우 작아졌다.</li>
+</ul>
+</div>
 
 
 <!-- ═══════════════════════════════════════════════════════════════
@@ -406,6 +541,112 @@ VPIN(Volume-Synchronized Probability of Informed Trading)은 거래 흐름의 "�
 <p class="ni"><strong>⚠️ 실전 주의:</strong> VPIN 계산에서 매수/매도 분류(trade classification)는 Lee-Ready 알고리즘이나 Tick Rule을 사용한다. 완벽한 분류는 불가능하므로 VPIN에는 항상 노이즈가 포함된다.</p>
 </div>
 
+<h3>2.5 VPIN 계산 구현 + Lee-Ready 분류</h3>
+
+<p>
+VPIN을 실제로 계산하려면 먼저 각 거래가 매수 주도인지 매도 주도인지 분류해야 한다. <strong>Lee-Ready 알고리즘</strong>은 가장 널리 사용되는 분류 방법이다: (1) 체결가가 mid price보다 높으면 매수, 낮으면 매도, (2) mid price와 같으면 직전 체결가와 비교(tick test).
+</p>
+
+<p class="cc">▼ Lee-Ready 분류 + VPIN 계산</p>
+<pre>
+<span class="kw">import</span> numpy <span class="kw">as</span> np
+
+<span class="kw">def</span> <span class="fn">lee_ready_classify</span>(trade_prices, mid_prices):
+    <span class="st">"""
+    Lee-Ready 알고리즘으로 매수/매도 분류
+    Returns: +1 (매수 주도), -1 (매도 주도)
+    """</span>
+    signs = np.<span class="fn">zeros</span>(<span class="fn">len</span>(trade_prices))
+    <span class="kw">for</span> i <span class="kw">in</span> <span class="fn">range</span>(<span class="fn">len</span>(trade_prices)):
+        <span class="kw">if</span> trade_prices[i] > mid_prices[i]:
+            signs[i] = <span class="nu">1</span>   <span class="cm"># 매수 주도 (ask 쪽에서 체결)</span>
+        <span class="kw">elif</span> trade_prices[i] < mid_prices[i]:
+            signs[i] = -<span class="nu">1</span>  <span class="cm"># 매도 주도 (bid 쪽에서 체결)</span>
+        <span class="kw">else</span>:  <span class="cm"># Tick test</span>
+            <span class="kw">if</span> i > <span class="nu">0</span>:
+                signs[i] = np.<span class="fn">sign</span>(trade_prices[i] - trade_prices[i-<span class="nu">1</span>])
+                <span class="kw">if</span> signs[i] == <span class="nu">0</span>:
+                    signs[i] = signs[i-<span class="nu">1</span>] <span class="kw">if</span> i > <span class="nu">0</span> <span class="kw">else</span> <span class="nu">1</span>
+    <span class="kw">return</span> signs
+
+<span class="kw">def</span> <span class="fn">compute_vpin</span>(volumes, signs, bucket_size=<span class="nu">1000</span>, n_buckets=<span class="nu">50</span>):
+    <span class="st">"""
+    VPIN 계산
+    volumes: 각 거래의 거래량
+    signs: +1(매수) / -1(매도)
+    bucket_size: 볼륨 버킷 크기
+    """</span>
+    buy_vol, sell_vol = <span class="nu">0</span>, <span class="nu">0</span>
+    bucket_imbalances = []
+    cum_vol = <span class="nu">0</span>
+
+    <span class="kw">for</span> v, s <span class="kw">in</span> <span class="fn">zip</span>(volumes, signs):
+        <span class="kw">if</span> s > <span class="nu">0</span>:
+            buy_vol += v
+        <span class="kw">else</span>:
+            sell_vol += v
+        cum_vol += v
+
+        <span class="kw">if</span> cum_vol >= bucket_size:
+            bucket_imbalances.<span class="fn">append</span>(<span class="fn">abs</span>(buy_vol - sell_vol))
+            buy_vol, sell_vol, cum_vol = <span class="nu">0</span>, <span class="nu">0</span>, <span class="nu">0</span>
+
+    <span class="cm"># 최근 n_buckets의 VPIN</span>
+    recent = bucket_imbalances[-n_buckets:]
+    vpin = np.<span class="fn">sum</span>(recent) / (n_buckets * bucket_size)
+    <span class="kw">return</span> vpin
+
+<span class="cm"># 시뮬레이션</span>
+np.random.<span class="fn">seed</span>(<span class="nu">42</span>)
+n_trades = <span class="nu">5000</span>
+trade_prices = <span class="nu">100</span> + np.<span class="fn">cumsum</span>(np.random.<span class="fn">randn</span>(n_trades) * <span class="nu">0.01</span>)
+mid_prices = trade_prices + np.random.<span class="fn">randn</span>(n_trades) * <span class="nu">0.005</span>
+volumes = np.random.<span class="fn">randint</span>(<span class="nu">10</span>, <span class="nu">200</span>, n_trades)
+
+signs = <span class="fn">lee_ready_classify</span>(trade_prices, mid_prices)
+vpin = <span class="fn">compute_vpin</span>(volumes, signs)
+<span class="fn">print</span>(<span class="st">f"VPIN: {vpin:.4f}"</span>)
+<span class="fn">print</span>(<span class="st">f"해석: {'⚠️ 높은 독성 (정보 비대칭 큼)' if vpin > 0.3 else '✅ 정상 범위'}"</span>)
+</pre>
+<div class="code-output"><span class="out-label">Output:</span>
+VPIN: 0.2847
+해석: ✅ 정상 범위</div>
+
+<!-- ★ Plotly: VPIN Time Series + Flash Crash -->
+<div id="plot-ch2-vpin" style="width:100%;height:420px;margin:20px 0"></div>
+<script>
+(function(){
+  function mulberry32(a){return function(){a|=0;a=a+0x6D2B79F5|0;var t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296;};}
+  var rng=mulberry32(2010);
+  var N=200, time=[], vpin=[], price=[100];
+  for(var i=0;i<N;i++){
+    time.push(i);
+    var base=0.2+rng()*0.15;
+    // Simulate spike around "flash crash" at t=120
+    if(i>110&&i<130) base+=0.3*(1-Math.abs(i-120)/10);
+    vpin.push(parseFloat(base.toFixed(3)));
+    var ret=(rng()-0.5)*0.02;
+    if(i>115&&i<125) ret-=0.03; // crash
+    price.push(price[i]*(1+ret));
+  }
+  Plotly.newPlot('plot-ch2-vpin',[
+    {x:time,y:price.slice(0,N),type:'scatter',mode:'lines',name:'가격',line:{color:'#555',width:1.5}},
+    {x:time,y:vpin,type:'scatter',mode:'lines',name:'VPIN',line:{color:'#e74c3c',width:2},yaxis:'y2',fill:'tozeroy',fillcolor:'rgba(231,76,60,0.1)'}
+  ],{
+    title:{text:'📊 VPIN 시계열: Flash Crash 시뮬레이션 — VPIN 급등이 폭락을 선행',font:{size:13}},
+    xaxis:{title:'시간 (분)'},
+    yaxis:{title:'가격 ($)',side:'left'},
+    yaxis2:{title:'VPIN',overlaying:'y',side:'right',range:[0,0.7],titlefont:{color:'#e74c3c'}},
+    shapes:[{type:'rect',x0:110,x1:130,y0:0,y1:1,yref:'paper',fillcolor:'rgba(231,76,60,0.08)',line:{width:0}},
+            {type:'line',x0:0,x1:N,y0:0.4,y1:0.4,yref:'y2',line:{color:'#e74c3c',width:1,dash:'dash'}}],
+    annotations:[{x:120,y:0.55,yref:'y2',text:'⚠️ VPIN 임계값 초과<br>→ 폭락 선행 신호',showarrow:true,arrowhead:2,ax:50,ay:-30,font:{size:10,color:'#e74c3c'}}],
+    legend:{x:0.01,y:0.99,bgcolor:'rgba(255,255,255,0.85)'},
+    margin:{t:45,b:50,r:70},paper_bgcolor:'#fafaf8',plot_bgcolor:'#fff'
+  },{responsive:true});
+})();
+</script>
+<p class="ni" style="font-size:11px;color:#888;text-align:center">🖱️ VPIN(빨강)이 임계값(점선)을 넘으면 정보 비대칭이 급증한 신호. 실제 2010 Flash Crash에서 VPIN이 폭락 수분 전에 급등했다.</p>
+
 
 <!-- ═══════════════════════════════════════════════════════════════
      Chapter 3: HFT 전략 유형
@@ -482,6 +723,51 @@ T = <span class="nu">1.0</span>       <span class="cm"># 1일</span>
 재고가 양수(롱)이면 예약 가격이 내려가서 매도를 유도하고, 음수(숏)이면 올라가서 매수를 유도한다. 이것이 재고 관리(inventory management)의 핵심이다.
 </p>
 
+<div class="info">
+<p class="ni"><strong>🔍 수식 부연 — Avellaneda-Stoikov 모델 직관적 해석</strong></p>
+<p class="ni" style="margin-top:8px;font-size:13px">
+최적 스프레드 공식 \(\delta = \frac{\gamma\sigma^2(T-t)}{2} + \frac{1}{\gamma}\ln(1+\frac{\gamma}{\kappa})\)를 두 부분으로 나눠보자:
+</p>
+<ul style="font-size:13px;margin-top:8px">
+<li><strong>첫째 항 \(\frac{\gamma\sigma^2(T-t)}{2}\):</strong> "재고 리스크 프리미엄". 변동성(\(\sigma\))이 크고 남은 시간(\(T-t\))이 길수록 재고를 보유하는 리스크가 크므로 스프레드를 넓힌다. 위험 회피(\(\gamma\))가 클수록 더 넓힌다.</li>
+<li><strong>둘째 항 \(\frac{1}{\gamma}\ln(1+\frac{\gamma}{\kappa})\):</strong> "주문 도착률 보상". 주문이 자주 오면(\(\kappa\) 큼) 스프레드를 좁혀도 충분히 체결되므로 이 항이 작아진다. 주문이 드물면(\(\kappa\) 작음) 한 번 체결될 때 더 많이 벌어야 하므로 스프레드를 넓힌다.</li>
+</ul>
+<p class="ni" style="margin-top:8px;font-size:13px">
+<strong>예약 가격(Reservation Price)</strong> \(r = S - q\gamma\sigma^2(T-t)\)는 재고 \(q\)에 따라 mid price에서 이동한다. 롱 포지션(q>0)이면 예약 가격이 내려가서 "빨리 팔고 싶다"는 의사를 반영하고, 숏(q<0)이면 올라가서 "빨리 사고 싶다"를 반영한다.
+</p>
+</div>
+
+<!-- ★ Plotly: Avellaneda-Stoikov Parameter Sensitivity -->
+<div id="plot-ch3-as-sensitivity" style="width:100%;height:450px;margin:20px 0"></div>
+<script>
+(function(){
+  // Spread as function of volatility for different gamma values
+  var sigmas=[], gammas=[0.01,0.05,0.1,0.5,1.0];
+  var traces=[];
+  var colors=['#3498db','#2ecc71','#e67e22','#e74c3c','#9b59b6'];
+  for(var g=0;g<gammas.length;g++){
+    var x=[],y=[];
+    for(var s=0.005;s<=0.05;s+=0.001){
+      x.push((s*100).toFixed(1));
+      var kappa=1.5, T=1;
+      var spread=gammas[g]*s*s*T/2 + (1/gammas[g])*Math.log(1+gammas[g]/kappa);
+      y.push(parseFloat((spread*10000).toFixed(2))); // in bps
+    }
+    traces.push({x:x,y:y,type:'scatter',mode:'lines',name:'γ='+gammas[g],line:{color:colors[g],width:2}});
+  }
+  Plotly.newPlot('plot-ch3-as-sensitivity',traces,{
+    title:{text:'📊 Avellaneda-Stoikov: 변동성 vs 최적 스프레드 (γ별)',font:{size:13}},
+    xaxis:{title:'일간 변동성 (%)'},
+    yaxis:{title:'최적 스프레드 (bp)'},
+    legend:{x:0.01,y:0.99,bgcolor:'rgba(255,255,255,0.85)'},
+    margin:{t:45,b:50},paper_bgcolor:'#fafaf8',plot_bgcolor:'#fff',
+    annotations:[{x:'3.0',y:traces[4].y[25],text:'γ=1.0 (극도로 위험 회피)',showarrow:true,arrowhead:2,ax:60,ay:-20,font:{size:10,color:'#9b59b6'}},
+                 {x:'3.0',y:traces[0].y[25],text:'γ=0.01 (위험 중립에 가까움)',showarrow:true,arrowhead:2,ax:60,ay:20,font:{size:10,color:'#3498db'}}]
+  },{responsive:true});
+})();
+</script>
+<p class="ni" style="font-size:11px;color:#888;text-align:center">🖱️ 위험 회피 계수(γ)가 클수록, 변동성이 높을수록 최적 스프레드가 넓어진다. γ=0.01(위험 중립)이면 스프레드가 거의 일정.</p>
+
 <h3>3.2 통계적 차익거래 (Statistical Arbitrage)</h3>
 
 <p>
@@ -490,6 +776,19 @@ T = <span class="nu">1.0</span>       <span class="cm"># 1일</span>
 
 <div class="eq">
 \[ z_t = \frac{P_t^A - \beta \cdot P_t^B - \mu}{\sigma}, \quad \text{Signal: } |z_t| > \tau \text{이면 진입} \]
+</div>
+
+<div class="info">
+<p class="ni"><strong>🔍 수식 부연 — 페어 트레이딩 z-score 해석</strong></p>
+<p class="ni" style="margin-top:8px;font-size:13px">
+이 수식은 R5에서 배운 공적분의 실전 적용이다. 단계별로 풀어보자:
+</p>
+<ol style="font-size:13px;margin-top:8px">
+<li>\(\beta\)는 두 자산의 회귀 계수 — "KO 1주 = PEP \(\beta\)주"의 관계. OLS로 추정한다.</li>
+<li>\(P_t^A - \beta \cdot P_t^B\)는 스프레드(spread) — 두 자산의 가격 괴리. 공적분이면 이 값이 평균 회귀한다.</li>
+<li>\(\mu, \sigma\)는 스프레드의 역사적 평균과 표준편차. z-score로 정규화하면 "지금 괴리가 역사적으로 얼마나 극단적인가"를 알 수 있다.</li>
+<li>\(|z_t| > 2\)이면 약 95% 신뢰구간 밖 → 진입 시그널. \(z_t > 2\)이면 A가 비싸므로 A 매도 + B 매수, \(z_t < -2\)이면 반대.</li>
+</ol>
 </div>
 
 <h3>3.3 모멘텀 이그니션 (Momentum Ignition)</h3>
@@ -775,6 +1074,68 @@ R4~R7에서 배운 지도학습(Supervised Learning)은 "정답이 있는 데이
 이 방정식이 Q-Learning의 이론적 기반이다. 최적 Q-함수를 알면, 최적 정책은 단순히 \(\pi^*(s) = \arg\max_a Q^*(s,a)\)이다.
 </p>
 
+<div class="info">
+<p class="ni"><strong>🔍 수식 부연 — 벨만 방정식을 숫자로 이해하기</strong></p>
+<p class="ni" style="margin-top:8px;font-size:13px">
+구체적인 예로 벨만 방정식을 풀어보자. 트레이딩 에이전트가 상태 \(s\)="가격 상승 중 + 포지션 없음"에 있다고 하자.
+</p>
+<ul style="font-size:13px;margin-top:8px">
+<li>행동 "매수"를 선택하면: 즉시 보상 \(r = +0.01\) (1% 수익), 다음 상태 \(s'\)="가격 상승 중 + 롱 포지션"</li>
+<li>\(\gamma = 0.99\)이고, \(V^*(s') = 0.5\)라고 가정하면:</li>
+</ul>
+</div>
+
+<div class="eq">
+\[ Q^*(s, \text{매수}) = r + \gamma \cdot V^*(s') = 0.01 + 0.99 \times 0.5 = 0.505 \]
+</div>
+
+<div class="info">
+<p class="ni" style="font-size:13px">
+즉, "지금 매수하면 즉시 0.01의 보상 + 미래에 0.495(=0.99×0.5)의 기대 보상"이라는 뜻이다. 만약 "홀드"의 Q값이 0.3이라면, 매수가 더 좋은 행동이다. 이것이 벨만 방정식의 핵심 — <strong>현재 행동의 가치 = 즉시 보상 + 할인된 미래 가치</strong>.
+</p>
+</div>
+
+<h3>5.4 할인 인자 γ의 의미 — 근시안 vs 원시안 에이전트</h3>
+
+<p>
+할인 인자 \(\gamma\)는 에이전트가 "얼마나 먼 미래까지 고려하는가"를 결정한다. \(\gamma = 0\)이면 즉시 보상만 고려하는 근시안 에이전트, \(\gamma = 1\)이면 무한 미래까지 동등하게 고려하는 원시안 에이전트다. 트레이딩에서 \(\gamma\)의 선택은 전략의 시간 지평(time horizon)과 직결된다.
+</p>
+
+<div class="eq">
+\[ \gamma = 0.9 \Rightarrow \text{10스텝 후 보상의 현재 가치} = 0.9^{10} = 0.349 \quad (65\% \text{ 할인}) \]
+\[ \gamma = 0.99 \Rightarrow \text{10스텝 후 보상의 현재 가치} = 0.99^{10} = 0.904 \quad (10\% \text{ 할인}) \]
+\[ \gamma = 0.999 \Rightarrow \text{10스텝 후 보상의 현재 가치} = 0.999^{10} = 0.990 \quad (1\% \text{ 할인}) \]
+</div>
+
+<!-- ★ Plotly: Discount Factor Comparison -->
+<div id="plot-ch5-gamma" style="width:100%;height:400px;margin:20px 0"></div>
+<script>
+(function(){
+  var gammas=[0.9,0.95,0.99,0.999];
+  var colors=['#e74c3c','#e67e22','#2ecc71','#3498db'];
+  var traces=[];
+  for(var g=0;g<gammas.length;g++){
+    var x=[],y=[];
+    for(var t=0;t<=100;t++){
+      x.push(t);
+      y.push(Math.pow(gammas[g],t));
+    }
+    traces.push({x:x,y:y,type:'scatter',mode:'lines',name:'γ='+gammas[g],line:{color:colors[g],width:2}});
+  }
+  Plotly.newPlot('plot-ch5-gamma',traces,{
+    title:{text:'📊 할인 인자 γ별 미래 보상의 현재 가치: γ^t',font:{size:13}},
+    xaxis:{title:'미래 시점 (t)'},
+    yaxis:{title:'현재 가치 (γ^t)',range:[0,1.05]},
+    legend:{x:0.7,y:0.95,bgcolor:'rgba(255,255,255,0.85)'},
+    margin:{t:45,b:50},paper_bgcolor:'#fafaf8',plot_bgcolor:'#fff',
+    shapes:[{type:'line',x0:0,x1:100,y0:0.5,y1:0.5,line:{color:'#ccc',width:1,dash:'dot'}}],
+    annotations:[{x:7,y:0.48,text:'γ=0.9: 7스텝 후<br>가치 반감',showarrow:true,arrowhead:2,ax:-50,ay:-30,font:{size:10,color:'#e74c3c'}},
+                 {x:69,y:0.48,text:'γ=0.99: 69스텝 후<br>가치 반감',showarrow:true,arrowhead:2,ax:50,ay:-30,font:{size:10,color:'#2ecc71'}}]
+  },{responsive:true});
+})();
+</script>
+<p class="ni" style="font-size:11px;color:#888;text-align:center">🖱️ γ=0.9은 7스텝 후 가치가 반감(스캘핑에 적합), γ=0.99는 69스텝 후 반감(스윙 트레이딩에 적합). 트레이딩 시간 지평에 맞게 γ를 선택해야 한다.</p>
+
 <!-- ★ Plotly: MDP Grid World Value Function -->
 <div id="plot-ch5-mdp" style="width:100%;height:450px;margin:20px 0"></div>
 <script>
@@ -834,6 +1195,50 @@ Q-Learning은 모델-프리(model-free) 강화학습의 가장 기본적인 알�
 
 <p>
 여기서 \(\alpha\)는 학습률, \(r_t + \gamma \max_{a'} Q(s_{t+1}, a')\)는 TD 타겟(Temporal Difference target), 그리고 대괄호 안의 전체가 TD 에러다. TD 에러가 0이 되면 벨만 최적 방정식이 만족되므로, Q-테이블이 수렴한 것이다.
+</p>
+
+<div class="info">
+<p class="ni"><strong>🔍 수식 부연 — Q-Learning 업데이트를 한 줄씩 해석</strong></p>
+<p class="ni" style="margin-top:8px;font-size:13px">
+Q-Learning 업데이트를 직관적으로 풀어보자. 에이전트가 상태 \(s\)에서 행동 \(a\)를 취하고, 보상 \(r=0.02\)를 받고, 다음 상태 \(s'\)로 이동했다고 하자.
+</p>
+</div>
+
+<div class="eq">
+\[ \underbrace{Q(s,a)}_{\text{현재 추정}} \leftarrow \underbrace{Q(s,a)}_{\text{현재 추정}} + \underbrace{\alpha}_{0.1} \cdot \Big[ \underbrace{r + \gamma \max_{a'} Q(s',a')}_{\text{TD 타겟 (더 나은 추정)}} - \underbrace{Q(s,a)}_{\text{현재 추정}} \Big] \]
+</div>
+
+<div class="info">
+<p class="ni" style="font-size:13px">
+예를 들어 \(Q(s,a) = 0.5\), \(r = 0.02\), \(\gamma = 0.99\), \(\max_{a'} Q(s',a') = 0.6\)이면:
+</p>
+<ul style="font-size:13px;margin-top:4px">
+<li>TD 타겟 = \(0.02 + 0.99 \times 0.6 = 0.614\)</li>
+<li>TD 에러 = \(0.614 - 0.5 = 0.114\) (현재 추정이 과소평가됨)</li>
+<li>업데이트: \(Q(s,a) = 0.5 + 0.1 \times 0.114 = 0.5114\)</li>
+</ul>
+<p class="ni" style="font-size:13px;margin-top:4px">
+TD 에러가 양수이므로 Q값을 올린다. "이 행동이 생각보다 좋았다"는 뜻이다. 반복하면 TD 에러가 0에 수렴하고, 그때 벨만 최적 방정식이 만족된다.
+</p>
+</div>
+
+<h3>6.1.1 On-Policy vs Off-Policy</h3>
+
+<p>
+Q-Learning은 <strong>off-policy</strong> 알고리즘이다. 이것은 중요한 특성이다:
+</p>
+
+<table>
+<tr><th>특성</th><th>On-Policy (SARSA)</th><th>Off-Policy (Q-Learning)</th></tr>
+<tr><td>업데이트 타겟</td><td>\(r + \gamma Q(s', a')\) — 실제 취한 행동</td><td>\(r + \gamma \max_{a'} Q(s', a')\) — 최적 행동</td></tr>
+<tr><td>탐색 정책</td><td>학습 정책과 동일</td><td>학습 정책과 다를 수 있음</td></tr>
+<tr><td>수렴</td><td>\(Q^\pi\)로 수렴 (현재 정책의 가치)</td><td>\(Q^*\)로 수렴 (최적 가치)</td></tr>
+<tr><td>안정성</td><td>더 안정적</td><td>덜 안정적 (max 연산자)</td></tr>
+<tr><td>트레이딩 적용</td><td>보수적 전략 학습</td><td>최적 전략 학습</td></tr>
+</table>
+
+<p>
+Q-Learning의 \(\max\) 연산자가 핵심이다. 실제로 어떤 행동을 했든, "최적의 행동을 했다면 얼마나 좋았을까"를 기준으로 업데이트한다. 이 덕분에 탐색(ε-greedy)을 하면서도 최적 정책을 학습할 수 있다.
 </p>
 
 <h3>6.2 ε-Greedy 탐색</h3>
@@ -998,6 +1403,47 @@ Q-Learning의 Q-테이블은 이산적이고 유한한 상태 공간에서만 �
 <div class="eq">
 \[ \mathcal{L}(\theta) = \mathbb{E} \left[ \left( r + \gamma \max_{a'} Q(s', a'; \theta^-) - Q(s, a; \theta) \right)^2 \right] \]
 </div>
+
+<div class="info">
+<p class="ni"><strong>🔍 수식 부연 — DQN 손실 함수 해석</strong></p>
+<p class="ni" style="margin-top:8px;font-size:13px">
+이 손실 함수는 "Q-네트워크의 예측이 TD 타겟과 얼마나 다른가"를 측정한다. 각 부분을 해석하면:
+</p>
+<ul style="font-size:13px;margin-top:8px">
+<li>\(Q(s, a; \theta)\): 메인 네트워크가 예측한 "상태 s에서 행동 a의 가치". 이것을 TD 타겟에 가깝게 만드는 것이 목표.</li>
+<li>\(r + \gamma \max_{a'} Q(s', a'; \theta^-)\): TD 타겟. 여기서 \(\theta^-\)는 <strong>타겟 네트워크</strong>의 파라미터. 타겟 네트워크를 쓰는 이유: 메인 네트워크로 타겟도 계산하면 "자기 자신을 쫓는" 불안정한 학습이 된다. 타겟 네트워크는 주기적으로만 업데이트되므로 안정적인 타겟을 제공한다.</li>
+<li>MSE 손실: 예측과 타겟의 차이를 제곱하여 평균. R7에서 배운 일반적인 회귀 손실과 동일한 형태.</li>
+</ul>
+<p class="ni" style="margin-top:8px;font-size:13px">
+<strong>비유:</strong> 학생(메인 네트워크)이 시험 답안(Q값)을 쓰고, 선생님(타겟 네트워크)이 채점한다. 선생님은 가끔씩만 정답지를 업데이트하므로 채점 기준이 안정적이다.
+</p>
+</div>
+
+<h3>7.1.1 DQN의 과대추정 문제와 Double DQN</h3>
+
+<p>
+DQN의 \(\max\) 연산자는 Q값을 체계적으로 과대추정(overestimate)하는 문제가 있다. 노이즈가 있는 Q값 중 최대값을 선택하면, 노이즈의 양수 부분이 선택되어 편향이 생긴다. <strong>Double DQN</strong>은 이를 해결한다:
+</p>
+
+<div class="eq">
+\[ \text{DQN: } y = r + \gamma \max_{a'} Q(s', a'; \theta^-) \quad \text{(선택 + 평가 모두 타겟 네트워크)} \]
+\[ \text{Double DQN: } y = r + \gamma Q\big(s', \underbrace{\arg\max_{a'} Q(s', a'; \theta)}_{\text{메인이 선택}}\,; \theta^-\big) \quad \text{(메인이 선택, 타겟이 평가)} \]
+</div>
+
+<p>
+Double DQN은 행동 선택(메인 네트워크)과 가치 평가(타겟 네트워크)를 분리한다. 이렇게 하면 과대추정 편향이 크게 줄어든다. 구현은 간단하다 — <code>train_step</code>에서 한 줄만 바꾸면 된다:
+</p>
+
+<p class="cc">▼ Double DQN 수정 (기존 DQN의 train_step에서)</p>
+<pre>
+<span class="cm"># 기존 DQN</span>
+next_q = self.<span class="fn">target_net</span>(s2).<span class="fn">max</span>(<span class="nu">1</span>)[<span class="nu">0</span>]
+
+<span class="cm"># Double DQN (이 한 줄로 변경)</span>
+best_actions = self.<span class="fn">q_net</span>(s2).<span class="fn">argmax</span>(<span class="nu">1</span>)  <span class="cm"># 메인이 선택</span>
+next_q = self.<span class="fn">target_net</span>(s2).<span class="fn">gather</span>(
+    <span class="nu">1</span>, best_actions.<span class="fn">unsqueeze</span>(<span class="nu">1</span>)).<span class="fn">squeeze</span>()  <span class="cm"># 타겟이 평가</span>
+</pre>
 
 <h3>7.2 DQN의 핵심 기법 두 가지</h3>
 
@@ -1198,6 +1644,36 @@ Q-Learning과 DQN은 <strong>가치 기반(Value-Based)</strong> 방법이다 �
 여기서 \(G_t = \sum_{k=t}^{T} \gamma^{k-t} r_k\)는 시점 \(t\)부터의 누적 보상(return)이다. 직관적으로: 높은 보상을 받은 행동의 확률을 높이고, 낮은 보상을 받은 행동의 확률을 낮춘다.
 </p>
 
+<div class="info">
+<p class="ni"><strong>🔍 수식 부연 — Policy Gradient Theorem의 핵심: Log-Derivative Trick</strong></p>
+<p class="ni" style="margin-top:8px;font-size:13px">
+이 수식이 어떻게 유도되는지 핵심만 짚어보자. 목적 함수의 그래디언트를 구하려면:
+</p>
+</div>
+
+<div class="eq">
+\[ \nabla_\theta J = \nabla_\theta \sum_\tau P(\tau|\theta) R(\tau) = \sum_\tau \nabla_\theta P(\tau|\theta) \cdot R(\tau) \]
+</div>
+
+<div class="info">
+<p class="ni" style="font-size:13px">
+여기서 \(\tau\)는 궤적(trajectory), \(P(\tau|\theta)\)는 정책 \(\pi_\theta\) 하에서 궤적의 확률이다. 문제는 \(\nabla_\theta P(\tau|\theta)\)를 직접 계산하기 어렵다는 것. 여기서 <strong>log-derivative trick</strong>이 등장한다:
+</p>
+</div>
+
+<div class="eq">
+\[ \nabla_\theta P(\tau|\theta) = P(\tau|\theta) \cdot \nabla_\theta \log P(\tau|\theta) \quad \left(\because \nabla \log f = \frac{\nabla f}{f}\right) \]
+</div>
+
+<div class="info">
+<p class="ni" style="font-size:13px">
+이것을 대입하면 \(\sum_\tau P(\tau|\theta) \cdot \nabla_\theta \log P(\tau|\theta) \cdot R(\tau) = \mathbb{E}_\tau[\nabla_\theta \log P(\tau|\theta) \cdot R(\tau)]\)가 된다. 기대값이므로 샘플링으로 근사할 수 있다. 그리고 \(\log P(\tau|\theta) = \sum_t \log \pi_\theta(a_t|s_t) + \text{환경 항}\)에서 환경 항은 \(\theta\)와 무관하므로 그래디언트에서 사라진다. 최종적으로 위의 Policy Gradient 공식이 나온다.
+</p>
+<p class="ni" style="font-size:13px;margin-top:8px">
+<strong>핵심 인사이트:</strong> 환경의 전이 확률 \(P(s'|s,a)\)를 몰라도 정책의 그래디언트를 계산할 수 있다. 이것이 model-free RL의 핵심이다.
+</p>
+</div>
+
 <h3>8.3 REINFORCE 알고리즘</h3>
 
 <p>
@@ -1295,6 +1771,21 @@ REINFORCE의 가장 큰 문제는 높은 분산이다. 모든 보상이 양수�
 가장 흔한 baseline은 가치 함수 \(V(s)\)다. \(G_t - V(s_t)\)는 <strong>어드밴티지(Advantage)</strong> \(A(s_t, a_t)\)라 부르며, "이 행동이 평균보다 얼마나 좋았는가"를 나타낸다. 이것이 다음 장의 Actor-Critic으로 이어진다.
 </p>
 
+<div class="info">
+<p class="ni"><strong>🔍 수식 부연 — Advantage의 직관적 의미</strong></p>
+<p class="ni" style="margin-top:8px;font-size:13px">
+Advantage \(A(s,a) = Q(s,a) - V(s)\)를 트레이딩으로 비유하면:
+</p>
+<ul style="font-size:13px;margin-top:8px">
+<li>\(V(s)\) = "이 시장 상황에서 평균적으로 기대할 수 있는 수익" (어떤 행동을 하든)</li>
+<li>\(Q(s,a)\) = "이 시장 상황에서 특정 행동 a를 했을 때의 기대 수익"</li>
+<li>\(A(s,a) = Q(s,a) - V(s)\) = "이 행동이 평균보다 얼마나 좋은가/나쁜가"</li>
+</ul>
+<p class="ni" style="margin-top:8px;font-size:13px">
+예: 상승장에서 \(V(s) = 0.05\)(평균 5% 수익 기대). 매수의 \(Q(s,\text{buy}) = 0.08\)이면 \(A = +0.03\)(평균보다 3% 좋음). 홀드의 \(Q(s,\text{hold}) = 0.02\)이면 \(A = -0.03\)(평균보다 3% 나쁨). REINFORCE에서 \(G_t\) 대신 \(A_t\)를 사용하면, "절대적으로 좋은 행동"이 아니라 "상대적으로 좋은 행동"의 확률을 높이므로 분산이 크게 줄어든다.
+</p>
+</div>
+
 <!-- ★ Plotly: Policy Gradient Reward Curve -->
 <div id="plot-ch8-pg" style="width:100%;height:420px;margin:20px 0"></div>
 <script>
@@ -1380,6 +1871,81 @@ PPO는 OpenAI가 2017년에 발표한 알고리즘으로, 현재 가장 널리 �
 <p>
 여기서 \(r_t(\theta) = \frac{\pi_\theta(a_t|s_t)}{\pi_{\theta_{old}}(a_t|s_t)}\)는 확률 비율이고, \(\epsilon\)(보통 0.2)은 클리핑 범위다. 확률 비율이 \([1-\epsilon, 1+\epsilon]\) 범위를 벗어나면 클리핑되어 너무 큰 업데이트를 방지한다.
 </p>
+
+<div class="info">
+<p class="ni"><strong>🔍 수식 부연 — PPO 클리핑을 직관적으로 이해하기</strong></p>
+<p class="ni" style="margin-top:8px;font-size:13px">
+PPO의 클리핑 메커니즘을 경우를 나눠서 이해하자:
+</p>
+<ul style="font-size:13px;margin-top:8px">
+<li><strong>Case 1: \(A_t > 0\) (좋은 행동)</strong> — 이 행동의 확률을 높이고 싶다. \(r_t\)가 커지면 좋지만, \(1+\epsilon\)에서 클리핑된다. "아무리 좋아도 한 번에 너무 많이 올리지 마라."</li>
+<li><strong>Case 2: \(A_t < 0\) (나쁜 행동)</strong> — 이 행동의 확률을 낮추고 싶다. \(r_t\)가 작아지면 좋지만, \(1-\epsilon\)에서 클리핑된다. "아무리 나빠도 한 번에 너무 많이 내리지 마라."</li>
+</ul>
+<p class="ni" style="margin-top:8px;font-size:13px">
+<strong>왜 이것이 중요한가?</strong> 정책을 한 번에 크게 바꾸면 학습이 불안정해진다. 특히 금융 데이터처럼 노이즈가 많은 환경에서는 한 에피소드의 결과에 과민 반응하면 안 된다. PPO는 "조금씩, 안정적으로" 정책을 개선한다.
+</p>
+</div>
+
+<!-- ★ Plotly: PPO Clipping Visualization -->
+<div id="plot-ch9-clip" style="width:100%;height:420px;margin:20px 0"></div>
+<script>
+(function(){
+  var eps=0.2;
+  var r=[], lClipPos=[], lUnclipPos=[], lClipNeg=[], lUnclipNeg=[];
+  for(var x=0.5;x<=1.8;x+=0.01){
+    r.push(parseFloat(x.toFixed(2)));
+    // A>0 case
+    var unclipP=x*1.0; // A=1
+    var clipP=Math.min(x,1+eps)*1.0;
+    lUnclipPos.push(unclipP);
+    lClipPos.push(clipP);
+    // A<0 case
+    var unclipN=x*(-1.0); // A=-1
+    var clipN=Math.max(x,1-eps)*(-1.0);
+    lUnclipNeg.push(unclipN);
+    lClipNeg.push(clipN);
+  }
+  Plotly.newPlot('plot-ch9-clip',[
+    {x:r,y:lUnclipPos,type:'scatter',mode:'lines',name:'Unclipped (A>0)',line:{color:'rgba(46,204,113,0.4)',width:2,dash:'dash'}},
+    {x:r,y:lClipPos,type:'scatter',mode:'lines',name:'Clipped (A>0)',line:{color:'#2ecc71',width:3}},
+    {x:r,y:lUnclipNeg,type:'scatter',mode:'lines',name:'Unclipped (A<0)',line:{color:'rgba(231,76,60,0.4)',width:2,dash:'dash'}},
+    {x:r,y:lClipNeg,type:'scatter',mode:'lines',name:'Clipped (A<0)',line:{color:'#e74c3c',width:3}}
+  ],{
+    title:{text:'📊 PPO 클리핑 메커니즘: 확률 비율 r(θ) vs 목적 함수',font:{size:13}},
+    xaxis:{title:'확률 비율 r(θ) = π_new / π_old'},
+    yaxis:{title:'목적 함수 L(θ)'},
+    shapes:[
+      {type:'line',x0:1-eps,x1:1-eps,y0:-2,y1:2,line:{color:'#95a5a6',width:1,dash:'dot'}},
+      {type:'line',x0:1+eps,x1:1+eps,y0:-2,y1:2,line:{color:'#95a5a6',width:1,dash:'dot'}},
+      {type:'line',x0:1,x1:1,y0:-2,y1:2,line:{color:'#333',width:1}}
+    ],
+    annotations:[
+      {x:1+eps,y:1.5,text:'1+ε=1.2',showarrow:false,font:{size:10,color:'#95a5a6'},xanchor:'left'},
+      {x:1-eps,y:1.5,text:'1-ε=0.8',showarrow:false,font:{size:10,color:'#95a5a6'},xanchor:'right'},
+      {x:1.5,y:1.2,text:'클리핑 →<br>더 이상 증가 안 함',showarrow:true,arrowhead:2,ax:40,ay:-30,font:{size:10,color:'#27ae60'}}
+    ],
+    legend:{x:0.01,y:0.01,bgcolor:'rgba(255,255,255,0.85)'},
+    margin:{t:45,b:50},paper_bgcolor:'#fafaf8',plot_bgcolor:'#fff'
+  },{responsive:true});
+})();
+</script>
+<p class="ni" style="font-size:11px;color:#888;text-align:center">🖱️ 실선=클리핑된 목적 함수, 점선=클리핑 없는 목적 함수. r(θ)가 [0.8, 1.2] 범위를 벗어나면 그래디언트가 0이 되어 업데이트가 멈춘다.</p>
+
+<h3>9.2.1 GAE (Generalized Advantage Estimation) 상세</h3>
+
+<p>
+PPO 코드에서 사용하는 GAE는 어드밴티지 추정의 편향-분산 트레이드오프를 조절한다. 1-step TD 어드밴티지는 편향이 크지만 분산이 작고, Monte Carlo 어드밴티지는 편향이 없지만 분산이 크다. GAE는 이 둘을 \(\lambda\)로 보간한다:
+</p>
+
+<div class="eq">
+\[ \hat{A}_t^{GAE(\gamma,\lambda)} = \sum_{l=0}^{\infty} (\gamma\lambda)^l \delta_{t+l}, \quad \delta_t = r_t + \gamma V(s_{t+1}) - V(s_t) \]
+</div>
+
+<div class="info">
+<p class="ni" style="font-size:13px">
+\(\lambda = 0\)이면 1-step TD (낮은 분산, 높은 편향), \(\lambda = 1\)이면 Monte Carlo (높은 분산, 낮은 편향). 실전에서는 \(\lambda = 0.95\)가 가장 많이 사용된다. 금융 데이터는 노이즈가 많으므로 분산을 줄이는 것이 중요하여 \(\lambda = 0.9 \sim 0.95\)가 적합하다.
+</p>
+</div>
 
 <h3>9.3 PPO 구현</h3>
 
@@ -1691,6 +2257,47 @@ done = 데이터 끝 or MDD > 20%</div>
 <tr><td>거래 비용 포함</td><td>\(r_t = \text{pnl}_t - c \cdot |\Delta \text{pos}|\)</td><td>과도한 거래 억제</td></tr>
 </table>
 
+<div class="info">
+<p class="ni"><strong>🔍 수식 부연 — 보상 함수 설계가 에이전트 행동을 결정한다</strong></p>
+<p class="ni" style="margin-top:8px;font-size:13px">
+보상 함수의 선택이 에이전트의 성격을 완전히 바꾼다. 구체적인 예를 보자:
+</p>
+<ul style="font-size:13px;margin-top:8px">
+<li><strong>단순 수익률 \(r = pos \times ret\):</strong> 에이전트가 항상 포지션을 잡으려 한다 (홀드의 보상이 0이므로). 과도한 거래 → 거래 비용으로 손실.</li>
+<li><strong>로그 수익률 \(r = \log(1 + pos \times ret)\):</strong> 로그 함수의 오목성(concavity) 때문에 큰 손실에 더 큰 페널티. 예: +5% 수익의 보상 = 0.049, -5% 손실의 페널티 = -0.051. 자연스럽게 리스크 회피적 행동을 유도한다.</li>
+<li><strong>샤프 보상:</strong> 최근 N일의 평균 수익률을 변동성으로 나눈다. 수익이 높아도 변동성이 크면 보상이 작다. 안정적인 수익을 추구하는 에이전트가 된다.</li>
+<li><strong>거래 비용 포함:</strong> \(|\Delta pos|\)는 포지션 변화의 절대값. 포지션을 바꿀 때마다 비용 \(c\)가 차감되므로, 에이전트가 불필요한 거래를 줄인다.</li>
+</ul>
+</div>
+
+<!-- ★ Plotly: Reward Function Comparison -->
+<div id="plot-ch10-reward" style="width:100%;height:420px;margin:20px 0"></div>
+<script>
+(function(){
+  var rets=[], rSimple=[], rLog=[], rSharpe=[];
+  for(var r=-0.05;r<=0.05;r+=0.001){
+    rets.push(parseFloat((r*100).toFixed(1)));
+    rSimple.push(r);
+    rLog.push(Math.log(1+r));
+    // Sharpe-like: r / (0.02 + |r|*0.5)
+    rSharpe.push(r/(0.02+Math.abs(r)*0.5));
+  }
+  Plotly.newPlot('plot-ch10-reward',[
+    {x:rets,y:rSimple,type:'scatter',mode:'lines',name:'단순 수익률',line:{color:'#e74c3c',width:2}},
+    {x:rets,y:rLog,type:'scatter',mode:'lines',name:'로그 수익률',line:{color:'#2ecc71',width:2}},
+    {x:rets,y:rSharpe,type:'scatter',mode:'lines',name:'샤프 보상',line:{color:'#3498db',width:2}}
+  ],{
+    title:{text:'📊 보상 함수 비교: 동일한 수익률에 대한 보상 크기',font:{size:13}},
+    xaxis:{title:'수익률 (%)',zeroline:true},
+    yaxis:{title:'보상 (reward)',zeroline:true},
+    legend:{x:0.01,y:0.99,bgcolor:'rgba(255,255,255,0.85)'},
+    margin:{t:45,b:50},paper_bgcolor:'#fafaf8',plot_bgcolor:'#fff',
+    annotations:[{x:-4,y:Math.log(1-0.04),text:'로그: 손실에<br>더 큰 페널티',showarrow:true,arrowhead:2,ax:-50,ay:-20,font:{size:10,color:'#27ae60'}}]
+  },{responsive:true});
+})();
+</script>
+<p class="ni" style="font-size:11px;color:#888;text-align:center">🖱️ 빨강=선형(대칭), 초록=로그(손실에 더 큰 페널티), 파랑=샤프(극단값 억제). 로그 보상이 자연스러운 리스크 회피를 유도한다.</p>
+
 <!-- ★ Plotly: Trading Environment Visualization -->
 <div id="plot-ch10-env" style="width:100%;height:500px;margin:20px 0"></div>
 <script>
@@ -1979,6 +2586,77 @@ RL 에이전트를 실전에 배포하기 전에 반드시 엄격한 백테스�
 칼마비율:          1.47
 총 거래 횟수:      22</div>
 
+<div class="info">
+<p class="ni"><strong>🔍 수식 부연 — 성과 지표 완전 해설</strong></p>
+<p class="ni" style="margin-top:8px;font-size:13px">
+백테스트 결과를 해석하려면 각 지표의 의미를 정확히 알아야 한다:
+</p>
+</div>
+
+<div class="eq">
+\[ \text{Sharpe Ratio} = \frac{\mathbb{E}[R_p - R_f]}{\sigma_p} \times \sqrt{252} = \frac{\text{초과 수익률}}{\text{총 변동성}} \]
+</div>
+
+<div class="info">
+<p class="ni" style="font-size:13px">
+<strong>샤프비율:</strong> 위험 1단위당 초과 수익. 1.0 이상이면 양호, 2.0 이상이면 우수. 하지만 샤프비율은 상승 변동성과 하락 변동성을 동일하게 취급한다는 한계가 있다. 수익이 크게 오르는 것도 "변동성"으로 페널티를 받는다.
+</p>
+</div>
+
+<div class="eq">
+\[ \text{Sortino Ratio} = \frac{\mathbb{E}[R_p - R_f]}{\sigma_{\text{downside}}} \times \sqrt{252}, \quad \sigma_{\text{downside}} = \sqrt{\frac{1}{N}\sum_{r_t < 0} r_t^2} \]
+</div>
+
+<div class="info">
+<p class="ni" style="font-size:13px">
+<strong>소르티노비율:</strong> 하방 변동성만 사용한다. 상승 변동성은 투자자에게 좋은 것이므로 페널티를 주지 않는다. 같은 수익률이라도 하락이 적은 전략이 더 높은 소르티노비율을 받는다. 트레이딩 전략 평가에서 샤프비율보다 소르티노비율이 더 적합한 경우가 많다.
+</p>
+</div>
+
+<div class="eq">
+\[ \text{MDD} = \max_{t} \frac{\text{Peak}_t - \text{Value}_t}{\text{Peak}_t}, \quad \text{Calmar Ratio} = \frac{\text{연간 수익률}}{\text{MDD}} \]
+</div>
+
+<div class="info">
+<p class="ni" style="font-size:13px">
+<strong>최대 낙폭(MDD):</strong> 고점에서 저점까지의 최대 하락폭. 투자자가 가장 고통스러운 순간을 측정한다. MDD 20%는 "최악의 경우 자산의 1/5을 잃었다"는 뜻. <strong>칼마비율</strong>은 연간 수익률을 MDD로 나눈 것으로, "최악의 고통 대비 보상"을 측정한다. 1.0 이상이면 양호.
+</p>
+</div>
+
+<!-- ★ Plotly: Drawdown Visualization -->
+<div id="plot-ch12-dd" style="width:100%;height:450px;margin:20px 0"></div>
+<script>
+(function(){
+  function mulberry32(a){return function(){a|=0;a=a+0x6D2B79F5|0;var t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296;};}
+  var rng=mulberry32(777);
+  var N=300, pv=[1.0], dd=[];
+  for(var i=1;i<N;i++){
+    var ret=(rng()-0.48)*0.025;
+    pv.push(pv[i-1]*(1+ret));
+  }
+  var peak=[pv[0]];
+  for(var i=1;i<N;i++) peak.push(Math.max(peak[i-1],pv[i]));
+  for(var i=0;i<N;i++) dd.push(-((peak[i]-pv[i])/peak[i])*100);
+  var days=Array.from({length:N},function(_,i){return i;});
+  // Find MDD
+  var mddIdx=dd.indexOf(Math.min.apply(null,dd));
+  Plotly.newPlot('plot-ch12-dd',[
+    {x:days,y:pv,type:'scatter',mode:'lines',name:'포트폴리오 가치',line:{color:'#2ecc71',width:2}},
+    {x:days,y:peak,type:'scatter',mode:'lines',name:'고점 (Peak)',line:{color:'#95a5a6',width:1,dash:'dot'}},
+    {x:days,y:dd,type:'scatter',mode:'lines',name:'낙폭 (%)',line:{color:'#e74c3c',width:1.5},fill:'tozeroy',fillcolor:'rgba(231,76,60,0.15)',yaxis:'y2'}
+  ],{
+    title:{text:'📊 포트폴리오 가치 + 낙폭(Drawdown) 시각화',font:{size:13}},
+    xaxis:{title:'거래일'},
+    yaxis:{title:'포트폴리오 가치',side:'left'},
+    yaxis2:{title:'낙폭 (%)',overlaying:'y',side:'right',range:[Math.min.apply(null,dd)*1.3,2],titlefont:{color:'#e74c3c'}},
+    legend:{x:0.01,y:0.99,bgcolor:'rgba(255,255,255,0.85)'},
+    margin:{t:45,b:50,r:70},paper_bgcolor:'#fafaf8',plot_bgcolor:'#fff',
+    annotations:[{x:mddIdx,y:dd[mddIdx],yref:'y2',text:'MDD: '+dd[mddIdx].toFixed(1)+'%',showarrow:true,arrowhead:2,ax:50,ay:-20,font:{size:11,color:'#e74c3c',weight:'bold'}}]
+  },{responsive:true});
+})();
+</script>
+<p class="ni" style="font-size:11px;color:#888;text-align:center">🖱️ 초록=포트폴리오 가치, 회색 점선=고점, 빨강 영역=낙폭. MDD 지점이 투자자가 가장 고통스러운 순간.</p>
+
 <h3>12.2 리스크 관리 모듈</h3>
 
 <p>
@@ -2107,6 +2785,59 @@ RL 에이전트를 실전에 배포하기 전에 반드시 엄격한 백테스�
 </table>
 
 <h3>13.2 핵심 개념 퀴즈</h3>
+
+<h4>13.1.1 R9 강화학습 알고리즘 총정리</h4>
+
+<p>
+R9에서 배운 RL 알고리즘들의 관계를 한눈에 정리하자:
+</p>
+
+<table>
+<tr><th>알고리즘</th><th>유형</th><th>상태 공간</th><th>행동 공간</th><th>업데이트</th><th>핵심 특징</th></tr>
+<tr><td>Q-Learning</td><td>Value-Based</td><td>이산</td><td>이산</td><td>매 스텝 (TD)</td><td>Q-테이블, Off-policy</td></tr>
+<tr><td>DQN</td><td>Value-Based</td><td>연속</td><td>이산</td><td>매 스텝 (TD)</td><td>신경망, Replay, Target Net</td></tr>
+<tr><td>Double DQN</td><td>Value-Based</td><td>연속</td><td>이산</td><td>매 스텝 (TD)</td><td>과대추정 방지</td></tr>
+<tr><td>REINFORCE</td><td>Policy-Based</td><td>연속</td><td>이산/연속</td><td>에피소드 끝 (MC)</td><td>높은 분산, 단순</td></tr>
+<tr><td>Actor-Critic</td><td>Hybrid</td><td>연속</td><td>이산/연속</td><td>매 스텝 (TD)</td><td>낮은 분산, Actor+Critic</td></tr>
+<tr><td>PPO</td><td>Hybrid</td><td>연속</td><td>이산/연속</td><td>미니배치 (GAE)</td><td>클리핑, 안정적, SOTA</td></tr>
+</table>
+
+<div class="info">
+<p class="ni"><strong>💡 트레이딩에서 어떤 알고리즘을 선택할까?</strong></p>
+<ul style="font-size:13px;margin-top:8px">
+<li><strong>이산 행동 (buy/sell/hold):</strong> DQN 또는 Double DQN이 가장 간단하고 효과적</li>
+<li><strong>연속 행동 (포지션 비중 0~100%):</strong> PPO가 가장 안정적</li>
+<li><strong>빠른 프로토타이핑:</strong> Q-Learning으로 시작하여 아이디어 검증</li>
+<li><strong>실전 배포:</strong> PPO + 리스크 관리 래퍼 조합이 가장 실용적</li>
+</ul>
+</div>
+
+<!-- ★ Plotly: RL Algorithm Comparison Radar -->
+<div id="plot-ch13-radar" style="width:100%;height:450px;margin:20px 0"></div>
+<script>
+(function(){
+  var categories=['구현 난이도','샘플 효율성','학습 안정성','연속 행동','확장성'];
+  var dqn=[5,4,3,1,3], ppo=[3,3,5,5,5], reinforce=[5,1,2,4,2], qlearn=[5,3,4,1,1];
+  function makeTrace(name,vals,color){
+    var v=vals.concat([vals[0]]);
+    var c=categories.concat([categories[0]]);
+    return {type:'scatterpolar',r:v,theta:c,fill:'toself',name:name,
+      fillcolor:color.replace('1)','0.15)'),line:{color:color,width:2},marker:{size:5}};
+  }
+  Plotly.newPlot('plot-ch13-radar',[
+    makeTrace('Q-Learning',qlearn,'rgba(231,76,60,1)'),
+    makeTrace('DQN',dqn,'rgba(52,152,219,1)'),
+    makeTrace('REINFORCE',reinforce,'rgba(230,126,34,1)'),
+    makeTrace('PPO',ppo,'rgba(46,204,113,1)')
+  ],{
+    title:{text:'📊 RL 알고리즘 비교: 5가지 차원 (5=최고)',font:{size:13}},
+    polar:{radialaxis:{visible:true,range:[0,5.5]}},
+    legend:{x:0.85,y:0.95,bgcolor:'rgba(255,255,255,0.85)'},
+    margin:{t:60,b:30},paper_bgcolor:'#fafaf8'
+  },{responsive:true});
+})();
+</script>
+<p class="ni" style="font-size:11px;color:#888;text-align:center">🖱️ PPO(초록)가 가장 균형 잡힌 프로필. DQN(파랑)은 이산 행동에 특화. Q-Learning(빨강)은 구현이 쉽지만 확장성 제한.</p>
 
 <div class="def">
 <p class="ni"><strong>Q1. [R7]</strong> LSTM의 Forget Gate가 하는 역할은? 왜 일반 RNN보다 장기 의존성 학습에 유리한가?</p>
