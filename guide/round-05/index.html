@@ -4,6 +4,14 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Round 5 - Unsupervised Learning + Time Series Analysis</title>
+<script>
+MathJax = {
+  tex: {
+    inlineMath: [['\\(','\\)'],['$','$']],
+    displayMath: [['\\[','\\]'],['$$','$$']]
+  }
+};
+</script>
 <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
 <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;500&family=Space+Mono:wght@400&family=Inter:wght@300;400&display=swap" rel="stylesheet">
@@ -469,6 +477,20 @@ $$Z_{\text{reduced}} = Z \cdot W_k \quad (N \times k \text{ 행렬})$$
 </ul>
 </div>
 
+<div class="def">
+<p class="ni"><strong>Definition 2.1 — PCA 고유값 분해 (Eigendecomposition of Covariance Matrix)</strong></p>
+<p class="ni">표준화된 데이터 행렬 $Z \in \mathbb{R}^{N \times n}$의 공분산 행렬 $C$에 대해:</p>
+<div class="eq">\[ C = \frac{1}{N-1} Z^\top Z, \quad C \mathbf{w}_i = \lambda_i \mathbf{w}_i \]</div>
+<p class="ni">$\lambda_1 \geq \lambda_2 \geq \cdots \geq \lambda_n \geq 0$은 고유값(분산), $\mathbf{w}_i$는 대응하는 고유벡터(주성분 방향)이다. 상위 $k$개 고유벡터를 열로 쌓은 $W_k = [\mathbf{w}_1 \mid \cdots \mid \mathbf{w}_k]$로 투영하면:</p>
+<div class="eq">\[ Z_{\text{reduced}} = Z \, W_k \in \mathbb{R}^{N \times k} \]</div>
+</div>
+
+<div class="def">
+<p class="ni"><strong>Definition 2.2 — 분산 설명 비율 (Explained Variance Ratio)</strong></p>
+<div class="eq">\[ \text{EVR}_i = \frac{\lambda_i}{\displaystyle\sum_{j=1}^{n} \lambda_j}, \qquad \text{Cumulative EVR}(k) = \sum_{i=1}^{k} \text{EVR}_i \]</div>
+<p class="ni">$\text{EVR}_i$는 $i$번째 주성분이 전체 분산 중 설명하는 비율이다. 누적 EVR이 0.90~0.95에 도달하는 $k$를 선택한다.</p>
+</div>
+
 <h3>2.5 분산 설명 비율 (Explained Variance Ratio)</h3>
 
 <p>
@@ -827,6 +849,24 @@ $$q_{ij} = \frac{(1 + \|y_i - y_j\|^2)^{-1}}{\sum_{k \neq l} (1 + \|y_k - y_l\|^
 고차원 유사도(p)와 저차원 유사도(q)의 차이를 KL-divergence로 측정하고, 경사하강법으로 최소화한다. 즉, 저차원 배치를 조금씩 조정하여 고차원의 이웃 관계를 최대한 보존한다.
 </p>
 
+<div class="def">
+<p class="ni"><strong>Definition 4.1 — t-SNE 고차원 조건부 확률</strong></p>
+<div class="eq">\[ p_{j|i} = \frac{\exp\!\bigl(-\|x_i - x_j\|^2 / 2\sigma_i^2\bigr)}{\displaystyle\sum_{k \neq i} \exp\!\bigl(-\|x_i - x_k\|^2 / 2\sigma_i^2\bigr)}, \qquad p_{ij} = \frac{p_{j|i} + p_{i|j}}{2N} \]</div>
+<p class="ni">$\sigma_i$는 perplexity에 의해 결정되는 대역폭이다. $p_{ij}$는 고차원에서 점 $i$와 $j$의 유사도를 나타낸다.</p>
+</div>
+
+<div class="def">
+<p class="ni"><strong>Definition 4.2 — t-SNE 저차원 유사도 (Student-t 분포)</strong></p>
+<div class="eq">\[ q_{ij} = \frac{\bigl(1 + \|y_i - y_j\|^2\bigr)^{-1}}{\displaystyle\sum_{k \neq l} \bigl(1 + \|y_k - y_l\|^2\bigr)^{-1}} \]</div>
+<p class="ni">자유도 1인 t-분포(= 코시 분포)를 사용하여 꼬리가 두꺼운 분포로 먼 점들을 더 잘 분리한다.</p>
+</div>
+
+<div class="def">
+<p class="ni"><strong>Definition 4.3 — t-SNE 목적함수 (KL Divergence)</strong></p>
+<div class="eq">\[ \mathcal{L} = \text{KL}(P \| Q) = \sum_{i \neq j} p_{ij} \log \frac{p_{ij}}{q_{ij}} \]</div>
+<p class="ni">고차원 유사도 분포 $P$와 저차원 유사도 분포 $Q$의 KL-발산을 경사하강법으로 최소화하여 저차원 좌표 $\{y_i\}$를 학습한다.</p>
+</div>
+
 <h3>4.3 perplexity 파라미터의 이해</h3>
 
 <p>
@@ -1020,6 +1060,18 @@ plt.<span class="fn">show</span>()</code></pre>
 <p>
 K-Means는 가장 유명하고 가장 많이 쓰이는 클러스터링 알고리즘이다. MLAT Ch.13에 따르면, 1957년 Bell Labs의 Stuart Lloyd가 처음 제안했다. 알고리즘은 놀라울 정도로 단순하다.
 </p>
+
+<div class="def">
+<p class="ni"><strong>Definition 5.1 — K-Means 목적함수 (WCSS / Inertia)</strong></p>
+<div class="eq">\[ J = \sum_{k=1}^{K} \sum_{x_i \in C_k} \|x_i - \mu_k\|^2 \]</div>
+<p class="ni">$C_k$는 $k$번째 클러스터, $\mu_k = \frac{1}{|C_k|}\sum_{x_i \in C_k} x_i$는 클러스터 중심(centroid)이다. K-Means는 이 WCSS(Within-Cluster Sum of Squares)를 최소화하는 할당과 중심을 반복적으로 찾는다.</p>
+</div>
+
+<div class="def">
+<p class="ni"><strong>Definition 5.2 — 실루엣 점수 (Silhouette Score)</strong></p>
+<div class="eq">\[ s(i) = \frac{b(i) - a(i)}{\max\{a(i),\, b(i)\}} \in [-1, 1] \]</div>
+<p class="ni">$a(i)$: 점 $i$와 같은 클러스터 내 다른 점들까지의 평균 거리 (응집도). $b(i)$: 점 $i$와 가장 가까운 다른 클러스터 점들까지의 평균 거리 (분리도). $s(i) \approx 1$이면 잘 분류됨, $s(i) \approx 0$이면 경계, $s(i) < 0$이면 잘못 분류됨.</p>
+</div>
 
 <div class="def">
 <p class="ni"><strong>K-Means 알고리즘 (4단계)</strong></p>
@@ -1554,6 +1606,12 @@ DBSCAN(Density-Based Spatial Clustering of Applications with Noise)은 이름 �
 </div>
 </div>
 
+<div class="def">
+<p class="ni"><strong>Definition 7.1 — DBSCAN 핵심점 조건 (Core Point Condition)</strong></p>
+<div class="eq">\[ |N_\varepsilon(x_i)| \geq \text{min\_samples}, \quad N_\varepsilon(x_i) = \{x_j \in D : \|x_i - x_j\| \leq \varepsilon\} \]</div>
+<p class="ni">$\varepsilon$-이웃 $N_\varepsilon(x_i)$ 내에 min_samples 이상의 점이 있으면 $x_i$는 핵심점(core point)이다. 핵심점끼리 $\varepsilon$ 내에서 연결되면 같은 클러스터, 어떤 핵심점의 이웃도 아닌 점은 노이즈(label = $-1$)로 분류된다.</p>
+</div>
+
 <h3>7.3 DBSCAN vs K-Means 비교</h3>
 
 <div class="tc">표 7-1. DBSCAN vs K-Means 핵심 비교</div>
@@ -2045,6 +2103,26 @@ plt.<span class="fn">show</span>()</code></pre>
 </div>
 </div>
 
+<div class="def">
+<p class="ni"><strong>Definition 9.1 — 약정상성 (Weak / Covariance Stationarity)</strong></p>
+<p class="ni">시계열 $\{y_t\}$가 다음 세 조건을 만족하면 약정상(weakly stationary)이라 한다:</p>
+<div class="eq">\[ \text{(i)}\ \mathbb{E}[y_t] = \mu \quad \forall t, \qquad \text{(ii)}\ \text{Var}(y_t) = \sigma^2 \quad \forall t, \qquad \text{(iii)}\ \text{Cov}(y_t, y_{t-k}) = \gamma_k \quad \forall t \]</div>
+<p class="ni">평균, 분산이 시간에 무관하고, 자기공분산이 시차 $k$에만 의존한다. 주가는 비정상(추세), 수익률은 대체로 정상이다.</p>
+</div>
+
+<div class="def">
+<p class="ni"><strong>Definition 9.2 — 랜덤 워크 (Random Walk)</strong></p>
+<div class="eq">\[ y_t = y_{t-1} + \epsilon_t, \quad \epsilon_t \sim \text{WN}(0, \sigma^2) \]</div>
+<p class="ni">$\text{Var}(y_t) = t\sigma^2$로 분산이 시간에 따라 무한히 증가하므로 비정상이다. 주가가 랜덤 워크를 따른다는 것이 효율적 시장 가설(EMH)의 핵심 주장이다.</p>
+</div>
+
+<div class="def">
+<p class="ni"><strong>Definition 9.3 — ADF 검정 (Augmented Dickey-Fuller Test)</strong></p>
+<p class="ni">회귀 모형 $\Delta y_t = \alpha + \delta y_{t-1} + \sum_{i=1}^{p} \beta_i \Delta y_{t-i} + \epsilon_t$에서:</p>
+<div class="eq">\[ H_0: \delta = 0 \;\text{(단위근 존재, 비정상)} \quad \text{vs} \quad H_1: \delta < 0 \;\text{(정상)} \]</div>
+<p class="ni">검정 통계량이 임계값보다 작으면(또는 p-value < 0.05) 귀무가설을 기각하고 정상이라 판단한다. 시차 $p$는 AIC로 자동 선택한다.</p>
+</div>
+
 <p>
 하지만 <strong>수익률(return)은 대체로 정상적</strong>이다:
 </p>
@@ -2247,6 +2325,12 @@ $$\rho_k = \frac{\text{Cov}(y_t, y_{t-k})}{\text{Var}(y_t)} = \frac{\gamma_k}{\g
 비유하자면, "오늘 비가 왔으면 내일도 비가 올 확률이 높은가?"를 측정하는 것이다. 금융에서는 "오늘 주가가 올랐으면 내일도 오를 확률이 높은가?" — 이것이 모멘텀(momentum) 효과이고, 자기상관으로 측정할 수 있다.
 </p>
 
+<div class="def">
+<p class="ni"><strong>Definition 10.1 — 자기상관함수 (ACF, Autocorrelation Function)</strong></p>
+<div class="eq">\[ \rho_k = \frac{\gamma_k}{\gamma_0} = \frac{\text{Cov}(y_t,\, y_{t-k})}{\text{Var}(y_t)}, \quad \rho_0 = 1, \quad |\rho_k| \leq 1 \]</div>
+<p class="ni">시차 $k$에서의 자기상관. $|\rho_k| > 1.96/\sqrt{N}$이면 95% 유의수준에서 유의하다.</p>
+</div>
+
 <h3>10.2 ACF와 PACF의 차이</h3>
 
 <div class="def">
@@ -2324,6 +2408,13 @@ $$y_t = c + \phi_1 y_{t-1} + \cdots + \phi_p y_{t-p} + \theta_1 \epsilon_{t-1} +
 <p>
 여기서 \(\phi\)는 AR 계수, \(\theta\)는 MA 계수, \(\epsilon_t\)는 백색 잡음이다.
 </p>
+
+<div class="def">
+<p class="ni"><strong>Definition 10.2 — ARIMA(p, d, q) 모델</strong></p>
+<p class="ni">$d$차 차분된 시계열 $w_t = \Delta^d y_t$에 대해:</p>
+<div class="eq">\[ w_t = c + \sum_{i=1}^{p} \phi_i w_{t-i} + \sum_{j=1}^{q} \theta_j \epsilon_{t-j} + \epsilon_t, \quad \epsilon_t \sim \text{WN}(0, \sigma^2) \]</div>
+<p class="ni">$\phi_i$: AR 계수 (과거 $p$개 값의 영향), $\theta_j$: MA 계수 (과거 $q$개 오차의 영향), $d$: 정상성 확보를 위한 차분 횟수. 주가는 $d=1$, 수익률은 $d=0$이 일반적이다.</p>
+</div>
 
 <h3>10.5 ARIMA 실전: 주가 수익률 예측</h3>
 
@@ -2606,6 +2697,13 @@ plt.<span class="fn">show</span>()</code></pre>
 
 <h3>11.3 ARCH 모델: 변동성의 자기회귀</h3>
 
+<div class="def">
+<p class="ni"><strong>Definition 11.1 — ARCH(q) 모델</strong></p>
+<p class="ni">수익률 $r_t = \mu + \epsilon_t$, $\epsilon_t = \sigma_t z_t$, $z_t \sim N(0,1)$에서 조건부 분산:</p>
+<div class="eq">\[ \sigma_t^2 = \omega + \sum_{i=1}^{q} \alpha_i \epsilon_{t-i}^2, \quad \omega > 0,\; \alpha_i \geq 0 \]</div>
+<p class="ni">현재 변동성이 과거 $q$개 충격의 제곱에 의존한다. Robert Engle (1982, 노벨상 2003)이 제안.</p>
+</div>
+
 <p>
 ARCH(Autoregressive Conditional Heteroskedasticity)는 Robert Engle이 1982년에 제안한 모델로, 2003년 노벨 경제학상을 수상했다. MLAT Ch.9에서 자세히 다룬다.
 </p>
@@ -2623,6 +2721,12 @@ $$\sigma_t^2 = \omega + \alpha_1 \epsilon_{t-1}^2 + \alpha_2 \epsilon_{t-2}^2 + 
 </p>
 
 <h3>11.4 GARCH(1,1): 실무의 표준</h3>
+
+<div class="def">
+<p class="ni"><strong>Definition 11.2 — GARCH(1,1) 모델</strong></p>
+<div class="eq">\[ \sigma_t^2 = \omega + \alpha\, \epsilon_{t-1}^2 + \beta\, \sigma_{t-1}^2, \quad \omega > 0,\; \alpha \geq 0,\; \beta \geq 0,\; \alpha + \beta < 1 \]</div>
+<p class="ni">장기 무조건부 분산: $\bar{\sigma}^2 = \dfrac{\omega}{1 - \alpha - \beta}$. 변동성의 반감기(half-life): $h = \dfrac{\ln 2}{\ln(\alpha + \beta)^{-1}}$일. $\alpha + \beta$가 1에 가까울수록 충격이 오래 지속된다.</p>
+</div>
 
 <p>
 GARCH(Generalized ARCH)는 ARCH를 확장하여, 분산이 과거 오차뿐만 아니라 <strong>과거 분산 자체</strong>에도 의존하게 한다. GARCH(1,1)이 실무에서 가장 많이 쓰이는 모델이다:
@@ -2753,6 +2857,12 @@ var_95 = portfolio_value * z_95 * daily_vol
 </div>
 
 <h3>11.7 GARCH 변형 모델</h3>
+
+<div class="def">
+<p class="ni"><strong>Definition 11.3 — EGARCH(1,1) 모델 (비대칭 변동성)</strong></p>
+<div class="eq">\[ \ln \sigma_t^2 = \omega + \alpha\!\left(\left|\frac{\epsilon_{t-1}}{\sigma_{t-1}}\right| - \sqrt{\frac{2}{\pi}}\right) + \gamma \frac{\epsilon_{t-1}}{\sigma_{t-1}} + \beta \ln \sigma_{t-1}^2 \]</div>
+<p class="ni">$\gamma < 0$이면 음의 충격(하락)이 양의 충격(상승)보다 변동성을 더 크게 올린다 (레버리지 효과). 로그 변환 덕분에 $\sigma_t^2 > 0$이 자동 보장된다.</p>
+</div>
 
 <div class="tc">표 11-1. GARCH 변형 모델 비교</div>
 <table>
@@ -3101,6 +3211,12 @@ plt.<span class="fn">show</span>()</code></pre>
 </div>
 
 <h3>12.4 클러스터 기반 역변동성 가중 포트폴리오</h3>
+
+<div class="def">
+<p class="ni"><strong>Definition 12.1 — 역변동성 가중 (Inverse Volatility Weighting)</strong></p>
+<div class="eq">\[ w_k = \frac{1/\hat{\sigma}_k}{\displaystyle\sum_{j=1}^{K} 1/\hat{\sigma}_j}, \quad \sum_{k=1}^{K} w_k = 1 \]</div>
+<p class="ni">$\hat{\sigma}_k$는 클러스터 $k$의 GARCH 예측 변동성이다. 변동성이 낮은 클러스터에 높은 비중을 부여하여 포트폴리오 전체의 리스크를 균등화한다. Risk Parity 전략의 간소화 버전이다.</p>
+</div>
 
 <p>
 통합 파이프라인의 최종 목표는 투자 전략이다. 가장 직관적인 전략은 <strong>역변동성 가중(Inverse Volatility Weighting)</strong>이다. 변동성이 낮은 클러스터에 더 많은 비중을 주고, 높은 클러스터에 적은 비중을 준다. 이것은 R8에서 배울 Risk Parity의 간소화 버전이다.
