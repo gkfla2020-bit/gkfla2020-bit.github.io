@@ -4,6 +4,14 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Round 6 - NLP + Sentiment Analysis for Algorithmic Trading</title>
+<script>
+MathJax = {
+  tex: {
+    inlineMath: [['\\(','\\)'],['$','$']],
+    displayMath: [['\\[','\\]'],['$$','$$']]
+  }
+};
+</script>
 <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
 <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;500&family=Space+Mono:wght@400&family=Inter:wght@300;400&display=swap" rel="stylesheet">
@@ -967,6 +975,19 @@ TF-IDF(Term Frequency–Inverse Document Frequency)는 BoW의 핵심 한계인 "
 
 <h3>5.2 수학적 정의</h3>
 
+<div class="def">
+<p class="ni"><strong>Definition 5.1 — TF-IDF (Term Frequency–Inverse Document Frequency)</strong></p>
+<p class="ni" style="margin-top:8px">단어 $t$의 문서 $d$에 대한 TF-IDF 가중치는 다음 세 요소로 구성된다.</p>
+<p class="ni" style="margin-top:6px"><strong>(a) Term Frequency:</strong></p>
+<div class="eq">\[ \text{TF}(t, d) = \frac{\text{count}(t, d)}{\displaystyle\sum_{t' \in d} \text{count}(t', d)} \]</div>
+<p class="ni"><strong>(b) Inverse Document Frequency:</strong></p>
+<div class="eq">\[ \text{IDF}(t) = \log\!\left(\frac{N}{\text{df}(t)}\right) + 1 \]</div>
+<p class="ni">여기서 $N$은 전체 문서 수, $\text{df}(t)$는 단어 $t$가 등장하는 문서 수이다.</p>
+<p class="ni" style="margin-top:6px"><strong>(c) TF-IDF 최종 가중치:</strong></p>
+<div class="eq">\[ \text{TF-IDF}(t, d) = \text{TF}(t, d) \times \text{IDF}(t) \]</div>
+<p class="ni">모든 문서에 등장하는 단어는 $\text{IDF} = \log(1) + 1 = 1$로 가중치가 낮고, 하나의 문서에만 등장하는 단어는 $\text{IDF} = \log(N) + 1$로 가중치가 높다.</p>
+</div>
+
 <p>
 TF-IDF는 두 가지 요소의 곱이다:
 </p>
@@ -1033,6 +1054,12 @@ feature_names = tfidf.<span class="fn">get_feature_names_out</span>()
 </code></pre>
 
 <h3>5.4 문서 유사도: 코사인 유사도</h3>
+
+<div class="def">
+<p class="ni"><strong>Definition 5.2 — Cosine Similarity (코사인 유사도)</strong></p>
+<div class="eq">\[ \text{cosine}(\mathbf{d}_1, \mathbf{d}_2) = \frac{\mathbf{d}_1 \cdot \mathbf{d}_2}{\|\mathbf{d}_1\| \; \|\mathbf{d}_2\|} = \frac{\displaystyle\sum_{i=1}^{n} d_{1i}\, d_{2i}}{\sqrt{\displaystyle\sum_{i=1}^{n} d_{1i}^2}\;\sqrt{\displaystyle\sum_{i=1}^{n} d_{2i}^2}} \]</div>
+<p class="ni">값이 $1$에 가까우면 두 문서가 유사하고, $0$에 가까우면 관련이 없다. 벡터의 크기(문서 길이)에 영향을 받지 않으므로, 길이가 다른 문서를 비교할 때 유클리드 거리보다 적합하다.</p>
+</div>
 
 <p>
 TF-IDF 벡터를 얻으면, 문서 간 유사도를 계산할 수 있다. 가장 널리 쓰이는 방법이 <strong>코사인 유사도(Cosine Similarity)</strong>다. 두 벡터 사이의 각도의 코사인 값을 계산한다.
@@ -1136,6 +1163,12 @@ plt.<span class="fn">show</span>()
 
 <h3>6.1 베이즈 정리 복습 (R2 연결)</h3>
 
+<div class="def">
+<p class="ni"><strong>Definition 6.1 — Bayes' Theorem for Text Classification</strong></p>
+<div class="eq">\[ P(\text{class} \mid \text{document}) = \frac{P(\text{document} \mid \text{class}) \times P(\text{class})}{P(\text{document})} \]</div>
+<p class="ni">$P(\text{class})$는 사전 확률(prior), $P(\text{document} \mid \text{class})$는 우도(likelihood), $P(\text{class} \mid \text{document})$는 사후 확률(posterior)이다. 분모 $P(\text{document})$는 모든 클래스에 대해 동일하므로, 분류 시에는 분자만 비교하면 된다.</p>
+</div>
+
 <p>
 R2에서 우리는 베이즈 정리를 배웠다. 사전 확률(prior)과 우도(likelihood)를 결합하여 사후 확률(posterior)을 계산하는 공식이었다. 나이브 베이즈 분류기는 이 베이즈 정리를 텍스트 분류에 직접 적용한다.
 </p>
@@ -1149,6 +1182,14 @@ $$P(\text{class} | \text{document}) = \frac{P(\text{document} | \text{class}) \t
 </p>
 
 <h3>6.2 "나이브"한 가정: 조건부 독립</h3>
+
+<div class="def">
+<p class="ni"><strong>Definition 6.2 — Multinomial Naive Bayes Classifier</strong></p>
+<p class="ni" style="margin-top:8px">나이브 베이즈는 모든 단어가 조건부 독립이라고 가정하여, 문서 $\mathbf{x} = (w_1, w_2, \ldots, w_n)$의 클래스를 다음과 같이 결정한다:</p>
+<div class="eq">\[ \hat{c} = \arg\max_{c} \; P(c) \prod_{i=1}^{n} P(w_i \mid c) \]</div>
+<p class="ni">로그를 취하면 곱셈이 덧셈으로 변환되어 수치적으로 안정적이다:</p>
+<div class="eq">\[ \hat{c} = \arg\max_{c} \left[ \log P(c) + \sum_{i=1}^{n} \log P(w_i \mid c) \right] \]</div>
+</div>
 
 <p>
 나이브 베이즈가 "나이브(순진한)"라고 불리는 이유는 핵심 가정 때문이다: <strong>모든 단어가 서로 독립적</strong>이라고 가정한다. 즉, "earnings"가 등장할 확률은 "strong"이 등장했는지 여부와 무관하다고 가정한다. 현실에서 이 가정은 거의 항상 틀리다 — "strong earnings"는 함께 등장할 확률이 높다. 하지만 놀랍게도, 이 순진한 가정에도 불구하고 나이브 베이즈는 텍스트 분류에서 놀라울 정도로 잘 작동한다.
@@ -1222,6 +1263,13 @@ probabilities = nb.<span class="fn">predict_proba</span>(X_new)
 </code></pre>
 
 <h3>6.4 라플라스 스무딩 (Additive Smoothing)</h3>
+
+<div class="def">
+<p class="ni"><strong>Definition 6.3 — Laplace Smoothing (라플라스 스무딩)</strong></p>
+<p class="ni" style="margin-top:8px">훈련 데이터에 등장하지 않은 단어의 확률이 0이 되는 것을 방지하기 위해, 모든 단어의 빈도에 $\alpha$를 더한다:</p>
+<div class="eq">\[ P(w_i \mid c) = \frac{\text{count}(w_i, c) + \alpha}{\displaystyle\sum_{w \in V}\bigl[\text{count}(w, c) + \alpha\bigr]} = \frac{\text{count}(w_i, c) + \alpha}{\text{count}(c) + \alpha\,|V|} \]</div>
+<p class="ni">$|V|$는 어휘 크기, $\alpha = 1$이면 라플라스 스무딩, $0 < \alpha < 1$이면 리드스톤(Lidstone) 스무딩이라 한다.</p>
+</div>
 
 <p>
 나이브 베이즈에서 한 가지 문제가 있다. 훈련 데이터에 한 번도 등장하지 않은 단어가 테스트 데이터에 나타나면, 그 단어의 조건부 확률이 0이 되어 전체 확률이 0이 된다. 이를 방지하기 위해 <strong>라플라스 스무딩(Laplace Smoothing)</strong>을 적용한다. 모든 단어의 빈도에 \(\alpha\)(보통 1)를 더해준다.
@@ -1611,6 +1659,17 @@ MLAT Ch.15의 제목은 "Topic Modeling – Summarizing Financial News"다. 핵�
 
 <h3>8.3 LDA (Latent Dirichlet Allocation) 핵심 원리</h3>
 
+<div class="def">
+<p class="ni"><strong>Definition 8.2 — LDA Generative Process</strong></p>
+<p class="ni" style="margin-top:8px">$K$개의 토픽이 주어졌을 때, LDA는 각 문서 $d$가 다음 과정으로 생성된다고 가정한다:</p>
+<p class="ni" style="margin-top:6px">1. 문서의 토픽 분포를 디리클레에서 추출: $\boldsymbol{\theta}_d \sim \text{Dir}(\boldsymbol{\alpha})$</p>
+<p class="ni">2. 각 토픽 $k$의 단어 분포를 디리클레에서 추출: $\boldsymbol{\beta}_k \sim \text{Dir}(\boldsymbol{\eta})$</p>
+<p class="ni">3. 문서 $d$의 $n$번째 단어에 대해:</p>
+<p class="ni" style="padding-left:1.5em">(a) 토픽 할당: $z_{d,n} \sim \text{Multinomial}(\boldsymbol{\theta}_d)$</p>
+<p class="ni" style="padding-left:1.5em">(b) 단어 생성: $w_{d,n} \sim \text{Multinomial}(\boldsymbol{\beta}_{z_{d,n}})$</p>
+<p class="ni" style="margin-top:8px">LDA는 관찰된 단어 $\mathbf{w}$로부터 잠재 변수 $\boldsymbol{\theta}$ (문서-토픽 분포)와 $\boldsymbol{\beta}$ (토픽-단어 분포)를 추정한다.</p>
+</div>
+
 <p>
 LDA는 현재 가장 널리 쓰이는 토픽 모델이다. 핵심 아이디어는 "역공학(reverse engineering)"이다. LDA는 문서가 생성되는 과정을 다음과 같이 가정한다:
 </p>
@@ -1659,6 +1718,13 @@ LDA는 현재 가장 널리 쓰이는 토픽 모델이다. 핵심 아이디어�
 </div>
 
 <h3>8.4 디리클레 분포 (Dirichlet Distribution)</h3>
+
+<div class="def">
+<p class="ni"><strong>Definition 8.1 — Dirichlet Distribution (디리클레 분포)</strong></p>
+<p class="ni" style="margin-top:8px">$K$차원 확률 벡터 $\boldsymbol{\theta} = (\theta_1, \ldots, \theta_K)$에 대한 디리클레 분포는 다음과 같다 ($\sum_k \theta_k = 1$, $\theta_k > 0$):</p>
+<div class="eq">\[ \text{Dir}(\boldsymbol{\theta} \mid \boldsymbol{\alpha}) = \frac{\Gamma\!\left(\sum_{k=1}^{K} \alpha_k\right)}{\prod_{k=1}^{K} \Gamma(\alpha_k)} \prod_{k=1}^{K} \theta_k^{\,\alpha_k - 1} \]</div>
+<p class="ni">$\alpha > 1$: 토픽이 고르게 분포. $\alpha < 1$: 토픽이 희소하게 분포 (한두 개 토픽이 지배적, 실제 문서에 적합). $\alpha = 1$: 균등 분포.</p>
+</div>
 
 <p>
 LDA의 "D"는 디리클레(Dirichlet)를 의미한다. 디리클레 분포는 확률 벡터를 생성하는 분포다. 즉, 합이 1이 되는 양수 벡터를 만들어낸다. 파라미터 \(\alpha\)가 이 분포의 형태를 결정한다.
@@ -1940,6 +2006,15 @@ Word2Vec(Mikolov et al., 2013)은 얕은 신경망(shallow neural network)을 �
 
 <h3>9.3 Skip-gram의 수학</h3>
 
+<div class="def">
+<p class="ni"><strong>Definition 9.1 — Skip-gram Objective Function</strong></p>
+<p class="ni" style="margin-top:8px">코퍼스의 모든 단어 $w_t$ ($t = 1, \ldots, T$)에 대해, 윈도우 크기 $c$ 내의 문맥 단어 $w_{t+j}$를 예측하는 확률을 최대화한다:</p>
+<div class="eq">\[ \mathcal{J} = \frac{1}{T} \sum_{t=1}^{T} \sum_{\substack{-c \leq j \leq c \\ j \neq 0}} \log P(w_{t+j} \mid w_t) \]</div>
+<p class="ni">조건부 확률은 소프트맥스로 정의된다:</p>
+<div class="eq">\[ P(w_O \mid w_I) = \frac{\exp\!\bigl(\mathbf{v}'_{w_O}{}^{\!\top} \mathbf{v}_{w_I}\bigr)}{\displaystyle\sum_{w \in V} \exp\!\bigl(\mathbf{v}'_{w}{}^{\!\top} \mathbf{v}_{w_I}\bigr)} \]</div>
+<p class="ni">$\mathbf{v}_{w}$는 입력 임베딩, $\mathbf{v}'_{w}$는 출력 임베딩이다. 분모의 전체 어휘 합산은 비효율적이므로 Negative Sampling으로 근사한다.</p>
+</div>
+
 <p>
 Skip-gram 모델의 목적 함수를 수학적으로 정리하자. 코퍼스의 모든 단어 \(w_t\)에 대해, 윈도우 크기 \(c\) 내의 문맥 단어 \(w_{t+j}\)를 예측하는 확률을 최대화한다:
 </p>
@@ -1961,6 +2036,13 @@ $$P(w_O | w_I) = \frac{\exp(\mathbf{h}^T \mathbf{v}'_{w_O})}{\sum_{w_i \in V} \e
 </p>
 
 <h3>9.4 Negative Sampling: 효율적 학습</h3>
+
+<div class="def">
+<p class="ni"><strong>Definition 9.2 — Negative Sampling (NEG)</strong></p>
+<p class="ni" style="margin-top:8px">전체 어휘에 대한 소프트맥스 대신, 실제 문맥 단어(positive)와 $k$개의 노이즈 단어(negative)만 구별하는 이진 분류로 근사한다:</p>
+<div class="eq">\[ \log \sigma\!\bigl(\mathbf{v}'_{w_O}{}^{\!\top} \mathbf{v}_{w_I}\bigr) + \sum_{i=1}^{k} \mathbb{E}_{w_i \sim P_n(w)}\!\left[\log \sigma\!\bigl(-\mathbf{v}'_{w_i}{}^{\!\top} \mathbf{v}_{w_I}\bigr)\right] \]</div>
+<p class="ni">$\sigma(x) = 1/(1+e^{-x})$는 시그모이드 함수, $k$는 negative sample 수 (보통 5~15), $P_n(w) \propto f(w)^{3/4}$는 단어 빈도의 $\tfrac{3}{4}$ 제곱에 비례하는 노이즈 분포이다.</p>
+</div>
 
 <p>
 MLAT Ch.16에서 Jansen은 세 가지 효율화 기법을 소개한다: Hierarchical Softmax, NCE(Noise Contrastive Estimation), Negative Sampling. 실전에서 가장 많이 쓰이는 것은 <strong>Negative Sampling(NEG)</strong>이다.
@@ -2257,6 +2339,19 @@ lgb_pred = lgb_model.<span class="fn">predict</span>(X_test).<span class="fn">ar
 
 <h3>10.3 DM vs DBOW: 수학적 비교</h3>
 
+<div class="def">
+<p class="ni"><strong>Definition 10.1 — Doc2Vec: DM (Distributed Memory)</strong></p>
+<p class="ni" style="margin-top:8px">문서 벡터 $\mathbf{d}$와 문맥 단어 벡터를 결합하여 타겟 단어 $w_t$를 예측한다:</p>
+<div class="eq">\[ \mathcal{J}_{\text{DM}} = \sum_{t=k}^{T-k} \log P\!\bigl(w_t \mid \mathbf{d},\; w_{t-k}, \ldots, w_{t-1},\; w_{t+1}, \ldots, w_{t+k}\bigr) \]</div>
+</div>
+
+<div class="def">
+<p class="ni"><strong>Definition 10.2 — Doc2Vec: DBOW (Distributed Bag of Words)</strong></p>
+<p class="ni" style="margin-top:8px">문서 벡터만으로 문서 내 랜덤 단어를 예측한다:</p>
+<div class="eq">\[ \mathcal{J}_{\text{DBOW}} = \sum_{w \in d} \log P(w \mid \mathbf{d}) \]</div>
+<p class="ni">DBOW는 단어 순서를 무시하지만 학습이 빠르고, 짧은 문서에서 우수한 성능을 보인다.</p>
+</div>
+
 <p>
 Doc2Vec의 두 아키텍처를 수학적으로 비교해보자.
 </p>
@@ -2414,6 +2509,24 @@ Doc2Vec의 진정한 가치는 (1) 메모리 효율성 (300차원 vs 50,000차�
 </div>
 
 <h3>11.2 Attention의 수학</h3>
+
+<div class="def">
+<p class="ni"><strong>Definition 11.1 — Scaled Dot-Product Attention</strong></p>
+<p class="ni" style="margin-top:8px">입력 임베딩 $X$에 학습 가능한 가중치 행렬 $W^Q, W^K, W^V$를 곱하여 Query, Key, Value를 생성한다:</p>
+<div class="eq">\[ Q = XW^Q, \quad K = XW^K, \quad V = XW^V \]</div>
+<p class="ni">Attention 출력은 다음과 같다:</p>
+<div class="eq">\[ \text{Attention}(Q, K, V) = \text{softmax}\!\left(\frac{QK^{\top}}{\sqrt{d_k}}\right) V \]</div>
+<p class="ni">$d_k$는 Key 벡터의 차원이다. $\sqrt{d_k}$로 나누는 것은 내적 값이 커져 softmax가 극단적 분포가 되는 것을 방지한다.</p>
+</div>
+
+<div class="def">
+<p class="ni"><strong>Definition 11.2 — Multi-Head Attention</strong></p>
+<p class="ni" style="margin-top:8px">$h$개의 attention head를 병렬로 실행하여 서로 다른 관계 패턴을 학습한다:</p>
+<div class="eq">\[ \text{MultiHead}(Q, K, V) = \text{Concat}(\text{head}_1, \ldots, \text{head}_h)\, W^O \]</div>
+<p class="ni">각 head는 독립적인 가중치로 attention을 계산한다:</p>
+<div class="eq">\[ \text{head}_i = \text{Attention}(QW_i^Q,\; KW_i^K,\; VW_i^V) \]</div>
+<p class="ni">BERT-base는 $h = 12$ heads, $d_k = 64$를 사용한다. 총 $12 \times 64 = 768$차원의 hidden size를 갖는다.</p>
+</div>
 
 <p>
 Self-Attention은 Query(Q), Key(K), Value(V) 세 가지 행렬을 사용한다. 입력 임베딩 \(X\)에 학습 가능한 가중치 행렬을 곱하여 Q, K, V를 생성한다:
