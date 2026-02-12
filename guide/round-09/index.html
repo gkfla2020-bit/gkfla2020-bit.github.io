@@ -4,6 +4,14 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Round 9 - HFT System Design + Reinforcement Learning</title>
+<script>
+MathJax = {
+  tex: {
+    inlineMath: [['\\(','\\)'],['$','$']],
+    displayMath: [['\\[','\\]'],['$$','$$']]
+  }
+};
+</script>
 <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
 <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;500&family=Space+Mono:wght@400&family=Inter:wght@300;400&display=swap" rel="stylesheet">
@@ -176,7 +184,7 @@ R1~R8에서 우리는 "종가(Close)"를 기준으로 전략을 만들었다. �
 </p>
 
 <div class="def">
-<p class="ni"><strong>📖 시장 마이크로스트럭처 (Market Microstructure) 정의</strong></p>
+<p class="ni"><strong>Definition 1.1 — 시장 마이크로스트럭처 (Market Microstructure)</strong></p>
 <p class="ni" style="margin-top:8px">
 시장 마이크로스트럭처는 금융 자산의 거래가 이루어지는 과정과 메커니즘을 연구하는 분야다. 주문의 유형, 가격 형성 과정, 정보의 비대칭, 거래 비용, 시장 참여자의 행동 등을 다룬다. HFT(High-Frequency Trading)는 이 마이크로스트럭처의 미세한 비효율성을 밀리초 단위로 포착하여 수익을 추구하는 전략이다.
 </p>
@@ -432,13 +440,20 @@ VWAP: $149.667
 </p>
 
 <div class="def">
-<p class="ni"><strong>📖 오더북 이벤트 3가지</strong></p>
+<p class="ni"><strong>Definition 2.1 — 오더북 이벤트 (Order Book Events)</strong></p>
 <p class="ni" style="margin-top:8px">
 (1) <strong>Add</strong> — 새로운 지정가 주문이 오더북에 추가됨<br>
 (2) <strong>Cancel</strong> — 기존 지정가 주문이 취소됨<br>
 (3) <strong>Execute (Trade)</strong> — 시장가 주문이 지정가 주문과 매칭되어 체결됨
 </p>
 </div>
+
+<div class="def">
+<p class="ni"><strong>Definition 2.2 — Order Imbalance (OI)</strong></p>
+<div class="eq">\[OI = \frac{V_{\text{bid}}^{(1)} - V_{\text{ask}}^{(1)}}{V_{\text{bid}}^{(1)} + V_{\text{ask}}^{(1)}} \in [-1, +1]\]</div>
+<p class="ni">$V_{\text{bid}}^{(1)}$, $V_{\text{ask}}^{(1)}$는 최우선 호가의 대기 수량이다. $OI > 0$이면 매수 압력 우세, $OI < 0$이면 매도 압력 우세를 나타내며, 단기 가격 방향의 강력한 예측 변수다.</p>
+</div>
+
 
 <h3>2.2 Order Imbalance와 가격 예측</h3>
 
@@ -484,6 +499,13 @@ woi = (np.<span class="fn">sum</span>(weights * bid_sizes) - np.<span class="fn"
 Level-1 OI: 0.1429
 Weighted OI (5-level): 0.0312</div>
 
+<div class="def">
+<p class="ni"><strong>Definition 2.3 — Price Impact (Kyle's Lambda)</strong></p>
+<div class="eq">\[\Delta P = \lambda \cdot \Delta V, \qquad \lambda = \frac{\sigma}{\sqrt{V_{\text{daily}}}}\]</div>
+<p class="ni">$\Delta P$는 가격 변화, $\Delta V$는 순 주문 흐름(net order flow), $\lambda$는 Kyle의 람다(price impact coefficient)이다. $\sigma$는 변동성, $V_{\text{daily}}$는 일간 거래량이다. 유동성이 낮을수록 $\lambda$가 크다.</p>
+</div>
+
+
 <h3>2.3 Price Impact — 주문이 가격을 움직이는 메커니즘</h3>
 
 <p>
@@ -528,6 +550,13 @@ Weighted OI (5-level): 0.0312</div>
 })();
 </script>
 <p class="ni" style="font-size:11px;color:#888;text-align:center">🖱️ OI가 양수일 때 가격이 오르는 경향(초록), 음수일 때 내리는 경향(빨강). 점선은 이론적 선형 관계.</p>
+
+<div class="def">
+<p class="ni"><strong>Definition 2.4 — VPIN (Volume-Synchronized Probability of Informed Trading)</strong></p>
+<div class="eq">\[VPIN = \frac{\sum_{i=1}^{n} |V_i^{buy} - V_i^{sell}|}{n \cdot V_{\text{bucket}}}\]</div>
+<p class="ni">거래량을 동일 크기 버킷으로 나누고, 각 버킷 내 매수/매도 불균형의 절대값 평균을 구한다. $VPIN \to 1$이면 정보 비대칭이 극심하여 시장 급변 위험이 높다.</p>
+</div>
+
 
 <h3>2.4 Trade Flow Toxicity — VPIN</h3>
 
@@ -670,7 +699,7 @@ VPIN: 0.2847
 </p>
 
 <div class="def">
-<p class="ni"><strong>📖 Avellaneda-Stoikov 모델 (2008)</strong></p>
+<p class="ni"><strong>Definition 3.1 — Avellaneda-Stoikov 마켓메이킹 모델 (2008)</strong></p>
 <p class="ni" style="margin-top:8px">
 최적 호가 설정의 고전적 모델이다. 마켓메이커의 최적 bid/ask 가격은:
 </p>
@@ -773,6 +802,13 @@ T = <span class="nu">1.0</span>       <span class="cm"># 1일</span>
 })();
 </script>
 <p class="ni" style="font-size:11px;color:#888;text-align:center">🖱️ 위험 회피 계수(γ)가 클수록, 변동성이 높을수록 최적 스프레드가 넓어진다. γ=0.01(위험 중립)이면 스프레드가 거의 일정.</p>
+
+<div class="def">
+<p class="ni"><strong>Definition 3.2 — 페어 트레이딩 Z-Score</strong></p>
+<div class="eq">\[z_t = \frac{P_t^A - \beta \cdot P_t^B - \mu}{\sigma}, \qquad \text{Signal: } |z_t| > \tau \text{이면 진입}\]</div>
+<p class="ni">공적분 관계에 있는 두 자산 $A$, $B$의 스프레드를 Z-Score로 정규화한다. $\beta$는 헤지 비율, $\mu$와 $\sigma$는 스프레드의 평균과 표준편차이다. $|z_t| > \tau$(보통 2)이면 평균 회귀를 기대하고 진입한다.</p>
+</div>
+
 
 <h3>3.2 통계적 차익거래 (Statistical Arbitrage)</h3>
 
@@ -1036,11 +1072,19 @@ R4~R7에서 배운 지도학습(Supervised Learning)은 "정답이 있는 데이
 </table>
 
 <div class="def">
-<p class="ni"><strong>📖 마르코프 성질 (Markov Property)</strong></p>
+<p class="ni"><strong>Definition 5.1 — 마르코프 성질 (Markov Property)</strong></p>
 <p class="ni" style="margin-top:8px">
 미래 상태는 현재 상태에만 의존하고, 과거 이력에는 의존하지 않는다: \(P(s_{t+1}|s_t, a_t) = P(s_{t+1}|s_1, a_1, \ldots, s_t, a_t)\). 금융 시장은 엄밀히 마르코프가 아니지만, 충분한 정보를 상태에 포함시키면 근사적으로 마르코프로 모델링할 수 있다 (예: 과거 N일 수익률을 상태에 포함).
 </p>
 </div>
+
+<div class="def">
+<p class="ni"><strong>Definition 5.2 — 가치 함수와 벨만 방정식 (Bellman Equation)</strong></p>
+<div class="eq">\[V^\pi(s) = \mathbb{E}_\pi\!\left[\sum_{t=0}^{\infty} \gamma^t r_t \,\middle|\, s_0 = s\right]\]</div>
+<div class="eq">\[V^\pi(s) = \sum_a \pi(a|s) \sum_{s'} P(s'|s,a)\bigl[R(s,a,s') + \gamma\, V^\pi(s')\bigr]\]</div>
+<p class="ni">$V^\pi(s)$는 상태 $s$에서 정책 $\pi$를 따를 때의 기대 누적 보상이다. 벨만 방정식은 현재 가치를 즉시 보상 + 할인된 미래 가치로 재귀적으로 분해한다. $\gamma \in [0,1)$은 할인 인자이다.</p>
+</div>
+
 
 <h3>5.3 가치 함수와 벨만 방정식</h3>
 
@@ -1100,6 +1144,13 @@ R4~R7에서 배운 지도학습(Supervised Learning)은 "정답이 있는 데이
 즉, "지금 매수하면 즉시 0.01의 보상 + 미래에 0.495(=0.99×0.5)의 기대 보상"이라는 뜻이다. 만약 "홀드"의 Q값이 0.3이라면, 매수가 더 좋은 행동이다. 이것이 벨만 방정식의 핵심 — <strong>현재 행동의 가치 = 즉시 보상 + 할인된 미래 가치</strong>.
 </p>
 </div>
+
+<div class="def">
+<p class="ni"><strong>Definition 5.3 — 벨만 최적 방정식 (Bellman Optimality Equation)</strong></p>
+<div class="eq">\[Q^*(s, a) = \sum_{s'} P(s'|s,a)\bigl[R(s,a,s') + \gamma \max_{a'} Q^*(s', a')\bigr]\]</div>
+<p class="ni">$Q^*(s,a)$는 최적 행동-가치 함수로, 상태 $s$에서 행동 $a$를 취한 뒤 최적 정책을 따를 때의 기대 누적 보상이다. 최적 정책은 $\pi^*(s) = \arg\max_a Q^*(s,a)$이다.</p>
+</div>
+
 
 <h3>5.4 할인 인자 γ의 의미 — 근시안 vs 원시안 에이전트</h3>
 
@@ -1189,6 +1240,13 @@ R4~R7에서 배운 지도학습(Supervised Learning)은 "정답이 있는 데이
 <p class="ni"><strong>📚 교재 연동:</strong> MLAT Ch.22 "Q-Learning" / 혼공파 Ch.5 딕셔너리 — Q-테이블은 본질적으로 (상태, 행동) → 가치의 딕셔너리다</p>
 </div>
 
+<div class="def">
+<p class="ni"><strong>Definition 6.1 — Q-Learning 업데이트 규칙</strong></p>
+<div class="eq">\[Q(s_t, a_t) \leftarrow Q(s_t, a_t) + \alpha\bigl[r_t + \gamma \max_{a'} Q(s_{t+1}, a') - Q(s_t, a_t)\bigr]\]</div>
+<p class="ni">$\alpha \in (0,1]$은 학습률, $r_t + \gamma \max_{a'} Q(s_{t+1}, a')$는 TD 타겟이다. Q-Learning은 off-policy 알고리즘으로, 현재 정책과 무관하게 최적 Q-함수를 직접 학습한다.</p>
+</div>
+
+
 <h3>6.1 Q-Learning 알고리즘</h3>
 
 <p>
@@ -1246,6 +1304,13 @@ Q-Learning은 <strong>off-policy</strong> 알고리즘이다. 이것은 중요�
 <p>
 Q-Learning의 \(\max\) 연산자가 핵심이다. 실제로 어떤 행동을 했든, "최적의 행동을 했다면 얼마나 좋았을까"를 기준으로 업데이트한다. 이 덕분에 탐색(ε-greedy)을 하면서도 최적 정책을 학습할 수 있다.
 </p>
+
+<div class="def">
+<p class="ni"><strong>Definition 6.2 — ε-Greedy 탐색 전략</strong></p>
+<div class="eq">\[a_t = \begin{cases} \arg\max_a Q(s_t, a) & \text{확률 } 1-\varepsilon \;\text{(활용, exploitation)} \\ \text{random action} & \text{확률 } \varepsilon \;\text{(탐색, exploration)} \end{cases}\]</div>
+<p class="ni">$\varepsilon$을 점진적으로 감소시켜(예: $1.0 \to 0.01$) 초기에는 탐색을, 후기에는 활용을 강조한다. 탐색-활용 딜레마(exploration-exploitation dilemma)의 가장 기본적인 해결책이다.</p>
+</div>
+
 
 <h3>6.2 ε-Greedy 탐색</h3>
 
@@ -1399,6 +1464,13 @@ Step  8000 | Cum Reward: 0.2187 | ε: 0.010
 <div class="info">
 <p class="ni"><strong>📚 교재 연동:</strong> MLAT Ch.22 "Deep Q-Networks" / R7의 신경망 기초 — DQN은 Q-테이블을 신경망으로 대체한 것</p>
 </div>
+
+<div class="def">
+<p class="ni"><strong>Definition 7.1 — DQN 손실 함수 (Deep Q-Network Loss)</strong></p>
+<div class="eq">\[\mathcal{L}(\theta) = \mathbb{E}\!\left[\bigl(r + \gamma \max_{a'} Q(s', a'; \theta^-) - Q(s, a; \theta)\bigr)^2\right]\]</div>
+<p class="ni">$\theta$는 메인 네트워크, $\theta^-$는 타겟 네트워크 파라미터이다. Experience Replay(경험 재생)로 미니배치를 샘플링하고, 타겟 네트워크를 주기적으로 동기화하여 학습을 안정화한다.</p>
+</div>
+
 
 <h3>7.1 Q-테이블에서 Q-네트워크로</h3>
 
@@ -1636,6 +1708,13 @@ Q-Learning과 DQN은 <strong>가치 기반(Value-Based)</strong> 방법이다 �
 <tr><td>트레이딩 적용</td><td>이산 행동 (buy/sell/hold)</td><td>연속 행동 (비중 조절)</td></tr>
 </table>
 
+<div class="def">
+<p class="ni"><strong>Definition 8.1 — Policy Gradient 정리 (REINFORCE)</strong></p>
+<div class="eq">\[\nabla_\theta J(\theta) = \mathbb{E}_{\pi_\theta}\!\left[\sum_{t=0}^{T} \nabla_\theta \log \pi_\theta(a_t|s_t) \cdot G_t\right]\]</div>
+<p class="ni">$\pi_\theta(a|s)$는 파라미터 $\theta$로 정의된 확률적 정책, $G_t = \sum_{k=t}^{T} \gamma^{k-t} r_k$는 시점 $t$부터의 누적 보상이다. $\nabla_\theta \log \pi_\theta$는 score function으로, 좋은 행동의 확률을 높이고 나쁜 행동의 확률을 낮추는 방향으로 정책을 업데이트한다.</p>
+</div>
+
+
 <h3>8.2 Policy Gradient 정리</h3>
 
 <p>
@@ -1838,6 +1917,13 @@ Advantage \(A(s,a) = Q(s,a) - V(s)\)를 트레이딩으로 비유하면:
 <p class="ni"><strong>📚 교재 연동:</strong> MLAT Ch.22 "Actor-Critic Methods" / MLAT Ch.23 "Proximal Policy Optimization"</p>
 </div>
 
+<div class="def">
+<p class="ni"><strong>Definition 9.1 — Advantage 함수와 Actor-Critic</strong></p>
+<div class="eq">\[A(s_t, a_t) = r_t + \gamma V_\phi(s_{t+1}) - V_\phi(s_t)\]</div>
+<p class="ni">Advantage $A(s,a)$는 "행동 $a$가 평균 대비 얼마나 좋은가"를 측정한다. Actor(정책 $\pi_\theta$)는 행동을 선택하고, Critic(가치 $V_\phi$)은 상태를 평가한다. REINFORCE의 높은 분산 문제를 Critic의 baseline으로 해결한다.</p>
+</div>
+
+
 <h3>9.1 Actor-Critic 아키텍처</h3>
 
 <p>
@@ -1863,6 +1949,13 @@ Actor-Critic은 Value-Based와 Policy-Based의 장점을 결합한다. <strong>A
 <div class="eq">
 \[ \text{Advantage: } A(s_t, a_t) = r_t + \gamma V_\phi(s_{t+1}) - V_\phi(s_t) \]
 </div>
+
+<div class="def">
+<p class="ni"><strong>Definition 9.2 — PPO Clipped Objective</strong></p>
+<div class="eq">\[L^{CLIP}(\theta) = \mathbb{E}\!\left[\min\!\bigl(r_t(\theta)\, A_t,\; \text{clip}(r_t(\theta), 1{-}\epsilon, 1{+}\epsilon)\, A_t\bigr)\right]\]</div>
+<p class="ni">$r_t(\theta) = \pi_\theta(a_t|s_t) / \pi_{\theta_{\text{old}}}(a_t|s_t)$는 확률 비율이다. $\epsilon$(보통 0.2)으로 클리핑하여 정책이 한 번에 너무 크게 변하는 것을 방지한다. PPO는 TRPO의 복잡한 제약을 간단한 클리핑으로 대체한 실용적 알고리즘이다.</p>
+</div>
+
 
 <h3>9.2 PPO (Proximal Policy Optimization)</h3>
 
@@ -1936,6 +2029,13 @@ PPO의 클리핑 메커니즘을 경우를 나눠서 이해하자:
 })();
 </script>
 <p class="ni" style="font-size:11px;color:#888;text-align:center">🖱️ 실선=클리핑된 목적 함수, 점선=클리핑 없는 목적 함수. r(θ)가 [0.8, 1.2] 범위를 벗어나면 그래디언트가 0이 되어 업데이트가 멈춘다.</p>
+
+<div class="def">
+<p class="ni"><strong>Definition 9.3 — GAE (Generalized Advantage Estimation)</strong></p>
+<div class="eq">\[\hat{A}_t^{GAE(\gamma,\lambda)} = \sum_{l=0}^{\infty} (\gamma\lambda)^l \delta_{t+l}, \qquad \delta_t = r_t + \gamma V(s_{t+1}) - V(s_t)\]</div>
+<p class="ni">$\lambda \in [0,1]$은 편향-분산 트레이드오프를 조절한다. $\lambda=0$이면 1-step TD(저분산, 고편향), $\lambda=1$이면 Monte Carlo(고분산, 저편향)이다. 실전에서는 $\lambda=0.95$가 일반적이다.</p>
+</div>
+
 
 <h3>9.2.1 GAE (Generalized Advantage Estimation) 상세</h3>
 
