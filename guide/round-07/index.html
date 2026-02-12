@@ -4,6 +4,14 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Round 7 - Deep Learning: ANN, CNN, RNN, LSTM for Algorithmic Trading</title>
+<script>
+MathJax = {
+  tex: {
+    inlineMath: [['\\(','\\)'],['$','$']],
+    displayMath: [['\\[','\\]'],['$$','$$']]
+  }
+};
+</script>
 <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
 <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;500&family=Space+Mono:wght@400&family=Inter:wght@300;400&display=swap" rel="stylesheet">
@@ -304,6 +312,13 @@ R4에서 우리는 XGBoost로 주가 방향을 예측했다. 그때 우리가 �
 
 <h3>2.2 퍼셉트론의 수학적 정의</h3>
 
+<div class="def">
+<p class="ni"><strong>Definition 2.1 — Perceptron (퍼셉트론)</strong></p>
+<p class="ni" style="margin-top:8px">입력 벡터 $\mathbf{x} = (x_1, \ldots, x_n)$, 가중치 $\mathbf{w} = (w_1, \ldots, w_n)$, 편향 $b$에 대해:</p>
+<div class="eq">\[ z = \mathbf{w}^{\top}\mathbf{x} + b = \sum_{i=1}^{n} w_i x_i + b, \qquad \hat{y} = \begin{cases} 1 & z \geq 0 \\ 0 & z < 0 \end{cases} \]</div>
+<p class="ni">퍼셉트론 학습 규칙: $w_i \leftarrow w_i + \eta(y - \hat{y})x_i$, $b \leftarrow b + \eta(y - \hat{y})$. 데이터가 선형 분리 가능하면 유한 번 반복 후 수렴한다 (Perceptron Convergence Theorem).</p>
+</div>
+
 <p>
 1958년 Frank Rosenblatt이 제안한 퍼셉트론(Perceptron)은 가장 단순한 인공 뉴런이다. 입력 벡터 \(\mathbf{x} = (x_1, x_2, \ldots, x_n)\)에 가중치 벡터 \(\mathbf{w} = (w_1, w_2, \ldots, w_n)\)를 곱하고 편향(bias) \(b\)를 더한 뒤, 활성화 함수를 통과시켜 출력을 만든다.
 </p>
@@ -439,28 +454,25 @@ XOR 문제는 단순한 논리 게이트 문제가 아니다. 금융에서도 �
 <h3>3.2 주요 활성화 함수 총정리</h3>
 
 <div class="def">
-<p class="ni"><strong>📖 핵심 활성화 함수 6종</strong></p>
-</div>
-
-<div class="eq">
-\[
-\text{Sigmoid: } \sigma(z) = \frac{1}{1 + e^{-z}}, \quad \sigma'(z) = \sigma(z)(1 - \sigma(z))
-\]
-\[
-\text{Tanh: } \tanh(z) = \frac{e^z - e^{-z}}{e^z + e^{-z}}, \quad \tanh'(z) = 1 - \tanh^2(z)
-\]
-\[
-\text{ReLU: } f(z) = \max(0, z), \quad f'(z) = \begin{cases} 1 & z > 0 \\ 0 & z \leq 0 \end{cases}
-\]
-\[
-\text{Leaky ReLU: } f(z) = \begin{cases} z & z > 0 \\ \alpha z & z \leq 0 \end{cases}, \quad \alpha = 0.01
-\]
-\[
-\text{ELU: } f(z) = \begin{cases} z & z > 0 \\ \alpha(e^z - 1) & z \leq 0 \end{cases}
-\]
-\[
-\text{Softmax: } \text{softmax}(z_i) = \frac{e^{z_i}}{\sum_{j=1}^{K} e^{z_j}} \quad \text{(다중 클래스 출력층)}
-\]
+<p class="ni"><strong>Definition 3.1 — Activation Functions (활성화 함수 6종)</strong></p>
+<div class="eq">\[
+\text{Sigmoid:}\; \sigma(z) = \frac{1}{1+e^{-z}}, \quad \sigma'(z) = \sigma(z)(1-\sigma(z))
+\]</div>
+<div class="eq">\[
+\text{Tanh:}\; \tanh(z) = \frac{e^z - e^{-z}}{e^z + e^{-z}}, \quad \tanh'(z) = 1 - \tanh^2(z)
+\]</div>
+<div class="eq">\[
+\text{ReLU:}\; f(z) = \max(0, z), \quad f'(z) = \begin{cases} 1 & z > 0 \\ 0 & z \leq 0 \end{cases}
+\]</div>
+<div class="eq">\[
+\text{Leaky ReLU:}\; f(z) = \begin{cases} z & z > 0 \\ \alpha z & z \leq 0 \end{cases}, \quad \alpha = 0.01
+\]</div>
+<div class="eq">\[
+\text{ELU:}\; f(z) = \begin{cases} z & z > 0 \\ \alpha(e^z - 1) & z \leq 0 \end{cases}
+\]</div>
+<div class="eq">\[
+\text{Softmax:}\; \text{softmax}(z_i) = \frac{e^{z_i}}{\sum_{j=1}^{K} e^{z_j}} \quad \text{(다중 클래스 출력층, } \sum_i = 1\text{)}
+\]</div>
 </div>
 
 <table>
@@ -597,6 +609,13 @@ Sigmoid와 Tanh의 치명적 문제는 <strong>기울기 소실</strong>(vanishi
 <h2 id="ch4">Chapter 4. 다층 퍼셉트론 (MLP) — XOR을 넘어서</h2>
 
 <h3>4.1 MLP 아키텍처</h3>
+
+<div class="def">
+<p class="ni"><strong>Definition 4.1 — MLP Forward Propagation (다층 퍼셉트론 순전파)</strong></p>
+<p class="ni" style="margin-top:8px">$L$개의 층을 가진 MLP의 순전파는 각 층에서 선형 변환 + 비선형 활성화를 반복한다:</p>
+<div class="eq">\[ \mathbf{h}^{(l)} = \sigma\!\bigl(\mathbf{W}^{(l)}\,\mathbf{h}^{(l-1)} + \mathbf{b}^{(l)}\bigr), \quad l = 1, \ldots, L \]</div>
+<p class="ni">$\mathbf{h}^{(0)} = \mathbf{x}$ (입력), $\sigma$는 활성화 함수. 파라미터 수: $\sum_{l=1}^{L} n_l(n_{l-1} + 1)$, 여기서 $n_l$은 $l$번째 층의 뉴런 수.</p>
+</div>
 
 <p>
 다층 퍼셉트론(Multi-Layer Perceptron, MLP)은 입력층, 하나 이상의 은닉층, 출력층으로 구성된 완전 연결(fully connected) 신경망이다. 각 층의 모든 뉴런이 다음 층의 모든 뉴런과 연결되어 있다. MLP는 XOR 문제를 포함한 임의의 비선형 함수를 학습할 수 있다.
@@ -834,6 +853,13 @@ losses = []
 
 <h3>5.1 손실 함수 (Loss Function)</h3>
 
+<div class="def">
+<p class="ni"><strong>Definition 5.1 — Loss Functions (손실 함수)</strong></p>
+<div class="eq">\[ \text{MSE (회귀):}\quad L = \frac{1}{N}\sum_{i=1}^{N}(y_i - \hat{y}_i)^2 \]</div>
+<div class="eq">\[ \text{Binary CE (이진 분류):}\quad L = -\frac{1}{N}\sum_{i=1}^{N}\bigl[y_i\log\hat{y}_i + (1-y_i)\log(1-\hat{y}_i)\bigr] \]</div>
+<div class="eq">\[ \text{Categorical CE (다중 분류):}\quad L = -\frac{1}{N}\sum_{i=1}^{N}\sum_{k=1}^{K} y_{ik}\log\hat{y}_{ik} \]</div>
+</div>
+
 <p>
 신경망을 학습시키려면 먼저 "얼마나 틀렸는지"를 측정하는 손실 함수(loss function)가 필요하다. R4에서 이미 MSE와 Cross-Entropy를 배웠다. 딥러닝에서도 동일한 손실 함수를 사용한다:
 </p>
@@ -851,6 +877,14 @@ losses = []
 </div>
 
 <h3>5.2 역전파의 핵심: 체인룰</h3>
+
+<div class="def">
+<p class="ni"><strong>Definition 5.2 — Backpropagation via Chain Rule (역전파)</strong></p>
+<p class="ni" style="margin-top:8px">$L$층 네트워크에서 $l$번째 층의 오차 신호 $\boldsymbol{\delta}^{(l)}$과 기울기:</p>
+<div class="eq">\[ \boldsymbol{\delta}^{(L)} = \frac{\partial L}{\partial \hat{y}} \odot \sigma'(z^{(L)}) \quad \text{(출력층)} \]</div>
+<div class="eq">\[ \boldsymbol{\delta}^{(l)} = \bigl(W^{(l+1)}\bigr)^{\!\top} \boldsymbol{\delta}^{(l+1)} \odot \sigma'(z^{(l)}) \quad \text{(은닉층, } l = L{-}1, \ldots, 1\text{)} \]</div>
+<div class="eq">\[ \frac{\partial L}{\partial W^{(l)}} = \boldsymbol{\delta}^{(l)} \bigl(\mathbf{h}^{(l-1)}\bigr)^{\!\top}, \qquad \frac{\partial L}{\partial b^{(l)}} = \boldsymbol{\delta}^{(l)} \]</div>
+</div>
 
 <p>
 역전파(backpropagation)는 손실 함수의 기울기(gradient)를 출력층에서 입력층 방향으로 효율적으로 계산하는 알고리즘이다. 핵심은 R2에서 배운 <strong>체인룰</strong>(chain rule)이다. 합성 함수의 미분은 각 함수의 미분의 곱이다:
@@ -986,41 +1020,16 @@ f = (x + y) * z = (2 + 3) * -4 = -20
 
 <h3>5.5 정규화 기법</h3>
 
-<p>
-딥러닝에서 과적합을 방지하는 핵심 정규화 기법 세 가지를 알아보자:
-</p>
-
 <div class="def">
-<p class="ni"><strong>📖 Dropout</strong></p>
-<p class="ni" style="margin-top:8px">
-학습 시 각 뉴런을 확률 \(p\)로 무작위 비활성화한다. 이는 매 미니배치마다 다른 서브네트워크를 학습시키는 효과가 있어, 앙상블과 유사한 정규화 효과를 낸다. 추론 시에는 모든 뉴런을 사용하되, 출력에 \((1-p)\)를 곱한다.
-</p>
-</div>
-
-<div class="eq">
-\[
-\text{Dropout: } \tilde{a}_i = \begin{cases} 0 & \text{with probability } p \\ \frac{a_i}{1-p} & \text{with probability } 1-p \end{cases}
-\]
+<p class="ni"><strong>Definition 5.3 — Dropout</strong></p>
+<p class="ni" style="margin-top:8px">학습 시 각 뉴런을 확률 $p$로 무작위 비활성화한다. 추론 시에는 Inverted Dropout을 적용:</p>
+<div class="eq">\[ \tilde{a}_i = \begin{cases} 0 & \text{with probability } p \\ \dfrac{a_i}{1-p} & \text{with probability } 1-p \end{cases} \]</div>
 </div>
 
 <div class="def">
-<p class="ni"><strong>📖 Batch Normalization</strong></p>
-<p class="ni" style="margin-top:8px">
-각 미니배치에서 층의 입력을 정규화(평균 0, 분산 1)한 뒤, 학습 가능한 파라미터 \(\gamma, \beta\)로 스케일링/시프트한다. 내부 공변량 이동(internal covariate shift)을 줄여 학습을 안정화하고 가속한다.
-</p>
-</div>
-
-<div class="eq">
-\[
-\hat{x}_i = \frac{x_i - \mu_B}{\sqrt{\sigma_B^2 + \epsilon}}, \quad y_i = \gamma \hat{x}_i + \beta
-\]
-</div>
-
-<div class="def">
-<p class="ni"><strong>📖 Early Stopping</strong></p>
-<p class="ni" style="margin-top:8px">
-검증 손실(validation loss)이 더 이상 감소하지 않으면 학습을 조기 종료한다. R4에서 배운 교차검증의 딥러닝 버전이다. patience 파라미터로 몇 에폭 동안 개선이 없으면 멈출지 설정한다.
-</p>
+<p class="ni"><strong>Definition 5.4 — Batch Normalization</strong></p>
+<p class="ni" style="margin-top:8px">미니배치 $B$에서 층의 입력을 정규화한 뒤, 학습 가능한 $\gamma, \beta$로 스케일링/시프트:</p>
+<div class="eq">\[ \hat{x}_i = \frac{x_i - \mu_B}{\sqrt{\sigma_B^2 + \epsilon}}, \qquad y_i = \gamma\,\hat{x}_i + \beta \]</div>
 </div>
 
 <!-- ═══════════════════════════════════════════════════════════════
@@ -1088,6 +1097,15 @@ s_t = \beta s_{t-1} + (1-\beta)(\nabla_\theta L)^2
 </div>
 
 <h3>6.5 Adam (Adaptive Moment Estimation)</h3>
+
+<div class="def">
+<p class="ni"><strong>Definition 6.1 — Adam Optimizer</strong></p>
+<p class="ni" style="margin-top:8px">모멘텀(1차 모멘트)과 RMSprop(2차 모멘트)을 결합하고 편향 보정을 적용한다:</p>
+<div class="eq">\[ m_t = \beta_1 m_{t-1} + (1-\beta_1)\,g_t, \qquad v_t = \beta_2 v_{t-1} + (1-\beta_2)\,g_t^2 \]</div>
+<div class="eq">\[ \hat{m}_t = \frac{m_t}{1-\beta_1^t}, \qquad \hat{v}_t = \frac{v_t}{1-\beta_2^t} \]</div>
+<div class="eq">\[ \theta_{t+1} = \theta_t - \frac{\eta}{\sqrt{\hat{v}_t} + \epsilon}\,\hat{m}_t \]</div>
+<p class="ni">기본값: $\eta = 0.001$, $\beta_1 = 0.9$, $\beta_2 = 0.999$, $\epsilon = 10^{-8}$.</p>
+</div>
 
 <p>
 Adam은 모멘텀과 RMSprop을 결합한 옵티마이저로, 현재 딥러닝에서 가장 널리 사용된다. 1차 모멘트(평균)와 2차 모멘트(분산)를 모두 추적하며, 편향 보정(bias correction)을 적용한다.
@@ -1591,6 +1609,13 @@ MLP의 문제는 입력의 공간적 구조를 무시한다는 것이다. 이미
 </div>
 
 <h3>8.2 합성곱 연산 (Convolution)</h3>
+
+<div class="def">
+<p class="ni"><strong>Definition 8.1 — 2D Convolution (합성곱)</strong></p>
+<p class="ni" style="margin-top:8px">입력 $I$에 커널 $K$ ($k_h \times k_w$)를 슬라이딩하며 원소별 곱의 합을 계산:</p>
+<div class="eq">\[ (I * K)(i,j) = \sum_{m=0}^{k_h-1}\sum_{n=0}^{k_w-1} I(i+m,\; j+n) \cdot K(m,n) \]</div>
+<p class="ni">출력 크기: $\left\lfloor \dfrac{W - K + 2P}{S} \right\rfloor + 1$, 여기서 $W$=입력, $K$=커널, $P$=패딩, $S$=스트라이드.</p>
+</div>
 
 <p>
 합성곱은 작은 필터(커널)를 입력 위에서 슬라이딩하면서 원소별 곱의 합을 계산하는 연산이다. 2D 합성곱의 수식:
@@ -2186,6 +2211,14 @@ RNN은 <strong>은닉 상태</strong>(hidden state) \(h_t\)를 통해 과거 정
 
 <h3>10.2 RNN의 수학적 정의</h3>
 
+<div class="def">
+<p class="ni"><strong>Definition 10.1 — RNN (Recurrent Neural Network)</strong></p>
+<p class="ni" style="margin-top:8px">시점 $t$에서 입력 $x_t$와 이전 은닉 상태 $h_{t-1}$을 결합하여 새로운 은닉 상태를 생성:</p>
+<div class="eq">\[ h_t = \tanh(W_{hh}\,h_{t-1} + W_{xh}\,x_t + b_h) \]</div>
+<div class="eq">\[ y_t = W_{hy}\,h_t + b_y \]</div>
+<p class="ni">$W_{hh}, W_{xh}, W_{hy}$는 모든 시점에서 공유된다 (파라미터 공유). 기울기 소실 문제: $\frac{\partial h_t}{\partial h_1} = \prod_{k=2}^{t} W_{hh}^{\top} \cdot \text{diag}(\tanh'(z_k))$.</p>
+</div>
+
 <div class="eq">
 \[
 h_t = \tanh(W_{hh} h_{t-1} + W_{xh} x_t + b_h)
@@ -2323,6 +2356,16 @@ output, h_n = rnn(x, h0)
 
 <h3>11.2 LSTM 수식</h3>
 
+<div class="def">
+<p class="ni"><strong>Definition 11.1 — LSTM (Long Short-Term Memory)</strong></p>
+<p class="ni" style="margin-top:8px">세 개의 게이트와 셀 상태로 장기 의존성을 학습한다:</p>
+<div class="eq">\[ f_t = \sigma(W_f[h_{t-1}, x_t] + b_f) \quad \text{(Forget Gate)} \]</div>
+<div class="eq">\[ i_t = \sigma(W_i[h_{t-1}, x_t] + b_i), \quad \tilde{c}_t = \tanh(W_c[h_{t-1}, x_t] + b_c) \quad \text{(Input Gate)} \]</div>
+<div class="eq">\[ c_t = f_t \odot c_{t-1} + i_t \odot \tilde{c}_t \quad \text{(Cell State — 덧셈 구조로 기울기 직접 전파)} \]</div>
+<div class="eq">\[ o_t = \sigma(W_o[h_{t-1}, x_t] + b_o), \quad h_t = o_t \odot \tanh(c_t) \quad \text{(Output Gate)} \]</div>
+<p class="ni">파라미터 수: $4 \times n_h(n_x + n_h + 1)$. $\sigma$=sigmoid, $\odot$=Hadamard product.</p>
+</div>
+
 <div class="eq">
 \[
 f_t = \sigma(W_f [h_{t-1}, x_t] + b_f) \quad \text{(Forget Gate)}
@@ -2425,6 +2468,16 @@ OHLCV → 64 hidden             4,544     17,920   3.9x
 50 피처 → 128 hidden          23,168     91,648   4.0x</div>
 
 <h3>11.4 GRU (Gated Recurrent Unit)</h3>
+
+<div class="def">
+<p class="ni"><strong>Definition 11.2 — GRU (Gated Recurrent Unit)</strong></p>
+<p class="ni" style="margin-top:8px">LSTM을 단순화하여 게이트 2개(update, reset)로 구현. 셀 상태 없이 은닉 상태만 사용:</p>
+<div class="eq">\[ z_t = \sigma(W_z[h_{t-1}, x_t]) \quad \text{(Update Gate)} \]</div>
+<div class="eq">\[ r_t = \sigma(W_r[h_{t-1}, x_t]) \quad \text{(Reset Gate)} \]</div>
+<div class="eq">\[ \tilde{h}_t = \tanh(W[r_t \odot h_{t-1}, x_t]) \quad \text{(Candidate)} \]</div>
+<div class="eq">\[ h_t = (1 - z_t) \odot h_{t-1} + z_t \odot \tilde{h}_t \quad \text{(Hidden State)} \]</div>
+<p class="ni">파라미터 수: $3 \times n_h(n_x + n_h + 1)$ — LSTM의 75% 수준.</p>
+</div>
 
 <p>
 2014년 Cho et al.이 제안한 GRU는 LSTM을 단순화한 변형이다. 셀 상태를 별도로 두지 않고, 은닉 상태만으로 게이트 메커니즘을 구현한다. 게이트가 2개(reset, update)로 줄어 파라미터가 LSTM의 75% 수준이다.
