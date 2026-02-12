@@ -4,6 +4,14 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Round 2 - Linear Algebra + Statistics for ML</title>
+<script>
+MathJax = {
+  tex: {
+    inlineMath: [['\\(','\\)'],['$','$']],
+    displayMath: [['\\[','\\]'],['$$','$$']]
+  }
+};
+</script>
 <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
 <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;500&family=Space+Mono:wght@400&family=Inter:wght@300;400&display=swap" rel="stylesheet">
@@ -446,11 +454,21 @@ np.dot:    0.825%
 <p>이 성질은 나중에 상관계수(Ch.7)와 코사인 유사도(NLP, Round 6)에서 다시 등장한다.</p>
 
 <h3>2.4 벡터의 크기: 노름 (Norm)</h3>
-<p>벡터의 "크기"를 측정하는 방법을 노름(norm)이라 한다. 가장 흔한 것이 L2 노름(유클리드 거리)이다. 피타고라스 정리의 일반화라고 생각하면 된다.</p>
+<p>벡터의 "크기"를 측정하는 방법을 노름(norm)이라 한다. 금융과 ML에서 가장 많이 쓰는 두 가지 노름을 알아보자.</p>
 
-<div class="eq">\[ \|\mathbf{v}\|_2 = \sqrt{v_1^2 + v_2^2 + \cdots + v_n^2} = \sqrt{\sum_{i=1}^{n} v_i^2} \]</div>
+<div class="def">
+<p class="ni"><strong>Definition 2.1 — L2 노름 (유클리드 노름)</strong></p>
+<div class="eq">\[ \|\mathbf{v}\|_2 = \sqrt{\sum_{i=1}^{n} v_i^2} = \sqrt{v_1^2 + v_2^2 + \cdots + v_n^2} \]</div>
+<p class="ni">피타고라스 정리의 일반화. 원점에서 벡터 끝점까지의 직선 거리다. Ridge 정규화(L2 페널티)에서 사용한다.</p>
+</div>
 
-<p>예를 들어 벡터 <code>[3, 4]</code>의 L2 노름은 \(\sqrt{3^2 + 4^2} = \sqrt{25} = 5\)다. 직각삼각형의 빗변 길이와 같다.</p>
+<div class="def">
+<p class="ni"><strong>Definition 2.2 — L1 노름 (맨해튼 노름)</strong></p>
+<div class="eq">\[ \|\mathbf{v}\|_1 = \sum_{i=1}^{n} |v_i| = |v_1| + |v_2| + \cdots + |v_n| \]</div>
+<p class="ni">각 원소의 절댓값 합. 격자 도로를 따라 걷는 거리와 같다. Lasso 정규화(L1 페널티)에서 사용하며, 희소(sparse) 해를 유도하는 성질이 있다.</p>
+</div>
+
+<p>예를 들어 벡터 <code>[3, 4]</code>의 L2 노름은 \(\sqrt{3^2 + 4^2} = 5\), L1 노름은 \(|3| + |4| = 7\)이다.</p>
 
 <pre><code>v = np.array([<span class="nu">3</span>, <span class="nu">4</span>])
 
@@ -488,6 +506,29 @@ unit_v = v / np.linalg.norm(v)
 <span class="fn">print</span>(<span class="st">f"크기 확인: </span>{np.linalg.norm(unit_v)}<span class="st">"</span>)  <span class="cm"># 1.0</span></code></pre>
 
 <p>금융에서 단위벡터의 의미: 포트폴리오 비중 벡터를 정규화하면 "방향"(어떤 종목에 상대적으로 더 투자하는가)만 남고 "크기"(총 투자금액)는 사라진다. 이것이 바로 "전략의 방향성"이다.</p>
+
+<h3>2.6 코사인 유사도 (Cosine Similarity)</h3>
+<p>두 벡터가 얼마나 "같은 방향"을 가리키는지 측정하는 지표다. 크기는 무시하고 방향만 비교한다. NLP에서 문서 유사도, 금융에서 종목 간 수익률 패턴 유사도를 측정할 때 사용한다.</p>
+
+<div class="def">
+<p class="ni"><strong>Definition 2.3 — 코사인 유사도</strong></p>
+<div class="eq">\[ \cos\theta = \frac{\mathbf{a} \cdot \mathbf{b}}{\|\mathbf{a}\|_2 \cdot \|\mathbf{b}\|_2} = \frac{\sum_{i=1}^{n} a_i b_i}{\sqrt{\sum_{i=1}^{n} a_i^2} \cdot \sqrt{\sum_{i=1}^{n} b_i^2}} \]</div>
+<p class="ni">값의 범위는 \(-1 \leq \cos\theta \leq 1\)이다. 1이면 완전히 같은 방향, 0이면 직교(무관), -1이면 정반대 방향이다. 상관계수와 비슷하지만, 코사인 유사도는 평균을 빼지 않는다는 차이가 있다.</p>
+</div>
+
+<pre><code><span class="cm"># 코사인 유사도 계산</span>
+<span class="kw">from</span> numpy.linalg <span class="kw">import</span> norm
+
+<span class="kw">def</span> <span class="fn">cosine_sim</span>(a, b):
+    <span class="kw">return</span> np.dot(a, b) / (norm(a) * norm(b))
+
+<span class="cm"># 두 종목의 5일 수익률</span>
+stock_a = np.array([<span class="nu">0.02</span>, -<span class="nu">0.01</span>, <span class="nu">0.03</span>, -<span class="nu">0.02</span>, <span class="nu">0.01</span>])
+stock_b = np.array([<span class="nu">0.015</span>, -<span class="nu">0.008</span>, <span class="nu">0.025</span>, -<span class="nu">0.015</span>, <span class="nu">0.012</span>])
+stock_c = np.array([-<span class="nu">0.01</span>, <span class="nu">0.02</span>, -<span class="nu">0.03</span>, <span class="nu">0.01</span>, -<span class="nu">0.005</span>])
+
+<span class="fn">print</span>(<span class="st">f"A vs B (유사): </span>{cosine_sim(stock_a, stock_b):.4f}<span class="st">"</span>)  <span class="cm"># ≈ 0.99</span>
+<span class="fn">print</span>(<span class="st">f"A vs C (반대): </span>{cosine_sim(stock_a, stock_c):.4f}<span class="st">"</span>)  <span class="cm"># ≈ -0.98</span></code></pre>
 
 <!-- ═══ Plotly: Ch.1/2 벡터 연산 인터랙티브 시각화 ═══ -->
 <div id="plot-ch2-vectors" style="width:100%;height:500px;margin:25px 0"></div>
@@ -1429,13 +1470,31 @@ plt.show()</code></pre>
 <h3>6.2 정규분포 (Normal Distribution) — 종 모양의 곡선</h3>
 <p>정규분포(가우시안 분포)는 통계학에서 가장 중요한 분포다. 키, 몸무게, IQ, 측정 오차 등 자연현상의 많은 것이 정규분포를 따른다. 금융에서는 주가 수익률이 정규분포를 따른다고 가정하는 것이 많은 모델의 출발점이다.</p>
 
+<div class="def">
+<p class="ni"><strong>Definition 6.1 — 기본 통계량 (기술통계)</strong></p>
+<p class="ni">표본 \(\{x_1, x_2, \ldots, x_n\}\)에 대해:</p>
+<div class="eq">\[ \bar{x} = \frac{1}{n}\sum_{i=1}^{n} x_i \quad \text{(표본 평균)} \]</div>
+<div class="eq">\[ s^2 = \frac{1}{n-1}\sum_{i=1}^{n}(x_i - \bar{x})^2 \quad \text{(표본 분산)}, \qquad s = \sqrt{s^2} \quad \text{(표본 표준편차)} \]</div>
+<p class="ni">분모가 \(n\)이 아니라 \(n-1\)인 이유: 표본 분산이 모분산의 불편추정량(unbiased estimator)이 되도록 하기 위한 베셀 보정(Bessel's correction)이다. Pandas의 <code>.std()</code>는 기본적으로 \(n-1\)을 사용한다.</p>
+</div>
+
+<div class="def">
+<p class="ni"><strong>Definition 6.2 — 왜도와 첨도 (Skewness & Kurtosis)</strong></p>
+<div class="eq">\[ \text{Skewness} = \frac{1}{n}\sum_{i=1}^{n}\left(\frac{x_i - \bar{x}}{s}\right)^3, \qquad \text{Kurtosis} = \frac{1}{n}\sum_{i=1}^{n}\left(\frac{x_i - \bar{x}}{s}\right)^4 \]</div>
+<p class="ni">왜도(skewness)는 분포의 비대칭도다. 음수면 왼쪽 꼬리가 길고(주가 폭락), 양수면 오른쪽 꼬리가 길다. 첨도(kurtosis)는 꼬리의 두께를 측정한다. 정규분포의 첨도는 3이며, 초과첨도(excess kurtosis) = 첨도 - 3 > 0이면 팻테일(fat tail)이다. 실제 금융 수익률은 거의 항상 초과첨도 > 0이다.</p>
+</div>
+
 <p>정규분포는 두 개의 파라미터로 완전히 결정된다:</p>
 <ul>
 <li><strong>평균 (μ, mu):</strong> 분포의 중심. 종 모양의 꼭대기 위치</li>
 <li><strong>표준편차 (σ, sigma):</strong> 분포의 퍼짐 정도. 클수록 넓게 퍼진다</li>
 </ul>
 
-<div class="eq">\[ f(x) = \frac{1}{\sigma\sqrt{2\pi}} \exp\left(-\frac{(x-\mu)^2}{2\sigma^2}\right) \]</div>
+<div class="def">
+<p class="ni"><strong>Definition 6.3 — 정규분포 확률밀도함수 (PDF)</strong></p>
+<div class="eq">\[ f(x) = \frac{1}{\sigma\sqrt{2\pi}} \exp\left(-\frac{(x-\mu)^2}{2\sigma^2}\right), \quad X \sim N(\mu, \sigma^2) \]</div>
+<p class="ni">\(N(\mu, \sigma^2)\)는 "평균 μ, 분산 σ²인 정규분포"를 의미한다. 표준정규분포는 \(N(0, 1)\)이다.</p>
+</div>
 
 <p>이 공식을 외울 필요는 없다. 중요한 것은 "68-95-99.7 규칙"이다:</p>
 <ul>
