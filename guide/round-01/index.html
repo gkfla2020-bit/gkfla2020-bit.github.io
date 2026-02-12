@@ -4,6 +4,14 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Round 1 - Python + Finance Data Fundamentals</title>
+<script>
+MathJax = {
+  tex: {
+    inlineMath: [['\\(','\\)'],['$','$']],
+    displayMath: [['\\[','\\]'],['$$','$$']]
+  }
+};
+</script>
 <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
 <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;500&family=Space+Mono:wght@400&family=Inter:wght@300;400&display=swap" rel="stylesheet">
@@ -362,6 +370,18 @@ volume = <span class="nu">15234567</span>
 
 <h3>4.1 산술 연산자</h3>
 <p>사칙연산은 물론이고, 금융 계산에 필요한 거듭제곱, 나머지 연산 등을 알아보자.</p>
+
+<div class="def">
+<p class="ni"><strong>Definition 4.1 — 복리 (Compound Interest)</strong></p>
+<div class="eq">\[ FV = PV \times (1 + r)^{n} \]</div>
+<p class="ni">여기서 \(FV\)는 미래가치(Future Value), \(PV\)는 현재가치(Present Value), \(r\)은 기간 이자율, \(n\)은 기간 수다. 복리는 "이자에 이자가 붙는" 효과로, 기간이 길어질수록 단리와의 차이가 기하급수적으로 벌어진다.</p>
+</div>
+
+<div class="info">
+<p class="ni"><strong>72의 법칙 (Rule of 72):</strong> 원금이 2배가 되는 기간을 빠르게 추정하는 공식이다.</p>
+<div class="eq">\[ n_{\text{double}} \approx \frac{72}{r \times 100} \]</div>
+<p class="ni">연 7% 수익률이면 약 \(72/7 \approx 10.3\)년 만에 원금이 2배가 된다.</p>
+</div>
 
 <pre><code><span class="cm"># 기본 산술</span>
 <span class="fn">print</span>(<span class="nu">10</span> + <span class="nu">3</span>)    <span class="cm"># 13  (덧셈)</span>
@@ -789,6 +809,12 @@ rand_returns = np.random.normal(<span class="nu">0.0005</span>, <span class="nu"
 <h3>9.4 벡터 연산 (Vectorized Operations)</h3>
 <p>NumPy의 핵심 장점: for 문 없이 배열 전체에 연산을 적용할 수 있다. 이것을 벡터 연산이라 한다.</p>
 
+<div class="def">
+<p class="ni"><strong>Definition 9.1 — 누적 수익률 (Cumulative Return)</strong></p>
+<div class="eq">\[ R_{\text{cum}} = \prod_{t=1}^{T}(1 + r_t) - 1 \]</div>
+<p class="ni">각 기간의 수익률에 1을 더한 값을 모두 곱한 뒤 1을 빼면 전체 기간의 누적 수익률이 된다. NumPy에서는 <code>np.prod(1 + returns) - 1</code>로 한 줄 계산한다.</p>
+</div>
+
 <pre><code><span class="cm"># 주가 배열</span>
 prices = np.array([<span class="nu">70000</span>, <span class="nu">71500</span>, <span class="nu">69800</span>, <span class="nu">72000</span>, <span class="nu">73500</span>, <span class="nu">72800</span>, <span class="nu">74200</span>])
 
@@ -1070,7 +1096,23 @@ samsung = yf.download(<span class="st">"005930.KS"</span>, start=<span class="st
 <h3>12.2 수익률 계산</h3>
 <p>수익률(return)은 금융 분석의 가장 기본적인 지표다. "어제 대비 오늘 얼마나 변했는가"를 비율로 표현한 것이다.</p>
 
+<div class="def">
+<p class="ni"><strong>Definition 12.1 — 단순 수익률 (Simple Return)</strong></p>
 <div class="eq">\[ r_t = \frac{P_t - P_{t-1}}{P_{t-1}} = \frac{P_t}{P_{t-1}} - 1 \]</div>
+<p class="ni">여기서 \(P_t\)는 시점 \(t\)의 가격(종가)이다. Pandas에서는 <code>pct_change()</code> 한 줄로 계산한다.</p>
+</div>
+
+<div class="def">
+<p class="ni"><strong>Definition 12.2 — 로그 수익률 (Log Return)</strong></p>
+<div class="eq">\[ r_t^{\log} = \ln\!\left(\frac{P_t}{P_{t-1}}\right) = \ln P_t - \ln P_{t-1} \]</div>
+<p class="ni">로그 수익률은 시간 가산성(time-additivity)을 가진다: 여러 기간의 로그 수익률을 단순 합산하면 전체 기간의 로그 수익률이 된다. 수익률이 작을 때(\(|r_t| < 0.1\)) 단순 수익률과 거의 같다. NumPy에서는 <code>np.log(prices).diff()</code>로 계산한다.</p>
+</div>
+
+<div class="info">
+<p class="ni"><strong>연환산 (Annualization):</strong> 일간 통계를 연간 기준으로 변환한다. 1년 거래일 수 \(T = 252\)를 사용한다.</p>
+<div class="eq">\[ \mu_{\text{ann}} = \bar{r}_{\text{daily}} \times T, \qquad \sigma_{\text{ann}} = \sigma_{\text{daily}} \times \sqrt{T} \]</div>
+<p class="ni">수익률은 \(T\)를 곱하고, 변동성은 \(\sqrt{T}\)를 곱한다. 변동성에 제곱근을 쓰는 이유는 분산이 시간에 비례한다는 가정(i.i.d.) 때문이다.</p>
+</div>
 
 <pre><code><span class="cm"># 일간 수익률</span>
 close = samsung[<span class="st">"Close"</span>]
@@ -1102,16 +1144,23 @@ dtype: float64</div>
 <h3>12.3 샤프비율 (Sharpe Ratio)</h3>
 <p>샤프비율은 "위험 한 단위당 얼마나 수익을 냈는가"를 측정하는 지표다. 윌리엄 샤프(William Sharpe)가 1966년에 제안했으며, 투자 성과를 평가하는 가장 널리 사용되는 지표다.</p>
 
-<div class="eq">\[ \text{Sharpe Ratio} = \frac{R_p - R_f}{\sigma_p} \]</div>
+<div class="def">
+<p class="ni"><strong>Definition 12.3 — 샤프비율 (Sharpe Ratio)</strong></p>
+<div class="eq">\[ S = \frac{R_p - R_f}{\sigma_p} \]</div>
+<p class="ni">여기서 \(R_p\)는 포트폴리오 연간 수익률, \(R_f\)는 무위험이자율(보통 국채 금리), \(\sigma_p\)는 포트폴리오 연간 변동성이다. 일간 데이터로 계산할 때는 연환산을 적용한다:</p>
+<div class="eq">\[ S = \frac{\bar{r}_{\text{daily}} \times 252 - R_f}{\sigma_{\text{daily}} \times \sqrt{252}} \]</div>
+</div>
 
-<p>여기서 \(R_p\)는 포트폴리오 수익률, \(R_f\)는 무위험이자율(보통 국채 금리), \(\sigma_p\)는 포트폴리오 변동성이다.</p>
-
-<ul>
-<li>샤프비율 > 1: 좋은 투자</li>
-<li>샤프비율 > 2: 매우 좋은 투자</li>
-<li>샤프비율 > 3: 의심스러울 정도로 좋은 투자 (과적합 가능성)</li>
-<li>샤프비율 < 0: 무위험자산보다 못한 투자</li>
-</ul>
+<div class="tc">Table 12.1 — 샤프비율 해석 기준</div>
+<table>
+<tr><th>샤프비율</th><th>등급</th><th>해석</th></tr>
+<tr><td>\(S < 0\)</td><td>❌ 나쁨</td><td>무위험자산보다 못한 투자</td></tr>
+<tr><td>\(0 \leq S < 0.5\)</td><td>⚠️ 미흡</td><td>위험 대비 보상이 부족</td></tr>
+<tr><td>\(0.5 \leq S < 1\)</td><td>🔶 보통</td><td>수용 가능한 수준</td></tr>
+<tr><td>\(1 \leq S < 2\)</td><td>✅ 좋음</td><td>우수한 위험 조정 수익</td></tr>
+<tr><td>\(2 \leq S < 3\)</td><td>🌟 매우 좋음</td><td>탁월한 전략</td></tr>
+<tr><td>\(S \geq 3\)</td><td>🔍 의심</td><td>과적합(overfitting) 가능성 점검 필요</td></tr>
+</table>
 
 <pre><code><span class="cm"># 샤프비율 계산</span>
 risk_free_rate = <span class="nu">0.035</span>  <span class="cm"># 한국 국채 3.5% 가정</span>
