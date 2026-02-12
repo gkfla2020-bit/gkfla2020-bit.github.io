@@ -4,6 +4,14 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Round 4 - Supervised Learning: Regression + Classification</title>
+<script>
+MathJax = {
+  tex: {
+    inlineMath: [['\\(','\\)'],['$','$']],
+    displayMath: [['\\[','\\]'],['$$','$$']]
+  }
+};
+</script>
 <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
 <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;500&family=Space+Mono:wght@400&family=Inter:wght@300;400&display=swap" rel="stylesheet">
@@ -247,10 +255,10 @@ pre{font-size:11px;padding:14px}table{font-size:10px;display:block;overflow-x:au
 </div>
 
 <div class="def">
-<p class="ni"><strong>정의: 지도학습 (Supervised Learning)</strong></p>
-<p class="ni">입력(X)과 정답(y)이 쌍으로 주어진 데이터에서, X → y의 매핑 함수 f를 학습하는 것이다. "지도"라는 이름은 정답(label)이 "선생님"처럼 학습을 안내하기 때문이다.</p>
-<div class="eq">\[ \hat{y} = f(X) \quad \text{where } f \text{ is learned from } \{(X_1, y_1), (X_2, y_2), \ldots, (X_n, y_n)\} \]</div>
-<p class="ni">금융에서의 예: X = [RSI, MACD, 변동성, 거래량, ...] → y = 내일 수익률 (회귀) 또는 상승/하락 (분류)</p>
+<p class="ni"><strong>Definition 1.1 — 지도학습 (Supervised Learning)</strong></p>
+<p class="ni">입력(X)과 정답(y)이 쌍으로 주어진 데이터에서, X → y의 매핑 함수 $f$를 학습하는 것이다. "지도"라는 이름은 정답(label)이 "선생님"처럼 학습을 안내하기 때문이다.</p>
+<div class="eq">\[ \hat{y} = f(\mathbf{X}; \boldsymbol{\theta}), \quad \boldsymbol{\theta}^* = \arg\min_{\boldsymbol{\theta}} \sum_{i=1}^{n} \mathcal{L}\big(y_i,\; f(\mathbf{x}_i; \boldsymbol{\theta})\big) \]</div>
+<p class="ni">여기서 $\mathcal{L}$은 손실함수(loss function), $\boldsymbol{\theta}$는 모델 파라미터이다. 학습이란 손실함수를 최소화하는 $\boldsymbol{\theta}^*$를 찾는 최적화 문제다.</p>
 </div>
 
 <h3>1.2 ML의 세 가지 유형</h3>
@@ -373,7 +381,11 @@ Name: target_cls, dtype: int64</div>
 <h3>3.1 선형회귀란?</h3>
 <p>선형회귀(Linear Regression)는 가장 단순하면서도 가장 중요한 ML 모델이다. 입력 변수들의 가중합(weighted sum)으로 출력을 예측한다. "단순하다"고 무시하면 안 된다 — 금융에서 Fama-French 팩터 모델, CAPM, 리스크 모델 등 핵심 이론이 모두 선형회귀에 기반한다. MLAT Ch.7에서도 선형회귀를 "From Risk Factors to Return Forecasts"의 기본 도구로 다룬다.</p>
 
+<div class="def">
+<p class="ni"><strong>Definition 3.1 — 선형회귀 (Linear Regression)</strong></p>
 <div class="eq">\[ \hat{y} = \beta_0 + \beta_1 x_1 + \beta_2 x_2 + \cdots + \beta_p x_p = \beta_0 + \sum_{j=1}^{p} \beta_j x_j \]</div>
+<p class="ni">입력 피처 $x_1, \ldots, x_p$의 가중합으로 출력을 예측한다. $\beta_0$은 절편(intercept), $\beta_j$는 피처 $x_j$의 가중치(계수)이다.</p>
+</div>
 
 <p>각 기호의 의미:</p>
 <ul>
@@ -387,11 +399,12 @@ Name: target_cls, dtype: int64</div>
 <h3>3.2 OLS (Ordinary Least Squares) — 최소제곱법</h3>
 <p>선형회귀의 학습 목표는 예측값과 실제값의 차이(잔차, residual)를 최소화하는 계수 β를 찾는 것이다. 가장 기본적인 방법이 OLS(최소제곱법)다. 잔차의 제곱합(RSS)을 최소화한다.</p>
 
-<div class="eq">\[ \text{RSS} = \sum_{i=1}^{n} (y_i - \hat{y}_i)^2 = \sum_{i=1}^{n} \left(y_i - \beta_0 - \sum_{j=1}^{p} \beta_j x_{ij}\right)^2 \]</div>
-
-<p>행렬 표기로 쓰면 더 깔끔하다 (Round 2에서 배운 선형대수가 여기서 쓰인다!):</p>
-
-<div class="eq">\[ \hat{\boldsymbol{\beta}} = (\mathbf{X}^T \mathbf{X})^{-1} \mathbf{X}^T \mathbf{y} \]</div>
+<div class="def">
+<p class="ni"><strong>Definition 3.2 — OLS (최소제곱법)</strong></p>
+<div class="eq">\[ \text{RSS} = \sum_{i=1}^{n} (y_i - \hat{y}_i)^2 = \|\mathbf{y} - \mathbf{X}\boldsymbol{\beta}\|_2^2 \]</div>
+<div class="eq">\[ \hat{\boldsymbol{\beta}}_{\text{OLS}} = (\mathbf{X}^T \mathbf{X})^{-1} \mathbf{X}^T \mathbf{y} \]</div>
+<p class="ni">잔차 제곱합(RSS)을 최소화하는 닫힌 형태 해(closed-form solution)이다. 잔차 벡터 $\mathbf{y} - \hat{\mathbf{y}}$가 피처 공간에 직교(orthogonal)하도록 만든다.</p>
+</div>
 
 <p>이 공식은 "닫힌 형태 해(closed-form solution)"라고 한다. 반복 계산 없이 한 번에 최적 계수를 구할 수 있다. MLAT Ch.7에서 설명하듯, 이 해는 잔차 벡터 \(\mathbf{y} - \hat{\mathbf{y}}\)가 피처 공간에 직교(orthogonal)하도록 만든다 — Round 2에서 배운 직교 개념이 여기서 연결된다.</p>
 
@@ -541,16 +554,20 @@ Test R²:   0.0198
 <h3>4.2 Ridge 회귀 (L2 정규화)</h3>
 <p>Ridge 회귀는 OLS 손실함수에 계수의 제곱합(L2 norm)을 벌칙으로 추가한다.</p>
 
-<div class="eq">\[ \text{Loss}_{\text{Ridge}} = \sum_{i=1}^{n}(y_i - \hat{y}_i)^2 + \lambda \sum_{j=1}^{p} \beta_j^2 \]</div>
-
-<p>\(\lambda\)(람다)는 정규화 강도를 조절하는 하이퍼파라미터다. \(\lambda = 0\)이면 일반 OLS와 동일하고, \(\lambda\)가 커질수록 계수가 0에 가까워진다. Ridge는 모든 계수를 균등하게 축소(shrink)하지만, 정확히 0으로 만들지는 않는다.</p>
+<div class="def">
+<p class="ni"><strong>Definition 4.1 — Ridge 회귀 (L2 정규화)</strong></p>
+<div class="eq">\[ \mathcal{L}_{\text{Ridge}} = \underbrace{\sum_{i=1}^{n}(y_i - \hat{y}_i)^2}_{\text{RSS (적합도)}} + \underbrace{\lambda \sum_{j=1}^{p} \beta_j^2}_{\text{L2 벌칙 (복잡도)}} \]</div>
+<p class="ni">$\lambda \geq 0$는 정규화 강도를 조절하는 하이퍼파라미터이다. $\lambda = 0$이면 OLS, $\lambda \to \infty$이면 모든 $\beta_j \to 0$이다. Ridge는 모든 계수를 균등하게 축소(shrink)하지만, 정확히 0으로 만들지는 않는다.</p>
+</div>
 
 <h3>4.3 Lasso 회귀 (L1 정규화)</h3>
 <p>Lasso는 계수의 절대값 합(L1 norm)을 벌칙으로 사용한다.</p>
 
-<div class="eq">\[ \text{Loss}_{\text{Lasso}} = \sum_{i=1}^{n}(y_i - \hat{y}_i)^2 + \lambda \sum_{j=1}^{p} |\beta_j| \]</div>
-
-<p>Lasso의 핵심 특성: 일부 계수를 정확히 0으로 만든다. 즉, 자동으로 피처 선택(feature selection)을 수행한다. 20개 피처 중 실제로 유용한 5개만 남기고 나머지 15개의 계수를 0으로 만들 수 있다. 이것이 Ridge와의 가장 큰 차이다.</p>
+<div class="def">
+<p class="ni"><strong>Definition 4.2 — Lasso 회귀 (L1 정규화)</strong></p>
+<div class="eq">\[ \mathcal{L}_{\text{Lasso}} = \sum_{i=1}^{n}(y_i - \hat{y}_i)^2 + \lambda \sum_{j=1}^{p} |\beta_j| \]</div>
+<p class="ni">L1 벌칙의 핵심 특성: 일부 계수를 정확히 0으로 만든다. 즉, 자동으로 피처 선택(feature selection)을 수행한다. 20개 피처 중 유용한 5개만 남기고 나머지 15개의 $\beta_j = 0$으로 만들 수 있다.</p>
+</div>
 
 <div class="def">
 <p class="ni"><strong>Ridge vs Lasso 핵심 차이</strong></p>
@@ -690,9 +707,17 @@ plt.show()</code></pre>
 <h3>5.2 시그모이드 함수 — 실수를 확률로 변환</h3>
 <p>로지스틱 회귀는 선형회귀의 출력을 시그모이드(sigmoid) 함수에 통과시켜 0~1 사이의 확률로 변환한다.</p>
 
-<div class="eq">\[ P(y=1|X) = \sigma(z) = \frac{1}{1 + e^{-z}}, \quad z = \beta_0 + \sum_{j=1}^{p} \beta_j x_j \]</div>
+<div class="def">
+<p class="ni"><strong>Definition 5.1 — 로지스틱 회귀 (Logistic Regression)</strong></p>
+<div class="eq">\[ P(y=1|\mathbf{x}) = \sigma(z) = \frac{1}{1 + e^{-z}}, \quad z = \beta_0 + \sum_{j=1}^{p} \beta_j x_j \]</div>
+<p class="ni">시그모이드 함수 $\sigma: \mathbb{R} \to (0, 1)$는 임의의 실수를 확률로 변환한다. $z \gg 0$이면 $\sigma(z) \to 1$, $z \ll 0$이면 $\sigma(z) \to 0$, $z = 0$이면 $\sigma(z) = 0.5$이다. 역함수는 로짓(logit): $z = \ln\!\frac{p}{1-p}$이다.</p>
+</div>
 
-<p>시그모이드 함수의 성질: z가 매우 크면 σ(z) → 1 (확실히 상승), z가 매우 작으면 σ(z) → 0 (확실히 하락), z = 0이면 σ(z) = 0.5 (반반).</p>
+<div class="def">
+<p class="ni"><strong>Definition 5.2 — Binary Cross-Entropy (이진 교차 엔트로피 손실)</strong></p>
+<div class="eq">\[ \mathcal{L}_{\text{BCE}} = -\frac{1}{n}\sum_{i=1}^{n}\Big[y_i \ln \hat{p}_i + (1 - y_i)\ln(1 - \hat{p}_i)\Big] \]</div>
+<p class="ni">여기서 $\hat{p}_i = \sigma(z_i)$는 모델이 예측한 확률, $y_i \in \{0, 1\}$은 실제 레이블이다. $y_i = 1$일 때 $\hat{p}_i$가 1에 가까우면 손실이 작고, $y_i = 0$일 때 $\hat{p}_i$가 0에 가까우면 손실이 작다. 로지스틱 회귀의 학습은 이 BCE를 최소화하는 $\boldsymbol{\beta}$를 찾는 것이다.</p>
+</div>
 
 <pre><code><span class="cm"># 시그모이드 함수 시각화</span>
 <span class="kw">import</span> numpy <span class="kw">as</span> np
@@ -1010,6 +1035,13 @@ MLAT Ch.7에서 Jansen은 금융 시계열 예측에서 <strong>LightGBM이 가�
 
 <h3>6.1 회귀 평가 지표</h3>
 
+<div class="def">
+<p class="ni"><strong>Definition 6.1 — 회귀 평가 지표 (MSE, RMSE, MAE, R²)</strong></p>
+<div class="eq">\[ \text{MSE} = \frac{1}{n}\sum_{i=1}^{n}(y_i - \hat{y}_i)^2, \quad \text{RMSE} = \sqrt{\text{MSE}}, \quad \text{MAE} = \frac{1}{n}\sum_{i=1}^{n}|y_i - \hat{y}_i| \]</div>
+<div class="eq">\[ R^2 = 1 - \frac{\text{RSS}}{\text{TSS}} = 1 - \frac{\sum(y_i - \hat{y}_i)^2}{\sum(y_i - \bar{y})^2} \]</div>
+<p class="ni">$R^2 = 1$이면 완벽한 예측, $R^2 = 0$이면 평균 예측과 동일, $R^2 < 0$이면 평균보다 못한 모델이다. 금융 수익률 예측에서 $R^2 \approx 0.01 \sim 0.05$면 충분히 유용하다.</p>
+</div>
+
 <div class="tc">Table 4. 회귀 모델 평가 지표</div>
 <table>
 <tr><th>지표</th><th>수식</th><th>범위</th><th>해석</th></tr>
@@ -1060,6 +1092,13 @@ cm = confusion_matrix(y_test_cls, y_pred_cls)
 <span class="fn">print</span>(<span class="st">f"Recall:    </span>{recall_score(y_test_cls, y_pred_cls):.4f}<span class="st">"</span>)
 <span class="fn">print</span>(<span class="st">f"F1 Score:  </span>{f1_score(y_test_cls, y_pred_cls):.4f}<span class="st">"</span>)
 <span class="fn">print</span>(<span class="st">f"AUC-ROC:   </span>{roc_auc_score(y_test_cls, y_pred_prob):.4f}<span class="st">"</span>)</code></pre>
+
+<div class="def">
+<p class="ni"><strong>Definition 6.2 — 분류 평가 지표 (Precision, Recall, F1)</strong></p>
+<div class="eq">\[ \text{Precision} = \frac{TP}{TP + FP}, \quad \text{Recall} = \frac{TP}{TP + FN} \]</div>
+<div class="eq">\[ F_1 = 2 \cdot \frac{\text{Precision} \times \text{Recall}}{\text{Precision} + \text{Recall}} = \frac{2\,TP}{2\,TP + FP + FN} \]</div>
+<p class="ni">Precision은 "상승이라고 예측한 것 중 실제 상승 비율", Recall은 "실제 상승 중 모델이 잡아낸 비율"이다. $F_1$은 둘의 조화평균으로, 불균형 데이터에서 Accuracy보다 신뢰할 수 있는 지표이다. 금융에서는 Precision이 높아야 거짓 매수 신호를 줄일 수 있다.</p>
+</div>
 
 <h4>AUC-ROC 곡선</h4>
 <p>AUC-ROC는 분류 모델의 가장 중요한 평가 지표 중 하나다. 임계값(threshold)을 변화시키면서 True Positive Rate(재현율)과 False Positive Rate의 관계를 그린 곡선이다. AUC(Area Under Curve)가 1이면 완벽한 분류, 0.5면 랜덤 추측과 동일하다.</p>
@@ -1150,6 +1189,12 @@ plt.show()</code></pre>
 
 <h3>7.1 과적합 (Overfitting) vs 과소적합 (Underfitting)</h3>
 <p>과적합은 모델이 학습 데이터의 노이즈까지 "외워버리는" 현상이다. 학습 데이터에서는 성능이 좋지만, 새로운 데이터(테스트)에서는 성능이 급락한다. MLAT Ch.6에서 이것을 bias-variance trade-off로 설명한다.</p>
+
+<div class="def">
+<p class="ni"><strong>Definition 7.1 — Bias-Variance 분해</strong></p>
+<div class="eq">\[ \mathbb{E}\big[(y - \hat{f}(\mathbf{x}))^2\big] = \underbrace{\text{Bias}^2[\hat{f}]}_{\text{과소적합}} + \underbrace{\text{Var}[\hat{f}]}_{\text{과적합}} + \underbrace{\sigma^2_\epsilon}_{\text{환원 불가 노이즈}} \]</div>
+<p class="ni">Bias는 모델이 진짜 패턴을 놓치는 정도(과소적합), Variance는 데이터가 바뀔 때 예측이 흔들리는 정도(과적합)이다. 단순한 모델(선형회귀)은 High Bias / Low Variance, 복잡한 모델(깊은 트리)은 Low Bias / High Variance이다. 최적 모델은 둘의 합을 최소화한다.</p>
+</div>
 
 <!-- 과적합 다이어그램 -->
 <div style="margin:25px 0;padding:20px;background:#f8f9fa;border-radius:8px;border:1px solid #ddd">
@@ -1301,8 +1346,11 @@ Fold 5: Accuracy=0.5389, AUC=0.5567
 <p>교실에 학생 100명이 있다고 하자. 전원이 남학생이면 "순수한" 그룹이다 — 누가 남학생인지 맞추기 쉽다. 반면 남녀가 50:50이면 "불순한" 그룹이다 — 랜덤으로 찍어도 50%밖에 못 맞춘다. 불순도는 이 "뒤섞인 정도"를 숫자로 표현한 것이다. 결정 트리는 분할 후 불순도가 최대한 줄어드는 방향으로 데이터를 나눈다.</p>
 
 <h4>Gini 불순도 (Gini Impurity)</h4>
+<div class="def">
+<p class="ni"><strong>Definition 8.1 — Gini 불순도</strong></p>
 <div class="eq">\[ \text{Gini}(S) = 1 - \sum_{k=1}^{K} p_k^2 \]</div>
-<p class="ni">여기서 \(p_k\)는 그룹 \(S\) 안에서 클래스 \(k\)의 비율이다. 직관적 의미: "이 그룹에서 랜덤으로 샘플 하나를 뽑고, 다시 랜덤으로 클래스를 배정했을 때, 틀릴 확률"이다.</p>
+<p class="ni">여기서 $p_k$는 그룹 $S$ 안에서 클래스 $k$의 비율이다. 직관적 의미: "이 그룹에서 랜덤으로 샘플 하나를 뽑고, 다시 랜덤으로 클래스를 배정했을 때, 틀릴 확률"이다. 이진 분류에서 $\text{Gini} \in [0, 0.5]$이며, 0이면 순수(pure), 0.5면 최대 불순도이다.</p>
+</div>
 
 <div class="def">
 <p class="ni"><strong>Gini 계산 예시 (이진 분류: 상승/하락)</strong></p>
@@ -1316,8 +1364,11 @@ Fold 5: Accuracy=0.5389, AUC=0.5567
 </div>
 
 <h4>Entropy (엔트로피)</h4>
-<div class="eq">\[ \text{Entropy}(S) = -\sum_{k=1}^{K} p_k \log_2 p_k \]</div>
-<p class="ni">Entropy는 정보이론(Information Theory)에서 온 개념이다. "이 그룹의 클래스를 알아내려면 평균적으로 몇 비트(bit)의 정보가 필요한가?"를 측정한다. 모든 샘플이 같은 클래스면 정보가 필요 없으므로 Entropy = 0이다. 반반이면 1비트가 필요하므로 Entropy = 1이다.</p>
+<div class="def">
+<p class="ni"><strong>Definition 8.2 — Entropy (엔트로피)</strong></p>
+<div class="eq">\[ H(S) = -\sum_{k=1}^{K} p_k \log_2 p_k \]</div>
+<p class="ni">정보이론(Information Theory)에서 온 개념이다. "이 그룹의 클래스를 알아내려면 평균적으로 몇 비트(bit)의 정보가 필요한가?"를 측정한다. 모든 샘플이 같은 클래스면 $H = 0$, 이진 분류에서 반반이면 $H = 1$ bit이다.</p>
+</div>
 
 <div class="def">
 <p class="ni"><strong>Entropy 계산 예시 (이진 분류: 상승/하락)</strong></p>
@@ -1333,9 +1384,11 @@ Fold 5: Accuracy=0.5389, AUC=0.5567
 <h4>Information Gain — 분할의 "이득"</h4>
 <p>트리가 실제로 분할을 결정할 때는 불순도 자체가 아니라, 분할 전후의 불순도 감소량을 본다. 이것을 Information Gain이라 한다:</p>
 
+<div class="def">
+<p class="ni"><strong>Definition 8.3 — Information Gain (정보 이득)</strong></p>
 <div class="eq">\[ \text{IG}(S, A) = \text{Impurity}(S) - \sum_{v \in \text{values}(A)} \frac{|S_v|}{|S|} \cdot \text{Impurity}(S_v) \]</div>
-
-<p class="ni">즉, "분할 전 불순도 − 분할 후 가중 평균 불순도 = 정보 이득". 트리는 모든 피처의 모든 분할점에 대해 IG를 계산하고, IG가 가장 큰 분할을 선택한다.</p>
+<p class="ni">"분할 전 불순도 − 분할 후 가중 평균 불순도 = 정보 이득". 트리는 모든 피처의 모든 분할점에 대해 IG를 계산하고, IG가 가장 큰 분할을 선택한다. Impurity로 Gini 또는 Entropy를 사용한다.</p>
+</div>
 
 <div class="info">
 <p class="ni"><strong>구체적 예시: RSI ≤ 30으로 분할</strong></p>
@@ -1680,9 +1733,11 @@ plt.show()
 <li>최종 예측 = 모든 트리의 예측을 합산한다</li>
 </ol>
 
-<div class="eq">\[ F_m(x) = F_{m-1}(x) + \eta \cdot h_m(x) \]</div>
-
-<p>여기서 \(\eta\)(학습률, learning rate)는 각 트리의 기여도를 조절한다. 학습률이 작을수록 더 많은 트리가 필요하지만, 과적합 위험이 줄어든다. 보통 0.01~0.1 사이의 값을 사용한다.</p>
+<div class="def">
+<p class="ni"><strong>Definition 10.1 — Gradient Boosting 업데이트 규칙</strong></p>
+<div class="eq">\[ F_m(\mathbf{x}) = F_{m-1}(\mathbf{x}) + \eta \cdot h_m(\mathbf{x}) \]</div>
+<p class="ni">여기서 $F_m$은 $m$번째 라운드까지의 누적 모델, $h_m$은 $m$번째 약한 학습기(보통 얕은 결정 트리), $\eta \in (0, 1]$는 학습률(learning rate)이다. $h_m$은 이전 모델의 잔차(residual) 또는 음의 그래디언트 $-\nabla_F \mathcal{L}$에 적합(fit)된다. 학습률이 작을수록 더 많은 트리가 필요하지만, 과적합 위험이 줄어든다.</p>
+</div>
 
 <pre><code><span class="cm"># === Gradient Boosting 분류 ===</span>
 <span class="kw">from</span> sklearn.ensemble <span class="kw">import</span> GradientBoostingClassifier
@@ -1745,8 +1800,11 @@ y_prob_gb = gb.predict_proba(X_test_s)[:, <span class="nu">1</span>]
 </ol>
 </div>
 
+<div class="def">
+<p class="ni"><strong>Definition 11.1 — XGBoost 목적함수 (2차 근사)</strong></p>
 <div class="eq">\[ \mathcal{L}^{(m)} = \sum_{i=1}^{n} \left[ g_i f_m(x_i) + \frac{1}{2} h_i f_m^2(x_i) \right] + \Omega(f_m) \]</div>
-<p class="ni">여기서 \(g_i = \partial_{\hat{y}} l(y_i, \hat{y}_i^{(m-1)})\)는 1차 gradient, \(h_i = \partial^2_{\hat{y}} l(y_i, \hat{y}_i^{(m-1)})\)는 2차 Hessian, \(\Omega(f_m) = \gamma T + \frac{1}{2}\lambda \|w\|^2\)는 정규화 항이다. MLAT Ch.12 "How XGBoost speeds up computation"에서 이 수식의 유도 과정을 상세히 다룬다.</p>
+<p class="ni">여기서 $g_i = \partial_{\hat{y}} l(y_i, \hat{y}_i^{(m-1)})$는 1차 gradient, $h_i = \partial^2_{\hat{y}} l(y_i, \hat{y}_i^{(m-1)})$는 2차 Hessian, $\Omega(f_m) = \gamma T + \frac{1}{2}\lambda \|w\|^2$는 정규화 항($T$: 리프 수, $w$: 리프 가중치)이다. 2차 근사를 사용하여 Newton 방법처럼 빠르게 수렴한다.</p>
+</div>
 
 <pre><code><span class="cm"># === XGBoost 설치 및 기본 사용 ===</span>
 <span class="cm"># pip install xgboost</span>
