@@ -1,9 +1,17 @@
-﻿<!DOCTYPE html>
+﻿﻿<!DOCTYPE html>
 <html lang="ko">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Round 8 - Convex Optimization + Portfolio Optimization + Transformer</title>
+<script>
+MathJax = {
+  tex: {
+    inlineMath: [['\\(','\\)'],['$','$']],
+    displayMath: [['\\[','\\]'],['$$','$$']]
+  }
+};
+</script>
 <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
 <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;500&family=Space+Mono:wght@400&family=Inter:wght@300;400&display=swap" rel="stylesheet">
@@ -254,7 +262,7 @@ R4에서 XGBoost로 주가 방향을 예측했고, R7에서 LSTM으로 시계열
 </p>
 
 <div class="def">
-<p class="ni"><strong>📖 Convex Optimization 문제의 표준형</strong></p>
+<p class="ni"><strong>Definition 1.1 — Convex Optimization 표준형 (Standard Form)</strong></p>
 <div class="eq">
 $$\min_{x} \; f(x) \quad \text{subject to} \quad g_i(x) \leq 0, \;\; h_j(x) = 0$$
 </div>
@@ -283,7 +291,7 @@ $$\min_{x} \; f(x) \quad \text{subject to} \quad g_i(x) \leq 0, \;\; h_j(x) = 0$
 </p>
 
 <div class="def">
-<p class="ni"><strong>📖 볼록집합 (Convex Set) 정의</strong></p>
+<p class="ni"><strong>Definition 2.1 — 볼록집합 (Convex Set)</strong></p>
 <p class="ni" style="margin-top:8px">집합 \(C\)가 볼록하다 ⟺ 임의의 \(x_1, x_2 \in C\)와 \(0 \leq \theta \leq 1\)에 대해:</p>
 <div class="eq">
 $$\theta x_1 + (1-\theta) x_2 \in C$$
@@ -357,7 +365,7 @@ $$\theta x_1 + (1-\theta) x_2 \in C$$
 </p>
 
 <div class="def">
-<p class="ni"><strong>📖 볼록함수 (Convex Function) 정의</strong></p>
+<p class="ni"><strong>Definition 2.2 — 볼록함수 (Convex Function)</strong></p>
 <p class="ni" style="margin-top:8px">함수 \(f: \mathbb{R}^n \to \mathbb{R}\)가 볼록하다 ⟺ 정의역이 볼록집합이고, 임의의 \(x, y\)와 \(0 \leq \theta \leq 1\)에 대해:</p>
 <div class="eq">
 $$f(\theta x + (1-\theta)y) \leq \theta f(x) + (1-\theta) f(y)$$
@@ -400,6 +408,13 @@ $$f(y) \geq f(x) + \nabla f(x)^T (y - x) \quad \forall x, y$$
 $$\nabla^2 f(x) \succeq 0 \quad \forall x$$
 </div>
 
+<div class="def">
+<p class="ni"><strong>Definition 2.3 — 볼록성 판별 조건 (Convexity Conditions)</strong></p>
+<div class="eq">\[\text{1차 조건 (First-order):} \quad f(y) \geq f(x) + \nabla f(x)^T(y - x) \quad \forall\, x, y\]</div>
+<div class="eq">\[\text{2차 조건 (Second-order):} \quad \nabla^2 f(x) \succeq 0 \quad \forall\, x\]</div>
+<p class="ni">1차 조건은 모든 점에서 접선(접평면)이 함수 아래에 있음을 의미하고, 2차 조건은 헤시안 행렬이 양반정치(positive semidefinite)임을 의미한다. 포트폴리오 분산 $w^T\Sigma w$의 헤시안은 $2\Sigma \succeq 0$이므로 항상 볼록하다.</p>
+</div>
+
 <p>
 R2에서 배운 고유값을 기억하자. 행렬이 양반정치라는 것은 모든 고유값이 0 이상이라는 뜻이다. 포트폴리오의 공분산 행렬 \(\Sigma\)는 항상 양반정치이므로, 포트폴리오 분산 \(w^T \Sigma w\)는 항상 볼록함수다. 이것이 Mean-Variance 최적화가 볼록 최적화인 이유다.
 </p>
@@ -436,6 +451,12 @@ $$\mathcal{L}(x, \nu) = f(x) + \nu \cdot h(x)$$
 <p>
 여기서 \(\nu\)는 <strong>라그랑주 승수</strong>(Lagrange multiplier)다. 최적해에서는 \(\nabla_x \mathcal{L} = 0\)이고 \(h(x) = 0\)이다. 라그랑주 승수 \(\nu\)의 경제적 의미는 "제약을 한 단위 완화했을 때 목적함수가 얼마나 개선되는가"이다. 금융에서 이것은 <strong>그림자 가격</strong>(shadow price)이라 불린다 — 예를 들어, "공매도 제약을 풀면 샤프비율이 얼마나 올라가는가?"를 알려준다.
 </p>
+
+<div class="def">
+<p class="ni"><strong>Definition 3.1 — 라그랑주 함수 (Lagrangian)</strong></p>
+<div class="eq">\[\mathcal{L}(x, \lambda, \nu) = f(x) + \sum_{i} \lambda_i g_i(x) + \sum_{j} \nu_j h_j(x)\]</div>
+<p class="ni">$f(x)$는 목적함수, $g_i(x) \leq 0$은 부등식 제약, $h_j(x) = 0$은 등식 제약이다. $\lambda_i \geq 0$과 $\nu_j$는 라그랑주 승수(Lagrange multiplier)로, 제약을 한 단위 완화했을 때 목적함수의 개선량(그림자 가격, shadow price)을 나타낸다.</p>
+</div>
 
 <h3>3.3 KKT 조건 (Karush-Kuhn-Tucker Conditions)</h3>
 
@@ -475,6 +496,15 @@ KKT 조건은 볼록 최적화에서 최적해의 <strong>필요충분조건</st
 <p class="ni" style="font-size:11px;color:#888;margin-top:4px">제약이 활성이 아니면 승수 = 0</p>
 </div>
 </div>
+</div>
+
+<div class="def">
+<p class="ni"><strong>Definition 3.2 — KKT 조건 (Karush-Kuhn-Tucker Conditions)</strong></p>
+<div class="eq">\[\text{(i) Stationarity:} \quad \nabla f(x^*) + \sum_i \lambda_i \nabla g_i(x^*) + \sum_j \nu_j \nabla h_j(x^*) = 0\]</div>
+<div class="eq">\[\text{(ii) Primal feasibility:} \quad g_i(x^*) \leq 0, \;\; h_j(x^*) = 0\]</div>
+<div class="eq">\[\text{(iii) Dual feasibility:} \quad \lambda_i \geq 0\]</div>
+<div class="eq">\[\text{(iv) Complementary slackness:} \quad \lambda_i \cdot g_i(x^*) = 0\]</div>
+<p class="ni">볼록 최적화에서 KKT 조건은 최적해의 필요충분조건이다. 상보 이완 조건은 "제약이 등호로 성립하지 않으면 해당 승수는 0"임을 의미한다.</p>
 </div>
 
 <p>
@@ -729,6 +759,13 @@ port_ret = mu.values @ w.value
 <p>
 비유하자면, 축구팀을 구성할 때 개인 능력이 뛰어난 선수 11명을 모으는 것보다, 서로 보완하는 선수들을 조합하는 것이 더 강한 팀을 만든다. 공격수만 11명이면 수비가 무너진다. 마찬가지로, 수익률이 높은 종목만 모으면 리스크가 집중된다. 서로 상관관계가 낮은 종목을 조합하면 같은 수익률에서 리스크를 줄일 수 있다 — 이것이 <strong>분산 투자</strong>(diversification)의 수학적 근거다.
 </p>
+
+<div class="def">
+<p class="ni"><strong>Definition 5.1 — Mean-Variance 최적화 (Markowitz, 1952)</strong></p>
+<div class="eq">\[\mu_p = w^T \mu, \qquad \sigma_p^2 = w^T \Sigma w\]</div>
+<div class="eq">\[\min_w \; w^T \Sigma w \quad \text{s.t.} \quad w^T \mu \geq r_{\text{target}},\; \mathbf{1}^T w = 1\]</div>
+<p class="ni">$w$는 비중 벡터, $\mu$는 기대수익률 벡터, $\Sigma$는 공분산 행렬이다. 목적함수 $w^T\Sigma w$는 $\Sigma \succeq 0$이므로 볼록이며, 제약은 선형이므로 전체 문제가 이차 볼록 최적화(QP)이다.</p>
+</div>
 
 <h3>5.2 수학적 정식화</h3>
 
@@ -1010,6 +1047,13 @@ Black-Litterman의 핵심 아이디어는 두 단계다:
 비유하자면, Markowitz는 "백지에서 시작"하는 것이고, Black-Litterman은 "시장의 지혜에서 시작하여 내 의견을 반영"하는 것이다. 출발점이 안정적이므로 결과도 훨씬 안정적이다.
 </p>
 
+<div class="def">
+<p class="ni"><strong>Definition 6.1 — Black-Litterman 모델</strong></p>
+<div class="eq">\[\Pi = \delta \Sigma w_{\text{mkt}} \quad \text{(균형 기대수익률)}\]</div>
+<div class="eq">\[\mu_{\text{BL}} = \bigl[(\tau\Sigma)^{-1} + P^T \Omega^{-1} P\bigr]^{-1}\bigl[(\tau\Sigma)^{-1}\Pi + P^T \Omega^{-1} Q\bigr]\]</div>
+<p class="ni">$\Pi$는 시장 균형 수익률, $\delta$는 위험회피계수, $w_{\text{mkt}}$는 시가총액 비중이다. $P$는 전망 행렬, $Q$는 전망 수익률, $\Omega$는 전망 불확실성, $\tau$는 스케일링 파라미터(0.025~0.05)이다.</p>
+</div>
+
 <h3>6.2 수학적 구조</h3>
 
 <p>
@@ -1155,6 +1199,13 @@ w_BL = w_BL / w_BL.<span class="fn">sum</span>()  <span class="cm"># 정규화</
 <p>
 Risk Parity의 아이디어는 단순하다: <strong>각 자산이 포트폴리오 전체 리스크에 동일하게 기여하도록 비중을 조절한다.</strong> 금액이 아닌 리스크를 균등 배분하는 것이다.
 </p>
+
+<div class="def">
+<p class="ni"><strong>Definition 7.1 — 리스크 기여도와 Risk Parity</strong></p>
+<div class="eq">\[RC_i = w_i \cdot \frac{(\Sigma w)_i}{\sqrt{w^T \Sigma w}} = w_i \cdot \frac{\partial \sigma_p}{\partial w_i}\]</div>
+<div class="eq">\[\text{Risk Parity:} \quad RC_1 = RC_2 = \cdots = RC_n = \frac{\sigma_p}{n}\]</div>
+<p class="ni">$RC_i$는 자산 $i$의 포트폴리오 전체 리스크에 대한 기여도이며, $\sum_i RC_i = \sigma_p$이다. Risk Parity는 모든 자산의 리스크 기여도를 균등하게 만드는 비중을 찾는다.</p>
+</div>
 
 <h3>7.2 리스크 기여도 (Risk Contribution)</h3>
 
@@ -1438,6 +1489,13 @@ w_hrp = <span class="fn">get_hrp_weights</span>(returns)
 Kelly의 핵심 질문: "승률과 배당률이 알려진 게임에서, 매번 자산의 몇 %를 걸어야 장기적으로 자산이 최대가 되는가?"
 </p>
 
+<div class="def">
+<p class="ni"><strong>Definition 9.1 — Kelly Criterion</strong></p>
+<div class="eq">\[f^* = \frac{bp - q}{b} \quad \text{(이진 베팅: 승률 } p, \text{ 배당 } b, \; q = 1-p\text{)}\]</div>
+<div class="eq">\[f^* = \arg\max_f \; E[\log(1 + f \cdot R)] \quad \Longrightarrow \quad f^* = \Sigma^{-1}\mu \;\text{(다자산, 정규분포)}\]</div>
+<p class="ni">Kelly Criterion은 기대 로그 자산을 최대화하는 최적 베팅 비율이다. 다자산 연속 버전은 Markowitz 최대 효용($\gamma=1$)과 동일하다. 실전에서는 Half-Kelly($f^*/2$)를 사용하여 변동성을 줄인다.</p>
+</div>
+
 <h3>9.2 Kelly 공식</h3>
 
 <p>
@@ -1622,6 +1680,12 @@ Attention의 핵심 아이디어를 비유로 설명하자. 당신이 도서관�
 </div>
 </div>
 
+<div class="def">
+<p class="ni"><strong>Definition 10.1 — Scaled Dot-Product Attention</strong></p>
+<div class="eq">\[\text{Attention}(Q, K, V) = \text{softmax}\!\left(\frac{QK^T}{\sqrt{d_k}}\right) V\]</div>
+<p class="ni">$Q \in \mathbb{R}^{n \times d_k}$는 Query, $K$는 Key, $V$는 Value 행렬이다. $QK^T$로 유사도를 계산하고, $\sqrt{d_k}$로 스케일링한 뒤 softmax로 확률화하여 $V$의 가중 평균을 구한다.</p>
+</div>
+
 <h3>10.3 Scaled Dot-Product Attention</h3>
 
 <p>
@@ -1764,6 +1828,12 @@ $$Q = XW^Q, \quad K = XW^K, \quad V = XW^V$$
 <p class="ni"><strong>📚 교재 연동:</strong> MLAT Ch.16 "Attention is all you need" 섹션 — Transformer의 핵심 구성요소인 Positional Encoding과 Multi-Head Attention을 다룬다. MLAT Ch.20~21에서 Autoencoder/GAN과 결합한 고급 아키텍처도 소개된다.</p>
 </div>
 
+<div class="def">
+<p class="ni"><strong>Definition 11.1 — Positional Encoding</strong></p>
+<div class="eq">\[PE_{(pos,\, 2i)} = \sin\!\left(\frac{pos}{10000^{2i/d_{\text{model}}}}\right), \qquad PE_{(pos,\, 2i+1)} = \cos\!\left(\frac{pos}{10000^{2i/d_{\text{model}}}}\right)\]</div>
+<p class="ni">$pos$는 시퀀스 내 위치, $i$는 차원 인덱스, $d_{\text{model}}$은 모델 차원이다. 사인/코사인 함수를 사용하여 각 위치에 고유한 벡터를 부여하며, 상대적 위치를 선형 변환으로 표현할 수 있어 임의 길이 시퀀스에 일반화 가능하다.</p>
+</div>
+
 <h3>11.1 Positional Encoding — 순서 정보 주입</h3>
 
 <p>
@@ -1853,6 +1923,13 @@ Input shape: torch.Size([2, 20, 64]) → Output shape: torch.Size([2, 20, 64])</
 })();
 </script>
 <p class="ni" style="font-size:11px;color:#888;text-align:center;margin-top:-10px">🖱️ 낮은 차원(왼쪽)은 고주파 진동, 높은 차원(오른쪽)은 저주파 진동. 각 위치(pos)가 고유한 패턴을 가져 Transformer가 순서를 구분할 수 있다.</p>
+
+<div class="def">
+<p class="ni"><strong>Definition 11.2 — Multi-Head Attention</strong></p>
+<div class="eq">\[\text{MultiHead}(Q, K, V) = \text{Concat}(\text{head}_1, \ldots, \text{head}_h)\, W^O\]</div>
+<div class="eq">\[\text{head}_i = \text{Attention}(QW_i^Q,\; KW_i^K,\; VW_i^V)\]</div>
+<p class="ni">$h$개의 서로 다른 선형 변환($W_i^Q, W_i^K, W_i^V$)으로 $h$개의 Attention을 병렬 실행한 뒤 결합한다. 각 헤드는 $d_k = d_{\text{model}}/h$ 차원에서 작동하며, 단기 모멘텀·장기 추세·변동성 패턴 등 다양한 관점을 동시에 포착한다.</p>
+</div>
 
 <h3>11.2 Multi-Head Attention — 다양한 관점으로 보기</h3>
 
