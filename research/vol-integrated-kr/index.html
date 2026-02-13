@@ -1507,10 +1507,251 @@ title: "Regime Shift & Spillover"
 
 <div class="section-divider">• • •</div>
 
-<!-- 9. 결론 -->
-<h2>9. 결론 및 시사점</h2>
+<!-- DEVELOP: 확장 분석 -->
+<h2>9. 확장 분석: 방법론적 보완과 심화</h2>
 
-<h3>9.1 주요 발견</h3>
+<p>본 장에서는 기존 분석의 허점을 보완하고, 새로운 방법론과 데이터를 도입하여 연구의 강건성과 깊이를 확장한다. 구체적으로 (1) Vasicek 모델 선택의 정당화와 실질금리 분석, (2) 시변 전이효과와 포트폴리오 백테스팅, (3) 불확실성 지수와 주말 효과의 실증, (4) 주파수 영역 분해와 비선형 인과성 검정을 다룬다.</p>
+
+<h3>9.1 Vasicek 모델의 정당성: CIR 모델과의 비교</h3>
+
+<p>본 연구가 CIR(Cox-Ingersoll-Ross) 모델 대신 Vasicek 모델을 채택한 것에 대한 계량적 정당화가 필요하다. 특히 2008-2021년 제로금리 하한(ZLB) 기간에는 금리가 음수로 내려갈 수 있는 Vasicek 모델의 가정이 문제될 수 있다. 이를 검증하기 위해 두 모델을 동일 데이터에 추정하고 정보기준으로 비교했다.</p>
+
+<table>
+<caption>표 9-1: Vasicek vs CIR 모델 비교 (3개월 T-Bill)</caption>
+<thead>
+<tr><th>기간</th><th>모델</th><th>a (회귀속도)</th><th>b (장기평균, %)</th><th>σ</th><th>AIC</th><th>BIC</th></tr>
+</thead>
+<tbody>
+<tr><td class="left" rowspan="2">ZLB Era (2008-2021)</td><td>Vasicek</td><td>0.0751</td><td>0.48</td><td>0.290</td><td class="sig">-15,512</td><td class="sig">-15,494</td></tr>
+<tr><td>CIR</td><td>0.978</td><td>0.45</td><td>0.796</td><td>-15,131</td><td>-15,113</td></tr>
+<tr><td class="left" rowspan="2">Tightening (2022-2025)</td><td>Vasicek</td><td>1.031</td><td>5.34</td><td>0.700</td><td class="sig">-2,613</td><td class="sig">-2,599</td></tr>
+<tr><td>CIR</td><td>0.442</td><td>7.08</td><td>0.527</td><td>-2,144</td><td>-2,130</td></tr>
+</tbody>
+</table>
+<p class="note">주: 굵은 값은 각 기간에서 선호되는 모델. AIC/BIC가 낮을수록 우수.</p>
+
+<p>두 기간 모두에서 Vasicek 모델이 AIC와 BIC 기준으로 CIR 모델을 압도한다. ZLB 기간에는 AIC 차이가 382로 매우 크며, 이는 금리가 0% 근처에서 변동할 때 CIR 모델의 √r 변동성 구조가 오히려 적합도를 떨어뜨리기 때문이다. 금리가 0에 가까울수록 CIR의 변동성이 0에 수렴하는데, 실제로는 양적완화 기간에도 금리 변동이 존재했다. Vasicek 모델의 상수 변동성 가정이 이 기간에 더 현실적이다.</p>
+
+<div class="chart-container">
+<img src="chart_vasicek_cir.png" alt="Vasicek vs CIR 모델 비교">
+<div class="chart-caption">그림 9-1: Vasicek 평균회귀 반감기(좌)와 모델 비교 AIC(우). 두 기간 모두 Vasicek이 우월하다.</div>
+</div>
+
+<h3>9.2 실질금리와 금의 관계: TIPS 기반 DCC-GARCH</h3>
+
+<p>기존 분석에서 금-채권 상관관계는 명목금리(10년 국채)를 기준으로 측정했다. 그러나 금의 안전자산 성격은 실질금리(TIPS)와의 역상관에서 기인한다. 이를 검증하기 위해 10년 TIPS 수익률 변화와 금 수익률 간 DCC-GARCH를 추정했다.</p>
+
+<table>
+<caption>표 9-2: 금-금리 DCC-GARCH 비교 (명목 vs 실질)</caption>
+<thead>
+<tr><th>페어</th><th>DCC a</th><th>DCC b</th><th>평균 상관</th><th>Log-Lik</th><th>AIC</th></tr>
+</thead>
+<tbody>
+<tr><td class="left">Gold-TIPS (실질금리)</td><td>0.217</td><td>0.783</td><td class="sig">-0.366</td><td>748.0</td><td>-1,480</td></tr>
+<tr><td class="left">Gold-Nominal (명목금리)</td><td>0.262</td><td>0.738</td><td>-0.328</td><td>835.9</td><td>-1,656</td></tr>
+<tr><td class="left">BTC-TIPS (실질금리)</td><td>0.323</td><td>0.426</td><td>-0.046</td><td>355.4</td><td>-695</td></tr>
+</tbody>
+</table>
+
+<p>금-TIPS 평균 상관(-0.366)이 금-명목금리(-0.328)보다 더 강한 음의 상관을 보인다. 이는 금 가격이 명목금리보다 실질금리에 더 민감하게 반응한다는 기존 이론과 일치한다. 반면 BTC-TIPS 상관은 -0.046으로 거의 무상관이며, 비트코인이 실질금리 변동에 대한 헤지 수단으로는 기능하지 않음을 확인한다.</p>
+
+
+<h3>9.3 시변 전이효과: Rolling VAR Spillover</h3>
+
+<p>기존 Diebold-Yilmaz 분석은 전체 기간 또는 서브샘플의 정적 결과를 제시했다. TVP-VAR의 근사로 252일 롤링 윈도우 VAR을 추정하여 전이효과의 시변적 진화를 추적했다.</p>
+
+<table>
+<caption>표 9-3: 주요 시점의 Rolling Spillover Index</caption>
+<thead>
+<tr><th>시점</th><th>이벤트</th><th>총 전이지수(%)</th><th>BTC→Others(%)</th><th>Others→BTC(%)</th></tr>
+</thead>
+<tbody>
+<tr><td>2015.05</td><td>초기 BTC 시대</td><td>9.8</td><td>0.5</td><td>0.1</td></tr>
+<tr><td>2018.02</td><td>VIX 폭발</td><td>10.3</td><td>0.4</td><td>0.6</td></tr>
+<tr><td class="sig">2020.03</td><td class="sig">COVID-19</td><td class="sig">32.1</td><td class="sig">10.3</td><td class="sig">3.8</td></tr>
+<tr><td>2022.06</td><td>금리인상 본격화</td><td>18.5</td><td>6.9</td><td>0.4</td></tr>
+<tr><td>2023.03</td><td>SVB 위기</td><td>14.1</td><td>3.1</td><td>0.4</td></tr>
+<tr><td>2024.02</td><td>BTC ETF 출시</td><td>9.8</td><td>0.6</td><td>0.4</td></tr>
+</tbody>
+</table>
+<p class="note">주: 252일 롤링 윈도우, 월별 스텝. 평균 전이지수 14.7%, 최대 42.4% (COVID 직후).</p>
+
+<p>COVID-19 시기 총 전이지수가 32.1%로 급등하며 BTC→Others 전이가 10.3%에 달했다. 이는 유동성 위기 시 비트코인이 전통 자산과 강하게 연결되었음을 보여준다. 반면 2024년 BTC ETF 출시 이후에는 전이지수가 9.8%로 정상화되어, ETF를 통한 제도화가 오히려 시장 분절을 완화시켰을 가능성을 시사한다.</p>
+
+<div class="chart-container">
+<img src="chart_rolling_spillover.png" alt="Rolling Spillover Index">
+<div class="chart-caption">그림 9-2: 시변 전이효과 지수(상)와 BTC 방향별 전이(하). COVID-19 시기 급등 후 점진적 정상화.</div>
+</div>
+
+<h3>9.4 비트코인의 카멜레온 효과</h3>
+
+<p>비트코인이 위기 유형에 따라 상이한 역할을 수행하는 '카멜레온 효과'를 체계적으로 검증했다. 위기 유형별 BTC의 주요 자산 상관관계를 비교하여 Risk-On, Safe-Haven, Independent 세 가지 역할을 분류했다.</p>
+
+<table>
+<caption>표 9-4: 위기 유형별 BTC 상관관계와 역할 분류</caption>
+<thead>
+<tr><th>위기 유형</th><th>BTC-Gold</th><th>BTC-SPX</th><th>BTC-Bond</th><th>역할</th></tr>
+</thead>
+<tbody>
+<tr><td class="left">COVID Crash (2020.02-03)</td><td>0.305</td><td class="sig">0.492</td><td>-0.069</td><td>Risk-On</td></tr>
+<tr><td class="left">COVID Recovery (2020.04-12)</td><td class="sig">0.273</td><td>0.272</td><td>0.032</td><td>Safe-Haven</td></tr>
+<tr><td class="left">Rate Hike (2022.03-12)</td><td>0.167</td><td class="sig">0.563</td><td>-0.150</td><td>Risk-On</td></tr>
+<tr><td class="left">FTX Collapse (2022.11-12)</td><td>0.162</td><td class="sig">0.555</td><td>-0.192</td><td>Risk-On</td></tr>
+<tr><td class="left">SVB Crisis (2023.03-04)</td><td class="sig">0.325</td><td>0.188</td><td>-0.186</td><td>Safe-Haven</td></tr>
+<tr><td class="left">BTC ETF (2024.01-06)</td><td>0.075</td><td>0.192</td><td>-0.052</td><td>Independent</td></tr>
+<tr><td class="left">Normal (2019)</td><td>0.108</td><td>-0.049</td><td>-0.024</td><td>Independent</td></tr>
+</tbody>
+</table>
+
+<p>패턴이 명확하다. 시장 전체의 유동성 위기(COVID Crash, Rate Hike, FTX)에서 BTC는 SPX와 강하게 동조하는 Risk-On 자산으로 행동한다. 반면 시스템적 신용 위기(SVB)에서는 금과의 상관이 0.325로 높아지며 대안적 가치 저장 수단(Safe-Haven)으로 전환된다. 이는 "유동성 위기 시 Risk-On, 신용 위기 시 Alternative Safe-Haven"이라는 가설을 지지한다.</p>
+
+<div class="chart-container">
+<img src="chart_chameleon_effect.png" alt="BTC 카멜레온 효과">
+<div class="chart-caption">그림 9-3: 위기 유형별 BTC 상관관계. 유동성 위기(좌)에서는 SPX 동조, 신용 위기(SVB)에서는 Gold 동조.</div>
+</div>
+
+<h3>9.5 포트폴리오 백테스팅: 정적 vs 동적 배분</h3>
+
+<p>상관관계 변화가 실제 투자 성과에 미치는 영향을 검증하기 위해 세 가지 전략을 2015-2025년 기간 백테스팅했다.</p>
+
+<table>
+<caption>표 9-5: 포트폴리오 백테스팅 결과 (2015.09-2025.01)</caption>
+<thead>
+<tr><th>전략</th><th>연환산 수익률(%)</th><th>연환산 변동성(%)</th><th>샤프 비율</th><th>최대 낙폭(%)</th></tr>
+</thead>
+<tbody>
+<tr><td class="left">Static 60/40</td><td>5.15</td><td>8.91</td><td>0.577</td><td>-22.67</td></tr>
+<tr><td class="left">Static Alternative</td><td>7.52</td><td>9.22</td><td>0.815</td><td>-25.04</td></tr>
+<tr><td class="left sig">Dynamic MVP</td><td class="sig">9.68</td><td>10.03</td><td class="sig">0.965</td><td class="sig">-22.51</td></tr>
+</tbody>
+</table>
+<p class="note">주: Static 60/40 = SPX 60% + Bond 40%. Static Alt = SPX 40% + Bond 30% + Gold 15% + WTI 10% + BTC 5%. Dynamic MVP = 252일 롤링 공분산 기반 최소분산 포트폴리오 (SPX, Gold, BTC).</p>
+
+<p>DCC-GARCH 시변 상관관계를 반영한 Dynamic MVP의 샤프 비율(0.965)이 Static 60/40(0.577)을 67% 상회한다. 특히 최대 낙폭이 -22.51%로 정적 전략과 유사하면서도 수익률이 크게 높아, 시변 상관관계 정보의 실무적 가치를 확인한다.</p>
+
+<div class="chart-container">
+<img src="chart_backtesting.png" alt="포트폴리오 백테스팅">
+<div class="chart-caption">그림 9-4: 누적 수익률 비교. Dynamic MVP가 COVID 하락 후 빠른 회복을 보인다.</div>
+</div>
+
+<h3>9.6 VIX 레짐별 상관관계 비대칭성</h3>
+
+<p>불확실성 수준에 따른 자산 간 상관관계의 비대칭성을 검증하기 위해 VIX 중앙값을 기준으로 고스트레스/저스트레스 레짐을 구분하고 Fisher z-검정을 수행했다.</p>
+
+<table>
+<caption>표 9-6: VIX 레짐별 상관관계 비교</caption>
+<thead>
+<tr><th>페어</th><th>High VIX 상관</th><th>Low VIX 상관</th><th>Z-통계량</th><th>p-value</th></tr>
+</thead>
+<tbody>
+<tr><td class="left">BTC-SPX</td><td class="sig">0.285</td><td>0.048</td><td>7.52</td><td class="sig">&lt;0.001***</td></tr>
+<tr><td class="left">BTC-Gold</td><td class="sig">0.125</td><td>0.026</td><td>3.05</td><td class="sig">0.002***</td></tr>
+<tr><td class="left">Gold-Bond</td><td>-0.283</td><td class="sig">-0.359</td><td>2.60</td><td class="sig">0.009***</td></tr>
+<tr><td class="left">Copper-Bond</td><td>0.086</td><td>0.063</td><td>0.73</td><td>0.465</td></tr>
+</tbody>
+</table>
+
+<p>BTC-SPX 상관은 고스트레스 시 0.285로 저스트레스(0.048)의 약 6배에 달하며, 이 차이는 통계적으로 매우 유의하다(Z=7.52, p&lt;0.001). 이는 비트코인의 다각화 효과가 가장 필요한 위기 시기에 오히려 소멸됨을 의미한다. 반면 금-채권의 음의 상관은 저스트레스 시(-0.359) 더 강하여, 금의 안전자산 역할이 평시에 더 안정적으로 작동함을 보여준다.</p>
+
+<h3>9.7 주말 효과와 BTC 변동성</h3>
+
+<p>비트코인의 24/7 거래 특성이 전통 자산과의 상관관계에 미치는 영향을 실증했다.</p>
+
+<table>
+<caption>표 9-7: BTC 요일별 수익률 통계</caption>
+<thead>
+<tr><th>요일</th><th>평균 수익률(%)</th><th>변동성(%)</th><th>관측수</th></tr>
+</thead>
+<tbody>
+<tr><td class="sig">월요일</td><td class="sig">0.461</td><td class="sig">3.880</td><td>540</td></tr>
+<tr><td>화요일</td><td>0.029</td><td>3.689</td><td>540</td></tr>
+<tr><td>수요일</td><td>0.169</td><td>3.958</td><td>541</td></tr>
+<tr><td>목요일</td><td>-0.029</td><td>4.463</td><td>542</td></tr>
+<tr><td>금요일</td><td>0.192</td><td>3.530</td><td>542</td></tr>
+</tbody>
+</table>
+<p class="note">주: 월요일 vs 나머지 t-검정: t=2.187, p=0.029**. 금요일 BTC → 월요일 SPX 상관: 0.018 (N=540).</p>
+
+<p>BTC 월요일 평균 수익률(0.461%)이 다른 요일(0.091%)의 약 5배이며, 이 차이는 통계적으로 유의하다(t=2.187, p=0.029). 이는 주말 동안 축적된 정보가 월요일에 반영되는 효과를 시사한다. 다만 금요일 BTC 수익률과 월요일 SPX 수익률 간 상관(0.018)은 미미하여, BTC의 주말 가격 발견이 전통 시장에 직접 전이되는 증거는 제한적이다.</p>
+
+<h3>9.8 비대칭 상관관계: 극단 수익률 분석</h3>
+
+<p>BTC 수익률의 극단적 움직임(상위/하위 10분위)에서 상관관계가 어떻게 변하는지 분석했다.</p>
+
+<table>
+<caption>표 9-8: BTC 극단 수익률 시 상관관계</caption>
+<thead>
+<tr><th>페어</th><th>극단 하락 (Q10)</th><th>정상</th><th>극단 상승 (Q90)</th></tr>
+</thead>
+<tbody>
+<tr><td class="left">BTC-SPX</td><td class="sig">0.336</td><td>0.125</td><td>0.055</td></tr>
+<tr><td class="left">BTC-Gold</td><td>0.094</td><td>0.069</td><td>0.022</td></tr>
+<tr><td class="left">BTC-Bond</td><td>-0.016</td><td>-0.023</td><td>-0.074</td></tr>
+</tbody>
+</table>
+
+<p>BTC-SPX 상관은 극단 하락 시(0.336) 정상 시(0.125)의 2.7배로 급등한다. 이는 하방 위험에서의 동조화가 상방보다 훨씬 강함을 보여주며, 레버리지 효과와 강제 청산의 연쇄적 매도 압력으로 설명된다. 포트폴리오 관점에서 BTC의 하방 보호 기능이 극히 제한적임을 의미한다.</p>
+
+<div class="chart-container">
+<img src="chart_asymmetric_correlation.png" alt="비대칭 상관관계">
+<div class="chart-caption">그림 9-5: BTC 극단 수익률 시 상관관계. 하락 시 SPX 동조화가 급격히 강화된다.</div>
+</div>
+
+<h3>9.9 주파수 영역 전이효과 분해</h3>
+
+<p>Diebold-Yilmaz 전이효과를 주파수 대역별로 분해하여 단기(1-5일), 중기(5-20일), 장기(20일+) 전이의 구조를 분석했다.</p>
+
+<table>
+<caption>표 9-9: 주파수 대역별 전이효과 (전체 기간)</caption>
+<thead>
+<tr><th>주파수 대역</th><th>총 전이지수(%)</th><th>BTC→Others(%)</th><th>Others→BTC(%)</th><th>Gold↔Bond(%)</th></tr>
+</thead>
+<tbody>
+<tr><td class="left sig">단기 (1-5일)</td><td class="sig">7.6</td><td class="sig">6.5</td><td>0.2</td><td>10.1</td></tr>
+<tr><td class="left">중기 (5-20일)</td><td>~0</td><td>~0</td><td>~0</td><td>~0</td></tr>
+<tr><td class="left">장기 (20일+)</td><td>~0</td><td>~0</td><td>~0</td><td>~0</td></tr>
+</tbody>
+</table>
+
+<p>전이효과가 단기(1-5일) 주파수에 집중되어 있다. BTC→Others 전이(6.5%)가 단기에서 압도적이며, 중장기에서는 사실상 소멸한다. 이는 비트코인과 전통 자산 간 연계가 알고리즘 거래와 단기 투기적 흐름에 의해 주도되며, 장기 펀더멘탈 수준에서는 여전히 독립적임을 시사한다. 금-채권 관계(10.1%)도 단기에 집중되어 있어, 안전자산 간 대체 효과가 빠른 시간 내에 작동함을 확인한다.</p>
+
+<div class="chart-container">
+<img src="chart_frequency_spillover.png" alt="주파수 영역 전이효과">
+<div class="chart-caption">그림 9-6: 주파수 대역별 전이효과 분해. 단기(1-5일)에 전이가 집중된다.</div>
+</div>
+
+<h3>9.10 레짐별 Granger 인과성</h3>
+
+<p>전통적 Granger 인과성 검정은 전체 기간의 선형 관계만 포착한다. VIX 25를 기준으로 고스트레스/저스트레스 레짐을 구분하여 인과관계의 비대칭성을 검정했다.</p>
+
+<table>
+<caption>표 9-10: VIX 레짐별 Granger 인과성</caption>
+<thead>
+<tr><th>인과 방향</th><th colspan="3">High Stress (VIX&gt;25)</th><th colspan="3">Low Stress (VIX≤25)</th></tr>
+<tr><th></th><th>F</th><th>p-value</th><th>N</th><th>F</th><th>p-value</th><th>N</th></tr>
+</thead>
+<tbody>
+<tr><td class="left">BTC→SPX</td><td class="sig">2.79</td><td class="sig">0.026**</td><td>509</td><td class="sig">3.92</td><td class="sig">0.048**</td><td>3,278</td></tr>
+<tr><td class="left">SPX→BTC</td><td>2.55</td><td>0.055*</td><td>509</td><td>0.17</td><td>0.683</td><td>3,278</td></tr>
+<tr><td class="left">BTC→Gold</td><td class="sig">3.23</td><td class="sig">0.012**</td><td>509</td><td>1.58</td><td>0.193</td><td>3,278</td></tr>
+<tr><td class="left">Gold→BTC</td><td>1.38</td><td>0.230</td><td>509</td><td>0.95</td><td>0.417</td><td>3,278</td></tr>
+<tr><td class="left">Gold→Bond</td><td>0.44</td><td>0.505</td><td>509</td><td>0.32</td><td>0.807</td><td>3,278</td></tr>
+</tbody>
+</table>
+
+<p>핵심 발견은 BTC→SPX 인과성이 양 레짐 모두에서 유의하지만, SPX→BTC는 고스트레스에서만 한계적으로 유의(p=0.055)하다는 점이다. 이는 비트코인이 주식시장에 정보를 전달하는 채널이 존재하며, 위기 시에는 양방향 전이가 강화됨을 보여준다. 특히 BTC→Gold 인과성이 고스트레스에서만 유의(p=0.012)한 것은 위기 시 비트코인과 금 사이의 정보 전달이 활성화됨을 의미한다.</p>
+
+<div class="chart-container">
+<img src="chart_nonlinear_granger.png" alt="레짐별 Granger 인과성">
+<div class="chart-caption">그림 9-7: VIX 레짐별 Granger F-통계량. 점선은 5% 유의수준. 고스트레스 시 BTC 관련 인과성이 강화된다.</div>
+</div>
+
+<div class="section-divider">• • •</div>
+
+<!-- 10. 결론 -->
+<h2>10. 결론 및 시사점</h2>
+
+<h3>10.1 주요 발견</h3>
 
 <p><strong>첫째, 통화정책 레짐의 극적 변화</strong>: 바시첵 모델 분석 결과, 금융화 기간(2004-2021) 동안 단기금리의 평균회귀 반감기가 1,813일(7.2년)로 극도로 길어졌다가, 2022년 긴축 전환 후 169일(0.7년)로 급격히 단축되었다. 이는 양적완화의 금리 고착화 효과와 정상화 과정의 가속화를 정량적으로 보여준다.</p>
 
@@ -1522,11 +1763,11 @@ title: "Regime Shift & Spillover"
 
 <p><strong>다섯째, 위기별 적응적 행동</strong>: 비트코인은 유동성 위기(COVID-19)에서는 위험자산처럼(BTC-SPX=0.571), 은행 시스템 위기(SVB)에서는 대안적 가치 저장 수단처럼(BTC-Gold=0.370) 행동하는 적응성을 보였다.</p>
 
-<h3>9.2 이론적 기여</h3>
+<h3>10.2 이론적 기여</h3>
 
 <p>본 연구는 세 가지 이론적 기여를 제공한다. 첫째, DCC-GARCH 모델에 √ΔT 시간 조정과 Monday dummy를 도입하여 비거래일 효과를 체계적으로 통제하는 방법론을 제시했다. 둘째, 바시첵 모델의 반감기 개념을 통해 통화정책 레짐 전환의 속도를 정량화하는 새로운 접근법을 제안했다. 셋째, 전통적 채권-원자재 분석에 암호화폐를 통합하여 현대 금융시장의 복잡한 상호작용을 포괄적으로 분석하는 프레임워크를 구축했다.</p>
 
-<h3>9.3 실무적 시사점</h3>
+<h3>10.3 실무적 시사점</h3>
 
 <p><strong>포트폴리오 관리</strong>: 2022년 이후 구리-채권 상관의 음 전환과 BTC-SPX 동조화 강화는 전통적 분산투자 전략의 재검토를 요구한다. 특히 비트코인의 다각화 효과가 급격히 감소하고 있어, BTC 편입 비중을 3-5%에서 1-3%로 하향 조정할 필요가 있다.</p>
 
@@ -1534,7 +1775,7 @@ title: "Regime Shift & Spillover"
 
 <p><strong>통화정책 모니터링</strong>: 바시첵 반감기의 실시간 추적은 통화정책 레짐 전환의 조기 경보 지표로 활용될 수 있다. 반감기가 500일 이하로 단축되면 정책 전환이 가속화되고 있다는 신호로 해석할 수 있다.</p>
 
-<h3>9.4 연구의 한계 및 향후 과제</h3>
+<h3>10.4 연구의 한계 및 향후 과제</h3>
 
 <p>본 연구는 다음과 같은 한계를 가진다. 첫째, 일별 데이터를 사용하여 일중 변동성 구조를 포착하지 못했다. 둘째, 글로벌 시장의 시차 문제를 완전히 해결하지 못했다. 셋째, 축약형 모델에 의존하여 인과관계의 경제적 메커니즘을 완전히 규명하지 못했다.</p>
 
