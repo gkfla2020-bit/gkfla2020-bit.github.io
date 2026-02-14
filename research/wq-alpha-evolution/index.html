@@ -1,0 +1,587 @@
+---
+layout: null
+permalink: /research/wq-alpha-evolution/
+title: "WQ BRAIN Alpha Evolution"
+---
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WQ BRAIN Alpha Auto-Discovery | Ha Rim Jung</title>
+    
+    <meta property="og:type" content="article">
+    <meta property="og:title" content="Genetic Algorithm-Based Alpha Auto-Discovery on WorldQuant BRAIN">
+    <meta property="og:description" content="7-Round Island Model GP with SHADE, MAP-Elites, ε-Lexicase Selection for automated alpha generation.">
+    <meta property="og:url" content="https://gkfla2020-bit.github.io/research/wq-alpha-evolution/">
+    <meta property="og:image" content="https://gkfla2020-bit.github.io/assets/og-card.png">
+    <meta property="og:image:secure_url" content="https://gkfla2020-bit.github.io/assets/og-card.png">
+    <meta property="og:image:type" content="image/png">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+    <meta property="og:site_name" content="Ha Rim Jung">
+    <meta property="og:locale" content="ko_KR">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="WQ BRAIN Alpha Auto-Discovery System">
+    <meta name="twitter:description" content="Island Model GP + SHADE + MAP-Elites + ε-Lexicase for BRAIN alpha search">
+    <meta name="twitter:image" content="https://gkfla2020-bit.github.io/assets/og-card.png">
+    <meta property="kakao:image" content="https://gkfla2020-bit.github.io/assets/og-card.png">
+    
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-83LKVW7412"></script>
+    <script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-83LKVW7412');</script>
+    <script>
+        window.MathJax = {
+            tex: { inlineMath: [['\\(','\\)']], displayMath: [['\\[','\\]']] },
+            svg: { fontCache: 'global' }
+        };
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js" async></script>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;500&family=Space+Mono:wght@400&family=Inter:wght@300;400&family=Nanum+Myeongjo:wght@400;700&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Inter', sans-serif; background: #fafaf8; color: #1a1a1a; line-height: 1.7; overflow-x: hidden; }
+        .formula-bg{position:fixed;inset:0;pointer-events:none;z-index:0;overflow:hidden}
+        .f{position:absolute;font-family:'Space Mono',monospace;white-space:nowrap;will-change:transform;transition:transform .3s ease-out}
+        .sidebar{position:fixed;left:0;top:0;width:280px;height:100vh;background:rgba(255,255,255,.97);backdrop-filter:blur(10px);border-right:1px solid rgba(0,0,0,.06);padding:40px 30px;z-index:100;overflow-y:auto;display:flex;flex-direction:column}
+        .sidebar-profile{text-align:center;margin-bottom:35px;padding-bottom:30px;border-bottom:1px solid rgba(0,0,0,.08)}
+        .profile-photo{width:120px;height:120px;border-radius:50%;object-fit:cover;margin-bottom:18px;border:3px solid #f0f0f0;background:#e8e8e8}
+        .profile-name{font-family:'Cormorant Garamond',serif;font-size:1.5rem;font-weight:500;color:#1a1a1a;margin-bottom:6px;letter-spacing:.03em}
+        .profile-title{font-size:.75rem;color:#888;letter-spacing:.08em;text-transform:uppercase;margin-bottom:12px}
+        .profile-bio{font-size:.82rem;color:#666;line-height:1.6;margin-bottom:15px}
+        .profile-links{display:flex;justify-content:center;gap:15px}
+        .profile-links a{font-size:.7rem;color:#999;text-decoration:none;letter-spacing:.05em;transition:color .2s}
+        .profile-links a:hover{color:#0080c6}
+        .sidebar-nav{flex:1}
+        .nav-section{margin-bottom:25px}
+        .nav-section-title{font-size:.65rem;font-weight:600;color:#aaa;letter-spacing:.15em;text-transform:uppercase;margin-bottom:12px}
+        .nav-list{list-style:none}
+        .nav-list li{margin-bottom:8px}
+        .nav-list a{font-size:.85rem;color:#555;text-decoration:none;transition:all .2s;display:flex;align-items:center;gap:8px;padding:6px 0}
+        .nav-list a:hover{color:#0080c6;padding-left:5px}
+        .nav-list a.active{color:#0080c6;font-weight:500}
+        .sidebar-footer{padding-top:20px;border-top:1px solid rgba(0,0,0,.06);font-size:.7rem;color:#aaa;text-align:center}
+        .nav-toggle{display:none}
+        .main-wrapper{margin-left:280px;margin-right:260px;min-height:100vh}
+        .container{position:relative;z-index:1;max-width:900px;margin:0 auto;padding:50px 40px 80px}
+        .right-sidebar{position:fixed;right:0;top:0;width:260px;height:100vh;background:rgba(255,255,255,.97);backdrop-filter:blur(10px);border-left:1px solid rgba(0,0,0,.06);padding:30px 20px;z-index:100;overflow-y:auto}
+        .widget-title{font-size:.65rem;font-weight:600;color:#aaa;letter-spacing:.15em;text-transform:uppercase;margin-bottom:15px}
+        .market-item{display:flex;justify-content:space-between;align-items:center;padding:12px 0;border-bottom:1px solid rgba(0,0,0,.05)}
+        .market-item:last-child{border-bottom:none}
+        .market-name{font-size:.75rem;color:#666}
+        .market-value{font-family:'Space Mono',monospace;font-size:.85rem;font-weight:500;color:#1a1a1a}
+        .market-change{font-family:'Space Mono',monospace;font-size:.7rem;margin-left:8px}
+        .market-change.up{color:#16a34a}
+        .market-change.down{color:#dc2626}
+        .widget-section{margin-bottom:30px}
+        .widget-update{font-size:.6rem;color:#bbb;text-align:center;margin-top:10px}
+        .market-group{background:rgba(0,0,0,.02);padding:15px;margin-bottom:15px;border-left:2px solid #e0e0e0}
+        .market-group-title{font-size:.6rem;color:#999;letter-spacing:.1em;text-transform:uppercase;margin-bottom:10px}
+        
+        .paper-content{font-family:'Times New Roman','Nanum Myeongjo',serif;line-height:1.9;background:#fff;padding:45px 50px;border-radius:8px;box-shadow:0 2px 20px rgba(0,0,0,.05);font-size:15px}
+        .paper-header{text-align:center;margin-bottom:40px;padding-bottom:30px;border-bottom:2px solid #333}
+        .paper-category{font-size:11px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:#0080c6;margin-bottom:15px}
+        .paper-title{font-family:'Cormorant Garamond','Nanum Myeongjo',serif;font-size:26px;font-weight:700;margin-bottom:12px;line-height:1.35}
+        .paper-subtitle{font-family:'Cormorant Garamond',serif;font-size:15px;color:#666;font-style:italic;margin-bottom:15px}
+        .paper-author{font-size:14px;color:#444;margin-bottom:5px}
+        .paper-date{font-size:12px;color:#999}
+        .abstract{background:linear-gradient(135deg,#f8f9fa,#edf2f4);border-left:4px solid #1d3557;padding:25px 30px;margin:30px 0;border-radius:0 6px 6px 0;font-size:13.5px;line-height:1.8;color:#333}
+        .abstract-title{font-family:'Inter',sans-serif;font-size:11px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:#1d3557;margin-bottom:10px}
+        .keywords{background:#fafafa;padding:12px 20px;border-radius:6px;font-size:13px;color:#555;margin-bottom:30px}
+        .keywords strong{color:#1d3557}
+        h2{font-family:'Cormorant Garamond','Nanum Myeongjo',serif;font-size:1.5em;font-weight:700;color:#1d3557;margin:40px 0 15px;padding-bottom:8px;border-bottom:1px solid #e0e0e0}
+        h3{font-family:'Cormorant Garamond','Nanum Myeongjo',serif;font-size:1.2em;font-weight:600;color:#2c3e50;margin:30px 0 12px}
+        h4{font-size:1.05em;color:#2c3e50;margin:20px 0 10px}
+        p{text-align:justify;text-indent:2em;margin-bottom:12px}
+        p.no-indent{text-indent:0}
+        table{width:100%;border-collapse:collapse;margin:20px 0;font-size:12.5px}
+        table caption{font-weight:700;text-align:left;margin-bottom:8px;font-size:13.5px;color:#1d3557}
+        thead th{background:#1d3557;color:white;padding:10px;font-weight:600;font-size:11.5px;text-align:center;white-space:nowrap}
+        tbody td{padding:7px 10px;border-bottom:1px solid #eee;text-align:center}
+        tbody tr:nth-child(even){background:#fafafa}
+        tbody tr:hover{background:#f0f4ff}
+        td.left{text-align:left}
+        .sig{color:#e63946;font-weight:700}
+        .note{font-size:11.5px;color:#777;margin-top:5px;font-style:italic}
+        pre{background:#0f172a;color:#e2e8f0;padding:20px 22px;border-radius:8px;overflow-x:auto;font-family:'Space Mono',monospace;font-size:12px;line-height:1.65;margin:18px 0}
+        code{background:#f1f5f9;padding:2px 6px;border-radius:3px;font-family:'Space Mono',monospace;font-size:12px;color:#1d3557}
+        pre code{background:none;padding:0;color:inherit}
+        .kw{color:#c084fc} .fn{color:#67e8f9} .st{color:#86efac} .cm{color:#64748b;font-style:italic} .nu{color:#fbbf24}
+        .math-block{margin:15px 0;padding:10px 0;text-align:center;overflow-x:auto}
+        .section-divider{text-align:center;margin:40px 0;color:#ccc;font-size:18px;letter-spacing:10px}
+        .references{font-size:12.5px;line-height:1.7}
+        .references p{text-indent:-2em;padding-left:2em;margin-bottom:6px}
+        @media(max-width:1024px){
+            .sidebar{width:100%;height:auto;position:relative;border-right:none;border-bottom:1px solid rgba(0,0,0,.08);padding:25px 20px}
+            .sidebar-profile{margin-bottom:20px;padding-bottom:20px;display:flex;align-items:center;gap:15px;text-align:left}
+            .profile-photo{width:60px;height:60px;margin-bottom:0}
+            .profile-bio{display:none}
+            .nav-section{display:inline-block;margin-right:20px;margin-bottom:10px}
+            .nav-list{display:flex;gap:12px;flex-wrap:wrap}
+            .nav-list li{margin-bottom:0}
+            .sidebar-footer{display:none}
+            .nav-extra{display:none}.sidebar-nav.expanded .nav-extra{display:inline-block}
+            .nav-toggle{display:inline-block;padding:8px 14px;background:none;border:1px solid #ddd;border-radius:6px;font-size:.75rem;color:#888;cursor:pointer;letter-spacing:.05em;margin-bottom:10px;font-family:'Inter',sans-serif}
+            .main-wrapper{margin-left:0;margin-right:0}
+            .right-sidebar{display:none}
+            .container{padding:20px 0}
+            .paper-content{padding:25px 18px;border-radius:0;box-shadow:none;font-size:14px}
+            .paper-title{font-size:20px}
+            h2{font-size:1.3em;margin:30px 0 12px}
+            h3{font-size:1.1em}
+            p{text-indent:1.5em;text-align:left;font-size:14px}
+            table{font-size:10px;display:block;overflow-x:auto;-webkit-overflow-scrolling:touch}
+            thead th,tbody td{padding:6px 4px;white-space:nowrap}
+            .abstract{padding:16px;margin:20px 0}
+            .references p{font-size:11px}
+        }
+        @media print{.sidebar{display:none}.right-sidebar{display:none}.main-wrapper{margin:0}.paper-content{box-shadow:none;padding:15mm 20mm}}
+        .breadcrumb{font-size:.7rem;color:#999;letter-spacing:.06em;margin-bottom:30px;padding-bottom:15px;border-bottom:1px solid rgba(0,0,0,.05)}
+        .breadcrumb a{color:#888;text-decoration:none;transition:color .2s}
+        .breadcrumb a:hover{color:#0080c6}
+        .bc-sep{margin:0 6px;color:#ccc}
+        .bc-current{color:#555;font-weight:500}
+    </style>
+</head>
+<body>
+<img src="/assets/og-card.png" alt="" style="position:absolute;width:1px;height:1px;opacity:0;pointer-events:none;" aria-hidden="true">
+<div class="formula-bg" id="formulaBg"></div>
+
+{% include sidebar.html %}
+{% include market-widget.html %}
+
+<div class="main-wrapper">
+<div class="container">
+{% include breadcrumb.html %}
+<div class="paper-content">
+
+<div class="paper-header">
+    <div class="paper-category">Quantitative Finance Research</div>
+    <h1 class="paper-title">WorldQuant BRAIN Alpha Auto-Discovery System</h1>
+    <div class="paper-subtitle">7-Round Genetic Algorithm with Island Model, ε-Lexicase Selection, SHADE, MAP-Elites, and UCB1 Adaptive Operator Selection</div>
+    <div class="paper-author">Ha Rim Jung</div>
+    <div class="paper-date">February 14, 2026</div>
+</div>
+
+<div class="abstract">
+    <div class="abstract-title">Abstract</div>
+    본 논문은 WorldQuant BRAIN 플랫폼의 International Quant Championship(IQC) 및 컨설턴트 프로그램을 위한 완전 자동 알파 탐색 시스템의 설계와 구현을 기술한다. 시스템은 7라운드 진화 전략을 통해 FastExpression 및 Regular Expression 기반 알파 수식을 자동 생성·시뮬레이션·제출하며, Island Model(4섬, Ring Topology 이주), ε-Lexicase Selection, SHADE 적응형 DE 파라미터 제어(H=15, Lehmer Mean), MAP-Elites 품질-다양성 아카이브(10×5 그리드), UCB1 기반 적응형 연산자 선택(10개 연산자) 등 최신 진화 연산 기법을 통합한다. 영속적 체크포인트 시스템을 도입하여 크래시 복구 및 누적 진화를 지원하고, 멀티라인 Regular Expression, 확장 데이터셋, 36개 복합 전략 시드, Self-Correlation 회피 전략 등을 포함한다.
+</div>
+
+<div class="keywords">
+    <strong>Keywords:</strong> Genetic Programming, Alpha Discovery, WorldQuant BRAIN, Island Model, SHADE, MAP-Elites, ε-Lexicase Selection, UCB1, Adaptive Operator Selection, Regular Expression
+</div>
+
+<!-- 1. System Architecture -->
+<h2>1. 시스템 아키텍처</h2>
+
+<p>시스템은 7개의 핵심 모듈과 1개의 외부 라이브러리로 구성된다. 각 모듈은 단일 책임 원칙에 따라 분리되어 있으며, <code>EvolutionEngine</code>이 중앙 오케스트레이터 역할을 한다.</p>
+
+<table>
+<caption>표 1: 모듈 구성</caption>
+<thead><tr><th>모듈</th><th>역할</th><th>LOC</th></tr></thead>
+<tbody>
+<tr><td class="left"><code>main.py</code></td><td class="left">CLI 진입점, 루프 제어, 에러 복구</td><td>~200</td></tr>
+<tr><td class="left"><code>evolution.py</code></td><td class="left">진화 엔진 v3.2 — 6개 핵심 클래스, 30+ 메서드</td><td>1,680+</td></tr>
+<tr><td class="left"><code>brain_api.py</code></td><td class="left">BRAIN API 래퍼, ACE 라이브러리 통합</td><td>~300</td></tr>
+<tr><td class="left"><code>alpha_ast.py</code></td><td class="left">AST 노드, 유전 연산자, 멀티라인 생성</td><td>~700</td></tr>
+<tr><td class="left"><code>strategies.py</code></td><td class="left">36개 시드 전략, 리전/delay 특화</td><td>~500</td></tr>
+<tr><td class="left"><code>evaluator.py</code></td><td class="left">IQC 점수 계산, IS Check, 포트폴리오 평가</td><td>~150</td></tr>
+<tr><td class="left"><code>config.py</code></td><td class="left">7라운드 설정, 탐색 공간, 기준값</td><td>~200</td></tr>
+</tbody>
+</table>
+
+<p><code>evolution.py</code>에 정의된 6개 핵심 클래스는 다음과 같다: <code>Individual</code>(개체), <code>SHADEMemory</code>(SHADE 파라미터 메모리, H=15), <code>MAPElitesArchive</code>(품질-다양성 아카이브, 10×5), <code>AdaptiveOperatorSelector</code>(UCB1 연산자 선택기), <code>Island</code>(독립 진화 단위), <code>EvolutionEngine</code>(중앙 오케스트레이터).</p>
+
+<h3>1.1 실행 흐름</h3>
+
+<p>전체 파이프라인은 Biometric 인증 → 이전 결과 자동 로딩 → R1 광범위 탐색 → R2 패턴 집중 → R3 교배 강화 → R4 파라미터 최적화 → R5 멀티 리전 → R6 포트폴리오 최적화 → R7 최종 정제 → 결과 저장 및 제출의 순서로 진행된다. 각 라운드 종료 시 및 5세대 주기로 체크포인트가 저장되며, 재실행 시 이전 결과가 자동 복원된다.</p>
+
+<div class="section-divider">• • •</div>
+
+<!-- 2. 7-Round Evolution Strategy -->
+<h2>2. 7라운드 진화 전략</h2>
+
+<p>각 라운드는 고유한 목적과 파라미터를 가지며, 이전 라운드의 결과(명예의 전당, 파레토 아카이브, MAP-Elites)를 다음 라운드의 초기 개체군에 주입하여 점진적으로 알파 품질을 향상시킨다. 모든 라운드는 4개 섬(Island)에서 병렬 진화하며, 2세대마다 Ring Topology 이주가 발생한다.</p>
+
+<table>
+<caption>표 2: 7라운드 설정 요약</caption>
+<thead><tr><th>R#</th><th>이름</th><th>개체</th><th>세대</th><th>엘리트</th><th>변이</th><th>교배</th><th>깊이</th><th>파라미터 탐색</th></tr></thead>
+<tbody>
+<tr><td>1</td><td class="left">광범위 탐색</td><td>200</td><td>5</td><td>5%</td><td>0.50</td><td>0.30</td><td>3</td><td>✗</td></tr>
+<tr><td>2</td><td class="left">패턴 집중</td><td>150</td><td>8</td><td>10%</td><td>0.40</td><td>0.50</td><td>4</td><td>✗</td></tr>
+<tr><td>3</td><td class="left">교배 강화</td><td>120</td><td>10</td><td>15%</td><td>0.25</td><td>0.70</td><td>5</td><td>✗</td></tr>
+<tr><td>4</td><td class="left">파라미터 최적화</td><td>60</td><td>5</td><td>20%</td><td>0.15</td><td>0.40</td><td>5</td><td>✓</td></tr>
+<tr><td>5</td><td class="left">멀티 리전</td><td>80</td><td>6</td><td>15%</td><td>0.30</td><td>0.50</td><td>5</td><td>✓</td></tr>
+<tr><td>6</td><td class="left">포트폴리오 최적화</td><td>100</td><td>8</td><td>10%</td><td>0.40</td><td>0.50</td><td>5</td><td>✓</td></tr>
+<tr><td>7</td><td class="left">최종 정제</td><td>50</td><td>12</td><td>25%</td><td>0.10</td><td>0.30</td><td>6</td><td>✓</td></tr>
+</tbody>
+</table>
+
+<p>R1은 200개체를 4개 섬에 분배(섬당 50)하여 전략 시드 40% + 랜덤 60%로 초기 다양성을 확보한다. R3에서 교배율을 0.7로 극대화하여 구조적 결합을 촉진하고, R4에서 Latin Hypercube Sampling 기반 파라미터 최적화를 수행한다. R5는 명예의 전당 상위 20개 알파를 USA, ASI, CHN, EUR, KOR, JPN, TWN, GLB 전 리전에서 테스트한다. R7은 엘리트 비율 25%, 변이율 0.1로 미세 조정 후 자동 제출한다.</p>
+
+<div class="section-divider">• • •</div>
+
+<!-- 3. Core Algorithms -->
+<h2>3. 핵심 알고리즘</h2>
+
+<h3>3.1 Island Model</h3>
+
+<p>4개의 섬이 독립적으로 진화하며, 2세대마다 Ring Topology로 개체를 교환한다. 각 섬은 자체 <code>SHADEMemory</code>(H=10)와 <code>AdaptiveOperatorSelector</code>(window=50)를 보유한다.</p>
+
+<table>
+<caption>표 3: 섬 프로파일</caption>
+<thead><tr><th>섬 ID</th><th>프로파일</th><th>전략 구성</th><th>역할</th></tr></thead>
+<tbody>
+<tr><td>0</td><td class="left">Exploration</td><td class="left">랜덤 70% + 템플릿 20% + 진화 10%</td><td class="left">새로운 구조 탐색</td></tr>
+<tr><td>1</td><td class="left">Exploitation</td><td class="left">진화 70% + 템플릿 20% + 랜덤 10%</td><td class="left">엘리트 중심 정제</td></tr>
+<tr><td>2</td><td class="left">MAP-Seed</td><td class="left">MAP 30% + 템플릿 30% + 랜덤 20% + 진화 20%</td><td class="left">아카이브 시드 + 멀티라인</td></tr>
+<tr><td>3</td><td class="left">Balanced</td><td class="left">라운드 기본 설정</td><td class="left">균형 잡힌 기본 진화</td></tr>
+</tbody>
+</table>
+
+<p>이주 시 섬 \(i\)의 최우수 + 구조적으로 가장 다양한 개체 3개를 섬 \((i+1) \bmod 4\)로 이주시킨다. 구조적 거리는 필드 집합의 Jaccard Distance로 측정한다:</p>
+
+<div class="math-block">
+\[d_{\text{struct}}(a, b) = 1 - \frac{|\text{fields}(a) \cap \text{fields}(b)|}{|\text{fields}(a) \cup \text{fields}(b)| + \epsilon}\]
+</div>
+
+<h3>3.2 ε-Lexicase Selection</h3>
+
+<p>다목적 최적화를 위한 부모 선택 기법으로, NSGA-II 토너먼트와 50:50 하이브리드로 사용된다. 5개 목적 함수(Sharpe, Fitness, -Turnover, Returns, Drawdown)에 대해 ε-완화된 사전식 필터링을 수행한다:</p>
+
+<div class="math-block">
+\[\text{pass}_i(x) = \begin{cases} \text{true} & \text{if } f_i(x) \geq f_i^* - \epsilon \\ \text{false} & \text{otherwise} \end{cases}\]
+</div>
+
+<h3>3.3 SHADE</h3>
+
+<p>Differential Evolution의 핵심 파라미터 \(F\)(스케일 팩터)와 \(CR\)(교배율)을 성공 이력 기반으로 적응적으로 제어한다. 글로벌 메모리 H=15, 섬별 메모리 H=10.</p>
+
+<div class="math-block">
+\[F_i \sim \text{Cauchy}(\mu_{F,r}, 0.1), \quad CR_i \sim \mathcal{N}(\mu_{CR,r}, 0.1)\]
+</div>
+
+<p>메모리 업데이트는 Lehmer Mean을 사용한다:</p>
+
+<div class="math-block">
+\[\mu_{F,k} \leftarrow \text{mean}_L(S_F) = \frac{\sum_i w_i \cdot F_i^2}{\sum_i w_i \cdot F_i}, \quad \mu_{CR,k} \leftarrow \sum_i w_i \cdot CR_i\]
+</div>
+
+<p>가중치 \(w_i\)는 부모-자식 간 IQC 점수 개선량에 비례한다.</p>
+
+<h3>3.4 MAP-Elites Archive</h3>
+
+<p>행동 공간을 Sharpe × Turnover 2차원 그리드(10×5 = 50셀)로 이산화하여, 각 셀에서 최고 IQC 점수를 가진 개체만 보존하는 품질-다양성 아카이브이다.</p>
+
+<div class="math-block">
+\[\text{cell}(x) = \left(\left\lfloor \frac{\text{Sharpe}(x)}{0.3} \right\rfloor, \left\lfloor \frac{\text{Turnover}(x)}{0.2} \right\rfloor\right)\]
+</div>
+
+<h3>3.5 UCB1 Adaptive Operator Selection</h3>
+
+<p>10개 유전 연산자의 선택 확률을 UCB1 알고리즘으로 동적 조정한다. 글로벌 AOS(window=80)와 섬별 AOS(window=50)가 이중으로 운영된다:</p>
+
+<div class="math-block">
+\[\text{UCB1}(op) = \bar{r}_{op} + C \cdot \sqrt{\frac{\ln N}{n_{op}}}, \quad C = 0.5\]
+</div>
+
+<h3>3.6 NSGA-II 다목적 최적화</h3>
+
+<p>5개 목적 함수에 대해 비지배 정렬과 혼잡 거리를 적용한다. 엘리트 보존 시 Lexicographic Parsimony Pressure를 적용하여 동점 시 짧은 수식을 우선 선택한다.</p>
+
+<div class="math-block">
+\[a \succ b \iff \forall i: a_i \geq b_i \;\wedge\; \exists j: a_j > b_j\]
+</div>
+
+<h3>3.7 Simulated Annealing 수용</h3>
+
+<div class="math-block">
+\[P(\text{accept}) = \exp\left(\frac{\text{new} - \text{old}}{T}\right), \quad T = 1.0 \times 0.85^g, \quad T_{\min} = 0.01\]
+</div>
+
+<h3>3.8 복잡도 페널티</h3>
+
+<p>시그모이드 함수 기반 페널티를 적용하여 노드 수 20 이상에서 점진적으로 점수를 감소시킨다:</p>
+
+<div class="math-block">
+\[\text{penalty}(x) = \frac{1}{1 + e^{-0.3 \cdot (n_{\text{nodes}} - 20)}}\]
+\[\text{Score}_{\text{final}} = \max\left(0, \text{Score}_{\text{raw}} \times (1 - 0.15 \cdot \text{penalty})\right)\]
+</div>
+
+<table>
+<caption>표 4: 노드 수별 복잡도 페널티</caption>
+<thead><tr><th>노드 수</th><th>penalty</th><th>점수 감소율</th></tr></thead>
+<tbody>
+<tr><td>5</td><td>0.01</td><td>~0.2%</td></tr>
+<tr><td>10</td><td>0.05</td><td>~0.7%</td></tr>
+<tr><td class="sig">20</td><td class="sig">0.50</td><td class="sig">~7.5% (변곡점)</td></tr>
+<tr><td>30</td><td>0.95</td><td>~14.3%</td></tr>
+<tr><td>40+</td><td>~1.00</td><td>~15.0% (최대)</td></tr>
+</tbody>
+</table>
+
+<div class="section-divider">• • •</div>
+
+<!-- 4. Genetic Operators -->
+<h2>4. 유전 연산자</h2>
+
+<p>본 시스템은 10개의 유전 연산자를 운용하며, 각 연산자의 선택은 UCB1 기반 AOS에 의해 동적으로 결정된다. 교배(recombination) 5종과 변이(mutation) 5종으로 분류된다. SHADE에서 샘플링된 스케일 팩터 \(F\)는 변이 강도 및 차분 교배의 이식 확률로 활용된다. 모든 연산자는 트리 깊이 상한(depth ≤ 10)을 초과하면 부모를 그대로 반환하여 bloat를 방지한다.</p>
+
+<table>
+<caption>표 5: 유전 연산자 목록</caption>
+<thead><tr><th>연산자</th><th>유형</th><th>입력</th><th>설명</th></tr></thead>
+<tbody>
+<tr><td class="left"><code>crossover</code></td><td>교배</td><td>2</td><td class="left">서브트리 교환 (Koza, 1992)</td></tr>
+<tr><td class="left"><code>semantic_crossover</code></td><td>교배</td><td>2</td><td class="left">필드 Jaccard 거리 기반 이질적 서브트리 교환</td></tr>
+<tr><td class="left"><code>de_crossover</code></td><td>교배</td><td>3</td><td class="left">DE/rand/1 차분 벡터 이식 (Storn & Price, 1997)</td></tr>
+<tr><td class="left"><code>headless_chicken</code></td><td>교배</td><td>1</td><td class="left">랜덤 트리와의 교배 (Angeline, 1997)</td></tr>
+<tr><td class="left"><code>multiline_crossover</code></td><td>교배</td><td>2</td><td class="left">Regular Expression 변수 블록 교환</td></tr>
+<tr><td class="left"><code>mutate</code></td><td>변이</td><td>1</td><td class="left">확률적 다중 변이 (필드/연산자/윈도우/서브트리/래핑)</td></tr>
+<tr><td class="left"><code>micro_mutate</code></td><td>변이</td><td>1</td><td class="left">시계열 윈도우 크기 ±1~2 미세 조정</td></tr>
+<tr><td class="left"><code>hoist</code></td><td>변이</td><td>1</td><td class="left">내부 서브트리를 루트로 승격 (bloat 억제)</td></tr>
+<tr><td class="left"><code>shrink</code></td><td>변이</td><td>1</td><td class="left">내부 노드를 단일 필드로 축소</td></tr>
+<tr><td class="left"><code>multiline_mutate</code></td><td>변이</td><td>1</td><td class="left">Regular Expression 변수 수식 변이/추가/제거</td></tr>
+</tbody>
+</table>
+
+<h3>4.1 Niche Selection</h3>
+
+<p>교배 연산자에서 두 번째 부모를 선택할 때, 첫 번째 부모와 구조적으로 상이한 개체를 우선 선택한다. 후보 5개를 토너먼트 방식으로 추출한 뒤, 니치 점수가 가장 높은 개체를 선택한다:</p>
+
+<div class="math-block">
+\[\text{niche}(c) = 0.4 \cdot d_{\text{struct}}(c, p_1) + 0.6 \cdot \left(1 - \frac{\text{rank}(c)}{|P|}\right)\]
+</div>
+
+<h3>4.2 교배 연산자</h3>
+
+<h4>Standard Crossover</h4>
+<p>Koza(1992)의 표준 GP 교배이다. 두 부모 트리에서 각각 내부 노드를 랜덤 선택하고, 한쪽의 자식 서브트리를 다른 쪽의 서브트리로 교체한다.</p>
+<pre><code><span class="cm">// 부모 1:</span> rank(ts_delta(close, 5))
+<span class="cm">// 부모 2:</span> zscore(volume / (adv20 + 0.000001))
+<span class="cm">// 자식:</span>  rank(volume / (adv20 + 0.000001))</code></pre>
+
+<h4>Semantic Crossover</h4>
+<p>두 부모에서 사용하는 데이터 필드 집합이 최대한 다른 서브트리 쌍을 탐색하여 교환한다. 최대 10쌍의 후보를 랜덤 샘플링한 뒤, Jaccard Distance가 가장 큰 쌍을 선택한다.</p>
+<div class="math-block">
+\[d_J(a, b) = 1 - \frac{|\text{fields}(a) \cap \text{fields}(b)|}{|\text{fields}(a) \cup \text{fields}(b)|}\]
+</div>
+<pre><code><span class="cm">// 부모 1 (가격):</span> ts_rank((close - low) / (high - low + 0.000001), 10)
+<span class="cm">// 부모 2 (펀더멘탈):</span> rank(ebitda / (enterprise_value + 0.000001))
+<span class="cm">// 자식:</span> ts_rank(ebitda / (enterprise_value + 0.000001), 10)</code></pre>
+
+<h4>DE Crossover</h4>
+<p>Differential Evolution(Storn & Price, 1997)의 개념을 트리 구조에 적용한다. target, donor1, donor2 세 개체를 사용하여 구조적 차분을 추출하고, SHADE의 \(F\) 확률로 target에 이식한다:</p>
+<div class="math-block">
+\[\text{child} = \text{target} \oplus_F \left(\text{donor}_1 \ominus \text{donor}_2\right)\]
+</div>
+
+<h4>Headless Chicken Crossover</h4>
+<p>Angeline(1997)이 제안한 방법으로, 부모와 완전히 새로운 랜덤 트리(깊이 3)를 교배한다. 기존 개체군에 없는 구조를 주입하여 미탐색 영역을 개척한다.</p>
+
+<h4>Multiline Crossover</h4>
+<p>멀티라인 알파 전용 연산자이다. 두 부모의 변수 할당 블록에서 각각 하나의 변수 정의를 선택하여 교환한다.</p>
+<pre><code><span class="cm">// 부모 1:</span> a = rank(ts_delta(close, 5)); b = zscore(volume / (adv20 + 0.000001)); 0.6*a + 0.4*b
+<span class="cm">// 부모 2:</span> a = rank(ebitda / (ev + 0.000001)); b = ts_rank(returns, 20); 0.5*a + 0.5*b
+<span class="cm">// 자식:</span>  a = rank(ts_delta(close, 5)); b = ts_rank(returns, 20); 0.6*a + 0.4*b</code></pre>
+
+<h3>4.3 변이 연산자</h3>
+
+<h4>Standard Mutate</h4>
+<p>6가지 변이 유형을 확률적으로 선택하여 적용한다. SHADE의 \(F\) 값이 intensity로 전달되어(\(\sigma = 2F\)), 변이 강도를 적응적으로 제어한다.</p>
+
+<table>
+<caption>표 6: Standard Mutate 확률 분포</caption>
+<thead><tr><th>확률 구간</th><th>변이 유형</th><th>변환 예시</th></tr></thead>
+<tbody>
+<tr><td>\(r < 0.12\sigma\)</td><td class="left">필드 교체</td><td class="left"><code>close</code> → <code>volume</code></td></tr>
+<tr><td>\(r < 0.25\sigma\)</td><td class="left">윈도우 변경</td><td class="left"><code>ts_rank(x, 10)</code> → <code>ts_rank(x, 20)</code></td></tr>
+<tr><td>\(r < 0.38\sigma\)</td><td class="left">단항 연산자 교체</td><td class="left"><code>rank(x)</code> → <code>zscore(x)</code></td></tr>
+<tr><td>\(r < 0.50\sigma\)</td><td class="left">시계열 연산자 교체</td><td class="left"><code>ts_rank(x, 10)</code> → <code>ts_mean(x, 10)</code></td></tr>
+<tr><td>\(r < 0.65\sigma\)</td><td class="left">서브트리 교체</td><td class="left">자식을 깊이 3 랜덤 트리로 교체</td></tr>
+<tr><td>\(r < 0.80\sigma\)</td><td class="left">래핑</td><td class="left"><code>x</code> → <code>rank(x)</code> 또는 삼항 조건 래핑</td></tr>
+</tbody>
+</table>
+
+<h4>Micro Mutate</h4>
+<p>트리 구조를 완전히 보존하면서 시계열 연산자의 윈도우 크기만 ±1 또는 ±2로 조정한다. 윈도우 하한은 2이다.</p>
+
+<h4>Hoist Mutation</h4>
+<p>내부 노드 중 하나를 선택하여 전체 트리의 새로운 루트로 승격시킨다. 세대가 진행됨에 따라 누적되는 bloat를 억제한다.</p>
+<pre><code><span class="cm">// 변이 전:</span> rank(ts_corr(close, volume, 20) + ts_delta(returns, 5))
+<span class="cm">// 변이 후:</span> ts_corr(close, volume, 20)</code></pre>
+
+<h4>Shrink Mutation</h4>
+<p>내부 노드를 해당 서브트리에서 사용 중인 필드 중 하나로 교체한다. hoist보다 더 극단적인 단순화이다.</p>
+
+<h4>Multiline Mutate</h4>
+<p>멀티라인 알파 전용 변이 연산자이다. 변수 수식 변이(40%), 변수 추가(25%), 변수 제거(20%), 결합 수식 변이(15%)를 확률적으로 선택한다.</p>
+
+<div class="section-divider">• • •</div>
+
+<!-- 5. Expression Representation -->
+<h2>5. 수식 표현 체계</h2>
+
+<p>모든 알파 수식은 <code>Node</code> 데이터클래스로 표현되는 트리 구조이다. 각 노드는 <code>node_type</code>, <code>value</code>, <code>children</code>, <code>window</code> 속성을 가진다.</p>
+
+<table>
+<caption>표 7: AST 노드 유형</caption>
+<thead><tr><th>node_type</th><th>value 예시</th><th>children</th><th>출력 예시</th></tr></thead>
+<tbody>
+<tr><td class="left"><code>field</code></td><td class="left">close, volume</td><td>0</td><td class="left"><code>close</code></td></tr>
+<tr><td class="left"><code>unary</code></td><td class="left">rank, zscore</td><td>1</td><td class="left"><code>rank(close)</code></td></tr>
+<tr><td class="left"><code>binary</code></td><td class="left">+, -, *, /</td><td>2</td><td class="left"><code>(close + volume)</code></td></tr>
+<tr><td class="left"><code>ts_op</code></td><td class="left">ts_rank, ts_mean</td><td>1+window</td><td class="left"><code>ts_rank(close, 10)</code></td></tr>
+<tr><td class="left"><code>ts_op2</code></td><td class="left">ts_corr</td><td>2+window</td><td class="left"><code>ts_corr(close, volume, 20)</code></td></tr>
+<tr><td class="left"><code>ternary</code></td><td class="left">조건부</td><td>3</td><td class="left"><code>(vol > avg ? A : B)</code></td></tr>
+<tr><td class="left"><code>block</code></td><td class="left">멀티라인</td><td>N</td><td class="left"><code>a = ...; b = ...; result</code></td></tr>
+</tbody>
+</table>
+
+<p><code>to_expr()</code>는 FastExpression 형식(단일 줄), <code>to_regular()</code>는 Regular Expression 형식(멀티라인)을 출력한다. BRAIN Regular Expression 제약 조건: (1) 변수명은 단일 문자(a, b, c...), (2) 할당 후 세미콜론 필수, (3) 정의된 모든 변수는 반드시 사용, (4) 과학적 표기법 불가(<code>1e-6</code> → <code>0.000001</code>).</p>
+
+<p>멀티라인 알파의 최종 결합 수식은 가중합, 조건부(중첩 삼항), 교차항(곱셈+덧셈) 3가지 방식 중 랜덤 선택된다. 각 변수는 9개 시그널 카테고리(모멘텀/반전, 밸류, 유동성, 애널리스트, 베타/상관, 뉴스 센티먼트, 공매도, 옵션, 비율)에서 라운드 로빈으로 할당되어 멀티팩터 다양성을 확보한다.</p>
+
+<div class="section-divider">• • •</div>
+
+<!-- 6. Evaluation & Submission -->
+<h2>6. 평가 및 제출 파이프라인</h2>
+
+<h3>6.1 IQC 점수 계산</h3>
+
+<p>IS Check 통과 시:</p>
+<div class="math-block">
+\[\text{Score} = 4 \cdot \text{Sharpe} + 3 \cdot \text{Fitness} + 12 \cdot \max(0, \text{Returns}) + 4 \cdot \max(0, 0.7 - \text{TO}) + 3 \cdot \max(0, \text{DD} + 0.2)\]
+\[+ 3 \cdot \text{OS\_Sharpe} + 2 \cdot \text{OS\_Fitness} + 5 \cdot \mathbb{1}[\text{consistency} > 0.5] \cdot \frac{\text{OS\_Sharpe}}{\text{Sharpe}}\]
+</div>
+
+<p>IS Check 미통과 시:</p>
+<div class="math-block">
+\[\text{Score} = \max\left(0, 0.5 \cdot \text{Sharpe} + 0.3 \cdot \text{Fitness}\right)\]
+</div>
+
+<h3>6.2 IS Check 기준</h3>
+
+<table>
+<caption>표 8: IS Check 기준값</caption>
+<thead><tr><th>지표</th><th>delay=1</th><th>delay=0</th></tr></thead>
+<tbody>
+<tr><td class="left">Sharpe Ratio</td><td>≥ 0.58</td><td>≥ 1.25</td></tr>
+<tr><td class="left">Fitness</td><td>≥ 1.0</td><td>≥ 1.5</td></tr>
+<tr><td class="left">Turnover</td><td>≤ 0.70</td><td>≤ 0.70</td></tr>
+<tr><td class="left">Self-Correlation</td><td colspan="2">≤ 0.55</td></tr>
+</tbody>
+</table>
+
+<h3>6.3 제출 파이프라인</h3>
+
+<p>시뮬레이션 완료 → IS Check(all_checks_pass) → Self-Correlation Check(&lt;0.55) → 명예의 전당 등록 → 자동 제출(--submit). BRAIN API의 <code>all_checks_pass</code> 플래그를 우선 사용하며, 모든 메트릭 접근에 <code>float(metrics.get("sharpe") or 0)</code> 패턴을 적용하여 None 값을 방어한다.</p>
+
+<h3>6.4 포트폴리오 가치</h3>
+<div class="math-block">
+\[V_{\text{portfolio}} = \sum_{i=1}^{n} \text{Score}_i \cdot \left(1 + 0.5 \cdot \max(0, 1 - \rho_{\text{self},i})\right)\]
+</div>
+
+<div class="section-divider">• • •</div>
+
+<!-- 7. Stagnation Escape -->
+<h2>7. 정체 탈출 메커니즘</h2>
+
+<p>3세대 연속 최고 점수가 개선되지 않으면 대격변(Cataclysm)을 발동한다. 상위 50%를 보존하고 나머지 50%를 MAP-Elites 시드 30% + 멀티라인 15% + 전략 템플릿/랜덤 55%로 교체한다. 대격변 후 SA 온도를 2배로 올려 탐색 범위를 확대한다.</p>
+
+<div class="section-divider">• • •</div>
+
+<!-- 8. Persistence -->
+<h2>8. 영속성 및 체크포인트</h2>
+
+<p>프로그램 시작 시 <code>results/</code> 디렉토리의 모든 파일을 스캔하여 명예의 전당, MAP-Elites, 파레토 아카이브, 제출 기록, AOS 통계를 복원한다. 반복 실행에 따라 명예의 전당 확장으로 초기 개체군 품질이 향상되고, MAP-Elites 커버리지 증가로 시드 다양성이 확보되며, AOS 통계 축적으로 연산자 선택 정밀도가 높아진다.</p>
+
+<table>
+<caption>표 9: 저장 파일</caption>
+<thead><tr><th>파일</th><th>생성 시점</th><th>수명</th></tr></thead>
+<tbody>
+<tr><td class="left"><code>evolution_YYYYMMDD_HHMMSS.json</code></td><td class="left">7라운드 사이클 완료 시</td><td class="left">누적 (삭제 안 함)</td></tr>
+<tr><td class="left"><code>checkpoint_latest.json</code></td><td class="left">라운드 종료 + 5세대마다</td><td class="left">덮어쓰기 (최신만)</td></tr>
+</tbody>
+</table>
+
+<div class="section-divider">• • •</div>
+
+<!-- 9. Strategy Seeds -->
+<h2>9. 36개 전략 시드</h2>
+
+<p>초기 개체군 생성 시 사용되는 36개의 검증된 알파 전략 템플릿이다. 각 전략은 호출 시마다 랜덤 파라미터(윈도우, 필드)를 선택하여 다양한 변형을 생성한다.</p>
+
+<table>
+<caption>표 10: 전략 시드 요약 (일부)</caption>
+<thead><tr><th>#</th><th>전략명</th><th>카테고리</th><th>핵심 로직</th></tr></thead>
+<tbody>
+<tr><td>1</td><td class="left">Short-Term Reversal</td><td>반전</td><td class="left"><code>-rank(ts_delta(close, 5))</code></td></tr>
+<tr><td>3</td><td class="left">Volume-Price Divergence</td><td>거래량</td><td class="left"><code>-rank(ts_corr(close, volume, 20))</code></td></tr>
+<tr><td>4</td><td class="left">Fundamental Value</td><td>펀더멘탈</td><td class="left"><code>rank(ebitda / (enterprise_value + ε))</code></td></tr>
+<tr><td>19</td><td class="left">Momentum × Value</td><td>멀티팩터</td><td class="left">모멘텀 + 가치 결합</td></tr>
+<tr><td>26</td><td class="left">Sentiment Reversal</td><td>센티먼트</td><td class="left">뉴스 감성 반전</td></tr>
+<tr><td>29</td><td class="left">Multiline Multifactor</td><td>멀티라인</td><td class="left">변수 할당 기반 복합 팩터</td></tr>
+<tr><td>33</td><td class="left">Asia Value Momentum</td><td>아시아</td><td class="left">아시아 시장 가치+모멘텀</td></tr>
+<tr><td>35</td><td class="left">Decorrelated Composite</td><td>비상관</td><td class="left">다축 비상관 복합</td></tr>
+</tbody>
+</table>
+
+<p>delay=0 모드에서는 <code>delay0_strategies()</code>가 40% 확률로 우선 선택된다. 아시아 리전(CHN, KOR, JPN, ASI, TWN)에서는 <code>asia_strategies()</code>가 30% 확률로 선택된다.</p>
+
+<div class="section-divider">• • •</div>
+
+<!-- References -->
+<h2>References</h2>
+
+<div class="references">
+<p>Tanabe, R. & Fukunaga, A. (2013). Success-History Based Parameter Adaptation for Differential Evolution. <em>IEEE CEC</em>, pp. 71–78.</p>
+<p>Mouret, J.-B. & Clune, J. (2015). Illuminating search spaces by mapping elites. <em>arXiv:1504.04909</em>.</p>
+<p>La Cava, W. et al. (2016). Epsilon-Lexicase Selection for Regression. <em>GECCO</em>, pp. 741–748.</p>
+<p>Deb, K. et al. (2002). A Fast and Elitist Multiobjective Genetic Algorithm: NSGA-II. <em>IEEE Trans. Evol. Comput.</em>, 6(2), pp. 182–197.</p>
+<p>Auer, P. et al. (2002). Finite-time Analysis of the Multiarmed Bandit Problem. <em>Machine Learning</em>, 47(2), pp. 235–256.</p>
+<p>Koza, J. R. (1992). <em>Genetic Programming</em>. MIT Press.</p>
+<p>Storn, R. & Price, K. (1997). Differential Evolution. <em>J. Global Optimization</em>, 11(4), pp. 341–359.</p>
+<p>Ursem, R. K. (2000). Multinational GAs: Multimodal Optimization in Dynamic Environments. <em>GECCO</em>, pp. 19–26.</p>
+<p>WorldQuant BRAIN Platform. <em>FastExpression Language Reference</em>. <a href="https://platform.worldquantbrain.com" target="_blank">platform.worldquantbrain.com</a></p>
+</div>
+
+</div><!-- /.paper-content -->
+</div><!-- /.container -->
+</div><!-- /.main-wrapper -->
+
+<script>
+const syms = ['Σ','∫','∂','√','∞','π','θ','σ','μ','λ','α','β','γ','δ','Δ','Γ','κ','ρ','φ','ψ','dx','dt','dW','E[X]','Var','ln','exp'];
+const bg = document.getElementById('formulaBg');
+const items = [];
+for(let i = 0; i < 30; i++) {
+    const el = document.createElement('div');
+    el.className = 'f';
+    el.textContent = syms[Math.floor(Math.random() * syms.length)];
+    el.style.fontSize = (14 + Math.random() * 20) + 'px';
+    el.style.color = `rgba(0,0,0,${0.03 + Math.random() * 0.04})`;
+    el.style.left = Math.random() * 100 + '%';
+    el.style.top = Math.random() * 100 + '%';
+    bg.appendChild(el);
+    items.push({el, x: parseFloat(el.style.left), y: parseFloat(el.style.top), vx: (Math.random()-.5)*.02, vy: (Math.random()-.5)*.02});
+}
+let mx = -1000, my = -1000;
+document.addEventListener('mousemove', e => { mx = (e.clientX/window.innerWidth)*100; my = (e.clientY/window.innerHeight)*100; });
+function tick() {
+    for(const it of items) {
+        it.x += it.vx; it.y += it.vy;
+        if(it.x < 0 || it.x > 100) it.vx *= -1;
+        if(it.y < 0 || it.y > 100) it.vy *= -1;
+        const dx = it.x - mx, dy = it.y - my, dist = Math.sqrt(dx*dx + dy*dy);
+        let px = 0, py = 0;
+        if(dist < 12) { const f = (12-dist)/12*3; px = (dx/dist)*f; py = (dy/dist)*f; }
+        it.el.style.left = (it.x + px) + '%';
+        it.el.style.top = (it.y + py) + '%';
+    }
+    requestAnimationFrame(tick);
+}
+tick();
+</script>
+{% include market-data.html %}
+</body>
+</html>
