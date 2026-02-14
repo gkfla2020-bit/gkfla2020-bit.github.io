@@ -532,51 +532,165 @@ title: "WQ BRAIN Alpha Evolution"
 <div class="section-divider">• • •</div>
 
 <!-- 10. v4 Extensions -->
-<h2>10. v4 확장 모듈</h2>
+<h2>10. v4 확장: 탐색 효율 및 수렴 가속 모듈</h2>
 
-<p>v3까지의 핵심 진화 엔진 위에 4개의 보조 모듈을 추가하여 탐색 효율과 수렴 속도를 개선하였다. 각 모듈은 독립적으로 동작하며, 기존 파이프라인에 비침습적으로 통합된다.</p>
+<p>v3까지의 핵심 진화 엔진은 순수 유전 프로그래밍 기반으로 동작하며, 초기 개체군 생성은 전략 시드와 완전 랜덤의 혼합에 의존한다. 이 접근은 탐색 공간의 균일 커버리지를 보장하지만, 두 가지 구조적 비효율이 존재한다. 첫째, 이전 사이클에서 축적된 성공 패턴이 초기 개체군 생성에 반영되지 않아 매 사이클마다 동일한 탐색 영역을 반복 방문한다. 둘째, BRAIN API 시뮬레이션 호출(건당 3~15초)이 병목이므로, 명백히 유망하지 않은 수식에 대한 API 호출이 전체 처리량을 저하시킨다.</p>
+
+<p>v4에서는 이 두 문제를 해결하기 위해 4개의 독립 모듈과 2개의 기존 모듈 강화를 도입하였다. 각 모듈은 기존 파이프라인에 비침습적으로 통합되며, 모듈 간 의존성 없이 독립적으로 비활성화할 수 있다.</p>
+
+<table>
+<caption>표 10: v4 확장 모듈 구성</caption>
+<thead><tr><th>모듈</th><th>파일</th><th>역할</th><th>통합 지점</th></tr></thead>
+<tbody>
+<tr><td class="left">Pattern Learner</td><td class="left"><code>pattern_learner.py</code></td><td class="left">성공 패턴 추출 → 학습 기반 시드 생성</td><td class="left"><code>_create_population()</code></td></tr>
+<tr><td class="left">Surrogate Model</td><td class="left"><code>surrogate.py</code></td><td class="left">Sharpe 예측 → API 호출 전 필터링</td><td class="left"><code>_evaluate_population()</code></td></tr>
+<tr><td class="left">Field Explorer</td><td class="left"><code>field_explorer.py</code></td><td class="left">미사용 데이터필드 자동 스크리닝</td><td class="left"><code>run_all_rounds()</code> 후</td></tr>
+<tr><td class="left">MDL Penalty</td><td class="left"><code>evaluator.py</code></td><td class="left">정보이론 기반 복잡도 페널티</td><td class="left"><code>compute_iqc_score()</code></td></tr>
+<tr><td class="left">Dashboard</td><td class="left"><code>dashboard.py</code></td><td class="left">실시간 웹 모니터링</td><td class="left"><code>main.py --dashboard</code></td></tr>
+<tr><td class="left">Cross-Pollination</td><td class="left"><code>evolution.py</code></td><td class="left">멀티 리전 교차 수분</td><td class="left"><code>_run_multi_region_round()</code></td></tr>
+</tbody>
+</table>
 
 <h3>10.1 패턴 학습기 (Pattern Learner)</h3>
 
-<p>Hall of Fame에 축적된 성공 알파들의 공통 구조를 통계적으로 추출하여 초기 population 생성 시 seed 품질을 향상시킨다. 수식에서 데이터 필드, 연산자, 시계열 윈도우 크기의 빈도를 가중 집계하며, 가중치는 IQC 점수에 비례한다.</p>
+<h4>10.1.1 동기</h4>
 
-<p class="no-indent">학습된 패턴으로부터 트리를 생성할 때, 70%는 빈출 패턴 기반, 30%는 완전 랜덤으로 구성하여 exploitation-exploration 균형을 유지한다. 생성된 "학습 시드"는 전체 population의 15%를 차지하며, 라운드 종료 시마다 해당 라운드에서 발견된 신규 알파로 학습 데이터를 갱신한다.</p>
+<p>유전 프로그래밍에서 초기 개체군의 품질은 수렴 속도에 결정적 영향을 미친다(Koza, 1992). 기존 시스템은 36개 전략 시드와 <code>rand_tree()</code>의 균일 랜덤 생성에 의존하는데, 이는 BRAIN 플랫폼에서 실제로 높은 Sharpe를 달성하는 수식의 구조적 특성을 반영하지 못한다. 예를 들어, 성공 알파에서 <code>ts_decay_linear</code>이 <code>ts_sum</code>보다 10배 이상 빈출한다면, 초기 개체군에서도 이 비율을 반영하는 것이 합리적이다.</p>
+
+<h4>10.1.2 패턴 추출</h4>
+
+<p>Hall of Fame에 축적된 성공 알파들의 수식 문자열에서 3가지 통계를 추출한다: (1) 데이터 필드 빈도, (2) 연산자 빈도, (3) 시계열 윈도우 크기 빈도. 각 빈도는 해당 알파의 IQC 점수에 비례하는 가중치를 적용한다.</p>
 
 <div class="math-block">
 \[
-w_f = \sum_{i \in \text{HoF}} \text{count}(f, \alpha_i) \cdot \lfloor \text{IQC}_i \rfloor, \quad P(\text{field} = f) \propto w_f
+w_f = \sum_{i \in \text{HoF}} \text{count}(f, \alpha_i) \cdot \lfloor \text{IQC}_i \rfloor
 \]
 </div>
+
+<p class="no-indent">필드 추출 시 BRAIN 연산자 사전(60개)과의 차집합으로 순수 데이터 필드만 분리한다. 정규표현식 <code>[a-z][a-z0-9_]*</code>로 토큰을 추출한 뒤, <code>rank</code>, <code>ts_delta</code>, <code>group_neutralize</code> 등 알려진 연산자를 제외한다. 연산자는 <code>([a-z_]+)\s*\(</code> 패턴으로, 윈도우는 <code>ts_\w+\([^,]+,\s*(\d+)\)</code> 패턴으로 추출한다.</p>
+
+<h4>10.1.3 학습 기반 트리 생성</h4>
+
+<p>추출된 빈도 분포를 기반으로 AST 트리를 재귀적으로 생성한다. 각 노드에서 30%의 확률로 완전 랜덤 서브트리를 삽입하여 exploitation-exploration 균형을 유지한다. 나머지 70%에서는 다음 확률 분포에 따라 노드 유형을 선택한다:</p>
+
+<table>
+<caption>표 11: 학습 기반 노드 생성 확률</caption>
+<thead><tr><th>확률 구간</th><th>노드 유형</th><th>소스</th><th>예시</th></tr></thead>
+<tbody>
+<tr><td>\(r < 0.35\)</td><td class="left">시계열 연산자</td><td class="left">빈출 ts_op + 빈출 윈도우</td><td class="left"><code>ts_decay_linear(close, 10)</code></td></tr>
+<tr><td>\(0.35 \leq r < 0.55\)</td><td class="left">랭킹/중립화</td><td class="left">빈출 rank/group 연산자</td><td class="left"><code>group_rank(volume)</code></td></tr>
+<tr><td>\(0.55 \leq r < 0.75\)</td><td class="left">산술 연산</td><td class="left">균일 랜덤 {+, -, *, /}</td><td class="left"><code>close / adv20</code></td></tr>
+<tr><td>\(0.75 \leq r < 1.0\)</td><td class="left">단항 연산</td><td class="left">균일 랜덤 {rank, abs, log, sign, -1*}</td><td class="left"><code>rank(x)</code></td></tr>
+</tbody>
+</table>
+
+<p class="no-indent">리프 노드에서는 70% 확률로 빈출 필드 상위 15개에서 선택하고, 30% 확률로 [0.01, 2.0] 범위의 상수를 생성한다. 학습 시드는 전체 population의 15%를 차지하며, <code>birth_operator = "pattern_learned"</code>로 태깅되어 AOS 통계에서 추적된다.</p>
+
+<h4>10.1.4 온라인 갱신</h4>
+
+<p>패턴 학습기는 엔진 초기화 시 기존 Hall of Fame 전체를 분석하고, 각 라운드 종료 시 해당 라운드에서 신규 발견된 알파만 추가 분석한다. 최소 5개 이상의 알파가 분석되어야 학습 기반 생성이 활성화되며, 그 이전에는 <code>rand_tree()</code>로 폴백한다.</p>
 
 <h3>10.2 Surrogate Model (대리 모델)</h3>
 
-<p>BRAIN API 시뮬레이션 호출이 병목이므로, 수식의 구조적 특징으로부터 Sharpe ratio를 예측하는 경량 회귀 모델을 학습한다. 특징 벡터는 20차원으로 구성된다: 수식 길이, 괄호 깊이, 시계열/랭킹/그룹 연산자 빈도, 산술 연산자 빈도, 윈도우 크기 통계(평균/최대/최소), 필드 다양성, 멀티라인 여부, 특정 패턴 존재 여부(ts_decay_linear, ts_zscore, ts_corr, group_neutralize, ts_regression).</p>
+<h4>10.2.1 동기</h4>
 
-<p class="no-indent">XGBoost가 설치되어 있으면 자동으로 사용하고, 없으면 Ridge Regression으로 폴백한다. 30개 이상의 학습 샘플이 축적되면 모델이 활성화되며, 이후 평가 대상 population에서 상위 60%만 실제 API 호출로 평가한다. 하위 40% 중에서도 10%를 랜덤으로 포함하여 surrogate의 편향을 완화한다.</p>
+<p>BRAIN API 시뮬레이션은 건당 3~15초가 소요되며, 세대당 50개 개체를 평가하면 한 세대에 2.5~12.5분이 필요하다. 7라운드 전체(총 54세대)에서 약 2,700회의 API 호출이 발생하는데, 이 중 상당수는 Sharpe < 0인 수식에 대한 불필요한 호출이다. Surrogate-Assisted Evolutionary Computation(Jin, 2011)의 원리를 적용하여, 수식의 구조적 특징만으로 Sharpe를 사전 예측하고 유망한 후보만 실제 API로 평가한다.</p>
+
+<h4>10.2.2 특징 벡터 설계</h4>
+
+<p>수식 문자열에서 20차원 특징 벡터 \(\mathbf{x}_\alpha \in \mathbb{R}^{20}\)를 추출한다. 특징은 5개 카테고리로 구성된다:</p>
+
+<table>
+<caption>표 12: Surrogate 특징 벡터 (20차원)</caption>
+<thead><tr><th>차원</th><th>카테고리</th><th>특징</th><th>추출 방법</th></tr></thead>
+<tbody>
+<tr><td>1-2</td><td class="left">길이</td><td class="left">수식 길이, 괄호 수</td><td class="left"><code>len(expr)</code>, <code>count("(")</code></td></tr>
+<tr><td>3-5</td><td class="left">연산자 빈도</td><td class="left">ts_op 수, rank 수, group_op 수</td><td class="left">정규표현식 매칭</td></tr>
+<tr><td>6-9</td><td class="left">산술 연산자</td><td class="left">+, -, *, / 각각의 출현 횟수</td><td class="left"><code>count()</code></td></tr>
+<tr><td>10-12</td><td class="left">윈도우 통계</td><td class="left">평균, 최대, 최소</td><td class="left"><code>,\s*(\d+)\)</code> 패턴</td></tr>
+<tr><td>13</td><td class="left">필드 다양성</td><td class="left">고유 필드 수</td><td class="left">토큰 - 연산자 사전</td></tr>
+<tr><td>14</td><td class="left">구조</td><td class="left">멀티라인 여부</td><td class="left"><code>";" in expr</code></td></tr>
+<tr><td>15-19</td><td class="left">패턴 존재</td><td class="left">ts_decay_linear, ts_zscore, ts_corr, group_neutralize, ts_regression</td><td class="left">이진 플래그</td></tr>
+</tbody>
+</table>
+
+<h4>10.2.3 모델 학습</h4>
+
+<p>XGBoost가 설치되어 있으면 자동으로 사용하고(<code>n_estimators=100, max_depth=4, lr=0.1, subsample=0.8</code>), 없으면 Ridge Regression으로 폴백한다. Ridge의 경우 특징을 z-score 정규화한 뒤 정규화 파라미터 \(\lambda = 1.0\)으로 가우스 소거법을 통해 해석적으로 풀이한다:</p>
 
 <div class="math-block">
 \[
-\hat{S}(\alpha) = f_\theta(\mathbf{x}_\alpha), \quad \mathbf{x}_\alpha \in \mathbb{R}^{20}
+\hat{\mathbf{w}} = (\mathbf{X}^\top \mathbf{X} + \lambda \mathbf{I})^{-1} \mathbf{X}^\top \mathbf{y}
 \]
 </div>
 
-<p class="no-indent">Ridge Regression의 경우:</p>
+<p class="no-indent">학습 데이터는 매 시뮬레이션 완료 시 <code>(특징벡터, Sharpe)</code> 쌍으로 축적되며, 50개 단위로 재학습한다. 최소 30개 샘플이 축적되어야 모델이 활성화된다.</p>
 
-<div class="math-block">
-\[
-\hat{\mathbf{w}} = (\mathbf{X}^\top \mathbf{X} + \lambda \mathbf{I})^{-1} \mathbf{X}^\top \mathbf{y}, \quad \lambda = 1.0
-\]
-</div>
+<h4>10.2.4 사전 필터링</h4>
+
+<p>모델 활성화 후, <code>_evaluate_population()</code>에서 미평가 개체가 10개 이상일 때 사전 필터링을 수행한다. 모든 미평가 수식에 대해 \(\hat{S}(\alpha)\)를 예측하고, 상위 60%만 실제 API 호출로 평가한다. 하위 40% 중에서도 10%를 랜덤으로 포함하여 surrogate의 편향(bias)을 완화하고, 모델이 과소평가하는 영역의 탐색을 보장한다.</p>
+
+<pre><code><span class="cm"># Surrogate 필터링 의사코드</span>
+scores = [(i, surrogate.predict(expr)) <span class="kw">for</span> i, expr <span class="kw">in</span> enumerate(unevaluated)]
+scores.sort(key=<span class="kw">lambda</span> x: -x[<span class="nu">1</span>])
+keep = scores[:int(len(scores) * <span class="nu">0.6</span>)]           <span class="cm"># 상위 60%</span>
+random_add = random.sample(scores[len(keep):], <span class="nu">10</span>%)  <span class="cm"># 하위에서 10% 랜덤</span>
+evaluate_only = keep + random_add</code></pre>
 
 <h3>10.3 데이터필드 자동 탐색기 (Field Explorer)</h3>
 
-<p>BRAIN 플랫폼은 수백 개의 데이터 필드를 제공하지만, 수동 탐색으로는 전체를 커버하기 어렵다. Field Explorer는 <code>datafields_usa.csv</code>에서 전체 필드 목록을 로드하고, 현재 alpha_ast에서 사용 중인 필드 집합과 비교하여 미사용 필드를 자동으로 발견한다.</p>
+<h4>10.3.1 동기</h4>
 
-<p class="no-indent">각 미사용 필드에 대해 8가지 간단한 테스트 수식(rank, zscore, decay_linear, av_diff 등)을 생성하여 빠르게 스크리닝한다. Sharpe > 0.3인 필드는 "유망 필드 풀"에 추가되어 이후 진화 과정에서 활용된다. Sharpe ≤ -0.5인 필드는 실패 목록에 등록되어 재테스트를 방지한다.</p>
+<p>BRAIN 플랫폼은 USA 리전에서만 수백 개의 데이터 필드를 제공한다. <code>alpha_ast.py</code>에 하드코딩된 기본 필드 풀은 44개(가격 11 + 펀더멘탈 20 + 애널리스트 3 + 기타 10)로, 전체 가용 필드의 일부에 불과하다. 수동으로 새 필드를 발견하고 테스트하는 과정은 비효율적이며, 경쟁이 덜한 비주류 필드에서 알파를 발견할 기회를 놓치게 된다.</p>
+
+<h4>10.3.2 필드 로딩 및 분류</h4>
+
+<p>Field Explorer는 <code>results/datafields_usa.csv</code>에서 전체 필드 목록을 CSV 파싱으로 로드한다. 각 필드는 <code>category</code>(또는 <code>dataset</code>) 컬럼 기준으로 카테고리별로 분류된다. 기존 <code>KNOWN_FIELDS</code>(44개)와 이미 테스트된 필드를 제외한 미사용 필드 목록을 산출한다.</p>
+
+<h4>10.3.3 자동 스크리닝 프로토콜</h4>
+
+<p>7라운드 진화 완료 후, 미사용 필드에서 15개를 랜덤 샘플링하여 자동 스크리닝을 수행한다. 각 필드에 대해 8가지 표준 테스트 수식을 생성하되, API 호출 효율을 위해 필드당 최대 3개만 실제 시뮬레이션한다:</p>
+
+<table>
+<caption>표 13: 필드 스크리닝 테스트 수식</caption>
+<thead><tr><th>#</th><th>수식 템플릿</th><th>테스트 목적</th></tr></thead>
+<tbody>
+<tr><td>1</td><td class="left"><code>rank(ts_delta({field}, 5))</code></td><td class="left">단기 변화율 모멘텀</td></tr>
+<tr><td>2</td><td class="left"><code>-1 * rank(ts_delta({field}, 10))</code></td><td class="left">중기 반전</td></tr>
+<tr><td>3</td><td class="left"><code>rank(ts_zscore({field}, 20))</code></td><td class="left">정규화된 이탈도</td></tr>
+<tr><td>4</td><td class="left"><code>-1 * ts_decay_linear(ts_delta({field}, 5), 10)</code></td><td class="left">감쇠 모멘텀</td></tr>
+<tr><td>5</td><td class="left"><code>rank({field} / ts_mean({field}, 20) - 1)</code></td><td class="left">이동평균 대비 괴리</td></tr>
+<tr><td>6</td><td class="left"><code>-1 * rank(ts_std_dev({field}, 20))</code></td><td class="left">변동성 역전</td></tr>
+<tr><td>7</td><td class="left"><code>rank(ts_av_diff({field}, 20))</code></td><td class="left">평균 차이 추세</td></tr>
+<tr><td>8</td><td class="left"><code>group_rank(ts_delta({field}, 5), subindustry)</code></td><td class="left">산업 내 상대 모멘텀</td></tr>
+</tbody>
+</table>
+
+<h4>10.3.4 결과 분류 및 활용</h4>
+
+<p>스크리닝 결과는 3단계로 분류된다:</p>
+
+<table>
+<caption>표 14: 필드 분류 기준</caption>
+<thead><tr><th>분류</th><th>기준</th><th>후속 처리</th></tr></thead>
+<tbody>
+<tr><td class="left">유망 (Promising)</td><td>Sharpe &gt; 0.3</td><td class="left">유망 필드 풀에 등록, 최고 Sharpe 기록</td></tr>
+<tr><td class="left">중립 (Neutral)</td><td>-0.5 &lt; Sharpe ≤ 0.3</td><td class="left">테스트 완료 표시, 재테스트 가능</td></tr>
+<tr><td class="left">실패 (Failed)</td><td>Sharpe ≤ -0.5</td><td class="left">실패 목록 등록, 재테스트 방지</td></tr>
+</tbody>
+</table>
+
+<p class="no-indent">유망 필드에서 Sharpe > 0.5인 경우, 해당 수식을 즉시 Hall of Fame에 등록하고 <code>--submit</code> 모드에서는 자동 제출을 시도한다. 모든 스크리닝 결과는 Surrogate Model의 학습 데이터로도 활용된다.</p>
 
 <h3>10.4 MDL 복잡도 제어</h3>
 
-<p>Minimum Description Length (MDL) 원리에 기반한 복잡도 페널티를 IQC 점수 계산에 통합하였다. 수식의 정보량을 연산자 수(5 bits/op), 필드 수(7 bits/field), 윈도우 파라미터 수(4 bits/param), 멀티라인 변수 수(10 bits/var)로 추정한다.</p>
+<h4>10.4.1 이론적 배경</h4>
+
+<p>Minimum Description Length(Rissanen, 1978) 원리에 따르면, 최적 모델은 데이터 기술 길이 \(L(D|H)\)와 모델 기술 길이 \(L(H)\)의 합을 최소화한다. 유전 프로그래밍에서 수식의 복잡도가 증가하면 in-sample 적합도는 향상되지만 out-of-sample 일반화 성능은 저하되는 과적합이 발생한다. v3의 시그모이드 기반 노드 수 페널티(Section 3.8)는 트리 구조의 크기만 반영하며, 수식의 정보론적 복잡도를 포착하지 못한다.</p>
+
+<h4>10.4.2 기술 길이 추정</h4>
+
+<p>수식의 정보량을 4가지 구성 요소의 가중합으로 추정한다. 각 구성 요소의 비트 수는 해당 요소의 선택 공간 크기의 로그에 근사한다:</p>
 
 <div class="math-block">
 \[
@@ -584,23 +698,108 @@ L(H) = 5 \cdot n_{\text{ops}} + 7 \cdot n_{\text{fields}} + 4 \cdot n_{\text{par
 \]
 </div>
 
+<table>
+<caption>표 15: 기술 길이 구성 요소</caption>
+<thead><tr><th>구성 요소</th><th>비트/단위</th><th>근거</th><th>추출 방법</th></tr></thead>
+<tbody>
+<tr><td class="left">연산자 (\(n_{\text{ops}}\))</td><td>5</td><td class="left">\(\lceil \log_2 30 \rceil \approx 5\) (30개 연산자)</td><td class="left"><code>count("(")</code></td></tr>
+<tr><td class="left">필드 (\(n_{\text{fields}}\))</td><td>7</td><td class="left">\(\lceil \log_2 100 \rceil \approx 7\) (100개 필드)</td><td class="left">고유 토큰 - 연산자 사전</td></tr>
+<tr><td class="left">윈도우 (\(n_{\text{params}}\))</td><td>4</td><td class="left">\(\lceil \log_2 15 \rceil \approx 4\) (15개 윈도우 값)</td><td class="left"><code>,\s*(\d+)\)</code> 패턴</td></tr>
+<tr><td class="left">멀티라인 변수 (\(n_{\text{vars}}\))</td><td>10</td><td class="left">변수 정의 = 연산자 + 필드 + 윈도우 복합</td><td class="left"><code>count(";")</code></td></tr>
+</tbody>
+</table>
+
+<h4>10.4.3 페널티 함수</h4>
+
+<p>기술 길이 80 bits 이하에서는 페널티를 부과하지 않는다. 이는 <code>rank(ts_delta(close, 5))</code> 수준의 단순 수식(약 2개 연산자 + 2개 필드 + 1개 윈도우 = 28 bits)이 페널티 없이 통과하도록 설계된 임계값이다. 80 bits 초과 시 선형적으로 증가하여 480 bits에서 최대 25%에 도달한다:</p>
+
 <div class="math-block">
 \[
-\text{penalty} = \min\left(0.25, \; \frac{\max(0, \; L(H) - 80)}{400}\right)
+\text{penalty}_{\text{MDL}} = \min\left(0.25, \; \frac{\max(0, \; L(H) - 80)}{400}\right)
 \]
 </div>
 
-<p class="no-indent">80 bits 이하의 수식에는 페널티가 없으며, 이후 선형적으로 증가하여 최대 25%의 점수 감소를 적용한다. 이는 기존의 노드 수 기반 시그모이드 페널티와 곱셈적으로 결합되어, 과적합 위험이 높은 과도하게 복잡한 수식을 억제한다.</p>
+<p class="no-indent">이 페널티는 기존의 시그모이드 노드 수 페널티와 곱셈적으로 결합된다:</p>
+
+<div class="math-block">
+\[
+\text{Score}_{\text{final}} = \text{Score}_{\text{raw}} \times (1 - 0.15 \cdot \sigma_{\text{node}}) \times (1 - \text{penalty}_{\text{MDL}})
+\]
+</div>
+
+<table>
+<caption>표 16: MDL 페널티 예시</caption>
+<thead><tr><th>수식 예시</th><th>\(L(H)\)</th><th>페널티</th></tr></thead>
+<tbody>
+<tr><td class="left"><code>rank(ts_delta(close, 5))</code></td><td>28</td><td>0%</td></tr>
+<tr><td class="left"><code>-1 * rank(ts_zscore(close / adv20, 20))</code></td><td>52</td><td>0%</td></tr>
+<tr><td class="left">3-변수 멀티라인 (ts_corr + rank + group_rank)</td><td>105</td><td>6.3%</td></tr>
+<tr><td class="left">5-변수 멀티라인 (복합 조건부 결합)</td><td>210</td><td>32.5% → cap 25%</td></tr>
+</tbody>
+</table>
 
 <h3>10.5 실시간 대시보드</h3>
 
-<p>진행 상황 모니터링을 위한 웹 기반 대시보드를 제공한다. <code>--dashboard</code> 옵션으로 진화 엔진과 동시에 실행되며, 30초 간격으로 자동 갱신된다. 표시 항목: Hall of Fame 크기, 제출 수, 최고 IQC 점수, MAP-Elites 커버리지, 연산자별 AOS 보상, 라운드 히스토리, 상위 20개 알파 상세 정보.</p>
+<h4>10.5.1 아키텍처</h4>
+
+<p>Python 표준 라이브러리의 <code>http.server</code> 기반 경량 웹 서버로 구현하였다. 외부 의존성 없이 동작하며, <code>--dashboard</code> 옵션으로 진화 엔진과 동시에 데몬 스레드로 실행된다. 독립 실행(<code>python dashboard.py --port 8050</code>)도 지원한다.</p>
+
+<h4>10.5.2 데이터 소스</h4>
+
+<p>대시보드는 <code>results/</code> 디렉토리의 파일을 직접 읽어 데이터를 구성한다. <code>checkpoint_latest.json</code>을 우선 로드하고, <code>evolution_*.json</code> 파일들의 제출 기록을 합산한다. 30초 간격의 <code>meta http-equiv="refresh"</code>로 자동 갱신되므로, 진화 엔진이 체크포인트를 저장할 때마다 대시보드에 반영된다.</p>
+
+<h4>10.5.3 표시 항목</h4>
+
+<p>대시보드는 3개 계층으로 구성된다. 상단 카드 영역에 7개 핵심 지표(Hall of Fame 크기, 제출 수, 최고 IQC 점수, MAP-Elites 커버리지, 최고 Sharpe, 평균 HoF 점수, MAP 셀 수)를 표시한다. 중단에 AOS 연산자별 보상을 수평 바 차트로 시각화하여 어떤 연산자가 현재 가장 효과적인지 직관적으로 파악할 수 있다. 하단에 라운드 히스토리 테이블과 Hall of Fame 상위 20개 알파의 상세 정보(수식, IQC 점수, Sharpe, Fitness, Turnover, 제출 여부, 생성 연산자)를 표시한다.</p>
+
+<h4>10.5.4 API 엔드포인트</h4>
+
+<p><code>/</code> 경로는 HTML 대시보드를, <code>/api/data</code> 경로는 JSON 형식의 원시 데이터를 반환한다. JSON 엔드포인트는 외부 모니터링 도구나 커스텀 시각화와의 연동에 활용할 수 있다.</p>
 
 <h3>10.6 멀티 리전 교차 수분 (Cross-Pollination)</h3>
 
-<p>v3의 멀티 리전 라운드(R5)를 강화하였다. 기존의 단순 리전별 테스트에 더해, 서로 다른 리전에서 높은 점수를 받은 알파들 간의 교배(crossover)를 수행한다. 이는 리전 간 공통 구조를 발견하고, 특정 리전에 과적합된 수식의 일반화 가능성을 탐색하는 효과가 있다.</p>
+<h4>10.6.1 v3 대비 개선</h4>
 
-<div class="section-divider">• • •</div>
+<p>v3의 R5(멀티 리전 확장)는 Hall of Fame 상위 20개 알파를 각 리전에서 독립적으로 시뮬레이션하는 단순 전이(transfer) 방식이었다. v4에서는 3단계 파이프라인으로 확장하였다:</p>
+
+<table>
+<caption>표 17: 멀티 리전 라운드 3단계 파이프라인</caption>
+<thead><tr><th>Phase</th><th>내용</th><th>API 호출</th></tr></thead>
+<tbody>
+<tr><td class="left">Phase 1: Transfer</td><td class="left">HoF 상위 20개 알파를 전 리전(USA, ASI, CHN, EUR, KOR, JPN, TWN, GLB)에서 시뮬레이션</td><td class="left">20 × 8 = 160</td></tr>
+<tr><td class="left">Phase 2: Mini Evolution</td><td class="left">각 리전에서 40개체 × 3세대 미니 진화 라운드 실행</td><td class="left">리전당 ~120</td></tr>
+<tr><td class="left">Phase 3: Cross-Pollination</td><td class="left">서로 다른 리전에서 IQC > 2.0인 알파들 간 교배(최대 10회)</td><td class="left">최대 10</td></tr>
+</tbody>
+</table>
+
+<h4>10.6.2 교차 수분 메커니즘</h4>
+
+<p>Phase 1-2에서 수집된 리전별 결과 중 IQC > 2.0인 개체들을 교차 수분 후보 풀에 등록한다. 이 풀에서 2개를 랜덤 샘플링하여 표준 crossover를 적용하고, 첫 번째 부모의 리전 설정으로 시뮬레이션한다. 이는 서로 다른 시장 구조에서 유효한 수식 패턴을 결합하여, 단일 리전에 과적합되지 않는 범용적 알파 구조를 탐색하는 효과가 있다.</p>
+
+<pre><code><span class="cm"># 교차 수분 의사코드</span>
+cross_candidates = [ind <span class="kw">for</span> region_results <span class="kw">in</span> all_regions
+                    <span class="kw">if</span> ind.iqc_score > <span class="nu">2.0</span>]
+<span class="kw">for</span> _ <span class="kw">in</span> range(min(<span class="nu">10</span>, len(cross_candidates))):
+    p1, p2 = random.sample(cross_candidates, <span class="nu">2</span>)
+    child_tree = crossover(p1.tree, p2.tree)
+    metrics = api.simulate(child.expression, p1.settings)
+    <span class="kw">if</span> child.is_submittable():
+        hall_of_fame.add(child)
+        <span class="kw">if</span> auto_submit: try_submit(child)</code></pre>
+
+<h3>10.7 v4 통합 파이프라인</h3>
+
+<p>v4의 전체 실행 흐름은 다음과 같다. 엔진 초기화 시 이전 결과 로딩 → Pattern Learner에 HoF 주입 → Field Explorer CSV 로딩이 순차적으로 수행된다. 각 라운드의 <code>_create_population()</code>에서 패턴 학습 시드 15%가 주입되고, <code>_evaluate_population()</code>에서 Surrogate 필터링이 적용된다. 모든 시뮬레이션 결과는 Surrogate 학습 데이터로 축적된다. 7라운드 완료 후 <code>_explore_new_fields()</code>가 실행되어 미사용 필드를 스크리닝한다. IQC 점수 계산 시 MDL 페널티가 자동 적용된다.</p>
+
+<pre><code><span class="cm"># v4 통합 실행 흐름</span>
+engine = EvolutionEngine(api)          <span class="cm"># 초기화: load_previous → PatternLearner → FieldExplorer</span>
+<span class="kw">for</span> rnd <span class="kw">in</span> [<span class="nu">1</span>..<span class="nu">7</span>]:
+    pop = create_population(rnd)       <span class="cm"># 패턴 학습 시드 15% 포함</span>
+    <span class="kw">for</span> gen <span class="kw">in</span> range(generations):
+        evaluate_population(pop)       <span class="cm"># Surrogate 필터 → API 호출 → Surrogate 학습</span>
+        next_generation(pop)           <span class="cm"># AOS + SHADE + MDL 페널티 반영</span>
+explore_new_fields()                   <span class="cm"># 미사용 필드 15개 스크리닝</span>
+save_final()                           <span class="cm"># pattern_learner/surrogate/field_explorer 통계 포함</span></code></pre><div class="section-divider">• • •</div>
 
 <!-- References -->
 <h2>References</h2>
