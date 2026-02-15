@@ -1,0 +1,516 @@
+---
+layout: null
+permalink: /research/gp-alpha-ideas/
+title: "GP Alpha Research Ideas"
+---
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GP-Based Alpha Discovery: Research Directions | Ha Rim Jung</title>
+    
+    <meta property="og:type" content="article">
+    <meta property="og:title" content="GP-Based Alpha Discovery: Research Directions">
+    <meta property="og:description" content="Genetic Programming 기반 알파 탐색의 학술 확장 방향 — Quality-Diversity, Cross-Market Transfer, Surrogate-Assisted Evolution">
+    <meta property="og:url" content="https://gkfla2020-bit.github.io/research/gp-alpha-ideas/">
+    <meta property="og:image" content="https://gkfla2020-bit.github.io/assets/og-card.png">
+    <meta property="og:site_name" content="Ha Rim Jung">
+    <meta property="og:locale" content="ko_KR">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="GP-Based Alpha Discovery: Research Directions">
+    <meta name="twitter:description" content="Quality-Diversity, Cross-Market Transfer, Surrogate-Assisted Evolution for Quantitative Finance">
+    <meta name="twitter:image" content="https://gkfla2020-bit.github.io/assets/og-card.png">
+    
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-83LKVW7412"></script>
+    <script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-83LKVW7412');</script>
+    <script>
+        window.MathJax = {
+            tex: { inlineMath: [['\\(','\\)']], displayMath: [['\\[','\\]']] },
+            svg: { fontCache: 'global' }
+        };
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js" async></script>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;500&family=Space+Mono:wght@400&family=Inter:wght@300;400&family=Nanum+Myeongjo:wght@400;700&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Inter', sans-serif; background: #fafaf8; color: #1a1a1a; line-height: 1.7; overflow-x: hidden; }
+        .formula-bg{position:fixed;inset:0;pointer-events:none;z-index:0;overflow:hidden}
+        .f{position:absolute;font-family:'Space Mono',monospace;white-space:nowrap;will-change:transform;transition:transform .3s ease-out}
+        .sidebar{position:fixed;left:0;top:0;width:280px;height:100vh;background:rgba(255,255,255,.97);backdrop-filter:blur(10px);border-right:1px solid rgba(0,0,0,.06);padding:40px 30px;z-index:100;overflow-y:auto;display:flex;flex-direction:column}
+        .sidebar-profile{text-align:center;margin-bottom:35px;padding-bottom:30px;border-bottom:1px solid rgba(0,0,0,.08)}
+        .profile-photo{width:120px;height:120px;border-radius:50%;object-fit:cover;margin-bottom:18px;border:3px solid #f0f0f0;background:#e8e8e8}
+        .profile-name{font-family:'Cormorant Garamond',serif;font-size:1.5rem;font-weight:500;color:#1a1a1a;margin-bottom:6px;letter-spacing:.03em}
+        .profile-title{font-size:.75rem;color:#888;letter-spacing:.08em;text-transform:uppercase;margin-bottom:12px}
+        .profile-bio{font-size:.82rem;color:#666;line-height:1.6;margin-bottom:15px}
+        .profile-links{display:flex;justify-content:center;gap:15px}
+        .profile-links a{font-size:.7rem;color:#999;text-decoration:none;letter-spacing:.05em;transition:color .2s}
+        .profile-links a:hover{color:#0080c6}
+        .sidebar-nav{flex:1}
+        .nav-section{margin-bottom:25px}
+        .nav-section-title{font-size:.65rem;font-weight:600;color:#aaa;letter-spacing:.15em;text-transform:uppercase;margin-bottom:12px}
+        .nav-list{list-style:none}
+        .nav-list li{margin-bottom:8px}
+        .nav-list a{font-size:.85rem;color:#555;text-decoration:none;transition:all .2s;display:flex;align-items:center;gap:8px;padding:6px 0}
+        .nav-list a:hover{color:#0080c6;padding-left:5px}
+        .nav-list a.active{color:#0080c6;font-weight:500}
+        .sidebar-footer{padding-top:20px;border-top:1px solid rgba(0,0,0,.06);font-size:.7rem;color:#aaa;text-align:center}
+        .nav-toggle{display:none}
+        .main-wrapper{margin-left:280px;margin-right:260px;min-height:100vh}
+        .container{position:relative;z-index:1;max-width:900px;margin:0 auto;padding:50px 40px 80px}
+        .right-sidebar{position:fixed;right:0;top:0;width:260px;height:100vh;background:rgba(255,255,255,.97);backdrop-filter:blur(10px);border-left:1px solid rgba(0,0,0,.06);padding:30px 20px;z-index:100;overflow-y:auto}
+        .widget-title{font-size:.65rem;font-weight:600;color:#aaa;letter-spacing:.15em;text-transform:uppercase;margin-bottom:15px}
+        .market-item{display:flex;justify-content:space-between;align-items:center;padding:12px 0;border-bottom:1px solid rgba(0,0,0,.05)}
+        .market-item:last-child{border-bottom:none}
+        .market-name{font-size:.75rem;color:#666}
+        .market-value{font-family:'Space Mono',monospace;font-size:.85rem;font-weight:500;color:#1a1a1a}
+        .market-change{font-family:'Space Mono',monospace;font-size:.7rem;margin-left:8px}
+        .market-change.up{color:#16a34a}
+        .market-change.down{color:#dc2626}
+        .widget-section{margin-bottom:30px}
+        .widget-update{font-size:.6rem;color:#bbb;text-align:center;margin-top:10px}
+        .market-group{background:rgba(0,0,0,.02);padding:15px;margin-bottom:15px;border-left:2px solid #e0e0e0}
+        .market-group-title{font-size:.6rem;color:#999;letter-spacing:.1em;text-transform:uppercase;margin-bottom:10px}
+        
+        .paper-content{font-family:'Times New Roman','Nanum Myeongjo',serif;line-height:1.9;background:#fff;padding:45px 50px;border-radius:8px;box-shadow:0 2px 20px rgba(0,0,0,.05);font-size:15px}
+        .paper-header{text-align:center;margin-bottom:40px;padding-bottom:30px;border-bottom:2px solid #333}
+        .paper-category{font-size:11px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:#0080c6;margin-bottom:15px}
+        .paper-title{font-family:'Cormorant Garamond','Nanum Myeongjo',serif;font-size:26px;font-weight:700;margin-bottom:12px;line-height:1.35}
+        .paper-subtitle{font-family:'Cormorant Garamond',serif;font-size:15px;color:#666;font-style:italic;margin-bottom:15px}
+        .paper-author{font-size:14px;color:#444;margin-bottom:5px}
+        .paper-date{font-size:12px;color:#999}
+        .abstract{background:linear-gradient(135deg,#f8f9fa,#edf2f4);border-left:4px solid #1d3557;padding:25px 30px;margin:30px 0;border-radius:0 6px 6px 0;font-size:13.5px;line-height:1.8;color:#333}
+        .abstract-title{font-family:'Inter',sans-serif;font-size:11px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:#1d3557;margin-bottom:10px}
+        .keywords{background:#fafafa;padding:12px 20px;border-radius:6px;font-size:13px;color:#555;margin-bottom:30px}
+        .keywords strong{color:#1d3557}
+        h2{font-family:'Cormorant Garamond','Nanum Myeongjo',serif;font-size:1.5em;font-weight:700;color:#1d3557;margin:40px 0 15px;padding-bottom:8px;border-bottom:1px solid #e0e0e0}
+        h3{font-family:'Cormorant Garamond','Nanum Myeongjo',serif;font-size:1.2em;font-weight:600;color:#2c3e50;margin:30px 0 12px}
+        h4{font-size:1.05em;color:#2c3e50;margin:20px 0 10px}
+        p{text-align:justify;text-indent:2em;margin-bottom:12px}
+        p.no-indent{text-indent:0}
+        table{width:100%;border-collapse:collapse;margin:20px 0;font-size:12.5px}
+        table caption{font-weight:700;text-align:left;margin-bottom:8px;font-size:13.5px;color:#1d3557}
+        thead th{background:#1d3557;color:white;padding:10px;font-weight:600;font-size:11.5px;text-align:center;white-space:nowrap}
+        tbody td{padding:7px 10px;border-bottom:1px solid #eee;text-align:center}
+        tbody tr:nth-child(even){background:#fafafa}
+        tbody tr:hover{background:#f0f4ff}
+        td.left{text-align:left}
+        .note{font-size:11.5px;color:#777;margin-top:5px;font-style:italic}
+        code{background:#f1f5f9;padding:2px 6px;border-radius:3px;font-family:'Space Mono',monospace;font-size:12px;color:#1d3557}
+        .math-block{margin:15px 0;padding:10px 0;text-align:center;overflow-x:auto}
+        .section-divider{text-align:center;margin:40px 0;color:#ccc;font-size:18px;letter-spacing:10px}
+        .references{font-size:12.5px;line-height:1.7}
+        .references p{text-indent:-2em;padding-left:2em;margin-bottom:6px}
+        .idea-card{background:linear-gradient(135deg,#f8f9fa,#eef2f7);border:1px solid #d0d7de;border-radius:8px;padding:30px;margin:25px 0}
+        .idea-card h3{margin-top:0;color:#1d3557;border-bottom:none}
+        .idea-tag{display:inline-block;font-family:'Inter',sans-serif;font-size:10px;font-weight:600;letter-spacing:1px;text-transform:uppercase;padding:3px 10px;border-radius:12px;margin-right:6px;margin-bottom:8px}
+        .tag-novelty{background:#dbeafe;color:#1e40af}
+        .tag-practical{background:#dcfce7;color:#166534}
+        .tag-rare{background:#fef3c7;color:#92400e}
+        .tag-venue{background:#f3e8ff;color:#6b21a8}
+        @media(max-width:1024px){
+            .sidebar{width:100%;height:auto;position:relative;border-right:none;border-bottom:1px solid rgba(0,0,0,.08);padding:25px 20px}
+            .sidebar-profile{margin-bottom:20px;padding-bottom:20px;display:flex;align-items:center;gap:15px;text-align:left}
+            .profile-photo{width:60px;height:60px;margin-bottom:0}
+            .profile-bio{display:none}
+            .nav-section{display:inline-block;margin-right:20px;margin-bottom:10px}
+            .nav-list{display:flex;gap:12px;flex-wrap:wrap}
+            .nav-list li{margin-bottom:0}
+            .sidebar-footer{display:none}
+            .nav-extra{display:none}.sidebar-nav.expanded .nav-extra{display:inline-block}
+            .nav-toggle{display:inline-block;padding:8px 14px;background:none;border:1px solid #ddd;border-radius:6px;font-size:.75rem;color:#888;cursor:pointer;letter-spacing:.05em;margin-bottom:10px;font-family:'Inter',sans-serif}
+            .main-wrapper{margin-left:0;margin-right:0}
+            .right-sidebar{display:none}
+            .container{padding:20px 0}
+            .paper-content{padding:25px 18px;border-radius:0;box-shadow:none;font-size:14px}
+            .paper-title{font-size:20px}
+            h2{font-size:1.3em;margin:30px 0 12px}
+            h3{font-size:1.1em}
+            p{text-indent:1.5em;text-align:left;font-size:14px}
+            table{font-size:10px;display:block;overflow-x:auto;-webkit-overflow-scrolling:touch}
+            thead th,tbody td{padding:6px 4px;white-space:nowrap}
+            .abstract{padding:16px;margin:20px 0}
+        }
+        @media print{.sidebar{display:none}.right-sidebar{display:none}.main-wrapper{margin:0}.paper-content{box-shadow:none;padding:15mm 20mm}}
+        .breadcrumb{font-size:.7rem;color:#999;letter-spacing:.06em;margin-bottom:30px;padding-bottom:15px;border-bottom:1px solid rgba(0,0,0,.05)}
+        .breadcrumb a{color:#888;text-decoration:none;transition:color .2s}
+        .breadcrumb a:hover{color:#0080c6}
+        .bc-sep{margin:0 6px;color:#ccc}
+        .bc-current{color:#555;font-weight:500}
+    </style>
+</head>
+<body>
+<div class="formula-bg" id="formulaBg"></div>
+
+{% include sidebar.html %}
+{% include market-widget.html %}
+
+<div class="main-wrapper">
+<div class="container">
+{% include breadcrumb.html %}
+<div class="paper-content">
+
+<div class="paper-header">
+    <div class="paper-category">Research Ideas</div>
+    <h1 class="paper-title">Genetic Programming 기반 알파 탐색의 학술 확장 방향</h1>
+    <div class="paper-subtitle">Quality-Diversity, Cross-Market Transfer, Surrogate-Assisted Evolution, and Beyond</div>
+    <div class="paper-author">Ha Rim Jung</div>
+    <div class="paper-date">February 15, 2026</div>
+</div>
+
+<div class="abstract">
+    <div class="abstract-title">Overview</div>
+    기존에 구현한 Island Model GP + SHADE + MAP-Elites + Surrogate 기반 알파 자동 탐색 시스템을 출발점으로, 퀀트 파이낸스 도메인에서 학술적으로 확장 가능한 연구 방향을 정리한다. 각 아이디어는 기존 문헌에서의 공백(gap), 핵심 가설, 실험 설계, 기대 기여를 포함한다. 선정 기준은 세 가지다: (1) 기존 퀀트 GP 문헌에서 다뤄지지 않은 희소성, (2) 실제 트레이딩 시스템에 적용 가능한 실용성, (3) 기존 프레임워크를 깨는 창의성.
+</div>
+
+<div class="keywords">
+    <strong>Keywords:</strong> Genetic Programming, Quality-Diversity, MAP-Elites, Cross-Market Transfer, Surrogate-Assisted Optimization, Alpha Discovery, Portfolio Construction, Regime Detection, Minimum Description Length
+</div>
+
+<div class="section-divider">• • •</div>
+
+<!-- Idea 1 -->
+<h2>1. Quality-Diversity Alpha Portfolios via MAP-Elites</h2>
+
+<div class="idea-card">
+<span class="idea-tag tag-novelty">High Novelty</span>
+<span class="idea-tag tag-rare">Rare</span>
+<span class="idea-tag tag-practical">Practical</span>
+<span class="idea-tag tag-venue">GECCO / IEEE CEC</span>
+
+<h3>Gap</h3>
+<p class="no-indent">기존 GP 기반 알파 탐색은 단일 목적(Sharpe ratio 최대화)에 집중한다. 그러나 실제 포트폴리오 구성에서는 서로 상관관계가 낮은 다양한 알파가 필요하다. 단일 목적 최적화는 구조적으로 유사한 고성능 알파를 반복 생성하며, 이들의 self-correlation이 높아 포트폴리오 편입 시 분산 효과가 제한된다.</p>
+
+<h3>핵심 가설</h3>
+<p class="no-indent">MAP-Elites의 행동 기술자(Behavior Descriptor)를 (Sharpe, Turnover, Factor Exposure)로 확장하면, 단일 목적 GP 대비 포트폴리오 수준의 Sharpe ratio가 유의하게 높아진다.</p>
+
+<h3>방법론</h3>
+<p>행동 공간을 3차원으로 확장한다: \(\mathcal{B} = (\text{Sharpe}_{10}, \text{Turnover}_{5}, \text{FactorExposure}_{4})\). 각 차원의 구간 수를 아래첨자로 표기하면 총 200셀의 아카이브가 된다. Factor Exposure는 Fama-French 5-factor 중 지배적 팩터의 인덱스로 이산화한다.</p>
+
+<div class="math-block">
+\[
+\text{Portfolio Sharpe} = \frac{\mathbf{w}^\top \boldsymbol{\mu}}{\sqrt{\mathbf{w}^\top \boldsymbol{\Sigma} \mathbf{w}}}
+\]
+</div>
+
+<p>여기서 \(\boldsymbol{\Sigma}\)는 MAP-Elites 아카이브에서 선택된 알파들의 수익률 공분산 행렬이다. 아카이브의 각 셀에서 최고 개체를 추출한 후, 평균-분산 최적화로 포트폴리오 가중치 \(\mathbf{w}\)를 결정한다.</p>
+
+<h3>실험 설계</h3>
+<p class="no-indent">(1) 비교군: 단일 목적 GP → top-N 선택 vs MAP-Elites → Markowitz 선택<br>
+(2) 평가: 포트폴리오 Sharpe, Maximum Drawdown, 알파 간 평균 상관계수<br>
+(3) 데이터: US equities TOP3000, 2010-2025, IS/OS 분할</p>
+
+<h3>기대 기여</h3>
+<p class="no-indent">Quality-Diversity 알고리즘이 퀀트 포트폴리오 구성에 적용된 최초 사례. 진화 연산 커뮤니티와 퀀트 커뮤니티 양쪽에 어필 가능.</p>
+</div>
+
+<div class="section-divider">• • •</div>
+
+<!-- Idea 2 -->
+<h2>2. Cross-Market Alpha Transfer via Island Model GP</h2>
+
+<div class="idea-card">
+<span class="idea-tag tag-novelty">High Novelty</span>
+<span class="idea-tag tag-rare">Rare</span>
+<span class="idea-tag tag-practical">Practical</span>
+<span class="idea-tag tag-venue">Quantitative Finance / Financial Innovation</span>
+
+<h3>Gap</h3>
+<p class="no-indent">GP 기반 트레이딩 규칙 탐색은 거의 예외 없이 단일 시장에서 수행된다. 한 시장에서 발견된 알파가 다른 시장에서도 작동하는지, 어떤 구조적 특성이 시장 간 전이 가능한지에 대한 체계적 연구가 부재하다. 이는 글로벌 퀀트 펀드의 핵심 질문임에도 불구하고 진화 연산 문헌에서 다뤄진 적이 없다.</p>
+
+<h3>핵심 가설</h3>
+<p class="no-indent">Island Model의 각 섬을 서로 다른 시장(USA, CHN, EUR, ASI)에 할당하고 이주(migration)를 통해 알파를 교환하면, 단일 시장 GP 대비 Out-of-Sample 성과가 개선되며, 전이 가능한 알파의 구조적 특성(사용 필드, 연산자 패턴)을 식별할 수 있다.</p>
+
+<h3>방법론</h3>
+<p>4개 섬을 USA, CHN, EUR, ASI에 각각 할당한다. 이주 시 Ring Topology 대신 Adaptive Topology를 도입한다: 이주 성공률(받는 섬에서의 성과 개선)이 높은 경로의 이주 확률을 증가시킨다.</p>
+
+<div class="math-block">
+\[
+P(\text{migrate}_{i \to j}) = \frac{\text{success}_{i \to j} + \epsilon}{\sum_{k \neq j} (\text{success}_{k \to j} + \epsilon)}
+\]
+</div>
+
+<p>전이 가능성(Transferability) 지표를 정의한다:</p>
+
+<div class="math-block">
+\[
+T(\alpha) = \frac{1}{|\mathcal{M}|} \sum_{m \in \mathcal{M}} \mathbb{1}\left[\text{Sharpe}_m(\alpha) > \tau_m\right]
+\]
+</div>
+
+<p>여기서 \(\mathcal{M}\)은 시장 집합, \(\tau_m\)은 시장 \(m\)의 제출 기준 Sharpe이다. \(T(\alpha) = 1\)이면 모든 시장에서 통과하는 "범용 알파"이다.</p>
+
+<h3>실험 설계</h3>
+<p class="no-indent">(1) 비교군: 단일 시장 GP × 4 vs Cross-Market Island GP<br>
+(2) 분석: 전이 성공률, 범용 알파의 구조 분석 (어떤 필드/연산자가 시장 불변인지)<br>
+(3) 가설 검증: 펀더멘탈 기반 알파가 기술적 알파보다 전이 가능성이 높은가</p>
+
+<h3>기대 기여</h3>
+<p class="no-indent">GP 기반 금융 전략 탐색에서 cross-market transfer를 다룬 최초 연구. 글로벌 퀀트 운용사의 실무적 질문에 직접 답하는 구조.</p>
+</div>
+
+<div class="section-divider">• • •</div>
+
+<!-- Idea 3 -->
+<h2>3. Surrogate-Assisted GP with Fidelity Control for Expensive Alpha Evaluation</h2>
+
+<div class="idea-card">
+<span class="idea-tag tag-novelty">Medium Novelty</span>
+<span class="idea-tag tag-practical">Practical</span>
+<span class="idea-tag tag-venue">Applied Soft Computing / Swarm and Evolutionary Computation</span>
+
+<h3>Gap</h3>
+<p class="no-indent">알파 시뮬레이션은 건당 3~15초가 소요되는 고비용 평가(expensive evaluation)이다. Surrogate-Assisted Evolutionary Optimization(SAEO)은 공학 최적화에서 활발히 연구되지만, 금융 GP에 적용된 사례는 극히 드물다. 특히 수식의 구조적 특징을 입력으로 하는 surrogate 모델의 설계와, 실제 평가와 surrogate 평가의 동적 배분(fidelity control)이 미탐색 영역이다.</p>
+
+<h3>핵심 가설</h3>
+<p class="no-indent">수식의 구조적 특징(연산자 빈도, 필드 카테고리, 트리 깊이, 윈도우 통계)으로 구성된 20차원 특징 벡터 기반 surrogate가, 실제 Sharpe의 순위를 Spearman \(\rho > 0.6\)으로 예측할 수 있으며, 하위 40% 필터링으로 API 호출을 40% 절감하면서 최종 포트폴리오 성과를 유지할 수 있다.</p>
+
+<h3>방법론</h3>
+<p>Multi-fidelity 프레임워크를 도입한다. 저비용 surrogate(XGBoost)와 고비용 실제 평가(BRAIN API)를 동적으로 배분한다:</p>
+
+<div class="math-block">
+\[
+\text{Evaluate}(\alpha) = \begin{cases}
+f_{\text{surrogate}}(\alpha) & \text{if } \hat{\sigma}(\alpha) < \theta_{\text{conf}} \\
+f_{\text{real}}(\alpha) & \text{otherwise}
+\end{cases}
+\]
+</div>
+
+<p>여기서 \(\hat{\sigma}(\alpha)\)는 surrogate의 예측 불확실성이다. 불확실성이 높은 수식은 실제 평가로 보내고, 확실히 나쁜 수식은 surrogate만으로 필터링한다. 학습 데이터가 축적됨에 따라 \(\theta_{\text{conf}}\)를 적응적으로 조정한다.</p>
+
+<h3>실험 설계</h3>
+<p class="no-indent">(1) 비교군: 순수 GP vs Static Surrogate (고정 40% 필터) vs Adaptive Fidelity Control<br>
+(2) 평가: 동일 API 호출 예산 하에서의 최종 Sharpe, 발견된 제출 가능 알파 수<br>
+(3) Surrogate 정확도: Spearman \(\rho\), NDCG@10, 필터링 정밀도/재현율</p>
+
+<h3>기대 기여</h3>
+<p class="no-indent">SAEO를 금융 GP에 적용한 체계적 연구. API 호출 비용이 병목인 모든 플랫폼(WorldQuant, Quantopian 후속, QuantConnect 등)에 일반화 가능.</p>
+</div>
+
+<div class="section-divider">• • •</div>
+
+<!-- Idea 4 -->
+<h2>4. Regime-Aware Genetic Programming: 시장 국면별 알파 전환 시스템</h2>
+
+<div class="idea-card">
+<span class="idea-tag tag-novelty">High Novelty</span>
+<span class="idea-tag tag-rare">Rare</span>
+<span class="idea-tag tag-practical">Practical</span>
+<span class="idea-tag tag-venue">Journal of Financial Data Science / Expert Systems with Applications</span>
+
+<h3>Gap</h3>
+<p class="no-indent">대부분의 GP 기반 알파는 전체 기간에 대해 단일 수식을 최적화한다. 그러나 금융 시장은 비정상(non-stationary)이며, 특정 알파는 특정 국면(bull, bear, high-vol, low-vol)에서만 작동한다. 국면 전환을 GP 프레임워크에 내재화한 연구는 존재하지 않는다.</p>
+
+<h3>핵심 가설</h3>
+<p class="no-indent">Hidden Markov Model(HMM)로 식별된 시장 국면별로 독립적인 알파 풀을 진화시키고, 국면 전환 시 알파를 동적으로 교체하면, 단일 알파 대비 drawdown이 유의하게 감소하며 Sharpe가 개선된다.</p>
+
+<h3>방법론</h3>
+<p>2단계 시스템을 구성한다. 1단계에서 HMM(\(K=3\sim5\) states)으로 시장 국면을 식별한다. 관측 변수는 (수익률, 변동성, 거래량 변화율, 신용 스프레드)이다.</p>
+
+<div class="math-block">
+\[
+s_t = \arg\max_{k} \; P(S_t = k \mid \mathbf{x}_{1:t}), \quad \mathbf{x}_t = (r_t, \sigma_t, \Delta v_t, \text{spread}_t)
+\]
+</div>
+
+<p>2단계에서 각 국면 \(k\)에 대해 독립적인 Island를 할당하여 알파를 진화시킨다. 국면 \(k\)의 학습 데이터는 해당 국면에 속하는 기간만 사용한다. 실시간 운용 시 현재 국면 \(s_t\)에 해당하는 알파 풀에서 최고 알파를 선택한다.</p>
+
+<div class="math-block">
+\[
+\alpha^*_t = \arg\max_{\alpha \in \mathcal{A}_{s_t}} \; \text{Score}(\alpha)
+\]
+</div>
+
+<h3>실험 설계</h3>
+<p class="no-indent">(1) 비교군: 전체 기간 단일 GP vs 국면별 GP + HMM 전환<br>
+(2) 국면 수 \(K\)에 대한 민감도 분석<br>
+(3) 국면 전환 지연(lag)이 성과에 미치는 영향<br>
+(4) 백테스트: 2010-2020 IS, 2020-2025 OS</p>
+
+<h3>기대 기여</h3>
+<p class="no-indent">GP와 regime detection의 결합은 기존 문헌에 부재. 실무적으로 drawdown 관리가 핵심인 기관 투자자에게 직접적 가치를 제공.</p>
+</div>
+
+<div class="section-divider">• • •</div>
+
+<!-- Idea 5 -->
+<h2>5. MDL-Guided Bloat Control: 정보이론 기반 수식 복잡도 정규화</h2>
+
+<div class="idea-card">
+<span class="idea-tag tag-novelty">Medium Novelty</span>
+<span class="idea-tag tag-rare">Rare</span>
+<span class="idea-tag tag-venue">Genetic Programming and Evolvable Machines / Evolutionary Computation</span>
+
+<h3>Gap</h3>
+<p class="no-indent">GP의 고질적 문제인 bloat(수식 비대화)는 금융 도메인에서 과적합과 직결된다. 기존 접근(Parsimony Pressure, 깊이 제한)은 수식의 의미적 복잡도를 반영하지 못한다. 노드 수가 같아도 사용하는 필드 수, 윈도우 파라미터 수, 변수 할당 수에 따라 실질적 복잡도가 크게 다르다.</p>
+
+<h3>핵심 가설</h3>
+<p class="no-indent">Minimum Description Length(MDL) 원리에 기반한 복잡도 측정이, 노드 수 기반 Parsimony Pressure 대비 IS/OS 일관성을 유의하게 개선한다.</p>
+
+<h3>방법론</h3>
+<p>수식의 기술 길이(Description Length)를 정보이론적으로 정의한다:</p>
+
+<div class="math-block">
+\[
+L(H) = n_{\text{op}} \cdot \log_2 |\mathcal{O}| + n_{\text{field}} \cdot \log_2 |\mathcal{F}| + n_{\text{param}} \cdot \log_2 |\mathcal{W}| + n_{\text{var}} \cdot C_{\text{var}}
+\]
+</div>
+
+<p>여기서 \(|\mathcal{O}|\)는 연산자 집합 크기, \(|\mathcal{F}|\)는 필드 집합 크기, \(|\mathcal{W}|\)는 윈도우 값 집합 크기, \(C_{\text{var}}\)는 변수 할당의 정보 비용이다. MDL 기반 적합도는:</p>
+
+<div class="math-block">
+\[
+\text{Fitness}_{\text{MDL}}(\alpha) = \text{Sharpe}(\alpha) - \lambda \cdot L(H_\alpha)
+\]
+</div>
+
+<p>\(\lambda\)는 복잡도 페널티 강도로, 교차 검증으로 결정한다.</p>
+
+<h3>실험 설계</h3>
+<p class="no-indent">(1) 비교군: 깊이 제한 only vs 노드 수 Parsimony vs MDL 정규화<br>
+(2) 평가: IS Sharpe, OS Sharpe, IS/OS 비율, 수식 해석 가능성(인간 평가)<br>
+(3) \(\lambda\) 민감도 분석 및 적응적 \(\lambda\) 스케줄링</p>
+
+<h3>기대 기여</h3>
+<p class="no-indent">MDL을 GP bloat control에 적용한 연구는 소수 존재하나, 금융 도메인에서의 실증은 부재. IS/OS gap 문제에 대한 이론적으로 정당화된 해법.</p>
+</div>
+
+<div class="section-divider">• • •</div>
+
+<!-- Idea 6 -->
+<h2>6. Semantic Backpropagation for Financial GP: 의미 기반 역전파 초기화</h2>
+
+<div class="idea-card">
+<span class="idea-tag tag-novelty">High Novelty</span>
+<span class="idea-tag tag-rare">Rare</span>
+<span class="idea-tag tag-venue">GECCO / PPSN / IEEE Transactions on Evolutionary Computation</span>
+
+<h3>Gap</h3>
+<p class="no-indent">GP의 초기 개체군은 대부분 완전 랜덤이거나 수작업 템플릿에 의존한다. Semantic Backpropagation(SB)은 목표 출력에서 역방향으로 각 노드의 "원하는 의미(desired semantics)"를 계산하여 서브트리를 라이브러리에서 매칭하는 기법이다. 심볼릭 회귀에서 성과가 입증되었으나, 금융 시계열에 적용된 사례가 없다.</p>
+
+<h3>핵심 가설</h3>
+<p class="no-indent">목표 수익률 벡터를 desired semantics로 설정하고, 각 서브트리의 출력 벡터를 실제 주가 데이터로 계산하여 매칭하면, 랜덤 초기화 대비 초기 세대의 평균 적합도가 유의하게 높아지고, 수렴 속도가 2~3배 빨라진다.</p>
+
+<h3>방법론</h3>
+<p>서브트리 라이브러리 \(\mathcal{L}\)을 구축한다. 각 서브트리 \(t_i\)에 대해 의미 벡터 \(\mathbf{s}_i = t_i(\mathbf{X})\)를 사전 계산한다. 여기서 \(\mathbf{X}\)는 학습 기간의 주가 데이터이다.</p>
+
+<div class="math-block">
+\[
+t^* = \arg\min_{t_i \in \mathcal{L}} \; \| \mathbf{s}_i - \mathbf{s}_{\text{desired}} \|_2
+\]
+</div>
+
+<p>루트 노드의 desired semantics는 목표 수익률 벡터(예: 다음 날 수익률의 cross-sectional rank)이다. 이진 연산자의 경우, 한 자식의 semantics가 결정되면 다른 자식의 desired semantics를 역산할 수 있다:</p>
+
+<div class="math-block">
+\[
+\mathbf{s}_{\text{desired}}^{\text{right}} = \mathbf{s}_{\text{desired}}^{\text{parent}} - \mathbf{s}_{\text{left}} \quad (\text{for } +)
+\]
+</div>
+
+<h3>실험 설계</h3>
+<p class="no-indent">(1) 비교군: 랜덤 초기화 vs 전략 템플릿 vs Semantic Backpropagation<br>
+(2) 평가: 세대별 수렴 곡선, 동일 API 예산 하 최종 성과<br>
+(3) 라이브러리 크기 \(|\mathcal{L}|\)에 대한 민감도</p>
+
+<h3>기대 기여</h3>
+<p class="no-indent">SB를 금융 GP에 적용한 최초 연구. 초기화 품질이 전체 탐색 효율에 미치는 영향을 정량화. 고비용 평가 환경에서 특히 가치가 높음.</p>
+</div>
+
+<div class="section-divider">• • •</div>
+
+<!-- Idea 7 -->
+<h2>7. Alpha Decay Prediction via Expression Structural Features</h2>
+
+<div class="idea-card">
+<span class="idea-tag tag-novelty">High Novelty</span>
+<span class="idea-tag tag-rare">Rare</span>
+<span class="idea-tag tag-practical">Practical</span>
+<span class="idea-tag tag-venue">Journal of Financial Economics / Quantitative Finance</span>
+
+<h3>Gap</h3>
+<p class="no-indent">알파의 수명(alpha decay)은 퀀트 운용의 핵심 리스크이다. 제출 시점에 높은 Sharpe를 보이던 알파가 수 개월 내에 성과가 소멸하는 현상은 보편적이다. 그러나 알파의 구조적 특성(수식 복잡도, 사용 필드, 연산자 패턴)과 수명 사이의 관계를 체계적으로 분석한 연구는 부재하다.</p>
+
+<h3>핵심 가설</h3>
+<p class="no-indent">수식의 구조적 특징(MDL 복잡도, 팩터 노출, 데이터 빈도, 윈도우 길이 분포)으로 알파의 반감기(half-life)를 예측할 수 있으며, 단순한 수식이 복잡한 수식보다 긴 수명을 가진다.</p>
+
+<h3>방법론</h3>
+<p>GP로 생성된 대량의 알파(수천 개)에 대해 시간에 따른 Sharpe 감쇠를 추적한다. 반감기를 다음과 같이 정의한다:</p>
+
+<div class="math-block">
+\[
+t_{1/2} = \min \left\{ t : \text{Sharpe}_{[0,t]} < \frac{1}{2} \text{Sharpe}_{[0, T_{\text{IS}}]} \right\}
+\]
+</div>
+
+<p>수식의 구조적 특징 벡터 \(\mathbf{f}(\alpha)\)와 반감기 \(t_{1/2}\) 사이의 관계를 생존 분석(Cox Proportional Hazards)으로 모델링한다:</p>
+
+<div class="math-block">
+\[
+h(t | \mathbf{f}) = h_0(t) \exp(\boldsymbol{\beta}^\top \mathbf{f}(\alpha))
+\]
+</div>
+
+<h3>실험 설계</h3>
+<p class="no-indent">(1) 데이터: GP로 생성된 알파 5,000개 이상, 각각 3년 이상의 OS 추적<br>
+(2) 특징: MDL 복잡도, 트리 깊이, 필드 카테고리 분포, 윈도우 평균/분산, 팩터 베타<br>
+(3) 검증: 예측된 장수명 알파 vs 단수명 알파의 실제 OS 성과 비교</p>
+
+<h3>기대 기여</h3>
+<p class="no-indent">알파 수명을 사전 예측하는 프레임워크. 제출 전 수명 예측으로 단기 소멸 알파를 필터링하여 포트폴리오 안정성 향상. 퀀트 실무에 즉시 적용 가능.</p>
+</div>
+
+<div class="section-divider">• • •</div>
+
+<!-- Summary Table -->
+<h2>종합 비교</h2>
+
+<table>
+<caption>표 1: 연구 아이디어 비교</caption>
+<thead><tr><th>#</th><th>주제</th><th>희소성</th><th>실용성</th><th>난이도</th><th>타겟 저널/학회</th></tr></thead>
+<tbody>
+<tr><td>1</td><td class="left">QD Alpha Portfolios (MAP-Elites)</td><td>높음</td><td>높음</td><td>중</td><td class="left">GECCO, IEEE CEC</td></tr>
+<tr><td>2</td><td class="left">Cross-Market Transfer (Island)</td><td>높음</td><td>높음</td><td>중</td><td class="left">Quant Finance, Financial Innovation</td></tr>
+<tr><td>3</td><td class="left">Surrogate-Assisted GP</td><td>중</td><td>높음</td><td>중</td><td class="left">Applied Soft Computing, SWEVO</td></tr>
+<tr><td>4</td><td class="left">Regime-Aware GP (HMM)</td><td>높음</td><td>높음</td><td>상</td><td class="left">JFDS, Expert Systems</td></tr>
+<tr><td>5</td><td class="left">MDL Bloat Control</td><td>중</td><td>중</td><td>중</td><td class="left">GPEM, Evolutionary Computation</td></tr>
+<tr><td>6</td><td class="left">Semantic Backpropagation</td><td>높음</td><td>중</td><td>상</td><td class="left">GECCO, PPSN, IEEE TEVC</td></tr>
+<tr><td>7</td><td class="left">Alpha Decay Prediction</td><td>높음</td><td>높음</td><td>상</td><td class="left">JFE, Quantitative Finance</td></tr>
+</tbody>
+</table>
+
+<p>1, 2, 4번은 기존 문헌에서 다뤄진 적이 없는 조합이라 novelty가 가장 높다. 3, 5번은 기존 기법의 금융 도메인 적용이라 상대적으로 안전한 선택이다. 7번은 데이터 축적이 필요하므로 장기 프로젝트에 적합하다.</p>
+
+<p>이 아이디어들은 상호 배타적이지 않다. 예를 들어 1(MAP-Elites) + 4(Regime-Aware)를 결합하면 "국면별 다양성 최적화"라는 더 강력한 프레임워크가 된다. 2(Cross-Market) + 7(Decay Prediction)을 결합하면 "시장 간 전이 가능하면서 수명이 긴 알파"를 선별하는 시스템이 된다.</p>
+
+<div class="section-divider">• • •</div>
+
+<!-- References -->
+<h2>관련 문헌</h2>
+
+<div class="references">
+<p>[1] Mouret, J.-B. & Clune, J. (2015). Illuminating search spaces by mapping elites. <em>arXiv:1504.04909</em>.</p>
+<p>[2] Tanabe, R. & Fukunaga, A. (2013). Success-History Based Parameter Adaptation for Differential Evolution. <em>IEEE CEC</em>.</p>
+<p>[3] La Cava, W. & Moore, J. H. (2017). A General Feature Engineering Wrapper for Machine Learning Using ε-Lexicase Survival. <em>EuroGP</em>.</p>
+<p>[4] Jin, Y. (2011). Surrogate-Assisted Evolutionary Computation: Recent Advances and Future Challenges. <em>Swarm and Evolutionary Computation</em>, 1(2), 61-70.</p>
+<p>[5] Pawlak, T. P. et al. (2015). Semantic Backpropagation for Designing Search Operators in Genetic Programming. <em>IEEE TEVC</em>, 19(3), 326-340.</p>
+<p>[6] Hamilton, J. D. (1989). A New Approach to the Economic Analysis of Nonstationary Time Series and the Business Cycle. <em>Econometrica</em>, 57(2), 357-384.</p>
+<p>[7] Grünwald, P. D. (2007). <em>The Minimum Description Length Principle</em>. MIT Press.</p>
+<p>[8] McLean, R. D. & Pontiff, J. (2016). Does Academic Research Destroy Stock Return Predictability? <em>Journal of Finance</em>, 71(1), 5-32.</p>
+<p>[9] Poli, R. et al. (2008). <em>A Field Guide to Genetic Programming</em>. Lulu.com.</p>
+<p>[10] Chen, S.-H. et al. (2009). Genetic Programming and Financial Trading: How Much about "What We Know". In <em>Handbook of Financial Engineering</em>, Springer.</p>
+</div>
+
+</div><!-- paper-content -->
+</div><!-- container -->
+</div><!-- main-wrapper -->
+
+<script>
+const formulas=['rank(ts_delta(close,5))','zscore(volume/adv20)','ts_corr(close,volume,20)','group_rank(returns,sector)','ts_std_dev(returns,20)','ts_mean(close,10)/close','rank(ebitda/enterprise_value)','ts_zscore(sentiment,15)','MAP-Elites(Sharpe×Turnover)','Island[USA]→Island[CHN]','Surrogate(XGBoost)→Filter','HMM(K=3)→α_switch','L(H)=Σ n_i·log₂|S_i|','T(α)=Σ𝟙[Sharpe>τ]','h(t|f)=h₀·exp(β·f)','SB: s*=argmin‖s-s_d‖'];
+const bg=document.getElementById('formulaBg');
+if(bg){formulas.forEach((f,i)=>{const el=document.createElement('div');el.className='f';el.textContent=f;el.style.cssText=`font-size:${10+Math.random()*6}px;color:rgba(0,0,0,${.02+Math.random()*.03});left:${Math.random()*100}%;top:${Math.random()*100}%;transform:rotate(${-15+Math.random()*30}deg)`;bg.appendChild(el)})}
+</script>
+</body>
+</html>
