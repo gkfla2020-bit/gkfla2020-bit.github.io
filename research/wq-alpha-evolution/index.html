@@ -141,6 +141,53 @@ title: "WQ BRAIN Alpha Evolution"
         .breadcrumb a:hover{color:#0080c6}
         .bc-sep{margin:0 6px;color:#ccc}
         .bc-current{color:#555;font-weight:500}
+
+        /* Architecture Diagram */
+        .arch-diagram{margin:30px 0 35px;padding:30px 24px 24px;background:#fafbfd;border:1px solid #e0e4ea;border-radius:8px}
+        .arch-caption{font-family:'Inter',sans-serif;font-size:12px;font-weight:600;color:#1d3557;text-align:center;margin-bottom:24px;letter-spacing:.5px}
+        .arch-layer{margin-bottom:4px}
+        .arch-layer-label{font-family:'Inter',sans-serif;font-size:9px;font-weight:600;color:#999;letter-spacing:1.5px;text-transform:uppercase;margin-bottom:8px;padding-left:2px}
+        .arch-nodes{display:flex;gap:10px;flex-wrap:wrap;justify-content:center}
+        .arch-nodes-5{display:grid;grid-template-columns:repeat(5,1fr);gap:8px}
+        .arch-nodes-4{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+        .arch-node{padding:10px 12px;border-radius:6px;border:1px solid;transition:transform .15s,box-shadow .15s;cursor:default}
+        .arch-node:hover{transform:translateY(-2px);box-shadow:0 4px 12px rgba(0,0,0,.08)}
+        .arch-node-title{font-family:'Space Mono',monospace;font-size:11px;font-weight:700;margin-bottom:3px}
+        .arch-node-desc{font-family:'Inter',sans-serif;font-size:9.5px;color:#666;line-height:1.45}
+        .arch-node-classes{display:flex;flex-wrap:wrap;gap:3px;margin-top:6px}
+        .arch-class{font-family:'Space Mono',monospace;font-size:8px;background:rgba(29,53,87,.08);color:#1d3557;padding:1px 5px;border-radius:3px}
+        .arch-node-hook{font-family:'Space Mono',monospace;font-size:8px;color:#457b9d;margin-top:5px;padding-top:4px;border-top:1px dashed #d0d8e0}
+        .node-entry{background:#f0f7ff;border-color:#a8c8e8;}.node-entry .arch-node-title{color:#2c5282}
+        .node-core{background:#fff8f0;border-color:#e8c8a0;}.node-core .arch-node-title{color:#744210}
+        .node-module{background:#f0fff4;border-color:#a8e8b8;}.node-module .arch-node-title{color:#22543d}
+        .node-v4{background:#faf0ff;border-color:#c8a8e8;}.node-v4 .arch-node-title{color:#553c7b}
+        .node-ext{background:#fff0f0;border-color:#e8a8a8;}.node-ext .arch-node-title{color:#9b2c2c}
+        .arch-arrow-down{text-align:center;margin:6px 0}
+        .arch-arrow-fan{text-align:center;margin:4px 0;overflow:hidden}
+        .arch-legend{margin-top:24px;padding-top:16px;border-top:1px solid #e0e4ea}
+        .arch-legend-title{font-family:'Inter',sans-serif;font-size:9px;font-weight:600;color:#999;letter-spacing:1.5px;text-transform:uppercase;margin-bottom:8px}
+        .arch-legend-items{display:flex;flex-wrap:wrap;gap:14px}
+        .arch-legend-item{display:flex;align-items:center;gap:5px;font-family:'Inter',sans-serif;font-size:9.5px;color:#666}
+        .arch-legend-line{display:inline-block;width:18px;height:2px;border-radius:1px}
+        .arch-legend-dot{display:inline-block;width:10px;height:10px;border-radius:3px;border:1px solid}
+        .arch-pipeline{margin-top:20px;padding-top:16px;border-top:1px solid #e0e4ea}
+        .arch-pipeline-title{font-family:'Inter',sans-serif;font-size:9px;font-weight:600;color:#999;letter-spacing:1.5px;text-transform:uppercase;margin-bottom:10px}
+        .arch-pipeline-flow{display:flex;flex-wrap:wrap;align-items:center;gap:4px}
+        .arch-pipe-step{font-family:'Space Mono',monospace;font-size:9px;padding:4px 8px;border-radius:4px;border:1px solid;white-space:nowrap}
+        .arch-pipe-arrow{font-size:11px;color:#999;line-height:1}
+        .pipe-entry{background:#f0f7ff;border-color:#a8c8e8;color:#2c5282}
+        .pipe-core{background:#fff8f0;border-color:#e8c8a0;color:#744210}
+        .pipe-module{background:#f0fff4;border-color:#a8e8b8;color:#22543d}
+        .pipe-v4{background:#faf0ff;border-color:#c8a8e8;color:#553c7b}
+        .pipe-ext{background:#fff0f0;border-color:#e8a8a8;color:#9b2c2c}
+        @media(max-width:1024px){
+            .arch-nodes-5,.arch-nodes-4{grid-template-columns:repeat(2,1fr)}
+            .arch-arrow-fan{display:none}
+            .arch-pipeline-flow{gap:3px}
+            .arch-pipe-step{font-size:8px;padding:3px 5px}
+            .arch-pipe-arrow{font-size:9px}
+            .arch-diagram{padding:16px 12px}
+        }
     </style>
 </head>
 <body>
@@ -175,19 +222,233 @@ title: "WQ BRAIN Alpha Evolution"
 <!-- 1. System Architecture -->
 <h2>1. 시스템 아키텍처</h2>
 
-<p>시스템은 7개의 핵심 모듈과 1개의 외부 라이브러리로 구성된다. 각 모듈은 단일 책임 원칙에 따라 분리되어 있으며, <code>EvolutionEngine</code>이 중앙 오케스트레이터 역할을 한다.</p>
+<p>시스템은 11개의 핵심 모듈과 1개의 외부 라이브러리로 구성된다. 각 모듈은 단일 책임 원칙에 따라 분리되어 있으며, <code>EvolutionEngine</code>이 중앙 오케스트레이터 역할을 한다. 아래 다이어그램은 전체 시스템의 모듈 간 데이터 흐름과 제어 흐름을 도식화한 것이다.</p>
+
+<!-- System Architecture Diagram -->
+<div class="arch-diagram">
+    <div class="arch-caption">Figure 1: System Architecture — Module Dependency &amp; Data Flow</div>
+
+    <!-- Layer 0: Entry -->
+    <div class="arch-layer">
+        <div class="arch-layer-label">Entry</div>
+        <div class="arch-nodes">
+            <div class="arch-node node-entry" id="n-main">
+                <div class="arch-node-title">main.py</div>
+                <div class="arch-node-desc">CLI, Loop Control, Error Recovery</div>
+            </div>
+            <div class="arch-node node-entry" id="n-runsh">
+                <div class="arch-node-title">run.sh</div>
+                <div class="arch-node-desc">caffeinate -ds, venv, tee log</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Arrow -->
+    <div class="arch-arrow-down">
+        <svg width="24" height="28" viewBox="0 0 24 28"><path d="M12 0 L12 20 M6 16 L12 24 L18 16" stroke="#1d3557" stroke-width="1.5" fill="none"/></svg>
+    </div>
+
+    <!-- Layer 1: Core Engine -->
+    <div class="arch-layer">
+        <div class="arch-layer-label">Core Engine</div>
+        <div class="arch-nodes">
+            <div class="arch-node node-core" id="n-evolution">
+                <div class="arch-node-title">evolution.py</div>
+                <div class="arch-node-desc">EvolutionEngine, Island Model, SHADE, MAP-Elites, AOS, NSGA-II</div>
+                <div class="arch-node-classes">
+                    <span class="arch-class">Individual</span>
+                    <span class="arch-class">SHADEMemory</span>
+                    <span class="arch-class">MAPElitesArchive</span>
+                    <span class="arch-class">AdaptiveOperatorSelector</span>
+                    <span class="arch-class">Island</span>
+                    <span class="arch-class">EvolutionEngine</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Arrow fan-out -->
+    <div class="arch-arrow-fan">
+        <svg width="600" height="36" viewBox="0 0 600 36">
+            <path d="M300 0 L300 12" stroke="#1d3557" stroke-width="1.5" fill="none"/>
+            <path d="M60 12 L540 12" stroke="#1d3557" stroke-width="1" fill="none" stroke-dasharray="3,3"/>
+            <path d="M60 12 L60 28 M54 22 L60 30 L66 22" stroke="#1d3557" stroke-width="1.2" fill="none"/>
+            <path d="M180 12 L180 28 M174 22 L180 30 L186 22" stroke="#1d3557" stroke-width="1.2" fill="none"/>
+            <path d="M300 12 L300 28 M294 22 L300 30 L306 22" stroke="#1d3557" stroke-width="1.2" fill="none"/>
+            <path d="M420 12 L420 28 M414 22 L420 30 L426 22" stroke="#1d3557" stroke-width="1.2" fill="none"/>
+            <path d="M540 12 L540 28 M534 22 L540 30 L546 22" stroke="#1d3557" stroke-width="1.2" fill="none"/>
+        </svg>
+    </div>
+
+    <!-- Layer 2: Modules -->
+    <div class="arch-layer">
+        <div class="arch-layer-label">Modules</div>
+        <div class="arch-nodes arch-nodes-5">
+            <div class="arch-node node-module" id="n-ast">
+                <div class="arch-node-title">alpha_ast.py</div>
+                <div class="arch-node-desc">AST Node, 10 Genetic Operators, Multiline</div>
+            </div>
+            <div class="arch-node node-module" id="n-strategies">
+                <div class="arch-node-title">strategies.py</div>
+                <div class="arch-node-desc">36 Seed Templates, Region/Delay Variants</div>
+            </div>
+            <div class="arch-node node-module" id="n-evaluator">
+                <div class="arch-node-title">evaluator.py</div>
+                <div class="arch-node-desc">IQC Score, IS Check, MDL Penalty</div>
+            </div>
+            <div class="arch-node node-module" id="n-config">
+                <div class="arch-node-title">config.py</div>
+                <div class="arch-node-desc">7-Round Config, Search Spaces, Criteria</div>
+            </div>
+            <div class="arch-node node-module" id="n-brainapi">
+                <div class="arch-node-title">brain_api.py</div>
+                <div class="arch-node-desc">ACE Gold Wrapper, Batch Sim, Submit</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Arrow fan-out to v4 -->
+    <div class="arch-arrow-down">
+        <svg width="24" height="28" viewBox="0 0 24 28"><path d="M12 0 L12 20 M6 16 L12 24 L18 16" stroke="#457b9d" stroke-width="1.5" fill="none"/></svg>
+    </div>
+
+    <!-- Layer 3: v4 Extensions -->
+    <div class="arch-layer">
+        <div class="arch-layer-label">v4 Extensions</div>
+        <div class="arch-nodes arch-nodes-4">
+            <div class="arch-node node-v4" id="n-pattern">
+                <div class="arch-node-title">pattern_learner.py</div>
+                <div class="arch-node-desc">Success Pattern Extraction, Learned Seed Generation</div>
+                <div class="arch-node-hook">_create_population()</div>
+            </div>
+            <div class="arch-node node-v4" id="n-surrogate">
+                <div class="arch-node-title">surrogate.py</div>
+                <div class="arch-node-desc">XGBoost/Ridge, 20-dim Feature, Pre-filter 60%</div>
+                <div class="arch-node-hook">_evaluate_population()</div>
+            </div>
+            <div class="arch-node node-v4" id="n-field">
+                <div class="arch-node-title">field_explorer.py</div>
+                <div class="arch-node-desc">Unused Field Screening, 8 Test Templates</div>
+                <div class="arch-node-hook">run_all_rounds() post</div>
+            </div>
+            <div class="arch-node node-v4" id="n-dashboard">
+                <div class="arch-node-title">dashboard.py</div>
+                <div class="arch-node-desc">HTTP Server, Live Log, HoF, MAP-Elites</div>
+                <div class="arch-node-hook">daemon thread :8050</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Arrow to external -->
+    <div class="arch-arrow-down">
+        <svg width="24" height="28" viewBox="0 0 24 28"><path d="M12 0 L12 20 M6 16 L12 24 L18 16" stroke="#e63946" stroke-width="1.5" fill="none"/></svg>
+    </div>
+
+    <!-- Layer 4: External -->
+    <div class="arch-layer">
+        <div class="arch-layer-label">External</div>
+        <div class="arch-nodes">
+            <div class="arch-node node-ext" id="n-ace">
+                <div class="arch-node-title">ACE API [Gold]</div>
+                <div class="arch-node-desc">Biometric Auth, simulate_alpha_list_multi, concurrent=5, multi=5</div>
+            </div>
+            <div class="arch-node node-ext" id="n-brain">
+                <div class="arch-node-title">BRAIN Platform</div>
+                <div class="arch-node-desc">api.worldquantbrain.com — Simulation, IS Check, Submit</div>
+            </div>
+            <div class="arch-node node-ext" id="n-persist">
+                <div class="arch-node-title">results/</div>
+                <div class="arch-node-desc">checkpoint_latest.json, evolution_*.json</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Data flow legend -->
+    <div class="arch-legend">
+        <div class="arch-legend-title">Data Flow Legend</div>
+        <div class="arch-legend-items">
+            <div class="arch-legend-item"><span class="arch-legend-line" style="background:#1d3557"></span> Control Flow</div>
+            <div class="arch-legend-item"><span class="arch-legend-line" style="background:#457b9d"></span> v4 Module Integration</div>
+            <div class="arch-legend-item"><span class="arch-legend-line" style="background:#e63946"></span> External API / I/O</div>
+            <div class="arch-legend-item"><span class="arch-legend-dot node-entry"></span> Entry Point</div>
+            <div class="arch-legend-item"><span class="arch-legend-dot node-core"></span> Core Engine</div>
+            <div class="arch-legend-item"><span class="arch-legend-dot node-module"></span> Module</div>
+            <div class="arch-legend-item"><span class="arch-legend-dot node-v4"></span> v4 Extension</div>
+            <div class="arch-legend-item"><span class="arch-legend-dot node-ext"></span> External</div>
+        </div>
+    </div>
+
+    <!-- Pipeline flow -->
+    <div class="arch-pipeline">
+        <div class="arch-pipeline-title">Execution Pipeline (per cycle)</div>
+        <div class="arch-pipeline-flow">
+            <div class="arch-pipe-step pipe-entry">Biometric Auth</div>
+            <div class="arch-pipe-arrow">&rarr;</div>
+            <div class="arch-pipe-step pipe-core">Load Checkpoint</div>
+            <div class="arch-pipe-arrow">&rarr;</div>
+            <div class="arch-pipe-step pipe-v4">Pattern Learner Init</div>
+            <div class="arch-pipe-arrow">&rarr;</div>
+            <div class="arch-pipe-step pipe-core">R1 Wide Scan</div>
+            <div class="arch-pipe-arrow">&rarr;</div>
+            <div class="arch-pipe-step pipe-core">R2 Pattern Focus</div>
+            <div class="arch-pipe-arrow">&rarr;</div>
+            <div class="arch-pipe-step pipe-core">R3 Crossover Boost</div>
+            <div class="arch-pipe-arrow">&rarr;</div>
+            <div class="arch-pipe-step pipe-core">R4 Param Tuning</div>
+            <div class="arch-pipe-arrow">&rarr;</div>
+            <div class="arch-pipe-step pipe-module">R5 Multi-Region</div>
+            <div class="arch-pipe-arrow">&rarr;</div>
+            <div class="arch-pipe-step pipe-core">R6 Portfolio Opt</div>
+            <div class="arch-pipe-arrow">&rarr;</div>
+            <div class="arch-pipe-step pipe-core">R7 Final Polish</div>
+            <div class="arch-pipe-arrow">&rarr;</div>
+            <div class="arch-pipe-step pipe-v4">Field Explorer</div>
+            <div class="arch-pipe-arrow">&rarr;</div>
+            <div class="arch-pipe-step pipe-ext">Save &amp; Submit</div>
+        </div>
+    </div>
+
+    <!-- Inner loop detail -->
+    <div class="arch-pipeline" style="margin-top:12px">
+        <div class="arch-pipeline-title">Inner Loop (per generation, per island)</div>
+        <div class="arch-pipeline-flow">
+            <div class="arch-pipe-step pipe-v4">Surrogate Filter</div>
+            <div class="arch-pipe-arrow">&rarr;</div>
+            <div class="arch-pipe-step pipe-ext">Batch Simulate (5&times;5)</div>
+            <div class="arch-pipe-arrow">&rarr;</div>
+            <div class="arch-pipe-step pipe-module">IQC Score + MDL</div>
+            <div class="arch-pipe-arrow">&rarr;</div>
+            <div class="arch-pipe-step pipe-core">NSGA-II Sort</div>
+            <div class="arch-pipe-arrow">&rarr;</div>
+            <div class="arch-pipe-step pipe-core">&epsilon;-Lexicase Select</div>
+            <div class="arch-pipe-arrow">&rarr;</div>
+            <div class="arch-pipe-step pipe-core">AOS &rarr; Operator</div>
+            <div class="arch-pipe-arrow">&rarr;</div>
+            <div class="arch-pipe-step pipe-core">SHADE Update</div>
+            <div class="arch-pipe-arrow">&rarr;</div>
+            <div class="arch-pipe-step pipe-core">MAP-Elites Archive</div>
+            <div class="arch-pipe-arrow">&rarr;</div>
+            <div class="arch-pipe-step pipe-ext">Checkpoint</div>
+        </div>
+    </div>
+</div>
+<!-- /System Architecture Diagram -->
 
 <table>
 <caption>표 1: 모듈 구성</caption>
 <thead><tr><th>모듈</th><th>역할</th><th>LOC</th></tr></thead>
 <tbody>
 <tr><td class="left"><code>main.py</code></td><td class="left">CLI 진입점, 루프 제어, 에러 복구</td><td>~200</td></tr>
-<tr><td class="left"><code>evolution.py</code></td><td class="left">진화 엔진 v3.2 — 6개 핵심 클래스, 30+ 메서드</td><td>1,680+</td></tr>
-<tr><td class="left"><code>brain_api.py</code></td><td class="left">BRAIN API 래퍼, ACE 라이브러리 통합</td><td>~300</td></tr>
-<tr><td class="left"><code>alpha_ast.py</code></td><td class="left">AST 노드, 유전 연산자, 멀티라인 생성</td><td>~700</td></tr>
+<tr><td class="left"><code>evolution.py</code></td><td class="left">진화 엔진 v4 — 6개 핵심 클래스, 30+ 메서드</td><td>1,960+</td></tr>
+<tr><td class="left"><code>brain_api.py</code></td><td class="left">BRAIN API 래퍼, ACE 라이브러리 통합, 배치 시뮬</td><td>~300</td></tr>
+<tr><td class="left"><code>alpha_ast.py</code></td><td class="left">AST 노드, 10개 유전 연산자, 멀티라인 생성</td><td>~700</td></tr>
 <tr><td class="left"><code>strategies.py</code></td><td class="left">36개 시드 전략, 리전/delay 특화</td><td>~500</td></tr>
-<tr><td class="left"><code>evaluator.py</code></td><td class="left">IQC 점수 계산, IS Check, 포트폴리오 평가</td><td>~150</td></tr>
-<tr><td class="left"><code>config.py</code></td><td class="left">7라운드 설정, 탐색 공간, 기준값</td><td>~200</td></tr>
+<tr><td class="left"><code>evaluator.py</code></td><td class="left">IQC 점수 계산, IS Check, MDL 페널티</td><td>~150</td></tr>
+<tr><td class="left"><code>config.py</code></td><td class="left">7라운드 설정, 11개 탐색 공간, 기준값</td><td>~200</td></tr>
+<tr><td class="left"><code>pattern_learner.py</code></td><td class="left">성공 패턴 추출, 학습 기반 시드 생성 (v4)</td><td>~200</td></tr>
+<tr><td class="left"><code>surrogate.py</code></td><td class="left">XGBoost/Ridge 대리 모델, 사전 필터링 (v4)</td><td>~250</td></tr>
+<tr><td class="left"><code>field_explorer.py</code></td><td class="left">미사용 데이터필드 자동 스크리닝 (v4)</td><td>~200</td></tr>
+<tr><td class="left"><code>dashboard.py</code></td><td class="left">실시간 웹 대시보드, HTTP API (v4)</td><td>~350</td></tr>
 </tbody>
 </table>
 
