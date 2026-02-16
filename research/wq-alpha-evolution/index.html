@@ -298,7 +298,7 @@ Figure 1: 전체 시스템 상세 구조도 (Full System Architecture Diagram)
 <tr><td class="left"><code>evolution.py</code></td><td class="left">진화 엔진 v4 — 6개 핵심 클래스, 30+ 메서드</td><td>1,960+</td></tr>
 <tr><td class="left"><code>brain_api.py</code></td><td class="left">BRAIN API 래퍼, ACE 라이브러리 통합, 배치 시뮬</td><td>~300</td></tr>
 <tr><td class="left"><code>alpha_ast.py</code></td><td class="left">AST 노드, 10개 유전 연산자, 멀티라인 생성, 64-op 제한 검증</td><td>~780</td></tr>
-<tr><td class="left"><code>strategies.py</code></td><td class="left">36개 시드 전략, 리전/delay 특화</td><td>~500</td></tr>
+<tr><td class="left"><code>strategies.py</code></td><td class="left">42개 시드 전략 (독창적 anti-correlation 6개 포함), 리전/delay 특화</td><td>~600</td></tr>
 <tr><td class="left"><code>evaluator.py</code></td><td class="left">IQC 점수 계산, IS Check, MDL 페널티</td><td>~150</td></tr>
 <tr><td class="left"><code>config.py</code></td><td class="left">7라운드 설정, 11개 탐색 공간, 기준값</td><td>~200</td></tr>
 <tr><td class="left"><code>pattern_learner.py</code></td><td class="left">성공 패턴 추출, 학습 기반 시드 생성 (v4)</td><td>~200</td></tr>
@@ -609,7 +609,7 @@ Figure 1: 전체 시스템 상세 구조도 (Full System Architecture Diagram)
 <!-- 7. Stagnation Escape -->
 <h2>7. 정체 탈출 메커니즘</h2>
 
-<p>유전 알고리즘은 본질적으로 지역 최적해(local optimum)에 수렴하는 경향이 있다. 특히 BRAIN 알파 탐색에서는 특정 수식 패턴(예: <code>(close - low)/(high - low)</code> 계열)이 Sharpe 1.0~1.5 구간에서 정체되는 현상이 빈번하다. 이를 탈출하기 위해 5단계 정체 탈출 메커니즘을 운용한다.</p>
+<p>유전 알고리즘은 본질적으로 지역 최적해(local optimum)에 수렴하는 경향이 있다. 특히 BRAIN 알파 탐색에서는 특정 수식 패턴(예: <code>(close - low)/(high - low)</code> 계열)이 Sharpe 1.0~1.5 구간에서 정체되는 현상이 빈번하다. 이를 탈출하기 위해 9단계 정체 탈출 및 제출 확률 향상 메커니즘을 운용한다.</p>
 
 <h3>7.1 정체 감지</h3>
 
@@ -652,6 +652,20 @@ Figure 1: 전체 시스템 상세 구조도 (Full System Architecture Diagram)
 </div>
 
 <p>Jaccard 유사도가 0.85를 초과하면 해당 수식은 API 호출 없이 스킵된다. 이 필터는 Surrogate 필터 이전에 적용되어, 구조적으로 중복된 수식이 Surrogate 모델의 학습 데이터를 오염시키는 것도 방지한다.</p>
+
+<h3>7.7 조기 파라미터 스캔</h3>
+
+<p>기존 설계에서 파라미터 최적화(<code>_optimize_params</code>)는 R4 이후에만 활성화되었다. 그러나 R1~R3에서 1,200회 이상의 시뮬레이션을 수행하면서도 제출 가능한 알파가 나오지 않는 근본 원인 중 하나는, 유망한 수식이 부적절한 파라미터(decay=0, 고정 neutralization)로 평가되어 IS Check를 통과하지 못하는 것이었다.</p>
+
+<p>이를 해결하기 위해 R1~R3의 마지막 세대에서 IQC 점수 2.0 이상인 알파 상위 2개에 대해 조기 파라미터 스캔을 실행한다. 이는 R4를 기다리지 않고도 decay, neutralization, truncation 조합을 탐색하여 IS Check 통과 확률을 높인다.</p>
+
+<h3>7.8 파라미터 기본값 최적화</h3>
+
+<p>BRAIN 플랫폼에서 decay=0은 매일 포지션을 완전히 교체하는 것을 의미하며, 이는 HIGH_TURNOVER 실패의 주요 원인이다. 시스템의 기본 decay를 0에서 4~6(랜덤 선택)으로 변경하여 turnover를 안정화했다. 또한 neutralization을 80% 확률로 리전 기본값, 20% 확률로 SUBINDUSTRY/INDUSTRY/SECTOR 중 랜덤 선택하여 CONCENTRATED_WEIGHT 실패를 방지한다.</p>
+
+<h3>7.9 독창적 전략 시드</h3>
+
+<p>BRAIN 플랫폼에는 이미 수만 개의 알파가 제출되어 있으며, 전통적인 모멘텀/밸류 패턴은 Self-Correlation 검사에 걸릴 확률이 높다. 이를 회피하기 위해 6개의 독창적 전략 시드를 추가했다: 잔차 기반 시그널(<code>cross_field_residual</code>), 기관 자금 흐름(<code>institution_flow_signal</code>), 옵션 내재 모멘텀(<code>option_implied_momentum</code>), 애널리스트 추정치 발산(<code>analyst_revision_divergence</code>), 리스크 조정 밸류(<code>risk_adjusted_value</code>), 복합 랭크 스프레드(<code>composite_rank_spread</code>). 이들은 institution, option, analyst 등 상대적으로 덜 활용되는 데이터 필드를 조합하여 기존 제출 알파와의 상관관계를 최소화한다.</p>
 
 <div class="section-divider">• • •</div>
 
@@ -732,9 +746,9 @@ Figure 1: 전체 시스템 상세 구조도 (Full System Architecture Diagram)
 <div class="section-divider">• • •</div>
 
 <!-- 9. Strategy Seeds -->
-<h2>9. 36개 전략 시드</h2>
+<h2>9. 42개 전략 시드</h2>
 
-<p>초기 개체군 생성 시 사용되는 36개의 검증된 알파 전략 템플릿이다. 각 전략은 호출 시마다 랜덤 파라미터(윈도우, 필드)를 선택하여 다양한 변형을 생성한다.</p>
+<p>초기 개체군 생성 시 사용되는 42개의 검증된 알파 전략 템플릿이다. 각 전략은 호출 시마다 랜덤 파라미터(윈도우, 필드)를 선택하여 다양한 변형을 생성한다.</p>
 
 <table>
 <caption>표 12: 전략 시드 요약 (일부)</caption>
@@ -748,6 +762,12 @@ Figure 1: 전체 시스템 상세 구조도 (Full System Architecture Diagram)
 <tr><td>29</td><td class="left">Multiline Multifactor</td><td>멀티라인</td><td class="left">변수 할당 기반 복합 팩터</td></tr>
 <tr><td>33</td><td class="left">Asia Value Momentum</td><td>아시아</td><td class="left">아시아 시장 가치+모멘텀</td></tr>
 <tr><td>35</td><td class="left">Decorrelated Composite</td><td>비상관</td><td class="left">다축 비상관 복합</td></tr>
+<tr><td>37</td><td class="left">Cross-Field Residual</td><td>잔차</td><td class="left">펀더멘탈 비율의 평균 이탈</td></tr>
+<tr><td>38</td><td class="left">Institution Flow Signal</td><td>기관</td><td class="left">기관 보유량 변화 랭크</td></tr>
+<tr><td>39</td><td class="left">Option Implied Momentum</td><td>옵션</td><td class="left">단기/장기 call breakeven 스프레드</td></tr>
+<tr><td>40</td><td class="left">Analyst Revision Divergence</td><td>애널리스트</td><td class="left">추정치 간 랭크 불일치</td></tr>
+<tr><td>41</td><td class="left">Risk-Adjusted Value</td><td>리스크</td><td class="left">밸류 / 변동성 비율</td></tr>
+<tr><td>42</td><td class="left">Composite Rank Spread</td><td>복합</td><td class="left">3개 필드 변화율 랭크 합산</td></tr>
 </tbody>
 </table>
 
@@ -1054,6 +1074,10 @@ save_final()                           <span class="cm"># pattern_learner/surrog
 <tr><td>Self-Corr 사전 필터</td><td>필드 Jaccard 유사도 기반으로 기존 알파와 구조적으로 유사한 수식을 API 호출 전에 스킵하는 필터.</td></tr>
 <tr><td>Trivial Alpha</td><td><code>sign(cap)</code> 등 자명한 수식. 비현실적으로 높은 Sharpe(6+)를 보이나 IS Check에서 반드시 탈락한다.</td></tr>
 <tr><td>SA 온도(Temperature)</td><td>Simulated Annealing 온도. 높을수록 열악한 자식도 수용하여 탐색 범위를 확대한다. 세대 진행에 따라 냉각.</td></tr>
+<tr><td>조기 파라미터 스캔</td><td>R1~R3 마지막 세대에서 IQC 점수 2.0 이상인 알파에 대해 decay/neutralization/truncation 조합을 탐색하는 메커니즘. R4를 기다리지 않고 IS Check 통과 확률을 높인다.</td></tr>
+<tr><td>적응형 Surrogate 필터</td><td>학습 데이터 축적량에 따라 필터링 강도를 자동 조절하는 메커니즘. 200개 이상 학습 시 상위 35%만 통과시켜 API 호출을 절감한다.</td></tr>
+<tr><td>Island Early Stopping</td><td>3세대 연속 best score 변화 &lt; 0.05이고 score &lt; 1.0인 섬의 평가를 스킵하고 카타클리즘을 즉시 발동하는 메커니즘.</td></tr>
+<tr><td>스마트 파라미터 샘플링</td><td>HoF 성공 파라미터 분포 + 현재 best 근처 미세조정으로 30개 랜덤 조합을 15개 지능형 조합으로 대체하는 최적화.</td></tr>
 <tr><td>AOS(Adaptive Operator Selection)</td><td>UCB1 알고리즘으로 10개 유전 연산자의 선택 확률을 성과 기반으로 동적 조정.</td></tr>
 <tr><td>SHADE</td><td>Differential Evolution의 F(스케일 팩터)와 CR(교배율)을 성공 이력 기반으로 적응적 제어하는 메커니즘.</td></tr>
 <tr><td>Regular Expression</td><td>BRAIN의 멀티라인 수식 형식. 변수 할당(<code>a = expr;</code>)과 최종 수식으로 구성. 변수명은 단일 문자.</td></tr>

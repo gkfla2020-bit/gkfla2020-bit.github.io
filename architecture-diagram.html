@@ -1,7 +1,3 @@
----
-layout: null
-permalink: /architecture-diagram.html
----
 <!DOCTYPE html>
 <html lang="ko">
 <head>
@@ -155,9 +151,16 @@ th { background: #000; color: #fff; font-weight: bold; }
       <div class="mod">
         <div class="mod-name">strategies.py</div>
         StrategySeeds<br>
-        Template-based alpha generators<br>
+        42개 template-based generators<br>
         momentum / mean_reversion /<br>
-        value / quality / volatility / ...
+        value / quality / volatility /<br>
+        <strong>+ 6 novel anti-correlation:</strong><br>
+        <span class="tiny">cross_field_residual,<br>
+        institution_flow_signal,<br>
+        option_implied_momentum,<br>
+        analyst_revision_divergence,<br>
+        risk_adjusted_value,<br>
+        composite_rank_spread</span>
       </div>
       <div class="mod">
         <div class="mod-name">config.py</div>
@@ -184,7 +187,11 @@ th { background: #000; color: #fff; font-weight: bold; }
         SurrogateModel<br>
         ├ 20-dim feature extraction<br>
         ├ Ridge / XGBoost backend<br>
-        ├ filter_candidates(top 60%)<br>
+        ├ <strong>Adaptive filter_candidates:</strong><br>
+        │ &nbsp;≥200 samples → top 35%<br>
+        │ &nbsp;≥100 samples → top 40%<br>
+        │ &nbsp;≥50 samples → top 50%<br>
+        │ &nbsp;+ 10% random from bottom<br>
         └ retrain every 50 samples
       </div>
       <div class="mod">
@@ -328,7 +335,7 @@ th { background: #000; color: #fff; font-weight: bold; }
     <div class="small" style="font-weight:bold; margin-bottom:6px;">GENERATION LOOP (per generation, per island):</div>
 
     <div class="flow">
-      <span class="flow-step">① Self-Corr Filter + _evaluate_population</span>
+      <span class="flow-step">① Early Stop Check + Self-Corr Filter + _evaluate_population</span>
       <span class="flow-arrow">→</span>
       <span class="flow-step">② _post_generation_update</span>
       <span class="flow-arrow">→</span>
@@ -343,6 +350,8 @@ th { background: #000; color: #fff; font-weight: bold; }
       <span class="flow-step">⑥ Submit check</span>
       <span class="flow-arrow">→</span>
       <span class="flow-step">⑦ _optimize_params (if R4+)</span>
+      <span class="flow-arrow">→</span>
+      <span class="flow-step">⑦b Early param scan (R1-R3 last gen, score&gt;2.0)</span>
     </div>
     <div class="arrow-down">▼</div>
     <div class="flow">
@@ -407,11 +416,11 @@ th { background: #000; color: #fff; font-weight: bold; }
     </div>
     <div class="col">
       <div class="mod">
-        <div class="mod-name">⑨ _migrate (Ring Topology)</div>
+        <div class="mod-name">⑨ _migrate (Ring Topology v2)</div>
         Every MIGRATION_INTERVAL gens:<br>
         Island[i] → Island[(i+1) % 4]<br>
-        Selection: best + most diverse<br>
-        (structural_distance to dst)<br>
+        Selection: best + least field overlap<br>
+        (field-hash based O(n), not structural_distance)<br>
         Replace worst in destination<br>
         MIGRATION_SIZE = 3 per island
       </div>
@@ -538,28 +547,32 @@ th { background: #000; color: #fff; font-weight: bold; }
       Strategy: random=0.7, template=0.2, evolved=0.1<br>
       Role: Maximum diversity, broad search<br>
       Own SHADE memory + Own AOS<br>
-      Stagnation counter (→ cataclysm at ≥3)
+      Stagnation counter (→ cataclysm at ≥3)<br>
+      <strong>Early stop:</strong> 3 gen stagnant + best&lt;1.0 → skip eval
     </div>
     <div class="island-box">
       <div class="isl-title">Island 1 — Exploiter</div>
       Strategy: evolved=0.7, template=0.2, random=0.1<br>
       Role: Refine best-known solutions<br>
       Own SHADE memory + Own AOS<br>
-      Stagnation counter (→ cataclysm at ≥3)
+      Stagnation counter (→ cataclysm at ≥3)<br>
+      <strong>Early stop:</strong> 3 gen stagnant + best&lt;1.0 → skip eval
     </div>
     <div class="island-box">
       <div class="isl-title">Island 2 — MAP-Elites + Multiline</div>
       Strategy: map_elites=0.3, template=0.3, random=0.2, evolved=0.2<br>
       Role: Archive-seeded + Regular Expression<br>
       Own SHADE memory + Own AOS<br>
-      Stagnation counter (→ cataclysm at ≥3)
+      Stagnation counter (→ cataclysm at ≥3)<br>
+      <strong>Early stop:</strong> 3 gen stagnant + best&lt;1.0 → skip eval
     </div>
     <div class="island-box">
       <div class="isl-title">Island 3 — Balanced</div>
       Strategy: inherits round config strategy_mix<br>
       Role: Default balanced evolution<br>
       Own SHADE memory + Own AOS<br>
-      Stagnation counter (→ cataclysm at ≥3)
+      Stagnation counter (→ cataclysm at ≥3)<br>
+      <strong>Early stop:</strong> 3 gen stagnant + best&lt;1.0 → skip eval
     </div>
   </div>
 
@@ -567,7 +580,7 @@ th { background: #000; color: #fff; font-weight: bold; }
     <strong>Migration Ring:</strong>
     Island 0 ──(best+diverse)──▶ Island 1 ──▶ Island 2 ──▶ Island 3 ──▶ Island 0<br>
     <span class="muted">Every MIGRATION_INTERVAL generations | MIGRATION_SIZE=3 individuals per transfer</span><br>
-    <span class="muted">Selection: 1 best + (N-1) most structurally distant from destination (Multikulti policy)</span>
+    <span class="muted">Selection: 1 best + (N-1) least field overlap with destination (field-hash based, O(n))</span>
   </div>
 </div>
 
@@ -650,8 +663,9 @@ th { background: #000; color: #fff; font-weight: bold; }
           <ol>
             <li>evolved=0.6, cross_region=0.3, random=0.1</li>
             <li>elite=15%, mutation=0.3, crossover=0.5</li>
-            <li>Uses _run_multi_region_round()</li>
-            <li>Test passing alphas in ASI/CHN/EUR/KOR</li>
+            <li>Uses _run_multi_region_round() v3</li>
+            <li>Priority 1-2: batch test + mini evolution</li>
+            <li>Priority 3: batch scan only (no mini evo)</li>
             <li>Cross-pollination across markets</li>
           </ol>
         </div>
@@ -871,7 +885,11 @@ th { background: #000; color: #fff; font-weight: bold; }
         <br>
         <strong>Backend:</strong> XGBoost (if installed) / Ridge Regression<br>
         <strong>Training:</strong> Every 50 new samples, min_samples=30<br>
-        <strong>Filter:</strong> Keep top 60% + 10% random from bottom
+        <strong>Adaptive Filter:</strong><br>
+        &nbsp; ≥200 samples → keep top 35% + 10% random<br>
+        &nbsp; ≥100 samples → keep top 40% + 10% random<br>
+        &nbsp; ≥50 samples → keep top 50% + 10% random<br>
+        &nbsp; &lt;50 samples → keep top 60% + 10% random
       </div>
     </div>
     <div class="col">
@@ -1208,8 +1226,8 @@ th { background: #000; color: #fff; font-weight: bold; }
           <tr><td>region</td><td>space["region"]</td></tr>
           <tr><td>universe</td><td>space["universe"]</td></tr>
           <tr><td>delay</td><td>space["delay"]</td></tr>
-          <tr><td>decay</td><td>random from PARAM_RANGES</td></tr>
-          <tr><td>neutralization</td><td>REGION_CONFIGS pref</td></tr>
+          <tr><td>decay</td><td>default 4 or 6 (random)</td></tr>
+          <tr><td>neutralization</td><td>REGION_CONFIGS pref (80%)<br>random SUBIND/IND/SEC (20%)</td></tr>
           <tr><td>truncation</td><td>random from PARAM_RANGES</td></tr>
           <tr><td>language</td><td>FASTEXPR / REGULAR</td></tr>
           <tr><td>pasteurization</td><td>ON</td></tr>
@@ -1217,12 +1235,16 @@ th { background: #000; color: #fff; font-weight: bold; }
         </table>
       </div>
       <div class="mod">
-        <div class="mod-name">_optimize_params</div>
-        Grid search on top-3 submittable:<br>
-        decay: [0,2,4,6,8,10,12,15]<br>
-        neutralization: [SUBIND, IND, SEC, MKT, NONE]<br>
-        truncation: [0.01, 0.03, 0.05, 0.08, 0.10]<br>
-        → Re-simulate best combos
+        <div class="mod-name">_optimize_params (v3 Smart Sampling)</div>
+        15 trials (was 30):<br>
+        &nbsp; 8 from HoF top-20 param combos<br>
+        &nbsp; ~4 fine-tune around current best<br>
+        &nbsp; ~3 random fill<br>
+        → Single batch simulate<br>
+        <br>
+        <strong>Early param scan (R1-R3):</strong><br>
+        Last gen only, score&gt;2.0 alphas<br>
+        Top 2 near-submittable → _optimize_params
       </div>
     </div>
   </div>
