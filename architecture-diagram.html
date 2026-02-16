@@ -1,0 +1,1300 @@
+---
+layout: null
+permalink: /architecture-diagram.html
+---
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>WorldQuant BRAIN Alpha Evolution v4 — System Architecture</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: 'Courier New', monospace; background: #fff; color: #000; padding: 20px; }
+h1 { font-size: 18px; text-align: center; border: 2px solid #000; padding: 10px; margin-bottom: 20px; letter-spacing: 2px; }
+h2 { font-size: 14px; border-bottom: 2px solid #000; padding-bottom: 4px; margin: 20px 0 10px; text-transform: uppercase; letter-spacing: 1px; }
+h3 { font-size: 12px; margin: 8px 0 4px; }
+
+/* ─── Layout ─── */
+.section { border: 1px solid #000; padding: 12px; margin-bottom: 16px; position: relative; }
+.section-title { position: absolute; top: -10px; left: 12px; background: #fff; padding: 0 6px; font-size: 11px; font-weight: bold; letter-spacing: 1px; text-transform: uppercase; }
+.row { display: flex; gap: 10px; flex-wrap: wrap; }
+.col { flex: 1; min-width: 180px; }
+
+/* ─── Module Boxes ─── */
+.mod { border: 1.5px solid #000; padding: 8px; margin: 4px 0; font-size: 10px; line-height: 1.5; position: relative; }
+.mod-name { font-weight: bold; font-size: 11px; border-bottom: 1px solid #999; padding-bottom: 2px; margin-bottom: 4px; }
+.mod-dashed { border-style: dashed; }
+.mod-double { border: 3px double #000; }
+.mod-thick { border-width: 2.5px; }
+
+/* ─── Arrows (CSS) ─── */
+.arrow-down { text-align: center; font-size: 16px; line-height: 1; margin: 2px 0; color: #000; }
+.arrow-right { display: inline-block; margin: 0 4px; }
+.arrow-label { font-size: 9px; color: #555; text-align: center; display: block; }
+
+/* ─── Flow Steps ─── */
+.flow { display: flex; align-items: center; flex-wrap: wrap; gap: 2px; margin: 4px 0; }
+.flow-step { border: 1px solid #000; padding: 3px 6px; font-size: 9px; white-space: nowrap; }
+.flow-step-active { background: #000; color: #fff; }
+.flow-arrow { font-size: 12px; }
+
+/* ─── Round Cards ─── */
+.round-card { border: 2px solid #000; padding: 8px; margin: 6px 0; }
+.round-header { font-weight: bold; font-size: 12px; border-bottom: 1.5px solid #000; padding-bottom: 3px; margin-bottom: 6px; display: flex; justify-content: space-between; }
+.round-params { font-size: 9px; color: #444; }
+.round-body { font-size: 10px; line-height: 1.6; }
+.round-body ol { padding-left: 16px; }
+.round-body li { margin: 1px 0; }
+
+/* ─── Tables ─── */
+table { border-collapse: collapse; width: 100%; font-size: 9px; margin: 6px 0; }
+th, td { border: 1px solid #000; padding: 3px 5px; text-align: left; }
+th { background: #000; color: #fff; font-weight: bold; }
+
+/* ─── Island Topology ─── */
+.island-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; margin: 8px 0; }
+.island-box { border: 2px solid #000; padding: 6px; font-size: 9px; }
+.island-box .isl-title { font-weight: bold; font-size: 10px; margin-bottom: 3px; }
+
+/* ─── Data Flow ─── */
+.data-flow { display: flex; align-items: center; gap: 4px; margin: 3px 0; font-size: 9px; }
+.data-box { border: 1px solid #000; padding: 2px 6px; background: #f5f5f5; }
+.data-arrow { font-family: monospace; }
+
+/* ─── Legend ─── */
+.legend { display: flex; gap: 16px; flex-wrap: wrap; font-size: 9px; margin: 8px 0; padding: 6px; border: 1px dashed #999; }
+.legend-item { display: flex; align-items: center; gap: 4px; }
+.legend-box { width: 20px; height: 12px; border: 1.5px solid #000; display: inline-block; }
+.legend-box.dashed { border-style: dashed; }
+.legend-box.double { border: 3px double #000; }
+.legend-box.thick { border-width: 2.5px; }
+.legend-box.filled { background: #000; }
+
+/* ─── Connector Lines ─── */
+.connector { border-left: 1.5px solid #000; margin-left: 20px; padding-left: 10px; }
+.connector-h { border-top: 1.5px solid #000; margin: 0 10px; }
+
+/* ─── Misc ─── */
+.mono { font-family: 'Courier New', monospace; }
+.small { font-size: 9px; }
+.tiny { font-size: 8px; }
+.center { text-align: center; }
+.muted { color: #666; }
+.tag { border: 1px solid #000; padding: 1px 4px; font-size: 8px; display: inline-block; margin: 1px; }
+.tag-filled { background: #000; color: #fff; border: 1px solid #000; padding: 1px 4px; font-size: 8px; display: inline-block; margin: 1px; }
+.divider { border-top: 1px solid #ccc; margin: 8px 0; }
+.note { font-size: 9px; color: #555; font-style: italic; margin: 4px 0; }
+</style>
+</head>
+<body>
+
+<h1>WORLDQUANT BRAIN ALPHA EVOLUTION v4 — SYSTEM ARCHITECTURE</h1>
+<p class="center small muted">7-Round Genetic Algorithm with Island Model, SHADE, MAP-Elites, NSGA-II, UCB1 AOS, Surrogate Model, Pattern Learner</p>
+
+<!-- ═══════════════════════════════════════════════════════════ -->
+<!-- SECTION 0: LEGEND -->
+<!-- ═══════════════════════════════════════════════════════════ -->
+<div class="legend">
+  <div class="legend-item"><span class="legend-box thick"></span> Core Module</div>
+  <div class="legend-item"><span class="legend-box"></span> Sub-component</div>
+  <div class="legend-item"><span class="legend-box dashed"></span> External / API</div>
+  <div class="legend-item"><span class="legend-box double"></span> Data Store</div>
+  <div class="legend-item"><span class="legend-box filled"></span> Active Step</div>
+  <div class="legend-item">──▶ Data Flow</div>
+  <div class="legend-item">- - -▶ Optional Flow</div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════ -->
+<!-- SECTION 1: MODULE DEPENDENCY GRAPH -->
+<!-- ═══════════════════════════════════════════════════════════ -->
+<div class="section">
+  <span class="section-title">1. MODULE DEPENDENCY GRAPH (11 Modules + External API)</span>
+
+  <div class="row">
+    <!-- Entry Point -->
+    <div class="col" style="flex:0.8">
+      <div class="mod mod-thick">
+        <div class="mod-name">main.py</div>
+        CLI Entry Point<br>
+        argparse → region/rounds/submit<br>
+        Dashboard thread (port 8050)<br>
+        Loop controller + cooldown<br>
+        Session reconnect on error
+      </div>
+      <div class="arrow-down">│<br>▼</div>
+      <div class="mod mod-thick">
+        <div class="mod-name">evolution.py</div>
+        EvolutionEngine (core)<br>
+        ├ Individual<br>
+        ├ Island (×4)<br>
+        ├ SHADEMemory<br>
+        ├ MAPElitesArchive<br>
+        ├ AdaptiveOperatorSelector<br>
+        ├ NSGA-II (sort/crowding)<br>
+        └ ε-Lexicase Selection
+      </div>
+    </div>
+
+    <!-- Middle Column -->
+    <div class="col">
+      <div class="mod">
+        <div class="mod-name">alpha_ast.py</div>
+        Node (AST tree)<br>
+        ├ to_expr() → FastExpr<br>
+        ├ to_regular() → Regular<br>
+        ├ _validate_regular()<br>
+        ├ rand_tree / rand_multiline<br>
+        └ 10 Genetic Operators:<br>
+        <span class="tiny">crossover, semantic_xo, de_xo,<br>
+        headless_chicken, mutate,<br>
+        micro_mutate, hoist, shrink,<br>
+        multiline_xo, multiline_mut</span>
+      </div>
+      <div class="mod">
+        <div class="mod-name">strategies.py</div>
+        StrategySeeds<br>
+        Template-based alpha generators<br>
+        momentum / mean_reversion /<br>
+        value / quality / volatility / ...
+      </div>
+      <div class="mod">
+        <div class="mod-name">config.py</div>
+        ROUND_CONFIGS (R1-R7)<br>
+        SEARCH_SPACES (11 regions)<br>
+        SUBMISSION_CRITERIA<br>
+        PARAM_RANGES<br>
+        SIMULATION_BASE / REGULAR
+      </div>
+    </div>
+
+    <!-- Right Column -->
+    <div class="col">
+      <div class="mod">
+        <div class="mod-name">pattern_learner.py</div>
+        PatternLearner<br>
+        ├ field_freq / op_freq<br>
+        ├ ts_op_freq / window_freq<br>
+        ├ analyze(hof_data)<br>
+        └ generate_learned_tree()
+      </div>
+      <div class="mod">
+        <div class="mod-name">surrogate.py</div>
+        SurrogateModel<br>
+        ├ 20-dim feature extraction<br>
+        ├ Ridge / XGBoost backend<br>
+        ├ filter_candidates(top 60%)<br>
+        └ retrain every 50 samples
+      </div>
+      <div class="mod">
+        <div class="mod-name">field_explorer.py</div>
+        FieldExplorer<br>
+        ├ BRAIN field catalog fetch<br>
+        ├ category-based grouping<br>
+        └ novel field injection
+      </div>
+    </div>
+
+    <!-- Far Right -->
+    <div class="col" style="flex:0.7">
+      <div class="mod mod-dashed">
+        <div class="mod-name">brain_api.py</div>
+        BrainAPI<br>
+        ├ start_session() [ace_lib]<br>
+        ├ simulate_batch()<br>
+        │  concurrent=5, multi=5<br>
+        │  BATCH_SIZE=40<br>
+        ├ parse_batch_result()<br>
+        └ submit_alpha()
+      </div>
+      <div class="mod mod-dashed">
+        <div class="mod-name">ACE API [Gold]</div>
+        <span class="tiny">External library (DO NOT MODIFY)<br>
+        Biometric auth via stdin<br>
+        Session ~3hr expiry<br>
+        concurrent limit: 1-8</span>
+      </div>
+      <div class="mod">
+        <div class="mod-name">evaluator.py</div>
+        AlphaEvaluator<br>
+        ├ compute_iqc_score()<br>
+        ├ is_submittable()<br>
+        ├ passes_is_check()<br>
+        └ format_metrics()
+      </div>
+      <div class="mod">
+        <div class="mod-name">dashboard.py</div>
+        HTTP Dashboard (:8050)<br>
+        Real-time JSON stats<br>
+        <div class="mod" style="margin-top:4px">
+          <div class="mod-name">monitor.py</div>
+          Log parser (5s interval)<br>
+          Stall detection (2min)<br>
+          macOS notification
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Dependency arrows as text -->
+  <div class="divider"></div>
+  <div class="small">
+    <strong>Dependencies:</strong>
+    main → evolution, config, strategies, alpha_ast, brain_api, dashboard &nbsp;|&nbsp;
+    evolution → brain_api, evaluator, alpha_ast, strategies, config, pattern_learner, surrogate, field_explorer &nbsp;|&nbsp;
+    brain_api → ACE API [Gold] &nbsp;|&nbsp;
+    pattern_learner → alpha_ast &nbsp;|&nbsp;
+    monitor → run.log (read-only)
+  </div>
+</div>
+</body>
+</html>
+
+
+<!-- ═══════════════════════════════════════════════════════════ -->
+<!-- SECTION 2: EXECUTION PIPELINE (Top-Level Flow) -->
+<!-- ═══════════════════════════════════════════════════════════ -->
+<div class="section">
+  <span class="section-title">2. EXECUTION PIPELINE</span>
+
+  <div class="flow">
+    <span class="flow-step flow-step-active">CLI Parse</span>
+    <span class="flow-arrow">→</span>
+    <span class="flow-step">BrainAPI()</span>
+    <span class="flow-arrow">→</span>
+    <span class="flow-step">Biometric Auth</span>
+    <span class="flow-arrow">→</span>
+    <span class="flow-step flow-step-active">EvolutionEngine(api)</span>
+    <span class="flow-arrow">→</span>
+    <span class="flow-step">_load_previous()</span>
+    <span class="flow-arrow">→</span>
+    <span class="flow-step">PatternLearner.analyze()</span>
+    <span class="flow-arrow">→</span>
+    <span class="flow-step">FieldExplorer.load()</span>
+  </div>
+  <div class="arrow-down">▼</div>
+  <div class="flow">
+    <span class="flow-step flow-step-active">CYCLE LOOP</span>
+    <span class="flow-arrow">→</span>
+    <span class="flow-step">for space in SEARCH_SPACES</span>
+    <span class="flow-arrow">→</span>
+    <span class="flow-step flow-step-active">run_all_rounds(space)</span>
+    <span class="flow-arrow">→</span>
+    <span class="flow-step">_explore_new_fields()</span>
+    <span class="flow-arrow">→</span>
+    <span class="flow-step">_save_final()</span>
+    <span class="flow-arrow">→</span>
+    <span class="flow-step">_print_final_summary()</span>
+    <span class="flow-arrow">→</span>
+    <span class="flow-step">cooldown(60s)</span>
+    <span class="flow-arrow">↺</span>
+  </div>
+  <div class="arrow-down">▼</div>
+  <div class="flow">
+    <span class="flow-step">run_all_rounds</span>
+    <span class="flow-arrow">→</span>
+    <span class="flow-step">checkpoint resume check</span>
+    <span class="flow-arrow">→</span>
+    <span class="flow-step">for rnd in [1..7]</span>
+    <span class="flow-arrow">→</span>
+    <span class="flow-step">R5? _run_multi_region</span>
+    <span class="flow-arrow">/</span>
+    <span class="flow-step flow-step-active">_run_single_round</span>
+    <span class="flow-arrow">→</span>
+    <span class="flow-step">pattern_learner.analyze()</span>
+    <span class="flow-arrow">→</span>
+    <span class="flow-step">_save_checkpoint()</span>
+  </div>
+
+  <div class="divider"></div>
+  <div class="note">Checkpoint resume: if resume_round exists and region matches (or empty), skip completed rounds. Applied once per run_all_rounds call.</div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════ -->
+<!-- SECTION 3: SINGLE ROUND INTERNAL FLOW -->
+<!-- ═══════════════════════════════════════════════════════════ -->
+<div class="section">
+  <span class="section-title">3. _run_single_round() — GENERATION LOOP DETAIL</span>
+
+  <div class="flow">
+    <span class="flow-step flow-step-active">_create_islands(4)</span>
+    <span class="flow-arrow">→</span>
+    <span class="flow-step">for gen in generations</span>
+  </div>
+  <div class="arrow-down">▼</div>
+
+  <div style="border: 1.5px solid #000; padding: 8px; margin: 4px 0;">
+    <div class="small" style="font-weight:bold; margin-bottom:6px;">GENERATION LOOP (per generation, per island):</div>
+
+    <div class="flow">
+      <span class="flow-step">① _evaluate_population</span>
+      <span class="flow-arrow">→</span>
+      <span class="flow-step">② _post_generation_update</span>
+      <span class="flow-arrow">→</span>
+      <span class="flow-step">③ island.update_best</span>
+      <span class="flow-arrow">→</span>
+      <span class="flow-step">④ NSGA-II sort</span>
+    </div>
+    <div class="arrow-down">▼</div>
+    <div class="flow">
+      <span class="flow-step">⑤ HoF / MAP / Pareto update</span>
+      <span class="flow-arrow">→</span>
+      <span class="flow-step">⑥ Submit check</span>
+      <span class="flow-arrow">→</span>
+      <span class="flow-step">⑦ _optimize_params (if R4+)</span>
+    </div>
+    <div class="arrow-down">▼</div>
+    <div class="flow">
+      <span class="flow-step">⑧ _save_checkpoint</span>
+      <span class="flow-arrow">→</span>
+      <span class="flow-step">⑨ _migrate (every N gen)</span>
+      <span class="flow-arrow">→</span>
+      <span class="flow-step">⑩ Stagnation? → _cataclysm</span>
+      <span class="flow-arrow">→</span>
+      <span class="flow-step">⑪ _next_generation</span>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- Detailed sub-steps -->
+  <div class="row">
+    <div class="col">
+      <div class="mod">
+        <div class="mod-name">① _evaluate_population</div>
+        1. Filter unevaluated individuals<br>
+        2. Surrogate pre-filter (if ready):<br>
+        &nbsp;&nbsp; predict(expr) → keep top 60%<br>
+        &nbsp;&nbsp; + 10% random from bottom<br>
+        3. Batch simulate via API:<br>
+        &nbsp;&nbsp; BATCH_SIZE=40, concurrent=5<br>
+        4. Map results by expression<br>
+        5. ind.evaluate() → iqc_score<br>
+        6. surrogate.add_sample()
+      </div>
+      <div class="mod">
+        <div class="mod-name">② _post_generation_update</div>
+        Process pending_children from<br>
+        previous _next_generation:<br>
+        - Compare child vs parent score<br>
+        - If improved: SHADE.update(F,CR)<br>
+        - AOS.update(operator, reward)
+      </div>
+    </div>
+    <div class="col">
+      <div class="mod">
+        <div class="mod-name">④ NSGA-II Sort</div>
+        _fast_non_dominated_sort(pop):<br>
+        &nbsp; Multi-objective: (Sharpe↑,<br>
+        &nbsp; -Turnover↑, Fitness↑, -Complexity↑)<br>
+        &nbsp; → Pareto fronts F0, F1, ...<br>
+        _crowding_distance(front):<br>
+        &nbsp; Diversity preservation within front
+      </div>
+      <div class="mod">
+        <div class="mod-name">⑤ Archive Updates</div>
+        score &gt; 1.5 → Hall of Fame (top 200)<br>
+        score &gt; 0.5 → Near Misses (top 500)<br>
+        MAP-Elites: try_add(ind)<br>
+        &nbsp; key = (sharpe_bin, turnover_bin)<br>
+        &nbsp; 10×5 = 50 cells<br>
+        Pareto rank 0 → Pareto Archive
+      </div>
+    </div>
+    <div class="col">
+      <div class="mod">
+        <div class="mod-name">⑨ _migrate (Ring Topology)</div>
+        Every MIGRATION_INTERVAL gens:<br>
+        Island[i] → Island[(i+1) % 4]<br>
+        Selection: best + most diverse<br>
+        (structural_distance to dst)<br>
+        Replace worst in destination<br>
+        MIGRATION_SIZE = 3 per island
+      </div>
+      <div class="mod">
+        <div class="mod-name">⑩ _cataclysm</div>
+        Trigger: stagnation ≥ 3 gens<br>
+        1. Keep top 50% (NSGA-II order)<br>
+        2. Inject 30% from MAP-Elites<br>
+        3. Inject 15% multiline<br>
+        4. Fill rest: strategy(40%) + random<br>
+        5. Reset temperature ×2.0
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- ═══════════════════════════════════════════════════════════ -->
+<!-- SECTION 4: _next_generation() DETAIL -->
+<!-- ═══════════════════════════════════════════════════════════ -->
+<div class="section">
+  <span class="section-title">4. _next_generation() — OFFSPRING CREATION PIPELINE</span>
+
+  <div class="flow">
+    <span class="flow-step flow-step-active">Elite Preservation</span>
+    <span class="flow-arrow">→</span>
+    <span class="flow-step flow-step-active">AOS Select Operator</span>
+    <span class="flow-arrow">→</span>
+    <span class="flow-step">SHADE Sample F, CR</span>
+    <span class="flow-arrow">→</span>
+    <span class="flow-step">Parent Selection</span>
+    <span class="flow-arrow">→</span>
+    <span class="flow-step">_apply_operator</span>
+    <span class="flow-arrow">→</span>
+    <span class="flow-step">Dedup Check</span>
+    <span class="flow-arrow">→</span>
+    <span class="flow-step">Fill Remaining</span>
+  </div>
+
+  <div class="row" style="margin-top:8px;">
+    <div class="col">
+      <div class="mod">
+        <div class="mod-name">Elite Preservation</div>
+        Count = pop_size × elite_ratio<br>
+        Sort by: (-iqc_score, node_count)<br>
+        Lexicographic Parsimony:<br>
+        &nbsp; tie-break → shorter expression wins<br>
+        Deep copy + preserve metrics
+      </div>
+      <div class="mod">
+        <div class="mod-name">Parent Selection (50/50)</div>
+        50%: ε-Lexicase Selection<br>
+        &nbsp; Random objective order<br>
+        &nbsp; Filter: within ε of best<br>
+        &nbsp; Until 1 remains<br>
+        50%: NSGA-II Tournament<br>
+        &nbsp; Compare pareto_rank first<br>
+        &nbsp; Then crowding_distance
+      </div>
+    </div>
+    <div class="col">
+      <div class="mod mod-thick">
+        <div class="mod-name">10 Genetic Operators (AOS-selected)</div>
+        <table>
+          <tr><th>Operator</th><th>Type</th><th>Description</th></tr>
+          <tr><td>crossover</td><td>XO</td><td>Subtree swap (niche-selected p2)</td></tr>
+          <tr><td>semantic_crossover</td><td>XO</td><td>Semantically-guided subtree swap</td></tr>
+          <tr><td>de_crossover</td><td>XO</td><td>DE/rand/1: target + F×(donor1-donor2)</td></tr>
+          <tr><td>headless_chicken</td><td>XO</td><td>Crossover with random tree</td></tr>
+          <tr><td>mutate</td><td>MUT</td><td>Subtree replacement (σ = F×2)</td></tr>
+          <tr><td>micro_mutate</td><td>MUT</td><td>Constant/window perturbation</td></tr>
+          <tr><td>hoist</td><td>MUT</td><td>Promote subtree to root (simplify)</td></tr>
+          <tr><td>shrink</td><td>MUT</td><td>Replace subtree with leaf</td></tr>
+          <tr><td>multiline_crossover</td><td>ML-XO</td><td>Variable-level crossover</td></tr>
+          <tr><td>multiline_mutate</td><td>ML-MUT</td><td>Variable replacement/addition</td></tr>
+        </table>
+      </div>
+    </div>
+    <div class="col" style="flex:0.6">
+      <div class="mod">
+        <div class="mod-name">SHADE Parameter Tracking</div>
+        For each child:<br>
+        &nbsp; Record (child, parent_score,<br>
+        &nbsp;&nbsp; F, CR, op_name)<br>
+        → pending_children list<br>
+        <br>
+        Next gen evaluation:<br>
+        &nbsp; If child.score &gt; parent_score:<br>
+        &nbsp;&nbsp; success_F.append(F)<br>
+        &nbsp;&nbsp; success_CR.append(CR)<br>
+        &nbsp;&nbsp; improvement = delta<br>
+        → SHADE.update(weighted Lehmer)
+      </div>
+      <div class="mod">
+        <div class="mod-name">Dedup + Fill</div>
+        seen_exprs: set[str]<br>
+        Skip if expression exists<br>
+        max_attempts = pop_size × 5<br>
+        Shortfall → rand_tree fill<br>
+        Last resort → allow duplicates
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════ -->
+<!-- SECTION 5: ISLAND MODEL TOPOLOGY -->
+<!-- ═══════════════════════════════════════════════════════════ -->
+<div class="section">
+  <span class="section-title">5. ISLAND MODEL — 4 ISLANDS × RING TOPOLOGY</span>
+
+  <div class="island-grid">
+    <div class="island-box">
+      <div class="isl-title">Island 0 — Explorer</div>
+      Strategy: random=0.7, template=0.2, evolved=0.1<br>
+      Role: Maximum diversity, broad search<br>
+      Own SHADE memory + Own AOS<br>
+      Stagnation counter (→ cataclysm at ≥3)
+    </div>
+    <div class="island-box">
+      <div class="isl-title">Island 1 — Exploiter</div>
+      Strategy: evolved=0.7, template=0.2, random=0.1<br>
+      Role: Refine best-known solutions<br>
+      Own SHADE memory + Own AOS<br>
+      Stagnation counter (→ cataclysm at ≥3)
+    </div>
+    <div class="island-box">
+      <div class="isl-title">Island 2 — MAP-Elites + Multiline</div>
+      Strategy: map_elites=0.3, template=0.3, random=0.2, evolved=0.2<br>
+      Role: Archive-seeded + Regular Expression<br>
+      Own SHADE memory + Own AOS<br>
+      Stagnation counter (→ cataclysm at ≥3)
+    </div>
+    <div class="island-box">
+      <div class="isl-title">Island 3 — Balanced</div>
+      Strategy: inherits round config strategy_mix<br>
+      Role: Default balanced evolution<br>
+      Own SHADE memory + Own AOS<br>
+      Stagnation counter (→ cataclysm at ≥3)
+    </div>
+  </div>
+
+  <div class="center small" style="margin: 8px 0;">
+    <strong>Migration Ring:</strong>
+    Island 0 ──(best+diverse)──▶ Island 1 ──▶ Island 2 ──▶ Island 3 ──▶ Island 0<br>
+    <span class="muted">Every MIGRATION_INTERVAL generations | MIGRATION_SIZE=3 individuals per transfer</span><br>
+    <span class="muted">Selection: 1 best + (N-1) most structurally distant from destination (Multikulti policy)</span>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════ -->
+<!-- SECTION 6: 7-ROUND EVOLUTION STRATEGY -->
+<!-- ═══════════════════════════════════════════════════════════ -->
+<div class="section">
+  <span class="section-title">6. 7-ROUND EVOLUTION STRATEGY (ROUND_CONFIGS)</span>
+
+  <div class="row">
+    <div class="col">
+      <div class="round-card">
+        <div class="round-header">
+          R1: Wide Scan (광범위 탐색)
+          <span class="round-params">pop=200 gen=5 depth≤3</span>
+        </div>
+        <div class="round-body">
+          <ol>
+            <li>random=0.6, template=0.4</li>
+            <li>elite=5%, mutation=0.5, crossover=0.3</li>
+            <li>tournament=3, no param_search</li>
+            <li>Goal: Screen diverse expressions fast</li>
+            <li>Output → HoF seeds for R2</li>
+          </ol>
+        </div>
+      </div>
+      <div class="round-card">
+        <div class="round-header">
+          R2: Pattern Focus (패턴 집중)
+          <span class="round-params">pop=150 gen=8 depth≤4</span>
+        </div>
+        <div class="round-body">
+          <ol>
+            <li>evolved=0.5, template=0.3, random=0.2</li>
+            <li>elite=10%, mutation=0.4, crossover=0.5</li>
+            <li>tournament=5, no param_search</li>
+            <li>Goal: Focus on promising patterns from R1</li>
+            <li>PatternLearner active (learned seeds)</li>
+          </ol>
+        </div>
+      </div>
+      <div class="round-card">
+        <div class="round-header">
+          R3: Crossover Boost (교배 강화)
+          <span class="round-params">pop=120 gen=10 depth≤5</span>
+        </div>
+        <div class="round-body">
+          <ol>
+            <li>evolved=0.7, template=0.2, random=0.1</li>
+            <li>elite=15%, mutation=0.25, crossover=0.7</li>
+            <li>tournament=7, no param_search</li>
+            <li>Goal: Aggressive recombination of good alphas</li>
+            <li>High crossover rate → novel combinations</li>
+          </ol>
+        </div>
+      </div>
+    </div>
+    <div class="col">
+      <div class="round-card">
+        <div class="round-header">
+          R4: Param Tuning (파라미터 최적화)
+          <span class="round-params">pop=60 gen=5 depth≤5</span>
+        </div>
+        <div class="round-body">
+          <ol>
+            <li>evolved=0.9, random=0.1</li>
+            <li>elite=20%, mutation=0.15, crossover=0.4</li>
+            <li>tournament=5, param_search=ON</li>
+            <li>_optimize_params: decay/neutral/trunc</li>
+            <li>Grid search on top-3 submittable</li>
+          </ol>
+        </div>
+      </div>
+      <div class="round-card">
+        <div class="round-header">
+          R5: Multi-Region (멀티 리전 확장)
+          <span class="round-params">pop=80 gen=6 depth≤5</span>
+        </div>
+        <div class="round-body">
+          <ol>
+            <li>evolved=0.6, cross_region=0.3, random=0.1</li>
+            <li>elite=15%, mutation=0.3, crossover=0.5</li>
+            <li>Uses _run_multi_region_round()</li>
+            <li>Test passing alphas in ASI/CHN/EUR/KOR</li>
+            <li>Cross-pollination across markets</li>
+          </ol>
+        </div>
+      </div>
+      <div class="round-card">
+        <div class="round-header">
+          R6: Portfolio Opt (포트폴리오 최적화)
+          <span class="round-params">pop=100 gen=8 depth≤5</span>
+        </div>
+        <div class="round-body">
+          <ol>
+            <li>evolved=0.5, decorrelation=0.3, random=0.2</li>
+            <li>elite=10%, mutation=0.4, crossover=0.5</li>
+            <li>Self-correlation minimization (&lt;0.55)</li>
+            <li>Maximize portfolio diversity</li>
+            <li>param_search=ON</li>
+          </ol>
+        </div>
+      </div>
+    </div>
+    <div class="col" style="flex:0.5">
+      <div class="round-card">
+        <div class="round-header">
+          R7: Final Polish
+          <span class="round-params">pop=50 gen=12 depth≤6</span>
+        </div>
+        <div class="round-body">
+          <ol>
+            <li>evolved=0.95, random=0.05</li>
+            <li>elite=25%, mut=0.10, xo=0.3</li>
+            <li>tournament=3, param_search=ON</li>
+            <li>Fine-tune + submit best</li>
+            <li>Highest elite ratio</li>
+          </ol>
+        </div>
+      </div>
+
+      <div class="divider"></div>
+      <div class="mod" style="margin-top:6px;">
+        <div class="mod-name">Post-R7: Field Explorer</div>
+        _explore_new_fields():<br>
+        1. Fetch BRAIN field catalog<br>
+        2. Group by category<br>
+        3. Generate alphas with novel fields<br>
+        4. Evaluate + submit if passing
+      </div>
+
+      <div class="divider"></div>
+      <div class="small">
+        <strong>Inter-Round Data Flow:</strong><br>
+        R(n) → R(n+1):<br>
+        &nbsp; HoF individuals (evolved seed)<br>
+        &nbsp; MAP-Elites archive (diversity)<br>
+        &nbsp; Pareto archive (multi-obj)<br>
+        &nbsp; Near misses (0.5&lt;score&lt;1.5)<br>
+        &nbsp; SHADE memory (F, CR history)<br>
+        &nbsp; AOS stats (operator rewards)<br>
+        &nbsp; Surrogate training data<br>
+        &nbsp; Pattern learner frequencies
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- ═══════════════════════════════════════════════════════════ -->
+<!-- SECTION 7: ALGORITHM DETAIL BOXES -->
+<!-- ═══════════════════════════════════════════════════════════ -->
+<div class="section">
+  <span class="section-title">7. CORE ALGORITHM DETAILS</span>
+
+  <div class="row">
+    <div class="col">
+      <div class="mod mod-thick">
+        <div class="mod-name">SHADE (Success-History Adaptive DE)</div>
+        Memory: H=10 slots for F and CR<br>
+        <br>
+        <strong>Sample F:</strong> Cauchy(μ=M_F[rand], σ=0.1)<br>
+        &nbsp; Clamp to (0, 1], retry up to 100×<br>
+        <strong>Sample CR:</strong> Gauss(μ=M_CR[rand], σ=0.1)<br>
+        &nbsp; Clamp to [0, 1]<br>
+        <br>
+        <strong>Update (on success):</strong><br>
+        &nbsp; weights[i] = improvement[i] / Σimprovement<br>
+        &nbsp; M_F[k] = Σ(w·F²) / Σ(w·F) &nbsp;(Lehmer mean)<br>
+        &nbsp; M_CR[k] = Σ(w·CR) &nbsp;(weighted arithmetic)<br>
+        &nbsp; k = (k+1) % H<br>
+        <br>
+        <span class="muted">Each island has independent SHADE memory</span>
+      </div>
+
+      <div class="mod mod-thick">
+        <div class="mod-name">ε-Lexicase Selection</div>
+        Objectives: (Sharpe, -TO, Fitness, -Complexity)<br>
+        <br>
+        1. Shuffle objective order randomly<br>
+        2. For each objective:<br>
+        &nbsp;&nbsp; best = max(candidates, obj)<br>
+        &nbsp;&nbsp; threshold = best - ε (ε=0.1)<br>
+        &nbsp;&nbsp; candidates = [c if c.obj ≥ threshold]<br>
+        3. If |candidates| == 1: return it<br>
+        4. If all objectives exhausted: random pick<br>
+        <br>
+        <span class="muted">Used 50% of the time; other 50% = NSGA-II tournament</span>
+      </div>
+    </div>
+
+    <div class="col">
+      <div class="mod mod-thick">
+        <div class="mod-name">MAP-Elites Archive</div>
+        Grid: sharpe_bins=10 × turnover_bins=5 = 50 cells<br>
+        <br>
+        <strong>Behavior Descriptor:</strong><br>
+        &nbsp; s_bin = clamp(int((sharpe+1)×2), 0, 9)<br>
+        &nbsp; t_bin = clamp(int(turnover×5), 0, 4)<br>
+        <br>
+        <strong>try_add(ind):</strong><br>
+        &nbsp; key = (s_bin, t_bin)<br>
+        &nbsp; if key not in grid OR ind.score &gt; grid[key].score:<br>
+        &nbsp;&nbsp;&nbsp; grid[key] = ind → True<br>
+        <br>
+        <strong>sample(n):</strong> random.sample(grid.values(), n)<br>
+        <strong>coverage():</strong> len(grid) / 50<br>
+        <br>
+        <strong>Usage:</strong><br>
+        &nbsp; • Cataclysm seed injection (30%)<br>
+        &nbsp; • Island 2 population seeding<br>
+        &nbsp; • Diversity metric tracking
+      </div>
+
+      <div class="mod mod-thick">
+        <div class="mod-name">UCB1 Adaptive Operator Selection (AOS)</div>
+        Operators: 10 genetic operators<br>
+        Window: 80 recent rewards per operator<br>
+        <br>
+        <strong>UCB1 Score:</strong><br>
+        &nbsp; avg_reward = mean(recent_rewards[op])<br>
+        &nbsp; exploration = √(2·ln(total) / count[op])<br>
+        &nbsp; UCB = avg_reward + 0.5 × exploration<br>
+        <br>
+        <strong>Select:</strong> argmax(UCB) over all operators<br>
+        &nbsp; (ensure each op used ≥1 time first)<br>
+        <strong>Update:</strong> reward = child.score - parent.score<br>
+        <br>
+        <span class="muted">Each island has independent AOS</span>
+      </div>
+    </div>
+
+    <div class="col">
+      <div class="mod mod-thick">
+        <div class="mod-name">NSGA-II Multi-Objective Sorting</div>
+        <strong>4 Objectives:</strong><br>
+        &nbsp; 1. Sharpe ratio ↑<br>
+        &nbsp; 2. -Turnover ↑ (lower TO better)<br>
+        &nbsp; 3. Fitness ↑<br>
+        &nbsp; 4. -Complexity ↑ (fewer nodes better)<br>
+        <br>
+        <strong>_fast_non_dominated_sort:</strong><br>
+        &nbsp; For each pair (a, b):<br>
+        &nbsp;&nbsp; a dominates b if all obj(a) ≥ obj(b)<br>
+        &nbsp;&nbsp; and at least one strict &gt;<br>
+        &nbsp; Assign fronts: F0 (non-dominated),<br>
+        &nbsp; F1 (dominated by F0 only), ...<br>
+        <br>
+        <strong>_crowding_distance:</strong><br>
+        &nbsp; For each front, per objective:<br>
+        &nbsp;&nbsp; Sort by objective value<br>
+        &nbsp;&nbsp; Boundary = ∞<br>
+        &nbsp;&nbsp; Interior = (obj[i+1]-obj[i-1]) / range<br>
+        &nbsp; Sum across objectives<br>
+        <br>
+        <strong>Sort key:</strong> (pareto_rank↑, -crowding_dist↑)
+      </div>
+
+      <div class="mod mod-thick">
+        <div class="mod-name">Simulated Annealing (SA)</div>
+        Temperature: T ∈ [0.1, 1.0]<br>
+        <br>
+        <strong>_cool_temperature:</strong><br>
+        &nbsp; T = 0.1 + 0.9 × (1 - gen/total_gen)<br>
+        <br>
+        <strong>_sa_accept:</strong><br>
+        &nbsp; If new &gt; old: always accept<br>
+        &nbsp; Else: accept with P = e^((new-old)/T)<br>
+        <br>
+        <strong>Cataclysm reset:</strong><br>
+        &nbsp; T = min(1.0, T × 2.0)
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════ -->
+<!-- SECTION 8: SURROGATE MODEL & PATTERN LEARNER DETAIL -->
+<!-- ═══════════════════════════════════════════════════════════ -->
+<div class="section">
+  <span class="section-title">8. V4 MODULES — SURROGATE MODEL & PATTERN LEARNER</span>
+
+  <div class="row">
+    <div class="col">
+      <div class="mod mod-thick">
+        <div class="mod-name">Surrogate Model (surrogate.py)</div>
+        <strong>Purpose:</strong> Predict Sharpe from expression structure<br>
+        → Filter out low-quality candidates before API call<br>
+        <br>
+        <strong>Feature Vector (20-dim):</strong><br>
+        <table>
+          <tr><th>#</th><th>Feature</th></tr>
+          <tr><td>1-2</td><td>expr length, parenthesis count</td></tr>
+          <tr><td>3-5</td><td>ts_op count, rank count, group_op count</td></tr>
+          <tr><td>6-9</td><td>+, -, *, / counts</td></tr>
+          <tr><td>10-12</td><td>window mean, max, min</td></tr>
+          <tr><td>13</td><td>unique field count</td></tr>
+          <tr><td>14</td><td>is_multiline (0/1)</td></tr>
+          <tr><td>15-20</td><td>pattern flags: decay_linear, zscore,<br>corr, group_neutralize, regression</td></tr>
+        </table>
+        <br>
+        <strong>Backend:</strong> XGBoost (if installed) / Ridge Regression<br>
+        <strong>Training:</strong> Every 50 new samples, min_samples=30<br>
+        <strong>Filter:</strong> Keep top 60% + 10% random from bottom
+      </div>
+    </div>
+    <div class="col">
+      <div class="mod mod-thick">
+        <div class="mod-name">Pattern Learner (pattern_learner.py)</div>
+        <strong>Purpose:</strong> Extract common patterns from successful alphas<br>
+        → Generate higher-quality initial populations<br>
+        <br>
+        <strong>Tracked Frequencies:</strong><br>
+        &nbsp; field_freq: Counter (weighted by score)<br>
+        &nbsp; op_freq: Counter<br>
+        &nbsp; ts_op_freq: Counter<br>
+        &nbsp; window_freq: Counter<br>
+        &nbsp; bigram_freq: Counter (parent→child op pairs)<br>
+        <br>
+        <strong>generate_learned_tree():</strong><br>
+        &nbsp; 30% chance: pure random (diversity)<br>
+        &nbsp; 35%: ts_op from top_operators + learned window<br>
+        &nbsp; 20%: rank/neutralize from top_operators<br>
+        &nbsp; 15%: arithmetic combination<br>
+        &nbsp; Leaf: 70% top_field, 30% random constant<br>
+        <br>
+        <strong>Trigger:</strong> After each round, analyze new HoF entries<br>
+        <strong>Input:</strong> {expression, iqc_score} from Hall of Fame
+      </div>
+    </div>
+    <div class="col" style="flex:0.6">
+      <div class="mod mod-thick">
+        <div class="mod-name">Field Explorer (field_explorer.py)</div>
+        <strong>Purpose:</strong> Discover novel BRAIN data fields<br>
+        <br>
+        <strong>Flow:</strong><br>
+        1. Fetch field catalog from BRAIN API<br>
+        2. Group by category<br>
+        3. Identify under-explored fields<br>
+        4. Generate alphas using novel fields<br>
+        5. Evaluate and submit if passing<br>
+        <br>
+        <strong>Trigger:</strong> After all 7 rounds complete<br>
+        (_explore_new_fields)
+      </div>
+
+      <div class="mod">
+        <div class="mod-name">Data Flow Summary</div>
+        <div class="data-flow">
+          <span class="data-box">API Result</span>
+          <span class="data-arrow">──▶</span>
+          <span class="data-box">Surrogate</span>
+        </div>
+        <div class="data-flow">
+          <span class="data-box">HoF</span>
+          <span class="data-arrow">──▶</span>
+          <span class="data-box">PatternLearner</span>
+        </div>
+        <div class="data-flow">
+          <span class="data-box">PatternLearner</span>
+          <span class="data-arrow">──▶</span>
+          <span class="data-box">_create_population</span>
+        </div>
+        <div class="data-flow">
+          <span class="data-box">Surrogate</span>
+          <span class="data-arrow">──▶</span>
+          <span class="data-box">_evaluate_pop</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- ═══════════════════════════════════════════════════════════ -->
+<!-- SECTION 9: INDIVIDUAL & EXPRESSION PIPELINE -->
+<!-- ═══════════════════════════════════════════════════════════ -->
+<div class="section">
+  <span class="section-title">9. INDIVIDUAL LIFECYCLE & EXPRESSION PIPELINE</span>
+
+  <div class="row">
+    <div class="col">
+      <div class="mod">
+        <div class="mod-name">Individual (16 __slots__)</div>
+        <table>
+          <tr><th>Field</th><th>Type</th><th>Description</th></tr>
+          <tr><td>tree</td><td>Node</td><td>AST representation</td></tr>
+          <tr><td>expression</td><td>str</td><td>FastExpr or Regular</td></tr>
+          <tr><td>settings</td><td>dict</td><td>decay, neutral, trunc, region</td></tr>
+          <tr><td>metrics</td><td>dict|None</td><td>sharpe, fitness, turnover, ...</td></tr>
+          <tr><td>iqc_score</td><td>float</td><td>Composite score (penalized)</td></tr>
+          <tr><td>alpha_id</td><td>str|None</td><td>BRAIN alpha ID</td></tr>
+          <tr><td>simulated</td><td>bool</td><td>API evaluation done?</td></tr>
+          <tr><td>submitted</td><td>bool</td><td>Submitted to BRAIN?</td></tr>
+          <tr><td>pareto_rank</td><td>int</td><td>NSGA-II front index</td></tr>
+          <tr><td>crowding_distance</td><td>float</td><td>NSGA-II diversity</td></tr>
+          <tr><td>age</td><td>int</td><td>Generations survived</td></tr>
+          <tr><td>island_id</td><td>int</td><td>Home island</td></tr>
+          <tr><td>birth_operator</td><td>str</td><td>Which genetic op created it</td></tr>
+          <tr><td>is_multiline</td><td>bool</td><td>Regular Expression?</td></tr>
+        </table>
+      </div>
+    </div>
+    <div class="col">
+      <div class="mod">
+        <div class="mod-name">Expression Generation Pipeline</div>
+        <div class="flow">
+          <span class="flow-step">Node tree</span>
+          <span class="flow-arrow">→</span>
+          <span class="flow-step">is_multiline?</span>
+        </div>
+        <br>
+        <strong>If multiline (Regular Expression):</strong>
+        <div class="flow">
+          <span class="flow-step">to_regular()</span>
+          <span class="flow-arrow">→</span>
+          <span class="flow-step">_validate_regular()</span>
+          <span class="flow-arrow">→</span>
+          <span class="flow-step">Pass? Use it</span>
+        </div>
+        <div class="flow">
+          <span class="flow-step" style="visibility:hidden">to_regular()</span>
+          <span class="flow-arrow" style="visibility:hidden">→</span>
+          <span class="flow-step">_validate_regular()</span>
+          <span class="flow-arrow">→</span>
+          <span class="flow-step">Fail? → to_expr() fallback</span>
+        </div>
+        <br>
+        <strong>If single-line (FastExpression):</strong>
+        <div class="flow">
+          <span class="flow-step">to_expr()</span>
+          <span class="flow-arrow">→</span>
+          <span class="flow-step">Direct use</span>
+        </div>
+        <br>
+        <strong>Validation checks:</strong><br>
+        &nbsp; • Empty lines<br>
+        &nbsp; • Semicolons on assignments<br>
+        &nbsp; • Parentheses balance<br>
+        &nbsp; • Empty-arg function calls<br>
+        &nbsp; • Undefined variable references<br>
+        &nbsp; • Unused defined variables
+      </div>
+    </div>
+    <div class="col" style="flex:0.7">
+      <div class="mod">
+        <div class="mod-name">IQC Score Computation</div>
+        <strong>evaluate():</strong><br>
+        raw = AlphaEvaluator.compute_iqc_score(<br>
+        &nbsp;&nbsp; metrics, delay, expression)<br>
+        <br>
+        <strong>Complexity Penalty:</strong><br>
+        nc = tree.node_count()<br>
+        penalty = 1/(1 + e^(-0.3×(nc-20)))<br>
+        score = raw × (1 - 0.15 × penalty)<br>
+        <br>
+        <span class="muted">Sigmoid penalty: minimal for nc&lt;15,<br>
+        ~7.5% at nc=20, ~15% for nc&gt;30</span>
+      </div>
+      <div class="mod">
+        <div class="mod-name">Submission Pipeline</div>
+        <div class="flow">
+          <span class="flow-step">is_submittable()?</span>
+          <span class="flow-arrow">→</span>
+          <span class="flow-step">IS Check</span>
+        </div>
+        <div class="flow">
+          <span class="flow-arrow">→</span>
+          <span class="flow-step">_try_submit()</span>
+          <span class="flow-arrow">→</span>
+          <span class="flow-step">api.submit_alpha()</span>
+        </div>
+        <br>
+        <strong>IS Check (delay=1):</strong><br>
+        Sharpe ≥ 0.58, Fitness ≥ 1.0<br>
+        Turnover ≤ 0.70, Returns &gt; 0<br>
+        Drawdown &gt; -0.50, Margin ≥ 0.0003<br>
+        Long ≥ 50, Short ≥ 50<br>
+        Self-Correlation &lt; 0.55
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════ -->
+<!-- SECTION 10: CHECKPOINT & PERSISTENCE -->
+<!-- ═══════════════════════════════════════════════════════════ -->
+<div class="section">
+  <span class="section-title">10. CHECKPOINT, PERSISTENCE & RECOVERY</span>
+
+  <div class="row">
+    <div class="col">
+      <div class="mod mod-double">
+        <div class="mod-name">_save_checkpoint(rnd, region)</div>
+        File: results/checkpoint.json<br>
+        <br>
+        Contents:<br>
+        &nbsp; last_round: int<br>
+        &nbsp; last_region: str (e.g. "USA/TOP3000/d1")<br>
+        &nbsp; hall_of_fame: [{expr, score, metrics}]<br>
+        &nbsp; near_misses: [{expr, score}]<br>
+        &nbsp; submitted: [{expr, alpha_id}]<br>
+        &nbsp; map_elites: {key: {expr, score}}<br>
+        &nbsp; pareto_archive: [{expr, score, metrics}]<br>
+        &nbsp; round_history: [...]<br>
+        &nbsp; surrogate_samples: int<br>
+        &nbsp; timestamp: ISO datetime
+      </div>
+    </div>
+    <div class="col">
+      <div class="mod mod-double">
+        <div class="mod-name">_save_final()</div>
+        Files saved to results/:<br>
+        &nbsp; hall_of_fame.json<br>
+        &nbsp; submitted_alphas.json<br>
+        &nbsp; near_misses.json<br>
+        &nbsp; pareto_archive.json<br>
+        &nbsp; round_history.json<br>
+        &nbsp; map_elites_archive.json<br>
+        &nbsp; pattern_stats.json<br>
+        &nbsp; surrogate_stats.json
+      </div>
+      <div class="mod">
+        <div class="mod-name">_load_previous()</div>
+        On startup:<br>
+        1. Load checkpoint.json<br>
+        2. Restore HoF, MAP, Pareto, etc.<br>
+        3. Set resume_round, resume_region<br>
+        4. Rebuild seen_exprs set<br>
+        5. Inject HoF into PatternLearner
+      </div>
+    </div>
+    <div class="col" style="flex:0.7">
+      <div class="mod">
+        <div class="mod-name">Resume Logic</div>
+        <div class="flow">
+          <span class="flow-step">checkpoint exists?</span>
+          <span class="flow-arrow">→</span>
+          <span class="flow-step">same region?</span>
+        </div>
+        <div class="flow">
+          <span class="flow-arrow">→</span>
+          <span class="flow-step">skip rounds &lt; resume_round</span>
+        </div>
+        <br>
+        Region match: exact match OR empty string<br>
+        Applied once, then reset to None
+      </div>
+      <div class="mod">
+        <div class="mod-name">Error Recovery (main.py)</div>
+        On exception during cycle:<br>
+        1. Print error, wait 60s<br>
+        2. Try api._ensure_session()<br>
+        3. If fail: new BrainAPI() instance<br>
+        4. If still fail: wait 120s, retry<br>
+        5. engine.reset_for_next_cycle()<br>
+        6. Continue to next region
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════ -->
+<!-- SECTION 11: SEARCH SPACES & BRAIN API INTERACTION -->
+<!-- ═══════════════════════════════════════════════════════════ -->
+<div class="section">
+  <span class="section-title">11. SEARCH SPACES & BRAIN API INTERACTION</span>
+
+  <div class="row">
+    <div class="col">
+      <table>
+        <tr><th>Region</th><th>Universe</th><th>Delay</th><th>Priority</th><th>Neutralization</th></tr>
+        <tr><td>USA</td><td>TOP3000</td><td>1</td><td>1</td><td>SUBINDUSTRY</td></tr>
+        <tr><td>USA</td><td>TOP500</td><td>1</td><td>2</td><td>SUBINDUSTRY</td></tr>
+        <tr><td>ASI</td><td>TOP1500</td><td>1</td><td>1</td><td>INDUSTRY</td></tr>
+        <tr><td>CHN</td><td>TOP2000</td><td>1</td><td>1</td><td>INDUSTRY</td></tr>
+        <tr><td>KOR</td><td>TOP500</td><td>1</td><td>2</td><td>INDUSTRY</td></tr>
+        <tr><td>JPN</td><td>TOP500</td><td>1</td><td>2</td><td>INDUSTRY</td></tr>
+        <tr><td>TWN</td><td>TOP500</td><td>1</td><td>3</td><td>SECTOR</td></tr>
+        <tr><td>EUR</td><td>TOP1200</td><td>1</td><td>2</td><td>INDUSTRY</td></tr>
+        <tr><td>GLB</td><td>TOP3000</td><td>1</td><td>3</td><td>MARKET</td></tr>
+        <tr><td>USA</td><td>TOP3000</td><td>0</td><td>3</td><td>SUBINDUSTRY</td></tr>
+        <tr><td>ASI</td><td>TOP1500</td><td>0</td><td>3</td><td>INDUSTRY</td></tr>
+      </table>
+    </div>
+    <div class="col">
+      <div class="mod mod-dashed">
+        <div class="mod-name">BRAIN API Interaction Flow</div>
+        <div class="flow">
+          <span class="flow-step">start_session()</span>
+          <span class="flow-arrow">→</span>
+          <span class="flow-step">Biometric Auth (stdin)</span>
+        </div>
+        <div class="arrow-down">▼</div>
+        <div class="flow">
+          <span class="flow-step">simulate_batch(items, c=5, m=5)</span>
+        </div>
+        <div class="arrow-down">▼</div>
+        <div class="flow">
+          <span class="flow-step">ACE API concurrent pipeline</span>
+        </div>
+        <div class="arrow-down">▼</div>
+        <div class="flow">
+          <span class="flow-step">parse_batch_result()</span>
+          <span class="flow-arrow">→</span>
+          <span class="flow-step">metrics dict</span>
+        </div>
+        <div class="arrow-down">▼</div>
+        <div class="flow">
+          <span class="flow-step">submit_alpha(alpha_id)</span>
+          <span class="flow-arrow">→</span>
+          <span class="flow-step">OS Check + Self-Corr</span>
+        </div>
+        <br>
+        <strong>Session lifecycle:</strong><br>
+        ~3 hours → expiry → re-auth needed<br>
+        "Gone" error = link expired, press key<br>
+        <br>
+        <strong>Batch config:</strong><br>
+        check_submission=True, check_self_corr=True
+      </div>
+    </div>
+    <div class="col" style="flex:0.6">
+      <div class="mod">
+        <div class="mod-name">_build_settings(space)</div>
+        <table>
+          <tr><th>Param</th><th>Source</th></tr>
+          <tr><td>region</td><td>space["region"]</td></tr>
+          <tr><td>universe</td><td>space["universe"]</td></tr>
+          <tr><td>delay</td><td>space["delay"]</td></tr>
+          <tr><td>decay</td><td>random from PARAM_RANGES</td></tr>
+          <tr><td>neutralization</td><td>REGION_CONFIGS pref</td></tr>
+          <tr><td>truncation</td><td>random from PARAM_RANGES</td></tr>
+          <tr><td>language</td><td>FASTEXPR / REGULAR</td></tr>
+          <tr><td>pasteurization</td><td>ON</td></tr>
+          <tr><td>unitHandling</td><td>VERIFY</td></tr>
+        </table>
+      </div>
+      <div class="mod">
+        <div class="mod-name">_optimize_params</div>
+        Grid search on top-3 submittable:<br>
+        decay: [0,2,4,6,8,10,12,15]<br>
+        neutralization: [SUBIND, IND, SEC, MKT, NONE]<br>
+        truncation: [0.01, 0.03, 0.05, 0.08, 0.10]<br>
+        → Re-simulate best combos
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════ -->
+<!-- SECTION 12: COMPLETE DATA FLOW DIAGRAM -->
+<!-- ═══════════════════════════════════════════════════════════ -->
+<div class="section">
+  <span class="section-title">12. COMPLETE DATA FLOW — END TO END</span>
+
+  <div style="font-family: 'Courier New', monospace; font-size: 10px; line-height: 1.8; white-space: pre;">
+┌─────────────────────────────────────────────────────────────────────────────────────────┐
+│                                    main.py (CLI)                                        │
+│  argparse → region, rounds, submit, population, loop, cooldown, dashboard               │
+└────────────────────────────────────────┬────────────────────────────────────────────────┘
+                                         │
+                                         ▼
+┌─────────────────────────────────────────────────────────────────────────────────────────┐
+│  BrainAPI()  ←──── ACE API [Gold] ←──── Biometric Auth (stdin)                          │
+│  └─ start_session() → simulate_batch() → parse_batch_result() → submit_alpha()          │
+└────────────────────────────────────────┬────────────────────────────────────────────────┘
+                                         │
+                                         ▼
+┌─────────────────────────────────────────────────────────────────────────────────────────┐
+│  EvolutionEngine(api)                                                                   │
+│  ├─ _load_previous() ←── results/checkpoint.json                                        │
+│  ├─ PatternLearner.analyze(HoF)                                                         │
+│  ├─ FieldExplorer.load_fields()                                                         │
+│  └─ SurrogateModel (min_samples=30)                                                     │
+└────────────────────────────────────────┬────────────────────────────────────────────────┘
+                                         │
+                    ┌────────────────────┼────────────────────┐
+                    ▼                    ▼                    ▼
+          ┌─────────────────┐  ┌─────────────────┐  ┌─────────────────┐
+          │  Round 1-4, 6-7 │  │    Round 5      │  │  Field Explorer │
+          │ _run_single_rnd │  │ _run_multi_rgn  │  │ _explore_new    │
+          └────────┬────────┘  └────────┬────────┘  └────────┬────────┘
+                   │                    │                     │
+                   ▼                    ▼                     ▼
+          ┌──────────────────────────────────────────────────────────────┐
+          │  _create_islands(4) → [Island0, Island1, Island2, Island3]  │
+          │  Each: population + SHADEMemory + AOS                       │
+          └──────────────────────────────┬───────────────────────────────┘
+                                         │
+                                         ▼
+          ┌──────────────────────────────────────────────────────────────┐
+          │  GENERATION LOOP                                            │
+          │  ┌──────────────────────────────────────────────────────┐   │
+          │  │ Per Island:                                          │   │
+          │  │  _evaluate_population ──┬── Surrogate filter (60%)  │   │
+          │  │                         └── API batch simulate      │   │
+          │  │  _post_generation_update (SHADE + AOS feedback)     │   │
+          │  │  island.update_best → stagnation tracking           │   │
+          │  │  NSGA-II sort → pareto_rank + crowding_distance     │   │
+          │  └──────────────────────────────────────────────────────┘   │
+          │                         │                                   │
+          │                         ▼                                   │
+          │  ┌──────────────────────────────────────────────────────┐   │
+          │  │ Global Updates:                                      │   │
+          │  │  score>1.5 → HoF    score>0.5 → Near Miss           │   │
+          │  │  MAP-Elites.try_add    Pareto Archive (rank 0)       │   │
+          │  │  Submittable? → _try_submit → api.submit_alpha       │   │
+          │  │  param_search? → _optimize_params (grid search)      │   │
+          │  └──────────────────────────────────────────────────────┘   │
+          │                         │                                   │
+          │                         ▼                                   │
+          │  _save_checkpoint ── _migrate (ring) ── _cataclysm?        │
+          │                         │                                   │
+          │                         ▼                                   │
+          │  ┌──────────────────────────────────────────────────────┐   │
+          │  │ _next_generation:                                    │   │
+          │  │  Elite preserve → AOS select op → SHADE sample F,CR │   │
+          │  │  Parent: ε-Lexicase(50%) / NSGA-II tournament(50%)  │   │
+          │  │  _apply_operator → dedup → pending_children          │   │
+          │  └──────────────────────────────────────────────────────┘   │
+          └──────────────────────────────────────────────────────────────┘
+                                         │
+                                         ▼
+          ┌──────────────────────────────────────────────────────────────┐
+          │  Post-Round: PatternLearner.analyze(new HoF entries)        │
+          │  Post-All:   _explore_new_fields → _save_final → summary    │
+          └──────────────────────────────────────────────────────────────┘
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════ -->
+<!-- FOOTER -->
+<!-- ═══════════════════════════════════════════════════════════ -->
+<div style="border-top: 2px solid #000; margin-top: 20px; padding-top: 8px; font-size: 9px; color: #666; text-align: center;">
+  WorldQuant BRAIN Alpha Evolution v4 — System Architecture Diagram<br>
+  Generated for internal reference. All modules: main.py, evolution.py, alpha_ast.py, brain_api.py, evaluator.py,
+  config.py, strategies.py, pattern_learner.py, surrogate.py, field_explorer.py, dashboard.py, monitor.py<br>
+  Island Model (4) + SHADE + MAP-Elites (10×5) + NSGA-II + ε-Lexicase + UCB1 AOS (10 ops) + Surrogate + Pattern Learner + Field Explorer
+</div>
+
+</body>
+</html>
