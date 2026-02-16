@@ -1171,7 +1171,31 @@ title: "WQ BRAIN Alpha Evolution"
 <!-- 7. Stagnation Escape -->
 <h2>7. 정체 탈출 메커니즘</h2>
 
-<p>3세대 연속 최고 점수가 개선되지 않으면 대격변(Cataclysm)을 발동한다. 상위 50%를 보존하고 나머지 50%를 MAP-Elites 시드 30% + 멀티라인 15% + 전략 템플릿/랜덤 55%로 교체한다. 대격변 후 SA 온도를 2배로 올려 탐색 범위를 확대한다.</p>
+<p>유전 알고리즘은 본질적으로 지역 최적해(local optimum)에 수렴하는 경향이 있다. 특히 BRAIN 알파 탐색에서는 특정 수식 패턴(예: <code>(close - low)/(high - low)</code> 계열)이 Sharpe 1.0~1.5 구간에서 정체되는 현상이 빈번하다. 이를 탈출하기 위해 3단계 정체 탈출 메커니즘을 운용한다.</p>
+
+<h3>7.1 정체 감지</h3>
+
+<p>각 섬(Island)은 <code>stagnation</code> 카운터를 보유한다. 세대가 진행될 때마다 해당 섬의 최고 IQC 점수가 이전 세대 대비 개선되지 않으면 카운터가 1 증가한다. 3세대 연속 개선이 없으면(<code>stagnation >= 3</code>) 해당 섬에 대격변(Cataclysm)이 발동된다. 정체 감지는 섬 단위로 독립적이므로, 4개 섬 중 일부만 대격변이 발동될 수 있다.</p>
+
+<h3>7.2 대격변(Cataclysm)</h3>
+
+<p>대격변은 섬 인구의 다양성을 강제로 회복시키는 메커니즘이다. 구체적인 절차는 다음과 같다:</p>
+
+<p>(1) 현재 인구를 IQC 점수 기준으로 정렬하여 상위 50%를 보존한다. 이들은 지금까지 발견된 최선의 유전 정보를 담고 있으므로 폐기하지 않는다.</p>
+
+<p>(2) 하위 50%를 새로운 개체로 교체한다. 교체 비율은 MAP-Elites 시드 30%(아카이브에서 다양한 행동 영역의 개체를 추출), 멀티라인 알파 15%(복합 수식 구조 탐색), 전략 템플릿 및 완전 랜덤 55%(새로운 탐색 영역 진입)이다.</p>
+
+<p>(3) Simulated Annealing 온도를 현재 값의 2배로 상승시킨다. 이는 열악한 자식 개체도 일시적으로 수용할 확률을 높여, 현재 수렴 영역에서 벗어나는 것을 촉진한다.</p>
+
+<p>(4) 정체 카운터를 0으로 리셋한다.</p>
+
+<h3>7.3 이주(Migration)</h3>
+
+<p>대격변과 별도로, 2세대마다 Ring Topology 이주가 발생한다. 각 섬의 상위 3개체가 인접 섬으로 이동하여 유전적 다양성을 교환한다. 4개 섬 기준 한 번의 이주에서 총 12개체가 이동한다. 이주는 대격변보다 온건한 다양성 유지 수단으로, 섬 간 정보 공유를 통해 전역 최적해 탐색을 촉진한다.</p>
+
+<h3>7.4 실전 동작 예시</h3>
+
+<p>실제 실행에서 관찰된 전형적인 정체-탈출 패턴은 다음과 같다. R1 세대 3~4에서 4개 섬 모두 Score 1.30 근처에 수렴하면, 섬0과 섬1에서 대격변이 발동된다. 대격변 후 MAP-Elites 시드에서 주입된 이질적 개체(예: 밸류 팩터 기반 수식)가 기존 모멘텀 계열 수식과 교배되어 새로운 복합 시그널이 생성된다. 이 과정에서 Score 1.3을 돌파하는 개체가 출현할 수 있다.</p>
 
 <div class="section-divider">• • •</div>
 
@@ -1544,6 +1568,43 @@ engine = EvolutionEngine(api)          <span class="cm"># 초기화: load_previo
         next_generation(pop)           <span class="cm"># AOS + SHADE + MDL 페널티 반영</span>
 explore_new_fields()                   <span class="cm"># 미사용 필드 15개 스크리닝</span>
 save_final()                           <span class="cm"># pattern_learner/surrogate/field_explorer 통계 포함</span></code></pre><div class="section-divider">• • •</div>
+
+<!-- 11. Glossary -->
+<h2>11. 핵심 용어 해설</h2>
+
+<p>본 시스템의 실행 로그에 출현하는 주요 용어와 그 의미를 정리한다. 유전 프로그래밍 및 BRAIN 플랫폼 고유 용어를 포함한다.</p>
+
+<table>
+<thead>
+<tr><th>용어</th><th>의미</th></tr>
+</thead>
+<tbody>
+<tr><td>섬(Island)</td><td>독립적으로 진화하는 부분 개체군. 본 시스템은 4개 섬을 운용하며, 각 섬은 자체 SHADE 메모리와 AOS를 보유한다.</td></tr>
+<tr><td>세대(Generation)</td><td>한 번의 평가-선택-교배-변이 사이클. 라운드별로 5~12세대를 수행한다.</td></tr>
+<tr><td>이주(Migration)</td><td>2세대마다 Ring Topology로 섬 간 상위 3개체를 교환하는 다양성 유지 메커니즘.</td></tr>
+<tr><td>카타클리즘(Cataclysm)</td><td>3세대 연속 정체 시 발동. 하위 50% 개체를 MAP-Elites 시드 + 랜덤으로 교체하여 지역 최적해를 탈출한다.</td></tr>
+<tr><td>MAP-Elites</td><td>Sharpe(10구간) x Turnover(5구간) = 50셀 그리드에서 각 셀의 최고 개체만 보존하는 품질-다양성 아카이브.</td></tr>
+<tr><td>명예의 전당(Hall of Fame)</td><td>IQC 점수 1.5 이상의 우수 개체를 저장하는 엘리트 아카이브. 상위 100개만 유지.</td></tr>
+<tr><td>Surrogate 필터</td><td>경량 회귀 모델로 유망하지 않은 수식을 사전 필터링하여 BRAIN API 호출을 절약한다. 30샘플 이상 축적 시 활성화.</td></tr>
+<tr><td>IQC 점수</td><td>Sharpe, Fitness, Turnover, Returns, Drawdown을 가중 합산한 종합 품질 지표. 복잡도 페널티 적용.</td></tr>
+<tr><td>IS Check</td><td>BRAIN 플랫폼의 In-Sample Quality Check. SELF_CORRELATION, CONCENTRATED_WEIGHT, HIGH_TURNOVER 등의 기준을 통과해야 제출 가능.</td></tr>
+<tr><td>SELF_CORRELATION</td><td>이미 제출된 알파와의 상관이 높아 독립적 시그널로 인정되지 않는 경우.</td></tr>
+<tr><td>CONCENTRATED_WEIGHT</td><td>포지션이 소수 종목에 집중되어 분산이 부족한 경우.</td></tr>
+<tr><td>HIGH_TURNOVER</td><td>일일 포지션 변동이 과도하여 거래 비용 대비 수익이 불충분한 경우.</td></tr>
+<tr><td>LOW_SUB_UNIVERSE_SHARPE</td><td>하위 유니버스(시가총액 구간)에서 성과가 일관되지 않는 경우.</td></tr>
+<tr><td>PROD_CORRELATION</td><td>프로덕션 환경의 기존 알파 포트폴리오와 상관이 높은 경우.</td></tr>
+<tr><td>Trivial Alpha</td><td><code>sign(cap)</code> 등 자명한 수식. 비현실적으로 높은 Sharpe(6+)를 보이나 IS Check에서 반드시 탈락한다.</td></tr>
+<tr><td>SA 온도(Temperature)</td><td>Simulated Annealing 온도. 높을수록 열악한 자식도 수용하여 탐색 범위를 확대한다. 세대 진행에 따라 냉각.</td></tr>
+<tr><td>AOS(Adaptive Operator Selection)</td><td>UCB1 알고리즘으로 10개 유전 연산자의 선택 확률을 성과 기반으로 동적 조정.</td></tr>
+<tr><td>SHADE</td><td>Differential Evolution의 F(스케일 팩터)와 CR(교배율)을 성공 이력 기반으로 적응적 제어하는 메커니즘.</td></tr>
+<tr><td>Regular Expression</td><td>BRAIN의 멀티라인 수식 형식. 변수 할당(<code>a = expr;</code>)과 최종 수식으로 구성. 변수명은 단일 문자.</td></tr>
+<tr><td>FastExpression</td><td>BRAIN의 단일라인 수식 형식. 모든 로직이 한 줄에 표현된다.</td></tr>
+<tr><td>체크포인트(Checkpoint)</td><td>매 세대 종료 시 저장되는 상태 스냅샷. 명예의 전당, MAP-Elites, AOS 통계, 라운드 진행 정보를 포함.</td></tr>
+<tr><td>사이클(Cycle)</td><td>11개 리전을 순회하며 7라운드 진화를 수행하는 단위. <code>--region ALL</code> 모드에서 사용.</td></tr>
+</tbody>
+</table>
+
+<div class="section-divider">• • •</div>
 
 <!-- References -->
 <h2>References</h2>
