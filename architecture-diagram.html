@@ -143,7 +143,8 @@ th { background: #000; color: #fff; font-weight: bold; }
         Node (AST tree)<br>
         ├ to_expr() → FastExpr<br>
         ├ to_regular() → Regular<br>
-        ├ _validate_regular()<br>
+        ├ _validate_regular() (v2)<br>
+        ├ operator_count() / simplify()<br>
         ├ rand_tree / rand_multiline<br>
         └ 10 Genetic Operators:<br>
         <span class="tiny">crossover, semantic_xo, de_xo,<br>
@@ -327,7 +328,7 @@ th { background: #000; color: #fff; font-weight: bold; }
     <div class="small" style="font-weight:bold; margin-bottom:6px;">GENERATION LOOP (per generation, per island):</div>
 
     <div class="flow">
-      <span class="flow-step">① _evaluate_population</span>
+      <span class="flow-step">① Self-Corr Filter + _evaluate_population</span>
       <span class="flow-arrow">→</span>
       <span class="flow-step">② _post_generation_update</span>
       <span class="flow-arrow">→</span>
@@ -363,6 +364,9 @@ th { background: #000; color: #fff; font-weight: bold; }
       <div class="mod">
         <div class="mod-name">① _evaluate_population</div>
         1. Filter unevaluated individuals<br>
+        <strong>1.5. Self-Corr pre-filter:</strong><br>
+        &nbsp;&nbsp; Field Jaccard similarity &gt; 0.85<br>
+        &nbsp;&nbsp; vs HoF + submitted → skip<br>
         2. Surrogate pre-filter (if ready):<br>
         &nbsp;&nbsp; predict(expr) → keep top 60%<br>
         &nbsp;&nbsp; + 10% random from bottom<br>
@@ -444,6 +448,8 @@ th { background: #000; color: #fff; font-weight: bold; }
     <span class="flow-arrow">→</span>
     <span class="flow-step">Dedup Check</span>
     <span class="flow-arrow">→</span>
+    <span class="flow-step flow-step-active">Diversity Inject (15%)</span>
+    <span class="flow-arrow">→</span>
     <span class="flow-step">Fill Remaining</span>
   </div>
 
@@ -502,10 +508,17 @@ th { background: #000; color: #fff; font-weight: bold; }
         → SHADE.update(weighted Lehmer)
       </div>
       <div class="mod">
-        <div class="mod-name">Dedup + Fill</div>
+        <div class="mod-name">Dedup + Diversity + Fill</div>
         seen_exprs: set[str]<br>
         Skip if expression exists<br>
         max_attempts = pop_size × 5<br>
+        <br>
+        <strong>Diversity Inject (15%):</strong><br>
+        &nbsp; Detect overused fields (&gt;30% pop)<br>
+        &nbsp; Pick rare field groups<br>
+        &nbsp; Replace score=0 non-elites<br>
+        &nbsp; birth_operator = "diversity_inject"<br>
+        <br>
         Shortfall → rand_tree fill<br>
         Last resort → allow duplicates
       </div>
@@ -996,7 +1009,17 @@ th { background: #000; color: #fff; font-weight: bold; }
         &nbsp; • Parentheses balance<br>
         &nbsp; • Empty-arg function calls<br>
         &nbsp; • Undefined variable references<br>
-        &nbsp; • Unused defined variables
+        &nbsp; • Unused defined variables<br>
+        &nbsp; • Trailing/leading operators (v2)<br>
+        &nbsp; • Consecutive binary operators (v2)<br>
+        &nbsp; • Incomplete ternary (? without :) (v2)<br>
+        &nbsp; • Final line semicolon (v2)<br>
+        <br>
+        <strong>Operator Limit (64 max):</strong><br>
+        &nbsp; operator_count() → count non-leaf<br>
+        &nbsp; If &gt;64: simplify() prunes deepest<br>
+        &nbsp; Double-check: _count_expression_ops<br>
+        &nbsp; Last resort: rand_tree(depth=2)
       </div>
     </div>
     <div class="col" style="flex:0.7">
@@ -1250,7 +1273,8 @@ th { background: #000; color: #fff; font-weight: bold; }
           │  GENERATION LOOP                                            │
           │  ┌──────────────────────────────────────────────────────┐   │
           │  │ Per Island:                                          │   │
-          │  │  _evaluate_population ──┬── Surrogate filter (60%)  │   │
+          │  │  _evaluate_population ──┬── Self-Corr pre-filter  │   │
+          │  │                         ├── Surrogate filter (60%)  │   │
           │  │                         └── API batch simulate      │   │
           │  │  _post_generation_update (SHADE + AOS feedback)     │   │
           │  │  island.update_best → stagnation tracking           │   │
@@ -1274,7 +1298,8 @@ th { background: #000; color: #fff; font-weight: bold; }
           │  │ _next_generation:                                    │   │
           │  │  Elite preserve → AOS select op → SHADE sample F,CR │   │
           │  │  Parent: ε-Lexicase(50%) / NSGA-II tournament(50%)  │   │
-          │  │  _apply_operator → dedup → pending_children          │   │
+          │  │  _apply_operator → dedup → diversity inject (15%) │   │
+          │  │  → pending_children                                 │   │
           │  └──────────────────────────────────────────────────────┘   │
           └──────────────────────────────────────────────────────────────┘
                                          │
