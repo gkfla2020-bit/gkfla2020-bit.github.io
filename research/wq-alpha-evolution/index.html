@@ -265,17 +265,17 @@ title: "WQ BRAIN Alpha Evolution"
 
 <div class="abstract">
     <div class="abstract-title">Abstract</div>
-    본 글은 WorldQuant BRAIN 플랫폼의 International Quant Championship(IQC) 및 컨설턴트 프로그램을 위한 완전 자동 알파 탐색 시스템의 설계와 구현을 기술한다. 시스템은 7라운드 진화 전략을 통해 FastExpression 및 Regular Expression 기반 알파 수식을 자동 생성·시뮬레이션·제출하며, Island Model(4섬, Ring Topology 이주), ε-Lexicase Selection, SHADE 적응형 DE 파라미터 제어(H=15, Lehmer Mean), MAP-Elites 품질-다양성 아카이브(10×5 그리드), UCB1 기반 적응형 연산자 선택(10개 연산자) 등 최신 진화 연산 기법을 통합한다. 영속적 체크포인트 시스템을 도입하여 크래시 복구 및 누적 진화를 지원하고, 멀티라인 Regular Expression, 확장 데이터셋, 36개 복합 전략 시드, Self-Correlation 회피 전략 등을 포함한다.
+    본 글은 WorldQuant BRAIN 플랫폼의 International Quant Championship(IQC) 및 컨설턴트 프로그램을 위한 완전 자동 알파 탐색 시스템의 설계와 구현을 기술한다. 시스템은 7라운드 진화 전략을 통해 FastExpression 및 Regular Expression 기반 알파 수식을 자동 생성·시뮬레이션·제출하며, Island Model(4섬, Ring Topology 이주), ε-Lexicase Selection, SHADE 적응형 DE 파라미터 제어(H=15, Lehmer Mean), MAP-Elites 품질-다양성 아카이브(10×5 그리드), UCB1 기반 적응형 연산자 선택(10개 연산자) 등 최신 진화 연산 기법을 통합한다. v5에서는 구조적 중복 필터의 배치-로컬화, 정체 감지 완화(5세대, best&lt;0.5) 및 카타클리즘 쿨다운(2세대), Claude Sonnet 4.5 기반 LLM 시드 통합(초기 35%, 카타클리즘 40%), Self-Correlation 사전 필터 정밀화(submitted-only, 이중 조건)를 도입하여 장시간 실행 안정성과 탐색 효율을 개선하였다.
 </div>
 
 <div class="keywords">
-    <strong>Keywords:</strong> Genetic Programming, Alpha Discovery, WorldQuant BRAIN, Island Model, SHADE, MAP-Elites, ε-Lexicase Selection, UCB1, Adaptive Operator Selection, Regular Expression
+    <strong>Keywords:</strong> Genetic Programming, Alpha Discovery, WorldQuant BRAIN, Island Model, SHADE, MAP-Elites, ε-Lexicase Selection, UCB1, Adaptive Operator Selection, Regular Expression, LLM-Assisted Seed Generation
 </div>
 
 <!-- 1. System Architecture -->
 <h2>1. 시스템 아키텍처</h2>
 
-<p>시스템은 11개의 핵심 모듈과 1개의 외부 라이브러리로 구성된다. 각 모듈은 단일 책임 원칙에 따라 분리되어 있으며, <code>EvolutionEngine</code>이 중앙 오케스트레이터 역할을 한다. 아래 링크를 통해 전체 시스템의 모듈 의존성, 실행 파이프라인, 세대 루프, 알고리즘 상세, 7라운드 전략, 데이터 플로우를 포함하는 12개 섹션의 종합 구조도를 확인할 수 있다.</p>
+<p>시스템은 12개의 핵심 모듈과 1개의 외부 라이브러리로 구성된다. 각 모듈은 단일 책임 원칙에 따라 분리되어 있으며, <code>EvolutionEngine</code>이 중앙 오케스트레이터 역할을 한다. 아래 링크를 통해 전체 시스템의 모듈 의존성, 실행 파이프라인, 세대 루프, 알고리즘 상세, 7라운드 전략, 데이터 플로우를 포함하는 12개 섹션의 종합 구조도를 확인할 수 있다.</p>
 
 <!-- Full System Architecture (link to standalone page) -->
 <div style="margin:25px 0 30px;border:1px solid #e0e4ea;border-radius:8px;background:#fafbfd;padding:20px 24px;text-align:center;">
@@ -289,7 +289,7 @@ title: "WQ BRAIN Alpha Evolution"
 <thead><tr><th>모듈</th><th>역할</th><th>LOC</th></tr></thead>
 <tbody>
 <tr><td class="left"><code>main.py</code></td><td class="left">CLI 진입점, 루프 제어, 에러 복구</td><td>~200</td></tr>
-<tr><td class="left"><code>evolution.py</code></td><td class="left">진화 엔진 v4 — 6개 핵심 클래스, 30+ 메서드</td><td>1,960+</td></tr>
+<tr><td class="left"><code>evolution.py</code></td><td class="left">진화 엔진 v5 — 6개 핵심 클래스, 30+ 메서드</td><td>2,900+</td></tr>
 <tr><td class="left"><code>brain_api.py</code></td><td class="left">BRAIN API 래퍼, ACE 라이브러리 통합, 배치 시뮬</td><td>~300</td></tr>
 <tr><td class="left"><code>alpha_ast.py</code></td><td class="left">AST 노드, 10개 유전 연산자, 멀티라인 생성, 64-op 제한 검증</td><td>~780</td></tr>
 <tr><td class="left"><code>strategies.py</code></td><td class="left">42개 시드 전략 (독창적 anti-correlation 6개 포함), 리전/delay 특화</td><td>~600</td></tr>
@@ -299,6 +299,7 @@ title: "WQ BRAIN Alpha Evolution"
 <tr><td class="left"><code>surrogate.py</code></td><td class="left">XGBoost/Ridge 대리 모델, 사전 필터링 (v4)</td><td>~250</td></tr>
 <tr><td class="left"><code>field_explorer.py</code></td><td class="left">미사용 데이터필드 자동 스크리닝 (v4)</td><td>~200</td></tr>
 <tr><td class="left"><code>dashboard.py</code></td><td class="left">실시간 웹 대시보드, HTTP API (v4)</td><td>~350</td></tr>
+<tr><td class="left"><code>llm_seed.py</code></td><td class="left">Claude Sonnet 4.5 기반 알파 시드 생성, 병렬 호출 (v5)</td><td>~350</td></tr>
 </tbody>
 </table>
 
@@ -607,7 +608,7 @@ title: "WQ BRAIN Alpha Evolution"
 
 <h3>7.1 정체 감지</h3>
 
-<p>각 섬(Island)은 <code>stagnation</code> 카운터를 보유한다. 세대가 진행될 때마다 해당 섬의 최고 IQC 점수가 이전 세대 대비 개선되지 않으면 카운터가 1 증가한다. 3세대 연속 개선이 없으면(<code>stagnation >= 3</code>) 해당 섬에 대격변(Cataclysm)이 발동된다. 정체 감지는 섬 단위로 독립적이므로, 4개 섬 중 일부만 대격변이 발동될 수 있다.</p>
+<p>각 섬(Island)은 <code>stagnation</code> 카운터를 보유한다. 세대가 진행될 때마다 해당 섬의 최고 IQC 점수가 이전 세대 대비 개선되지 않으면 카운터가 1 증가한다. v5에서는 5세대 연속 개선이 없고 최고 점수가 0.5 미만일 때(<code>stagnation >= 5 and best < 0.5</code>) 해당 섬에 대격변(Cataclysm)이 발동된다. 정체 감지는 섬 단위로 독립적이므로, 4개 섬 중 일부만 대격변이 발동될 수 있다. 대격변 직후에는 2세대 쿨다운(<code>_cataclysm_cooldown</code>)이 적용되어, 새로 주입된 개체가 충분히 평가될 시간을 확보한다.</p>
 
 <h3>7.2 대격변(Cataclysm)</h3>
 
@@ -615,7 +616,7 @@ title: "WQ BRAIN Alpha Evolution"
 
 <p>(1) 현재 인구를 IQC 점수 기준으로 정렬하여 상위 50%를 보존한다. 이들은 지금까지 발견된 최선의 유전 정보를 담고 있으므로 폐기하지 않는다.</p>
 
-<p>(2) 하위 50%를 새로운 개체로 교체한다. 교체 비율은 MAP-Elites 시드 30%(아카이브에서 다양한 행동 영역의 개체를 추출), 멀티라인 알파 15%(복합 수식 구조 탐색), 전략 템플릿 및 완전 랜덤 55%(새로운 탐색 영역 진입)이다.</p>
+<p>(2) 하위 50%를 새로운 개체로 교체한다. <code>--llm</code> 모드에서는 LLM 시드 40%(Claude Sonnet 4.5 기반 알파 수식 생성), MAP-Elites 시드 20%, 전략 템플릿 및 완전 랜덤 40%로 구성된다. LLM 비활성화 시에는 MAP-Elites 시드 30%, 멀티라인 알파 15%, 전략 템플릿 및 완전 랜덤 55%이다.</p>
 
 <p>(3) Simulated Annealing 온도를 현재 값의 2배로 상승시킨다. 이는 열악한 자식 개체도 일시적으로 수용할 확률을 높여, 현재 수렴 영역에서 벗어나는 것을 촉진한다.</p>
 
@@ -637,9 +638,9 @@ title: "WQ BRAIN Alpha Evolution"
 
 <h3>7.6 Self-Correlation 사전 필터</h3>
 
-<p>BRAIN API의 Self-Correlation 검사는 시뮬레이션 완료 후에야 결과가 반환되므로, 유사한 수식을 반복 제출하면 API 호출이 낭비된다. 이를 방지하기 위해 <code>_evaluate_population()</code> 단계에서 필드 시그니처 기반 사전 필터를 적용한다.</p>
+<p>BRAIN API의 Self-Correlation 검사는 시뮬레이션 완료 후에야 결과가 반환되므로, 유사한 수식을 반복 제출하면 API 호출이 낭비된다. 이를 방지하기 위해 <code>_evaluate_population()</code> 단계에서 사전 필터를 적용한다.</p>
 
-<p>각 수식의 필드 집합을 추출하여 명예의 전당 및 제출 완료 알파의 필드 집합과 Jaccard 유사도를 계산한다:</p>
+<p>v5에서는 필터 대상을 명예의 전당이 아닌 <code>submitted_alphas</code>(실제 제출 완료 알파)로 한정하였다. 또한 필드 시그니처 일치와 구조적 해시(structural_hash) 일치를 모두 요구하는 이중 조건으로 변경하여, 과도한 필터링으로 인한 유망 수식 누락을 방지한다.</p>
 
 <div class="math-block">
 \[J(A, B) = \frac{|A \cap B|}{|A \cup B|}\]
@@ -866,12 +867,12 @@ w_f = \sum_{i \in \text{HoF}} \text{count}(f, \alpha_i) \cdot \lfloor \text{IQC}
 
 <h4>10.2.4 사전 필터링</h4>
 
-<p>모델 활성화 후, <code>_evaluate_population()</code>에서 미평가 개체가 10개 이상일 때 사전 필터링을 수행한다. 모든 미평가 수식에 대해 \(\hat{S}(\alpha)\)를 예측하고, 상위 60%만 실제 API 호출로 평가한다. 하위 40% 중에서도 10%를 랜덤으로 포함하여 surrogate의 편향(bias)을 완화하고, 모델이 과소평가하는 영역의 탐색을 보장한다.</p>
+<p>모델 활성화 후, <code>_evaluate_population()</code>에서 미평가 개체가 10개 이상일 때 사전 필터링을 수행한다. 모든 미평가 수식에 대해 \(\hat{S}(\alpha)\)를 예측하고, 상위 80%만 실제 API 호출로 평가한다(v5에서 60%→80%로 완화, 최소 15개 보장). 하위 20% 중에서도 10%를 랜덤으로 포함하여 surrogate의 편향(bias)을 완화하고, 모델이 과소평가하는 영역의 탐색을 보장한다.</p>
 
 <pre><code><span class="cm"># Surrogate 필터링 의사코드</span>
 scores = [(i, surrogate.predict(expr)) <span class="kw">for</span> i, expr <span class="kw">in</span> enumerate(unevaluated)]
 scores.sort(key=<span class="kw">lambda</span> x: -x[<span class="nu">1</span>])
-keep = scores[:int(len(scores) * <span class="nu">0.6</span>)]           <span class="cm"># 상위 60%</span>
+keep = scores[:int(len(scores) * <span class="nu">0.8</span>)]           <span class="cm"># 상위 80% (v5)</span>
 random_add = random.sample(scores[len(keep):], <span class="nu">10</span>%)  <span class="cm"># 하위에서 10% 랜덤</span>
 evaluate_only = keep + random_add</code></pre>
 
@@ -1039,8 +1040,49 @@ engine = EvolutionEngine(api)          <span class="cm"># 초기화: load_previo
 explore_new_fields()                   <span class="cm"># 미사용 필드 15개 스크리닝</span>
 save_final()                           <span class="cm"># pattern_learner/surrogate/field_explorer 통계 포함</span></code></pre><div class="section-divider">• • •</div>
 
-<!-- 11. Glossary -->
-<h2>11. 핵심 용어 해설</h2>
+<!-- 11. v5 Enhancements -->
+<h2>11. v5 개선: 안정성 및 LLM 통합</h2>
+
+<p>v4까지의 시스템은 장시간 실행 시 세 가지 구조적 문제를 노출하였다. 첫째, 구조적 중복 필터(<code>_seen_structures</code>)가 전역적으로 누적되어 세대가 진행될수록 대부분의 개체가 필터링되는 현상이 발생하였다. 둘째, 정체 감지 임계값이 지나치게 민감하여 카타클리즘 직후에도 즉시 재발동되는 악순환이 관찰되었다. 셋째, LLM 기반 시드 생성이 카타클리즘 시점에 활용되지 않아 다양성 회복 효과가 제한적이었다.</p>
+
+<h3>11.1 구조적 중복 필터 지역화</h3>
+
+<p>v4에서 <code>_seen_structures</code>는 전체 실행 기간 동안 누적되는 글로벌 집합이었다. 이로 인해 R1 세대 5 시점에서 이미 수백 개의 구조적 해시가 축적되어, 새로 생성된 개체의 80~90%가 "이미 본 구조"로 판정되어 스킵되었다. 이는 유전 연산자의 미세 변이(윈도우 ±1, 필드 교체)가 동일한 구조적 해시를 생성하기 때문이다.</p>
+
+<p>v5에서는 구조적 중복 필터를 배치-로컬(batch-local)로 변경하였다. 각 세대의 평가 배치 내에서만 중복을 검사하고, 세대가 끝나면 해시 집합을 초기화한다. 이를 통해 세대 간 동일 구조의 재탐색을 허용하되, 동일 배치 내 중복 API 호출은 방지한다. 라운드 시작 시에도 구조적 캐시를 무조건 리셋하여 이전 라운드의 필터링 편향이 전파되지 않도록 한다.</p>
+
+<h3>11.2 정체 감지 완화 및 쿨다운</h3>
+
+<p>v4의 정체 감지는 3세대 연속 미개선 시 발동되었으나, 카타클리즘으로 주입된 새 개체가 평가되기도 전에 다시 정체로 판정되는 문제가 있었다. v5에서는 세 가지 조건을 모두 충족해야 카타클리즘이 발동된다:</p>
+
+<p class="no-indent" style="margin-left:2em">
+(1) 5세대 연속 최고 점수 미개선<br>
+(2) 해당 섬의 최고 점수가 0.5 미만<br>
+(3) 이전 카타클리즘으로부터 2세대 이상 경과 (쿨다운)
+</p>
+
+<p>쿨다운 메커니즘은 <code>_cataclysm_cooldown</code> 딕셔너리로 섬별로 관리되며, 카타클리즘 발동 시 해당 섬의 쿨다운을 2로 설정하고 매 세대 1씩 감소시킨다.</p>
+
+<h3>11.3 LLM 시드 통합 (Claude Sonnet 4.5)</h3>
+
+<p><code>--llm</code> 옵션으로 활성화되는 LLM 시드 생성기는 Claude Sonnet 4.5를 사용하여 의미 있는 알파 수식을 생성한다. v5에서는 세 가지 통합 지점을 확보하였다:</p>
+
+<p class="no-indent" style="margin-left:2em">
+(1) 초기 개체군 생성(<code>_create_population</code>): 전체 개체의 35%를 LLM 시드로 할당<br>
+(2) 카타클리즘 시 다양성 주입: 교체 개체의 40%를 LLM 시드로 생성<br>
+(3) 피드백 기반 생성(<code>generate_from_feedback</code>): HoF 상위 수식을 변형하고 고 self-corr 패턴을 회피
+</p>
+
+<p>LLM 시드 생성은 4개 프롬프트를 병렬로 호출(<code>generate_batch_parallel</code>)하여 지연을 최소화한다. 10가지 프롬프트 템플릿이 기관 흐름, 옵션 텀스트럭처, 애널리스트 파생, 센티먼트 다이버전스, 크로스필드 상관 등 다양한 알파 카테고리를 커버한다. LLM이 비활성화된 경우에도 모든 핵심 기능은 정상 동작하며, 랜덤 트리 + 전략 템플릿 + 패턴 학습기 + MAP-Elites 시드로 대체된다.</p>
+
+<h3>11.4 Self-Correlation 사전 필터 정밀화</h3>
+
+<p>v4에서는 HoF 전체를 대상으로 필드 Jaccard 유사도만 검사하여, 구조적으로 다르지만 필드가 유사한 수식까지 과도하게 필터링하였다. v5에서는 검사 대상을 <code>submitted_alphas</code>(실제 제출 완료 알파)로 한정하고, 필드 시그니처 일치와 구조적 해시(MD5) 일치를 모두 요구하는 이중 조건으로 변경하였다. 이를 통해 필터 정밀도를 높이면서 유망 수식의 누락을 방지한다.</p>
+
+<div class="section-divider">• • •</div>
+
+<!-- 12. Glossary -->
+<h2>12. 핵심 용어 해설</h2>
 
 <p>본 시스템의 실행 로그에 출현하는 주요 용어와 그 의미를 정리한다. 유전 프로그래밍 및 BRAIN 플랫폼 고유 용어를 포함한다.</p>
 
@@ -1052,7 +1094,7 @@ save_final()                           <span class="cm"># pattern_learner/surrog
 <tr><td>섬(Island)</td><td>독립적으로 진화하는 부분 개체군. 본 시스템은 4개 섬을 운용하며, 각 섬은 자체 SHADE 메모리와 AOS를 보유한다.</td></tr>
 <tr><td>세대(Generation)</td><td>한 번의 평가-선택-교배-변이 사이클. 라운드별로 5~12세대를 수행한다.</td></tr>
 <tr><td>이주(Migration)</td><td>2세대마다 Ring Topology로 섬 간 상위 3개체를 교환하는 다양성 유지 메커니즘.</td></tr>
-<tr><td>카타클리즘(Cataclysm)</td><td>3세대 연속 정체 시 발동. 하위 50% 개체를 MAP-Elites 시드 + 랜덤으로 교체하여 지역 최적해를 탈출한다.</td></tr>
+<tr><td>카타클리즘(Cataclysm)</td><td>5세대 연속 정체(best &lt; 0.5) 시 발동. 하위 50% 개체를 LLM 시드(40%) + MAP-Elites 시드 + 랜덤으로 교체하여 지역 최적해를 탈출한다. 발동 후 2세대 쿨다운 적용.</td></tr>
 <tr><td>MAP-Elites</td><td>Sharpe(10구간) x Turnover(5구간) = 50셀 그리드에서 각 셀의 최고 개체만 보존하는 품질-다양성 아카이브.</td></tr>
 <tr><td>명예의 전당(Hall of Fame)</td><td>IQC 점수 1.5 이상의 우수 개체를 저장하는 엘리트 아카이브. 상위 100개만 유지.</td></tr>
 <tr><td>Surrogate 필터</td><td>경량 회귀 모델로 유망하지 않은 수식을 사전 필터링하여 BRAIN API 호출을 절약한다. 30샘플 이상 축적 시 활성화.</td></tr>
@@ -1070,7 +1112,7 @@ save_final()                           <span class="cm"># pattern_learner/surrog
 <tr><td>SA 온도(Temperature)</td><td>Simulated Annealing 온도. 높을수록 열악한 자식도 수용하여 탐색 범위를 확대한다. 세대 진행에 따라 냉각.</td></tr>
 <tr><td>조기 파라미터 스캔</td><td>R1~R3 마지막 세대에서 IQC 점수 2.0 이상인 알파에 대해 decay/neutralization/truncation 조합을 탐색하는 메커니즘. R4를 기다리지 않고 IS Check 통과 확률을 높인다.</td></tr>
 <tr><td>적응형 Surrogate 필터</td><td>학습 데이터 축적량에 따라 필터링 강도를 자동 조절하는 메커니즘. 200개 이상 학습 시 상위 35%만 통과시켜 API 호출을 절감한다.</td></tr>
-<tr><td>Island Early Stopping</td><td>3세대 연속 best score 변화 &lt; 0.05이고 score &lt; 1.0인 섬의 평가를 스킵하고 카타클리즘을 즉시 발동하는 메커니즘.</td></tr>
+<tr><td>Island Early Stopping</td><td>5세대 연속 best score 변화 없고 score &lt; 0.5인 섬의 평가를 스킵하고 카타클리즘을 발동하는 메커니즘. 카타클리즘 후 2세대 쿨다운 적용.</td></tr>
 <tr><td>스마트 파라미터 샘플링</td><td>HoF 성공 파라미터 분포 + 현재 best 근처 미세조정으로 30개 랜덤 조합을 15개 지능형 조합으로 대체하는 최적화.</td></tr>
 <tr><td>AOS(Adaptive Operator Selection)</td><td>UCB1 알고리즘으로 10개 유전 연산자의 선택 확률을 성과 기반으로 동적 조정.</td></tr>
 <tr><td>SHADE</td><td>Differential Evolution의 F(스케일 팩터)와 CR(교배율)을 성공 이력 기반으로 적응적 제어하는 메커니즘.</td></tr>
@@ -1078,6 +1120,9 @@ save_final()                           <span class="cm"># pattern_learner/surrog
 <tr><td>FastExpression</td><td>BRAIN의 단일라인 수식 형식. 모든 로직이 한 줄에 표현된다.</td></tr>
 <tr><td>체크포인트(Checkpoint)</td><td>매 세대 종료 시 저장되는 상태 스냅샷. 명예의 전당, MAP-Elites, AOS 통계, 라운드 진행 정보를 포함.</td></tr>
 <tr><td>사이클(Cycle)</td><td>11개 리전을 순회하며 7라운드 진화를 수행하는 단위. <code>--region ALL</code> 모드에서 사용.</td></tr>
+<tr><td>LLM 시드(LLM Seed)</td><td>Claude Sonnet 4.5를 사용하여 생성한 의미 있는 알파 수식. <code>--llm</code> 옵션으로 활성화. 초기 개체군의 35%, 카타클리즘 시 40%를 차지한다.</td></tr>
+<tr><td>카타클리즘 쿨다운</td><td>카타클리즘 발동 후 2세대 동안 동일 섬에서 재발동을 방지하는 메커니즘. 새 개체가 충분히 평가될 시간을 확보한다.</td></tr>
+<tr><td>배치-로컬 중복 필터</td><td>v5에서 도입. 구조적 해시 중복 검사를 세대 내 배치 단위로 한정하여, 글로벌 누적으로 인한 과도한 필터링을 방지한다.</td></tr>
 </tbody>
 </table>
 
