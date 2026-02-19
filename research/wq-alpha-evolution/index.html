@@ -258,14 +258,14 @@ title: "WQ BRAIN Alpha Evolution"
 <div class="paper-header">
     <div class="paper-category">Quantitative Finance Research</div>
     <h1 class="paper-title">WorldQuant BRAIN Alpha Auto-Discovery System</h1>
-    <div class="paper-subtitle">7-Round Genetic Algorithm with Island Model, ε-Lexicase Selection, SHADE, MAP-Elites, and UCB1 Adaptive Operator Selection</div>
+    <div class="paper-subtitle">7-Round Genetic Algorithm with Island Model, ε-Lexicase Selection, SHADE, MAP-Elites, UCB1 Adaptive Operator Selection, and LLM-Guided Seed Generation</div>
     <div class="paper-author">Ha Rim Jung</div>
-    <div class="paper-date">February 14, 2026</div>
+    <div class="paper-date">February 19, 2026 (v5.5)</div>
 </div>
 
 <div class="abstract">
     <div class="abstract-title">Abstract</div>
-    본 글은 WorldQuant BRAIN 플랫폼의 International Quant Championship(IQC) 및 컨설턴트 프로그램을 위한 완전 자동 알파 탐색 시스템의 설계와 구현을 기술한다. 시스템은 7라운드 진화 전략을 통해 FastExpression 및 Regular Expression 기반 알파 수식을 자동 생성·시뮬레이션·제출하며, Island Model(4섬, Ring Topology 이주), ε-Lexicase Selection, SHADE 적응형 DE 파라미터 제어(H=15, Lehmer Mean), MAP-Elites 품질-다양성 아카이브(10×5 그리드), UCB1 기반 적응형 연산자 선택(10개 연산자) 등 최신 진화 연산 기법을 통합한다. v5에서는 구조적 중복 필터의 배치-로컬화, 정체 감지 완화(5세대, best&lt;0.5) 및 카타클리즘 쿨다운(2세대), Claude Sonnet 4.5 기반 LLM 시드 통합(초기 35%, 카타클리즘 40%), Self-Correlation 사전 필터 정밀화(submitted-only, 이중 조건)를 도입하여 장시간 실행 안정성과 탐색 효율을 개선하였다.
+    본 글은 WorldQuant BRAIN 플랫폼의 International Quant Championship(IQC) 및 컨설턴트 프로그램을 위한 완전 자동 알파 탐색 시스템의 설계와 구현을 기술한다. 시스템은 7라운드 진화 전략을 통해 FastExpression 기반 알파 수식을 자동 생성·시뮬레이션·제출하며, Island Model(4섬, Ring Topology 이주), ε-Lexicase Selection, SHADE 적응형 DE 파라미터 제어(H=15, Lehmer Mean), MAP-Elites 품질-다양성 아카이브(10×5 그리드), UCB1 기반 적응형 연산자 선택(8개 연산자) 등 최신 진화 연산 기법을 통합한다. v5에서는 구조적 중복 필터의 배치-로컬화, 정체 감지 완화(5세대, best&lt;0.5) 및 카타클리즘 쿨다운(2세대), Claude Sonnet 4.5 기반 LLM 시드 통합(초기 35%, 카타클리즘 40%), Self-Correlation 사전 필터 정밀화(submitted-only, 이중 조건)를 도입하였다. v5.5에서는 BRAIN API의 REGULAR language 지원 중단에 대응하여 멀티라인 수식을 완전 비활성화하고, LLM 프롬프트를 4가지 구조 패턴(ts_decay_linear, group_zscore, rank_ts_corr, ternary)과 경제적 직관 기반으로 전면 개편하여 시드 다양성과 IS Check 통과율을 개선하였다.
 </div>
 
 <div class="keywords">
@@ -291,7 +291,7 @@ title: "WQ BRAIN Alpha Evolution"
 <tr><td class="left"><code>main.py</code></td><td class="left">CLI 진입점, 루프 제어, 에러 복구</td><td>~200</td></tr>
 <tr><td class="left"><code>evolution.py</code></td><td class="left">진화 엔진 v5 — 6개 핵심 클래스, 30+ 메서드</td><td>2,900+</td></tr>
 <tr><td class="left"><code>brain_api.py</code></td><td class="left">BRAIN API 래퍼, ACE 라이브러리 통합, 배치 시뮬</td><td>~300</td></tr>
-<tr><td class="left"><code>alpha_ast.py</code></td><td class="left">AST 노드, 10개 유전 연산자, 멀티라인 생성, 64-op 제한 검증</td><td>~780</td></tr>
+<tr><td class="left"><code>alpha_ast.py</code></td><td class="left">AST 노드, 8개 유전 연산자 (v5.5에서 멀티라인 2개 비활성화), 64-op 제한 검증</td><td>~780</td></tr>
 <tr><td class="left"><code>strategies.py</code></td><td class="left">42개 시드 전략 (독창적 anti-correlation 6개 포함), 리전/delay 특화</td><td>~600</td></tr>
 <tr><td class="left"><code>evaluator.py</code></td><td class="left">IQC 점수 계산, IS Check, MDL 페널티</td><td>~150</td></tr>
 <tr><td class="left"><code>config.py</code></td><td class="left">7라운드 설정, 11개 탐색 공간, 기준값</td><td>~200</td></tr>
@@ -299,7 +299,7 @@ title: "WQ BRAIN Alpha Evolution"
 <tr><td class="left"><code>surrogate.py</code></td><td class="left">XGBoost/Ridge 대리 모델, 사전 필터링 (v4)</td><td>~250</td></tr>
 <tr><td class="left"><code>field_explorer.py</code></td><td class="left">미사용 데이터필드 자동 스크리닝 (v4)</td><td>~200</td></tr>
 <tr><td class="left"><code>dashboard.py</code></td><td class="left">실시간 웹 대시보드, HTTP API (v4)</td><td>~350</td></tr>
-<tr><td class="left"><code>llm_seed.py</code></td><td class="left">Claude Sonnet 4.5 기반 알파 시드 생성, 병렬 호출 (v5)</td><td>~350</td></tr>
+<tr><td class="left"><code>llm_seed.py</code></td><td class="left">Claude Sonnet 4.5 기반 알파 시드 생성, 병렬 호출, 4구조 패턴 + 경제적 직관 프롬프트 (v5.5)</td><td>~450</td></tr>
 </tbody>
 </table>
 
@@ -393,7 +393,7 @@ title: "WQ BRAIN Alpha Evolution"
 
 <h3>3.5 UCB1 Adaptive Operator Selection</h3>
 
-<p>10개 유전 연산자의 선택 확률을 UCB1 알고리즘으로 동적 조정한다. 글로벌 AOS(window=80)와 섬별 AOS(window=50)가 이중으로 운영된다:</p>
+<p>10개 유전 연산자의 선택 확률을 UCB1 알고리즘으로 동적 조정한다 (v5.5에서 8개 활성). 글로벌 AOS(window=80)와 섬별 AOS(window=50)가 이중으로 운영된다:</p>
 
 <div class="math-block">
 \[\text{UCB1}(op) = \bar{r}_{op} + C \cdot \sqrt{\frac{\ln N}{n_{op}}}, \quad C = 0.5\]
@@ -439,7 +439,7 @@ title: "WQ BRAIN Alpha Evolution"
 <!-- 4. Genetic Operators -->
 <h2>4. 유전 연산자</h2>
 
-<p>본 시스템은 10개의 유전 연산자를 운용하며, 각 연산자의 선택은 UCB1 기반 AOS에 의해 동적으로 결정된다. 교배(recombination) 5종과 변이(mutation) 5종으로 분류된다. SHADE에서 샘플링된 스케일 팩터 \(F\)는 변이 강도 및 차분 교배의 이식 확률로 활용된다. 모든 연산자는 트리 깊이 상한(depth ≤ 10)을 초과하면 부모를 그대로 반환하여 bloat를 방지한다.</p>
+<p>본 시스템은 8개의 활성 유전 연산자를 운용하며 (v5.5에서 멀티라인 관련 2개 비활성화), 각 연산자의 선택은 UCB1 기반 AOS에 의해 동적으로 결정된다. 교배(recombination) 4종과 변이(mutation) 4종으로 분류된다. SHADE에서 샘플링된 스케일 팩터 \(F\)는 변이 강도 및 차분 교배의 이식 확률로 활용된다. 모든 연산자는 트리 깊이 상한(depth ≤ 10)을 초과하면 부모를 그대로 반환하여 bloat를 방지한다.</p>
 
 <table>
 <caption>표 5: 유전 연산자 목록</caption>
@@ -449,12 +449,12 @@ title: "WQ BRAIN Alpha Evolution"
 <tr><td class="left"><code>semantic_crossover</code></td><td>교배</td><td>2</td><td class="left">필드 Jaccard 거리 기반 이질적 서브트리 교환</td></tr>
 <tr><td class="left"><code>de_crossover</code></td><td>교배</td><td>3</td><td class="left">DE/rand/1 차분 벡터 이식 (Storn & Price, 1997)</td></tr>
 <tr><td class="left"><code>headless_chicken</code></td><td>교배</td><td>1</td><td class="left">랜덤 트리와의 교배 (Angeline, 1997)</td></tr>
-<tr><td class="left"><code>multiline_crossover</code></td><td>교배</td><td>2</td><td class="left">Regular Expression 변수 블록 교환</td></tr>
+<tr><td class="left"><code><s>multiline_crossover</s></code></td><td>교배</td><td>2</td><td class="left"><span style="color:#999;">Regular Expression 변수 블록 교환 — v5.5에서 비활성화 (BRAIN REGULAR 지원 중단)</span></td></tr>
 <tr><td class="left"><code>mutate</code></td><td>변이</td><td>1</td><td class="left">확률적 다중 변이 (필드/연산자/윈도우/서브트리/래핑)</td></tr>
 <tr><td class="left"><code>micro_mutate</code></td><td>변이</td><td>1</td><td class="left">시계열 윈도우 크기 ±1~2 미세 조정</td></tr>
 <tr><td class="left"><code>hoist</code></td><td>변이</td><td>1</td><td class="left">내부 서브트리를 루트로 승격 (bloat 억제)</td></tr>
 <tr><td class="left"><code>shrink</code></td><td>변이</td><td>1</td><td class="left">내부 노드를 단일 필드로 축소</td></tr>
-<tr><td class="left"><code>multiline_mutate</code></td><td>변이</td><td>1</td><td class="left">Regular Expression 변수 수식 변이/추가/제거</td></tr>
+<tr><td class="left"><code><s>multiline_mutate</s></code></td><td>변이</td><td>1</td><td class="left"><span style="color:#999;">Regular Expression 변수 수식 변이/추가/제거 — v5.5에서 비활성화 (BRAIN REGULAR 지원 중단)</span></td></tr>
 </tbody>
 </table>
 
@@ -558,6 +558,8 @@ title: "WQ BRAIN Alpha Evolution"
 <p><code>_validate_regular()</code>는 멀티라인 수식의 구문 유효성을 10가지 항목으로 검증한다: (1) 빈 줄, (2) 할당 줄 세미콜론, (3) 할당 형식, (4) 괄호 밸런스, (5) 빈 인자 함수 호출, (6) 미정의 변수 참조, (7) 미사용 정의 변수, (8) trailing/leading 연산자, (9) 연속 이항 연산자, (10) 불완전 삼항 연산자. 검증 실패 시 <code>to_expr()</code> 단일 줄 형식으로 자동 폴백한다.</p>
 
 <p>멀티라인 알파의 최종 결합 수식은 가중합, 조건부(중첩 삼항), 교차항(곱셈+덧셈) 3가지 방식 중 랜덤 선택된다. 각 변수는 9개 시그널 카테고리(모멘텀/반전, 밸류, 유동성, 애널리스트, 베타/상관, 뉴스 센티먼트, 공매도, 옵션, 비율)에서 라운드 로빈으로 할당되어 멀티팩터 다양성을 확보한다.</p>
+
+<p class="note"><strong>v5.5 참고:</strong> BRAIN API가 <code>language="REGULAR"</code> 설정을 더 이상 지원하지 않으며, FASTEXPR에서도 <code>\n</code>이 포함된 멀티라인 수식을 거부한다. 이에 따라 v5.5에서는 멀티라인 수식 생성을 완전 비활성화하였다 (<code>multiline_ratio=0.0</code>). 모든 알파는 FastExpression 단일 줄 형식으로만 생성·시뮬레이션된다.</p>
 
 <div class="section-divider">• • •</div>
 
@@ -1079,6 +1081,20 @@ save_final()                           <span class="cm"># pattern_learner/surrog
 
 <p>v4에서는 HoF 전체를 대상으로 필드 Jaccard 유사도만 검사하여, 구조적으로 다르지만 필드가 유사한 수식까지 과도하게 필터링하였다. v5에서는 검사 대상을 <code>submitted_alphas</code>(실제 제출 완료 알파)로 한정하고, 필드 시그니처 일치와 구조적 해시(MD5) 일치를 모두 요구하는 이중 조건으로 변경하였다. 이를 통해 필터 정밀도를 높이면서 유망 수식의 누락을 방지한다.</p>
 
+<h3>11.5 v5.5: LLM 프롬프트 전면 개편 및 멀티라인 비활성화</h3>
+
+<p>v5.5는 BRAIN API의 REGULAR language 지원 중단에 대응하고, LLM 시드 생성의 다양성과 IS Check 통과율을 개선하기 위한 업데이트이다. 주요 변경 사항은 다음과 같다:</p>
+
+<p><strong>(1) 멀티라인 수식 완전 비활성화.</strong> BRAIN API가 <code>language="REGULAR"</code>을 거부하고, FASTEXPR에서도 <code>\n</code> 포함 수식을 거부함에 따라, <code>multiline_ratio=0.0</code>으로 설정하고 카타클리즘 시 멀티라인 주입을 제거하였다. 유전 연산자에서도 <code>multiline_crossover</code>와 <code>multiline_mutate</code>를 비활성화하여 활성 연산자를 10개에서 8개로 축소하였다.</p>
+
+<p><strong>(2) LLM 프롬프트 다양화.</strong> 기존의 단일 구조 패턴("MANDATORY STRUCTURE") 대신 4가지 구조 패턴을 "RECOMMENDED PATTERNS"로 제시한다: (A) <code>ts_decay_linear</code> 기반 시계열 감쇠, (B) <code>group_zscore</code> 기반 그룹 정규화, (C) <code>rank(ts_corr(...))</code> 기반 상관 순위, (D) 삼항 조건 분기. 각 패턴에 Sharpe > 2.0 달성 사례를 포함하여 LLM의 출력 품질을 유도한다.</p>
+
+<p><strong>(3) 경제적 직관 기반 프롬프트.</strong> 6가지 경제적 아이디어(revision momentum, institutional herding, option term structure, sentiment divergence, quality shift, beta mean reversion)를 SYSTEM_PROMPT에 추가하여, LLM이 단순 구문 조합이 아닌 경제적 논리에 기반한 알파를 생성하도록 유도한다.</p>
+
+<p><strong>(4) GENERATION_PROMPTS 다양화.</strong> 10개 생성 프롬프트를 구조별로 분배(1-3: ts_decay_linear, 4-6: group_zscore, 7-8: rank_ts_corr, 9-10: ternary)하고, 각 프롬프트에 경제적 추론(60%)과 구문 힌트(40%)를 혼합하여 시드 다양성을 극대화하였다.</p>
+
+<p><strong>(5) 회피 패턴 명시.</strong> PATTERNS TO AVOID 섹션을 추가하여 LLM이 자주 생성하는 비효율적 패턴(단순 rank(field), 과도한 중첩, 의미 없는 상수 곱셈, 동일 필드 반복, 과도한 연산자 수)을 명시적으로 금지하였다.</p>
+
 <div class="section-divider">• • •</div>
 
 <!-- 12. Glossary -->
@@ -1114,7 +1130,7 @@ save_final()                           <span class="cm"># pattern_learner/surrog
 <tr><td>적응형 Surrogate 필터</td><td>학습 데이터 축적량에 따라 필터링 강도를 자동 조절하는 메커니즘. 200개 이상 학습 시 상위 35%만 통과시켜 API 호출을 절감한다.</td></tr>
 <tr><td>Island Early Stopping</td><td>5세대 연속 best score 변화 없고 score &lt; 0.5인 섬의 평가를 스킵하고 카타클리즘을 발동하는 메커니즘. 카타클리즘 후 2세대 쿨다운 적용.</td></tr>
 <tr><td>스마트 파라미터 샘플링</td><td>HoF 성공 파라미터 분포 + 현재 best 근처 미세조정으로 30개 랜덤 조합을 15개 지능형 조합으로 대체하는 최적화.</td></tr>
-<tr><td>AOS(Adaptive Operator Selection)</td><td>UCB1 알고리즘으로 10개 유전 연산자의 선택 확률을 성과 기반으로 동적 조정.</td></tr>
+<tr><td>AOS(Adaptive Operator Selection)</td><td>UCB1 알고리즘으로 8개 활성 유전 연산자의 선택 확률을 성과 기반으로 동적 조정 (v5.5에서 멀티라인 2개 비활성화).</td></tr>
 <tr><td>SHADE</td><td>Differential Evolution의 F(스케일 팩터)와 CR(교배율)을 성공 이력 기반으로 적응적 제어하는 메커니즘.</td></tr>
 <tr><td>Regular Expression</td><td>BRAIN의 멀티라인 수식 형식. 변수 할당(<code>a = expr;</code>)과 최종 수식으로 구성. 변수명은 단일 문자.</td></tr>
 <tr><td>FastExpression</td><td>BRAIN의 단일라인 수식 형식. 모든 로직이 한 줄에 표현된다.</td></tr>
