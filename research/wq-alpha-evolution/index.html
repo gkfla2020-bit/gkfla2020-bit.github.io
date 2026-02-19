@@ -260,16 +260,16 @@ title: "WQ BRAIN Alpha Evolution"
     <h1 class="paper-title">WorldQuant BRAIN Alpha Auto-Discovery System</h1>
     <div class="paper-subtitle">7-Round Genetic Algorithm with Island Model, ε-Lexicase Selection, SHADE, MAP-Elites, UCB1 Adaptive Operator Selection, and LLM-Guided Seed Generation</div>
     <div class="paper-author">Ha Rim Jung</div>
-    <div class="paper-date">February 19, 2026 (v5.5)</div>
+    <div class="paper-date">February 20, 2026 (v5.8)</div>
 </div>
 
 <div class="abstract">
     <div class="abstract-title">Abstract</div>
-    본 글은 WorldQuant BRAIN 플랫폼의 International Quant Championship(IQC) 및 컨설턴트 프로그램을 위한 완전 자동 알파 탐색 시스템의 설계와 구현을 기술한다. 시스템은 7라운드 진화 전략을 통해 FastExpression 기반 알파 수식을 자동 생성·시뮬레이션·제출하며, Island Model(4섬, Ring Topology 이주), ε-Lexicase Selection, SHADE 적응형 DE 파라미터 제어(H=15, Lehmer Mean), MAP-Elites 품질-다양성 아카이브(10×5 그리드), UCB1 기반 적응형 연산자 선택(8개 연산자) 등 최신 진화 연산 기법을 통합한다. v5에서는 구조적 중복 필터의 배치-로컬화, 정체 감지 완화(5세대, best&lt;0.5) 및 카타클리즘 쿨다운(2세대), Claude Sonnet 4.5 기반 LLM 시드 통합(초기 35%, 카타클리즘 40%), Self-Correlation 사전 필터 정밀화(submitted-only, 이중 조건)를 도입하였다. v5.5에서는 BRAIN API의 REGULAR language 지원 중단에 대응하여 멀티라인 수식을 완전 비활성화하고, LLM 프롬프트를 4가지 구조 패턴(ts_decay_linear, group_zscore, rank_ts_corr, ternary)과 경제적 직관 기반으로 전면 개편하여 시드 다양성과 IS Check 통과율을 개선하였다.
+    본 글은 WorldQuant BRAIN 플랫폼의 International Quant Championship(IQC) 및 컨설턴트 프로그램을 위한 완전 자동 알파 탐색 시스템의 설계와 구현을 기술한다. 시스템은 7라운드 진화 전략을 통해 FastExpression 기반 알파 수식을 자동 생성·시뮬레이션·제출하며, Island Model(4섬, Ring Topology 이주), ε-Lexicase Selection, SHADE 적응형 DE 파라미터 제어(H=15, Lehmer Mean), MAP-Elites 품질-다양성 아카이브(10×5 그리드), UCB1 기반 적응형 연산자 선택(8개 연산자) 등 최신 진화 연산 기법을 통합한다. v5.5에서는 BRAIN API의 REGULAR language 지원 중단에 대응하여 멀티라인 수식을 완전 비활성화하고, LLM 프롬프트를 전면 개편하였다. v5.6에서는 IS Check 친화성 평가 함수(<code>_is_check_friendliness</code>)를 도입하여 sign() 루트 패턴과 단일 필드 의존 수식에 페널티를 부여하였다. v5.7에서는 sign() 연산자를 5계층 차단 체계로 완전 제거하고, 비USA 리전 차단 필드를 체계화하였다. v5.8에서는 Fama-French, AQR, Novy-Marx, Hou-Xue-Zhang 등 학술 논문 기반 25개 고품질 팩터 전략을 5배 가중으로 추가하여 전략 풀을 226개로 확대하고, AST의 group_op 렌더링 버그를 수정하였다.
 </div>
 
 <div class="keywords">
-    <strong>Keywords:</strong> Genetic Programming, Alpha Discovery, WorldQuant BRAIN, Island Model, SHADE, MAP-Elites, ε-Lexicase Selection, UCB1, Adaptive Operator Selection, Regular Expression, LLM-Assisted Seed Generation
+    <strong>Keywords:</strong> Genetic Programming, Alpha Discovery, WorldQuant BRAIN, Island Model, SHADE, MAP-Elites, ε-Lexicase Selection, UCB1, Adaptive Operator Selection, Academic Factor Models, IS Check Friendliness, LLM-Assisted Seed Generation
 </div>
 
 <!-- 1. System Architecture -->
@@ -292,8 +292,8 @@ title: "WQ BRAIN Alpha Evolution"
 <tr><td class="left"><code>evolution.py</code></td><td class="left">진화 엔진 v5 — 6개 핵심 클래스, 30+ 메서드</td><td>2,900+</td></tr>
 <tr><td class="left"><code>brain_api.py</code></td><td class="left">BRAIN API 래퍼, ACE 라이브러리 통합, 배치 시뮬</td><td>~300</td></tr>
 <tr><td class="left"><code>alpha_ast.py</code></td><td class="left">AST 노드, 8개 유전 연산자 (v5.5에서 멀티라인 2개 비활성화), 64-op 제한 검증</td><td>~780</td></tr>
-<tr><td class="left"><code>strategies.py</code></td><td class="left">42개 시드 전략 (독창적 anti-correlation 6개 포함), 리전/delay 특화</td><td>~600</td></tr>
-<tr><td class="left"><code>evaluator.py</code></td><td class="left">IQC 점수 계산, IS Check, MDL 페널티</td><td>~150</td></tr>
+<tr><td class="left"><code>strategies.py</code></td><td class="left">61개 시드 전략 (25개 학술 팩터 + 12 IS-friendly + 11 희귀필드 + 13 기본), 5계층 가중</td><td>~1,400</td></tr>
+<tr><td class="left"><code>evaluator.py</code></td><td class="left">IQC 점수 계산, IS Check, MDL 페널티, IS Check 친화성 평가 (v5.6)</td><td>~250</td></tr>
 <tr><td class="left"><code>config.py</code></td><td class="left">7라운드 설정, 11개 탐색 공간, 기준값</td><td>~200</td></tr>
 <tr><td class="left"><code>pattern_learner.py</code></td><td class="left">성공 패턴 추출, 학습 기반 시드 생성 (v4)</td><td>~200</td></tr>
 <tr><td class="left"><code>surrogate.py</code></td><td class="left">XGBoost/Ridge 대리 모델, 사전 필터링 (v4)</td><td>~250</td></tr>
@@ -1095,6 +1095,80 @@ save_final()                           <span class="cm"># pattern_learner/surrog
 
 <p><strong>(5) 회피 패턴 명시.</strong> PATTERNS TO AVOID 섹션을 추가하여 LLM이 자주 생성하는 비효율적 패턴(단순 rank(field), 과도한 중첩, 의미 없는 상수 곱셈, 동일 필드 반복, 과도한 연산자 수)을 명시적으로 금지하였다.</p>
 
+<h3>11.6 v5.6: IS Check 친화성 평가 함수</h3>
+
+<p>v5.6은 IS Check 통과율을 근본적으로 개선하기 위해 수식 구조 자체를 평가하는 <code>_is_check_friendliness()</code> 함수를 도입하였다.</p>
+
+<p><strong>(1) sign() 루트 페널티.</strong> <code>sign()</code> 함수가 수식 어디에든 존재하면 CONCENTRATED_WEIGHT 실패가 거의 확실하므로, IQC 점수에 0.05 배율(95% 감점)을 적용한다. 비교 연산자가 루트에 있는 binary output 패턴도 동일하게 처리한다.</p>
+
+<p><strong>(2) 필드 다양성 페널티.</strong> 데이터 필드가 1개이면 0.30 배율(70% 감점), 2개이면 0.70 배율(30% 감점)을 적용하여 DATA_DIVERSITY 실패를 사전 방지한다.</p>
+
+<p><strong>(3) 필드 과집중 페널티.</strong> 특정 필드가 수식에서 4회 이상 등장하면 0.50 배율, 3회이면 0.70 배율을 적용한다.</p>
+
+<p><strong>(4) IS Check 친화적 전략 6개 추가.</strong> <code>group_neutralized_momentum</code>, <code>multi_field_decay</code>, <code>zscore_corr_spread</code>, <code>rank_ratio_value</code>, <code>neutralized_reversal</code>, <code>decay_corr_multi</code>를 4배 가중으로 전략 풀에 추가하였다.</p>
+
+<h3>11.7 v5.7: sign() 완전 제거 및 GLB 차단 필드</h3>
+
+<p>v5.7은 sign() 연산자를 시스템에서 완전히 제거하는 5계층 차단 체계를 구축하였다.</p>
+
+<p><strong>(1) 소스 레벨 차단.</strong> <code>alpha_ast.py</code>의 <code>UNARY_OPS</code>에서 <code>sign</code>을 제거하여 랜덤 트리 생성 시 sign()이 선택되지 않도록 하였다.</p>
+
+<p><strong>(2) LLM 차단.</strong> <code>llm_seed.py</code>의 sanitizer가 sign() 포함 수식을 거부하고, SYSTEM_PROMPT에서 sign()을 명시적으로 금지하였다.</p>
+
+<p><strong>(3) 평가 단계 차단.</strong> <code>_evaluate_population()</code>에서 sign() 또는 비교 연산자 루트 수식을 전량 스킵한다.</p>
+
+<p><strong>(4) 세대 생성 차단.</strong> <code>_next_generation()</code>에서 sign() 포함 자식 개체를 즉시 폐기한다.</p>
+
+<p><strong>(5) 카타클리즘 차단.</strong> <code>_cataclysm()</code>에서 sign() 수식을 차단한다.</p>
+
+<p>추가로 GLB 리전의 <code>REGION_BLOCKED_FIELDS</code>를 USA 전용 필드(기관, 센티먼트, 옵션, 애널리스트, 모델, 비율 필드)로 채워 unknown variable 에러를 방지하였다. IS Check 친화적 전략 6개를 추가하여 총 12개로 확대하였다.</p>
+
+<h3>11.8 v5.7.1: ts_covariance 중첩 차단 및 파서 에러 방지</h3>
+
+<p><strong>(1) ts_covariance 중첩 차단.</strong> <code>ts_covariance</code>가 3중 이상 중첩되면 CONCENTRATED_WEIGHT 실패가 발생하는 패턴을 발견하여, 평가·세대 생성·IS Check 친화성 평가에서 각각 차단/페널티를 적용하였다.</p>
+
+<p><strong>(2) BRAIN 파서 에러 방지.</strong> <code>), )</code>, <code>, ,</code>, <code>,)</code> 등 malformed expression 패턴을 검출하여 API 호출 전에 필터링한다.</p>
+
+<h3>11.9 v5.8: 학술 논문 기반 고품질 팩터 전략 25개</h3>
+
+<p>v5.8은 LLM 비용 없이 전략 시드의 품질을 근본적으로 개선하기 위해, 학술 논문에서 검증된 25개 팩터 전략을 하드코딩으로 추가하였다. 모든 전략은 3개 이상 필드, sign() 금지, 연산자 15~30개, <code>group_neutralize</code> 적용의 IS Check 친화적 구조를 따른다.</p>
+
+<table>
+<caption>표 11: v5.8 학술 팩터 전략 목록</caption>
+<thead><tr><th>#</th><th>전략명</th><th>학술 근거</th><th>핵심 직관</th></tr></thead>
+<tbody>
+<tr><td>1</td><td class="left"><code>acad_profitability_momentum</code></td><td class="left">Novy-Marx (2013)</td><td class="left">수익성 + 모멘텀 결합</td></tr>
+<tr><td>2</td><td class="left"><code>acad_asset_growth_anomaly</code></td><td class="left">Cooper et al. (2008)</td><td class="left">자산 성장률 역행 효과</td></tr>
+<tr><td>3</td><td class="left"><code>acad_earnings_quality</code></td><td class="left">Sloan (1996)</td><td class="left">현금흐름 vs 발생액 (이익의 질)</td></tr>
+<tr><td>4</td><td class="left"><code>acad_idio_vol_discount</code></td><td class="left">Ang et al. (2006)</td><td class="left">고유 변동성 할인 효과</td></tr>
+<tr><td>5</td><td class="left"><code>acad_liquidity_premium</code></td><td class="left">Amihud (2002)</td><td class="left">비유동성 프리미엄</td></tr>
+<tr><td>6</td><td class="left"><code>acad_accruals_anomaly</code></td><td class="left">Sloan (1996)</td><td class="left">높은 발생액 = 낮은 미래 수익</td></tr>
+<tr><td>7</td><td class="left"><code>acad_investment_factor</code></td><td class="left">Hou-Xue-Zhang (2015)</td><td class="left">낮은 투자 = 높은 수익</td></tr>
+<tr><td>8</td><td class="left"><code>acad_price_volume_trend</code></td><td class="left">Gervais-Kaniel (2001)</td><td class="left">가격-거래량 추세 상호작용</td></tr>
+<tr><td>9</td><td class="left"><code>acad_operating_leverage</code></td><td class="left">Novy-Marx (2011)</td><td class="left">영업 레버리지 효과</td></tr>
+<tr><td>10</td><td class="left"><code>acad_debt_issuance_anomaly</code></td><td class="left">Spiess-Affleck-Graves (1999)</td><td class="left">부채 발행 이상 현상</td></tr>
+<tr><td>11</td><td class="left"><code>acad_revenue_surprise</code></td><td class="left">Jegadeesh-Livnat (2006)</td><td class="left">매출 서프라이즈 모멘텀</td></tr>
+<tr><td>12</td><td class="left"><code>acad_cashflow_duration</code></td><td class="left">Dechow et al. (2004)</td><td class="left">현금흐름 지속성</td></tr>
+<tr><td>13</td><td class="left"><code>acad_multi_quality_composite</code></td><td class="left">AQR QMJ</td><td class="left">수익성 + 성장 + 안전</td></tr>
+<tr><td>14</td><td class="left"><code>acad_vol_of_vol</code></td><td class="left">Baltussen et al. (2018)</td><td class="left">변동성의 변동성 효과</td></tr>
+<tr><td>15</td><td class="left"><code>acad_turnover_reversal</code></td><td class="left">Lee-Swaminathan (2000)</td><td class="left">거래량 회전율 기반 반전</td></tr>
+<tr><td>16</td><td class="left"><code>acad_max_return_effect</code></td><td class="left">Bali et al. (2011)</td><td class="left">최대 수익률 효과 (복권형 회피)</td></tr>
+<tr><td>17</td><td class="left"><code>acad_industry_momentum_spread</code></td><td class="left">Moskowitz-Grinblatt (1999)</td><td class="left">산업 모멘텀 스프레드</td></tr>
+<tr><td>18</td><td class="left"><code>acad_fundamental_momentum</code></td><td class="left">Chordia-Shivakumar (2006)</td><td class="left">펀더멘탈 모멘텀</td></tr>
+<tr><td>19</td><td class="left"><code>acad_composite_value_quality</code></td><td class="left">Asness et al. (2019)</td><td class="left">가치 + 퀄리티 복합</td></tr>
+<tr><td>20</td><td class="left"><code>acad_decay_weighted_residual</code></td><td class="left">—</td><td class="left">장단기 decay 차이 잔차</td></tr>
+<tr><td>21</td><td class="left"><code>acad_multi_horizon_vol</code></td><td class="left">—</td><td class="left">단기/장기 변동성 비율</td></tr>
+<tr><td>22</td><td class="left"><code>acad_rank_dispersion</code></td><td class="left">—</td><td class="left">횡단면 랭크 분산도</td></tr>
+<tr><td>23</td><td class="left"><code>acad_corr_regime_switch</code></td><td class="left">—</td><td class="left">상관관계 레짐 전환</td></tr>
+<tr><td>24</td><td class="left"><code>acad_relative_strength_decay</code></td><td class="left">—</td><td class="left">그룹 내 상대 강도 감쇠</td></tr>
+<tr><td>25</td><td class="left"><code>acad_quality_minus_junk</code></td><td class="left">AQR QMJ</td><td class="left">수익성 + 안전성 + 성장성</td></tr>
+</tbody>
+</table>
+
+<p>전략 풀 구성은 5계층 가중 체계를 따른다: 학술 팩터 25개(5×), IS-friendly 12개(4×), 희귀 필드 11개(3×), 복합 7개(2×), 기본 6개(1×). 총 226개(가중 포함)로 기존 101개 대비 2.2배 확대되었다. 학술 전략이 전체의 55%를 차지하여, LLM 없이도 경제적 직관에 기반한 고품질 시드를 대량 공급한다.</p>
+
+<p><strong>group_op 렌더링 버그 수정.</strong> <code>alpha_ast.py</code>의 <code>to_expr()</code>에서 <code>group_op</code> 노드가 <code>var_name</code>이 비어 있을 때 children[1]에서 그룹 필드를 추출하는 fallback을 추가하였다. 이전에는 <code>group_neutralize(rank(x), )</code> 형태로 빈 그룹 필드가 출력되어 BRAIN API 에러를 유발할 수 있었다.</p>
+
 <div class="section-divider">• • •</div>
 
 <!-- 12. Glossary -->
@@ -1159,6 +1233,16 @@ save_final()                           <span class="cm"># pattern_learner/surrog
 <p>WorldQuant BRAIN Platform. <em>FastExpression Language Reference</em>. <a href="https://platform.worldquantbrain.com" target="_blank">platform.worldquantbrain.com</a></p>
 <p>Rissanen, J. (1978). Modeling by shortest data description. <em>Automatica</em>, 14(5), pp. 465–471.</p>
 <p>Jin, Y. (2011). Surrogate-assisted evolutionary computation: Recent advances and future challenges. <em>Swarm and Evolutionary Computation</em>, 1(2), pp. 61–70.</p>
+<p>Novy-Marx, R. (2013). The other side of value: The gross profitability premium. <em>Journal of Financial Economics</em>, 108(1), pp. 1–28.</p>
+<p>Cooper, M. J., Gulen, H. & Schill, M. J. (2008). Asset growth and the cross-section of stock returns. <em>Journal of Finance</em>, 63(4), pp. 1609–1651.</p>
+<p>Sloan, R. G. (1996). Do stock prices fully reflect information in accruals and cash flows about future earnings? <em>The Accounting Review</em>, 71(3), pp. 289–315.</p>
+<p>Ang, A., Hodrick, R. J., Xing, Y. & Zhang, X. (2006). The cross-section of volatility and expected returns. <em>Journal of Finance</em>, 61(1), pp. 259–299.</p>
+<p>Amihud, Y. (2002). Illiquidity and stock returns: Cross-section and time-series effects. <em>Journal of Financial Markets</em>, 5(1), pp. 31–56.</p>
+<p>Hou, K., Xue, C. & Zhang, L. (2015). Digesting anomalies: An investment approach. <em>Review of Financial Studies</em>, 28(3), pp. 650–705.</p>
+<p>Asness, C. S., Frazzini, A. & Pedersen, L. H. (2019). Quality minus junk. <em>Review of Accounting Studies</em>, 24(1), pp. 34–112.</p>
+<p>Moskowitz, T. J. & Grinblatt, M. (1999). Do industries explain momentum? <em>Journal of Finance</em>, 54(4), pp. 1249–1290.</p>
+<p>Bali, T. G., Cakici, N. & Whitelaw, R. F. (2011). Maxing out: Stocks as lotteries and the cross-section of expected returns. <em>Journal of Financial Economics</em>, 99(2), pp. 427–446.</p>
+<p>Lee, C. M. C. & Swaminathan, B. (2000). Price momentum and trading volume. <em>Journal of Finance</em>, 55(5), pp. 2017–2069.</p>
 </div>
 
 </div><!-- /.paper-content -->
