@@ -441,8 +441,150 @@ toc_sticky: true
 <span class="code-kw">telegram_bot_token</span>: <span class="code-str">""</span>     <span class="code-cm"># @BotFather에서 발급</span>
 <span class="code-kw">telegram_chat_id</span>: <span class="code-str">""</span>       <span class="code-cm"># 채팅 ID</span></div>
 
+    <h2 class="section-header">IX. 프로젝트 구조</h2>
+
+    <div class="code-block"><span class="code-cm">📁 프로젝트 디렉토리 구조</span>
+
+├── config.yaml                  <span class="code-cm"># 시스템 설정 (심볼, 주기, 클라우드 등)</span>
+├── src/
+│   ├── __init__.py
+│   ├── config.py                <span class="code-cm"># Config 데이터클래스, YAML 로드</span>
+│   ├── models.py                <span class="code-cm"># 데이터 모델 (DepthDiff, AggTrade, ...)</span>
+│   ├── collector.py             <span class="code-cm"># WebSocket 수신기 (Spot + Futures)</span>
+│   ├── orderbook_manager.py     <span class="code-cm"># 오더북 재구성, 시퀀스 검증</span>
+│   ├── buffer.py                <span class="code-cm"># 심볼별 메모리 버퍼</span>
+│   ├── flusher.py               <span class="code-cm"># Parquet 저장, 체크섬 기록</span>
+│   ├── syncer.py                <span class="code-cm"># rclone 클라우드 동기화</span>
+│   ├── integrity_logger.py      <span class="code-cm"># 갭 추적, 통계, 커버리지</span>
+│   ├── telegram_reporter.py     <span class="code-cm"># 텔레그램 알림</span>
+│   ├── funding_rate_collector.py<span class="code-cm"># 8시간 주기 펀딩비 수집</span>
+│   ├── time_sync_monitor.py     <span class="code-cm"># NTP 오프셋, 바이낸스 RTT</span>
+│   ├── environment_recorder.py  <span class="code-cm"># 환경 메타데이터 기록</span>
+│   └── main.py                  <span class="code-cm"># 엔트리포인트, 모듈 초기화</span>
+├── tests/                       <span class="code-cm"># 107개 테스트 (pytest + hypothesis)</span>
+│   ├── test_collector.py
+│   ├── test_orderbook_manager.py
+│   ├── test_buffer.py
+│   ├── test_flusher.py
+│   ├── test_syncer.py
+│   ├── test_integrity_logger.py
+│   ├── test_telegram_reporter.py
+│   ├── test_funding_rate.py
+│   ├── test_kline.py
+│   ├── test_liquidation.py
+│   ├── test_time_sync.py
+│   ├── test_checksum.py
+│   ├── test_environment_recorder.py
+│   ├── test_coverage_report.py
+│   ├── test_config.py
+│   └── test_integration.py
+├── data/                        <span class="code-cm"># Parquet 파일 저장 디렉토리</span>
+│   ├── BTCUSDT_orderbook_20260226_1100.parquet
+│   ├── BTCUSDT_trade_20260226_1100.parquet
+│   └── checksums.json
+└── logs/                        <span class="code-cm"># 무결성 로그, 시간 동기화, 환경 메타데이터</span>
+    ├── stats_20260226_11.json
+    ├── time_sync_20260226.json
+    └── environment_20260226_110000.json</div>
+
+    <h2 class="section-header">X. 실제 수집 데이터 샘플</h2>
+
+    <div class="subsection">10.1 체결 데이터 (aggTrade)</div>
+
+    <p class="body-text">아래는 3분 수집 테스트에서 실제로 기록된 BTC/USDT 체결 데이터의 처음 5건이다. 각 레코드에는 거래소 서버 시각(trade_time)과 로컬 수신 시각(recv_time)이 이중으로 기록되며, datetime_utc 컬럼은 사람이 읽을 수 있는 형태로 변환한 것이다.</p>
+
+    <div style="overflow-x:auto;">
+    <table class="data-table">
+        <tr>
+            <th>datetime_utc</th>
+            <th class="num">price</th>
+            <th class="num">quantity</th>
+            <th>side</th>
+            <th class="mono">trade_id</th>
+            <th class="num">latency (ms)</th>
+        </tr>
+        <tr>
+            <td class="mono">2026-02-26 10:59:18.621</td>
+            <td class="num">68,313.75</td>
+            <td class="num">0.00082</td>
+            <td><span class="badge badge-red">SELL</span></td>
+            <td class="mono">3879581394</td>
+            <td class="num">323</td>
+        </tr>
+        <tr>
+            <td class="mono">2026-02-26 10:59:19.425</td>
+            <td class="num">68,313.75</td>
+            <td class="num">0.00249</td>
+            <td><span class="badge badge-red">SELL</span></td>
+            <td class="mono">3879581395</td>
+            <td class="num">183</td>
+        </tr>
+        <tr>
+            <td class="mono">2026-02-26 10:59:19.517</td>
+            <td class="num">68,313.75</td>
+            <td class="num">0.00085</td>
+            <td><span class="badge badge-red">SELL</span></td>
+            <td class="mono">3879581396</td>
+            <td class="num">160</td>
+        </tr>
+        <tr>
+            <td class="mono">2026-02-26 10:59:19.535</td>
+            <td class="num">68,313.75</td>
+            <td class="num">0.01025</td>
+            <td><span class="badge badge-red">SELL</span></td>
+            <td class="mono">3879581397</td>
+            <td class="num">142</td>
+        </tr>
+        <tr>
+            <td class="mono">2026-02-26 10:59:19.945</td>
+            <td class="num">68,313.76</td>
+            <td class="num">0.03593</td>
+            <td><span class="badge badge-green">BUY</span></td>
+            <td class="mono">3879581398</td>
+            <td class="num">41</td>
+        </tr>
+    </table>
+    </div>
+    <p style="font-size:12px; color:var(--wsj-gray);">is_buyer_maker=True → 매수자가 maker(지정가) = taker가 매도 → SELL 표시. latency = recv_time − trade_time.</p>
+
+    <div class="subsection">10.2 오더북 스냅샷</div>
+
+    <p class="body-text">오더북 데이터는 100ms 주기로 수신되며, 각 스냅샷에는 상위 20호가의 매수/매도 가격과 수량이 기록된다. 아래는 첫 번째 스냅샷의 상위 5호가이다.</p>
+
+    <div style="display:grid; grid-template-columns:1fr 1fr; gap:20px; margin:20px 0;">
+        <div>
+            <table class="data-table">
+                <tr><th colspan="2" style="text-align:center; color:var(--wsj-green);">매수 (Bids) — 내림차순</th></tr>
+                <tr><th class="num">Price</th><th class="num">Quantity</th></tr>
+                <tr><td class="num" style="color:var(--wsj-green);">68,313.75</td><td class="num">0.46086</td></tr>
+                <tr><td class="num" style="color:var(--wsj-green);">68,313.74</td><td class="num">0.00108</td></tr>
+                <tr><td class="num" style="color:var(--wsj-green);">68,313.73</td><td class="num">0.00044</td></tr>
+                <tr><td class="num" style="color:var(--wsj-green);">68,313.71</td><td class="num">0.00017</td></tr>
+                <tr><td class="num" style="color:var(--wsj-green);">68,313.70</td><td class="num">0.00051</td></tr>
+            </table>
+        </div>
+        <div>
+            <table class="data-table">
+                <tr><th colspan="2" style="text-align:center; color:var(--wsj-red);">매도 (Asks) — 오름차순</th></tr>
+                <tr><th class="num">Price</th><th class="num">Quantity</th></tr>
+                <tr><td class="num" style="color:var(--wsj-red);">68,313.76</td><td class="num">1.62515</td></tr>
+                <tr><td class="num" style="color:var(--wsj-red);">68,314.20</td><td class="num">0.00209</td></tr>
+                <tr><td class="num" style="color:var(--wsj-red);">68,314.50</td><td class="num">0.00159</td></tr>
+                <tr><td class="num" style="color:var(--wsj-red);">68,314.63</td><td class="num">0.00008</td></tr>
+                <tr><td class="num" style="color:var(--wsj-red);">68,314.90</td><td class="num">0.00016</td></tr>
+            </table>
+        </div>
+    </div>
+    <p style="font-size:12px; color:var(--wsj-gray);">update_id: 88801206505 | event_time: 2026-02-26 10:59:18.616 UTC | recv_time: 2026-02-26 10:59:18.722 UTC | latency: 106ms | spread: $0.01</p>
+
+    <div class="chart-section">
+        <div class="chart-title">BTC/USDT Orderbook Depth — First Snapshot</div>
+        <div class="chart-subtitle">상위 20호가 가격-수량 분포 (2026-02-26 10:59:18 UTC)</div>
+        <div id="depthChart" class="chart-container" style="height:350px;"></div>
+    </div>
+
     <div class="conclusion-box">
-        <h2 class="section-header">IX. 결론</h2>
+        <h2 class="section-header">XI. 결론</h2>
         <p class="body-text">본 시스템은 학술 연구 목적의 암호화폐 시장 미시구조 데이터 수집을 위해 설계되었다. Python asyncio 기반의 단일 프로세스 아키텍처로 구형 PC에서도 24/7 무중단 운영이 가능하며, 바이낸스 공식 오더북 관리 가이드라인을 엄격히 준수하여 데이터의 정확성을 보장한다.</p>
 
         <p class="body-text">이중 타임스탬프, SHA-256 체크섬, NTP 동기화 모니터링, 환경 메타데이터 기록 등 SCI 논문 수준의 데이터 무결성 요건을 충족하도록 설계되었으며, 16개의 정확성 속성(correctness property)과 107개의 자동화된 테스트로 시스템의 신뢰성을 검증하였다.</p>
@@ -450,7 +592,7 @@ toc_sticky: true
         <p class="body-text">rclone 기반 클라우드 동기화와 7일 로컬 보관 정책을 통해 장기 수집(3개월+)에도 로컬 디스크 부담 없이 운영할 수 있다. 텔레그램 알림을 통해 원격에서도 시스템 상태를 실시간으로 모니터링할 수 있다.</p>
     </div>
     
-    <h2 class="section-header">X. 기술 스택</h2>
+    <h2 class="section-header">XII. 기술 스택</h2>
     
     <table class="data-table">
         <tr><th>구분</th><th>기술</th><th>용도</th></tr>
@@ -465,7 +607,7 @@ toc_sticky: true
         <tr><td>테스트</td><td>pytest + hypothesis</td><td>단위 테스트 + 속성 기반 테스트</td></tr>
     </table>
 
-    <h2 class="section-header">XI. 참고문헌</h2>
+    <h2 class="section-header">XIII. 참고문헌</h2>
     
     <div class="ref-list">
         <div class="ref-item">Binance. (2024). How to manage a local order book correctly. Binance API Documentation.</div>
@@ -672,5 +814,45 @@ Plotly.newPlot('storageChart', [{
         {x:'1개월', y:40, text:'<b>~37GB</b>', showarrow:false, font:{size:10}},
         {x:'3개월', y:118, text:'<b>~112GB</b>', showarrow:false, font:{size:10}}
     ]
+}, {responsive: true});
+
+// ── Orderbook Depth Chart ──
+const bidPrices = [68313.75,68313.74,68313.73,68313.71,68313.70,68313.69,68313.68,68313.67,68313.46,68313.44,68312.94,68312.84,68312.83,68312.79,68312.78,68312.59,68312.56,68312.16,68312.04,68312.03];
+const bidQtys = [0.46086,0.00108,0.00044,0.00017,0.00051,0.00035,0.00017,0.00009,0.00008,0.00008,0.00017,0.00016,0.00008,0.00016,0.00016,0.00008,0.00008,0.00024,0.00016,0.03229];
+const askPrices = [68313.76,68314.20,68314.50,68314.63,68314.90,68314.91,68314.92,68314.99,68315.31,68315.38,68315.39,68315.40,68315.45,68315.84,68316.19,68316.20,68316.21,68316.68,68317.48,68317.79];
+const askQtys = [1.62515,0.00209,0.00159,0.00008,0.00016,0.01555,0.01092,0.00009,0.00008,0.00016,0.00731,0.00008,0.00009,0.00200,0.00016,0.00731,0.00150,0.00008,0.00200,0.00008];
+
+// cumulative
+let bidCum = [], askCum = [];
+let sum = 0;
+for(let i=0; i<bidQtys.length; i++) { sum += bidQtys[i]; bidCum.push(sum); }
+sum = 0;
+for(let i=0; i<askQtys.length; i++) { sum += askQtys[i]; askCum.push(sum); }
+
+Plotly.newPlot('depthChart', [{
+    x: bidPrices, y: bidCum,
+    type: 'scatter', mode: 'lines',
+    fill: 'tozeroy', fillcolor: 'rgba(0,132,61,0.2)',
+    line: {color: colors.green, width: 2},
+    name: 'Bids (누적)'
+}, {
+    x: askPrices, y: askCum,
+    type: 'scatter', mode: 'lines',
+    fill: 'tozeroy', fillcolor: 'rgba(196,18,0,0.2)',
+    line: {color: colors.accent, width: 2},
+    name: 'Asks (누적)'
+}], {
+    ...baseLayout,
+    xaxis: {title: 'Price (USDT)', tickformat: ',.2f', range: [68311.5, 68318.5]},
+    yaxis: {title: '누적 수량 (BTC)'},
+    legend: {orientation: 'h', y: 1.12},
+    shapes: [{
+        type: 'line', x0: 68313.755, x1: 68313.755, y0: 0, y1: 1.7,
+        line: {color: '#999', width: 1, dash: 'dot'}
+    }],
+    annotations: [{
+        x: 68313.755, y: 1.75, text: 'Mid Price<br>$68,313.755',
+        showarrow: false, font: {size: 10, color: '#666'}
+    }]
 }, {responsive: true});
 </script>
