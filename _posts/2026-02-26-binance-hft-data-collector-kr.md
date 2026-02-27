@@ -120,6 +120,96 @@ toc_sticky: true
         <div class="stat-item"><div class="stat-label">수집 주기</div><div class="stat-value">100ms</div></div>
     </div>
 
+    <h2 class="section-header">연구 활용: 이 데이터로 무엇을 할 수 있는가</h2>
+
+    <p class="body-text">본 시스템이 수집하는 6종의 데이터는 암호화폐 시장 미시구조 연구의 핵심 원재료이다. 아래는 각 데이터 유형별로 가능한 연구 주제와 전략, 그리고 실제 학술 논문에서 활용되는 방법론을 정리한 것이다.</p>
+
+    <div class="subsection">수집 가능 데이터 → 연구 주제 매핑</div>
+
+    <table class="data-table">
+        <tr><th>수집 데이터</th><th>연구 주제 / 전략</th><th>관련 논문 / 방법론</th></tr>
+        <tr>
+            <td><span class="badge badge-blue">오더북</span> 100ms L20</td>
+            <td>유동성 측정 (bid-ask spread, depth imbalance)<br>가격 충격 모델 (Kyle's Lambda)<br>오더북 불균형 기반 단기 예측</td>
+            <td>Cont, Stoikov & Talreja (2010)<br>Kyle (1985)<br>Cao, Chen & Gould (2009)</td>
+        </tr>
+        <tr>
+            <td><span class="badge badge-green">체결 (aggTrade)</span></td>
+            <td>거래량 클러스터링 (Hawkes process)<br>정보 비대칭 측정 (VPIN, PIN)<br>고빈도 변동성 추정 (realized volatility)</td>
+            <td>Hawkes (1971), Bacry et al. (2015)<br>Easley, López de Prado & O'Hara (2012)<br>Andersen & Bollerslev (1998)</td>
+        </tr>
+        <tr>
+            <td><span class="badge badge-red">청산 (forceOrder)</span></td>
+            <td>레버리지 캐스케이드 분석<br>청산 클러스터 → 가격 급락 예측<br>선물 시장 시스템 리스크 측정</td>
+            <td>Brunnermeier & Pedersen (2009)<br>Thurner, Farmer & Geanakoplos (2012)</td>
+        </tr>
+        <tr>
+            <td><span class="badge badge-orange">1분봉 (kline)</span></td>
+            <td>OHLCV 기반 기술적 분석<br>변동성 레짐 탐지 (HMM, GARCH)<br>크로스 심볼 상관 분석</td>
+            <td>Hamilton (1989)<br>Bollerslev (1986)<br>Diebold & Yilmaz (2012)</td>
+        </tr>
+        <tr>
+            <td><span class="badge badge-blue">펀딩비</span> 8h</td>
+            <td>선물-현물 베이시스 트레이딩<br>시장 센티먼트 지표 구축<br>캐리 트레이드 수익률 분석</td>
+            <td>Alexander & Heck (2020)<br>Biais et al. (2023)</td>
+        </tr>
+        <tr>
+            <td><span class="badge badge-red">시간 동기화</span> NTP</td>
+            <td>레이턴시 보정 (latency correction)<br>거래소 간 차익거래 타이밍 분석<br>데이터 무결성 검증</td>
+            <td>Hasbrouck & Saar (2013)<br>Ding et al. (2014)</td>
+        </tr>
+    </table>
+
+    <div class="subsection">구체적 연구 전략 및 논문 아이디어</div>
+
+    <div class="callout">
+        <div class="callout-header">📝 Strategy 1 — 오더북 불균형 기반 단기 가격 예측</div>
+        <p class="body-text" style="margin-bottom:8px;">오더북 상위 N호가의 매수/매도 수량 비율(Order Imbalance)이 단기 가격 방향을 예측하는지 검증한다. 100ms 오더북 스냅샷에서 OI = (V_bid − V_ask) / (V_bid + V_ask)를 계산하고, 다음 1초/5초/10초 수익률과의 관계를 분석한다.</p>
+        <p style="font-size:13px; color:var(--wsj-gray);">필요 데이터: 오더북 + 체결 | 방법론: Linear/Logistic Regression, Random Forest | 참고: Cont, Kukanov & Stoikov (2014)</p>
+    </div>
+
+    <div class="callout">
+        <div class="callout-header">📝 Strategy 2 — Hawkes Process 기반 체결 클러스터링</div>
+        <p class="body-text" style="margin-bottom:8px;">암호화폐 체결 데이터의 자기 흥분(self-exciting) 특성을 Hawkes process로 모델링한다. 체결이 체결을 유발하는 피드백 루프의 강도(branching ratio)를 추정하고, 이를 통해 시장의 내생적 변동성과 외생적 충격을 분리한다.</p>
+        <p style="font-size:13px; color:var(--wsj-gray);">필요 데이터: 체결 (밀리초 정밀도) | 방법론: MLE, EM Algorithm | 참고: Bacry, Mastromatteo & Muzy (2015)</p>
+    </div>
+
+    <div class="callout">
+        <div class="callout-header">📝 Strategy 3 — 청산 캐스케이드와 가격 급락 예측</div>
+        <p class="body-text" style="margin-bottom:8px;">선물 시장의 강제 청산(forceOrder) 데이터를 활용하여 레버리지 캐스케이드를 탐지한다. 단위 시간당 청산 건수/금액이 임계값을 초과할 때 추가 가격 하락이 발생하는지, 그리고 이를 실시간으로 감지하여 리스크 관리에 활용할 수 있는지 검증한다.</p>
+        <p style="font-size:13px; color:var(--wsj-gray);">필요 데이터: 청산 + 체결 + 오더북 | 방법론: Event Study, Threshold Model | 참고: Brunnermeier & Pedersen (2009)</p>
+    </div>
+
+    <div class="callout">
+        <div class="callout-header">📝 Strategy 4 — 펀딩비 기반 선물-현물 차익거래</div>
+        <p class="body-text" style="margin-bottom:8px;">바이낸스 무기한 선물의 펀딩비(8시간 주기)가 양수일 때 현물 매수 + 선물 매도, 음수일 때 반대 포지션을 취하는 캐리 트레이드 전략을 백테스트한다. 펀딩비의 평균 회귀 특성과 극단값에서의 수익률을 분석한다.</p>
+        <p style="font-size:13px; color:var(--wsj-gray);">필요 데이터: 펀딩비 + 1분봉 | 방법론: Mean Reversion, Pairs Trading | 참고: Alexander & Heck (2020)</p>
+    </div>
+
+    <div class="callout">
+        <div class="callout-header">📝 Strategy 5 — 크로스 심볼 유동성 스필오버</div>
+        <p class="body-text" style="margin-bottom:8px;">BTC, ETH, XRP 간의 유동성 스필오버를 분석한다. BTC 오더북 깊이 변화가 ETH/XRP의 스프레드에 미치는 영향, 그리고 BTC 대량 체결 이후 알트코인의 유동성 변화를 VAR/Granger 인과성 검정으로 분석한다.</p>
+        <p style="font-size:13px; color:var(--wsj-gray);">필요 데이터: 3심볼 오더북 + 체결 | 방법론: VAR, Granger Causality, Diebold-Yilmaz Spillover Index | 참고: Diebold & Yilmaz (2012)</p>
+    </div>
+
+    <div class="callout">
+        <div class="callout-header">📝 Strategy 6 — VPIN 기반 정보 비대칭 측정</div>
+        <p class="body-text" style="margin-bottom:8px;">Volume-Synchronized Probability of Informed Trading (VPIN)을 암호화폐 체결 데이터에 적용한다. VPIN이 급등하는 시점이 가격 급변 이전에 나타나는지 검증하고, 이를 실시간 리스크 지표로 활용할 수 있는지 분석한다.</p>
+        <p style="font-size:13px; color:var(--wsj-gray);">필요 데이터: 체결 (is_buyer_maker 필드 활용) | 방법론: Bulk Volume Classification | 참고: Easley, López de Prado & O'Hara (2012)</p>
+    </div>
+
+    <div class="formula-box">
+        <div class="formula-label">SCI 논문 작성 시 데이터 활용 가이드</div>
+        <div class="formula-content">
+            1. 데이터 수집 기간: 최소 3개월 (계절성, 레짐 변화 포착)<br>
+            2. 무결성 보고: SHA-256 체크섬, 커버리지 비율, 갭 통계 명시<br>
+            3. 레이턴시 보정: NTP 오프셋으로 recv_time 보정 후 분석<br>
+            4. 재현성: config.yaml + environment_recorder 메타데이터 공개<br>
+            5. 데이터 접근: Parquet 파일 + checksums.json을 Zenodo 등에 공개
+        </div>
+        <div class="formula-note">본 시스템의 이중 타임스탬프, 환경 메타데이터, 체크섬 기록은 SCI 저널의 데이터 무결성 요건을 충족하도록 설계되었다.</div>
+    </div>
+
     <h2 class="section-header">I. 설계 동기</h2>
     
     <p class="body-text">암호화폐 시장 미시구조 연구에서 가장 근본적인 과제는 데이터의 확보이다. 기존 학술 데이터 제공업체(Refinitiv, Bloomberg)는 전통 금융시장에 특화되어 있으며, 암호화폐 거래소의 틱 단위 오더북 데이터를 제공하지 않는다. Binance Vision(data.binance.vision)이 과거 데이터를 제공하지만, 실시간 오더북 재구성 데이터나 수신 레이턴시 정보는 포함되지 않는다.</p>
