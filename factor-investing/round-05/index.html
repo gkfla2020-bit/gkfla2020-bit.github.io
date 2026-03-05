@@ -379,6 +379,91 @@ TSLA    0.289  1.567 -0.123 -0.789 -0.567 -0.345  0.423</div>
 <tr><td>β_CMA</td><td>보수적 투자</td><td>공격적 투자</td></tr>
 </table>
 
+<h3>4.3 알파 검정과 전략 유효성 판단</h3>
+<p>팩터 회귀에서 추정된 알파(α)는 단순한 숫자가 아니라, 투자 전략의 유효성을 판단하는 핵심 도구다. Ang은 알파의 통계적 유의성에 따라 세 가지 시나리오를 구분한다.</p>
+
+<div class="def">
+<p class="ni"><strong>Definition 4.3 — 알파 검정의 세 가지 시나리오</strong></p>
+<ul>
+<li><strong>α = 0 (유의하지 않음):</strong> 팩터 모델이 수익률을 완전히 설명한다. 전략의 초과수익은 팩터 노출(β)에 대한 보상일 뿐, 매니저 스킬이 아니다.</li>
+<li><strong>α > 0 (통계적으로 유의):</strong> 팩터로 설명되지 않는 진짜 초과수익이 존재한다. 전략이 유효하다는 증거.</li>
+<li><strong>α < 0 (통계적으로 유의):</strong> 팩터 노출 대비 성과가 부진하다. 거래비용, 나쁜 타이밍 등으로 가치를 파괴하고 있다.</li>
+</ul>
+<div class="eq">\[ H_0: \alpha = 0 \quad \text{vs} \quad H_1: \alpha \neq 0 \]</div>
+<p class="ni">t-통계량 \(= \alpha / SE(\alpha)\). 일반적으로 \(|t| > 2\)이면 5% 수준에서 유의하다.</p>
+</div>
+
+<pre><code><span class="kw">import</span> numpy <span class="kw">as</span> np
+<span class="kw">import</span> statsmodels.api <span class="kw">as</span> sm
+
+<span class="cm"># 시뮬레이션: 3개 전략의 알파 검정</span>
+np.random.seed(<span class="nu">42</span>)
+T = <span class="nu">120</span>  <span class="cm"># 10년 월간</span>
+
+<span class="cm"># 팩터 수익률</span>
+mkt = np.random.normal(<span class="nu">0.007</span>, <span class="nu">0.04</span>, T)
+smb = np.random.normal(<span class="nu">0.002</span>, <span class="nu">0.03</span>, T)
+hml = np.random.normal(<span class="nu">0.003</span>, <span class="nu">0.03</span>, T)
+
+<span class="cm"># 전략 A: 진짜 알파 있음 (스킬 있는 매니저)</span>
+strat_a = <span class="nu">0.004</span> + <span class="nu">1.1</span>*mkt + <span class="nu">0.3</span>*smb + <span class="nu">0.2</span>*hml + np.random.normal(<span class="nu">0</span>, <span class="nu">0.015</span>, T)
+
+<span class="cm"># 전략 B: 알파 = 0 (팩터 노출만, 스킬 없음)</span>
+strat_b = <span class="nu">0.0</span> + <span class="nu">0.9</span>*mkt + <span class="nu">0.5</span>*smb + <span class="nu">0.6</span>*hml + np.random.normal(<span class="nu">0</span>, <span class="nu">0.012</span>, T)
+
+<span class="cm"># 전략 C: 음의 알파 (비용이 수익을 잠식)</span>
+strat_c = -<span class="nu">0.003</span> + <span class="nu">1.2</span>*mkt + <span class="nu">0.1</span>*smb - <span class="nu">0.1</span>*hml + np.random.normal(<span class="nu">0</span>, <span class="nu">0.018</span>, T)
+
+X = sm.add_constant(np.column_stack([mkt, smb, hml]))
+
+<span class="fn">print</span>(<span class="st">"=== 알파 검정: 전략 유효성 판단 ==="</span>)
+<span class="fn">print</span>(<span class="st">f"{'전략':>6} {'α(월)':>8} {'α(연)':>8} {'t-stat':>8} {'p-value':>8} {'판정':>12}"</span>)
+<span class="fn">print</span>(<span class="st">"-"</span> * <span class="nu">58</span>)
+
+<span class="kw">for</span> name, y <span class="kw">in</span> [(<span class="st">'A(스킬)'</span>, strat_a), (<span class="st">'B(베타만)'</span>, strat_b), (<span class="st">'C(비용)'</span>, strat_c)]:
+    model = sm.OLS(y, X).fit()
+    alpha = model.params[<span class="nu">0</span>]
+    t_stat = model.tvalues[<span class="nu">0</span>]
+    p_val = model.pvalues[<span class="nu">0</span>]
+    
+    <span class="kw">if</span> p_val < <span class="nu">0.05</span> <span class="kw">and</span> alpha > <span class="nu">0</span>:
+        verdict = <span class="st">"✓ 전략 유효"</span>
+    <span class="kw">elif</span> p_val < <span class="nu">0.05</span> <span class="kw">and</span> alpha < <span class="nu">0</span>:
+        verdict = <span class="st">"✗ 가치 파괴"</span>
+    <span class="kw">else</span>:
+        verdict = <span class="st">"— 팩터 설명"</span>
+    
+    <span class="fn">print</span>(<span class="st">f"</span>{name:>6} {alpha:>+8.4f} {alpha*<span class="nu">12</span>:>+8.2%} {t_stat:>8.3f} {p_val:>8.4f} {verdict:>12}<span class="st">"</span>)
+
+<span class="fn">print</span>(<span class="st">"\n--- 전략 B 상세 ---"</span>)
+model_b = sm.OLS(strat_b, X).fit()
+<span class="fn">print</span>(<span class="st">f"α = {model_b.params[0]*12:+.2%}/년, t = {model_b.tvalues[0]:.2f}, p = {model_b.pvalues[0]:.3f}"</span>)
+<span class="fn">print</span>(<span class="st">f"→ α가 0과 다르지 않음. 이 전략의 수익은 전부 팩터 노출(β) 덕분."</span>)
+<span class="fn">print</span>(<span class="st">f"→ β_MKT={model_b.params[1]:.2f}, β_SMB={model_b.params[2]:.2f}, β_HML={model_b.params[3]:.2f}"</span>)
+<span class="fn">print</span>(<span class="st">f"→ 저렴한 팩터 ETF로 동일한 노출을 복제할 수 있다."</span>)</code></pre>
+<div class="code-output"><span class="out-label">Output:</span>
+=== 알파 검정: 전략 유효성 판단 ===
+  전략   α(월)   α(연)   t-stat  p-value         판정
+----------------------------------------------------------
+A(스킬) +0.0043  +5.16%    3.124   0.0023   ✓ 전략 유효
+B(베타만) +0.0005  +0.62%    0.412   0.6812   — 팩터 설명
+C(비용) -0.0028  -3.36%   -1.987   0.0494   ✗ 가치 파괴
+
+--- 전략 B 상세 ---
+α = +0.62%/년, t = 0.41, p = 0.681
+→ α가 0과 다르지 않음. 이 전략의 수익은 전부 팩터 노출(β) 덕분.
+→ β_MKT=0.90, β_SMB=0.51, β_HML=0.59
+→ 저렴한 팩터 ETF로 동일한 노출을 복제할 수 있다.</div>
+
+<div class="warn">
+<p class="ni"><strong>"어제의 알파는 오늘의 베타":</strong> 한때 알파로 여겨졌던 가치 프리미엄(HML)이나 모멘텀 프리미엄(UMD)은 이제 팩터(β)로 인식된다. 전략 B처럼 높은 수익률을 보여도 알파가 0이면, 그 수익은 팩터 노출에 대한 보상일 뿐이다. 이 경우 높은 수수료를 내고 액티브 펀드에 투자할 이유가 없다 — 저렴한 팩터 ETF로 같은 노출을 얻을 수 있기 때문이다.</p>
+</div>
+
+<div class="ok">
+<p class="ni"><strong>GRS 검정 (Gibbons, Ross & Shanken, 1989):</strong> 개별 자산이 아닌 여러 자산의 알파를 동시에 검정한다. 귀무가설은 "모든 자산의 알파가 동시에 0"이다. GRS F-통계량이 유의하면 팩터 모델이 불완전하다는 의미이며, 추가 팩터가 필요하거나 진짜 알파가 존재한다는 증거다.</p>
+<div class="eq">\[ GRS = \frac{T-N-K}{N} \cdot \frac{\hat{\boldsymbol{\alpha}}' \hat{\Sigma}^{-1} \hat{\boldsymbol{\alpha}}}{1 + \bar{\mu}' \hat{\Omega}^{-1} \bar{\mu}} \sim F(N, T-N-K) \]</div>
+</div>
+
 <h2 id="ch5">5. 팩터 수익률 분석 — 장기 팩터 프리미엄 통계</h2>
 
 <h3>5.1 누적 팩터 수익률</h3>
