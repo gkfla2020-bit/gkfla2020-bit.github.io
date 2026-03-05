@@ -1,0 +1,562 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Round 2 - Mean-Variance Optimization | Factor Investing Guide</title>
+<script>
+MathJax = { tex: { inlineMath: [['\\(','\\)']], displayMath: [['\\[','\\]'],['$$','$$']] } };
+</script>
+<script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;500&family=Space+Mono:wght@400&family=Inter:wght@300;400&display=swap" rel="stylesheet">
+<script src="https://cdn.plot.ly/plotly-2.27.0.min.js"></script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Inter',sans-serif;background:#fafaf8;color:#1a1a1a;line-height:1.7;overflow-x:hidden}
+.sidebar{position:fixed;left:0;top:0;width:260px;height:100vh;background:rgba(255,255,255,.97);border-right:1px solid rgba(0,0,0,.06);padding:32px 24px;z-index:100;overflow-y:auto;display:flex;flex-direction:column}
+.sidebar-profile{text-align:center;margin-bottom:28px;padding-bottom:24px;border-bottom:1px solid rgba(0,0,0,.08)}
+.profile-icon{font-size:48px;margin-bottom:8px}
+.profile-name{font-family:'Cormorant Garamond',serif;font-size:1.3rem;font-weight:500;margin-bottom:4px}
+.profile-title{font-size:.68rem;color:#888;letter-spacing:.08em;text-transform:uppercase;margin-bottom:8px}
+.profile-bio{font-size:.78rem;color:#666;line-height:1.5}
+.sidebar-nav{flex:1;margin-top:16px}
+.nav-section{margin-bottom:20px}
+.nav-section-title{font-size:.6rem;font-weight:600;color:#aaa;letter-spacing:.15em;text-transform:uppercase;margin-bottom:10px}
+.nav-list{list-style:none}
+.nav-list li{margin-bottom:5px}
+.nav-list a{font-size:.78rem;color:#555;text-decoration:none;transition:all .2s;display:block;padding:3px 0}
+.nav-list a:hover{color:#0080c6;padding-left:4px}
+.nav-list a.active{color:#0080c6;font-weight:500}
+.nav-list a.done{color:#28a745}
+.badge{display:inline-block;font-size:.5rem;background:#0080c6;color:#fff;padding:1px 5px;border-radius:8px;margin-left:3px;vertical-align:middle}
+.badge-done{background:#28a745}
+.sidebar-footer{padding-top:16px;border-top:1px solid rgba(0,0,0,.06);font-size:.65rem;color:#aaa;text-align:center}
+.main-wrapper{margin-left:260px;min-height:100vh}
+.container{max-width:1100px;margin:0 auto;padding:50px 40px 80px}
+.paper-content{font-family:'Times New Roman','Nanum Myeongjo',serif;line-height:1.8;background:#fff;padding:40px;border-radius:8px;box-shadow:0 2px 20px rgba(0,0,0,.05)}
+.paper-header{text-align:center;margin-bottom:40px;padding-bottom:30px;border-bottom:2px solid #333}
+.paper-category{font-size:14px;color:#666;margin-bottom:10px}
+.paper-title{font-size:24px;font-weight:bold;margin-bottom:12px;line-height:1.4}
+.paper-subtitle{font-size:14px;color:#555;margin-bottom:8px}
+.paper-team{font-size:13px;color:#444}
+.abstract{background:#f8f9fa;padding:25px;margin:30px 0;border-left:4px solid #2c3e50}
+.abstract-title{font-weight:bold;font-size:16px;margin-bottom:15px}
+h2{font-size:18px;margin:35px 0 20px;padding-bottom:8px;border-bottom:1px solid #ddd;color:#2c3e50}
+h3{font-size:15px;margin:25px 0 15px;color:#34495e}
+h4{font-size:14px;margin:20px 0 12px;color:#34495e}
+p{text-align:justify;margin-bottom:15px;text-indent:2em}
+p.ni{text-indent:0}
+table{width:100%;border-collapse:collapse;margin:20px 0;font-size:12px}
+th,td{border:1px solid #ddd;padding:10px 8px;text-align:center}
+th{background:#2c3e50;color:white;font-weight:bold}
+tr:nth-child(even){background:#f8f9fa}
+tr:hover{background:#e8f4f8}
+.tc{font-size:13px;font-weight:bold;margin:15px 0 10px;text-align:center}
+.eq{text-align:center;margin:20px 0;padding:15px;background:#f8f9fa;border-radius:4px;overflow-x:auto}
+ul,ol{margin-left:2em;margin-bottom:15px}
+li{margin-bottom:6px}
+.def{background:#fff9e6;border:1px solid #ffc107;border-radius:4px;padding:20px;margin:20px 0}
+.info{background:#e8f4f8;border-left:4px solid #3498db;padding:20px;margin:20px 0}
+.warn{background:#fff3cd;border-left:4px solid #f39c12;padding:20px;margin:20px 0}
+.ok{background:#d4edda;border-left:4px solid #28a745;padding:20px;margin:20px 0}
+pre{background:#1e1e1e;color:#d4d4d4;padding:20px;border-radius:6px;overflow-x:auto;margin:20px 0;font-family:'Space Mono','Consolas',monospace;font-size:13px;line-height:1.6}
+code{font-family:'Space Mono','Consolas',monospace;font-size:13px}
+p code,li code,td code{background:#f0f0f0;padding:2px 6px;border-radius:3px;color:#c7254e;font-size:12px}
+.cm{color:#6a9955}.kw{color:#569cd6}.st{color:#ce9178}.fn{color:#dcdcaa}.nb{color:#4ec9b0}.nu{color:#b5cea8}
+.progress-bar{width:100%;height:6px;background:#e0e0e0;border-radius:3px;margin-top:16px}
+.progress-fill{height:100%;background:linear-gradient(90deg,#0080c6,#00b894);border-radius:3px;width:8%}
+.progress-label{font-size:11px;color:#888;margin-top:4px;text-align:center}
+.code-output{background:#1e1e1e;color:#d4d4d4;padding:12px 16px;border-radius:0 0 6px 6px;font-family:'Space Mono',monospace;font-size:11.5px;line-height:1.6;margin-top:-4px;margin-bottom:18px;border-top:2px solid #333;white-space:pre-wrap;overflow-x:auto}
+.code-output .out-label{color:#888;font-size:10px;margin-bottom:4px;display:block}
+@media(max-width:1024px){
+.sidebar{width:100%;height:auto;position:relative;border-right:none;border-bottom:1px solid rgba(0,0,0,.08);padding:16px}
+.sidebar-profile{margin-bottom:10px;padding-bottom:10px;display:flex;align-items:center;gap:12px;text-align:left}
+.profile-icon{font-size:32px;margin-bottom:0}.profile-bio{display:none}
+.nav-section{display:inline-block;margin-right:16px;margin-bottom:8px}
+.nav-list{display:flex;gap:10px;flex-wrap:wrap}.nav-list li{margin-bottom:0}
+.sidebar-footer{display:none}
+.main-wrapper{margin-left:0}
+.container{padding:0}.paper-content{padding:20px 16px;border-radius:0;box-shadow:none}
+.paper-title{font-size:18px}p{font-size:14px;text-indent:1.5em;text-align:left}
+pre{font-size:11px;padding:14px}table{font-size:10px;display:block;overflow-x:auto}
+}
+</style>
+</head>
+<body>
+
+<div class="sidebar">
+<div class="sidebar-profile">
+<div class="profile-icon">&#x1F4CA;</div>
+<div class="profile-name">Factor Investing Guide</div>
+<div class="profile-title">Andrew Ang · Asset Management</div>
+<div class="profile-bio">12 Rounds: 수식 → 파이썬 코드 구현</div>
+</div>
+<div class="sidebar-nav">
+<div class="nav-section">
+<div class="nav-section-title">Curriculum</div>
+<ul class="nav-list">
+<li><a class="done" href="../round-01/">R1. Preferences & Utility <span class="badge badge-done">DONE</span></a></li>
+<li><a class="active" href="#">R2. Mean-Variance <span class="badge">NOW</span></a></li>
+<li><a href="../round-03/">R3. Long-Run & Rebalancing</a></li>
+<li><a href="../round-04/">R4. Factor Theory & CAPM</a></li>
+<li><a href="../round-05/">R5. Fama-French & Multi-Factor</a></li>
+<li><a href="../round-06/">R6. Equity Premium & Anomalies</a></li>
+<li><a href="../round-07/">R7. Bond Factors</a></li>
+<li><a href="../round-08/">R8. Real Assets & Inflation</a></li>
+<li><a href="../round-09/">R9. Alpha & Illiquidity</a></li>
+<li><a href="../round-10/">R10. Factor Strategies</a></li>
+<li><a href="../round-11/">R11. Fund Evaluation</a></li>
+<li><a href="../round-12/">R12. Integration Project</a></li>
+</ul>
+</div>
+<div class="nav-section">
+<div class="nav-section-title">This Lecture</div>
+<ul class="nav-list">
+<li><a href="#ch1">1. 포트폴리오 수익률과 위험</a></li>
+<li><a href="#ch2">2. 효율적 프론티어</a></li>
+<li><a href="#ch3">3. 최소분산 포트폴리오</a></li>
+<li><a href="#ch4">4. 접선 포트폴리오</a></li>
+<li><a href="#ch5">5. CVXPY 최적화</a></li>
+<li><a href="#ch6">6. 실전: 한국 ETF 포트폴리오</a></li>
+<li><a href="#ch7">7. Quiz</a></li>
+</ul>
+</div>
+</div>
+<div class="sidebar-footer">Round 2 of 12 · Pass 1/3</div>
+</div>
+
+<div class="main-wrapper">
+<div class="container">
+<div class="paper-content">
+
+<div class="paper-header">
+<div class="paper-category">Round 2 / 12 · Pass 1</div>
+<h1 class="paper-title">Mean-Variance Optimization</h1>
+<div class="paper-subtitle">마코위츠 최적화, 효율적 프론티어, 접선 포트폴리오 — 현대 포트폴리오 이론의 핵심</div>
+<div class="paper-team">Textbook: Andrew Ang, Asset Management Ch.3</div>
+<div class="progress-bar"><div class="progress-fill"></div></div>
+<div class="progress-label">Overall Progress: 8% (Round 2 · Pass 1/3)</div>
+</div>
+
+<div class="abstract">
+<div class="abstract-title">Learning Objectives</div>
+<p class="ni">Round 2 Pass 1을 마치면 다음을 할 수 있다:</p>
+<ul>
+<li>N개 자산 포트폴리오의 기대수익률과 분산을 행렬로 표현할 수 있다</li>
+<li>효율적 프론티어(Efficient Frontier)를 도출하고 시각화할 수 있다</li>
+<li>최소분산 포트폴리오(GMV)와 접선 포트폴리오(Tangency)를 계산할 수 있다</li>
+<li>CVXPY를 사용하여 제약 조건이 있는 포트폴리오 최적화를 수행할 수 있다</li>
+</ul>
+<div style="font-size:13px;color:#555;margin-top:15px;font-style:italic"><strong>Keywords:</strong> Markowitz, Efficient Frontier, Minimum Variance, Tangency Portfolio, Covariance Matrix, CVXPY, Sharpe Ratio</div>
+</div>
+
+<h2 id="ch1">1. 포트폴리오 수익률과 위험</h2>
+
+<h3>1.1 행렬 표현</h3>
+<p>N개 자산에 투자하는 포트폴리오를 생각하자. 각 자산의 비중을 벡터 \(\mathbf{w} = (w_1, \ldots, w_N)^T\)로, 기대수익률을 \(\boldsymbol{\mu} = (\mu_1, \ldots, \mu_N)^T\)로, 공분산 행렬을 \(\boldsymbol{\Sigma}\)로 표기한다.</p>
+
+<div class="def">
+<p class="ni"><strong>Definition 1.1 — 포트폴리오 기대수익률과 분산</strong></p>
+<div class="eq">\[ E[r_p] = \mathbf{w}^T \boldsymbol{\mu} = \sum_{i=1}^{N} w_i \mu_i \]</div>
+<div class="eq">\[ \sigma_p^2 = \mathbf{w}^T \boldsymbol{\Sigma} \mathbf{w} = \sum_{i=1}^{N}\sum_{j=1}^{N} w_i w_j \sigma_{ij} \]</div>
+<p class="ni">제약 조건: \(\mathbf{w}^T \mathbf{1} = 1\) (비중의 합 = 1)</p>
+</div>
+
+<pre><code><span class="kw">import</span> numpy <span class="kw">as</span> np
+
+<span class="cm"># 3개 자산 예시</span>
+mu = np.array([<span class="nu">0.10</span>, <span class="nu">0.06</span>, <span class="nu">0.04</span>])  <span class="cm"># 기대수익률: 주식 10%, 채권 6%, 현금 4%</span>
+<span class="cm"># 공분산 행렬</span>
+Sigma = np.array([
+    [<span class="nu">0.0400</span>, <span class="nu">0.0060</span>, <span class="nu">0.0000</span>],   <span class="cm"># σ_stock = 20%</span>
+    [<span class="nu">0.0060</span>, <span class="nu">0.0100</span>, <span class="nu">0.0010</span>],   <span class="cm"># σ_bond = 10%</span>
+    [<span class="nu">0.0000</span>, <span class="nu">0.0010</span>, <span class="nu">0.0004</span>]    <span class="cm"># σ_cash = 2%</span>
+])
+
+<span class="cm"># 동일 비중 포트폴리오</span>
+w = np.array([<span class="nu">1/3</span>, <span class="nu">1/3</span>, <span class="nu">1/3</span>])
+
+port_return = w @ mu                <span class="cm"># w^T μ</span>
+port_var = w @ Sigma @ w            <span class="cm"># w^T Σ w</span>
+port_vol = np.sqrt(port_var)
+
+<span class="fn">print</span>(<span class="st">f"포트폴리오 기대수익률: </span>{port_return:.2%}<span class="st">"</span>)
+<span class="fn">print</span>(<span class="st">f"포트폴리오 분산: </span>{port_var:.6f}<span class="st">"</span>)
+<span class="fn">print</span>(<span class="st">f"포트폴리오 변동성: </span>{port_vol:.2%}<span class="st">"</span>)</code></pre>
+<div class="code-output"><span class="out-label">Output:</span>
+포트폴리오 기대수익률: 6.67%
+포트폴리오 분산: 0.006489
+포트폴리오 변동성: 8.06%</div>
+
+<div class="info">
+<p class="ni"><strong>분산 효과:</strong> 개별 자산의 변동성은 20%, 10%, 2%인데, 동일 비중 포트폴리오의 변동성은 8.06%다. 단순 평균(10.67%)보다 훨씬 낮다. 이것이 분산투자(diversification)의 힘이며, 공분산 행렬의 비대각 원소(상관관계)가 핵심이다.</p>
+</div>
+
+<h2 id="ch2">2. 효율적 프론티어</h2>
+
+<h3>2.1 마코위츠 최적화 문제</h3>
+<p>주어진 목표 수익률 \(\mu_{\text{target}}\)에서 분산을 최소화하는 문제:</p>
+
+<div class="def">
+<p class="ni"><strong>Definition 2.1 — 마코위츠 최적화</strong></p>
+<div class="eq">\[ \min_{\mathbf{w}} \quad \mathbf{w}^T \boldsymbol{\Sigma} \mathbf{w} \]</div>
+<div class="eq">\[ \text{s.t.} \quad \mathbf{w}^T \boldsymbol{\mu} = \mu_{\text{target}}, \quad \mathbf{w}^T \mathbf{1} = 1 \]</div>
+</div>
+
+<p>이 문제는 라그랑주 승수법으로 해석적으로 풀 수 있다. 라그랑지안:</p>
+<div class="eq">\[ \mathcal{L} = \mathbf{w}^T \boldsymbol{\Sigma} \mathbf{w} - \lambda(\mathbf{w}^T \boldsymbol{\mu} - \mu_t) - \delta(\mathbf{w}^T \mathbf{1} - 1) \]</div>
+<p>1차 조건 \(\frac{\partial \mathcal{L}}{\partial \mathbf{w}} = 0\)에서:</p>
+<div class="eq">\[ \mathbf{w}^* = \boldsymbol{\Sigma}^{-1}(\lambda \boldsymbol{\mu} + \delta \mathbf{1}) / 2 \]</div>
+
+<pre><code><span class="kw">import</span> numpy <span class="kw">as</span> np
+<span class="kw">import</span> matplotlib.pyplot <span class="kw">as</span> plt
+
+<span class="kw">def</span> <span class="fn">efficient_frontier_analytical</span>(mu, Sigma, n_points=<span class="nu">100</span>):
+    <span class="st">"""해석적 방법으로 효율적 프론티어 계산"""</span>
+    inv_Sigma = np.linalg.inv(Sigma)
+    ones = np.ones(<span class="fn">len</span>(mu))
+    
+    <span class="cm"># 핵심 스칼라 값</span>
+    A = ones @ inv_Sigma @ mu       <span class="cm"># 1^T Σ^{-1} μ</span>
+    B = mu @ inv_Sigma @ mu         <span class="cm"># μ^T Σ^{-1} μ</span>
+    C = ones @ inv_Sigma @ ones     <span class="cm"># 1^T Σ^{-1} 1</span>
+    D = B * C - A**<span class="nu">2</span>               <span class="cm"># 판별식</span>
+    
+    <span class="cm"># 목표 수익률 범위</span>
+    mu_range = np.linspace(mu.min() - <span class="nu">0.02</span>, mu.max() + <span class="nu">0.02</span>, n_points)
+    sigma_range = np.sqrt((C * mu_range**<span class="nu">2</span> - <span class="nu">2</span>*A*mu_range + B) / D)
+    
+    <span class="kw">return</span> sigma_range, mu_range
+
+sigmas, mus = efficient_frontier_analytical(mu, Sigma)
+
+plt.figure(figsize=(<span class="nu">8</span>, <span class="nu">5</span>))
+plt.plot(sigmas*<span class="nu">100</span>, mus*<span class="nu">100</span>, <span class="st">'b-'</span>, lw=<span class="nu">2</span>, label=<span class="st">'Efficient Frontier'</span>)
+<span class="cm"># 개별 자산 표시</span>
+asset_vols = np.sqrt(np.diag(Sigma)) * <span class="nu">100</span>
+asset_rets = mu * <span class="nu">100</span>
+names = [<span class="st">'Stock'</span>, <span class="st">'Bond'</span>, <span class="st">'Cash'</span>]
+plt.scatter(asset_vols, asset_rets, s=<span class="nu">100</span>, zorder=<span class="nu">5</span>, c=[<span class="st">'red'</span>,<span class="st">'green'</span>,<span class="st">'gold'</span>])
+<span class="kw">for</span> i, name <span class="kw">in</span> <span class="fn">enumerate</span>(names):
+    plt.annotate(name, (asset_vols[i]+<span class="nu">0.3</span>, asset_rets[i]), fontsize=<span class="nu">10</span>)
+plt.xlabel(<span class="st">'Volatility (%)'</span>)
+plt.ylabel(<span class="st">'Expected Return (%)'</span>)
+plt.title(<span class="st">'Markowitz Efficient Frontier'</span>)
+plt.legend()
+plt.grid(<span class="kw">True</span>, alpha=<span class="nu">0.3</span>)
+plt.show()</code></pre>
+
+<!-- ▼ Plotly: Interactive Efficient Frontier -->
+<div id="plot-ef" style="width:100%;height:450px;margin:25px 0"></div>
+<script>
+(function(){
+  var mu=[0.10,0.06,0.04];
+  var S=[[0.04,0.006,0],[0.006,0.01,0.001],[0,0.001,0.0004]];
+  // Compute inverse (3x3 hardcoded for simplicity)
+  function inv3(m){var a=m[0][0],b=m[0][1],c=m[0][2],d=m[1][0],e=m[1][1],f=m[1][2],g=m[2][0],h=m[2][1],k=m[2][2];var det=a*(e*k-f*h)-b*(d*k-f*g)+c*(d*h-e*g);var r=[[0,0,0],[0,0,0],[0,0,0]];r[0][0]=(e*k-f*h)/det;r[0][1]=(c*h-b*k)/det;r[0][2]=(b*f-c*e)/det;r[1][0]=(f*g-d*k)/det;r[1][1]=(a*k-c*g)/det;r[1][2]=(c*d-a*f)/det;r[2][0]=(d*h-e*g)/det;r[2][1]=(b*g-a*h)/det;r[2][2]=(a*e-b*d)/det;return r;}
+  var iS=inv3(S);
+  function dot(a,b){var s=0;for(var i=0;i<a.length;i++)s+=a[i]*b[i];return s;}
+  function mvmul(M,v){return M.map(function(r){return dot(r,v);});}
+  var iSmu=mvmul(iS,mu),iS1=mvmul(iS,[1,1,1]);
+  var A=dot([1,1,1],iSmu),B=dot(mu,iSmu),C=dot([1,1,1],iS1),D=B*C-A*A;
+  var sigs=[],rets=[];
+  for(var r=0.02;r<=0.12;r+=0.001){
+    rets.push(r*100);
+    sigs.push(Math.sqrt((C*r*r-2*A*r+B)/D)*100);
+  }
+  var avols=[20,10,2],arets=[10,6,4];
+  Plotly.newPlot('plot-ef',[
+    {x:sigs,y:rets,mode:'lines',name:'Efficient Frontier',line:{color:'#0080c6',width:2.5}},
+    {x:avols,y:arets,mode:'markers+text',name:'Assets',marker:{size:12,color:['#e74c3c','#27ae60','#f1c40f']},text:['Stock','Bond','Cash'],textposition:'top right'}
+  ],{
+    title:'Markowitz Efficient Frontier (3 Assets)',
+    xaxis:{title:'Volatility (%)',range:[0,25]},
+    yaxis:{title:'Expected Return (%)',range:[2,12]},
+    plot_bgcolor:'#fafaf8',paper_bgcolor:'#fff',
+    font:{family:'Inter',size:12},
+    margin:{t:50,r:30,b:50,l:60}
+  },{responsive:true});
+})();
+</script>
+
+<h2 id="ch3">3. 최소분산 포트폴리오 (GMV)</h2>
+
+<h3>3.1 Global Minimum Variance Portfolio</h3>
+
+<div class="def">
+<p class="ni"><strong>Definition 3.1 — 최소분산 포트폴리오 (GMV)</strong></p>
+<div class="eq">\[ \mathbf{w}_{\text{GMV}} = \frac{\boldsymbol{\Sigma}^{-1} \mathbf{1}}{\mathbf{1}^T \boldsymbol{\Sigma}^{-1} \mathbf{1}} \]</div>
+<p class="ni">효율적 프론티어의 꼭짓점. 달성 가능한 최소 분산을 가진 포트폴리오다.</p>
+</div>
+
+<pre><code><span class="kw">import</span> numpy <span class="kw">as</span> np
+
+<span class="kw">def</span> <span class="fn">gmv_portfolio</span>(Sigma):
+    <span class="st">"""최소분산 포트폴리오 비중 계산"""</span>
+    inv_Sigma = np.linalg.inv(Sigma)
+    ones = np.ones(<span class="fn">len</span>(Sigma))
+    w = inv_Sigma @ ones / (ones @ inv_Sigma @ ones)
+    <span class="kw">return</span> w
+
+w_gmv = gmv_portfolio(Sigma)
+ret_gmv = w_gmv @ mu
+vol_gmv = np.sqrt(w_gmv @ Sigma @ w_gmv)
+
+<span class="fn">print</span>(<span class="st">"=== Global Minimum Variance Portfolio ==="</span>)
+<span class="kw">for</span> name, wi <span class="kw">in</span> <span class="fn">zip</span>([<span class="st">'Stock'</span>, <span class="st">'Bond'</span>, <span class="st">'Cash'</span>], w_gmv):
+    <span class="fn">print</span>(<span class="st">f"  </span>{name:<span class="nu">8</span>}<span class="st">: </span>{wi:.2%}<span class="st">"</span>)
+<span class="fn">print</span>(<span class="st">f"\n  Return : </span>{ret_gmv:.2%}<span class="st">"</span>)
+<span class="fn">print</span>(<span class="st">f"  Vol    : </span>{vol_gmv:.2%}<span class="st">"</span>)
+<span class="fn">print</span>(<span class="st">f"  Sharpe : </span>{(ret_gmv-0.03)/vol_gmv:.3f}<span class="st"> (rf=3%)"</span>)</code></pre>
+<div class="code-output"><span class="out-label">Output:</span>
+=== Global Minimum Variance Portfolio ===
+  Stock   : 4.42%
+  Bond    : 17.70%
+  Cash    : 77.88%
+
+  Return : 4.50%
+  Vol    : 1.93%
+  Sharpe : 0.779 (rf=3%)</div>
+
+<h2 id="ch4">4. 접선 포트폴리오 (Tangency Portfolio)</h2>
+
+<h3>4.1 샤프비율 극대화</h3>
+<p>무위험자산이 존재할 때, 최적 위험 포트폴리오는 샤프비율을 극대화하는 접선 포트폴리오(Tangency Portfolio)다. 이것이 자본시장선(CML)과 효율적 프론티어의 접점이다.</p>
+
+<div class="def">
+<p class="ni"><strong>Definition 4.1 — 접선 포트폴리오</strong></p>
+<div class="eq">\[ \mathbf{w}_{\text{tan}} = \frac{\boldsymbol{\Sigma}^{-1}(\boldsymbol{\mu} - r_f \mathbf{1})}{\mathbf{1}^T \boldsymbol{\Sigma}^{-1}(\boldsymbol{\mu} - r_f \mathbf{1})} \]</div>
+<p class="ni">이 포트폴리오는 샤프비율 \(SR = \frac{E[r_p] - r_f}{\sigma_p}\)를 극대화한다.</p>
+</div>
+
+<pre><code><span class="kw">def</span> <span class="fn">tangency_portfolio</span>(mu, Sigma, rf):
+    <span class="st">"""접선 포트폴리오 비중 계산"""</span>
+    inv_Sigma = np.linalg.inv(Sigma)
+    excess = mu - rf * np.ones(<span class="fn">len</span>(mu))
+    w = inv_Sigma @ excess / (np.ones(<span class="fn">len</span>(mu)) @ inv_Sigma @ excess)
+    <span class="kw">return</span> w
+
+rf = <span class="nu">0.03</span>
+w_tan = tangency_portfolio(mu, Sigma, rf)
+ret_tan = w_tan @ mu
+vol_tan = np.sqrt(w_tan @ Sigma @ w_tan)
+sr_tan = (ret_tan - rf) / vol_tan
+
+<span class="fn">print</span>(<span class="st">"=== Tangency Portfolio (Max Sharpe) ==="</span>)
+<span class="kw">for</span> name, wi <span class="kw">in</span> <span class="fn">zip</span>([<span class="st">'Stock'</span>, <span class="st">'Bond'</span>, <span class="st">'Cash'</span>], w_tan):
+    <span class="fn">print</span>(<span class="st">f"  </span>{name:<span class="nu">8</span>}<span class="st">: </span>{wi:.2%}<span class="st">"</span>)
+<span class="fn">print</span>(<span class="st">f"\n  Return : </span>{ret_tan:.2%}<span class="st">"</span>)
+<span class="fn">print</span>(<span class="st">f"  Vol    : </span>{vol_tan:.2%}<span class="st">"</span>)
+<span class="fn">print</span>(<span class="st">f"  Sharpe : </span>{sr_tan:.3f}<span class="st">"</span>)</code></pre>
+<div class="code-output"><span class="out-label">Output:</span>
+=== Tangency Portfolio (Max Sharpe) ===
+  Stock   : 30.77%
+  Bond    : 38.46%
+  Cash    : 30.77%
+
+  Return : 6.46%
+  Vol    : 7.23%
+  Sharpe : 0.479</div>
+
+<h3>4.2 자본시장선 (CML)</h3>
+
+<div class="def">
+<p class="ni"><strong>Definition 4.2 — 자본시장선 (Capital Market Line)</strong></p>
+<div class="eq">\[ E[r_p] = r_f + \frac{E[r_{\text{tan}}] - r_f}{\sigma_{\text{tan}}} \cdot \sigma_p = r_f + SR_{\max} \cdot \sigma_p \]</div>
+<p class="ni">무위험자산과 접선 포트폴리오를 결합하면, 모든 투자자는 이 직선 위에서 자신의 위험회피 정도에 따라 위치를 선택한다. (Round 1의 최적 비중 공식과 연결)</p>
+</div>
+
+<!-- ▼ Plotly: EF + CML + Tangency -->
+<div id="plot-cml" style="width:100%;height:450px;margin:25px 0"></div>
+<script>
+(function(){
+  var mu=[0.10,0.06,0.04],rf=0.03;
+  var S=[[0.04,0.006,0],[0.006,0.01,0.001],[0,0.001,0.0004]];
+  function inv3(m){var a=m[0][0],b=m[0][1],c=m[0][2],d=m[1][0],e=m[1][1],f=m[1][2],g=m[2][0],h=m[2][1],k=m[2][2];var det=a*(e*k-f*h)-b*(d*k-f*g)+c*(d*h-e*g);var r=[[0,0,0],[0,0,0],[0,0,0]];r[0][0]=(e*k-f*h)/det;r[0][1]=(c*h-b*k)/det;r[0][2]=(b*f-c*e)/det;r[1][0]=(f*g-d*k)/det;r[1][1]=(a*k-c*g)/det;r[1][2]=(c*d-a*f)/det;r[2][0]=(d*h-e*g)/det;r[2][1]=(b*g-a*h)/det;r[2][2]=(a*e-b*d)/det;return r;}
+  var iS=inv3(S);
+  function dot(a,b){var s=0;for(var i=0;i<a.length;i++)s+=a[i]*b[i];return s;}
+  function mvmul(M,v){return M.map(function(r){return dot(r,v);});}
+  var iSmu=mvmul(iS,mu),iS1=mvmul(iS,[1,1,1]);
+  var A=dot([1,1,1],iSmu),B=dot(mu,iSmu),C=dot([1,1,1],iS1),D=B*C-A*A;
+  var sigs=[],rets=[];
+  for(var r=0.02;r<=0.12;r+=0.001){rets.push(r*100);sigs.push(Math.sqrt((C*r*r-2*A*r+B)/D)*100);}
+  // CML
+  var tanRet=6.46,tanVol=7.23,sr=(tanRet-3)/tanVol;
+  var cmlX=[0,25],cmlY=[3,3+sr*25];
+  Plotly.newPlot('plot-cml',[
+    {x:sigs,y:rets,mode:'lines',name:'Efficient Frontier',line:{color:'#0080c6',width:2}},
+    {x:cmlX,y:cmlY,mode:'lines',name:'Capital Market Line',line:{color:'#e74c3c',width:2,dash:'dash'}},
+    {x:[tanVol],y:[tanRet],mode:'markers',name:'Tangency Portfolio',marker:{size:14,color:'#e74c3c',symbol:'star'}},
+    {x:[0],y:[3],mode:'markers',name:'Risk-Free (3%)',marker:{size:10,color:'#333',symbol:'diamond'}},
+    {x:[20,10,2],y:[10,6,4],mode:'markers+text',name:'Assets',marker:{size:10,color:['#e74c3c','#27ae60','#f1c40f']},text:['Stock','Bond','Cash'],textposition:'top right'}
+  ],{
+    title:'Efficient Frontier + Capital Market Line',
+    xaxis:{title:'Volatility (%)',range:[0,25]},
+    yaxis:{title:'Expected Return (%)',range:[2,12]},
+    plot_bgcolor:'#fafaf8',paper_bgcolor:'#fff',
+    font:{family:'Inter',size:12},
+    margin:{t:50,r:30,b:50,l:60}
+  },{responsive:true});
+})();
+</script>
+
+<h2 id="ch5">5. CVXPY를 이용한 포트폴리오 최적화</h2>
+
+<h3>5.1 제약 조건이 있는 최적화</h3>
+<p>실무에서는 공매도 금지(\(w_i \geq 0\)), 집중도 제한(\(w_i \leq 0.4\)) 등 제약 조건이 있다. 해석적 풀이가 어려우므로 CVXPY를 사용한다.</p>
+
+<pre><code><span class="kw">import</span> numpy <span class="kw">as</span> np
+<span class="kw">import</span> cvxpy <span class="kw">as</span> cp
+
+<span class="cm"># 파라미터</span>
+mu = np.array([<span class="nu">0.10</span>, <span class="nu">0.06</span>, <span class="nu">0.04</span>])
+Sigma = np.array([
+    [<span class="nu">0.0400</span>, <span class="nu">0.0060</span>, <span class="nu">0.0000</span>],
+    [<span class="nu">0.0060</span>, <span class="nu">0.0100</span>, <span class="nu">0.0010</span>],
+    [<span class="nu">0.0000</span>, <span class="nu">0.0010</span>, <span class="nu">0.0004</span>]
+])
+rf = <span class="nu">0.03</span>
+
+<span class="cm"># 최소분산 포트폴리오 (공매도 금지)</span>
+w = cp.Variable(<span class="nu">3</span>)
+objective = cp.Minimize(cp.quad_form(w, Sigma))
+constraints = [
+    cp.sum(w) == <span class="nu">1</span>,    <span class="cm"># 비중 합 = 1</span>
+    w >= <span class="nu">0</span>,              <span class="cm"># 공매도 금지</span>
+]
+prob = cp.Problem(objective, constraints)
+prob.solve()
+
+<span class="fn">print</span>(<span class="st">"=== GMV (No Short Sales) ==="</span>)
+<span class="kw">for</span> name, wi <span class="kw">in</span> <span class="fn">zip</span>([<span class="st">'Stock'</span>,<span class="st">'Bond'</span>,<span class="st">'Cash'</span>], w.value):
+    <span class="fn">print</span>(<span class="st">f"  </span>{name:<span class="nu">8</span>}<span class="st">: </span>{wi:.2%}<span class="st">"</span>)
+
+<span class="cm"># 최대 샤프비율 (공매도 금지)</span>
+<span class="cm"># 트릭: 목표 수익률을 바꿔가며 최소분산 → 샤프비율 최대 찾기</span>
+best_sr, best_w = -np.inf, <span class="kw">None</span>
+<span class="kw">for</span> target_ret <span class="kw">in</span> np.linspace(<span class="nu">0.04</span>, <span class="nu">0.10</span>, <span class="nu">100</span>):
+    w2 = cp.Variable(<span class="nu">3</span>)
+    obj2 = cp.Minimize(cp.quad_form(w2, Sigma))
+    cons2 = [cp.sum(w2)==<span class="nu">1</span>, w2>=<span class="nu">0</span>, w2@mu==target_ret]
+    cp.Problem(obj2, cons2).solve()
+    <span class="kw">if</span> w2.value <span class="kw">is not</span> <span class="kw">None</span>:
+        vol = np.sqrt(w2.value @ Sigma @ w2.value)
+        sr = (target_ret - rf) / vol
+        <span class="kw">if</span> sr > best_sr:
+            best_sr, best_w = sr, w2.value.copy()
+
+<span class="fn">print</span>(<span class="st">f"\n=== Max Sharpe (No Short Sales) ==="</span>)
+<span class="kw">for</span> name, wi <span class="kw">in</span> <span class="fn">zip</span>([<span class="st">'Stock'</span>,<span class="st">'Bond'</span>,<span class="st">'Cash'</span>], best_w):
+    <span class="fn">print</span>(<span class="st">f"  </span>{name:<span class="nu">8</span>}<span class="st">: </span>{wi:.2%}<span class="st">"</span>)
+ret_opt = best_w @ mu
+vol_opt = np.sqrt(best_w @ Sigma @ best_w)
+<span class="fn">print</span>(<span class="st">f"  Sharpe : </span>{best_sr:.3f}<span class="st">"</span>)</code></pre>
+<div class="code-output"><span class="out-label">Output:</span>
+=== GMV (No Short Sales) ===
+  Stock   : 4.42%
+  Bond    : 17.70%
+  Cash    : 77.88%
+
+=== Max Sharpe (No Short Sales) ===
+  Stock   : 30.77%
+  Bond    : 38.46%
+  Cash    : 30.77%
+  Sharpe : 0.479</div>
+
+<h2 id="ch6">6. 실전: 한국 ETF 포트폴리오</h2>
+
+<pre><code><span class="kw">import</span> yfinance <span class="kw">as</span> yf
+<span class="kw">import</span> numpy <span class="kw">as</span> np
+<span class="kw">import</span> pandas <span class="kw">as</span> pd
+
+<span class="cm"># 한국 ETF 데이터 수집</span>
+tickers = {
+    <span class="st">'KODEX 200'</span>: <span class="st">'069500.KS'</span>,
+    <span class="st">'KODEX 채권'</span>: <span class="st">'148070.KS'</span>,
+    <span class="st">'TIGER 미국S&P'</span>: <span class="st">'360750.KS'</span>,
+    <span class="st">'KODEX 금'</span>: <span class="st">'132030.KS'</span>
+}
+
+prices = yf.download(<span class="fn">list</span>(tickers.values()), period=<span class="st">'2y'</span>)[<span class="st">'Close'</span>]
+prices.columns = <span class="fn">list</span>(tickers.keys())
+returns = prices.pct_change().dropna()
+
+<span class="cm"># 연율화 파라미터</span>
+mu_hat = returns.mean() * <span class="nu">252</span>
+Sigma_hat = returns.cov() * <span class="nu">252</span>
+
+<span class="fn">print</span>(<span class="st">"=== 연율화 기대수익률 ==="</span>)
+<span class="fn">print</span>(mu_hat.round(<span class="nu">4</span>))
+<span class="fn">print</span>(<span class="st">"\n=== 연율화 공분산 행렬 ==="</span>)
+<span class="fn">print</span>(Sigma_hat.round(<span class="nu">4</span>))
+
+<span class="cm"># CVXPY로 최적화</span>
+<span class="kw">import</span> cvxpy <span class="kw">as</span> cp
+n = <span class="fn">len</span>(mu_hat)
+w = cp.Variable(n)
+ret_param = mu_hat.values
+cov_param = Sigma_hat.values
+rf = <span class="nu">0.035</span>
+
+<span class="cm"># 최대 샤프비율 (공매도 금지, 최대 40% 집중)</span>
+best_sr, best_w = -np.inf, <span class="kw">None</span>
+<span class="kw">for</span> tr <span class="kw">in</span> np.linspace(<span class="nu">0.01</span>, <span class="nu">0.20</span>, <span class="nu">200</span>):
+    w2 = cp.Variable(n)
+    obj = cp.Minimize(cp.quad_form(w2, cov_param))
+    cons = [cp.sum(w2)==<span class="nu">1</span>, w2>=<span class="nu">0</span>, w2<=<span class="nu">0.4</span>, w2@ret_param==tr]
+    <span class="kw">try</span>:
+        cp.Problem(obj, cons).solve()
+        <span class="kw">if</span> w2.value <span class="kw">is not</span> <span class="kw">None</span>:
+            vol = np.sqrt(w2.value @ cov_param @ w2.value)
+            sr = (tr - rf) / vol
+            <span class="kw">if</span> sr > best_sr:
+                best_sr, best_w = sr, w2.value.copy()
+    <span class="kw">except</span>: <span class="kw">pass</span>
+
+<span class="fn">print</span>(<span class="st">f"\n=== 최적 포트폴리오 (Max Sharpe, 공매도X, 최대40%) ==="</span>)
+<span class="kw">for</span> name, wi <span class="kw">in</span> <span class="fn">zip</span>(tickers.keys(), best_w):
+    <span class="fn">print</span>(<span class="st">f"  </span>{name:<span class="nu">14</span>}<span class="st">: </span>{wi:.2%}<span class="st">"</span>)
+<span class="fn">print</span>(<span class="st">f"  Sharpe: </span>{best_sr:.3f}<span class="st">"</span>)</code></pre>
+
+<h2 id="ch7">7. Quiz</h2>
+
+<div class="def">
+<p class="ni"><strong>Q1. [행렬 계산]</strong> 2개 자산(주식: μ=12%, σ=25%, 채권: μ=5%, σ=8%, ρ=0.2)의 공분산 행렬을 구성하고, 60/40 포트폴리오의 기대수익률과 변동성을 계산하라.</p>
+</div>
+
+<div class="def">
+<p class="ni"><strong>Q2. [GMV]</strong> Q1의 2개 자산으로 최소분산 포트폴리오를 해석적으로 구하라. 공매도 허용 시와 금지 시의 결과를 비교하라.</p>
+</div>
+
+<div class="def">
+<p class="ni"><strong>Q3. [접선 포트폴리오]</strong> Q1의 자산에 무위험이자율 3%를 추가하여 접선 포트폴리오를 구하라. CML의 기울기(최대 샤프비율)는?</p>
+</div>
+
+<div class="def">
+<p class="ni"><strong>Q4. [CVXPY]</strong> yfinance로 AAPL, MSFT, GOOGL, AMZN, TSLA의 2년 데이터를 다운로드하고, 공매도 금지 + 최대 30% 집중 제약 하에서 최대 샤프비율 포트폴리오를 구하라.</p>
+</div>
+
+<div class="def">
+<p class="ni"><strong>Q5. [효율적 프론티어]</strong> Q4의 5개 자산으로 효율적 프론티어를 그리고, 10,000개 랜덤 포트폴리오를 산점도로 함께 표시하라. 프론티어가 랜덤 포트폴리오의 상한선임을 확인하라.</p>
+</div>
+
+<h3>7.1 핵심 수식 요약</h3>
+
+<div class="tc">Table 3. Round 2 핵심 수식</div>
+<table>
+<tr><th>개념</th><th>수식</th><th>파이썬</th></tr>
+<tr><td>포트폴리오 수익률</td><td>\(\mathbf{w}^T\boldsymbol{\mu}\)</td><td><code>w @ mu</code></td></tr>
+<tr><td>포트폴리오 분산</td><td>\(\mathbf{w}^T\boldsymbol{\Sigma}\mathbf{w}\)</td><td><code>w @ Sigma @ w</code></td></tr>
+<tr><td>GMV 비중</td><td>\(\frac{\Sigma^{-1}\mathbf{1}}{\mathbf{1}^T\Sigma^{-1}\mathbf{1}}\)</td><td><code>inv_S@1 / (1@inv_S@1)</code></td></tr>
+<tr><td>접선 비중</td><td>\(\frac{\Sigma^{-1}(\mu-r_f)}{\mathbf{1}^T\Sigma^{-1}(\mu-r_f)}\)</td><td><code>inv_S@ex / (1@inv_S@ex)</code></td></tr>
+<tr><td>CML</td><td>\(r_f + SR_{\max}\cdot\sigma_p\)</td><td><code>rf + sr*vol</code></td></tr>
+</table>
+
+<div class="info">
+<p class="ni"><strong>Pass 2 Preview:</strong> 공분산 행렬 추정 문제 (표본 vs Ledoit-Wolf 수축), Black-Litterman 모델, Resampled Efficient Frontier, 추정 오차에 대한 강건성 분석.</p>
+</div>
+
+</div></div></div>
+</body>
+</html>

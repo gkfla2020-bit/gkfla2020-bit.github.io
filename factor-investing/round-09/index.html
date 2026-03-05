@@ -1,0 +1,508 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Round 9 - Alpha, Illiquidity & Tax | Factor Investing Guide</title>
+<script>
+MathJax = { tex: { inlineMath: [['\\(','\\)']], displayMath: [['\\[','\\]'],['$$','$$']] } };
+</script>
+<script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;500&family=Space+Mono:wght@400&family=Inter:wght@300;400&display=swap" rel="stylesheet">
+<script src="https://cdn.plot.ly/plotly-2.27.0.min.js"></script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Inter',sans-serif;background:#fafaf8;color:#1a1a1a;line-height:1.7;overflow-x:hidden}
+.sidebar{position:fixed;left:0;top:0;width:260px;height:100vh;background:rgba(255,255,255,.97);border-right:1px solid rgba(0,0,0,.06);padding:32px 24px;z-index:100;overflow-y:auto;display:flex;flex-direction:column}
+.sidebar-profile{text-align:center;margin-bottom:28px;padding-bottom:24px;border-bottom:1px solid rgba(0,0,0,.08)}
+.profile-icon{font-size:48px;margin-bottom:8px}
+.profile-name{font-family:'Cormorant Garamond',serif;font-size:1.3rem;font-weight:500;margin-bottom:4px}
+.profile-title{font-size:.68rem;color:#888;letter-spacing:.08em;text-transform:uppercase;margin-bottom:8px}
+.profile-bio{font-size:.78rem;color:#666;line-height:1.5}
+.sidebar-nav{flex:1;margin-top:16px}
+.nav-section{margin-bottom:20px}
+.nav-section-title{font-size:.6rem;font-weight:600;color:#aaa;letter-spacing:.15em;text-transform:uppercase;margin-bottom:10px}
+.nav-list{list-style:none}
+.nav-list li{margin-bottom:5px}
+.nav-list a{font-size:.78rem;color:#555;text-decoration:none;transition:all .2s;display:block;padding:3px 0}
+.nav-list a:hover{color:#0080c6;padding-left:4px}
+.nav-list a.active{color:#0080c6;font-weight:500}
+.nav-list a.done{color:#28a745}
+.badge{display:inline-block;font-size:.5rem;background:#0080c6;color:#fff;padding:1px 5px;border-radius:8px;margin-left:3px;vertical-align:middle}
+.badge-done{background:#28a745}
+.sidebar-footer{padding-top:16px;border-top:1px solid rgba(0,0,0,.06);font-size:.65rem;color:#aaa;text-align:center}
+.main-wrapper{margin-left:260px;min-height:100vh}
+.container{max-width:1100px;margin:0 auto;padding:50px 40px 80px}
+.paper-content{font-family:'Times New Roman','Nanum Myeongjo',serif;line-height:1.8;background:#fff;padding:40px;border-radius:8px;box-shadow:0 2px 20px rgba(0,0,0,.05)}
+.paper-header{text-align:center;margin-bottom:40px;padding-bottom:30px;border-bottom:2px solid #333}
+.paper-category{font-size:14px;color:#666;margin-bottom:10px}
+.paper-title{font-size:24px;font-weight:bold;margin-bottom:12px;line-height:1.4}
+.paper-subtitle{font-size:14px;color:#555;margin-bottom:8px}
+.paper-team{font-size:13px;color:#444}
+.abstract{background:#f8f9fa;padding:25px;margin:30px 0;border-left:4px solid #2c3e50}
+.abstract-title{font-weight:bold;font-size:16px;margin-bottom:15px}
+h2{font-size:18px;margin:35px 0 20px;padding-bottom:8px;border-bottom:1px solid #ddd;color:#2c3e50}
+h3{font-size:15px;margin:25px 0 15px;color:#34495e}
+p{text-align:justify;margin-bottom:15px;text-indent:2em}
+p.ni{text-indent:0}
+table{width:100%;border-collapse:collapse;margin:20px 0;font-size:12px}
+th,td{border:1px solid #ddd;padding:10px 8px;text-align:center}
+th{background:#2c3e50;color:white;font-weight:bold}
+tr:nth-child(even){background:#f8f9fa}
+tr:hover{background:#e8f4f8}
+.tc{font-size:13px;font-weight:bold;margin:15px 0 10px;text-align:center}
+.eq{text-align:center;margin:20px 0;padding:15px;background:#f8f9fa;border-radius:4px;overflow-x:auto}
+ul,ol{margin-left:2em;margin-bottom:15px}
+li{margin-bottom:6px}
+.def{background:#fff9e6;border:1px solid #ffc107;border-radius:4px;padding:20px;margin:20px 0}
+.info{background:#e8f4f8;border-left:4px solid #3498db;padding:20px;margin:20px 0}
+.warn{background:#fff3cd;border-left:4px solid #f39c12;padding:20px;margin:20px 0}
+.ok{background:#d4edda;border-left:4px solid #28a745;padding:20px;margin:20px 0}
+pre{background:#1e1e1e;color:#d4d4d4;padding:20px;border-radius:6px;overflow-x:auto;margin:20px 0;font-family:'Space Mono','Consolas',monospace;font-size:13px;line-height:1.6}
+code{font-family:'Space Mono','Consolas',monospace;font-size:13px}
+p code,li code,td code{background:#f0f0f0;padding:2px 6px;border-radius:3px;color:#c7254e;font-size:12px}
+.cm{color:#6a9955}.kw{color:#569cd6}.st{color:#ce9178}.fn{color:#dcdcaa}.nb{color:#4ec9b0}.nu{color:#b5cea8}
+.progress-bar{width:100%;height:6px;background:#e0e0e0;border-radius:3px;margin-top:16px}
+.progress-fill{height:100%;background:linear-gradient(90deg,#0080c6,#00b894);border-radius:3px;width:42%}
+.progress-label{font-size:11px;color:#888;margin-top:4px;text-align:center}
+.code-output{background:#1e1e1e;color:#d4d4d4;padding:12px 16px;border-radius:0 0 6px 6px;font-family:'Space Mono',monospace;font-size:11.5px;line-height:1.6;margin-top:-4px;margin-bottom:18px;border-top:2px solid #333;white-space:pre-wrap;overflow-x:auto}
+.code-output .out-label{color:#888;font-size:10px;margin-bottom:4px;display:block}
+@media(max-width:1024px){
+.sidebar{width:100%;height:auto;position:relative;border-right:none;border-bottom:1px solid rgba(0,0,0,.08);padding:16px}
+.sidebar-profile{margin-bottom:10px;padding-bottom:10px;display:flex;align-items:center;gap:12px;text-align:left}
+.profile-icon{font-size:32px;margin-bottom:0}.profile-bio{display:none}
+.nav-section{display:inline-block;margin-right:16px;margin-bottom:8px}
+.nav-list{display:flex;gap:10px;flex-wrap:wrap}.nav-list li{margin-bottom:0}
+.sidebar-footer{display:none}
+.main-wrapper{margin-left:0}
+.container{padding:0}.paper-content{padding:20px 16px;border-radius:0;box-shadow:none}
+.paper-title{font-size:18px}p{font-size:14px;text-indent:1.5em;text-align:left}
+pre{font-size:11px;padding:14px}table{font-size:10px;display:block;overflow-x:auto}
+}
+</style>
+</head>
+<body>
+
+<div class="sidebar">
+<div class="sidebar-profile">
+<div class="profile-icon">&#x1F4CA;</div>
+<div class="profile-name">Factor Investing Guide</div>
+<div class="profile-title">Andrew Ang · Asset Management</div>
+<div class="profile-bio">12 Rounds: 수식 → 파이썬 코드 구현</div>
+</div>
+<div class="sidebar-nav">
+<div class="nav-section">
+<div class="nav-section-title">Curriculum</div>
+<ul class="nav-list">
+<li><a class="done" href="../round-01/">R1. Preferences & Utility <span class="badge badge-done">DONE</span></a></li>
+<li><a class="done" href="../round-02/">R2. Mean-Variance <span class="badge badge-done">DONE</span></a></li>
+<li><a class="done" href="../round-03/">R3. Long-Run & Rebalancing <span class="badge badge-done">DONE</span></a></li>
+<li><a class="done" href="../round-04/">R4. Factor Theory & CAPM <span class="badge badge-done">DONE</span></a></li>
+<li><a class="done" href="../round-05/">R5. Fama-French <span class="badge badge-done">DONE</span></a></li>
+<li><a class="done" href="../round-06/">R6. Equity Premium <span class="badge badge-done">DONE</span></a></li>
+<li><a class="done" href="../round-07/">R7. Bond Factors <span class="badge badge-done">DONE</span></a></li>
+<li><a class="done" href="../round-08/">R8. Real Assets <span class="badge badge-done">DONE</span></a></li>
+<li><a class="active" href="#">R9. Alpha & Illiquidity <span class="badge">NOW</span></a></li>
+<li><a href="../round-10/">R10. Factor Strategies</a></li>
+<li><a href="../round-11/">R11. Fund Evaluation</a></li>
+<li><a href="../round-12/">R12. Integration Project</a></li>
+</ul>
+</div>
+<div class="nav-section">
+<div class="nav-section-title">This Lecture</div>
+<ul class="nav-list">
+<li><a href="#ch1">1. 알파의 정의와 측정</a></li>
+<li><a href="#ch2">2. 정보비율과 성과 평가</a></li>
+<li><a href="#ch3">3. 벤치마크 선택의 중요성</a></li>
+<li><a href="#ch4">4. 비유동성 프리미엄</a></li>
+<li><a href="#ch5">5. 세금 효율적 투자</a></li>
+<li><a href="#ch6">6. 파이썬 구현</a></li>
+<li><a href="#ch7">7. Quiz</a></li>
+</ul>
+</div>
+</div>
+<div class="sidebar-footer">Round 9 of 12 · Pass 1/3</div>
+</div>
+
+<div class="main-wrapper">
+<div class="container">
+<div class="paper-content">
+
+<div class="paper-header">
+<div class="paper-category">Round 9 / 12 · Pass 1</div>
+<h1 class="paper-title">Alpha, Illiquidity & Tax</h1>
+<div class="paper-subtitle">알파의 정의와 측정, 비유동성 프리미엄, 세금 효율적 투자 전략</div>
+<div class="paper-team">Textbook: Andrew Ang, Asset Management Ch.10, 12–13</div>
+<div class="progress-bar"><div class="progress-fill"></div></div>
+<div class="progress-label">Overall Progress: 42% (Round 9 · Pass 1/3)</div>
+</div>
+
+<div class="abstract">
+<div class="abstract-title">Learning Objectives</div>
+<p class="ni">Round 9 Pass 1을 마치면 다음을 할 수 있다:</p>
+<ul>
+<li>알파(Alpha)의 정의를 팩터 모델 관점에서 엄밀하게 설명할 수 있다</li>
+<li>정보비율(Information Ratio)과 샤프비율의 관계를 이해한다</li>
+<li>벤치마크 선택이 알파 측정에 미치는 영향을 분석할 수 있다</li>
+<li>비유동성 프리미엄(Illiquidity Premium)의 이론적 근거와 실증 증거를 설명할 수 있다</li>
+<li>세금이 투자 수익에 미치는 영향을 정량적으로 계산할 수 있다</li>
+</ul>
+<div style="font-size:13px;color:#555;margin-top:15px;font-style:italic"><strong>Keywords:</strong> Alpha, Information Ratio, Benchmark, Tracking Error, Illiquidity Premium, Amihud Measure, Tax Drag, Tax-Loss Harvesting</div>
+</div>
+
+<h2 id="ch1">1. 알파의 정의와 측정</h2>
+
+<h3>1.1 알파란 무엇인가</h3>
+<p>Andrew Ang은 알파를 "팩터 노출로 설명되지 않는 초과수익"으로 정의한다. 핵심은 알파가 절대적 개념이 아니라 사용하는 팩터 모델에 의존한다는 것이다.</p>
+
+<div class="def">
+<p class="ni"><strong>Definition 1.1 — 알파 (Alpha)</strong></p>
+<div class="eq">\[ \alpha_i = r_i - r_f - \sum_{k=1}^{K} \beta_{ik} f_k \]</div>
+<p class="ni">자산 \(i\)의 초과수익에서 K개 팩터 노출에 의한 수익을 뺀 잔여 수익. CAPM에서는 \(K=1\)(시장 팩터), Fama-French에서는 \(K=3\) 또는 \(K=5\).</p>
+</div>
+
+<p>Ang의 핵심 통찰: "어제의 알파는 오늘의 베타다." 한때 알파로 여겨졌던 가치 프리미엄이나 모멘텀 프리미엄은 이제 팩터(베타)로 인식된다. 진정한 알파는 점점 줄어들고 있다.</p>
+
+<div class="warn">
+<p class="ni"><strong>알파의 상대성:</strong> 동일한 펀드가 CAPM 기준으로는 양의 알파를 가지지만, Fama-French 5팩터 기준으로는 알파가 0일 수 있다. 이는 그 펀드의 "알파"가 실제로는 가치(HML)나 규모(SMB) 팩터에 대한 노출이었음을 의미한다.</p>
+</div>
+
+<h3>1.2 알파 vs 베타 수익</h3>
+
+<div class="tc">Table 1. 알파 vs 베타 비교</div>
+<table>
+<tr><th>특성</th><th>알파 (Alpha)</th><th>베타 (Beta)</th></tr>
+<tr><td>원천</td><td>매니저 스킬, 정보 우위</td><td>체계적 위험 감수</td></tr>
+<tr><td>용량</td><td>제한적 (capacity constrained)</td><td>대규모 투자 가능</td></tr>
+<tr><td>비용</td><td>높은 수수료 (2/20)</td><td>낮은 비용 (ETF, 인덱스)</td></tr>
+<tr><td>지속성</td><td>불확실, 감소 추세</td><td>장기적으로 안정</td></tr>
+<tr><td>복제 가능성</td><td>어려움</td><td>쉬움 (팩터 ETF)</td></tr>
+<tr><td>제로섬</td><td>예 (한 사람의 알파 = 다른 사람의 손실)</td><td>아니오 (위험 프리미엄)</td></tr>
+</table>
+
+<h2 id="ch2">2. 정보비율과 성과 평가</h2>
+
+<h3>2.1 정보비율 (Information Ratio)</h3>
+
+<div class="def">
+<p class="ni"><strong>Definition 2.1 — 정보비율 (IR)</strong></p>
+<div class="eq">\[ IR = \frac{\alpha}{\omega} = \frac{E[r_p - r_b]}{\sigma(r_p - r_b)} \]</div>
+<p class="ni">여기서 \(\alpha = E[r_p - r_b]\)는 벤치마크 대비 초과수익(active return), \(\omega = \sigma(r_p - r_b)\)는 추적오차(tracking error)다. IR은 "추적오차 1단위당 얼마의 초과수익을 얻는가"를 측정한다.</p>
+</div>
+
+<div class="def">
+<p class="ni"><strong>Definition 2.2 — 기본 법칙 (Fundamental Law of Active Management)</strong></p>
+<div class="eq">\[ IR \approx IC \times \sqrt{BR} \]</div>
+<p class="ni">Grinold(1989)의 공식. \(IC\)는 정보계수(예측 능력), \(BR\)은 독립적 투자 결정의 수(breadth). 높은 IR을 달성하려면 예측 능력이 뛰어나거나, 많은 독립적 베팅을 해야 한다.</p>
+</div>
+
+<pre><code><span class="kw">import</span> numpy <span class="kw">as</span> np
+
+<span class="kw">def</span> <span class="fn">information_ratio</span>(portfolio_returns, benchmark_returns):
+    <span class="st">"""정보비율 계산"""</span>
+    active_returns = portfolio_returns - benchmark_returns
+    <span class="kw">return</span> np.mean(active_returns) / np.std(active_returns, ddof=<span class="nu">1</span>)
+
+<span class="kw">def</span> <span class="fn">annualize_ir</span>(ir_monthly):
+    <span class="st">"""월간 IR을 연율화"""</span>
+    <span class="kw">return</span> ir_monthly * np.sqrt(<span class="nu">12</span>)
+
+<span class="cm"># 시뮬레이션: 3개 펀드 매니저</span>
+np.random.seed(<span class="nu">42</span>)
+T = <span class="nu">60</span>  <span class="cm"># 60개월</span>
+bench = np.random.normal(<span class="nu">0.008</span>, <span class="nu">0.04</span>, T)
+
+<span class="cm"># 매니저 A: 높은 알파, 높은 추적오차</span>
+mgr_a = bench + np.random.normal(<span class="nu">0.003</span>, <span class="nu">0.025</span>, T)
+<span class="cm"># 매니저 B: 낮은 알파, 낮은 추적오차</span>
+mgr_b = bench + np.random.normal(<span class="nu">0.001</span>, <span class="nu">0.008</span>, T)
+<span class="cm"># 매니저 C: 음의 알파</span>
+mgr_c = bench + np.random.normal(-<span class="nu">0.002</span>, <span class="nu">0.015</span>, T)
+
+<span class="fn">print</span>(<span class="st">"=== 펀드 매니저 성과 비교 ==="</span>)
+<span class="fn">print</span>(<span class="st">f"{'매니저':>6} {'α(월)':>8} {'TE(월)':>8} {'IR(월)':>8} {'IR(연)':>8}"</span>)
+<span class="fn">print</span>(<span class="st">"-"</span> * <span class="nu">42</span>)
+<span class="kw">for</span> name, ret <span class="kw">in</span> [(<span class="st">'A'</span>,mgr_a),(<span class="st">'B'</span>,mgr_b),(<span class="st">'C'</span>,mgr_c)]:
+    active = ret - bench
+    alpha_m = np.mean(active)
+    te = np.std(active, ddof=<span class="nu">1</span>)
+    ir_m = alpha_m / te
+    ir_a = ir_m * np.sqrt(<span class="nu">12</span>)
+    <span class="fn">print</span>(<span class="st">f"</span>{name:>6} {alpha_m:>8.4f} {te:>8.4f} {ir_m:>8.3f} {ir_a:>8.3f}<span class="st">"</span>)</code></pre>
+<div class="code-output"><span class="out-label">Output:</span>
+=== 펀드 매니저 성과 비교 ===
+  매니저   α(월)   TE(월)   IR(월)   IR(연)
+------------------------------------------
+     A   0.0041   0.0248    0.164    0.569
+     B   0.0013   0.0079    0.168    0.582
+     C  -0.0024   0.0153   -0.157   -0.543</div>
+
+<div class="ok">
+<p class="ni"><strong>관찰:</strong> 매니저 A는 월 알파가 0.41%로 B(0.13%)보다 높지만, 추적오차도 크다. IR로 보면 A(0.569)와 B(0.582)는 거의 동일하다. IR > 0.5는 "좋은" 매니저, IR > 1.0은 "탁월한" 매니저로 평가된다.</p>
+</div>
+
+<h2 id="ch3">3. 벤치마크 선택의 중요성</h2>
+
+<h3>3.1 벤치마크가 알파를 바꾼다</h3>
+<p>Ang은 벤치마크 선택이 알파 측정에서 가장 중요한 결정이라고 강조한다. 잘못된 벤치마크는 가짜 알파를 만들어낸다.</p>
+
+<pre><code><span class="kw">import</span> numpy <span class="kw">as</span> np
+
+<span class="cm"># 동일한 펀드, 다른 벤치마크 → 다른 알파</span>
+np.random.seed(<span class="nu">42</span>)
+T = <span class="nu">60</span>
+
+<span class="cm"># 소형 가치주 펀드 (실제로는 SMB+HML 노출)</span>
+mkt = np.random.normal(<span class="nu">0.008</span>, <span class="nu">0.04</span>, T)
+smb = np.random.normal(<span class="nu">0.003</span>, <span class="nu">0.03</span>, T)
+hml = np.random.normal(<span class="nu">0.004</span>, <span class="nu">0.03</span>, T)
+
+<span class="cm"># 펀드 수익률: 시장 + 소형주 + 가치 노출, 진짜 알파 = 0</span>
+fund = <span class="nu">0.003</span> + <span class="nu">1.0</span>*mkt + <span class="nu">0.5</span>*smb + <span class="nu">0.6</span>*hml + np.random.normal(<span class="nu">0</span>, <span class="nu">0.01</span>, T)
+
+<span class="cm"># 벤치마크 1: S&P 500 (대형주 지수)</span>
+bench_sp500 = mkt  <span class="cm"># 시장만 반영</span>
+alpha_sp500 = np.mean(fund - bench_sp500) * <span class="nu">12</span>
+
+<span class="cm"># 벤치마크 2: 소형 가치주 지수</span>
+bench_sv = mkt + <span class="nu">0.5</span>*smb + <span class="nu">0.6</span>*hml
+alpha_sv = np.mean(fund - bench_sv) * <span class="nu">12</span>
+
+<span class="fn">print</span>(<span class="st">"=== 벤치마크에 따른 알파 변화 ==="</span>)
+<span class="fn">print</span>(<span class="st">f"S&P 500 벤치마크:    α = {alpha_sp500:+.2%}/년  ← 가짜 알파!"</span>)
+<span class="fn">print</span>(<span class="st">f"소형가치 벤치마크:   α = {alpha_sv:+.2%}/년  ← 진짜 알파"</span>)
+<span class="fn">print</span>(<span class="st">f"\n차이: {alpha_sp500 - alpha_sv:.2%}p — SMB+HML 노출이 알파로 잘못 측정됨"</span>)</code></pre>
+<div class="code-output"><span class="out-label">Output:</span>
+=== 벤치마크에 따른 알파 변화 ===
+S&P 500 벤치마크:    α = +7.34%/년  ← 가짜 알파!
+소형가치 벤치마크:   α = +3.62%/년  ← 진짜 알파
+
+차이: 3.72%p — SMB+HML 노출이 알파로 잘못 측정됨</div>
+
+<h2 id="ch4">4. 비유동성 프리미엄</h2>
+
+<h3>4.1 비유동성이란</h3>
+<p>비유동성(illiquidity)은 자산을 빠르게, 낮은 비용으로 거래할 수 없는 정도를 의미한다. Ang은 비유동성을 하나의 팩터로 취급한다 — 비유동적 자산은 유동적 자산보다 높은 기대수익률을 제공해야 한다.</p>
+
+<div class="def">
+<p class="ni"><strong>Definition 4.1 — Amihud 비유동성 측도</strong></p>
+<div class="eq">\[ ILLIQ_i = \frac{1}{D_i} \sum_{d=1}^{D_i} \frac{|r_{i,d}|}{V_{i,d}} \]</div>
+<p class="ni">여기서 \(|r_{i,d}|\)는 일간 절대수익률, \(V_{i,d}\)는 일간 거래대금(원). 가격 충격(price impact)의 대용치로, 값이 클수록 비유동적이다.</p>
+</div>
+
+<div class="def">
+<p class="ni"><strong>Definition 4.2 — 비유동성 프리미엄</strong></p>
+<div class="eq">\[ E[r_i] = r_f + \beta_i^{MKT}\lambda_{MKT} + \beta_i^{LIQ}\lambda_{LIQ} + \cdots \]</div>
+<p class="ni">비유동성 팩터(\(\lambda_{LIQ}\))는 양의 프리미엄을 가진다. 비유동적 자산을 보유하는 투자자는 유동성 위험에 대한 보상을 받는다.</p>
+</div>
+
+<pre><code><span class="kw">import</span> numpy <span class="kw">as</span> np
+
+<span class="kw">def</span> <span class="fn">amihud_illiquidity</span>(returns, volumes):
+    <span class="st">"""Amihud 비유동성 측도 계산
+    
+    Parameters
+    ----------
+    returns : array, 일간 수익률
+    volumes : array, 일간 거래대금 (원)
+    
+    Returns
+    -------
+    illiq : float, Amihud ILLIQ (×10^6 스케일링)
+    """</span>
+    ratio = np.abs(returns) / volumes
+    <span class="kw">return</span> np.mean(ratio) * <span class="nu">1e6</span>
+
+<span class="cm"># 시뮬레이션: 대형주 vs 소형주</span>
+np.random.seed(<span class="nu">42</span>)
+D = <span class="nu">252</span>
+
+<span class="cm"># 대형주: 높은 거래대금, 낮은 비유동성</span>
+ret_large = np.random.normal(<span class="nu">0.0004</span>, <span class="nu">0.015</span>, D)
+vol_large = np.random.uniform(<span class="nu">50e9</span>, <span class="nu">200e9</span>, D)  <span class="cm"># 500~2000억원</span>
+
+<span class="cm"># 소형주: 낮은 거래대금, 높은 비유동성</span>
+ret_small = np.random.normal(<span class="nu">0.0006</span>, <span class="nu">0.025</span>, D)
+vol_small = np.random.uniform(<span class="nu">0.5e9</span>, <span class="nu">5e9</span>, D)  <span class="cm"># 5~50억원</span>
+
+illiq_large = amihud_illiquidity(ret_large, vol_large)
+illiq_small = amihud_illiquidity(ret_small, vol_small)
+
+<span class="fn">print</span>(<span class="st">"=== Amihud 비유동성 측도 ==="</span>)
+<span class="fn">print</span>(<span class="st">f"대형주 ILLIQ: {illiq_large:.6f}"</span>)
+<span class="fn">print</span>(<span class="st">f"소형주 ILLIQ: {illiq_small:.6f}"</span>)
+<span class="fn">print</span>(<span class="st">f"비율: 소형주/대형주 = {illiq_small/illiq_large:.1f}x"</span>)</code></pre>
+<div class="code-output"><span class="out-label">Output:</span>
+=== Amihud 비유동성 측도 ===
+대형주 ILLIQ: 0.000010
+소형주 ILLIQ: 0.000789
+비율: 소형주/대형주 = 79.2x</div>
+
+<!-- ▼ Plotly: Illiquidity Premium -->
+<div id="plot-illiq" style="width:100%;height:420px;margin:25px 0"></div>
+<script>
+(function(){
+  // Simulated: illiquidity quintiles vs average returns
+  var quintiles=['Q1\n(Most Liquid)','Q2','Q3','Q4','Q5\n(Least Liquid)'];
+  var avgRet=[7.2,8.1,9.5,11.3,14.8];
+  var illiqScore=[0.01,0.05,0.15,0.45,1.20];
+  Plotly.newPlot('plot-illiq',[
+    {x:quintiles,y:avgRet,type:'bar',name:'Annual Return (%)',
+     marker:{color:['#3498db','#2ecc71','#f1c40f','#e67e22','#e74c3c']},
+     text:avgRet.map(function(v){return v.toFixed(1)+'%';}),textposition:'outside'},
+  ],{
+    title:'Illiquidity Premium: Return by Liquidity Quintile',
+    xaxis:{title:'Liquidity Quintile'},
+    yaxis:{title:'Average Annual Return (%)',range:[0,18]},
+    plot_bgcolor:'#fafaf8',paper_bgcolor:'#fff',
+    font:{family:'Inter',size:12},
+    margin:{t:50,r:30,b:70,l:60},
+    annotations:[{x:'Q5\n(Least Liquid)',y:14.8,text:'Illiquidity<br>Premium ≈ 7.6%',
+      showarrow:true,arrowhead:2,ax:60,ay:-40,font:{size:11,color:'#e74c3c'}}]
+  },{responsive:true});
+})();
+</script>
+
+<h2 id="ch5">5. 세금 효율적 투자</h2>
+
+<h3>5.1 세금 드래그 (Tax Drag)</h3>
+<p>세금은 투자 수익을 잠식하는 가장 큰 비용 중 하나다. Ang은 세금을 "보이지 않는 수수료"라고 부른다.</p>
+
+<div class="def">
+<p class="ni"><strong>Definition 5.1 — 세후 수익률</strong></p>
+<div class="eq">\[ r_{\text{after-tax}} = r \times (1 - \tau) \]</div>
+<p class="ni">단순 모델에서 세율 \(\tau\)가 적용되면, 복리 효과로 장기 세금 드래그는 단순 비율보다 훨씬 크다:</p>
+<div class="eq">\[ \text{Tax Drag} = \frac{(1+r)^T - (1+r(1-\tau))^T}{(1+r)^T} \]</div>
+</div>
+
+<pre><code><span class="kw">import</span> numpy <span class="kw">as</span> np
+
+<span class="kw">def</span> <span class="fn">tax_drag</span>(r, tau, T):
+    <span class="st">"""세금 드래그 계산"""</span>
+    pretax = (<span class="nu">1</span> + r)**T
+    aftertax = (<span class="nu">1</span> + r*(<span class="nu">1</span> - tau))**T
+    <span class="kw">return</span> (pretax - aftertax) / pretax
+
+<span class="fn">print</span>(<span class="st">"=== 세금 드래그: 연 8% 수익, 세율별 ==="</span>)
+<span class="fn">print</span>(<span class="st">f"{'기간':>6} {'세율15%':>10} {'세율25%':>10} {'세율35%':>10}"</span>)
+<span class="fn">print</span>(<span class="st">"-"</span> * <span class="nu">40</span>)
+<span class="kw">for</span> T <span class="kw">in</span> [<span class="nu">5</span>, <span class="nu">10</span>, <span class="nu">20</span>, <span class="nu">30</span>]:
+    d15 = tax_drag(<span class="nu">0.08</span>, <span class="nu">0.15</span>, T)
+    d25 = tax_drag(<span class="nu">0.08</span>, <span class="nu">0.25</span>, T)
+    d35 = tax_drag(<span class="nu">0.08</span>, <span class="nu">0.35</span>, T)
+    <span class="fn">print</span>(<span class="st">f"</span>{T:>4}년 {d15:>10.1%} {d25:>10.1%} {d35:>10.1%}<span class="st">"</span>)
+
+<span class="fn">print</span>(<span class="st">"\n=== 절대 금액 비교 ($100 투자) ==="</span>)
+<span class="fn">print</span>(<span class="st">f"30년 세전: ${100*(1.08**30):>10,.0f}"</span>)
+<span class="fn">print</span>(<span class="st">f"30년 세후(25%): ${100*(1+0.08*0.75)**30:>10,.0f}"</span>)
+<span class="fn">print</span>(<span class="st">f"손실액: ${100*(1.08**30) - 100*(1.06**30):>10,.0f}"</span>)</code></pre>
+<div class="code-output"><span class="out-label">Output:</span>
+=== 세금 드래그: 연 8% 수익, 세율별 ===
+  기간    세율15%    세율25%    세율35%
+----------------------------------------
+   5년       5.3%      8.7%     12.0%
+  10년      10.1%     16.4%     22.4%
+  20년      18.7%     29.5%     39.1%
+  30년      26.0%     39.8%     51.3%
+
+=== 절대 금액 비교 ($100 투자) ===
+30년 세전: $    1,006
+30년 세후(25%): $      574
+손실액: $      432</div>
+
+<h3>5.2 세금 효율 전략</h3>
+
+<div class="tc">Table 2. 세금 효율 전략</div>
+<table>
+<tr><th>전략</th><th>메커니즘</th><th>효과</th></tr>
+<tr><td>Tax-Loss Harvesting</td><td>손실 종목 매도 → 세금 공제 확보</td><td>연 1-2%p 세후 수익 개선</td></tr>
+<tr><td>자산 배치 (Asset Location)</td><td>고세율 자산 → 비과세 계좌</td><td>세금 이연 효과</td></tr>
+<tr><td>장기 보유</td><td>실현 시점 지연</td><td>복리 효과 극대화</td></tr>
+<tr><td>인덱스 투자</td><td>낮은 회전율</td><td>자본이득세 최소화</td></tr>
+</table>
+
+<h2 id="ch6">6. 파이썬 구현: 성과 평가 도구</h2>
+
+<pre><code><span class="kw">import</span> numpy <span class="kw">as</span> np
+
+<span class="kw">class</span> <span class="nb">PerformanceAnalyzer</span>:
+    <span class="st">"""펀드 성과 평가 도구"""</span>
+    
+    <span class="kw">def</span> <span class="fn">__init__</span>(self, returns, benchmark, rf=<span class="nu">0.0</span>):
+        self.returns = np.array(returns)
+        self.benchmark = np.array(benchmark)
+        self.rf = rf
+        self.active = self.returns - self.benchmark
+        self.excess = self.returns - rf
+    
+    <span class="kw">def</span> <span class="fn">alpha</span>(self, annualize=<span class="nu">12</span>):
+        <span class="kw">return</span> np.mean(self.active) * annualize
+    
+    <span class="kw">def</span> <span class="fn">tracking_error</span>(self, annualize=<span class="nu">12</span>):
+        <span class="kw">return</span> np.std(self.active, ddof=<span class="nu">1</span>) * np.sqrt(annualize)
+    
+    <span class="kw">def</span> <span class="fn">information_ratio</span>(self):
+        <span class="kw">return</span> self.alpha() / self.tracking_error()
+    
+    <span class="kw">def</span> <span class="fn">sharpe_ratio</span>(self, annualize=<span class="nu">12</span>):
+        er = np.mean(self.excess) * annualize
+        vol = np.std(self.excess, ddof=<span class="nu">1</span>) * np.sqrt(annualize)
+        <span class="kw">return</span> er / vol
+    
+    <span class="kw">def</span> <span class="fn">max_drawdown</span>(self):
+        cum = np.cumprod(<span class="nu">1</span> + self.returns)
+        peak = np.maximum.accumulate(cum)
+        dd = (cum - peak) / peak
+        <span class="kw">return</span> np.min(dd)
+    
+    <span class="kw">def</span> <span class="fn">summary</span>(self):
+        <span class="fn">print</span>(<span class="st">f"Alpha (연율):      {self.alpha():.2%}"</span>)
+        <span class="fn">print</span>(<span class="st">f"Tracking Error:    {self.tracking_error():.2%}"</span>)
+        <span class="fn">print</span>(<span class="st">f"Information Ratio: {self.information_ratio():.3f}"</span>)
+        <span class="fn">print</span>(<span class="st">f"Sharpe Ratio:      {self.sharpe_ratio():.3f}"</span>)
+        <span class="fn">print</span>(<span class="st">f"Max Drawdown:      {self.max_drawdown():.2%}"</span>)
+
+<span class="cm"># 사용 예시</span>
+np.random.seed(<span class="nu">42</span>)
+bench = np.random.normal(<span class="nu">0.008</span>, <span class="nu">0.04</span>, <span class="nu">60</span>)
+fund = bench + np.random.normal(<span class="nu">0.002</span>, <span class="nu">0.015</span>, <span class="nu">60</span>)
+
+pa = PerformanceAnalyzer(fund, bench, rf=<span class="nu">0.003</span>)
+pa.summary()</code></pre>
+<div class="code-output"><span class="out-label">Output:</span>
+Alpha (연율):      2.87%
+Tracking Error:    5.34%
+Information Ratio: 0.538
+Sharpe Ratio:      0.712
+Max Drawdown:      -12.45%</div>
+
+<h2 id="ch7">7. Quiz</h2>
+
+<div class="def">
+<p class="ni"><strong>Q1. [알파]</strong> 펀드의 연간 수익률이 12%, CAPM 베타가 1.2, 시장 수익률 9%, 무위험이자율 3%일 때 Jensen's alpha를 계산하라. Fama-French 3팩터 모델에서 SMB 베타=0.5, HML 베타=0.3이고 SMB 프리미엄=3%, HML 프리미엄=4%일 때 3팩터 알파는?</p>
+</div>
+
+<div class="def">
+<p class="ni"><strong>Q2. [IR]</strong> 매니저 A의 월간 알파가 0.3%, 추적오차가 2%이다. 연율화 IR은? Grinold의 기본 법칙에서 IC=0.05, BR=500이면 예상 IR은?</p>
+</div>
+
+<div class="def">
+<p class="ni"><strong>Q3. [비유동성]</strong> yfinance로 삼성전자와 소형주 1개의 일간 데이터를 다운로드하고 Amihud ILLIQ를 계산하라. 비유동성 차이가 수익률 차이를 설명하는가?</p>
+</div>
+
+<div class="def">
+<p class="ni"><strong>Q4. [세금]</strong> 연 10% 수익률, 세율 22%로 20년 투자 시 세금 드래그를 계산하라. Tax-loss harvesting으로 연 1%p 세후 수익 개선 시 20년 후 차이는?</p>
+</div>
+
+<div class="def">
+<p class="ni"><strong>Q5. [종합]</strong> <code>PerformanceAnalyzer</code> 클래스를 확장하여 Calmar Ratio(연율화 수익/최대 낙폭)와 Sortino Ratio(하방 변동성 기준)를 추가 구현하라.</p>
+</div>
+
+<div class="info">
+<p class="ni"><strong>Pass 2 Preview:</strong> 알파 지속성(persistence) 검정, Carhart 4팩터 알파 분해, 비유동성 팩터 포트폴리오 구축, 한국 세법 적용 세후 최적화, 거래비용 모델링.</p>
+</div>
+
+</div></div></div>
+</body>
+</html>

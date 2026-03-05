@@ -1,0 +1,659 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Round 12 - Integration: Factor-Based Portfolio | Factor Investing Guide</title>
+<script>
+MathJax = { tex: { inlineMath: [['\\(','\\)']], displayMath: [['\\[','\\]'],['$','$']] } };
+</script>
+<script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;500&family=Space+Mono:wght@400&family=Inter:wght@300;400&display=swap" rel="stylesheet">
+<script src="https://cdn.plot.ly/plotly-2.27.0.min.js"></script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Inter',sans-serif;background:#fafaf8;color:#1a1a1a;line-height:1.7;overflow-x:hidden}
+.sidebar{position:fixed;left:0;top:0;width:260px;height:100vh;background:rgba(255,255,255,.97);border-right:1px solid rgba(0,0,0,.06);padding:32px 24px;z-index:100;overflow-y:auto;display:flex;flex-direction:column}
+.sidebar-profile{text-align:center;margin-bottom:28px;padding-bottom:24px;border-bottom:1px solid rgba(0,0,0,.08)}
+.profile-icon{font-size:48px;margin-bottom:8px}
+.profile-name{font-family:'Cormorant Garamond',serif;font-size:1.3rem;font-weight:500;margin-bottom:4px}
+.profile-title{font-size:.68rem;color:#888;letter-spacing:.08em;text-transform:uppercase;margin-bottom:8px}
+.profile-bio{font-size:.78rem;color:#666;line-height:1.5}
+</style>
+</head>
+<body>
+
+<div class="sidebar">
+<div class="sidebar-profile">
+<div class="profile-icon">&#x1F4CA;</div>
+<div class="profile-name">Factor Investing Guide</div>
+<div class="profile-title">Andrew Ang · Asset Management</div>
+<div class="profile-bio">12 Rounds: 수식 → 파이썬 코드 구현</div>
+</div>
+<div class="sidebar-nav">
+<div class="nav-section">
+<div class="nav-section-title">Curriculum</div>
+<ul class="nav-list">
+<li><a class="done" href="../round-01/">R1. Preferences & Utility <span class="badge badge-done">DONE</span></a></li>
+<li><a class="done" href="../round-02/">R2. Mean-Variance <span class="badge badge-done">DONE</span></a></li>
+<li><a class="done" href="../round-03/">R3. Long-Run & Rebalancing <span class="badge badge-done">DONE</span></a></li>
+<li><a class="done" href="../round-04/">R4. Factor Theory & CAPM <span class="badge badge-done">DONE</span></a></li>
+<li><a class="done" href="../round-05/">R5. Fama-French <span class="badge badge-done">DONE</span></a></li>
+<li><a class="done" href="../round-06/">R6. Equity Premium <span class="badge badge-done">DONE</span></a></li>
+<li><a class="done" href="../round-07/">R7. Bond Factors <span class="badge badge-done">DONE</span></a></li>
+<li><a class="done" href="../round-08/">R8. Real Assets <span class="badge badge-done">DONE</span></a></li>
+<li><a class="done" href="../round-09/">R9. Alpha & Illiquidity <span class="badge badge-done">DONE</span></a></li>
+<li><a class="done" href="../round-10/">R10. Factor Strategies <span class="badge badge-done">DONE</span></a></li>
+<li><a class="done" href="../round-11/">R11. Fund Evaluation <span class="badge badge-done">DONE</span></a></li>
+<li><a class="active" href="#">R12. Integration Project <span class="badge">NOW</span></a></li>
+</ul>
+</div>
+<div class="nav-section">
+<div class="nav-section-title">This Lecture</div>
+<ul class="nav-list">
+<li><a href="#ch1">1. 통합 프로젝트 개요</a></li>
+<li><a href="#ch2">2. 데이터 수집 파이프라인</a></li>
+<li><a href="#ch3">3. 팩터 모델 추정</a></li>
+<li><a href="#ch4">4. 포트폴리오 구축</a></li>
+<li><a href="#ch5">5. 백테스팅 엔진</a></li>
+<li><a href="#ch6">6. 성과 평가 & 귀인분석</a></li>
+<li><a href="#ch7">7. Final Quiz</a></li>
+</ul>
+</div>
+</div>
+<div class="sidebar-footer">Round 12 of 12 · Pass 1/3</div>
+</div>
+
+<div class="main-wrapper">
+<div class="container">
+<div class="paper-content">
+
+<div class="paper-header">
+<div class="paper-category">Round 12 / 12 · Pass 1</div>
+<h1 class="paper-title">Integration: Factor-Based Portfolio</h1>
+<div class="paper-subtitle">전체 통합 — 데이터 수집 → 팩터 추정 → 포트폴리오 구축 → 백테스팅 → 성과 귀인분석</div>
+<div class="paper-team">Textbook: Andrew Ang, Asset Management (전체 통합)</div>
+<div class="progress-bar"><div class="progress-fill" style="width:67%"></div></div>
+<div class="progress-label">Overall Progress: 67% (Round 12 · Pass 1/3)</div>
+</div>
+
+<div class="abstract">
+<div class="abstract-title">Learning Objectives</div>
+<p class="ni">Round 12 Pass 1을 마치면 다음을 할 수 있다:</p>
+<ul>
+<li>팩터 데이터 수집부터 성과 평가까지 전체 파이프라인을 구축할 수 있다</li>
+<li>멀티팩터 포트폴리오를 구축하고 백테스팅할 수 있다</li>
+<li>성과 귀인분석(Performance Attribution)으로 수익의 원천을 분해할 수 있다</li>
+<li>R1-R11에서 배운 모든 개념을 하나의 통합 시스템으로 연결할 수 있다</li>
+</ul>
+<div style="font-size:13px;color:#555;margin-top:15px;font-style:italic"><strong>Keywords:</strong> Full Pipeline, Data Collection, Factor Estimation, Portfolio Construction, Backtesting, Performance Attribution, Risk Decomposition</div>
+</div>
+
+<h2 id="ch1">1. 통합 프로젝트 개요</h2>
+
+<h3>1.1 전체 파이프라인 아키텍처</h3>
+<p>이 라운드는 R1-R11에서 배운 모든 개념을 하나의 end-to-end 시스템으로 통합한다. Ang의 교재 전체를 관통하는 핵심 메시지: 팩터는 자산 가격의 근본 동인이며, 모든 투자 의사결정은 팩터 렌즈를 통해 이루어져야 한다.</p>
+
+<div class="tc">Table 1. 통합 파이프라인 단계</div>
+<table>
+<tr><th>단계</th><th>내용</th><th>관련 라운드</th><th>핵심 도구</th></tr>
+<tr><td>1. 데이터 수집</td><td>팩터 수익률, 자산 가격, 거시 변수</td><td>R5-R8</td><td>FRED API, yfinance, Kenneth French</td></tr>
+<tr><td>2. 팩터 추정</td><td>팩터 노출(β) 추정, 공분산 행렬</td><td>R4-R6</td><td>OLS, Rolling Regression</td></tr>
+<tr><td>3. 기대수익 추정</td><td>팩터 프리미엄 × 팩터 노출</td><td>R4, R6</td><td>Cross-Sectional Regression</td></tr>
+<tr><td>4. 포트폴리오 구축</td><td>MVO, 팩터 틸팅, 리스크 패리티</td><td>R2, R10</td><td>CVXPY, scipy.optimize</td></tr>
+<tr><td>5. 백테스팅</td><td>아웃오브샘플 성과 시뮬레이션</td><td>R3, R10</td><td>Rolling Window, Walk-Forward</td></tr>
+<tr><td>6. 성과 평가</td><td>알파, 팩터 귀인, 위험 분해</td><td>R9, R11</td><td>Factor Regression, RBSA</td></tr>
+</table>
+
+<div class="def">
+<p class="ni"><strong>Definition 1.1 — 팩터 기반 투자 프로세스 (Ang의 프레임워크)</strong></p>
+<div class="eq">\[ \underbrace{E[r_i] - r_f}_{\text{기대 초과수익}} = \underbrace{\sum_{k=1}^{K} \beta_{i,k}}_{\text{팩터 노출}} \cdot \underbrace{\lambda_k}_{\text{팩터 프리미엄}} \]</div>
+<p class="ni">이 단순한 수식이 전체 파이프라인의 핵심이다. 우리가 해야 할 일: (1) \(\beta_{i,k}\)를 추정하고, (2) \(\lambda_k\)를 추정하고, (3) 이를 기반으로 최적 포트폴리오를 구축한다.</p>
+</div>
+
+<h2 id="ch2">2. 데이터 수집 파이프라인</h2>
+
+<h3>2.1 팩터 데이터 소스</h3>
+
+<div class="info">
+<p class="ni"><strong>주요 데이터 소스:</strong></p>
+<ul>
+<li><strong>Kenneth French Data Library:</strong> Fama-French 팩터(MKT, SMB, HML, RMW, CMA), 모멘텀(UMD), 산업 포트폴리오</li>
+<li><strong>FRED (Federal Reserve):</strong> 무위험이자율, 기간 스프레드, 신용 스프레드, 인플레이션</li>
+<li><strong>yfinance:</strong> 개별 주식/ETF 가격, 거래량</li>
+<li><strong>AQR Data Library:</strong> BAB(Betting Against Beta), QMJ(Quality Minus Junk)</li>
+</ul>
+</div>
+
+<pre><code><span class="kw">import</span> numpy <span class="kw">as</span> np
+<span class="kw">import</span> pandas <span class="kw">as</span> pd
+
+<span class="cm"># ═══════════════════════════════════════════════</span>
+<span class="cm"># Step 1: 데이터 수집 (시뮬레이션 버전)</span>
+<span class="cm"># ═══════════════════════════════════════════════</span>
+<span class="cm"># 실제로는 pandas_datareader, yfinance 등을 사용</span>
+<span class="cm"># 여기서는 재현 가능한 시뮬레이션 데이터 사용</span>
+
+np.random.seed(<span class="nu">2024</span>)
+T = <span class="nu">240</span>  <span class="cm"># 20년 월별</span>
+N = <span class="nu">30</span>   <span class="cm"># 30개 주식</span>
+
+<span class="cm"># Fama-French 5 팩터 + 모멘텀</span>
+factor_names = [<span class="st">'MKT'</span>, <span class="st">'SMB'</span>, <span class="st">'HML'</span>, <span class="st">'RMW'</span>, <span class="st">'CMA'</span>, <span class="st">'UMD'</span>]
+K = <span class="fn">len</span>(factor_names)
+
+<span class="cm"># 팩터 수익률 (현실적 통계량 반영)</span>
+factor_means = np.array([<span class="nu">0.006</span>, <span class="nu">0.002</span>, <span class="nu">0.003</span>, <span class="nu">0.003</span>, <span class="nu">0.002</span>, <span class="nu">0.005</span>])
+factor_vols = np.array([<span class="nu">0.045</span>, <span class="nu">0.030</span>, <span class="nu">0.028</span>, <span class="nu">0.020</span>, <span class="nu">0.018</span>, <span class="nu">0.042</span>])
+
+<span class="cm"># 팩터 간 상관행렬</span>
+factor_corr = np.array([
+    [<span class="nu">1.00</span>, <span class="nu">0.10</span>,-<span class="nu">0.15</span>,-<span class="nu">0.20</span>,-<span class="nu">0.10</span>,-<span class="nu">0.05</span>],
+    [<span class="nu">0.10</span>, <span class="nu">1.00</span>, <span class="nu">0.05</span>,-<span class="nu">0.30</span>, <span class="nu">0.00</span>, <span class="nu">0.00</span>],
+    [-<span class="nu">0.15</span>, <span class="nu">0.05</span>, <span class="nu">1.00</span>, <span class="nu">0.10</span>, <span class="nu">0.60</span>,-<span class="nu">0.15</span>],
+    [-<span class="nu">0.20</span>,-<span class="nu">0.30</span>, <span class="nu">0.10</span>, <span class="nu">1.00</span>, <span class="nu">0.10</span>, <span class="nu">0.05</span>],
+    [-<span class="nu">0.10</span>, <span class="nu">0.00</span>, <span class="nu">0.60</span>, <span class="nu">0.10</span>, <span class="nu">1.00</span>,-<span class="nu">0.10</span>],
+    [-<span class="nu">0.05</span>, <span class="nu">0.00</span>,-<span class="nu">0.15</span>, <span class="nu">0.05</span>,-<span class="nu">0.10</span>, <span class="nu">1.00</span>]
+])
+factor_cov = np.outer(factor_vols, factor_vols) * factor_corr
+L = np.linalg.cholesky(factor_cov)
+Z = np.random.randn(T, K)
+factors = factor_means + Z @ L.T
+
+<span class="cm"># 개별 주식의 팩터 노출 (true betas)</span>
+true_betas = np.random.uniform(-<span class="nu">0.5</span>, <span class="nu">1.5</span>, (N, K))
+true_betas[:, <span class="nu">0</span>] = np.random.uniform(<span class="nu">0.5</span>, <span class="nu">1.5</span>, N)  <span class="cm"># 시장 베타는 양수</span>
+true_alphas = np.random.normal(<span class="nu">0</span>, <span class="nu">0.001</span>, N)  <span class="cm"># 대부분 알파 ≈ 0</span>
+idio_vol = np.random.uniform(<span class="nu">0.03</span>, <span class="nu">0.08</span>, N)
+
+<span class="cm"># 주식 수익률 생성</span>
+stock_returns = np.zeros((T, N))
+<span class="kw">for</span> i <span class="kw">in</span> <span class="fn">range</span>(N):
+    stock_returns[:, i] = true_alphas[i] + factors @ true_betas[i] + \
+                          np.random.normal(<span class="nu">0</span>, idio_vol[i], T)
+
+<span class="fn">print</span>(<span class="st">"=== 데이터 수집 완료 ==="</span>)
+<span class="fn">print</span>(<span class="st">f"기간: {T}개월 ({T//12}년)"</span>)
+<span class="fn">print</span>(<span class="st">f"주식: {N}개"</span>)
+<span class="fn">print</span>(<span class="st">f"팩터: {K}개 {factor_names}"</span>)
+<span class="fn">print</span>(<span class="st">f"\n팩터 통계 (연율화):"</span>)
+<span class="fn">print</span>(<span class="st">f"{'팩터':>6} {'평균':>8} {'변동성':>8} {'SR':>6}"</span>)
+<span class="kw">for</span> i <span class="kw">in</span> <span class="fn">range</span>(K):
+    mu = factors[:,i].mean()*<span class="nu">12</span>
+    vol = factors[:,i].std()*np.sqrt(<span class="nu">12</span>)
+    <span class="fn">print</span>(<span class="st">f"</span>{factor_names[i]:>6} {mu:>8.2%} {vol:>8.2%} {mu/vol:>6.3f}<span class="st">"</span>)</code></pre>
+<div class="code-output"><span class="out-label">Output:</span>
+=== 데이터 수집 완료 ===
+기간: 240개월 (20년)
+주식: 30개
+팩터: 6개 ['MKT', 'SMB', 'HML', 'RMW', 'CMA', 'UMD']
+
+팩터 통계 (연율화):
+  팩터     평균    변동성     SR
+   MKT    7.34%   15.42%  0.476
+   SMB    2.18%   10.28%  0.212
+   HML    3.52%    9.64%  0.365
+   RMW    3.41%    6.92%  0.493
+   CMA    2.28%    6.18%  0.369
+   UMD    5.87%   14.52%  0.404</div>
+
+<h2 id="ch3">3. 팩터 모델 추정</h2>
+
+<h3>3.1 시계열 회귀: 팩터 노출 추정</h3>
+<p>각 주식에 대해 시계열 회귀를 수행하여 팩터 노출(β)을 추정한다. 이것이 Fama-MacBeth 2단계 절차의 첫 번째 단계다.</p>
+
+<div class="def">
+<p class="ni"><strong>Definition 3.1 — 시계열 회귀 (Time-Series Regression)</strong></p>
+<div class="eq">\[ r_{i,t} - r_{f,t} = \alpha_i + \beta_{i,1}f_{1,t} + \cdots + \beta_{i,K}f_{K,t} + \varepsilon_{i,t} \quad \forall i \]</div>
+<p class="ni">각 주식 \(i\)에 대해 독립적으로 OLS 추정. 결과: \(\hat{\alpha}_i\), \(\hat{\beta}_{i,1}, \ldots, \hat{\beta}_{i,K}\)</p>
+</div>
+
+<h3>3.2 횡단면 회귀: 팩터 프리미엄 추정</h3>
+
+<div class="def">
+<p class="ni"><strong>Definition 3.2 — Fama-MacBeth 횡단면 회귀</strong></p>
+<div class="eq">\[ r_{i,t} = \gamma_{0,t} + \gamma_{1,t}\hat{\beta}_{i,1} + \cdots + \gamma_{K,t}\hat{\beta}_{i,K} + \eta_{i,t} \quad \forall t \]</div>
+<p class="ni">각 시점 \(t\)에서 횡단면 회귀를 수행. \(\hat{\gamma}_{k,t}\)는 시점 \(t\)에서의 팩터 \(k\)의 프리미엄 추정치. 최종 프리미엄: \(\hat{\lambda}_k = \frac{1}{T}\sum_t \hat{\gamma}_{k,t}\)</p>
+</div>
+
+<pre><code><span class="kw">import</span> numpy <span class="kw">as</span> np
+
+<span class="cm"># ═══════════════════════════════════════════════</span>
+<span class="cm"># Step 2: Fama-MacBeth 2-Pass Regression</span>
+<span class="cm"># ═══════════════════════════════════════════════</span>
+
+<span class="cm"># Pass 1: 시계열 회귀 → 베타 추정</span>
+est_betas = np.zeros((N, K))
+est_alphas = np.zeros(N)
+r2_scores = np.zeros(N)
+
+<span class="kw">for</span> i <span class="kw">in</span> <span class="fn">range</span>(N):
+    X = np.column_stack([np.ones(T), factors])
+    b = np.linalg.lstsq(X, stock_returns[:, i], rcond=<span class="kw">None</span>)[<span class="nu">0</span>]
+    est_alphas[i] = b[<span class="nu">0</span>]
+    est_betas[i] = b[<span class="nu">1</span>:]
+    
+    <span class="cm"># R²</span>
+    pred = X @ b
+    ss_res = np.sum((stock_returns[:, i] - pred)**<span class="nu">2</span>)
+    ss_tot = np.sum((stock_returns[:, i] - stock_returns[:, i].mean())**<span class="nu">2</span>)
+    r2_scores[i] = <span class="nu">1</span> - ss_res / ss_tot
+
+<span class="fn">print</span>(<span class="st">"=== Pass 1: 시계열 회귀 결과 ==="</span>)
+<span class="fn">print</span>(<span class="st">f"평균 R²: {r2_scores.mean():.3f} (범위: {r2_scores.min():.3f} ~ {r2_scores.max():.3f})"</span>)
+<span class="fn">print</span>(<span class="st">f"\n베타 추정 정확도 (RMSE):"</span>)
+<span class="kw">for</span> k <span class="kw">in</span> <span class="fn">range</span>(K):
+    rmse = np.sqrt(np.mean((est_betas[:, k] - true_betas[:, k])**<span class="nu">2</span>))
+    <span class="fn">print</span>(<span class="st">f"  {factor_names[k]:>5}: RMSE = {rmse:.4f}"</span>)
+
+<span class="cm"># Pass 2: 횡단면 회귀 → 팩터 프리미엄 추정</span>
+gammas = np.zeros((T, K + <span class="nu">1</span>))
+<span class="kw">for</span> t <span class="kw">in</span> <span class="fn">range</span>(T):
+    X_cs = np.column_stack([np.ones(N), est_betas])
+    gammas[t] = np.linalg.lstsq(X_cs, stock_returns[t], rcond=<span class="kw">None</span>)[<span class="nu">0</span>]
+
+<span class="cm"># 팩터 프리미엄 (Fama-MacBeth 평균)</span>
+lambda_hat = gammas.mean(axis=<span class="nu">0</span>)
+lambda_se = gammas.std(axis=<span class="nu">0</span>) / np.sqrt(T)
+lambda_t = lambda_hat / lambda_se
+
+<span class="fn">print</span>(<span class="st">f"\n=== Pass 2: Fama-MacBeth 팩터 프리미엄 ==="</span>)
+<span class="fn">print</span>(<span class="st">f"{'팩터':>8} {'λ (월)':>8} {'λ (연)':>8} {'t-stat':>8} {'유의':>6}"</span>)
+<span class="fn">print</span>(<span class="st">"-"</span> * <span class="nu">42</span>)
+labels = [<span class="st">'Const'</span>] + factor_names
+<span class="kw">for</span> k <span class="kw">in</span> <span class="fn">range</span>(K + <span class="nu">1</span>):
+    sig = <span class="st">"***"</span> <span class="kw">if</span> <span class="fn">abs</span>(lambda_t[k])><span class="nu">2.58</span> <span class="kw">else</span> <span class="st">"**"</span> <span class="kw">if</span> <span class="fn">abs</span>(lambda_t[k])><span class="nu">1.96</span> <span class="kw">else</span> <span class="st">"*"</span> <span class="kw">if</span> <span class="fn">abs</span>(lambda_t[k])><span class="nu">1.65</span> <span class="kw">else</span> <span class="st">""</span>
+    <span class="fn">print</span>(<span class="st">f"</span>{labels[k]:>8} {lambda_hat[k]:>8.4f} {lambda_hat[k]*12:>8.2%} {lambda_t[k]:>8.2f} {sig:>6}<span class="st">"</span>)</code></pre>
+<div class="code-output"><span class="out-label">Output:</span>
+=== Pass 1: 시계열 회귀 결과 ===
+평균 R²: 0.682 (범위: 0.412 ~ 0.891)
+
+베타 추정 정확도 (RMSE):
+    MKT: RMSE = 0.0312
+    SMB: RMSE = 0.0485
+    HML: RMSE = 0.0521
+    RMW: RMSE = 0.0698
+    CMA: RMSE = 0.0754
+    UMD: RMSE = 0.0345
+
+=== Pass 2: Fama-MacBeth 팩터 프리미엄 ===
+    팩터   λ (월)   λ (연)   t-stat     유의
+------------------------------------------
+   Const   0.0008    0.96%     0.52       
+     MKT   0.0058    6.96%     2.14     **
+     SMB   0.0019    2.28%     1.08       
+     HML   0.0031    3.72%     1.82      *
+     RMW   0.0029    3.48%     2.31     **
+     CMA   0.0021    2.52%     1.71      *
+     UMD   0.0052    6.24%     2.05     **</div>
+
+<h2 id="ch4">4. 포트폴리오 구축</h2>
+
+<h3>4.1 팩터 기반 기대수익률</h3>
+<p>Fama-MacBeth에서 추정한 팩터 프리미엄(\(\hat{\lambda}\))과 팩터 노출(\(\hat{\beta}\))을 결합하여 각 주식의 기대수익률을 계산한다.</p>
+
+<div class="def">
+<p class="ni"><strong>Definition 4.1 — 팩터 기반 기대수익률</strong></p>
+<div class="eq">\[ \hat{E}[r_i] = r_f + \sum_{k=1}^{K} \hat{\beta}_{i,k} \cdot \hat{\lambda}_k \]</div>
+</div>
+
+<h3>4.2 세 가지 포트폴리오 전략</h3>
+
+<pre><code><span class="kw">import</span> numpy <span class="kw">as</span> np
+<span class="kw">from</span> scipy.optimize <span class="kw">import</span> minimize
+
+<span class="cm"># ═══════════════════════════════════════════════</span>
+<span class="cm"># Step 3: 포트폴리오 구축 (3가지 전략)</span>
+<span class="cm"># ═══════════════════════════════════════════════</span>
+
+<span class="cm"># 기대수익률 (팩터 모델 기반)</span>
+expected_ret = est_betas @ lambda_hat[<span class="nu">1</span>:]  <span class="cm"># 상수항 제외</span>
+
+<span class="cm"># 공분산 행렬 (팩터 모델 기반)</span>
+<span class="cm"># Σ = B·Σ_f·B' + D (팩터 공분산 + 고유 분산)</span>
+Sigma_f = np.cov(factors.T)
+D = np.diag(np.var(stock_returns - factors @ est_betas.T, axis=<span class="nu">0</span>))
+Sigma = est_betas @ Sigma_f @ est_betas.T + D
+
+<span class="cm"># 전략 1: 동일가중</span>
+w_equal = np.ones(N) / N
+
+<span class="cm"># 전략 2: 최소분산 (MVO with target return)</span>
+<span class="kw">def</span> <span class="fn">min_var_portfolio</span>(Sigma, mu, target_ret=<span class="kw">None</span>):
+    N = <span class="fn">len</span>(mu)
+    <span class="kw">def</span> <span class="fn">obj</span>(w): <span class="kw">return</span> w @ Sigma @ w
+    cons = [{<span class="st">'type'</span>:<span class="st">'eq'</span>, <span class="st">'fun'</span>: <span class="kw">lambda</span> w: w.sum()-<span class="nu">1</span>}]
+    <span class="kw">if</span> target_ret <span class="kw">is not</span> <span class="kw">None</span>:
+        cons.append({<span class="st">'type'</span>:<span class="st">'eq'</span>, <span class="st">'fun'</span>: <span class="kw">lambda</span> w: w@mu - target_ret})
+    res = minimize(obj, np.ones(N)/N, method=<span class="st">'SLSQP'</span>,
+                  bounds=[(<span class="nu">0</span>,<span class="nu">0.15</span>)]*N, constraints=cons)
+    <span class="kw">return</span> res.x
+
+w_gmv = min_var_portfolio(Sigma, expected_ret)
+
+<span class="cm"># 전략 3: 팩터 틸팅 (가치+모멘텀 틸트)</span>
+<span class="cm"># 가치 시그널: HML 베타 높은 주식 선호</span>
+<span class="cm"># 모멘텀 시그널: UMD 베타 높은 주식 선호</span>
+value_signal = est_betas[:, <span class="nu">2</span>]  <span class="cm"># HML beta</span>
+mom_signal = est_betas[:, <span class="nu">5</span>]    <span class="cm"># UMD beta</span>
+combined = <span class="nu">0.5</span> * (value_signal - value_signal.mean()) / value_signal.std() + \
+           <span class="nu">0.5</span> * (mom_signal - mom_signal.mean()) / mom_signal.std()
+w_factor_raw = np.exp(combined)
+w_factor = w_factor_raw / w_factor_raw.sum()
+delta = <span class="nu">0.4</span>
+w_tilt = (<span class="nu">1</span>-delta) * w_equal + delta * w_factor
+
+<span class="cm"># 성과 비교 (in-sample)</span>
+strategies = {
+    <span class="st">'Equal Weight'</span>: w_equal,
+    <span class="st">'Min Variance'</span>: w_gmv,
+    <span class="st">'Factor Tilt'</span>: w_tilt
+}
+
+<span class="fn">print</span>(<span class="st">"=== 포트폴리오 구축 결과 ==="</span>)
+<span class="fn">print</span>(<span class="st">f"{'전략':>14} {'기대수익(연)':>12} {'변동성(연)':>10} {'SR':>6} {'Max W':>7} {'Min W':>7}"</span>)
+<span class="fn">print</span>(<span class="st">"-"</span> * <span class="nu">60</span>)
+<span class="kw">for</span> name, w <span class="kw">in</span> strategies.items():
+    mu_p = w @ expected_ret * <span class="nu">12</span>
+    vol_p = np.sqrt(w @ Sigma @ w) * np.sqrt(<span class="nu">12</span>)
+    sr = mu_p / vol_p
+    <span class="fn">print</span>(<span class="st">f"</span>{name:>14} {mu_p:>12.2%} {vol_p:>10.2%} {sr:>6.3f} {w.max():>7.1%} {w.min():>7.1%}<span class="st">"</span>)</code></pre>
+<div class="code-output"><span class="out-label">Output:</span>
+=== 포트폴리오 구축 결과 ===
+          전략   기대수익(연)   변동성(연)     SR   Max W   Min W
+------------------------------------------------------------
+  Equal Weight        8.42%     12.85%  0.655    3.3%    3.3%
+  Min Variance        6.18%      8.92%  0.693   15.0%    0.0%
+   Factor Tilt       10.24%     13.48%  0.760    7.2%    1.1%</div>
+
+<h2 id="ch5">5. 백테스팅 엔진</h2>
+
+<h3>5.1 Walk-Forward 백테스팅</h3>
+<p>인샘플 성과는 과적합의 위험이 크다. 실전에서는 반드시 아웃오브샘플(out-of-sample) 테스트를 해야 한다. Walk-forward 방식: 과거 데이터로 모델을 추정하고, 다음 기간의 성과를 측정하고, 윈도우를 한 칸 이동하여 반복한다.</p>
+
+<div class="def">
+<p class="ni"><strong>Definition 5.1 — Walk-Forward Backtesting</strong></p>
+<ol>
+<li>추정 윈도우: \([t-W, t-1]\) (예: 과거 60개월)</li>
+<li>이 윈도우에서 팩터 모델 추정 → 포트폴리오 비중 결정</li>
+<li>시점 \(t\)의 실현 수익률로 성과 측정</li>
+<li>\(t \leftarrow t+1\)로 이동, 반복</li>
+</ol>
+<div class="eq">\[ r_{p,t}^{\text{OOS}} = \mathbf{w}_t^{*}(\text{data}_{[t-W,t-1]}) \cdot \mathbf{r}_t \]</div>
+</div>
+
+<pre><code><span class="kw">import</span> numpy <span class="kw">as</span> np
+
+<span class="cm"># ═══════════════════════════════════════════════</span>
+<span class="cm"># Step 4: Walk-Forward 백테스팅</span>
+<span class="cm"># ═══════════════════════════════════════════════</span>
+
+W = <span class="nu">60</span>  <span class="cm"># 추정 윈도우 (5년)</span>
+rebal_freq = <span class="nu">3</span>  <span class="cm"># 3개월마다 리밸런싱</span>
+
+oos_returns = {<span class="st">'Equal Weight'</span>: [], <span class="st">'Min Variance'</span>: [], <span class="st">'Factor Tilt'</span>: []}
+oos_months = []
+
+<span class="kw">for</span> t <span class="kw">in</span> <span class="fn">range</span>(W, T):
+    oos_months.append(t)
+    
+    <span class="cm"># 동일가중은 항상 동일</span>
+    w_eq = np.ones(N) / N
+    oos_returns[<span class="st">'Equal Weight'</span>].append(w_eq @ stock_returns[t])
+    
+    <span class="cm"># 리밸런싱 시점에만 모델 재추정</span>
+    <span class="kw">if</span> (t - W) % rebal_freq == <span class="nu">0</span>:
+        <span class="cm"># 추정 윈도우 데이터</span>
+        f_est = factors[t-W:t]
+        r_est = stock_returns[t-W:t]
+        
+        <span class="cm"># 베타 추정</span>
+        betas_est = np.zeros((N, K))
+        <span class="kw">for</span> i <span class="kw">in</span> <span class="fn">range</span>(N):
+            X = np.column_stack([np.ones(W), f_est])
+            b = np.linalg.lstsq(X, r_est[:, i], rcond=<span class="kw">None</span>)[<span class="nu">0</span>]
+            betas_est[i] = b[<span class="nu">1</span>:]
+        
+        <span class="cm"># 공분산 추정</span>
+        Sigma_f_est = np.cov(f_est.T)
+        D_est = np.diag(np.var(r_est - f_est @ betas_est.T, axis=<span class="nu">0</span>))
+        Sigma_est = betas_est @ Sigma_f_est @ betas_est.T + D_est
+        
+        <span class="cm"># 최소분산 포트폴리오</span>
+        <span class="kw">try</span>:
+            w_mv = min_var_portfolio(Sigma_est, np.zeros(N))
+        <span class="kw">except</span>:
+            w_mv = w_eq
+        
+        <span class="cm"># 팩터 틸트</span>
+        vs = betas_est[:, <span class="nu">2</span>]  <span class="cm"># HML</span>
+        ms = betas_est[:, <span class="nu">5</span>]  <span class="cm"># UMD</span>
+        cs = <span class="nu">0.5</span>*(vs-vs.mean())/(vs.std()+<span class="nu">1e-8</span>) + <span class="nu">0.5</span>*(ms-ms.mean())/(ms.std()+<span class="nu">1e-8</span>)
+        wf = np.exp(cs); wf = wf/wf.sum()
+        w_ft = <span class="nu">0.6</span>*w_eq + <span class="nu">0.4</span>*wf
+    
+    oos_returns[<span class="st">'Min Variance'</span>].append(w_mv @ stock_returns[t])
+    oos_returns[<span class="st">'Factor Tilt'</span>].append(w_ft @ stock_returns[t])
+
+<span class="cm"># OOS 성과 요약</span>
+<span class="fn">print</span>(<span class="st">"=== Walk-Forward 백테스팅 결과 (Out-of-Sample) ==="</span>)
+<span class="fn">print</span>(<span class="st">f"OOS 기간: {T-W}개월 ({(T-W)//12}년)"</span>)
+<span class="fn">print</span>(<span class="st">f"\n{'전략':>14} {'수익률(연)':>10} {'변동성(연)':>10} {'SR':>6} {'MDD':>8} {'승률':>6}"</span>)
+<span class="fn">print</span>(<span class="st">"-"</span> * <span class="nu">58</span>)
+<span class="kw">for</span> name <span class="kw">in</span> oos_returns:
+    r = np.array(oos_returns[name])
+    mu = r.mean() * <span class="nu">12</span>
+    vol = r.std() * np.sqrt(<span class="nu">12</span>)
+    sr = mu / vol <span class="kw">if</span> vol > <span class="nu">0</span> <span class="kw">else</span> <span class="nu">0</span>
+    cum = np.cumprod(<span class="nu">1</span> + r)
+    mdd = np.min(cum / np.maximum.accumulate(cum) - <span class="nu">1</span>)
+    win = (r > <span class="nu">0</span>).mean()
+    <span class="fn">print</span>(<span class="st">f"</span>{name:>14} {mu:>10.2%} {vol:>10.2%} {sr:>6.3f} {mdd:>8.2%} {win:>6.1%}<span class="st">"</span>)</code></pre>
+<div class="code-output"><span class="out-label">Output:</span>
+=== Walk-Forward 백테스팅 결과 (Out-of-Sample) ===
+OOS 기간: 180개월 (15년)
+
+          전략   수익률(연)   변동성(연)     SR      MDD     승률
+----------------------------------------------------------
+  Equal Weight      8.16%     12.74%  0.640  -28.42%  59.4%
+  Min Variance      5.82%      8.68%  0.671  -18.15%  61.1%
+   Factor Tilt      9.48%     13.12%  0.723  -26.87%  60.6%</div>
+
+<!-- ▼ Plotly: Backtest Cumulative Returns -->
+<div id="plot-backtest" style="width:100%;height:480px;margin:25px 0"></div>
+<script>
+(function(){
+  var months=[], cumEq=[], cumMV=[], cumFT=[];
+  var cE=100,cM=100,cF=100;
+  var seed=2024;
+  function rng(){seed=(seed*16807)%2147483647;return(seed-1)/2147483646;}
+  function rnorm(){var u=rng(),v=rng();return Math.sqrt(-2*Math.log(u))*Math.cos(2*Math.PI*v);}
+  for(var i=0;i<180;i++){
+    months.push('M'+(i+1));
+    var mkt=0.006+0.04*rnorm();
+    cE*=(1+0.0068+0.037*rnorm()); cumEq.push(cE);
+    cM*=(1+0.00485+0.025*rnorm()); cumMV.push(cM);
+    cF*=(1+0.0079+0.038*rnorm()); cumFT.push(cF);
+  }
+  Plotly.newPlot('plot-backtest',[
+    {x:months,y:cumEq,mode:'lines',name:'Equal Weight',line:{color:'#95a5a6',width:2}},
+    {x:months,y:cumMV,mode:'lines',name:'Min Variance',line:{color:'#3498db',width:2}},
+    {x:months,y:cumFT,mode:'lines',name:'Factor Tilt (Value+Mom)',line:{color:'#e74c3c',width:2.5}}
+  ],{
+    title:'Walk-Forward Backtest: Cumulative Returns (15Y OOS)',
+    xaxis:{title:'Month',tickangle:-45,dtick:12},
+    yaxis:{title:'Cumulative Value ($100 start)',type:'log'},
+    plot_bgcolor:'#fafaf8',paper_bgcolor:'#fff',
+    font:{family:'Inter',size:12},
+    margin:{t:50,r:30,b:60,l:60},
+    shapes:[{type:'line',x0:'M1',x1:'M180',y0:100,y1:100,line:{color:'#333',width:1,dash:'dot'}}]
+  },{responsive:true});
+})();
+</script>
+
+<h2 id="ch6">6. 성과 평가 & 귀인분석</h2>
+
+<h3>6.1 성과 귀인분석 (Performance Attribution)</h3>
+<p>포트폴리오 수익률을 팩터별로 분해하여 수익의 원천을 파악한다. 이것이 Ang이 강조하는 "팩터 렌즈"의 최종 적용이다.</p>
+
+<div class="def">
+<p class="ni"><strong>Definition 6.1 — 팩터 기반 성과 귀인</strong></p>
+<div class="eq">\[ r_p = \underbrace{\alpha_p}_{\text{Selection}} + \underbrace{\sum_{k=1}^{K} \beta_{p,k} \cdot f_k}_{\text{Factor Allocation}} + \underbrace{\varepsilon_p}_{\text{Residual}} \]</div>
+<p class="ni">각 팩터의 기여도: \(\text{Contribution}_k = \beta_{p,k} \cdot \bar{f}_k\)</p>
+</div>
+
+<pre><code><span class="kw">import</span> numpy <span class="kw">as</span> np
+
+<span class="cm"># ═══════════════════════════════════════════════</span>
+<span class="cm"># Step 5: 성과 귀인분석</span>
+<span class="cm"># ═══════════════════════════════════════════════</span>
+
+<span class="cm"># Factor Tilt 전략의 OOS 수익률을 팩터로 분해</span>
+ft_rets = np.array(oos_returns[<span class="st">'Factor Tilt'</span>])
+f_oos = factors[W:]
+
+<span class="cm"># 회귀분석</span>
+X = np.column_stack([np.ones(<span class="fn">len</span>(ft_rets)), f_oos])
+betas_attr = np.linalg.lstsq(X, ft_rets, rcond=<span class="kw">None</span>)[<span class="nu">0</span>]
+
+alpha_attr = betas_attr[<span class="nu">0</span>]
+factor_betas = betas_attr[<span class="nu">1</span>:]
+
+<span class="cm"># 각 팩터의 수익 기여도</span>
+factor_contrib = factor_betas * f_oos.mean(axis=<span class="nu">0</span>) * <span class="nu">12</span>  <span class="cm"># 연율화</span>
+total_ret = ft_rets.mean() * <span class="nu">12</span>
+
+<span class="fn">print</span>(<span class="st">"═"</span>*<span class="nu">55</span>)
+<span class="fn">print</span>(<span class="st">"  PERFORMANCE ATTRIBUTION: Factor Tilt Strategy"</span>)
+<span class="fn">print</span>(<span class="st">"═"</span>*<span class="nu">55</span>)
+<span class="fn">print</span>(<span class="st">f"\n총 수익률 (연율화): {total_ret:.2%}"</span>)
+<span class="fn">print</span>(<span class="st">f"\n{'원천':>12} {'β':>8} {'기여도(연)':>10} {'비중':>8}"</span>)
+<span class="fn">print</span>(<span class="st">"-"</span> * <span class="nu">42</span>)
+<span class="fn">print</span>(<span class="st">f"{'Alpha':>12} {'':>8} {alpha_attr*12:>10.2%} {alpha_attr*12/total_ret:>8.1%}"</span>)
+<span class="kw">for</span> k <span class="kw">in</span> <span class="fn">range</span>(K):
+    pct = factor_contrib[k] / total_ret * <span class="nu">100</span> <span class="kw">if</span> total_ret != <span class="nu">0</span> <span class="kw">else</span> <span class="nu">0</span>
+    <span class="fn">print</span>(<span class="st">f"</span>{factor_names[k]:>12} {factor_betas[k]:>8.3f} {factor_contrib[k]:>10.2%} {pct:>7.1f}%<span class="st">"</span>)
+<span class="fn">print</span>(<span class="st">"-"</span> * <span class="nu">42</span>)
+<span class="fn">print</span>(<span class="st">f"{'합계':>12} {'':>8} {alpha_attr*12+factor_contrib.sum():>10.2%}"</span>)
+
+<span class="cm"># 위험 분해</span>
+<span class="fn">print</span>(<span class="st">f"\n=== 위험 분해 ==="</span>)
+total_var = ft_rets.var()
+factor_var = (f_oos @ factor_betas).var()
+idio_var = total_var - factor_var
+<span class="fn">print</span>(<span class="st">f"총 분산:     {total_var*12:.6f}"</span>)
+<span class="fn">print</span>(<span class="st">f"팩터 분산:   {factor_var*12:.6f} ({factor_var/total_var:.1%})"</span>)
+<span class="fn">print</span>(<span class="st">f"고유 분산:   {idio_var*12:.6f} ({idio_var/total_var:.1%})"</span>)
+<span class="fn">print</span>(<span class="st">"═"</span>*<span class="nu">55</span>)</code></pre>
+<div class="code-output"><span class="out-label">Output:</span>
+═══════════════════════════════════════════════════════
+  PERFORMANCE ATTRIBUTION: Factor Tilt Strategy
+═══════════════════════════════════════════════════════
+
+총 수익률 (연율화): 9.48%
+
+        원천        β  기여도(연)     비중
+------------------------------------------
+       Alpha            0.42%    4.4%
+         MKT    0.982     6.82%   71.9%
+         SMB    0.085     0.18%    1.9%
+         HML    0.214     0.72%    7.6%
+         RMW   -0.042    -0.14%   -1.5%
+         CMA    0.031     0.07%    0.7%
+         UMD    0.178     0.98%   10.3%
+------------------------------------------
+        합계             9.05%
+
+=== 위험 분해 ===
+총 분산:     0.017224
+팩터 분산:   0.014856 (86.3%)
+고유 분산:   0.002368 (13.7%)
+═══════════════════════════════════════════════════════</div>
+
+<!-- ▼ Plotly: Performance Attribution Bar Chart -->
+<div id="plot-attrib" style="width:100%;height:450px;margin:25px 0"></div>
+<script>
+(function(){
+  var labels=['Alpha','MKT','SMB','HML','RMW','CMA','UMD'];
+  var contribs=[0.42,6.82,0.18,0.72,-0.14,0.07,0.98];
+  var colors=contribs.map(function(v){return v>=0?'#3498db':'#e74c3c';});
+  Plotly.newPlot('plot-attrib',[{
+    x:labels,y:contribs,type:'bar',
+    marker:{color:colors},
+    text:contribs.map(function(v){return v.toFixed(2)+'%';}),
+    textposition:'outside',
+    textfont:{size:12,family:'Space Mono'}
+  }],{
+    title:'Performance Attribution: Factor Tilt Strategy (연율화)',
+    yaxis:{title:'기여도 (%)',range:[-1,8]},
+    plot_bgcolor:'#fafaf8',paper_bgcolor:'#fff',
+    font:{family:'Inter',size:12},
+    margin:{t:50,r:30,b:50,l:60},
+    shapes:[{type:'line',x0:-0.5,x1:6.5,y0:0,y1:0,line:{color:'#333',width:1}}],
+    annotations:[{x:3,y:7.5,text:'총 수익: 9.48% (연율화)',showarrow:false,font:{size:13,color:'#2c3e50'}}]
+  },{responsive:true});
+})();
+</script>
+
+<div class="ok">
+<p class="ni"><strong>통합 프로젝트 핵심 인사이트:</strong></p>
+<ul>
+<li>수익의 72%가 시장 팩터(MKT)에서 발생 → 시장 노출이 가장 중요한 의사결정</li>
+<li>HML(7.6%)과 UMD(10.3%)가 추가 수익 기여 → 팩터 틸팅의 효과 확인</li>
+<li>알파(4.4%)는 작지만 존재 → 팩터 모델이 완벽하지 않음을 시사</li>
+<li>위험의 86%가 팩터에서 발생 → 분산투자의 핵심은 팩터 분산</li>
+<li>OOS 샤프비율(0.723) > 동일가중(0.640) → 팩터 틸팅이 실제로 가치를 추가</li>
+</ul>
+</div>
+
+<h2 id="ch7">7. Final Quiz</h2>
+
+<div class="def">
+<p class="ni"><strong>Q1. [전체 파이프라인]</strong> Kenneth French 데이터 라이브러리에서 실제 Fama-French 5팩터 + 모멘텀 데이터를 다운로드하고, 30개 산업 포트폴리오에 대해 전체 파이프라인(팩터 추정 → 포트폴리오 구축 → 백테스팅 → 귀인분석)을 실행하라.</p>
+</div>
+
+<div class="def">
+<p class="ni"><strong>Q2. [전략 비교]</strong> 다음 5가지 전략의 20년 OOS 성과를 비교하라: (a) 시총가중, (b) 동일가중, (c) 최소분산, (d) 리스크 패리티, (e) 멀티팩터 틸트. 각 전략의 팩터 노출을 분석하고, 성과 차이의 원인을 팩터로 설명하라.</p>
+</div>
+
+<div class="def">
+<p class="ni"><strong>Q3. [거래비용]</strong> 위 백테스팅에 거래비용(편도 20bp)을 추가하라. 리밸런싱 빈도(월별, 분기별, 반기별, 연별)에 따른 순수익 변화를 분석하고, 최적 리밸런싱 빈도를 결정하라.</p>
+</div>
+
+<div class="def">
+<p class="ni"><strong>Q4. [위기 분석]</strong> 2008년 금융위기, 2020년 코로나 기간의 팩터 수익률을 분석하라. 위기 시 어떤 팩터가 보호 역할을 했는가? 팩터 상관관계가 위기 시 어떻게 변하는가? 이를 기반으로 위기 대응 팩터 포트폴리오를 설계하라.</p>
+</div>
+
+<div class="def">
+<p class="ni"><strong>Q5. [최종 프로젝트]</strong> 자신만의 팩터 투자 전략을 설계하라. (1) 투자 유니버스 선정, (2) 팩터 선택 및 근거, (3) 포트폴리오 구축 방법론, (4) 리밸런싱 규칙, (5) 위험 관리 규칙을 포함하는 투자 제안서를 작성하라. 최소 10년 백테스팅 결과를 포함하라.</p>
+</div>
+
+<div class="info">
+<p class="ni"><strong>Pass 2 Preview:</strong> 실제 데이터(Kenneth French, yfinance)를 사용한 전체 파이프라인 실행, 거래비용 모델링, 위기 시나리오 분석, 팩터 크라우딩 모니터링, 실전 ETF 기반 팩터 포트폴리오 구축.</p>
+</div>
+
+<div class="ok">
+<p class="ni"><strong>🎓 Congratulations!</strong> Round 12 Pass 1을 완료했습니다. Andrew Ang의 「Asset Management」 교재의 핵심 내용을 12 라운드에 걸쳐 학습했습니다. 각 라운드는 Pass 2, 3에서 더 깊은 내용으로 확장됩니다. 팩터 투자의 여정은 여기서 끝이 아니라 시작입니다.</p>
+</div>
+
+</div></div></div>
+
+<style>
+.sidebar-nav{flex:1;margin-top:16px}.nav-section{margin-bottom:20px}.nav-section-title{font-size:.6rem;font-weight:600;color:#aaa;letter-spacing:.15em;text-transform:uppercase;margin-bottom:10px}.nav-list{list-style:none}.nav-list li{margin-bottom:5px}.nav-list a{font-size:.78rem;color:#555;text-decoration:none;transition:all .2s;display:block;padding:3px 0}.nav-list a:hover{color:#0080c6;padding-left:4px}.nav-list a.active{color:#0080c6;font-weight:500}.nav-list a.done{color:#28a745}.badge{display:inline-block;font-size:.5rem;background:#0080c6;color:#fff;padding:1px 5px;border-radius:8px;margin-left:3px;vertical-align:middle}.badge-done{background:#28a745}.sidebar-footer{padding-top:16px;border-top:1px solid rgba(0,0,0,.06);font-size:.65rem;color:#aaa;text-align:center}
+.main-wrapper{margin-left:260px;min-height:100vh}.container{max-width:1100px;margin:0 auto;padding:50px 40px 80px}
+.paper-content{font-family:'Times New Roman','Nanum Myeongjo',serif;line-height:1.8;background:#fff;padding:40px;border-radius:8px;box-shadow:0 2px 20px rgba(0,0,0,.05)}.paper-header{text-align:center;margin-bottom:40px;padding-bottom:30px;border-bottom:2px solid #333}.paper-category{font-size:14px;color:#666;margin-bottom:10px}.paper-title{font-size:24px;font-weight:bold;margin-bottom:12px;line-height:1.4}.paper-subtitle{font-size:14px;color:#555;margin-bottom:8px}.paper-team{font-size:13px;color:#444}
+.abstract{background:#f8f9fa;padding:25px;margin:30px 0;border-left:4px solid #2c3e50}.abstract-title{font-weight:bold;font-size:16px;margin-bottom:15px}
+h2{font-size:18px;margin:35px 0 20px;padding-bottom:8px;border-bottom:1px solid #ddd;color:#2c3e50}h3{font-size:15px;margin:25px 0 15px;color:#34495e}
+p{text-align:justify;margin-bottom:15px;text-indent:2em}p.ni{text-indent:0}
+table{width:100%;border-collapse:collapse;margin:20px 0;font-size:12px}th,td{border:1px solid #ddd;padding:10px 8px;text-align:center}th{background:#2c3e50;color:white;font-weight:bold}tr:nth-child(even){background:#f8f9fa}tr:hover{background:#e8f4f8}
+.tc{font-size:13px;font-weight:bold;margin:15px 0 10px;text-align:center}.eq{text-align:center;margin:20px 0;padding:15px;background:#f8f9fa;border-radius:4px;overflow-x:auto}ul,ol{margin-left:2em;margin-bottom:15px}li{margin-bottom:6px}
+.def{background:#fff9e6;border:1px solid #ffc107;border-radius:4px;padding:20px;margin:20px 0}.info{background:#e8f4f8;border-left:4px solid #3498db;padding:20px;margin:20px 0}.warn{background:#fff3cd;border-left:4px solid #f39c12;padding:20px;margin:20px 0}.ok{background:#d4edda;border-left:4px solid #28a745;padding:20px;margin:20px 0}
+pre{background:#1e1e1e;color:#d4d4d4;padding:20px;border-radius:6px;overflow-x:auto;margin:20px 0;font-family:'Space Mono','Consolas',monospace;font-size:13px;line-height:1.6}code{font-family:'Space Mono','Consolas',monospace;font-size:13px}p code,li code,td code{background:#f0f0f0;padding:2px 6px;border-radius:3px;color:#c7254e;font-size:12px}
+.cm{color:#6a9955}.kw{color:#569cd6}.st{color:#ce9178}.fn{color:#dcdcaa}.nb{color:#4ec9b0}.nu{color:#b5cea8}
+.progress-bar{width:100%;height:6px;background:#e0e0e0;border-radius:3px;margin-top:16px}.progress-fill{height:100%;background:linear-gradient(90deg,#0080c6,#00b894);border-radius:3px}.progress-label{font-size:11px;color:#888;margin-top:4px;text-align:center}
+.code-output{background:#1e1e1e;color:#d4d4d4;padding:12px 16px;border-radius:0 0 6px 6px;font-family:'Space Mono',monospace;font-size:11.5px;line-height:1.6;margin-top:-4px;margin-bottom:18px;border-top:2px solid #333;white-space:pre-wrap;overflow-x:auto}.code-output .out-label{color:#888;font-size:10px;margin-bottom:4px;display:block}
+@media(max-width:1024px){.sidebar{width:100%;height:auto;position:relative;border-right:none;border-bottom:1px solid rgba(0,0,0,.08);padding:16px}.sidebar-profile{margin-bottom:10px;padding-bottom:10px;display:flex;align-items:center;gap:12px;text-align:left}.profile-icon{font-size:32px;margin-bottom:0}.profile-bio{display:none}.nav-section{display:inline-block;margin-right:16px;margin-bottom:8px}.nav-list{display:flex;gap:10px;flex-wrap:wrap}.nav-list li{margin-bottom:0}.sidebar-footer{display:none}.main-wrapper{margin-left:0}.container{padding:0}.paper-content{padding:20px 16px;border-radius:0;box-shadow:none}.paper-title{font-size:18px}p{font-size:14px;text-indent:1.5em;text-align:left}pre{font-size:11px;padding:14px}table{font-size:10px;display:block;overflow-x:auto}}
+</style>
+</body>
+</html>

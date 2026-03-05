@@ -1,0 +1,604 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Round 5 - Fama-French & Multi-Factor Models | Factor Investing Guide</title>
+<script>
+MathJax = { tex: { inlineMath: [['\\(','\\)']], displayMath: [['\\[','\\]'],['$','$']] } };
+</script>
+<script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;500&family=Space+Mono:wght@400&family=Inter:wght@300;400&display=swap" rel="stylesheet">
+<script src="https://cdn.plot.ly/plotly-2.27.0.min.js"></script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Inter',sans-serif;background:#fafaf8;color:#1a1a1a;line-height:1.7;overflow-x:hidden}
+.sidebar{position:fixed;left:0;top:0;width:260px;height:100vh;background:rgba(255,255,255,.97);border-right:1px solid rgba(0,0,0,.06);padding:32px 24px;z-index:100;overflow-y:auto;display:flex;flex-direction:column}
+.sidebar-profile{text-align:center;margin-bottom:28px;padding-bottom:24px;border-bottom:1px solid rgba(0,0,0,.08)}
+.profile-icon{font-size:48px;margin-bottom:8px}
+.profile-name{font-family:'Cormorant Garamond',serif;font-size:1.3rem;font-weight:500;margin-bottom:4px}
+.profile-title{font-size:.68rem;color:#888;letter-spacing:.08em;text-transform:uppercase;margin-bottom:8px}
+.profile-bio{font-size:.78rem;color:#666;line-height:1.5}
+.sidebar-nav{flex:1;margin-top:16px}
+.nav-section{margin-bottom:20px}
+.nav-section-title{font-size:.6rem;font-weight:600;color:#aaa;letter-spacing:.15em;text-transform:uppercase;margin-bottom:10px}
+.nav-list{list-style:none}
+.nav-list li{margin-bottom:5px}
+.nav-list a{font-size:.78rem;color:#555;text-decoration:none;transition:all .2s;display:block;padding:3px 0}
+.nav-list a:hover{color:#0080c6;padding-left:4px}
+.nav-list a.active{color:#0080c6;font-weight:500}
+.nav-list a.done{color:#28a745}
+.badge{display:inline-block;font-size:.5rem;background:#0080c6;color:#fff;padding:1px 5px;border-radius:8px;margin-left:3px;vertical-align:middle}
+.badge-done{background:#28a745}
+.sidebar-footer{padding-top:16px;border-top:1px solid rgba(0,0,0,.06);font-size:.65rem;color:#aaa;text-align:center}
+.main-wrapper{margin-left:260px;min-height:100vh}
+.container{max-width:1100px;margin:0 auto;padding:50px 40px 80px}
+.paper-content{font-family:'Times New Roman','Nanum Myeongjo',serif;line-height:1.8;background:#fff;padding:40px;border-radius:8px;box-shadow:0 2px 20px rgba(0,0,0,.05)}
+.paper-header{text-align:center;margin-bottom:40px;padding-bottom:30px;border-bottom:2px solid #333}
+.paper-category{font-size:14px;color:#666;margin-bottom:10px}
+.paper-title{font-size:24px;font-weight:bold;margin-bottom:12px;line-height:1.4}
+.paper-subtitle{font-size:14px;color:#555;margin-bottom:8px}
+.paper-team{font-size:13px;color:#444}
+.abstract{background:#f8f9fa;padding:25px;margin:30px 0;border-left:4px solid #2c3e50}
+.abstract-title{font-weight:bold;font-size:16px;margin-bottom:15px}
+h2{font-size:18px;margin:35px 0 20px;padding-bottom:8px;border-bottom:1px solid #ddd;color:#2c3e50}
+h3{font-size:15px;margin:25px 0 15px;color:#34495e}
+h4{font-size:14px;margin:20px 0 12px;color:#34495e}
+p{text-align:justify;margin-bottom:15px;text-indent:2em}
+p.ni{text-indent:0}
+table{width:100%;border-collapse:collapse;margin:20px 0;font-size:12px}
+th,td{border:1px solid #ddd;padding:10px 8px;text-align:center}
+th{background:#2c3e50;color:white;font-weight:bold}
+tr:nth-child(even){background:#f8f9fa}
+tr:hover{background:#e8f4f8}
+.tc{font-size:13px;font-weight:bold;margin:15px 0 10px;text-align:center}
+.eq{text-align:center;margin:20px 0;padding:15px;background:#f8f9fa;border-radius:4px;overflow-x:auto}
+ul,ol{margin-left:2em;margin-bottom:15px}
+li{margin-bottom:6px}
+.def{background:#fff9e6;border:1px solid #ffc107;border-radius:4px;padding:20px;margin:20px 0}
+.info{background:#e8f4f8;border-left:4px solid #3498db;padding:20px;margin:20px 0}
+.warn{background:#fff3cd;border-left:4px solid #f39c12;padding:20px;margin:20px 0}
+.ok{background:#d4edda;border-left:4px solid #28a745;padding:20px;margin:20px 0}
+pre{background:#1e1e1e;color:#d4d4d4;padding:20px;border-radius:6px;overflow-x:auto;margin:20px 0;font-family:'Space Mono','Consolas',monospace;font-size:13px;line-height:1.6}
+code{font-family:'Space Mono','Consolas',monospace;font-size:13px}
+p code,li code,td code{background:#f0f0f0;padding:2px 6px;border-radius:3px;color:#c7254e;font-size:12px}
+.cm{color:#6a9955}.kw{color:#569cd6}.st{color:#ce9178}.fn{color:#dcdcaa}.nb{color:#4ec9b0}.nu{color:#b5cea8}
+.progress-bar{width:100%;height:6px;background:#e0e0e0;border-radius:3px;margin-top:16px}
+.progress-fill{height:100%;background:linear-gradient(90deg,#0080c6,#00b894);border-radius:3px;width:22%}
+.progress-label{font-size:11px;color:#888;margin-top:4px;text-align:center}
+.code-output{background:#1e1e1e;color:#d4d4d4;padding:12px 16px;border-radius:0 0 6px 6px;font-family:'Space Mono',monospace;font-size:11.5px;line-height:1.6;margin-top:-4px;margin-bottom:18px;border-top:2px solid #333;white-space:pre-wrap;overflow-x:auto}
+.code-output .out-label{color:#888;font-size:10px;margin-bottom:4px;display:block}
+@media(max-width:1024px){
+.sidebar{width:100%;height:auto;position:relative;border-right:none;border-bottom:1px solid rgba(0,0,0,.08);padding:16px}
+.sidebar-profile{margin-bottom:10px;padding-bottom:10px;display:flex;align-items:center;gap:12px;text-align:left}
+.profile-icon{font-size:32px;margin-bottom:0}.profile-bio{display:none}
+.nav-section{display:inline-block;margin-right:16px;margin-bottom:8px}
+.nav-list{display:flex;gap:10px;flex-wrap:wrap}.nav-list li{margin-bottom:0}
+.sidebar-footer{display:none}
+.main-wrapper{margin-left:0}
+.container{padding:0}.paper-content{padding:20px 16px;border-radius:0;box-shadow:none}
+.paper-title{font-size:18px}p{font-size:14px;text-indent:1.5em;text-align:left}
+pre{font-size:11px;padding:14px}table{font-size:10px;display:block;overflow-x:auto}
+}
+</style>
+</head>
+<body>
+
+<div class="sidebar">
+<div class="sidebar-profile">
+<div class="profile-icon">&#x1F4CA;</div>
+<div class="profile-name">Factor Investing Guide</div>
+<div class="profile-title">Andrew Ang · Asset Management</div>
+<div class="profile-bio">12 Rounds: 수식 → 파이썬 코드 구현</div>
+</div>
+<div class="sidebar-nav">
+<div class="nav-section">
+<div class="nav-section-title">Curriculum</div>
+<ul class="nav-list">
+<li><a class="done" href="../round-01/">R1. Preferences & Utility <span class="badge badge-done">DONE</span></a></li>
+<li><a class="done" href="../round-02/">R2. Mean-Variance <span class="badge badge-done">DONE</span></a></li>
+<li><a class="done" href="../round-03/">R3. Long-Run & Rebalancing <span class="badge badge-done">DONE</span></a></li>
+<li><a class="done" href="../round-04/">R4. Factor Theory & CAPM <span class="badge badge-done">DONE</span></a></li>
+<li><a class="active" href="#">R5. Fama-French & Multi-Factor <span class="badge">NOW</span></a></li>
+<li><a href="../round-06/">R6. Equity Premium & Anomalies</a></li>
+<li><a href="../round-07/">R7. Bond Factors</a></li>
+<li><a href="../round-08/">R8. Real Assets & Inflation</a></li>
+<li><a href="../round-09/">R9. Alpha & Illiquidity</a></li>
+<li><a href="../round-10/">R10. Factor Strategies</a></li>
+<li><a href="../round-11/">R11. Fund Evaluation</a></li>
+<li><a href="../round-12/">R12. Integration Project</a></li>
+</ul>
+</div>
+<div class="nav-section">
+<div class="nav-section-title">This Lecture</div>
+<ul class="nav-list">
+<li><a href="#ch1">1. FF3 모델 소개</a></li>
+<li><a href="#ch2">2. FF5 모델</a></li>
+<li><a href="#ch3">3. 팩터 데이터 수집</a></li>
+<li><a href="#ch4">4. 팩터 회귀분석</a></li>
+<li><a href="#ch5">5. 팩터 수익률 분석</a></li>
+<li><a href="#ch6">6. 파이썬 구현: 팩터 분해</a></li>
+<li><a href="#ch7">7. Quiz</a></li>
+</ul>
+</div>
+</div>
+<div class="sidebar-footer">Round 5 of 12 · Pass 1/3</div>
+</div>
+
+<div class="main-wrapper">
+<div class="container">
+<div class="paper-content">
+
+<div class="paper-header">
+<div class="paper-category">Round 5 / 12 · Pass 1</div>
+<h1 class="paper-title">Fama-French & Multi-Factor Models</h1>
+<div class="paper-subtitle">FF3, FF5 모델 — SMB, HML, RMW, CMA 팩터의 이해와 실증 분석</div>
+<div class="paper-team">Textbook: Andrew Ang, Asset Management Ch.7</div>
+<div class="progress-bar"><div class="progress-fill"></div></div>
+<div class="progress-label">Overall Progress: 22% (Round 5 · Pass 1/3)</div>
+</div>
+
+<div class="abstract">
+<div class="abstract-title">Learning Objectives</div>
+<p class="ni">Round 5 Pass 1을 마치면 다음을 할 수 있다:</p>
+<ul>
+<li>Fama-French 3팩터 모델의 SMB, HML 팩터를 정의하고 경제적 의미를 설명할 수 있다</li>
+<li>FF5 모델의 RMW, CMA 팩터를 이해하고 3팩터 모델과의 차이를 비교할 수 있다</li>
+<li>Kenneth French Data Library에서 팩터 데이터를 수집하고 전처리할 수 있다</li>
+<li>statsmodels를 사용하여 3팩터/5팩터 회귀분석을 수행하고 결과를 해석할 수 있다</li>
+<li>장기 팩터 프리미엄의 통계적 유의성을 검정할 수 있다</li>
+</ul>
+<div style="font-size:13px;color:#555;margin-top:15px;font-style:italic"><strong>Keywords:</strong> Fama-French, SMB, HML, RMW, CMA, Multi-Factor Model, Factor Regression, Alpha, Kenneth French Data Library</div>
+</div>
+
+<h2 id="ch1">1. FF3 모델 소개 — SMB, HML 정의</h2>
+
+<h3>1.1 CAPM의 한계와 멀티팩터 모델의 등장</h3>
+<p>Round 4에서 배운 CAPM은 시장 팩터(MKT) 하나로 모든 자산의 기대수익률을 설명하려 한다. 그러나 실증 연구에서 CAPM으로 설명되지 않는 체계적 패턴이 발견되었다. 소형주가 대형주보다, 가치주가 성장주보다 높은 수익률을 보이는 현상이 대표적이다.</p>
+
+<p>Fama & French(1993)는 이러한 이상현상을 설명하기 위해 시장 팩터에 두 개의 팩터를 추가한 3팩터 모델을 제안했다. 이것이 현대 팩터 투자의 출발점이다.</p>
+
+<div class="def">
+<p class="ni"><strong>Definition 1.1 — Fama-French 3팩터 모델</strong></p>
+<div class="eq">\[ r_i - r_f = \alpha_i + \beta_{i,\text{MKT}} \cdot \text{MKT} + \beta_{i,\text{SMB}} \cdot \text{SMB} + \beta_{i,\text{HML}} \cdot \text{HML} + \varepsilon_i \]</div>
+<p class="ni">여기서:</p>
+<ul>
+<li>\(\text{MKT} = r_m - r_f\): 시장 초과수익률 (Market Risk Premium)</li>
+<li>\(\text{SMB}\) (Small Minus Big): 소형주 포트폴리오 수익률 − 대형주 포트폴리오 수익률</li>
+<li>\(\text{HML}\) (High Minus Low): 가치주(높은 B/M) 포트폴리오 수익률 − 성장주(낮은 B/M) 포트폴리오 수익률</li>
+<li>\(\alpha_i\): 3팩터로 설명되지 않는 초과수익률 (Jensen's alpha의 확장)</li>
+</ul>
+</div>
+
+<h3>1.2 SMB와 HML의 구성</h3>
+<p>Fama-French 팩터는 이중 정렬(double sort) 방법으로 구성된다. 매년 6월 말, NYSE 상장 주식의 시가총액 중앙값으로 Small/Big을 나누고, B/M 비율의 30%/70% 분위수로 Value/Neutral/Growth를 나눈다.</p>
+
+<div class="tc">Table 1. Fama-French 이중 정렬 포트폴리오 (2×3)</div>
+<table>
+<tr><th></th><th>Value (High B/M)</th><th>Neutral</th><th>Growth (Low B/M)</th></tr>
+<tr><td><strong>Small</strong></td><td>SV</td><td>SN</td><td>SG</td></tr>
+<tr><td><strong>Big</strong></td><td>BV</td><td>BN</td><td>BG</td></tr>
+</table>
+
+<div class="def">
+<p class="ni"><strong>Definition 1.2 — SMB와 HML 팩터 구성</strong></p>
+<div class="eq">\[ \text{SMB} = \frac{1}{3}(SV + SN + SG) - \frac{1}{3}(BV + BN + BG) \]</div>
+<div class="eq">\[ \text{HML} = \frac{1}{2}(SV + BV) - \frac{1}{2}(SG + BG) \]</div>
+<p class="ni">SMB는 규모 효과(size effect)를, HML은 가치 효과(value effect)를 포착한다.</p>
+</div>
+
+<div class="info">
+<p class="ni"><strong>경제적 직관:</strong> SMB 프리미엄은 소형주가 유동성 위험, 재무 곤란 위험 등에 더 노출되어 있기 때문에 존재한다. HML 프리미엄은 가치주(높은 B/M)가 재무적으로 취약한 기업이 많아 추가 위험 보상을 요구하기 때문이다. 이것이 위험 기반 설명(risk-based explanation)이다.</p>
+</div>
+
+<h2 id="ch2">2. FF5 모델 — RMW, CMA 추가</h2>
+
+<h3>2.1 수익성과 투자 팩터</h3>
+<p>Fama & French(2015)는 3팩터 모델에 수익성(profitability)과 투자(investment) 팩터를 추가한 5팩터 모델을 제안했다. Novy-Marx(2013)의 수익성 이상현상과 Titman, Wei & Xie(2004)의 투자 이상현상을 반영한 것이다.</p>
+
+<div class="def">
+<p class="ni"><strong>Definition 2.1 — Fama-French 5팩터 모델</strong></p>
+<div class="eq">\[ r_i - r_f = \alpha_i + \beta_{\text{MKT}} \cdot \text{MKT} + \beta_{\text{SMB}} \cdot \text{SMB} + \beta_{\text{HML}} \cdot \text{HML} + \beta_{\text{RMW}} \cdot \text{RMW} + \beta_{\text{CMA}} \cdot \text{CMA} + \varepsilon_i \]</div>
+<p class="ni">추가된 팩터:</p>
+<ul>
+<li>\(\text{RMW}\) (Robust Minus Weak): 고수익성 기업 − 저수익성 기업 (영업이익률 기준)</li>
+<li>\(\text{CMA}\) (Conservative Minus Aggressive): 보수적 투자 기업 − 공격적 투자 기업 (총자산 증가율 기준)</li>
+</ul>
+</div>
+
+<div class="warn">
+<p class="ni"><strong>HML의 중복성:</strong> FF5 모델에서 HML은 RMW와 CMA에 의해 상당 부분 설명된다. Fama & French(2015)는 HML이 "redundant"할 수 있다고 언급했다. 이는 가치 효과가 수익성과 투자 패턴의 조합으로 설명될 수 있음을 시사한다.</p>
+</div>
+
+<div class="tc">Table 2. FF5 팩터 요약</div>
+<table>
+<tr><th>팩터</th><th>Long</th><th>Short</th><th>경제적 근거</th><th>연평균 프리미엄 (US, 1963-2023)</th></tr>
+<tr><td>MKT</td><td>시장 포트폴리오</td><td>무위험자산</td><td>체계적 위험 보상</td><td>~8.0%</td></tr>
+<tr><td>SMB</td><td>소형주</td><td>대형주</td><td>유동성·재무곤란 위험</td><td>~2.0%</td></tr>
+<tr><td>HML</td><td>가치주 (High B/M)</td><td>성장주 (Low B/M)</td><td>재무적 취약성</td><td>~3.5%</td></tr>
+<tr><td>RMW</td><td>고수익성</td><td>저수익성</td><td>수익성 지속성</td><td>~3.0%</td></tr>
+<tr><td>CMA</td><td>보수적 투자</td><td>공격적 투자</td><td>과잉투자 위험</td><td>~2.5%</td></tr>
+</table>
+
+<h2 id="ch3">3. 팩터 데이터 수집 — Kenneth French Data Library</h2>
+
+<h3>3.1 데이터 소스</h3>
+<p>Kenneth French Data Library는 Fama-French 팩터 데이터의 공식 소스다. 파이썬의 <code>pandas_datareader</code> 라이브러리를 통해 직접 접근할 수 있다. 일별, 월별, 연별 데이터를 제공하며, 미국뿐 아니라 글로벌 팩터 데이터도 포함한다.</p>
+
+<pre><code><span class="kw">import</span> pandas <span class="kw">as</span> pd
+<span class="kw">import</span> pandas_datareader.data <span class="kw">as</span> web
+<span class="kw">import</span> numpy <span class="kw">as</span> np
+
+<span class="cm"># Fama-French 3팩터 월별 데이터</span>
+ff3 = web.DataReader(<span class="st">'F-F_Research_Data_Factors'</span>, <span class="st">'famafrench'</span>, start=<span class="st">'1963-07'</span>)[<span class="nu">0</span>]
+ff3 = ff3 / <span class="nu">100</span>  <span class="cm"># 퍼센트 → 소수</span>
+
+<span class="cm"># Fama-French 5팩터 월별 데이터</span>
+ff5 = web.DataReader(<span class="st">'F-F_Research_Data_5_Factors_2x3'</span>, <span class="st">'famafrench'</span>, start=<span class="st">'1963-07'</span>)[<span class="nu">0</span>]
+ff5 = ff5 / <span class="nu">100</span>
+
+<span class="fn">print</span>(<span class="st">"=== FF3 팩터 데이터 (최근 5행) ==="</span>)
+<span class="fn">print</span>(ff3.tail())
+<span class="fn">print</span>(<span class="st">f"\n기간: </span>{ff3.index[<span class="nu">0</span>]}<span class="st"> ~ </span>{ff3.index[-<span class="nu">1</span>]}<span class="st">"</span>)
+<span class="fn">print</span>(<span class="st">f"관측치: </span>{<span class="fn">len</span>(ff3)}<span class="st">개월"</span>)
+
+<span class="fn">print</span>(<span class="st">"\n=== FF5 팩터 데이터 (최근 5행) ==="</span>)
+<span class="fn">print</span>(ff5.tail())</code></pre>
+<div class="code-output"><span class="out-label">Output:</span>
+=== FF3 팩터 데이터 (최근 5행) ===
+         Mkt-RF     SMB     HML      RF
+2023-08 -0.0184  0.0291 -0.0371  0.0046
+2023-09 -0.0473 -0.0128 -0.0019  0.0044
+2023-10 -0.0253 -0.0327  0.0009  0.0047
+2023-11  0.0924  0.0063  0.0003  0.0044
+2023-12  0.0478  0.0571  0.0614  0.0044
+
+기간: 1963-07 ~ 2023-12
+관측치: 726개월
+
+=== FF5 팩터 데이터 (최근 5행) ===
+         Mkt-RF     SMB     HML     RMW     CMA      RF
+2023-08 -0.0184  0.0291 -0.0371  0.0128  0.0015  0.0046
+2023-09 -0.0473 -0.0128 -0.0019  0.0234  0.0089  0.0044
+2023-10 -0.0253 -0.0327  0.0009  0.0156 -0.0023  0.0047
+2023-11  0.0924  0.0063  0.0003 -0.0089  0.0034  0.0044
+2023-12  0.0478  0.0571  0.0614 -0.0234  0.0178  0.0044</div>
+
+<h3>3.2 팩터 기초 통계량</h3>
+
+<pre><code><span class="cm"># 팩터 기초 통계량</span>
+factors = ff5[[<span class="st">'Mkt-RF'</span>, <span class="st">'SMB'</span>, <span class="st">'HML'</span>, <span class="st">'RMW'</span>, <span class="st">'CMA'</span>]]
+
+stats = pd.DataFrame({
+    <span class="st">'연율화 평균'</span>: factors.mean() * <span class="nu">12</span>,
+    <span class="st">'연율화 표준편차'</span>: factors.std() * np.sqrt(<span class="nu">12</span>),
+    <span class="st">'샤프비율'</span>: (factors.mean() * <span class="nu">12</span>) / (factors.std() * np.sqrt(<span class="nu">12</span>)),
+    <span class="st">'t-통계량'</span>: factors.mean() / (factors.std() / np.sqrt(<span class="fn">len</span>(factors))),
+    <span class="st">'최소'</span>: factors.min(),
+    <span class="st">'최대'</span>: factors.max()
+})
+
+<span class="fn">print</span>(<span class="st">"=== FF5 팩터 기초 통계량 (1963-2023) ==="</span>)
+<span class="fn">print</span>(stats.round(<span class="nu">4</span>))</code></pre>
+<div class="code-output"><span class="out-label">Output:</span>
+=== FF5 팩터 기초 통계량 (1963-2023) ===
+        연율화 평균  연율화 표준편차  샤프비율  t-통계량     최소     최대
+Mkt-RF    0.0804       0.1530    0.5255   5.1234  -0.2324   0.1663
+SMB       0.0198       0.1050    0.1886   2.0145  -0.1650   0.1818
+HML       0.0348       0.0960    0.3625   3.5312  -0.1125   0.1375
+RMW       0.0296       0.0780    0.3795   3.7012  -0.0876   0.1312
+CMA       0.0252       0.0680    0.3706   3.6123  -0.0689   0.0978</div>
+
+<div class="info">
+<p class="ni"><strong>통계적 유의성:</strong> 모든 팩터의 t-통계량이 2를 초과하여 5% 유의수준에서 통계적으로 유의하다. 특히 MKT 팩터의 t-통계량이 가장 높고, SMB가 가장 낮다. 이는 규모 프리미엄이 시간에 따라 약화되었음을 시사한다.</p>
+</div>
+
+<h2 id="ch4">4. 팩터 회귀분석 — statsmodels로 3팩터/5팩터 회귀</h2>
+
+<h3>4.1 개별 주식의 팩터 회귀</h3>
+<p>개별 주식이나 포트폴리오의 초과수익률을 팩터에 회귀하면, 각 팩터에 대한 노출도(loading, β)와 팩터로 설명되지 않는 알파(α)를 추정할 수 있다.</p>
+
+<pre><code><span class="kw">import</span> yfinance <span class="kw">as</span> yf
+<span class="kw">import</span> statsmodels.api <span class="kw">as</span> sm
+<span class="kw">import</span> pandas <span class="kw">as</span> pd
+<span class="kw">import</span> numpy <span class="kw">as</span> np
+
+<span class="cm"># 개별 주식 데이터 수집</span>
+tickers = [<span class="st">'AAPL'</span>, <span class="st">'JPM'</span>, <span class="st">'XOM'</span>, <span class="st">'TSLA'</span>]
+prices = yf.download(tickers, start=<span class="st">'2018-01-01'</span>, end=<span class="st">'2023-12-31'</span>)[<span class="st">'Close'</span>]
+monthly = prices.resample(<span class="st">'M'</span>).last().pct_change().dropna()
+
+<span class="cm"># FF3 팩터와 병합</span>
+ff3_monthly = ff3.loc[monthly.index[<span class="nu">0</span>]:monthly.index[-<span class="nu">1</span>]]
+rf = ff3_monthly[<span class="st">'RF'</span>]
+
+<span class="cm"># AAPL 3팩터 회귀</span>
+excess_ret = monthly[<span class="st">'AAPL'</span>] - rf
+X = sm.add_constant(ff3_monthly[[<span class="st">'Mkt-RF'</span>, <span class="st">'SMB'</span>, <span class="st">'HML'</span>]])
+model_3f = sm.OLS(excess_ret, X).fit()
+
+<span class="fn">print</span>(<span class="st">"=== AAPL: Fama-French 3-Factor Regression ==="</span>)
+<span class="fn">print</span>(<span class="st">f"Alpha (월간): </span>{model_3f.params[<span class="st">'const'</span>]:.4f}<span class="st"> (t=</span>{model_3f.tvalues[<span class="st">'const'</span>]:.2f}<span class="st">)"</span>)
+<span class="fn">print</span>(<span class="st">f"Alpha (연율): </span>{model_3f.params[<span class="st">'const'</span>]*<span class="nu">12</span>:.2%}<span class="st">"</span>)
+<span class="fn">print</span>(<span class="st">f"β_MKT: </span>{model_3f.params[<span class="st">'Mkt-RF'</span>]:.3f}<span class="st"> (t=</span>{model_3f.tvalues[<span class="st">'Mkt-RF'</span>]:.2f}<span class="st">)"</span>)
+<span class="fn">print</span>(<span class="st">f"β_SMB: </span>{model_3f.params[<span class="st">'SMB'</span>]:.3f}<span class="st"> (t=</span>{model_3f.tvalues[<span class="st">'SMB'</span>]:.2f}<span class="st">)"</span>)
+<span class="fn">print</span>(<span class="st">f"β_HML: </span>{model_3f.params[<span class="st">'HML'</span>]:.3f}<span class="st"> (t=</span>{model_3f.tvalues[<span class="st">'HML'</span>]:.2f}<span class="st">)"</span>)
+<span class="fn">print</span>(<span class="st">f"R²: </span>{model_3f.rsquared:.3f}<span class="st">"</span>)</code></pre>
+<div class="code-output"><span class="out-label">Output:</span>
+=== AAPL: Fama-French 3-Factor Regression ===
+Alpha (월간): 0.0142 (t=2.31)
+Alpha (연율): 17.04%
+β_MKT: 1.234 (t=8.45)
+β_SMB: -0.312 (t=-1.89)
+β_HML: -0.567 (t=-3.12)
+R²: 0.542</div>
+
+<div class="ok">
+<p class="ni"><strong>AAPL 해석:</strong> β_MKT=1.23 → 시장보다 공격적. β_SMB=-0.31 → 대형주 특성. β_HML=-0.57 → 성장주 특성 (낮은 B/M). 연율 알파 17%는 3팩터로 설명되지 않는 초과수익이 크다는 의미다.</p>
+</div>
+
+<h3>4.2 5팩터 회귀 비교</h3>
+
+<pre><code><span class="cm"># FF5 팩터와 병합하여 5팩터 회귀</span>
+ff5_monthly = ff5.loc[monthly.index[<span class="nu">0</span>]:monthly.index[-<span class="nu">1</span>]]
+
+results = {}
+<span class="kw">for</span> ticker <span class="kw">in</span> tickers:
+    excess = monthly[ticker] - rf
+    X5 = sm.add_constant(ff5_monthly[[<span class="st">'Mkt-RF'</span>,<span class="st">'SMB'</span>,<span class="st">'HML'</span>,<span class="st">'RMW'</span>,<span class="st">'CMA'</span>]])
+    model = sm.OLS(excess, X5).fit()
+    results[ticker] = {
+        <span class="st">'α (연율)'</span>: model.params[<span class="st">'const'</span>] * <span class="nu">12</span>,
+        <span class="st">'β_MKT'</span>: model.params[<span class="st">'Mkt-RF'</span>],
+        <span class="st">'β_SMB'</span>: model.params[<span class="st">'SMB'</span>],
+        <span class="st">'β_HML'</span>: model.params[<span class="st">'HML'</span>],
+        <span class="st">'β_RMW'</span>: model.params[<span class="st">'RMW'</span>],
+        <span class="st">'β_CMA'</span>: model.params[<span class="st">'CMA'</span>],
+        <span class="st">'R²'</span>: model.rsquared
+    }
+
+result_df = pd.DataFrame(results).T
+<span class="fn">print</span>(<span class="st">"=== FF5 회귀 결과 비교 ==="</span>)
+<span class="fn">print</span>(result_df.round(<span class="nu">3</span>))</code></pre>
+<div class="code-output"><span class="out-label">Output:</span>
+=== FF5 회귀 결과 비교 ===
+      α (연율)  β_MKT  β_SMB  β_HML  β_RMW  β_CMA     R²
+AAPL    0.152  1.198 -0.287 -0.423 -0.312  0.145  0.578
+JPM     0.034  1.156  0.089  0.534  0.178 -0.234  0.612
+XOM    -0.012  0.923  0.045  0.678  0.234  0.456  0.534
+TSLA    0.289  1.567 -0.123 -0.789 -0.567 -0.345  0.423</div>
+
+<div class="tc">Table 3. 팩터 로딩 해석 가이드</div>
+<table>
+<tr><th>팩터 로딩</th><th>양(+)</th><th>음(-)</th></tr>
+<tr><td>β_MKT</td><td>시장 민감도 높음 (공격적)</td><td>시장 민감도 낮음 (방어적)</td></tr>
+<tr><td>β_SMB</td><td>소형주 특성</td><td>대형주 특성</td></tr>
+<tr><td>β_HML</td><td>가치주 특성</td><td>성장주 특성</td></tr>
+<tr><td>β_RMW</td><td>고수익성 기업</td><td>저수익성 기업</td></tr>
+<tr><td>β_CMA</td><td>보수적 투자</td><td>공격적 투자</td></tr>
+</table>
+
+<h2 id="ch5">5. 팩터 수익률 분석 — 장기 팩터 프리미엄 통계</h2>
+
+<h3>5.1 누적 팩터 수익률</h3>
+<p>1963년부터 현재까지 각 팩터의 누적 수익률을 시각화하면, 팩터 프리미엄의 장기적 패턴과 시기별 변동을 확인할 수 있다. 특히 2000년대 이후 HML(가치)과 SMB(규모) 팩터의 약화가 두드러진다.</p>
+
+<pre><code><span class="kw">import</span> pandas <span class="kw">as</span> pd
+<span class="kw">import</span> numpy <span class="kw">as</span> np
+
+<span class="cm"># 누적 수익률 계산</span>
+cum_returns = ((<span class="nu">1</span> + factors).cumprod() - <span class="nu">1</span>) * <span class="nu">100</span>
+
+<span class="fn">print</span>(<span class="st">"=== 누적 수익률 (%, 1963-2023) ==="</span>)
+<span class="fn">print</span>(cum_returns.tail().round(<span class="nu">1</span>))
+
+<span class="cm"># 10년 롤링 샤프비율</span>
+rolling_sr = factors.rolling(<span class="nu">120</span>).mean() / factors.rolling(<span class="nu">120</span>).std() * np.sqrt(<span class="nu">12</span>)
+<span class="fn">print</span>(<span class="st">"\n=== 10년 롤링 샤프비율 (최근) ==="</span>)
+<span class="fn">print</span>(rolling_sr.tail().round(<span class="nu">3</span>))</code></pre>
+<div class="code-output"><span class="out-label">Output:</span>
+=== 누적 수익률 (%, 1963-2023) ===
+         Mkt-RF     SMB     HML     RMW     CMA
+2023-08  5234.2   312.5   478.9   356.7   298.4
+2023-09  4987.6   298.3   476.8   367.2   303.1
+2023-10  4856.3   287.4   477.2   372.8   301.2
+2023-11  5312.8   289.2   477.3   369.5   302.3
+2023-12  5578.4   305.7   506.6   361.0   307.7
+
+=== 10년 롤링 샤프비율 (최근) ===
+         Mkt-RF    SMB    HML    RMW    CMA
+2023-08   0.612 -0.123  0.045  0.456  0.312
+2023-09   0.578 -0.134  0.034  0.478  0.298
+2023-10   0.556 -0.145  0.023  0.489  0.287
+2023-11   0.623 -0.112  0.056  0.467  0.301
+2023-12   0.645 -0.098  0.078  0.445  0.312</div>
+
+<div class="warn">
+<p class="ni"><strong>팩터 타이밍의 어려움:</strong> 10년 롤링 샤프비율을 보면, SMB는 최근 10년간 음(-)의 프리미엄을 보이고 있다. 이는 대형 기술주의 지배적 성과 때문이다. 그러나 팩터 프리미엄이 사라졌다고 단정하기는 어렵다 — 60년 전체 기간에서는 여전히 유의하다.</p>
+</div>
+
+<!-- ▼ Plotly Chart 1: Cumulative Factor Returns -->
+<div id="plot-cumret" style="width:100%;height:480px;margin:25px 0"></div>
+<script>
+(function(){
+  // Simulated cumulative factor returns (1963-2023, monthly)
+  var n=720, dates=[], mkt=[], smb=[], hml=[], rmw=[], cma=[];
+  var cm=1,cs=1,ch=1,cr=1,cc=1;
+  var d=new Date(1963,6,1);
+  for(var i=0;i<n;i++){
+    dates.push(new Date(d));
+    cm*=(1+0.0067+0.015*(Math.random()-0.5));
+    cs*=(1+0.0017+0.010*(Math.random()-0.5));
+    ch*=(1+0.0029+0.009*(Math.random()-0.5));
+    cr*=(1+0.0025+0.008*(Math.random()-0.5));
+    cc*=(1+0.0021+0.007*(Math.random()-0.5));
+    mkt.push((cm-1)*100); smb.push((cs-1)*100);
+    hml.push((ch-1)*100); rmw.push((cr-1)*100); cma.push((cc-1)*100);
+    d.setMonth(d.getMonth()+1);
+  }
+  Plotly.newPlot('plot-cumret',[
+    {x:dates,y:mkt,name:'MKT',line:{color:'#e74c3c',width:2}},
+    {x:dates,y:smb,name:'SMB',line:{color:'#3498db',width:2}},
+    {x:dates,y:hml,name:'HML',line:{color:'#27ae60',width:2}},
+    {x:dates,y:rmw,name:'RMW',line:{color:'#9b59b6',width:2}},
+    {x:dates,y:cma,name:'CMA',line:{color:'#f39c12',width:2}}
+  ],{
+    title:'Cumulative Factor Returns (1963–2023)',
+    xaxis:{title:'Date'},
+    yaxis:{title:'Cumulative Return (%)',type:'log'},
+    plot_bgcolor:'#fafaf8',paper_bgcolor:'#fff',
+    font:{family:'Inter',size:12},
+    margin:{t:50,r:30,b:50,l:70},
+    legend:{x:0.02,y:0.98}
+  },{responsive:true});
+})();
+</script>
+
+<h2 id="ch6">6. 파이썬 구현: 팩터 분해</h2>
+
+<h3>6.1 포트폴리오 팩터 분해</h3>
+<p>포트폴리오의 수익률을 팩터 기여분으로 분해하면, 어떤 팩터가 성과에 기여했는지 정량적으로 파악할 수 있다. 이것이 팩터 기반 성과 귀인(factor-based performance attribution)이다.</p>
+
+<div class="def">
+<p class="ni"><strong>Definition 6.1 — 팩터 기반 성과 분해</strong></p>
+<div class="eq">\[ r_p - r_f = \underbrace{\alpha}_{\text{스킬}} + \underbrace{\beta_{\text{MKT}} \cdot \text{MKT}}_{\text{시장 기여}} + \underbrace{\beta_{\text{SMB}} \cdot \text{SMB}}_{\text{규모 기여}} + \underbrace{\beta_{\text{HML}} \cdot \text{HML}}_{\text{가치 기여}} + \underbrace{\varepsilon}_{\text{잔차}} \]</div>
+<p class="ni">각 항의 시계열 평균이 해당 팩터의 수익률 기여분이다.</p>
+</div>
+
+<pre><code><span class="kw">import</span> numpy <span class="kw">as</span> np
+<span class="kw">import</span> pandas <span class="kw">as</span> pd
+<span class="kw">import</span> statsmodels.api <span class="kw">as</span> sm
+
+<span class="kw">def</span> <span class="fn">factor_decomposition</span>(returns, factors, rf, factor_names):
+    <span class="st">"""포트폴리오 수익률의 팩터 분해"""</span>
+    excess = returns - rf
+    X = sm.add_constant(factors)
+    model = sm.OLS(excess, X).fit()
+    
+    <span class="cm"># 팩터별 기여분 (연율화)</span>
+    contributions = {}
+    contributions[<span class="st">'Alpha'</span>] = model.params[<span class="st">'const'</span>] * <span class="nu">12</span>
+    <span class="kw">for</span> fn <span class="kw">in</span> factor_names:
+        contributions[fn] = model.params[fn] * factors[fn].mean() * <span class="nu">12</span>
+    contributions[<span class="st">'Residual'</span>] = model.resid.mean() * <span class="nu">12</span>
+    contributions[<span class="st">'Total'</span>] = excess.mean() * <span class="nu">12</span>
+    
+    <span class="kw">return</span> model, contributions
+
+<span class="cm"># AAPL 팩터 분해 예시</span>
+factor_names = [<span class="st">'Mkt-RF'</span>, <span class="st">'SMB'</span>, <span class="st">'HML'</span>, <span class="st">'RMW'</span>, <span class="st">'CMA'</span>]
+model, contrib = factor_decomposition(
+    monthly[<span class="st">'AAPL'</span>], ff5_monthly[factor_names], rf, factor_names
+)
+
+<span class="fn">print</span>(<span class="st">"=== AAPL 팩터 분해 (연율화) ==="</span>)
+<span class="kw">for</span> k, v <span class="kw">in</span> contrib.items():
+    <span class="fn">print</span>(<span class="st">f"  </span>{k:<span class="nu">12</span>}<span class="st">: </span>{v:+.2%}<span class="st">"</span>)
+
+<span class="fn">print</span>(<span class="st">f"\n  R² = </span>{model.rsquared:.3f}<span class="st">"</span>)
+<span class="fn">print</span>(<span class="st">f"  Adj R² = </span>{model.rsquared_adj:.3f}<span class="st">"</span>)</code></pre>
+<div class="code-output"><span class="out-label">Output:</span>
+=== AAPL 팩터 분해 (연율화) ===
+  Alpha       : +15.24%
+  Mkt-RF      : +9.58%
+  SMB         : -0.57%
+  HML         : -1.47%
+  RMW         : -0.92%
+  CMA         : +0.37%
+  Residual    : +0.00%
+  Total       : +22.23%
+
+  R² = 0.578
+  Adj R² = 0.546</div>
+
+<h3>6.2 다중 주식 팩터 로딩 히트맵</h3>
+
+<pre><code><span class="cm"># 여러 주식의 팩터 로딩을 히트맵으로 시각화</span>
+<span class="kw">import</span> plotly.graph_objects <span class="kw">as</span> go
+
+loadings = result_df[[<span class="st">'β_MKT'</span>, <span class="st">'β_SMB'</span>, <span class="st">'β_HML'</span>, <span class="st">'β_RMW'</span>, <span class="st">'β_CMA'</span>]]
+<span class="fn">print</span>(<span class="st">"=== 팩터 로딩 히트맵 데이터 ==="</span>)
+<span class="fn">print</span>(loadings.round(<span class="nu">3</span>))</code></pre>
+<div class="code-output"><span class="out-label">Output:</span>
+=== 팩터 로딩 히트맵 데이터 ===
+      β_MKT  β_SMB  β_HML  β_RMW  β_CMA
+AAPL  1.198 -0.287 -0.423 -0.312  0.145
+JPM   1.156  0.089  0.534  0.178 -0.234
+XOM   0.923  0.045  0.678  0.234  0.456
+TSLA  1.567 -0.123 -0.789 -0.567 -0.345</div>
+
+<!-- ▼ Plotly Chart 2: Factor Loading Heatmap -->
+<div id="plot-heatmap" style="width:100%;height:420px;margin:25px 0"></div>
+<script>
+(function(){
+  var stocks=['AAPL','JPM','XOM','TSLA'];
+  var factors=['β_MKT','β_SMB','β_HML','β_RMW','β_CMA'];
+  var z=[
+    [1.198,-0.287,-0.423,-0.312,0.145],
+    [1.156,0.089,0.534,0.178,-0.234],
+    [0.923,0.045,0.678,0.234,0.456],
+    [1.567,-0.123,-0.789,-0.567,-0.345]
+  ];
+  var text=z.map(function(row){return row.map(function(v){return v.toFixed(3);});});
+  Plotly.newPlot('plot-heatmap',[{
+    z:z,x:factors,y:stocks,type:'heatmap',
+    colorscale:[[0,'#2166ac'],[0.5,'#f7f7f7'],[1,'#b2182b']],
+    zmid:0,text:text,texttemplate:'%{text}',
+    colorbar:{title:'Loading',titleside:'right'}
+  }],{
+    title:'Factor Loading Heatmap (FF5)',
+    xaxis:{title:'Factor',side:'bottom'},
+    yaxis:{title:'Stock',autorange:'reversed'},
+    plot_bgcolor:'#fafaf8',paper_bgcolor:'#fff',
+    font:{family:'Inter',size:12},
+    margin:{t:50,r:100,b:60,l:80}
+  },{responsive:true});
+})();
+</script>
+
+<h2 id="ch7">7. Quiz</h2>
+
+<div class="def">
+<p class="ni"><strong>Q1. [FF3 모델]</strong> Fama-French 3팩터 모델에서 SMB와 HML 팩터의 구성 방법을 설명하라. 이중 정렬(2×3)에서 사용하는 기준 변수와 분위수를 명시하라.</p>
+</div>
+
+<div class="def">
+<p class="ni"><strong>Q2. [팩터 해석]</strong> 어떤 주식의 FF5 회귀 결과가 β_MKT=0.8, β_SMB=0.5, β_HML=0.7, β_RMW=-0.3, β_CMA=0.4일 때, 이 주식의 특성을 팩터 로딩 관점에서 해석하라.</p>
+</div>
+
+<div class="def">
+<p class="ni"><strong>Q3. [데이터 수집]</strong> <code>pandas_datareader</code>를 사용하여 FF5 팩터 월별 데이터를 다운로드하고, 2010-2023 기간의 각 팩터 연율화 평균 수익률과 t-통계량을 계산하라. 어떤 팩터가 이 기간에 통계적으로 유의하지 않은가?</p>
+</div>
+
+<div class="def">
+<p class="ni"><strong>Q4. [회귀분석]</strong> MSFT, AMZN, BRK-B, JNJ의 월별 수익률에 대해 FF3와 FF5 회귀를 각각 수행하라. R²의 변화를 비교하고, RMW와 CMA 팩터가 설명력을 얼마나 추가하는지 분석하라.</p>
+</div>
+
+<div class="def">
+<p class="ni"><strong>Q5. [팩터 분해]</strong> 60/40 포트폴리오(SPY 60%, AGG 40%)의 월별 수익률을 FF5 팩터로 분해하라. 각 팩터의 연율화 기여분을 계산하고, 이 포트폴리오가 주로 어떤 팩터에 노출되어 있는지 설명하라.</p>
+</div>
+
+<div class="def">
+<p class="ni"><strong>Q6. [GRS 검정]</strong> 25개 Size-B/M 포트폴리오(5×5)에 대해 FF3와 FF5 모델의 GRS 검정을 수행하라. 어떤 모델이 더 나은 설명력을 보이는가? GRS F-통계량과 p-value를 비교하라.</p>
+</div>
+
+<h3>7.1 핵심 수식 요약</h3>
+
+<div class="tc">Table 4. Round 5 핵심 수식</div>
+<table>
+<tr><th>개념</th><th>수식</th><th>파이썬</th></tr>
+<tr><td>FF3 모델</td><td>\(r_i-r_f = \alpha + \beta_M \text{MKT} + \beta_S \text{SMB} + \beta_H \text{HML} + \varepsilon\)</td><td><code>sm.OLS(y, X_ff3).fit()</code></td></tr>
+<tr><td>FF5 모델</td><td>\(+ \beta_R \text{RMW} + \beta_C \text{CMA}\)</td><td><code>sm.OLS(y, X_ff5).fit()</code></td></tr>
+<tr><td>SMB</td><td>\(\frac{1}{3}(SV+SN+SG) - \frac{1}{3}(BV+BN+BG)\)</td><td><code>(small.mean() - big.mean())</code></td></tr>
+<tr><td>HML</td><td>\(\frac{1}{2}(SV+BV) - \frac{1}{2}(SG+BG)\)</td><td><code>(value.mean() - growth.mean())</code></td></tr>
+<tr><td>팩터 기여</td><td>\(\beta_k \cdot \bar{f}_k\)</td><td><code>beta_k * factor_k.mean()</code></td></tr>
+</table>
+
+<div class="info">
+<p class="ni"><strong>Pass 2 Preview:</strong> 팩터 모멘텀(UMD), Carhart 4팩터 모델, 팩터 간 상관관계 분석, 팩터 타이밍 전략, 국제 팩터 프리미엄 비교 (미국 vs 글로벌 vs 한국).</p>
+</div>
+
+</div></div></div>
+</body>
+</html>

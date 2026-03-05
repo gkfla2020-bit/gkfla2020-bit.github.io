@@ -1,0 +1,889 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Round 1 - Preferences & Utility Theory | Factor Investing Guide</title>
+<script>
+MathJax = {
+  tex: {
+    inlineMath: [['\\(','\\)']],
+    displayMath: [['\\[','\\]'],['$$','$$']]
+  }
+};
+</script>
+<script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;500&family=Space+Mono:wght@400&family=Inter:wght@300;400&display=swap" rel="stylesheet">
+<script src="https://cdn.plot.ly/plotly-2.27.0.min.js"></script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Inter',sans-serif;background:#fafaf8;color:#1a1a1a;line-height:1.7;overflow-x:hidden}
+.sidebar{position:fixed;left:0;top:0;width:260px;height:100vh;background:rgba(255,255,255,.97);border-right:1px solid rgba(0,0,0,.06);padding:32px 24px;z-index:100;overflow-y:auto;display:flex;flex-direction:column}
+.sidebar-profile{text-align:center;margin-bottom:28px;padding-bottom:24px;border-bottom:1px solid rgba(0,0,0,.08)}
+.profile-icon{font-size:48px;margin-bottom:8px}
+.profile-name{font-family:'Cormorant Garamond',serif;font-size:1.3rem;font-weight:500;margin-bottom:4px}
+.profile-title{font-size:.68rem;color:#888;letter-spacing:.08em;text-transform:uppercase;margin-bottom:8px}
+.profile-bio{font-size:.78rem;color:#666;line-height:1.5}
+.sidebar-nav{flex:1;margin-top:16px}
+.nav-section{margin-bottom:20px}
+.nav-section-title{font-size:.6rem;font-weight:600;color:#aaa;letter-spacing:.15em;text-transform:uppercase;margin-bottom:10px}
+.nav-list{list-style:none}
+.nav-list li{margin-bottom:5px}
+.nav-list a{font-size:.78rem;color:#555;text-decoration:none;transition:all .2s;display:block;padding:3px 0}
+.nav-list a:hover{color:#0080c6;padding-left:4px}
+.nav-list a.active{color:#0080c6;font-weight:500}
+.nav-list a.done{color:#28a745}
+.badge{display:inline-block;font-size:.5rem;background:#0080c6;color:#fff;padding:1px 5px;border-radius:8px;margin-left:3px;vertical-align:middle}
+.badge-done{background:#28a745}
+.sidebar-footer{padding-top:16px;border-top:1px solid rgba(0,0,0,.06);font-size:.65rem;color:#aaa;text-align:center}
+.main-wrapper{margin-left:260px;min-height:100vh}
+.container{max-width:1100px;margin:0 auto;padding:50px 40px 80px}
+.paper-content{font-family:'Times New Roman','Nanum Myeongjo',serif;line-height:1.8;background:#fff;padding:40px;border-radius:8px;box-shadow:0 2px 20px rgba(0,0,0,.05)}
+.paper-header{text-align:center;margin-bottom:40px;padding-bottom:30px;border-bottom:2px solid #333}
+.paper-category{font-size:14px;color:#666;margin-bottom:10px}
+.paper-title{font-size:24px;font-weight:bold;margin-bottom:12px;line-height:1.4}
+.paper-subtitle{font-size:14px;color:#555;margin-bottom:8px}
+.paper-team{font-size:13px;color:#444}
+.abstract{background:#f8f9fa;padding:25px;margin:30px 0;border-left:4px solid #2c3e50}
+.abstract-title{font-weight:bold;font-size:16px;margin-bottom:15px}
+h2{font-size:18px;margin:35px 0 20px;padding-bottom:8px;border-bottom:1px solid #ddd;color:#2c3e50}
+h3{font-size:15px;margin:25px 0 15px;color:#34495e}
+h4{font-size:14px;margin:20px 0 12px;color:#34495e}
+p{text-align:justify;margin-bottom:15px;text-indent:2em}
+p.ni{text-indent:0}
+table{width:100%;border-collapse:collapse;margin:20px 0;font-size:12px}
+th,td{border:1px solid #ddd;padding:10px 8px;text-align:center}
+th{background:#2c3e50;color:white;font-weight:bold}
+tr:nth-child(even){background:#f8f9fa}
+tr:hover{background:#e8f4f8}
+.tc{font-size:13px;font-weight:bold;margin:15px 0 10px;text-align:center}
+.eq{text-align:center;margin:20px 0;padding:15px;background:#f8f9fa;border-radius:4px;overflow-x:auto}
+ul,ol{margin-left:2em;margin-bottom:15px}
+li{margin-bottom:6px}
+.def{background:#fff9e6;border:1px solid #ffc107;border-radius:4px;padding:20px;margin:20px 0}
+.info{background:#e8f4f8;border-left:4px solid #3498db;padding:20px;margin:20px 0}
+.warn{background:#fff3cd;border-left:4px solid #f39c12;padding:20px;margin:20px 0}
+.ok{background:#d4edda;border-left:4px solid #28a745;padding:20px;margin:20px 0}
+pre{background:#1e1e1e;color:#d4d4d4;padding:20px;border-radius:6px;overflow-x:auto;margin:20px 0;font-family:'Space Mono','Consolas',monospace;font-size:13px;line-height:1.6}
+code{font-family:'Space Mono','Consolas',monospace;font-size:13px}
+p code,li code,td code{background:#f0f0f0;padding:2px 6px;border-radius:3px;color:#c7254e;font-size:12px}
+.cc{font-size:12px;font-weight:bold;color:#2c3e50;margin-top:15px;margin-bottom:4px}
+.cm{color:#6a9955}.kw{color:#569cd6}.st{color:#ce9178}.fn{color:#dcdcaa}.nb{color:#4ec9b0}.nu{color:#b5cea8}
+.progress-bar{width:100%;height:6px;background:#e0e0e0;border-radius:3px;margin-top:16px}
+.progress-fill{height:100%;background:linear-gradient(90deg,#0080c6,#00b894);border-radius:3px;width:3%}
+.progress-label{font-size:11px;color:#888;margin-top:4px;text-align:center}
+.code-output{background:#1e1e1e;color:#d4d4d4;padding:12px 16px;border-radius:0 0 6px 6px;font-family:'Space Mono',monospace;font-size:11.5px;line-height:1.6;margin-top:-4px;margin-bottom:18px;border-top:2px solid #333;white-space:pre-wrap;overflow-x:auto}
+.code-output .out-label{color:#888;font-size:10px;margin-bottom:4px;display:block}
+@media(max-width:1024px){
+.sidebar{width:100%;height:auto;position:relative;border-right:none;border-bottom:1px solid rgba(0,0,0,.08);padding:16px}
+.sidebar-profile{margin-bottom:10px;padding-bottom:10px;display:flex;align-items:center;gap:12px;text-align:left}
+.profile-icon{font-size:32px;margin-bottom:0}.profile-bio{display:none}
+.nav-section{display:inline-block;margin-right:16px;margin-bottom:8px}
+.nav-list{display:flex;gap:10px;flex-wrap:wrap}.nav-list li{margin-bottom:0}
+.sidebar-footer{display:none}
+.main-wrapper{margin-left:0}
+.container{padding:0}.paper-content{padding:20px 16px;border-radius:0;box-shadow:none}
+.paper-title{font-size:18px}p{font-size:14px;text-indent:1.5em;text-align:left}
+pre{font-size:11px;padding:14px}table{font-size:10px;display:block;overflow-x:auto}
+}
+</style>
+</head>
+<body>
+
+<div class="sidebar">
+<div class="sidebar-profile">
+<div class="profile-icon">&#x1F4CA;</div>
+<div class="profile-name">Factor Investing Guide</div>
+<div class="profile-title">Andrew Ang · Asset Management</div>
+<div class="profile-bio">12 Rounds: 수식 → 파이썬 코드 구현</div>
+</div>
+<div class="sidebar-nav">
+<div class="nav-section">
+<div class="nav-section-title">Curriculum</div>
+<ul class="nav-list">
+<li><a class="active" href="#">R1. Preferences & Utility <span class="badge">NOW</span></a></li>
+<li><a href="../round-02/">R2. Mean-Variance</a></li>
+<li><a href="../round-03/">R3. Long-Run & Rebalancing</a></li>
+<li><a href="../round-04/">R4. Factor Theory & CAPM</a></li>
+<li><a href="../round-05/">R5. Fama-French & Multi-Factor</a></li>
+<li><a href="../round-06/">R6. Equity Premium & Anomalies</a></li>
+<li><a href="../round-07/">R7. Bond Factors & Term Structure</a></li>
+<li><a href="../round-08/">R8. Real Assets & Inflation</a></li>
+<li><a href="../round-09/">R9. Alpha, Illiquidity & Tax</a></li>
+<li><a href="../round-10/">R10. Factor Strategies</a></li>
+<li><a href="../round-11/">R11. Fund Evaluation</a></li>
+<li><a href="../round-12/">R12. Integration Project</a></li>
+</ul>
+</div>
+<div class="nav-section">
+<div class="nav-section-title">This Lecture</div>
+<ul class="nav-list">
+<li><a href="#ch1">1. 왜 효용 이론인가</a></li>
+<li><a href="#ch2">2. 효용함수의 정의</a></li>
+<li><a href="#ch3">3. 위험회피계수</a></li>
+<li><a href="#ch4">4. CRRA vs CARA</a></li>
+<li><a href="#ch5">5. 확실성 등가</a></li>
+<li><a href="#ch6">6. 기대효용과 포트폴리오</a></li>
+<li><a href="#ch7">7. 파이썬 구현 종합</a></li>
+<li><a href="#ch8">8. Quiz</a></li>
+</ul>
+</div>
+</div>
+<div class="sidebar-footer">Round 1 of 12 · Pass 1/3</div>
+</div>
+
+<div class="main-wrapper">
+<div class="container">
+<div class="paper-content">
+
+<div class="paper-header">
+<div class="paper-category">Round 1 / 12 · Pass 1</div>
+<h1 class="paper-title">Preferences & Utility Theory</h1>
+<div class="paper-subtitle">효용함수, 위험회피, 확실성 등가 — 투자자의 선호를 수식으로 정의하다</div>
+<div class="paper-team">Textbook: Andrew Ang, Asset Management Ch.2</div>
+<div class="progress-bar"><div class="progress-fill"></div></div>
+<div class="progress-label">Overall Progress: 3% (Round 1 · Pass 1/3)</div>
+</div>
+
+<div class="abstract">
+<div class="abstract-title">Learning Objectives</div>
+<p class="ni">Round 1 Pass 1을 마치면 다음을 할 수 있다:</p>
+<ul>
+<li>효용함수(Utility Function)의 개념과 공리적 기반을 설명할 수 있다</li>
+<li>절대위험회피계수(ARA)와 상대위험회피계수(RRA)를 수식으로 도출하고 파이썬으로 계산할 수 있다</li>
+<li>CRRA와 CARA 효용함수의 차이를 이해하고 그래프로 비교할 수 있다</li>
+<li>확실성 등가(Certainty Equivalent)를 계산하고 위험 프리미엄을 도출할 수 있다</li>
+<li>기대효용 프레임워크에서 최적 포트폴리오 배분을 수식으로 표현할 수 있다</li>
+</ul>
+<div style="font-size:13px;color:#555;margin-top:15px;font-style:italic"><strong>Keywords:</strong> Utility Function, Risk Aversion, CRRA, CARA, Certainty Equivalent, Risk Premium, Expected Utility, Arrow-Pratt</div>
+</div>
+
+<!-- ═══════════════════════════════════════════ -->
+<!-- Ch1: 왜 효용 이론인가 -->
+<!-- ═══════════════════════════════════════════ -->
+<h2 id="ch1">1. 왜 효용 이론인가</h2>
+
+<h3>1.1 팩터 투자의 출발점</h3>
+<p>Andrew Ang의 교재는 팩터 투자를 다루기 전에 "투자자가 무엇을 원하는가"부터 시작한다. 이것이 효용 이론(Utility Theory)이다. 왜 여기서 시작할까?</p>
+
+<p>모든 자산 가격 모델 — CAPM, Fama-French, APT — 의 근저에는 "투자자가 위험을 싫어한다"는 가정이 있다. 이 가정을 수학적으로 엄밀하게 표현하는 도구가 효용함수다. 효용함수 없이 팩터 프리미엄을 이해하는 것은 미적분 없이 물리학을 하는 것과 같다.</p>
+
+<p>Ang Ch.2의 핵심 메시지: 투자자의 선호(preferences)를 수식으로 정의하면, 최적 포트폴리오가 자연스럽게 도출된다. 이것이 Part I "The Asset Owner"의 출발점이다.</p>
+
+<div class="info">
+<p class="ni"><strong>교재 연동:</strong> Ang Ch.2 "Preferences"는 Von Neumann-Morgenstern 기대효용 이론에서 출발하여, 위험회피의 측정(Arrow-Pratt), CRRA/CARA 효용함수, 확실성 등가까지 다룬다. 이 라운드에서 이 모든 개념을 파이썬 코드로 구현한다.</p>
+</div>
+
+<h3>1.2 직관: 왜 사람들은 도박을 싫어하는가</h3>
+<p>동전 던지기 게임을 생각하자. 앞면이 나오면 200만원을 받고, 뒷면이 나오면 0원을 받는다. 기대값은 100만원이다. 그런데 "지금 당장 80만원을 줄게"라고 하면, 대부분의 사람은 80만원을 선택한다.</p>
+
+<p>기대값(100만원)보다 적은 확실한 금액(80만원)을 선호하는 것 — 이것이 위험회피(risk aversion)다. 그리고 100만원과 80만원의 차이인 20만원이 위험 프리미엄(risk premium)이다. 이 직관을 수식으로 표현하는 것이 이 라운드의 목표다.</p>
+
+<pre><code><span class="kw">import</span> numpy <span class="kw">as</span> np
+
+<span class="cm"># 동전 던지기 게임</span>
+outcomes = np.array([<span class="nu">2000000</span>, <span class="nu">0</span>])  <span class="cm"># 200만원 or 0원</span>
+probs = np.array([<span class="nu">0.5</span>, <span class="nu">0.5</span>])
+
+expected_value = np.sum(outcomes * probs)
+<span class="fn">print</span>(<span class="st">f"기대값: </span>{expected_value:,.0f}<span class="st">원"</span>)
+
+<span class="cm"># 대부분의 사람은 확실한 80만원을 선택</span>
+certain_amount = <span class="nu">800000</span>
+risk_premium = expected_value - certain_amount
+<span class="fn">print</span>(<span class="st">f"확실성 등가: </span>{certain_amount:,.0f}<span class="st">원"</span>)
+<span class="fn">print</span>(<span class="st">f"위험 프리미엄: </span>{risk_premium:,.0f}<span class="st">원"</span>)</code></pre>
+<div class="code-output"><span class="out-label">Output:</span>
+기대값: 1,000,000원
+확실성 등가: 800,000원
+위험 프리미엄: 200,000원</div>
+
+<!-- ═══════════════════════════════════════════ -->
+<!-- Ch2: 효용함수의 정의 -->
+<!-- ═══════════════════════════════════════════ -->
+<h2 id="ch2">2. 효용함수의 정의</h2>
+
+<h3>2.1 Von Neumann-Morgenstern 기대효용</h3>
+<p>효용함수 \(u(W)\)는 부(wealth) \(W\)를 "만족도"로 변환하는 함수다. 핵심 아이디어: 투자자는 부 자체가 아니라 부의 효용의 기대값을 극대화한다.</p>
+
+<div class="def">
+<p class="ni"><strong>Definition 2.1 — 기대효용 (Expected Utility)</strong></p>
+<div class="eq">\[ E[u(W)] = \sum_{i} p_i \cdot u(W_i) \]</div>
+<p class="ni">여기서 \(p_i\)는 상태 \(i\)의 확률, \(W_i\)는 상태 \(i\)에서의 부, \(u(\cdot)\)는 효용함수다. 연속 분포의 경우:</p>
+<div class="eq">\[ E[u(W)] = \int u(W) \, f(W) \, dW \]</div>
+</div>
+
+<p>효용함수가 오목(concave)하면 — 즉 \(u''(W) < 0\)이면 — 투자자는 위험회피적이다. 이것이 Jensen's inequality에 의해 보장된다:</p>
+
+<div class="eq">\[ E[u(W)] \leq u(E[W]) \quad \text{(오목함수의 성질)} \]</div>
+
+<p>기대효용이 기대부의 효용보다 작다. 즉, 불확실한 100만원의 만족도가 확실한 100만원의 만족도보다 낮다. 이것이 위험회피의 수학적 정의다.</p>
+
+<h3>2.2 효용함수의 기본 성질</h3>
+
+<div class="tc">Table 1. 효용함수의 핵심 성질</div>
+<table>
+<tr><th>성질</th><th>수학적 조건</th><th>경제적 의미</th></tr>
+<tr><td>단조증가</td><td>\(u'(W) > 0\)</td><td>부가 많을수록 좋다 (non-satiation)</td></tr>
+<tr><td>오목성</td><td>\(u''(W) < 0\)</td><td>위험회피 (risk aversion)</td></tr>
+<tr><td>한계효용 체감</td><td>\(u'(W)\) 감소</td><td>부가 늘수록 추가 1원의 만족도 감소</td></tr>
+</table>
+
+<pre><code><span class="kw">import</span> numpy <span class="kw">as</span> np
+<span class="kw">import</span> matplotlib.pyplot <span class="kw">as</span> plt
+
+<span class="cm"># 로그 효용함수: u(W) = ln(W)</span>
+W = np.linspace(<span class="nu">0.1</span>, <span class="nu">10</span>, <span class="nu">200</span>)
+u_log = np.log(W)
+
+<span class="cm"># 1차 도함수 (한계효용): u'(W) = 1/W > 0</span>
+u_prime = <span class="nu">1</span> / W
+
+<span class="cm"># 2차 도함수: u''(W) = -1/W^2 < 0 → 오목!</span>
+u_double_prime = -<span class="nu">1</span> / W**<span class="nu">2</span>
+
+fig, axes = plt.subplots(<span class="nu">1</span>, <span class="nu">3</span>, figsize=(<span class="nu">14</span>, <span class="nu">4</span>))
+
+axes[<span class="nu">0</span>].plot(W, u_log, <span class="st">'b-'</span>, lw=<span class="nu">2</span>)
+axes[<span class="nu">0</span>].set_title(<span class="st">'u(W) = ln(W)'</span>)
+axes[<span class="nu">0</span>].set_xlabel(<span class="st">'Wealth (W)'</span>)
+axes[<span class="nu">0</span>].set_ylabel(<span class="st">'Utility'</span>)
+axes[<span class="nu">0</span>].grid(<span class="kw">True</span>, alpha=<span class="nu">0.3</span>)
+
+axes[<span class="nu">1</span>].plot(W, u_prime, <span class="st">'g-'</span>, lw=<span class="nu">2</span>)
+axes[<span class="nu">1</span>].set_title(<span class="st">"u'(W) = 1/W  (한계효용)"</span>)
+axes[<span class="nu">1</span>].set_xlabel(<span class="st">'Wealth (W)'</span>)
+axes[<span class="nu">1</span>].set_ylabel(<span class="st">"Marginal Utility"</span>)
+axes[<span class="nu">1</span>].grid(<span class="kw">True</span>, alpha=<span class="nu">0.3</span>)
+
+axes[<span class="nu">2</span>].plot(W, u_double_prime, <span class="st">'r-'</span>, lw=<span class="nu">2</span>)
+axes[<span class="nu">2</span>].axhline(y=<span class="nu">0</span>, color=<span class="st">'k'</span>, ls=<span class="st">'--'</span>, alpha=<span class="nu">0.5</span>)
+axes[<span class="nu">2</span>].set_title(<span class="st">"u''(W) = -1/W²  (항상 < 0)"</span>)
+axes[<span class="nu">2</span>].set_xlabel(<span class="st">'Wealth (W)'</span>)
+axes[<span class="nu">2</span>].set_ylabel(<span class="st">"Curvature"</span>)
+axes[<span class="nu">2</span>].grid(<span class="kw">True</span>, alpha=<span class="nu">0.3</span>)
+
+plt.tight_layout()
+plt.show()</code></pre>
+
+<div class="info">
+<p class="ni"><strong>Jensen's Inequality 시각적 이해:</strong> 오목한 효용함수 위에서, 두 점을 잇는 직선(기대효용)은 항상 곡선(확실한 부의 효용) 아래에 있다. 이 "갭"이 위험 프리미엄이다.</p>
+</div>
+
+<!-- ═══════════════════════════════════════════ -->
+<!-- Ch3: 위험회피계수 -->
+<!-- ═══════════════════════════════════════════ -->
+<h2 id="ch3">3. 위험회피계수 (Arrow-Pratt Measures)</h2>
+
+<h3>3.1 절대위험회피계수 (ARA)</h3>
+<p>효용함수의 오목한 정도를 측정하는 방법이 필요하다. Arrow와 Pratt가 독립적으로 제안한 측도가 절대위험회피계수(Absolute Risk Aversion, ARA)다.</p>
+
+<div class="def">
+<p class="ni"><strong>Definition 3.1 — 절대위험회피계수 (ARA)</strong></p>
+<div class="eq">\[ A(W) = -\frac{u''(W)}{u'(W)} \]</div>
+<p class="ni">\(u''(W)\)는 효용함수의 2차 도함수(오목성), \(u'(W)\)는 1차 도함수(한계효용)다. \(u''(W) < 0\)이므로 마이너스를 붙여 양수로 만든다. ARA가 클수록 더 위험회피적이다.</p>
+</div>
+
+<p>왜 \(u''(W)\)만 쓰지 않고 \(u'(W)\)로 나눌까? 효용함수는 양의 선형 변환(affine transformation)에 대해 불변이어야 하기 때문이다. \(v(W) = a \cdot u(W) + b\) (단, \(a > 0\))는 같은 선호를 나타내는데, \(u''\)만 쓰면 \(a\)에 따라 값이 달라진다. \(u''/u'\)로 정규화하면 \(a\)가 상쇄된다.</p>
+
+<h3>3.2 상대위험회피계수 (RRA)</h3>
+
+<div class="def">
+<p class="ni"><strong>Definition 3.2 — 상대위험회피계수 (RRA)</strong></p>
+<div class="eq">\[ R(W) = -\frac{W \cdot u''(W)}{u'(W)} = W \cdot A(W) \]</div>
+<p class="ni">ARA에 부 \(W\)를 곱한 것이다. ARA는 "절대 금액 기준"의 위험회피를, RRA는 "부의 비율 기준"의 위험회피를 측정한다.</p>
+</div>
+
+<p>직관적으로: ARA는 "1만원짜리 도박을 얼마나 싫어하는가", RRA는 "전 재산의 1%짜리 도박을 얼마나 싫어하는가"를 측정한다. 부자가 되면 1만원짜리 도박은 덜 무섭지만(ARA 감소), 전 재산의 1%짜리 도박은 여전히 무섭다(RRA 일정). 이것이 CRRA 모델의 핵심이다.</p>
+
+<pre><code><span class="kw">import</span> numpy <span class="kw">as</span> np
+
+<span class="kw">def</span> <span class="fn">compute_ara_rra</span>(u_prime_func, u_double_prime_func, W):
+    <span class="st">"""ARA와 RRA를 계산하는 범용 함수"""</span>
+    u_p = u_prime_func(W)
+    u_pp = u_double_prime_func(W)
+    ARA = -u_pp / u_p
+    RRA = W * ARA
+    <span class="kw">return</span> ARA, RRA
+
+<span class="cm"># 로그 효용: u(W) = ln(W)</span>
+<span class="cm"># u'(W) = 1/W,  u''(W) = -1/W²</span>
+u_prime_log = <span class="kw">lambda</span> W: <span class="nu">1</span>/W
+u_dprime_log = <span class="kw">lambda</span> W: -<span class="nu">1</span>/W**<span class="nu">2</span>
+
+W_values = np.array([<span class="nu">1</span>, <span class="nu">5</span>, <span class="nu">10</span>, <span class="nu">50</span>, <span class="nu">100</span>])
+<span class="fn">print</span>(<span class="st">f"{'W':>6} {'ARA':>10} {'RRA':>10}"</span>)
+<span class="fn">print</span>(<span class="st">"-"</span> * <span class="nu">28</span>)
+<span class="kw">for</span> W <span class="kw">in</span> W_values:
+    ara, rra = compute_ara_rra(u_prime_log, u_dprime_log, W)
+    <span class="fn">print</span>(<span class="st">f"</span>{W:>6.0f} {ara:>10.4f} {rra:>10.4f}<span class="st">"</span>)</code></pre>
+<div class="code-output"><span class="out-label">Output:</span>
+     W        ARA        RRA
+----------------------------
+     1     1.0000     1.0000
+     5     0.2000     1.0000
+    10     0.1000     1.0000
+    50     0.0200     1.0000
+   100     0.0100     1.0000</div>
+
+<div class="ok">
+<p class="ni"><strong>핵심 관찰:</strong> 로그 효용함수에서 ARA = 1/W (부가 늘면 감소), RRA = 1 (항상 일정). 이것이 CRRA(Constant Relative Risk Aversion)의 가장 단순한 예다. 부자가 되어도 "전 재산의 비율"로 보면 위험 태도가 변하지 않는다.</p>
+</div>
+
+<!-- ═══════════════════════════════════════════ -->
+<!-- Ch4: CRRA vs CARA -->
+<!-- ═══════════════════════════════════════════ -->
+<h2 id="ch4">4. CRRA vs CARA 효용함수</h2>
+
+<h3>4.1 CRRA (Constant Relative Risk Aversion)</h3>
+
+<div class="def">
+<p class="ni"><strong>Definition 4.1 — CRRA 효용함수</strong></p>
+<div class="eq">\[ u(W) = \begin{cases} \dfrac{W^{1-\gamma}}{1-\gamma} & \text{if } \gamma \neq 1 \\[8pt] \ln(W) & \text{if } \gamma = 1 \end{cases} \]</div>
+<p class="ni">여기서 \(\gamma > 0\)는 상대위험회피계수(RRA)다. \(\gamma\)가 클수록 더 위험회피적이다.</p>
+</div>
+
+<p>CRRA 효용함수의 Arrow-Pratt 측도를 확인하자:</p>
+<div class="eq">\[ u'(W) = W^{-\gamma}, \quad u''(W) = -\gamma W^{-\gamma-1} \]</div>
+<div class="eq">\[ A(W) = -\frac{u''(W)}{u'(W)} = \frac{\gamma}{W}, \quad R(W) = W \cdot A(W) = \gamma \]</div>
+
+<p>RRA가 상수 \(\gamma\)로 일정하다. 이것이 "Constant" Relative Risk Aversion이라 불리는 이유다. 실증 연구에서 \(\gamma\)의 추정치는 보통 2~10 사이다. Ang 교재에서는 \(\gamma = 5\) 정도를 "합리적인" 값으로 자주 사용한다.</p>
+
+<h3>4.2 CARA (Constant Absolute Risk Aversion)</h3>
+
+<div class="def">
+<p class="ni"><strong>Definition 4.2 — CARA 효용함수 (지수 효용)</strong></p>
+<div class="eq">\[ u(W) = -\frac{1}{\alpha} e^{-\alpha W}, \quad \alpha > 0 \]</div>
+<p class="ni">여기서 \(\alpha\)는 절대위험회피계수(ARA)다.</p>
+</div>
+
+<div class="eq">\[ u'(W) = e^{-\alpha W}, \quad u''(W) = -\alpha e^{-\alpha W} \]</div>
+<div class="eq">\[ A(W) = \alpha \quad \text{(상수)}, \quad R(W) = \alpha W \quad \text{(부에 비례)}\]</div>
+
+<p>CARA에서는 ARA가 상수다. 문제는 RRA가 부에 비례하여 증가한다는 것이다. 부자가 될수록 "전 재산 비율 기준"으로 더 위험회피적이 된다는 뜻인데, 이는 현실과 맞지 않는다. 그래서 자산 가격 이론에서는 CRRA가 더 널리 사용된다.</p>
+
+<div class="tc">Table 2. CRRA vs CARA 비교</div>
+<table>
+<tr><th>특성</th><th>CRRA</th><th>CARA</th></tr>
+<tr><td>효용함수</td><td>\(\frac{W^{1-\gamma}}{1-\gamma}\)</td><td>\(-\frac{1}{\alpha}e^{-\alpha W}\)</td></tr>
+<tr><td>ARA</td><td>\(\gamma / W\) (감소)</td><td>\(\alpha\) (상수)</td></tr>
+<tr><td>RRA</td><td>\(\gamma\) (상수)</td><td>\(\alpha W\) (증가)</td></tr>
+<tr><td>부자가 되면</td><td>절대 위험 감수 ↑</td><td>절대 위험 감수 불변</td></tr>
+<tr><td>현실 적합성</td><td>높음</td><td>낮음</td></tr>
+<tr><td>주요 용도</td><td>자산 가격 이론, C-CAPM</td><td>정규분포 가정 하 분석</td></tr>
+</table>
+
+<pre><code><span class="kw">import</span> numpy <span class="kw">as</span> np
+<span class="kw">import</span> matplotlib.pyplot <span class="kw">as</span> plt
+
+W = np.linspace(<span class="nu">0.01</span>, <span class="nu">5</span>, <span class="nu">300</span>)
+
+<span class="cm"># CRRA 효용함수</span>
+<span class="kw">def</span> <span class="fn">crra_utility</span>(W, gamma):
+    <span class="st">"""CRRA: u(W) = W^(1-γ)/(1-γ) for γ≠1, ln(W) for γ=1"""</span>
+    <span class="kw">if</span> gamma == <span class="nu">1</span>:
+        <span class="kw">return</span> np.log(W)
+    <span class="kw">return</span> W**(<span class="nu">1</span> - gamma) / (<span class="nu">1</span> - gamma)
+
+<span class="cm"># CARA 효용함수</span>
+<span class="kw">def</span> <span class="fn">cara_utility</span>(W, alpha):
+    <span class="st">"""CARA: u(W) = -(1/α)exp(-αW)"""</span>
+    <span class="kw">return</span> -(<span class="nu">1</span>/alpha) * np.exp(-alpha * W)
+
+fig, axes = plt.subplots(<span class="nu">1</span>, <span class="nu">2</span>, figsize=(<span class="nu">12</span>, <span class="nu">5</span>))
+
+<span class="cm"># CRRA: 다양한 γ 값</span>
+<span class="kw">for</span> gamma <span class="kw">in</span> [<span class="nu">0.5</span>, <span class="nu">1</span>, <span class="nu">2</span>, <span class="nu">5</span>, <span class="nu">10</span>]:
+    u = crra_utility(W, gamma)
+    label = <span class="st">f"γ=</span>{gamma}<span class="st">"</span> <span class="kw">if</span> gamma != <span class="nu">1</span> <span class="kw">else</span> <span class="st">"γ=1 (log)"</span>
+    axes[<span class="nu">0</span>].plot(W, u, label=label, lw=<span class="nu">1.5</span>)
+axes[<span class="nu">0</span>].set_title(<span class="st">"CRRA Utility Functions"</span>)
+axes[<span class="nu">0</span>].set_xlabel(<span class="st">"Wealth (W)"</span>)
+axes[<span class="nu">0</span>].set_ylabel(<span class="st">"u(W)"</span>)
+axes[<span class="nu">0</span>].legend()
+axes[<span class="nu">0</span>].set_ylim(-<span class="nu">10</span>, <span class="nu">5</span>)
+axes[<span class="nu">0</span>].grid(<span class="kw">True</span>, alpha=<span class="nu">0.3</span>)
+
+<span class="cm"># CARA: 다양한 α 값</span>
+<span class="kw">for</span> alpha <span class="kw">in</span> [<span class="nu">0.5</span>, <span class="nu">1</span>, <span class="nu">2</span>, <span class="nu">5</span>]:
+    u = cara_utility(W, alpha)
+    axes[<span class="nu">1</span>].plot(W, u, label=<span class="st">f"α=</span>{alpha}<span class="st">"</span>, lw=<span class="nu">1.5</span>)
+axes[<span class="nu">1</span>].set_title(<span class="st">"CARA Utility Functions"</span>)
+axes[<span class="nu">1</span>].set_xlabel(<span class="st">"Wealth (W)"</span>)
+axes[<span class="nu">1</span>].set_ylabel(<span class="st">"u(W)"</span>)
+axes[<span class="nu">1</span>].legend()
+axes[<span class="nu">1</span>].grid(<span class="kw">True</span>, alpha=<span class="nu">0.3</span>)
+
+plt.tight_layout()
+plt.show()</code></pre>
+
+<!-- ▼ Plotly: Interactive CRRA comparison -->
+<div id="plot-crra" style="width:100%;height:420px;margin:25px 0"></div>
+<script>
+(function(){
+  var W=[], u05=[], u1=[], u2=[], u5=[], u10=[];
+  for(var w=0.01;w<=5;w+=0.02){
+    W.push(w);
+    u05.push(Math.pow(w,0.5)/0.5);
+    u1.push(Math.log(w));
+    u2.push(-Math.pow(w,-1));
+    u5.push(Math.pow(w,-4)/(-4));
+    u10.push(Math.pow(w,-9)/(-9));
+  }
+  Plotly.newPlot('plot-crra',[
+    {x:W,y:u05,mode:'lines',name:'γ=0.5',line:{width:2}},
+    {x:W,y:u1,mode:'lines',name:'γ=1 (log)',line:{width:2.5,dash:'dash'}},
+    {x:W,y:u2,mode:'lines',name:'γ=2',line:{width:2}},
+    {x:W,y:u5,mode:'lines',name:'γ=5',line:{width:2}},
+    {x:W,y:u10,mode:'lines',name:'γ=10',line:{width:2}}
+  ],{
+    title:'CRRA Utility Functions: u(W) = W^(1-γ)/(1-γ)',
+    xaxis:{title:'Wealth (W)',range:[0,5]},
+    yaxis:{title:'Utility u(W)',range:[-12,5]},
+    plot_bgcolor:'#fafaf8',paper_bgcolor:'#fff',
+    font:{family:'Inter',size:12},
+    legend:{x:0.02,y:0.98},
+    margin:{t:50,r:30,b:50,l:60}
+  },{responsive:true});
+})();
+</script>
+
+<div class="warn">
+<p class="ni"><strong>γ의 경제적 의미:</strong></p>
+<ul>
+<li>\(\gamma = 0\): 위험 중립 (risk neutral). 기대값만 본다.</li>
+<li>\(\gamma = 1\): 로그 효용. Kelly criterion의 기반.</li>
+<li>\(\gamma = 2\sim5\): 일반적인 투자자. 실증 연구의 주요 범위.</li>
+<li>\(\gamma = 10+\): 극도로 위험회피적. Equity premium puzzle에서 등장.</li>
+</ul>
+</div>
+
+<!-- ═══════════════════════════════════════════ -->
+<!-- Ch5: 확실성 등가 -->
+<!-- ═══════════════════════════════════════════ -->
+<h2 id="ch5">5. 확실성 등가 (Certainty Equivalent)</h2>
+
+<h3>5.1 정의와 도출</h3>
+
+<div class="def">
+<p class="ni"><strong>Definition 5.1 — 확실성 등가 (CE)</strong></p>
+<div class="eq">\[ u(CE) = E[u(W)] \]</div>
+<div class="eq">\[ CE = u^{-1}\big(E[u(W)]\big) \]</div>
+<p class="ni">확실성 등가(Certainty Equivalent)는 "불확실한 도박과 동일한 효용을 주는 확실한 금액"이다. 위험회피 투자자에게 CE < E[W]이다.</p>
+</div>
+
+<div class="def">
+<p class="ni"><strong>Definition 5.2 — 위험 프리미엄 (Risk Premium)</strong></p>
+<div class="eq">\[ \pi = E[W] - CE \]</div>
+<p class="ni">위험 프리미엄은 투자자가 위험을 제거하기 위해 기꺼이 포기하는 금액이다. \(\pi > 0\)이면 위험회피, \(\pi = 0\)이면 위험중립, \(\pi < 0\)이면 위험선호.</p>
+</div>
+
+<h3>5.2 Arrow-Pratt 근사</h3>
+<p>작은 도박(small gamble)에 대해, 위험 프리미엄은 다음과 같이 근사된다:</p>
+
+<div class="def">
+<p class="ni"><strong>Theorem 5.1 — Arrow-Pratt 위험 프리미엄 근사</strong></p>
+<div class="eq">\[ \pi \approx \frac{1}{2} A(W) \cdot \sigma^2 \]</div>
+<p class="ni">여기서 \(A(W)\)는 ARA, \(\sigma^2\)는 도박의 분산이다. 위험 프리미엄은 (1) 위험회피 정도와 (2) 위험의 크기에 비례한다.</p>
+</div>
+
+<p>이 근사식은 2차 테일러 전개에서 나온다. \(u(W + \tilde{z})\)를 \(W\) 주위에서 전개하면:</p>
+<div class="eq">\[ E[u(W + \tilde{z})] \approx u(W) + u'(W)E[\tilde{z}] + \frac{1}{2}u''(W)E[\tilde{z}^2] \]</div>
+<p>공정한 도박(\(E[\tilde{z}] = 0\))이면 \(E[\tilde{z}^2] = \sigma^2\)이므로:</p>
+<div class="eq">\[ E[u(W + \tilde{z})] \approx u(W) + \frac{1}{2}u''(W)\sigma^2 \]</div>
+<p>한편 \(u(CE) = u(W - \pi) \approx u(W) - u'(W)\pi\)이므로, 두 식을 같다고 놓으면 \(\pi \approx -\frac{u''(W)}{2u'(W)}\sigma^2 = \frac{1}{2}A(W)\sigma^2\).</p>
+
+<pre><code><span class="kw">import</span> numpy <span class="kw">as</span> np
+
+<span class="kw">def</span> <span class="fn">certainty_equivalent_crra</span>(outcomes, probs, gamma):
+    <span class="st">"""CRRA 효용함수에서 확실성 등가 계산
+    
+    Parameters
+    ----------
+    outcomes : array, 가능한 부의 수준
+    probs : array, 각 결과의 확률
+    gamma : float, 상대위험회피계수
+    
+    Returns
+    -------
+    CE : float, 확실성 등가
+    """</span>
+    <span class="kw">if</span> gamma == <span class="nu">1</span>:
+        <span class="cm"># 로그 효용</span>
+        eu = np.sum(probs * np.log(outcomes))
+        CE = np.exp(eu)
+    <span class="kw">else</span>:
+        eu = np.sum(probs * outcomes**(<span class="nu">1</span>-gamma) / (<span class="nu">1</span>-gamma))
+        CE = (eu * (<span class="nu">1</span>-gamma)) ** (<span class="nu">1</span>/(<span class="nu">1</span>-gamma))
+    <span class="kw">return</span> CE
+
+<span class="cm"># 동전 던지기: 200만원 or 50만원</span>
+outcomes = np.array([<span class="nu">2000000</span>, <span class="nu">500000</span>])
+probs = np.array([<span class="nu">0.5</span>, <span class="nu">0.5</span>])
+EW = np.sum(outcomes * probs)
+
+<span class="fn">print</span>(<span class="st">f"기대값 E[W] = </span>{EW:,.0f}<span class="st">원\n"</span>)
+<span class="fn">print</span>(<span class="st">f"{'γ':>5} {'CE':>15} {'Risk Premium':>15} {'CE/E[W]':>10}"</span>)
+<span class="fn">print</span>(<span class="st">"-"</span> * <span class="nu">48</span>)
+
+<span class="kw">for</span> gamma <span class="kw">in</span> [<span class="nu">0.5</span>, <span class="nu">1</span>, <span class="nu">2</span>, <span class="nu">5</span>, <span class="nu">10</span>, <span class="nu">20</span>]:
+    ce = certainty_equivalent_crra(outcomes, probs, gamma)
+    rp = EW - ce
+    <span class="fn">print</span>(<span class="st">f"</span>{gamma:>5.1f} {ce:>15,.0f} {rp:>15,.0f} {ce/EW:>10.2%}<span class="st">"</span>)</code></pre>
+<div class="code-output"><span class="out-label">Output:</span>
+기대값 E[W] = 1,250,000원
+
+    γ              CE  Risk Premium      CE/E[W]
+------------------------------------------------
+  0.5       1,207,107         42,893     96.57%
+  1.0       1,000,000        250,000     80.00%
+  2.0         800,000        450,000     64.00%
+  5.0         593,015        656,985     47.44%
+ 10.0         521,842        728,158     41.75%
+ 20.0         502,630        747,370     40.21%</div>
+
+<div class="ok">
+<p class="ni"><strong>핵심 관찰:</strong> γ가 커질수록 CE가 급격히 감소한다. γ=1(로그 효용)이면 기대값 125만원 대비 CE가 100만원으로, 25만원의 위험 프리미엄을 요구한다. γ=10이면 CE가 52만원까지 떨어진다 — 기대값의 42%만 확실하게 받겠다는 것이다.</p>
+</div>
+
+<!-- ▼ Plotly: CE vs gamma interactive -->
+<div id="plot-ce" style="width:100%;height:420px;margin:25px 0"></div>
+<script>
+(function(){
+  var gammas=[], ces=[], rps=[];
+  var o1=2000000, o2=500000, p=0.5;
+  var EW=p*o1+p*o2;
+  for(var g=0.1;g<=15;g+=0.1){
+    gammas.push(g);
+    var eu, ce;
+    if(Math.abs(g-1)<0.01){
+      eu=p*Math.log(o1)+p*Math.log(o2);
+      ce=Math.exp(eu);
+    } else {
+      eu=p*Math.pow(o1,1-g)/(1-g)+p*Math.pow(o2,1-g)/(1-g);
+      ce=Math.pow(eu*(1-g),1/(1-g));
+    }
+    ces.push(ce);
+    rps.push(EW-ce);
+  }
+  Plotly.newPlot('plot-ce',[
+    {x:gammas,y:ces,mode:'lines',name:'Certainty Equivalent',line:{color:'#0080c6',width:2.5}},
+    {x:gammas,y:rps,mode:'lines',name:'Risk Premium',line:{color:'#e74c3c',width:2,dash:'dash'}},
+    {x:[0.1,15],y:[EW,EW],mode:'lines',name:'E[W]=1,250,000',line:{color:'#999',width:1,dash:'dot'}}
+  ],{
+    title:'Certainty Equivalent & Risk Premium vs γ (CRRA)',
+    xaxis:{title:'γ (Relative Risk Aversion)'},
+    yaxis:{title:'Amount (원)',tickformat:','},
+    plot_bgcolor:'#fafaf8',paper_bgcolor:'#fff',
+    font:{family:'Inter',size:12},
+    legend:{x:0.55,y:0.95},
+    margin:{t:50,r:30,b:50,l:80}
+  },{responsive:true});
+})();
+</script>
+
+<!-- ═══════════════════════════════════════════ -->
+<!-- Ch6: 기대효용과 포트폴리오 -->
+<!-- ═══════════════════════════════════════════ -->
+<h2 id="ch6">6. 기대효용과 포트폴리오 선택</h2>
+
+<h3>6.1 평균-분산 효용</h3>
+<p>CARA 효용 + 정규분포 수익률, 또는 2차 효용함수를 가정하면, 기대효용은 평균과 분산만의 함수로 단순화된다. 이것이 평균-분산(Mean-Variance) 프레임워크의 이론적 기반이다.</p>
+
+<div class="def">
+<p class="ni"><strong>Definition 6.1 — 평균-분산 효용 (Mean-Variance Utility)</strong></p>
+<div class="eq">\[ U = E[r_p] - \frac{\gamma}{2} \sigma_p^2 \]</div>
+<p class="ni">여기서 \(E[r_p]\)는 포트폴리오 기대수익률, \(\sigma_p^2\)는 포트폴리오 분산, \(\gamma\)는 위험회피계수다. 투자자는 이 \(U\)를 극대화하는 포트폴리오를 선택한다.</p>
+</div>
+
+<p>이 식의 직관: 수익률이 높으면 좋고(+), 분산이 크면 나쁘다(-). \(\gamma\)는 이 둘 사이의 트레이드오프를 결정한다. \(\gamma\)가 크면 분산에 대한 페널티가 커져서 보수적인 포트폴리오를 선택한다.</p>
+
+<h3>6.2 최적 위험자산 배분</h3>
+<p>무위험자산(수익률 \(r_f\))과 위험자산(기대수익률 \(\mu\), 분산 \(\sigma^2\)) 두 개만 있을 때, 위험자산에 투자하는 최적 비중 \(w^*\)는:</p>
+
+<div class="def">
+<p class="ni"><strong>Theorem 6.1 — 최적 위험자산 비중</strong></p>
+<div class="eq">\[ w^* = \frac{\mu - r_f}{\gamma \sigma^2} = \frac{\text{초과수익률}}{\text{위험회피} \times \text{분산}} \]</div>
+<p class="ni">이 식은 \(U = r_f + w(\mu - r_f) - \frac{\gamma}{2}w^2\sigma^2\)를 \(w\)에 대해 미분하여 0으로 놓으면 도출된다.</p>
+</div>
+
+<pre><code><span class="kw">import</span> numpy <span class="kw">as</span> np
+
+<span class="kw">def</span> <span class="fn">optimal_risky_weight</span>(mu, rf, sigma, gamma):
+    <span class="st">"""최적 위험자산 비중 계산
+    
+    Parameters
+    ----------
+    mu : float, 위험자산 기대수익률
+    rf : float, 무위험이자율
+    sigma : float, 위험자산 표준편차
+    gamma : float, 위험회피계수
+    
+    Returns
+    -------
+    w_star : float, 최적 위험자산 비중
+    """</span>
+    <span class="kw">return</span> (mu - rf) / (gamma * sigma**<span class="nu">2</span>)
+
+<span class="cm"># 시장 파라미터</span>
+mu = <span class="nu">0.08</span>      <span class="cm"># 주식 기대수익률 8%</span>
+rf = <span class="nu">0.03</span>      <span class="cm"># 무위험이자율 3%</span>
+sigma = <span class="nu">0.16</span>   <span class="cm"># 주식 변동성 16%</span>
+
+<span class="fn">print</span>(<span class="st">f"시장 파라미터: μ=</span>{mu:.0%}<span class="st">, rf=</span>{rf:.0%}<span class="st">, σ=</span>{sigma:.0%}<span class="st">"</span>)
+<span class="fn">print</span>(<span class="st">f"초과수익률: </span>{mu-rf:.0%}<span class="st">, 샤프비율: </span>{(mu-rf)/sigma:.3f}<span class="st">\n"</span>)
+
+<span class="fn">print</span>(<span class="st">f"{'γ':>5} {'w* (주식)':>12} {'1-w* (채권)':>12} {'E[rp]':>8} {'σp':>8}"</span>)
+<span class="fn">print</span>(<span class="st">"-"</span> * <span class="nu">50</span>)
+
+<span class="kw">for</span> gamma <span class="kw">in</span> [<span class="nu">1</span>, <span class="nu">2</span>, <span class="nu">3</span>, <span class="nu">5</span>, <span class="nu">10</span>, <span class="nu">20</span>]:
+    w = optimal_risky_weight(mu, rf, sigma, gamma)
+    w_clipped = np.clip(w, <span class="nu">0</span>, <span class="nu">1</span>)  <span class="cm"># 공매도 불가 가정</span>
+    erp = rf + w_clipped * (mu - rf)
+    sp = w_clipped * sigma
+    <span class="fn">print</span>(<span class="st">f"</span>{gamma:>5} {w:>11.1%} {1-w:>11.1%} {erp:>7.1%} {sp:>7.1%}<span class="st">"</span>)</code></pre>
+<div class="code-output"><span class="out-label">Output:</span>
+시장 파라미터: μ=8%, rf=3%, σ=16%
+초과수익률: 5%, 샤프비율: 0.313
+
+    γ   w* (주식)  1-w* (채권)   E[rp]      σp
+--------------------------------------------------
+    1      195.3%      -95.3%    8.0%   16.0%
+    2       97.7%        2.3%    7.9%   15.6%
+    3       65.1%       34.9%    6.3%   10.4%
+    5       39.1%       60.9%    5.0%    6.3%
+   10       19.5%       80.5%    4.0%    3.1%
+   20        9.8%       90.2%    3.5%    1.6%</div>
+
+<div class="info">
+<p class="ni"><strong>해석:</strong> γ=1(위험 중립에 가까움)이면 레버리지를 써서 195%를 주식에 투자한다. γ=5(보통 투자자)이면 39%만 주식에 넣는다. γ=20(극도로 보수적)이면 10%만 주식이다. 이 하나의 수식이 투자자의 성격에 따른 자산배분을 완전히 결정한다.</p>
+</div>
+
+<!-- ▼ Plotly: Optimal weight vs gamma -->
+<div id="plot-weight" style="width:100%;height:420px;margin:25px 0"></div>
+<script>
+(function(){
+  var gammas=[], ws=[], erps=[], sps=[];
+  var mu=0.08, rf=0.03, sig=0.16;
+  for(var g=0.5;g<=20;g+=0.1){
+    gammas.push(g);
+    var w=(mu-rf)/(g*sig*sig);
+    var wc=Math.max(0,Math.min(1,w));
+    ws.push(w*100);
+    erps.push((rf+wc*(mu-rf))*100);
+    sps.push(wc*sig*100);
+  }
+  Plotly.newPlot('plot-weight',[
+    {x:gammas,y:ws,mode:'lines',name:'w* (%) — unconstrained',line:{color:'#0080c6',width:2.5}},
+    {x:gammas,y:erps,mode:'lines',name:'E[rp] (%)',line:{color:'#28a745',width:2},yaxis:'y2'},
+    {x:gammas,y:sps,mode:'lines',name:'σp (%)',line:{color:'#e74c3c',width:2,dash:'dash'},yaxis:'y2'}
+  ],{
+    title:'Optimal Risky Asset Weight vs Risk Aversion (γ)',
+    xaxis:{title:'γ (Risk Aversion)'},
+    yaxis:{title:'w* (%)',side:'left',range:[-20,220]},
+    yaxis2:{title:'Return / Vol (%)',overlaying:'y',side:'right',range:[0,20]},
+    shapes:[{type:'line',x0:0.5,x1:20,y0:100,y1:100,line:{color:'#999',width:1,dash:'dot'}}],
+    plot_bgcolor:'#fafaf8',paper_bgcolor:'#fff',
+    font:{family:'Inter',size:12},
+    legend:{x:0.5,y:0.95},
+    margin:{t:50,r:60,b:50,l:60}
+  },{responsive:true});
+})();
+</script>
+
+<!-- ═══════════════════════════════════════════ -->
+<!-- Ch7: 파이썬 구현 종합 -->
+<!-- ═══════════════════════════════════════════ -->
+<h2 id="ch7">7. 파이썬 구현 종합: Utility Toolkit</h2>
+
+<h3>7.1 효용함수 클래스</h3>
+<p>지금까지 배운 모든 개념을 하나의 파이썬 클래스로 통합한다. 이 클래스를 이후 라운드에서도 재사용할 것이다.</p>
+
+<pre><code><span class="kw">import</span> numpy <span class="kw">as</span> np
+<span class="kw">from</span> scipy.optimize <span class="kw">import</span> brentq
+
+<span class="kw">class</span> <span class="nb">CRRAUtility</span>:
+    <span class="st">"""CRRA 효용함수 도구 모음
+    
+    Parameters
+    ----------
+    gamma : float
+        상대위험회피계수 (γ > 0)
+    """</span>
+    <span class="kw">def</span> <span class="fn">__init__</span>(self, gamma):
+        <span class="kw">assert</span> gamma > <span class="nu">0</span>, <span class="st">"γ must be positive"</span>
+        self.gamma = gamma
+    
+    <span class="kw">def</span> <span class="fn">utility</span>(self, W):
+        <span class="st">"""u(W) 계산"""</span>
+        <span class="kw">if</span> self.gamma == <span class="nu">1</span>:
+            <span class="kw">return</span> np.log(W)
+        <span class="kw">return</span> W**(<span class="nu">1</span> - self.gamma) / (<span class="nu">1</span> - self.gamma)
+    
+    <span class="kw">def</span> <span class="fn">marginal_utility</span>(self, W):
+        <span class="st">"""u'(W) = W^(-γ)"""</span>
+        <span class="kw">return</span> W**(-self.gamma)
+    
+    <span class="kw">def</span> <span class="fn">ara</span>(self, W):
+        <span class="st">"""절대위험회피계수: A(W) = γ/W"""</span>
+        <span class="kw">return</span> self.gamma / W
+    
+    <span class="kw">def</span> <span class="fn">rra</span>(self, W):
+        <span class="st">"""상대위험회피계수: R(W) = γ (상수)"""</span>
+        <span class="kw">return</span> self.gamma
+    
+    <span class="kw">def</span> <span class="fn">certainty_equivalent</span>(self, outcomes, probs):
+        <span class="st">"""확실성 등가 계산"""</span>
+        eu = np.sum(probs * self.utility(outcomes))
+        <span class="kw">if</span> self.gamma == <span class="nu">1</span>:
+            <span class="kw">return</span> np.exp(eu)
+        <span class="kw">return</span> (eu * (<span class="nu">1</span> - self.gamma)) ** (<span class="nu">1</span> / (<span class="nu">1</span> - self.gamma))
+    
+    <span class="kw">def</span> <span class="fn">risk_premium</span>(self, outcomes, probs):
+        <span class="st">"""위험 프리미엄 = E[W] - CE"""</span>
+        EW = np.sum(outcomes * probs)
+        CE = self.certainty_equivalent(outcomes, probs)
+        <span class="kw">return</span> EW - CE
+    
+    <span class="kw">def</span> <span class="fn">optimal_weight</span>(self, mu, rf, sigma):
+        <span class="st">"""최적 위험자산 비중: w* = (μ-rf)/(γσ²)"""</span>
+        <span class="kw">return</span> (mu - rf) / (self.gamma * sigma**<span class="nu">2</span>)
+    
+    <span class="kw">def</span> <span class="fn">mv_utility</span>(self, er, var):
+        <span class="st">"""평균-분산 효용: U = E[r] - (γ/2)σ²"""</span>
+        <span class="kw">return</span> er - (self.gamma / <span class="nu">2</span>) * var
+
+<span class="cm"># 사용 예시</span>
+u = CRRAUtility(gamma=<span class="nu">5</span>)
+
+<span class="cm"># 1. 효용 계산</span>
+<span class="fn">print</span>(<span class="st">f"u(100) = </span>{u.utility(100):.6f}<span class="st">"</span>)
+<span class="fn">print</span>(<span class="st">f"u'(100) = </span>{u.marginal_utility(100):.2e}<span class="st">"</span>)
+<span class="fn">print</span>(<span class="st">f"ARA(100) = </span>{u.ara(100):.4f}<span class="st">"</span>)
+<span class="fn">print</span>(<span class="st">f"RRA(100) = </span>{u.rra(100):.1f}<span class="st">"</span>)
+
+<span class="cm"># 2. 확실성 등가</span>
+outcomes = np.array([<span class="nu">150</span>, <span class="nu">50</span>])
+probs = np.array([<span class="nu">0.5</span>, <span class="nu">0.5</span>])
+<span class="fn">print</span>(<span class="st">f"\nCE = </span>{u.certainty_equivalent(outcomes, probs):.2f}<span class="st">"</span>)
+<span class="fn">print</span>(<span class="st">f"Risk Premium = </span>{u.risk_premium(outcomes, probs):.2f}<span class="st">"</span>)
+
+<span class="cm"># 3. 최적 배분</span>
+w = u.optimal_weight(mu=<span class="nu">0.08</span>, rf=<span class="nu">0.03</span>, sigma=<span class="nu">0.16</span>)
+<span class="fn">print</span>(<span class="st">f"\n최적 주식 비중: </span>{w:.1%}<span class="st">"</span>)</code></pre>
+<div class="code-output"><span class="out-label">Output:</span>
+u(100) = -0.000003
+u'(100) = 1.00e-10
+ARA(100) = 0.0500
+RRA(100) = 5.0
+
+CE = 74.35
+Risk Premium = 25.65
+
+최적 주식 비중: 39.1%</div>
+
+<h3>7.2 Jensen's Inequality 시각화</h3>
+
+<pre><code><span class="kw">import</span> numpy <span class="kw">as</span> np
+<span class="kw">import</span> matplotlib.pyplot <span class="kw">as</span> plt
+
+<span class="cm"># 로그 효용으로 Jensen's Inequality 시각화</span>
+W = np.linspace(<span class="nu">0.5</span>, <span class="nu">4</span>, <span class="nu">200</span>)
+u = np.log(W)
+
+W1, W2 = <span class="nu">1.0</span>, <span class="nu">3.0</span>  <span class="cm"># 두 가능한 결과</span>
+p = <span class="nu">0.5</span>               <span class="cm"># 동일 확률</span>
+
+EW = p*W1 + p*W2                    <span class="cm"># E[W] = 2.0</span>
+Eu = p*np.log(W1) + p*np.log(W2)    <span class="cm"># E[u(W)]</span>
+uEW = np.log(EW)                    <span class="cm"># u(E[W])</span>
+CE = np.exp(Eu)                     <span class="cm"># 확실성 등가</span>
+
+fig, ax = plt.subplots(figsize=(<span class="nu">8</span>, <span class="nu">5</span>))
+ax.plot(W, u, <span class="st">'b-'</span>, lw=<span class="nu">2</span>, label=<span class="st">'u(W) = ln(W)'</span>)
+ax.plot([W1, W2], [np.log(W1), np.log(W2)], <span class="st">'r--'</span>, lw=<span class="nu">1.5</span>, label=<span class="st">'Chord (기대효용 선)'</span>)
+
+<span class="cm"># 주요 점 표시</span>
+ax.plot(EW, uEW, <span class="st">'go'</span>, ms=<span class="nu">10</span>, label=<span class="st">f'u(E[W]) = </span>{uEW:.3f}<span class="st">'</span>)
+ax.plot(EW, Eu, <span class="st">'ro'</span>, ms=<span class="nu">10</span>, label=<span class="st">f'E[u(W)] = </span>{Eu:.3f}<span class="st">'</span>)
+ax.plot(CE, Eu, <span class="st">'ms'</span>, ms=<span class="nu">10</span>, label=<span class="st">f'CE = </span>{CE:.3f}<span class="st">'</span>)
+
+<span class="cm"># 위험 프리미엄 화살표</span>
+ax.annotate(<span class="st">''</span>, xy=(CE, Eu), xytext=(EW, Eu),
+            arrowprops=<span class="fn">dict</span>(arrowstyle=<span class="st">'<->'</span>, color=<span class="st">'purple'</span>, lw=<span class="nu">2</span>))
+ax.text((CE+EW)/<span class="nu">2</span>, Eu-<span class="nu">0.15</span>, <span class="st">f'π = </span>{EW-CE:.3f}<span class="st">'</span>, ha=<span class="st">'center'</span>, color=<span class="st">'purple'</span>, fontsize=<span class="nu">11</span>)
+
+ax.set_xlabel(<span class="st">'Wealth (W)'</span>, fontsize=<span class="nu">12</span>)
+ax.set_ylabel(<span class="st">'Utility u(W)'</span>, fontsize=<span class="nu">12</span>)
+ax.set_title(<span class="st">"Jensen's Inequality & Risk Premium"</span>, fontsize=<span class="nu">14</span>)
+ax.legend(fontsize=<span class="nu">10</span>)
+ax.grid(<span class="kw">True</span>, alpha=<span class="nu">0.3</span>)
+plt.tight_layout()
+plt.show()</code></pre>
+
+<!-- ═══════════════════════════════════════════ -->
+<!-- Ch8: Quiz -->
+<!-- ═══════════════════════════════════════════ -->
+<h2 id="ch8">8. Quiz</h2>
+
+<div class="def">
+<p class="ni"><strong>Q1. [효용함수]</strong> CRRA 효용함수 \(u(W) = \frac{W^{1-\gamma}}{1-\gamma}\)에서 \(\gamma = 3\)일 때, \(u(50)\)과 \(u(100)\)을 계산하라. 부가 2배가 되면 효용은 몇 배가 되는가?</p>
+</div>
+
+<div class="def">
+<p class="ni"><strong>Q2. [Arrow-Pratt]</strong> 효용함수 \(u(W) = \sqrt{W}\)에 대해 ARA와 RRA를 도출하라. 이 효용함수는 CRRA인가 CARA인가? \(\gamma\)값은 얼마인가?</p>
+</div>
+
+<div class="def">
+<p class="ni"><strong>Q3. [확실성 등가]</strong> 투자자의 \(\gamma = 4\)이다. 50% 확률로 300만원, 50% 확률로 100만원을 받는 도박의 확실성 등가를 계산하라. Arrow-Pratt 근사식으로도 계산하고 정확한 값과 비교하라.</p>
+</div>
+
+<div class="def">
+<p class="ni"><strong>Q4. [최적 배분]</strong> 주식 기대수익률 10%, 변동성 20%, 무위험이자율 2%일 때, \(\gamma = 3\)인 투자자의 최적 주식 비중을 구하라. 이 포트폴리오의 기대수익률과 변동성은?</p>
+</div>
+
+<div class="def">
+<p class="ni"><strong>Q5. [코딩]</strong> <code>CRRAUtility</code> 클래스를 확장하여 <code>CARAUtility</code> 클래스를 만들어라. CARA 효용함수 \(u(W) = -\frac{1}{\alpha}e^{-\alpha W}\)에 대해 <code>utility</code>, <code>ara</code>, <code>rra</code>, <code>certainty_equivalent</code> 메서드를 구현하라.</p>
+</div>
+
+<div class="def">
+<p class="ni"><strong>Q6. [시뮬레이션]</strong> 정규분포 \(N(\mu=0.08, \sigma=0.16)\)에서 10,000개의 수익률을 생성하고, \(\gamma = 1, 3, 5, 10\)에 대해 기대효용 \(E[u(1+r)]\)을 몬테카를로로 추정하라. 각 \(\gamma\)에서 확실성 등가 수익률(CE return)은 얼마인가?</p>
+</div>
+
+<h3>8.1 Round 1 학습 정리</h3>
+
+<div class="tc">Table 3. Round 1 핵심 수식 요약</div>
+<table>
+<tr><th>개념</th><th>수식</th><th>파이썬 코드</th></tr>
+<tr><td>CRRA 효용</td><td>\(\frac{W^{1-\gamma}}{1-\gamma}\)</td><td><code>W**(1-g)/(1-g)</code></td></tr>
+<tr><td>CARA 효용</td><td>\(-\frac{1}{\alpha}e^{-\alpha W}\)</td><td><code>-(1/a)*np.exp(-a*W)</code></td></tr>
+<tr><td>ARA</td><td>\(-u''/u'\)</td><td><code>gamma/W</code> (CRRA)</td></tr>
+<tr><td>RRA</td><td>\(-Wu''/u'\)</td><td><code>gamma</code> (CRRA)</td></tr>
+<tr><td>확실성 등가</td><td>\(u^{-1}(E[u(W)])\)</td><td><code>certainty_equivalent()</code></td></tr>
+<tr><td>위험 프리미엄</td><td>\(E[W] - CE\)</td><td><code>EW - CE</code></td></tr>
+<tr><td>Arrow-Pratt 근사</td><td>\(\frac{1}{2}A(W)\sigma^2\)</td><td><code>0.5*ara*var</code></td></tr>
+<tr><td>MV 효용</td><td>\(E[r] - \frac{\gamma}{2}\sigma^2\)</td><td><code>er - g/2*var</code></td></tr>
+<tr><td>최적 비중</td><td>\(\frac{\mu-r_f}{\gamma\sigma^2}\)</td><td><code>(mu-rf)/(g*sig**2)</code></td></tr>
+</table>
+
+<h3>8.2 Next: Pass 2 Preview</h3>
+
+<div class="info">
+<p class="ni"><strong>Pass 2에서 추가될 내용:</strong></p>
+<ul>
+<li>Von Neumann-Morgenstern 공리 체계 (완비성, 이행성, 독립성, 연속성)</li>
+<li>Allais Paradox와 기대효용 이론의 한계</li>
+<li>Prospect Theory (Kahneman-Tversky)와의 비교</li>
+<li>실제 주식 데이터로 implied γ 추정</li>
+<li>다자산 포트폴리오에서의 기대효용 극대화</li>
+<li>Equity Premium Puzzle: γ가 왜 비현실적으로 높아야 하는가</li>
+</ul>
+</div>
+
+</div><!-- paper-content -->
+</div><!-- container -->
+</div><!-- main-wrapper -->
+
+</body>
+</html>

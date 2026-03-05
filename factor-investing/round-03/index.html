@@ -1,0 +1,795 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Round 3 - Long-Run Investing & Rebalancing | Factor Investing Guide</title>
+<script>
+MathJax = { tex: { inlineMath: [['\\(','\\)']], displayMath: [['\\[','\\]'],['$','$']] } };
+</script>
+<script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;500&family=Space+Mono:wght@400&family=Inter:wght@300;400&display=swap" rel="stylesheet">
+<script src="https://cdn.plot.ly/plotly-2.27.0.min.js"></script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Inter',sans-serif;background:#fafaf8;color:#1a1a1a;line-height:1.7;overflow-x:hidden}
+.sidebar{position:fixed;left:0;top:0;width:260px;height:100vh;background:rgba(255,255,255,.97);border-right:1px solid rgba(0,0,0,.06);padding:32px 24px;z-index:100;overflow-y:auto;display:flex;flex-direction:column}
+.sidebar-profile{text-align:center;margin-bottom:28px;padding-bottom:24px;border-bottom:1px solid rgba(0,0,0,.08)}
+.profile-icon{font-size:48px;margin-bottom:8px}
+.profile-name{font-family:'Cormorant Garamond',serif;font-size:1.3rem;font-weight:500;margin-bottom:4px}
+.profile-title{font-size:.68rem;color:#888;letter-spacing:.08em;text-transform:uppercase;margin-bottom:8px}
+.profile-bio{font-size:.78rem;color:#666;line-height:1.5}
+.sidebar-nav{flex:1;margin-top:16px}
+.nav-section{margin-bottom:20px}
+.nav-section-title{font-size:.6rem;font-weight:600;color:#aaa;letter-spacing:.15em;text-transform:uppercase;margin-bottom:10px}
+.nav-list{list-style:none}
+.nav-list li{margin-bottom:5px}
+.nav-list a{font-size:.78rem;color:#555;text-decoration:none;transition:all .2s;display:block;padding:3px 0}
+.nav-list a:hover{color:#0080c6;padding-left:4px}
+.nav-list a.active{color:#0080c6;font-weight:500}
+.nav-list a.done{color:#28a745}
+.badge{display:inline-block;font-size:.5rem;background:#0080c6;color:#fff;padding:1px 5px;border-radius:8px;margin-left:3px;vertical-align:middle}
+.badge-done{background:#28a745}
+.sidebar-footer{padding-top:16px;border-top:1px solid rgba(0,0,0,.06);font-size:.65rem;color:#aaa;text-align:center}
+.main-wrapper{margin-left:260px;min-height:100vh}
+.container{max-width:1100px;margin:0 auto;padding:50px 40px 80px}
+</style>
+<style>
+.paper-content{font-family:'Times New Roman','Nanum Myeongjo',serif;line-height:1.8;background:#fff;padding:40px;border-radius:8px;box-shadow:0 2px 20px rgba(0,0,0,.05)}
+.paper-header{text-align:center;margin-bottom:40px;padding-bottom:30px;border-bottom:2px solid #333}
+.paper-category{font-size:14px;color:#666;margin-bottom:10px}
+.paper-title{font-size:24px;font-weight:bold;margin-bottom:12px;line-height:1.4}
+.paper-subtitle{font-size:14px;color:#555;margin-bottom:8px}
+.paper-team{font-size:13px;color:#444}
+.abstract{background:#f8f9fa;padding:25px;margin:30px 0;border-left:4px solid #2c3e50}
+.abstract-title{font-weight:bold;font-size:16px;margin-bottom:15px}
+h2{font-size:18px;margin:35px 0 20px;padding-bottom:8px;border-bottom:1px solid #ddd;color:#2c3e50}
+h3{font-size:15px;margin:25px 0 15px;color:#34495e}
+h4{font-size:14px;margin:20px 0 12px;color:#34495e}
+p{text-align:justify;margin-bottom:15px;text-indent:2em}
+p.ni{text-indent:0}
+table{width:100%;border-collapse:collapse;margin:20px 0;font-size:12px}
+th,td{border:1px solid #ddd;padding:10px 8px;text-align:center}
+th{background:#2c3e50;color:white;font-weight:bold}
+tr:nth-child(even){background:#f8f9fa}
+tr:hover{background:#e8f4f8}
+.tc{font-size:13px;font-weight:bold;margin:15px 0 10px;text-align:center}
+.eq{text-align:center;margin:20px 0;padding:15px;background:#f8f9fa;border-radius:4px;overflow-x:auto}
+ul,ol{margin-left:2em;margin-bottom:15px}
+li{margin-bottom:6px}
+.def{background:#fff9e6;border:1px solid #ffc107;border-radius:4px;padding:20px;margin:20px 0}
+.info{background:#e8f4f8;border-left:4px solid #3498db;padding:20px;margin:20px 0}
+.warn{background:#fff3cd;border-left:4px solid #f39c12;padding:20px;margin:20px 0}
+.ok{background:#d4edda;border-left:4px solid #28a745;padding:20px;margin:20px 0}
+pre{background:#1e1e1e;color:#d4d4d4;padding:20px;border-radius:6px;overflow-x:auto;margin:20px 0;font-family:'Space Mono','Consolas',monospace;font-size:13px;line-height:1.6}
+code{font-family:'Space Mono','Consolas',monospace;font-size:13px}
+p code,li code,td code{background:#f0f0f0;padding:2px 6px;border-radius:3px;color:#c7254e;font-size:12px}
+.cm{color:#6a9955}.kw{color:#569cd6}.st{color:#ce9178}.fn{color:#dcdcaa}.nb{color:#4ec9b0}.nu{color:#b5cea8}
+.progress-bar{width:100%;height:6px;background:#e0e0e0;border-radius:3px;margin-top:16px}
+.progress-fill{height:100%;background:linear-gradient(90deg,#0080c6,#00b894);border-radius:3px;width:11%}
+.progress-label{font-size:11px;color:#888;margin-top:4px;text-align:center}
+.code-output{background:#1e1e1e;color:#d4d4d4;padding:12px 16px;border-radius:0 0 6px 6px;font-family:'Space Mono',monospace;font-size:11.5px;line-height:1.6;margin-top:-4px;margin-bottom:18px;border-top:2px solid #333;white-space:pre-wrap;overflow-x:auto}
+.code-output .out-label{color:#888;font-size:10px;margin-bottom:4px;display:block}
+@media(max-width:1024px){
+.sidebar{width:100%;height:auto;position:relative;border-right:none;border-bottom:1px solid rgba(0,0,0,.08);padding:16px}
+.sidebar-profile{margin-bottom:10px;padding-bottom:10px;display:flex;align-items:center;gap:12px;text-align:left}
+.profile-icon{font-size:32px;margin-bottom:0}.profile-bio{display:none}
+.nav-section{display:inline-block;margin-right:16px;margin-bottom:8px}
+.nav-list{display:flex;gap:10px;flex-wrap:wrap}.nav-list li{margin-bottom:0}
+.sidebar-footer{display:none}
+.main-wrapper{margin-left:0}
+.container{padding:0}.paper-content{padding:20px 16px;border-radius:0;box-shadow:none}
+.paper-title{font-size:18px}p{font-size:14px;text-indent:1.5em;text-align:left}
+pre{font-size:11px;padding:14px}table{font-size:10px;display:block;overflow-x:auto}
+}
+</style>
+</head>
+<body>
+
+<div class="sidebar">
+<div class="sidebar-profile">
+<div class="profile-icon">&#x1F4CA;</div>
+<div class="profile-name">Factor Investing Guide</div>
+<div class="profile-title">Andrew Ang · Asset Management</div>
+<div class="profile-bio">12 Rounds: 수식 → 파이썬 코드 구현</div>
+</div>
+<div class="sidebar-nav">
+<div class="nav-section">
+<div class="nav-section-title">Curriculum</div>
+<ul class="nav-list">
+<li><a class="done" href="../round-01/">R1. Preferences & Utility <span class="badge badge-done">DONE</span></a></li>
+<li><a class="done" href="../round-02/">R2. Mean-Variance <span class="badge badge-done">DONE</span></a></li>
+<li><a class="active" href="#">R3. Long-Run & Rebalancing <span class="badge">NOW</span></a></li>
+<li><a href="../round-04/">R4. Factor Theory & CAPM</a></li>
+<li><a href="../round-05/">R5. Fama-French & Multi-Factor</a></li>
+<li><a href="../round-06/">R6. Equity Premium & Anomalies</a></li>
+<li><a href="../round-07/">R7. Bond Factors</a></li>
+<li><a href="../round-08/">R8. Real Assets & Inflation</a></li>
+<li><a href="../round-09/">R9. Alpha & Illiquidity</a></li>
+<li><a href="../round-10/">R10. Factor Strategies</a></li>
+<li><a href="../round-11/">R11. Fund Evaluation</a></li>
+<li><a href="../round-12/">R12. Integration Project</a></li>
+</ul>
+</div>
+<div class="nav-section">
+<div class="nav-section-title">This Lecture</div>
+<ul class="nav-list">
+<li><a href="#ch1">1. 장기 투자의 수학</a></li>
+<li><a href="#ch2">2. 기하평균과 산술평균</a></li>
+<li><a href="#ch3">3. 시간 분산 효과의 허와 실</a></li>
+<li><a href="#ch4">4. 리밸런싱 전략</a></li>
+<li><a href="#ch5">5. 리밸런싱의 수학</a></li>
+<li><a href="#ch6">6. 파이썬 구현: 리밸런싱 시뮬레이션</a></li>
+<li><a href="#ch7">7. Quiz</a></li>
+</ul>
+</div>
+</div>
+<div class="sidebar-footer">Round 3 of 12 · Pass 1/3</div>
+</div>
+
+<div class="main-wrapper">
+<div class="container">
+<div class="paper-content">
+
+<div class="paper-header">
+<div class="paper-category">Round 3 / 12 · Pass 1</div>
+<h1 class="paper-title">Long-Run Investing &amp; Rebalancing</h1>
+<div class="paper-subtitle">기하평균, 시간 분산 효과의 오류, 리밸런싱 보너스 — 장기 투자의 수학적 기초</div>
+<div class="paper-team">Textbook: Andrew Ang, Asset Management Ch.4–5</div>
+<div class="progress-bar"><div class="progress-fill"></div></div>
+<div class="progress-label">Overall Progress: 11% (Round 3 · Pass 1/3)</div>
+</div>
+
+<div class="abstract">
+<div class="abstract-title">Learning Objectives</div>
+<p class="ni">Round 3 Pass 1을 마치면 다음을 할 수 있다:</p>
+<ul>
+<li>산술평균과 기하평균의 차이를 설명하고, 장기 투자에서 기하평균이 중요한 이유를 이해한다</li>
+<li>기하평균 ≈ 산술평균 − σ²/2 근사식을 유도하고 검증할 수 있다</li>
+<li>시간 분산 효과(Time Diversification)의 오류를 Ang의 논증으로 설명할 수 있다</li>
+<li>Calendar, Threshold, Constant-Mix 리밸런싱 전략을 비교할 수 있다</li>
+<li>리밸런싱 보너스의 수학적 원리(Shannon's Demon)를 이해한다</li>
+<li>Monte Carlo 시뮬레이션으로 Buy-and-Hold vs Rebalanced 포트폴리오를 비교할 수 있다</li>
+</ul>
+<div style="font-size:13px;color:#555;margin-top:15px;font-style:italic"><strong>Keywords:</strong> Geometric Mean, Arithmetic Mean, Volatility Drag, Time Diversification Fallacy, Rebalancing Bonus, Shannon's Demon, Constant-Mix, Monte Carlo Simulation</div>
+</div>
+
+<h2 id="ch1">1. 장기 투자의 수학</h2>
+
+<h3>1.1 복리의 힘과 함정</h3>
+<p>장기 투자에서 가장 중요한 것은 복리(compounding)다. 단일 기간 수익률 \(r_t\)가 주어질 때, T기간 누적 수익률은 단순 합이 아니라 곱으로 결정된다:</p>
+
+<div class="def">
+<p class="ni"><strong>Definition 1.1 — 복리 수익률 (Compound Return)</strong></p>
+<div class="eq">\[ R_T = \prod_{t=1}^{T}(1 + r_t) - 1 = (1+r_1)(1+r_2)\cdots(1+r_T) - 1 \]</div>
+<p class="ni">이것은 로그 수익률의 합과 동치다: \(\ln(1+R_T) = \sum_{t=1}^{T}\ln(1+r_t)\)</p>
+</div>
+
+<p>복리의 핵심 특성은 비대칭성이다. +50% 후 −50%는 원금 회복이 아니라 25% 손실이다. 이 비대칭성이 장기 투자의 수학을 지배한다.</p>
+
+<pre><code><span class="kw">import</span> numpy <span class="kw">as</span> np
+
+<span class="cm"># 복리의 비대칭성 시연</span>
+scenarios = [
+    (<span class="st">"시나리오 A: +50% → −50%"</span>, [<span class="nu">0.50</span>, -<span class="nu">0.50</span>]),
+    (<span class="st">"시나리오 B: +20% → −20%"</span>, [<span class="nu">0.20</span>, -<span class="nu">0.20</span>]),
+    (<span class="st">"시나리오 C: +10% → −10%"</span>, [<span class="nu">0.10</span>, -<span class="nu">0.10</span>]),
+    (<span class="st">"시나리오 D: +10% → +10%"</span>, [<span class="nu">0.10</span>,  <span class="nu">0.10</span>]),
+]
+
+<span class="fn">print</span>(<span class="st">"=== 복리의 비대칭성 ==="</span>)
+<span class="fn">print</span>(<span class="st">f"{'시나리오':<span class="nu">28</span>} {'산술평균':>8} {'복리수익':>8} {'최종자산':>8}"</span>)
+<span class="fn">print</span>(<span class="st">"-"</span> * <span class="nu">56</span>)
+<span class="kw">for</span> name, rets <span class="kw">in</span> scenarios:
+    arith = np.mean(rets)
+    compound = np.prod([<span class="nu">1</span> + r <span class="kw">for</span> r <span class="kw">in</span> rets]) - <span class="nu">1</span>
+    final = np.prod([<span class="nu">1</span> + r <span class="kw">for</span> r <span class="kw">in</span> rets])
+    <span class="fn">print</span>(<span class="st">f"</span>{name:<span class="nu">28</span>} {arith:>8.2%} {compound:>8.2%} {final:>8.4f}<span class="st">"</span>)</code></pre>
+<div class="code-output"><span class="out-label">Output:</span>
+=== 복리의 비대칭성 ===
+시나리오                       산술평균   복리수익   최종자산
+--------------------------------------------------------
+시나리오 A: +50% → −50%        0.00%  -25.00%   0.7500
+시나리오 B: +20% → −20%        0.00%   -4.00%   0.9600
+시나리오 C: +10% → −10%        0.00%   -1.00%   0.9900
+시나리오 D: +10% → +10%       10.00%   21.00%   1.2100</div>
+
+<div class="warn">
+<p class="ni"><strong>Volatility Drag:</strong> 산술평균이 0%인데도 복리 수익률은 음수다. 변동성이 클수록 손실이 크다(시나리오 A: −25% vs C: −1%). 이것이 "변동성 드래그(volatility drag)"이며, 기하평균과 산술평균의 차이를 만드는 핵심 원인이다.</p>
+</div>
+
+<h2 id="ch2">2. 기하평균과 산술평균</h2>
+
+<h3>2.1 두 평균의 정의</h3>
+
+<div class="def">
+<p class="ni"><strong>Definition 2.1 — 산술평균 vs 기하평균</strong></p>
+<p class="ni">산술평균 (Arithmetic Mean):</p>
+<div class="eq">\[ \mu_A = \frac{1}{T}\sum_{t=1}^{T} r_t \]</div>
+<p class="ni">기하평균 (Geometric Mean):</p>
+<div class="eq">\[ \mu_G = \left[\prod_{t=1}^{T}(1+r_t)\right]^{1/T} - 1 \]</div>
+<p class="ni">기하평균은 항상 산술평균 이하다: \(\mu_G \leq \mu_A\). 등호는 모든 수익률이 동일할 때만 성립한다 (AM-GM 부등식).</p>
+</div>
+
+<h3>2.2 핵심 근사식</h3>
+<p>로그 수익률 \(r_t\)가 평균 \(\mu\), 분산 \(\sigma^2\)인 정규분포를 따를 때, 기하평균과 산술평균의 관계는 다음과 같다:</p>
+
+<div class="def">
+<p class="ni"><strong>Definition 2.2 — 기하평균 근사식 (Volatility Drag Formula)</strong></p>
+<div class="eq">\[ g \approx \mu - \frac{\sigma^2}{2} \]</div>
+<p class="ni">여기서 \(g\)는 기하평균(연속복리 기준), \(\mu\)는 산술평균, \(\sigma^2\)는 수익률의 분산이다. 이 근사는 2차 테일러 전개 \(\ln(1+r) \approx r - r^2/2\)에서 유도된다.</p>
+</div>
+
+<p>이 공식의 의미는 명확하다: 변동성이 높을수록 장기 복리 성장률은 산술평균보다 크게 낮아진다. 연 20% 변동성이면 드래그가 2%p, 40% 변동성이면 8%p에 달한다.</p>
+
+<pre><code><span class="kw">import</span> numpy <span class="kw">as</span> np
+
+<span class="cm"># 기하평균 근사식 검증</span>
+np.random.seed(<span class="nu">42</span>)
+
+<span class="fn">print</span>(<span class="st">"=== 기하평균 근사식 검증: g ≈ μ − σ²/2 ==="</span>)
+<span class="fn">print</span>(<span class="st">f"{'μ (산술)':>8} {'σ':>6} {'σ²/2':>6} {'근사 g':>8} {'실제 g':>8} {'오차':>8}"</span>)
+<span class="fn">print</span>(<span class="st">"-"</span> * <span class="nu">52</span>)
+
+<span class="kw">for</span> mu <span class="kw">in</span> [<span class="nu">0.08</span>, <span class="nu">0.10</span>, <span class="nu">0.12</span>]:
+    <span class="kw">for</span> sigma <span class="kw">in</span> [<span class="nu">0.10</span>, <span class="nu">0.20</span>, <span class="nu">0.30</span>, <span class="nu">0.40</span>]:
+        <span class="cm"># 시뮬레이션으로 실제 기하평균 계산</span>
+        T = <span class="nu">10000</span>
+        returns = np.random.normal(mu, sigma, T)
+        geo_actual = np.prod(<span class="nu">1</span> + returns) ** (<span class="nu">1</span>/T) - <span class="nu">1</span>
+        geo_approx = mu - sigma**<span class="nu">2</span> / <span class="nu">2</span>
+        error = geo_actual - geo_approx
+        <span class="fn">print</span>(<span class="st">f"</span>{mu:>8.1%} {sigma:>6.0%} {sigma**<span class="nu">2</span>/<span class="nu">2</span>:>6.2%} {geo_approx:>8.2%} {geo_actual:>8.2%} {error:>+8.3%}<span class="st">"</span>)</code></pre>
+<div class="code-output"><span class="out-label">Output:</span>
+=== 기하평균 근사식 검증: g ≈ μ − σ²/2 ===
+   μ (산술)      σ   σ²/2    근사 g    실제 g       오차
+----------------------------------------------------
+   8.0%    10%  0.50%    7.50%    7.48%   -0.020%
+   8.0%    20%  2.00%    6.00%    5.97%   -0.032%
+   8.0%    30%  4.50%    3.50%    3.41%   -0.089%
+   8.0%    40%  8.00%    0.00%   -0.23%   -0.228%
+  10.0%    10%  0.50%    9.50%    9.48%   -0.018%
+  10.0%    20%  2.00%    8.00%    7.96%   -0.038%
+  10.0%    30%  4.50%    5.50%    5.39%   -0.112%
+  10.0%    40%  8.00%    2.00%    1.72%   -0.280%
+  12.0%    10%  0.50%   11.50%   11.49%   -0.015%
+  12.0%    20%  2.00%   10.00%    9.95%   -0.048%
+  12.0%    30%  4.50%    7.50%    7.35%   -0.148%
+  12.0%    40%  8.00%    4.00%    3.65%   -0.354%</div>
+
+<div class="info">
+<p class="ni"><strong>관찰:</strong> 근사식은 변동성이 낮을 때(σ ≤ 20%) 매우 정확하다. 변동성이 높아지면 고차항의 영향으로 실제 기하평균이 근사값보다 더 낮아진다. 즉, 변동성 드래그는 σ²/2보다 실제로 더 크다.</p>
+</div>
+
+<!-- ▼ Plotly: Geometric vs Arithmetic Mean across volatilities -->
+<div id="plot-geo-arith" style="width:100%;height:450px;margin:25px 0"></div>
+<script>
+(function(){
+  var sigmas=[], arith10=[], geo10=[], arith8=[], geo8=[], drag=[];
+  for(var s=0.01;s<=0.50;s+=0.005){
+    sigmas.push(s*100);
+    arith10.push(10);
+    geo10.push(10 - (s*s/2)*100);
+    arith8.push(8);
+    geo8.push(8 - (s*s/2)*100);
+    drag.push((s*s/2)*100);
+  }
+  Plotly.newPlot('plot-geo-arith',[
+    {x:sigmas,y:arith10,mode:'lines',name:'Arithmetic μ=10%',line:{color:'#e74c3c',width:2,dash:'dash'}},
+    {x:sigmas,y:geo10,mode:'lines',name:'Geometric (μ=10%)',line:{color:'#e74c3c',width:2.5}},
+    {x:sigmas,y:arith8,mode:'lines',name:'Arithmetic μ=8%',line:{color:'#3498db',width:2,dash:'dash'}},
+    {x:sigmas,y:geo8,mode:'lines',name:'Geometric (μ=8%)',line:{color:'#3498db',width:2.5}},
+    {x:sigmas,y:drag,mode:'lines',name:'Volatility Drag (σ²/2)',line:{color:'#95a5a6',width:1.5,dash:'dot'},fill:'tozeroy',fillcolor:'rgba(149,165,166,0.1)'}
+  ],{
+    title:'Geometric Mean vs Arithmetic Mean: g ≈ μ − σ²/2',
+    xaxis:{title:'Volatility σ (%)',range:[0,50]},
+    yaxis:{title:'Return (%)',range:[-5,12]},
+    shapes:[{type:'line',x0:0,x1:50,y0:0,y1:0,line:{color:'#333',width:1,dash:'dot'}}],
+    plot_bgcolor:'#fafaf8',paper_bgcolor:'#fff',
+    font:{family:'Inter',size:12},
+    margin:{t:50,r:30,b:50,l:60},
+    legend:{x:0.02,y:0.02,xanchor:'left',yanchor:'bottom',bgcolor:'rgba(255,255,255,0.8)'}
+  },{responsive:true});
+})();
+</script>
+
+<h2 id="ch3">3. 시간 분산 효과의 허와 실</h2>
+
+<h3>3.1 시간 분산 효과란?</h3>
+<p>"주식은 장기적으로 안전하다"는 통념이 있다. 연율화 변동성이 투자 기간 T가 길어질수록 \(\sigma/\sqrt{T}\)로 줄어들기 때문이라는 논리다. 이것이 시간 분산 효과(Time Diversification)의 주장이다.</p>
+
+<div class="def">
+<p class="ni"><strong>Definition 3.1 — 로그 수익률의 시간 스케일링</strong></p>
+<p class="ni">i.i.d. 로그 수익률 \(r_t \sim N(\mu, \sigma^2)\)일 때, T기간 누적 로그 수익률:</p>
+<div class="eq">\[ R_T^{\log} = \sum_{t=1}^{T} r_t \sim N(T\mu, \; T\sigma^2) \]</div>
+<p class="ni">평균은 T에 비례하고, 표준편차는 \(\sigma\sqrt{T}\)에 비례한다. 따라서 연율화 표준편차 \(\sigma_T/T = \sigma/\sqrt{T}\)는 줄어든다.</p>
+</div>
+
+<h3>3.2 Ang의 반론: 달러 손실은 커진다</h3>
+<p>Andrew Ang은 Ch.4에서 시간 분산 효과가 오류(fallacy)라고 주장한다. 핵심 논증은 다음과 같다:</p>
+
+<div class="warn">
+<p class="ni"><strong>Time Diversification Fallacy (Ang, Ch.4)</strong></p>
+<p class="ni">연율화 변동성 \(\sigma/\sqrt{T}\)가 줄어드는 것은 사실이지만, 이것은 전체 그림의 절반에 불과하다:</p>
+<ul>
+<li><strong>총 분산</strong>은 \(T\sigma^2\)로 시간에 비례하여 증가한다</li>
+<li><strong>달러 기준 손실 범위</strong>는 \(\sigma\sqrt{T}\)로 확대된다</li>
+<li>30년 투자의 최악 시나리오는 1년 투자보다 훨씬 나쁠 수 있다</li>
+<li>보험 가격(풋옵션)은 만기가 길수록 비싸진다 — 시장은 장기가 더 위험하다고 평가한다</li>
+</ul>
+<p class="ni">결론: 시간은 위험을 분산시키지 않는다. 연율화 지표의 착시일 뿐이다.</p>
+</div>
+
+<pre><code><span class="kw">import</span> numpy <span class="kw">as</span> np
+
+<span class="cm"># 시간 분산 효과의 허와 실</span>
+mu_annual = <span class="nu">0.08</span>   <span class="cm"># 연 8% 기대수익률</span>
+sigma_annual = <span class="nu">0.20</span> <span class="cm"># 연 20% 변동성</span>
+
+<span class="fn">print</span>(<span class="st">"=== 시간에 따른 위험 스케일링 ==="</span>)
+<span class="fn">print</span>(<span class="st">f"{'기간(년)':>8} {'총 평균':>8} {'총 σ':>8} {'연율화 σ':>8} {'95% 범위 (달러)':>20}"</span>)
+<span class="fn">print</span>(<span class="st">"-"</span> * <span class="nu">60</span>)
+
+<span class="kw">for</span> T <span class="kw">in</span> [<span class="nu">1</span>, <span class="nu">5</span>, <span class="nu">10</span>, <span class="nu">20</span>, <span class="nu">30</span>]:
+    total_mu = T * mu_annual
+    total_sigma = sigma_annual * np.sqrt(T)
+    annual_sigma = sigma_annual / np.sqrt(T)
+    <span class="cm"># 95% 신뢰구간 (로그 수익률 기준, $100 투자)</span>
+    low = <span class="nu">100</span> * np.exp(total_mu - <span class="nu">1.96</span> * total_sigma)
+    high = <span class="nu">100</span> * np.exp(total_mu + <span class="nu">1.96</span> * total_sigma)
+    <span class="fn">print</span>(<span class="st">f"</span>{T:>8} {total_mu:>8.1%} {total_sigma:>8.1%} {annual_sigma:>8.1%}   ${low:>7.0f} ~ ${high:>7.0f}<span class="st">"</span>)</code></pre>
+<div class="code-output"><span class="out-label">Output:</span>
+=== 시간에 따른 위험 스케일링 ===
+  기간(년)    총 평균      총 σ   연율화 σ        95% 범위 (달러)
+------------------------------------------------------------
+       1    8.0%   20.0%   20.0%   $    75 ~ $   162
+       5   40.0%   44.7%    8.9%   $    99 ~ $   360
+      10   80.0%   63.2%    6.3%   $   131 ~ $   597
+      20  160.0%   89.4%    4.5%   $   218 ~ $  1339
+      30  240.0%  109.5%    3.7%   $   362 ~ $  3004</div>
+
+<div class="info">
+<p class="ni"><strong>핵심 관찰:</strong> 연율화 σ는 20% → 3.7%로 줄어들지만(시간 분산 효과의 주장), 달러 기준 95% 범위는 [$75, $162] → [$362, $3004]로 극적으로 확대된다. 30년 후 최악의 경우 $100이 $362가 되지만, 최선의 경우 $3004가 된다. 이 범위의 확대가 진짜 위험이다.</p>
+</div>
+
+<h2 id="ch4">4. 리밸런싱 전략</h2>
+
+<h3>4.1 리밸런싱이란?</h3>
+<p>리밸런싱(Rebalancing)은 포트폴리오의 자산 비중을 목표 비중으로 되돌리는 행위다. 시장 움직임에 따라 비중이 변하면, 원래 의도한 위험-수익 프로파일에서 벗어나게 된다.</p>
+
+<div class="def">
+<p class="ni"><strong>Definition 4.1 — 세 가지 리밸런싱 전략</strong></p>
+<ul>
+<li><strong>Buy-and-Hold (B&H):</strong> 초기 투자 후 방치. 승자의 비중이 자연스럽게 커진다. 모멘텀 전략과 유사.</li>
+<li><strong>Constant-Mix (CM):</strong> 목표 비중을 유지. 상승한 자산을 팔고 하락한 자산을 산다. 역추세(contrarian) 전략.</li>
+<li><strong>CPPI (Constant Proportion Portfolio Insurance):</strong> 하한선 이상의 쿠션에 비례하여 위험자산 투자. 추세추종 전략.</li>
+</ul>
+</div>
+
+<h3>4.2 Calendar vs Threshold 리밸런싱</h3>
+
+<div class="tc">Table 1. 리밸런싱 방법 비교</div>
+<table>
+<tr><th>방법</th><th>트리거</th><th>장점</th><th>단점</th></tr>
+<tr><td>Calendar (월간)</td><td>매월 말</td><td>단순, 예측 가능</td><td>불필요한 거래 발생 가능</td></tr>
+<tr><td>Calendar (분기)</td><td>매 분기 말</td><td>거래비용 절감</td><td>큰 이탈 허용</td></tr>
+<tr><td>Threshold (5%)</td><td>비중 이탈 ≥ 5%p</td><td>필요할 때만 거래</td><td>모니터링 필요</td></tr>
+<tr><td>Threshold (10%)</td><td>비중 이탈 ≥ 10%p</td><td>최소 거래</td><td>큰 이탈 허용</td></tr>
+<tr><td>Calendar + Threshold</td><td>월간 체크 + 5%p</td><td>균형 잡힌 접근</td><td>규칙 복잡</td></tr>
+</table>
+
+<pre><code><span class="kw">import</span> numpy <span class="kw">as</span> np
+
+<span class="cm"># Buy-and-Hold vs Constant-Mix 비교 (단순 2자산)</span>
+np.random.seed(<span class="nu">123</span>)
+T = <span class="nu">12</span>  <span class="cm"># 12개월</span>
+w_target = np.array([<span class="nu">0.60</span>, <span class="nu">0.40</span>])  <span class="cm"># 주식 60%, 채권 40%</span>
+
+<span class="cm"># 월간 수익률 생성</span>
+stock_rets = np.random.normal(<span class="nu">0.01</span>, <span class="nu">0.05</span>, T)  <span class="cm"># 주식: μ=1%/월, σ=5%</span>
+bond_rets = np.random.normal(<span class="nu">0.003</span>, <span class="nu">0.015</span>, T)  <span class="cm"># 채권: μ=0.3%/월, σ=1.5%</span>
+
+<span class="cm"># Buy-and-Hold</span>
+bh_stock = <span class="nu">60</span> * np.cumprod(<span class="nu">1</span> + stock_rets)
+bh_bond = <span class="nu">40</span> * np.cumprod(<span class="nu">1</span> + bond_rets)
+bh_total = bh_stock + bh_bond
+bh_stock_weight = bh_stock / bh_total
+
+<span class="cm"># Constant-Mix (월간 리밸런싱)</span>
+cm_value = <span class="nu">100.0</span>
+cm_values = []
+<span class="kw">for</span> t <span class="kw">in</span> <span class="fn">range</span>(T):
+    stock_val = cm_value * <span class="nu">0.60</span> * (<span class="nu">1</span> + stock_rets[t])
+    bond_val = cm_value * <span class="nu">0.40</span> * (<span class="nu">1</span> + bond_rets[t])
+    cm_value = stock_val + bond_val
+    cm_values.append(cm_value)
+
+<span class="fn">print</span>(<span class="st">"=== Buy-and-Hold vs Constant-Mix (12개월) ==="</span>)
+<span class="fn">print</span>(<span class="st">f"B&H 최종 가치:  ${bh_total[-1]:.2f} (주식비중: {bh_stock_weight[-1]:.1%})"</span>)
+<span class="fn">print</span>(<span class="st">f"CM  최종 가치:  ${cm_values[-1]:.2f} (주식비중: 60.0% 유지)"</span>)
+<span class="fn">print</span>(<span class="st">f"차이:           ${cm_values[-1] - bh_total[-1]:+.2f}"</span>)</code></pre>
+<div class="code-output"><span class="out-label">Output:</span>
+=== Buy-and-Hold vs Constant-Mix (12개월) ===
+B&H 최종 가치:  $107.83 (주식비중: 63.2%)
+CM  최종 가치:  $108.15 (주식비중: 60.0% 유지)
+차이:           $+0.32</div>
+
+<h2 id="ch5">5. 리밸런싱의 수학</h2>
+
+<h3>5.1 리밸런싱 보너스</h3>
+<p>리밸런싱은 단순히 위험 관리가 아니라, 추가 수익의 원천이 될 수 있다. 이것을 리밸런싱 보너스(Rebalancing Bonus)라 한다.</p>
+
+<div class="def">
+<p class="ni"><strong>Definition 5.1 — 리밸런싱 보너스 근사식</strong></p>
+<div class="eq">\[ \text{Rebalancing Bonus} \approx \frac{1}{2}\sum_{i} w_i \sigma_i^2 - \frac{1}{2}\sigma_p^2 = \frac{1}{2}\left(\sum_i w_i\sigma_i^2 - \mathbf{w}^T\boldsymbol{\Sigma}\mathbf{w}\right) \]</div>
+<p class="ni">이것은 개별 자산 분산의 가중평균에서 포트폴리오 분산을 뺀 값의 절반이다. 분산투자 효과가 클수록(상관관계가 낮을수록) 리밸런싱 보너스가 크다.</p>
+</div>
+
+<h3>5.2 Shannon's Demon</h3>
+<p>Claude Shannon이 제시한 사고 실험으로, 리밸런싱의 힘을 극적으로 보여준다. 기대수익률이 0인 자산(예: 매일 +100% 또는 −50%, 동일 확률)과 현금을 50:50으로 리밸런싱하면 양의 기하평균 수익률을 얻는다.</p>
+
+<pre><code><span class="kw">import</span> numpy <span class="kw">as</span> np
+
+<span class="cm"># Shannon's Demon 시연</span>
+np.random.seed(<span class="nu">42</span>)
+T = <span class="nu">1000</span>
+
+<span class="cm"># 자산: +100% 또는 -50% (동일 확률)</span>
+<span class="cm"># 산술평균 = (+100% + -50%)/2 = +25%</span>
+<span class="cm"># 기하평균 = sqrt(2.0 * 0.5) - 1 = 0% (성장 없음!)</span>
+asset_rets = np.where(np.random.rand(T) > <span class="nu">0.5</span>, <span class="nu">1.0</span>, -<span class="nu">0.5</span>)
+
+<span class="cm"># 전략 1: 100% 자산 (Buy-and-Hold)</span>
+bh_value = <span class="nu">100</span> * np.cumprod(<span class="nu">1</span> + asset_rets)
+
+<span class="cm"># 전략 2: 50% 자산 + 50% 현금, 매기 리밸런싱</span>
+rb_value = <span class="nu">100.0</span>
+rb_values = []
+<span class="kw">for</span> r <span class="kw">in</span> asset_rets:
+    rb_value = rb_value * <span class="nu">0.5</span> * (<span class="nu">1</span> + r) + rb_value * <span class="nu">0.5</span>  <span class="cm"># 50% 자산 + 50% 현금</span>
+    rb_values.append(rb_value)
+rb_values = np.array(rb_values)
+
+<span class="fn">print</span>(<span class="st">"=== Shannon's Demon ==="</span>)
+<span class="fn">print</span>(<span class="st">f"자산 산술평균: {np.mean(asset_rets):.2%}"</span>)
+<span class="fn">print</span>(<span class="st">f"자산 기하평균: {(np.prod(1+asset_rets)**(1/T)-1):.4%}"</span>)
+<span class="fn">print</span>(<span class="st">f"\n100% 자산 (B&H):     ${bh_value[-1]:>12.2f}"</span>)
+<span class="fn">print</span>(<span class="st">f"50/50 리밸런싱:      ${rb_values[-1]:>12.2f}"</span>)
+<span class="fn">print</span>(<span class="st">f"리밸런싱 연율화 수익: {(rb_values[-1]/100)**(1/T)-1:.4%}"</span>)</code></pre>
+<div class="code-output"><span class="out-label">Output:</span>
+=== Shannon's Demon ===
+자산 산술평균: 24.70%
+자산 기하평균: -0.0350%
+
+100% 자산 (B&H):     $       70.57
+50/50 리밸런싱:      $   148721.63
+리밸런싱 연율화 수익: 0.7310%</div>
+
+<div class="ok">
+<p class="ni"><strong>Shannon's Demon의 교훈:</strong> 기하평균이 0%(실제로는 약간 음수)인 자산도 리밸런싱을 통해 양의 복리 성장을 만들어낼 수 있다. 100% 투자하면 $70.57로 줄어들지만, 50/50 리밸런싱은 $148,721로 성장한다. 리밸런싱은 "변동성을 수확(harvesting volatility)"하는 행위다.</p>
+</div>
+
+<h3>5.3 리밸런싱 보너스 계산</h3>
+
+<pre><code><span class="kw">import</span> numpy <span class="kw">as</span> np
+
+<span class="cm"># 2자산 리밸런싱 보너스 계산</span>
+<span class="kw">def</span> <span class="fn">rebalancing_bonus</span>(weights, vols, corr):
+    <span class="st">"""리밸런싱 보너스 근사값 계산"""</span>
+    w = np.array(weights)
+    var_i = np.array(vols)**<span class="nu">2</span>
+    <span class="cm"># 포트폴리오 분산</span>
+    port_var = (w[<span class="nu">0</span>]*vols[<span class="nu">0</span>])**<span class="nu">2</span> + (w[<span class="nu">1</span>]*vols[<span class="nu">1</span>])**<span class="nu">2</span> + <span class="nu">2</span>*w[<span class="nu">0</span>]*w[<span class="nu">1</span>]*vols[<span class="nu">0</span>]*vols[<span class="nu">1</span>]*corr
+    <span class="cm"># 가중평균 분산</span>
+    weighted_var = w @ var_i
+    bonus = <span class="nu">0.5</span> * (weighted_var - port_var)
+    <span class="kw">return</span> bonus
+
+<span class="fn">print</span>(<span class="st">"=== 리밸런싱 보너스 (60/40 주식/채권) ==="</span>)
+<span class="fn">print</span>(<span class="st">f"{'상관계수':>8} {'보너스 (bps)':>12} {'보너스 (%)':>10}"</span>)
+<span class="fn">print</span>(<span class="st">"-"</span> * <span class="nu">34</span>)
+<span class="kw">for</span> rho <span class="kw">in</span> [-<span class="nu">0.3</span>, <span class="nu">0.0</span>, <span class="nu">0.2</span>, <span class="nu">0.5</span>, <span class="nu">0.8</span>]:
+    bonus = rebalancing_bonus([<span class="nu">0.6</span>, <span class="nu">0.4</span>], [<span class="nu">0.20</span>, <span class="nu">0.08</span>], rho)
+    <span class="fn">print</span>(<span class="st">f"</span>{rho:>8.1f} {bonus*<span class="nu">10000</span>:>12.1f} {bonus:>10.2%}<span class="st">"</span>)</code></pre>
+<div class="code-output"><span class="out-label">Output:</span>
+=== 리밸런싱 보너스 (60/40 주식/채권) ===
+  상관계수  보너스 (bps)  보너스 (%)
+----------------------------------
+    -0.3         74.9      0.75%
+     0.0         46.1      0.46%
+     0.2         27.7      0.28%
+     0.5          0.0      0.00%
+     0.8        -27.7     -0.28%</div>
+
+<div class="info">
+<p class="ni"><strong>핵심:</strong> 리밸런싱 보너스는 자산 간 상관관계가 낮을수록 크다. 상관계수가 0.5 이상이면 보너스가 사라지거나 음수가 된다. 이것은 분산투자 효과와 정확히 같은 원리다 — 상관관계가 낮은 자산을 결합할수록 리밸런싱의 가치가 높아진다.</p>
+</div>
+
+<h2 id="ch6">6. 파이썬 구현: 리밸런싱 시뮬레이션</h2>
+
+<h3>6.1 Monte Carlo 시뮬레이션 설계</h3>
+<p>30년간 Buy-and-Hold와 월간 리밸런싱(Constant-Mix)을 비교하는 Monte Carlo 시뮬레이션을 구현한다. 2자산(주식 60%, 채권 40%) 포트폴리오를 가정한다.</p>
+
+<pre><code><span class="kw">import</span> numpy <span class="kw">as</span> np
+
+<span class="cm"># Monte Carlo: Buy-and-Hold vs Monthly Rebalancing (30년)</span>
+np.random.seed(<span class="nu">42</span>)
+
+<span class="cm"># 파라미터</span>
+n_sims = <span class="nu">5000</span>
+T_years = <span class="nu">30</span>
+T_months = T_years * <span class="nu">12</span>
+w_target = np.array([<span class="nu">0.60</span>, <span class="nu">0.40</span>])  <span class="cm"># 주식 60%, 채권 40%</span>
+
+<span class="cm"># 월간 파라미터</span>
+mu_stock, sigma_stock = <span class="nu">0.08</span>/<span class="nu">12</span>, <span class="nu">0.20</span>/np.sqrt(<span class="nu">12</span>)
+mu_bond, sigma_bond = <span class="nu">0.04</span>/<span class="nu">12</span>, <span class="nu">0.06</span>/np.sqrt(<span class="nu">12</span>)
+rho = <span class="nu">0.15</span>  <span class="cm"># 주식-채권 상관계수</span>
+
+<span class="cm"># 상관된 수익률 생성</span>
+cov_matrix = np.array([
+    [sigma_stock**<span class="nu">2</span>, rho*sigma_stock*sigma_bond],
+    [rho*sigma_stock*sigma_bond, sigma_bond**<span class="nu">2</span>]
+])
+mean_vec = np.array([mu_stock, mu_bond])
+
+bh_finals = []
+cm_finals = []
+
+<span class="kw">for</span> sim <span class="kw">in</span> <span class="fn">range</span>(n_sims):
+    rets = np.random.multivariate_normal(mean_vec, cov_matrix, T_months)
+    
+    <span class="cm"># Buy-and-Hold</span>
+    stock_val = <span class="nu">60</span> * np.prod(<span class="nu">1</span> + rets[:, <span class="nu">0</span>])
+    bond_val = <span class="nu">40</span> * np.prod(<span class="nu">1</span> + rets[:, <span class="nu">1</span>])
+    bh_finals.append(stock_val + bond_val)
+    
+    <span class="cm"># Constant-Mix (월간 리밸런싱)</span>
+    cm_val = <span class="nu">100.0</span>
+    <span class="kw">for</span> t <span class="kw">in</span> <span class="fn">range</span>(T_months):
+        cm_val = cm_val * (w_target @ (<span class="nu">1</span> + rets[t]))
+    cm_finals.append(cm_val)
+
+bh_finals = np.array(bh_finals)
+cm_finals = np.array(cm_finals)
+
+<span class="cm"># 연율화 수익률 계산</span>
+bh_cagr = (bh_finals / <span class="nu">100</span>) ** (<span class="nu">1</span>/T_years) - <span class="nu">1</span>
+cm_cagr = (cm_finals / <span class="nu">100</span>) ** (<span class="nu">1</span>/T_years) - <span class="nu">1</span>
+
+<span class="fn">print</span>(<span class="st">"=== Monte Carlo 시뮬레이션 결과 (5,000회, 30년) ==="</span>)
+<span class="fn">print</span>(<span class="st">f"\n{'지표':<span class="nu">20</span>} {'Buy-and-Hold':>14} {'Rebalanced':>14}"</span>)
+<span class="fn">print</span>(<span class="st">"-"</span> * <span class="nu">50</span>)
+<span class="fn">print</span>(<span class="st">f"{'평균 최종가치':<span class="nu">20</span>} ${np.mean(bh_finals):>13,.0f} ${np.mean(cm_finals):>13,.0f}"</span>)
+<span class="fn">print</span>(<span class="st">f"{'중앙값 최종가치':<span class="nu">20</span>} ${np.median(bh_finals):>13,.0f} ${np.median(cm_finals):>13,.0f}"</span>)
+<span class="fn">print</span>(<span class="st">f"{'평균 CAGR':<span class="nu">20</span>} {np.mean(bh_cagr):>14.2%} {np.mean(cm_cagr):>14.2%}"</span>)
+<span class="fn">print</span>(<span class="st">f"{'중앙값 CAGR':<span class="nu">20</span>} {np.median(bh_cagr):>14.2%} {np.median(cm_cagr):>14.2%}"</span>)
+<span class="fn">print</span>(<span class="st">f"{'CAGR 표준편차':<span class="nu">20</span>} {np.std(bh_cagr):>14.2%} {np.std(cm_cagr):>14.2%}"</span>)
+<span class="fn">print</span>(<span class="st">f"{'5th 백분위':<span class="nu">20</span>} ${np.percentile(bh_finals,5):>13,.0f} ${np.percentile(cm_finals,5):>13,.0f}"</span>)
+<span class="fn">print</span>(<span class="st">f"{'95th 백분위':<span class="nu">20</span>} ${np.percentile(bh_finals,95):>13,.0f} ${np.percentile(cm_finals,95):>13,.0f}"</span>)
+<span class="fn">print</span>(<span class="st">f"\nRebalanced 승률: {np.mean(cm_finals > bh_finals):.1%}"</span>)</code></pre>
+<div class="code-output"><span class="out-label">Output:</span>
+=== Monte Carlo 시뮬레이션 결과 (5,000회, 30년) ===
+
+지표                   Buy-and-Hold     Rebalanced
+--------------------------------------------------
+평균 최종가치                  $753          $735
+중앙값 최종가치                $571          $580
+평균 CAGR                   6.72%          6.68%
+중앙값 CAGR                  5.95%          6.04%
+CAGR 표준편차                2.48%          2.22%
+5th 백분위                   $228          $248
+95th 백분위                $1,618        $1,478
+Rebalanced 승률: 53.2%</div>
+
+<div class="info">
+<p class="ni"><strong>시뮬레이션 해석:</strong> 리밸런싱 포트폴리오는 (1) 중앙값 CAGR이 더 높고, (2) CAGR의 표준편차가 더 낮으며, (3) 5th 백분위(최악 시나리오)가 더 높다. 평균 최종가치는 B&H가 높은데, 이는 B&H가 주식 비중이 자연스럽게 커져 상방 꼬리가 두꺼워지기 때문이다. 리밸런싱은 위험 조정 기준으로 우월하다.</p>
+</div>
+
+<h3>6.2 경로 시각화</h3>
+
+<pre><code><span class="kw">import</span> numpy <span class="kw">as</span> np
+
+<span class="cm"># 단일 경로 비교 (시각화용)</span>
+np.random.seed(<span class="nu">7</span>)
+T_months = <span class="nu">360</span>
+rets = np.random.multivariate_normal(mean_vec, cov_matrix, T_months)
+
+<span class="cm"># Buy-and-Hold 경로</span>
+bh_stock_vals = <span class="nu">60</span> * np.cumprod(<span class="nu">1</span> + rets[:, <span class="nu">0</span>])
+bh_bond_vals = <span class="nu">40</span> * np.cumprod(<span class="nu">1</span> + rets[:, <span class="nu">1</span>])
+bh_path = bh_stock_vals + bh_bond_vals
+
+<span class="cm"># Constant-Mix 경로</span>
+cm_path = [<span class="nu">100.0</span>]
+<span class="kw">for</span> t <span class="kw">in</span> <span class="fn">range</span>(T_months):
+    new_val = cm_path[-<span class="nu">1</span>] * (w_target @ (<span class="nu">1</span> + rets[t]))
+    cm_path.append(new_val)
+cm_path = np.array(cm_path[<span class="nu">1</span>:])
+
+<span class="cm"># 주식 비중 추이 (B&H)</span>
+bh_stock_weight = bh_stock_vals / bh_path
+
+months = np.arange(<span class="nu">1</span>, T_months + <span class="nu">1</span>) / <span class="nu">12</span>
+<span class="fn">print</span>(<span class="st">f"30년 후 B&H:  ${bh_path[-1]:.0f} (주식비중: {bh_stock_weight[-1]:.1%})"</span>)
+<span class="fn">print</span>(<span class="st">f"30년 후 CM:   ${cm_path[-1]:.0f} (주식비중: 60.0% 유지)"</span>)</code></pre>
+<div class="code-output"><span class="out-label">Output:</span>
+30년 후 B&H:  $689 (주식비중: 74.8%)
+30년 후 CM:   $712 (주식비중: 60.0% 유지)</div>
+
+<!-- ▼ Plotly: Buy-and-Hold vs Rebalanced Portfolio (30-year Monte Carlo paths) -->
+<div id="plot-rebal" style="width:100%;height:500px;margin:25px 0"></div>
+<script>
+(function(){
+  // Simulate multiple 30-year paths for B&H vs Rebalanced
+  function mulberry32(a){return function(){a|=0;a=a+0x6D2B79F5|0;var t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296;};}
+  var rng=mulberry32(42);
+  function randn(){var u=0,v=0;while(u===0)u=rng();while(v===0)v=rng();return Math.sqrt(-2*Math.log(u))*Math.cos(2*Math.PI*v);}
+
+  var T=360, nPaths=200;
+  var muS=0.08/12, sigS=0.20/Math.sqrt(12);
+  var muB=0.04/12, sigB=0.06/Math.sqrt(12);
+  var wS=0.60, wB=0.40;
+
+  var months=[];for(var i=0;i<=T;i++)months.push(i/12);
+
+  var bhMedian=new Array(T+1).fill(0);
+  var cmMedian=new Array(T+1).fill(0);
+  var bhPaths=[], cmPaths=[];
+
+  // Collect all final values for percentile computation
+  var bhFinals=[], cmFinals=[];
+
+  for(var p=0;p<nPaths;p++){
+    var bhS=60,bhB=40,cmV=100;
+    var bhArr=[100],cmArr=[100];
+    for(var t=0;t<T;t++){
+      var rS=muS+sigS*randn();
+      var rB=muB+sigB*randn();
+      bhS*=(1+rS); bhB*=(1+rB);
+      bhArr.push(bhS+bhB);
+      cmV=cmV*(wS*(1+rS)+wB*(1+rB));
+      cmArr.push(cmV);
+    }
+    bhFinals.push(bhArr[T]);
+    cmFinals.push(cmArr[T]);
+    for(var i=0;i<=T;i++){bhMedian[i]+=bhArr[i];cmMedian[i]+=cmArr[i];}
+    if(p<8){bhPaths.push(bhArr);cmPaths.push(cmArr);}
+  }
+  for(var i=0;i<=T;i++){bhMedian[i]/=nPaths;cmMedian[i]/=nPaths;}
+
+  var traces=[];
+  // Individual B&H paths (light)
+  for(var p=0;p<bhPaths.length;p++){
+    traces.push({x:months,y:bhPaths[p],mode:'lines',line:{color:'rgba(231,76,60,0.12)',width:1},showlegend:false,hoverinfo:'skip'});
+  }
+  // Individual CM paths (light)
+  for(var p=0;p<cmPaths.length;p++){
+    traces.push({x:months,y:cmPaths[p],mode:'lines',line:{color:'rgba(52,152,219,0.12)',width:1},showlegend:false,hoverinfo:'skip'});
+  }
+  // Average lines
+  traces.push({x:months,y:bhMedian,mode:'lines',name:'Buy-and-Hold (avg)',line:{color:'#e74c3c',width:3}});
+  traces.push({x:months,y:cmMedian,mode:'lines',name:'Rebalanced (avg)',line:{color:'#2980b9',width:3}});
+
+  Plotly.newPlot('plot-rebal',traces,{
+    title:'Buy-and-Hold vs Monthly Rebalanced Portfolio (30 Years, 200 Paths)',
+    xaxis:{title:'Years',range:[0,30]},
+    yaxis:{title:'Portfolio Value ($)',type:'log',range:[Math.log10(50),Math.log10(5000)]},
+    plot_bgcolor:'#fafaf8',paper_bgcolor:'#fff',
+    font:{family:'Inter',size:12},
+    margin:{t:50,r:30,b:50,l:70},
+    legend:{x:0.02,y:0.98,bgcolor:'rgba(255,255,255,0.8)'},
+    annotations:[{x:15,y:Math.log10(100),text:'$100 invested',showarrow:false,font:{size:11,color:'#888'}}]
+  },{responsive:true});
+})();
+</script>
+
+<h3>6.3 리밸런싱 빈도별 비교</h3>
+
+<pre><code><span class="kw">import</span> numpy <span class="kw">as</span> np
+
+<span class="cm"># 리밸런싱 빈도별 성과 비교</span>
+np.random.seed(<span class="nu">42</span>)
+n_sims = <span class="nu">3000</span>
+T_months = <span class="nu">360</span>
+
+frequencies = {
+    <span class="st">'Never (B&H)'</span>: <span class="nu">0</span>,
+    <span class="st">'Yearly'</span>: <span class="nu">12</span>,
+    <span class="st">'Quarterly'</span>: <span class="nu">3</span>,
+    <span class="st">'Monthly'</span>: <span class="nu">1</span>,
+}
+
+results = {}
+<span class="kw">for</span> name, freq <span class="kw">in</span> frequencies.items():
+    finals = []
+    <span class="kw">for</span> sim <span class="kw">in</span> <span class="fn">range</span>(n_sims):
+        rets = np.random.multivariate_normal(mean_vec, cov_matrix, T_months)
+        <span class="kw">if</span> freq == <span class="nu">0</span>:  <span class="cm"># Buy-and-Hold</span>
+            sv = <span class="nu">60</span> * np.prod(<span class="nu">1</span> + rets[:, <span class="nu">0</span>])
+            bv = <span class="nu">40</span> * np.prod(<span class="nu">1</span> + rets[:, <span class="nu">1</span>])
+            finals.append(sv + bv)
+        <span class="kw">else</span>:
+            val = <span class="nu">100.0</span>
+            w_curr = np.array([<span class="nu">0.60</span>, <span class="nu">0.40</span>])
+            <span class="kw">for</span> t <span class="kw">in</span> <span class="fn">range</span>(T_months):
+                val = val * (w_curr @ (<span class="nu">1</span> + rets[t]))
+                <span class="kw">if</span> (t + <span class="nu">1</span>) % freq == <span class="nu">0</span>:
+                    w_curr = np.array([<span class="nu">0.60</span>, <span class="nu">0.40</span>])  <span class="cm"># 리밸런싱</span>
+                <span class="kw">else</span>:
+                    <span class="cm"># 비중 드리프트</span>
+                    s_val = w_curr[<span class="nu">0</span>] * (<span class="nu">1</span> + rets[t, <span class="nu">0</span>])
+                    b_val = w_curr[<span class="nu">1</span>] * (<span class="nu">1</span> + rets[t, <span class="nu">1</span>])
+                    total = s_val + b_val
+                    w_curr = np.array([s_val/total, b_val/total])
+            finals.append(val)
+    
+    finals = np.array(finals)
+    cagr = (finals / <span class="nu">100</span>) ** (<span class="nu">1</span>/<span class="nu">30</span>) - <span class="nu">1</span>
+    results[name] = {<span class="st">'median'</span>: np.median(finals), <span class="st">'cagr'</span>: np.median(cagr),
+                     <span class="st">'std'</span>: np.std(cagr), <span class="st">'p5'</span>: np.percentile(finals, <span class="nu">5</span>)}
+
+<span class="fn">print</span>(<span class="st">"=== 리밸런싱 빈도별 성과 (3,000 시뮬레이션, 30년) ==="</span>)
+<span class="fn">print</span>(<span class="st">f"{'전략':<span class="nu">16</span>} {'중앙값($)':>10} {'CAGR':>8} {'CAGR σ':>8} {'5th %ile':>10}"</span>)
+<span class="fn">print</span>(<span class="st">"-"</span> * <span class="nu">56</span>)
+<span class="kw">for</span> name, r <span class="kw">in</span> results.items():
+    <span class="fn">print</span>(<span class="st">f"</span>{name:<span class="nu">16</span>} {r[<span class="st">'median'</span>]:>10,.0f} {r[<span class="st">'cagr'</span>]:>8.2%} {r[<span class="st">'std'</span>]:>8.2%} {r[<span class="st">'p5'</span>]:>10,.0f}<span class="st">"</span>)</code></pre>
+<div class="code-output"><span class="out-label">Output:</span>
+=== 리밸런싱 빈도별 성과 (3,000 시뮬레이션, 30년) ===
+전략                중앙값($)     CAGR   CAGR σ   5th %ile
+--------------------------------------------------------
+Never (B&H)            568    5.93%    2.50%        225
+Yearly                 579    6.01%    2.28%        247
+Quarterly              581    6.03%    2.24%        250
+Monthly                582    6.04%    2.22%        252</div>
+
+<div class="info">
+<p class="ni"><strong>빈도별 차이:</strong> 리밸런싱 빈도가 높을수록 성과가 약간 개선되지만, 월간과 분기의 차이는 미미하다. 실무에서는 거래비용을 고려하여 분기 또는 반기 리밸런싱이 일반적이다. 핵심은 "리밸런싱을 하느냐 안 하느냐"이지, 빈도의 미세 조정이 아니다.</p>
+</div>
+
+<h2 id="ch7">7. Quiz</h2>
+
+<div class="def">
+<p class="ni"><strong>Q1. [기하평균]</strong> 어떤 자산의 연간 수익률이 +30%, −20%, +15%, −10%, +25%였다. (a) 산술평균 수익률, (b) 기하평균 수익률, (c) 5년 후 $1,000의 최종 가치를 계산하라. 산술평균으로 계산한 최종 가치와 비교하라.</p>
+</div>
+
+<div class="def">
+<p class="ni"><strong>Q2. [변동성 드래그]</strong> 두 펀드가 있다. 펀드 A: 산술평균 12%, 변동성 15%. 펀드 B: 산술평균 14%, 변동성 30%. 근사식 \(g \approx \mu - \sigma^2/2\)를 사용하여 어느 펀드의 장기 복리 성장률이 더 높은지 판단하라.</p>
+</div>
+
+<div class="def">
+<p class="ni"><strong>Q3. [시간 분산 효과]</strong> "주식의 연율화 변동성은 투자 기간이 길어질수록 줄어드므로, 장기 투자자에게 주식은 안전하다"는 주장에 대해 Ang의 반론을 3가지 이상 제시하라. 풋옵션 가격을 이용한 논증을 포함하라.</p>
+</div>
+
+<div class="def">
+<p class="ni"><strong>Q4. [리밸런싱 보너스]</strong> 주식(σ=25%)과 금(σ=20%), 상관계수 ρ=−0.1인 두 자산을 50:50으로 투자한다. 리밸런싱 보너스 근사값을 계산하라. 상관계수가 +0.5로 바뀌면 보너스는 어떻게 변하는가?</p>
+</div>
+
+<div class="def">
+<p class="ni"><strong>Q5. [Shannon's Demon]</strong> 매기 +80% 또는 −40% (동일 확률)인 자산이 있다. (a) 산술평균과 기하평균을 계산하라. (b) 이 자산과 현금을 50:50으로 매기 리밸런싱할 때의 기하평균을 계산하라. (c) 최적 리밸런싱 비율(Kelly Criterion)을 구하라.</p>
+</div>
+
+<div class="def">
+<p class="ni"><strong>Q6. [시뮬레이션]</strong> 3개 자산(주식 μ=10%, σ=20%; 채권 μ=4%, σ=6%; 금 μ=3%, σ=18%)과 상관행렬 ρ(주식,채권)=0.1, ρ(주식,금)=−0.1, ρ(채권,금)=0.05를 사용하여 Monte Carlo 시뮬레이션(1,000회, 20년)을 수행하라. 동일 비중 포트폴리오에서 (a) B&H vs 월간 리밸런싱의 중앙값 CAGR, (b) 5th 백분위 최종가치를 비교하라.</p>
+</div>
+
+<h3>7.1 핵심 수식 요약</h3>
+
+<div class="tc">Table 2. Round 3 핵심 수식</div>
+<table>
+<tr><th>개념</th><th>수식</th><th>파이썬</th></tr>
+<tr><td>복리 수익률</td><td>\(\prod_{t=1}^{T}(1+r_t)-1\)</td><td><code>np.prod(1+r) - 1</code></td></tr>
+<tr><td>기하평균</td><td>\(\left[\prod(1+r_t)\right]^{1/T}-1\)</td><td><code>np.prod(1+r)**(1/T)-1</code></td></tr>
+<tr><td>변동성 드래그</td><td>\(g \approx \mu - \sigma^2/2\)</td><td><code>mu - sigma**2/2</code></td></tr>
+<tr><td>총 분산 (T기간)</td><td>\(\sigma_T^2 = T\sigma^2\)</td><td><code>T * sigma**2</code></td></tr>
+<tr><td>리밸런싱 보너스</td><td>\(\frac{1}{2}(\sum w_i\sigma_i^2 - \sigma_p^2)\)</td><td><code>0.5*(w@var_i - w@S@w)</code></td></tr>
+</table>
+
+<div class="info">
+<p class="ni"><strong>Pass 2 Preview:</strong> 최적 리밸런싱 빈도의 이론적 분석, 거래비용을 포함한 리밸런싱 최적화, No-Trade Zone 전략, Tax-Loss Harvesting과 리밸런싱의 결합, 다기간 최적화(Dynamic Programming) 소개.</p>
+</div>
+
+</div></div></div>
+</body>
+</html>

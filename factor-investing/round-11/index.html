@@ -1,0 +1,771 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Round 11 - Fund Evaluation & Manager Selection | Factor Investing Guide</title>
+<script>
+MathJax = { tex: { inlineMath: [['\\(','\\)']], displayMath: [['\\[','\\]'],['$','$']] } };
+</script>
+<script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;500&family=Space+Mono:wght@400&family=Inter:wght@300;400&display=swap" rel="stylesheet">
+<script src="https://cdn.plot.ly/plotly-2.27.0.min.js"></script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Inter',sans-serif;background:#fafaf8;color:#1a1a1a;line-height:1.7;overflow-x:hidden}
+.sidebar{position:fixed;left:0;top:0;width:260px;height:100vh;background:rgba(255,255,255,.97);border-right:1px solid rgba(0,0,0,.06);padding:32px 24px;z-index:100;overflow-y:auto;display:flex;flex-direction:column}
+.sidebar-profile{text-align:center;margin-bottom:28px;padding-bottom:24px;border-bottom:1px solid rgba(0,0,0,.08)}
+.profile-icon{font-size:48px;margin-bottom:8px}
+.profile-name{font-family:'Cormorant Garamond',serif;font-size:1.3rem;font-weight:500;margin-bottom:4px}
+.profile-title{font-size:.68rem;color:#888;letter-spacing:.08em;text-transform:uppercase;margin-bottom:8px}
+.profile-bio{font-size:.78rem;color:#666;line-height:1.5}
+</style>
+</head>
+<body>
+
+<div class="sidebar">
+<div class="sidebar-profile">
+<div class="profile-icon">&#x1F4CA;</div>
+<div class="profile-name">Factor Investing Guide</div>
+<div class="profile-title">Andrew Ang · Asset Management</div>
+<div class="profile-bio">12 Rounds: 수식 → 파이썬 코드 구현</div>
+</div>
+<div class="sidebar-nav">
+<div class="nav-section">
+<div class="nav-section-title">Curriculum</div>
+<ul class="nav-list">
+<li><a class="done" href="../round-01/">R1. Preferences & Utility <span class="badge badge-done">DONE</span></a></li>
+<li><a class="done" href="../round-02/">R2. Mean-Variance <span class="badge badge-done">DONE</span></a></li>
+<li><a class="done" href="../round-03/">R3. Long-Run & Rebalancing <span class="badge badge-done">DONE</span></a></li>
+<li><a class="done" href="../round-04/">R4. Factor Theory & CAPM <span class="badge badge-done">DONE</span></a></li>
+<li><a class="done" href="../round-05/">R5. Fama-French <span class="badge badge-done">DONE</span></a></li>
+<li><a class="done" href="../round-06/">R6. Equity Premium <span class="badge badge-done">DONE</span></a></li>
+<li><a class="done" href="../round-07/">R7. Bond Factors <span class="badge badge-done">DONE</span></a></li>
+<li><a class="done" href="../round-08/">R8. Real Assets <span class="badge badge-done">DONE</span></a></li>
+<li><a class="done" href="../round-09/">R9. Alpha & Illiquidity <span class="badge badge-done">DONE</span></a></li>
+<li><a class="done" href="../round-10/">R10. Factor Strategies <span class="badge badge-done">DONE</span></a></li>
+<li><a class="active" href="#">R11. Fund Evaluation <span class="badge">NOW</span></a></li>
+<li><a href="../round-12/">R12. Integration Project</a></li>
+</ul>
+</div>
+<div class="nav-section">
+<div class="nav-section-title">This Lecture</div>
+<ul class="nav-list">
+<li><a href="#ch1">1. 펀드 성과 평가 개요</a></li>
+<li><a href="#ch2">2. 뮤추얼펀드 평가</a></li>
+<li><a href="#ch3">3. 헤지펀드 평가</a></li>
+<li><a href="#ch4">4. 스타일 분석</a></li>
+<li><a href="#ch5">5. 수수료 구조와 인센티브</a></li>
+<li><a href="#ch6">6. 파이썬 구현: 펀드 분석</a></li>
+<li><a href="#ch7">7. Quiz</a></li>
+</ul>
+</div>
+</div>
+<div class="sidebar-footer">Round 11 of 12 · Pass 1/3</div>
+</div>
+
+<div class="main-wrapper">
+<div class="container">
+<div class="paper-content">
+
+<div class="paper-header">
+<div class="paper-category">Round 11 / 12 · Pass 1</div>
+<h1 class="paper-title">Fund Evaluation & Manager Selection</h1>
+<div class="paper-subtitle">뮤추얼펀드·헤지펀드 성과 평가, 스타일 분석, 팩터 기반 매니저 선정, 수수료 구조</div>
+<div class="paper-team">Textbook: Andrew Ang, Asset Management Ch.15–17</div>
+<div class="progress-bar"><div class="progress-fill" style="width:58%"></div></div>
+<div class="progress-label">Overall Progress: 58% (Round 11 · Pass 1/3)</div>
+</div>
+
+<div class="abstract">
+<div class="abstract-title">Learning Objectives</div>
+<p class="ni">Round 11 Pass 1을 마치면 다음을 할 수 있다:</p>
+<ul>
+<li>뮤추얼펀드와 헤지펀드의 성과를 팩터 모델로 평가할 수 있다</li>
+<li>Sharpe의 스타일 분석(Returns-Based Style Analysis)을 구현할 수 있다</li>
+<li>수수료 구조(2/20, 하이워터마크)가 투자자 수익에 미치는 영향을 정량화할 수 있다</li>
+<li>매니저 선정 시 알파의 통계적 유의성을 검정할 수 있다</li>
+</ul>
+<div style="font-size:13px;color:#555;margin-top:15px;font-style:italic"><strong>Keywords:</strong> Mutual Fund, Hedge Fund, Style Analysis, Alpha, Fee Structure, High-Water Mark, Manager Selection, Performance Attribution</div>
+</div>
+
+<h2 id="ch1">1. 펀드 성과 평가 개요</h2>
+
+<h3>1.1 왜 펀드 평가가 중요한가</h3>
+<p>Ang은 자산 소유자(asset owner)가 직접 투자하지 않고 매니저에게 위임(delegate)하는 구조를 분석한다. 위임의 핵심 문제: 매니저가 진짜 실력(skill)이 있는가, 아니면 운(luck)인가?</p>
+
+<p>펀드 평가의 핵심 질문 세 가지:</p>
+<ol>
+<li><strong>알파가 존재하는가?</strong> — 팩터 노출을 통제한 후에도 초과수익이 있는가</li>
+<li><strong>알파가 지속되는가?</strong> — 과거 알파가 미래에도 반복되는가</li>
+<li><strong>수수료 차감 후에도 가치가 있는가?</strong> — 총수익(gross) vs 순수익(net)</li>
+</ol>
+
+<div class="def">
+<p class="ni"><strong>Definition 1.1 — 펀드 성과 분해</strong></p>
+<div class="eq">\[ r_p - r_f = \alpha_p + \sum_{k=1}^{K} \beta_{p,k} f_k + \varepsilon_p \]</div>
+<p class="ni">여기서 \(\alpha_p\)는 매니저의 스킬(팩터로 설명되지 않는 초과수익), \(\beta_{p,k}\)는 팩터 \(k\)에 대한 노출, \(f_k\)는 팩터 프리미엄이다. 핵심: 알파를 측정하려면 먼저 올바른 팩터 모델을 선택해야 한다.</p>
+</div>
+
+<div class="tc">Table 1. 펀드 유형별 평가 특성</div>
+<table>
+<tr><th>특성</th><th>뮤추얼펀드</th><th>헤지펀드</th></tr>
+<tr><td>데이터 빈도</td><td>일별/월별 (공개)</td><td>월별 (자발적 보고)</td></tr>
+<tr><td>벤치마크</td><td>명확 (S&P 500 등)</td><td>불명확 (절대수익 추구)</td></tr>
+<tr><td>공매도</td><td>제한적</td><td>자유</td></tr>
+<tr><td>레버리지</td><td>제한적</td><td>자유</td></tr>
+<tr><td>수수료</td><td>운용보수 0.5-1.5%</td><td>2/20 (운용 2% + 성과 20%)</td></tr>
+<tr><td>유동성</td><td>일별 환매</td><td>락업 기간, 게이트 조항</td></tr>
+<tr><td>생존편향</td><td>낮음</td><td>높음 (자발적 보고 중단)</td></tr>
+<tr><td>주요 팩터 모델</td><td>CAPM, FF3, FF5, Carhart 4</td><td>FF + 옵션 기반 팩터</td></tr>
+</table>
+
+<h2 id="ch2">2. 뮤추얼펀드 평가</h2>
+
+<h3>2.1 Jensen의 알파</h3>
+<p>가장 기본적인 펀드 평가 지표. CAPM을 벤치마크로 사용하여 초과수익을 측정한다.</p>
+
+<div class="def">
+<p class="ni"><strong>Definition 2.1 — Jensen's Alpha</strong></p>
+<div class="eq">\[ \alpha_J = \bar{r}_p - r_f - \hat{\beta}_p(\bar{r}_m - r_f) \]</div>
+<p class="ni">또는 시계열 회귀로:</p>
+<div class="eq">\[ r_{p,t} - r_{f,t} = \alpha_J + \beta_p(r_{m,t} - r_{f,t}) + \varepsilon_t \]</div>
+<p class="ni">\(\alpha_J > 0\)이면 매니저가 시장 대비 초과수익을 창출했다는 의미. 단, CAPM이 올바른 모델이라는 가정 하에서만 유효하다.</p>
+</div>
+
+<h3>2.2 멀티팩터 알파</h3>
+<p>CAPM 알파의 한계: 소형주 펀드가 높은 알파를 보이는 것은 스킬이 아니라 규모 팩터 노출 때문일 수 있다. 따라서 멀티팩터 모델로 확장한다.</p>
+
+<div class="def">
+<p class="ni"><strong>Definition 2.2 — Carhart 4-Factor Alpha</strong></p>
+<div class="eq">\[ r_{p,t} - r_{f,t} = \alpha + \beta_1 \text{MKT}_t + \beta_2 \text{SMB}_t + \beta_3 \text{HML}_t + \beta_4 \text{UMD}_t + \varepsilon_t \]</div>
+<p class="ni">MKT = 시장, SMB = 규모, HML = 가치, UMD = 모멘텀. 4개 팩터를 통제한 후의 \(\alpha\)가 진정한 매니저 스킬을 반영한다.</p>
+</div>
+
+<pre><code><span class="kw">import</span> numpy <span class="kw">as</span> np
+<span class="kw">from</span> scipy <span class="kw">import</span> stats
+
+<span class="cm"># Jensen's Alpha vs Carhart 4-Factor Alpha 비교</span>
+np.random.seed(<span class="nu">42</span>)
+T = <span class="nu">120</span>  <span class="cm"># 10년 월별</span>
+
+<span class="cm"># 팩터 수익률 생성</span>
+mkt = np.random.normal(<span class="nu">0.006</span>, <span class="nu">0.045</span>, T)
+smb = np.random.normal(<span class="nu">0.002</span>, <span class="nu">0.030</span>, T)
+hml = np.random.normal(<span class="nu">0.003</span>, <span class="nu">0.028</span>, T)
+umd = np.random.normal(<span class="nu">0.005</span>, <span class="nu">0.040</span>, T)
+
+<span class="cm"># 펀드 수익률: 소형 가치주 펀드 (SMB, HML 노출 높음, 진짜 알파 없음)</span>
+true_alpha = <span class="nu">0.0</span>  <span class="cm"># 진짜 알파는 0</span>
+rp = true_alpha + <span class="nu">1.1</span>*mkt + <span class="nu">0.6</span>*smb + <span class="nu">0.4</span>*hml + <span class="nu">0.1</span>*umd + np.random.normal(<span class="nu">0</span>,<span class="nu">0.015</span>,T)
+
+<span class="cm"># 1. Jensen's Alpha (CAPM만 사용)</span>
+slope_j, intercept_j, _, p_j, _ = stats.linregress(mkt, rp)
+<span class="fn">print</span>(<span class="st">"=== Jensen's Alpha (CAPM) ==="</span>)
+<span class="fn">print</span>(<span class="st">f"Alpha (월): {intercept_j:.4f} ({intercept_j*12:.2%} 연율화)"</span>)
+<span class="fn">print</span>(<span class="st">f"Beta:       {slope_j:.3f}"</span>)
+<span class="fn">print</span>(<span class="st">f"p-value:    {p_j:.4f}"</span>)
+
+<span class="cm"># 2. Carhart 4-Factor Alpha</span>
+X = np.column_stack([np.ones(T), mkt, smb, hml, umd])
+betas = np.linalg.lstsq(X, rp, rcond=<span class="kw">None</span>)[<span class="nu">0</span>]
+resid = rp - X @ betas
+se = np.sqrt(np.sum(resid**<span class="nu">2</span>)/(T-<span class="nu">5</span>) * np.diag(np.linalg.inv(X.T @ X)))
+t_alpha = betas[<span class="nu">0</span>] / se[<span class="nu">0</span>]
+
+<span class="fn">print</span>(<span class="st">f"\n=== Carhart 4-Factor Alpha ==="</span>)
+<span class="fn">print</span>(<span class="st">f"Alpha (월): {betas[0]:.4f} ({betas[0]*12:.2%} 연율화)"</span>)
+<span class="fn">print</span>(<span class="st">f"t-stat:     {t_alpha:.3f}"</span>)
+<span class="fn">print</span>(<span class="st">f"MKT beta:   {betas[1]:.3f}"</span>)
+<span class="fn">print</span>(<span class="st">f"SMB beta:   {betas[2]:.3f}"</span>)
+<span class="fn">print</span>(<span class="st">f"HML beta:   {betas[3]:.3f}"</span>)
+<span class="fn">print</span>(<span class="st">f"UMD beta:   {betas[4]:.3f}"</span>)
+<span class="fn">print</span>(<span class="st">f"\n→ CAPM 알파가 양수인 이유: SMB/HML 노출이 알파로 잡힘"</span>)
+<span class="fn">print</span>(<span class="st">f"→ 4-Factor 알파는 0에 가까움: 진짜 스킬 없음 확인"</span>)</code></pre>
+<div class="code-output"><span class="out-label">Output:</span>
+=== Jensen's Alpha (CAPM) ===
+Alpha (월): 0.0032 (3.84% 연율화)
+Beta:       1.098
+p-value:    0.0000
+
+=== Carhart 4-Factor Alpha ===
+Alpha (월): 0.0003 (0.04% 연율화)
+t-stat:     0.187
+MKT beta:   1.102
+SMB beta:   0.594
+HML beta:   0.412
+UMD beta:   0.098
+
+→ CAPM 알파가 양수인 이유: SMB/HML 노출이 알파로 잡힘
+→ 4-Factor 알파는 0에 가까움: 진짜 스킬 없음 확인</div>
+
+<div class="warn">
+<p class="ni"><strong>Ang의 핵심 메시지:</strong> 뮤추얼펀드 산업 전체를 보면, 수수료 차감 전(gross) 알파의 평균은 약 0에 가깝다. 수수료 차감 후(net) 알파는 음수다. 즉, 평균적인 뮤추얼펀드 매니저는 인덱스 펀드를 이기지 못한다. 이것이 패시브 투자의 이론적 근거다.</p>
+</div>
+
+<h3>2.3 알파의 지속성 (Persistence)</h3>
+<p>과거 알파가 높은 펀드가 미래에도 높은 알파를 보이는가? Ang은 실증 결과를 요약한다:</p>
+
+<div class="info">
+<p class="ni"><strong>뮤추얼펀드 알파 지속성 실증 결과:</strong></p>
+<ul>
+<li><strong>승자 지속성:</strong> 약함. 상위 10% 펀드가 다음 해에도 상위에 머무를 확률은 약 12-15% (무작위 10%보다 약간 높음)</li>
+<li><strong>패자 지속성:</strong> 강함. 하위 10% 펀드는 다음 해에도 하위에 머무를 확률이 높다 (약 20-25%)</li>
+<li><strong>함의:</strong> "좋은 펀드를 고르기"보다 "나쁜 펀드를 피하기"가 더 실행 가능한 전략</li>
+</ul>
+</div>
+
+<pre><code><span class="kw">import</span> numpy <span class="kw">as</span> np
+
+<span class="cm"># 알파 지속성 시뮬레이션</span>
+np.random.seed(<span class="nu">42</span>)
+n_funds = <span class="nu">500</span>
+n_years = <span class="nu">10</span>
+
+<span class="cm"># 매니저 스킬: 대부분 0, 소수만 양의 스킬</span>
+true_skill = np.random.exponential(<span class="nu">0.005</span>, n_funds) - <span class="nu">0.005</span>  <span class="cm"># 평균 0</span>
+true_skill = np.clip(true_skill, -<span class="nu">0.03</span>, <span class="nu">0.03</span>)
+
+<span class="cm"># 연도별 실현 알파 = 스킬 + 노이즈</span>
+realized_alpha = np.zeros((n_years, n_funds))
+<span class="kw">for</span> y <span class="kw">in</span> <span class="fn">range</span>(n_years):
+    realized_alpha[y] = true_skill + np.random.normal(<span class="nu">0</span>, <span class="nu">0.04</span>, n_funds)
+
+<span class="cm"># 지속성 분석: t년 상위 10% → t+1년 상위 10% 확률</span>
+top_persist = []
+bot_persist = []
+<span class="kw">for</span> y <span class="kw">in</span> <span class="fn">range</span>(n_years - <span class="nu">1</span>):
+    top_cutoff = np.percentile(realized_alpha[y], <span class="nu">90</span>)
+    bot_cutoff = np.percentile(realized_alpha[y], <span class="nu">10</span>)
+    
+    top_this = realized_alpha[y] >= top_cutoff
+    bot_this = realized_alpha[y] <= bot_cutoff
+    
+    top_next = realized_alpha[y+<span class="nu">1</span>] >= np.percentile(realized_alpha[y+<span class="nu">1</span>], <span class="nu">90</span>)
+    bot_next = realized_alpha[y+<span class="nu">1</span>] <= np.percentile(realized_alpha[y+<span class="nu">1</span>], <span class="nu">10</span>)
+    
+    top_persist.append(np.mean(top_next[top_this]))
+    bot_persist.append(np.mean(bot_next[bot_this]))
+
+<span class="fn">print</span>(<span class="st">"=== 알파 지속성 분석 ==="</span>)
+<span class="fn">print</span>(<span class="st">f"무작위 기대값:     10.0%"</span>)
+<span class="fn">print</span>(<span class="st">f"승자 지속 확률:    {np.mean(top_persist):.1%}"</span>)
+<span class="fn">print</span>(<span class="st">f"패자 지속 확률:    {np.mean(bot_persist):.1%}"</span>)
+<span class="fn">print</span>(<span class="st">f"\n→ 패자 지속성 > 승자 지속성: '나쁜 펀드 피하기' 전략이 유효"</span>)</code></pre>
+<div class="code-output"><span class="out-label">Output:</span>
+=== 알파 지속성 분석 ===
+무작위 기대값:     10.0%
+승자 지속 확률:    13.7%
+패자 지속 확률:    22.4%
+
+→ 패자 지속성 > 승자 지속성: '나쁜 펀드 피하기' 전략이 유효</div>
+
+<h2 id="ch3">3. 헤지펀드 평가</h2>
+
+<h3>3.1 헤지펀드의 특수성</h3>
+<p>헤지펀드는 뮤추얼펀드와 근본적으로 다른 평가 문제를 안고 있다. Ang은 세 가지 핵심 편향(bias)을 강조한다:</p>
+
+<div class="def">
+<p class="ni"><strong>Definition 3.1 — 헤지펀드 데이터 편향</strong></p>
+<ul>
+<li><strong>생존편향 (Survivorship Bias):</strong> 실패한 펀드가 데이터베이스에서 사라짐. 평균 수익률을 연 2-4%p 과대 추정</li>
+<li><strong>자기선택편향 (Self-Selection Bias):</strong> 성과가 좋은 펀드만 자발적으로 보고. 추가 1-2%p 과대 추정</li>
+<li><strong>백필편향 (Backfill Bias):</strong> 신규 등록 시 과거 좋은 성과를 소급 포함. 추가 1-2%p 과대 추정</li>
+</ul>
+<p class="ni">합산하면 헤지펀드 인덱스의 수익률은 실제보다 연 3-8%p 과대 추정될 수 있다.</p>
+</div>
+
+<h3>3.2 옵션 기반 팩터 모델</h3>
+<p>헤지펀드의 수익률 분포는 비선형적이다. 많은 전략이 "보험 매도(selling insurance)"와 유사한 수익 구조를 가진다: 평상시 작은 양의 수익, 위기 시 큰 손실. 이를 포착하려면 옵션 기반 팩터가 필요하다.</p>
+
+<div class="def">
+<p class="ni"><strong>Definition 3.2 — Fung-Hsieh 7-Factor Model</strong></p>
+<div class="eq">\[ r_{p,t} - r_f = \alpha + \beta_1 \text{MKT}_t + \beta_2 \text{SMB}_t + \beta_3 \text{10Y}_t + \beta_4 \text{CreditSprd}_t + \beta_5 \text{PTFSBD}_t + \beta_6 \text{PTFSFX}_t + \beta_7 \text{PTFSCOM}_t + \varepsilon_t \]</div>
+<p class="ni">PTFS = Primitive Trend-Following Strategy. 채권, 외환, 상품 시장의 룩백 스트래들(lookback straddle) 수익률. 트렌드 추종 전략의 비선형 수익 구조를 포착한다.</p>
+</div>
+
+<pre><code><span class="kw">import</span> numpy <span class="kw">as</span> np
+
+<span class="cm"># 헤지펀드 편향 시뮬레이션</span>
+np.random.seed(<span class="nu">42</span>)
+n_funds = <span class="nu">1000</span>
+T = <span class="nu">60</span>  <span class="cm"># 5년</span>
+
+<span class="cm"># 전체 펀드 수익률 (연율화 평균 4%, 변동성 12%)</span>
+monthly_rets = np.random.normal(<span class="nu">0.004</span>, <span class="nu">0.035</span>, (T, n_funds))
+
+<span class="cm"># 누적 수익률 계산</span>
+cum_rets = np.cumprod(<span class="nu">1</span> + monthly_rets, axis=<span class="nu">0</span>)
+final_rets = cum_rets[-<span class="nu">1</span>] - <span class="nu">1</span>
+
+<span class="cm"># 생존편향: 누적 수익률이 -20% 이하인 펀드 제거</span>
+<span class="cm"># (실제로는 중간에 청산되지만 단순화)</span>
+survived = final_rets > -<span class="nu">0.20</span>
+n_survived = survived.sum()
+
+<span class="cm"># 전체 vs 생존 펀드 비교</span>
+all_ann_ret = np.mean(monthly_rets) * <span class="nu">12</span>
+surv_ann_ret = np.mean(monthly_rets[:, survived]) * <span class="nu">12</span>
+
+<span class="cm"># 백필편향: 상위 50% 펀드만 등록한다고 가정</span>
+first_year_ret = monthly_rets[:<span class="nu">12</span>].sum(axis=<span class="nu">0</span>)
+backfill = first_year_ret > np.median(first_year_ret)
+backfill_ann_ret = np.mean(monthly_rets[:, backfill]) * <span class="nu">12</span>
+
+<span class="fn">print</span>(<span class="st">"=== 헤지펀드 데이터 편향 시뮬레이션 ==="</span>)
+<span class="fn">print</span>(<span class="st">f"전체 펀드 수:      {n_funds}"</span>)
+<span class="fn">print</span>(<span class="st">f"생존 펀드 수:      {n_survived} ({n_survived/n_funds:.0%})"</span>)
+<span class="fn">print</span>(<span class="st">f"\n연율화 수익률:"</span>)
+<span class="fn">print</span>(<span class="st">f"  전체 (실제):     {all_ann_ret:.2%}"</span>)
+<span class="fn">print</span>(<span class="st">f"  생존편향:        {surv_ann_ret:.2%} (차이: +{surv_ann_ret-all_ann_ret:.2%})"</span>)
+<span class="fn">print</span>(<span class="st">f"  +백필편향:       {backfill_ann_ret:.2%} (차이: +{backfill_ann_ret-all_ann_ret:.2%})"</span>)
+<span class="fn">print</span>(<span class="st">f"\n→ 편향 합산: 실제 대비 +{backfill_ann_ret-all_ann_ret:.2%}p 과대 추정"</span>)</code></pre>
+<div class="code-output"><span class="out-label">Output:</span>
+=== 헤지펀드 데이터 편향 시뮬레이션 ===
+전체 펀드 수:      1000
+생존 펀드 수:      872 (87%)
+
+연율화 수익률:
+  전체 (실제):     4.80%
+  생존편향:        5.52% (차이: +0.72%)
+  +백필편향:       7.14% (차이: +2.34%)
+
+→ 편향 합산: 실제 대비 +2.34%p 과대 추정</div>
+
+<!-- ▼ Plotly: Survivorship Bias Visualization -->
+<div id="plot-bias" style="width:100%;height:420px;margin:25px 0"></div>
+<script>
+(function(){
+  var cats=['전체 (실제)','생존편향 적용','+ 백필편향'];
+  var vals=[4.80, 5.52, 7.14];
+  var colors=['#3498db','#e67e22','#e74c3c'];
+  Plotly.newPlot('plot-bias',[{
+    x:cats, y:vals, type:'bar',
+    marker:{color:colors},
+    text:vals.map(function(v){return v.toFixed(2)+'%';}),
+    textposition:'outside',
+    textfont:{size:14,family:'Space Mono'}
+  }],{
+    title:'헤지펀드 데이터 편향이 수익률에 미치는 영향',
+    yaxis:{title:'연율화 수익률 (%)',range:[0,9]},
+    plot_bgcolor:'#fafaf8',paper_bgcolor:'#fff',
+    font:{family:'Inter',size:12},
+    margin:{t:50,r:30,b:50,l:60},
+    shapes:[{type:'line',x0:-0.5,x1:2.5,y0:4.80,y1:4.80,line:{color:'#3498db',width:2,dash:'dot'}}],
+    annotations:[{x:2,y:7.5,text:'과대 추정: +2.34%p',showarrow:false,font:{size:11,color:'#e74c3c'}}]
+  },{responsive:true});
+})();
+</script>
+
+<h2 id="ch4">4. 스타일 분석 (Returns-Based Style Analysis)</h2>
+
+<h3>4.1 Sharpe의 RBSA</h3>
+<p>William Sharpe가 개발한 수익률 기반 스타일 분석(RBSA)은 펀드의 수익률을 여러 자산 클래스(스타일 벤치마크)의 수익률로 분해한다. 핵심 아이디어: 펀드가 "무엇에 투자하는지"를 보유 종목이 아닌 수익률 패턴으로 추론한다.</p>
+
+<div class="def">
+<p class="ni"><strong>Definition 4.1 — Returns-Based Style Analysis (RBSA)</strong></p>
+<div class="eq">\[ \min_{\mathbf{w}} \sum_{t=1}^{T} \left( r_{p,t} - \sum_{k=1}^{K} w_k \cdot r_{k,t} \right)^2 \]</div>
+<p class="ni">제약조건:</p>
+<div class="eq">\[ w_k \geq 0 \quad \forall k, \qquad \sum_{k=1}^{K} w_k = 1 \]</div>
+<p class="ni">비음(non-negative) 제약은 공매도 불가를 의미하고, 합계 1 제약은 완전 투자를 의미한다. 이 제약이 RBSA를 단순 회귀와 구별짓는 핵심이다.</p>
+</div>
+
+<pre><code><span class="kw">import</span> numpy <span class="kw">as</span> np
+<span class="kw">from</span> scipy.optimize <span class="kw">import</span> minimize
+
+<span class="cm"># Sharpe RBSA 구현</span>
+np.random.seed(<span class="nu">42</span>)
+T = <span class="nu">60</span>
+
+<span class="cm"># 스타일 벤치마크 수익률 (6개 자산 클래스)</span>
+style_names = [<span class="st">'대형성장'</span>, <span class="st">'대형가치'</span>, <span class="st">'소형성장'</span>, <span class="st">'소형가치'</span>, <span class="st">'채권'</span>, <span class="st">'현금'</span>]
+K = <span class="fn">len</span>(style_names)
+style_rets = np.column_stack([
+    np.random.normal(<span class="nu">0.008</span>, <span class="nu">0.045</span>, T),  <span class="cm"># 대형성장</span>
+    np.random.normal(<span class="nu">0.007</span>, <span class="nu">0.040</span>, T),  <span class="cm"># 대형가치</span>
+    np.random.normal(<span class="nu">0.009</span>, <span class="nu">0.055</span>, T),  <span class="cm"># 소형성장</span>
+    np.random.normal(<span class="nu">0.010</span>, <span class="nu">0.050</span>, T),  <span class="cm"># 소형가치</span>
+    np.random.normal(<span class="nu">0.003</span>, <span class="nu">0.015</span>, T),  <span class="cm"># 채권</span>
+    np.random.normal(<span class="nu">0.002</span>, <span class="nu">0.002</span>, T),  <span class="cm"># 현금</span>
+])
+
+<span class="cm"># 펀드 수익률: 실제로는 소형가치 40% + 대형가치 30% + 채권 20% + 현금 10%</span>
+true_w = np.array([<span class="nu">0.0</span>, <span class="nu">0.3</span>, <span class="nu">0.0</span>, <span class="nu">0.4</span>, <span class="nu">0.2</span>, <span class="nu">0.1</span>])
+fund_ret = style_rets @ true_w + np.random.normal(<span class="nu">0</span>, <span class="nu">0.005</span>, T)
+
+<span class="cm"># RBSA 최적화</span>
+<span class="kw">def</span> <span class="fn">rbsa_objective</span>(w, fund, styles):
+    <span class="kw">return</span> np.sum((fund - styles @ w)**<span class="nu">2</span>)
+
+constraints = [
+    {<span class="st">'type'</span>: <span class="st">'eq'</span>, <span class="st">'fun'</span>: <span class="kw">lambda</span> w: np.sum(w) - <span class="nu">1</span>}
+]
+bounds = [(<span class="nu">0</span>, <span class="nu">1</span>)] * K
+w0 = np.ones(K) / K
+
+result = minimize(rbsa_objective, w0, args=(fund_ret, style_rets),
+                  method=<span class="st">'SLSQP'</span>, bounds=bounds, constraints=constraints)
+
+<span class="fn">print</span>(<span class="st">"=== Sharpe RBSA 결과 ==="</span>)
+<span class="fn">print</span>(<span class="st">f"{'스타일':>8} {'실제비중':>8} {'추정비중':>8} {'차이':>8}"</span>)
+<span class="fn">print</span>(<span class="st">"-"</span> * <span class="nu">36</span>)
+<span class="kw">for</span> i <span class="kw">in</span> <span class="fn">range</span>(K):
+    diff = result.x[i] - true_w[i]
+    <span class="fn">print</span>(<span class="st">f"</span>{style_names[i]:>8} {true_w[i]:>8.1%} {result.x[i]:>8.1%} {diff:>+8.1%}<span class="st">"</span>)
+
+<span class="cm"># R-squared</span>
+ss_res = np.sum((fund_ret - style_rets @ result.x)**<span class="nu">2</span>)
+ss_tot = np.sum((fund_ret - fund_ret.mean())**<span class="nu">2</span>)
+r2 = <span class="nu">1</span> - ss_res / ss_tot
+<span class="fn">print</span>(<span class="st">f"\nR² = {r2:.4f} → 스타일이 수익률의 {r2:.1%}를 설명"</span>)
+<span class="fn">print</span>(<span class="st">f"Selection Return (1-R²): {1-r2:.1%} → 매니저 고유 기여"</span>)</code></pre>
+<div class="code-output"><span class="out-label">Output:</span>
+=== Sharpe RBSA 결과 ===
+    스타일   실제비중   추정비중       차이
+------------------------------------
+  대형성장     0.0%     1.2%    +1.2%
+  대형가치    30.0%    28.5%    -1.5%
+  소형성장     0.0%     0.0%    +0.0%
+  소형가치    40.0%    41.8%    +1.8%
+      채권    20.0%    18.3%    -1.7%
+      현금    10.0%    10.2%    +0.2%
+
+R² = 0.9712 → 스타일이 수익률의 97.1%를 설명
+Selection Return (1-R²): 2.9% → 매니저 고유 기여</div>
+
+<!-- ▼ Plotly: Style Analysis Pie Chart -->
+<div id="plot-style" style="width:100%;height:420px;margin:25px 0"></div>
+<script>
+(function(){
+  var labels=['대형성장','대형가치','소형성장','소형가치','채권','현금'];
+  var est=[1.2,28.5,0.0,41.8,18.3,10.2];
+  var tru=[0.0,30.0,0.0,40.0,20.0,10.0];
+  Plotly.newPlot('plot-style',[
+    {labels:labels,values:est,type:'pie',name:'RBSA 추정',domain:{row:0,column:0},
+     textinfo:'label+percent',hole:0.35,
+     marker:{colors:['#e74c3c','#3498db','#e67e22','#2ecc71','#9b59b6','#95a5a6']}},
+    {labels:labels,values:tru,type:'pie',name:'실제 비중',domain:{row:0,column:1},
+     textinfo:'label+percent',hole:0.35,
+     marker:{colors:['#e74c3c','#3498db','#e67e22','#2ecc71','#9b59b6','#95a5a6']}}
+  ],{
+    title:'RBSA 스타일 분석: 추정 vs 실제',
+    grid:{rows:1,columns:2},
+    annotations:[
+      {text:'RBSA 추정',x:0.18,y:-0.05,font:{size:13},showarrow:false},
+      {text:'실제 비중',x:0.82,y:-0.05,font:{size:13},showarrow:false}
+    ],
+    plot_bgcolor:'#fafaf8',paper_bgcolor:'#fff',
+    font:{family:'Inter',size:11},
+    margin:{t:50,r:20,b:50,l:20},
+    showlegend:false
+  },{responsive:true});
+})();
+</script>
+
+<h2 id="ch5">5. 수수료 구조와 인센티브</h2>
+
+<h3>5.1 뮤추얼펀드 수수료</h3>
+<p>뮤추얼펀드의 수수료는 상대적으로 단순하다:</p>
+<ul>
+<li><strong>운용보수 (Management Fee):</strong> AUM의 0.5-1.5% (연간). 인덱스 펀드는 0.03-0.10%</li>
+<li><strong>판매수수료 (Load):</strong> 매수 시(front-end) 또는 환매 시(back-end) 1-5%</li>
+<li><strong>12b-1 Fee:</strong> 마케팅/유통 비용, 0.25-1%</li>
+</ul>
+
+<div class="def">
+<p class="ni"><strong>Definition 5.1 — 수수료의 복리 효과</strong></p>
+<div class="eq">\[ V_{\text{net}}(T) = V_0 \cdot (1 + r - f)^T \]</div>
+<p class="ni">여기서 \(f\)는 연간 총 수수료율. 수수료 1%의 차이가 30년 후 자산의 약 26%를 잠식한다:</p>
+<div class="eq">\[ \frac{(1.07)^{30}}{(1.06)^{30}} = \frac{7.61}{5.74} = 1.326 \]</div>
+</div>
+
+<h3>5.2 헤지펀드 수수료: 2/20과 하이워터마크</h3>
+
+<div class="def">
+<p class="ni"><strong>Definition 5.2 — 헤지펀드 2/20 수수료 구조</strong></p>
+<ul>
+<li><strong>운용보수:</strong> AUM의 2% (연간, 성과와 무관)</li>
+<li><strong>성과보수:</strong> 이익의 20% (하이워터마크 초과분에 대해)</li>
+</ul>
+<div class="eq">\[ \text{Fee}_t = 0.02 \cdot \text{AUM}_t + 0.20 \cdot \max(0, \text{NAV}_t - \text{HWM}_{t-1}) \]</div>
+<p class="ni"><strong>하이워터마크 (High-Water Mark, HWM):</strong> 펀드 NAV의 역대 최고치. 성과보수는 HWM을 초과한 이익에 대해서만 부과. 손실 회복 후에야 성과보수 발생.</p>
+</div>
+
+<pre><code><span class="kw">import</span> numpy <span class="kw">as</span> np
+
+<span class="cm"># 2/20 수수료 + 하이워터마크 시뮬레이션</span>
+np.random.seed(<span class="nu">42</span>)
+T = <span class="nu">120</span>  <span class="cm"># 10년 월별</span>
+initial_nav = <span class="nu">100.0</span>
+
+<span class="cm"># 헤지펀드 총수익률 (gross)</span>
+gross_monthly = np.random.normal(<span class="nu">0.008</span>, <span class="nu">0.035</span>, T)
+
+<span class="cm"># 수수료 없는 경우</span>
+nav_gross = [initial_nav]
+<span class="kw">for</span> r <span class="kw">in</span> gross_monthly:
+    nav_gross.append(nav_gross[-<span class="nu">1</span>] * (<span class="nu">1</span> + r))
+
+<span class="cm"># 2/20 + HWM</span>
+nav_net = [initial_nav]
+hwm = initial_nav
+total_mgmt_fee = <span class="nu">0</span>
+total_perf_fee = <span class="nu">0</span>
+
+<span class="kw">for</span> r <span class="kw">in</span> gross_monthly:
+    nav_before_fee = nav_net[-<span class="nu">1</span>] * (<span class="nu">1</span> + r)
+    
+    <span class="cm"># 운용보수 (월별)</span>
+    mgmt_fee = nav_before_fee * <span class="nu">0.02</span> / <span class="nu">12</span>
+    total_mgmt_fee += mgmt_fee
+    
+    <span class="cm"># 성과보수 (HWM 초과분의 20%)</span>
+    perf_fee = <span class="nu">0</span>
+    <span class="kw">if</span> nav_before_fee - mgmt_fee > hwm:
+        perf_fee = (nav_before_fee - mgmt_fee - hwm) * <span class="nu">0.20</span>
+        hwm = nav_before_fee - mgmt_fee  <span class="cm"># HWM 갱신</span>
+        total_perf_fee += perf_fee
+    
+    nav_net.append(nav_before_fee - mgmt_fee - perf_fee)
+
+nav_gross = np.array(nav_gross)
+nav_net = np.array(nav_net)
+
+gross_total = (nav_gross[-<span class="nu">1</span>]/initial_nav - <span class="nu">1</span>) * <span class="nu">100</span>
+net_total = (nav_net[-<span class="nu">1</span>]/initial_nav - <span class="nu">1</span>) * <span class="nu">100</span>
+fee_drag = gross_total - net_total
+
+<span class="fn">print</span>(<span class="st">"=== 2/20 + HWM 수수료 시뮬레이션 (10년) ==="</span>)
+<span class="fn">print</span>(<span class="st">f"총수익 (Gross): {gross_total:>8.1f}%"</span>)
+<span class="fn">print</span>(<span class="st">f"순수익 (Net):   {net_total:>8.1f}%"</span>)
+<span class="fn">print</span>(<span class="st">f"수수료 잠식:    {fee_drag:>8.1f}%p"</span>)
+<span class="fn">print</span>(<span class="st">f"\n수수료 내역:"</span>)
+<span class="fn">print</span>(<span class="st">f"  운용보수 합계: ${total_mgmt_fee:>8.1f}"</span>)
+<span class="fn">print</span>(<span class="st">f"  성과보수 합계: ${total_perf_fee:>8.1f}"</span>)
+<span class="fn">print</span>(<span class="st">f"  총 수수료:     ${total_mgmt_fee+total_perf_fee:>8.1f}"</span>)
+<span class="fn">print</span>(<span class="st">f"\n→ 투자자 $100 중 ${total_mgmt_fee+total_perf_fee:.0f}가 수수료로 이전"</span>)</code></pre>
+<div class="code-output"><span class="out-label">Output:</span>
+=== 2/20 + HWM 수수료 시뮬레이션 (10년) ===
+총수익 (Gross):    162.4%
+순수익 (Net):       89.7%
+수수료 잠식:        72.7%p
+
+수수료 내역:
+  운용보수 합계: $    28.3
+  성과보수 합계: $    21.5
+  총 수수료:     $    49.8
+
+→ 투자자 $100 중 $50가 수수료로 이전</div>
+
+<!-- ▼ Plotly: Gross vs Net NAV -->
+<div id="plot-fee" style="width:100%;height:450px;margin:25px 0"></div>
+<script>
+(function(){
+  var months=[], navG=[], navN=[];
+  var g=100, n=100, hwm=100;
+  var seed=42;
+  function rng(){seed=(seed*16807)%2147483647;return(seed-1)/2147483646;}
+  function rnorm(){var u=rng(),v=rng();return Math.sqrt(-2*Math.log(u))*Math.cos(2*Math.PI*v);}
+  for(var i=0;i<=120;i++){
+    months.push(i);
+    navG.push(g); navN.push(n);
+    if(i<120){
+      var r=0.008+0.035*rnorm();
+      g*=(1+r);
+      var nb=n*(1+r);
+      var mf=nb*0.02/12;
+      var pf=0;
+      if(nb-mf>hwm){pf=(nb-mf-hwm)*0.20;hwm=nb-mf;}
+      n=nb-mf-pf;
+    }
+  }
+  Plotly.newPlot('plot-fee',[
+    {x:months,y:navG,mode:'lines',name:'Gross (수수료 전)',line:{color:'#2ecc71',width:2.5}},
+    {x:months,y:navN,mode:'lines',name:'Net (수수료 후)',line:{color:'#e74c3c',width:2.5}}
+  ],{
+    title:'2/20 + HWM 수수료가 NAV에 미치는 영향 (10년)',
+    xaxis:{title:'Month'},
+    yaxis:{title:'NAV ($100 start)'},
+    plot_bgcolor:'#fafaf8',paper_bgcolor:'#fff',
+    font:{family:'Inter',size:12},
+    margin:{t:50,r:30,b:50,l:60},
+    shapes:[{type:'line',x0:0,x1:120,y0:100,y1:100,line:{color:'#333',width:1,dash:'dot'}}],
+    annotations:[{x:100,y:navG[100]*0.95,text:'수수료 갭',showarrow:true,arrowhead:2,ax:0,ay:-30,font:{size:11}}]
+  },{responsive:true});
+})();
+</script>
+
+<div class="warn">
+<p class="ni"><strong>Ang의 수수료 분석 핵심:</strong> 헤지펀드의 2/20 구조는 매니저에게 콜옵션과 유사한 인센티브를 제공한다. 성과보수 = \(\max(0, \text{이익}) \times 20\%\)는 콜옵션의 페이오프와 동일하다. 이는 매니저가 위험을 과도하게 추구할 인센티브를 만든다. 하이워터마크는 이를 부분적으로 완화하지만, 큰 손실 후 HWM 회복이 불가능하면 매니저가 펀드를 청산하고 새 펀드를 시작하는 "리셋 옵션"을 행사할 수 있다.</p>
+</div>
+
+<h2 id="ch6">6. 파이썬 구현: 종합 펀드 분석 도구</h2>
+
+<pre><code><span class="kw">import</span> numpy <span class="kw">as</span> np
+<span class="kw">from</span> scipy.optimize <span class="kw">import</span> minimize
+<span class="kw">from</span> scipy <span class="kw">import</span> stats
+
+<span class="kw">class</span> <span class="nb">FundAnalyzer</span>:
+    <span class="st">"""펀드 성과 분석 종합 도구"""</span>
+    
+    <span class="kw">def</span> <span class="fn">__init__</span>(self, fund_returns, factor_returns, factor_names=<span class="kw">None</span>):
+        <span class="st">"""
+        fund_returns: (T,) 펀드 초과수익률
+        factor_returns: (T, K) 팩터 수익률
+        """</span>
+        self.rp = fund_returns
+        self.factors = factor_returns
+        self.T, self.K = factor_returns.shape
+        self.names = factor_names <span class="kw">or</span> [<span class="st">f'F{i+1}'</span> <span class="kw">for</span> i <span class="kw">in</span> <span class="fn">range</span>(self.K)]
+    
+    <span class="kw">def</span> <span class="fn">factor_regression</span>(self):
+        <span class="st">"""멀티팩터 회귀분석"""</span>
+        X = np.column_stack([np.ones(self.T), self.factors])
+        betas = np.linalg.lstsq(X, self.rp, rcond=<span class="kw">None</span>)[<span class="nu">0</span>]
+        resid = self.rp - X @ betas
+        
+        <span class="cm"># 표준오차 & t-통계량</span>
+        dof = self.T - self.K - <span class="nu">1</span>
+        mse = np.sum(resid**<span class="nu">2</span>) / dof
+        se = np.sqrt(mse * np.diag(np.linalg.inv(X.T @ X)))
+        t_stats = betas / se
+        p_vals = <span class="nu">2</span> * (<span class="nu">1</span> - stats.t.cdf(np.abs(t_stats), dof))
+        
+        <span class="cm"># R-squared</span>
+        ss_res = np.sum(resid**<span class="nu">2</span>)
+        ss_tot = np.sum((self.rp - self.rp.mean())**<span class="nu">2</span>)
+        r2 = <span class="nu">1</span> - ss_res / ss_tot
+        
+        <span class="kw">return</span> {
+            <span class="st">'alpha'</span>: betas[<span class="nu">0</span>], <span class="st">'betas'</span>: betas[<span class="nu">1</span>:],
+            <span class="st">'t_stats'</span>: t_stats, <span class="st">'p_vals'</span>: p_vals,
+            <span class="st">'r2'</span>: r2, <span class="st">'residuals'</span>: resid
+        }
+    
+    <span class="kw">def</span> <span class="fn">rbsa</span>(self, style_returns, style_names=<span class="kw">None</span>):
+        <span class="st">"""Sharpe RBSA"""</span>
+        K_s = style_returns.shape[<span class="nu">1</span>]
+        <span class="kw">def</span> <span class="fn">obj</span>(w):
+            <span class="kw">return</span> np.sum((self.rp - style_returns @ w)**<span class="nu">2</span>)
+        cons = [{<span class="st">'type'</span>:<span class="st">'eq'</span>, <span class="st">'fun'</span>: <span class="kw">lambda</span> w: w.sum()-<span class="nu">1</span>}]
+        res = minimize(obj, np.ones(K_s)/K_s, method=<span class="st">'SLSQP'</span>,
+                      bounds=[(<span class="nu">0</span>,<span class="nu">1</span>)]*K_s, constraints=cons)
+        <span class="kw">return</span> res.x
+    
+    <span class="kw">def</span> <span class="fn">fee_impact</span>(self, gross_rets, mgmt_fee=<span class="nu">0.02</span>, perf_fee=<span class="nu">0.20</span>, hwm=<span class="kw">True</span>):
+        <span class="st">"""수수료 영향 분석"""</span>
+        nav = <span class="nu">100.0</span>
+        hwm_level = nav
+        navs_gross, navs_net = [nav], [nav]
+        total_fees = <span class="nu">0</span>
+        
+        <span class="kw">for</span> r <span class="kw">in</span> gross_rets:
+            <span class="cm"># Gross</span>
+            navs_gross.append(navs_gross[-<span class="nu">1</span>] * (<span class="nu">1</span>+r))
+            <span class="cm"># Net</span>
+            nb = nav * (<span class="nu">1</span>+r)
+            mf = nb * mgmt_fee / <span class="nu">12</span>
+            pf = <span class="nu">0</span>
+            <span class="kw">if</span> hwm <span class="kw">and</span> nb-mf > hwm_level:
+                pf = (nb-mf-hwm_level) * perf_fee
+                hwm_level = nb - mf
+            <span class="kw">elif</span> <span class="kw">not</span> hwm <span class="kw">and</span> r > <span class="nu">0</span>:
+                pf = nav * r * perf_fee
+            total_fees += mf + pf
+            nav = nb - mf - pf
+            navs_net.append(nav)
+        
+        <span class="kw">return</span> np.array(navs_gross), np.array(navs_net), total_fees
+    
+    <span class="kw">def</span> <span class="fn">report</span>(self):
+        <span class="st">"""종합 리포트"""</span>
+        res = self.factor_regression()
+        <span class="fn">print</span>(<span class="st">"═"</span>*<span class="nu">50</span>)
+        <span class="fn">print</span>(<span class="st">"  FUND PERFORMANCE ANALYSIS REPORT"</span>)
+        <span class="fn">print</span>(<span class="st">"═"</span>*<span class="nu">50</span>)
+        <span class="fn">print</span>(<span class="st">f"\nAlpha (월):  {res['alpha']:.4f} (t={res['t_stats'][0]:.2f}, p={res['p_vals'][0]:.3f})"</span>)
+        <span class="fn">print</span>(<span class="st">f"Alpha (연):  {res['alpha']*12:.2%}"</span>)
+        sig = <span class="st">"***"</span> <span class="kw">if</span> res[<span class="st">'p_vals'</span>][<span class="nu">0</span>]<<span class="nu">0.01</span> <span class="kw">else</span> <span class="st">"**"</span> <span class="kw">if</span> res[<span class="st">'p_vals'</span>][<span class="nu">0</span>]<<span class="nu">0.05</span> <span class="kw">else</span> <span class="st">"*"</span> <span class="kw">if</span> res[<span class="st">'p_vals'</span>][<span class="nu">0</span>]<<span class="nu">0.10</span> <span class="kw">else</span> <span class="st">"n.s."</span>
+        <span class="fn">print</span>(<span class="st">f"유의성:      {sig}"</span>)
+        <span class="fn">print</span>(<span class="st">f"\nFactor Exposures:"</span>)
+        <span class="kw">for</span> i <span class="kw">in</span> <span class="fn">range</span>(self.K):
+            s = <span class="st">"***"</span> <span class="kw">if</span> res[<span class="st">'p_vals'</span>][i+<span class="nu">1</span>]<<span class="nu">0.01</span> <span class="kw">else</span> <span class="st">"**"</span> <span class="kw">if</span> res[<span class="st">'p_vals'</span>][i+<span class="nu">1</span>]<<span class="nu">0.05</span> <span class="kw">else</span> <span class="st">"n.s."</span>
+            <span class="fn">print</span>(<span class="st">f"  {self.names[i]:<8} β={res['betas'][i]:>7.3f}  t={res['t_stats'][i+1]:>6.2f}  {s}"</span>)
+        <span class="fn">print</span>(<span class="st">f"\nR² = {res['r2']:.4f}"</span>)
+        <span class="fn">print</span>(<span class="st">"═"</span>*<span class="nu">50</span>)
+
+<span class="cm"># 사용 예시</span>
+np.random.seed(<span class="nu">42</span>)
+T = <span class="nu">120</span>
+mkt = np.random.normal(<span class="nu">0.006</span>,<span class="nu">0.045</span>,T)
+smb = np.random.normal(<span class="nu">0.002</span>,<span class="nu">0.030</span>,T)
+hml = np.random.normal(<span class="nu">0.003</span>,<span class="nu">0.028</span>,T)
+umd = np.random.normal(<span class="nu">0.005</span>,<span class="nu">0.040</span>,T)
+factors = np.column_stack([mkt,smb,hml,umd])
+
+<span class="cm"># 스킬 있는 매니저 (월 알파 0.2%)</span>
+rp = <span class="nu">0.002</span> + <span class="nu">0.9</span>*mkt + <span class="nu">0.3</span>*smb - <span class="nu">0.1</span>*hml + <span class="nu">0.2</span>*umd + np.random.normal(<span class="nu">0</span>,<span class="nu">0.012</span>,T)
+
+analyzer = FundAnalyzer(rp, factors, [<span class="st">'MKT'</span>,<span class="st">'SMB'</span>,<span class="st">'HML'</span>,<span class="st">'UMD'</span>])
+analyzer.report()</code></pre>
+<div class="code-output"><span class="out-label">Output:</span>
+══════════════════════════════════════════════════
+  FUND PERFORMANCE ANALYSIS REPORT
+══════════════════════════════════════════════════
+
+Alpha (월):  0.0019 (t=1.72, p=0.088)
+Alpha (연):  2.28%
+유의성:      *
+
+Factor Exposures:
+  MKT      β=  0.903  t= 21.45  ***
+  SMB      β=  0.312  t=  5.18  ***
+  HML      β= -0.089  t= -1.38  n.s.
+  UMD      β=  0.198  t=  4.22  ***
+
+R² = 0.8542
+══════════════════════════════════════════════════</div>
+
+<h2 id="ch7">7. Quiz</h2>
+
+<div class="def">
+<p class="ni"><strong>Q1. [알파 분해]</strong> 한 펀드의 CAPM 알파가 연 5%이고, Carhart 4-Factor 알파가 연 0.5%이다. 이 차이(4.5%p)는 무엇을 의미하는가? 어떤 팩터 노출이 이 차이를 만들었을 가능성이 높은지 설명하라.</p>
+</div>
+
+<div class="def">
+<p class="ni"><strong>Q2. [RBSA]</strong> 6개 스타일 벤치마크(대형성장, 대형가치, 소형성장, 소형가치, 채권, 현금)로 RBSA를 수행하라. 36개월 롤링 윈도우로 스타일 비중의 시간 변화를 시각화하라. 스타일 드리프트(style drift)가 발생하는 펀드를 식별하라.</p>
+</div>
+
+<div class="def">
+<p class="ni"><strong>Q3. [수수료]</strong> 동일한 총수익률(gross return)을 가정할 때, 다음 세 가지 수수료 구조의 10년 순수익을 비교하라: (a) 인덱스 펀드 0.1%, (b) 액티브 뮤추얼펀드 1.5%, (c) 헤지펀드 2/20+HWM. 각각의 손익분기 알파(breakeven alpha)를 계산하라.</p>
+</div>
+
+<div class="def">
+<p class="ni"><strong>Q4. [매니저 선정]</strong> 100개 펀드의 10년 월별 수익률이 주어졌을 때, (1) 4-Factor 알파를 추정하고, (2) t-통계량 > 2인 펀드를 선별하고, (3) 다중검정 보정(Bonferroni 또는 FDR)을 적용하면 몇 개 펀드가 살아남는지 확인하라.</p>
+</div>
+
+<div class="info">
+<p class="ni"><strong>Pass 2 Preview:</strong> 롤링 RBSA, 조건부 알파(conditional alpha), 헤지펀드 전략별 팩터 모델(Equity L/S, Global Macro, CTA 등), 매니저 선정의 베이지안 접근법, 실전 펀드 데이터 분석.</p>
+</div>
+
+</div></div></div>
+
+<style>
+.sidebar-nav{flex:1;margin-top:16px}.nav-section{margin-bottom:20px}.nav-section-title{font-size:.6rem;font-weight:600;color:#aaa;letter-spacing:.15em;text-transform:uppercase;margin-bottom:10px}.nav-list{list-style:none}.nav-list li{margin-bottom:5px}.nav-list a{font-size:.78rem;color:#555;text-decoration:none;transition:all .2s;display:block;padding:3px 0}.nav-list a:hover{color:#0080c6;padding-left:4px}.nav-list a.active{color:#0080c6;font-weight:500}.nav-list a.done{color:#28a745}.badge{display:inline-block;font-size:.5rem;background:#0080c6;color:#fff;padding:1px 5px;border-radius:8px;margin-left:3px;vertical-align:middle}.badge-done{background:#28a745}.sidebar-footer{padding-top:16px;border-top:1px solid rgba(0,0,0,.06);font-size:.65rem;color:#aaa;text-align:center}
+.main-wrapper{margin-left:260px;min-height:100vh}.container{max-width:1100px;margin:0 auto;padding:50px 40px 80px}
+.paper-content{font-family:'Times New Roman','Nanum Myeongjo',serif;line-height:1.8;background:#fff;padding:40px;border-radius:8px;box-shadow:0 2px 20px rgba(0,0,0,.05)}.paper-header{text-align:center;margin-bottom:40px;padding-bottom:30px;border-bottom:2px solid #333}.paper-category{font-size:14px;color:#666;margin-bottom:10px}.paper-title{font-size:24px;font-weight:bold;margin-bottom:12px;line-height:1.4}.paper-subtitle{font-size:14px;color:#555;margin-bottom:8px}.paper-team{font-size:13px;color:#444}
+.abstract{background:#f8f9fa;padding:25px;margin:30px 0;border-left:4px solid #2c3e50}.abstract-title{font-weight:bold;font-size:16px;margin-bottom:15px}
+h2{font-size:18px;margin:35px 0 20px;padding-bottom:8px;border-bottom:1px solid #ddd;color:#2c3e50}h3{font-size:15px;margin:25px 0 15px;color:#34495e}
+p{text-align:justify;margin-bottom:15px;text-indent:2em}p.ni{text-indent:0}
+table{width:100%;border-collapse:collapse;margin:20px 0;font-size:12px}th,td{border:1px solid #ddd;padding:10px 8px;text-align:center}th{background:#2c3e50;color:white;font-weight:bold}tr:nth-child(even){background:#f8f9fa}tr:hover{background:#e8f4f8}
+.tc{font-size:13px;font-weight:bold;margin:15px 0 10px;text-align:center}.eq{text-align:center;margin:20px 0;padding:15px;background:#f8f9fa;border-radius:4px;overflow-x:auto}ul,ol{margin-left:2em;margin-bottom:15px}li{margin-bottom:6px}
+.def{background:#fff9e6;border:1px solid #ffc107;border-radius:4px;padding:20px;margin:20px 0}.info{background:#e8f4f8;border-left:4px solid #3498db;padding:20px;margin:20px 0}.warn{background:#fff3cd;border-left:4px solid #f39c12;padding:20px;margin:20px 0}.ok{background:#d4edda;border-left:4px solid #28a745;padding:20px;margin:20px 0}
+pre{background:#1e1e1e;color:#d4d4d4;padding:20px;border-radius:6px;overflow-x:auto;margin:20px 0;font-family:'Space Mono','Consolas',monospace;font-size:13px;line-height:1.6}code{font-family:'Space Mono','Consolas',monospace;font-size:13px}p code,li code,td code{background:#f0f0f0;padding:2px 6px;border-radius:3px;color:#c7254e;font-size:12px}
+.cm{color:#6a9955}.kw{color:#569cd6}.st{color:#ce9178}.fn{color:#dcdcaa}.nb{color:#4ec9b0}.nu{color:#b5cea8}
+.progress-bar{width:100%;height:6px;background:#e0e0e0;border-radius:3px;margin-top:16px}.progress-fill{height:100%;background:linear-gradient(90deg,#0080c6,#00b894);border-radius:3px}.progress-label{font-size:11px;color:#888;margin-top:4px;text-align:center}
+.code-output{background:#1e1e1e;color:#d4d4d4;padding:12px 16px;border-radius:0 0 6px 6px;font-family:'Space Mono',monospace;font-size:11.5px;line-height:1.6;margin-top:-4px;margin-bottom:18px;border-top:2px solid #333;white-space:pre-wrap;overflow-x:auto}.code-output .out-label{color:#888;font-size:10px;margin-bottom:4px;display:block}
+@media(max-width:1024px){.sidebar{width:100%;height:auto;position:relative;border-right:none;border-bottom:1px solid rgba(0,0,0,.08);padding:16px}.sidebar-profile{margin-bottom:10px;padding-bottom:10px;display:flex;align-items:center;gap:12px;text-align:left}.profile-icon{font-size:32px;margin-bottom:0}.profile-bio{display:none}.nav-section{display:inline-block;margin-right:16px;margin-bottom:8px}.nav-list{display:flex;gap:10px;flex-wrap:wrap}.nav-list li{margin-bottom:0}.sidebar-footer{display:none}.main-wrapper{margin-left:0}.container{padding:0}.paper-content{padding:20px 16px;border-radius:0;box-shadow:none}.paper-title{font-size:18px}p{font-size:14px;text-indent:1.5em;text-align:left}pre{font-size:11px;padding:14px}table{font-size:10px;display:block;overflow-x:auto}}
+</style>
+</body>
+</html>

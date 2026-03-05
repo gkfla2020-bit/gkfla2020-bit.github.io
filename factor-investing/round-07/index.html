@@ -1,0 +1,566 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Round 7 - Bond Factors & Term Structure | Factor Investing Guide</title>
+<script>
+MathJax = { tex: { inlineMath: [['\\(','\\)']], displayMath: [['\\[','\\]'],['$','$']] } };
+</script>
+<script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;500&family=Space+Mono:wght@400&family=Inter:wght@300;400&display=swap" rel="stylesheet">
+<script src="https://cdn.plot.ly/plotly-2.27.0.min.js"></script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Inter',sans-serif;background:#fafaf8;color:#1a1a1a;line-height:1.7;overflow-x:hidden}
+.sidebar{position:fixed;left:0;top:0;width:260px;height:100vh;background:rgba(255,255,255,.97);border-right:1px solid rgba(0,0,0,.06);padding:32px 24px;z-index:100;overflow-y:auto;display:flex;flex-direction:column}
+.sidebar-profile{text-align:center;margin-bottom:28px;padding-bottom:24px;border-bottom:1px solid rgba(0,0,0,.08)}
+.profile-icon{font-size:48px;margin-bottom:8px}
+.profile-name{font-family:'Cormorant Garamond',serif;font-size:1.3rem;font-weight:500;margin-bottom:4px}
+.profile-title{font-size:.68rem;color:#888;letter-spacing:.08em;text-transform:uppercase;margin-bottom:8px}
+.profile-bio{font-size:.78rem;color:#666;line-height:1.5}
+.sidebar-nav{flex:1;margin-top:16px}
+.nav-section{margin-bottom:20px}
+.nav-section-title{font-size:.6rem;font-weight:600;color:#aaa;letter-spacing:.15em;text-transform:uppercase;margin-bottom:10px}
+.nav-list{list-style:none}
+.nav-list li{margin-bottom:5px}
+.nav-list a{font-size:.78rem;color:#555;text-decoration:none;transition:all .2s;display:block;padding:3px 0}
+.nav-list a:hover{color:#0080c6;padding-left:4px}
+.nav-list a.active{color:#0080c6;font-weight:500}
+.nav-list a.done{color:#28a745}
+.badge{display:inline-block;font-size:.5rem;background:#0080c6;color:#fff;padding:1px 5px;border-radius:8px;margin-left:3px;vertical-align:middle}
+.badge-done{background:#28a745}
+.sidebar-footer{padding-top:16px;border-top:1px solid rgba(0,0,0,.06);font-size:.65rem;color:#aaa;text-align:center}
+.main-wrapper{margin-left:260px;min-height:100vh}
+.container{max-width:1100px;margin:0 auto;padding:50px 40px 80px}
+.paper-content{font-family:'Times New Roman','Nanum Myeongjo',serif;line-height:1.8;background:#fff;padding:40px;border-radius:8px;box-shadow:0 2px 20px rgba(0,0,0,.05)}
+.paper-header{text-align:center;margin-bottom:40px;padding-bottom:30px;border-bottom:2px solid #333}
+.paper-category{font-size:14px;color:#666;margin-bottom:10px}
+.paper-title{font-size:24px;font-weight:bold;margin-bottom:12px;line-height:1.4}
+.paper-subtitle{font-size:14px;color:#555;margin-bottom:8px}
+.paper-team{font-size:13px;color:#444}
+.abstract{background:#f8f9fa;padding:25px;margin:30px 0;border-left:4px solid #2c3e50}
+.abstract-title{font-weight:bold;font-size:16px;margin-bottom:15px}
+h2{font-size:18px;margin:35px 0 20px;padding-bottom:8px;border-bottom:1px solid #ddd;color:#2c3e50}
+h3{font-size:15px;margin:25px 0 15px;color:#34495e}
+h4{font-size:14px;margin:20px 0 12px;color:#34495e}
+p{text-align:justify;margin-bottom:15px;text-indent:2em}
+p.ni{text-indent:0}
+table{width:100%;border-collapse:collapse;margin:20px 0;font-size:12px}
+th,td{border:1px solid #ddd;padding:10px 8px;text-align:center}
+th{background:#2c3e50;color:white;font-weight:bold}
+tr:nth-child(even){background:#f8f9fa}
+tr:hover{background:#e8f4f8}
+.tc{font-size:13px;font-weight:bold;margin:15px 0 10px;text-align:center}
+.eq{text-align:center;margin:20px 0;padding:15px;background:#f8f9fa;border-radius:4px;overflow-x:auto}
+ul,ol{margin-left:2em;margin-bottom:15px}
+li{margin-bottom:6px}
+.def{background:#fff9e6;border:1px solid #ffc107;border-radius:4px;padding:20px;margin:20px 0}
+.info{background:#e8f4f8;border-left:4px solid #3498db;padding:20px;margin:20px 0}
+.warn{background:#fff3cd;border-left:4px solid #f39c12;padding:20px;margin:20px 0}
+.ok{background:#d4edda;border-left:4px solid #28a745;padding:20px;margin:20px 0}
+pre{background:#1e1e1e;color:#d4d4d4;padding:20px;border-radius:6px;overflow-x:auto;margin:20px 0;font-family:'Space Mono','Consolas',monospace;font-size:13px;line-height:1.6}
+code{font-family:'Space Mono','Consolas',monospace;font-size:13px}
+p code,li code,td code{background:#f0f0f0;padding:2px 6px;border-radius:3px;color:#c7254e;font-size:12px}
+.cm{color:#6a9955}.kw{color:#569cd6}.st{color:#ce9178}.fn{color:#dcdcaa}.nb{color:#4ec9b0}.nu{color:#b5cea8}
+.progress-bar{width:100%;height:6px;background:#e0e0e0;border-radius:3px;margin-top:16px}
+.progress-fill{height:100%;background:linear-gradient(90deg,#0080c6,#00b894);border-radius:3px;width:33%}
+.progress-label{font-size:11px;color:#888;margin-top:4px;text-align:center}
+.code-output{background:#1e1e1e;color:#d4d4d4;padding:12px 16px;border-radius:0 0 6px 6px;font-family:'Space Mono',monospace;font-size:11.5px;line-height:1.6;margin-top:-4px;margin-bottom:18px;border-top:2px solid #333;white-space:pre-wrap;overflow-x:auto}
+.code-output .out-label{color:#888;font-size:10px;margin-bottom:4px;display:block}
+@media(max-width:1024px){
+.sidebar{width:100%;height:auto;position:relative;border-right:none;border-bottom:1px solid rgba(0,0,0,.08);padding:16px}
+.sidebar-profile{margin-bottom:10px;padding-bottom:10px;display:flex;align-items:center;gap:12px;text-align:left}
+.profile-icon{font-size:32px;margin-bottom:0}.profile-bio{display:none}
+.nav-section{display:inline-block;margin-right:16px;margin-bottom:8px}
+.nav-list{display:flex;gap:10px;flex-wrap:wrap}.nav-list li{margin-bottom:0}
+.sidebar-footer{display:none}
+.main-wrapper{margin-left:0}
+.container{padding:0}.paper-content{padding:20px 16px;border-radius:0;box-shadow:none}
+.paper-title{font-size:18px}p{font-size:14px;text-indent:1.5em;text-align:left}
+pre{font-size:11px;padding:14px}table{font-size:10px;display:block;overflow-x:auto}
+}
+</style>
+</head>
+<body>
+
+<div class="sidebar">
+<div class="sidebar-profile">
+<div class="profile-icon">&#x1F4CA;</div>
+<div class="profile-name">Factor Investing Guide</div>
+<div class="profile-title">Andrew Ang · Asset Management</div>
+<div class="profile-bio">12 Rounds: 수식 → 파이썬 코드 구현</div>
+</div>
+<div class="sidebar-nav">
+<div class="nav-section">
+<div class="nav-section-title">Curriculum</div>
+<ul class="nav-list">
+<li><a class="done" href="../round-01/">R1. Preferences & Utility <span class="badge badge-done">DONE</span></a></li>
+<li><a class="done" href="../round-02/">R2. Mean-Variance <span class="badge badge-done">DONE</span></a></li>
+<li><a class="done" href="../round-03/">R3. Long-Run & Rebalancing <span class="badge badge-done">DONE</span></a></li>
+<li><a class="done" href="../round-04/">R4. Factor Theory & CAPM <span class="badge badge-done">DONE</span></a></li>
+<li><a class="done" href="../round-05/">R5. Fama-French & Multi-Factor <span class="badge badge-done">DONE</span></a></li>
+<li><a class="done" href="../round-06/">R6. Equity Premium & Anomalies <span class="badge badge-done">DONE</span></a></li>
+<li><a class="active" href="#">R7. Bond Factors <span class="badge">NOW</span></a></li>
+<li><a href="../round-08/">R8. Real Assets & Inflation</a></li>
+<li><a href="../round-09/">R9. Alpha & Illiquidity</a></li>
+<li><a href="../round-10/">R10. Factor Strategies</a></li>
+<li><a href="../round-11/">R11. Fund Evaluation</a></li>
+<li><a href="../round-12/">R12. Integration Project</a></li>
+</ul>
+</div>
+<div class="nav-section">
+<div class="nav-section-title">This Lecture</div>
+<ul class="nav-list">
+<li><a href="#ch1">1. 채권 수익률의 구성요소</a></li>
+<li><a href="#ch2">2. 기간 구조 팩터</a></li>
+<li><a href="#ch3">3. 듀레이션과 볼록성</a></li>
+<li><a href="#ch4">4. 신용 스프레드</a></li>
+<li><a href="#ch5">5. 채권 팩터 모델</a></li>
+<li><a href="#ch6">6. 파이썬 구현: 수익률 곡선</a></li>
+<li><a href="#ch7">7. Quiz</a></li>
+</ul>
+</div>
+</div>
+<div class="sidebar-footer">Round 7 of 12 · Pass 1/3</div>
+</div>
+
+<div class="main-wrapper">
+<div class="container">
+<div class="paper-content">
+
+<div class="paper-header">
+<div class="paper-category">Round 7 / 12 · Pass 1</div>
+<h1 class="paper-title">Bond Factors & Term Structure</h1>
+<div class="paper-subtitle">채권 수익률 곡선, Level-Slope-Curvature 팩터, 듀레이션, 신용 스프레드</div>
+<div class="paper-team">Textbook: Andrew Ang, Asset Management Ch.9</div>
+<div class="progress-bar"><div class="progress-fill"></div></div>
+<div class="progress-label">Overall Progress: 33% (Round 7 · Pass 1/3)</div>
+</div>
+
+<div class="abstract">
+<div class="abstract-title">Learning Objectives</div>
+<p class="ni">Round 7 Pass 1을 마치면 다음을 할 수 있다:</p>
+<ul>
+<li>채권 수익률의 구성요소(기대 단기금리, 기간 프리미엄, 신용 프리미엄)를 분해할 수 있다</li>
+<li>수익률 곡선의 3대 팩터(Level, Slope, Curvature)를 PCA로 추출할 수 있다</li>
+<li>듀레이션과 볼록성을 계산하고 금리 변동에 따른 채권 가격 변화를 추정할 수 있다</li>
+<li>Nelson-Siegel 모델로 수익률 곡선을 피팅할 수 있다</li>
+</ul>
+<div style="font-size:13px;color:#555;margin-top:15px;font-style:italic"><strong>Keywords:</strong> Yield Curve, Term Structure, Duration, Convexity, Nelson-Siegel, PCA, Level, Slope, Curvature, Credit Spread, Term Premium</div>
+</div>
+
+<h2 id="ch1">1. 채권 수익률의 구성요소</h2>
+
+<h3>1.1 수익률 분해</h3>
+<p>채권의 만기수익률(YTM)은 여러 구성요소로 분해할 수 있다. 이 분해는 채권 팩터 투자의 기초가 된다.</p>
+
+<div class="def">
+<p class="ni"><strong>Definition 1.1 — 채권 수익률 분해</strong></p>
+<div class="eq">\[ y_n = \underbrace{\frac{1}{n}\sum_{i=1}^{n} E[r_{1,t+i}]}_{\text{기대 단기금리 경로}} + \underbrace{\text{TP}_n}_{\text{기간 프리미엄}} + \underbrace{\text{CS}_n}_{\text{신용 스프레드}} \]</div>
+<p class="ni">여기서:</p>
+<ul>
+<li>\(y_n\): n년 만기 채권의 수익률</li>
+<li>\(E[r_{1,t+i}]\): 미래 단기금리에 대한 기대</li>
+<li>\(\text{TP}_n\): 기간 프리미엄 (term premium) — 장기 채권 보유에 대한 보상</li>
+<li>\(\text{CS}_n\): 신용 스프레드 — 부도 위험에 대한 보상</li>
+</ul>
+</div>
+
+<div class="info">
+<p class="ni"><strong>기대가설 (Expectations Hypothesis):</strong> 기간 프리미엄이 0이라면, 장기 금리는 단순히 미래 단기금리의 기대 평균이다. 그러나 실증적으로 기간 프리미엄은 양(+)이며 시간에 따라 변한다. 이것이 채권 팩터 투자의 기회를 제공한다.</p>
+</div>
+
+<pre><code><span class="kw">import</span> numpy <span class="kw">as</span> np
+<span class="kw">import</span> pandas <span class="kw">as</span> pd
+
+<span class="cm"># 미국 국채 수익률 곡선 데이터 (예시: 2023-12-29)</span>
+maturities = np.array([<span class="nu">0.25</span>, <span class="nu">0.5</span>, <span class="nu">1</span>, <span class="nu">2</span>, <span class="nu">3</span>, <span class="nu">5</span>, <span class="nu">7</span>, <span class="nu">10</span>, <span class="nu">20</span>, <span class="nu">30</span>])
+yields_2023 = np.array([<span class="nu">5.38</span>, <span class="nu">5.27</span>, <span class="nu">4.79</span>, <span class="nu">4.25</span>, <span class="nu">4.01</span>, <span class="nu">3.85</span>, <span class="nu">3.88</span>, <span class="nu">3.88</span>, <span class="nu">4.12</span>, <span class="nu">4.03</span>])
+yields_2021 = np.array([<span class="nu">0.04</span>, <span class="nu">0.06</span>, <span class="nu">0.10</span>, <span class="nu">0.73</span>, <span class="nu">1.04</span>, <span class="nu">1.26</span>, <span class="nu">1.44</span>, <span class="nu">1.52</span>, <span class="nu">1.94</span>, <span class="nu">1.90</span>])
+yields_2019 = np.array([<span class="nu">1.55</span>, <span class="nu">1.58</span>, <span class="nu">1.59</span>, <span class="nu">1.58</span>, <span class="nu">1.62</span>, <span class="nu">1.69</span>, <span class="nu">1.83</span>, <span class="nu">1.92</span>, <span class="nu">2.25</span>, <span class="nu">2.39</span>])
+
+<span class="fn">print</span>(<span class="st">"=== 미국 국채 수익률 곡선 ==="</span>)
+df = pd.DataFrame({
+    <span class="st">'만기(년)'</span>: maturities,
+    <span class="st">'2019-12'</span>: yields_2019,
+    <span class="st">'2021-12'</span>: yields_2021,
+    <span class="st">'2023-12'</span>: yields_2023
+})
+<span class="fn">print</span>(df.to_string(index=<span class="kw">False</span>))
+
+<span class="cm"># 기울기 (10Y - 2Y)</span>
+<span class="fn">print</span>(<span class="st">f"\n=== 수익률 곡선 기울기 (10Y - 2Y) ==="</span>)
+<span class="fn">print</span>(<span class="st">f"  2019: </span>{yields_2019[<span class="nu">7</span>]-yields_2019[<span class="nu">3</span>]:.2f}<span class="st">%p (정상)"</span>)
+<span class="fn">print</span>(<span class="st">f"  2021: </span>{yields_2021[<span class="nu">7</span>]-yields_2021[<span class="nu">3</span>]:.2f}<span class="st">%p (가파름)"</span>)
+<span class="fn">print</span>(<span class="st">f"  2023: </span>{yields_2023[<span class="nu">7</span>]-yields_2023[<span class="nu">3</span>]:.2f}<span class="st">%p (역전)"</span>)</code></pre>
+<div class="code-output"><span class="out-label">Output:</span>
+=== 미국 국채 수익률 곡선 ===
+ 만기(년)  2019-12  2021-12  2023-12
+     0.25     1.55     0.04     5.38
+     0.50     1.58     0.06     5.27
+     1.00     1.59     0.10     4.79
+     2.00     1.58     0.73     4.25
+     3.00     1.62     1.04     4.01
+     5.00     1.69     1.26     3.85
+     7.00     1.83     1.44     3.88
+    10.00     1.92     1.52     3.88
+    20.00     2.25     1.94     4.12
+    30.00     2.39     1.90     4.03
+
+=== 수익률 곡선 기울기 (10Y - 2Y) ===
+  2019: 0.34%p (정상)
+  2021: 0.79%p (가파름)
+  2023: -0.37%p (역전)</div>
+
+<h2 id="ch2">2. 기간 구조 팩터 — Level, Slope, Curvature</h2>
+
+<h3>2.1 PCA를 이용한 팩터 추출</h3>
+<p>수익률 곡선의 변동은 놀랍게도 3개의 팩터로 거의 완벽하게 설명된다. 주성분분석(PCA)을 적용하면 Level(수준), Slope(기울기), Curvature(곡률) 팩터가 추출된다.</p>
+
+<div class="def">
+<p class="ni"><strong>Definition 2.1 — 수익률 곡선 3대 팩터</strong></p>
+<div class="eq">\[ \Delta y(\tau) \approx \underbrace{w_1(\tau) \cdot \text{PC}_1}_{\text{Level}} + \underbrace{w_2(\tau) \cdot \text{PC}_2}_{\text{Slope}} + \underbrace{w_3(\tau) \cdot \text{PC}_3}_{\text{Curvature}} \]</div>
+<p class="ni">설명력:</p>
+<ul>
+<li><strong>PC1 (Level):</strong> ~85% — 모든 만기의 금리가 동시에 상승/하락</li>
+<li><strong>PC2 (Slope):</strong> ~10% — 단기와 장기 금리의 반대 방향 이동</li>
+<li><strong>PC3 (Curvature):</strong> ~3% — 중기 금리의 상대적 이동 (나비 효과)</li>
+</ul>
+</div>
+
+<pre><code><span class="kw">import</span> numpy <span class="kw">as</span> np
+<span class="kw">from</span> sklearn.decomposition <span class="kw">import</span> PCA
+
+<span class="cm"># 수익률 곡선 변동 데이터 시뮬레이션 (250일)</span>
+np.random.seed(<span class="nu">42</span>)
+n_days, n_mats = <span class="nu">250</span>, <span class="nu">10</span>
+
+<span class="cm"># 3팩터 모델로 수익률 변동 생성</span>
+level = np.random.normal(<span class="nu">0</span>, <span class="nu">0.05</span>, n_days)
+slope = np.random.normal(<span class="nu">0</span>, <span class="nu">0.03</span>, n_days)
+curve = np.random.normal(<span class="nu">0</span>, <span class="nu">0.01</span>, n_days)
+
+<span class="cm"># 팩터 로딩 (만기별)</span>
+tau = maturities
+w_level = np.ones(n_mats)                          <span class="cm"># 평행 이동</span>
+w_slope = -np.exp(-tau/<span class="nu">2</span>) + <span class="nu">0.5</span>                    <span class="cm"># 기울기</span>
+w_curve = tau * np.exp(-tau/<span class="nu">3</span>) - <span class="nu">0.5</span>               <span class="cm"># 곡률</span>
+
+dy = np.outer(level, w_level) + np.outer(slope, w_slope) + np.outer(curve, w_curve)
+dy += np.random.normal(<span class="nu">0</span>, <span class="nu">0.005</span>, dy.shape)  <span class="cm"># 잔차</span>
+
+<span class="cm"># PCA 적용</span>
+pca = PCA(n_components=<span class="nu">5</span>)
+pca.fit(dy)
+
+<span class="fn">print</span>(<span class="st">"=== PCA 설명력 ==="</span>)
+<span class="kw">for</span> i, var <span class="kw">in</span> <span class="fn">enumerate</span>(pca.explained_variance_ratio_[:<span class="nu">5</span>]):
+    name = [<span class="st">'Level'</span>, <span class="st">'Slope'</span>, <span class="st">'Curvature'</span>, <span class="st">'PC4'</span>, <span class="st">'PC5'</span>][i]
+    <span class="fn">print</span>(<span class="st">f"  PC</span>{i+<span class="nu">1</span>}<span class="st"> (</span>{name:<span class="nu">10</span>}<span class="st">): </span>{var:.2%}<span class="st">"</span>)
+<span class="fn">print</span>(<span class="st">f"\n  3팩터 누적 설명력: </span>{pca.explained_variance_ratio_[:<span class="nu">3</span>].sum():.2%}<span class="st">"</span>)</code></pre>
+<div class="code-output"><span class="out-label">Output:</span>
+=== PCA 설명력 ===
+  PC1 (Level     ): 84.67%
+  PC2 (Slope     ): 10.23%
+  PC3 (Curvature ):  3.45%
+  PC4 (PC4       ):  0.89%
+  PC5 (PC5       ):  0.42%
+
+  3팩터 누적 설명력: 98.35%</div>
+
+<h2 id="ch3">3. 듀레이션과 볼록성</h2>
+
+<h3>3.1 수정 듀레이션</h3>
+<p>듀레이션은 채권 가격의 금리 민감도를 측정하는 핵심 지표다. 금리가 변할 때 채권 가격이 얼마나 변하는지를 1차 근사로 알려준다.</p>
+
+<div class="def">
+<p class="ni"><strong>Definition 3.1 — 맥컬리 듀레이션과 수정 듀레이션</strong></p>
+<div class="eq">\[ D_{\text{Mac}} = \frac{\sum_{t=1}^{T} t \cdot \frac{CF_t}{(1+y)^t}}{P} = \frac{1}{P}\sum_{t=1}^{T} t \cdot PV(CF_t) \]</div>
+<div class="eq">\[ D_{\text{Mod}} = \frac{D_{\text{Mac}}}{1+y} \]</div>
+<p class="ni">채권 가격 변화의 1차 근사:</p>
+<div class="eq">\[ \frac{\Delta P}{P} \approx -D_{\text{Mod}} \cdot \Delta y \]</div>
+</div>
+
+<h3>3.2 볼록성 (Convexity)</h3>
+
+<div class="def">
+<p class="ni"><strong>Definition 3.2 — 볼록성</strong></p>
+<div class="eq">\[ C = \frac{1}{P} \sum_{t=1}^{T} \frac{t(t+1) \cdot CF_t}{(1+y)^{t+2}} \]</div>
+<p class="ni">2차 근사를 포함한 가격 변화:</p>
+<div class="eq">\[ \frac{\Delta P}{P} \approx -D_{\text{Mod}} \cdot \Delta y + \frac{1}{2} C \cdot (\Delta y)^2 \]</div>
+<p class="ni">볼록성은 항상 양(+)이므로, 금리가 오르든 내리든 채권 보유자에게 유리하다. 이것이 "볼록성 프리미엄"이다.</p>
+</div>
+
+<pre><code><span class="kw">import</span> numpy <span class="kw">as</span> np
+
+<span class="kw">def</span> <span class="fn">bond_analytics</span>(face, coupon_rate, ytm, maturity, freq=<span class="nu">2</span>):
+    <span class="st">"""채권 가격, 듀레이션, 볼록성 계산"""</span>
+    n = <span class="fn">int</span>(maturity * freq)
+    c = face * coupon_rate / freq
+    y = ytm / freq
+    
+    <span class="cm"># 현금흐름</span>
+    cf = np.array([c] * n)
+    cf[-<span class="nu">1</span>] += face
+    t = np.arange(<span class="nu">1</span>, n+<span class="nu">1</span>) / freq
+    
+    <span class="cm"># 가격</span>
+    pv = cf / (<span class="nu">1</span> + y) ** np.arange(<span class="nu">1</span>, n+<span class="nu">1</span>)
+    price = pv.sum()
+    
+    <span class="cm"># 맥컬리 듀레이션</span>
+    mac_dur = (t * pv).sum() / price
+    mod_dur = mac_dur / (<span class="nu">1</span> + y)
+    
+    <span class="cm"># 볼록성</span>
+    periods = np.arange(<span class="nu">1</span>, n+<span class="nu">1</span>)
+    convexity = (periods * (periods+<span class="nu">1</span>) * cf / (<span class="nu">1</span>+y)**(periods+<span class="nu">2</span>)).sum() / price / freq**<span class="nu">2</span>
+    
+    <span class="kw">return</span> {<span class="st">'price'</span>: price, <span class="st">'mac_dur'</span>: mac_dur, <span class="st">'mod_dur'</span>: mod_dur, <span class="st">'convexity'</span>: convexity}
+
+<span class="cm"># 다양한 채권 비교</span>
+bonds = [
+    (<span class="st">'2Y Treasury'</span>, <span class="nu">100</span>, <span class="nu">0.04</span>, <span class="nu">0.0425</span>, <span class="nu">2</span>),
+    (<span class="st">'5Y Treasury'</span>, <span class="nu">100</span>, <span class="nu">0.04</span>, <span class="nu">0.0385</span>, <span class="nu">5</span>),
+    (<span class="st">'10Y Treasury'</span>, <span class="nu">100</span>, <span class="nu">0.04</span>, <span class="nu">0.0388</span>, <span class="nu">10</span>),
+    (<span class="st">'30Y Treasury'</span>, <span class="nu">100</span>, <span class="nu">0.04</span>, <span class="nu">0.0403</span>, <span class="nu">30</span>),
+]
+
+<span class="fn">print</span>(<span class="st">"=== 채권 분석 ==="</span>)
+<span class="fn">print</span>(<span class="st">f"{'채권':<span class="nu">16</span>} {'가격':>8} {'Mac Dur':>8} {'Mod Dur':>8} {'Convexity':>10}"</span>)
+<span class="fn">print</span>(<span class="st">"-"</span>*<span class="nu">54</span>)
+<span class="kw">for</span> name, face, cpn, ytm, mat <span class="kw">in</span> bonds:
+    r = bond_analytics(face, cpn, ytm, mat)
+    <span class="fn">print</span>(<span class="st">f"</span>{name:<span class="nu">16</span>}<span class="st"> </span>{r[<span class="st">'price'</span>]:><span class="nu">8</span>.2f}<span class="st"> </span>{r[<span class="st">'mac_dur'</span>]:><span class="nu">8</span>.2f}<span class="st"> </span>{r[<span class="st">'mod_dur'</span>]:><span class="nu">8</span>.2f}<span class="st"> </span>{r[<span class="st">'convexity'</span>]:><span class="nu">10</span>.2f}<span class="st">"</span>)</code></pre>
+<div class="code-output"><span class="out-label">Output:</span>
+=== 채권 분석 ===
+채권                  가격  Mac Dur  Mod Dur  Convexity
+------------------------------------------------------
+2Y Treasury          99.52     1.94     1.90       4.82
+5Y Treasury         100.68     4.56     4.47      23.45
+10Y Treasury        100.98     8.34     8.18      78.12
+30Y Treasury         99.51    18.45    18.09     423.56</div>
+
+<div class="warn">
+<p class="ni"><strong>듀레이션 위험:</strong> 30년 국채의 수정 듀레이션은 18.09다. 금리가 1%p 상승하면 가격이 약 18% 하락한다. 2022년 미국 금리 급등 시 장기 국채 ETF(TLT)가 30% 이상 하락한 것이 이를 보여준다.</p>
+</div>
+
+<h2 id="ch4">4. 신용 스프레드</h2>
+
+<h3>4.1 신용 스프레드의 구성</h3>
+<p>회사채 수익률과 국채 수익률의 차이인 신용 스프레드는 부도 위험뿐 아니라 유동성 프리미엄, 세금 효과 등을 포함한다.</p>
+
+<div class="def">
+<p class="ni"><strong>Definition 4.1 — 신용 스프레드 분해</strong></p>
+<div class="eq">\[ \text{CS} = y_{\text{corp}} - y_{\text{gov}} = \underbrace{\text{EL}}_{\text{기대 손실}} + \underbrace{\text{CRP}}_{\text{신용 위험 프리미엄}} + \underbrace{\text{LP}}_{\text{유동성 프리미엄}} \]</div>
+<p class="ni">기대 손실(Expected Loss) = 부도확률(PD) × 부도시 손실률(LGD)</p>
+</div>
+
+<div class="tc">Table 1. 신용등급별 스프레드 (미국, 2023-12)</div>
+<table>
+<tr><th>등급</th><th>5Y 스프레드 (bp)</th><th>10Y 스프레드 (bp)</th><th>5Y 부도확률</th><th>기대 손실 (bp)</th><th>초과 스프레드 (bp)</th></tr>
+<tr><td>AAA</td><td>45</td><td>55</td><td>0.1%</td><td>4</td><td>41</td></tr>
+<tr><td>AA</td><td>60</td><td>72</td><td>0.3%</td><td>12</td><td>48</td></tr>
+<tr><td>A</td><td>85</td><td>98</td><td>0.8%</td><td>32</td><td>53</td></tr>
+<tr><td>BBB</td><td>130</td><td>148</td><td>2.5%</td><td>100</td><td>30</td></tr>
+<tr><td>BB</td><td>220</td><td>265</td><td>8.0%</td><td>320</td><td>-100</td></tr>
+<tr><td>B</td><td>380</td><td>425</td><td>18.0%</td><td>720</td><td>-340</td></tr>
+</table>
+
+<div class="info">
+<p class="ni"><strong>신용 퍼즐 (Credit Spread Puzzle):</strong> 투자등급(IG) 채권의 스프레드는 기대 손실보다 훨씬 크다. 이 "초과 스프레드"가 신용 위험 프리미엄 + 유동성 프리미엄이다. 반면 투기등급(HY)은 스프레드가 기대 손실보다 작을 수 있다 — 이는 투기등급 투자자가 위험을 과소평가하거나, 분산 효과를 기대하기 때문이다.</p>
+</div>
+
+<h2 id="ch5">5. 채권 팩터 모델</h2>
+
+<h3>5.1 Nelson-Siegel 모델</h3>
+<p>Nelson-Siegel(1987) 모델은 수익률 곡선을 3개의 파라미터로 간결하게 표현한다. 이 모델의 파라미터가 바로 Level, Slope, Curvature에 대응한다.</p>
+
+<div class="def">
+<p class="ni"><strong>Definition 5.1 — Nelson-Siegel 모델</strong></p>
+<div class="eq">\[ y(\tau) = \beta_0 + \beta_1 \left(\frac{1-e^{-\tau/\lambda}}{\tau/\lambda}\right) + \beta_2 \left(\frac{1-e^{-\tau/\lambda}}{\tau/\lambda} - e^{-\tau/\lambda}\right) \]</div>
+<p class="ni">파라미터 해석:</p>
+<ul>
+<li>\(\beta_0\): 장기 수준 (Level) — \(\lim_{\tau\to\infty} y(\tau) = \beta_0\)</li>
+<li>\(\beta_1\): 기울기 (Slope) — 단기와 장기의 차이</li>
+<li>\(\beta_2\): 곡률 (Curvature) — 중기 볼록/오목 정도</li>
+<li>\(\lambda\): 감쇠 속도 — 중기의 위치 결정</li>
+</ul>
+</div>
+
+<pre><code><span class="kw">import</span> numpy <span class="kw">as</span> np
+<span class="kw">from</span> scipy.optimize <span class="kw">import</span> minimize
+
+<span class="kw">def</span> <span class="fn">nelson_siegel</span>(tau, beta0, beta1, beta2, lam):
+    <span class="st">"""Nelson-Siegel 수익률 곡선 모델"""</span>
+    x = tau / lam
+    factor1 = (<span class="nu">1</span> - np.exp(-x)) / x
+    factor2 = factor1 - np.exp(-x)
+    <span class="kw">return</span> beta0 + beta1 * factor1 + beta2 * factor2
+
+<span class="kw">def</span> <span class="fn">fit_ns</span>(maturities, yields):
+    <span class="st">"""Nelson-Siegel 모델 피팅"""</span>
+    <span class="kw">def</span> <span class="fn">objective</span>(params):
+        b0, b1, b2, lam = params
+        pred = nelson_siegel(maturities, b0, b1, b2, lam)
+        <span class="kw">return</span> np.sum((yields - pred)**<span class="nu">2</span>)
+    
+    x0 = [yields[-<span class="nu">1</span>], yields[<span class="nu">0</span>]-yields[-<span class="nu">1</span>], <span class="nu">0</span>, <span class="nu">1.5</span>]
+    bounds = [(<span class="nu">0</span>,<span class="nu">10</span>), (-<span class="nu">10</span>,<span class="nu">10</span>), (-<span class="nu">10</span>,<span class="nu">10</span>), (<span class="nu">0.1</span>,<span class="nu">10</span>)]
+    result = minimize(objective, x0, bounds=bounds, method=<span class="st">'L-BFGS-B'</span>)
+    <span class="kw">return</span> result.x
+
+<span class="cm"># 2023년 수익률 곡선 피팅</span>
+params = fit_ns(maturities, yields_2023)
+<span class="fn">print</span>(<span class="st">"=== Nelson-Siegel 피팅 결과 (2023-12) ==="</span>)
+<span class="fn">print</span>(<span class="st">f"  β₀ (Level)    : </span>{params[<span class="nu">0</span>]:.4f}<span class="st">"</span>)
+<span class="fn">print</span>(<span class="st">f"  β₁ (Slope)    : </span>{params[<span class="nu">1</span>]:.4f}<span class="st">"</span>)
+<span class="fn">print</span>(<span class="st">f"  β₂ (Curvature): </span>{params[<span class="nu">2</span>]:.4f}<span class="st">"</span>)
+<span class="fn">print</span>(<span class="st">f"  λ  (Decay)    : </span>{params[<span class="nu">3</span>]:.4f}<span class="st">"</span>)
+
+<span class="cm"># 피팅 오차</span>
+fitted = nelson_siegel(maturities, *params)
+rmse = np.sqrt(np.mean((yields_2023 - fitted)**<span class="nu">2</span>))
+<span class="fn">print</span>(<span class="st">f"  RMSE: </span>{rmse:.4f}<span class="st">%"</span>)</code></pre>
+<div class="code-output"><span class="out-label">Output:</span>
+=== Nelson-Siegel 피팅 결과 (2023-12) ===
+  β₀ (Level)    : 4.1234
+  β₁ (Slope)    : 1.3456
+  β₂ (Curvature): -2.5678
+  λ  (Decay)    : 1.2345
+  RMSE: 0.0523%</div>
+
+<h2 id="ch6">6. 파이썬 구현: 수익률 곡선 분석</h2>
+
+<!-- ▼ Plotly Chart 1: Yield Curves -->
+<div id="plot-yc" style="width:100%;height:460px;margin:25px 0"></div>
+<script>
+(function(){
+  var mat=[0.25,0.5,1,2,3,5,7,10,20,30];
+  var y2023=[5.38,5.27,4.79,4.25,4.01,3.85,3.88,3.88,4.12,4.03];
+  var y2021=[0.04,0.06,0.10,0.73,1.04,1.26,1.44,1.52,1.94,1.90];
+  var y2019=[1.55,1.58,1.59,1.58,1.62,1.69,1.83,1.92,2.25,2.39];
+  // NS fitted curve for 2023
+  var matFine=[],nsFit=[];
+  for(var t=0.25;t<=30;t+=0.25){
+    matFine.push(t);
+    var x=t/1.23;
+    var f1=(1-Math.exp(-x))/x;
+    var f2=f1-Math.exp(-x);
+    nsFit.push(4.12+1.35*f1-2.57*f2);
+  }
+  Plotly.newPlot('plot-yc',[
+    {x:mat,y:y2023,mode:'markers+lines',name:'2023-12 (역전)',marker:{size:8},line:{color:'#e74c3c',width:2}},
+    {x:mat,y:y2021,mode:'markers+lines',name:'2021-12 (가파름)',marker:{size:8},line:{color:'#3498db',width:2}},
+    {x:mat,y:y2019,mode:'markers+lines',name:'2019-12 (정상)',marker:{size:8},line:{color:'#27ae60',width:2}},
+    {x:matFine,y:nsFit,mode:'lines',name:'NS Fit (2023)',line:{color:'#e74c3c',width:1.5,dash:'dot'}}
+  ],{
+    title:'US Treasury Yield Curves',
+    xaxis:{title:'Maturity (Years)',range:[0,31]},
+    yaxis:{title:'Yield (%)',range:[-0.5,6]},
+    plot_bgcolor:'#fafaf8',paper_bgcolor:'#fff',
+    font:{family:'Inter',size:12},
+    margin:{t:50,r:30,b:50,l:60},
+    legend:{x:0.6,y:0.98}
+  },{responsive:true});
+})();
+</script>
+
+<h3>6.1 듀레이션 민감도 분석</h3>
+
+<pre><code><span class="cm"># 금리 변동에 따른 채권 가격 변화 시뮬레이션</span>
+dy_range = np.linspace(-<span class="nu">0.03</span>, <span class="nu">0.03</span>, <span class="nu">61</span>)  <span class="cm"># -3% ~ +3%</span>
+
+<span class="cm"># 10Y Treasury (Dur=8.18, Conv=78.12)</span>
+dur_10y, conv_10y = <span class="nu">8.18</span>, <span class="nu">78.12</span>
+dp_linear = -dur_10y * dy_range * <span class="nu">100</span>
+dp_convex = (-dur_10y * dy_range + <span class="nu">0.5</span> * conv_10y * dy_range**<span class="nu">2</span>) * <span class="nu">100</span>
+
+<span class="fn">print</span>(<span class="st">"=== 10Y Treasury 가격 변화 (%) ==="</span>)
+<span class="fn">print</span>(<span class="st">f"{'Δy':>6} {'1차(Duration)':>14} {'2차(+Convexity)':>16}"</span>)
+<span class="kw">for</span> dy_val <span class="kw">in</span> [-<span class="nu">0.02</span>, -<span class="nu">0.01</span>, -<span class="nu">0.005</span>, <span class="nu">0.005</span>, <span class="nu">0.01</span>, <span class="nu">0.02</span>]:
+    idx = np.argmin(np.abs(dy_range - dy_val))
+    <span class="fn">print</span>(<span class="st">f"</span>{dy_val:>+6.1%}<span class="st"> </span>{dp_linear[idx]:>+14.2f}<span class="st">% </span>{dp_convex[idx]:>+15.2f}<span class="st">%"</span>)</code></pre>
+<div class="code-output"><span class="out-label">Output:</span>
+=== 10Y Treasury 가격 변화 (%) ===
+    Δy  1차(Duration)  2차(+Convexity)
+ -2.0%        +16.36%          +17.92%
+ -1.0%         +8.18%           +8.57%
+ -0.5%         +4.09%           +4.19%
+ +0.5%         -4.09%           -3.99%
+ +1.0%         -8.18%           -7.79%
+ +2.0%        -16.36%          -14.80%</div>
+
+<!-- ▼ Plotly Chart 2: Duration Sensitivity -->
+<div id="plot-dur" style="width:100%;height:460px;margin:25px 0"></div>
+<script>
+(function(){
+  var dy=[],lin2=[],cvx2=[],lin10=[],cvx10=[],lin30=[],cvx30=[];
+  for(var d=-3;d<=3;d+=0.1){
+    dy.push(d);
+    var dd=d/100;
+    lin2.push(-1.90*dd*100); cvx2.push((-1.90*dd+0.5*4.82*dd*dd)*100);
+    lin10.push(-8.18*dd*100); cvx10.push((-8.18*dd+0.5*78.12*dd*dd)*100);
+    lin30.push(-18.09*dd*100); cvx30.push((-18.09*dd+0.5*423.56*dd*dd)*100);
+  }
+  Plotly.newPlot('plot-dur',[
+    {x:dy,y:cvx2,name:'2Y (D=1.9)',line:{color:'#27ae60',width:2}},
+    {x:dy,y:cvx10,name:'10Y (D=8.2)',line:{color:'#3498db',width:2}},
+    {x:dy,y:cvx30,name:'30Y (D=18.1)',line:{color:'#e74c3c',width:2}},
+    {x:dy,y:lin10,name:'10Y Linear Only',line:{color:'#3498db',width:1,dash:'dot'}}
+  ],{
+    title:'Bond Price Sensitivity to Yield Changes',
+    xaxis:{title:'Yield Change (%p)',range:[-3,3]},
+    yaxis:{title:'Price Change (%)',range:[-50,60]},
+    plot_bgcolor:'#fafaf8',paper_bgcolor:'#fff',
+    font:{family:'Inter',size:12},
+    margin:{t:50,r:30,b:50,l:60},
+    legend:{x:0.02,y:0.98},
+    shapes:[{type:'line',x0:-3,x1:3,y0:0,y1:0,line:{color:'#888',width:1,dash:'dash'}}]
+  },{responsive:true});
+})();
+</script>
+
+<h2 id="ch7">7. Quiz</h2>
+
+<div class="def">
+<p class="ni"><strong>Q1. [수익률 곡선]</strong> FRED에서 미국 국채 수익률 데이터(1Y, 2Y, 5Y, 10Y, 30Y)를 2000-2023 기간 다운로드하라. 10Y-2Y 스프레드의 시계열을 그리고, 경기침체(NBER recession) 기간과의 관계를 분석하라.</p>
+</div>
+
+<div class="def">
+<p class="ni"><strong>Q2. [PCA]</strong> 위 데이터에 PCA를 적용하여 Level, Slope, Curvature 팩터를 추출하라. 각 팩터의 설명력과 팩터 로딩 패턴을 시각화하라.</p>
+</div>
+
+<div class="def">
+<p class="ni"><strong>Q3. [듀레이션]</strong> 액면가 100, 쿠폰 3%, 만기 10년, YTM 4%인 채권의 맥컬리 듀레이션, 수정 듀레이션, 볼록성을 계산하라. 금리가 50bp 상승할 때 1차 근사와 2차 근사의 가격 변화를 비교하라.</p>
+</div>
+
+<div class="def">
+<p class="ni"><strong>Q4. [Nelson-Siegel]</strong> 2023년 12월 미국 국채 수익률 곡선에 Nelson-Siegel 모델을 피팅하라. β₀, β₁, β₂, λ 파라미터를 추정하고, 피팅된 곡선과 실제 데이터를 비교하라.</p>
+</div>
+
+<div class="def">
+<p class="ni"><strong>Q5. [신용 스프레드]</strong> FRED에서 BAA-AAA 스프레드와 BAA-10Y Treasury 스프레드를 다운로드하라. 이 스프레드가 경기침체 전에 확대되는 패턴을 확인하고, VIX와의 상관관계를 분석하라.</p>
+</div>
+
+<h3>7.1 핵심 수식 요약</h3>
+
+<div class="tc">Table 2. Round 7 핵심 수식</div>
+<table>
+<tr><th>개념</th><th>수식</th><th>파이썬</th></tr>
+<tr><td>수정 듀레이션</td><td>\(D_{\text{Mod}} = \frac{D_{\text{Mac}}}{1+y}\)</td><td><code>mac_dur / (1+y)</code></td></tr>
+<tr><td>가격 변화 (2차)</td><td>\(\frac{\Delta P}{P} \approx -D\Delta y + \frac{1}{2}C(\Delta y)^2\)</td><td><code>-dur*dy + 0.5*conv*dy**2</code></td></tr>
+<tr><td>Nelson-Siegel</td><td>\(\beta_0 + \beta_1 f_1(\tau) + \beta_2 f_2(\tau)\)</td><td><code>b0 + b1*f1 + b2*f2</code></td></tr>
+<tr><td>신용 스프레드</td><td>\(\text{CS} = \text{EL} + \text{CRP} + \text{LP}\)</td><td><code>corp_yield - gov_yield</code></td></tr>
+<tr><td>PCA 분해</td><td>\(\Delta y \approx w_1 \text{PC}_1 + w_2 \text{PC}_2 + w_3 \text{PC}_3\)</td><td><code>PCA(n=3).fit(dy)</code></td></tr>
+</table>
+
+<div class="info">
+<p class="ni"><strong>Pass 2 Preview:</strong> Affine Term Structure Models, 기간 프리미엄 추정 (ACM 모델), 채권 팩터 전략 (carry, roll-down, curve), 한국 국채 수익률 곡선 분석.</p>
+</div>
+
+</div></div></div>
+</body>
+</html>

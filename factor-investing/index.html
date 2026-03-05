@@ -1,0 +1,287 @@
+---
+layout: null
+permalink: /factor-investing/
+title: "Factor Investing Guide"
+---
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Factor Investing Guide | Ha Rim Jung</title>
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="Factor Investing Guide | Ha Rim Jung">
+    <meta property="og:description" content="Andrew Ang의 Asset Management 교재 기반 팩터 투자 학습 가이드. 수식 → 파이썬 코드 구현 중심.">
+    <meta property="og:url" content="https://gkfla2020-bit.github.io/factor-investing/">
+    <meta property="og:image" content="https://gkfla2020-bit.github.io/assets/og-card.png">
+    <meta property="og:site_name" content="Ha Rim Jung">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Factor Investing Guide | Ha Rim Jung">
+    <meta name="twitter:description" content="Andrew Ang의 Asset Management 교재 기반 팩터 투자 학습 가이드">
+    <meta name="twitter:image" content="https://gkfla2020-bit.github.io/assets/og-card.png">
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-83LKVW7412"></script>
+    <script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-83LKVW7412');</script>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300&family=Space+Mono:wght@400&family=Inter:wght@300;400&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Inter',sans-serif;background:#fafaf8;color:#1a1a1a;line-height:1.7;overflow-x:hidden}
+
+{% include sidebar-styles.html %}
+
+.container{position:relative;z-index:1;max-width:800px;margin:0 auto;padding:60px 50px 80px}
+.page-title{font-family:'Cormorant Garamond',serif;font-size:clamp(2rem,5vw,2.8rem);font-weight:300;margin-bottom:8px;opacity:0}
+.page-subtitle{font-family:'Space Mono',monospace;font-size:11px;color:#888;letter-spacing:.2em;text-transform:uppercase;margin-bottom:15px;opacity:0}
+.page-desc{font-size:.92rem;color:#666;line-height:1.8;margin-bottom:50px;max-width:650px;opacity:0}
+
+.progress-overview{display:flex;align-items:center;gap:16px;margin-bottom:50px;padding:20px 25px;background:#fff;border:1px solid #e8e8e8;opacity:0}
+.progress-label{font-size:.7rem;color:#999;letter-spacing:.1em;text-transform:uppercase;white-space:nowrap}
+.progress-bar{flex:1;height:6px;background:#f0f0f0;border-radius:3px;overflow:hidden}
+.progress-fill{height:100%;background:linear-gradient(90deg,#0080c6,#00b4d8);border-radius:3px;transition:width .8s ease}
+.progress-text{font-family:'Space Mono',monospace;font-size:.8rem;color:#1a1a1a;white-space:nowrap}
+
+.round-list{display:flex;flex-direction:column;gap:20px}
+.round-card{display:block;padding:30px 35px;background:rgba(255,255,255,.9);border:1px solid #e8e8e8;text-decoration:none;transition:all .25s ease;opacity:0;transform:translateY(20px);position:relative;overflow:hidden}
+.round-card:hover{border-color:#1a1a1a;transform:translateX(8px) translateY(0);box-shadow:0 4px 20px rgba(0,0,0,.05)}
+.round-card.completed{border-left:3px solid #28a745}
+.round-card.current{border-left:3px solid #0080c6}
+.round-card.locked{border-left:3px solid #ddd;opacity:.6;pointer-events:none}
+.round-number{font-family:'Space Mono',monospace;font-size:.65rem;color:#999;letter-spacing:.15em;text-transform:uppercase;margin-bottom:8px;display:flex;align-items:center;gap:10px}
+.round-status{font-size:.55rem;padding:2px 8px;border-radius:10px;letter-spacing:.08em}
+.status-done{background:#e8f5e9;color:#2e7d32}
+.status-current{background:#e3f2fd;color:#1565c0}
+.status-locked{background:#f5f5f5;color:#999}
+.round-title{font-family:'Cormorant Garamond',serif;font-size:1.4rem;color:#1a1a1a;margin-bottom:10px;font-weight:400}
+.round-desc{font-size:.88rem;color:#666;line-height:1.7;margin-bottom:14px}
+.round-topics{display:flex;gap:6px;flex-wrap:wrap}
+.topic-tag{font-size:.58rem;padding:4px 10px;background:#f0f0f0;color:#666;letter-spacing:.04em;text-transform:uppercase;transition:all .2s}
+.round-card:hover .topic-tag{background:#1a1a1a;color:#fff}
+
+.part-header{font-family:'Cormorant Garamond',serif;font-size:1.1rem;font-weight:400;color:#999;letter-spacing:.05em;margin:40px 0 15px;padding-bottom:8px;border-bottom:1px solid #eee;opacity:0}
+.part-header:first-of-type{margin-top:0}
+
+.curriculum-info{margin-top:60px;padding:30px;background:#fff;border:1px solid #e8e8e8;opacity:0}
+.curriculum-title{font-family:'Cormorant Garamond',serif;font-size:1.2rem;font-weight:400;margin-bottom:15px;padding-bottom:10px;border-bottom:1px solid #eee}
+.curriculum-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px 30px}
+.curriculum-item{font-size:.82rem;color:#555;display:flex;align-items:baseline;gap:8px}
+.curriculum-item .label{font-size:.65rem;color:#999;letter-spacing:.08em;text-transform:uppercase;min-width:70px}
+
+@media(max-width:1024px){
+    .container{padding:30px 20px 50px}
+    .round-card{padding:22px 20px;border-radius:12px}
+    .round-card:hover{transform:none}
+    .round-title{font-size:1.2rem}
+    .round-desc{font-size:.84rem}
+    .curriculum-grid{grid-template-columns:1fr}
+    .progress-overview{flex-direction:column;align-items:stretch;gap:10px}
+    .page-desc{font-size:.85rem}
+}
+    </style>
+</head>
+<body>
+<img src="/assets/og-card.png" alt="" style="position:absolute;width:1px;height:1px;opacity:0;pointer-events:none;" aria-hidden="true">
+
+{% include sidebar.html %}
+{% include market-widget.html %}
+
+<div class="main-wrapper">
+<div class="container">
+    {% include breadcrumb.html %}
+    <h1 class="page-title">Factor Investing Guide</h1>
+    <p class="page-subtitle">Andrew Ang · Asset Management</p>
+    <p class="page-desc">Andrew Ang의 「Asset Management: A Systematic Approach to Factor Investing」 교재를 기반으로, 핵심 수식을 파이썬 코드로 직접 구현하며 학습하는 가이드입니다. 각 라운드는 3회에 걸쳐 점진적으로 내용을 확장합니다.</p>
+
+    <div class="progress-overview">
+        <span class="progress-label">Overall Progress</span>
+        <div class="progress-bar"><div class="progress-fill" style="width:8%"></div></div>
+        <span class="progress-text">1 / 12 In Progress</span>
+    </div>
+
+    <!-- PART I -->
+    <div class="part-header">Part I — The Asset Owner</div>
+
+    <div class="round-list">
+        <a href="/factor-investing/round-01/" class="round-card current">
+            <div class="round-number">Round 01 <span class="round-status status-current">▶ In Progress</span></div>
+            <h2 class="round-title">Preferences & Utility Theory</h2>
+            <p class="round-desc">효용함수, 위험회피계수, 확실성 등가, CRRA/CARA 선호 체계. 투자자의 위험 태도를 수식으로 정의하고 파이썬으로 시뮬레이션한다. (Ang Ch.2)</p>
+            <div class="round-topics">
+                <span class="topic-tag">Utility Function</span>
+                <span class="topic-tag">Risk Aversion</span>
+                <span class="topic-tag">CRRA</span>
+                <span class="topic-tag">Certainty Equivalent</span>
+            </div>
+        </a>
+
+        <div class="round-card locked">
+            <div class="round-number">Round 02 <span class="round-status status-locked">🔒 Locked</span></div>
+            <h2 class="round-title">Mean-Variance Optimization</h2>
+            <p class="round-desc">마코위츠 평균-분산 최적화, 효율적 프론티어, 최소분산 포트폴리오, 접선 포트폴리오. 공분산 행렬 추정부터 CVXPY 최적화까지. (Ang Ch.3)</p>
+            <div class="round-topics">
+                <span class="topic-tag">Markowitz</span>
+                <span class="topic-tag">Efficient Frontier</span>
+                <span class="topic-tag">Minimum Variance</span>
+                <span class="topic-tag">CVXPY</span>
+            </div>
+        </div>
+
+        <div class="round-card locked">
+            <div class="round-number">Round 03 <span class="round-status status-locked">🔒 Locked</span></div>
+            <h2 class="round-title">Long-Run Investing & Rebalancing</h2>
+            <p class="round-desc">장기 투자의 수학적 기초, 리밸런싱 전략, 기하평균 vs 산술평균, 시간 분산 효과의 허와 실. (Ang Ch.4–5)</p>
+            <div class="round-topics">
+                <span class="topic-tag">Rebalancing</span>
+                <span class="topic-tag">Geometric Mean</span>
+                <span class="topic-tag">Time Diversification</span>
+                <span class="topic-tag">Life Cycle</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- PART II -->
+    <div class="part-header">Part II — Factor Risk Premiums</div>
+
+    <div class="round-list">
+        <div class="round-card locked">
+            <div class="round-number">Round 04 <span class="round-status status-locked">🔒 Locked</span></div>
+            <h2 class="round-title">Factor Theory & CAPM</h2>
+            <p class="round-desc">팩터 이론의 기초, CAPM 도출과 검증, 시장 베타 추정, SML과 CML. 자산 가격 결정의 핵심 프레임워크. (Ang Ch.6)</p>
+            <div class="round-topics">
+                <span class="topic-tag">CAPM</span>
+                <span class="topic-tag">Beta</span>
+                <span class="topic-tag">SML</span>
+                <span class="topic-tag">Market Risk Premium</span>
+            </div>
+        </div>
+
+        <div class="round-card locked">
+            <div class="round-number">Round 05 <span class="round-status status-locked">🔒 Locked</span></div>
+            <h2 class="round-title">Fama-French & Multi-Factor Models</h2>
+            <p class="round-desc">Fama-French 3팩터/5팩터, Value-Growth, Size, Momentum, Quality. 팩터 수익률 데이터 수집부터 회귀분석까지. (Ang Ch.7)</p>
+            <div class="round-topics">
+                <span class="topic-tag">Fama-French</span>
+                <span class="topic-tag">Value</span>
+                <span class="topic-tag">Momentum</span>
+                <span class="topic-tag">Size</span>
+                <span class="topic-tag">Quality</span>
+            </div>
+        </div>
+
+        <div class="round-card locked">
+            <div class="round-number">Round 06 <span class="round-status status-locked">🔒 Locked</span></div>
+            <h2 class="round-title">Equity Risk Premium & Anomalies</h2>
+            <p class="round-desc">주식 리스크 프리미엄 추정, 소비 기반 자산가격 모델, 저변동성 이상현상, 베팅 어게인스트 베타. (Ang Ch.8, 10)</p>
+            <div class="round-topics">
+                <span class="topic-tag">Equity Premium</span>
+                <span class="topic-tag">C-CAPM</span>
+                <span class="topic-tag">Low Volatility</span>
+                <span class="topic-tag">BAB</span>
+            </div>
+        </div>
+
+        <div class="round-card locked">
+            <div class="round-number">Round 07 <span class="round-status status-locked">🔒 Locked</span></div>
+            <h2 class="round-title">Bond Factors & Term Structure</h2>
+            <p class="round-desc">채권 팩터(Level, Slope, Curvature), 기간 구조 모델, 신용 스프레드, 듀레이션과 볼록성. (Ang Ch.9)</p>
+            <div class="round-topics">
+                <span class="topic-tag">Yield Curve</span>
+                <span class="topic-tag">Duration</span>
+                <span class="topic-tag">Credit Spread</span>
+                <span class="topic-tag">Term Premium</span>
+            </div>
+        </div>
+
+        <div class="round-card locked">
+            <div class="round-number">Round 08 <span class="round-status status-locked">🔒 Locked</span></div>
+            <h2 class="round-title">Real Assets & Inflation Hedging</h2>
+            <p class="round-desc">TIPS, 원자재, 부동산의 팩터 분해. 인플레이션 헤지의 실증 분석. 금은 진짜 인플레이션 헤지인가? (Ang Ch.11)</p>
+            <div class="round-topics">
+                <span class="topic-tag">TIPS</span>
+                <span class="topic-tag">Commodities</span>
+                <span class="topic-tag">Real Estate</span>
+                <span class="topic-tag">Inflation</span>
+            </div>
+        </div>
+
+        <div class="round-card locked">
+            <div class="round-number">Round 09 <span class="round-status status-locked">🔒 Locked</span></div>
+            <h2 class="round-title">Alpha, Illiquidity & Tax</h2>
+            <p class="round-desc">알파의 정의와 측정, 정보비율, 비유동성 프리미엄, 세금 효율적 투자. 벤치마크 선택이 알파를 바꾼다. (Ang Ch.10, 12–13)</p>
+            <div class="round-topics">
+                <span class="topic-tag">Alpha</span>
+                <span class="topic-tag">Information Ratio</span>
+                <span class="topic-tag">Illiquidity Premium</span>
+                <span class="topic-tag">Tax Efficiency</span>
+            </div>
+        </div>
+
+        <div class="round-card locked">
+            <div class="round-number">Round 10 <span class="round-status status-locked">🔒 Locked</span></div>
+            <h2 class="round-title">Factor Investing Strategies</h2>
+            <p class="round-desc">팩터 타이밍, 팩터 틸팅, 스마트 베타, 롱숏 팩터 포트폴리오 구축. 이론에서 실전 전략으로. (Ang Ch.14)</p>
+            <div class="round-topics">
+                <span class="topic-tag">Smart Beta</span>
+                <span class="topic-tag">Factor Timing</span>
+                <span class="topic-tag">Long-Short</span>
+                <span class="topic-tag">Factor Tilting</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- PART III -->
+    <div class="part-header">Part III — Delegated Portfolio Management</div>
+
+    <div class="round-list">
+        <div class="round-card locked">
+            <div class="round-number">Round 11 <span class="round-status status-locked">🔒 Locked</span></div>
+            <h2 class="round-title">Fund Evaluation & Manager Selection</h2>
+            <p class="round-desc">뮤추얼펀드·헤지펀드 성과 평가, 스타일 분석, 팩터 기반 매니저 선정. 수수료 구조와 인센티브. (Ang Ch.15–17)</p>
+            <div class="round-topics">
+                <span class="topic-tag">Mutual Funds</span>
+                <span class="topic-tag">Hedge Funds</span>
+                <span class="topic-tag">Style Analysis</span>
+                <span class="topic-tag">Fee Structure</span>
+            </div>
+        </div>
+
+        <div class="round-card locked">
+            <div class="round-number">Round 12 <span class="round-status status-locked">🔒 Locked</span></div>
+            <h2 class="round-title">Integration: Factor-Based Portfolio</h2>
+            <p class="round-desc">전체 통합 프로젝트. 팩터 데이터 수집 → 모델 추정 → 포트폴리오 구축 → 백테스팅 → 성과 평가 파이프라인. (Ang 전체)</p>
+            <div class="round-topics">
+                <span class="topic-tag">Full Pipeline</span>
+                <span class="topic-tag">Backtesting</span>
+                <span class="topic-tag">Performance Attribution</span>
+                <span class="topic-tag">Final Project</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="curriculum-info">
+        <h3 class="curriculum-title">Curriculum Overview</h3>
+        <div class="curriculum-grid">
+            <div class="curriculum-item"><span class="label">Textbook</span> Andrew Ang, Asset Management (Oxford)</div>
+            <div class="curriculum-item"><span class="label">Rounds</span> 12 Rounds (각 3회 확장)</div>
+            <div class="curriculum-item"><span class="label">Focus</span> 수식 → 파이썬 코드 구현</div>
+            <div class="curriculum-item"><span class="label">Style</span> 교재 수식 → 직관 설명 → 코드 실습</div>
+            <div class="curriculum-item"><span class="label">Data</span> Kenneth French Library, FRED, yfinance</div>
+            <div class="curriculum-item"><span class="label">Tools</span> NumPy, Pandas, statsmodels, CVXPY, Plotly</div>
+        </div>
+    </div>
+</div>
+</div>
+
+<script>
+gsap.to('.page-title',{opacity:1,y:0,duration:.6,delay:.2});
+gsap.to('.page-subtitle',{opacity:1,duration:.5,delay:.35});
+gsap.to('.page-desc',{opacity:1,duration:.5,delay:.45});
+gsap.to('.progress-overview',{opacity:1,duration:.5,delay:.55});
+gsap.to('.part-header',{opacity:1,duration:.5,delay:.6,stagger:.1});
+gsap.to('.round-card',{opacity:1,y:0,duration:.5,delay:.65,stagger:.06});
+gsap.to('.curriculum-info',{opacity:1,duration:.5,delay:2});
+gsap.set('.page-title',{y:15});
+gsap.set('.round-card',{y:20});
+</script>
+{% include market-data.html %}
+</body>
+</html>

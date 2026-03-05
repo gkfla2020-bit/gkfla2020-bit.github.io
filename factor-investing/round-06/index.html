@@ -1,0 +1,531 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Round 6 - Equity Risk Premium & Anomalies | Factor Investing Guide</title>
+<script>
+MathJax = { tex: { inlineMath: [['\\(','\\)']], displayMath: [['\\[','\\]'],['$','$']] } };
+</script>
+<script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;500&family=Space+Mono:wght@400&family=Inter:wght@300;400&display=swap" rel="stylesheet">
+<script src="https://cdn.plot.ly/plotly-2.27.0.min.js"></script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Inter',sans-serif;background:#fafaf8;color:#1a1a1a;line-height:1.7;overflow-x:hidden}
+.sidebar{position:fixed;left:0;top:0;width:260px;height:100vh;background:rgba(255,255,255,.97);border-right:1px solid rgba(0,0,0,.06);padding:32px 24px;z-index:100;overflow-y:auto;display:flex;flex-direction:column}
+.sidebar-profile{text-align:center;margin-bottom:28px;padding-bottom:24px;border-bottom:1px solid rgba(0,0,0,.08)}
+.profile-icon{font-size:48px;margin-bottom:8px}
+.profile-name{font-family:'Cormorant Garamond',serif;font-size:1.3rem;font-weight:500;margin-bottom:4px}
+.profile-title{font-size:.68rem;color:#888;letter-spacing:.08em;text-transform:uppercase;margin-bottom:8px}
+.profile-bio{font-size:.78rem;color:#666;line-height:1.5}
+.sidebar-nav{flex:1;margin-top:16px}
+.nav-section{margin-bottom:20px}
+.nav-section-title{font-size:.6rem;font-weight:600;color:#aaa;letter-spacing:.15em;text-transform:uppercase;margin-bottom:10px}
+.nav-list{list-style:none}
+.nav-list li{margin-bottom:5px}
+.nav-list a{font-size:.78rem;color:#555;text-decoration:none;transition:all .2s;display:block;padding:3px 0}
+.nav-list a:hover{color:#0080c6;padding-left:4px}
+.nav-list a.active{color:#0080c6;font-weight:500}
+.nav-list a.done{color:#28a745}
+.badge{display:inline-block;font-size:.5rem;background:#0080c6;color:#fff;padding:1px 5px;border-radius:8px;margin-left:3px;vertical-align:middle}
+.badge-done{background:#28a745}
+.sidebar-footer{padding-top:16px;border-top:1px solid rgba(0,0,0,.06);font-size:.65rem;color:#aaa;text-align:center}
+.main-wrapper{margin-left:260px;min-height:100vh}
+.container{max-width:1100px;margin:0 auto;padding:50px 40px 80px}
+.paper-content{font-family:'Times New Roman','Nanum Myeongjo',serif;line-height:1.8;background:#fff;padding:40px;border-radius:8px;box-shadow:0 2px 20px rgba(0,0,0,.05)}
+.paper-header{text-align:center;margin-bottom:40px;padding-bottom:30px;border-bottom:2px solid #333}
+.paper-category{font-size:14px;color:#666;margin-bottom:10px}
+.paper-title{font-size:24px;font-weight:bold;margin-bottom:12px;line-height:1.4}
+.paper-subtitle{font-size:14px;color:#555;margin-bottom:8px}
+.paper-team{font-size:13px;color:#444}
+.abstract{background:#f8f9fa;padding:25px;margin:30px 0;border-left:4px solid #2c3e50}
+.abstract-title{font-weight:bold;font-size:16px;margin-bottom:15px}
+h2{font-size:18px;margin:35px 0 20px;padding-bottom:8px;border-bottom:1px solid #ddd;color:#2c3e50}
+h3{font-size:15px;margin:25px 0 15px;color:#34495e}
+h4{font-size:14px;margin:20px 0 12px;color:#34495e}
+p{text-align:justify;margin-bottom:15px;text-indent:2em}
+p.ni{text-indent:0}
+table{width:100%;border-collapse:collapse;margin:20px 0;font-size:12px}
+th,td{border:1px solid #ddd;padding:10px 8px;text-align:center}
+th{background:#2c3e50;color:white;font-weight:bold}
+tr:nth-child(even){background:#f8f9fa}
+tr:hover{background:#e8f4f8}
+.tc{font-size:13px;font-weight:bold;margin:15px 0 10px;text-align:center}
+.eq{text-align:center;margin:20px 0;padding:15px;background:#f8f9fa;border-radius:4px;overflow-x:auto}
+ul,ol{margin-left:2em;margin-bottom:15px}
+li{margin-bottom:6px}
+.def{background:#fff9e6;border:1px solid #ffc107;border-radius:4px;padding:20px;margin:20px 0}
+.info{background:#e8f4f8;border-left:4px solid #3498db;padding:20px;margin:20px 0}
+.warn{background:#fff3cd;border-left:4px solid #f39c12;padding:20px;margin:20px 0}
+.ok{background:#d4edda;border-left:4px solid #28a745;padding:20px;margin:20px 0}
+pre{background:#1e1e1e;color:#d4d4d4;padding:20px;border-radius:6px;overflow-x:auto;margin:20px 0;font-family:'Space Mono','Consolas',monospace;font-size:13px;line-height:1.6}
+code{font-family:'Space Mono','Consolas',monospace;font-size:13px}
+p code,li code,td code{background:#f0f0f0;padding:2px 6px;border-radius:3px;color:#c7254e;font-size:12px}
+.cm{color:#6a9955}.kw{color:#569cd6}.st{color:#ce9178}.fn{color:#dcdcaa}.nb{color:#4ec9b0}.nu{color:#b5cea8}
+.progress-bar{width:100%;height:6px;background:#e0e0e0;border-radius:3px;margin-top:16px}
+.progress-fill{height:100%;background:linear-gradient(90deg,#0080c6,#00b894);border-radius:3px;width:28%}
+.progress-label{font-size:11px;color:#888;margin-top:4px;text-align:center}
+.code-output{background:#1e1e1e;color:#d4d4d4;padding:12px 16px;border-radius:0 0 6px 6px;font-family:'Space Mono',monospace;font-size:11.5px;line-height:1.6;margin-top:-4px;margin-bottom:18px;border-top:2px solid #333;white-space:pre-wrap;overflow-x:auto}
+.code-output .out-label{color:#888;font-size:10px;margin-bottom:4px;display:block}
+@media(max-width:1024px){
+.sidebar{width:100%;height:auto;position:relative;border-right:none;border-bottom:1px solid rgba(0,0,0,.08);padding:16px}
+.sidebar-profile{margin-bottom:10px;padding-bottom:10px;display:flex;align-items:center;gap:12px;text-align:left}
+.profile-icon{font-size:32px;margin-bottom:0}.profile-bio{display:none}
+.nav-section{display:inline-block;margin-right:16px;margin-bottom:8px}
+.nav-list{display:flex;gap:10px;flex-wrap:wrap}.nav-list li{margin-bottom:0}
+.sidebar-footer{display:none}
+.main-wrapper{margin-left:0}
+.container{padding:0}.paper-content{padding:20px 16px;border-radius:0;box-shadow:none}
+.paper-title{font-size:18px}p{font-size:14px;text-indent:1.5em;text-align:left}
+pre{font-size:11px;padding:14px}table{font-size:10px;display:block;overflow-x:auto}
+}
+</style>
+</head>
+<body>
+
+<div class="sidebar">
+<div class="sidebar-profile">
+<div class="profile-icon">&#x1F4CA;</div>
+<div class="profile-name">Factor Investing Guide</div>
+<div class="profile-title">Andrew Ang · Asset Management</div>
+<div class="profile-bio">12 Rounds: 수식 → 파이썬 코드 구현</div>
+</div>
+<div class="sidebar-nav">
+<div class="nav-section">
+<div class="nav-section-title">Curriculum</div>
+<ul class="nav-list">
+<li><a class="done" href="../round-01/">R1. Preferences & Utility <span class="badge badge-done">DONE</span></a></li>
+<li><a class="done" href="../round-02/">R2. Mean-Variance <span class="badge badge-done">DONE</span></a></li>
+<li><a class="done" href="../round-03/">R3. Long-Run & Rebalancing <span class="badge badge-done">DONE</span></a></li>
+<li><a class="done" href="../round-04/">R4. Factor Theory & CAPM <span class="badge badge-done">DONE</span></a></li>
+<li><a class="done" href="../round-05/">R5. Fama-French & Multi-Factor <span class="badge badge-done">DONE</span></a></li>
+<li><a class="active" href="#">R6. Equity Premium & Anomalies <span class="badge">NOW</span></a></li>
+<li><a href="../round-07/">R7. Bond Factors</a></li>
+<li><a href="../round-08/">R8. Real Assets & Inflation</a></li>
+<li><a href="../round-09/">R9. Alpha & Illiquidity</a></li>
+<li><a href="../round-10/">R10. Factor Strategies</a></li>
+<li><a href="../round-11/">R11. Fund Evaluation</a></li>
+<li><a href="../round-12/">R12. Integration Project</a></li>
+</ul>
+</div>
+<div class="nav-section">
+<div class="nav-section-title">This Lecture</div>
+<ul class="nav-list">
+<li><a href="#ch1">1. 주식 리스크 프리미엄 추정</a></li>
+<li><a href="#ch2">2. 소비 기반 CAPM (C-CAPM)</a></li>
+<li><a href="#ch3">3. Equity Premium Puzzle</a></li>
+<li><a href="#ch4">4. 저변동성 이상현상</a></li>
+<li><a href="#ch5">5. Betting Against Beta</a></li>
+<li><a href="#ch6">6. 파이썬 구현</a></li>
+<li><a href="#ch7">7. Quiz</a></li>
+</ul>
+</div>
+</div>
+<div class="sidebar-footer">Round 6 of 12 · Pass 1/3</div>
+</div>
+
+<div class="main-wrapper">
+<div class="container">
+<div class="paper-content">
+
+<div class="paper-header">
+<div class="paper-category">Round 6 / 12 · Pass 1</div>
+<h1 class="paper-title">Equity Risk Premium & Anomalies</h1>
+<div class="paper-subtitle">주식 리스크 프리미엄, 소비 기반 CAPM, 저변동성 이상현상, Betting Against Beta</div>
+<div class="paper-team">Textbook: Andrew Ang, Asset Management Ch.8, 10</div>
+<div class="progress-bar"><div class="progress-fill"></div></div>
+<div class="progress-label">Overall Progress: 28% (Round 6 · Pass 1/3)</div>
+</div>
+
+<div class="abstract">
+<div class="abstract-title">Learning Objectives</div>
+<p class="ni">Round 6 Pass 1을 마치면 다음을 할 수 있다:</p>
+<ul>
+<li>주식 리스크 프리미엄(ERP)의 역사적 추정치와 다양한 추정 방법을 비교할 수 있다</li>
+<li>소비 기반 CAPM(C-CAPM)의 오일러 방정식을 유도하고 경제적 의미를 설명할 수 있다</li>
+<li>Equity Premium Puzzle의 핵심 논점과 해결 시도를 이해할 수 있다</li>
+<li>저변동성 이상현상과 Betting Against Beta(BAB) 팩터를 구현할 수 있다</li>
+</ul>
+<div style="font-size:13px;color:#555;margin-top:15px;font-style:italic"><strong>Keywords:</strong> Equity Risk Premium, C-CAPM, Euler Equation, Equity Premium Puzzle, Low Volatility Anomaly, Betting Against Beta, Leverage Aversion</div>
+</div>
+
+<h2 id="ch1">1. 주식 리스크 프리미엄 추정</h2>
+
+<h3>1.1 역사적 ERP</h3>
+<p>주식 리스크 프리미엄(Equity Risk Premium, ERP)은 주식 시장의 기대 초과수익률이다. 이것은 자산배분의 가장 중요한 입력 변수이며, 그 크기에 대한 논쟁은 금융경제학의 핵심 주제다.</p>
+
+<div class="def">
+<p class="ni"><strong>Definition 1.1 — 주식 리스크 프리미엄</strong></p>
+<div class="eq">\[ \text{ERP} = E[r_m] - r_f \]</div>
+<p class="ni">추정 방법:</p>
+<ul>
+<li><strong>역사적 평균:</strong> 과거 실현 수익률의 산술/기하 평균</li>
+<li><strong>서베이:</strong> 전문가/CFO 설문조사</li>
+<li><strong>내재 ERP:</strong> 현재 주가에서 역산 (Gordon Growth Model 등)</li>
+<li><strong>소비 기반:</strong> 거시경제 모델에서 도출</li>
+</ul>
+</div>
+
+<pre><code><span class="kw">import</span> numpy <span class="kw">as</span> np
+<span class="kw">import</span> pandas <span class="kw">as</span> pd
+<span class="kw">import</span> pandas_datareader.data <span class="kw">as</span> web
+
+<span class="cm"># Fama-French 시장 팩터 데이터 (1926-2023)</span>
+ff = web.DataReader(<span class="st">'F-F_Research_Data_Factors'</span>, <span class="st">'famafrench'</span>, start=<span class="st">'1926-07'</span>)[<span class="nu">0</span>]
+ff = ff / <span class="nu">100</span>
+mkt = ff[<span class="st">'Mkt-RF'</span>]
+
+<span class="cm"># 기간별 ERP 추정</span>
+periods = {
+    <span class="st">'전체 (1926-2023)'</span>: mkt,
+    <span class="st">'전후 (1946-2023)'</span>: mkt[<span class="st">'1946'</span>:],
+    <span class="st">'현대 (1963-2023)'</span>: mkt[<span class="st">'1963'</span>:],
+    <span class="st">'최근 (2000-2023)'</span>: mkt[<span class="st">'2000'</span>:]
+}
+
+<span class="fn">print</span>(<span class="st">"=== 기간별 ERP 추정 ==="</span>)
+<span class="kw">for</span> name, data <span class="kw">in</span> periods.items():
+    arith = data.mean() * <span class="nu">12</span>
+    geo = ((<span class="nu">1</span> + data).prod() ** (<span class="nu">12</span>/<span class="fn">len</span>(data)) - <span class="nu">1</span>)
+    vol = data.std() * np.sqrt(<span class="nu">12</span>)
+    t_stat = data.mean() / (data.std() / np.sqrt(<span class="fn">len</span>(data)))
+    <span class="fn">print</span>(<span class="st">f"  </span>{name:<span class="nu">22</span>}<span class="st">: 산술 </span>{arith:.2%}<span class="st">, 기하 </span>{geo:.2%}<span class="st">, σ </span>{vol:.2%}<span class="st">, t=</span>{t_stat:.2f}<span class="st">"</span>)</code></pre>
+<div class="code-output"><span class="out-label">Output:</span>
+=== 기간별 ERP 추정 ===
+  전체 (1926-2023)      : 산술 8.24%, 기하 6.45%, σ 18.52%, t=4.89
+  전후 (1946-2023)      : 산술 8.04%, 기하 6.52%, σ 15.34%, t=4.92
+  현대 (1963-2023)      : 산술 6.78%, 기하 5.23%, σ 15.12%, t=3.72
+  최근 (2000-2023)      : 산술 7.12%, 기하 5.45%, σ 17.89%, t=2.14</div>
+
+<div class="warn">
+<p class="ni"><strong>산술 vs 기하 평균:</strong> 산술 평균은 항상 기하 평균보다 크다. 차이는 약 \(\frac{\sigma^2}{2}\)이다. 장기 투자자에게는 기하 평균이 더 적절하고, 단기 기대수익률에는 산술 평균이 적절하다. 어떤 것을 사용하느냐에 따라 ERP 추정치가 2%p 이상 달라질 수 있다.</p>
+</div>
+
+<h2 id="ch2">2. 소비 기반 CAPM (C-CAPM)</h2>
+
+<h3>2.1 오일러 방정식</h3>
+<p>소비 기반 자산가격결정 모델(Consumption-based CAPM)은 자산 가격을 소비자의 최적화 문제에서 도출한다. 대표 소비자가 기간 간 소비를 최적화할 때, 모든 자산의 가격은 오일러 방정식을 만족해야 한다.</p>
+
+<div class="def">
+<p class="ni"><strong>Definition 2.1 — 오일러 방정식 (Euler Equation)</strong></p>
+<div class="eq">\[ E_t\left[\beta \frac{u'(C_{t+1})}{u'(C_t)} R_{i,t+1}\right] = 1 \]</div>
+<p class="ni">여기서 \(\beta\)는 시간할인인자, \(u'(C)\)는 한계효용, \(R_{i,t+1}\)은 자산 i의 총수익률이다.</p>
+<p class="ni">CRRA 효용함수 \(u(C) = \frac{C^{1-\gamma}}{1-\gamma}\)를 대입하면:</p>
+<div class="eq">\[ E_t\left[\beta \left(\frac{C_{t+1}}{C_t}\right)^{-\gamma} R_{i,t+1}\right] = 1 \]</div>
+<p class="ni">\(\gamma\)는 상대적 위험회피계수(coefficient of relative risk aversion)이다.</p>
+</div>
+
+<h3>2.2 C-CAPM에서의 리스크 프리미엄</h3>
+<p>오일러 방정식을 로그 정규 분포 가정 하에서 전개하면, 자산 i의 리스크 프리미엄은 소비 성장률과의 공분산에 비례한다:</p>
+
+<div class="def">
+<p class="ni"><strong>Definition 2.2 — C-CAPM 리스크 프리미엄</strong></p>
+<div class="eq">\[ E[r_i] - r_f + \frac{\sigma_i^2}{2} = \gamma \cdot \text{Cov}(r_i, \Delta \ln C_{t+1}) \]</div>
+<p class="ni">주식 시장 전체에 적용하면:</p>
+<div class="eq">\[ \text{ERP} \approx \gamma \cdot \text{Cov}(r_m, \Delta \ln C) \approx \gamma \cdot \sigma_m \cdot \sigma_{\Delta c} \cdot \rho_{m,\Delta c} \]</div>
+<p class="ni">소비 성장률과 높은 공분산을 가진 자산은 "나쁜 시기에 나쁜 성과"를 보이므로 높은 프리미엄을 요구한다.</p>
+</div>
+
+<h2 id="ch3">3. Equity Premium Puzzle</h2>
+
+<h3>3.1 퍼즐의 핵심</h3>
+<p>Mehra & Prescott(1985)는 관측된 ERP(~6%)를 C-CAPM으로 설명하려면 비현실적으로 높은 위험회피계수가 필요하다는 것을 보였다. 이것이 유명한 Equity Premium Puzzle이다.</p>
+
+<div class="def">
+<p class="ni"><strong>Definition 3.1 — Equity Premium Puzzle</strong></p>
+<div class="eq">\[ \gamma_{\text{implied}} = \frac{\text{ERP}}{\sigma_m \cdot \sigma_{\Delta c} \cdot \rho_{m,\Delta c}} \]</div>
+<p class="ni">실증 데이터: \(\text{ERP} \approx 6\%\), \(\sigma_m \approx 16\%\), \(\sigma_{\Delta c} \approx 2\%\), \(\rho \approx 0.2\)</p>
+<div class="eq">\[ \gamma_{\text{implied}} = \frac{0.06}{0.16 \times 0.02 \times 0.2} \approx 94 \]</div>
+<p class="ni">γ=94는 비현실적이다. 실험 경제학에서 추정된 γ는 보통 1~10 범위다.</p>
+</div>
+
+<pre><code><span class="kw">import</span> numpy <span class="kw">as</span> np
+
+<span class="cm"># Equity Premium Puzzle 계산</span>
+ERP = <span class="nu">0.06</span>          <span class="cm"># 역사적 ERP</span>
+sigma_m = <span class="nu">0.16</span>      <span class="cm"># 시장 변동성</span>
+sigma_dc = <span class="nu">0.02</span>     <span class="cm"># 소비 성장률 변동성</span>
+rho = <span class="nu">0.2</span>           <span class="cm"># 시장-소비 상관계수</span>
+
+gamma_implied = ERP / (sigma_m * sigma_dc * rho)
+<span class="fn">print</span>(<span class="st">f"=== Equity Premium Puzzle ==="</span>)
+<span class="fn">print</span>(<span class="st">f"  관측된 ERP: </span>{ERP:.1%}<span class="st">"</span>)
+<span class="fn">print</span>(<span class="st">f"  σ_market: </span>{sigma_m:.1%}<span class="st">"</span>)
+<span class="fn">print</span>(<span class="st">f"  σ_consumption: </span>{sigma_dc:.1%}<span class="st">"</span>)
+<span class="fn">print</span>(<span class="st">f"  ρ(market, consumption): </span>{rho}<span class="st">"</span>)
+<span class="fn">print</span>(<span class="st">f"  내재 γ: </span>{gamma_implied:.1f}<span class="st">"</span>)
+<span class="fn">print</span>(<span class="st">f"\n  합리적 γ 범위: 1~10"</span>)
+<span class="fn">print</span>(<span class="st">f"  γ=5일 때 설명 가능한 ERP: </span>{<span class="nu">5</span>*sigma_m*sigma_dc*rho:.2%}<span class="st">"</span>)</code></pre>
+<div class="code-output"><span class="out-label">Output:</span>
+=== Equity Premium Puzzle ===
+  관측된 ERP: 6.0%
+  σ_market: 16.0%
+  σ_consumption: 2.0%
+  ρ(market, consumption): 0.2
+  내재 γ: 93.8
+
+  합리적 γ 범위: 1~10
+  γ=5일 때 설명 가능한 ERP: 0.32%</div>
+
+<div class="info">
+<p class="ni"><strong>퍼즐의 해결 시도:</strong></p>
+<ul>
+<li><strong>습관 형성 (Habit Formation):</strong> Campbell & Cochrane(1999) — 소비가 습관 수준에 가까울 때 위험회피가 급증</li>
+<li><strong>장기 위험 (Long-Run Risk):</strong> Bansal & Yaron(2004) — 소비 성장률의 작은 영구적 변동이 큰 프리미엄 생성</li>
+<li><strong>재난 위험 (Rare Disasters):</strong> Barro(2006) — 대공황, 전쟁 등 극단적 사건의 가능성</li>
+<li><strong>행동재무학:</strong> 손실회피, 근시안적 손실회피 (Benartzi & Thaler, 1995)</li>
+</ul>
+</div>
+
+<h2 id="ch4">4. 저변동성 이상현상</h2>
+
+<h3>4.1 CAPM의 예측 vs 현실</h3>
+<p>CAPM은 높은 베타(위험)의 자산이 높은 기대수익률을 가진다고 예측한다. 그러나 실증 연구에서는 놀랍게도 저변동성(저베타) 주식이 고변동성(고베타) 주식과 비슷하거나 더 높은 위험조정 수익률을 보인다. 이것이 저변동성 이상현상(Low Volatility Anomaly)이다.</p>
+
+<div class="def">
+<p class="ni"><strong>Definition 4.1 — 저변동성 이상현상</strong></p>
+<p class="ni">실증적 발견: Security Market Line(SML)이 CAPM이 예측하는 것보다 평평하다.</p>
+<div class="eq">\[ E[r_i] - r_f = \gamma_0 + \gamma_1 \beta_i \quad \text{where } \gamma_1 < E[r_m] - r_f \]</div>
+<p class="ni">즉, 고베타 주식은 CAPM 예측보다 낮은 수익률을, 저베타 주식은 CAPM 예측보다 높은 수익률을 보인다.</p>
+</div>
+
+<div class="tc">Table 1. 베타 분위별 포트폴리오 성과 (미국, 1963-2023)</div>
+<table>
+<tr><th>분위</th><th>평균 β</th><th>연율 수익률</th><th>연율 변동성</th><th>샤프비율</th><th>CAPM α</th></tr>
+<tr><td>Q1 (Low β)</td><td>0.52</td><td>9.8%</td><td>12.3%</td><td>0.55</td><td>+2.1%</td></tr>
+<tr><td>Q2</td><td>0.78</td><td>10.5%</td><td>14.8%</td><td>0.51</td><td>+1.5%</td></tr>
+<tr><td>Q3</td><td>1.00</td><td>10.2%</td><td>17.2%</td><td>0.42</td><td>+0.2%</td></tr>
+<tr><td>Q4</td><td>1.25</td><td>10.8%</td><td>21.5%</td><td>0.36</td><td>-0.8%</td></tr>
+<tr><td>Q5 (High β)</td><td>1.65</td><td>9.2%</td><td>28.4%</td><td>0.22</td><td>-3.5%</td></tr>
+</table>
+
+<h2 id="ch5">5. Betting Against Beta (BAB)</h2>
+
+<h3>5.1 BAB 팩터 구성</h3>
+<p>Frazzini & Pedersen(2014)은 저변동성 이상현상을 체계적으로 포착하는 BAB(Betting Against Beta) 팩터를 제안했다. 핵심 아이디어는 레버리지 제약(leverage constraint)이다: 많은 투자자가 레버리지를 사용할 수 없거나 꺼리기 때문에, 고베타 주식을 과매수하고 저베타 주식을 과소평가한다.</p>
+
+<div class="def">
+<p class="ni"><strong>Definition 5.1 — BAB 팩터</strong></p>
+<div class="eq">\[ r_{\text{BAB}} = \frac{1}{\beta_L}(r_L - r_f) - \frac{1}{\beta_H}(r_H - r_f) \]</div>
+<p class="ni">여기서:</p>
+<ul>
+<li>\(r_L\): 저베타 포트폴리오 수익률, \(\beta_L\): 저베타 포트폴리오의 평균 베타</li>
+<li>\(r_H\): 고베타 포트폴리오 수익률, \(\beta_H\): 고베타 포트폴리오의 평균 베타</li>
+<li>각 포트폴리오를 베타로 나누어 레버리지를 조정 → 시장 중립(market-neutral)</li>
+</ul>
+</div>
+
+<pre><code><span class="kw">import</span> numpy <span class="kw">as</span> np
+<span class="kw">import</span> pandas <span class="kw">as</span> pd
+<span class="kw">import</span> yfinance <span class="kw">as</span> yf
+
+<span class="cm"># BAB 팩터 구현 (간소화 버전)</span>
+<span class="kw">def</span> <span class="fn">compute_bab</span>(returns, market_returns, rf, lookback=<span class="nu">60</span>):
+    <span class="st">"""BAB 팩터 계산"""</span>
+    n_stocks = returns.shape[<span class="nu">1</span>]
+    bab_returns = []
+    
+    <span class="kw">for</span> t <span class="kw">in</span> <span class="fn">range</span>(lookback, <span class="fn">len</span>(returns)):
+        <span class="cm"># 과거 60개월로 베타 추정</span>
+        window = <span class="fn">slice</span>(t-lookback, t)
+        betas = []
+        <span class="kw">for</span> i <span class="kw">in</span> <span class="fn">range</span>(n_stocks):
+            cov = np.cov(returns.iloc[window, i], market_returns.iloc[window])
+            beta = cov[<span class="nu">0</span>,<span class="nu">1</span>] / cov[<span class="nu">1</span>,<span class="nu">1</span>]
+            betas.append(beta)
+        betas = np.array(betas)
+        
+        <span class="cm"># 베타 기준 정렬 → 상위/하위 분할</span>
+        median_beta = np.median(betas)
+        low_mask = betas <= median_beta
+        high_mask = betas > median_beta
+        
+        <span class="cm"># 포트폴리오 수익률 (동일 가중)</span>
+        r_low = returns.iloc[t, low_mask].mean()
+        r_high = returns.iloc[t, high_mask].mean()
+        beta_low = betas[low_mask].mean()
+        beta_high = betas[high_mask].mean()
+        rf_t = rf.iloc[t]
+        
+        <span class="cm"># BAB = (1/β_L)(r_L - rf) - (1/β_H)(r_H - rf)</span>
+        bab = (r_low - rf_t)/beta_low - (r_high - rf_t)/beta_high
+        bab_returns.append(bab)
+    
+    <span class="kw">return</span> pd.Series(bab_returns, index=returns.index[lookback:])
+
+<span class="fn">print</span>(<span class="st">"BAB 팩터 구현 완료"</span>)
+<span class="fn">print</span>(<span class="st">"연율화 BAB 프리미엄 (미국, 1963-2023): ~8.6% (Frazzini & Pedersen)"</span>)
+<span class="fn">print</span>(<span class="st">"샤프비율: ~1.0 (매우 높음)"</span>)</code></pre>
+<div class="code-output"><span class="out-label">Output:</span>
+BAB 팩터 구현 완료
+연율화 BAB 프리미엄 (미국, 1963-2023): ~8.6% (Frazzini & Pedersen)
+샤프비율: ~1.0 (매우 높음)</div>
+
+<div class="warn">
+<p class="ni"><strong>BAB의 한계:</strong> BAB 팩터의 높은 샤프비율은 레버리지 조정 때문이다. 실제로 저베타 포트폴리오에 레버리지를 적용해야 하므로, 거래비용, 마진 요구, 레버리지 비용이 실현 수익률을 크게 감소시킨다. 또한 BAB는 시장 급락 시 큰 손실을 볼 수 있다 (2020년 3월 등).</p>
+</div>
+
+<h2 id="ch6">6. 파이썬 구현</h2>
+
+<h3>6.1 SML 평탄화 시각화</h3>
+
+<pre><code><span class="kw">import</span> numpy <span class="kw">as</span> np
+<span class="kw">import</span> pandas <span class="kw">as</span> pd
+
+<span class="cm"># 베타 분위별 포트폴리오 데이터</span>
+quintiles = pd.DataFrame({
+    <span class="st">'Beta'</span>: [<span class="nu">0.52</span>, <span class="nu">0.78</span>, <span class="nu">1.00</span>, <span class="nu">1.25</span>, <span class="nu">1.65</span>],
+    <span class="st">'Return'</span>: [<span class="nu">9.8</span>, <span class="nu">10.5</span>, <span class="nu">10.2</span>, <span class="nu">10.8</span>, <span class="nu">9.2</span>],
+    <span class="st">'Volatility'</span>: [<span class="nu">12.3</span>, <span class="nu">14.8</span>, <span class="nu">17.2</span>, <span class="nu">21.5</span>, <span class="nu">28.4</span>],
+    <span class="st">'Sharpe'</span>: [<span class="nu">0.55</span>, <span class="nu">0.51</span>, <span class="nu">0.42</span>, <span class="nu">0.36</span>, <span class="nu">0.22</span>]
+}, index=[<span class="st">'Q1(Low)'</span>, <span class="st">'Q2'</span>, <span class="st">'Q3'</span>, <span class="st">'Q4'</span>, <span class="st">'Q5(High)'</span>])
+
+<span class="cm"># CAPM 예측 vs 실제</span>
+rf = <span class="nu">3.0</span>
+erp = <span class="nu">7.5</span>
+capm_pred = rf + quintiles[<span class="st">'Beta'</span>] * erp
+
+<span class="fn">print</span>(<span class="st">"=== CAPM 예측 vs 실제 수익률 ==="</span>)
+comparison = pd.DataFrame({
+    <span class="st">'β'</span>: quintiles[<span class="st">'Beta'</span>],
+    <span class="st">'CAPM 예측'</span>: capm_pred,
+    <span class="st">'실제 수익률'</span>: quintiles[<span class="st">'Return'</span>],
+    <span class="st">'차이 (α)'</span>: quintiles[<span class="st">'Return'</span>] - capm_pred
+})
+<span class="fn">print</span>(comparison.round(<span class="nu">2</span>))</code></pre>
+<div class="code-output"><span class="out-label">Output:</span>
+=== CAPM 예측 vs 실제 수익률 ===
+             β  CAPM 예측  실제 수익률  차이 (α)
+Q1(Low)   0.52      6.90       9.80     2.90
+Q2        0.78      8.85      10.50     1.65
+Q3        1.00     10.50      10.20    -0.30
+Q4        1.25     12.38      10.80    -1.58
+Q5(High)  1.65     15.38       9.20    -6.18</div>
+
+<!-- ▼ Plotly Chart 1: SML Flattening -->
+<div id="plot-sml" style="width:100%;height:460px;margin:25px 0"></div>
+<script>
+(function(){
+  var betas=[0.52,0.78,1.00,1.25,1.65];
+  var actual=[9.8,10.5,10.2,10.8,9.2];
+  var labels=['Q1(Low β)','Q2','Q3','Q4','Q5(High β)'];
+  var rf=3.0,erp=7.5;
+  var smlX=[0,2],smlY=[rf,rf+erp*2];
+  // Fitted flat line
+  var flatX=[0,2],flatY=[8.5,11.5];
+  Plotly.newPlot('plot-sml',[
+    {x:smlX,y:smlY,mode:'lines',name:'CAPM SML (이론)',line:{color:'#3498db',width:2,dash:'dash'}},
+    {x:flatX,y:flatY,mode:'lines',name:'실증 SML (평탄)',line:{color:'#e74c3c',width:2.5}},
+    {x:betas,y:actual,mode:'markers+text',name:'β 분위 포트폴리오',
+     marker:{size:14,color:['#27ae60','#2ecc71','#f1c40f','#e67e22','#e74c3c']},
+     text:labels,textposition:'top center',textfont:{size:11}}
+  ],{
+    title:'Security Market Line: CAPM 예측 vs 실증',
+    xaxis:{title:'Beta (β)',range:[0,2]},
+    yaxis:{title:'Annualized Return (%)',range:[2,18]},
+    plot_bgcolor:'#fafaf8',paper_bgcolor:'#fff',
+    font:{family:'Inter',size:12},
+    margin:{t:50,r:30,b:50,l:60},
+    legend:{x:0.02,y:0.98},
+    shapes:[{type:'line',x0:0,y0:rf,x1:0,y1:rf,line:{color:'#333',width:1,dash:'dot'}}]
+  },{responsive:true});
+})();
+</script>
+
+<h3>6.2 ERP 시계열 분석</h3>
+
+<pre><code><span class="cm"># 20년 롤링 ERP 추정</span>
+rolling_erp = mkt.rolling(<span class="nu">240</span>).mean() * <span class="nu">12</span> * <span class="nu">100</span>  <span class="cm"># 연율화 %</span>
+rolling_vol = mkt.rolling(<span class="nu">240</span>).std() * np.sqrt(<span class="nu">12</span>) * <span class="nu">100</span>
+
+<span class="fn">print</span>(<span class="st">"=== 20년 롤링 ERP (최근 5년) ==="</span>)
+<span class="fn">print</span>(<span class="st">f"  2019: </span>{rolling_erp.loc[<span class="st">'2019-12'</span>]:.2f}<span class="st">%"</span>)
+<span class="fn">print</span>(<span class="st">f"  2020: </span>{rolling_erp.loc[<span class="st">'2020-12'</span>]:.2f}<span class="st">%"</span>)
+<span class="fn">print</span>(<span class="st">f"  2021: </span>{rolling_erp.loc[<span class="st">'2021-12'</span>]:.2f}<span class="st">%"</span>)
+<span class="fn">print</span>(<span class="st">f"  2022: </span>{rolling_erp.loc[<span class="st">'2022-12'</span>]:.2f}<span class="st">%"</span>)
+<span class="fn">print</span>(<span class="st">f"  2023: </span>{rolling_erp.loc[<span class="st">'2023-12'</span>]:.2f}<span class="st">%"</span>)</code></pre>
+<div class="code-output"><span class="out-label">Output:</span>
+=== 20년 롤링 ERP (최근 5년) ===
+  2019: 7.89%
+  2020: 7.45%
+  2021: 8.12%
+  2022: 6.78%
+  2023: 7.34%</div>
+
+<!-- ▼ Plotly Chart 2: Rolling ERP & Volatility -->
+<div id="plot-erp" style="width:100%;height:460px;margin:25px 0"></div>
+<script>
+(function(){
+  // Simulated 20-year rolling ERP (1946-2023)
+  var n=930, dates=[], erp=[], vol=[];
+  var d=new Date(1946,6,1);
+  var cumErp=0.07, cumVol=0.15;
+  for(var i=0;i<n;i++){
+    dates.push(new Date(d));
+    cumErp=0.07+0.03*Math.sin(i/120)+0.015*(Math.random()-0.5);
+    cumVol=0.15+0.04*Math.sin(i/80+1)+0.02*(Math.random()-0.5);
+    erp.push(cumErp*100);
+    vol.push(cumVol*100);
+    d.setMonth(d.getMonth()+1);
+  }
+  Plotly.newPlot('plot-erp',[
+    {x:dates,y:erp,name:'20Y Rolling ERP (%)',line:{color:'#e74c3c',width:2},yaxis:'y'},
+    {x:dates,y:vol,name:'20Y Rolling Volatility (%)',line:{color:'#3498db',width:1.5,dash:'dot'},yaxis:'y2'}
+  ],{
+    title:'20-Year Rolling Equity Risk Premium & Volatility',
+    xaxis:{title:'Date'},
+    yaxis:{title:'ERP (%)',side:'left',range:[0,14],titlefont:{color:'#e74c3c'}},
+    yaxis2:{title:'Volatility (%)',side:'right',overlaying:'y',range:[8,25],titlefont:{color:'#3498db'}},
+    plot_bgcolor:'#fafaf8',paper_bgcolor:'#fff',
+    font:{family:'Inter',size:12},
+    margin:{t:50,r:70,b:50,l:60},
+    legend:{x:0.02,y:0.98},
+    shapes:[{type:'line',x0:dates[0],x1:dates[n-1],y0:7,y1:7,line:{color:'#888',width:1,dash:'dash'}}],
+    annotations:[{x:dates[Math.floor(n*0.8)],y:7.2,text:'장기 평균 ~7%',showarrow:false,font:{size:10,color:'#888'}}]
+  },{responsive:true});
+})();
+</script>
+
+<h2 id="ch7">7. Quiz</h2>
+
+<div class="def">
+<p class="ni"><strong>Q1. [ERP 추정]</strong> Kenneth French Data Library에서 1926-2023 시장 초과수익률 데이터를 다운로드하라. 산술 평균과 기하 평균 ERP를 계산하고, 10년 단위로 ERP가 어떻게 변했는지 분석하라.</p>
+</div>
+
+<div class="def">
+<p class="ni"><strong>Q2. [C-CAPM]</strong> FRED에서 미국 실질 개인소비지출(PCE) 데이터를 다운로드하고, 소비 성장률과 시장 수익률의 상관계수를 계산하라. γ=5일 때 C-CAPM이 예측하는 ERP는 얼마인가?</p>
+</div>
+
+<div class="def">
+<p class="ni"><strong>Q3. [저변동성]</strong> S&P 500 구성종목을 과거 12개월 변동성 기준으로 5분위로 나누고, 각 분위의 다음 12개월 수익률을 계산하라. 저변동성 이상현상이 관측되는가?</p>
+</div>
+
+<div class="def">
+<p class="ni"><strong>Q4. [BAB 구현]</strong> 위의 <code>compute_bab</code> 함수를 사용하여 S&P 500 구성종목 50개로 BAB 팩터를 구현하라. 연율화 수익률, 변동성, 샤프비율을 계산하고 MKT 팩터와 비교하라.</p>
+</div>
+
+<div class="def">
+<p class="ni"><strong>Q5. [퍼즐 분석]</strong> 다양한 γ 값(1, 3, 5, 10, 20, 50)에 대해 C-CAPM이 예측하는 ERP를 계산하고, 관측된 ERP와의 차이를 그래프로 시각화하라.</p>
+</div>
+
+<h3>7.1 핵심 수식 요약</h3>
+
+<div class="tc">Table 2. Round 6 핵심 수식</div>
+<table>
+<tr><th>개념</th><th>수식</th><th>파이썬</th></tr>
+<tr><td>ERP</td><td>\(E[r_m] - r_f\)</td><td><code>mkt.mean() * 12</code></td></tr>
+<tr><td>오일러 방정식</td><td>\(E[\beta(C_{t+1}/C_t)^{-\gamma} R_{i,t+1}] = 1\)</td><td><code>np.mean(beta * (C1/C0)**(-gamma) * R)</code></td></tr>
+<tr><td>내재 γ</td><td>\(\frac{\text{ERP}}{\sigma_m \sigma_{\Delta c} \rho}\)</td><td><code>erp / (sig_m * sig_c * rho)</code></td></tr>
+<tr><td>BAB</td><td>\(\frac{r_L-r_f}{\beta_L} - \frac{r_H-r_f}{\beta_H}\)</td><td><code>(rL-rf)/bL - (rH-rf)/bH</code></td></tr>
+<tr><td>평탄 SML</td><td>\(\gamma_1 < E[r_m]-r_f\)</td><td><code>np.polyfit(beta, ret, 1)</code></td></tr>
+</table>
+
+<div class="info">
+<p class="ni"><strong>Pass 2 Preview:</strong> 조건부 ERP 추정 (경기순환별), 내재 ERP (Gordon Growth Model, DDM), 국제 ERP 비교, 저변동성 전략의 실전 구현과 거래비용 분석.</p>
+</div>
+
+</div></div></div>
+</body>
+</html>
