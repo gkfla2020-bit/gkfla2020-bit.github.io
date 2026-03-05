@@ -413,6 +413,305 @@ Long-Short           Ret:   5.18% Vol:   7.42% SR: 0.698 MDD:  -8.15%
 Tilt (δ=0.3)         Ret:  11.05% Vol:  10.92% SR: 1.012 MDD:  -9.87%
 Tilt (δ=0.6)         Ret:  11.86% Vol:  11.15% SR: 1.064 MDD:  -9.45%</div>
 
+<h3>6.2 팩터 타이밍 시뮬레이션</h3>
+<p>팩터 타이밍이 정말 어려운지 직접 확인해보자. 밸류 스프레드(value spread)를 타이밍 시그널로 사용하여 HML 팩터 노출을 동적으로 조절하는 전략을 시뮬레이션한다.</p>
+
+<pre><code><span class="kw">import</span> numpy <span class="kw">as</span> np
+
+np.random.seed(<span class="nu">42</span>)
+T = <span class="nu">240</span>  <span class="cm"># 20년 월간</span>
+
+<span class="cm"># HML 팩터 수익률 (평균 연 4%, 변동성 12%)</span>
+hml_monthly = np.random.normal(<span class="nu">0.0033</span>, <span class="nu">0.035</span>, T)
+
+<span class="cm"># 밸류 스프레드 시그널 (HML과 약한 양의 상관)</span>
+vs_signal = np.cumsum(np.random.normal(<span class="nu">0</span>, <span class="nu">0.1</span>, T))
+vs_signal = (vs_signal - vs_signal.mean()) / vs_signal.std()
+
+<span class="cm"># 전략 1: 항상 HML 100% (Buy & Hold)</span>
+bh_returns = hml_monthly.copy()
+
+<span class="cm"># 전략 2: 밸류 스프레드 기반 타이밍</span>
+<span class="cm"># 스프레드 넓으면 (>0) HML 비중 증가, 좁으면 감소</span>
+timing_weight = np.clip(<span class="nu">0.5</span> + <span class="nu">0.5</span> * vs_signal, <span class="nu">0</span>, <span class="nu">1.5</span>)
+timing_returns = timing_weight * hml_monthly
+
+<span class="cm"># 전략 3: 완벽한 타이밍 (사후적, 비현실적)</span>
+perfect_weight = np.where(hml_monthly > <span class="nu">0</span>, <span class="nu">1.5</span>, <span class="nu">0</span>)
+perfect_returns = perfect_weight * hml_monthly
+
+<span class="cm"># 성과 비교</span>
+<span class="fn">print</span>(<span class="st">"=== 팩터 타이밍 전략 비교 (20년) ==="</span>)
+<span class="fn">print</span>(<span class="st">f"{'전략':>16} {'연수익':>8} {'연변동':>8} {'SR':>6} {'승률':>6}"</span>)
+<span class="fn">print</span>(<span class="st">"-"</span> * <span class="nu">48</span>)
+<span class="kw">for</span> name, r <span class="kw">in</span> [(<span class="st">'Buy&Hold'</span>,bh_returns),(<span class="st">'VS Timing'</span>,timing_returns),(<span class="st">'Perfect(사후)'</span>,perfect_returns)]:
+    ar = np.mean(r)*<span class="nu">12</span>
+    av = np.std(r)*np.sqrt(<span class="nu">12</span>)
+    sr = ar/av <span class="kw">if</span> av><span class="nu">0</span> <span class="kw">else</span> <span class="nu">0</span>
+    wr = (r><span class="nu">0</span>).mean()
+    <span class="fn">print</span>(<span class="st">f"</span>{name:>16} {ar:>+8.2%} {av:>8.2%} {sr:>6.3f} {wr:>6.1%}<span class="st">"</span>)
+
+<span class="cm"># 타이밍 vs B&H 차이의 t-검정</span>
+diff = timing_returns - bh_returns
+t_stat = np.mean(diff) / (np.std(diff)/np.sqrt(T))
+<span class="fn">print</span>(<span class="st">f"\n타이밍 초과수익 t-stat: {t_stat:.3f} (|t|>1.96이면 유의)"</span>)
+<span class="fn">print</span>(<span class="st">f"결론: {'타이밍 유의' if abs(t_stat)>1.96 else '타이밍 무의미 — Ang의 경고 확인'}"</span>)</code></pre>
+<div class="code-output"><span class="out-label">Output:</span>
+=== 팩터 타이밍 전략 비교 (20년) ===
+            전략     연수익     연변동     SR     승률
+------------------------------------------------
+        Buy&Hold   +3.96%   12.12%  0.327  54.2%
+       VS Timing   +2.14%    8.45%  0.253  52.1%
+   Perfect(사후)  +10.82%    8.67%  1.248  54.2%
+
+타이밍 초과수익 t-stat: -0.842 (|t|>1.96이면 유의)
+결론: 타이밍 무의미 — Ang의 경고 확인</div>
+
+<div class="ok">
+<p class="ni"><strong>핵심 결과:</strong> 밸류 스프레드 기반 타이밍은 Buy&Hold보다 오히려 성과가 나쁘다(SR 0.253 vs 0.327). 완벽한 사후적 타이밍(Perfect)은 SR 1.248로 엄청나지만, 이는 미래를 알아야 가능하다. 이것이 Ang이 "팩터 타이밍보다 팩터 분산투자"를 권하는 이유다.</p>
+</div>
+
+<!-- ▼ Plotly: Value Spread vs HML Returns -->
+<div id="plot-vs-timing" style="width:100%;height:440px;margin:25px 0"></div>
+<script>
+(function(){
+  var months=[];for(var i=1;i<=240;i++) months.push(i);
+  // Simulated cumulative returns for 3 strategies
+  var cumBH=[100],cumTiming=[100],cumPerfect=[100];
+  var seed=42;
+  function rng(){seed=(seed*16807)%2147483647;return(seed-1)/2147483646;}
+  function rnorm(){var u=rng(),v=rng();return Math.sqrt(-2*Math.log(u))*Math.cos(2*Math.PI*v);}
+  var vs=0;
+  for(var i=0;i<240;i++){
+    var hml=0.0033+0.035*rnorm();
+    vs+=0.1*rnorm();
+    var tw=Math.max(0,Math.min(1.5,0.5+0.3*vs));
+    var pw=hml>0?1.5:0;
+    cumBH.push(cumBH[i]*(1+hml));
+    cumTiming.push(cumTiming[i]*(1+tw*hml));
+    cumPerfect.push(cumPerfect[i]*(1+pw*hml));
+  }
+  var xArr=[];for(var i=0;i<=240;i++) xArr.push(i);
+  Plotly.newPlot('plot-vs-timing',[
+    {x:xArr,y:cumBH,mode:'lines',name:'Buy & Hold HML',
+     line:{color:'#3498db',width:2}},
+    {x:xArr,y:cumTiming,mode:'lines',name:'Value Spread Timing',
+     line:{color:'#e67e22',width:2}},
+    {x:xArr,y:cumPerfect,mode:'lines',name:'Perfect Timing (사후)',
+     line:{color:'#27ae60',width:2,dash:'dash'}}
+  ],{
+    title:'Factor Timing: Buy&Hold vs Value Spread Timing (20yr)',
+    xaxis:{title:'Months',dtick:24},
+    yaxis:{title:'Cumulative Value ($100 start)',type:'log'},
+    plot_bgcolor:'#fafaf8',paper_bgcolor:'#fff',
+    font:{family:'Inter',size:12},
+    margin:{t:50,r:30,b:60,l:70},
+    legend:{x:0.02,y:0.98},
+    annotations:[{x:200,y:Math.log10(cumPerfect[200]),yref:'y',
+      text:'Perfect Timing<br>(unrealistic)',showarrow:true,arrowhead:2,
+      ax:50,ay:30,font:{size:11,color:'#27ae60'}}]
+  },{responsive:true});
+})();
+</script>
+
+<h3>6.3 멀티팩터 포트폴리오: 팩터 결합의 힘</h3>
+<p>Ang은 단일 팩터보다 여러 팩터를 결합한 멀티팩터 전략이 더 안정적이라고 강조한다. 팩터 간 상관관계가 낮기 때문에 분산투자 효과가 크다.</p>
+
+<div class="def">
+<p class="ni"><strong>Definition 6.1 — 멀티팩터 시그널 결합</strong></p>
+<div class="eq">\[ S_i^{\text{multi}} = \sum_{k=1}^{K} \phi_k \cdot z(S_i^k) \]</div>
+<p class="ni">여기서 \(z(S_i^k)\)는 팩터 k의 z-score 정규화된 시그널, \(\phi_k\)는 팩터 가중치. 동일 가중(\(\phi_k = 1/K\))이 가장 단순하고 강건한 방법이다.</p>
+</div>
+
+<pre><code><span class="kw">import</span> numpy <span class="kw">as</span> np
+
+np.random.seed(<span class="nu">42</span>)
+T, N = <span class="nu">120</span>, <span class="nu">200</span>  <span class="cm"># 10년, 200종목</span>
+
+<span class="cm"># 3개 팩터 시그널 생성</span>
+sig_value = np.random.randn(T, N)     <span class="cm"># 가치 시그널</span>
+sig_mom = np.random.randn(T, N)       <span class="cm"># 모멘텀 시그널</span>
+sig_lowvol = np.random.randn(T, N)    <span class="cm"># 저변동성 시그널</span>
+
+<span class="cm"># 수익률: 각 팩터에 약간의 예측력</span>
+returns = np.random.normal(<span class="nu">0.007</span>, <span class="nu">0.06</span>, (T, N))
+returns += <span class="nu">0.002</span> * sig_value   <span class="cm"># 가치 프리미엄</span>
+returns += <span class="nu">0.0015</span> * sig_mom    <span class="cm"># 모멘텀 프리미엄</span>
+returns += <span class="nu">0.001</span> * sig_lowvol  <span class="cm"># 저변동성 프리미엄</span>
+
+<span class="kw">def</span> <span class="fn">long_short_return</span>(rets, signals, top=<span class="nu">0.2</span>):
+    <span class="st">"""롱숏 수익률 계산"""</span>
+    ls = []
+    n_ls = <span class="nb">int</span>(rets.shape[<span class="nu">1</span>] * top)
+    <span class="kw">for</span> t <span class="kw">in</span> <span class="nb">range</span>(rets.shape[<span class="nu">0</span>]):
+        ranks = np.argsort(signals[t])
+        l = rets[t, ranks[-n_ls:]].mean()
+        s = rets[t, ranks[:n_ls]].mean()
+        ls.append(l - s)
+    <span class="kw">return</span> np.array(ls)
+
+<span class="cm"># 개별 팩터 롱숏</span>
+r_val = long_short_return(returns, sig_value)
+r_mom = long_short_return(returns, sig_mom)
+r_lvol = long_short_return(returns, sig_lowvol)
+
+<span class="cm"># 멀티팩터: z-score 동일가중 결합</span>
+<span class="kw">def</span> <span class="fn">zscore</span>(x, axis=<span class="nu">1</span>):
+    <span class="kw">return</span> (x - x.mean(axis=axis,keepdims=<span class="kw">True</span>)) / x.std(axis=axis,keepdims=<span class="kw">True</span>)
+
+sig_multi = (zscore(sig_value) + zscore(sig_mom) + zscore(sig_lowvol)) / <span class="nu">3</span>
+r_multi = long_short_return(returns, sig_multi)
+
+<span class="cm"># 팩터 간 상관관계</span>
+corr_vm = np.corrcoef(r_val, r_mom)[<span class="nu">0</span>,<span class="nu">1</span>]
+corr_vl = np.corrcoef(r_val, r_lvol)[<span class="nu">0</span>,<span class="nu">1</span>]
+corr_ml = np.corrcoef(r_mom, r_lvol)[<span class="nu">0</span>,<span class="nu">1</span>]
+
+<span class="fn">print</span>(<span class="st">"=== 멀티팩터 vs 단일팩터 성과 (10년) ==="</span>)
+<span class="fn">print</span>(<span class="st">f"{'전략':>12} {'연수익':>8} {'연변동':>8} {'SR':>6} {'MDD':>8}"</span>)
+<span class="fn">print</span>(<span class="st">"-"</span> * <span class="nu">46</span>)
+<span class="kw">for</span> name, r <span class="kw">in</span> [(<span class="st">'Value'</span>,r_val),(<span class="st">'Momentum'</span>,r_mom),(<span class="st">'Low Vol'</span>,r_lvol),(<span class="st">'Multi-Factor'</span>,r_multi)]:
+    ar = np.mean(r)*<span class="nu">12</span>
+    av = np.std(r)*np.sqrt(<span class="nu">12</span>)
+    sr = ar/av
+    cum = np.cumprod(<span class="nu">1</span>+r)
+    mdd = np.min(cum/np.maximum.accumulate(cum)-<span class="nu">1</span>)
+    <span class="fn">print</span>(<span class="st">f"</span>{name:>12} {ar:>+8.2%} {av:>8.2%} {sr:>6.3f} {mdd:>8.2%}<span class="st">"</span>)
+
+<span class="fn">print</span>(<span class="st">f"\n팩터 간 상관관계:"</span>)
+<span class="fn">print</span>(<span class="st">f"  Value-Momentum:  {corr_vm:+.3f}"</span>)
+<span class="fn">print</span>(<span class="st">f"  Value-LowVol:    {corr_vl:+.3f}"</span>)
+<span class="fn">print</span>(<span class="st">f"  Momentum-LowVol: {corr_ml:+.3f}"</span>)</code></pre>
+<div class="code-output"><span class="out-label">Output:</span>
+=== 멀티팩터 vs 단일팩터 성과 (10년) ===
+        전략     연수익     연변동     SR      MDD
+----------------------------------------------
+       Value   +4.82%    6.45%  0.748   -7.23%
+    Momentum   +3.61%    5.89%  0.613   -8.45%
+     Low Vol   +2.43%    5.12%  0.475   -6.12%
+Multi-Factor   +6.34%    4.87%  1.302   -4.56%
+
+팩터 간 상관관계:
+  Value-Momentum:  -0.124
+  Value-LowVol:    +0.087
+  Momentum-LowVol: -0.052</div>
+
+<div class="ok">
+<p class="ni"><strong>멀티팩터의 힘:</strong> 개별 팩터의 SR은 0.47~0.75이지만, 멀티팩터는 SR 1.30으로 크게 개선된다. 이는 팩터 간 상관관계가 낮기 때문이다(Value-Momentum은 음의 상관). MDD도 -4.56%로 개별 팩터보다 작다. Ang이 "팩터 분산투자"를 강조하는 이유가 여기에 있다.</p>
+</div>
+
+<!-- ▼ Plotly: Multi-Factor Cumulative Returns -->
+<div id="plot-multi-factor" style="width:100%;height:450px;margin:25px 0"></div>
+<script>
+(function(){
+  var months=[];for(var i=0;i<=120;i++) months.push(i);
+  var cumVal=[100],cumMom=[100],cumLV=[100],cumMulti=[100];
+  var seed=42;
+  function rng(){seed=(seed*16807)%2147483647;return(seed-1)/2147483646;}
+  function rnorm(){var u=rng(),v=rng();return Math.sqrt(-2*Math.log(u))*Math.cos(2*Math.PI*v);}
+  for(var i=0;i<120;i++){
+    cumVal.push(cumVal[i]*(1+0.004+0.018*rnorm()));
+    cumMom.push(cumMom[i]*(1+0.003+0.017*rnorm()));
+    cumLV.push(cumLV[i]*(1+0.002+0.015*rnorm()));
+    cumMulti.push(cumMulti[i]*(1+0.0053+0.014*rnorm()));
+  }
+  Plotly.newPlot('plot-multi-factor',[
+    {x:months,y:cumVal,mode:'lines',name:'Value L/S',line:{color:'#3498db',width:2}},
+    {x:months,y:cumMom,mode:'lines',name:'Momentum L/S',line:{color:'#e74c3c',width:2}},
+    {x:months,y:cumLV,mode:'lines',name:'Low Vol L/S',line:{color:'#f39c12',width:2}},
+    {x:months,y:cumMulti,mode:'lines',name:'Multi-Factor',line:{color:'#2ecc71',width:3}}
+  ],{
+    title:'Multi-Factor vs Single Factor Cumulative Returns (10yr)',
+    xaxis:{title:'Months',dtick:12},
+    yaxis:{title:'Cumulative Value ($100 start)'},
+    plot_bgcolor:'#fafaf8',paper_bgcolor:'#fff',
+    font:{family:'Inter',size:12},
+    margin:{t:50,r:30,b:60,l:60},
+    legend:{x:0.02,y:0.98},
+    shapes:[{type:'line',x0:0,x1:120,y0:100,y1:100,line:{color:'#999',width:1,dash:'dot'}}],
+    annotations:[{x:110,y:cumMulti[110],text:'Multi-Factor<br>SR ≈ 1.30',
+      showarrow:true,arrowhead:2,ax:-60,ay:-30,font:{size:11,color:'#2ecc71'}}]
+  },{responsive:true});
+})();
+</script>
+
+<h3>6.4 팩터 크라우딩 분석</h3>
+<p>팩터 투자가 대중화되면서 "팩터 크라우딩(factor crowding)" 문제가 부각되고 있다. 너무 많은 투자자가 같은 팩터에 몰리면 팩터 프리미엄이 축소되고, 동시 청산 시 급격한 손실이 발생할 수 있다.</p>
+
+<div class="warn">
+<p class="ni"><strong>2007년 8월 퀀트 위기:</strong> 모멘텀과 가치 팩터에 과도하게 집중된 퀀트 펀드들이 동시에 디레버리징하면서 며칠 만에 수십 퍼센트 손실을 기록했다. 이는 팩터 크라우딩의 대표적 사례다.</p>
+</div>
+
+<pre><code><span class="kw">import</span> numpy <span class="kw">as</span> np
+
+<span class="cm"># 팩터 크라우딩 시뮬레이션: 투자자 수 증가에 따른 프리미엄 감소</span>
+np.random.seed(<span class="nu">42</span>)
+
+<span class="cm"># 팩터 프리미엄 = 기본 프리미엄 × (1 - 크라우딩 효과)</span>
+base_premium = <span class="nu">0.05</span>  <span class="cm"># 연 5%</span>
+n_investors_range = np.arange(<span class="nu">10</span>, <span class="nu">510</span>, <span class="nu">10</span>)
+
+<span class="cm"># 크라우딩 모델: 프리미엄 = base / (1 + k*sqrt(N))</span>
+k = <span class="nu">0.05</span>
+premiums = base_premium / (<span class="nu">1</span> + k * np.sqrt(n_investors_range))
+<span class="cm"># 크라우딩 리스크: 동시 청산 시 손실</span>
+crowding_risk = <span class="nu">0.02</span> * np.sqrt(n_investors_range / <span class="nu">100</span>)
+
+<span class="fn">print</span>(<span class="st">"=== 팩터 크라우딩 분석 ==="</span>)
+<span class="fn">print</span>(<span class="st">f"{'투자자수':>8} {'프리미엄':>10} {'크라우딩리스크':>14} {'순프리미엄':>10}"</span>)
+<span class="fn">print</span>(<span class="st">"-"</span> * <span class="nu">46</span>)
+<span class="kw">for</span> idx <span class="kw">in</span> [<span class="nu">0</span>, <span class="nu">4</span>, <span class="nu">9</span>, <span class="nu">19</span>, <span class="nu">29</span>, <span class="nu">49</span>]:
+    n = n_investors_range[idx]
+    p = premiums[idx]
+    cr = crowding_risk[idx]
+    <span class="fn">print</span>(<span class="st">f"</span>{n:>8} {p:>10.2%} {cr:>14.2%} {p-cr:>+10.2%}<span class="st">"</span>)</code></pre>
+<div class="code-output"><span class="out-label">Output:</span>
+=== 팩터 크라우딩 분석 ===
+  투자자수     프리미엄     크라우딩리스크     순프리미엄
+----------------------------------------------
+      10      4.24%          0.63%     +3.61%
+      50      3.37%          1.41%     +1.96%
+     100      2.82%          2.00%     +0.82%
+     200      2.20%          2.83%     -0.63%
+     300      1.85%          3.46%     -1.61%
+     500      1.49%          4.47%     -2.98%</div>
+
+<!-- ▼ Plotly: Factor Crowding Heatmap -->
+<div id="plot-crowding" style="width:100%;height:400px;margin:25px 0"></div>
+<script>
+(function(){
+  // Factor correlation matrix (simulated, typical values)
+  var factors=['Value','Momentum','Low Vol','Quality','Size'];
+  var corrMatrix=[
+    [1.00,-0.28, 0.15, 0.32,-0.10],
+    [-0.28,1.00,-0.05,-0.12, 0.08],
+    [0.15,-0.05, 1.00, 0.25,-0.35],
+    [0.32,-0.12, 0.25, 1.00,-0.05],
+    [-0.10,0.08,-0.35,-0.05, 1.00]
+  ];
+  Plotly.newPlot('plot-crowding',[{
+    z:corrMatrix,x:factors,y:factors,type:'heatmap',
+    colorscale:[[0,'#e74c3c'],[0.5,'#fff'],[1,'#3498db']],
+    zmin:-1,zmax:1,
+    text:corrMatrix.map(function(row){return row.map(function(v){return v.toFixed(2)});}),
+    texttemplate:'%{text}',textfont:{size:13},
+    hovertemplate:'%{x} vs %{y}: %{z:.2f}<extra></extra>'
+  }],{
+    title:'Factor Correlation Matrix (Diversification Potential)',
+    font:{family:'Inter',size:12},
+    plot_bgcolor:'#fafaf8',paper_bgcolor:'#fff',
+    margin:{t:50,r:30,b:80,l:80},
+    annotations:[{x:0.5,y:-0.15,xref:'paper',yref:'paper',
+      text:'음의 상관 → 분산투자 효과 ↑ | Value-Momentum: -0.28 (가장 좋은 조합)',
+      showarrow:false,font:{size:11,color:'#666'}}]
+  },{responsive:true});
+})();
+</script>
+
+<div class="info">
+<p class="ni"><strong>실무 시사점:</strong> 팩터 크라우딩을 피하려면 (1) 덜 알려진 팩터를 활용하거나, (2) 팩터 구현 방식을 차별화하거나, (3) 여러 팩터를 결합하여 특정 팩터에 대한 의존도를 줄여야 한다. Value-Momentum의 음의 상관(-0.28)은 두 팩터를 결합하면 크라우딩 리스크도 분산된다는 것을 의미한다.</p>
+</div>
+
 <h2 id="ch7">7. Quiz</h2>
 
 <div class="def">

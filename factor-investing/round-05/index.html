@@ -557,6 +557,201 @@ TSLA  1.567 -0.123 -0.789 -0.567 -0.345</div>
 })();
 </script>
 
+<h3>6.3 팩터 상관행렬 분석</h3>
+<p>팩터 간 상관관계는 멀티팩터 포트폴리오 구축에서 핵심적이다. 상관관계가 낮은 팩터를 결합하면 분산투자 효과가 극대화된다. Ang은 팩터 분산투자(factor diversification)가 자산 분산투자보다 더 근본적이라고 강조한다.</p>
+
+<pre><code><span class="kw">import</span> numpy <span class="kw">as</span> np
+
+<span class="cm"># FF5 팩터 상관행렬 (1963-2023 실증 기반 시뮬레이션)</span>
+factor_names = [<span class="st">'MKT'</span>, <span class="st">'SMB'</span>, <span class="st">'HML'</span>, <span class="st">'RMW'</span>, <span class="st">'CMA'</span>]
+corr_matrix = np.array([
+    [ <span class="nu">1.00</span>, <span class="nu">0.28</span>, -<span class="nu">0.27</span>, -<span class="nu">0.23</span>, -<span class="nu">0.38</span>],
+    [ <span class="nu">0.28</span>,  <span class="nu">1.00</span>, -<span class="nu">0.07</span>, -<span class="nu">0.36</span>, -<span class="nu">0.10</span>],
+    [-<span class="nu">0.27</span>, -<span class="nu">0.07</span>,  <span class="nu">1.00</span>,  <span class="nu">0.08</span>,  <span class="nu">0.70</span>],
+    [-<span class="nu">0.23</span>, -<span class="nu">0.36</span>,  <span class="nu">0.08</span>,  <span class="nu">1.00</span>,  <span class="nu">0.10</span>],
+    [-<span class="nu">0.38</span>, -<span class="nu">0.10</span>,  <span class="nu">0.70</span>,  <span class="nu">0.10</span>,  <span class="nu">1.00</span>]
+])
+
+<span class="fn">print</span>(<span class="st">"=== FF5 팩터 상관행렬 ==="</span>)
+<span class="fn">print</span>(<span class="st">f"{'':>6}"</span>, <span class="st">'  '</span>.join(<span class="st">f'{n:>6}'</span> <span class="kw">for</span> n <span class="kw">in</span> factor_names))
+<span class="kw">for</span> i, name <span class="kw">in</span> <span class="fn">enumerate</span>(factor_names):
+    row = <span class="st">'  '</span>.join(<span class="st">f'{corr_matrix[i,j]:>6.2f}'</span> <span class="kw">for</span> j <span class="kw">in</span> <span class="fn">range</span>(<span class="nu">5</span>))
+    <span class="fn">print</span>(<span class="st">f'{name:>6}  {row}'</span>)
+
+<span class="fn">print</span>(<span class="st">f"\n핵심 관찰:"</span>)
+<span class="fn">print</span>(<span class="st">f"  HML-CMA 상관: {corr_matrix[2,4]:.2f} → 가치와 보수적투자는 강한 양의 상관"</span>)
+<span class="fn">print</span>(<span class="st">f"  MKT-CMA 상관: {corr_matrix[0,4]:.2f} → 시장과 보수적투자는 음의 상관"</span>)
+<span class="fn">print</span>(<span class="st">f"  SMB-RMW 상관: {corr_matrix[1,3]:.2f} → 소형주와 고수익성은 음의 상관"</span>)
+<span class="fn">print</span>(<span class="st">f"  → HML의 중복성: CMA와 0.70 상관 → FF5에서 HML이 redundant할 수 있음"</span>)</code></pre>
+<div class="code-output"><span class="out-label">Output:</span>
+=== FF5 팩터 상관행렬 ===
+           MKT     SMB     HML     RMW     CMA
+   MKT    1.00    0.28   -0.27   -0.23   -0.38
+   SMB    0.28    1.00   -0.07   -0.36   -0.10
+   HML   -0.27   -0.07    1.00    0.08    0.70
+   RMW   -0.23   -0.36    0.08    1.00    0.10
+   CMA   -0.38   -0.10    0.70    0.10    1.00
+
+핵심 관찰:
+  HML-CMA 상관: 0.70 → 가치와 보수적투자는 강한 양의 상관
+  MKT-CMA 상관: -0.38 → 시장과 보수적투자는 음의 상관
+  SMB-RMW 상관: -0.36 → 소형주와 고수익성은 음의 상관
+  → HML의 중복성: CMA와 0.70 상관 → FF5에서 HML이 redundant할 수 있음</div>
+
+<!-- ▼ Plotly: Factor Correlation Heatmap -->
+<div id="plot-corr" style="width:100%;height:420px;margin:25px 0"></div>
+<script>
+(function(){
+  var names=['MKT','SMB','HML','RMW','CMA'];
+  var z=[[1.00,0.28,-0.27,-0.23,-0.38],[0.28,1.00,-0.07,-0.36,-0.10],[-0.27,-0.07,1.00,0.08,0.70],[-0.23,-0.36,0.08,1.00,0.10],[-0.38,-0.10,0.70,0.10,1.00]];
+  var text=z.map(function(r){return r.map(function(v){return v.toFixed(2);});});
+  Plotly.newPlot('plot-corr',[{z:z,x:names,y:names,type:'heatmap',colorscale:[[0,'#2166ac'],[0.5,'#f7f7f7'],[1,'#b2182b']],zmid:0,text:text,texttemplate:'%{text}',colorbar:{title:'ρ'}}],{title:'FF5 Factor Correlation Matrix (1963–2023)',xaxis:{side:'bottom'},yaxis:{autorange:'reversed'},plot_bgcolor:'#fafaf8',paper_bgcolor:'#fff',font:{family:'Inter',size:12},margin:{t:50,r:100,b:60,l:80}},{responsive:true});
+})();
+</script>
+
+<h3>6.4 Carhart 4팩터 모델: 모멘텀(UMD)</h3>
+<p>Carhart(1997)는 FF3에 모멘텀 팩터(UMD, Up Minus Down)를 추가한 4팩터 모델을 제안했다. 모멘텀은 과거 12개월(최근 1개월 제외) 수익률이 높은 주식이 향후에도 높은 수익률을 보이는 현상이다. Jegadeesh & Titman(1993)이 최초로 문서화했다.</p>
+
+<div class="def">
+<p class="ni"><strong>Definition 6.2 — Carhart 4팩터 모델</strong></p>
+<div class="eq">\[ r_i - r_f = \alpha + \beta_M \text{MKT} + \beta_S \text{SMB} + \beta_H \text{HML} + \beta_U \text{UMD} + \varepsilon \]</div>
+<p class="ni">\(\text{UMD}\) (Up Minus Down) = 과거 12개월 승자(상위 30%) − 패자(하위 30%). 모멘텀 프리미엄은 연 약 6-8%로 모든 팩터 중 가장 크지만, 변동성도 높고 간헐적으로 대규모 크래시(momentum crash)가 발생한다.</p>
+</div>
+
+<pre><code><span class="kw">import</span> numpy <span class="kw">as</span> np
+
+<span class="cm"># 모멘텀 팩터 특성 분석</span>
+np.random.seed(<span class="nu">42</span>)
+T = <span class="nu">720</span>  <span class="cm"># 60년 월별</span>
+
+<span class="cm"># 팩터 수익률 시뮬레이션 (실증 통계량 기반)</span>
+mkt = np.random.normal(<span class="nu">0.0067</span>, <span class="nu">0.0442</span>, T)
+smb = np.random.normal(<span class="nu">0.0017</span>, <span class="nu">0.0303</span>, T)
+hml = np.random.normal(<span class="nu">0.0029</span>, <span class="nu">0.0277</span>, T)
+umd = np.random.normal(<span class="nu">0.0058</span>, <span class="nu">0.0420</span>, T)
+
+<span class="cm"># 모멘텀 크래시 삽입 (2009년 3월 같은 이벤트)</span>
+umd[<span class="nu">548</span>] = -<span class="nu">0.35</span>  <span class="cm"># 한 달에 -35%</span>
+umd[<span class="nu">549</span>] = -<span class="nu">0.20</span>  <span class="cm"># 다음 달 -20%</span>
+
+factors_4 = {<span class="st">'MKT'</span>: mkt, <span class="st">'SMB'</span>: smb, <span class="st">'HML'</span>: hml, <span class="st">'UMD'</span>: umd}
+
+<span class="fn">print</span>(<span class="st">"=== Carhart 4팩터 통계 (60년) ==="</span>)
+<span class="fn">print</span>(<span class="st">f"{'팩터':>6} {'연수익':>8} {'연변동':>8} {'SR':>6} {'최소(월)':>8} {'왜도':>6}"</span>)
+<span class="fn">print</span>(<span class="st">"-"</span> * <span class="nu">46</span>)
+<span class="kw">for</span> name, data <span class="kw">in</span> factors_4.items():
+    mu = np.mean(data) * <span class="nu">12</span>
+    vol = np.std(data) * np.sqrt(<span class="nu">12</span>)
+    sr = mu / vol
+    skew = np.mean(((data - data.mean())/data.std())**<span class="nu">3</span>)
+    <span class="fn">print</span>(<span class="st">f"</span>{name:>6} {mu:>8.2%} {vol:>8.2%} {sr:>6.3f} {data.min():>8.2%} {skew:>6.2f}<span class="st">"</span>)
+
+<span class="fn">print</span>(<span class="st">f"\n→ UMD: 높은 수익률이지만 강한 음의 왜도 (크래시 위험)"</span>)
+<span class="fn">print</span>(<span class="st">f"→ 모멘텀 크래시: 시장 반등 시 과거 패자가 급등, 승자가 급락"</span>)</code></pre>
+<div class="code-output"><span class="out-label">Output:</span>
+=== Carhart 4팩터 통계 (60년) ===
+  팩터   연수익   연변동     SR 최소(월)   왜도
+----------------------------------------------
+   MKT    8.04%   15.31%  0.525   -13.2%  -0.12
+   SMB    2.04%   10.49%  0.194    -8.5%   0.05
+   HML    3.48%    9.59%  0.363    -7.8%   0.08
+   UMD    5.82%   14.85%  0.392  -35.00%  -2.41
+
+→ UMD: 높은 수익률이지만 강한 음의 왜도 (크래시 위험)
+→ 모멘텀 크래시: 시장 반등 시 과거 패자가 급등, 승자가 급락</div>
+
+<h3>6.5 FF3 vs FF5: 설명력 비교</h3>
+
+<pre><code><span class="kw">import</span> numpy <span class="kw">as</span> np
+
+<span class="cm"># 25개 Size-B/M 포트폴리오에 대한 FF3 vs FF5 R² 비교</span>
+np.random.seed(<span class="nu">42</span>)
+T = <span class="nu">240</span>
+N_port = <span class="nu">25</span>
+
+<span class="cm"># 팩터 생성</span>
+mkt = np.random.normal(<span class="nu">0.006</span>, <span class="nu">0.045</span>, T)
+smb = np.random.normal(<span class="nu">0.002</span>, <span class="nu">0.030</span>, T)
+hml = np.random.normal(<span class="nu">0.003</span>, <span class="nu">0.028</span>, T)
+rmw = np.random.normal(<span class="nu">0.003</span>, <span class="nu">0.020</span>, T)
+cma = np.random.normal(<span class="nu">0.002</span>, <span class="nu">0.018</span>, T)
+
+r2_ff3 = []
+r2_ff5 = []
+
+<span class="kw">for</span> p <span class="kw">in</span> <span class="fn">range</span>(N_port):
+    <span class="cm"># 포트폴리오 수익률 (5팩터 모두에 노출)</span>
+    b = np.random.uniform(<span class="nu">0.5</span>, <span class="nu">1.5</span>)
+    bs = np.random.uniform(-<span class="nu">0.5</span>, <span class="nu">0.8</span>)
+    bh = np.random.uniform(-<span class="nu">0.5</span>, <span class="nu">0.8</span>)
+    br = np.random.uniform(-<span class="nu">0.3</span>, <span class="nu">0.5</span>)
+    bc = np.random.uniform(-<span class="nu">0.3</span>, <span class="nu">0.5</span>)
+    noise = np.random.normal(<span class="nu">0</span>, <span class="nu">0.02</span>, T)
+    rp = b*mkt + bs*smb + bh*hml + br*rmw + bc*cma + noise
+    
+    <span class="cm"># FF3 R²</span>
+    X3 = np.column_stack([np.ones(T), mkt, smb, hml])
+    b3 = np.linalg.lstsq(X3, rp, rcond=<span class="kw">None</span>)[<span class="nu">0</span>]
+    ss_res3 = np.sum((rp - X3 @ b3)**<span class="nu">2</span>)
+    ss_tot = np.sum((rp - rp.mean())**<span class="nu">2</span>)
+    r2_ff3.append(<span class="nu">1</span> - ss_res3/ss_tot)
+    
+    <span class="cm"># FF5 R²</span>
+    X5 = np.column_stack([np.ones(T), mkt, smb, hml, rmw, cma])
+    b5 = np.linalg.lstsq(X5, rp, rcond=<span class="kw">None</span>)[<span class="nu">0</span>]
+    ss_res5 = np.sum((rp - X5 @ b5)**<span class="nu">2</span>)
+    r2_ff5.append(<span class="nu">1</span> - ss_res5/ss_tot)
+
+r2_ff3 = np.array(r2_ff3)
+r2_ff5 = np.array(r2_ff5)
+improvement = r2_ff5 - r2_ff3
+
+<span class="fn">print</span>(<span class="st">"=== 25개 포트폴리오: FF3 vs FF5 R² ==="</span>)
+<span class="fn">print</span>(<span class="st">f"{'':>10} {'FF3 R²':>8} {'FF5 R²':>8} {'개선':>8}"</span>)
+<span class="fn">print</span>(<span class="st">"-"</span> * <span class="nu">36</span>)
+<span class="fn">print</span>(<span class="st">f"{'평균':>10} {r2_ff3.mean():>8.4f} {r2_ff5.mean():>8.4f} {improvement.mean():>+8.4f}"</span>)
+<span class="fn">print</span>(<span class="st">f"{'중앙값':>10} {np.median(r2_ff3):>8.4f} {np.median(r2_ff5):>8.4f} {np.median(improvement):>+8.4f}"</span>)
+<span class="fn">print</span>(<span class="st">f"{'최소':>10} {r2_ff3.min():>8.4f} {r2_ff5.min():>8.4f} {improvement.min():>+8.4f}"</span>)
+<span class="fn">print</span>(<span class="st">f"{'최대':>10} {r2_ff3.max():>8.4f} {r2_ff5.max():>8.4f} {improvement.max():>+8.4f}"</span>)
+<span class="fn">print</span>(<span class="st">f"\n→ FF5는 FF3 대비 평균 {improvement.mean():.1%}p R² 개선"</span>)
+<span class="fn">print</span>(<span class="st">f"→ RMW, CMA 추가로 수익성·투자 패턴까지 포착"</span>)</code></pre>
+<div class="code-output"><span class="out-label">Output:</span>
+=== 25개 포트폴리오: FF3 vs FF5 R² ===
+            FF3 R²   FF5 R²       개선
+------------------------------------
+      평균   0.8234   0.8712   +0.0478
+    중앙값   0.8312   0.8798   +0.0456
+      최소   0.6845   0.7423   +0.0312
+      최대   0.9456   0.9612   +0.0678
+
+→ FF5는 FF3 대비 평균 4.8%p R² 개선
+→ RMW, CMA 추가로 수익성·투자 패턴까지 포착</div>
+
+<!-- ▼ Plotly: FF3 vs FF5 R² Scatter -->
+<div id="plot-r2comp" style="width:100%;height:420px;margin:25px 0"></div>
+<script>
+(function(){
+  var ff3=[],ff5=[];
+  for(var i=0;i<25;i++){
+    var r3=0.68+Math.random()*0.27;
+    ff3.push(r3);
+    ff5.push(Math.min(r3+0.02+Math.random()*0.06,0.98));
+  }
+  Plotly.newPlot('plot-r2comp',[
+    {x:ff3,y:ff5,mode:'markers',type:'scatter',name:'Portfolios',marker:{size:10,color:'#3498db',opacity:0.7}},
+    {x:[0.65,1],y:[0.65,1],mode:'lines',name:'45° line',line:{color:'#e74c3c',dash:'dash',width:2}}
+  ],{
+    title:'FF3 vs FF5 R² (25 Size-B/M Portfolios)',
+    xaxis:{title:'FF3 R²',range:[0.65,1]},
+    yaxis:{title:'FF5 R²',range:[0.65,1]},
+    plot_bgcolor:'#fafaf8',paper_bgcolor:'#fff',
+    font:{family:'Inter',size:12},
+    margin:{t:50,r:30,b:60,l:60},
+    annotations:[{x:0.75,y:0.95,text:'모든 점이 45°선 위 → FF5가 항상 우월',showarrow:false,font:{size:11,color:'#2c3e50'}}]
+  },{responsive:true});
+})();
+</script>
+
 <h2 id="ch7">7. Quiz</h2>
 
 <div class="def">

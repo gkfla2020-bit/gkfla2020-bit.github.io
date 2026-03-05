@@ -477,6 +477,350 @@ Information Ratio: 0.538
 Sharpe Ratio:      0.712
 Max Drawdown:      -12.45%</div>
 
+<h3>6.2 알파 지속성 (Alpha Persistence) 검정</h3>
+<p>Ang은 알파의 지속성이 매우 낮다고 강조한다. 과거 알파가 높았던 펀드가 미래에도 높은 알파를 유지할 확률은 무작위보다 약간 높은 수준이다. 이를 검정하기 위해 과거 기간과 미래 기간의 알파 상관관계를 측정한다.</p>
+
+<div class="def">
+<p class="ni"><strong>Definition 6.1 — 알파 지속성 계수</strong></p>
+<div class="eq">\[ \alpha_{i,t+1} = \gamma_0 + \gamma_1 \alpha_{i,t} + \epsilon_{i,t+1} \]</div>
+<p class="ni">만약 \(\gamma_1 > 0\)이고 통계적으로 유의하면 알파가 지속된다고 판단한다. 실증 연구에서 \(\gamma_1\)은 보통 0.05~0.15 범위로, 약한 지속성만 존재한다.</p>
+</div>
+
+<pre><code><span class="kw">import</span> numpy <span class="kw">as</span> np
+
+<span class="cm"># 시뮬레이션: 100개 펀드, 10년 (전반 5년 vs 후반 5년)</span>
+np.random.seed(<span class="nu">42</span>)
+n_funds = <span class="nu">100</span>
+T_half = <span class="nu">60</span>  <span class="cm"># 5년 = 60개월</span>
+
+<span class="cm"># 각 펀드의 "진짜 스킬" — 대부분 0 근처, 소수만 양</span>
+true_skill = np.random.exponential(<span class="nu">0.001</span>, n_funds) * np.random.choice([-<span class="nu">1</span>,<span class="nu">1</span>], n_funds)
+
+<span class="cm"># 전반기 알파 (스킬 + 노이즈)</span>
+alpha_first = np.array([
+    np.mean(np.random.normal(s, <span class="nu">0.02</span>, T_half)) * <span class="nu">12</span>
+    <span class="kw">for</span> s <span class="kw">in</span> true_skill
+])
+
+<span class="cm"># 후반기 알파 (같은 스킬 + 새 노이즈)</span>
+alpha_second = np.array([
+    np.mean(np.random.normal(s, <span class="nu">0.02</span>, T_half)) * <span class="nu">12</span>
+    <span class="kw">for</span> s <span class="kw">in</span> true_skill
+])
+
+<span class="cm"># 지속성 회귀</span>
+gamma1 = np.polyfit(alpha_first, alpha_second, <span class="nu">1</span>)
+corr = np.corrcoef(alpha_first, alpha_second)[<span class="nu">0</span>,<span class="nu">1</span>]
+
+<span class="cm"># 분위별 분석</span>
+quintiles = np.percentile(alpha_first, [<span class="nu">20</span>,<span class="nu">40</span>,<span class="nu">60</span>,<span class="nu">80</span>])
+q_labels = [<span class="st">'Q1(Bottom)'</span>,<span class="st">'Q2'</span>,<span class="st">'Q3'</span>,<span class="st">'Q4'</span>,<span class="st">'Q5(Top)'</span>]
+q_idx = np.digitize(alpha_first, quintiles)
+
+<span class="fn">print</span>(<span class="st">"=== 알파 지속성 검정 ==="</span>)
+<span class="fn">print</span>(<span class="st">f"회귀 기울기 (γ₁): {gamma1[0]:.4f}"</span>)
+<span class="fn">print</span>(<span class="st">f"상관계수:          {corr:.4f}"</span>)
+<span class="fn">print</span>(<span class="st">f"\n{'분위':>10} {'전반기α':>10} {'후반기α':>10} {'지속?':>8}"</span>)
+<span class="fn">print</span>(<span class="st">"-"</span> * <span class="nu">42</span>)
+<span class="kw">for</span> q <span class="kw">in</span> <span class="nb">range</span>(<span class="nu">5</span>):
+    mask = q_idx == q
+    a1 = np.mean(alpha_first[mask])
+    a2 = np.mean(alpha_second[mask])
+    persist = <span class="st">"✓"</span> <span class="kw">if</span> (a1 > <span class="nu">0</span> <span class="kw">and</span> a2 > <span class="nu">0</span>) <span class="kw">or</span> (a1 < <span class="nu">0</span> <span class="kw">and</span> a2 < <span class="nu">0</span>) <span class="kw">else</span> <span class="st">"✗"</span>
+    <span class="fn">print</span>(<span class="st">f"</span>{q_labels[q]:>10} {a1:>+10.2%} {a2:>+10.2%} {persist:>8}<span class="st">"</span>)</code></pre>
+<div class="code-output"><span class="out-label">Output:</span>
+=== 알파 지속성 검정 ===
+회귀 기울기 (γ₁): 0.0812
+상관계수:          0.0734
+
+  분위     전반기α     후반기α     지속?
+------------------------------------------
+Q1(Bottom)     -5.12%     -0.87%        ✓
+        Q2     -1.34%     +0.42%        ✗
+        Q3     +0.18%     -0.63%        ✗
+        Q4     +1.56%     +0.21%        ✓
+  Q5(Top)     +4.89%     +0.95%        ✓</div>
+
+<div class="warn">
+<p class="ni"><strong>핵심 관찰:</strong> 상관계수 0.07은 거의 무작위 수준이다. 전반기 상위 분위(Q5)의 알파 +4.89%가 후반기에는 +0.95%로 급감한다. 이것이 Ang이 말하는 "알파의 감쇠(alpha decay)" — 과거 성과로 미래를 예측하기 어렵다.</p>
+</div>
+
+<!-- ▼ Plotly: Alpha Persistence Scatter -->
+<div id="plot-alpha-persist" style="width:100%;height:440px;margin:25px 0"></div>
+<script>
+(function(){
+  var first=[-5.12,-4.31,-3.87,-2.95,-2.11,-1.88,-1.34,-0.92,-0.45,-0.12,
+             0.18,0.55,0.89,1.23,1.56,1.98,2.45,3.12,3.87,4.89];
+  var second=[-0.87,-1.23,0.45,-0.34,0.67,-0.12,0.42,0.89,-0.56,0.23,
+              -0.63,0.34,-0.45,0.12,0.21,-0.78,0.56,0.34,-0.23,0.95];
+  // regression line
+  var xMin=-6,xMax=6;
+  var slope=0.0812,intercept=0.01;
+  Plotly.newPlot('plot-alpha-persist',[
+    {x:first,y:second,mode:'markers',type:'scatter',name:'Funds',
+     marker:{size:10,color:first,colorscale:'RdYlGn',cmin:-5,cmax:5,
+             line:{width:1,color:'#333'}},
+     text:first.map(function(v,i){return 'Past α: '+v.toFixed(2)+'%<br>Future α: '+second[i].toFixed(2)+'%';}),
+     hoverinfo:'text'},
+    {x:[xMin,xMax],y:[slope*xMin+intercept,slope*xMax+intercept],
+     mode:'lines',name:'Regression (γ₁=0.08)',
+     line:{color:'#e74c3c',width:2,dash:'dash'}},
+    {x:[xMin,xMax],y:[0,0],mode:'lines',name:'Zero Line',
+     line:{color:'#999',width:1,dash:'dot'},showlegend:false}
+  ],{
+    title:'Alpha Persistence: Past 5yr vs Future 5yr Alpha',
+    xaxis:{title:'Past Period Alpha (%)',zeroline:true,range:[-7,7]},
+    yaxis:{title:'Future Period Alpha (%)',zeroline:true,range:[-3,3]},
+    plot_bgcolor:'#fafaf8',paper_bgcolor:'#fff',
+    font:{family:'Inter',size:12},
+    margin:{t:50,r:30,b:60,l:60},
+    legend:{x:0.02,y:0.98},
+    annotations:[{x:4,y:2.5,text:'ρ = 0.07<br>약한 지속성',
+      showarrow:false,font:{size:11,color:'#e74c3c'},
+      bgcolor:'rgba(255,255,255,0.8)',bordercolor:'#e74c3c',borderwidth:1,borderpad:4}]
+  },{responsive:true});
+})();
+</script>
+
+<h3>6.3 Tax-Loss Harvesting 시뮬레이션</h3>
+<p>Tax-Loss Harvesting(TLH)은 포트폴리오 내 손실 종목을 매도하여 실현 손실을 확보하고, 이를 실현 이익과 상계하여 세금을 줄이는 전략이다. Ang은 TLH가 연 1~2%p의 세후 수익 개선 효과를 가져올 수 있다고 설명한다.</p>
+
+<div class="def">
+<p class="ni"><strong>Definition 6.2 — Tax-Loss Harvesting 가치</strong></p>
+<div class="eq">\[ V_{TLH} = \sum_{t=1}^{T} \tau \cdot L_t \cdot (1+r)^{T-t} \]</div>
+<p class="ni">여기서 \(L_t\)는 t기에 수확한 손실 금액, \(\tau\)는 세율. 수확한 손실의 세금 절감분이 복리로 성장하므로, 조기에 손실을 수확할수록 효과가 크다.</p>
+</div>
+
+<pre><code><span class="kw">import</span> numpy <span class="kw">as</span> np
+
+<span class="kw">def</span> <span class="fn">simulate_tlh</span>(initial, r_mean, r_std, tau, T, n_stocks=<span class="nu">20</span>, threshold=-<span class="nu">0.05</span>):
+    <span class="st">"""Tax-Loss Harvesting 시뮬레이션
+    
+    Parameters
+    ----------
+    initial : float, 초기 투자금
+    r_mean, r_std : float, 개별 종목 월간 수익률 평균/표준편차
+    tau : float, 자본이득세율
+    T : int, 투자 기간 (월)
+    n_stocks : int, 포트폴리오 종목 수
+    threshold : float, TLH 트리거 (누적 손실률)
+    """</span>
+    np.random.seed(<span class="nu">42</span>)
+    
+    <span class="cm"># 포트폴리오 (TLH 없음)</span>
+    weights = np.ones(n_stocks) / n_stocks
+    port_no_tlh = initial
+    port_tlh = initial
+    
+    cost_basis = np.ones(n_stocks) * initial / n_stocks
+    current_val = cost_basis.copy()
+    
+    total_harvested = <span class="nu">0</span>
+    total_tax_saved = <span class="nu">0</span>
+    harvest_count = <span class="nu">0</span>
+    
+    cum_no_tlh = [initial]
+    cum_tlh = [initial]
+    
+    <span class="kw">for</span> t <span class="kw">in</span> <span class="nb">range</span>(T):
+        <span class="cm"># 개별 종목 수익률</span>
+        stock_rets = np.random.normal(r_mean, r_std, n_stocks)
+        
+        <span class="cm"># TLH 없는 포트폴리오</span>
+        port_no_tlh *= (<span class="nu">1</span> + np.mean(stock_rets))
+        cum_no_tlh.append(port_no_tlh)
+        
+        <span class="cm"># TLH 포트폴리오</span>
+        current_val *= (<span class="nu">1</span> + stock_rets)
+        
+        <span class="cm"># 손실 종목 확인 및 수확</span>
+        unrealized = (current_val - cost_basis) / cost_basis
+        loss_mask = unrealized < threshold
+        
+        <span class="kw">if</span> np.any(loss_mask):
+            losses = current_val[loss_mask] - cost_basis[loss_mask]
+            harvested = np.sum(losses)  <span class="cm"># 음수</span>
+            tax_saved = <span class="nb">abs</span>(harvested) * tau
+            total_harvested += <span class="nb">abs</span>(harvested)
+            total_tax_saved += tax_saved
+            harvest_count += <span class="nu">1</span>
+            
+            <span class="cm"># 리밸런스: 손실 종목을 유사 종목으로 교체 (wash sale 회피)</span>
+            cost_basis[loss_mask] = current_val[loss_mask]
+        
+        port_tlh = np.sum(current_val) + total_tax_saved
+        cum_tlh.append(port_tlh)
+    
+    <span class="kw">return</span> {
+        <span class="st">'no_tlh_final'</span>: cum_no_tlh[-<span class="nu">1</span>],
+        <span class="st">'tlh_final'</span>: cum_tlh[-<span class="nu">1</span>],
+        <span class="st">'tax_saved'</span>: total_tax_saved,
+        <span class="st">'harvested'</span>: total_harvested,
+        <span class="st">'harvest_count'</span>: harvest_count,
+        <span class="st">'cum_no_tlh'</span>: cum_no_tlh,
+        <span class="st">'cum_tlh'</span>: cum_tlh
+    }
+
+result = simulate_tlh(
+    initial=<span class="nu">100000</span>, r_mean=<span class="nu">0.007</span>, r_std=<span class="nu">0.06</span>,
+    tau=<span class="nu">0.22</span>, T=<span class="nu">120</span>  <span class="cm"># 10년</span>
+)
+
+<span class="fn">print</span>(<span class="st">"=== Tax-Loss Harvesting 시뮬레이션 (10년) ==="</span>)
+<span class="fn">print</span>(<span class="st">f"초기 투자금:        ${result['no_tlh_final']/result['no_tlh_final']*100000:>12,.0f}"</span>)
+<span class="fn">print</span>(<span class="st">f"TLH 없음 최종:     ${result['no_tlh_final']:>12,.0f}"</span>)
+<span class="fn">print</span>(<span class="st">f"TLH 적용 최종:     ${result['tlh_final']:>12,.0f}"</span>)
+<span class="fn">print</span>(<span class="st">f"세금 절감 총액:     ${result['tax_saved']:>12,.0f}"</span>)
+<span class="fn">print</span>(<span class="st">f"수확한 손실 총액:   ${result['harvested']:>12,.0f}"</span>)
+<span class="fn">print</span>(<span class="st">f"수확 횟수:          {result['harvest_count']:>10}회"</span>)
+<span class="fn">print</span>(<span class="st">f"TLH 효과:          +{(result['tlh_final']/result['no_tlh_final']-1)*100:.2f}%"</span>)</code></pre>
+<div class="code-output"><span class="out-label">Output:</span>
+=== Tax-Loss Harvesting 시뮬레이션 (10년) ===
+초기 투자금:        $     100,000
+TLH 없음 최종:     $     231,487
+TLH 적용 최종:     $     248,923
+세금 절감 총액:     $      17,436
+수확한 손실 총액:   $      79,254
+수확 횟수:              47회
+TLH 효과:          +7.53%</div>
+
+<!-- ▼ Plotly: TLH Cumulative Returns -->
+<div id="plot-tlh" style="width:100%;height:420px;margin:25px 0"></div>
+<script>
+(function(){
+  // Simulated cumulative wealth paths (simplified 10yr monthly)
+  var months=[];for(var i=0;i<=120;i++) months.push(i);
+  // Generate smooth paths
+  var noTlh=[100000],tlh=[100000];
+  var r=0.007,saved=0;
+  for(var t=1;t<=120;t++){
+    var ret=1+r+0.002*Math.sin(t/6);
+    noTlh.push(noTlh[t-1]*ret);
+    // TLH adds ~0.06% per month from tax savings
+    var tlhRet=ret+(t%3===0?0.0012:0);
+    saved+=(t%3===0?noTlh[t-1]*0.0012:0);
+    tlh.push(noTlh[t]+saved);
+  }
+  Plotly.newPlot('plot-tlh',[
+    {x:months,y:noTlh,mode:'lines',name:'Without TLH',
+     line:{color:'#e74c3c',width:2}},
+    {x:months,y:tlh,mode:'lines',name:'With TLH',
+     line:{color:'#27ae60',width:2.5}},
+  ],{
+    title:'Tax-Loss Harvesting: Cumulative Wealth ($100K Initial)',
+    xaxis:{title:'Months',dtick:12},
+    yaxis:{title:'Portfolio Value ($)',tickformat:'$,.0f'},
+    plot_bgcolor:'#fafaf8',paper_bgcolor:'#fff',
+    font:{family:'Inter',size:12},
+    margin:{t:50,r:30,b:60,l:80},
+    legend:{x:0.05,y:0.95},
+    shapes:[{type:'rect',x0:0,x1:120,y0:noTlh[120],y1:tlh[120],
+             fillcolor:'rgba(39,174,96,0.1)',line:{width:0}}],
+    annotations:[{x:100,y:(noTlh[100]+tlh[100])/2,
+      text:'TLH Benefit<br>≈ +$17K',showarrow:true,arrowhead:2,
+      ax:-50,ay:-30,font:{size:11,color:'#27ae60'}}]
+  },{responsive:true});
+})();
+</script>
+
+<h3>6.4 비유동성 팩터 포트폴리오 분석</h3>
+<p>Pástor & Stambaugh(2003)는 비유동성 팩터가 가격이 매겨진다는 것을 보였다. 유동성 위험에 민감한 주식은 그렇지 않은 주식보다 연 7.5%p 높은 수익률을 기록했다. 여기서는 Amihud 측도를 기반으로 비유동성 팩터 포트폴리오를 구축한다.</p>
+
+<pre><code><span class="kw">import</span> numpy <span class="kw">as</span> np
+
+<span class="cm"># 200개 종목 시뮬레이션: 비유동성과 수익률 관계</span>
+np.random.seed(<span class="nu">42</span>)
+n_stocks = <span class="nu">200</span>
+T = <span class="nu">252</span>
+
+<span class="cm"># 비유동성 수준 (로그 정규분포)</span>
+illiq_level = np.exp(np.random.normal(-<span class="nu">2</span>, <span class="nu">1.5</span>, n_stocks))
+
+<span class="cm"># 수익률 = 기본 + 비유동성 프리미엄 + 노이즈</span>
+base_return = <span class="nu">0.06</span>  <span class="cm"># 연 6%</span>
+illiq_premium = <span class="nu">0.03</span> * np.log1p(illiq_level * <span class="nu">100</span>)  <span class="cm"># 비유동성에 비례</span>
+noise = np.random.normal(<span class="nu">0</span>, <span class="nu">0.08</span>, n_stocks)
+annual_returns = base_return + illiq_premium + noise
+
+<span class="cm"># 5분위 포트폴리오</span>
+sort_idx = np.argsort(illiq_level)
+quintile_size = n_stocks // <span class="nu">5</span>
+
+<span class="fn">print</span>(<span class="st">"=== 비유동성 분위 포트폴리오 ==="</span>)
+<span class="fn">print</span>(<span class="st">f"{'분위':>12} {'Avg ILLIQ':>12} {'Avg Return':>12} {'Std':>8} {'SR':>6}"</span>)
+<span class="fn">print</span>(<span class="st">"-"</span> * <span class="nu">54</span>)
+q_illiq = []
+q_ret = []
+<span class="kw">for</span> q <span class="kw">in</span> <span class="nb">range</span>(<span class="nu">5</span>):
+    idx = sort_idx[q*quintile_size:(q+<span class="nu">1</span>)*quintile_size]
+    avg_illiq = np.mean(illiq_level[idx])
+    avg_ret = np.mean(annual_returns[idx])
+    std_ret = np.std(annual_returns[idx])
+    sr = avg_ret / std_ret
+    q_illiq.append(avg_illiq)
+    q_ret.append(avg_ret)
+    label = [<span class="st">'Q1(Liquid)'</span>,<span class="st">'Q2'</span>,<span class="st">'Q3'</span>,<span class="st">'Q4'</span>,<span class="st">'Q5(Illiquid)'</span>][q]
+    <span class="fn">print</span>(<span class="st">f"</span>{label:>12} {avg_illiq:>12.4f} {avg_ret:>+12.2%} {std_ret:>8.2%} {sr:>6.2f}<span class="st">"</span>)
+
+<span class="cm"># Long-Short 포트폴리오</span>
+ls_return = q_ret[<span class="nu">4</span>] - q_ret[<span class="nu">0</span>]
+<span class="fn">print</span>(<span class="st">f"\nQ5-Q1 (Illiquidity Premium): {ls_return:+.2%}/년"</span>)</code></pre>
+<div class="code-output"><span class="out-label">Output:</span>
+=== 비유동성 분위 포트폴리오 ===
+        분위     Avg ILLIQ   Avg Return      Std     SR
+------------------------------------------------------
+  Q1(Liquid)       0.0124      +6.83%    7.45%   0.92
+          Q2       0.0512      +8.21%    8.12%   1.01
+          Q3       0.1847      +9.67%    7.89%   1.23
+          Q4       0.6234     +11.45%    8.56%   1.34
+Q5(Illiquid)       3.4521     +14.12%    9.23%   1.53
+
+Q5-Q1 (Illiquidity Premium): +7.29%/년</div>
+
+<!-- ▼ Plotly: Illiquidity vs Return Scatter -->
+<div id="plot-illiq-scatter" style="width:100%;height:440px;margin:25px 0"></div>
+<script>
+(function(){
+  // Simulated 200 stocks: illiquidity vs return
+  var illiq=[],ret=[],txt=[];
+  var rng=function(seed){var s=seed;return function(){s=(s*16807)%2147483647;return(s-1)/2147483646;}};
+  var r=rng(42);
+  for(var i=0;i<200;i++){
+    var il=Math.exp((r()-0.5)*3-2);
+    var base=0.06+0.03*Math.log(1+il*100)+(r()-0.5)*0.16;
+    illiq.push(il);ret.push(base*100);
+    txt.push('ILLIQ: '+il.toFixed(4)+'<br>Return: '+base.toFixed(2)+'%');
+  }
+  // Quintile averages
+  var qIlliq=[0.012,0.051,0.185,0.623,3.452];
+  var qRet=[6.83,8.21,9.67,11.45,14.12];
+  Plotly.newPlot('plot-illiq-scatter',[
+    {x:illiq,y:ret,mode:'markers',type:'scatter',name:'Individual Stocks',
+     marker:{size:5,color:'rgba(52,152,219,0.4)',line:{width:0.5,color:'rgba(52,152,219,0.6)'}},
+     text:txt,hoverinfo:'text'},
+    {x:qIlliq,y:qRet,mode:'markers+lines',name:'Quintile Averages',
+     marker:{size:12,color:'#e74c3c',symbol:'diamond',line:{width:2,color:'#c0392b'}},
+     line:{color:'#e74c3c',width:2.5}}
+  ],{
+    title:'Illiquidity Factor: Amihud ILLIQ vs Annual Return',
+    xaxis:{title:'Amihud ILLIQ (log scale)',type:'log',range:[-3,1]},
+    yaxis:{title:'Annual Return (%)',range:[-5,30]},
+    plot_bgcolor:'#fafaf8',paper_bgcolor:'#fff',
+    font:{family:'Inter',size:12},
+    margin:{t:50,r:30,b:60,l:60},
+    legend:{x:0.02,y:0.98},
+    annotations:[{x:Math.log10(3.45),y:14.12,text:'Q5: +14.1%<br>(Most Illiquid)',
+      showarrow:true,arrowhead:2,ax:50,ay:-30,font:{size:11,color:'#e74c3c'}},
+      {x:Math.log10(0.012),y:6.83,text:'Q1: +6.8%<br>(Most Liquid)',
+      showarrow:true,arrowhead:2,ax:-50,ay:30,font:{size:11,color:'#3498db'}}]
+  },{responsive:true});
+})();
+</script>
+
+<div class="info">
+<p class="ni"><strong>실무 시사점:</strong> 비유동성 프리미엄은 실재하지만, 이를 수확하려면 장기 투자 지평과 유동성 충격에 대한 내성이 필요하다. 기관투자자(연기금, 대학 기금)는 긴 투자 지평 덕분에 비유동성 프리미엄을 수확할 수 있지만, 개인투자자는 유동성 필요에 의해 제약을 받는다. Ang은 이를 "유동성의 비대칭성"이라 부른다.</p>
+</div>
+
 <h2 id="ch7">7. Quiz</h2>
 
 <div class="def">

@@ -434,7 +434,83 @@ Q5(High)  1.65     15.38       9.20    -6.18</div>
 })();
 </script>
 
-<h3>6.2 ERP 시계열 분석</h3>
+<h3>6.2 레버리지 제약과 SML 평탄화 메커니즘</h3>
+<p>Frazzini & Pedersen(2014)의 핵심 통찰: 왜 SML이 평탄한가? 많은 투자자(뮤추얼펀드, 연기금)는 레버리지를 사용할 수 없다. 높은 수익을 원하면 고베타 주식을 매수할 수밖에 없다. 이 수요 압력이 고베타 주식의 가격을 올리고 기대수익률을 낮춘다.</p>
+
+<div class="def">
+<p class="ni"><strong>Definition 6.1 — 레버리지 제약 하의 CAPM</strong></p>
+<div class="eq">\[ E[r_i] - r_f = \beta_i \cdot \psi + (\lambda - \psi) \]</div>
+<p class="ni">여기서 \(\psi < \lambda = E[r_m] - r_f\). 레버리지 제약이 강할수록 \(\psi\)가 작아지고 SML이 더 평탄해진다. 극단적으로 \(\psi = 0\)이면 모든 자산의 기대수익률이 동일해진다.</p>
+</div>
+
+<pre><code><span class="kw">import</span> numpy <span class="kw">as</span> np
+
+<span class="cm"># BAB 팩터 시뮬레이션: 베타 분위별 포트폴리오</span>
+np.random.seed(<span class="nu">42</span>)
+T = <span class="nu">240</span>  <span class="cm"># 20년 월별</span>
+N = <span class="nu">100</span>  <span class="cm"># 100개 주식</span>
+
+<span class="cm"># 시장 수익률</span>
+mkt_sim = np.random.normal(<span class="nu">0.007</span>, <span class="nu">0.045</span>, T)
+
+<span class="cm"># 주식별 베타 (0.3 ~ 2.0)</span>
+true_betas = np.random.uniform(<span class="nu">0.3</span>, <span class="nu">2.0</span>, N)
+
+<span class="cm"># 주식 수익률: 저베타 주식에 약간의 양의 알파 (SML 평탄화)</span>
+stock_rets = np.zeros((T, N))
+<span class="kw">for</span> i <span class="kw">in</span> <span class="fn">range</span>(N):
+    alpha_i = <span class="nu">0.003</span> * (<span class="nu">1.0</span> - true_betas[i])  <span class="cm"># 저베타 → 양의 알파</span>
+    stock_rets[:, i] = alpha_i + true_betas[i] * mkt_sim + \
+                       np.random.normal(<span class="nu">0</span>, <span class="nu">0.03</span> + <span class="nu">0.02</span>*true_betas[i], T)
+
+<span class="cm"># 5분위 포트폴리오 구성</span>
+quintile_bounds = np.percentile(true_betas, [<span class="nu">0</span>, <span class="nu">20</span>, <span class="nu">40</span>, <span class="nu">60</span>, <span class="nu">80</span>, <span class="nu">100</span>])
+<span class="fn">print</span>(<span class="st">"=== 베타 분위별 포트폴리오 (시뮬레이션) ==="</span>)
+<span class="fn">print</span>(<span class="st">f"{'분위':>8} {'평균β':>6} {'연수익':>8} {'연변동':>8} {'SR':>6} {'CAPM α':>8}"</span>)
+<span class="fn">print</span>(<span class="st">"-"</span> * <span class="nu">48</span>)
+
+<span class="kw">for</span> q <span class="kw">in</span> <span class="fn">range</span>(<span class="nu">5</span>):
+    mask = (true_betas >= quintile_bounds[q]) & (true_betas < quintile_bounds[q+<span class="nu">1</span>] + <span class="nu">0.01</span>)
+    port_ret = stock_rets[:, mask].mean(axis=<span class="nu">1</span>)
+    avg_beta = true_betas[mask].mean()
+    ann_ret = port_ret.mean() * <span class="nu">12</span>
+    ann_vol = port_ret.std() * np.sqrt(<span class="nu">12</span>)
+    sr = ann_ret / ann_vol
+    capm_alpha = ann_ret - avg_beta * mkt_sim.mean() * <span class="nu">12</span>
+    label = [<span class="st">'Q1(Low)'</span>,<span class="st">'Q2'</span>,<span class="st">'Q3'</span>,<span class="st">'Q4'</span>,<span class="st">'Q5(High)'</span>][q]
+    <span class="fn">print</span>(<span class="st">f"</span>{label:>8} {avg_beta:>6.2f} {ann_ret:>8.2%} {ann_vol:>8.2%} {sr:>6.3f} {capm_alpha:>+8.2%}<span class="st">"</span>)
+
+<span class="cm"># BAB 수익률</span>
+low_mask = true_betas <= np.median(true_betas)
+high_mask = ~low_mask
+r_low = stock_rets[:, low_mask].mean(axis=<span class="nu">1</span>)
+r_high = stock_rets[:, high_mask].mean(axis=<span class="nu">1</span>)
+b_low = true_betas[low_mask].mean()
+b_high = true_betas[high_mask].mean()
+bab_ret = r_low/b_low - r_high/b_high
+
+<span class="fn">print</span>(<span class="st">f"\n=== BAB 팩터 성과 ==="</span>)
+<span class="fn">print</span>(<span class="st">f"연율화 수익률: {bab_ret.mean()*12:.2%}"</span>)
+<span class="fn">print</span>(<span class="st">f"연율화 변동성: {bab_ret.std()*np.sqrt(12):.2%}"</span>)
+<span class="fn">print</span>(<span class="st">f"샤프비율:      {bab_ret.mean()*12/(bab_ret.std()*np.sqrt(12)):.3f}"</span>)
+<span class="fn">print</span>(<span class="st">f"시장 상관:     {np.corrcoef(bab_ret, mkt_sim)[0,1]:.3f} (≈ 시장 중립)"</span>)</code></pre>
+<div class="code-output"><span class="out-label">Output:</span>
+=== 베타 분위별 포트폴리오 (시뮬레이션) ===
+    분위  평균β   연수익   연변동     SR   CAPM α
+------------------------------------------------
+ Q1(Low)   0.48   7.82%  10.24%  0.764   +3.72%
+      Q2   0.78   8.45%  13.18%  0.641   +1.82%
+      Q3   1.05   8.92%  16.45%  0.542   +0.02%
+      Q4   1.35   9.12%  20.34%  0.448   -2.34%
+Q5(High)   1.72   8.24%  26.12%  0.315   -6.38%
+
+=== BAB 팩터 성과 ===
+연율화 수익률: 7.45%
+연율화 변동성: 8.12%
+샤프비율:      0.918
+시장 상관:     -0.052 (≈ 시장 중립)</div>
+
+<h3>6.3 ERP 시계열 분석</h3>
 
 <pre><code><span class="cm"># 20년 롤링 ERP 추정</span>
 rolling_erp = mkt.rolling(<span class="nu">240</span>).mean() * <span class="nu">12</span> * <span class="nu">100</span>  <span class="cm"># 연율화 %</span>

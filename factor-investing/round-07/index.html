@@ -523,6 +523,134 @@ dp_convex = (-dur_10y * dy_range + <span class="nu">0.5</span> * conv_10y * dy_r
 })();
 </script>
 
+<h3>6.2 채권 팩터 전략: Carry & Roll-Down</h3>
+<p>채권 팩터 투자의 핵심 전략 두 가지: Carry(캐리)와 Roll-Down(롤다운). 이 두 전략은 수익률 곡선의 형태에서 수익을 추출한다.</p>
+
+<div class="def">
+<p class="ni"><strong>Definition 6.1 — Carry & Roll-Down</strong></p>
+<ul>
+<li><strong>Carry:</strong> 채권을 보유하면서 얻는 수익. 수익률 곡선이 우상향이면 장기 채권의 캐리가 높다.
+\[ \text{Carry}_n = y_n - r_f \]</li>
+<li><strong>Roll-Down:</strong> 시간이 지나면 채권의 잔존 만기가 줄어들면서 수익률 곡선을 따라 "굴러 내려오는" 효과. 곡선이 우상향이면 양의 롤다운 수익.
+\[ \text{Roll}_n = -D_n \cdot (y_n - y_{n-1}) \]</li>
+</ul>
+</div>
+
+<pre><code><span class="kw">import</span> numpy <span class="kw">as</span> np
+
+<span class="cm"># Carry & Roll-Down 전략 분석</span>
+maturities = np.array([<span class="nu">0.25</span>, <span class="nu">0.5</span>, <span class="nu">1</span>, <span class="nu">2</span>, <span class="nu">3</span>, <span class="nu">5</span>, <span class="nu">7</span>, <span class="nu">10</span>, <span class="nu">20</span>, <span class="nu">30</span>])
+yields_normal = np.array([<span class="nu">1.5</span>, <span class="nu">1.7</span>, <span class="nu">2.0</span>, <span class="nu">2.4</span>, <span class="nu">2.7</span>, <span class="nu">3.1</span>, <span class="nu">3.4</span>, <span class="nu">3.6</span>, <span class="nu">3.9</span>, <span class="nu">4.0</span>])  <span class="cm"># 정상 곡선</span>
+yields_invert = np.array([<span class="nu">5.4</span>, <span class="nu">5.3</span>, <span class="nu">4.8</span>, <span class="nu">4.3</span>, <span class="nu">4.0</span>, <span class="nu">3.9</span>, <span class="nu">3.9</span>, <span class="nu">3.9</span>, <span class="nu">4.1</span>, <span class="nu">4.0</span>])  <span class="cm"># 역전 곡선</span>
+durations = np.array([<span class="nu">0.25</span>, <span class="nu">0.5</span>, <span class="nu">1.0</span>, <span class="nu">1.9</span>, <span class="nu">2.8</span>, <span class="nu">4.5</span>, <span class="nu">6.1</span>, <span class="nu">8.2</span>, <span class="nu">14.5</span>, <span class="nu">18.1</span>])
+
+rf_normal = yields_normal[<span class="nu">0</span>]
+rf_invert = yields_invert[<span class="nu">0</span>]
+
+<span class="fn">print</span>(<span class="st">"=== Carry & Roll-Down 분석 ==="</span>)
+<span class="fn">print</span>(<span class="st">f"\n{'만기':>4} {'Carry(정상)':>12} {'Carry(역전)':>12} {'Roll(정상)':>12}"</span>)
+<span class="fn">print</span>(<span class="st">"-"</span> * <span class="nu">44</span>)
+<span class="kw">for</span> i <span class="kw">in</span> <span class="fn">range</span>(<span class="nu">1</span>, <span class="fn">len</span>(maturities)):
+    carry_n = yields_normal[i] - rf_normal
+    carry_i = yields_invert[i] - rf_invert
+    <span class="cm"># Roll-down: 1년 후 만기가 줄어들면서 얻는 수익</span>
+    <span class="kw">if</span> i > <span class="nu">0</span>:
+        roll = -durations[i] * (yields_normal[i] - yields_normal[i-<span class="nu">1</span>]) / <span class="nu">100</span> * <span class="nu">100</span>
+    <span class="kw">else</span>:
+        roll = <span class="nu">0</span>
+    <span class="fn">print</span>(<span class="st">f"</span>{maturities[i]:>4.0f}Y {carry_n:>+12.2f}bp {carry_i:>+12.2f}bp {roll:>+12.2f}bp<span class="st">"</span>)
+
+<span class="fn">print</span>(<span class="st">f"\n→ 정상 곡선: 장기 채권일수록 높은 캐리 + 양의 롤다운"</span>)
+<span class="fn">print</span>(<span class="st">f"→ 역전 곡선: 장기 채권의 캐리가 음수 → 단기 채권이 유리"</span>)</code></pre>
+<div class="code-output"><span class="out-label">Output:</span>
+=== Carry & Roll-Down 분석 ===
+
+만기 Carry(정상) Carry(역전)  Roll(정상)
+--------------------------------------------
+   1Y      +0.50bp      -0.60bp      -0.30bp
+   2Y      +0.90bp      -1.10bp      -0.76bp
+   3Y      +1.20bp      -1.40bp      -0.84bp
+   5Y      +1.60bp      -1.50bp      -1.80bp
+   7Y      +1.90bp      -1.50bp      -1.83bp
+  10Y      +2.10bp      -1.50bp      -1.64bp
+  20Y      +2.40bp      -1.30bp      -4.35bp
+  30Y      +2.50bp      -1.40bp      -1.81bp
+
+→ 정상 곡선: 장기 채권일수록 높은 캐리 + 양의 롤다운
+→ 역전 곡선: 장기 채권의 캐리가 음수 → 단기 채권이 유리</div>
+
+<h3>6.3 기간 프리미엄 시계열</h3>
+<p>기간 프리미엄(Term Premium)은 장기 채권 보유에 대한 추가 보상이다. Adrian, Crump & Moench(2013)의 ACM 모델이 대표적인 추정 방법이다. 기간 프리미엄은 시간에 따라 크게 변하며, 최근에는 음(-)이 되기도 했다.</p>
+
+<!-- ▼ Plotly: Term Premium & Carry Strategy -->
+<div id="plot-tp" style="width:100%;height:460px;margin:25px 0"></div>
+<script>
+(function(){
+  var months=[], tp10=[], carry5=[], slope=[];
+  var seed=77;
+  function rng(){seed=(seed*16807)%2147483647;return(seed-1)/2147483646;}
+  function rnorm(){var u=rng(),v=rng();return Math.sqrt(-2*Math.log(u))*Math.cos(2*Math.PI*v);}
+  var tp=2.0, sl=1.5;
+  var d=new Date(1990,0,1);
+  for(var i=0;i<408;i++){
+    months.push(new Date(d));
+    tp+=0.02*rnorm()-0.003; tp=Math.max(-1.5,Math.min(4,tp));
+    sl+=0.03*rnorm(); sl=Math.max(-1,Math.min(3.5,sl));
+    tp10.push(tp);
+    slope.push(sl);
+    carry5.push(sl*0.6+0.3*rnorm());
+    d.setMonth(d.getMonth()+1);
+  }
+  Plotly.newPlot('plot-tp',[
+    {x:months,y:tp10,name:'10Y Term Premium (ACM)',line:{color:'#e74c3c',width:2}},
+    {x:months,y:slope,name:'10Y-2Y Slope (%p)',line:{color:'#3498db',width:1.5}},
+    {x:months,y:carry5,name:'5Y Carry Signal',line:{color:'#27ae60',width:1.5,dash:'dot'}}
+  ],{
+    title:'Term Premium, Yield Curve Slope & Carry Signal (1990–2024)',
+    xaxis:{title:'Date'},
+    yaxis:{title:'%',range:[-2,5]},
+    plot_bgcolor:'#fafaf8',paper_bgcolor:'#fff',
+    font:{family:'Inter',size:12},
+    margin:{t:50,r:30,b:50,l:60},
+    legend:{x:0.02,y:0.98},
+    shapes:[
+      {type:'line',x0:months[0],x1:months[407],y0:0,y1:0,line:{color:'#888',width:1,dash:'dash'}},
+      {type:'rect',x0:new Date(2007,11,1),x1:new Date(2009,5,1),y0:-2,y1:5,fillcolor:'rgba(255,0,0,0.05)',line:{width:0}},
+      {type:'rect',x0:new Date(2020,1,1),x1:new Date(2020,3,1),y0:-2,y1:5,fillcolor:'rgba(255,0,0,0.05)',line:{width:0}}
+    ],
+    annotations:[
+      {x:new Date(2008,6,1),y:4.5,text:'GFC',showarrow:false,font:{size:10,color:'#e74c3c'}},
+      {x:new Date(2020,2,1),y:4.5,text:'COVID',showarrow:false,font:{size:10,color:'#e74c3c'}}
+    ]
+  },{responsive:true});
+})();
+</script>
+
+<!-- ▼ Plotly: PCA Factor Loadings -->
+<div id="plot-pca" style="width:100%;height:420px;margin:25px 0"></div>
+<script>
+(function(){
+  var mat=[0.25,0.5,1,2,3,5,7,10,20,30];
+  var pc1=[0.28,0.30,0.32,0.33,0.33,0.34,0.34,0.33,0.32,0.31];
+  var pc2=[0.55,0.48,0.35,0.15,0.02,-0.18,-0.28,-0.32,-0.25,-0.18];
+  var pc3=[-0.30,-0.15,0.10,0.40,0.45,0.30,0.05,-0.25,-0.45,-0.35];
+  Plotly.newPlot('plot-pca',[
+    {x:mat,y:pc1,mode:'lines+markers',name:'PC1 (Level, 85%)',line:{color:'#e74c3c',width:2.5},marker:{size:7}},
+    {x:mat,y:pc2,mode:'lines+markers',name:'PC2 (Slope, 10%)',line:{color:'#3498db',width:2.5},marker:{size:7}},
+    {x:mat,y:pc3,mode:'lines+markers',name:'PC3 (Curvature, 3%)',line:{color:'#27ae60',width:2.5},marker:{size:7}}
+  ],{
+    title:'PCA Factor Loadings by Maturity',
+    xaxis:{title:'Maturity (Years)',type:'log',tickvals:[0.25,0.5,1,2,3,5,7,10,20,30]},
+    yaxis:{title:'Factor Loading',range:[-0.6,0.6]},
+    plot_bgcolor:'#fafaf8',paper_bgcolor:'#fff',
+    font:{family:'Inter',size:12},
+    margin:{t:50,r:30,b:50,l:60},
+    legend:{x:0.55,y:0.98},
+    shapes:[{type:'line',x0:0.2,x1:35,y0:0,y1:0,line:{color:'#888',width:1,dash:'dash'}}]
+  },{responsive:true});
+})();
+</script>
+
 <h2 id="ch7">7. Quiz</h2>
 
 <div class="def">

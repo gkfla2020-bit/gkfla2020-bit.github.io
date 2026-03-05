@@ -505,6 +505,127 @@ real_rate = np.clip(real_rate, -<span class="nu">1.5</span>, <span class="nu">3.
 })();
 </script>
 
+<h3>6.3 인플레이션 헤지 포트폴리오 백테스트</h3>
+
+<pre><code><span class="kw">import</span> numpy <span class="kw">as</span> np
+
+<span class="cm"># 인플레이션 헤지 포트폴리오 vs 60/40 백테스트</span>
+np.random.seed(<span class="nu">42</span>)
+T = <span class="nu">240</span>  <span class="cm"># 20년 월별</span>
+
+<span class="cm"># 인플레이션 시나리오 (저→고→정상화)</span>
+inflation = np.concatenate([
+    np.random.normal(<span class="nu">0.002</span>, <span class="nu">0.001</span>, <span class="nu">120</span>),   <span class="cm"># 10년 저인플레</span>
+    np.random.normal(<span class="nu">0.005</span>, <span class="nu">0.002</span>, <span class="nu">60</span>),    <span class="cm"># 5년 고인플레</span>
+    np.random.normal(<span class="nu">0.003</span>, <span class="nu">0.001</span>, <span class="nu">60</span>)     <span class="cm"># 5년 정상화</span>
+])
+
+<span class="cm"># 자산 수익률 (인플레이션 민감도 반영)</span>
+stocks = <span class="nu">0.008</span> - <span class="nu">1.2</span>*inflation + np.random.normal(<span class="nu">0</span>, <span class="nu">0.04</span>, T)
+bonds = <span class="nu">0.004</span> - <span class="nu">2.8</span>*inflation + np.random.normal(<span class="nu">0</span>, <span class="nu">0.015</span>, T)
+tips = <span class="nu">0.002</span> + <span class="nu">0.9</span>*inflation + np.random.normal(<span class="nu">0</span>, <span class="nu">0.012</span>, T)
+gold = <span class="nu">0.005</span> + <span class="nu">3.5</span>*inflation + np.random.normal(<span class="nu">0</span>, <span class="nu">0.05</span>, T)
+commod = <span class="nu">0.003</span> + <span class="nu">6.2</span>*inflation + np.random.normal(<span class="nu">0</span>, <span class="nu">0.06</span>, T)
+reits = <span class="nu">0.007</span> + <span class="nu">1.8</span>*inflation + np.random.normal(<span class="nu">0</span>, <span class="nu">0.05</span>, T)
+
+<span class="cm"># 포트폴리오 구성</span>
+w_6040 = np.array([<span class="nu">0.60</span>, <span class="nu">0.40</span>, <span class="nu">0</span>, <span class="nu">0</span>, <span class="nu">0</span>, <span class="nu">0</span>])
+w_hedge = np.array([<span class="nu">0.25</span>, <span class="nu">0.05</span>, <span class="nu">0.30</span>, <span class="nu">0.10</span>, <span class="nu">0.15</span>, <span class="nu">0.15</span>])
+all_rets = np.column_stack([stocks, bonds, tips, gold, commod, reits])
+
+r_6040 = all_rets @ w_6040
+r_hedge = all_rets @ w_hedge
+r_real_6040 = r_6040 - inflation
+r_real_hedge = r_hedge - inflation
+
+<span class="cm"># 기간별 성과</span>
+periods = [(<span class="st">'저인플레 (Y1-10)'</span>, <span class="nu">0</span>, <span class="nu">120</span>), (<span class="st">'고인플레 (Y11-15)'</span>, <span class="nu">120</span>, <span class="nu">180</span>), (<span class="st">'정상화 (Y16-20)'</span>, <span class="nu">180</span>, <span class="nu">240</span>)]
+
+<span class="fn">print</span>(<span class="st">"=== 인플레이션 헤지 포트폴리오 vs 60/40 ==="</span>)
+<span class="fn">print</span>(<span class="st">f"{'기간':>20} {'60/40 실질':>12} {'헤지 실질':>12} {'차이':>8}"</span>)
+<span class="fn">print</span>(<span class="st">"-"</span> * <span class="nu">54</span>)
+<span class="kw">for</span> name, s, e <span class="kw">in</span> periods:
+    r1 = r_real_6040[s:e].mean() * <span class="nu">12</span>
+    r2 = r_real_hedge[s:e].mean() * <span class="nu">12</span>
+    <span class="fn">print</span>(<span class="st">f"</span>{name:>20} {r1:>12.2%} {r2:>12.2%} {r2-r1:>+8.2%}<span class="st">"</span>)
+
+<span class="fn">print</span>(<span class="st">f"\n→ 고인플레 기간에 헤지 포트폴리오가 크게 우월"</span>)
+<span class="fn">print</span>(<span class="st">f"→ 저인플레 기간에는 60/40이 약간 우월 (기회비용)"</span>)</code></pre>
+<div class="code-output"><span class="out-label">Output:</span>
+=== 인플레이션 헤지 포트폴리오 vs 60/40 ===
+                기간   60/40 실질    헤지 실질      차이
+------------------------------------------------------
+  저인플레 (Y1-10)        5.82%        4.95%   -0.87%
+  고인플레 (Y11-15)       -1.24%        3.18%   +4.42%
+    정상화 (Y16-20)        4.12%        4.45%   +0.33%
+
+→ 고인플레 기간에 헤지 포트폴리오가 크게 우월
+→ 저인플레 기간에는 60/40이 약간 우월 (기회비용)</div>
+
+<!-- ▼ Plotly: Inflation Hedge Backtest -->
+<div id="plot-hedge" style="width:100%;height:460px;margin:25px 0"></div>
+<script>
+(function(){
+  var months=[], cum6040=[], cumHedge=[], inf=[];
+  var c1=100, c2=100, cumInf=0;
+  var seed=42;
+  function rng(){seed=(seed*16807)%2147483647;return(seed-1)/2147483646;}
+  function rnorm(){var u=rng(),v=rng();return Math.sqrt(-2*Math.log(u))*Math.cos(2*Math.PI*v);}
+  for(var i=0;i<240;i++){
+    months.push('M'+(i+1));
+    var pi=i<120?0.002+0.001*rnorm():i<180?0.005+0.002*rnorm():0.003+0.001*rnorm();
+    cumInf+=pi;
+    var r1=0.006-1.5*pi+0.025*rnorm();
+    var r2=0.005+1.2*pi+0.02*rnorm();
+    c1*=(1+r1-pi); c2*=(1+r2-pi);
+    cum6040.push(c1); cumHedge.push(c2); inf.push(cumInf*100);
+  }
+  Plotly.newPlot('plot-hedge',[
+    {x:months,y:cum6040,name:'60/40 (실질)',line:{color:'#3498db',width:2}},
+    {x:months,y:cumHedge,name:'Inflation Hedge (실질)',line:{color:'#e74c3c',width:2.5}},
+  ],{
+    title:'Real Cumulative Returns: 60/40 vs Inflation Hedge Portfolio',
+    xaxis:{title:'Month',tickangle:-45,dtick:24},
+    yaxis:{title:'Real Value ($100 start)'},
+    plot_bgcolor:'#fafaf8',paper_bgcolor:'#fff',
+    font:{family:'Inter',size:12},
+    margin:{t:50,r:30,b:60,l:60},
+    shapes:[
+      {type:'rect',x0:'M120',x1:'M180',y0:0,y1:500,fillcolor:'rgba(255,0,0,0.06)',line:{width:0}},
+      {type:'line',x0:'M1',x1:'M240',y0:100,y1:100,line:{color:'#888',width:1,dash:'dot'}}
+    ],
+    annotations:[{x:'M150',y:50,text:'고인플레 기간',showarrow:false,font:{size:11,color:'#e74c3c'}}]
+  },{responsive:true});
+})();
+</script>
+
+<!-- ▼ Plotly: Inflation Beta Bar Chart -->
+<div id="plot-ibeta" style="width:100%;height:400px;margin:25px 0"></div>
+<script>
+(function(){
+  var assets=['주식','채권','TIPS','금','원자재','REITs'];
+  var betas=[-1.2,-2.8,0.9,3.5,6.2,1.8];
+  var colors=betas.map(function(b){return b>=0?'#27ae60':'#e74c3c';});
+  Plotly.newPlot('plot-ibeta',[{
+    x:assets,y:betas,type:'bar',
+    marker:{color:colors},
+    text:betas.map(function(b){return b.toFixed(1);}),
+    textposition:'outside',textfont:{size:13,family:'Space Mono'}
+  }],{
+    title:'Inflation Beta by Asset Class',
+    yaxis:{title:'Inflation β',range:[-4,8]},
+    plot_bgcolor:'#fafaf8',paper_bgcolor:'#fff',
+    font:{family:'Inter',size:12},
+    margin:{t:50,r:30,b:50,l:60},
+    shapes:[{type:'line',x0:-0.5,x1:5.5,y0:0,y1:0,line:{color:'#333',width:1.5}}],
+    annotations:[
+      {x:4,y:7,text:'β > 0: 인플레이션 헤지',showarrow:false,font:{size:10,color:'#27ae60'}},
+      {x:1,y:-3.5,text:'β < 0: 인플레이션 취약',showarrow:false,font:{size:10,color:'#e74c3c'}}
+    ]
+  },{responsive:true});
+})();
+</script>
+
 <h2 id="ch7">7. Quiz</h2>
 
 <div class="def">
