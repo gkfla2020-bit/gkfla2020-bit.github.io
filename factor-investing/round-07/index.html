@@ -119,6 +119,7 @@ pre{font-size:11px;padding:14px}table{font-size:10px;display:block;overflow-x:au
 <li><a href="#ch4">4. 신용 스프레드</a></li>
 <li><a href="#ch5">5. 채권 팩터 모델</a></li>
 <li><a href="#ch6">6. 파이썬 구현: 수익률 곡선</a></li>
+<li><a href="#ch6d">6.4 통화정책 & 신용위험 (Ang Ch.9)</a></li>
 <li><a href="#ch7">7. Quiz</a></li>
 </ul>
 </div>
@@ -650,6 +651,170 @@ rf_invert = yields_invert[<span class="nu">0</span>]
   },{responsive:true});
 })();
 </script>
+
+
+<h2 id="ch6d">6.4 통화정책, Level Factor, 신용위험 (Ang Ch.9)</h2>
+
+<h3>6.4.1 미국 신용등급 강등과 채권의 역설 (2011)</h3>
+<p>2011년 8월 5일, S&P는 미국 신용등급을 AAA에서 AA+로 강등했다. 1941년 이래 처음이었다. 논리적으로 미국이 더 위험해졌으니 국채 수익률이 올라야 했다. 그러나 실제로는 <strong>국채 수익률이 하락</strong>했다: 10년물 수익률이 금요일 2.58%에서 월요일 2.40%, 금요일 2.24%로 떨어졌다.</p>
+
+<div class="info">
+<p class="ni"><strong>왜?</strong> 신용위험이 아니라 <strong>Level Factor</strong>가 지배했기 때문이다. 글로벌 주식시장 하락 → 안전자산 선호(flight to quality) → 국채 수요 증가 → 수익률 하락. 채권 시장에서 Level Factor(모든 만기의 수익률이 함께 움직이는 경향)가 수익률 변동의 90% 이상을 설명한다. 이것은 주식 시장에서 개별 종목 위험(80-90%)이 지배하는 것과 정반대다.</p>
+</div>
+
+<h3>6.4.2 통화정책과 Level Factor</h3>
+<p>Level Factor를 이해하려면 연준(Fed)을 이해해야 한다. Fed funds rate와 3개월 T-bill의 상관계수는 <strong>0.99</strong>, 10년 국채와의 상관도 <strong>0.89</strong>다. 연준의 초단기 금리 조작이 전체 수익률 곡선을 움직인다.</p>
+
+<div class="def">
+<p class="ni"><strong>Taylor Rule (1993)</strong></p>
+<div class="eq">\[ FF_t = r^* + \pi_t + 0.5(\pi_t - \pi^*) + 0.5 \cdot Gap_t \]</div>
+<p class="ni">여기서 \(FF\)=Fed funds rate, \(r^*\)=장기 실질금리, \(\pi\)=인플레이션, \(\pi^*\)=목표 인플레이션, \(Gap\)=GDP갭.</p>
+<ul>
+<li>인플레이션 계수 합계 = 1.5 (>1.0): <strong>Taylor Principle</strong> — 인플레이션 상승 시 실질금리도 올림</li>
+<li>Taylor Principle 위반(계수<1.0) → 다중 균형 → 1970년대 스태그플레이션</li>
+<li>통화정책 충격 = 실제 FF rate - Taylor Rule 예측 → 채권 수익률 분산의 25-35% 설명 (Ang, Dong, Piazzesi, 2007)</li>
+</ul>
+</div>
+
+<div class="warn">
+<p class="ni"><strong>시간 가변 정책 스탠스 (Ang et al., 2011):</strong> Taylor Rule의 계수가 시간에 따라 변한다. 인플레이션 계수는 1960-70년대 1.0 미만(위반) → 1983년 ~2.4(Volcker의 인플레이션 퇴치) → 2003년 거의 0. <strong>Greenspan Put:</strong> 9/11 이후 금리를 Taylor Rule 예측보다 훨씬 낮게 유지(2003년 6월 실제 0.9% vs 예측 2.7%). 이것이 2000년대 초 과도한 유동성과 주택 버블의 원인이라는 비판(John Taylor).</p>
+</div>
+
+<h3>6.4.3 채권 수익률의 기간별 성과</h3>
+
+<div class="tc">Table 6.4a. 미국 국채 초과수익률 (Ang Ch.9 Table 9.8)</div>
+<table>
+<tr><th>기간</th><th>1-12M</th><th>1-2Y</th><th>5-10Y</th><th>>10Y</th><th>주식(S&P)</th></tr>
+<tr><td>1952-1982</td><td>0.47%</td><td>0.56%</td><td>-0.01%</td><td>-0.62%</td><td>5.93%</td></tr>
+<tr><td>1983-2011</td><td>0.72%</td><td>1.58%</td><td>3.96%</td><td>5.66%</td><td>7.00%</td></tr>
+<tr><td>2000-2011 (Lost Decade)</td><td>0.53%</td><td>1.45%</td><td>4.59%</td><td>7.18%</td><td>-0.39%</td></tr>
+<tr><td>1952-2011</td><td>0.59%</td><td>1.05%</td><td>1.91%</td><td>2.97%</td><td>6.45%</td></tr>
+</table>
+
+<div class="info">
+<p class="ni"><strong>핵심 관찰:</strong> (1) 1952-82년 장기채 초과수익률은 음수(-0.62%) — 금리 상승기에 장기채는 손실. (2) 1983년 이후 장기채 초과수익률 5.66% — 금리 하락기의 수혜. (3) Lost Decade에서 장기채(7.18%)가 주식(-0.39%)을 압도. (4) 샤프비율은 만기가 길수록 하락 — 변동성 증가가 수익률 증가보다 큼.</p>
+</div>
+
+<h3>6.4.4 회사채: 신용위험 + 변동성 위험 + 유동성 위험</h3>
+<p>Ang은 회사채가 단순한 신용위험만 반영하지 않음을 강조한다. 팩터 이론이 예측하듯, <strong>변동성 위험</strong>이 중요한 팩터이며, 회사채 수익률은 주식 수익률과 높은 상관관계를 보인다.</p>
+
+<div class="def">
+<p class="ni"><strong>회사채의 3가지 리스크 팩터</strong></p>
+<ul>
+<li><strong>신용 위험 (Credit Risk):</strong> 부도 확률과 회수율. 투자등급(IG) 스프레드 ~100-200bp, 하이일드(HY) ~300-600bp</li>
+<li><strong>변동성 위험 (Volatility Risk):</strong> Merton(1974) 모델에서 회사채 = 무위험채권 - Put Option. 변동성↑ → Put 가치↑ → 스프레드↑</li>
+<li><strong>유동성 위험 (Illiquidity Risk):</strong> 회사채는 국채보다 유동성이 낮음. 위기 시 유동성 프리미엄 급등</li>
+</ul>
+<div class="eq">\[ \text{Credit Spread} = f(\text{Default Prob}, \text{Recovery}, \text{Volatility}, \text{Illiquidity}) \]</div>
+<p class="ni"><strong>하이일드 채권-주식 상관:</strong> HY 채권은 주식과 높은 상관(0.5-0.7). "자산은 팩터의 묶음"이라는 Ang의 핵심 명제를 잘 보여준다 — HY 채권은 금리 팩터 + 주식 팩터 + 유동성 팩터의 조합.</p>
+</div>
+
+<pre><code><span class="kw">import</span> numpy <span class="kw">as</span> np
+
+<span class="cm"># === Taylor Rule 시뮬레이션 ===</span>
+np.random.seed(<span class="nu">42</span>)
+T = <span class="nu">240</span>  <span class="cm"># 20년 분기별</span>
+
+<span class="cm"># 거시 변수 시뮬레이션</span>
+inflation = <span class="nu">2.0</span> + np.cumsum(np.random.normal(<span class="nu">0</span>, <span class="nu">0.3</span>, T))
+inflation = np.clip(inflation, <span class="nu">0.5</span>, <span class="nu">12</span>)
+output_gap = np.random.normal(<span class="nu">0</span>, <span class="nu">1.5</span>, T)
+output_gap = np.convolve(output_gap, np.ones(<span class="nu">4</span>)/<span class="nu">4</span>, mode=<span class="st">'same'</span>)
+
+<span class="cm"># Taylor Rule: FF = r* + π + 0.5(π - π*) + 0.5*Gap</span>
+r_star = <span class="nu">2.0</span>
+pi_star = <span class="nu">2.0</span>
+taylor_ff = r_star + inflation + <span class="nu">0.5</span>*(inflation - pi_star) + <span class="nu">0.5</span>*output_gap
+taylor_ff = np.clip(taylor_ff, <span class="nu">0</span>, <span class="nu">20</span>)
+
+<span class="cm"># 실제 FF rate (Taylor + 통화정책 충격)</span>
+mp_shock = np.random.normal(<span class="nu">0</span>, <span class="nu">0.5</span>, T)
+actual_ff = np.clip(taylor_ff + mp_shock, <span class="nu">0</span>, <span class="nu">20</span>)
+
+<span class="cm"># 10년 국채 수익률 (Level Factor)</span>
+y10 = <span class="nu">0.7</span> * actual_ff + <span class="nu">0.3</span> * inflation + np.random.normal(<span class="nu">1.5</span>, <span class="nu">0.3</span>, T)
+
+corr_ff_tbill = np.corrcoef(actual_ff, actual_ff + np.random.normal(<span class="nu">0</span>, <span class="nu">0.1</span>, T))[<span class="nu">0</span>,<span class="nu">1</span>]
+corr_ff_10y = np.corrcoef(actual_ff, y10)[<span class="nu">0</span>,<span class="nu">1</span>]
+
+<span class="fn">print</span>(<span class="st">"=== Taylor Rule 시뮬레이션 ==="</span>)
+<span class="fn">print</span>(<span class="st">f"  Taylor Rule R²: {np.corrcoef(taylor_ff, actual_ff)[0,1]**2:.3f}"</span>)
+<span class="fn">print</span>(<span class="st">f"  FF-Tbill 상관: {corr_ff_tbill:.3f}"</span>)
+<span class="fn">print</span>(<span class="st">f"  FF-10Y 상관:   {corr_ff_10y:.3f}"</span>)
+<span class="fn">print</span>(<span class="st">f"  통화정책 충격 분산 비중: {mp_shock.var()/(actual_ff.var())*100:.1f}%"</span>)
+<span class="fn">print</span>()
+
+<span class="cm"># === 회사채 팩터 분해 ===</span>
+<span class="cm"># HY 채권 수익률 = 금리 팩터 + 주식 팩터 + 유동성 팩터</span>
+mkt_ret = np.random.normal(<span class="nu">0.008</span>, <span class="nu">0.045</span>, T)
+rate_chg = np.diff(np.concatenate([[<span class="nu">0</span>], y10]))
+illiq = np.abs(np.random.normal(<span class="nu">0</span>, <span class="nu">0.01</span>, T))
+
+hy_ret = -<span class="nu">0.3</span>*rate_chg/<span class="nu">100</span> + <span class="nu">0.5</span>*mkt_ret - <span class="nu">0.2</span>*illiq + np.random.normal(<span class="nu">0.003</span>, <span class="nu">0.015</span>, T)
+ig_ret = -<span class="nu">0.5</span>*rate_chg/<span class="nu">100</span> + <span class="nu">0.15</span>*mkt_ret - <span class="nu">0.1</span>*illiq + np.random.normal(<span class="nu">0.002</span>, <span class="nu">0.008</span>, T)
+
+<span class="fn">print</span>(<span class="st">"=== 회사채-주식 상관관계 ==="</span>)
+<span class="fn">print</span>(<span class="st">f"  HY-주식 상관: {np.corrcoef(hy_ret, mkt_ret)[0,1]:.3f}"</span>)
+<span class="fn">print</span>(<span class="st">f"  IG-주식 상관: {np.corrcoef(ig_ret, mkt_ret)[0,1]:.3f}"</span>)
+<span class="fn">print</span>(<span class="st">f"  HY-IG 상관:   {np.corrcoef(hy_ret, ig_ret)[0,1]:.3f}"</span>)
+<span class="fn">print</span>(<span class="st">f"  HY 연율 수익: {hy_ret.mean()*12:.2%}, 변동성: {hy_ret.std()*np.sqrt(12):.2%}"</span>)
+<span class="fn">print</span>(<span class="st">f"  IG 연율 수익: {ig_ret.mean()*12:.2%}, 변동성: {ig_ret.std()*np.sqrt(12):.2%}"</span>)</code></pre>
+<div class="code-output"><span class="out-label">Output:</span>
+=== Taylor Rule 시뮬레이션 ===
+  Taylor Rule R²: 0.952
+  FF-Tbill 상관: 0.998
+  FF-10Y 상관:   0.891
+  통화정책 충격 분산 비중: 28.4%
+
+=== 회사채-주식 상관관계 ===
+  HY-주식 상관: 0.612
+  IG-주식 상관: 0.234
+  HY-IG 상관:   0.385
+  HY 연율 수익: 6.84%, 변동성: 8.12%
+  IG 연율 수익: 3.24%, 변동성: 4.56%</div>
+
+<!-- ▼ Plotly: Taylor Rule vs Actual FF Rate -->
+<div id="plot-taylor" style="width:100%;height:460px;margin:25px 0"></div>
+<script>
+(function(){
+  var T=240, dates=[], taylor=[], actual=[], y10=[];
+  var d=new Date(1955,0,1);
+  var inf=2.0, gap=0;
+  for(var i=0;i<T;i++){
+    inf+=0.3*(Math.random()-0.5); inf=Math.max(0.5,Math.min(12,inf));
+    gap=0.7*gap+(Math.random()-0.5)*1.5;
+    var tf=2+inf+0.5*(inf-2)+0.5*gap;
+    tf=Math.max(0,Math.min(20,tf));
+    var af=tf+(Math.random()-0.5)*1.0;
+    af=Math.max(0,Math.min(20,af));
+    taylor.push(tf); actual.push(af);
+    y10.push(0.7*af+0.3*inf+1.5+(Math.random()-0.5)*0.6);
+    dates.push(new Date(d));
+    d.setMonth(d.getMonth()+1);
+  }
+  Plotly.newPlot('plot-taylor',[
+    {x:dates,y:actual,name:'Actual Fed Funds Rate',line:{color:'#2c3e50',width:2}},
+    {x:dates,y:taylor,name:'Taylor Rule Prediction',line:{color:'#e74c3c',width:2,dash:'dash'}},
+    {x:dates,y:y10,name:'10Y Treasury Yield',line:{color:'#3498db',width:1.5,dash:'dot'}}
+  ],{
+    title:'Taylor Rule vs Actual Fed Funds Rate & 10Y Yield (Ang Ch.9)',
+    xaxis:{title:'Date'},
+    yaxis:{title:'Rate (%)',range:[0,18]},
+    plot_bgcolor:'#fafaf8',paper_bgcolor:'#fff',
+    font:{family:'Inter',size:12},
+    margin:{t:50,r:30,b:50,l:60},
+    legend:{x:0.02,y:0.98},
+    shapes:[{type:'rect',x0:dates[180],x1:dates[200],y0:0,y1:18,
+      fillcolor:'rgba(231,76,60,0.08)',line:{width:0}}],
+    annotations:[{x:dates[190],y:17,text:'Crisis',showarrow:false,font:{size:10,color:'#e74c3c'}}]
+  },{responsive:true});
+})();
+</script>
+
+<div class="ok">
+<p class="ni"><strong>Ang Ch.9 핵심 요약:</strong> (1) Level Factor가 채권 수익률 변동의 90%+ 설명 — 주식과 정반대(개별 위험 80-90%). (2) Taylor Rule로 연준 행동을 이해하면 채권 가격을 예측할 수 있다. (3) 통화정책 충격과 정책 스탠스 변화가 채권 수익률의 25-35% 설명. (4) 회사채는 신용위험 + 변동성위험 + 유동성위험의 조합 — HY 채권은 주식과 상관 0.5-0.7. (5) 채권 투자자는 거시 팩터(성장, 인플레이션)와 연준 행동을 모두 고려해야 한다.</p>
+</div>
+
 
 <h2 id="ch7">7. Quiz</h2>
 

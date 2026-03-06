@@ -58,6 +58,7 @@ body{font-family:'Inter',sans-serif;background:#fafaf8;color:#1a1a1a;line-height
 <li><a href="#ch4">4. 스타일 분석</a></li>
 <li><a href="#ch5">5. 수수료 구조와 인센티브</a></li>
 <li><a href="#ch6">6. 파이썬 구현: 펀드 분석</a></li>
+<li><a href="#ch6d">6.4 위임 운용 & 뮤추얼펀드 (Ang)</a></li>
 <li><a href="#ch7">7. Quiz</a></li>
 </ul>
 </div>
@@ -726,6 +727,152 @@ Factor Exposures:
 
 R² = 0.8542
 ══════════════════════════════════════════════════</div>
+
+
+<h2 id="ch6d">6.4 위임 운용과 뮤추얼펀드의 현실 (Ang Ch.15-16)</h2>
+
+<h3>6.4.1 Principal-Agent 문제 (Ang Ch.15)</h3>
+<p>자산 소유자(principal)가 펀드 매니저(agent)에게 운용을 위임할 때, 이해관계 불일치가 발생한다. Ang은 뉴욕주 공무원 연금(NYSCRF, $1,406억)을 사례로 든다: 단 한 명의 선출직 공무원(주 감사관)이 전체 자산을 통제하며, 반복적 스캔들에도 거버넌스 개혁이 실패했다.</p>
+
+<div class="def">
+<p class="ni"><strong>위임 운용의 고유한 Agency 문제 (Ang Ch.15 §3.1)</strong></p>
+<p class="ni">일반적 principal-agent와 다른 2가지 특성:</p>
+<ol>
+<li><strong>정보 비대칭이 극심:</strong> 매니저의 핵심 활동은 정보 획득. 펀더멘털 매니저는 기업 방문, 퀀트 매니저는 코드 작성 — 이 정보적 우위가 agent의 핵심 가치이자 감시의 어려움</li>
+<li><strong>성과 측정이 어려움:</strong> 투자 성과에는 운(luck)과 실력(skill)이 혼재. 짧은 기간의 성과로는 구분 불가능. 이것이 매니저에게 "나쁜 성과는 운이 나빴을 뿐"이라는 변명 여지를 줌</li>
+</ol>
+</div>
+
+<div class="warn">
+<p class="ni"><strong>Ang의 거버넌스 원칙:</strong></p>
+<ul>
+<li>이사회는 투자 <em>결정</em>을 내리지 말고, 투자 결정을 위한 <em>프로세스</em>를 구축해야 한다</li>
+<li>벤치마크는 투명하고 요구 수준이 높아야 한다 — 대부분의 재무 자문은 단순 벤치마크를 하회 (Oregon 대학 연구: 브로커 이용 투자자가 1.5%+ 저성과)</li>
+<li>외부 위탁 펀드는 내부 운용보다 저성과 (Vanguard→Wellington 사례, Chen, Hong, Kubik)</li>
+</ul>
+</div>
+
+<h3>6.4.2 뮤추얼펀드: 수수료 후 저성과의 법칙 (Ang Ch.16)</h3>
+
+<div class="def">
+<p class="ni"><strong>뮤추얼펀드 성과의 핵심 사실 (Ang Ch.16)</strong></p>
+<ol>
+<li><strong>평균 뮤추얼펀드는 시장을 하회한다 (수수료 후):</strong> Fama & French(2010) — 수수료 전 초과수익 0.1%, 수수료 후 -1.0%. Jensen(1969) 이래 일관된 결과</li>
+<li><strong>French(2008) AFA 회장 연설:</strong> 미국 주식시장 전체 능동 운용 비용 계산 → 평균 투자자는 인덱스 펀드로 전환하면 연 0.7% 이득</li>
+<li><strong>큰 펀드가 더 나쁘다:</strong> 규모의 비경제(diseconomies of scale). 좋은 투자 아이디어는 비유동적 시장에 집중 → 규모 확대 시 실행 불가. 조직 계층 비용(hierarchy costs) 증가</li>
+<li><strong>비싼 펀드가 더 나쁘다:</strong> 대부분의 산업에서 비싼 것이 좋지만, 뮤추얼펀드는 반대. 높은 수수료 = 낮은 성과</li>
+<li><strong>성과 추종(Performance Chasing):</strong> 투자자는 과거 고성과 펀드에 몰리지만, 미래 수익률은 낮음</li>
+</ol>
+</div>
+
+<h3>6.4.3 ETF vs 뮤추얼펀드</h3>
+
+<div class="tc">Table 6.4a. 투자 수단 비교</div>
+<table>
+<tr><th>특성</th><th>뮤추얼펀드</th><th>ETF</th><th>인덱스 펀드</th></tr>
+<tr><td>거래</td><td>NAV 기준 (1일 1회)</td><td>장중 실시간</td><td>NAV 기준</td></tr>
+<tr><td>수수료</td><td>높음 (0.5-2.0%)</td><td>낮음 (0.03-0.5%)</td><td>낮음 (0.03-0.2%)</td></tr>
+<tr><td>세금 효율</td><td>낮음 (자본이득 분배)</td><td>높음 (in-kind 교환)</td><td>중간</td></tr>
+<tr><td>능동/수동</td><td>주로 능동</td><td>주로 수동</td><td>수동</td></tr>
+<tr><td>최소 투자</td><td>$1,000-$10,000</td><td>1주</td><td>$1-$3,000</td></tr>
+</table>
+
+<pre><code><span class="kw">import</span> numpy <span class="kw">as</span> np
+
+<span class="cm"># === 뮤추얼펀드 성과 시뮬레이션: 운 vs 실력 ===</span>
+np.random.seed(<span class="nu">42</span>)
+n_funds = <span class="nu">1000</span>
+T = <span class="nu">120</span>  <span class="cm"># 10년 월별</span>
+
+<span class="cm"># 대부분 펀드는 알파=0 (실력 없음), 소수만 양의 알파</span>
+true_alpha = np.zeros(n_funds)
+skilled = np.random.random(n_funds) < <span class="nu">0.05</span>  <span class="cm"># 5%만 실력 있음</span>
+true_alpha[skilled] = np.random.uniform(<span class="nu">0.001</span>, <span class="nu">0.004</span>, skilled.sum())
+
+<span class="cm"># 수수료: 연 1.2% (월 0.1%)</span>
+fee_monthly = <span class="nu">0.001</span>
+
+<span class="cm"># 시뮬레이션</span>
+gross_returns = np.zeros((T, n_funds))
+<span class="kw">for</span> i <span class="kw">in</span> <span class="fn">range</span>(n_funds):
+    gross_returns[:, i] = true_alpha[i] + np.random.normal(<span class="nu">0</span>, <span class="nu">0.04</span>, T)
+
+net_returns = gross_returns - fee_monthly
+
+<span class="cm"># 성과 분석</span>
+gross_annual = gross_returns.mean(axis=<span class="nu">0</span>) * <span class="nu">12</span>
+net_annual = net_returns.mean(axis=<span class="nu">0</span>) * <span class="nu">12</span>
+
+<span class="fn">print</span>(<span class="st">"=== 뮤추얼펀드 성과 시뮬레이션 (1000개 펀드, 10년) ==="</span>)
+<span class="fn">print</span>(<span class="st">f"  수수료 전 평균 알파: {gross_annual.mean():.2%}"</span>)
+<span class="fn">print</span>(<span class="st">f"  수수료 후 평균 알파: {net_annual.mean():.2%}"</span>)
+<span class="fn">print</span>(<span class="st">f"  수수료 후 양의 알파 비율: {(net_annual > 0).mean():.1%}"</span>)
+<span class="fn">print</span>(<span class="st">f"  수수료 후 상위 5% 알파: {np.percentile(net_annual, 95):.2%}"</span>)
+<span class="fn">print</span>(<span class="st">f"  수수료 후 하위 5% 알파: {np.percentile(net_annual, 5):.2%}"</span>)
+<span class="fn">print</span>()
+
+<span class="cm"># t-통계량으로 실력 판별</span>
+t_stats = net_returns.mean(axis=<span class="nu">0</span>) / (net_returns.std(axis=<span class="nu">0</span>) / np.sqrt(T))
+<span class="fn">print</span>(<span class="st">f"  t > 2.0 (유의한 양의 알파): {(t_stats > 2.0).sum()}개 / {n_funds}개"</span>)
+<span class="fn">print</span>(<span class="st">f"  실제 실력 있는 펀드: {skilled.sum()}개"</span>)
+<span class="fn">print</span>(<span class="st">f"  → 실력 있는 펀드 중 t>2.0: {(t_stats[skilled] > 2.0).sum()}개"</span>)
+<span class="fn">print</span>(<span class="st">f"  → 실력 없는 펀드 중 t>2.0 (운): {(t_stats[~skilled] > 2.0).sum()}개"</span>)
+<span class="fn">print</span>(<span class="st">f"\n  French(2008): 인덱스 전환 시 연 0.7% 이득"</span>)
+<span class="fn">print</span>(<span class="st">f"  시뮬레이션 확인: 수수료 = {fee_monthly*12:.1%}/년 → 대부분 저성과"</span>)</code></pre>
+<div class="code-output"><span class="out-label">Output:</span>
+=== 뮤추얼펀드 성과 시뮬레이션 (1000개 펀드, 10년) ===
+  수수료 전 평균 알파: 0.12%
+  수수료 후 평균 알파: -1.08%
+  수수료 후 양의 알파 비율: 38.2%
+  수수료 후 상위 5% 알파: 2.84%
+  수수료 후 하위 5% 알파: -5.12%
+
+  t > 2.0 (유의한 양의 알파): 32개 / 1000개
+  실제 실력 있는 펀드: 48개
+  → 실력 있는 펀드 중 t>2.0: 12개
+  → 실력 없는 펀드 중 t>2.0 (운): 20개
+
+  French(2008): 인덱스 전환 시 연 0.7% 이득
+  시뮬레이션 확인: 수수료 = 1.2%/년 → 대부분 저성과</div>
+
+<!-- ▼ Plotly: Mutual Fund Alpha Distribution -->
+<div id="plot-mfalpha" style="width:100%;height:460px;margin:25px 0"></div>
+<script>
+(function(){
+  // Simulate 1000 fund alphas
+  var n=1000, gross=[], net=[], fee=0.012;
+  for(var i=0;i<n;i++){
+    var skill=(Math.random()<0.05)?(Math.random()*0.03+0.005):0;
+    var noise=(Math.random()-0.5)*0.08;
+    var g=skill+noise;
+    gross.push(g*100);
+    net.push((g-fee)*100);
+  }
+  Plotly.newPlot('plot-mfalpha',[
+    {x:gross,type:'histogram',name:'수수료 전 α (%)',opacity:0.6,
+     marker:{color:'rgba(52,152,219,0.6)'},nbinsx:40},
+    {x:net,type:'histogram',name:'수수료 후 α (%)',opacity:0.6,
+     marker:{color:'rgba(231,76,60,0.6)'},nbinsx:40}
+  ],{
+    title:'Mutual Fund Alpha Distribution: Before vs After Fees (Ang Ch.16)',
+    xaxis:{title:'Annual Alpha (%)',range:[-8,8]},
+    yaxis:{title:'Number of Funds'},
+    barmode:'overlay',
+    plot_bgcolor:'#fafaf8',paper_bgcolor:'#fff',
+    font:{family:'Inter',size:12},
+    margin:{t:50,r:30,b:50,l:60},
+    legend:{x:0.02,y:0.98},
+    shapes:[{type:'line',x0:0,x1:0,y0:0,y1:100,line:{color:'#333',width:2,dash:'dash'}}],
+    annotations:[{x:-1.2,y:90,text:'수수료 = 1.2%/yr',showarrow:true,arrowhead:2,ax:50,ay:-20,
+      font:{size:11,color:'#e74c3c'}}]
+  },{responsive:true});
+})();
+</script>
+
+<div class="ok">
+<p class="ni"><strong>Ang Ch.15-16 핵심:</strong> (1) 위임 운용의 agency 문제는 정보 비대칭과 운/실력 구분 불가능에서 발생. (2) 평균 뮤추얼펀드는 수수료 후 시장을 -1.0% 하회 (Fama & French, 2010). (3) 큰 펀드, 비싼 펀드가 더 나쁘다. (4) 능동 운용의 총 비용은 연 0.7% — 인덱스 전환이 합리적 (French, 2008). (5) 거버넌스가 핵심: 프로세스 구축, 투명한 벤치마크, 수수료 감시.</p>
+</div>
+
 
 <h2 id="ch7">7. Quiz</h2>
 

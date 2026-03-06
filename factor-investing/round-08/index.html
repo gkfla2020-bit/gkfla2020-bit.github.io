@@ -119,6 +119,7 @@ pre{font-size:11px;padding:14px}table{font-size:10px;display:block;overflow-x:au
 <li><a href="#ch4">4. 부동산 팩터</a></li>
 <li><a href="#ch5">5. 금은 인플레이션 헤지인가?</a></li>
 <li><a href="#ch6">6. 파이썬 구현: 인플레이션 헤지</a></li>
+<li><a href="#ch6d">6.4 "실물" 자산의 진실 (Ang Ch.11)</a></li>
 <li><a href="#ch7">7. Quiz</a></li>
 </ul>
 </div>
@@ -625,6 +626,130 @@ periods = [(<span class="st">'저인플레 (Y1-10)'</span>, <span class="nu">0</
   },{responsive:true});
 })();
 </script>
+
+
+<h2 id="ch6d">6.4 "실물" 자산의 진실 (Ang Ch.11)</h2>
+
+<h3>6.4.1 TIPS: 인플레이션 헤지의 환상</h3>
+<p>Ang은 TIPS(물가연동국채)가 개별 채권으로는 완벽한 인플레이션 헤지이지만, <strong>자산 클래스로서는 인플레이션과 거의 무상관</strong>이라는 놀라운 사실을 보여준다.</p>
+
+<div class="tc">Table 6.4a. TIPS vs 명목 국채 (Ang Ch.11 Table 11.4, 1997-2011)</div>
+<table>
+<tr><th></th><th>TIPS</th><th>명목 국채</th><th>월간 인플레이션</th></tr>
+<tr><td>평균 수익률</td><td>7.02%</td><td>6.24%</td><td>2.35%</td></tr>
+<tr><td>변동성</td><td>5.89%</td><td>4.70%</td><td>1.33%</td></tr>
+<tr><td>인플레이션 상관</td><td>10%</td><td>-22%</td><td>—</td></tr>
+</table>
+
+<div class="warn">
+<p class="ni"><strong>왜 TIPS가 인플레이션과 무상관인가?</strong> TIPS 수익률 = 실질 수익률 변동 + 인플레이션 보상. 실질 수익률이 놀라울 정도로 변동성이 크고, 이것이 인플레이션 보상 효과를 압도한다. 2007-2011 기간에도 TIPS-인플레이션 상관은 겨우 16%.</p>
+<p class="ni"><strong>Bodie의 조언에 대한 Ang의 반론:</strong> (1) 미래 부채를 완벽히 예측할 수 없다, (2) 실질 수익률이 시간에 따라 변한다, (3) 2013년 기준 TIPS 실질 수익률이 음수 — 부를 보존하지 못하고 감소시킨다, (4) 국가 위험 — 아르헨티나는 통계청을 장악해 인플레이션을 조작, $25억 절약.</p>
+</div>
+
+<h3>6.4.2 T-Bills: 최고의 인플레이션 헤지</h3>
+<p>Ang의 가장 반직관적인 결론: <strong>"지루한 T-Bill이 인플레이션 헤지에 가장 좋다."</strong></p>
+
+<div class="def">
+<p class="ni"><strong>Fisher Hypothesis와 T-Bill</strong></p>
+<div class="eq">\[ i_t \approx r_t + E_t[\pi_{t+1}] \]</div>
+<p class="ni">T-Bill 금리는 기대 인플레이션을 반영한다. 인플레이션이 지속적(persistent)이므로, 현재 인플레이션 충격이 T-Bill 수익률에 (약간의 시차를 두고) 반영된다. Figure 11.3에서 T-Bill과 CPI의 동조화가 명확하다.</p>
+<p class="ni"><strong>한계:</strong> (1) T-Bill은 인플레이션에 시차를 두고 반응 — 1970년대 후반 인플레이션 급등 시 T-Bill 수익률 상승은 1980년대 초에야 발생. (2) 제로금리 환경에서는 헤지 기능 상실.</p>
+</div>
+
+<h3>6.4.3 원자재: Spot, Cash, Roll Return 분해</h3>
+<p>Ang은 원자재 선물 수익률을 3가지 구성요소로 분해한다:</p>
+
+<div class="def">
+<p class="ni"><strong>원자재 선물 수익률 분해 (Ang Ch.11 §5.3)</strong></p>
+<div class="eq">\[ r_{\text{commodity}} = r_{\text{spot}} + r_{\text{cash}} + r_{\text{roll}} \]</div>
+<ul>
+<li><strong>Spot Return:</strong> 현물 가격 변동. 에너지는 거시 팩터(성장, 인플레이션)에 민감, 귀금속은 독립적</li>
+<li><strong>Cash/Collateral Return:</strong> 선물 증거금에 대한 이자 수익. T-Bill 수익률과 동일</li>
+<li><strong>Roll Return:</strong> 선물 만기 교체 시 발생. <strong>Backwardation</strong>(선물<현물) → 양의 롤 수익, <strong>Contango</strong>(선물>현물) → 음의 롤 수익</li>
+</ul>
+<p class="ni">Gorton & Rouwenhorst(2006)의 유명한 연구: 1959-2004 원자재 선물 수익률의 대부분은 roll return과 cash return에서 발생. 그러나 2004년 이후 원자재 지수 투자 급증 → contango 심화 → roll return 악화.</p>
+</div>
+
+<h3>6.4.4 인플레이션 베타 종합 비교</h3>
+
+<pre><code><span class="kw">import</span> numpy <span class="kw">as</span> np
+
+<span class="cm"># === Ang Ch.11: 자산별 인플레이션 베타 종합 ===</span>
+assets = {
+    <span class="st">'T-Bills (Cash)'</span>:     {<span class="st">'beta'</span>: <span class="nu">0.82</span>, <span class="st">'corr'</span>: <span class="nu">0.65</span>, <span class="st">'real_ret'</span>: <span class="nu">0.8</span>},
+    <span class="st">'TIPS'</span>:                {<span class="st">'beta'</span>: <span class="nu">0.12</span>, <span class="st">'corr'</span>: <span class="nu">0.10</span>, <span class="st">'real_ret'</span>: <span class="nu">4.7</span>},
+    <span class="st">'명목 국채'</span>:           {<span class="st">'beta'</span>: -<span class="nu">1.85</span>, <span class="st">'corr'</span>: -<span class="nu">0.22</span>, <span class="st">'real_ret'</span>: <span class="nu">3.9</span>},
+    <span class="st">'주식 (S&P 500)'</span>:     {<span class="st">'beta'</span>: -<span class="nu">3.52</span>, <span class="st">'corr'</span>: -<span class="nu">0.15</span>, <span class="st">'real_ret'</span>: <span class="nu">7.1</span>},
+    <span class="st">'에너지 원자재'</span>:       {<span class="st">'beta'</span>: <span class="nu">5.24</span>, <span class="st">'corr'</span>: <span class="nu">0.35</span>, <span class="st">'real_ret'</span>: <span class="nu">4.2</span>},
+    <span class="st">'금 (Gold)'</span>:           {<span class="st">'beta'</span>: <span class="nu">0.68</span>, <span class="st">'corr'</span>: <span class="nu">0.05</span>, <span class="st">'real_ret'</span>: <span class="nu">3.8</span>},
+    <span class="st">'부동산 (REITs)'</span>:     {<span class="st">'beta'</span>: -<span class="nu">2.10</span>, <span class="st">'corr'</span>: -<span class="nu">0.08</span>, <span class="st">'real_ret'</span>: <span class="nu">5.5</span>},
+    <span class="st">'직접 부동산 (NCREIF)'</span>: {<span class="st">'beta'</span>: <span class="nu">0.45</span>, <span class="st">'corr'</span>: <span class="nu">0.15</span>, <span class="st">'real_ret'</span>: <span class="nu">4.8</span>},
+}
+
+<span class="fn">print</span>(<span class="st">"=== 자산별 인플레이션 헤지 능력 (Ang Ch.11) ==="</span>)
+<span class="fn">print</span>(<span class="st">f"{'자산':<22} {'인플β':>7} {'인플상관':>8} {'실질수익':>8}"</span>)
+<span class="fn">print</span>(<span class="st">"-"</span> * <span class="nu">48</span>)
+<span class="kw">for</span> name, d <span class="kw">in</span> assets.items():
+    <span class="fn">print</span>(<span class="st">f"{name:<22} {d['beta']:>+7.2f} {d['corr']:>+8.2f} {d['real_ret']:>7.1f}%"</span>)
+
+<span class="fn">print</span>(<span class="st">"\n=== Ang의 핵심 결론 ==="</span>)
+<span class="fn">print</span>(<span class="st">"  1. T-Bill이 최고의 인플레이션 헤지 (β=0.82, 상관=0.65)"</span>)
+<span class="fn">print</span>(<span class="st">"  2. 주식은 인플레이션에 취약 (β=-3.52) — 놀라운 결과"</span>)
+<span class="fn">print</span>(<span class="st">"  3. TIPS는 자산 클래스로서 인플레이션과 거의 무상관 (상관=0.10)"</span>)
+<span class="fn">print</span>(<span class="st">"  4. 에너지만 유일하게 양의 인플레이션 베타 (β=5.24)"</span>)
+<span class="fn">print</span>(<span class="st">"  5. 금은 인플레이션 헤지로서 실패 (상관=0.05)"</span>)
+<span class="fn">print</span>(<span class="st">"  6. 부동산은 장기(3-5년)에서만 부분적 헤지"</span>)</code></pre>
+<div class="code-output"><span class="out-label">Output:</span>
+=== 자산별 인플레이션 헤지 능력 (Ang Ch.11) ===
+자산                     인플β   인플상관   실질수익
+------------------------------------------------
+T-Bills (Cash)           +0.82    +0.65     0.8%
+TIPS                     +0.12    +0.10     4.7%
+명목 국채                -1.85    -0.22     3.9%
+주식 (S&P 500)           -3.52    -0.15     7.1%
+에너지 원자재            +5.24    +0.35     4.2%
+금 (Gold)                +0.68    +0.05     3.8%
+부동산 (REITs)           -2.10    -0.08     5.5%
+직접 부동산 (NCREIF)     +0.45    +0.15     4.8%
+
+=== Ang의 핵심 결론 ===
+  1. T-Bill이 최고의 인플레이션 헤지 (β=0.82, 상관=0.65)
+  2. 주식은 인플레이션에 취약 (β=-3.52) — 놀라운 결과
+  3. TIPS는 자산 클래스로서 인플레이션과 거의 무상관 (상관=0.10)
+  4. 에너지만 유일하게 양의 인플레이션 베타 (β=5.24)
+  5. 금은 인플레이션 헤지로서 실패 (상관=0.05)
+  6. 부동산은 장기(3-5년)에서만 부분적 헤지</div>
+
+<!-- ▼ Plotly: Inflation Beta Comparison -->
+<div id="plot-infbeta" style="width:100%;height:460px;margin:25px 0"></div>
+<script>
+(function(){
+  var assets=['T-Bills','TIPS','명목국채','주식(S&P)','에너지','금','REITs','직접부동산'];
+  var betas=[0.82,0.12,-1.85,-3.52,5.24,0.68,-2.10,0.45];
+  var corrs=[0.65,0.10,-0.22,-0.15,0.35,0.05,-0.08,0.15];
+  var colors=betas.map(function(b){return b>0?'rgba(39,174,96,0.8)':'rgba(231,76,60,0.8)';});
+  Plotly.newPlot('plot-infbeta',[
+    {x:assets,y:betas,type:'bar',name:'Inflation β',marker:{color:colors}},
+    {x:assets,y:corrs,type:'scatter',mode:'markers+lines',name:'Inflation Corr',
+     marker:{size:10,color:'#2c3e50'},line:{color:'#2c3e50',dash:'dot'},yaxis:'y2'}
+  ],{
+    title:'Asset Inflation Betas & Correlations (Ang Ch.11)',
+    yaxis:{title:'Inflation Beta',zeroline:true,zerolinecolor:'#333',zerolinewidth:2},
+    yaxis2:{title:'Correlation',side:'right',overlaying:'y',range:[-0.5,0.8],titlefont:{color:'#2c3e50'}},
+    plot_bgcolor:'#fafaf8',paper_bgcolor:'#fff',
+    font:{family:'Inter',size:12},
+    margin:{t:50,r:70,b:80,l:60},
+    legend:{x:0.02,y:0.98},
+    annotations:[{x:'T-Bills',y:0.82,text:'Best Hedge',showarrow:true,arrowhead:2,ax:40,ay:-30,font:{size:10,color:'#27ae60'}},
+                 {x:'주식(S&P)',y:-3.52,text:'Worst!',showarrow:true,arrowhead:2,ax:-30,ay:-30,font:{size:10,color:'#e74c3c'}}]
+  },{responsive:true});
+})();
+</script>
+
+<div class="ok">
+<p class="ni"><strong>Ang Ch.11 핵심 요약:</strong> (1) 대부분의 "실물" 자산은 실제로 인플레이션 헤지가 아니다. (2) T-Bill이 최고의 인플레이션 헤지 — Fisher Hypothesis 덕분. (3) TIPS는 개별 채권으로는 완벽하지만 자산 클래스로서는 실질 수익률 변동이 인플레이션 보상을 압도. (4) 주식은 놀랍게도 인플레이션에 취약(음의 베타). (5) 에너지만 유일하게 양의 인플레이션 베타. (6) 금은 인플레이션 헤지로서 실패. (7) 부동산은 장기에서만 부분적 헤지. (8) 원자재 선물 수익률 = spot + cash + roll — roll return이 핵심이지만 contango 시 음수.</p>
+</div>
+
 
 <h2 id="ch7">7. Quiz</h2>
 

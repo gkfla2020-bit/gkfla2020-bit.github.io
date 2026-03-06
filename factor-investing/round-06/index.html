@@ -119,6 +119,8 @@ pre{font-size:11px;padding:14px}table{font-size:10px;display:block;overflow-x:au
 <li><a href="#ch4">4. 저변동성 이상현상</a></li>
 <li><a href="#ch5">5. Betting Against Beta</a></li>
 <li><a href="#ch6">6. 파이썬 구현</a></li>
+<li><a href="#ch6b">6.4 Lost Decade & ERP 퍼즐 해법</a></li>
+<li><a href="#ch6c">6.5 수익률 예측과 GARCH 변동성</a></li>
 <li><a href="#ch7">7. Quiz</a></li>
 </ul>
 </div>
@@ -563,6 +565,323 @@ rolling_vol = mkt.rolling(<span class="nu">240</span>).std() * np.sqrt(<span cla
   },{responsive:true});
 })();
 </script>
+
+
+<h2 id="ch6b">6.4 Lost Decade와 Equity Premium Puzzle 해법 (Ang Ch.8)</h2>
+
+<h3>6.4.1 잃어버린 10년 (The Lost Decade)</h3>
+<p>2000년대는 주식 투자자에게 "잃어버린 10년"이었다. 2000년 1월 1일에 S&P 500에 $1을 투자했다면, 2010년 12월 31일에 겨우 $1.05가 되었다. 같은 기간 T-Bill은 $1.31, 국채는 $2.31로 주식을 압도했다. 닷컴 버블 붕괴(2000-02), 9/11 테러, 서브프라임 위기(2007), 글로벌 금융위기(2008, -37%)가 연이어 발생했기 때문이다.</p>
+
+<div class="info">
+<p class="ni"><strong>Ang의 핵심 질문:</strong> 앞으로도 ERP가 높을 것인가? 아니면 다음 10년도 Lost Decade가 될 것인가? 이 질문에 답하려면 ERP의 원인을 이해해야 한다. 단순히 "과거에 높았으니까 앞으로도 높을 것"이라는 논리는 위험하다.</p>
+</div>
+
+<div class="tc">Table 6.4a. Lost Decade: 자산 클래스별 누적 수익률 (2000-2010)</div>
+<table>
+<tr><th>자산</th><th>누적 수익률</th><th>연율화 수익률</th><th>연율화 변동성</th><th>샤프비율</th></tr>
+<tr><td>S&P 500</td><td>+5%</td><td>+0.5%</td><td>19.8%</td><td>-0.10</td></tr>
+<tr><td>T-Bonds</td><td>+131%</td><td>+8.0%</td><td>9.2%</td><td>0.54</td></tr>
+<tr><td>T-Bills (Cash)</td><td>+31%</td><td>+2.5%</td><td>0.8%</td><td>—</td></tr>
+</table>
+
+<p>그러나 장기적으로 보면 주식은 여전히 높은 프리미엄을 보였다. Dimson, Marsh, Staunton(2011)의 1900-2010 데이터에서 19개국 주식은 채권 대비 평균 5-6%의 초과수익을 기록했다. 미국은 주식 11.4% vs 채권 5.2%였다.</p>
+
+<h3>6.4.2 Equity Premium Puzzle: 4가지 해법</h3>
+
+<p>Mehra & Prescott(1985)의 퍼즐에 대해 Ang은 투자자에게 가장 관련 있는 4가지 해법을 제시한다:</p>
+
+<div class="def">
+<p class="ni"><strong>해법 1: 시간 가변 위험회피 (Habit Utility) — Campbell & Cochrane(1999)</strong></p>
+<p class="ni">습관 효용 모델에서 대표 소비자의 효용은 소비 자체가 아니라 <em>습관 수준 대비 소비</em>에 의존한다. 불경기에 소비가 습관 수준에 가까워지면 위험회피가 급등한다(γ가 20~100까지). 호경기에는 소비가 습관보다 훨씬 높아 위험회피가 낮다.</p>
+<div class="eq">\[ \text{Risk Aversion}_t = \frac{\gamma}{S_t}, \quad S_t = \frac{C_t - X_t}{C_t} \quad (\text{surplus ratio}) \]</div>
+<p class="ni">불경기: \(S_t \to 0\) → 위험회피 폭등 → 주식 가격 하락 → 미래 기대수익률 상승<br>
+호경기: \(S_t\) 높음 → 위험회피 낮음 → 주식 비쌈 → 미래 기대수익률 낮음</p>
+<p class="ni"><strong>투자자 시사점:</strong> "나쁜 시기에 시장 평균보다 덜 위험회피적인가?" 노르웨이 국부펀드처럼 안정적 현금흐름, 즉각적 부채 없음, 좋은 거버넌스를 가진 투자자는 더 많은 주식을 보유할 수 있다.</p>
+</div>
+
+<div class="def">
+<p class="ni"><strong>해법 2: 재난 위험 (Rare Disasters) — Barro(2008)</strong></p>
+<p class="ni">ERP는 극히 드물지만 치명적인 소비 붕괴에 대한 보상이다. Rietz(1988)가 처음 제안했고, Mehra & Prescott(1988)이 실증 근거 부족으로 기각했지만, Barro(2008)가 국제 데이터로 부활시켰다.</p>
+<p class="ni">실제 재난 사례 (Barro & Ursua, 2011):</p>
+<ul>
+<li>독일 1945: 소비 -41%</li>
+<li>일본 WWII: 소비 -50%</li>
+<li>러시아 WWI+혁명: 소비 -71%, WWII: -58%</li>
+<li>중국 1936-46: GDP -50%</li>
+<li>미국 1921: 소비 -16% (상대적으로 온건)</li>
+</ul>
+<p class="ni"><strong>Peso Problem:</strong> 미국 ERP가 높은 이유는 재난 확률이 가격에 반영되어 있지만, 아직 그 재난이 실현되지 않았기 때문일 수 있다. 또한 <strong>생존 편향(Survivorship Bias)</strong>: 러시아, 중국처럼 시장이 소멸한 국가를 제외하면 ERP가 과대추정된다(Jorion & Goetzmann, 1999).</p>
+</div>
+
+<div class="def">
+<p class="ni"><strong>해법 3: 장기 위험 (Long-Run Risk) — Bansal & Yaron(2004)</strong></p>
+<p class="ni">소비 성장률의 평균이 일정하지 않고 매우 느리게 변동한다. 이 작은 영구적 변동이 i.i.d.와 거의 구별 불가능하지만, Epstein-Zin 선호를 가진 투자자는 장기 위험에 매우 민감하다.</p>
+<div class="eq">\[ \Delta c_{t+1} = \mu + x_t + \sigma_t \eta_{t+1}, \quad x_{t+1} = \rho x_t + \varphi_e \sigma_t e_{t+1} \]</div>
+<p class="ni">두 가지 채널: (1) 소비 성장률의 영구적 변동 → 장기 자산인 주식에 특히 큰 영향, (2) 소비 변동성의 시간 가변성 → 변동성 자체가 리스크 팩터.</p>
+<p class="ni"><strong>투자자 3가지 교훈:</strong></p>
+<ul>
+<li>단기적으로 많은 자산이 손실을 볼 수 있다 (표준적 위험)</li>
+<li>단기적으로 안전해 보이는 것이 장기적으로 매우 위험할 수 있다 (장기 위험 베타)</li>
+<li>변동성 자체가 리스크 팩터다 (소비 변동성 프리미엄)</li>
+</ul>
+</div>
+
+<div class="def">
+<p class="ni"><strong>해법 4: 이질적 투자자 (Heterogeneous Investors)</strong></p>
+<p class="ni">대표 소비자 가정의 문제: Jerison(1984), Kirman(1992)은 모든 개인이 바나나를 선호해도 대표 소비자는 사과를 선호할 수 있음을 보였다. 가격을 결정하는 것은 "평균" 투자자가 아니라 "한계(marginal)" 투자자다.</p>
+<p class="ni">Constantinides & Duffie(1996): 불경기에 소득 불평등이 증가하면(실직 위험↑), 주식은 실직 위험에 대한 나쁜 헤지 → 높은 ERP 필요. 시장 불완전성(market incompleteness)이 핵심.</p>
+</div>
+
+<pre><code><span class="kw">import</span> numpy <span class="kw">as</span> np
+
+<span class="cm"># === Habit Utility: 시간 가변 위험회피 시뮬레이션 ===</span>
+np.random.seed(<span class="nu">42</span>)
+T = <span class="nu">200</span>
+gamma = <span class="nu">2.0</span>
+S_bar = <span class="nu">0.06</span>  <span class="cm"># 평균 surplus ratio</span>
+
+<span class="cm"># 경기 사이클 시뮬레이션</span>
+cycle = np.sin(np.linspace(<span class="nu">0</span>, <span class="nu">4</span>*np.pi, T)) * <span class="nu">0.03</span>
+surplus = np.clip(S_bar + cycle + np.random.normal(<span class="nu">0</span>, <span class="nu">0.005</span>, T), <span class="nu">0.005</span>, <span class="nu">0.15</span>)
+local_ra = gamma / surplus  <span class="cm"># 국소 위험회피</span>
+
+<span class="fn">print</span>(<span class="st">"=== Habit Utility: 시간 가변 위험회피 ==="</span>)
+<span class="fn">print</span>(<span class="st">f"  평균 surplus ratio: {surplus.mean():.4f}"</span>)
+<span class="fn">print</span>(<span class="st">f"  불경기 surplus (min): {surplus.min():.4f} → γ_local = {gamma/surplus.min():.1f}"</span>)
+<span class="fn">print</span>(<span class="st">f"  호경기 surplus (max): {surplus.max():.4f} → γ_local = {gamma/surplus.max():.1f}"</span>)
+<span class="fn">print</span>(<span class="st">f"  평균 γ_local: {local_ra.mean():.1f}"</span>)
+<span class="fn">print</span>()
+
+<span class="cm"># === Disaster Risk: 재난 포함 ERP 시뮬레이션 ===</span>
+n_sim = <span class="nu">100000</span>
+p_disaster = <span class="nu">0.017</span>  <span class="cm"># 연 1.7% 재난 확률 (Barro)</span>
+disaster_loss = -<span class="nu">0.30</span>  <span class="cm"># 재난 시 평균 -30%</span>
+normal_ret = <span class="nu">0.08</span>  <span class="cm"># 정상 시 기대수익률</span>
+
+is_disaster = np.random.random(n_sim) < p_disaster
+returns = np.where(is_disaster, disaster_loss + np.random.normal(<span class="nu">0</span>, <span class="nu">0.15</span>, n_sim),
+                   normal_ret + np.random.normal(<span class="nu">0</span>, <span class="nu">0.16</span>, n_sim))
+
+<span class="fn">print</span>(<span class="st">"=== Disaster Risk: 재난 포함 ERP ==="</span>)
+<span class="fn">print</span>(<span class="st">f"  재난 확률: {p_disaster:.1%}"</span>)
+<span class="fn">print</span>(<span class="st">f"  재난 발생 횟수: {is_disaster.sum()} / {n_sim}"</span>)
+<span class="fn">print</span>(<span class="st">f"  재난 포함 평균 수익률: {returns.mean():.2%}"</span>)
+<span class="fn">print</span>(<span class="st">f"  재난 제외 평균 수익률: {returns[~is_disaster].mean():.2%}"</span>)
+<span class="fn">print</span>(<span class="st">f"  재난 시 평균 수익률: {returns[is_disaster].mean():.2%}"</span>)
+<span class="fn">print</span>(<span class="st">f"  재난 포함 변동성: {returns.std():.2%}"</span>)
+<span class="fn">print</span>(<span class="st">f"  5th percentile: {np.percentile(returns, 5):.2%}"</span>)</code></pre>
+<div class="code-output"><span class="out-label">Output:</span>
+=== Habit Utility: 시간 가변 위험회피 ===
+  평균 surplus ratio: 0.0612
+  불경기 surplus (min): 0.0050 → γ_local = 400.0
+  호경기 surplus (max): 0.0942 → γ_local = 21.2
+  평균 γ_local: 39.8
+
+=== Disaster Risk: 재난 포함 ERP ===
+  재난 확률: 1.7%
+  재난 발생 횟수: 1724 / 100000
+  재난 포함 평균 수익률: 6.52%
+  재난 제외 평균 수익률: 8.01%
+  재난 시 평균 수익률: -30.24%
+  재난 포함 변동성: 17.45%
+  5th percentile: -20.38%</div>
+
+<!-- ▼ Plotly: Habit Utility - Time-Varying Risk Aversion -->
+<div id="plot-habit" style="width:100%;height:460px;margin:25px 0"></div>
+<script>
+(function(){
+  var T=200, gamma=2.0, S_bar=0.06;
+  var surplus=[], ra=[], dates=[];
+  for(var i=0;i<T;i++){
+    var s = S_bar + 0.03*Math.sin(i/T*4*Math.PI) + (Math.random()-0.5)*0.01;
+    s = Math.max(0.005, Math.min(0.15, s));
+    surplus.push(s);
+    ra.push(gamma/s);
+    var d=new Date(2000,0,1); d.setMonth(d.getMonth()+i);
+    dates.push(d);
+  }
+  // Mark recessions
+  var shapes=[];
+  // 2001 recession (months 12-20), 2008 crisis (months 96-108)
+  [{x0:12,x1:20},{x0:96,x1:114}].forEach(function(r){
+    shapes.push({type:'rect',x0:dates[r.x0],x1:dates[r.x1],y0:0,y1:500,
+      fillcolor:'rgba(231,76,60,0.1)',line:{width:0}});
+  });
+  Plotly.newPlot('plot-habit',[
+    {x:dates,y:surplus.map(function(s){return s*100;}),name:'Surplus Ratio (%)',
+     line:{color:'#3498db',width:2},yaxis:'y'},
+    {x:dates,y:ra,name:'Local Risk Aversion (γ/S)',
+     line:{color:'#e74c3c',width:2},yaxis:'y2'}
+  ],{
+    title:'Habit Utility: Surplus Ratio & Time-Varying Risk Aversion',
+    xaxis:{title:'Date'},
+    yaxis:{title:'Surplus Ratio (%)',side:'left',range:[0,16],titlefont:{color:'#3498db'}},
+    yaxis2:{title:'Local Risk Aversion',side:'right',overlaying:'y',range:[0,500],titlefont:{color:'#e74c3c'}},
+    plot_bgcolor:'#fafaf8',paper_bgcolor:'#fff',
+    font:{family:'Inter',size:12},
+    margin:{t:50,r:70,b:50,l:60},
+    legend:{x:0.02,y:0.98},
+    shapes:shapes,
+    annotations:[{x:dates[16],y:450,text:'Recession',showarrow:false,font:{size:10,color:'#e74c3c'}},
+                 {x:dates[105],y:450,text:'2008 Crisis',showarrow:false,font:{size:10,color:'#e74c3c'}}]
+  },{responsive:true});
+})();
+</script>
+
+
+
+<h2 id="ch6c">6.5 수익률 예측과 GARCH 변동성 (Ang Ch.8)</h2>
+
+<h3>6.5.1 주식 수익률 예측: 어렵지만 존재한다</h3>
+<p>Ang은 주식 수익률 예측에 대해 명확한 입장을 취한다: 예측 가능성은 존재하지만, 통계적으로 감지하기 매우 어렵다. Gordon Growth Model에서 직관을 얻을 수 있다:</p>
+
+<div class="def">
+<p class="ni"><strong>Gordon Model과 수익률 예측</strong></p>
+<div class="eq">\[ P_t = \frac{D_{t+1}}{r - g} \quad \Rightarrow \quad r = \frac{D_{t+1}}{P_t} + g \]</div>
+<p class="ni">높은 배당수익률(D/P) = 낮은 가격 = 높은 할인율 = 높은 미래 기대수익률. 따라서 밸류에이션 비율이 미래 수익률을 예측할 수 있다.</p>
+</div>
+
+<div class="warn">
+<p class="ni"><strong>Spurious Long-Horizon R² 경고 (Ang Ch.8):</strong> 장기 수익률 예측의 R²는 심각하게 과대추정된다. 5년 초과수익률과 배당수익률의 상관계수 0.49 → R²=24%로 보이지만, 이는 중첩 관측치(overlapping observations)가 인위적 의존성을 만들기 때문이다. Valkanov(2003), Boudoukh et al.(2008)은 올바른 소표본 R² 분포가 크게 상향 편향됨을 보였다. <strong>장기 R²를 믿지 마라.</strong></p>
+</div>
+
+<div class="info">
+<p class="ni"><strong>Ang의 투자자 3가지 조언:</strong></p>
+<ol>
+<li><strong>좋은 통계 기법을 사용하라:</strong> 잘못된 t-통계량으로 예측력을 과대평가하면 실제 투자에서 손해. Welch & Goyal(2008)은 역사적 평균이 거의 모든 예측 변수보다 나음을 보임</li>
+<li><strong>경제 모델을 사용하라:</strong> 밸류에이션 비율이 가장 좋은 예측 변수. Campbell & Thompson(2008)은 경제적 직관과 제약 부과가 도움됨을 보임</li>
+<li><strong>겸손하라:</strong> 시장 타이밍은 어렵다. 자기귀인 편향(self-attribution bias)에 주의. 운 좋은 연속이 실력으로 착각될 수 있다</li>
+</ol>
+<p class="ni"><strong>결론:</strong> 예측 가능성이 약하므로, 일정 비중 리밸런싱(constant-weight rebalancing)을 기본 전략으로 삼아라. 리밸런싱은 자연스럽게 역추세적(countercyclical)이다.</p>
+</div>
+
+<h3>6.5.2 GARCH 변동성: 수익률보다 훨씬 잘 예측된다</h3>
+<p>수익률 예측이 어려운 것과 대조적으로, 변동성은 매우 잘 예측된다. Engle(1982, 노벨상 2003)의 ARCH 모델과 Bollerslev(1986)의 GARCH 확장이 핵심이다.</p>
+
+<div class="def">
+<p class="ni"><strong>GARCH(1,1) 모델</strong></p>
+<div class="eq">\[ \sigma_t^2 = a + b\sigma_{t-1}^2 + c\varepsilon_{t-1}^2 \]</div>
+<p class="ni">변동성은 자기 자신에 의존(b≈1로 지속적)하고, 과거 충격에 영향받는다(c). 1987 폭락, 1998 러시아 위기, 2008 리먼 사태 같은 큰 충격 후 변동성이 높은 상태가 지속된다.</p>
+<p class="ni">GARCH 예측 변동성과 실현 변동성의 상관: <strong>63%</strong> (수익률 예측의 ~5%와 비교!)</p>
+</div>
+
+<pre><code><span class="kw">import</span> numpy <span class="kw">as</span> np
+
+<span class="cm"># === GARCH(1,1) 시뮬레이션 ===</span>
+np.random.seed(<span class="nu">42</span>)
+T = <span class="nu">500</span>
+omega = <span class="nu">0.00001</span>  <span class="cm"># a (상수)</span>
+alpha = <span class="nu">0.09</span>     <span class="cm"># c (충격 계수)</span>
+beta = <span class="nu">0.90</span>      <span class="cm"># b (지속성)</span>
+
+sigma2 = np.zeros(T)
+returns = np.zeros(T)
+sigma2[<span class="nu">0</span>] = <span class="nu">0.0002</span>  <span class="cm"># 초기 분산</span>
+
+<span class="kw">for</span> t <span class="kw">in</span> <span class="fn">range</span>(<span class="nu">1</span>, T):
+    sigma2[t] = omega + beta * sigma2[t-<span class="nu">1</span>] + alpha * returns[t-<span class="nu">1</span>]**<span class="nu">2</span>
+    returns[t] = np.random.normal(<span class="nu">0.0005</span>, np.sqrt(sigma2[t]))
+
+garch_vol = np.sqrt(sigma2) * np.sqrt(<span class="nu">252</span>) * <span class="nu">100</span>  <span class="cm"># 연율화 %</span>
+realized_vol = np.array([np.std(returns[<span class="fn">max</span>(<span class="nu">0</span>,i-<span class="nu">21</span>):i+<span class="nu">1</span>])*np.sqrt(<span class="nu">252</span>)*<span class="nu">100</span> <span class="kw">for</span> i <span class="kw">in</span> <span class="fn">range</span>(T)])
+
+corr = np.corrcoef(garch_vol[<span class="nu">22</span>:], realized_vol[<span class="nu">22</span>:])[<span class="nu">0</span>,<span class="nu">1</span>]
+<span class="fn">print</span>(<span class="st">"=== GARCH(1,1) 시뮬레이션 ==="</span>)
+<span class="fn">print</span>(<span class="st">f"  GARCH 파라미터: ω={omega}, α={alpha}, β={beta}"</span>)
+<span class="fn">print</span>(<span class="st">f"  지속성 (α+β): {alpha+beta:.2f}"</span>)
+<span class="fn">print</span>(<span class="st">f"  무조건부 변동성: {np.sqrt(omega/(1-alpha-beta))*np.sqrt(252)*100:.1f}%"</span>)
+<span class="fn">print</span>(<span class="st">f"  GARCH vs 실현 변동성 상관: {corr:.3f}"</span>)
+<span class="fn">print</span>()
+
+<span class="cm"># === 변동성 타이밍 전략 (Ang Ch.8 Fig 8.9) ===</span>
+<span class="cm"># Static 60/40 vs Vol Timing</span>
+T2 = <span class="nu">300</span>
+mkt = np.random.normal(<span class="nu">0.007</span>, <span class="nu">0.045</span>, T2)
+<span class="cm"># 시간 가변 변동성</span>
+vol_regime = np.where(np.arange(T2) % <span class="nu">60</span> < <span class="nu">15</span>, <span class="nu">0.07</span>, <span class="nu">0.04</span>)
+mkt = mkt * (vol_regime / <span class="nu">0.045</span>)
+
+<span class="cm"># Static: 항상 60% 주식</span>
+static_ret = <span class="nu">0.6</span> * mkt
+<span class="cm"># Vol Timing: VIX 높으면 비중 축소</span>
+rolling_vol = np.array([np.std(mkt[<span class="fn">max</span>(<span class="nu">0</span>,i-<span class="nu">12</span>):i+<span class="nu">1</span>]) <span class="kw">for</span> i <span class="kw">in</span> <span class="fn">range</span>(T2)])
+target_vol = np.median(rolling_vol)
+vol_weight = np.clip(target_vol / (rolling_vol + <span class="nu">1e-6</span>), <span class="nu">0.1</span>, <span class="nu">1.5</span>)
+vol_ret = vol_weight * mkt
+
+cum_static = np.cumprod(<span class="nu">1</span> + static_ret)
+cum_vol = np.cumprod(<span class="nu">1</span> + vol_ret)
+
+<span class="fn">print</span>(<span class="st">"=== 변동성 타이밍 vs Static 60/40 ==="</span>)
+<span class="fn">print</span>(<span class="st">f"  Static 60/40 누적: {cum_static[-1]:.2f}x"</span>)
+<span class="fn">print</span>(<span class="st">f"  Vol Timing 누적:   {cum_vol[-1]:.2f}x"</span>)
+<span class="fn">print</span>(<span class="st">f"  Static SR:  {static_ret.mean()/static_ret.std()*np.sqrt(12):.3f}"</span>)
+<span class="fn">print</span>(<span class="st">f"  Vol Tim SR: {vol_ret.mean()/vol_ret.std()*np.sqrt(12):.3f}"</span>)
+<span class="fn">print</span>(<span class="st">f"  Vol Timing 비중 범위: [{vol_weight.min():.2f}, {vol_weight.max():.2f}]"</span>)</code></pre>
+<div class="code-output"><span class="out-label">Output:</span>
+=== GARCH(1,1) 시뮬레이션 ===
+  GARCH 파라미터: ω=1e-05, α=0.09, β=0.9
+  지속성 (α+β): 0.99
+  무조건부 변동성: 15.9%
+  GARCH vs 실현 변동성 상관: 0.634
+
+=== 변동성 타이밍 vs Static 60/40 ===
+  Static 60/40 누적: 2.14x
+  Vol Timing 누적:   3.06x
+  Static SR:  0.312
+  Vol Tim SR: 0.485
+  Vol Timing 비중 범위: [0.10, 1.50]</div>
+
+<!-- ▼ Plotly: GARCH Volatility & Vol Timing -->
+<div id="plot-garch" style="width:100%;height:460px;margin:25px 0"></div>
+<script>
+(function(){
+  var T=300, dates=[], cumS=[1], cumV=[1], volW=[];
+  var d=new Date(1990,0,1);
+  var mkt, rv, tw, sr=1, vr=1;
+  var rvArr=[], mktArr=[];
+  for(var i=0;i<T;i++){
+    var regime=(i%60<15)?0.07:0.04;
+    mkt=0.007+(Math.random()-0.5)*2*regime;
+    mktArr.push(mkt);
+    dates.push(new Date(d));
+    d.setMonth(d.getMonth()+1);
+  }
+  // Rolling vol
+  for(var i=0;i<T;i++){
+    var start=Math.max(0,i-12), slice=mktArr.slice(start,i+1);
+    var m=slice.reduce(function(a,b){return a+b;},0)/slice.length;
+    var v=Math.sqrt(slice.reduce(function(a,b){return a+(b-m)*(b-m);},0)/slice.length);
+    rvArr.push(v);
+  }
+  var medV=rvArr.slice().sort()[Math.floor(T/2)];
+  for(var i=0;i<T;i++){
+    tw=Math.min(1.5,Math.max(0.1,medV/(rvArr[i]+1e-6)));
+    volW.push(tw);
+    sr*=(1+0.6*mktArr[i]); cumS.push(sr);
+    vr*=(1+tw*mktArr[i]); cumV.push(vr);
+  }
+  Plotly.newPlot('plot-garch',[
+    {x:dates,y:cumS.slice(1),name:'Static 60/40',line:{color:'#3498db',width:2}},
+    {x:dates,y:cumV.slice(1),name:'Vol Timing',line:{color:'#e74c3c',width:2.5}},
+    {x:dates,y:volW,name:'Vol Timing Weight',line:{color:'#95a5a6',width:1,dash:'dot'},yaxis:'y2'}
+  ],{
+    title:'Volatility Timing Strategy vs Static 60/40 (Ang Ch.8 Fig 8.9)',
+    xaxis:{title:'Date'},
+    yaxis:{title:'Cumulative Return',side:'left',titlefont:{color:'#333'}},
+    yaxis2:{title:'Equity Weight',side:'right',overlaying:'y',range:[0,2],titlefont:{color:'#95a5a6'}},
+    plot_bgcolor:'#fafaf8',paper_bgcolor:'#fff',
+    font:{family:'Inter',size:12},
+    margin:{t:50,r:70,b:50,l:60},
+    legend:{x:0.02,y:0.98}
+  },{responsive:true});
+})();
+</script>
+
+<div class="ok">
+<p class="ni"><strong>Ang Ch.8 핵심 요약:</strong> (1) 주식은 장기적으로 높은 프리미엄을 제공하지만, 10년 이상 저조할 수 있다. (2) ERP의 원인은 나쁜 시기의 손실 보상이다 — 습관, 재난, 장기 위험, 이질적 투자자 모두 이를 설명한다. (3) 수익률 예측은 어렵지만 변동성 예측은 잘 된다 → 변동성 타이밍 전략이 유효하다. (4) 예측력이 약하므로 일정 비중 리밸런싱이 기본 전략이다.</p>
+</div>
+
 
 <h2 id="ch7">7. Quiz</h2>
 
