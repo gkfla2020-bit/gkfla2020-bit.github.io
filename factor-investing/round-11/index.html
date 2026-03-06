@@ -106,6 +106,7 @@ body{font-family:'Inter',sans-serif;background:#fafaf8;color:#1a1a1a;line-height
 <div class="def">
 <p class="ni"><strong>Definition 1.1 — 펀드 성과 분해</strong></p>
 <div class="eq">\[ r_p - r_f = \alpha_p + \sum_{k=1}^{K} \beta_{p,k} f_k + \varepsilon_p \]</div>
+<p class="ni" style="font-size:12px;color:#555;margin:4px 0 8px 0">↑ 펀드 초과수익 = 알파(매니저 스킬) + K개 팩터 노출에 의한 수익 + 잔차. 올바른 팩터 모델 선택이 핵심 — 팩터가 부족하면 팩터 노출이 알파로 잘못 측정됨.</p>
 <p class="ni">여기서 \(\alpha_p\)는 매니저의 스킬(팩터로 설명되지 않는 초과수익), \(\beta_{p,k}\)는 팩터 \(k\)에 대한 노출, \(f_k\)는 팩터 프리미엄이다. 핵심: 알파를 측정하려면 먼저 올바른 팩터 모델을 선택해야 한다.</p>
 </div>
 
@@ -130,8 +131,10 @@ body{font-family:'Inter',sans-serif;background:#fafaf8;color:#1a1a1a;line-height
 <div class="def">
 <p class="ni"><strong>Definition 2.1 — Jensen's Alpha</strong></p>
 <div class="eq">\[ \alpha_J = \bar{r}_p - r_f - \hat{\beta}_p(\bar{r}_m - r_f) \]</div>
+<p class="ni" style="font-size:12px;color:#555;margin:4px 0 8px 0">↑ Jensen의 알파 = 펀드 평균 초과수익 - 베타 × 시장 프리미엄. CAPM 기준 초과성과. 양수이면 시장 대비 우수, 음수이면 열등.</p>
 <p class="ni">또는 시계열 회귀로:</p>
 <div class="eq">\[ r_{p,t} - r_{f,t} = \alpha_J + \beta_p(r_{m,t} - r_{f,t}) + \varepsilon_t \]</div>
+<p class="ni" style="font-size:12px;color:#555;margin:4px 0 8px 0">↑ Jensen 알파의 시계열 회귀 형태. 절편(α_J)이 매니저 스킬, 기울기(β_p)가 시장 민감도. t-통계량으로 알파의 통계적 유의성 검정.</p>
 <p class="ni">\(\alpha_J > 0\)이면 매니저가 시장 대비 초과수익을 창출했다는 의미. 단, CAPM이 올바른 모델이라는 가정 하에서만 유효하다.</p>
 </div>
 
@@ -141,6 +144,7 @@ body{font-family:'Inter',sans-serif;background:#fafaf8;color:#1a1a1a;line-height
 <div class="def">
 <p class="ni"><strong>Definition 2.2 — Carhart 4-Factor Alpha</strong></p>
 <div class="eq">\[ r_{p,t} - r_{f,t} = \alpha + \beta_1 \text{MKT}_t + \beta_2 \text{SMB}_t + \beta_3 \text{HML}_t + \beta_4 \text{UMD}_t + \varepsilon_t \]</div>
+<p class="ni" style="font-size:12px;color:#555;margin:4px 0 8px 0">↑ Carhart 4팩터 모델: 시장(MKT) + 규모(SMB) + 가치(HML) + 모멘텀(UMD) 통제 후 알파. CAPM 알파가 양수인 펀드도 4팩터 알파는 0일 수 있음 — 소형 가치주 편향이 알파로 잘못 측정된 것.</p>
 <p class="ni">MKT = 시장, SMB = 규모, HML = 가치, UMD = 모멘텀. 4개 팩터를 통제한 후의 \(\alpha\)가 진정한 매니저 스킬을 반영한다.</p>
 </div>
 
@@ -283,6 +287,7 @@ bot_persist = []
 <div class="def">
 <p class="ni"><strong>Definition 3.2 — Fung-Hsieh 7-Factor Model</strong></p>
 <div class="eq">\[ r_{p,t} - r_f = \alpha + \beta_1 \text{MKT}_t + \beta_2 \text{SMB}_t + \beta_3 \text{10Y}_t + \beta_4 \text{CreditSprd}_t + \beta_5 \text{PTFSBD}_t + \beta_6 \text{PTFSFX}_t + \beta_7 \text{PTFSCOM}_t + \varepsilon_t \]</div>
+<p class="ni" style="font-size:12px;color:#555;margin:4px 0 8px 0">↑ Fung-Hsieh 7팩터: 주식(MKT, SMB) + 채권(10Y, Credit) + 트렌드 추종(PTFS: 채권/외환/상품 룩백 스트래들). PTFS 팩터가 헤지펀드의 비선형 수익 구조(옵션 매도 유사)를 포착.</p>
 <p class="ni">PTFS = Primitive Trend-Following Strategy. 채권, 외환, 상품 시장의 룩백 스트래들(lookback straddle) 수익률. 트렌드 추종 전략의 비선형 수익 구조를 포착한다.</p>
 </div>
 
@@ -367,8 +372,10 @@ backfill_ann_ret = np.mean(monthly_rets[:, backfill]) * <span class="nu">12</spa
 <div class="def">
 <p class="ni"><strong>Definition 4.1 — Returns-Based Style Analysis (RBSA)</strong></p>
 <div class="eq">\[ \min_{\mathbf{w}} \sum_{t=1}^{T} \left( r_{p,t} - \sum_{k=1}^{K} w_k \cdot r_{k,t} \right)^2 \]</div>
+<p class="ni" style="font-size:12px;color:#555;margin:4px 0 8px 0">↑ RBSA 목적함수: 펀드 수익률과 스타일 벤치마크 조합의 차이(잔차)를 최소화하는 비중(w)을 찾음. 보유 종목 없이 수익률 패턴만으로 펀드의 실제 투자 스타일을 추론.</p>
 <p class="ni">제약조건:</p>
 <div class="eq">\[ w_k \geq 0 \quad \forall k, \qquad \sum_{k=1}^{K} w_k = 1 \]</div>
+<p class="ni" style="font-size:12px;color:#555;margin:4px 0 8px 0">↑ RBSA 제약조건: 모든 비중 ≥ 0(공매도 불가) + 비중 합계 = 1(완전 투자). 이 제약이 단순 OLS 회귀와 RBSA를 구별짓는 핵심 — 경제적으로 해석 가능한 비중을 보장.</p>
 <p class="ni">비음(non-negative) 제약은 공매도 불가를 의미하고, 합계 1 제약은 완전 투자를 의미한다. 이 제약이 RBSA를 단순 회귀와 구별짓는 핵심이다.</p>
 </div>
 
@@ -477,8 +484,10 @@ Selection Return (1-R²): 2.9% → 매니저 고유 기여</div>
 <div class="def">
 <p class="ni"><strong>Definition 5.1 — 수수료의 복리 효과</strong></p>
 <div class="eq">\[ V_{\text{net}}(T) = V_0 \cdot (1 + r - f)^T \]</div>
+<p class="ni" style="font-size:12px;color:#555;margin:4px 0 8px 0">↑ 수수료 차감 후 최종 자산가치 = 초기 투자 × (1 + 수익률 - 수수료)^T. 수수료(f)가 복리로 누적되어 장기 자산을 크게 잠식.</p>
 <p class="ni">여기서 \(f\)는 연간 총 수수료율. 수수료 1%의 차이가 30년 후 자산의 약 26%를 잠식한다:</p>
 <div class="eq">\[ \frac{(1.07)^{30}}{(1.06)^{30}} = \frac{7.61}{5.74} = 1.326 \]</div>
+<p class="ni" style="font-size:12px;color:#555;margin:4px 0 8px 0">↑ 수수료 1%p 차이의 30년 복리 효과: 수수료 0%(7% 성장) vs 수수료 1%(6% 성장)이면 30년 후 자산 차이 32.6%. 수수료가 자산의 약 1/4을 잠식.</p>
 </div>
 
 <h3>5.2 헤지펀드 수수료: 2/20과 하이워터마크</h3>
@@ -490,6 +499,7 @@ Selection Return (1-R²): 2.9% → 매니저 고유 기여</div>
 <li><strong>성과보수:</strong> 이익의 20% (하이워터마크 초과분에 대해)</li>
 </ul>
 <div class="eq">\[ \text{Fee}_t = 0.02 \cdot \text{AUM}_t + 0.20 \cdot \max(0, \text{NAV}_t - \text{HWM}_{t-1}) \]</div>
+<p class="ni" style="font-size:12px;color:#555;margin:4px 0 8px 0">↑ 2/20 수수료: 운용보수(AUM의 2%, 성과 무관) + 성과보수(NAV가 역대 최고치(HWM) 초과한 부분의 20%). HWM 덕분에 손실 회복 전에는 성과보수 없음 — 그러나 매니저가 펀드를 청산하고 새로 시작하면 HWM 리셋.</p>
 <p class="ni"><strong>하이워터마크 (High-Water Mark, HWM):</strong> 펀드 NAV의 역대 최고치. 성과보수는 HWM을 초과한 이익에 대해서만 부과. 손실 회복 후에야 성과보수 발생.</p>
 </div>
 

@@ -160,6 +160,7 @@ pre{font-size:11px;padding:14px}table{font-size:10px;display:block;overflow-x:au
 <div class="def">
 <p class="ni"><strong>Definition 1.1 — 채권 수익률 분해</strong></p>
 <div class="eq">\[ y_n = \underbrace{\frac{1}{n}\sum_{i=1}^{n} E[r_{1,t+i}]}_{\text{기대 단기금리 경로}} + \underbrace{\text{TP}_n}_{\text{기간 프리미엄}} + \underbrace{\text{CS}_n}_{\text{신용 스프레드}} \]</div>
+<p class="ni" style="font-size:12px;color:#555;margin:4px 0 8px 0">↑ n년 만기 채권 수익률(y_n) = 미래 단기금리 기대값의 평균 + 장기 보유 보상(기간 프리미엄) + 부도 위험 보상(신용 스프레드). 기대가설이 맞다면 TP=0이지만, 실증적으로 TP>0이며 시간에 따라 변한다.</p>
 <p class="ni">여기서:</p>
 <ul>
 <li>\(y_n\): n년 만기 채권의 수익률</li>
@@ -223,6 +224,7 @@ df = pd.DataFrame({
 <div class="def">
 <p class="ni"><strong>Definition 2.1 — 수익률 곡선 3대 팩터</strong></p>
 <div class="eq">\[ \Delta y(\tau) \approx \underbrace{w_1(\tau) \cdot \text{PC}_1}_{\text{Level}} + \underbrace{w_2(\tau) \cdot \text{PC}_2}_{\text{Slope}} + \underbrace{w_3(\tau) \cdot \text{PC}_3}_{\text{Curvature}} \]</div>
+<p class="ni" style="font-size:12px;color:#555;margin:4px 0 8px 0">↑ 만기 τ에서의 수익률 변동(Δy) ≈ Level 팩터(모든 만기 동시 이동, 85%) + Slope 팩터(단기↔장기 반대 이동, 10%) + Curvature 팩터(중기 볼록/오목, 3%). w는 각 만기별 팩터 로딩(가중치).</p>
 <p class="ni">설명력:</p>
 <ul>
 <li><strong>PC1 (Level):</strong> ~85% — 모든 만기의 금리가 동시에 상승/하락</li>
@@ -279,9 +281,12 @@ pca.fit(dy)
 <div class="def">
 <p class="ni"><strong>Definition 3.1 — 맥컬리 듀레이션과 수정 듀레이션</strong></p>
 <div class="eq">\[ D_{\text{Mac}} = \frac{\sum_{t=1}^{T} t \cdot \frac{CF_t}{(1+y)^t}}{P} = \frac{1}{P}\sum_{t=1}^{T} t \cdot PV(CF_t) \]</div>
+<p class="ni" style="font-size:12px;color:#555;margin:4px 0 8px 0">↑ 맥컬리 듀레이션 = 각 현금흐름의 현재가치(PV)를 가중치로 한 시점(t)의 가중평균. 쿠폰이 작을수록, 만기가 길수록 듀레이션이 커진다. 단위는 '년'.</p>
 <div class="eq">\[ D_{\text{Mod}} = \frac{D_{\text{Mac}}}{1+y} \]</div>
+<p class="ni" style="font-size:12px;color:#555;margin:4px 0 8px 0">↑ 수정 듀레이션 = 맥컬리 듀레이션 ÷ (1+수익률). 금리 변동 1%p당 채권 가격 변화율(%)을 직접 나타낸다.</p>
 <p class="ni">채권 가격 변화의 1차 근사:</p>
 <div class="eq">\[ \frac{\Delta P}{P} \approx -D_{\text{Mod}} \cdot \Delta y \]</div>
+<p class="ni" style="font-size:12px;color:#555;margin:4px 0 8px 0">↑ 채권 가격 변화율 ≈ -(수정 듀레이션) × 금리 변화. 듀레이션이 8이면 금리 1%p 상승 시 가격 약 8% 하락. 마이너스 부호는 금리와 가격의 역관계를 나타냄.</p>
 </div>
 
 <h3>3.2 볼록성 (Convexity)</h3>
@@ -289,8 +294,10 @@ pca.fit(dy)
 <div class="def">
 <p class="ni"><strong>Definition 3.2 — 볼록성</strong></p>
 <div class="eq">\[ C = \frac{1}{P} \sum_{t=1}^{T} \frac{t(t+1) \cdot CF_t}{(1+y)^{t+2}} \]</div>
+<p class="ni" style="font-size:12px;color:#555;margin:4px 0 8px 0">↑ 볼록성(Convexity) = 가격의 금리에 대한 2차 도함수를 가격으로 나눈 값. t(t+1) 가중치 때문에 만기가 긴 현금흐름일수록 볼록성 기여가 크다. 항상 양수이므로 채권 보유자에게 유리.</p>
 <p class="ni">2차 근사를 포함한 가격 변화:</p>
 <div class="eq">\[ \frac{\Delta P}{P} \approx -D_{\text{Mod}} \cdot \Delta y + \frac{1}{2} C \cdot (\Delta y)^2 \]</div>
+<p class="ni" style="font-size:12px;color:#555;margin:4px 0 8px 0">↑ 2차 근사: 가격 변화 ≈ 듀레이션 효과(1차, 선형) + 볼록성 효과(2차, 비선형). 볼록성 항은 항상 양수이므로 금리 하락 시 이득이 더 크고, 금리 상승 시 손실이 더 작다.</p>
 <p class="ni">볼록성은 항상 양(+)이므로, 금리가 오르든 내리든 채권 보유자에게 유리하다. 이것이 "볼록성 프리미엄"이다.</p>
 </div>
 
@@ -356,6 +363,7 @@ bonds = [
 <div class="def">
 <p class="ni"><strong>Definition 4.1 — 신용 스프레드 분해</strong></p>
 <div class="eq">\[ \text{CS} = y_{\text{corp}} - y_{\text{gov}} = \underbrace{\text{EL}}_{\text{기대 손실}} + \underbrace{\text{CRP}}_{\text{신용 위험 프리미엄}} + \underbrace{\text{LP}}_{\text{유동성 프리미엄}} \]</div>
+<p class="ni" style="font-size:12px;color:#555;margin:4px 0 8px 0">↑ 신용 스프레드(회사채-국채 금리차) = 기대 손실(부도확률×손실률) + 신용 위험 프리미엄(체계적 위험 보상) + 유동성 프리미엄(거래 비용 보상). 투자등급은 초과 스프레드가 크고(신용 퍼즐), 투기등급은 기대 손실이 스프레드를 초과하기도 함.</p>
 <p class="ni">기대 손실(Expected Loss) = 부도확률(PD) × 부도시 손실률(LGD)</p>
 </div>
 
@@ -382,6 +390,7 @@ bonds = [
 <div class="def">
 <p class="ni"><strong>Definition 5.1 — Nelson-Siegel 모델</strong></p>
 <div class="eq">\[ y(\tau) = \beta_0 + \beta_1 \left(\frac{1-e^{-\tau/\lambda}}{\tau/\lambda}\right) + \beta_2 \left(\frac{1-e^{-\tau/\lambda}}{\tau/\lambda} - e^{-\tau/\lambda}\right) \]</div>
+<p class="ni" style="font-size:12px;color:#555;margin:4px 0 8px 0">↑ Nelson-Siegel 모델: β₀=장기 수준(Level, τ→∞일 때 수렴값), β₁=기울기(Slope, 단기-장기 차이), β₂=곡률(Curvature, 중기 볼록/오목). λ는 중기의 위치를 결정하는 감쇠 파라미터. 3개 파라미터로 수익률 곡선 전체를 간결하게 표현.</p>
 <p class="ni">파라미터 해석:</p>
 <ul>
 <li>\(\beta_0\): 장기 수준 (Level) — \(\lim_{\tau\to\infty} y(\tau) = \beta_0\)</li>
@@ -668,6 +677,7 @@ rf_invert = yields_invert[<span class="nu">0</span>]
 <div class="def">
 <p class="ni"><strong>Taylor Rule (1993)</strong></p>
 <div class="eq">\[ FF_t = r^* + \pi_t + 0.5(\pi_t - \pi^*) + 0.5 \cdot Gap_t \]</div>
+<p class="ni" style="font-size:12px;color:#555;margin:4px 0 8px 0">↑ Taylor Rule: 기준금리(FF) = 장기 실질금리(r*) + 현재 인플레이션(π) + 0.5×(인플레이션 갭) + 0.5×(GDP 갭). 인플레이션 계수 합계=1.5(>1)이면 Taylor Principle 충족 — 인플레이션 상승 시 실질금리도 올려 경기를 억제.</p>
 <p class="ni">여기서 \(FF\)=Fed funds rate, \(r^*\)=장기 실질금리, \(\pi\)=인플레이션, \(\pi^*\)=목표 인플레이션, \(Gap\)=GDP갭.</p>
 <ul>
 <li>인플레이션 계수 합계 = 1.5 (>1.0): <strong>Taylor Principle</strong> — 인플레이션 상승 시 실질금리도 올림</li>
@@ -706,6 +716,7 @@ rf_invert = yields_invert[<span class="nu">0</span>]
 <li><strong>유동성 위험 (Illiquidity Risk):</strong> 회사채는 국채보다 유동성이 낮음. 위기 시 유동성 프리미엄 급등</li>
 </ul>
 <div class="eq">\[ \text{Credit Spread} = f(\text{Default Prob}, \text{Recovery}, \text{Volatility}, \text{Illiquidity}) \]</div>
+<p class="ni" style="font-size:12px;color:#555;margin:4px 0 8px 0">↑ 회사채 스프레드는 부도확률, 회수율, 변동성, 유동성의 함수. Merton 모델에서 회사채 = 무위험채권 - Put Option이므로, 변동성↑ → Put 가치↑ → 스프레드↑. HY 채권은 주식과 상관 0.5-0.7으로 주식 팩터 노출이 큼.</p>
 <p class="ni"><strong>하이일드 채권-주식 상관:</strong> HY 채권은 주식과 높은 상관(0.5-0.7). "자산은 팩터의 묶음"이라는 Ang의 핵심 명제를 잘 보여준다 — HY 채권은 금리 팩터 + 주식 팩터 + 유동성 팩터의 조합.</p>
 </div>
 

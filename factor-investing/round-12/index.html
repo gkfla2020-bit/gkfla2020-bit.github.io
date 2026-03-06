@@ -110,6 +110,7 @@ body{font-family:'Inter',sans-serif;background:#fafaf8;color:#1a1a1a;line-height
 <div class="def">
 <p class="ni"><strong>Definition 1.1 — 팩터 기반 투자 프로세스 (Ang의 프레임워크)</strong></p>
 <div class="eq">\[ \underbrace{E[r_i] - r_f}_{\text{기대 초과수익}} = \underbrace{\sum_{k=1}^{K} \beta_{i,k}}_{\text{팩터 노출}} \cdot \underbrace{\lambda_k}_{\text{팩터 프리미엄}} \]</div>
+<p class="ni" style="font-size:12px;color:#555;margin:4px 0 8px 0">↑ 팩터 투자의 핵심 공식: 기대 초과수익 = 팩터 노출(β) × 팩터 프리미엄(λ)의 합. β는 시계열 회귀로, λ는 횡단면 회귀(Fama-MacBeth)로 추정. 이 공식이 전체 투자 파이프라인의 출발점.</p>
 <p class="ni">이 단순한 수식이 전체 파이프라인의 핵심이다. 우리가 해야 할 일: (1) \(\beta_{i,k}\)를 추정하고, (2) \(\lambda_k\)를 추정하고, (3) 이를 기반으로 최적 포트폴리오를 구축한다.</p>
 </div>
 
@@ -207,6 +208,7 @@ stock_returns = np.zeros((T, N))
 <div class="def">
 <p class="ni"><strong>Definition 3.1 — 시계열 회귀 (Time-Series Regression)</strong></p>
 <div class="eq">\[ r_{i,t} - r_{f,t} = \alpha_i + \beta_{i,1}f_{1,t} + \cdots + \beta_{i,K}f_{K,t} + \varepsilon_{i,t} \quad \forall i \]</div>
+<p class="ni" style="font-size:12px;color:#555;margin:4px 0 8px 0">↑ Fama-MacBeth 1단계(시계열 회귀): 각 주식 i에 대해 초과수익을 K개 팩터로 회귀 → 팩터 노출(β) 추정. α가 유의하면 팩터로 설명 안 되는 초과수익 존재.</p>
 <p class="ni">각 주식 \(i\)에 대해 독립적으로 OLS 추정. 결과: \(\hat{\alpha}_i\), \(\hat{\beta}_{i,1}, \ldots, \hat{\beta}_{i,K}\)</p>
 </div>
 
@@ -215,6 +217,7 @@ stock_returns = np.zeros((T, N))
 <div class="def">
 <p class="ni"><strong>Definition 3.2 — Fama-MacBeth 횡단면 회귀</strong></p>
 <div class="eq">\[ r_{i,t} = \gamma_{0,t} + \gamma_{1,t}\hat{\beta}_{i,1} + \cdots + \gamma_{K,t}\hat{\beta}_{i,K} + \eta_{i,t} \quad \forall t \]</div>
+<p class="ni" style="font-size:12px;color:#555;margin:4px 0 8px 0">↑ Fama-MacBeth 2단계(횡단면 회귀): 각 시점 t에서 주식 수익률을 1단계에서 추정한 β로 회귀 → 팩터 프리미엄(γ) 추정. 최종 λ = γ의 시간 평균, t-통계량으로 유의성 검정.</p>
 <p class="ni">각 시점 \(t\)에서 횡단면 회귀를 수행. \(\hat{\gamma}_{k,t}\)는 시점 \(t\)에서의 팩터 \(k\)의 프리미엄 추정치. 최종 프리미엄: \(\hat{\lambda}_k = \frac{1}{T}\sum_t \hat{\gamma}_{k,t}\)</p>
 </div>
 
@@ -297,6 +300,7 @@ labels = [<span class="st">'Const'</span>] + factor_names
 <div class="def">
 <p class="ni"><strong>Definition 4.1 — 팩터 기반 기대수익률</strong></p>
 <div class="eq">\[ \hat{E}[r_i] = r_f + \sum_{k=1}^{K} \hat{\beta}_{i,k} \cdot \hat{\lambda}_k \]</div>
+<p class="ni" style="font-size:12px;color:#555;margin:4px 0 8px 0">↑ 팩터 기반 기대수익률: 무위험이자율 + (추정된 팩터 노출 × 추정된 팩터 프리미엄)의 합. 이 기대수익률을 평균-분산 최적화의 입력으로 사용하여 포트폴리오 구축.</p>
 </div>
 
 <h3>4.2 세 가지 포트폴리오 전략</h3>
@@ -382,6 +386,7 @@ strategies = {
 <li>\(t \leftarrow t+1\)로 이동, 반복</li>
 </ol>
 <div class="eq">\[ r_{p,t}^{\text{OOS}} = \mathbf{w}_t^{*}(\text{data}_{[t-W,t-1]}) \cdot \mathbf{r}_t \]</div>
+<p class="ni" style="font-size:12px;color:#555;margin:4px 0 8px 0">↑ Walk-Forward 백테스트: 시점 t의 OOS 수익률 = 과거 W개월 데이터로 최적화한 비중(w*) × 시점 t의 실현 수익률. 미래 데이터를 사용하지 않으므로 실전과 동일한 조건.</p>
 </div>
 
 <pre><code><span class="kw">import</span> numpy <span class="kw">as</span> np
@@ -501,6 +506,7 @@ OOS 기간: 180개월 (15년)
 <div class="def">
 <p class="ni"><strong>Definition 6.1 — 팩터 기반 성과 귀인</strong></p>
 <div class="eq">\[ r_p = \underbrace{\alpha_p}_{\text{Selection}} + \underbrace{\sum_{k=1}^{K} \beta_{p,k} \cdot f_k}_{\text{Factor Allocation}} + \underbrace{\varepsilon_p}_{\text{Residual}} \]</div>
+<p class="ni" style="font-size:12px;color:#555;margin:4px 0 8px 0">↑ 성과 귀인분석: 포트폴리오 수익 = 종목 선택 효과(α) + 팩터 배분 효과(β×f의 합) + 잔차. 각 팩터 기여도 = β_k × f̄_k로 수익의 원천을 분해.</p>
 <p class="ni">각 팩터의 기여도: \(\text{Contribution}_k = \beta_{p,k} \cdot \bar{f}_k\)</p>
 </div>
 
@@ -636,6 +642,7 @@ idio_var = total_var - factor_var
 <li><strong>비대칭:</strong> HF 전략은 오목(concave)하지만, HF 보수는 볼록(convex) → 매니저-투자자 이해 불일치</li>
 </ul>
 <div class="eq">\[ r_{\text{HF}} = \alpha + \beta_1 r_m + \beta_2 \text{SMB} + \beta_3 \text{HML} + \beta_4 \text{UMD} + \gamma \cdot \max(0, -r_m + K) + \varepsilon \]</div>
+<p class="ni" style="font-size:12px;color:#555;margin:4px 0 8px 0">↑ 헤지펀드 비선형 팩터 모델: 선형 팩터(시장, 규모, 가치, 모멘텀) + 풋옵션 유사 항(max(0, -r_m+K)). γ>0이면 시장 하락 시 추가 손실 — 많은 HF가 본질적으로 변동성 매도(short vol) 전략.</p>
 <p class="ni">마지막 항은 풋옵션 유사 페이오프 — 시장 하락 시 HF 손실이 선형 모델 예측보다 큼.</p>
 </div>
 
