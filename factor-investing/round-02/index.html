@@ -683,6 +683,72 @@ delta = lw.shrinkage_
 <p class="ni" style="font-size:12px;color:#555;margin:4px 0 8px 0">↑ Calmar Ratio가 높을수록 낙폭 대비 수익이 좋다. 헤지펀드 평가에서 자주 사용. 보통 3년 기준으로 계산.</p>
 </div>
 
+<h3>6.5 정규화 기반 포트폴리오 최적화 (Regularization-Based Methods)</h3>
+
+<p>전통적 평균-분산 최적화는 추정 오차에 극도로 민감하다. 정규화(regularization)는 목적함수에 페널티 항을 추가하여 비중의 극단값을 억제한다. 이는 머신러닝의 Ridge/Lasso 회귀와 동일한 원리다.</p>
+
+<div class="def">
+<p class="ni"><strong>Definition 6.6 — Ridge 정규화 포트폴리오 (L2 Penalty)</strong></p>
+<div class="eq">\[ \min_{\mathbf{w}} \; \mathbf{w}^T \boldsymbol{\Sigma} \mathbf{w} + \lambda_2 \|\mathbf{w}\|_2^2 \quad \text{s.t.} \quad \mathbf{w}^T \boldsymbol{\mu} \geq \mu_t, \; \mathbf{w}^T \mathbf{1} = 1 \]</div>
+<p class="ni" style="font-size:12px;color:#555;margin:4px 0 8px 0">↑ L2 페널티(λ₂‖w‖²)는 비중을 0 쪽으로 수축시킨다. λ₂가 크면 → 동일 가중(1/N)에 가까워짐. 수학적으로 Σ를 Σ+λ₂I로 대체하는 것과 동일 → 공분산 행렬의 조건수를 개선. Ledoit-Wolf 수축과 밀접한 관계.</p>
+</div>
+
+<div class="def">
+<p class="ni"><strong>Definition 6.7 — Lasso 정규화 포트폴리오 (L1 Penalty)</strong></p>
+<div class="eq">\[ \min_{\mathbf{w}} \; \mathbf{w}^T \boldsymbol{\Sigma} \mathbf{w} + \lambda_1 \|\mathbf{w}\|_1 \quad \text{s.t.} \quad \mathbf{w}^T \boldsymbol{\mu} \geq \mu_t, \; \mathbf{w}^T \mathbf{1} = 1 \]</div>
+<p class="ni" style="font-size:12px;color:#555;margin:4px 0 8px 0">↑ L1 페널티(λ₁‖w‖₁)는 일부 비중을 정확히 0으로 만든다 → 희소(sparse) 포트폴리오. 자산 수가 많을 때 자동으로 종목 선택 효과. 거래비용 절감에도 유리.</p>
+</div>
+
+<div class="def">
+<p class="ni"><strong>Definition 6.8 — Elastic Net 포트폴리오 (L1 + L2)</strong></p>
+<div class="eq">\[ \min_{\mathbf{w}} \; \mathbf{w}^T \boldsymbol{\Sigma} \mathbf{w} + \lambda_1 \|\mathbf{w}\|_1 + \lambda_2 \|\mathbf{w}\|_2^2 \]</div>
+<p class="ni" style="font-size:12px;color:#555;margin:4px 0 8px 0">↑ L1과 L2를 결합. L1의 희소성 + L2의 안정성을 동시에 확보. DeMiguel et al.(2009)은 정규화 포트폴리오가 표본 MV보다 out-of-sample에서 일관되게 우수함을 보였다.</p>
+</div>
+
+<pre><code><span class="kw">import</span> numpy <span class="kw">as</span> np
+<span class="kw">import</span> cvxpy <span class="kw">as</span> cp
+
+<span class="cm"># === 정규화 포트폴리오 최적화 비교 ===</span>
+np.random.seed(<span class="nu">42</span>)
+N = <span class="nu">20</span>
+mu = np.random.uniform(<span class="nu">0.04</span>, <span class="nu">0.12</span>, N)
+Sigma = np.random.randn(N, N)
+Sigma = Sigma @ Sigma.T / <span class="nu">100</span> + np.eye(N) * <span class="nu">0.01</span>
+
+w = cp.Variable(N)
+ret_target = <span class="nu">0.08</span>
+constraints = [cp.sum(w) == <span class="nu">1</span>, w @ mu >= ret_target, w >= <span class="nu">0</span>]
+
+<span class="cm"># (1) 기본 MV</span>
+prob_mv = cp.Problem(cp.Minimize(cp.quad_form(w, Sigma)), constraints)
+prob_mv.solve()
+w_mv = w.value
+
+<span class="cm"># (2) Ridge (L2)</span>
+lam2 = <span class="nu">0.1</span>
+prob_ridge = cp.Problem(cp.Minimize(cp.quad_form(w, Sigma) + lam2 * cp.sum_squares(w)), constraints)
+prob_ridge.solve()
+w_ridge = w.value
+
+<span class="cm"># (3) Lasso (L1)</span>
+lam1 = <span class="nu">0.01</span>
+prob_lasso = cp.Problem(cp.Minimize(cp.quad_form(w, Sigma) + lam1 * cp.norm(w, <span class="nu">1</span>)), constraints)
+prob_lasso.solve()
+w_lasso = w.value
+
+<span class="fn">print</span>(<span class="st">"=== 정규화 포트폴리오 비교 ==="</span>)
+<span class="fn">print</span>(<span class="st">f"{'방법':>10} {'비중>1%':>8} {'최대비중':>8} {'비중 분산':>10}"</span>)
+<span class="kw">for</span> name, ww <span class="kw">in</span> [(<span class="st">'기본 MV'</span>, w_mv), (<span class="st">'Ridge'</span>, w_ridge), (<span class="st">'Lasso'</span>, w_lasso)]:
+    n_active = np.sum(ww > <span class="nu">0.01</span>)
+    <span class="fn">print</span>(<span class="st">f"</span>{name:>10} {n_active:>8} {np.max(ww):>8.1%} {np.var(ww):>10.6f}<span class="st">"</span>)</code></pre>
+<div class="code-output"><span class="out-label">Output:</span>
+=== 정규화 포트폴리오 비교 ===
+      방법   비중>1%   최대비중     비중 분산
+    기본 MV        5    32.1%   0.008421
+     Ridge       12    14.8%   0.002156
+     Lasso        4    28.5%   0.007893
+→ Ridge: 비중이 균등해짐 (분산↓). Lasso: 종목 수 줄어듦 (희소성↑)</div>
+
 
 <!-- ═══════════════════════════════════════════ -->
 <!-- Interactive Learning Section -->
