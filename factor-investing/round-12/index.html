@@ -59,6 +59,7 @@ body{font-family:'Inter',sans-serif;background:#fafaf8;color:#1a1a1a;line-height
 <li><a href="#ch5">5. 백테스팅 엔진</a></li>
 <li><a href="#ch6">6. 성과 평가 & 귀인분석</a></li>
 <li><a href="#ch6d">6.4 HF & PE의 현실 (Ang Ch.17-18)</a></li>
+<li><a href="#interactive">🎮 직접 해보기</a></li>
 <li><a href="#ch7">7. Final Quiz</a></li>
 </ul>
 </div>
@@ -783,51 +784,280 @@ pme = <span class="fn">sum</span>(c <span class="kw">for</span> c <span class="k
 
 <h2 id="ch7">7. Final Quiz</h2>
 
-<div class="def">
-<p class="ni"><strong>Q1. [전체 파이프라인]</strong> Kenneth French 데이터 라이브러리에서 실제 Fama-French 5팩터 + 모멘텀 데이터를 다운로드하고, 30개 산업 포트폴리오에 대해 전체 파이프라인(팩터 추정 → 포트폴리오 구축 → 백테스팅 → 귀인분석)을 실행하라.</p>
+<h2 id="interactive">🎮 직접 해보기 — Interactive Lab</h2>
+
+<h3>Lab 1. Fama-MacBeth 회귀 시뮬레이터</h3>
+<p class="ni">팩터 프리미엄의 "진짜 값"과 노이즈를 조절하면서 Fama-MacBeth 2단계 회귀의 추정 정확도를 확인하세요. 표본 크기가 추정에 미치는 영향도 체감합니다.</p>
+
+<div style="background:#f0f4f8;padding:20px;border-radius:8px;margin:20px 0">
+<div style="display:flex;gap:16px;flex-wrap:wrap;margin-bottom:12px">
+<div>
+<label style="font-size:11px;color:#555">진짜 MKT 프리미엄 (%)</label><br>
+<input type="range" id="sl-tm" min="2" max="12" step="0.5" value="7" style="width:100px">
+<span id="val-tm" style="font-family:'Space Mono',monospace;font-size:12px">7.0%</span>
+</div>
+<div>
+<label style="font-size:11px;color:#555">진짜 HML 프리미엄 (%)</label><br>
+<input type="range" id="sl-th" min="-2" max="6" step="0.5" value="3" style="width:100px">
+<span id="val-th" style="font-family:'Space Mono',monospace;font-size:12px">3.0%</span>
+</div>
+<div>
+<label style="font-size:11px;color:#555">노이즈 (σ_ε, %)</label><br>
+<input type="range" id="sl-ne" min="1" max="10" step="0.5" value="4" style="width:100px">
+<span id="val-ne" style="font-family:'Space Mono',monospace;font-size:12px">4.0%</span>
+</div>
+<div>
+<label style="font-size:11px;color:#555">기간 T (월)</label><br>
+<input type="range" id="sl-tt" min="60" max="600" step="60" value="240" style="width:100px">
+<span id="val-tt" style="font-family:'Space Mono',monospace;font-size:12px">240</span>
+</div>
+</div>
+<div id="plot-lab1r12" style="width:100%;height:380px"></div>
+<div id="lab1r12-info" style="font-family:'Space Mono',monospace;font-size:12px;margin-top:8px;padding:10px;background:#1e1e1e;color:#d4d4d4;border-radius:6px;line-height:1.8"></div>
 </div>
 
-<div class="def">
-<p class="ni"><strong>Q2. [전략 비교]</strong> 다음 5가지 전략의 20년 OOS 성과를 비교하라: (a) 시총가중, (b) 동일가중, (c) 최소분산, (d) 리스크 패리티, (e) 멀티팩터 틸트. 각 전략의 팩터 노출을 분석하고, 성과 차이의 원인을 팩터로 설명하라.</p>
+<script>
+(function(){
+  var sls={tm:document.getElementById('sl-tm'),th:document.getElementById('sl-th'),ne:document.getElementById('sl-ne'),tt:document.getElementById('sl-tt')};
+  var vls={tm:document.getElementById('val-tm'),th:document.getElementById('val-th'),ne:document.getElementById('val-ne'),tt:document.getElementById('val-tt')};
+  function mulberry32(a){return function(){a|=0;a=a+0x6D2B79F5|0;var t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296;};}
+  function draw(){
+    var trueMKT=parseFloat(sls.tm.value)/100/12;
+    var trueHML=parseFloat(sls.th.value)/100/12;
+    var sigE=parseFloat(sls.ne.value)/100/Math.sqrt(12);
+    var T=parseInt(sls.tt.value);
+    vls.tm.textContent=(trueMKT*1200).toFixed(1)+'%';vls.th.textContent=(trueHML*1200).toFixed(1)+'%';
+    vls.ne.textContent=(sigE*Math.sqrt(12)*100).toFixed(1)+'%';vls.tt.textContent=T;
+    // simulate FM cross-sectional regressions
+    var rng=mulberry32(42);
+    function randn(){var u=0,v=0;while(u===0)u=rng();while(v===0)v=rng();return Math.sqrt(-2*Math.log(u))*Math.cos(2*Math.PI*v);}
+    var N=25; // 25 portfolios
+    // fixed betas
+    var betaM=[],betaH=[];
+    for(var i=0;i<N;i++){betaM.push(0.5+1.0*i/N);betaH.push(-0.5+1.0*i/N);}
+    var gammaM=[],gammaH=[];
+    for(var t=0;t<T;t++){
+      // generate cross-section of returns
+      var rets=[];
+      for(var i=0;i<N;i++){
+        rets.push(betaM[i]*(trueMKT+0.04*randn())+betaH[i]*(trueHML+0.03*randn())+sigE*randn());
+      }
+      // cross-sectional regression: r_i = gamma0 + gamma_M*beta_M_i + gamma_H*beta_H_i
+      // simple 2-variable OLS
+      var sumBm=0,sumBh=0,sumR=0,sumBmBm=0,sumBhBh=0,sumBmBh=0,sumBmR=0,sumBhR=0;
+      for(var i=0;i<N;i++){
+        sumBm+=betaM[i];sumBh+=betaH[i];sumR+=rets[i];
+        sumBmBm+=betaM[i]*betaM[i];sumBhBh+=betaH[i]*betaH[i];sumBmBh+=betaM[i]*betaH[i];
+        sumBmR+=betaM[i]*rets[i];sumBhR+=betaH[i]*rets[i];
+      }
+      // solve normal equations (simplified)
+      var det=sumBmBm*sumBhBh-sumBmBh*sumBmBh;
+      if(Math.abs(det)>1e-10){
+        gammaM.push((sumBmR*sumBhBh-sumBhR*sumBmBh)/det);
+        gammaH.push((sumBhR*sumBmBm-sumBmR*sumBmBh)/det);
+      }
+    }
+    var avgGM=gammaM.reduce(function(a,b){return a+b;},0)/gammaM.length*12*100;
+    var avgGH=gammaH.reduce(function(a,b){return a+b;},0)/gammaH.length*12*100;
+    var seGM=Math.sqrt(gammaM.reduce(function(a,v){return a+Math.pow(v-avgGM/1200,2);},0)/(gammaM.length-1))/Math.sqrt(gammaM.length)*12*100;
+    var seGH=Math.sqrt(gammaH.reduce(function(a,v){return a+Math.pow(v-avgGH/1200,2);},0)/(gammaH.length-1))/Math.sqrt(gammaH.length)*12*100;
+    var tM=avgGM/seGM,tH=avgGH/seGH;
+    Plotly.react('plot-lab1r12',[
+      {x:['MKT 프리미엄','HML 프리미엄'],y:[parseFloat(sls.tm.value),parseFloat(sls.th.value)],name:'진짜 값',type:'bar',marker:{color:'#27ae60'}},
+      {x:['MKT 프리미엄','HML 프리미엄'],y:[avgGM,avgGH],name:'FM 추정값',type:'bar',marker:{color:'#3498db'},
+       error_y:{type:'data',array:[seGM*1.96,seGH*1.96],visible:true}}
+    ],{
+      title:'Fama-MacBeth 추정 (T='+T+'개월, N=25 포트폴리오)',barmode:'group',
+      yaxis:{title:'연율화 프리미엄 (%)'},
+      plot_bgcolor:'#fafaf8',paper_bgcolor:'#f0f4f8',font:{family:'Inter',size:12},
+      margin:{t:50,r:20,b:50,l:60}
+    },{responsive:true});
+    document.getElementById('lab1r12-info').innerHTML=
+      'MKT: 진짜='+(trueMKT*1200).toFixed(1)+'% | FM추정='+avgGM.toFixed(1)+'% ± '+seGM.toFixed(1)+'% (t='+tM.toFixed(2)+')\n'+
+      'HML: 진짜='+(trueHML*1200).toFixed(1)+'% | FM추정='+avgGH.toFixed(1)+'% ± '+seGH.toFixed(1)+'% (t='+tH.toFixed(2)+')\n'+
+      '<span style="color:#6a9955">→ T가 클수록 SE 감소 → 추정 정확도 향상</span>\n'+
+      '<span style="color:#6a9955">→ 노이즈(σ_ε)가 크면 SE 증가 → 유의성 확보 어려움</span>';
+  }
+  Object.keys(sls).forEach(function(k){sls[k].addEventListener('input',draw);});
+  setTimeout(draw,300);
+})();
+</script>
+
+<h3>Lab 2. 종합 성과 귀인 대시보드</h3>
+<p class="ni">포트폴리오의 팩터 노출과 알파를 설정하면 12개월 성과를 팩터별로 분해합니다. 전체 과정의 종합 복습입니다.</p>
+
+<div style="background:#f0f4f8;padding:20px;border-radius:8px;margin:20px 0">
+<div style="display:flex;gap:16px;flex-wrap:wrap;margin-bottom:12px">
+<div>
+<label style="font-size:11px;color:#555">α (%/년)</label><br>
+<input type="range" id="sl-pa" min="-3" max="5" step="0.5" value="1" style="width:80px">
+<span id="val-pa" style="font-family:'Space Mono',monospace;font-size:12px">1.0%</span>
+</div>
+<div>
+<label style="font-size:11px;color:#555">β_MKT</label><br>
+<input type="range" id="sl-pbm" min="0.5" max="1.5" step="0.1" value="1.0" style="width:80px">
+<span id="val-pbm" style="font-family:'Space Mono',monospace;font-size:12px">1.00</span>
+</div>
+<div>
+<label style="font-size:11px;color:#555">β_HML</label><br>
+<input type="range" id="sl-pbh" min="-0.5" max="0.8" step="0.1" value="0.3" style="width:80px">
+<span id="val-pbh" style="font-family:'Space Mono',monospace;font-size:12px">0.30</span>
+</div>
+<div>
+<label style="font-size:11px;color:#555">β_SMB</label><br>
+<input type="range" id="sl-pbs" min="-0.5" max="0.8" step="0.1" value="0.2" style="width:80px">
+<span id="val-pbs" style="font-family:'Space Mono',monospace;font-size:12px">0.20</span>
+</div>
+<div>
+<label style="font-size:11px;color:#555">β_UMD</label><br>
+<input type="range" id="sl-pbu" min="-0.5" max="0.8" step="0.1" value="0.1" style="width:80px">
+<span id="val-pbu" style="font-family:'Space Mono',monospace;font-size:12px">0.10</span>
+</div>
+</div>
+<div id="plot-lab2r12" style="width:100%;height:400px"></div>
+<div id="lab2r12-info" style="font-family:'Space Mono',monospace;font-size:12px;margin-top:8px;padding:10px;background:#1e1e1e;color:#d4d4d4;border-radius:6px;line-height:1.8"></div>
 </div>
 
-<div class="def">
-<p class="ni"><strong>Q3. [거래비용]</strong> 위 백테스팅에 거래비용(편도 20bp)을 추가하라. 리밸런싱 빈도(월별, 분기별, 반기별, 연별)에 따른 순수익 변화를 분석하고, 최적 리밸런싱 빈도를 결정하라.</p>
+<script>
+(function(){
+  var ids=['pa','pbm','pbh','pbs','pbu'];
+  var sls={},vls={};
+  ids.forEach(function(id){sls[id]=document.getElementById('sl-'+id);vls[id]=document.getElementById('val-'+id);});
+  var fp={MKT:7,HML:3,SMB:2.5,UMD:6};
+  function draw2(){
+    var alpha=parseFloat(sls.pa.value),bm=parseFloat(sls.pbm.value),bh=parseFloat(sls.pbh.value);
+    var bs=parseFloat(sls.pbs.value),bu=parseFloat(sls.pbu.value);
+    vls.pa.textContent=alpha.toFixed(1)+'%';vls.pbm.textContent=bm.toFixed(2);
+    vls.pbh.textContent=bh.toFixed(2);vls.pbs.textContent=bs.toFixed(2);vls.pbu.textContent=bu.toFixed(2);
+    var contribs={Alpha:alpha,MKT:bm*fp.MKT,HML:bh*fp.HML,SMB:bs*fp.SMB,UMD:bu*fp.UMD};
+    var total=Object.values(contribs).reduce(function(a,b){return a+b;},0);
+    var labels=Object.keys(contribs).concat(['Total']);
+    var vals=Object.values(contribs).concat([total]);
+    var colors=['#95a5a6','#e74c3c','#27ae60','#3498db','#f39c12','#2c3e50'];
+    // waterfall chart
+    var base=[0];var running=0;
+    for(var i=0;i<5;i++){base.push(running);running+=vals[i];}
+    base.push(0);
+    Plotly.react('plot-lab2r12',[{
+      x:labels,y:vals,type:'bar',base:labels.map(function(l,i){return i<5?base[i]:0;}),
+      marker:{color:colors},
+      text:vals.map(function(v){return (v>=0?'+':'')+v.toFixed(1)+'%';}),textposition:'outside'
+    }],{
+      title:'성과 귀인 분해 — 총 초과수익: '+(total>=0?'+':'')+total.toFixed(1)+'%',
+      yaxis:{title:'기여분 (%)'},
+      plot_bgcolor:'#fafaf8',paper_bgcolor:'#f0f4f8',font:{family:'Inter',size:12},
+      margin:{t:50,r:20,b:50,l:60}
+    },{responsive:true});
+    var factorPart=total-alpha;
+    document.getElementById('lab2r12-info').innerHTML=
+      '<span style="color:#6a9955">// 총 초과수익 = α + Σ(β_k × λ_k)</span>\n'+
+      Object.keys(contribs).map(function(k){return k+': '+(contribs[k]>=0?'+':'')+contribs[k].toFixed(1)+'%';}).join(' | ')+'\n'+
+      '스킬(α): '+alpha.toFixed(1)+'% | 팩터 보상: '+factorPart.toFixed(1)+'% | 총: '+total.toFixed(1)+'%\n'+
+      '<span style="color:#569cd6">스킬 비중: '+(total!==0?(alpha/total*100).toFixed(0):'N/A')+'% — '+(Math.abs(alpha)>Math.abs(factorPart)?'스킬 주도':'팩터 주도')+'</span>\n'+
+      '<span style="color:#6a9955">→ 대부분의 펀드 수익은 팩터 노출(β)에서 온다 — Ang의 핵심 메시지</span>';
+  }
+  ids.forEach(function(id){sls[id].addEventListener('input',draw2);});
+  setTimeout(draw2,400);
+})();
+</script>
+
+
+<h2 id="ch7">7. Final Quiz — 전 과정 종합</h2>
+
+<style>
+.quiz-box{background:#fff;border:2px solid #e0e0e0;border-radius:8px;padding:20px;margin:16px 0;transition:border-color .3s}
+.quiz-box.correct{border-color:#27ae60;background:#f0fff4}
+.quiz-box.wrong{border-color:#e74c3c;background:#fff5f5}
+.quiz-box h4{margin:0 0 12px;font-size:14px}
+.quiz-opt{display:block;margin:6px 0;padding:8px 12px;border:1px solid #ddd;border-radius:6px;cursor:pointer;font-size:13px;transition:all .2s}
+.quiz-opt:hover{background:#f0f4f8;border-color:#3498db}
+.quiz-opt.correct-answer{background:#d4edda;border-color:#27ae60}
+.quiz-opt.wrong-answer{background:#f8d7da;border-color:#e74c3c}
+.quiz-feedback{margin-top:10px;padding:10px;border-radius:6px;font-size:12px;display:none}
+.quiz-feedback.show{display:block}
+.quiz-score{text-align:center;padding:20px;background:#f8f9fa;border-radius:8px;margin:20px 0;font-size:16px}
+</style>
+
+<div class="quiz-box" id="q1">
+<h4>Q1. (R01 효용이론) CRRA 효용함수에서 위험회피계수 γ=5인 투자자가 기대수익 8%, 변동성 20%인 위험자산에 최적 배분하는 비중은?</h4>
+<label class="quiz-opt" onclick="checkQ('q1',this,0)">A. 80%</label>
+<label class="quiz-opt" onclick="checkQ('q1',this,1)">B. 40%</label>
+<label class="quiz-opt" onclick="checkQ('q1',this,2)">C. 20%</label>
+<label class="quiz-opt" onclick="checkQ('q1',this,3)">D. 10%</label>
+<div class="quiz-feedback" id="q1-fb"></div>
 </div>
 
-<div class="def">
-<p class="ni"><strong>Q4. [위기 분석]</strong> 2008년 금융위기, 2020년 코로나 기간의 팩터 수익률을 분석하라. 위기 시 어떤 팩터가 보호 역할을 했는가? 팩터 상관관계가 위기 시 어떻게 변하는가? 이를 기반으로 위기 대응 팩터 포트폴리오를 설계하라.</p>
+<div class="quiz-box" id="q2">
+<h4>Q2. (R03 변동성) 연 변동성 30%인 자산의 변동성 드래그(volatility drag)는 약?</h4>
+<label class="quiz-opt" onclick="checkQ('q2',this,0)">A. 0.5%</label>
+<label class="quiz-opt" onclick="checkQ('q2',this,1)">B. 2.25%</label>
+<label class="quiz-opt" onclick="checkQ('q2',this,2)">C. 4.5%</label>
+<label class="quiz-opt" onclick="checkQ('q2',this,3)">D. 9.0%</label>
+<div class="quiz-feedback" id="q2-fb"></div>
 </div>
 
-<div class="def">
-<p class="ni"><strong>Q5. [최종 프로젝트]</strong> 자신만의 팩터 투자 전략을 설계하라. (1) 투자 유니버스 선정, (2) 팩터 선택 및 근거, (3) 포트폴리오 구축 방법론, (4) 리밸런싱 규칙, (5) 위험 관리 규칙을 포함하는 투자 제안서를 작성하라. 최소 10년 백테스팅 결과를 포함하라.</p>
+<div class="quiz-box" id="q3">
+<h4>Q3. (R05 팩터모델) Fama-French 5팩터 모델에서 RMW 팩터의 의미는?</h4>
+<label class="quiz-opt" onclick="checkQ('q3',this,0)">A. 고모멘텀 − 저모멘텀</label>
+<label class="quiz-opt" onclick="checkQ('q3',this,1)">B. 고수익성 − 저수익성 (Robust Minus Weak)</label>
+<label class="quiz-opt" onclick="checkQ('q3',this,2)">C. 소형주 − 대형주</label>
+<label class="quiz-opt" onclick="checkQ('q3',this,3)">D. 저투자 − 고투자</label>
+<div class="quiz-feedback" id="q3-fb"></div>
 </div>
+
+<div class="quiz-box" id="q4">
+<h4>Q4. (R07 채권) 듀레이션 7년, 컨벡시티 80인 채권에서 금리가 +100bp 변동 시 가격 변화는 약?</h4>
+<label class="quiz-opt" onclick="checkQ('q4',this,0)">A. −7.0%</label>
+<label class="quiz-opt" onclick="checkQ('q4',this,1)">B. −6.6%</label>
+<label class="quiz-opt" onclick="checkQ('q4',this,2)">C. −7.4%</label>
+<label class="quiz-opt" onclick="checkQ('q4',this,3)">D. −5.0%</label>
+<div class="quiz-feedback" id="q4-fb"></div>
+</div>
+
+<div class="quiz-box" id="q5">
+<h4>Q5. (R09-R12 종합) Ang의 핵심 메시지 중 가장 정확한 것은?</h4>
+<label class="quiz-opt" onclick="checkQ('q5',this,0)">A. 헤지펀드는 독립적 자산 클래스이므로 분산 효과가 크다</label>
+<label class="quiz-opt" onclick="checkQ('q5',this,1)">B. 팩터는 자산 클래스보다 더 근본적인 수익 원천이며, 대부분의 능동 수익은 팩터 노출로 설명된다</label>
+<label class="quiz-opt" onclick="checkQ('q5',this,2)">C. PE(사모펀드)는 공개 주식 대비 일관되게 높은 위험 조정 수익을 제공한다</label>
+<label class="quiz-opt" onclick="checkQ('q5',this,3)">D. 높은 수수료를 내는 펀드가 더 좋은 성과를 낸다</label>
+<div class="quiz-feedback" id="q5-fb"></div>
+</div>
+
+<div class="quiz-score" id="quiz-score" style="display:none"></div>
+
+<script>
+var quizAnswers={q1:1,q2:2,q3:1,q4:1,q5:1};
+var quizExplain={
+  q1:'최적 비중 w* = (μ−r_f)/(γσ²). 초과수익 8%=0.08, γ=5, σ²=0.04. w*=0.08/(5×0.04)=0.08/0.20=0.40=40%. R01에서 배운 CRRA 최적화의 핵심 공식.',
+  q2:'변동성 드래그 ≈ σ²/2 = 0.30²/2 = 0.09/2 = 0.045 = 4.5%. 기하평균 ≈ 산술평균 − σ²/2. R03에서 배운 복리 수익률과 변동성의 관계.',
+  q3:'RMW = Robust Minus Weak. 영업이익률이 높은(robust) 기업 − 낮은(weak) 기업의 수익률 차이. FF5에서 추가된 수익성 팩터. CMA는 Conservative Minus Aggressive(투자 팩터).',
+  q4:'ΔP/P ≈ −D×Δy + ½×C×(Δy)² = −7×0.01 + ½×80×0.0001 = −0.07+0.004 = −0.066 = −6.6%. 컨벡시티가 금리 상승 시 손실을 완화(+0.4%p). R07 듀레이션-컨벡시티 공식.',
+  q5:'Ang의 핵심: 팩터(value, momentum, volatility, size 등)가 자산 클래스보다 근본적인 수익 원천. 대부분의 능동 펀드 수익은 팩터 노출(β)로 설명되며, 진짜 α는 매우 드물다. HF와 PE는 자산 클래스가 아니라 동적 팩터 전략의 집합.'
+};
+var quizDone={},quizCorrect=0,quizTotal=5;
+function checkQ(qid,el,idx){
+  if(quizDone[qid])return;quizDone[qid]=true;
+  var box=document.getElementById(qid),opts=box.querySelectorAll('.quiz-opt'),correct=quizAnswers[qid];
+  el.classList.add(idx===correct?'correct-answer':'wrong-answer');
+  if(idx!==correct)opts[correct].classList.add('correct-answer');
+  box.classList.add(idx===correct?'correct':'wrong');
+  if(idx===correct)quizCorrect++;
+  var fb=document.getElementById(qid+'-fb');
+  fb.innerHTML=(idx===correct?'<span style="color:#27ae60">✓ 정답!</span> ':'<span style="color:#e74c3c">✗ 오답.</span> ')+quizExplain[qid];
+  fb.style.background=idx===correct?'#d4edda':'#f8d7da';fb.classList.add('show');
+  if(Object.keys(quizDone).length===quizTotal){
+    var sc=document.getElementById('quiz-score');sc.style.display='block';
+    var pct=Math.round(quizCorrect/quizTotal*100);
+    var emoji=pct>=80?'🎉':pct>=60?'👍':'💪';
+    sc.innerHTML=emoji+' <strong>'+quizCorrect+'/'+quizTotal+'</strong> ('+pct+'%) — '+(pct>=80?'전 과정 마스터! 축하합니다!':pct>=60?'좋아요, 약한 라운드를 복습하면 완벽!':'각 라운드의 Lab에서 다시 실험해보세요!');
+  }
+}
+</script>
 
 <div class="info">
-<p class="ni"><strong>Pass 2 Preview:</strong> 실제 데이터(Kenneth French, yfinance)를 사용한 전체 파이프라인 실행, 거래비용 모델링, 위기 시나리오 분석, 팩터 크라우딩 모니터링, 실전 ETF 기반 팩터 포트폴리오 구축.</p>
-</div>
-
-<div class="ok">
-<p class="ni"><strong>🎓 Congratulations!</strong> Round 12 Pass 1을 완료했습니다. Andrew Ang의 「Asset Management」 교재의 핵심 내용을 12 라운드에 걸쳐 학습했습니다. 각 라운드는 Pass 2, 3에서 더 깊은 내용으로 확장됩니다. 팩터 투자의 여정은 여기서 끝이 아니라 시작입니다.</p>
+<p class="ni"><strong>🎓 전 과정 완료!</strong> Andrew Ang의 "Asset Management: A Systematic Approach to Factor Investing" 전 18장을 12라운드에 걸쳐 학습했습니다. 핵심 메시지: 팩터가 자산 클래스보다 근본적인 수익 원천이며, 대부분의 능동 수익은 팩터 노출로 설명됩니다. 진짜 α는 매우 드물고, 수수료를 고려하면 인덱스/스마트베타가 합리적 선택입니다.</p>
 </div>
 
 </div></div></div>
-
-<style>
-.sidebar-nav{flex:1;margin-top:16px}.nav-section{margin-bottom:20px}.nav-section-title{font-size:.6rem;font-weight:600;color:#aaa;letter-spacing:.15em;text-transform:uppercase;margin-bottom:10px}.nav-list{list-style:none}.nav-list li{margin-bottom:5px}.nav-list a{font-size:.78rem;color:#555;text-decoration:none;transition:all .2s;display:block;padding:3px 0}.nav-list a:hover{color:#0080c6;padding-left:4px}.nav-list a.active{color:#0080c6;font-weight:500}.nav-list a.done{color:#28a745}.badge{display:inline-block;font-size:.5rem;background:#0080c6;color:#fff;padding:1px 5px;border-radius:8px;margin-left:3px;vertical-align:middle}.badge-done{background:#28a745}.sidebar-footer{padding-top:16px;border-top:1px solid rgba(0,0,0,.06);font-size:.65rem;color:#aaa;text-align:center}
-.main-wrapper{margin-left:260px;min-height:100vh}.container{max-width:1100px;margin:0 auto;padding:50px 40px 80px}
-.paper-content{font-family:'Times New Roman','Nanum Myeongjo',serif;line-height:1.8;background:#fff;padding:40px;border-radius:8px;box-shadow:0 2px 20px rgba(0,0,0,.05)}.paper-header{text-align:center;margin-bottom:40px;padding-bottom:30px;border-bottom:2px solid #333}.paper-category{font-size:14px;color:#666;margin-bottom:10px}.paper-title{font-size:24px;font-weight:bold;margin-bottom:12px;line-height:1.4}.paper-subtitle{font-size:14px;color:#555;margin-bottom:8px}.paper-team{font-size:13px;color:#444}
-.abstract{background:#f8f9fa;padding:25px;margin:30px 0;border-left:4px solid #2c3e50}.abstract-title{font-weight:bold;font-size:16px;margin-bottom:15px}
-h2{font-size:18px;margin:35px 0 20px;padding-bottom:8px;border-bottom:1px solid #ddd;color:#2c3e50}h3{font-size:15px;margin:25px 0 15px;color:#34495e}
-p{text-align:justify;margin-bottom:15px;text-indent:2em}p.ni{text-indent:0}
-table{width:100%;border-collapse:collapse;margin:20px 0;font-size:12px}th,td{border:1px solid #ddd;padding:10px 8px;text-align:center}th{background:#2c3e50;color:white;font-weight:bold}tr:nth-child(even){background:#f8f9fa}tr:hover{background:#e8f4f8}
-.tc{font-size:13px;font-weight:bold;margin:15px 0 10px;text-align:center}.eq{text-align:center;margin:20px 0;padding:15px;background:#f8f9fa;border-radius:4px;overflow-x:auto}ul,ol{margin-left:2em;margin-bottom:15px}li{margin-bottom:6px}
-.def{background:#fff9e6;border:1px solid #ffc107;border-radius:4px;padding:20px;margin:20px 0}.info{background:#e8f4f8;border-left:4px solid #3498db;padding:20px;margin:20px 0}.warn{background:#fff3cd;border-left:4px solid #f39c12;padding:20px;margin:20px 0}.ok{background:#d4edda;border-left:4px solid #28a745;padding:20px;margin:20px 0}
-pre{background:#1e1e1e;color:#d4d4d4;padding:20px;border-radius:6px;overflow-x:auto;margin:20px 0;font-family:'Space Mono','Consolas',monospace;font-size:13px;line-height:1.6}code{font-family:'Space Mono','Consolas',monospace;font-size:13px}p code,li code,td code{background:#f0f0f0;padding:2px 6px;border-radius:3px;color:#c7254e;font-size:12px}
-.cm{color:#6a9955}.kw{color:#569cd6}.st{color:#ce9178}.fn{color:#dcdcaa}.nb{color:#4ec9b0}.nu{color:#b5cea8}
-.progress-bar{width:100%;height:6px;background:#e0e0e0;border-radius:3px;margin-top:16px}.progress-fill{height:100%;background:linear-gradient(90deg,#0080c6,#00b894);border-radius:3px}.progress-label{font-size:11px;color:#888;margin-top:4px;text-align:center}
-.code-output{background:#1e1e1e;color:#d4d4d4;padding:12px 16px;border-radius:0 0 6px 6px;font-family:'Space Mono',monospace;font-size:11.5px;line-height:1.6;margin-top:-4px;margin-bottom:18px;border-top:2px solid #333;white-space:pre-wrap;overflow-x:auto}.code-output .out-label{color:#888;font-size:10px;margin-bottom:4px;display:block}
-@media(max-width:1024px){.sidebar{width:100%;height:auto;position:relative;border-right:none;border-bottom:1px solid rgba(0,0,0,.08);padding:16px}.sidebar-profile{margin-bottom:10px;padding-bottom:10px;display:flex;align-items:center;gap:12px;text-align:left}.profile-icon{font-size:32px;margin-bottom:0}.profile-bio{display:none}.nav-section{display:inline-block;margin-right:16px;margin-bottom:8px}.nav-list{display:flex;gap:10px;flex-wrap:wrap}.nav-list li{margin-bottom:0}.sidebar-footer{display:none}.main-wrapper{margin-left:0}.container{padding:0}.paper-content{padding:20px 16px;border-radius:0;box-shadow:none}.paper-title{font-size:18px}p{font-size:14px;text-indent:1.5em;text-align:left}pre{font-size:11px;padding:14px}table{font-size:10px;display:block;overflow-x:auto}}
-</style>
 </body>
 </html>
