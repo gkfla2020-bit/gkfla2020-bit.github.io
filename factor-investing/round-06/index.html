@@ -121,6 +121,7 @@ pre{font-size:11px;padding:14px}table{font-size:10px;display:block;overflow-x:au
 <li><a href="#ch6">6. 파이썬 구현</a></li>
 <li><a href="#ch6b">6.4 Lost Decade & ERP 퍼즐 해법</a></li>
 <li><a href="#ch6c">6.5 수익률 예측과 GARCH 변동성</a></li>
+<li><a href="#interactive">🎮 직접 해보기</a></li>
 <li><a href="#ch7">7. Quiz</a></li>
 </ul>
 </div>
@@ -899,25 +900,337 @@ cum_vol = np.cumprod(<span class="nu">1</span> + vol_ret)
 
 <h2 id="ch7">7. Quiz</h2>
 
-<div class="def">
-<p class="ni"><strong>Q1. [ERP 추정]</strong> Kenneth French Data Library에서 1926-2023 시장 초과수익률 데이터를 다운로드하라. 산술 평균과 기하 평균 ERP를 계산하고, 10년 단위로 ERP가 어떻게 변했는지 분석하라.</p>
+<!-- ═══════════════════════════════════════════ -->
+<!-- Interactive Learning Section -->
+<!-- ═══════════════════════════════════════════ -->
+<h2 id="interactive">🎮 직접 해보기 — Interactive Lab</h2>
+
+<h3>Lab 1. Equity Premium Puzzle — 내재 γ 계산기</h3>
+<p class="ni">관측된 ERP, 시장 변동성, 소비 성장률 변동성, 상관계수를 조절하면서 C-CAPM이 요구하는 위험회피계수(γ)를 확인하세요. γ가 비현실적으로 높으면 → 퍼즐!</p>
+
+<div style="background:#f0f4f8;padding:20px;border-radius:8px;margin:20px 0">
+<div style="display:flex;gap:16px;flex-wrap:wrap;margin-bottom:12px">
+<div>
+<label style="font-size:11px;color:#555">관측 ERP (%)</label><br>
+<input type="range" id="sl-erp" min="1" max="12" step="0.5" value="7" style="width:110px">
+<span id="val-erp" style="font-family:'Space Mono',monospace;font-size:12px">7.0%</span>
+</div>
+<div>
+<label style="font-size:11px;color:#555">σ_m (시장 변동성, %)</label><br>
+<input type="range" id="sl-sm" min="5" max="30" step="1" value="16" style="width:110px">
+<span id="val-sm" style="font-family:'Space Mono',monospace;font-size:12px">16%</span>
+</div>
+<div>
+<label style="font-size:11px;color:#555">σ_Δc (소비 변동성, %)</label><br>
+<input type="range" id="sl-sc" min="0.5" max="8" step="0.5" value="2" style="width:110px">
+<span id="val-sc" style="font-family:'Space Mono',monospace;font-size:12px">2.0%</span>
+</div>
+<div>
+<label style="font-size:11px;color:#555">ρ (상관계수)</label><br>
+<input type="range" id="sl-rho" min="0.1" max="1" step="0.05" value="0.2" style="width:110px">
+<span id="val-rho" style="font-family:'Space Mono',monospace;font-size:12px">0.20</span>
+</div>
+</div>
+<div id="plot-lab1r6" style="width:100%;height:380px"></div>
+<div id="lab1r6-info" style="font-family:'Space Mono',monospace;font-size:12px;margin-top:8px;padding:10px;background:#1e1e1e;color:#d4d4d4;border-radius:6px;line-height:1.8"></div>
 </div>
 
-<div class="def">
-<p class="ni"><strong>Q2. [C-CAPM]</strong> FRED에서 미국 실질 개인소비지출(PCE) 데이터를 다운로드하고, 소비 성장률과 시장 수익률의 상관계수를 계산하라. γ=5일 때 C-CAPM이 예측하는 ERP는 얼마인가?</p>
+<script>
+(function(){
+  var sls={erp:document.getElementById('sl-erp'),sm:document.getElementById('sl-sm'),sc:document.getElementById('sl-sc'),rho:document.getElementById('sl-rho')};
+  var vls={erp:document.getElementById('val-erp'),sm:document.getElementById('val-sm'),sc:document.getElementById('val-sc'),rho:document.getElementById('val-rho')};
+  function draw(){
+    var erp=parseFloat(sls.erp.value)/100;
+    var sm=parseFloat(sls.sm.value)/100;
+    var sc=parseFloat(sls.sc.value)/100;
+    var rho=parseFloat(sls.rho.value);
+    vls.erp.textContent=(erp*100).toFixed(1)+'%';
+    vls.sm.textContent=(sm*100).toFixed(0)+'%';
+    vls.sc.textContent=(sc*100).toFixed(1)+'%';
+    vls.rho.textContent=rho.toFixed(2);
+    var gamma_implied=erp/(sm*sc*rho);
+    // show C-CAPM predicted ERP for various gamma
+    var gammas=[],predicted=[],observed=[];
+    for(var g=1;g<=60;g++){
+      gammas.push(g);
+      predicted.push(g*sm*sc*rho*100);
+      observed.push(erp*100);
+    }
+    Plotly.react('plot-lab1r6',[
+      {x:gammas,y:predicted,name:'C-CAPM 예측 ERP',line:{color:'#3498db',width:2}},
+      {x:gammas,y:observed,name:'관측 ERP',line:{color:'#e74c3c',width:2,dash:'dash'}},
+      {x:[gamma_implied],y:[erp*100],name:'내재 γ = '+gamma_implied.toFixed(1),mode:'markers',marker:{size:14,color:'#f39c12',symbol:'star'}}
+    ],{
+      title:'C-CAPM: 내재 위험회피계수 γ = '+gamma_implied.toFixed(1),
+      xaxis:{title:'위험회피계수 (γ)'},yaxis:{title:'ERP (%)'},
+      plot_bgcolor:'#fafaf8',paper_bgcolor:'#f0f4f8',font:{family:'Inter',size:12},
+      margin:{t:50,r:20,b:50,l:60},
+      shapes:[{type:'rect',x0:1,x1:10,y0:0,y1:Math.max(erp*100,15),fillcolor:'rgba(39,174,96,0.1)',line:{width:0}},
+              {type:'rect',x0:10,x1:60,y0:0,y1:Math.max(erp*100,15),fillcolor:'rgba(231,76,60,0.05)',line:{width:0}}],
+      annotations:[{x:5,y:Math.max(erp*100,15)*0.9,text:'합리적 범위<br>(γ=1~10)',showarrow:false,font:{size:10,color:'#27ae60'}},
+                   {x:35,y:Math.max(erp*100,15)*0.9,text:'비현실적<br>(γ>10)',showarrow:false,font:{size:10,color:'#e74c3c'}}]
+    },{responsive:true});
+    var puzzle=gamma_implied>10;
+    document.getElementById('lab1r6-info').innerHTML=
+      '<span style="color:#6a9955">// γ_implied = ERP / (σ_m × σ_Δc × ρ)</span>\n'+
+      '= '+(erp*100).toFixed(1)+'% / ('+(sm*100).toFixed(0)+'% × '+(sc*100).toFixed(1)+'% × '+rho.toFixed(2)+')\n'+
+      '= <span style="color:'+(puzzle?'#e74c3c':'#27ae60')+';font-weight:bold">'+gamma_implied.toFixed(1)+'</span>\n'+
+      (puzzle?'<span style="color:#e74c3c">⚠ 퍼즐! γ > 10은 비현실적 → 관측 ERP를 설명하려면 극단적 위험회피 필요</span>':
+              '<span style="color:#27ae60">✓ γ가 합리적 범위 내 → C-CAPM이 ERP를 설명 가능</span>');
+  }
+  Object.keys(sls).forEach(function(k){sls[k].addEventListener('input',draw);});
+  setTimeout(draw,300);
+})();
+</script>
+
+<h3>Lab 2. Betting Against Beta (BAB) 시뮬레이터</h3>
+<p class="ni">저베타/고베타 포트폴리오의 베타와 수익률을 조절하면서 BAB 팩터의 수익률을 확인하세요. SML이 평탄할수록 BAB 수익이 커집니다.</p>
+
+<div style="background:#f0f4f8;padding:20px;border-radius:8px;margin:20px 0">
+<div style="display:flex;gap:16px;flex-wrap:wrap;margin-bottom:12px">
+<div>
+<label style="font-size:11px;color:#555">β_L (저베타)</label><br>
+<input type="range" id="sl-bl" min="0.3" max="0.9" step="0.05" value="0.6" style="width:100px">
+<span id="val-bl" style="font-family:'Space Mono',monospace;font-size:12px">0.60</span>
+</div>
+<div>
+<label style="font-size:11px;color:#555">β_H (고베타)</label><br>
+<input type="range" id="sl-bhi" min="1.1" max="2.0" step="0.05" value="1.4" style="width:100px">
+<span id="val-bhi" style="font-family:'Space Mono',monospace;font-size:12px">1.40</span>
+</div>
+<div>
+<label style="font-size:11px;color:#555">r_L 초과수익 (%)</label><br>
+<input type="range" id="sl-rl" min="2" max="12" step="0.5" value="7" style="width:100px">
+<span id="val-rl" style="font-family:'Space Mono',monospace;font-size:12px">7.0%</span>
+</div>
+<div>
+<label style="font-size:11px;color:#555">r_H 초과수익 (%)</label><br>
+<input type="range" id="sl-rh" min="2" max="16" step="0.5" value="9" style="width:100px">
+<span id="val-rh" style="font-family:'Space Mono',monospace;font-size:12px">9.0%</span>
+</div>
+<div>
+<label style="font-size:11px;color:#555">r_f (%)</label><br>
+<input type="range" id="sl-rf6" min="0" max="5" step="0.25" value="2" style="width:80px">
+<span id="val-rf6" style="font-family:'Space Mono',monospace;font-size:12px">2.0%</span>
+</div>
+</div>
+<div id="plot-lab2r6" style="width:100%;height:400px"></div>
+<div id="lab2r6-info" style="font-family:'Space Mono',monospace;font-size:12px;margin-top:8px;padding:10px;background:#1e1e1e;color:#d4d4d4;border-radius:6px;line-height:1.8"></div>
 </div>
 
-<div class="def">
-<p class="ni"><strong>Q3. [저변동성]</strong> S&P 500 구성종목을 과거 12개월 변동성 기준으로 5분위로 나누고, 각 분위의 다음 12개월 수익률을 계산하라. 저변동성 이상현상이 관측되는가?</p>
+<script>
+(function(){
+  var ids=['bl','bhi','rl','rh','rf6'];
+  var sls={},vls={};
+  ids.forEach(function(id){sls[id]=document.getElementById('sl-'+id);vls[id]=document.getElementById('val-'+id);});
+  function draw2(){
+    var bL=parseFloat(sls.bl.value),bH=parseFloat(sls.bhi.value);
+    var rL=parseFloat(sls.rl.value),rH=parseFloat(sls.rh.value),rf=parseFloat(sls.rf6.value);
+    vls.bl.textContent=bL.toFixed(2);vls.bhi.textContent=bH.toFixed(2);
+    vls.rl.textContent=rL.toFixed(1)+'%';vls.rh.textContent=rH.toFixed(1)+'%';vls.rf6.textContent=rf.toFixed(1)+'%';
+    // BAB = (rL-rf)/bL - (rH-rf)/bH
+    var bab=(rL)/bL-(rH)/bH;
+    // SML: theoretical line from rf through market (beta=1)
+    var mktRet=(rL+rH)/2; // approximate
+    var smlSlope=mktRet; // E[rm]-rf approx
+    // actual points
+    var betas=[0,bL,1.0,bH,2.0];
+    var smlLine=betas.map(function(b){return b*smlSlope;});
+    Plotly.react('plot-lab2r6',[
+      {x:betas,y:smlLine,name:'이론적 SML',mode:'lines',line:{color:'#95a5a6',dash:'dash',width:1.5}},
+      {x:[bL,bH],y:[rL,rH],name:'실제 포트폴리오',mode:'markers+text',
+       marker:{size:16,color:['#3498db','#e74c3c']},
+       text:['Low-β ('+bL.toFixed(2)+')','High-β ('+bH.toFixed(2)+')'],textposition:'top center'},
+      {x:[bL,bH],y:[rL,rH],name:'실제 SML (평탄)',mode:'lines',line:{color:'#f39c12',width:2.5}}
+    ],{
+      title:'SML 평탄화 & BAB 수익률: '+(bab>=0?'+':'')+bab.toFixed(1)+'%',
+      xaxis:{title:'β',range:[-0.1,2.2]},yaxis:{title:'초과수익률 (%)'},
+      plot_bgcolor:'#fafaf8',paper_bgcolor:'#f0f4f8',font:{family:'Inter',size:12},
+      margin:{t:50,r:20,b:50,l:60},
+      annotations:[{x:(bL+bH)/2,y:(rL+rH)/2+1.5,text:'실제 SML 기울기: '+((rH-rL)/(bH-bL)).toFixed(1),showarrow:false,font:{size:11,color:'#f39c12'}}]
+    },{responsive:true});
+    document.getElementById('lab2r6-info').innerHTML=
+      '<span style="color:#6a9955">// BAB = (r_L - r_f)/β_L - (r_H - r_f)/β_H</span>\n'+
+      '= '+rL.toFixed(1)+'%/'+bL.toFixed(2)+' - '+rH.toFixed(1)+'%/'+bH.toFixed(2)+'\n'+
+      '= '+(rL/bL).toFixed(1)+'% - '+(rH/bH).toFixed(1)+'%\n'+
+      '= <span style="color:#569cd6;font-weight:bold">'+(bab>=0?'+':'')+bab.toFixed(1)+'%</span>\n'+
+      '실제 SML 기울기: '+((rH-rL)/(bH-bL)).toFixed(1)+' vs 이론적 기울기: '+smlSlope.toFixed(1)+'\n'+
+      (bab>0?'<span style="color:#27ae60">→ BAB > 0: 저베타를 레버리지하면 고베타보다 효율적!</span>':
+             '<span style="color:#e74c3c">→ BAB ≤ 0: SML이 가파르면 BAB 전략 무효</span>');
+  }
+  ids.forEach(function(id){sls[id].addEventListener('input',draw2);});
+  setTimeout(draw2,400);
+})();
+</script>
+
+<h3>Lab 3. ERP 10년 롤링 시뮬레이터</h3>
+<p class="ni">장기 평균 ERP와 변동성을 설정하면 시뮬레이션된 10년 롤링 ERP를 확인할 수 있습니다. "Lost Decade"가 얼마나 자주 발생하는지 체감해보세요.</p>
+
+<div style="background:#f0f4f8;padding:20px;border-radius:8px;margin:20px 0">
+<div style="display:flex;gap:16px;flex-wrap:wrap;margin-bottom:12px">
+<div>
+<label style="font-size:11px;color:#555">장기 평균 ERP (%)</label><br>
+<input type="range" id="sl-merp" min="2" max="10" step="0.5" value="7" style="width:110px">
+<span id="val-merp" style="font-family:'Space Mono',monospace;font-size:12px">7.0%</span>
+</div>
+<div>
+<label style="font-size:11px;color:#555">연 변동성 (%)</label><br>
+<input type="range" id="sl-mvol" min="8" max="30" step="1" value="16" style="width:110px">
+<span id="val-mvol" style="font-family:'Space Mono',monospace;font-size:12px">16%</span>
+</div>
+</div>
+<div id="plot-lab3r6" style="width:100%;height:380px"></div>
+<div id="lab3r6-info" style="font-family:'Space Mono',monospace;font-size:12px;margin-top:8px;padding:10px;background:#1e1e1e;color:#d4d4d4;border-radius:6px;line-height:1.8"></div>
 </div>
 
-<div class="def">
-<p class="ni"><strong>Q4. [BAB 구현]</strong> 위의 <code>compute_bab</code> 함수를 사용하여 S&P 500 구성종목 50개로 BAB 팩터를 구현하라. 연율화 수익률, 변동성, 샤프비율을 계산하고 MKT 팩터와 비교하라.</p>
+<script>
+(function(){
+  var slMerp=document.getElementById('sl-merp'),slMvol=document.getElementById('sl-mvol');
+  var vlMerp=document.getElementById('val-merp'),vlMvol=document.getElementById('val-mvol');
+  function mulberry32(a){return function(){a|=0;a=a+0x6D2B79F5|0;var t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296;};}
+  function draw3(){
+    var merp=parseFloat(slMerp.value)/100;
+    var mvol=parseFloat(slMvol.value)/100;
+    vlMerp.textContent=(merp*100).toFixed(1)+'%';
+    vlMvol.textContent=(mvol*100).toFixed(0)+'%';
+    var rng=mulberry32(42);
+    function randn(){var u=0,v=0;while(u===0)u=rng();while(v===0)v=rng();return Math.sqrt(-2*Math.log(u))*Math.cos(2*Math.PI*v);}
+    // 100 years monthly
+    var T=1200,monthly=[];
+    var mu_m=merp/12,sig_m=mvol/Math.sqrt(12);
+    for(var i=0;i<T;i++) monthly.push(mu_m+sig_m*randn());
+    // 10-year rolling annualized mean
+    var window=120;
+    var years=[],rolling=[],negCount=0;
+    for(var i=window;i<T;i++){
+      var sum=0;for(var j=i-window;j<i;j++)sum+=monthly[j];
+      var ann=sum/window*12*100;
+      years.push(1926+(i/12));
+      rolling.push(ann);
+      if(ann<0)negCount++;
+    }
+    var negPct=(negCount/rolling.length*100).toFixed(1);
+    Plotly.react('plot-lab3r6',[
+      {x:years,y:rolling,name:'10년 롤링 ERP',line:{color:'#3498db',width:1.5},fill:'tozeroy',fillcolor:'rgba(52,152,219,0.1)'},
+      {x:[years[0],years[years.length-1]],y:[0,0],name:'ERP=0',line:{color:'#e74c3c',dash:'dash',width:1}},
+      {x:[years[0],years[years.length-1]],y:[merp*100,merp*100],name:'장기 평균',line:{color:'#27ae60',dash:'dot',width:1.5}}
+    ],{
+      title:'10년 롤링 ERP (음수 구간 비율: '+negPct+'%)',
+      xaxis:{title:'Year'},yaxis:{title:'10년 롤링 ERP (%)'},
+      plot_bgcolor:'#fafaf8',paper_bgcolor:'#f0f4f8',font:{family:'Inter',size:12},
+      margin:{t:50,r:20,b:50,l:60}
+    },{responsive:true});
+    document.getElementById('lab3r6-info').innerHTML=
+      '장기 평균 ERP = '+(merp*100).toFixed(1)+'%, 연 변동성 = '+(mvol*100).toFixed(0)+'%\n'+
+      '10년 롤링 ERP 범위: '+Math.min.apply(null,rolling).toFixed(1)+'% ~ '+Math.max.apply(null,rolling).toFixed(1)+'%\n'+
+      '<span style="color:#e74c3c">Lost Decade (10년 ERP < 0) 비율: '+negPct+'%</span>\n'+
+      '<span style="color:#6a9955">→ 변동성이 높을수록 Lost Decade 확률 증가. ERP가 양수여도 10년간 음수일 수 있다!</span>';
+  }
+  [slMerp,slMvol].forEach(function(s){s.addEventListener('input',draw3);});
+  setTimeout(draw3,500);
+})();
+</script>
+
+<!-- ═══════════════════════════════════════════ -->
+<!-- Quiz Section -->
+<!-- ═══════════════════════════════════════════ -->
+<h2 id="ch7">7. 객관식 퀴즈</h2>
+
+<style>
+.quiz-box{background:#fff;border:2px solid #e0e0e0;border-radius:8px;padding:20px;margin:16px 0;transition:border-color .3s}
+.quiz-box.correct{border-color:#27ae60;background:#f0fff4}
+.quiz-box.wrong{border-color:#e74c3c;background:#fff5f5}
+.quiz-box h4{margin:0 0 12px;font-size:14px}
+.quiz-opt{display:block;margin:6px 0;padding:8px 12px;border:1px solid #ddd;border-radius:6px;cursor:pointer;font-size:13px;transition:all .2s}
+.quiz-opt:hover{background:#f0f4f8;border-color:#3498db}
+.quiz-opt.selected{background:#e8f4f8;border-color:#3498db;font-weight:600}
+.quiz-opt.correct-answer{background:#d4edda;border-color:#27ae60}
+.quiz-opt.wrong-answer{background:#f8d7da;border-color:#e74c3c}
+.quiz-feedback{margin-top:10px;padding:10px;border-radius:6px;font-size:12px;display:none}
+.quiz-feedback.show{display:block}
+.quiz-score{text-align:center;padding:20px;background:#f8f9fa;border-radius:8px;margin:20px 0;font-size:16px}
+</style>
+
+<div class="quiz-box" id="q1">
+<h4>Q1. Equity Premium Puzzle에서 "퍼즐"인 이유는?</h4>
+<label class="quiz-opt" onclick="checkQ('q1',this,0)">A. ERP가 음수이기 때문</label>
+<label class="quiz-opt" onclick="checkQ('q1',this,1)">B. C-CAPM으로 관측 ERP를 설명하려면 비현실적으로 높은 γ가 필요하기 때문</label>
+<label class="quiz-opt" onclick="checkQ('q1',this,2)">C. 주식 수익률이 정규분포를 따르지 않기 때문</label>
+<label class="quiz-opt" onclick="checkQ('q1',this,3)">D. 무위험이자율이 너무 높기 때문</label>
+<div class="quiz-feedback" id="q1-fb"></div>
 </div>
 
-<div class="def">
-<p class="ni"><strong>Q5. [퍼즐 분석]</strong> 다양한 γ 값(1, 3, 5, 10, 20, 50)에 대해 C-CAPM이 예측하는 ERP를 계산하고, 관측된 ERP와의 차이를 그래프로 시각화하라.</p>
+<div class="quiz-box" id="q2">
+<h4>Q2. 저변동성 이상현상(Low Volatility Anomaly)의 핵심 발견은?</h4>
+<label class="quiz-opt" onclick="checkQ('q2',this,0)">A. 고변동성 주식이 항상 높은 수익률을 낸다</label>
+<label class="quiz-opt" onclick="checkQ('q2',this,1)">B. 변동성과 수익률 사이에 관계가 없다</label>
+<label class="quiz-opt" onclick="checkQ('q2',this,2)">C. 저변동성 주식이 위험 대비 더 높은 수익률을 낸다 (SML이 평탄)</label>
+<label class="quiz-opt" onclick="checkQ('q2',this,3)">D. 모든 주식의 변동성이 시간에 따라 수렴한다</label>
+<div class="quiz-feedback" id="q2-fb"></div>
 </div>
+
+<div class="quiz-box" id="q3">
+<h4>Q3. BAB 팩터의 구성 방법은?</h4>
+<label class="quiz-opt" onclick="checkQ('q3',this,0)">A. 고베타 주식 매수 + 저베타 주식 매도</label>
+<label class="quiz-opt" onclick="checkQ('q3',this,1)">B. 저베타 포트폴리오를 β_L로 레버리지 − 고베타 포트폴리오를 β_H로 디레버리지</label>
+<label class="quiz-opt" onclick="checkQ('q3',this,2)">C. 시장 포트폴리오를 2배 레버리지</label>
+<label class="quiz-opt" onclick="checkQ('q3',this,3)">D. 변동성이 가장 낮은 10개 주식만 매수</label>
+<div class="quiz-feedback" id="q3-fb"></div>
+</div>
+
+<div class="quiz-box" id="q4">
+<h4>Q4. C-CAPM 오일러 방정식 E[β(C₁/C₀)^(-γ) × R] = 1에서 γ=5, 소비 성장률 2%, 변동성 2%, 시장 변동성 16%, 상관 0.2일 때 예측 ERP는?</h4>
+<label class="quiz-opt" onclick="checkQ('q4',this,0)">A. 약 0.32%</label>
+<label class="quiz-opt" onclick="checkQ('q4',this,1)">B. 약 1.6%</label>
+<label class="quiz-opt" onclick="checkQ('q4',this,2)">C. 약 7%</label>
+<label class="quiz-opt" onclick="checkQ('q4',this,3)">D. 약 16%</label>
+<div class="quiz-feedback" id="q4-fb"></div>
+</div>
+
+<div class="quiz-box" id="q5">
+<h4>Q5. "Lost Decade"에 대한 올바른 설명은?</h4>
+<label class="quiz-opt" onclick="checkQ('q5',this,0)">A. ERP가 영구적으로 사라진 기간</label>
+<label class="quiz-opt" onclick="checkQ('q5',this,1)">B. 10년간 주식이 채권보다 낮은 수익률을 기록한 기간</label>
+<label class="quiz-opt" onclick="checkQ('q5',this,2)">C. 변동성이 0에 수렴한 기간</label>
+<label class="quiz-opt" onclick="checkQ('q5',this,3)">D. 모든 팩터 프리미엄이 동시에 양수인 기간</label>
+<div class="quiz-feedback" id="q5-fb"></div>
+</div>
+
+<div class="quiz-score" id="quiz-score" style="display:none"></div>
+
+<script>
+var quizAnswers={q1:1,q2:2,q3:1,q4:0,q5:1};
+var quizExplain={
+  q1:'Mehra & Prescott(1985)의 핵심: C-CAPM에서 관측된 ERP(~7%)를 설명하려면 γ가 30~50 이상 필요. 실험 경제학에서 합리적 γ는 1~10. 이 괴리가 "퍼즐"이다.',
+  q2:'저변동성 이상현상: CAPM에 따르면 고베타(고변동성) 주식이 높은 수익률을 내야 하지만, 실증적으로 SML이 이론보다 평탄하다. 저변동성 주식의 위험조정 수익률이 더 높다.',
+  q3:'BAB = (r_L-r_f)/β_L - (r_H-r_f)/β_H. 저베타 포트폴리오를 1/β_L로 레버리지하고, 고베타 포트폴리오를 1/β_H로 디레버리지하여 둘 다 β=1로 맞춘 뒤 차이를 취한다.',
+  q4:'예측 ERP = γ × σ_m × σ_Δc × ρ = 5 × 0.16 × 0.02 × 0.2 = 0.0032 = 0.32%. 관측 ERP 7%와 비교하면 약 22배 차이 → 퍼즐!',
+  q5:'Lost Decade는 2000-2009처럼 10년간 주식이 채권보다 낮은 수익률을 기록한 기간. ERP가 영구적으로 사라진 것이 아니라, 장기 양의 ERP에도 불구하고 10년 단위로는 음수가 가능하다는 것.'
+};
+var quizDone={},quizCorrect=0,quizTotal=5;
+function checkQ(qid,el,idx){
+  if(quizDone[qid])return;
+  quizDone[qid]=true;
+  var box=document.getElementById(qid);
+  var opts=box.querySelectorAll('.quiz-opt');
+  var correct=quizAnswers[qid];
+  el.classList.add(idx===correct?'correct-answer':'wrong-answer');
+  if(idx!==correct) opts[correct].classList.add('correct-answer');
+  box.classList.add(idx===correct?'correct':'wrong');
+  if(idx===correct) quizCorrect++;
+  var fb=document.getElementById(qid+'-fb');
+  fb.innerHTML=(idx===correct?'<span style="color:#27ae60">✓ 정답!</span> ':'<span style="color:#e74c3c">✗ 오답.</span> ')+quizExplain[qid];
+  fb.style.background=idx===correct?'#d4edda':'#f8d7da';
+  fb.classList.add('show');
+  if(Object.keys(quizDone).length===quizTotal){
+    var sc=document.getElementById('quiz-score');
+    sc.style.display='block';
+    var pct=Math.round(quizCorrect/quizTotal*100);
+    var emoji=pct>=80?'🎉':pct>=60?'👍':'💪';
+    sc.innerHTML=emoji+' <strong>'+quizCorrect+'/'+quizTotal+'</strong> ('+pct+'%) — '+(pct>=80?'훌륭합니다!':pct>=60?'좋아요, 복습하면 완벽!':'위의 Lab에서 다시 실험해보세요!');
+  }
+}
+</script>
 
 <h3>7.1 핵심 수식 요약</h3>
 
