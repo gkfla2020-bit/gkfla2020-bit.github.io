@@ -126,6 +126,7 @@ pre{font-size:11px;padding:14px}table{font-size:10px;display:block;overflow-x:au
 <li><a href="#ch5">5. 확실성 등가</a></li>
 <li><a href="#ch6">6. 기대효용과 포트폴리오</a></li>
 <li><a href="#ch7">7. 파이썬 구현 종합</a></li>
+<li><a href="#interactive">🎮 직접 해보기</a></li>
 <li><a href="#ch8">8. Quiz</a></li>
 </ul>
 </div>
@@ -924,33 +925,280 @@ lambdas = [<span class="nu">1.0</span>, <span class="nu">1.5</span>, <span class
 </table>
 
 <!-- ═══════════════════════════════════════════ -->
+<!-- ═══════════════════════════════════════════ -->
+<!-- Interactive Learning Section -->
+<!-- ═══════════════════════════════════════════ -->
+<h2 id="interactive">🎮 직접 해보기 — Interactive Lab</h2>
+
+<h3>Lab 1. 위험회피계수(γ)와 효용함수 모양</h3>
+<p class="ni">슬라이더로 γ를 바꿔보면서 CRRA 효용함수의 곡률이 어떻게 변하는지 확인하세요.</p>
+
+<div style="background:#f0f4f8;padding:20px;border-radius:8px;margin:20px 0">
+<div style="display:flex;align-items:center;gap:16px;margin-bottom:12px;flex-wrap:wrap">
+<label style="font-size:14px;font-weight:600">γ (위험회피계수):</label>
+<input type="range" id="sl-gamma1" min="0.5" max="10" step="0.5" value="3" style="width:200px">
+<span id="val-gamma1" style="font-family:'Space Mono',monospace;font-size:16px;color:#e74c3c;font-weight:bold">3.0</span>
+</div>
+<div id="plot-lab1" style="width:100%;height:380px"></div>
+<p class="ni" style="font-size:12px;color:#555;margin-top:8px">↑ γ가 클수록 곡선이 더 오목해짐 → 같은 부의 증가에 대해 효용 증가가 작아짐 → 더 위험회피적. γ=1이면 로그 효용(u=ln W).</p>
+</div>
+
+<script>
+(function(){
+  var sl=document.getElementById('sl-gamma1');
+  var vl=document.getElementById('val-gamma1');
+  function draw(){
+    var g=parseFloat(sl.value); vl.textContent=g.toFixed(1);
+    var W=[],U=[];
+    for(var w=10;w<=200;w+=1){
+      W.push(w);
+      if(Math.abs(g-1)<0.01) U.push(Math.log(w));
+      else U.push(Math.pow(w,1-g)/(1-g));
+    }
+    Plotly.react('plot-lab1',[{x:W,y:U,mode:'lines',line:{color:'#e74c3c',width:3},name:'u(W), γ='+g.toFixed(1)}],{
+      title:'CRRA 효용함수: u(W) = W^(1-γ)/(1-γ), γ='+g.toFixed(1),
+      xaxis:{title:'부(W)',range:[10,200]},yaxis:{title:'효용 u(W)'},
+      plot_bgcolor:'#fafaf8',paper_bgcolor:'#f0f4f8',font:{family:'Inter',size:12},
+      margin:{t:50,r:20,b:50,l:60}
+    },{responsive:true});
+  }
+  sl.addEventListener('input',draw);
+  setTimeout(draw,300);
+})();
+</script>
+
+<h3>Lab 2. γ에 따른 최적 주식 비중</h3>
+<p class="ni">기대수익률, 변동성, 무위험이자율을 바꿔보면서 최적 주식 비중이 어떻게 변하는지 확인하세요.</p>
+
+<div style="background:#f0f4f8;padding:20px;border-radius:8px;margin:20px 0">
+<div style="display:flex;gap:24px;flex-wrap:wrap;margin-bottom:12px">
+<div>
+<label style="font-size:12px;color:#555">기대수익률 μ (%)</label><br>
+<input type="range" id="sl-mu" min="2" max="20" step="0.5" value="10" style="width:140px">
+<span id="val-mu" style="font-family:'Space Mono',monospace;font-size:13px">10.0%</span>
+</div>
+<div>
+<label style="font-size:12px;color:#555">변동성 σ (%)</label><br>
+<input type="range" id="sl-sig" min="5" max="40" step="1" value="20" style="width:140px">
+<span id="val-sig" style="font-family:'Space Mono',monospace;font-size:13px">20%</span>
+</div>
+<div>
+<label style="font-size:12px;color:#555">무위험이자율 r_f (%)</label><br>
+<input type="range" id="sl-rf" min="0" max="8" step="0.5" value="2" style="width:140px">
+<span id="val-rf" style="font-family:'Space Mono',monospace;font-size:13px">2.0%</span>
+</div>
+</div>
+<div id="plot-lab2" style="width:100%;height:380px"></div>
+<div id="lab2-result" style="font-family:'Space Mono',monospace;font-size:13px;margin-top:8px;padding:10px;background:#1e1e1e;color:#d4d4d4;border-radius:6px"></div>
+</div>
+
+<script>
+(function(){
+  var sMu=document.getElementById('sl-mu'),sSig=document.getElementById('sl-sig'),sRf=document.getElementById('sl-rf');
+  var vMu=document.getElementById('val-mu'),vSig=document.getElementById('val-sig'),vRf=document.getElementById('val-rf');
+  function draw(){
+    var mu=parseFloat(sMu.value)/100, sig=parseFloat(sSig.value)/100, rf=parseFloat(sRf.value)/100;
+    vMu.textContent=(mu*100).toFixed(1)+'%'; vSig.textContent=(sig*100).toFixed(0)+'%'; vRf.textContent=(rf*100).toFixed(1)+'%';
+    var gammas=[],wStars=[],portRet=[],portVol=[],sharpe=(mu-rf)/sig;
+    for(var g=0.5;g<=15;g+=0.1){
+      gammas.push(g);
+      var ws=(mu-rf)/(g*sig*sig); ws=Math.max(0,Math.min(3,ws));
+      wStars.push(ws*100);
+      portRet.push((rf+ws*(mu-rf))*100);
+      portVol.push((ws*sig)*100);
+    }
+    Plotly.react('plot-lab2',[
+      {x:gammas,y:wStars,name:'최적 주식 비중 (%)',line:{color:'#e74c3c',width:3}},
+      {x:gammas,y:portRet,name:'포트폴리오 기대수익률 (%)',line:{color:'#3498db',width:2,dash:'dot'}},
+      {x:gammas,y:portVol,name:'포트폴리오 변동성 (%)',line:{color:'#27ae60',width:2,dash:'dash'}}
+    ],{
+      title:'w* = (μ-r_f)/(γσ²), Sharpe='+sharpe.toFixed(2),
+      xaxis:{title:'γ (위험회피계수)'},yaxis:{title:'%',range:[0,Math.max(150,wStars[0]+20)]},
+      plot_bgcolor:'#fafaf8',paper_bgcolor:'#f0f4f8',font:{family:'Inter',size:12},
+      margin:{t:50,r:20,b:50,l:60},legend:{x:0.55,y:0.98}
+    },{responsive:true});
+    var g3=(mu-rf)/(3*sig*sig);
+    document.getElementById('lab2-result').innerHTML=
+      'γ=3 → w*='+(g3*100).toFixed(1)+'%, E[r_p]='+(rf+g3*(mu-rf)).toFixed(2).replace(/^0/,'')+', σ_p='+(g3*sig*100).toFixed(1)+'%';
+  }
+  sMu.addEventListener('input',draw); sSig.addEventListener('input',draw); sRf.addEventListener('input',draw);
+  setTimeout(draw,400);
+})();
+</script>
+
+<h3>Lab 3. 확실성 등가 체험</h3>
+<p class="ni">도박의 결과와 확률을 바꿔보면서 확실성 등가(CE)와 위험 프리미엄이 어떻게 변하는지 확인하세요.</p>
+
+<div style="background:#f0f4f8;padding:20px;border-radius:8px;margin:20px 0">
+<div style="display:flex;gap:24px;flex-wrap:wrap;margin-bottom:12px">
+<div>
+<label style="font-size:12px;color:#555">좋은 결과 (만원)</label><br>
+<input type="range" id="sl-w1" min="100" max="500" step="10" value="300" style="width:130px">
+<span id="val-w1" style="font-family:'Space Mono',monospace;font-size:13px">300</span>
+</div>
+<div>
+<label style="font-size:12px;color:#555">나쁜 결과 (만원)</label><br>
+<input type="range" id="sl-w2" min="10" max="200" step="10" value="100" style="width:130px">
+<span id="val-w2" style="font-family:'Space Mono',monospace;font-size:13px">100</span>
+</div>
+<div>
+<label style="font-size:12px;color:#555">좋은 결과 확률 (%)</label><br>
+<input type="range" id="sl-p" min="10" max="90" step="5" value="50" style="width:130px">
+<span id="val-p" style="font-family:'Space Mono',monospace;font-size:13px">50%</span>
+</div>
+<div>
+<label style="font-size:12px;color:#555">γ</label><br>
+<input type="range" id="sl-gamma3" min="0.5" max="10" step="0.5" value="3" style="width:100px">
+<span id="val-gamma3" style="font-family:'Space Mono',monospace;font-size:13px">3.0</span>
+</div>
+</div>
+<div id="plot-lab3" style="width:100%;height:360px"></div>
+<div id="lab3-result" style="font-family:'Space Mono',monospace;font-size:13px;margin-top:8px;padding:12px;background:#1e1e1e;color:#d4d4d4;border-radius:6px;line-height:1.8"></div>
+</div>
+
+<script>
+(function(){
+  var sW1=document.getElementById('sl-w1'),sW2=document.getElementById('sl-w2'),sP=document.getElementById('sl-p'),sG=document.getElementById('sl-gamma3');
+  var vW1=document.getElementById('val-w1'),vW2=document.getElementById('val-w2'),vP=document.getElementById('val-p'),vG=document.getElementById('val-gamma3');
+  function crra(w,g){return Math.abs(g-1)<0.01?Math.log(w):Math.pow(w,1-g)/(1-g);}
+  function invCrra(u,g){if(Math.abs(g-1)<0.01)return Math.exp(u);return Math.pow(u*(1-g),1/(1-g));}
+  function draw(){
+    var w1=parseFloat(sW1.value),w2=parseFloat(sW2.value),p=parseFloat(sP.value)/100,g=parseFloat(sG.value);
+    vW1.textContent=w1; vW2.textContent=w2; vP.textContent=(p*100).toFixed(0)+'%'; vG.textContent=g.toFixed(1);
+    var ew=p*w1+(1-p)*w2;
+    var eu=p*crra(w1,g)+(1-p)*crra(w2,g);
+    var ce=invCrra(eu,g);
+    var rp=ew-ce;
+    // plot utility curve with markers
+    var W=[],U=[];
+    for(var w=Math.max(1,w2-50);w<=w1+50;w+=1){W.push(w);U.push(crra(w,g));}
+    Plotly.react('plot-lab3',[
+      {x:W,y:U,mode:'lines',name:'u(W)',line:{color:'#888',width:2}},
+      {x:[w1],y:[crra(w1,g)],mode:'markers',name:'좋은 결과',marker:{size:14,color:'#27ae60',symbol:'diamond'}},
+      {x:[w2],y:[crra(w2,g)],mode:'markers',name:'나쁜 결과',marker:{size:14,color:'#e74c3c',symbol:'diamond'}},
+      {x:[ew],y:[crra(ew,g)],mode:'markers',name:'E[W]='+ew.toFixed(0),marker:{size:12,color:'#3498db',symbol:'circle'}},
+      {x:[ce],y:[eu],mode:'markers',name:'CE='+ce.toFixed(1),marker:{size:12,color:'#f39c12',symbol:'star',line:{width:2,color:'#333'}}},
+      {x:[w2,w1],y:[crra(w2,g),crra(w1,g)],mode:'lines',name:'기대효용 선',line:{color:'#e74c3c',width:1,dash:'dot'}}
+    ],{
+      title:'확실성 등가(CE)와 위험 프리미엄(RP)',
+      xaxis:{title:'부(W, 만원)'},yaxis:{title:'효용 u(W)'},
+      plot_bgcolor:'#fafaf8',paper_bgcolor:'#f0f4f8',font:{family:'Inter',size:12},
+      margin:{t:50,r:20,b:50,l:60},legend:{x:0.6,y:0.3},showlegend:true
+    },{responsive:true});
+    document.getElementById('lab3-result').innerHTML=
+      '<span style="color:#6a9955">// 결과</span>\n'+
+      'E[W] = '+p.toFixed(2)+'×'+w1+' + '+(1-p).toFixed(2)+'×'+w2+' = <span style="color:#569cd6">'+ew.toFixed(1)+'만원</span>\n'+
+      'E[u(W)] = '+eu.toFixed(4)+'\n'+
+      'CE = u⁻¹(E[u(W)]) = <span style="color:#f39c12">'+ce.toFixed(1)+'만원</span>\n'+
+      '위험 프리미엄 = E[W] - CE = <span style="color:#e74c3c">'+rp.toFixed(1)+'만원</span> (기대값의 '+(rp/ew*100).toFixed(1)+'%)';
+  }
+  sW1.addEventListener('input',draw); sW2.addEventListener('input',draw);
+  sP.addEventListener('input',draw); sG.addEventListener('input',draw);
+  setTimeout(draw,500);
+})();
+</script>
+
+
 <!-- Ch8: Quiz -->
 <!-- ═══════════════════════════════════════════ -->
-<h2 id="ch8">8. Quiz</h2>
+<h2 id="ch8">8. Quiz — 즉시 채점</h2>
 
-<div class="def">
-<p class="ni"><strong>Q1. [효용함수]</strong> CRRA 효용함수 \(u(W) = \frac{W^{1-\gamma}}{1-\gamma}\)에서 \(\gamma = 3\)일 때, \(u(50)\)과 \(u(100)\)을 계산하라. 부가 2배가 되면 효용은 몇 배가 되는가?</p>
+<style>
+.quiz-box{background:#fff;border:2px solid #e0e0e0;border-radius:8px;padding:20px;margin:16px 0;transition:border-color .3s}
+.quiz-box.correct{border-color:#27ae60;background:#f0fff4}
+.quiz-box.wrong{border-color:#e74c3c;background:#fff5f5}
+.quiz-box h4{margin:0 0 12px;font-size:14px}
+.quiz-opt{display:block;margin:6px 0;padding:8px 12px;border:1px solid #ddd;border-radius:6px;cursor:pointer;font-size:13px;transition:all .2s}
+.quiz-opt:hover{background:#f0f4f8;border-color:#3498db}
+.quiz-opt.selected{background:#e8f4f8;border-color:#3498db;font-weight:600}
+.quiz-opt.correct-answer{background:#d4edda;border-color:#27ae60}
+.quiz-opt.wrong-answer{background:#f8d7da;border-color:#e74c3c}
+.quiz-feedback{margin-top:10px;padding:10px;border-radius:6px;font-size:12px;display:none}
+.quiz-feedback.show{display:block}
+.quiz-score{text-align:center;padding:20px;background:#f8f9fa;border-radius:8px;margin:20px 0;font-size:16px}
+</style>
+
+<div class="quiz-box" id="q1">
+<h4>Q1. CRRA 효용함수에서 γ=2일 때, 부가 100에서 200으로 2배가 되면 효용은 몇 배가 되는가?</h4>
+<label class="quiz-opt" onclick="checkQ('q1',this,0)">A. 정확히 2배</label>
+<label class="quiz-opt" onclick="checkQ('q1',this,1)">B. 2배보다 작다 (약 1.5배)</label>
+<label class="quiz-opt" onclick="checkQ('q1',this,2)">C. 2배보다 크다</label>
+<label class="quiz-opt" onclick="checkQ('q1',this,3)">D. 알 수 없다</label>
+<div class="quiz-feedback" id="q1-fb"></div>
 </div>
 
-<div class="def">
-<p class="ni"><strong>Q2. [Arrow-Pratt]</strong> 효용함수 \(u(W) = \sqrt{W}\)에 대해 ARA와 RRA를 도출하라. 이 효용함수는 CRRA인가 CARA인가? \(\gamma\)값은 얼마인가?</p>
+<div class="quiz-box" id="q2">
+<h4>Q2. 위험회피계수 γ가 커지면 최적 주식 비중(w*)은 어떻게 변하는가?</h4>
+<label class="quiz-opt" onclick="checkQ('q2',this,0)">A. 증가한다</label>
+<label class="quiz-opt" onclick="checkQ('q2',this,1)">B. 감소한다</label>
+<label class="quiz-opt" onclick="checkQ('q2',this,2)">C. 변하지 않는다</label>
+<label class="quiz-opt" onclick="checkQ('q2',this,3)">D. γ에 따라 증가했다 감소한다</label>
+<div class="quiz-feedback" id="q2-fb"></div>
 </div>
 
-<div class="def">
-<p class="ni"><strong>Q3. [확실성 등가]</strong> 투자자의 \(\gamma = 4\)이다. 50% 확률로 300만원, 50% 확률로 100만원을 받는 도박의 확실성 등가를 계산하라. Arrow-Pratt 근사식으로도 계산하고 정확한 값과 비교하라.</p>
+<div class="quiz-box" id="q3">
+<h4>Q3. 주식 기대수익률 12%, 변동성 20%, 무위험이자율 4%일 때, γ=4인 투자자의 최적 주식 비중은?</h4>
+<label class="quiz-opt" onclick="checkQ('q3',this,0)">A. 25%</label>
+<label class="quiz-opt" onclick="checkQ('q3',this,1)">B. 50%</label>
+<label class="quiz-opt" onclick="checkQ('q3',this,2)">C. 75%</label>
+<label class="quiz-opt" onclick="checkQ('q3',this,3)">D. 100%</label>
+<div class="quiz-feedback" id="q3-fb"></div>
 </div>
 
-<div class="def">
-<p class="ni"><strong>Q4. [최적 배분]</strong> 주식 기대수익률 10%, 변동성 20%, 무위험이자율 2%일 때, \(\gamma = 3\)인 투자자의 최적 주식 비중을 구하라. 이 포트폴리오의 기대수익률과 변동성은?</p>
+<div class="quiz-box" id="q4">
+<h4>Q4. 확실성 등가(CE)에 대한 설명으로 틀린 것은?</h4>
+<label class="quiz-opt" onclick="checkQ('q4',this,0)">A. CE는 항상 기대값(E[W]) 이하이다 (위험회피 투자자)</label>
+<label class="quiz-opt" onclick="checkQ('q4',this,1)">B. γ가 클수록 CE는 작아진다</label>
+<label class="quiz-opt" onclick="checkQ('q4',this,2)">C. CE = E[W]이면 위험중립 투자자이다</label>
+<label class="quiz-opt" onclick="checkQ('q4',this,3)">D. CE는 항상 양수이다</label>
+<div class="quiz-feedback" id="q4-fb"></div>
 </div>
 
-<div class="def">
-<p class="ni"><strong>Q5. [코딩]</strong> <code>CRRAUtility</code> 클래스를 확장하여 <code>CARAUtility</code> 클래스를 만들어라. CARA 효용함수 \(u(W) = -\frac{1}{\alpha}e^{-\alpha W}\)에 대해 <code>utility</code>, <code>ara</code>, <code>rra</code>, <code>certainty_equivalent</code> 메서드를 구현하라.</p>
+<div class="quiz-box" id="q5">
+<h4>Q5. CRRA와 CARA의 차이로 올바른 것은?</h4>
+<label class="quiz-opt" onclick="checkQ('q5',this,0)">A. CRRA는 부가 증가하면 위험자산 투자 금액이 일정하다</label>
+<label class="quiz-opt" onclick="checkQ('q5',this,1)">B. CARA는 부가 증가하면 위험자산 투자 비율이 일정하다</label>
+<label class="quiz-opt" onclick="checkQ('q5',this,2)">C. CRRA는 부가 증가하면 위험자산 투자 비율이 일정하다</label>
+<label class="quiz-opt" onclick="checkQ('q5',this,3)">D. 둘 다 부와 무관하게 동일한 투자 결정을 한다</label>
+<div class="quiz-feedback" id="q5-fb"></div>
 </div>
 
-<div class="def">
-<p class="ni"><strong>Q6. [시뮬레이션]</strong> 정규분포 \(N(\mu=0.08, \sigma=0.16)\)에서 10,000개의 수익률을 생성하고, \(\gamma = 1, 3, 5, 10\)에 대해 기대효용 \(E[u(1+r)]\)을 몬테카를로로 추정하라. 각 \(\gamma\)에서 확실성 등가 수익률(CE return)은 얼마인가?</p>
-</div>
+<div class="quiz-score" id="quiz-score" style="display:none"></div>
+
+<script>
+var quizAnswers={q1:1,q2:1,q3:1,q4:3,q5:2};
+var quizExplain={
+  q1:'u(100)=100^(-1)/(-1)=-0.01, u(200)=200^(-1)/(-1)=-0.005. 비율=-0.005/-0.01=0.5배. CRRA에서 부가 2배가 되면 효용 증가는 2배보다 작다 (오목성 때문).',
+  q2:'w*=(μ-r_f)/(γσ²). γ가 분모에 있으므로 γ↑ → w*↓. 위험을 싫어할수록 주식 비중을 줄인다.',
+  q3:'w*=(0.12-0.04)/(4×0.04)=0.08/0.16=0.50=50%. Lab 2에서 직접 확인해보세요!',
+  q4:'CE가 항상 양수인 것은 아니다. 예를 들어 CRRA γ>1에서 매우 나쁜 도박이면 CE가 매우 작아질 수 있다. 다만 부(W)가 양수이면 CE도 양수.',
+  q5:'CRRA(Constant Relative Risk Aversion)는 상대적 위험회피가 일정 → 부가 증가하면 위험자산 투자 비율이 일정. CARA는 절대적 위험회피가 일정 → 위험자산 투자 금액이 일정.'
+};
+var quizDone={},quizCorrect=0,quizTotal=5;
+function checkQ(qid,el,idx){
+  if(quizDone[qid])return;
+  quizDone[qid]=true;
+  var box=document.getElementById(qid);
+  var opts=box.querySelectorAll('.quiz-opt');
+  var correct=quizAnswers[qid];
+  el.classList.add(idx===correct?'correct-answer':'wrong-answer');
+  if(idx!==correct) opts[correct].classList.add('correct-answer');
+  box.classList.add(idx===correct?'correct':'wrong');
+  if(idx===correct) quizCorrect++;
+  var fb=document.getElementById(qid+'-fb');
+  fb.innerHTML=(idx===correct?'<span style="color:#27ae60">✓ 정답!</span> ':'<span style="color:#e74c3c">✗ 오답.</span> ')+quizExplain[qid];
+  fb.style.background=idx===correct?'#d4edda':'#f8d7da';
+  fb.classList.add('show');
+  // check if all done
+  if(Object.keys(quizDone).length===quizTotal){
+    var sc=document.getElementById('quiz-score');
+    sc.style.display='block';
+    var pct=Math.round(quizCorrect/quizTotal*100);
+    var emoji=pct>=80?'🎉':pct>=60?'👍':'💪';
+    sc.innerHTML=emoji+' <strong>'+quizCorrect+'/'+quizTotal+'</strong> ('+pct+'%) — '+(pct>=80?'훌륭합니다!':pct>=60?'좋아요, 복습하면 완벽!':'위의 Lab에서 다시 실험해보세요!');
+  }
+}
+</script>
 
 <h3>8.1 Round 1 학습 정리</h3>
 
