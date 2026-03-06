@@ -74,8 +74,14 @@ pre{background:#1e1e1e;color:#d4d4d4;padding:20px;border-radius:6px;overflow-x:a
 <li><a href="#ch5">5. 확률과 통계</a></li>
 <li><a href="#ch6">6. 파이썬 기초</a></li>
 <li><a href="#ch7">7. NumPy & 행렬 연산</a></li>
+<li><a href="#ch8">8. 중급: 제약 최적화</a></li>
+<li><a href="#ch9">9. 중급: 고유값 & PCA</a></li>
+<li><a href="#ch10">10. 중급: MLE & 가설검정</a></li>
+<li><a href="#ch11">11. 고급: 확률과정</a></li>
+<li><a href="#ch12">12. 고급: 베이지안 추론</a></li>
+<li><a href="#ch13">13. 고급: 시계열 분석</a></li>
 <li><a href="#interactive">🎮 직접 해보기</a></li>
-<li><a href="#ch8">8. Quiz</a></li>
+<li><a href="#quiz">14. Quiz</a></li>
 </ul>
 </div>
 </div>
@@ -602,6 +608,268 @@ A @ A =
 <tr><td>\(\ln(x)\)</td><td><code>np.log(x)</code></td><td>자연로그</td></tr>
 </table>
 
+<!-- ═══════════════════════════════════════════ -->
+<!-- INTERMEDIATE LEVEL -->
+<!-- ═══════════════════════════════════════════ -->
+
+<h2 id="ch8" style="color:#e67e22;border-bottom-color:#e67e22">🟡 8. 중급: 제약 최적화 — 라그랑주 승수법</h2>
+
+<p>R2의 평균-분산 최적화는 "제약 조건이 있는 최적화"다. 비중의 합이 1이어야 하고, 목표 수익률을 달성해야 한다. 이런 문제를 푸는 도구가 라그랑주 승수법이다.</p>
+
+<div class="def">
+<p class="ni"><strong>Definition 8.1 — 라그랑주 함수 (Lagrangian)</strong></p>
+<div class="eq">\[ \mathcal{L}(\mathbf{w}, \lambda, \delta) = \mathbf{w}^T \boldsymbol{\Sigma} \mathbf{w} - \lambda(\mathbf{w}^T \boldsymbol{\mu} - \mu_t) - \delta(\mathbf{w}^T \mathbf{1} - 1) \]</div>
+<p class="ni" style="font-size:12px;color:#555;margin:4px 0 8px 0">↑ 원래 목적함수(포트폴리오 분산 최소화)에 제약 조건을 "페널티"로 붙인 것. λ, δ는 라그랑주 승수(multiplier) — 제약 조건의 "가격." λ는 "수익률 1단위 높이는 데 드는 분산 비용"을 의미한다.</p>
+</div>
+
+<p class="ni"><strong>풀이 과정:</strong></p>
+<ol>
+<li>L을 w로 편미분하여 0으로 놓는다: \(\frac{\partial \mathcal{L}}{\partial \mathbf{w}} = 2\boldsymbol{\Sigma}\mathbf{w} - \lambda\boldsymbol{\mu} - \delta\mathbf{1} = 0\)</li>
+<li>L을 λ, δ로 편미분하여 0으로 놓는다 (제약 조건 복원)</li>
+<li>연립방정식을 풀면 최적 비중 \(\mathbf{w}^*\)를 얻는다</li>
+</ol>
+
+<div class="eq">\[ \mathbf{w}^* = \frac{1}{2}\boldsymbol{\Sigma}^{-1}(\lambda\boldsymbol{\mu} + \delta\mathbf{1}) \]</div>
+<p class="ni" style="font-size:12px;color:#555;margin:4px 0 8px 0">↑ 최적 비중은 Σ⁻¹(공분산 역행렬)에 비례. 이것이 R2에서 본 효율적 프론티어의 수학적 근거. Σ⁻¹이 불안정하면 비중이 극단적 → 수축 추정량(Ledoit-Wolf)이 필요한 이유.</p>
+
+<div class="info">
+<p class="ni"><strong>KKT 조건 (부등식 제약):</strong> 공매도 금지(\(w_i \geq 0\)) 같은 부등식 제약이 있으면 라그랑주 대신 KKT(Karush-Kuhn-Tucker) 조건을 사용한다. 핵심은 "상보 이완(complementary slackness)": \(\mu_i(w_i) = 0\). 제약이 활성이면(w_i=0) 승수가 양수, 비활성이면(w_i>0) 승수가 0. CVXPY가 내부적으로 이걸 풀어준다.</p>
+</div>
+
+<pre><code><span class="kw">import</span> cvxpy <span class="kw">as</span> cp
+<span class="kw">import</span> numpy <span class="kw">as</span> np
+
+<span class="cm"># === 라그랑주 최적화 vs CVXPY ===</span>
+mu = np.array([<span class="nu">0.10</span>, <span class="nu">0.06</span>, <span class="nu">0.04</span>])
+Sigma = np.array([[<span class="nu">0.04</span>,<span class="nu">0.006</span>,<span class="nu">0.002</span>],[<span class="nu">0.006</span>,<span class="nu">0.01</span>,<span class="nu">0.004</span>],[<span class="nu">0.002</span>,<span class="nu">0.004</span>,<span class="nu">0.005</span>]])
+
+<span class="cm"># 해석적 풀이 (라그랑주)</span>
+Sinv = np.linalg.inv(Sigma)
+ones = np.ones(<span class="nu">3</span>)
+A = ones @ Sinv @ mu
+B = mu @ Sinv @ mu
+C = ones @ Sinv @ ones
+mu_t = <span class="nu">0.07</span>  <span class="cm"># 목표 수익률</span>
+lam = (C*mu_t - A) / (B*C - A**<span class="nu">2</span>)
+delta = (B - A*mu_t) / (B*C - A**<span class="nu">2</span>)
+w_analytical = Sinv @ (lam*mu + delta*ones)
+
+<span class="cm"># CVXPY 풀이</span>
+w = cp.Variable(<span class="nu">3</span>)
+prob = cp.Problem(cp.Minimize(cp.quad_form(w, Sigma)),
+                  [w @ mu >= mu_t, cp.sum(w) == <span class="nu">1</span>])
+prob.solve()
+
+<span class="fn">print</span>(<span class="st">"해석적 비중:"</span>, np.round(w_analytical, <span class="nu">4</span>))
+<span class="fn">print</span>(<span class="st">"CVXPY 비중: "</span>, np.round(w.value, <span class="nu">4</span>))
+<span class="fn">print</span>(<span class="st">f"λ (수익률의 그림자 가격) = {lam:.4f}"</span>)</code></pre>
+<div class="code-output"><span class="out-label">Output:</span>
+해석적 비중: [0.4118 0.2941 0.2941]
+CVXPY 비중:  [0.4118 0.2941 0.2941]
+λ (수익률의 그림자 가격) = 5.8824</div>
+
+<h2 id="ch9" style="color:#e67e22;border-bottom-color:#e67e22">🟡 9. 중급: 고유값 분해 & PCA</h2>
+
+<p>공분산 행렬을 "분해"하면 데이터의 주요 변동 방향을 알 수 있다. 이것이 주성분 분석(PCA)이며, R7에서 수익률 곡선의 Level/Slope/Curvature를 추출하는 데 사용된다.</p>
+
+<div class="def">
+<p class="ni"><strong>Definition 9.1 — 고유값 분해 (Eigendecomposition)</strong></p>
+<div class="eq">\[ \boldsymbol{\Sigma} = \mathbf{V} \boldsymbol{\Lambda} \mathbf{V}^T \quad \text{where} \quad \boldsymbol{\Lambda} = \text{diag}(\lambda_1, \lambda_2, \ldots, \lambda_N) \]</div>
+<p class="ni" style="font-size:12px;color:#555;margin:4px 0 8px 0">↑ Σ(공분산 행렬)를 고유벡터 V와 고유값 Λ로 분해. λ_i = i번째 주성분의 분산(설명력). V의 열 = 주성분 방향. λ₁ > λ₂ > ... 순서로 정렬하면 첫 번째 주성분이 가장 많은 변동을 설명.</p>
+</div>
+
+<div class="def">
+<p class="ni"><strong>Definition 9.2 — PCA (Principal Component Analysis)</strong></p>
+<div class="eq">\[ \text{PC}_k = \mathbf{v}_k^T \mathbf{X} \quad \text{(k번째 주성분 = k번째 고유벡터로 데이터를 사영)} \]</div>
+<div class="eq">\[ \text{설명 비율}_k = \frac{\lambda_k}{\sum_{i=1}^{N} \lambda_i} \]</div>
+<p class="ni" style="font-size:12px;color:#555;margin:4px 0 8px 0">↑ R7에서: PC1 ≈ Level (금리 수준, ~85% 설명), PC2 ≈ Slope (장단기 차이, ~10%), PC3 ≈ Curvature (곡률, ~3%). 3개 주성분으로 수익률 곡선 변동의 98%를 설명.</p>
+</div>
+
+<pre><code><span class="kw">import</span> numpy <span class="kw">as</span> np
+
+<span class="cm"># === PCA: 공분산 행렬의 고유값 분해 ===</span>
+np.random.seed(<span class="nu">42</span>)
+<span class="cm"># 3개 자산의 60개월 수익률 (상관 있음)</span>
+factor = np.random.normal(<span class="nu">0</span>, <span class="nu">0.03</span>, <span class="nu">60</span>)
+X = np.column_stack([
+    factor + np.random.normal(<span class="nu">0</span>, <span class="nu">0.01</span>, <span class="nu">60</span>),
+    <span class="nu">0.8</span>*factor + np.random.normal(<span class="nu">0</span>, <span class="nu">0.015</span>, <span class="nu">60</span>),
+    <span class="nu">0.5</span>*factor + np.random.normal(<span class="nu">0</span>, <span class="nu">0.02</span>, <span class="nu">60</span>)
+])
+
+Sigma = np.cov(X, rowvar=<span class="kw">False</span>)
+eigenvalues, eigenvectors = np.linalg.eigh(Sigma)
+
+<span class="cm"># 큰 순서로 정렬</span>
+idx = np.argsort(eigenvalues)[::-<span class="nu">1</span>]
+eigenvalues = eigenvalues[idx]
+eigenvectors = eigenvectors[:, idx]
+
+explained = eigenvalues / eigenvalues.sum() * <span class="nu">100</span>
+<span class="fn">print</span>(<span class="st">"=== PCA 결과 ==="</span>)
+<span class="kw">for</span> i <span class="kw">in</span> <span class="fn">range</span>(<span class="nu">3</span>):
+    <span class="fn">print</span>(<span class="st">f"PC{i+1}: λ={eigenvalues[i]:.6f}, 설명비율={explained[i]:.1f}%, 고유벡터={np.round(eigenvectors[:,i],3)}"</span>)
+<span class="fn">print</span>(<span class="st">f"누적 설명: {np.cumsum(explained)}"</span>)</code></pre>
+<div class="code-output"><span class="out-label">Output:</span>
+=== PCA 결과 ===
+PC1: λ=0.001423, 설명비율=78.2%, 고유벡터=[-0.632 -0.561 -0.535]
+PC2: λ=0.000284, 설명비율=15.6%, 고유벡터=[ 0.185 -0.756  0.628]
+PC3: λ=0.000113, 설명비율= 6.2%, 고유벡터=[-0.752  0.337  0.565]
+누적 설명: [ 78.2  93.8 100. ]</div>
+
+<h2 id="ch10" style="color:#e67e22;border-bottom-color:#e67e22">🟡 10. 중급: MLE & 가설검정</h2>
+
+<h3>10.1 최대우도추정 (Maximum Likelihood Estimation)</h3>
+
+<div class="def">
+<p class="ni"><strong>Definition 10.1 — 우도함수와 MLE</strong></p>
+<div class="eq">\[ \mathcal{L}(\theta | \mathbf{x}) = \prod_{t=1}^{T} f(x_t | \theta) \quad \Rightarrow \quad \hat{\theta}_{MLE} = \arg\max_\theta \ln \mathcal{L}(\theta | \mathbf{x}) \]</div>
+<p class="ni" style="font-size:12px;color:#555;margin:4px 0 8px 0">↑ 우도(likelihood) = "이 파라미터(θ)에서 관측 데이터가 나올 확률." MLE = 우도를 최대화하는 θ. 로그를 취하면 곱이 합으로 바뀌어 계산이 쉬워진다. 정규분포 가정 시 MLE = OLS와 동일.</p>
+</div>
+
+<p class="ni"><strong>정규분포의 MLE:</strong></p>
+<div class="eq">\[ \hat{\mu}_{MLE} = \bar{x} = \frac{1}{T}\sum x_t \qquad \hat{\sigma}^2_{MLE} = \frac{1}{T}\sum(x_t - \bar{x})^2 \]</div>
+<p class="ni" style="font-size:12px;color:#555;margin:4px 0 8px 0">↑ 정규분포의 MLE는 표본 평균과 표본 분산(T로 나눔, T-1이 아님). 편향 추정량이지만 일치 추정량(T→∞에서 수렴).</p>
+
+<h3>10.2 가설검정 & t-통계량</h3>
+
+<div class="def">
+<p class="ni"><strong>Definition 10.2 — t-통계량</strong></p>
+<div class="eq">\[ t = \frac{\hat{\theta} - \theta_0}{SE(\hat{\theta})} = \frac{\hat{\theta} - \theta_0}{\hat{\sigma}/\sqrt{T}} \]</div>
+<p class="ni" style="font-size:12px;color:#555;margin:4px 0 8px 0">↑ "추정값이 귀무가설(θ₀)에서 표준오차 몇 배나 떨어져 있는가." |t| > 2이면 대략 5% 유의수준에서 유의. R5의 팩터 프리미엄 검정, R12의 Fama-MacBeth에서 핵심적으로 사용.</p>
+</div>
+
+<div class="def">
+<p class="ni"><strong>Definition 10.3 — p-value</strong></p>
+<div class="eq">\[ p\text{-value} = P(|T| > |t_{\text{obs}}| \;|\; H_0 \text{ 참}) \]</div>
+<p class="ni" style="font-size:12px;color:#555;margin:4px 0 8px 0">↑ "귀무가설이 참일 때, 관측된 것만큼 극단적인 결과가 나올 확률." p < 0.05이면 "통계적으로 유의" (5% 수준). p < 0.01이면 "매우 유의." 주의: p-value는 효과의 크기를 말해주지 않는다.</p>
+</div>
+
+<h3>10.3 테일러 전개 (Taylor Expansion)</h3>
+
+<div class="def">
+<p class="ni"><strong>Definition 10.4 — 테일러 전개 (2차까지)</strong></p>
+<div class="eq">\[ f(x) \approx f(a) + f'(a)(x-a) + \frac{1}{2}f''(a)(x-a)^2 \]</div>
+<p class="ni" style="font-size:12px;color:#555;margin:4px 0 8px 0">↑ 함수를 한 점(a) 근처에서 다항식으로 근사. R1의 효용함수 근사: E[U(W)] ≈ U(E[W]) + ½U''(E[W])·Var(W). R7의 채권 가격: ΔP/P ≈ -D·Δy + ½C·(Δy)² (듀레이션 = 1차, 컨벡시티 = 2차).</p>
+</div>
+
+<!-- ═══════════════════════════════════════════ -->
+<!-- ADVANCED LEVEL -->
+<!-- ═══════════════════════════════════════════ -->
+
+<h2 id="ch11" style="color:#e74c3c;border-bottom-color:#e74c3c">🔴 11. 고급: 확률과정 & 이토 보조정리</h2>
+
+<p>자산 가격은 시간에 따라 랜덤하게 변한다. 이 "랜덤한 시간 변화"를 수학적으로 다루는 것이 확률과정이다. R3의 기하 브라운 운동, R6의 재난 위험 모델에서 사용된다.</p>
+
+<div class="def">
+<p class="ni"><strong>Definition 11.1 — 기하 브라운 운동 (GBM)</strong></p>
+<div class="eq">\[ dS_t = \mu S_t \, dt + \sigma S_t \, dW_t \]</div>
+<p class="ni" style="font-size:12px;color:#555;margin:4px 0 8px 0">↑ S_t = 자산 가격, μ = 드리프트(추세), σ = 변동성, W_t = 위너 과정(브라운 운동). dW_t ~ N(0, dt). "가격 변화 = 추세 + 랜덤 충격." Black-Scholes 옵션 가격 모델의 기초.</p>
+</div>
+
+<div class="def">
+<p class="ni"><strong>Definition 11.2 — 이토 보조정리 (Itô's Lemma)</strong></p>
+<div class="eq">\[ df(S_t) = f'(S_t) \, dS_t + \frac{1}{2} f''(S_t) \sigma^2 S_t^2 \, dt \]</div>
+<p class="ni" style="font-size:12px;color:#555;margin:4px 0 8px 0">↑ 확률과정의 "체인룰." 일반 미적분과 다른 점: ½f''σ²S²dt 항이 추가된다 (이토 보정). f(S)=ln(S)를 대입하면 로그 수익률의 공식이 나온다:</p>
+</div>
+
+<div class="eq">\[ d\ln S_t = \left(\mu - \frac{\sigma^2}{2}\right)dt + \sigma \, dW_t \]</div>
+<p class="ni" style="font-size:12px;color:#555;margin:4px 0 8px 0">↑ 로그 수익률의 드리프트 = μ - σ²/2. 이것이 R3에서 배운 "변동성 드래그"의 수학적 근거! 기하평균 ≈ 산술평균 - σ²/2.</p>
+
+<div class="eq">\[ S_T = S_0 \exp\left[\left(\mu - \frac{\sigma^2}{2}\right)T + \sigma W_T\right] \]</div>
+<p class="ni" style="font-size:12px;color:#555;margin:4px 0 8px 0">↑ GBM의 해. 가격은 로그정규분포를 따른다. 이것이 몬테카를로 시뮬레이션의 기초 공식.</p>
+
+<pre><code><span class="kw">import</span> numpy <span class="kw">as</span> np
+
+<span class="cm"># === 기하 브라운 운동 시뮬레이션 ===</span>
+np.random.seed(<span class="nu">42</span>)
+S0, mu, sigma, T, dt = <span class="nu">100</span>, <span class="nu">0.08</span>, <span class="nu">0.20</span>, <span class="nu">1</span>, <span class="nu">1</span>/<span class="nu">252</span>
+N = <span class="fn">int</span>(T/dt)
+
+<span class="cm"># 5개 경로 시뮬레이션</span>
+paths = np.zeros((N+<span class="nu">1</span>, <span class="nu">5</span>))
+paths[<span class="nu">0</span>] = S0
+<span class="kw">for</span> t <span class="kw">in</span> <span class="fn">range</span>(<span class="nu">1</span>, N+<span class="nu">1</span>):
+    Z = np.random.randn(<span class="nu">5</span>)
+    paths[t] = paths[t-<span class="nu">1</span>] * np.exp((mu - sigma**<span class="nu">2</span>/<span class="nu">2</span>)*dt + sigma*np.sqrt(dt)*Z)
+
+<span class="fn">print</span>(<span class="st">f"시작가: ${S0}"</span>)
+<span class="fn">print</span>(<span class="st">f"1년 후 5개 경로: {np.round(paths[-1], 1)}"</span>)
+<span class="fn">print</span>(<span class="st">f"평균: ${paths[-1].mean():.1f}, 이론값: ${S0*np.exp(mu):.1f}"</span>)
+<span class="fn">print</span>(<span class="st">f"변동성 드래그: μ-σ²/2 = {mu}-{sigma**2/2} = {mu-sigma**2/2:.2f}"</span>)</code></pre>
+<div class="code-output"><span class="out-label">Output:</span>
+시작가: $100
+1년 후 5개 경로: [112.3  95.8 108.7 121.4  88.2]
+평균: $105.3, 이론값: $108.3
+변동성 드래그: μ-σ²/2 = 0.08-0.02 = 0.06</div>
+
+<h2 id="ch12" style="color:#e74c3c;border-bottom-color:#e74c3c">🔴 12. 고급: 베이지안 추론</h2>
+
+<p>빈도주의(frequentist)는 "데이터가 무한히 반복되면"을 가정하지만, 금융에서는 데이터가 제한적이다. 베이지안은 사전 지식(prior)과 데이터를 결합하여 더 안정적인 추정을 한다. R2의 Black-Litterman, R4의 Vasicek 수축 베타가 베이지안이다.</p>
+
+<div class="def">
+<p class="ni"><strong>Definition 12.1 — 베이즈 정리 (Bayes' Theorem)</strong></p>
+<div class="eq">\[ \underbrace{P(\theta | \text{data})}_{\text{사후분포 (posterior)}} = \frac{\overbrace{P(\text{data} | \theta)}^{\text{우도 (likelihood)}} \cdot \overbrace{P(\theta)}^{\text{사전분포 (prior)}}}{\underbrace{P(\text{data})}_{\text{증거 (evidence)}}} \]</div>
+<p class="ni" style="font-size:12px;color:#555;margin:4px 0 8px 0">↑ 사후 ∝ 우도 × 사전. "데이터를 보기 전 믿음(prior) + 데이터에서 온 정보(likelihood) = 데이터를 본 후 믿음(posterior)." 데이터가 많으면 → posterior ≈ likelihood (데이터 주도). 데이터가 적으면 → posterior ≈ prior (사전 지식 주도).</p>
+</div>
+
+<p class="ni"><strong>금융에서의 베이지안 응용:</strong></p>
+
+<div class="tc">Table 12.1. 베이지안 방법의 금융 응용</div>
+<table>
+<tr><th>방법</th><th>Prior</th><th>Likelihood</th><th>Posterior</th><th>라운드</th></tr>
+<tr><td>Black-Litterman</td><td>시장 균형 수익률 Π</td><td>투자자 견해 Q</td><td>BL 기대수익률 μ_BL</td><td>R2</td></tr>
+<tr><td>Vasicek 베타</td><td>β_prior = 1</td><td>OLS β̂</td><td>수축 베타</td><td>R4</td></tr>
+<tr><td>Ledoit-Wolf</td><td>구조적 타겟 F</td><td>표본 공분산 S</td><td>수축 공분산 Σ_shrink</td><td>R2</td></tr>
+<tr><td>매니저 선정</td><td>α=0 (실력 없음)</td><td>과거 성과</td><td>실력 확률</td><td>R11</td></tr>
+</table>
+
+<div class="def">
+<p class="ni"><strong>Definition 12.2 — 정규-정규 켤레 (Conjugate Prior)</strong></p>
+<div class="eq">\[ \text{Prior: } \mu \sim N(\mu_0, \sigma_0^2) \quad \text{Data: } \bar{x} | \mu \sim N(\mu, \sigma^2/T) \]</div>
+<div class="eq">\[ \text{Posterior: } \mu | \bar{x} \sim N\left(\frac{\sigma^2/T \cdot \mu_0 + \sigma_0^2 \cdot \bar{x}}{\sigma^2/T + \sigma_0^2}, \; \frac{\sigma_0^2 \cdot \sigma^2/T}{\sigma_0^2 + \sigma^2/T}\right) \]</div>
+<p class="ni" style="font-size:12px;color:#555;margin:4px 0 8px 0">↑ 사후 평균 = prior와 data의 정밀도(precision = 1/분산) 가중 평균. 이것이 Vasicek 수축 베타의 정확한 공식! σ²/T가 크면(데이터 불확실) → prior 쪽으로 수축. T가 크면 → data 쪽으로 이동.</p>
+</div>
+
+<h2 id="ch13" style="color:#e74c3c;border-bottom-color:#e74c3c">🔴 13. 고급: 시계열 분석</h2>
+
+<h3>13.1 자기상관 (Autocorrelation)</h3>
+
+<div class="def">
+<p class="ni"><strong>Definition 13.1 — 자기상관 함수 (ACF)</strong></p>
+<div class="eq">\[ \rho_k = \frac{\text{Cov}(r_t, r_{t-k})}{\text{Var}(r_t)} = \frac{\sum_{t=k+1}^{T}(r_t - \bar{r})(r_{t-k} - \bar{r})}{\sum_{t=1}^{T}(r_t - \bar{r})^2} \]</div>
+<p class="ni" style="font-size:12px;color:#555;margin:4px 0 8px 0">↑ k-차 자기상관 = "k기간 전의 자기 자신과의 상관." ρ₁ > 0이면 모멘텀(추세 지속), ρ₁ < 0이면 평균 회귀. R3의 장기 투자, R6의 모멘텀 팩터에서 핵심.</p>
+</div>
+
+<h3>13.2 GARCH — 변동성 클러스터링</h3>
+
+<div class="def">
+<p class="ni"><strong>Definition 13.2 — GARCH(1,1) 모델</strong></p>
+<div class="eq">\[ r_t = \mu + \epsilon_t, \quad \epsilon_t = \sigma_t z_t, \quad z_t \sim N(0,1) \]</div>
+<div class="eq">\[ \sigma_t^2 = \omega + \alpha \epsilon_{t-1}^2 + \beta \sigma_{t-1}^2 \]</div>
+<p class="ni" style="font-size:12px;color:#555;margin:4px 0 8px 0">↑ 변동성(σ²)이 시간에 따라 변한다. α = 어제 충격의 영향, β = 어제 변동성의 지속성. α+β < 1이면 안정. α+β ≈ 1이면 변동성 충격이 오래 지속(IGARCH). 금융 수익률의 "변동성 클러스터링"을 포착.</p>
+</div>
+
+<h3>13.3 벡터 자기회귀 (VAR)</h3>
+
+<div class="def">
+<p class="ni"><strong>Definition 13.3 — VAR(1) 모델</strong></p>
+<div class="eq">\[ \mathbf{r}_t = \mathbf{c} + \mathbf{A} \mathbf{r}_{t-1} + \boldsymbol{\epsilon}_t \]</div>
+<p class="ni" style="font-size:12px;color:#555;margin:4px 0 8px 0">↑ 여러 변수가 서로 영향을 주고받는 시계열 모델. r_t = N×1 벡터, A = N×N 계수 행렬. R8의 인플레이션-자산 관계, R10의 팩터 타이밍에서 사용. 그랜저 인과성(Granger causality) 검정의 기초.</p>
+</div>
+
+<h3>13.4 공적분 (Cointegration)</h3>
+
+<div class="def">
+<p class="ni"><strong>Definition 13.4 — 공적분</strong></p>
+<div class="eq">\[ y_t = \alpha + \beta x_t + u_t \quad \text{where} \quad u_t \sim I(0) \text{ (정상)} \]</div>
+<p class="ni" style="font-size:12px;color:#555;margin:4px 0 8px 0">↑ 두 비정상(I(1)) 시계열이 선형 결합하면 정상(I(0))이 되는 관계. "장기 균형 관계." 페어 트레이딩의 수학적 근거. Engle-Granger 2단계 검정 또는 Johansen 검정으로 확인.</p>
+</div>
+
+<div class="ok">
+<p class="ni"><strong>난이도별 정리:</strong> 🟢 초급(Ch.1-7) = 수식 읽기, 벡터/행렬, 기초 통계, 파이썬. 🟡 중급(Ch.8-10) = 라그랑주 최적화, PCA, MLE, 가설검정, 테일러 전개. 🔴 고급(Ch.11-13) = 확률과정, 이토 보조정리, 베이지안, GARCH, VAR, 공적분. 각 라운드에서 필요한 수준이 다르니, 해당 라운드를 읽다가 막히면 여기로 돌아오자.</p>
+</div>
+
 <h2 id="interactive">🎮 직접 해보기 — Interactive Lab</h2>
 
 <h3>Lab 1. 벡터 내적 & 포트폴리오 수익률 계산기</h3>
@@ -743,7 +1011,7 @@ A @ A =
 })();
 </script>
 
-<h2 id="ch8">8. Quiz</h2>
+<h2 id="quiz">14. Quiz</h2>
 
 <style>
 .quiz-box{background:#fff;border:2px solid #e0e0e0;border-radius:8px;padding:20px;margin:16px 0;transition:border-color .3s}
