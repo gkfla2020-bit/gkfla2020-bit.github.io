@@ -72,6 +72,7 @@ pre{background:#1e1e1e;color:#d4d4d4;padding:20px;border-radius:6px;overflow-x:a
 <li><a href="#ch4">4. 롱숏 팩터 포트폴리오</a></li>
 <li><a href="#ch5">5. 팩터 틸팅</a></li>
 <li><a href="#ch6">6. 파이썬 구현: 팩터 전략</a></li>
+<li><a href="#interactive">🎮 직접 해보기</a></li>
 <li><a href="#ch7">7. Quiz</a></li>
 </ul>
 </div>
@@ -839,21 +840,231 @@ cum_contra = np.cumprod(<span class="nu">1</span> + contrarian_ret)
 
 <h2 id="ch7">7. Quiz</h2>
 
-<div class="def">
-<p class="ni"><strong>Q1. [스마트 베타]</strong> 10개 주식의 시가총액과 변동성이 주어졌을 때, 시총가중, 동일가중, 역변동성 가중 포트폴리오를 구성하고 각각의 팩터 노출(시장, 규모, 저변동성)을 비교하라.</p>
+<h2 id="interactive">🎮 직접 해보기 — Interactive Lab</h2>
+
+<h3>Lab 1. 팩터 틸팅 시뮬레이터</h3>
+<p class="ni">벤치마크 대비 각 팩터의 틸팅 강도(δ)를 조절하면서 포트폴리오의 기대 초과수익과 추적오차가 어떻게 변하는지 확인하세요.</p>
+
+<div style="background:#f0f4f8;padding:20px;border-radius:8px;margin:20px 0">
+<div style="display:flex;gap:16px;flex-wrap:wrap;margin-bottom:12px">
+<div>
+<label style="font-size:11px;color:#555">δ_Value</label><br>
+<input type="range" id="sl-dv" min="0" max="0.5" step="0.05" value="0.2" style="width:100px">
+<span id="val-dv" style="font-family:'Space Mono',monospace;font-size:12px">0.20</span>
+</div>
+<div>
+<label style="font-size:11px;color:#555">δ_Momentum</label><br>
+<input type="range" id="sl-dm" min="0" max="0.5" step="0.05" value="0.15" style="width:100px">
+<span id="val-dm" style="font-family:'Space Mono',monospace;font-size:12px">0.15</span>
+</div>
+<div>
+<label style="font-size:11px;color:#555">δ_LowVol</label><br>
+<input type="range" id="sl-dl" min="0" max="0.5" step="0.05" value="0.1" style="width:100px">
+<span id="val-dl" style="font-family:'Space Mono',monospace;font-size:12px">0.10</span>
+</div>
+<div>
+<label style="font-size:11px;color:#555">δ_Quality</label><br>
+<input type="range" id="sl-dq" min="0" max="0.5" step="0.05" value="0.1" style="width:100px">
+<span id="val-dq" style="font-family:'Space Mono',monospace;font-size:12px">0.10</span>
+</div>
+</div>
+<div id="plot-lab1r10" style="width:100%;height:400px"></div>
+<div id="lab1r10-info" style="font-family:'Space Mono',monospace;font-size:12px;margin-top:8px;padding:10px;background:#1e1e1e;color:#d4d4d4;border-radius:6px;line-height:1.8"></div>
 </div>
 
-<div class="def">
-<p class="ni"><strong>Q2. [롱숏]</strong> Kenneth French 데이터 라이브러리에서 HML 팩터 수익률을 다운로드하고, 연율화 수익률, 변동성, 샤프비율, 최대 낙폭을 계산하라.</p>
+<script>
+(function(){
+  var ids=['dv','dm','dl','dq'];
+  var sls={},vls={};
+  ids.forEach(function(id){sls[id]=document.getElementById('sl-'+id);vls[id]=document.getElementById('val-'+id);});
+  // factor premiums and TE per unit tilt
+  var fp={dv:3.0,dm:6.0,dl:2.5,dq:3.5};
+  var te={dv:4.0,dm:5.0,dl:3.0,dq:3.5};
+  var names={dv:'Value',dm:'Momentum',dl:'LowVol',dq:'Quality'};
+  var colors={dv:'#27ae60',dm:'#e74c3c',dl:'#3498db',dq:'#9b59b6'};
+  function draw(){
+    var deltas={};
+    ids.forEach(function(id){deltas[id]=parseFloat(sls[id].value);vls[id].textContent=deltas[id].toFixed(2);});
+    var totalAlpha=0,totalTE2=0;
+    var contribs=[],teContribs=[],labels=[];
+    ids.forEach(function(id){
+      var a=deltas[id]*fp[id];
+      var t=deltas[id]*te[id];
+      totalAlpha+=a;totalTE2+=t*t;
+      contribs.push(a);teContribs.push(t);labels.push(names[id]);
+    });
+    var totalTE=Math.sqrt(totalTE2);
+    var ir=totalTE>0?totalAlpha/totalTE:0;
+    Plotly.react('plot-lab1r10',[
+      {x:labels,y:contribs,name:'기대 α 기여',type:'bar',marker:{color:ids.map(function(id){return colors[id];})}},
+      {x:labels,y:teContribs,name:'TE 기여',type:'bar',marker:{color:ids.map(function(id){return colors[id];}),opacity:0.4}}
+    ],{
+      title:'멀티팩터 틸팅 — 총 α: '+totalAlpha.toFixed(1)+'%, TE: '+totalTE.toFixed(1)+'%, IR: '+ir.toFixed(2),
+      barmode:'group',yaxis:{title:'%'},
+      plot_bgcolor:'#fafaf8',paper_bgcolor:'#f0f4f8',font:{family:'Inter',size:12},
+      margin:{t:50,r:20,b:50,l:60}
+    },{responsive:true});
+    document.getElementById('lab1r10-info').innerHTML=
+      ids.map(function(id){return names[id]+': δ='+deltas[id].toFixed(2)+' → α='+((deltas[id]*fp[id]).toFixed(1))+'%, TE='+(deltas[id]*te[id]).toFixed(1)+'%';}).join('\n')+'\n'+
+      '총 기대 α = '+totalAlpha.toFixed(1)+'% | 총 TE = '+totalTE.toFixed(1)+'% (√Σ 가정: 팩터 간 독립)\n'+
+      '<span style="color:#569cd6">포트폴리오 IR = '+ir.toFixed(2)+'</span> '+(ir>=0.5?'✓ 우수':'— 개선 필요')+'\n'+
+      '<span style="color:#6a9955">→ 여러 팩터를 결합하면 TE 대비 α가 개선 (분산투자 효과)</span>';
+  }
+  ids.forEach(function(id){sls[id].addEventListener('input',draw);});
+  setTimeout(draw,300);
+})();
+</script>
+
+<h3>Lab 2. 스마트 베타 가중 방식 비교</h3>
+<p class="ni">주식 수와 집중도를 조절하면서 시총가중, 동일가중, 역변동성 가중의 팩터 노출 차이를 확인하세요.</p>
+
+<div style="background:#f0f4f8;padding:20px;border-radius:8px;margin:20px 0">
+<div style="display:flex;gap:16px;flex-wrap:wrap;margin-bottom:12px">
+<div>
+<label style="font-size:11px;color:#555">주식 수</label><br>
+<input type="range" id="sl-ns" min="5" max="50" step="5" value="20" style="width:100px">
+<span id="val-ns" style="font-family:'Space Mono',monospace;font-size:12px">20</span>
+</div>
+<div>
+<label style="font-size:11px;color:#555">대형주 집중도</label><br>
+<input type="range" id="sl-conc" min="1" max="5" step="0.5" value="2" style="width:100px">
+<span id="val-conc" style="font-family:'Space Mono',monospace;font-size:12px">2.0</span>
+</div>
+</div>
+<div id="plot-lab2r10" style="width:100%;height:380px"></div>
+<div id="lab2r10-info" style="font-family:'Space Mono',monospace;font-size:12px;margin-top:8px;padding:10px;background:#1e1e1e;color:#d4d4d4;border-radius:6px;line-height:1.8"></div>
 </div>
 
-<div class="def">
-<p class="ni"><strong>Q3. [팩터 틸팅]</strong> KOSPI 200 ETF를 벤치마크로, 가치(PBR 역수) 시그널로 δ=0.1, 0.3, 0.5 틸팅한 포트폴리오의 성과를 비교하라.</p>
+<script>
+(function(){
+  var slNs=document.getElementById('sl-ns'),slConc=document.getElementById('sl-conc');
+  var vlNs=document.getElementById('val-ns'),vlConc=document.getElementById('val-conc');
+  function draw2(){
+    var N=parseInt(slNs.value),conc=parseFloat(slConc.value);
+    vlNs.textContent=N;vlConc.textContent=conc.toFixed(1);
+    // generate market caps (power law)
+    var caps=[],vols=[];
+    for(var i=0;i<N;i++){caps.push(Math.pow(N-i,conc));vols.push(15+20*i/N+5*Math.sin(i));}
+    var totalCap=caps.reduce(function(a,b){return a+b;},0);
+    var totalInvVol=vols.reduce(function(a,b){return a+1/b;},0);
+    // weights
+    var wCap=caps.map(function(c){return c/totalCap;});
+    var wEq=caps.map(function(){return 1/N;});
+    var wIV=vols.map(function(v){return (1/v)/totalInvVol;});
+    // HHI (concentration)
+    var hhiCap=wCap.reduce(function(a,w){return a+w*w;},0);
+    var hhiEq=wEq.reduce(function(a,w){return a+w*w;},0);
+    var hhiIV=wIV.reduce(function(a,w){return a+w*w;},0);
+    // effective N
+    var effCap=1/hhiCap,effEq=1/hhiEq,effIV=1/hhiIV;
+    var stocks=[];for(var i=0;i<N;i++)stocks.push('S'+(i+1));
+    Plotly.react('plot-lab2r10',[
+      {x:stocks,y:wCap.map(function(w){return w*100;}),name:'시총가중',type:'bar',marker:{color:'#e74c3c',opacity:0.7}},
+      {x:stocks,y:wEq.map(function(w){return w*100;}),name:'동일가중',type:'bar',marker:{color:'#3498db',opacity:0.7}},
+      {x:stocks,y:wIV.map(function(w){return w*100;}),name:'역변동성',type:'bar',marker:{color:'#27ae60',opacity:0.7}}
+    ],{
+      title:'가중 방식별 포트폴리오 비중 (N='+N+')',barmode:'group',
+      xaxis:{title:'주식'},yaxis:{title:'비중 (%)'},
+      plot_bgcolor:'#fafaf8',paper_bgcolor:'#f0f4f8',font:{family:'Inter',size:11},
+      margin:{t:50,r:20,b:50,l:60}
+    },{responsive:true});
+    document.getElementById('lab2r10-info').innerHTML=
+      '유효 종목 수 (1/HHI): 시총가중='+effCap.toFixed(1)+' | 동일가중='+effEq.toFixed(1)+' | 역변동성='+effIV.toFixed(1)+'\n'+
+      '상위 5개 비중: 시총='+(wCap.slice(0,5).reduce(function(a,b){return a+b;},0)*100).toFixed(1)+'% | 동일='+(wEq.slice(0,5).reduce(function(a,b){return a+b;},0)*100).toFixed(1)+'% | 역변동성='+(wIV.slice(0,5).reduce(function(a,b){return a+b;},0)*100).toFixed(1)+'%\n'+
+      '<span style="color:#6a9955">→ 동일가중: 소형주 틸트 (SMB+), 역변동성: 저변동성 틸트 (BAB+)</span>\n'+
+      '<span style="color:#569cd6">→ 시총가중은 대형주 집중, 스마트 베타는 대안적 팩터 노출 제공</span>';
+  }
+  [slNs,slConc].forEach(function(s){s.addEventListener('input',draw2);});
+  setTimeout(draw2,400);
+})();
+</script>
+
+<h2 id="ch7">7. 객관식 퀴즈</h2>
+
+<style>
+.quiz-box{background:#fff;border:2px solid #e0e0e0;border-radius:8px;padding:20px;margin:16px 0;transition:border-color .3s}
+.quiz-box.correct{border-color:#27ae60;background:#f0fff4}
+.quiz-box.wrong{border-color:#e74c3c;background:#fff5f5}
+.quiz-box h4{margin:0 0 12px;font-size:14px}
+.quiz-opt{display:block;margin:6px 0;padding:8px 12px;border:1px solid #ddd;border-radius:6px;cursor:pointer;font-size:13px;transition:all .2s}
+.quiz-opt:hover{background:#f0f4f8;border-color:#3498db}
+.quiz-opt.correct-answer{background:#d4edda;border-color:#27ae60}
+.quiz-opt.wrong-answer{background:#f8d7da;border-color:#e74c3c}
+.quiz-feedback{margin-top:10px;padding:10px;border-radius:6px;font-size:12px;display:none}
+.quiz-feedback.show{display:block}
+.quiz-score{text-align:center;padding:20px;background:#f8f9fa;border-radius:8px;margin:20px 0;font-size:16px}
+</style>
+
+<div class="quiz-box" id="q1">
+<h4>Q1. 동일가중 포트폴리오가 시총가중 대비 갖는 팩터 틸트는?</h4>
+<label class="quiz-opt" onclick="checkQ('q1',this,0)">A. 대형주 틸트 (SMB−)</label>
+<label class="quiz-opt" onclick="checkQ('q1',this,1)">B. 소형주 틸트 (SMB+)</label>
+<label class="quiz-opt" onclick="checkQ('q1',this,2)">C. 가치주 틸트 (HML+)</label>
+<label class="quiz-opt" onclick="checkQ('q1',this,3)">D. 팩터 노출 차이 없음</label>
+<div class="quiz-feedback" id="q1-fb"></div>
 </div>
 
-<div class="def">
-<p class="ni"><strong>Q4. [멀티팩터]</strong> 가치 + 모멘텀 + 저변동성 3개 시그널을 결합한 멀티팩터 롱숏 전략을 구현하라. 개별 팩터 대비 멀티팩터의 샤프비율 개선을 확인하라.</p>
+<div class="quiz-box" id="q2">
+<h4>Q2. 팩터 틸팅에서 δ를 너무 크게 설정하면 발생하는 문제는?</h4>
+<label class="quiz-opt" onclick="checkQ('q2',this,0)">A. 추적오차가 0에 수렴</label>
+<label class="quiz-opt" onclick="checkQ('q2',this,1)">B. 추적오차가 과도하게 커지고 집중 위험 증가</label>
+<label class="quiz-opt" onclick="checkQ('q2',this,2)">C. 알파가 항상 증가</label>
+<label class="quiz-opt" onclick="checkQ('q2',this,3)">D. 거래비용이 감소</label>
+<div class="quiz-feedback" id="q2-fb"></div>
 </div>
+
+<div class="quiz-box" id="q3">
+<h4>Q3. 멀티팩터 전략이 단일 팩터 대비 유리한 이유는?</h4>
+<label class="quiz-opt" onclick="checkQ('q3',this,0)">A. 각 팩터의 프리미엄이 항상 양수이므로</label>
+<label class="quiz-opt" onclick="checkQ('q3',this,1)">B. 팩터 간 낮은 상관관계로 분산투자 효과</label>
+<label class="quiz-opt" onclick="checkQ('q3',this,2)">C. 거래비용이 0이므로</label>
+<label class="quiz-opt" onclick="checkQ('q3',this,3)">D. 레버리지를 사용하므로</label>
+<div class="quiz-feedback" id="q3-fb"></div>
+</div>
+
+<div class="quiz-box" id="q4">
+<h4>Q4. 팩터 타이밍이 어려운 주된 이유는?</h4>
+<label class="quiz-opt" onclick="checkQ('q4',this,0)">A. 팩터 프리미엄이 존재하지 않기 때문</label>
+<label class="quiz-opt" onclick="checkQ('q4',this,1)">B. 팩터 수익률의 예측 가능성이 매우 낮고 거래비용이 높기 때문</label>
+<label class="quiz-opt" onclick="checkQ('q4',this,2)">C. 모든 팩터가 동시에 움직이기 때문</label>
+<label class="quiz-opt" onclick="checkQ('q4',this,3)">D. 데이터가 부족하기 때문</label>
+<div class="quiz-feedback" id="q4-fb"></div>
+</div>
+
+<div class="quiz-box" id="q5">
+<h4>Q5. 롱숏 팩터 포트폴리오의 장점이 아닌 것은?</h4>
+<label class="quiz-opt" onclick="checkQ('q5',this,0)">A. 시장 중립 (β≈0)</label>
+<label class="quiz-opt" onclick="checkQ('q5',this,1)">B. 순수 팩터 프리미엄 추출</label>
+<label class="quiz-opt" onclick="checkQ('q5',this,2)">C. 공매도 비용과 제약이 없음</label>
+<label class="quiz-opt" onclick="checkQ('q5',this,3)">D. 팩터 노출의 정밀한 통제</label>
+<div class="quiz-feedback" id="q5-fb"></div>
+</div>
+
+<div class="quiz-score" id="quiz-score" style="display:none"></div>
+
+<script>
+var quizAnswers={q1:1,q2:1,q3:1,q4:1,q5:2};
+var quizExplain={
+  q1:'동일가중은 모든 주식에 같은 비중 → 시총가중 대비 소형주 비중 증가 → SMB+ 틸트. 이것이 동일가중 포트폴리오의 초과수익 원천 중 하나.',
+  q2:'δ가 크면 벤치마크에서 크게 벗어나 추적오차 증가, 소수 종목에 집중, 거래비용 증가. 실무에서는 δ를 TE 예산 내에서 제한.',
+  q3:'팩터 간 상관관계가 낮으면(예: Value와 Momentum은 음의 상관) 결합 시 TE 대비 α가 개선. IR = α/TE가 높아지는 분산투자 효과.',
+  q4:'팩터 수익률의 단기 예측 가능성은 매우 낮다. Ang은 팩터 타이밍보다 장기 팩터 노출 유지가 더 효과적이라고 강조. 빈번한 리밸런싱은 거래비용을 증가시킨다.',
+  q5:'롱숏 전략은 공매도가 필수이며, 공매도 비용(대차 수수료), 숏 스퀴즈 위험, 마진 요구 등의 제약이 있다. "비용과 제약이 없다"는 틀린 설명.'
+};
+var quizDone={},quizCorrect=0,quizTotal=5;
+function checkQ(qid,el,idx){
+  if(quizDone[qid])return;quizDone[qid]=true;
+  var box=document.getElementById(qid),opts=box.querySelectorAll('.quiz-opt'),correct=quizAnswers[qid];
+  el.classList.add(idx===correct?'correct-answer':'wrong-answer');
+  if(idx!==correct)opts[correct].classList.add('correct-answer');
+  box.classList.add(idx===correct?'correct':'wrong');
+  if(idx===correct)quizCorrect++;
+  var fb=document.getElementById(qid+'-fb');
+  fb.innerHTML=(idx===correct?'<span style="color:#27ae60">✓ 정답!</span> ':'<span style="color:#e74c3c">✗ 오답.</span> ')+quizExplain[qid];
+  fb.style.background=idx===correct?'#d4edda':'#f8d7da';fb.classList.add('show');
+  if(Object.keys(quizDone).length===quizTotal){var sc=document.getElementById('quiz-score');sc.style.display='block';var pct=Math.round(quizCorrect/quizTotal*100);var emoji=pct>=80?'🎉':pct>=60?'👍':'💪';sc.innerHTML=emoji+' <strong>'+quizCorrect+'/'+quizTotal+'</strong> ('+pct+'%) — '+(pct>=80?'훌륭합니다!':pct>=60?'좋아요, 복습하면 완벽!':'위의 Lab에서 다시 실험해보세요!');}
+}
+</script>
 
 <div class="info">
 <p class="ni"><strong>Pass 2 Preview:</strong> 거래비용 모델링, 팩터 크라우딩(crowding) 분석, 팩터 모멘텀과 반전, 실전 ETF 기반 팩터 포트폴리오 구축.</p>
