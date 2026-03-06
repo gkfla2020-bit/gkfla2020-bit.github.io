@@ -120,6 +120,7 @@ pre{font-size:11px;padding:14px}table{font-size:10px;display:block;overflow-x:au
 <li><a href="#ch5">5. 채권 팩터 모델</a></li>
 <li><a href="#ch6">6. 파이썬 구현: 수익률 곡선</a></li>
 <li><a href="#ch6d">6.4 통화정책 & 신용위험 (Ang Ch.9)</a></li>
+<li><a href="#interactive">🎮 직접 해보기</a></li>
 <li><a href="#ch7">7. Quiz</a></li>
 </ul>
 </div>
@@ -829,25 +830,336 @@ ig_ret = -<span class="nu">0.5</span>*rate_chg/<span class="nu">100</span> + <sp
 
 <h2 id="ch7">7. Quiz</h2>
 
-<div class="def">
-<p class="ni"><strong>Q1. [수익률 곡선]</strong> FRED에서 미국 국채 수익률 데이터(1Y, 2Y, 5Y, 10Y, 30Y)를 2000-2023 기간 다운로드하라. 10Y-2Y 스프레드의 시계열을 그리고, 경기침체(NBER recession) 기간과의 관계를 분석하라.</p>
+<!-- ═══════════════════════════════════════════ -->
+<!-- Interactive Learning Section -->
+<!-- ═══════════════════════════════════════════ -->
+<h2 id="interactive">🎮 직접 해보기 — Interactive Lab</h2>
+
+<h3>Lab 1. 듀레이션 & 볼록성 계산기</h3>
+<p class="ni">채권의 쿠폰, 만기, YTM을 조절하면서 듀레이션과 볼록성이 어떻게 변하는지 확인하세요. 금리 변동 시 1차 근사(듀레이션만)와 2차 근사(+볼록성)의 차이도 비교합니다.</p>
+
+<div style="background:#f0f4f8;padding:20px;border-radius:8px;margin:20px 0">
+<div style="display:flex;gap:16px;flex-wrap:wrap;margin-bottom:12px">
+<div>
+<label style="font-size:11px;color:#555">쿠폰 (%)</label><br>
+<input type="range" id="sl-cpn" min="0" max="8" step="0.5" value="3" style="width:100px">
+<span id="val-cpn" style="font-family:'Space Mono',monospace;font-size:12px">3.0%</span>
+</div>
+<div>
+<label style="font-size:11px;color:#555">만기 (년)</label><br>
+<input type="range" id="sl-mat" min="1" max="30" step="1" value="10" style="width:100px">
+<span id="val-mat" style="font-family:'Space Mono',monospace;font-size:12px">10</span>
+</div>
+<div>
+<label style="font-size:11px;color:#555">YTM (%)</label><br>
+<input type="range" id="sl-ytm" min="0.5" max="10" step="0.25" value="4" style="width:100px">
+<span id="val-ytm" style="font-family:'Space Mono',monospace;font-size:12px">4.0%</span>
+</div>
+<div>
+<label style="font-size:11px;color:#555">금리 변동 (bp)</label><br>
+<input type="range" id="sl-dy" min="-200" max="200" step="10" value="50" style="width:100px">
+<span id="val-dy" style="font-family:'Space Mono',monospace;font-size:12px">+50bp</span>
+</div>
+</div>
+<div id="plot-lab1r7" style="width:100%;height:380px"></div>
+<div id="lab1r7-info" style="font-family:'Space Mono',monospace;font-size:12px;margin-top:8px;padding:10px;background:#1e1e1e;color:#d4d4d4;border-radius:6px;line-height:1.8"></div>
 </div>
 
-<div class="def">
-<p class="ni"><strong>Q2. [PCA]</strong> 위 데이터에 PCA를 적용하여 Level, Slope, Curvature 팩터를 추출하라. 각 팩터의 설명력과 팩터 로딩 패턴을 시각화하라.</p>
+<script>
+(function(){
+  var sls={cpn:document.getElementById('sl-cpn'),mat:document.getElementById('sl-mat'),ytm:document.getElementById('sl-ytm'),dy:document.getElementById('sl-dy')};
+  var vls={cpn:document.getElementById('val-cpn'),mat:document.getElementById('val-mat'),ytm:document.getElementById('val-ytm'),dy:document.getElementById('val-dy')};
+  function draw(){
+    var cpn=parseFloat(sls.cpn.value)/100,T=parseInt(sls.mat.value),y=parseFloat(sls.ytm.value)/100,dy=parseInt(sls.dy.value)/10000;
+    vls.cpn.textContent=(cpn*100).toFixed(1)+'%';vls.mat.textContent=T;vls.ytm.textContent=(y*100).toFixed(1)+'%';
+    vls.dy.textContent=(dy>=0?'+':'')+Math.round(dy*10000)+'bp';
+    // bond price
+    function bondPrice(yy){var p=0;for(var t=1;t<=T;t++)p+=cpn*100/Math.pow(1+yy,t);p+=100/Math.pow(1+yy,T);return p;}
+    var P0=bondPrice(y);
+    // Macaulay duration
+    var macD=0;for(var t=1;t<=T;t++){var cf=(t<T?cpn*100:cpn*100+100);macD+=t*cf/Math.pow(1+y,t);}macD/=P0;
+    var modD=macD/(1+y);
+    // Convexity
+    var conv=0;for(var t=1;t<=T;t++){var cf=(t<T?cpn*100:cpn*100+100);conv+=t*(t+1)*cf/Math.pow(1+y,t+2);}conv/=P0;
+    // price changes
+    var P_actual=bondPrice(y+dy);
+    var dP_actual=(P_actual-P0)/P0*100;
+    var dP_dur=-modD*dy*100;
+    var dP_durconv=(-modD*dy+0.5*conv*dy*dy)*100;
+    // plot: price vs yield curve
+    var yields=[],prices=[],dur_approx=[],durconv_approx=[];
+    for(var yy=-200;yy<=200;yy+=5){
+      var dyy=yy/10000;
+      yields.push((y+dyy)*100);
+      prices.push((bondPrice(y+dyy)-P0)/P0*100);
+      dur_approx.push(-modD*dyy*100);
+      durconv_approx.push((-modD*dyy+0.5*conv*dyy*dyy)*100);
+    }
+    Plotly.react('plot-lab1r7',[
+      {x:yields,y:prices,name:'실제 가격 변화',line:{color:'#2c3e50',width:2.5}},
+      {x:yields,y:dur_approx,name:'1차 근사 (듀레이션)',line:{color:'#e74c3c',dash:'dash',width:1.5}},
+      {x:yields,y:durconv_approx,name:'2차 근사 (+볼록성)',line:{color:'#3498db',dash:'dot',width:1.5}},
+      {x:[(y+dy)*100],y:[dP_actual],name:'현재 Δy',mode:'markers',marker:{size:12,color:'#f39c12',symbol:'star'}}
+    ],{
+      title:'채권 가격 변화 (P₀='+P0.toFixed(2)+', D_mod='+modD.toFixed(2)+', C='+conv.toFixed(1)+')',
+      xaxis:{title:'YTM (%)'},yaxis:{title:'가격 변화 (%)'},
+      plot_bgcolor:'#fafaf8',paper_bgcolor:'#f0f4f8',font:{family:'Inter',size:12},
+      margin:{t:50,r:20,b:50,l:60}
+    },{responsive:true});
+    document.getElementById('lab1r7-info').innerHTML=
+      'P₀ = '+P0.toFixed(2)+' | D_Mac = '+macD.toFixed(2)+'년 | D_Mod = '+modD.toFixed(2)+' | Convexity = '+conv.toFixed(1)+'\n'+
+      'Δy = '+(dy>=0?'+':'')+Math.round(dy*10000)+'bp 일 때:\n'+
+      '  실제 ΔP/P = <span style="color:#2c3e50">'+dP_actual.toFixed(2)+'%</span>\n'+
+      '  1차 근사  = <span style="color:#e74c3c">'+dP_dur.toFixed(2)+'%</span> (오차: '+(dP_actual-dP_dur).toFixed(2)+'%p)\n'+
+      '  2차 근사  = <span style="color:#3498db">'+dP_durconv.toFixed(2)+'%</span> (오차: '+(dP_actual-dP_durconv).toFixed(2)+'%p)\n'+
+      '<span style="color:#6a9955">→ 볼록성 항이 큰 금리 변동에서 근사 정확도를 크게 개선</span>';
+  }
+  Object.keys(sls).forEach(function(k){sls[k].addEventListener('input',draw);});
+  setTimeout(draw,300);
+})();
+</script>
+
+<h3>Lab 2. 수익률 곡선 시뮬레이터 (Nelson-Siegel)</h3>
+<p class="ni">Nelson-Siegel 모델의 β₀(Level), β₁(Slope), β₂(Curvature), λ(감쇠 속도)를 조절하면서 수익률 곡선의 형태가 어떻게 변하는지 확인하세요.</p>
+
+<div style="background:#f0f4f8;padding:20px;border-radius:8px;margin:20px 0">
+<div style="display:flex;gap:16px;flex-wrap:wrap;margin-bottom:12px">
+<div>
+<label style="font-size:11px;color:#555">β₀ (Level, %)</label><br>
+<input type="range" id="sl-b0" min="1" max="8" step="0.25" value="4.5" style="width:100px">
+<span id="val-b0" style="font-family:'Space Mono',monospace;font-size:12px">4.50%</span>
+</div>
+<div>
+<label style="font-size:11px;color:#555">β₁ (Slope, %)</label><br>
+<input type="range" id="sl-b1" min="-5" max="3" step="0.25" value="-2" style="width:100px">
+<span id="val-b1" style="font-family:'Space Mono',monospace;font-size:12px">-2.00%</span>
+</div>
+<div>
+<label style="font-size:11px;color:#555">β₂ (Curvature, %)</label><br>
+<input type="range" id="sl-b2" min="-5" max="5" step="0.25" value="1" style="width:100px">
+<span id="val-b2" style="font-family:'Space Mono',monospace;font-size:12px">1.00%</span>
+</div>
+<div>
+<label style="font-size:11px;color:#555">λ (감쇠)</label><br>
+<input type="range" id="sl-lam" min="0.5" max="5" step="0.25" value="2" style="width:100px">
+<span id="val-lam" style="font-family:'Space Mono',monospace;font-size:12px">2.00</span>
+</div>
+</div>
+<div id="plot-lab2r7" style="width:100%;height:380px"></div>
+<div id="lab2r7-info" style="font-family:'Space Mono',monospace;font-size:12px;margin-top:8px;padding:10px;background:#1e1e1e;color:#d4d4d4;border-radius:6px;line-height:1.8"></div>
 </div>
 
-<div class="def">
-<p class="ni"><strong>Q3. [듀레이션]</strong> 액면가 100, 쿠폰 3%, 만기 10년, YTM 4%인 채권의 맥컬리 듀레이션, 수정 듀레이션, 볼록성을 계산하라. 금리가 50bp 상승할 때 1차 근사와 2차 근사의 가격 변화를 비교하라.</p>
+<script>
+(function(){
+  var sls={b0:document.getElementById('sl-b0'),b1:document.getElementById('sl-b1'),b2:document.getElementById('sl-b2'),lam:document.getElementById('sl-lam')};
+  var vls={b0:document.getElementById('val-b0'),b1:document.getElementById('val-b1'),b2:document.getElementById('val-b2'),lam:document.getElementById('val-lam')};
+  function draw2(){
+    var b0=parseFloat(sls.b0.value),b1=parseFloat(sls.b1.value),b2=parseFloat(sls.b2.value),lam=parseFloat(sls.lam.value);
+    vls.b0.textContent=b0.toFixed(2)+'%';vls.b1.textContent=b1.toFixed(2)+'%';vls.b2.textContent=b2.toFixed(2)+'%';vls.lam.textContent=lam.toFixed(2);
+    var taus=[],yields=[],f1_vals=[],f2_vals=[];
+    for(var tau=0.25;tau<=30;tau+=0.25){
+      var x=tau/lam;
+      var f1=(1-Math.exp(-x))/x;
+      var f2=f1-Math.exp(-x);
+      var y=b0+b1*f1+b2*f2;
+      taus.push(tau);yields.push(y);f1_vals.push(f1);f2_vals.push(f2);
+    }
+    // determine curve shape
+    var short_y=yields[0],long_y=yields[yields.length-1];
+    var mid_y=yields[Math.floor(yields.length/2)];
+    var shape='';
+    if(long_y>short_y+0.3) shape='정상 (우상향)';
+    else if(short_y>long_y+0.3) shape='역전 (우하향)';
+    else shape='평탄';
+    if(mid_y>Math.max(short_y,long_y)+0.2) shape+=' + 험프';
+    Plotly.react('plot-lab2r7',[
+      {x:taus,y:yields,name:'수익률 곡선',line:{color:'#2c3e50',width:2.5}},
+      {x:[0.25,2,5,10,30],y:[yields[0],yields[7],yields[19],yields[39],yields[yields.length-1]],name:'주요 만기',mode:'markers',marker:{size:8,color:'#e74c3c'}}
+    ],{
+      title:'Nelson-Siegel 수익률 곡선 (형태: '+shape+')',
+      xaxis:{title:'만기 (년)'},yaxis:{title:'수익률 (%)'},
+      plot_bgcolor:'#fafaf8',paper_bgcolor:'#f0f4f8',font:{family:'Inter',size:12},
+      margin:{t:50,r:20,b:50,l:60}
+    },{responsive:true});
+    document.getElementById('lab2r7-info').innerHTML=
+      '<span style="color:#6a9955">// y(τ) = β₀ + β₁·[(1-e^(-τ/λ))/(τ/λ)] + β₂·[(1-e^(-τ/λ))/(τ/λ) - e^(-τ/λ)]</span>\n'+
+      'β₀='+b0.toFixed(2)+'% (장기 수준), β₁='+b1.toFixed(2)+'% (기울기), β₂='+b2.toFixed(2)+'% (곡률), λ='+lam.toFixed(2)+'\n'+
+      '3M: '+yields[0].toFixed(2)+'% | 2Y: '+yields[7].toFixed(2)+'% | 10Y: '+yields[39].toFixed(2)+'% | 30Y: '+yields[yields.length-1].toFixed(2)+'%\n'+
+      '10Y-2Y 스프레드: '+(yields[39]-yields[7]).toFixed(2)+'%p | 곡선 형태: <span style="color:#569cd6">'+shape+'</span>';
+  }
+  Object.keys(sls).forEach(function(k){sls[k].addEventListener('input',draw2);});
+  setTimeout(draw2,400);
+})();
+</script>
+
+<h3>Lab 3. 신용 스프레드 & 채권 포트폴리오</h3>
+<p class="ni">국채 금리, 신용 스프레드, 포트폴리오 듀레이션을 조절하면서 투자등급(IG)과 하이일드(HY) 채권의 기대수익률과 위험을 비교하세요.</p>
+
+<div style="background:#f0f4f8;padding:20px;border-radius:8px;margin:20px 0">
+<div style="display:flex;gap:16px;flex-wrap:wrap;margin-bottom:12px">
+<div>
+<label style="font-size:11px;color:#555">국채 금리 (%)</label><br>
+<input type="range" id="sl-gov" min="1" max="6" step="0.25" value="4" style="width:100px">
+<span id="val-gov" style="font-family:'Space Mono',monospace;font-size:12px">4.0%</span>
+</div>
+<div>
+<label style="font-size:11px;color:#555">IG 스프레드 (bp)</label><br>
+<input type="range" id="sl-igs" min="50" max="300" step="10" value="120" style="width:100px">
+<span id="val-igs" style="font-family:'Space Mono',monospace;font-size:12px">120bp</span>
+</div>
+<div>
+<label style="font-size:11px;color:#555">HY 스프레드 (bp)</label><br>
+<input type="range" id="sl-hys" min="200" max="800" step="25" value="400" style="width:100px">
+<span id="val-hys" style="font-family:'Space Mono',monospace;font-size:12px">400bp</span>
+</div>
+<div>
+<label style="font-size:11px;color:#555">예상 부도율 HY (%)</label><br>
+<input type="range" id="sl-def" min="0.5" max="8" step="0.5" value="3" style="width:80px">
+<span id="val-def" style="font-family:'Space Mono',monospace;font-size:12px">3.0%</span>
+</div>
+</div>
+<div id="plot-lab3r7" style="width:100%;height:380px"></div>
+<div id="lab3r7-info" style="font-family:'Space Mono',monospace;font-size:12px;margin-top:8px;padding:10px;background:#1e1e1e;color:#d4d4d4;border-radius:6px;line-height:1.8"></div>
 </div>
 
-<div class="def">
-<p class="ni"><strong>Q4. [Nelson-Siegel]</strong> 2023년 12월 미국 국채 수익률 곡선에 Nelson-Siegel 모델을 피팅하라. β₀, β₁, β₂, λ 파라미터를 추정하고, 피팅된 곡선과 실제 데이터를 비교하라.</p>
+<script>
+(function(){
+  var sls={gov:document.getElementById('sl-gov'),igs:document.getElementById('sl-igs'),hys:document.getElementById('sl-hys'),def:document.getElementById('sl-def')};
+  var vls={gov:document.getElementById('val-gov'),igs:document.getElementById('val-igs'),hys:document.getElementById('val-hys'),def:document.getElementById('val-def')};
+  function draw3(){
+    var gov=parseFloat(sls.gov.value),igs=parseInt(sls.igs.value),hys=parseInt(sls.hys.value),defRate=parseFloat(sls.def.value);
+    vls.gov.textContent=gov.toFixed(1)+'%';vls.igs.textContent=igs+'bp';vls.hys.textContent=hys+'bp';vls.def.textContent=defRate.toFixed(1)+'%';
+    var igYield=gov+igs/100,hyYield=gov+hys/100;
+    var igDefRate=0.1; // IG default ~0.1%
+    var recovery=40; // 40% recovery
+    var igEL=igDefRate/100*(1-recovery/100)*100; // expected loss in bp
+    var hyEL=defRate/100*(1-recovery/100)*100;
+    var igExcess=igs/100-igEL;
+    var hyExcess=hys/100-hyEL;
+    var categories=['국채','IG 회사채','HY 회사채'];
+    var yields=[gov,igYield,hyYield];
+    var expectedLoss=[0,igEL,hyEL];
+    var excessSpread=[0,igExcess,hyExcess];
+    Plotly.react('plot-lab3r7',[
+      {x:categories,y:yields,name:'명목 수익률',type:'bar',marker:{color:'#3498db'}},
+      {x:categories,y:expectedLoss,name:'기대 손실 (EL)',type:'bar',marker:{color:'#e74c3c'}},
+      {x:categories,y:excessSpread,name:'초과 스프레드 (보상)',type:'bar',marker:{color:'#27ae60'}}
+    ],{
+      title:'채권 수익률 분해: 명목 vs 기대손실 vs 초과보상',barmode:'group',
+      yaxis:{title:'%'},
+      plot_bgcolor:'#fafaf8',paper_bgcolor:'#f0f4f8',font:{family:'Inter',size:12},
+      margin:{t:50,r:20,b:50,l:60}
+    },{responsive:true});
+    document.getElementById('lab3r7-info').innerHTML=
+      '<span style="color:#6a9955">// 신용 스프레드 = 기대손실(EL) + 신용위험 프리미엄(CRP) + 유동성 프리미엄(LP)</span>\n'+
+      'IG: 수익률 '+igYield.toFixed(2)+'% | 스프레드 '+(igs/100).toFixed(2)+'% | EL '+igEL.toFixed(2)+'% | 초과보상 '+igExcess.toFixed(2)+'%\n'+
+      'HY: 수익률 '+hyYield.toFixed(2)+'% | 스프레드 '+(hys/100).toFixed(2)+'% | EL '+hyEL.toFixed(2)+'% | 초과보상 '+hyExcess.toFixed(2)+'%\n'+
+      (hyExcess>igExcess?'<span style="color:#27ae60">→ HY 초과보상('+hyExcess.toFixed(2)+'%) > IG('+igExcess.toFixed(2)+'%) — 신용위험 감수 보상 존재</span>':
+       '<span style="color:#e74c3c">→ HY 초과보상이 IG보다 낮음 — 부도율 대비 스프레드 부족</span>');
+  }
+  Object.keys(sls).forEach(function(k){sls[k].addEventListener('input',draw3);});
+  setTimeout(draw3,500);
+})();
+</script>
+
+<!-- Quiz Section -->
+<h2 id="ch7">7. 객관식 퀴즈</h2>
+
+<style>
+.quiz-box{background:#fff;border:2px solid #e0e0e0;border-radius:8px;padding:20px;margin:16px 0;transition:border-color .3s}
+.quiz-box.correct{border-color:#27ae60;background:#f0fff4}
+.quiz-box.wrong{border-color:#e74c3c;background:#fff5f5}
+.quiz-box h4{margin:0 0 12px;font-size:14px}
+.quiz-opt{display:block;margin:6px 0;padding:8px 12px;border:1px solid #ddd;border-radius:6px;cursor:pointer;font-size:13px;transition:all .2s}
+.quiz-opt:hover{background:#f0f4f8;border-color:#3498db}
+.quiz-opt.selected{background:#e8f4f8;border-color:#3498db;font-weight:600}
+.quiz-opt.correct-answer{background:#d4edda;border-color:#27ae60}
+.quiz-opt.wrong-answer{background:#f8d7da;border-color:#e74c3c}
+.quiz-feedback{margin-top:10px;padding:10px;border-radius:6px;font-size:12px;display:none}
+.quiz-feedback.show{display:block}
+.quiz-score{text-align:center;padding:20px;background:#f8f9fa;border-radius:8px;margin:20px 0;font-size:16px}
+</style>
+
+<div class="quiz-box" id="q1">
+<h4>Q1. 수정 듀레이션(Modified Duration)이 7인 채권에서 금리가 100bp 상승하면 가격 변화의 1차 근사는?</h4>
+<label class="quiz-opt" onclick="checkQ('q1',this,0)">A. +7%</label>
+<label class="quiz-opt" onclick="checkQ('q1',this,1)">B. -7%</label>
+<label class="quiz-opt" onclick="checkQ('q1',this,2)">C. -0.7%</label>
+<label class="quiz-opt" onclick="checkQ('q1',this,3)">D. -70%</label>
+<div class="quiz-feedback" id="q1-fb"></div>
 </div>
 
-<div class="def">
-<p class="ni"><strong>Q5. [신용 스프레드]</strong> FRED에서 BAA-AAA 스프레드와 BAA-10Y Treasury 스프레드를 다운로드하라. 이 스프레드가 경기침체 전에 확대되는 패턴을 확인하고, VIX와의 상관관계를 분석하라.</p>
+<div class="quiz-box" id="q2">
+<h4>Q2. Nelson-Siegel 모델에서 β₁이 음수이면 수익률 곡선의 형태는?</h4>
+<label class="quiz-opt" onclick="checkQ('q2',this,0)">A. 역전 (우하향)</label>
+<label class="quiz-opt" onclick="checkQ('q2',this,1)">B. 정상 (우상향)</label>
+<label class="quiz-opt" onclick="checkQ('q2',this,2)">C. 평탄</label>
+<label class="quiz-opt" onclick="checkQ('q2',this,3)">D. 험프형</label>
+<div class="quiz-feedback" id="q2-fb"></div>
 </div>
+
+<div class="quiz-box" id="q3">
+<h4>Q3. 볼록성(Convexity)이 채권 투자자에게 유리한 이유는?</h4>
+<label class="quiz-opt" onclick="checkQ('q3',this,0)">A. 금리 하락 시 가격 상승폭이 금리 상승 시 가격 하락폭보다 크기 때문</label>
+<label class="quiz-opt" onclick="checkQ('q3',this,1)">B. 볼록성이 높으면 쿠폰이 높기 때문</label>
+<label class="quiz-opt" onclick="checkQ('q3',this,2)">C. 볼록성이 높으면 듀레이션이 낮기 때문</label>
+<label class="quiz-opt" onclick="checkQ('q3',this,3)">D. 볼록성은 항상 불리하다</label>
+<div class="quiz-feedback" id="q3-fb"></div>
+</div>
+
+<div class="quiz-box" id="q4">
+<h4>Q4. 수익률 곡선 PCA에서 첫 3개 주성분의 일반적인 설명력 비율은?</h4>
+<label class="quiz-opt" onclick="checkQ('q4',this,0)">A. PC1 50%, PC2 30%, PC3 20%</label>
+<label class="quiz-opt" onclick="checkQ('q4',this,1)">B. PC1 85-90%, PC2 5-10%, PC3 1-3%</label>
+<label class="quiz-opt" onclick="checkQ('q4',this,2)">C. 각각 33%씩 균등</label>
+<label class="quiz-opt" onclick="checkQ('q4',this,3)">D. PC1 99%, 나머지 무시 가능</label>
+<div class="quiz-feedback" id="q4-fb"></div>
+</div>
+
+<div class="quiz-box" id="q5">
+<h4>Q5. 신용 스프레드의 구성요소가 아닌 것은?</h4>
+<label class="quiz-opt" onclick="checkQ('q5',this,0)">A. 기대 손실 (Expected Loss)</label>
+<label class="quiz-opt" onclick="checkQ('q5',this,1)">B. 신용위험 프리미엄 (Credit Risk Premium)</label>
+<label class="quiz-opt" onclick="checkQ('q5',this,2)">C. 유동성 프리미엄 (Liquidity Premium)</label>
+<label class="quiz-opt" onclick="checkQ('q5',this,3)">D. 인플레이션 프리미엄 (Inflation Premium)</label>
+<div class="quiz-feedback" id="q5-fb"></div>
+</div>
+
+<div class="quiz-score" id="quiz-score" style="display:none"></div>
+
+<script>
+var quizAnswers={q1:1,q2:1,q3:0,q4:1,q5:3};
+var quizExplain={
+  q1:'ΔP/P ≈ -D_mod × Δy = -7 × 0.01 = -0.07 = -7%. 수정 듀레이션은 금리 1% 변동 시 가격 변화율의 근사치.',
+  q2:'β₁이 음수이면 단기 금리가 장기보다 낮아 우상향(정상) 곡선. y(0) = β₀+β₁ (단기), y(∞) = β₀ (장기). β₁<0이면 y(0)<y(∞).',
+  q3:'볼록성은 가격-금리 관계의 곡률. 양의 볼록성 덕분에 금리 하락 시 가격 상승폭 > 금리 상승 시 가격 하락폭. 같은 듀레이션이면 볼록성이 높은 채권이 유리.',
+  q4:'수익률 곡선 PCA에서 PC1(Level)이 85-90%, PC2(Slope)가 5-10%, PC3(Curvature)가 1-3%를 설명. 3개 팩터로 95%+ 설명 가능.',
+  q5:'신용 스프레드 = EL + CRP + LP. 인플레이션 프리미엄은 명목 국채 금리에 이미 포함되어 있으며, 신용 스프레드(회사채-국채)에서는 상쇄된다.'
+};
+var quizDone={},quizCorrect=0,quizTotal=5;
+function checkQ(qid,el,idx){
+  if(quizDone[qid])return;
+  quizDone[qid]=true;
+  var box=document.getElementById(qid);
+  var opts=box.querySelectorAll('.quiz-opt');
+  var correct=quizAnswers[qid];
+  el.classList.add(idx===correct?'correct-answer':'wrong-answer');
+  if(idx!==correct) opts[correct].classList.add('correct-answer');
+  box.classList.add(idx===correct?'correct':'wrong');
+  if(idx===correct) quizCorrect++;
+  var fb=document.getElementById(qid+'-fb');
+  fb.innerHTML=(idx===correct?'<span style="color:#27ae60">✓ 정답!</span> ':'<span style="color:#e74c3c">✗ 오답.</span> ')+quizExplain[qid];
+  fb.style.background=idx===correct?'#d4edda':'#f8d7da';
+  fb.classList.add('show');
+  if(Object.keys(quizDone).length===quizTotal){
+    var sc=document.getElementById('quiz-score');
+    sc.style.display='block';
+    var pct=Math.round(quizCorrect/quizTotal*100);
+    var emoji=pct>=80?'🎉':pct>=60?'👍':'💪';
+    sc.innerHTML=emoji+' <strong>'+quizCorrect+'/'+quizTotal+'</strong> ('+pct+'%) — '+(pct>=80?'훌륭합니다!':pct>=60?'좋아요, 복습하면 완벽!':'위의 Lab에서 다시 실험해보세요!');
+  }
+}
+</script>
 
 <h3>7.1 핵심 수식 요약</h3>
 
