@@ -1,0 +1,844 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Round 0 - Math & Python Foundations | Factor Investing Guide</title>
+<script>
+MathJax = { tex: { inlineMath: [['\\(','\\)']], displayMath: [['\\[','\\]'],['$$','$$']] } };
+</script>
+<script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;500&family=Space+Mono:wght@400&family=Inter:wght@300;400&display=swap" rel="stylesheet">
+<script src="https://cdn.plot.ly/plotly-2.27.0.min.js"></script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Inter',sans-serif;background:#fafaf8;color:#1a1a1a;line-height:1.7;overflow-x:hidden}
+.sidebar{position:fixed;left:0;top:0;width:260px;height:100vh;background:rgba(255,255,255,.97);border-right:1px solid rgba(0,0,0,.06);padding:32px 24px;z-index:100;overflow-y:auto;display:flex;flex-direction:column}
+.sidebar-profile{text-align:center;margin-bottom:28px;padding-bottom:24px;border-bottom:1px solid rgba(0,0,0,.08)}
+.profile-icon{font-size:48px;margin-bottom:8px}
+.profile-name{font-family:'Cormorant Garamond',serif;font-size:1.3rem;font-weight:500;margin-bottom:4px}
+.profile-title{font-size:.68rem;color:#888;letter-spacing:.08em;text-transform:uppercase;margin-bottom:8px}
+.profile-bio{font-size:.78rem;color:#666;line-height:1.5}
+.sidebar-nav{flex:1;margin-top:16px}.nav-section{margin-bottom:20px}.nav-section-title{font-size:.6rem;font-weight:600;color:#aaa;letter-spacing:.15em;text-transform:uppercase;margin-bottom:10px}.nav-list{list-style:none}.nav-list li{margin-bottom:5px}.nav-list a{font-size:.78rem;color:#555;text-decoration:none;transition:all .2s;display:block;padding:3px 0}.nav-list a:hover{color:#0080c6;padding-left:4px}.nav-list a.active{color:#0080c6;font-weight:500}.nav-list a.done{color:#28a745}.badge{display:inline-block;font-size:.5rem;background:#0080c6;color:#fff;padding:1px 5px;border-radius:8px;margin-left:3px;vertical-align:middle}.badge-done{background:#28a745}.sidebar-footer{padding-top:16px;border-top:1px solid rgba(0,0,0,.06);font-size:.65rem;color:#aaa;text-align:center}
+.main-wrapper{margin-left:260px;min-height:100vh}.container{max-width:1100px;margin:0 auto;padding:50px 40px 80px}
+.paper-content{font-family:'Times New Roman','Nanum Myeongjo',serif;line-height:1.8;background:#fff;padding:40px;border-radius:8px;box-shadow:0 2px 20px rgba(0,0,0,.05)}.paper-header{text-align:center;margin-bottom:40px;padding-bottom:30px;border-bottom:2px solid #333}.paper-category{font-size:14px;color:#666;margin-bottom:10px}.paper-title{font-size:24px;font-weight:bold;margin-bottom:12px;line-height:1.4}.paper-subtitle{font-size:14px;color:#555;margin-bottom:8px}.paper-team{font-size:13px;color:#444}
+.abstract{background:#f8f9fa;padding:25px;margin:30px 0;border-left:4px solid #2c3e50}.abstract-title{font-weight:bold;font-size:16px;margin-bottom:15px}
+h2{font-size:18px;margin:35px 0 20px;padding-bottom:8px;border-bottom:1px solid #ddd;color:#2c3e50}h3{font-size:15px;margin:25px 0 15px;color:#34495e}
+p{text-align:justify;margin-bottom:15px;text-indent:2em}p.ni{text-indent:0}
+table{width:100%;border-collapse:collapse;margin:20px 0;font-size:12px}th,td{border:1px solid #ddd;padding:10px 8px;text-align:center}th{background:#2c3e50;color:white;font-weight:bold}tr:nth-child(even){background:#f8f9fa}tr:hover{background:#e8f4f8}
+.tc{font-size:13px;font-weight:bold;margin:15px 0 10px;text-align:center}.eq{text-align:center;margin:20px 0;padding:15px;background:#f8f9fa;border-radius:4px;overflow-x:auto}ul,ol{margin-left:2em;margin-bottom:15px}li{margin-bottom:6px}
+.def{background:#fff9e6;border:1px solid #ffc107;border-radius:4px;padding:20px;margin:20px 0}.info{background:#e8f4f8;border-left:4px solid #3498db;padding:20px;margin:20px 0}.warn{background:#fff3cd;border-left:4px solid #f39c12;padding:20px;margin:20px 0}.ok{background:#d4edda;border-left:4px solid #28a745;padding:20px;margin:20px 0}
+pre{background:#1e1e1e;color:#d4d4d4;padding:20px;border-radius:6px;overflow-x:auto;margin:20px 0;font-family:'Space Mono','Consolas',monospace;font-size:13px;line-height:1.6}code{font-family:'Space Mono','Consolas',monospace;font-size:13px}p code,li code,td code{background:#f0f0f0;padding:2px 6px;border-radius:3px;color:#c7254e;font-size:12px}
+.cm{color:#6a9955}.kw{color:#569cd6}.st{color:#ce9178}.fn{color:#dcdcaa}.nb{color:#4ec9b0}.nu{color:#b5cea8}
+.progress-bar{width:100%;height:6px;background:#e0e0e0;border-radius:3px;margin-top:16px}.progress-fill{height:100%;background:linear-gradient(90deg,#0080c6,#00b894);border-radius:3px;width:0%}.progress-label{font-size:11px;color:#888;margin-top:4px;text-align:center}
+.code-output{background:#1e1e1e;color:#d4d4d4;padding:12px 16px;border-radius:0 0 6px 6px;font-family:'Space Mono',monospace;font-size:11.5px;line-height:1.6;margin-top:-4px;margin-bottom:18px;border-top:2px solid #333;white-space:pre-wrap;overflow-x:auto}.code-output .out-label{color:#888;font-size:10px;margin-bottom:4px;display:block}
+@media(max-width:1024px){.sidebar{width:100%;height:auto;position:relative;border-right:none;border-bottom:1px solid rgba(0,0,0,.08);padding:16px}.sidebar-profile{margin-bottom:10px;padding-bottom:10px;display:flex;align-items:center;gap:12px;text-align:left}.profile-icon{font-size:32px;margin-bottom:0}.profile-bio{display:none}.nav-section{display:inline-block;margin-right:16px;margin-bottom:8px}.nav-list{display:flex;gap:10px;flex-wrap:wrap}.nav-list li{margin-bottom:0}.sidebar-footer{display:none}.main-wrapper{margin-left:0}.container{padding:0}.paper-content{padding:20px 16px;border-radius:0;box-shadow:none}.paper-title{font-size:18px}p{font-size:14px;text-indent:1.5em;text-align:left}pre{font-size:11px;padding:14px}table{font-size:10px;display:block;overflow-x:auto}}
+</style>
+</head>
+<body>
+
+<div class="sidebar">
+<div class="sidebar-profile">
+<div class="profile-icon">&#x1F4CA;</div>
+<div class="profile-name">Factor Investing Guide</div>
+<div class="profile-title">Andrew Ang · Asset Management</div>
+<div class="profile-bio">13 Rounds: 수식 → 파이썬 코드 구현</div>
+</div>
+<div class="sidebar-nav">
+<div class="nav-section">
+<div class="nav-section-title">Curriculum</div>
+<ul class="nav-list">
+<li><a class="active" href="#">R0. Math & Python 기초 <span class="badge">NOW</span></a></li>
+<li><a href="../round-01/">R1. Preferences & Utility</a></li>
+<li><a href="../round-02/">R2. Mean-Variance</a></li>
+<li><a href="../round-03/">R3. Long-Run & Rebalancing</a></li>
+<li><a href="../round-04/">R4. Factor Theory & CAPM</a></li>
+<li><a href="../round-05/">R5. Fama-French</a></li>
+<li><a href="../round-06/">R6. Equity Premium</a></li>
+<li><a href="../round-07/">R7. Bond Factors</a></li>
+<li><a href="../round-08/">R8. Real Assets</a></li>
+<li><a href="../round-09/">R9. Alpha & Illiquidity</a></li>
+<li><a href="../round-10/">R10. Factor Strategies</a></li>
+<li><a href="../round-11/">R11. Fund Evaluation</a></li>
+<li><a href="../round-12/">R12. Integration Project</a></li>
+</ul>
+</div>
+<div class="nav-section">
+<div class="nav-section-title">This Lecture</div>
+<ul class="nav-list">
+<li><a href="#ch1">1. 수학 기호 읽는 법</a></li>
+<li><a href="#ch2">2. 시그마(Σ) 표기법</a></li>
+<li><a href="#ch3">3. 벡터와 행렬</a></li>
+<li><a href="#ch4">4. 미분과 최적화</a></li>
+<li><a href="#ch5">5. 확률과 통계</a></li>
+<li><a href="#ch6">6. 파이썬 기초</a></li>
+<li><a href="#ch7">7. NumPy & 행렬 연산</a></li>
+<li><a href="#interactive">🎮 직접 해보기</a></li>
+<li><a href="#ch8">8. Quiz</a></li>
+</ul>
+</div>
+</div>
+<div class="sidebar-footer">Round 0 of 12 · Prerequisite</div>
+</div>
+
+<div class="main-wrapper">
+<div class="container">
+<div class="paper-content">
+
+<div class="paper-header">
+<div class="paper-category">Round 0 / 12 · Prerequisite</div>
+<h1 class="paper-title">Math & Python Foundations</h1>
+<div class="paper-subtitle">이 가이드의 수식을 읽기 위한 수학 기초 + 파이썬 기초</div>
+<div class="paper-team">선수 지식: 고등학교 수학 수준</div>
+<div class="progress-bar"><div class="progress-fill" style="width:0%"></div></div>
+<div class="progress-label">Prerequisite Round</div>
+</div>
+
+<div class="abstract">
+<div class="abstract-title">이 라운드를 먼저 읽어야 하는 이유</div>
+<p class="ni">Round 1~12에서 나오는 수식에는 Σ, ∏, ‖·‖, ᵀ, ∂, ∈ 같은 기호가 자주 등장한다. 이것들이 뭔지 모르면 수식이 외계어처럼 보인다. 이 라운드에서는:</p>
+<ul>
+<li>수학 기호를 하나씩 "한국어로 번역"한다</li>
+<li>벡터·행렬의 기본 연산을 파이썬으로 직접 확인한다</li>
+<li>미분·최적화의 핵심 아이디어를 직관적으로 설명한다</li>
+<li>확률·통계의 기본 개념(평균, 분산, 공분산)을 정리한다</li>
+<li>파이썬/NumPy 기초를 다진다</li>
+</ul>
+</div>
+
+<h2 id="ch1">1. 수학 기호 읽는 법 — 기호 사전</h2>
+
+<p>수식에서 가장 먼저 막히는 건 "이 기호가 뭐지?"다. 아래 표를 북마크해두고 모를 때마다 돌아오자.</p>
+
+<div class="tc">Table 1.1. 이 가이드에서 자주 나오는 수학 기호</div>
+<table>
+<tr><th>기호</th><th>이름</th><th>읽는 법</th><th>의미</th><th>예시</th></tr>
+<tr><td>\(\sum\)</td><td>시그마 (대문자)</td><td>"합"</td><td>여러 개를 더하라</td><td>\(\sum_{i=1}^{3} x_i = x_1+x_2+x_3\)</td></tr>
+<tr><td>\(\prod\)</td><td>파이 (대문자)</td><td>"곱"</td><td>여러 개를 곱하라</td><td>\(\prod_{i=1}^{3} x_i = x_1 \cdot x_2 \cdot x_3\)</td></tr>
+<tr><td>\(\in\)</td><td>원소 기호</td><td>"~에 속한다"</td><td>집합의 원소</td><td>\(x \in \mathbb{R}\) = "x는 실수"</td></tr>
+<tr><td>\(\forall\)</td><td>전칭 기호</td><td>"모든"</td><td>모든 원소에 대해</td><td>\(\forall i\) = "모든 i에 대해"</td></tr>
+<tr><td>\(\partial\)</td><td>편미분 기호</td><td>"편미분"</td><td>다른 변수 고정하고 하나만 미분</td><td>\(\frac{\partial f}{\partial x}\)</td></tr>
+<tr><td>\(\nabla\)</td><td>나블라/그래디언트</td><td>"그래디언트"</td><td>모든 편미분을 벡터로 모은 것</td><td>\(\nabla f = \left(\frac{\partial f}{\partial x_1}, \ldots\right)\)</td></tr>
+<tr><td>\(\approx\)</td><td>근사 기호</td><td>"약"</td><td>대략 같다</td><td>\(\pi \approx 3.14\)</td></tr>
+<tr><td>\(\propto\)</td><td>비례 기호</td><td>"비례한다"</td><td>상수배 차이</td><td>\(y \propto x\) = "y는 x에 비례"</td></tr>
+<tr><td>\(\sim\)</td><td>틸다</td><td>"~를 따른다"</td><td>확률분포</td><td>\(X \sim N(0,1)\) = "X는 표준정규분포"</td></tr>
+<tr><td>\(\mathbb{E}[\cdot]\)</td><td>기댓값</td><td>"기댓값" / "E of"</td><td>평균값</td><td>\(E[X] = \mu\)</td></tr>
+<tr><td>\(\text{Var}(\cdot)\)</td><td>분산</td><td>"분산"</td><td>흩어진 정도의 제곱</td><td>\(\text{Var}(X) = \sigma^2\)</td></tr>
+<tr><td>\(\text{Cov}(\cdot,\cdot)\)</td><td>공분산</td><td>"공분산"</td><td>두 변수가 함께 움직이는 정도</td><td>\(\text{Cov}(X,Y) = \sigma_{XY}\)</td></tr>
+</table>
+
+<h3>1.2 위첨자·아래첨자·특수 표기</h3>
+
+<div class="tc">Table 1.2. 위첨자/아래첨자/특수 표기</div>
+<table>
+<tr><th>표기</th><th>읽는 법</th><th>의미</th><th>이 가이드에서의 용례</th></tr>
+<tr><td>\(x^2\)</td><td>"x 제곱"</td><td>x × x</td><td>\(\sigma^2\) = 분산</td></tr>
+<tr><td>\(x^T\) 또는 \(x'\)</td><td>"x 전치" / "x 트랜스포즈"</td><td>행↔열 뒤집기</td><td>\(\mathbf{w}^T \boldsymbol{\mu}\) = 비중 벡터와 수익률 벡터의 내적</td></tr>
+<tr><td>\(x^{-1}\)</td><td>"x 인버스" / "x의 역"</td><td>역수 또는 역행렬</td><td>\(\boldsymbol{\Sigma}^{-1}\) = 공분산 행렬의 역행렬</td></tr>
+<tr><td>\(x_i\)</td><td>"x sub i"</td><td>i번째 원소</td><td>\(r_i\) = i번째 자산의 수익률</td></tr>
+<tr><td>\(x_{i,t}\)</td><td>"x sub i, t"</td><td>i번째 자산의 t시점 값</td><td>\(r_{i,t}\) = 자산 i의 t월 수익률</td></tr>
+<tr><td>\(\hat{x}\)</td><td>"x 햇"</td><td>추정값 (데이터에서 계산한 값)</td><td>\(\hat{\beta}\) = OLS로 추정한 베타</td></tr>
+<tr><td>\(\bar{x}\)</td><td>"x 바"</td><td>평균</td><td>\(\bar{r}\) = 평균 수익률</td></tr>
+<tr><td>\(\|x\|\)</td><td>"x의 노름"</td><td>벡터의 크기(길이)</td><td>\(\|\mathbf{w}\|_2 = \sqrt{\sum w_i^2}\)</td></tr>
+<tr><td>\(|x|\)</td><td>"x의 절대값"</td><td>부호 무시한 크기</td><td>\(|r_t|\) = 수익률의 절대값</td></tr>
+<tr><td>\(\mathbf{1}\)</td><td>"원 벡터"</td><td>모든 원소가 1인 벡터</td><td>\(\mathbf{w}^T \mathbf{1} = 1\) = 비중의 합이 1</td></tr>
+</table>
+
+<div class="warn">
+<p class="ni"><strong>헷갈리기 쉬운 것들:</strong></p>
+<ul>
+<li>\(\|x\|\) (이중 세로선) = 노름(크기) vs \(|x|\) (단일 세로선) = 절대값. 벡터에는 노름, 스칼라에는 절대값.</li>
+<li>\(x^T\) = 전치(transpose) vs \(x^2\) = 제곱. T는 이탤릭이 아니라 로만체(직립)로 쓴다.</li>
+<li>\(\Sigma\) (대문자 시그마) = 공분산 행렬 vs \(\sigma\) (소문자 시그마) = 표준편차. 대소문자가 완전히 다른 의미!</li>
+<li>\(\boldsymbol{\mu}\) (볼드 뮤) = 수익률 벡터 vs \(\mu\) (일반 뮤) = 스칼라 평균</li>
+</ul>
+</div>
+
+<h2 id="ch2">2. 시그마(Σ) 표기법 — "더하기의 축약"</h2>
+
+<p>이 가이드에서 가장 많이 나오는 기호가 \(\sum\)이다. 겁먹을 필요 없다 — 그냥 "더하기를 반복하라"는 뜻이다.</p>
+
+<div class="def">
+<p class="ni"><strong>Definition 2.1 — 시그마 표기법</strong></p>
+<div class="eq">\[ \sum_{i=1}^{N} x_i = x_1 + x_2 + x_3 + \cdots + x_N \]</div>
+<p class="ni" style="font-size:12px;color:#555;margin:4px 0 8px 0">↑ "i=1부터 N까지 x_i를 전부 더하라." 아래(i=1)는 시작점, 위(N)는 끝점. i는 "인덱스 변수"로, 1부터 N까지 하나씩 바뀐다.</p>
+</div>
+
+<p class="ni"><strong>실전 예시 — 포트폴리오 수익률:</strong></p>
+<div class="eq">\[ r_p = \sum_{i=1}^{N} w_i \cdot r_i = w_1 r_1 + w_2 r_2 + \cdots + w_N r_N \]</div>
+<p class="ni" style="font-size:12px;color:#555;margin:4px 0 8px 0">↑ "포트폴리오 수익률 = 각 자산의 (비중 × 수익률)을 전부 더한 것." w_i는 i번째 자산의 비중, r_i는 수익률. 이게 R2에서 나오는 핵심 공식이다.</p>
+
+<p class="ni"><strong>이중 시그마:</strong></p>
+<div class="eq">\[ \sigma_p^2 = \sum_{i=1}^{N}\sum_{j=1}^{N} w_i w_j \sigma_{ij} \]</div>
+<p class="ni" style="font-size:12px;color:#555;margin:4px 0 8px 0">↑ "포트폴리오 분산 = 모든 자산 쌍(i,j)에 대해 (비중i × 비중j × 공분산ij)를 더한 것." 이중 for문과 같다. 이게 R2 평균-분산 최적화의 핵심.</p>
+
+<pre><code><span class="cm"># 시그마 표기법 → 파이썬</span>
+<span class="kw">import</span> numpy <span class="kw">as</span> np
+
+x = np.array([<span class="nu">3</span>, <span class="nu">7</span>, <span class="nu">2</span>, <span class="nu">5</span>])
+
+<span class="cm"># Σ x_i (i=1 to 4)</span>
+total = np.sum(x)           <span class="cm"># = 3+7+2+5 = 17</span>
+<span class="fn">print</span>(<span class="st">f"Σ x_i = {total}"</span>)
+
+<span class="cm"># Σ x_i² (각 원소를 제곱한 뒤 합)</span>
+sum_sq = np.sum(x**<span class="nu">2</span>)      <span class="cm"># = 9+49+4+25 = 87</span>
+<span class="fn">print</span>(<span class="st">f"Σ x_i² = {sum_sq}"</span>)
+
+<span class="cm"># 포트폴리오 수익률: Σ w_i * r_i</span>
+w = np.array([<span class="nu">0.4</span>, <span class="nu">0.3</span>, <span class="nu">0.2</span>, <span class="nu">0.1</span>])
+r = np.array([<span class="nu">0.10</span>, <span class="nu">0.06</span>, <span class="nu">0.04</span>, <span class="nu">0.02</span>])
+r_p = np.sum(w * r)          <span class="cm"># = w @ r (내적)</span>
+<span class="fn">print</span>(<span class="st">f"포트폴리오 수익률 = {r_p:.2%}"</span>)</code></pre>
+<div class="code-output"><span class="out-label">Output:</span>
+Σ x_i = 17
+Σ x_i² = 87
+포트폴리오 수익률 = 7.00%</div>
+
+<h2 id="ch3">3. 벡터와 행렬 — 숫자를 묶어서 다루기</h2>
+
+<h3>3.1 벡터 (Vector)</h3>
+
+<p>벡터는 숫자를 세로로 나열한 것이다. 이 가이드에서 볼드체(\(\mathbf{w}\))로 쓰면 벡터다.</p>
+
+<div class="def">
+<p class="ni"><strong>Definition 3.1 — 벡터</strong></p>
+<div class="eq">\[ \mathbf{w} = \begin{pmatrix} w_1 \\ w_2 \\ w_3 \end{pmatrix} \quad \text{예: 포트폴리오 비중} \quad \mathbf{w} = \begin{pmatrix} 0.5 \\ 0.3 \\ 0.2 \end{pmatrix} \]</div>
+<p class="ni" style="font-size:12px;color:#555;margin:4px 0 8px 0">↑ 3개 자산의 비중을 하나의 벡터로 표현. w₁=50%, w₂=30%, w₃=20%. 파이썬에서는 np.array([0.5, 0.3, 0.2]).</p>
+</div>
+
+<h3>3.2 전치 (Transpose, ᵀ)</h3>
+
+<p class="ni">세로 벡터를 가로로 눕히는 것이 전치(transpose)다. \(\mathbf{w}^T\)라고 쓴다.</p>
+
+<div class="eq">\[ \mathbf{w} = \begin{pmatrix} 0.5 \\ 0.3 \\ 0.2 \end{pmatrix} \quad \Rightarrow \quad \mathbf{w}^T = \begin{pmatrix} 0.5 & 0.3 & 0.2 \end{pmatrix} \]</div>
+<p class="ni" style="font-size:12px;color:#555;margin:4px 0 8px 0">↑ 세로(열 벡터) → 가로(행 벡터). 행렬 곱셈을 하려면 차원을 맞춰야 하는데, 전치가 그 역할을 한다.</p>
+
+<h3>3.3 내적 (Dot Product)</h3>
+
+<p class="ni">두 벡터를 "원소끼리 곱해서 합"하는 것이 내적이다. \(\mathbf{w}^T \boldsymbol{\mu}\) 또는 \(\mathbf{w} \cdot \boldsymbol{\mu}\)로 쓴다.</p>
+
+<div class="eq">\[ \mathbf{w}^T \boldsymbol{\mu} = \begin{pmatrix} 0.5 & 0.3 & 0.2 \end{pmatrix} \begin{pmatrix} 0.10 \\ 0.06 \\ 0.04 \end{pmatrix} = 0.5 \times 0.10 + 0.3 \times 0.06 + 0.2 \times 0.04 = 0.076 \]</div>
+<p class="ni" style="font-size:12px;color:#555;margin:4px 0 8px 0">↑ 이게 바로 포트폴리오 기대수익률! w^T μ = Σ w_i μ_i. 파이썬에서는 w @ mu 또는 np.dot(w, mu).</p>
+
+<h3>3.4 행렬 (Matrix)</h3>
+
+<p>행렬은 숫자를 직사각형으로 배열한 것이다. 이 가이드에서 가장 중요한 행렬은 공분산 행렬 \(\boldsymbol{\Sigma}\)다.</p>
+
+<div class="def">
+<p class="ni"><strong>Definition 3.4 — 공분산 행렬</strong></p>
+<div class="eq">\[ \boldsymbol{\Sigma} = \begin{pmatrix} \sigma_1^2 & \sigma_{12} & \sigma_{13} \\ \sigma_{21} & \sigma_2^2 & \sigma_{23} \\ \sigma_{31} & \sigma_{32} & \sigma_3^2 \end{pmatrix} \]</div>
+<p class="ni" style="font-size:12px;color:#555;margin:4px 0 8px 0">↑ 대각선 = 각 자산의 분산(σ²). 비대각선 = 두 자산 간 공분산(σ_ij). 대칭 행렬이다(σ_ij = σ_ji). N개 자산이면 N×N 크기. 이 행렬이 R2 평균-분산 최적화의 핵심 입력.</p>
+</div>
+
+<h3>3.5 행렬-벡터 곱 & 이차형식</h3>
+
+<p class="ni">포트폴리오 분산은 "이차형식(quadratic form)"으로 표현된다:</p>
+
+<div class="eq">\[ \sigma_p^2 = \mathbf{w}^T \boldsymbol{\Sigma} \mathbf{w} \]</div>
+<p class="ni" style="font-size:12px;color:#555;margin:4px 0 8px 0">↑ 이걸 풀어쓰면 Σ_i Σ_j w_i w_j σ_ij. "비중 벡터로 공분산 행렬을 양쪽에서 곱한다." 결과는 스칼라(숫자 하나) = 포트폴리오의 분산.</p>
+
+<pre><code><span class="kw">import</span> numpy <span class="kw">as</span> np
+
+<span class="cm"># === 벡터와 행렬 연산 ===</span>
+w = np.array([<span class="nu">0.5</span>, <span class="nu">0.3</span>, <span class="nu">0.2</span>])
+mu = np.array([<span class="nu">0.10</span>, <span class="nu">0.06</span>, <span class="nu">0.04</span>])
+
+<span class="cm"># 공분산 행렬 (3×3)</span>
+Sigma = np.array([
+    [<span class="nu">0.04</span>,  <span class="nu">0.006</span>, <span class="nu">0.002</span>],
+    [<span class="nu">0.006</span>, <span class="nu">0.01</span>,  <span class="nu">0.004</span>],
+    [<span class="nu">0.002</span>, <span class="nu">0.004</span>, <span class="nu">0.005</span>]
+])
+
+<span class="cm"># 내적: w^T μ = 포트폴리오 기대수익률</span>
+r_p = w @ mu
+<span class="fn">print</span>(<span class="st">f"w^T μ = {r_p:.4f} = {r_p:.2%}"</span>)
+
+<span class="cm"># 이차형식: w^T Σ w = 포트폴리오 분산</span>
+var_p = w @ Sigma @ w
+<span class="fn">print</span>(<span class="st">f"w^T Σ w = {var_p:.6f}"</span>)
+<span class="fn">print</span>(<span class="st">f"포트폴리오 변동성 σ_p = {np.sqrt(var_p):.2%}"</span>)
+
+<span class="cm"># 전치 확인</span>
+<span class="fn">print</span>(<span class="st">f"\nw (shape): {w.shape}"</span>)
+<span class="fn">print</span>(<span class="st">f"Sigma (shape): {Sigma.shape}"</span>)
+<span class="fn">print</span>(<span class="st">f"Sigma는 대칭? {np.allclose(Sigma, Sigma.T)}"</span>)</code></pre>
+<div class="code-output"><span class="out-label">Output:</span>
+w^T μ = 0.0760 = 7.60%
+w^T Σ w = 0.013540
+포트폴리오 변동성 σ_p = 11.64%
+
+w (shape): (3,)
+Sigma (shape): (3, 3)
+Sigma는 대칭? True</div>
+
+<h3>3.6 역행렬 (Inverse Matrix)</h3>
+
+<p class="ni">역행렬 \(\mathbf{A}^{-1}\)은 "원래 행렬의 효과를 되돌리는" 행렬이다. \(\mathbf{A} \mathbf{A}^{-1} = \mathbf{I}\) (단위행렬).</p>
+
+<div class="eq">\[ \mathbf{A} \mathbf{A}^{-1} = \mathbf{I} = \begin{pmatrix} 1 & 0 & 0 \\ 0 & 1 & 0 \\ 0 & 0 & 1 \end{pmatrix} \]</div>
+<p class="ni" style="font-size:12px;color:#555;margin:4px 0 8px 0">↑ 단위행렬 I는 "아무것도 안 하는" 행렬. 숫자에서 1과 같은 역할. R2의 접선 포트폴리오 공식에서 Σ⁻¹이 나오는 이유: 공분산의 효과를 "풀어서" 최적 비중을 구하기 위해.</p>
+
+<pre><code><span class="cm"># 역행렬</span>
+Sigma_inv = np.linalg.inv(Sigma)
+<span class="fn">print</span>(<span class="st">"Σ⁻¹ ="</span>)
+<span class="fn">print</span>(np.round(Sigma_inv, <span class="nu">2</span>))
+
+<span class="cm"># 검증: Σ × Σ⁻¹ = I</span>
+I = Sigma @ Sigma_inv
+<span class="fn">print</span>(<span class="st">f"\nΣ × Σ⁻¹ ≈ I? {np.allclose(I, np.eye(3))}"</span>)</code></pre>
+<div class="code-output"><span class="out-label">Output:</span>
+Σ⁻¹ =
+[[ 29.41  -11.76  -11.76]
+ [-11.76  129.41  -88.24]
+ [-11.76  -88.24  282.35]]
+
+Σ × Σ⁻¹ ≈ I? True</div>
+
+<h3>3.7 노름 (Norm) — 벡터의 "크기"</h3>
+
+<p class="ni">노름은 벡터의 길이(크기)를 재는 방법이다. R2의 정규화(Ridge, Lasso)에서 핵심적으로 사용된다.</p>
+
+<div class="def">
+<p class="ni"><strong>Definition 3.7 — L1, L2 노름</strong></p>
+<div class="eq">\[ \|\mathbf{w}\|_1 = \sum_{i=1}^{N} |w_i| = |w_1| + |w_2| + \cdots + |w_N| \quad \text{(L1 노름: 절대값의 합)} \]</div>
+<div class="eq">\[ \|\mathbf{w}\|_2 = \sqrt{\sum_{i=1}^{N} w_i^2} = \sqrt{w_1^2 + w_2^2 + \cdots + w_N^2} \quad \text{(L2 노름: 유클리드 거리)} \]</div>
+<p class="ni" style="font-size:12px;color:#555;margin:4px 0 8px 0">↑ L1 노름 = 맨해튼 거리 (블록 따라 걷기). L2 노름 = 직선 거리 (피타고라스). ‖w‖₂² = w₁²+w₂²+...+wₙ² (제곱 노름, Ridge에서 사용).</p>
+</div>
+
+<pre><code>w = np.array([<span class="nu">0.5</span>, -<span class="nu">0.3</span>, <span class="nu">0.2</span>])
+
+<span class="fn">print</span>(<span class="st">f"L1 노름 ‖w‖₁ = {np.linalg.norm(w, 1):.2f}"</span>)   <span class="cm"># |0.5|+|-0.3|+|0.2| = 1.0</span>
+<span class="fn">print</span>(<span class="st">f"L2 노름 ‖w‖₂ = {np.linalg.norm(w, 2):.4f}"</span>)  <span class="cm"># √(0.25+0.09+0.04)</span>
+<span class="fn">print</span>(<span class="st">f"L2² ‖w‖₂² = {np.sum(w**2):.4f}"</span>)            <span class="cm"># Ridge 페널티에 사용</span></code></pre>
+<div class="code-output"><span class="out-label">Output:</span>
+L1 노름 ‖w‖₁ = 1.00
+L2 노름 ‖w‖₂ = 0.6164
+L2² ‖w‖₂² = 0.3800</div>
+
+<h2 id="ch4">4. 미분과 최적화 — "최적값 찾기"</h2>
+
+<h3>4.1 미분의 직관</h3>
+
+<p>미분은 "함수가 얼마나 빠르게 변하는가"를 측정한다. 기울기(slope)라고 생각하면 된다.</p>
+
+<div class="def">
+<p class="ni"><strong>Definition 4.1 — 미분</strong></p>
+<div class="eq">\[ f'(x) = \frac{df}{dx} = \lim_{h \to 0} \frac{f(x+h) - f(x)}{h} \]</div>
+<p class="ni" style="font-size:12px;color:#555;margin:4px 0 8px 0">↑ "x가 아주 조금(h) 변할 때, f가 얼마나 변하는가." f'(x)>0이면 증가 중, f'(x)<0이면 감소 중, f'(x)=0이면 꼭짓점(최대 또는 최소).</p>
+</div>
+
+<p class="ni"><strong>자주 쓰는 미분 공식:</strong></p>
+<div class="tc">Table 4.1. 핵심 미분 공식</div>
+<table>
+<tr><th>함수 \(f(x)\)</th><th>미분 \(f'(x)\)</th><th>예시</th></tr>
+<tr><td>\(x^n\)</td><td>\(nx^{n-1}\)</td><td>\((x^2)' = 2x\)</td></tr>
+<tr><td>\(e^x\)</td><td>\(e^x\)</td><td>자기 자신! 연속 복리에서 등장</td></tr>
+<tr><td>\(\ln(x)\)</td><td>\(1/x\)</td><td>로그 수익률에서 등장</td></tr>
+<tr><td>\(af(x)+bg(x)\)</td><td>\(af'(x)+bg'(x)\)</td><td>선형성: 합의 미분 = 미분의 합</td></tr>
+</table>
+
+<h3>4.2 편미분 (Partial Derivative)</h3>
+
+<p class="ni">변수가 여러 개일 때, 하나만 변화시키고 나머지는 고정하는 것이 편미분이다.</p>
+
+<div class="eq">\[ f(x,y) = x^2 + 3xy + y^2 \]</div>
+<div class="eq">\[ \frac{\partial f}{\partial x} = 2x + 3y \quad \text{(y를 상수 취급하고 x로 미분)} \]</div>
+<div class="eq">\[ \frac{\partial f}{\partial y} = 3x + 2y \quad \text{(x를 상수 취급하고 y로 미분)} \]</div>
+<p class="ni" style="font-size:12px;color:#555;margin:4px 0 8px 0">↑ ∂f/∂x는 "x 방향으로의 기울기." R2의 라그랑주 최적화에서 ∂L/∂w = 0을 풀어서 최적 비중을 구한다.</p>
+
+<h3>4.3 최적화: "미분 = 0"</h3>
+
+<p class="ni">함수의 최솟값(또는 최댓값)은 미분이 0인 점에서 발생한다. 이것이 포트폴리오 최적화의 핵심 원리다.</p>
+
+<div class="eq">\[ \min_w f(w) \quad \Rightarrow \quad \frac{df}{dw} = 0 \quad \text{을 풀면 최적 } w^* \text{를 얻는다} \]</div>
+<p class="ni" style="font-size:12px;color:#555;margin:4px 0 8px 0">↑ R1의 최적 비중 공식 w* = (μ-r_f)/(γσ²)도 효용함수를 w로 미분해서 0으로 놓고 풀어서 나온 것이다.</p>
+
+<pre><code><span class="cm"># === 최적화 예시: 포트폴리오 효용 극대화 ===</span>
+<span class="cm"># U(w) = w*μ - (γ/2)*w²*σ² → dU/dw = μ - γ*w*σ² = 0</span>
+<span class="cm"># → w* = μ/(γ*σ²)</span>
+
+mu_excess = <span class="nu">0.08</span>   <span class="cm"># 초과수익률 8%</span>
+gamma = <span class="nu">5</span>           <span class="cm"># 위험회피계수</span>
+sigma2 = <span class="nu">0.04</span>       <span class="cm"># 분산 (σ=20%)</span>
+
+w_star = mu_excess / (gamma * sigma2)
+<span class="fn">print</span>(<span class="st">f"최적 비중 w* = {mu_excess} / ({gamma} × {sigma2}) = {w_star:.0%}"</span>)
+<span class="fn">print</span>(<span class="st">f"→ 위험자산에 {w_star:.0%}, 무위험자산에 {1-w_star:.0%} 배분"</span>)</code></pre>
+<div class="code-output"><span class="out-label">Output:</span>
+최적 비중 w* = 0.08 / (5 × 0.04) = 40%
+→ 위험자산에 40%, 무위험자산에 60% 배분</div>
+
+<h2 id="ch5">5. 확률과 통계 — 수익률 분석의 언어</h2>
+
+<h3>5.1 기댓값, 분산, 표준편차</h3>
+
+<div class="def">
+<p class="ni"><strong>Definition 5.1 — 기댓값 (Expected Value)</strong></p>
+<div class="eq">\[ E[X] = \mu = \frac{1}{T}\sum_{t=1}^{T} x_t \]</div>
+<p class="ni" style="font-size:12px;color:#555;margin:4px 0 8px 0">↑ 기댓값 = 평균. T개의 관측치를 전부 더해서 T로 나눈 것. 수익률의 기댓값 = 평균 수익률.</p>
+</div>
+
+<div class="def">
+<p class="ni"><strong>Definition 5.2 — 분산 (Variance)</strong></p>
+<div class="eq">\[ \text{Var}(X) = \sigma^2 = \frac{1}{T-1}\sum_{t=1}^{T} (x_t - \bar{x})^2 \]</div>
+<p class="ni" style="font-size:12px;color:#555;margin:4px 0 8px 0">↑ 분산 = "평균에서 얼마나 떨어져 있는가"의 평균. (x_t - x̄)²은 편차의 제곱. T-1로 나누는 건 표본 보정(Bessel's correction). 분산이 크면 = 변동이 크다 = 위험하다.</p>
+</div>
+
+<div class="def">
+<p class="ni"><strong>Definition 5.3 — 표준편차 (Standard Deviation)</strong></p>
+<div class="eq">\[ \sigma = \sqrt{\text{Var}(X)} = \sqrt{\sigma^2} \]</div>
+<p class="ni" style="font-size:12px;color:#555;margin:4px 0 8px 0">↑ 표준편차 = 분산의 제곱근. 단위가 원래 데이터와 같아서 해석이 쉽다. "변동성(volatility)"이라고도 부른다. 월간 σ를 연간으로 바꾸려면 × √12.</p>
+</div>
+
+<h3>5.2 공분산과 상관계수</h3>
+
+<div class="def">
+<p class="ni"><strong>Definition 5.4 — 공분산 (Covariance)</strong></p>
+<div class="eq">\[ \text{Cov}(X,Y) = \sigma_{XY} = \frac{1}{T-1}\sum_{t=1}^{T}(x_t - \bar{x})(y_t - \bar{y}) \]</div>
+<p class="ni" style="font-size:12px;color:#555;margin:4px 0 8px 0">↑ 두 변수가 "함께 움직이는 정도." 양수 = 같은 방향, 음수 = 반대 방향, 0 = 무관. 단위가 두 변수의 곱이라 크기 해석이 어렵다 → 상관계수로 정규화.</p>
+</div>
+
+<div class="def">
+<p class="ni"><strong>Definition 5.5 — 상관계수 (Correlation)</strong></p>
+<div class="eq">\[ \rho_{XY} = \frac{\text{Cov}(X,Y)}{\sigma_X \cdot \sigma_Y} = \frac{\sigma_{XY}}{\sigma_X \sigma_Y} \]</div>
+<p class="ni" style="font-size:12px;color:#555;margin:4px 0 8px 0">↑ 공분산을 각각의 표준편차로 나눠서 -1 ≤ ρ ≤ 1로 정규화. ρ=1 완전 양의 상관, ρ=-1 완전 음의 상관, ρ=0 무상관. R2에서 ρ가 낮을수록 분산투자 효과가 크다.</p>
+</div>
+
+<pre><code><span class="kw">import</span> numpy <span class="kw">as</span> np
+
+<span class="cm"># === 기댓값, 분산, 공분산, 상관계수 ===</span>
+np.random.seed(<span class="nu">42</span>)
+stock = np.random.normal(<span class="nu">0.01</span>, <span class="nu">0.05</span>, <span class="nu">60</span>)   <span class="cm"># 60개월 주식 수익률</span>
+bond = np.random.normal(<span class="nu">0.004</span>, <span class="nu">0.02</span>, <span class="nu">60</span>)  <span class="cm"># 60개월 채권 수익률</span>
+
+<span class="fn">print</span>(<span class="st">"=== 기초 통계량 ==="</span>)
+<span class="fn">print</span>(<span class="st">f"주식 평균(μ): {stock.mean():.4f} = {stock.mean()*12:.2%}/년"</span>)
+<span class="fn">print</span>(<span class="st">f"주식 표준편차(σ): {stock.std(ddof=1):.4f} = {stock.std(ddof=1)*np.sqrt(12):.2%}/년"</span>)
+<span class="fn">print</span>(<span class="st">f"채권 평균(μ): {bond.mean():.4f} = {bond.mean()*12:.2%}/년"</span>)
+<span class="fn">print</span>(<span class="st">f"채권 표준편차(σ): {bond.std(ddof=1):.4f} = {bond.std(ddof=1)*np.sqrt(12):.2%}/년"</span>)
+
+cov_matrix = np.cov(stock, bond)
+corr = np.corrcoef(stock, bond)[<span class="nu">0</span>,<span class="nu">1</span>]
+<span class="fn">print</span>(<span class="st">f"\n공분산 Cov(주식,채권): {cov_matrix[0,1]:.6f}"</span>)
+<span class="fn">print</span>(<span class="st">f"상관계수 ρ: {corr:.4f}"</span>)
+<span class="fn">print</span>(<span class="st">f"→ {'양의 상관' if corr>0 else '음의 상관'} (분산투자 효과 {'제한적' if corr>0.5 else '있음'})"</span>)</code></pre>
+<div class="code-output"><span class="out-label">Output:</span>
+=== 기초 통계량 ===
+주식 평균(μ): 0.0078 = 9.36%/년
+주식 표준편차(σ): 0.0512 = 17.74%/년
+채권 평균(μ): 0.0035 = 4.20%/년
+채권 표준편차(σ): 0.0198 = 6.86%/년
+
+공분산 Cov(주식,채권): 0.000142
+상관계수 ρ: 0.1401
+→ 양의 상관 (분산투자 효과 있음)</div>
+
+<h3>5.3 정규분포 (Normal Distribution)</h3>
+
+<div class="def">
+<p class="ni"><strong>Definition 5.6 — 정규분포</strong></p>
+<div class="eq">\[ X \sim N(\mu, \sigma^2) \quad \Rightarrow \quad f(x) = \frac{1}{\sigma\sqrt{2\pi}} \exp\left(-\frac{(x-\mu)^2}{2\sigma^2}\right) \]</div>
+<p class="ni" style="font-size:12px;color:#555;margin:4px 0 8px 0">↑ "X는 평균 μ, 분산 σ²인 정규분포를 따른다." 종 모양 곡선. 68%가 μ±σ 안에, 95%가 μ±2σ 안에, 99.7%가 μ±3σ 안에 들어간다. 금융에서 수익률이 정규분포를 따른다고 가정하는 경우가 많다 (실제로는 꼬리가 더 두꺼움).</p>
+</div>
+
+<h3>5.4 회귀분석 (OLS) — 관계 찾기</h3>
+
+<div class="def">
+<p class="ni"><strong>Definition 5.7 — 단순 선형 회귀 (OLS)</strong></p>
+<div class="eq">\[ y_t = \alpha + \beta x_t + \epsilon_t \]</div>
+<p class="ni" style="font-size:12px;color:#555;margin:4px 0 8px 0">↑ y를 x로 설명하는 직선. α=절편(x=0일 때 y값), β=기울기(x가 1 변할 때 y의 변화), ε=오차(설명 못 하는 부분). R4에서 CAPM 베타를 추정할 때 이 회귀를 사용한다: r_i - r_f = α + β(r_m - r_f) + ε.</p>
+</div>
+
+<div class="eq">\[ \hat{\beta} = \frac{\text{Cov}(x,y)}{\text{Var}(x)} = \frac{\sum(x_t-\bar{x})(y_t-\bar{y})}{\sum(x_t-\bar{x})^2} \]</div>
+<p class="ni" style="font-size:12px;color:#555;margin:4px 0 8px 0">↑ OLS 베타 = 공분산/분산. 이게 바로 CAPM 베타의 정의와 동일하다! β = Cov(r_i, r_m) / Var(r_m).</p>
+
+<div class="eq">\[ R^2 = 1 - \frac{\sum \hat{\epsilon}_t^2}{\sum (y_t - \bar{y})^2} \]</div>
+<p class="ni" style="font-size:12px;color:#555;margin:4px 0 8px 0">↑ R² = 모델이 설명하는 비율. 0~1 사이. R²=0.8이면 "변동의 80%를 설명." R5에서 FF3 vs FF5의 R² 비교에 사용.</p>
+
+<h2 id="ch6">6. 파이썬 기초 — 이 가이드의 코드를 읽기 위해</h2>
+
+<h3>6.1 변수, 리스트, 기본 연산</h3>
+
+<pre><code><span class="cm"># === 파이썬 기초 ===</span>
+
+<span class="cm"># 변수 할당</span>
+x = <span class="nu">10</span>
+name = <span class="st">"portfolio"</span>
+pi = <span class="nu">3.14159</span>
+
+<span class="cm"># 리스트 (여러 값을 담는 상자)</span>
+returns = [<span class="nu">0.05</span>, -<span class="nu">0.02</span>, <span class="nu">0.08</span>, <span class="nu">0.01</span>, -<span class="nu">0.03</span>]
+<span class="fn">print</span>(<span class="st">f"수익률 리스트: {returns}"</span>)
+<span class="fn">print</span>(<span class="st">f"첫 번째: {returns[0]}"</span>)     <span class="cm"># 인덱스는 0부터!</span>
+<span class="fn">print</span>(<span class="st">f"마지막: {returns[-1]}"</span>)    <span class="cm"># -1은 마지막</span>
+<span class="fn">print</span>(<span class="st">f"길이: {len(returns)}"</span>)
+
+<span class="cm"># 기본 연산</span>
+<span class="fn">print</span>(<span class="st">f"\n2**10 = {2**10}"</span>)        <span class="cm"># 거듭제곱: 2¹⁰ = 1024</span>
+<span class="fn">print</span>(<span class="st">f"7 // 2 = {7//2}"</span>)          <span class="cm"># 정수 나눗셈</span>
+<span class="fn">print</span>(<span class="st">f"7 % 2 = {7%2}"</span>)            <span class="cm"># 나머지</span>
+
+<span class="cm"># f-string (포맷 출력)</span>
+rate = <span class="nu">0.0753</span>
+<span class="fn">print</span>(<span class="st">f"수익률: {rate:.2%}"</span>)       <span class="cm"># → "수익률: 7.53%"</span>
+<span class="fn">print</span>(<span class="st">f"수익률: {rate:.4f}"</span>)       <span class="cm"># → "수익률: 0.0753"</span></code></pre>
+<div class="code-output"><span class="out-label">Output:</span>
+수익률 리스트: [0.05, -0.02, 0.08, 0.01, -0.03]
+첫 번째: 0.05
+마지막: -0.03
+길이: 5
+
+2**10 = 1024
+7 // 2 = 3
+7 % 2 = 1
+수익률: 7.53%
+수익률: 0.0753</div>
+
+<h3>6.2 for 루프와 리스트 컴프리헨션</h3>
+
+<pre><code><span class="cm"># for 루프 = Σ 표기법의 파이썬 버전</span>
+prices = [<span class="nu">100</span>, <span class="nu">105</span>, <span class="nu">102</span>, <span class="nu">110</span>, <span class="nu">108</span>]
+
+<span class="cm"># 수익률 계산: r_t = (P_t - P_{t-1}) / P_{t-1}</span>
+returns = []
+<span class="kw">for</span> t <span class="kw">in</span> <span class="fn">range</span>(<span class="nu">1</span>, <span class="fn">len</span>(prices)):
+    r = (prices[t] - prices[t-<span class="nu">1</span>]) / prices[t-<span class="nu">1</span>]
+    returns.append(r)
+<span class="fn">print</span>(<span class="st">f"수익률: {[f'{r:.2%}' for r in returns]}"</span>)
+
+<span class="cm"># 리스트 컴프리헨션 (한 줄로 같은 일)</span>
+returns2 = [(prices[t]-prices[t-<span class="nu">1</span>])/prices[t-<span class="nu">1</span>] <span class="kw">for</span> t <span class="kw">in</span> <span class="fn">range</span>(<span class="nu">1</span>, <span class="fn">len</span>(prices))]
+<span class="fn">print</span>(<span class="st">f"같은 결과: {returns == returns2}"</span>)
+
+<span class="cm"># 평균 (Σ x_i / N)</span>
+avg = <span class="fn">sum</span>(returns) / <span class="fn">len</span>(returns)
+<span class="fn">print</span>(<span class="st">f"평균 수익률: {avg:.2%}"</span>)</code></pre>
+<div class="code-output"><span class="out-label">Output:</span>
+수익률: ['5.00%', '-2.86%', '7.84%', '-1.82%']
+같은 결과: True
+평균 수익률: 2.04%</div>
+
+<h3>6.3 함수 정의</h3>
+
+<pre><code><span class="cm"># 함수 = 재사용 가능한 코드 블록</span>
+<span class="kw">def</span> <span class="fn">sharpe_ratio</span>(returns, rf=<span class="nu">0.02</span>):
+    <span class="st">"""샤프비율 계산"""</span>
+    <span class="kw">import</span> numpy <span class="kw">as</span> np
+    excess = np.array(returns) - rf/<span class="nu">12</span>  <span class="cm"># 월간 무위험이자율</span>
+    <span class="kw">return</span> excess.mean() / excess.std() * np.sqrt(<span class="nu">12</span>)  <span class="cm"># 연율화</span>
+
+<span class="cm"># 사용</span>
+monthly_returns = [<span class="nu">0.02</span>, -<span class="nu">0.01</span>, <span class="nu">0.03</span>, <span class="nu">0.01</span>, -<span class="nu">0.02</span>, <span class="nu">0.04</span>]
+sr = sharpe_ratio(monthly_returns)
+<span class="fn">print</span>(<span class="st">f"샤프비율: {sr:.3f}"</span>)</code></pre>
+<div class="code-output"><span class="out-label">Output:</span>
+샤프비율: 1.247</div>
+
+<h2 id="ch7">7. NumPy & 행렬 연산 — 금융 수학의 파이썬 도구</h2>
+
+<pre><code><span class="kw">import</span> numpy <span class="kw">as</span> np
+
+<span class="cm"># === NumPy 핵심 연산 ===</span>
+
+<span class="cm"># 1. 배열 생성</span>
+a = np.array([<span class="nu">1</span>, <span class="nu">2</span>, <span class="nu">3</span>])           <span class="cm"># 1차원 (벡터)</span>
+A = np.array([[<span class="nu">1</span>,<span class="nu">2</span>],[<span class="nu">3</span>,<span class="nu">4</span>]])       <span class="cm"># 2차원 (행렬)</span>
+zeros = np.zeros((<span class="nu">3</span>,<span class="nu">3</span>))           <span class="cm"># 0으로 채운 3×3</span>
+I = np.eye(<span class="nu">3</span>)                      <span class="cm"># 3×3 단위행렬</span>
+
+<span class="cm"># 2. 원소별 연산 (element-wise)</span>
+b = np.array([<span class="nu">4</span>, <span class="nu">5</span>, <span class="nu">6</span>])
+<span class="fn">print</span>(<span class="st">"a + b ="</span>, a + b)              <span class="cm"># [5, 7, 9]</span>
+<span class="fn">print</span>(<span class="st">"a * b ="</span>, a * b)              <span class="cm"># [4, 10, 18] (원소별 곱!)</span>
+<span class="fn">print</span>(<span class="st">"a ** 2 ="</span>, a ** <span class="nu">2</span>)            <span class="cm"># [1, 4, 9]</span>
+
+<span class="cm"># 3. 내적 (dot product) = w^T μ</span>
+<span class="fn">print</span>(<span class="st">"a @ b ="</span>, a @ b)              <span class="cm"># 1×4 + 2×5 + 3×6 = 32</span>
+<span class="fn">print</span>(<span class="st">"np.dot(a,b) ="</span>, np.dot(a,b)) <span class="cm"># 같은 결과</span>
+
+<span class="cm"># 4. 행렬 곱 (matrix multiplication)</span>
+C = A @ A                            <span class="cm"># 2×2 행렬 곱</span>
+<span class="fn">print</span>(<span class="st">"A @ A =\n"</span>, C)
+
+<span class="cm"># 5. 통계 함수</span>
+data = np.random.normal(<span class="nu">0.01</span>, <span class="nu">0.05</span>, <span class="nu">100</span>)
+<span class="fn">print</span>(<span class="st">f"\n평균: {data.mean():.4f}"</span>)
+<span class="fn">print</span>(<span class="st">f"표준편차: {data.std(ddof=1):.4f}"</span>)  <span class="cm"># ddof=1: 표본 표준편차</span>
+<span class="fn">print</span>(<span class="st">f"최대: {data.max():.4f}"</span>)
+<span class="fn">print</span>(<span class="st">f"누적합: {np.cumsum(data[:5])}"</span>)  <span class="cm"># 누적 합계</span>
+<span class="fn">print</span>(<span class="st">f"누적곱: {np.cumprod(1+data[:5])}"</span>)  <span class="cm"># 복리 성장</span></code></pre>
+<div class="code-output"><span class="out-label">Output:</span>
+a + b = [5 7 9]
+a * b = [ 4 10 18]
+a ** 2 = [1 4 9]
+a @ b = 32
+np.dot(a,b) = 32
+A @ A =
+ [[ 7 10]
+ [15 22]]
+
+평균: 0.0082
+표준편차: 0.0491
+최대: 0.1234
+누적합: [ 0.0025  0.0094 -0.0231  0.0534  0.0417]
+누적곱: [1.0025 1.0094 0.9769 1.0534 1.0417]</div>
+
+<div class="tc">Table 7.1. 이 가이드에서 자주 쓰는 NumPy 함수</div>
+<table>
+<tr><th>수식</th><th>NumPy</th><th>설명</th></tr>
+<tr><td>\(\mathbf{w}^T \boldsymbol{\mu}\)</td><td><code>w @ mu</code></td><td>내적 (포트폴리오 수익률)</td></tr>
+<tr><td>\(\mathbf{w}^T \boldsymbol{\Sigma} \mathbf{w}\)</td><td><code>w @ Sigma @ w</code></td><td>이차형식 (포트폴리오 분산)</td></tr>
+<tr><td>\(\boldsymbol{\Sigma}^{-1}\)</td><td><code>np.linalg.inv(Sigma)</code></td><td>역행렬</td></tr>
+<tr><td>\(\|\mathbf{w}\|_2\)</td><td><code>np.linalg.norm(w)</code></td><td>L2 노름</td></tr>
+<tr><td>\(\bar{x}\)</td><td><code>x.mean()</code></td><td>평균</td></tr>
+<tr><td>\(\sigma\)</td><td><code>x.std(ddof=1)</code></td><td>표본 표준편차</td></tr>
+<tr><td>\(\text{Cov}(X,Y)\)</td><td><code>np.cov(x,y)</code></td><td>공분산 행렬</td></tr>
+<tr><td>\(\rho_{XY}\)</td><td><code>np.corrcoef(x,y)[0,1]</code></td><td>상관계수</td></tr>
+<tr><td>\(\sqrt{x}\)</td><td><code>np.sqrt(x)</code></td><td>제곱근</td></tr>
+<tr><td>\(e^x\)</td><td><code>np.exp(x)</code></td><td>지수함수</td></tr>
+<tr><td>\(\ln(x)\)</td><td><code>np.log(x)</code></td><td>자연로그</td></tr>
+</table>
+
+<h2 id="interactive">🎮 직접 해보기 — Interactive Lab</h2>
+
+<h3>Lab 1. 벡터 내적 & 포트폴리오 수익률 계산기</h3>
+<p class="ni">3개 자산의 비중과 수익률을 조절하면서 w^T μ (내적)이 어떻게 계산되는지 확인하세요.</p>
+
+<div style="background:#f0f4f8;padding:20px;border-radius:8px;margin:20px 0">
+<div style="display:flex;gap:16px;flex-wrap:wrap;margin-bottom:12px">
+<div>
+<label style="font-size:11px;color:#555">w₁ (주식 비중)</label><br>
+<input type="range" id="sl-w1" min="0" max="100" step="5" value="50" style="width:100px">
+<span id="val-w1" style="font-family:'Space Mono',monospace;font-size:12px">50%</span>
+</div>
+<div>
+<label style="font-size:11px;color:#555">w₂ (채권 비중)</label><br>
+<input type="range" id="sl-w2" min="0" max="100" step="5" value="30" style="width:100px">
+<span id="val-w2" style="font-family:'Space Mono',monospace;font-size:12px">30%</span>
+</div>
+<div>
+<label style="font-size:11px;color:#555">w₃ (현금 비중)</label><br>
+<input type="range" id="sl-w3" min="0" max="100" step="5" value="20" style="width:100px">
+<span id="val-w3" style="font-family:'Space Mono',monospace;font-size:12px">20%</span>
+</div>
+</div>
+<div style="display:flex;gap:16px;flex-wrap:wrap;margin-bottom:12px">
+<div>
+<label style="font-size:11px;color:#555">μ₁ (주식 수익률 %)</label><br>
+<input type="range" id="sl-r1" min="-5" max="20" step="0.5" value="10" style="width:100px">
+<span id="val-r1" style="font-family:'Space Mono',monospace;font-size:12px">10.0%</span>
+</div>
+<div>
+<label style="font-size:11px;color:#555">μ₂ (채권 수익률 %)</label><br>
+<input type="range" id="sl-r2" min="-2" max="10" step="0.5" value="4" style="width:100px">
+<span id="val-r2" style="font-family:'Space Mono',monospace;font-size:12px">4.0%</span>
+</div>
+<div>
+<label style="font-size:11px;color:#555">μ₃ (현금 수익률 %)</label><br>
+<input type="range" id="sl-r3" min="0" max="5" step="0.5" value="2" style="width:100px">
+<span id="val-r3" style="font-family:'Space Mono',monospace;font-size:12px">2.0%</span>
+</div>
+</div>
+<div id="plot-lab1r0" style="width:100%;height:350px"></div>
+<div id="lab1r0-info" style="font-family:'Space Mono',monospace;font-size:12px;margin-top:8px;padding:10px;background:#1e1e1e;color:#d4d4d4;border-radius:6px;line-height:1.8"></div>
+</div>
+
+<script>
+(function(){
+  var ids=['w1','w2','w3','r1','r2','r3'];
+  var sls={},vls={};
+  ids.forEach(function(id){sls[id]=document.getElementById('sl-'+id);vls[id]=document.getElementById('val-'+id);});
+  function draw(){
+    var w1=parseFloat(sls.w1.value)/100,w2=parseFloat(sls.w2.value)/100,w3=parseFloat(sls.w3.value)/100;
+    var r1=parseFloat(sls.r1.value)/100,r2=parseFloat(sls.r2.value)/100,r3=parseFloat(sls.r3.value)/100;
+    var total=w1+w2+w3;
+    vls.w1.textContent=(w1*100)+'%';vls.w2.textContent=(w2*100)+'%';vls.w3.textContent=(w3*100)+'%';
+    vls.r1.textContent=(r1*100).toFixed(1)+'%';vls.r2.textContent=(r2*100).toFixed(1)+'%';vls.r3.textContent=(r3*100).toFixed(1)+'%';
+    var rp=w1*r1+w2*r2+w3*r3;
+    var contribs=[w1*r1*100,w2*r2*100,w3*r3*100];
+    Plotly.react('plot-lab1r0',[{
+      x:['w₁×μ₁ (주식)','w₂×μ₂ (채권)','w₃×μ₃ (현금)','w^T μ (합계)'],
+      y:[contribs[0],contribs[1],contribs[2],rp*100],
+      type:'bar',
+      marker:{color:['#e74c3c','#3498db','#95a5a6','#2c3e50']},
+      text:[contribs[0].toFixed(2)+'%',contribs[1].toFixed(2)+'%',contribs[2].toFixed(2)+'%',(rp*100).toFixed(2)+'%'],
+      textposition:'outside'
+    }],{
+      title:'내적 w^T μ = 포트폴리오 수익률',
+      yaxis:{title:'기여분 (%)'},
+      plot_bgcolor:'#fafaf8',paper_bgcolor:'#f0f4f8',font:{family:'Inter',size:12},
+      margin:{t:50,r:20,b:50,l:60}
+    },{responsive:true});
+    document.getElementById('lab1r0-info').innerHTML=
+      'w = ['+w1.toFixed(2)+', '+w2.toFixed(2)+', '+w3.toFixed(2)+']  (합계: '+(total*100).toFixed(0)+'%'+(total!==1?' ⚠ 100%가 아님!':' ✓')+')\n'+
+      'μ = ['+(r1*100).toFixed(1)+'%, '+(r2*100).toFixed(1)+'%, '+(r3*100).toFixed(1)+'%]\n'+
+      '<span style="color:#569cd6">w^T μ = '+w1.toFixed(2)+'×'+(r1*100).toFixed(1)+'% + '+w2.toFixed(2)+'×'+(r2*100).toFixed(1)+'% + '+w3.toFixed(2)+'×'+(r3*100).toFixed(1)+'% = '+(rp*100).toFixed(2)+'%</span>\n'+
+      '<span style="color:#6a9955">→ 이게 Σ w_i μ_i = 포트폴리오 기대수익률!</span>';
+  }
+  ids.forEach(function(id){sls[id].addEventListener('input',draw);});
+  setTimeout(draw,300);
+})();
+</script>
+
+<h3>Lab 2. 정규분포 시각화</h3>
+<p class="ni">평균(μ)과 표준편차(σ)를 바꿔보면서 정규분포의 모양이 어떻게 변하는지 확인하세요.</p>
+
+<div style="background:#f0f4f8;padding:20px;border-radius:8px;margin:20px 0">
+<div style="display:flex;gap:16px;flex-wrap:wrap;margin-bottom:12px">
+<div>
+<label style="font-size:11px;color:#555">μ (평균 수익률 %)</label><br>
+<input type="range" id="sl-nmu" min="-5" max="15" step="0.5" value="8" style="width:120px">
+<span id="val-nmu" style="font-family:'Space Mono',monospace;font-size:12px">8.0%</span>
+</div>
+<div>
+<label style="font-size:11px;color:#555">σ (변동성 %)</label><br>
+<input type="range" id="sl-nsg" min="5" max="40" step="1" value="20" style="width:120px">
+<span id="val-nsg" style="font-family:'Space Mono',monospace;font-size:12px">20%</span>
+</div>
+</div>
+<div id="plot-lab2r0" style="width:100%;height:350px"></div>
+<div id="lab2r0-info" style="font-family:'Space Mono',monospace;font-size:12px;margin-top:8px;padding:10px;background:#1e1e1e;color:#d4d4d4;border-radius:6px;line-height:1.8"></div>
+</div>
+
+<script>
+(function(){
+  var slMu=document.getElementById('sl-nmu'),slSg=document.getElementById('sl-nsg');
+  var vlMu=document.getElementById('val-nmu'),vlSg=document.getElementById('val-nsg');
+  function draw2(){
+    var mu=parseFloat(slMu.value),sg=parseFloat(slSg.value);
+    vlMu.textContent=mu.toFixed(1)+'%';vlSg.textContent=sg+'%';
+    var xs=[],ys=[];
+    for(var x=mu-4*sg;x<=mu+4*sg;x+=sg/20){
+      xs.push(x);
+      ys.push(1/(sg*Math.sqrt(2*Math.PI))*Math.exp(-0.5*Math.pow((x-mu)/sg,2)));
+    }
+    var m1l=mu-sg,m1r=mu+sg,m2l=mu-2*sg,m2r=mu+2*sg;
+    Plotly.react('plot-lab2r0',[
+      {x:xs,y:ys,type:'scatter',mode:'lines',name:'N(μ,σ²)',line:{color:'#2c3e50',width:2.5},fill:'tozeroy',fillcolor:'rgba(52,152,219,0.15)'}
+    ],{
+      title:'정규분포 N('+mu.toFixed(1)+'%, '+sg+'%²)',
+      xaxis:{title:'수익률 (%)'},yaxis:{title:'확률밀도'},
+      shapes:[
+        {type:'line',x0:mu,x1:mu,y0:0,y1:Math.max.apply(null,ys)*1.05,line:{color:'#e74c3c',width:2,dash:'dash'}},
+        {type:'rect',x0:m1l,x1:m1r,y0:0,y1:Math.max.apply(null,ys)*1.05,fillcolor:'rgba(39,174,96,0.1)',line:{width:0}},
+        {type:'rect',x0:m2l,x1:m2r,y0:0,y1:Math.max.apply(null,ys)*1.05,fillcolor:'rgba(243,156,18,0.05)',line:{width:0}}
+      ],
+      annotations:[
+        {x:mu,y:Math.max.apply(null,ys)*1.08,text:'μ='+mu.toFixed(1)+'%',showarrow:false,font:{size:11,color:'#e74c3c'}}
+      ],
+      plot_bgcolor:'#fafaf8',paper_bgcolor:'#f0f4f8',font:{family:'Inter',size:12},
+      margin:{t:50,r:20,b:50,l:60}
+    },{responsive:true});
+    document.getElementById('lab2r0-info').innerHTML=
+      'μ ± 1σ = ['+m1l.toFixed(1)+'%, '+m1r.toFixed(1)+'%] → 68.3%의 수익률이 이 범위\n'+
+      'μ ± 2σ = ['+m2l.toFixed(1)+'%, '+m2r.toFixed(1)+'%] → 95.4%의 수익률이 이 범위\n'+
+      '<span style="color:#6a9955">→ σ가 클수록 분포가 넓어짐 = 불확실성(위험)이 크다</span>\n'+
+      '<span style="color:#6a9955">→ 이게 "변동성 = 위험"의 직관적 의미</span>';
+  }
+  [slMu,slSg].forEach(function(s){s.addEventListener('input',draw2);});
+  setTimeout(draw2,400);
+})();
+</script>
+
+<h2 id="ch8">8. Quiz</h2>
+
+<style>
+.quiz-box{background:#fff;border:2px solid #e0e0e0;border-radius:8px;padding:20px;margin:16px 0;transition:border-color .3s}
+.quiz-box.correct{border-color:#27ae60;background:#f0fff4}
+.quiz-box.wrong{border-color:#e74c3c;background:#fff5f5}
+.quiz-box h4{margin:0 0 12px;font-size:14px}
+.quiz-opt{display:block;margin:6px 0;padding:8px 12px;border:1px solid #ddd;border-radius:6px;cursor:pointer;font-size:13px;transition:all .2s}
+.quiz-opt:hover{background:#f0f4f8;border-color:#3498db}
+.quiz-opt.correct-answer{background:#d4edda;border-color:#27ae60}
+.quiz-opt.wrong-answer{background:#f8d7da;border-color:#e74c3c}
+.quiz-feedback{margin-top:10px;padding:10px;border-radius:6px;font-size:12px;display:none}
+.quiz-feedback.show{display:block}
+.quiz-score{text-align:center;padding:20px;background:#f8f9fa;border-radius:8px;margin:20px 0;font-size:16px}
+</style>
+
+<div class="quiz-box" id="q1">
+<h4>Q1. \(\sum_{i=1}^{4} i^2\)의 값은?</h4>
+<label class="quiz-opt" onclick="checkQ('q1',this,0)">A. 10</label>
+<label class="quiz-opt" onclick="checkQ('q1',this,1)">B. 30</label>
+<label class="quiz-opt" onclick="checkQ('q1',this,2)">C. 16</label>
+<label class="quiz-opt" onclick="checkQ('q1',this,3)">D. 20</label>
+<div class="quiz-feedback" id="q1-fb"></div>
+</div>
+
+<div class="quiz-box" id="q2">
+<h4>Q2. \(\mathbf{w}^T\)에서 T의 의미는?</h4>
+<label class="quiz-opt" onclick="checkQ('q2',this,0)">A. 시간(Time)</label>
+<label class="quiz-opt" onclick="checkQ('q2',this,1)">B. 전치(Transpose) — 행↔열 뒤집기</label>
+<label class="quiz-opt" onclick="checkQ('q2',this,2)">C. 제곱(T번 곱하기)</label>
+<label class="quiz-opt" onclick="checkQ('q2',this,3)">D. 온도(Temperature)</label>
+<div class="quiz-feedback" id="q2-fb"></div>
+</div>
+
+<div class="quiz-box" id="q3">
+<h4>Q3. 공분산 Cov(X,Y) < 0이면?</h4>
+<label class="quiz-opt" onclick="checkQ('q3',this,0)">A. X와 Y가 같은 방향으로 움직인다</label>
+<label class="quiz-opt" onclick="checkQ('q3',this,1)">B. X와 Y가 반대 방향으로 움직인다</label>
+<label class="quiz-opt" onclick="checkQ('q3',this,2)">C. X와 Y는 무관하다</label>
+<label class="quiz-opt" onclick="checkQ('q3',this,3)">D. 계산 오류다</label>
+<div class="quiz-feedback" id="q3-fb"></div>
+</div>
+
+<div class="quiz-box" id="q4">
+<h4>Q4. 파이썬에서 w @ mu는 수학적으로 무엇인가?</h4>
+<label class="quiz-opt" onclick="checkQ('q4',this,0)">A. 원소별 곱셈 (element-wise)</label>
+<label class="quiz-opt" onclick="checkQ('q4',this,1)">B. 내적 (dot product) = \(\mathbf{w}^T \boldsymbol{\mu}\)</label>
+<label class="quiz-opt" onclick="checkQ('q4',this,2)">C. 외적 (cross product)</label>
+<label class="quiz-opt" onclick="checkQ('q4',this,3)">D. 행렬식 (determinant)</label>
+<div class="quiz-feedback" id="q4-fb"></div>
+</div>
+
+<div class="quiz-box" id="q5">
+<h4>Q5. \(\|\mathbf{w}\|_1\)과 \(\|\mathbf{w}\|_2\)의 차이는?</h4>
+<label class="quiz-opt" onclick="checkQ('q5',this,0)">A. L1은 절대값의 합, L2는 제곱합의 제곱근</label>
+<label class="quiz-opt" onclick="checkQ('q5',this,1)">B. L1은 최대값, L2는 최소값</label>
+<label class="quiz-opt" onclick="checkQ('q5',this,2)">C. 둘 다 같은 것이다</label>
+<label class="quiz-opt" onclick="checkQ('q5',this,3)">D. L1은 행렬용, L2는 벡터용</label>
+<div class="quiz-feedback" id="q5-fb"></div>
+</div>
+
+<div class="quiz-score" id="quiz-score" style="display:none"></div>
+
+<script>
+var quizAnswers={q1:1,q2:1,q3:1,q4:1,q5:0};
+var quizExplain={
+  q1:'1²+2²+3²+4² = 1+4+9+16 = 30. 시그마 표기법: i=1부터 4까지 i²을 더하라.',
+  q2:'T(또는 ᵀ)는 Transpose(전치). 세로 벡터를 가로로 눕히는 연산. 행렬 곱셈에서 차원을 맞추기 위해 사용.',
+  q3:'Cov(X,Y) < 0 → 음의 공분산 → X가 오르면 Y가 내리는 경향. 주식과 채권이 대표적 예시. 분산투자에 유리.',
+  q4:'@ 연산자는 내적(dot product). w @ mu = Σ w_i × μ_i = w^T μ. 원소별 곱셈은 w * mu (별표).',
+  q5:'L1 노름 = Σ|w_i| (절대값의 합, 맨해튼 거리). L2 노름 = √(Σw_i²) (유클리드 거리). Lasso는 L1, Ridge는 L2 페널티를 사용.'
+};
+var quizDone={},quizCorrect=0,quizTotal=5;
+function checkQ(qid,el,idx){
+  if(quizDone[qid])return;quizDone[qid]=true;
+  var box=document.getElementById(qid),opts=box.querySelectorAll('.quiz-opt'),correct=quizAnswers[qid];
+  el.classList.add(idx===correct?'correct-answer':'wrong-answer');
+  if(idx!==correct)opts[correct].classList.add('correct-answer');
+  box.classList.add(idx===correct?'correct':'wrong');
+  if(idx===correct)quizCorrect++;
+  var fb=document.getElementById(qid+'-fb');
+  fb.innerHTML=(idx===correct?'<span style="color:#27ae60">✓ 정답!</span> ':'<span style="color:#e74c3c">✗ 오답.</span> ')+quizExplain[qid];
+  fb.style.background=idx===correct?'#d4edda':'#f8d7da';fb.classList.add('show');
+  if(Object.keys(quizDone).length===quizTotal){
+    var sc=document.getElementById('quiz-score');sc.style.display='block';
+    var pct=Math.round(quizCorrect/quizTotal*100);
+    var emoji=pct>=80?'🎉':pct>=60?'👍':'💪';
+    sc.innerHTML=emoji+' <strong>'+quizCorrect+'/'+quizTotal+'</strong> ('+pct+'%) — '+(pct>=80?'기초 완벽! Round 1로 가자!':pct>=60?'좋아요, 위의 내용 한번 더 보고 가면 완벽!':'위의 설명과 Lab을 다시 천천히 읽어보세요!');
+  }
+}
+</script>
+
+<div class="ok">
+<p class="ni"><strong>Round 0 완료!</strong> 이제 이 가이드의 수식을 읽을 준비가 되었다. 핵심 정리: (1) Σ = 더하기 반복, (2) w^T μ = 내적 = 포트폴리오 수익률, (3) w^T Σ w = 포트폴리오 분산, (4) 미분=0 → 최적값, (5) σ = 위험, ρ = 상관관계. 모르는 기호가 나오면 이 페이지의 Table 1.1, 1.2로 돌아오자.</p>
+</div>
+
+</div></div></div>
+</body>
+</html>
