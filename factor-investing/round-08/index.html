@@ -120,6 +120,7 @@ pre{font-size:11px;padding:14px}table{font-size:10px;display:block;overflow-x:au
 <li><a href="#ch5">5. 금은 인플레이션 헤지인가?</a></li>
 <li><a href="#ch6">6. 파이썬 구현: 인플레이션 헤지</a></li>
 <li><a href="#ch6d">6.4 "실물" 자산의 진실 (Ang Ch.11)</a></li>
+<li><a href="#interactive">🎮 직접 해보기</a></li>
 <li><a href="#ch7">7. Quiz</a></li>
 </ul>
 </div>
@@ -763,25 +764,318 @@ TIPS                     +0.12    +0.10     4.7%
 
 <h2 id="ch7">7. Quiz</h2>
 
-<div class="def">
-<p class="ni"><strong>Q1. [피셔 방정식]</strong> 명목 수익률 8%, 인플레이션 3%일 때 정확한 실질 수익률과 근사 실질 수익률을 계산하라. 인플레이션이 10%일 때 근사 오차는 얼마나 커지는가?</p>
+<!-- ═══════════════════════════════════════════ -->
+<!-- Interactive Learning Section -->
+<!-- ═══════════════════════════════════════════ -->
+<h2 id="interactive">🎮 직접 해보기 — Interactive Lab</h2>
+
+<h3>Lab 1. 인플레이션 베타 비교기</h3>
+<p class="ni">각 자산의 인플레이션 베타(β_π)를 조절하면서 인플레이션 시나리오별 실질 수익률을 비교하세요. β_π > 1이면 인플레이션 헤지 효과가 있습니다.</p>
+
+<div style="background:#f0f4f8;padding:20px;border-radius:8px;margin:20px 0">
+<div style="display:flex;gap:16px;flex-wrap:wrap;margin-bottom:12px">
+<div>
+<label style="font-size:11px;color:#555">인플레이션 (π, %)</label><br>
+<input type="range" id="sl-pi" min="0" max="10" step="0.5" value="3" style="width:110px">
+<span id="val-pi" style="font-family:'Space Mono',monospace;font-size:12px">3.0%</span>
+</div>
+<div>
+<label style="font-size:11px;color:#555">β_π 주식</label><br>
+<input type="range" id="sl-beq" min="-1" max="2" step="0.1" value="0.0" style="width:90px">
+<span id="val-beq" style="font-family:'Space Mono',monospace;font-size:12px">0.00</span>
+</div>
+<div>
+<label style="font-size:11px;color:#555">β_π 채권</label><br>
+<input type="range" id="sl-bbd" min="-2" max="1" step="0.1" value="-0.5" style="width:90px">
+<span id="val-bbd" style="font-family:'Space Mono',monospace;font-size:12px">-0.50</span>
+</div>
+<div>
+<label style="font-size:11px;color:#555">β_π 금</label><br>
+<input type="range" id="sl-bgd" min="-1" max="3" step="0.1" value="1.0" style="width:90px">
+<span id="val-bgd" style="font-family:'Space Mono',monospace;font-size:12px">1.00</span>
+</div>
+<div>
+<label style="font-size:11px;color:#555">β_π 원자재</label><br>
+<input type="range" id="sl-bcm" min="-1" max="4" step="0.1" value="2.0" style="width:90px">
+<span id="val-bcm" style="font-family:'Space Mono',monospace;font-size:12px">2.00</span>
+</div>
+<div>
+<label style="font-size:11px;color:#555">β_π REITs</label><br>
+<input type="range" id="sl-bre" min="-1" max="2" step="0.1" value="0.5" style="width:90px">
+<span id="val-bre" style="font-family:'Space Mono',monospace;font-size:12px">0.50</span>
+</div>
+</div>
+<div id="plot-lab1r8" style="width:100%;height:400px"></div>
+<div id="lab1r8-info" style="font-family:'Space Mono',monospace;font-size:12px;margin-top:8px;padding:10px;background:#1e1e1e;color:#d4d4d4;border-radius:6px;line-height:1.8"></div>
 </div>
 
-<div class="def">
-<p class="ni"><strong>Q2. [BEI 분석]</strong> FRED에서 5Y, 10Y TIPS 수익률과 명목 국채 수익률을 다운로드하라. 2003-2023 기간의 BEI 시계열을 그리고, 2021-2022 인플레이션 급등 시기의 BEI 변화를 분석하라.</p>
+<script>
+(function(){
+  var ids=['pi','beq','bbd','bgd','bcm','bre'];
+  var sls={},vls={};
+  ids.forEach(function(id){sls[id]=document.getElementById('sl-'+id);vls[id]=document.getElementById('val-'+id);});
+  var assets=['주식','채권','금','원자재','REITs'];
+  var baseReal=[7,2,1,3,5]; // base real returns at 0% inflation
+  var colors=['#e74c3c','#3498db','#f39c12','#27ae60','#9b59b6'];
+  function draw(){
+    var pi=parseFloat(sls.pi.value);
+    var betas=[parseFloat(sls.beq.value),parseFloat(sls.bbd.value),parseFloat(sls.bgd.value),parseFloat(sls.bcm.value),parseFloat(sls.bre.value)];
+    vls.pi.textContent=pi.toFixed(1)+'%';
+    vls.beq.textContent=betas[0].toFixed(2);vls.bbd.textContent=betas[1].toFixed(2);
+    vls.bgd.textContent=betas[2].toFixed(2);vls.bcm.textContent=betas[3].toFixed(2);vls.bre.textContent=betas[4].toFixed(2);
+    // nominal return = base_real + pi + beta_pi * (pi - 2.5) [surprise component]
+    var piSurprise=pi-2.5;
+    var nominals=[],reals=[];
+    for(var i=0;i<5;i++){
+      var nom=baseReal[i]+pi+betas[i]*piSurprise;
+      nominals.push(nom);
+      reals.push(nom-pi);
+    }
+    Plotly.react('plot-lab1r8',[
+      {x:assets,y:nominals,name:'명목 수익률',type:'bar',marker:{color:colors.map(function(c){return c;}),opacity:0.6}},
+      {x:assets,y:reals,name:'실질 수익률',type:'bar',marker:{color:colors}},
+      {x:assets,y:baseReal,name:'기본 실질 (π=0)',type:'scatter',mode:'markers',marker:{size:10,color:'#95a5a6',symbol:'diamond'}}
+    ],{
+      title:'인플레이션 '+pi.toFixed(1)+'% 시나리오 — 자산별 수익률',barmode:'group',
+      yaxis:{title:'수익률 (%)'},
+      plot_bgcolor:'#fafaf8',paper_bgcolor:'#f0f4f8',font:{family:'Inter',size:12},
+      margin:{t:50,r:20,b:50,l:60}
+    },{responsive:true});
+    var best=0;for(var i=1;i<5;i++)if(reals[i]>reals[best])best=i;
+    document.getElementById('lab1r8-info').innerHTML=
+      '<span style="color:#6a9955">// 명목수익률 ≈ 기본실질 + π + β_π × (π - 2.5%)</span>\n'+
+      assets.map(function(a,i){return a+': 명목 '+nominals[i].toFixed(1)+'%, 실질 '+reals[i].toFixed(1)+'% (β_π='+betas[i].toFixed(1)+')';}).join('\n')+'\n'+
+      '<span style="color:#569cd6">→ 최고 실질수익: '+assets[best]+' ('+reals[best].toFixed(1)+'%)</span>\n'+
+      (pi>5?'<span style="color:#e74c3c">⚠ 고인플레이션: β_π > 1인 자산만 실질 구매력 보존</span>':'');
+  }
+  ids.forEach(function(id){sls[id].addEventListener('input',draw);});
+  setTimeout(draw,300);
+})();
+</script>
+
+<h3>Lab 2. 피셔 방정식 & BEI 계산기</h3>
+<p class="ni">명목 금리와 TIPS 금리를 조절하면서 BEI(Breakeven Inflation)와 정확한 실질 수익률을 확인하세요.</p>
+
+<div style="background:#f0f4f8;padding:20px;border-radius:8px;margin:20px 0">
+<div style="display:flex;gap:16px;flex-wrap:wrap;margin-bottom:12px">
+<div>
+<label style="font-size:11px;color:#555">명목 금리 (%)</label><br>
+<input type="range" id="sl-nom" min="1" max="10" step="0.25" value="4.5" style="width:110px">
+<span id="val-nom" style="font-family:'Space Mono',monospace;font-size:12px">4.50%</span>
+</div>
+<div>
+<label style="font-size:11px;color:#555">TIPS 금리 (%)</label><br>
+<input type="range" id="sl-tips" min="-1" max="5" step="0.25" value="2" style="width:110px">
+<span id="val-tips" style="font-family:'Space Mono',monospace;font-size:12px">2.00%</span>
+</div>
+<div>
+<label style="font-size:11px;color:#555">실현 인플레이션 (%)</label><br>
+<input type="range" id="sl-rpi" min="0" max="10" step="0.5" value="3" style="width:110px">
+<span id="val-rpi" style="font-family:'Space Mono',monospace;font-size:12px">3.0%</span>
+</div>
+</div>
+<div id="plot-lab2r8" style="width:100%;height:380px"></div>
+<div id="lab2r8-info" style="font-family:'Space Mono',monospace;font-size:12px;margin-top:8px;padding:10px;background:#1e1e1e;color:#d4d4d4;border-radius:6px;line-height:1.8"></div>
 </div>
 
-<div class="def">
-<p class="ni"><strong>Q3. [인플레이션 베타]</strong> yfinance로 SPY, TLT, GLD, DBC(원자재), VNQ(REITs)의 월별 수익률을 다운로드하고, CPI 인플레이션에 대한 각 자산의 인플레이션 베타를 추정하라.</p>
+<script>
+(function(){
+  var sls={nom:document.getElementById('sl-nom'),tips:document.getElementById('sl-tips'),rpi:document.getElementById('sl-rpi')};
+  var vls={nom:document.getElementById('val-nom'),tips:document.getElementById('val-tips'),rpi:document.getElementById('val-rpi')};
+  function draw2(){
+    var nom=parseFloat(sls.nom.value),tips=parseFloat(sls.tips.value),rpi=parseFloat(sls.rpi.value);
+    vls.nom.textContent=nom.toFixed(2)+'%';vls.tips.textContent=tips.toFixed(2)+'%';vls.rpi.textContent=rpi.toFixed(1)+'%';
+    var bei=nom-tips;
+    var exactReal=((1+nom/100)/(1+rpi/100)-1)*100;
+    var approxReal=nom-rpi;
+    var approxErr=Math.abs(exactReal-approxReal);
+    // TIPS wins if realized inflation > BEI
+    var tipsWin=rpi>bei;
+    var nomReal=exactReal;
+    var tipsReal=tips; // TIPS real return is locked in
+    // bar chart
+    Plotly.react('plot-lab2r8',[
+      {x:['명목 국채','TIPS'],y:[nomReal,tipsReal],type:'bar',
+       marker:{color:[tipsWin?'#e74c3c':'#27ae60',tipsWin?'#27ae60':'#e74c3c']},
+       text:[nomReal.toFixed(2)+'%',tipsReal.toFixed(2)+'%'],textposition:'outside'}
+    ],{
+      title:'실질 수익률 비교 (BEI='+bei.toFixed(2)+'%, 실현π='+rpi.toFixed(1)+'%) → '+(tipsWin?'TIPS 승':'명목 국채 승'),
+      yaxis:{title:'실질 수익률 (%)'},
+      plot_bgcolor:'#fafaf8',paper_bgcolor:'#f0f4f8',font:{family:'Inter',size:12},
+      margin:{t:50,r:20,b:50,l:60}
+    },{responsive:true});
+    document.getElementById('lab2r8-info').innerHTML=
+      '<span style="color:#6a9955">// BEI = 명목금리 - TIPS금리 = '+nom.toFixed(2)+'% - '+tips.toFixed(2)+'% = '+bei.toFixed(2)+'%</span>\n'+
+      '정확한 실질수익률 = (1+'+nom.toFixed(2)+'%)/(1+'+rpi.toFixed(1)+'%) - 1 = '+exactReal.toFixed(2)+'%\n'+
+      '근사 실질수익률 = '+nom.toFixed(2)+'% - '+rpi.toFixed(1)+'% = '+approxReal.toFixed(2)+'% (오차: '+approxErr.toFixed(3)+'%p)\n'+
+      (tipsWin?'<span style="color:#27ae60">실현 π('+rpi.toFixed(1)+'%) > BEI('+bei.toFixed(2)+'%) → TIPS가 유리</span>':
+               '<span style="color:#e74c3c">실현 π('+rpi.toFixed(1)+'%) < BEI('+bei.toFixed(2)+'%) → 명목 국채가 유리</span>');
+  }
+  Object.keys(sls).forEach(function(k){sls[k].addEventListener('input',draw2);});
+  setTimeout(draw2,400);
+})();
+</script>
+
+<h3>Lab 3. 인플레이션 레짐별 자산 성과</h3>
+<p class="ni">인플레이션 레짐 경계값을 조절하면서 저/중/고 인플레이션 환경에서 각 자산의 실질 수익률이 어떻게 달라지는지 확인하세요.</p>
+
+<div style="background:#f0f4f8;padding:20px;border-radius:8px;margin:20px 0">
+<div style="display:flex;gap:16px;flex-wrap:wrap;margin-bottom:12px">
+<div>
+<label style="font-size:11px;color:#555">저→중 경계 (%)</label><br>
+<input type="range" id="sl-lo" min="1" max="4" step="0.5" value="2" style="width:100px">
+<span id="val-lo" style="font-family:'Space Mono',monospace;font-size:12px">2.0%</span>
+</div>
+<div>
+<label style="font-size:11px;color:#555">중→고 경계 (%)</label><br>
+<input type="range" id="sl-hi" min="3" max="8" step="0.5" value="5" style="width:100px">
+<span id="val-hi" style="font-family:'Space Mono',monospace;font-size:12px">5.0%</span>
+</div>
+</div>
+<div id="plot-lab3r8" style="width:100%;height:400px"></div>
+<div id="lab3r8-info" style="font-family:'Space Mono',monospace;font-size:12px;margin-top:8px;padding:10px;background:#1e1e1e;color:#d4d4d4;border-radius:6px;line-height:1.8"></div>
 </div>
 
-<div class="def">
-<p class="ni"><strong>Q4. [레짐 분석]</strong> 1972-2023 기간을 인플레이션 레짐(저/중/고)으로 분류하고, 각 레짐에서 주식, 채권, 금, 원자재의 실질 수익률을 비교하라.</p>
+<script>
+(function(){
+  var slLo=document.getElementById('sl-lo'),slHi=document.getElementById('sl-hi');
+  var vlLo=document.getElementById('val-lo'),vlHi=document.getElementById('val-hi');
+  // Historical-ish real returns by regime (stylized)
+  function draw3(){
+    var lo=parseFloat(slLo.value),hi=parseFloat(slHi.value);
+    if(hi<=lo)hi=lo+1;
+    vlLo.textContent=lo.toFixed(1)+'%';vlHi.textContent=hi.toFixed(1)+'%';
+    var regimes=['저인플레 (<'+lo.toFixed(0)+'%)','중인플레 ('+lo.toFixed(0)+'-'+hi.toFixed(0)+'%)','고인플레 (>'+hi.toFixed(0)+'%)'];
+    var assets=['주식','채권','금','원자재','REITs'];
+    // stylized real returns: stocks do well in low/mid, bonds in low, commodities/gold in high
+    var data={
+      '주식':[10,7,2],
+      '채권':[4,2,-3],
+      '금':[-2,1,8],
+      '원자재':[-1,3,12],
+      'REITs':[8,5,1]
+    };
+    var colors=['#e74c3c','#3498db','#f39c12','#27ae60','#9b59b6'];
+    var traces=[];
+    assets.forEach(function(a,i){
+      traces.push({x:regimes,y:data[a],name:a,type:'bar',marker:{color:colors[i]}});
+    });
+    Plotly.react('plot-lab3r8',traces,{
+      title:'인플레이션 레짐별 실질 수익률 (연율화, 스타일화)',barmode:'group',
+      yaxis:{title:'실질 수익률 (%)'},
+      plot_bgcolor:'#fafaf8',paper_bgcolor:'#f0f4f8',font:{family:'Inter',size:11},
+      margin:{t:50,r:20,b:80,l:60},legend:{x:0,y:1.15,orientation:'h'}
+    },{responsive:true});
+    document.getElementById('lab3r8-info').innerHTML=
+      '<span style="color:#6a9955">// 레짐 경계: 저 < '+lo.toFixed(1)+'% < 중 < '+hi.toFixed(1)+'% < 고</span>\n'+
+      '저인플레: 주식·REITs 강세, 채권 양호, 원자재·금 부진\n'+
+      '중인플레: 주식 양호, 원자재 개선, 채권 약화\n'+
+      '고인플레: <span style="color:#e74c3c">주식·채권 부진</span>, <span style="color:#27ae60">원자재·금 강세</span>\n'+
+      '<span style="color:#569cd6">→ 인플레이션 헤지는 "항상"이 아니라 "고인플레 레짐"에서 중요</span>';
+  }
+  [slLo,slHi].forEach(function(s){s.addEventListener('input',draw3);});
+  setTimeout(draw3,500);
+})();
+</script>
+
+<!-- Quiz Section -->
+<h2 id="ch7">7. 객관식 퀴즈</h2>
+
+<style>
+.quiz-box{background:#fff;border:2px solid #e0e0e0;border-radius:8px;padding:20px;margin:16px 0;transition:border-color .3s}
+.quiz-box.correct{border-color:#27ae60;background:#f0fff4}
+.quiz-box.wrong{border-color:#e74c3c;background:#fff5f5}
+.quiz-box h4{margin:0 0 12px;font-size:14px}
+.quiz-opt{display:block;margin:6px 0;padding:8px 12px;border:1px solid #ddd;border-radius:6px;cursor:pointer;font-size:13px;transition:all .2s}
+.quiz-opt:hover{background:#f0f4f8;border-color:#3498db}
+.quiz-opt.selected{background:#e8f4f8;border-color:#3498db;font-weight:600}
+.quiz-opt.correct-answer{background:#d4edda;border-color:#27ae60}
+.quiz-opt.wrong-answer{background:#f8d7da;border-color:#e74c3c}
+.quiz-feedback{margin-top:10px;padding:10px;border-radius:6px;font-size:12px;display:none}
+.quiz-feedback.show{display:block}
+.quiz-score{text-align:center;padding:20px;background:#f8f9fa;border-radius:8px;margin:20px 0;font-size:16px}
+</style>
+
+<div class="quiz-box" id="q1">
+<h4>Q1. 피셔 방정식에서 명목 수익률 10%, 인플레이션 8%일 때 정확한 실질 수익률은?</h4>
+<label class="quiz-opt" onclick="checkQ('q1',this,0)">A. 2.00%</label>
+<label class="quiz-opt" onclick="checkQ('q1',this,1)">B. 1.85%</label>
+<label class="quiz-opt" onclick="checkQ('q1',this,2)">C. 1.50%</label>
+<label class="quiz-opt" onclick="checkQ('q1',this,3)">D. 2.15%</label>
+<div class="quiz-feedback" id="q1-fb"></div>
 </div>
 
-<div class="def">
-<p class="ni"><strong>Q5. [헤지 포트폴리오]</strong> 인플레이션 베타가 최소 1.0 이상이 되도록 SPY, TLT, GLD, DBC, VNQ를 조합한 포트폴리오를 CVXPY로 최적화하라. 제약 조건: 공매도 금지, 최대 40% 집중, 인플레이션 β ≥ 1.0.</p>
+<div class="quiz-box" id="q2">
+<h4>Q2. BEI(Breakeven Inflation)가 2.5%이고 실현 인플레이션이 4%이면?</h4>
+<label class="quiz-opt" onclick="checkQ('q2',this,0)">A. 명목 국채가 TIPS보다 유리</label>
+<label class="quiz-opt" onclick="checkQ('q2',this,1)">B. TIPS가 명목 국채보다 유리</label>
+<label class="quiz-opt" onclick="checkQ('q2',this,2)">C. 둘의 수익률이 동일</label>
+<label class="quiz-opt" onclick="checkQ('q2',this,3)">D. 판단 불가</label>
+<div class="quiz-feedback" id="q2-fb"></div>
 </div>
+
+<div class="quiz-box" id="q3">
+<h4>Q3. 인플레이션 베타(β_π)가 음수인 자산은?</h4>
+<label class="quiz-opt" onclick="checkQ('q3',this,0)">A. 원자재</label>
+<label class="quiz-opt" onclick="checkQ('q3',this,1)">B. 금</label>
+<label class="quiz-opt" onclick="checkQ('q3',this,2)">C. 장기 국채</label>
+<label class="quiz-opt" onclick="checkQ('q3',this,3)">D. TIPS</label>
+<div class="quiz-feedback" id="q3-fb"></div>
+</div>
+
+<div class="quiz-box" id="q4">
+<h4>Q4. 원자재 선물 수익률의 3가지 구성요소가 아닌 것은?</h4>
+<label class="quiz-opt" onclick="checkQ('q4',this,0)">A. 현물 가격 변동 (Spot Return)</label>
+<label class="quiz-opt" onclick="checkQ('q4',this,1)">B. 롤 수익률 (Roll Yield)</label>
+<label class="quiz-opt" onclick="checkQ('q4',this,2)">C. 담보 수익률 (Collateral Return)</label>
+<label class="quiz-opt" onclick="checkQ('q4',this,3)">D. 배당 수익률 (Dividend Yield)</label>
+<div class="quiz-feedback" id="q4-fb"></div>
+</div>
+
+<div class="quiz-box" id="q5">
+<h4>Q5. 고인플레이션 레짐에서 가장 좋은 실질 수익률을 보이는 자산군은?</h4>
+<label class="quiz-opt" onclick="checkQ('q5',this,0)">A. 장기 국채</label>
+<label class="quiz-opt" onclick="checkQ('q5',this,1)">B. 성장주</label>
+<label class="quiz-opt" onclick="checkQ('q5',this,2)">C. 원자재</label>
+<label class="quiz-opt" onclick="checkQ('q5',this,3)">D. 투자등급 회사채</label>
+<div class="quiz-feedback" id="q5-fb"></div>
+</div>
+
+<div class="quiz-score" id="quiz-score" style="display:none"></div>
+
+<script>
+var quizAnswers={q1:1,q2:1,q3:2,q4:3,q5:2};
+var quizExplain={
+  q1:'정확한 실질수익률 = (1+0.10)/(1+0.08) - 1 = 1.10/1.08 - 1 = 0.01852 ≈ 1.85%. 근사값(10%-8%=2%)과 0.15%p 차이. 인플레이션이 높을수록 근사 오차가 커진다.',
+  q2:'실현 인플레이션(4%) > BEI(2.5%)이면 TIPS가 유리. TIPS는 실현 인플레이션에 연동되므로 예상보다 높은 인플레이션에서 이득. 명목 국채는 고정 수익률이므로 실질 구매력 하락.',
+  q3:'장기 국채는 인플레이션 베타가 음수. 인플레이션 상승 → 금리 상승 → 채권 가격 하락. 듀레이션이 길수록 이 효과가 크다. 원자재와 금은 양의 β_π를 가진다.',
+  q4:'원자재 선물 수익률 = 현물 수익률 + 롤 수익률 + 담보 수익률. 원자재는 배당을 지급하지 않는다. 롤 수익률은 선물 만기 교체 시 발생하며, 백워데이션이면 양수, 콘탱고이면 음수.',
+  q5:'고인플레이션 레짐에서 원자재가 가장 높은 실질 수익률을 보인다. 원자재 가격 자체가 인플레이션의 원인이기도 하므로 자연스러운 헤지. 금도 양호하지만 원자재보다는 낮다.'
+};
+var quizDone={},quizCorrect=0,quizTotal=5;
+function checkQ(qid,el,idx){
+  if(quizDone[qid])return;
+  quizDone[qid]=true;
+  var box=document.getElementById(qid);
+  var opts=box.querySelectorAll('.quiz-opt');
+  var correct=quizAnswers[qid];
+  el.classList.add(idx===correct?'correct-answer':'wrong-answer');
+  if(idx!==correct) opts[correct].classList.add('correct-answer');
+  box.classList.add(idx===correct?'correct':'wrong');
+  if(idx===correct) quizCorrect++;
+  var fb=document.getElementById(qid+'-fb');
+  fb.innerHTML=(idx===correct?'<span style="color:#27ae60">✓ 정답!</span> ':'<span style="color:#e74c3c">✗ 오답.</span> ')+quizExplain[qid];
+  fb.style.background=idx===correct?'#d4edda':'#f8d7da';
+  fb.classList.add('show');
+  if(Object.keys(quizDone).length===quizTotal){
+    var sc=document.getElementById('quiz-score');
+    sc.style.display='block';
+    var pct=Math.round(quizCorrect/quizTotal*100);
+    var emoji=pct>=80?'🎉':pct>=60?'👍':'💪';
+    sc.innerHTML=emoji+' <strong>'+quizCorrect+'/'+quizTotal+'</strong> ('+pct+'%) — '+(pct>=80?'훌륭합니다!':pct>=60?'좋아요, 복습하면 완벽!':'위의 Lab에서 다시 실험해보세요!');
+  }
+}
+</script>
 
 <h3>7.1 핵심 수식 요약</h3>
 
