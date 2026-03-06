@@ -121,6 +121,7 @@ pre{font-size:11px;padding:14px}table{font-size:10px;display:block;overflow-x:au
 <li><a href="#ch4">4. 리밸런싱 전략</a></li>
 <li><a href="#ch5">5. 리밸런싱의 수학</a></li>
 <li><a href="#ch6">6. 파이썬 구현: 리밸런싱 시뮬레이션</a></li>
+<li><a href="#interactive">🎮 직접 해보기</a></li>
 <li><a href="#ch7">7. Quiz</a></li>
 </ul>
 </div>
@@ -837,31 +838,322 @@ w_stock = <span class="nu">0.6</span>
 <p class="ni"><strong>Ang Ch.4의 핵심 — 부채 헤징 포트폴리오 (LDI):</strong> 장기 투자자(연기금)는 자산만이 아니라 부채도 고려해야 한다. Ang은 최적 포트폴리오를 세 부분으로 분해한다: (1) 부채 헤징 포트폴리오 — 부채의 현금흐름을 매칭 (2) 근시안적 시장 포트폴리오 — 단기 위험-수익 최적화 (3) 장기 기회주의 포트폴리오 — 장기 투자 지평의 이점 활용. 이 분해는 Merrill Lynch의 "보호-시장-열망" 3단계 포트폴리오와 동일한 구조다.</p>
 </div>
 
-<h2 id="ch7">7. Quiz</h2>
 
-<div class="def">
-<p class="ni"><strong>Q1. [기하평균]</strong> 어떤 자산의 연간 수익률이 +30%, −20%, +15%, −10%, +25%였다. (a) 산술평균 수익률, (b) 기하평균 수익률, (c) 5년 후 $1,000의 최종 가치를 계산하라. 산술평균으로 계산한 최종 가치와 비교하라.</p>
+<!-- ═══════════════════════════════════════════ -->
+<!-- Interactive Learning Section -->
+<!-- ═══════════════════════════════════════════ -->
+<h2 id="interactive">🎮 직접 해보기 — Interactive Lab</h2>
+
+<h3>Lab 1. 변동성 드래그 체험</h3>
+<p class="ni">산술평균(μ)과 변동성(σ)을 바꿔보면서 기하평균이 어떻게 변하는지 확인하세요. 변동성이 높을수록 장기 복리 성장률이 크게 낮아집니다.</p>
+
+<div style="background:#f0f4f8;padding:20px;border-radius:8px;margin:20px 0">
+<div style="display:flex;gap:24px;flex-wrap:wrap;margin-bottom:12px">
+<div>
+<label style="font-size:14px;font-weight:600">산술평균 μ (%):</label><br>
+<input type="range" id="sl-mu3" min="2" max="20" step="0.5" value="10" style="width:180px">
+<span id="val-mu3" style="font-family:'Space Mono',monospace;font-size:16px;color:#0080c6;font-weight:bold">10.0%</span>
+</div>
+<div>
+<label style="font-size:14px;font-weight:600">변동성 σ (%):</label><br>
+<input type="range" id="sl-sig3" min="1" max="60" step="1" value="20" style="width:180px">
+<span id="val-sig3" style="font-family:'Space Mono',monospace;font-size:16px;color:#e74c3c;font-weight:bold">20%</span>
+</div>
+</div>
+<div id="plot-lab1r3" style="width:100%;height:380px"></div>
+<div id="lab1r3-info" style="font-family:'Space Mono',monospace;font-size:13px;margin-top:8px;padding:12px;background:#1e1e1e;color:#d4d4d4;border-radius:6px;line-height:1.8"></div>
 </div>
 
-<div class="def">
-<p class="ni"><strong>Q2. [변동성 드래그]</strong> 두 펀드가 있다. 펀드 A: 산술평균 12%, 변동성 15%. 펀드 B: 산술평균 14%, 변동성 30%. 근사식 \(g \approx \mu - \sigma^2/2\)를 사용하여 어느 펀드의 장기 복리 성장률이 더 높은지 판단하라.</p>
+<script>
+(function(){
+  var sMu=document.getElementById('sl-mu3'),sSig=document.getElementById('sl-sig3');
+  var vMu=document.getElementById('val-mu3'),vSig=document.getElementById('val-sig3');
+  function draw(){
+    var mu=parseFloat(sMu.value)/100,sig=parseFloat(sSig.value)/100;
+    vMu.textContent=(mu*100).toFixed(1)+'%'; vSig.textContent=(sig*100).toFixed(0)+'%';
+    var geo=mu-sig*sig/2;
+    var drag=sig*sig/2;
+    // chart: show growth of $100 over 30 years with arithmetic vs geometric
+    var years=[],arithGrowth=[],geoGrowth=[],dragGrowth=[];
+    for(var t=0;t<=30;t++){
+      years.push(t);
+      arithGrowth.push(100*Math.exp(mu*t));
+      geoGrowth.push(100*Math.exp(geo*t));
+      dragGrowth.push(100*Math.exp(mu*t)-100*Math.exp(geo*t));
+    }
+    Plotly.react('plot-lab1r3',[
+      {x:years,y:arithGrowth,mode:'lines',name:'산술평균 성장 (μ='+(mu*100).toFixed(1)+'%)',line:{color:'#3498db',width:2,dash:'dash'}},
+      {x:years,y:geoGrowth,mode:'lines',name:'기하평균 성장 (g='+(geo*100).toFixed(1)+'%)',line:{color:'#e74c3c',width:3}},
+      {x:years,y:dragGrowth,mode:'lines',name:'변동성 드래그 누적',line:{color:'#95a5a6',width:1.5,dash:'dot'},fill:'tozeroy',fillcolor:'rgba(149,165,166,0.15)'}
+    ],{
+      title:'$100 투자 30년 성장: 산술평균 vs 기하평균',
+      xaxis:{title:'투자 기간 (년)'},yaxis:{title:'자산 가치 ($)',type:'log'},
+      plot_bgcolor:'#fafaf8',paper_bgcolor:'#f0f4f8',font:{family:'Inter',size:12},
+      margin:{t:50,r:20,b:50,l:70},legend:{x:0.02,y:0.98}
+    },{responsive:true});
+    var final_arith=100*Math.exp(mu*30),final_geo=100*Math.exp(geo*30);
+    document.getElementById('lab1r3-info').innerHTML=
+      '<span style="color:#6a9955">// 변동성 드래그 분석</span>\n'+
+      'g ≈ μ - σ²/2 = '+(mu*100).toFixed(1)+'% - '+(drag*100).toFixed(2)+'% = <span style="color:#e74c3c">'+(geo*100).toFixed(2)+'%</span>\n'+
+      '30년 후 $100 → 산술: $'+final_arith.toFixed(0)+' vs 기하: <span style="color:#e74c3c">$'+final_geo.toFixed(0)+'</span>\n'+
+      '드래그 손실: <span style="color:#f39c12">$'+(final_arith-final_geo).toFixed(0)+'</span> ('+(((final_arith-final_geo)/final_arith)*100).toFixed(1)+'%)\n'+
+      (sig>0.3?'<span style="color:#e74c3c">⚠ 변동성 '+((sig*100).toFixed(0))+'%는 매우 높음 — 드래그가 수익의 대부분을 잠식!</span>':'');
+  }
+  sMu.addEventListener('input',draw); sSig.addEventListener('input',draw);
+  setTimeout(draw,300);
+})();
+</script>
+
+<h3>Lab 2. 리밸런싱 보너스 계산기</h3>
+<p class="ni">두 자산의 변동성과 상관계수를 바꿔보면서 리밸런싱 보너스가 어떻게 변하는지 확인하세요.</p>
+
+<div style="background:#f0f4f8;padding:20px;border-radius:8px;margin:20px 0">
+<div style="display:flex;gap:20px;flex-wrap:wrap;margin-bottom:12px">
+<div>
+<label style="font-size:12px;color:#555">자산1 비중 w₁ (%)</label><br>
+<input type="range" id="sl-w1r3" min="10" max="90" step="5" value="60" style="width:130px">
+<span id="val-w1r3" style="font-family:'Space Mono',monospace;font-size:13px">60%</span>
+</div>
+<div>
+<label style="font-size:12px;color:#555">자산1 σ₁ (%)</label><br>
+<input type="range" id="sl-v1r3" min="5" max="40" step="1" value="20" style="width:120px">
+<span id="val-v1r3" style="font-family:'Space Mono',monospace;font-size:13px">20%</span>
+</div>
+<div>
+<label style="font-size:12px;color:#555">자산2 σ₂ (%)</label><br>
+<input type="range" id="sl-v2r3" min="5" max="40" step="1" value="8" style="width:120px">
+<span id="val-v2r3" style="font-family:'Space Mono',monospace;font-size:13px">8%</span>
+</div>
+<div>
+<label style="font-size:12px;color:#555">상관계수 ρ</label><br>
+<input type="range" id="sl-rhor3" min="-1" max="1" step="0.05" value="0.2" style="width:130px">
+<span id="val-rhor3" style="font-family:'Space Mono',monospace;font-size:13px;color:#e74c3c">0.20</span>
+</div>
+</div>
+<div id="plot-lab2r3" style="width:100%;height:380px"></div>
+<div id="lab2r3-info" style="font-family:'Space Mono',monospace;font-size:13px;margin-top:8px;padding:12px;background:#1e1e1e;color:#d4d4d4;border-radius:6px;line-height:1.8"></div>
 </div>
 
-<div class="def">
-<p class="ni"><strong>Q3. [시간 분산 효과]</strong> "주식의 연율화 변동성은 투자 기간이 길어질수록 줄어드므로, 장기 투자자에게 주식은 안전하다"는 주장에 대해 Ang의 반론을 3가지 이상 제시하라. 풋옵션 가격을 이용한 논증을 포함하라.</p>
+<script>
+(function(){
+  var sW=document.getElementById('sl-w1r3'),sV1=document.getElementById('sl-v1r3'),sV2=document.getElementById('sl-v2r3'),sRho=document.getElementById('sl-rhor3');
+  var vW=document.getElementById('val-w1r3'),vV1=document.getElementById('val-v1r3'),vV2=document.getElementById('val-v2r3'),vRho=document.getElementById('val-rhor3');
+  function draw(){
+    var w1=parseInt(sW.value)/100,w2=1-w1;
+    var s1=parseInt(sV1.value)/100,s2=parseInt(sV2.value)/100,rho=parseFloat(sRho.value);
+    vW.textContent=(w1*100).toFixed(0)+'%'; vV1.textContent=(s1*100).toFixed(0)+'%';
+    vV2.textContent=(s2*100).toFixed(0)+'%'; vRho.textContent=rho.toFixed(2);
+    // compute bonus across all rho values
+    var rhos=[],bonuses=[];
+    for(var r=-1;r<=1;r+=0.02){
+      rhos.push(r);
+      var pv=w1*w1*s1*s1+w2*w2*s2*s2+2*w1*w2*s1*s2*r;
+      var wv=w1*s1*s1+w2*s2*s2;
+      bonuses.push((0.5*(wv-pv))*10000);
+    }
+    // current bonus
+    var pv_cur=w1*w1*s1*s1+w2*w2*s2*s2+2*w1*w2*s1*s2*rho;
+    var wv_cur=w1*s1*s1+w2*s2*s2;
+    var bonus_cur=0.5*(wv_cur-pv_cur);
+    Plotly.react('plot-lab2r3',[
+      {x:rhos,y:bonuses,mode:'lines',name:'리밸런싱 보너스 (bps)',line:{color:'#0080c6',width:3}},
+      {x:[rho],y:[bonus_cur*10000],mode:'markers',name:'현재 ρ='+rho.toFixed(2),marker:{size:14,color:'#e74c3c',symbol:'star',line:{width:2,color:'#333'}}},
+      {x:[-1,1],y:[0,0],mode:'lines',showlegend:false,line:{color:'#999',width:1,dash:'dot'}}
+    ],{
+      title:'리밸런싱 보너스 vs 상관계수 (w₁='+(w1*100).toFixed(0)+'%)',
+      xaxis:{title:'상관계수 ρ',range:[-1.05,1.05]},yaxis:{title:'리밸런싱 보너스 (bps)'},
+      plot_bgcolor:'#fafaf8',paper_bgcolor:'#f0f4f8',font:{family:'Inter',size:12},
+      margin:{t:50,r:20,b:50,l:60},legend:{x:0.6,y:0.98}
+    },{responsive:true});
+    document.getElementById('lab2r3-info').innerHTML=
+      '<span style="color:#6a9955">// 리밸런싱 보너스 = ½(Σwᵢσᵢ² - σ_p²)</span>\n'+
+      '가중평균 분산 = '+(wv_cur*10000).toFixed(1)+' bps\n'+
+      '포트폴리오 분산 = '+(pv_cur*10000).toFixed(1)+' bps\n'+
+      '리밸런싱 보너스 = <span style="color:'+(bonus_cur>=0?'#27ae60':'#e74c3c')+'">'+(bonus_cur*10000).toFixed(1)+' bps ('+(bonus_cur*100).toFixed(2)+'%)</span>\n'+
+      (bonus_cur>0.003?'→ 연 '+(bonus_cur*100).toFixed(2)+'% 추가 수익 — 상관관계가 낮아 리밸런싱 가치 높음':'→ 보너스가 작거나 음수 — 상관관계가 높아 리밸런싱 효과 제한적');
+  }
+  [sW,sV1,sV2,sRho].forEach(function(s){s.addEventListener('input',draw);});
+  setTimeout(draw,400);
+})();
+</script>
+
+<h3>Lab 3. Shannon's Demon 시뮬레이터</h3>
+<p class="ni">자산 비중을 바꿔보면서 Shannon's Demon 효과를 확인하세요. 기하평균이 0%인 자산도 리밸런싱으로 양의 수익을 만들 수 있습니다.</p>
+
+<div style="background:#f0f4f8;padding:20px;border-radius:8px;margin:20px 0">
+<div style="display:flex;gap:24px;flex-wrap:wrap;margin-bottom:12px">
+<div>
+<label style="font-size:14px;font-weight:600">자산 비중 (%):</label><br>
+<input type="range" id="sl-shannon" min="0" max="100" step="5" value="50" style="width:200px">
+<span id="val-shannon" style="font-family:'Space Mono',monospace;font-size:16px;color:#9b59b6;font-weight:bold">50%</span>
+<span style="font-size:12px;color:#555"> (나머지 = 현금)</span>
+</div>
+<div>
+<label style="font-size:14px;font-weight:600">상승폭 (%):</label><br>
+<input type="range" id="sl-up" min="20" max="200" step="10" value="100" style="width:140px">
+<span id="val-up" style="font-family:'Space Mono',monospace;font-size:13px">+100%</span>
+</div>
+<div>
+<label style="font-size:14px;font-weight:600">하락폭 (%):</label><br>
+<input type="range" id="sl-dn" min="10" max="90" step="5" value="50" style="width:140px">
+<span id="val-dn" style="font-family:'Space Mono',monospace;font-size:13px">-50%</span>
+</div>
+</div>
+<div id="plot-lab3r3" style="width:100%;height:380px"></div>
+<div id="lab3r3-info" style="font-family:'Space Mono',monospace;font-size:13px;margin-top:8px;padding:12px;background:#1e1e1e;color:#d4d4d4;border-radius:6px;line-height:1.8"></div>
 </div>
 
-<div class="def">
-<p class="ni"><strong>Q4. [리밸런싱 보너스]</strong> 주식(σ=25%)과 금(σ=20%), 상관계수 ρ=−0.1인 두 자산을 50:50으로 투자한다. 리밸런싱 보너스 근사값을 계산하라. 상관계수가 +0.5로 바뀌면 보너스는 어떻게 변하는가?</p>
+<script>
+(function(){
+  var sW=document.getElementById('sl-shannon'),sUp=document.getElementById('sl-up'),sDn=document.getElementById('sl-dn');
+  var vW=document.getElementById('val-shannon'),vUp=document.getElementById('val-up'),vDn=document.getElementById('val-dn');
+  function draw(){
+    var w=parseInt(sW.value)/100,up=parseInt(sUp.value)/100,dn=parseInt(sDn.value)/100;
+    vW.textContent=(w*100).toFixed(0)+'%'; vUp.textContent='+'+(up*100).toFixed(0)+'%'; vDn.textContent='-'+(dn*100).toFixed(0)+'%';
+    // compute geometric growth for different weights
+    var weights=[],geos=[];
+    for(var ww=0;ww<=1;ww+=0.01){
+      weights.push(ww*100);
+      // per-period: up scenario: ww*(1+up)+(1-ww) = 1+ww*up
+      // dn scenario: ww*(1-dn)+(1-ww) = 1-ww*dn
+      var gUp=1+ww*up, gDn=1-ww*dn;
+      var geoPerPeriod=Math.sqrt(gUp*gDn)-1;
+      geos.push(geoPerPeriod*100);
+    }
+    // current weight
+    var gUpCur=1+w*up,gDnCur=1-w*dn;
+    var geoCur=Math.sqrt(gUpCur*gDnCur)-1;
+    // 100% asset
+    var geo100=Math.sqrt((1+up)*(1-dn))-1;
+    // optimal Kelly
+    var kelly=(up-dn)/(2*up*dn); // simplified for 50/50
+    if(kelly<0)kelly=0;if(kelly>1)kelly=1;
+    var gUpK=1+kelly*up,gDnK=1-kelly*dn;
+    var geoKelly=Math.sqrt(gUpK*gDnK)-1;
+
+    Plotly.react('plot-lab3r3',[
+      {x:weights,y:geos,mode:'lines',name:'기하평균 vs 자산 비중',line:{color:'#9b59b6',width:3}},
+      {x:[w*100],y:[geoCur*100],mode:'markers',name:'현재 (w='+(w*100).toFixed(0)+'%)',marker:{size:14,color:'#e74c3c',symbol:'circle',line:{width:2,color:'#333'}}},
+      {x:[kelly*100],y:[geoKelly*100],mode:'markers',name:'Kelly 최적 (w='+(kelly*100).toFixed(0)+'%)',marker:{size:12,color:'#27ae60',symbol:'star',line:{width:2,color:'#333'}}},
+      {x:[0,100],y:[0,0],mode:'lines',showlegend:false,line:{color:'#999',width:1,dash:'dot'}}
+    ],{
+      title:"Shannon's Demon: 기하평균 vs 자산 비중",
+      xaxis:{title:'자산 비중 (%)',range:[0,100]},yaxis:{title:'기하평균 수익률 (%)'},
+      plot_bgcolor:'#fafaf8',paper_bgcolor:'#f0f4f8',font:{family:'Inter',size:12},
+      margin:{t:50,r:20,b:50,l:60},legend:{x:0.55,y:0.98}
+    },{responsive:true});
+    document.getElementById('lab3r3-info').innerHTML=
+      '<span style="color:#6a9955">// Shannon\'s Demon 분석</span>\n'+
+      '자산: +'+(up*100).toFixed(0)+'% or -'+(dn*100).toFixed(0)+'% (50/50 확률)\n'+
+      '100% 자산 기하평균: <span style="color:'+(geo100>=0?'#27ae60':'#e74c3c')+'">'+(geo100*100).toFixed(2)+'%</span>\n'+
+      '현재 비중('+(w*100).toFixed(0)+'%) 기하평균: <span style="color:'+(geoCur>=0?'#27ae60':'#e74c3c')+'">'+(geoCur*100).toFixed(2)+'%</span>\n'+
+      'Kelly 최적 비중: <span style="color:#27ae60">'+(kelly*100).toFixed(0)+'%</span> → 기하평균 '+(geoKelly*100).toFixed(2)+'%\n'+
+      (geoCur>geo100?'<span style="color:#27ae60">→ 리밸런싱이 100% 투자보다 우월!</span>':'');
+  }
+  [sW,sUp,sDn].forEach(function(s){s.addEventListener('input',draw);});
+  setTimeout(draw,500);
+})();
+</script>
+
+
+<!-- Ch7: Quiz — 즉시 채점 -->
+<!-- ═══════════════════════════════════════════ -->
+<h2 id="ch7">7. Quiz — 즉시 채점</h2>
+
+<style>
+.quiz-box{background:#fff;border:2px solid #e0e0e0;border-radius:8px;padding:20px;margin:16px 0;transition:border-color .3s}
+.quiz-box.correct{border-color:#27ae60;background:#f0fff4}
+.quiz-box.wrong{border-color:#e74c3c;background:#fff5f5}
+.quiz-box h4{margin:0 0 12px;font-size:14px}
+.quiz-opt{display:block;margin:6px 0;padding:8px 12px;border:1px solid #ddd;border-radius:6px;cursor:pointer;font-size:13px;transition:all .2s}
+.quiz-opt:hover{background:#f0f4f8;border-color:#3498db}
+.quiz-opt.correct-answer{background:#d4edda;border-color:#27ae60}
+.quiz-opt.wrong-answer{background:#f8d7da;border-color:#e74c3c}
+.quiz-feedback{margin-top:10px;padding:10px;border-radius:6px;font-size:12px;display:none}
+.quiz-feedback.show{display:block}
+.quiz-score{text-align:center;padding:20px;background:#f8f9fa;border-radius:8px;margin:20px 0;font-size:16px}
+</style>
+
+<div class="quiz-box" id="q1">
+<h4>Q1. 산술평균 10%, 변동성 30%인 자산의 기하평균(장기 복리 성장률) 근사값은?</h4>
+<label class="quiz-opt" onclick="checkQ('q1',this,0)">A. 10.0%</label>
+<label class="quiz-opt" onclick="checkQ('q1',this,1)">B. 5.5%</label>
+<label class="quiz-opt" onclick="checkQ('q1',this,2)">C. 7.0%</label>
+<label class="quiz-opt" onclick="checkQ('q1',this,3)">D. 8.5%</label>
+<div class="quiz-feedback" id="q1-fb"></div>
 </div>
 
-<div class="def">
-<p class="ni"><strong>Q5. [Shannon's Demon]</strong> 매기 +80% 또는 −40% (동일 확률)인 자산이 있다. (a) 산술평균과 기하평균을 계산하라. (b) 이 자산과 현금을 50:50으로 매기 리밸런싱할 때의 기하평균을 계산하라. (c) 최적 리밸런싱 비율(Kelly Criterion)을 구하라.</p>
+<div class="quiz-box" id="q2">
+<h4>Q2. "주식은 장기적으로 안전하다"는 시간 분산 효과에 대한 Ang의 반론으로 올바른 것은?</h4>
+<label class="quiz-opt" onclick="checkQ('q2',this,0)">A. 연율화 변동성이 줄어드는 것은 사실이 아니다</label>
+<label class="quiz-opt" onclick="checkQ('q2',this,1)">B. 달러 기준 손실 범위(σ√T)는 시간에 따라 확대된다</label>
+<label class="quiz-opt" onclick="checkQ('q2',this,2)">C. 장기 풋옵션이 단기보다 싸다</label>
+<label class="quiz-opt" onclick="checkQ('q2',this,3)">D. 기하평균이 산술평균보다 항상 크다</label>
+<div class="quiz-feedback" id="q2-fb"></div>
 </div>
 
-<div class="def">
-<p class="ni"><strong>Q6. [시뮬레이션]</strong> 3개 자산(주식 μ=10%, σ=20%; 채권 μ=4%, σ=6%; 금 μ=3%, σ=18%)과 상관행렬 ρ(주식,채권)=0.1, ρ(주식,금)=−0.1, ρ(채권,금)=0.05를 사용하여 Monte Carlo 시뮬레이션(1,000회, 20년)을 수행하라. 동일 비중 포트폴리오에서 (a) B&H vs 월간 리밸런싱의 중앙값 CAGR, (b) 5th 백분위 최종가치를 비교하라.</p>
+<div class="quiz-box" id="q3">
+<h4>Q3. Shannon's Demon에서 기하평균이 0%인 자산과 현금을 50:50으로 리밸런싱하면?</h4>
+<label class="quiz-opt" onclick="checkQ('q3',this,0)">A. 기하평균도 0%이다</label>
+<label class="quiz-opt" onclick="checkQ('q3',this,1)">B. 양의 기하평균을 얻을 수 있다</label>
+<label class="quiz-opt" onclick="checkQ('q3',this,2)">C. 음의 기하평균이 된다</label>
+<label class="quiz-opt" onclick="checkQ('q3',this,3)">D. 결과를 예측할 수 없다</label>
+<div class="quiz-feedback" id="q3-fb"></div>
 </div>
+
+<div class="quiz-box" id="q4">
+<h4>Q4. 리밸런싱 보너스가 가장 큰 경우는?</h4>
+<label class="quiz-opt" onclick="checkQ('q4',this,0)">A. 두 자산의 상관계수가 +0.9일 때</label>
+<label class="quiz-opt" onclick="checkQ('q4',this,1)">B. 두 자산의 변동성이 모두 낮을 때</label>
+<label class="quiz-opt" onclick="checkQ('q4',this,2)">C. 두 자산의 상관계수가 낮고 변동성이 높을 때</label>
+<label class="quiz-opt" onclick="checkQ('q4',this,3)">D. 한 자산에 100% 투자할 때</label>
+<div class="quiz-feedback" id="q4-fb"></div>
+</div>
+
+<div class="quiz-box" id="q5">
+<h4>Q5. Constant-Mix 리밸런싱 전략의 특성으로 올바른 것은?</h4>
+<label class="quiz-opt" onclick="checkQ('q5',this,0)">A. 모멘텀(추세추종) 전략과 유사하다</label>
+<label class="quiz-opt" onclick="checkQ('q5',this,1)">B. 상승한 자산을 더 사고 하락한 자산을 판다</label>
+<label class="quiz-opt" onclick="checkQ('q5',this,2)">C. 역추세(contrarian) 전략으로, 상승한 자산을 팔고 하락한 자산을 산다</label>
+<label class="quiz-opt" onclick="checkQ('q5',this,3)">D. 초기 투자 후 아무것도 하지 않는다</label>
+<div class="quiz-feedback" id="q5-fb"></div>
+</div>
+
+<div class="quiz-score" id="quiz-score" style="display:none"></div>
+
+<script>
+var quizAnswers={q1:1,q2:1,q3:1,q4:2,q5:2};
+var quizExplain={
+  q1:'g ≈ μ - σ²/2 = 10% - (0.30²)/2 = 10% - 4.5% = 5.5%. 변동성 30%의 드래그가 4.5%p나 된다! Lab 1에서 직접 확인해보세요.',
+  q2:'Ang의 핵심 반론: 연율화 σ/√T는 줄지만, 달러 기준 손실 범위 σ√T는 커진다. 또한 장기 풋옵션은 단기보다 비싸다 — 시장이 장기가 더 위험하다고 평가하는 증거.',
+  q3:'Shannon\'s Demon의 핵심. 기하평균 0%인 자산도 현금과 리밸런싱하면 양의 복리 수익을 얻는다. 리밸런싱이 "변동성을 수확"하기 때문. Lab 3에서 확인!',
+  q4:'리밸런싱 보너스 = ½(Σwᵢσᵢ² - σ_p²). 상관관계가 낮으면 σ_p²가 작아져 보너스 증가. 변동성이 높으면 개별 분산이 커져 보너스 증가. Lab 2에서 ρ를 -1로 놓아보세요.',
+  q5:'Constant-Mix는 목표 비중을 유지하므로, 상승한 자산을 팔고(이익 실현) 하락한 자산을 산다(저가 매수). 이것은 역추세(contrarian) 전략이다. Buy-and-Hold가 모멘텀, CPPI가 추세추종.'
+};
+var quizDone={},quizCorrect=0,quizTotal=5;
+function checkQ(qid,el,idx){
+  if(quizDone[qid])return;
+  quizDone[qid]=true;
+  var box=document.getElementById(qid);
+  var opts=box.querySelectorAll('.quiz-opt');
+  var correct=quizAnswers[qid];
+  el.classList.add(idx===correct?'correct-answer':'wrong-answer');
+  if(idx!==correct) opts[correct].classList.add('correct-answer');
+  box.classList.add(idx===correct?'correct':'wrong');
+  if(idx===correct) quizCorrect++;
+  var fb=document.getElementById(qid+'-fb');
+  fb.innerHTML=(idx===correct?'<span style="color:#27ae60">✓ 정답!</span> ':'<span style="color:#e74c3c">✗ 오답.</span> ')+quizExplain[qid];
+  fb.style.background=idx===correct?'#d4edda':'#f8d7da';
+  fb.classList.add('show');
+  if(Object.keys(quizDone).length===quizTotal){
+    var sc=document.getElementById('quiz-score');
+    sc.style.display='block';
+    var pct=Math.round(quizCorrect/quizTotal*100);
+    var emoji=pct>=80?'🎉':pct>=60?'👍':'💪';
+    sc.innerHTML=emoji+' <strong>'+quizCorrect+'/'+quizTotal+'</strong> ('+pct+'%) — '+(pct>=80?'훌륭합니다!':pct>=60?'좋아요, 복습하면 완벽!':'위의 Lab에서 다시 실험해보세요!');
+  }
+}
+</script>
 
 <h3>7.1 핵심 수식 요약</h3>
 
