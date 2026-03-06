@@ -119,6 +119,7 @@ pre{font-size:11px;padding:14px}table{font-size:10px;display:block;overflow-x:au
 <li><a href="#ch4">4. 베타 추정</a></li>
 <li><a href="#ch5">5. CAPM의 한계</a></li>
 <li><a href="#ch6">6. 파이썬 구현: 베타 추정</a></li>
+<li><a href="#interactive">🎮 직접 해보기</a></li>
 <li><a href="#ch7">7. Quiz</a></li>
 </ul>
 </div>
@@ -631,37 +632,276 @@ corr = np.corrcoef(assets.T)
 
 <h2 id="ch7">7. Quiz</h2>
 
-<div class="def">
-<p class="ni"><strong>Q1. [CAPM 계산]</strong> 무위험이자율 \(r_f = 3\%\), 시장 기대수익률 \(E[r_m] = 10\%\)일 때, \(\beta = 1.5\)인 주식의 CAPM 기대수익률은? 이 주식의 실제 수익률이 14%라면 알파는?</p>
+<!-- ═══════════════════════════════════════════ -->
+<!-- Interactive Learning Section -->
+<!-- ═══════════════════════════════════════════ -->
+<h2 id="interactive">🎮 직접 해보기 — Interactive Lab</h2>
+
+<h3>Lab 1. Security Market Line (SML) 탐색기</h3>
+<p class="ni">무위험이자율(r_f)과 시장 기대수익률(E[r_m])을 바꿔보면서 SML이 어떻게 변하는지 확인하세요. 개별 주식이 SML 위(양의 알파)인지 아래(음의 알파)인지 관찰하세요.</p>
+
+<div style="background:#f0f4f8;padding:20px;border-radius:8px;margin:20px 0">
+<div style="display:flex;gap:24px;flex-wrap:wrap;margin-bottom:12px">
+<div>
+<label style="font-size:14px;font-weight:600">r_f (%):</label><br>
+<input type="range" id="sl-rf4" min="0" max="8" step="0.5" value="3" style="width:150px">
+<span id="val-rf4" style="font-family:'Space Mono',monospace;font-size:16px;color:#0080c6;font-weight:bold">3.0%</span>
+</div>
+<div>
+<label style="font-size:14px;font-weight:600">E[r_m] (%):</label><br>
+<input type="range" id="sl-erm" min="4" max="18" step="0.5" value="10" style="width:150px">
+<span id="val-erm" style="font-family:'Space Mono',monospace;font-size:16px;color:#e74c3c;font-weight:bold">10.0%</span>
+</div>
+</div>
+<div id="plot-lab1r4" style="width:100%;height:400px"></div>
+<div id="lab1r4-info" style="font-family:'Space Mono',monospace;font-size:12px;margin-top:8px;padding:10px;background:#1e1e1e;color:#d4d4d4;border-radius:6px;line-height:1.8"></div>
 </div>
 
-<div class="def">
-<p class="ni"><strong>Q2. [베타 해석]</strong> 주식 A의 \(\beta = 0.7\), 주식 B의 \(\beta = 1.3\)이다. 시장이 -5% 하락할 때 각 주식의 CAPM 예측 수익률 변화는? 어떤 주식이 경기 침체기에 더 방어적인가?</p>
+<script>
+(function(){
+  var sRf=document.getElementById('sl-rf4'),sErm=document.getElementById('sl-erm');
+  var vRf=document.getElementById('val-rf4'),vErm=document.getElementById('val-erm');
+  // sample stocks: name, beta, actual return
+  var stocks=[
+    {n:'삼성전자',b:1.0,r:12,c:'#e74c3c'},
+    {n:'카카오',b:1.4,r:8,c:'#f39c12'},
+    {n:'한국전력',b:0.4,r:6,c:'#27ae60'},
+    {n:'셀트리온',b:1.2,r:15,c:'#9b59b6'},
+    {n:'SK하이닉스',b:1.3,r:11,c:'#3498db'}
+  ];
+  function draw(){
+    var rf=parseFloat(sRf.value),erm=parseFloat(sErm.value);
+    vRf.textContent=rf.toFixed(1)+'%'; vErm.textContent=erm.toFixed(1)+'%';
+    var erp=erm-rf; // equity risk premium
+    // SML line
+    var betas=[0,0.5,1.0,1.5,2.0],smlRets=betas.map(function(b){return rf+b*erp;});
+    var traces=[{x:betas,y:smlRets,mode:'lines',name:'SML: E[r]='+rf.toFixed(1)+'%+β×'+erp.toFixed(1)+'%',line:{color:'#0080c6',width:3}}];
+    // stocks
+    var info='<span style="color:#6a9955">// 알파 분석 (ERP='+(erp).toFixed(1)+'%)</span>\n';
+    stocks.forEach(function(s){
+      var expected=rf+s.b*erp;
+      var alpha=s.r-expected;
+      traces.push({x:[s.b],y:[s.r],mode:'markers+text',name:s.n+' (α='+(alpha>=0?'+':'')+alpha.toFixed(1)+'%)',
+        marker:{size:12,color:s.c,symbol:alpha>=0?'triangle-up':'triangle-down'},text:[s.n],textposition:'top right'});
+      info+=s.n+': β='+s.b.toFixed(1)+', CAPM='+expected.toFixed(1)+'%, 실제='+s.r+'%, <span style="color:'+(alpha>=0?'#27ae60':'#e74c3c')+'">α='+(alpha>=0?'+':'')+alpha.toFixed(1)+'%</span>\n';
+    });
+    Plotly.react('plot-lab1r4',traces,{
+      title:'Security Market Line (r_f='+rf.toFixed(1)+'%, E[r_m]='+erm.toFixed(1)+'%)',
+      xaxis:{title:'β (시장 민감도)',range:[-0.1,2.2]},yaxis:{title:'기대수익률 (%)',range:[0,20]},
+      plot_bgcolor:'#fafaf8',paper_bgcolor:'#f0f4f8',font:{family:'Inter',size:12},
+      margin:{t:50,r:20,b:50,l:60},legend:{x:0.02,y:0.98}
+    },{responsive:true});
+    document.getElementById('lab1r4-info').innerHTML=info;
+  }
+  sRf.addEventListener('input',draw); sErm.addEventListener('input',draw);
+  setTimeout(draw,300);
+})();
+</script>
+
+<h3>Lab 2. 베타와 시장 시나리오</h3>
+<p class="ni">베타(β)를 바꿔보면서 시장이 상승/하락할 때 주식 수익률이 어떻게 변하는지 확인하세요.</p>
+
+<div style="background:#f0f4f8;padding:20px;border-radius:8px;margin:20px 0">
+<div style="display:flex;gap:24px;flex-wrap:wrap;margin-bottom:12px">
+<div>
+<label style="font-size:14px;font-weight:600">β (베타):</label><br>
+<input type="range" id="sl-beta4" min="-0.5" max="2.5" step="0.1" value="1.2" style="width:200px">
+<span id="val-beta4" style="font-family:'Space Mono',monospace;font-size:16px;color:#9b59b6;font-weight:bold">1.20</span>
+</div>
+<div>
+<label style="font-size:14px;font-weight:600">알파 (%):</label><br>
+<input type="range" id="sl-alpha4" min="-5" max="5" step="0.5" value="0" style="width:150px">
+<span id="val-alpha4" style="font-family:'Space Mono',monospace;font-size:13px">0.0%</span>
+</div>
+</div>
+<div id="plot-lab2r4" style="width:100%;height:380px"></div>
+<div id="lab2r4-info" style="font-family:'Space Mono',monospace;font-size:13px;margin-top:8px;padding:10px;background:#1e1e1e;color:#d4d4d4;border-radius:6px;line-height:1.8"></div>
 </div>
 
-<div class="def">
-<p class="ni"><strong>Q3. [SML 분석]</strong> 다음 5개 주식의 데이터가 주어졌을 때 (\(r_f=2\%\), \(E[r_m]=9\%\)), 각 주식의 알파를 계산하고 SML 그래프를 그려라.</p>
-<table>
-<tr><th>주식</th><th>β</th><th>실제 수익률</th></tr>
-<tr><td>A</td><td>0.5</td><td>7%</td></tr>
-<tr><td>B</td><td>1.0</td><td>9%</td></tr>
-<tr><td>C</td><td>1.2</td><td>8%</td></tr>
-<tr><td>D</td><td>0.8</td><td>10%</td></tr>
-<tr><td>E</td><td>1.5</td><td>13%</td></tr>
-</table>
+<script>
+(function(){
+  var sB=document.getElementById('sl-beta4'),sA=document.getElementById('sl-alpha4');
+  var vB=document.getElementById('val-beta4'),vA=document.getElementById('val-alpha4');
+  function draw(){
+    var beta=parseFloat(sB.value),alpha=parseFloat(sA.value);
+    vB.textContent=beta.toFixed(2); vA.textContent=alpha.toFixed(1)+'%';
+    // market scenarios
+    var mktRets=[];for(var m=-30;m<=30;m+=0.5)mktRets.push(m);
+    var stockRets=mktRets.map(function(m){return alpha+beta*m;});
+    // specific scenarios
+    var scenarios=[-20,-10,-5,0,5,10,20];
+    var scenX=scenarios,scenY=scenarios.map(function(m){return alpha+beta*m;});
+    Plotly.react('plot-lab2r4',[
+      {x:mktRets,y:stockRets,mode:'lines',name:'주식 수익률 = '+alpha.toFixed(1)+'% + '+beta.toFixed(2)+'×r_m',line:{color:'#9b59b6',width:3}},
+      {x:scenX,y:scenY,mode:'markers',name:'시나리오',marker:{size:10,color:scenY.map(function(y){return y>=0?'#27ae60':'#e74c3c';}),symbol:'circle'}},
+      {x:[-30,30],y:[0,0],mode:'lines',showlegend:false,line:{color:'#999',width:1,dash:'dot'}},
+      {x:[0,0],y:[-50,50],mode:'lines',showlegend:false,line:{color:'#999',width:1,dash:'dot'}},
+      {x:[-30,30],y:[-30,30],mode:'lines',name:'β=1 (시장)',line:{color:'#ccc',width:1,dash:'dash'}}
+    ],{
+      title:'주식 수익률 vs 시장 수익률 (β='+beta.toFixed(2)+', α='+alpha.toFixed(1)+'%)',
+      xaxis:{title:'시장 수익률 r_m (%)',range:[-32,32]},yaxis:{title:'주식 수익률 r_i (%)',range:[-50,50]},
+      plot_bgcolor:'#fafaf8',paper_bgcolor:'#f0f4f8',font:{family:'Inter',size:12},
+      margin:{t:50,r:20,b:50,l:60},legend:{x:0.02,y:0.98}
+    },{responsive:true});
+    document.getElementById('lab2r4-info').innerHTML=
+      '<span style="color:#6a9955">// 시나리오 분석</span>\n'+
+      '시장 -20% → 주식 '+(alpha+beta*(-20)).toFixed(1)+'%  |  시장 +20% → 주식 '+(alpha+beta*20).toFixed(1)+'%\n'+
+      '시장 -10% → 주식 '+(alpha+beta*(-10)).toFixed(1)+'%  |  시장 +10% → 주식 '+(alpha+beta*10).toFixed(1)+'%\n'+
+      (beta>1?'β>1: 시장보다 변동 큼 (공격적)':beta<1&&beta>0?'β<1: 시장보다 변동 작음 (방어적)':beta<0?'β<0: 시장과 반대로 움직임 (헤지)':'β=1: 시장과 동일하게 움직임');
+  }
+  sB.addEventListener('input',draw); sA.addEventListener('input',draw);
+  setTimeout(draw,400);
+})();
+</script>
+
+<h3>Lab 3. CAPM 알파 계산기</h3>
+<p class="ni">여러 주식의 베타와 실제 수익률을 입력하면 알파를 자동 계산합니다.</p>
+
+<div style="background:#f0f4f8;padding:20px;border-radius:8px;margin:20px 0">
+<div style="display:flex;gap:20px;flex-wrap:wrap;margin-bottom:12px">
+<div>
+<label style="font-size:12px;color:#555">r_f (%)</label><br>
+<input type="range" id="sl-rf4b" min="0" max="6" step="0.5" value="3" style="width:100px">
+<span id="val-rf4b" style="font-family:'Space Mono',monospace;font-size:12px">3%</span>
+</div>
+<div>
+<label style="font-size:12px;color:#555">E[r_m] (%)</label><br>
+<input type="range" id="sl-erm4b" min="5" max="15" step="0.5" value="10" style="width:100px">
+<span id="val-erm4b" style="font-family:'Space Mono',monospace;font-size:12px">10%</span>
+</div>
+<div>
+<label style="font-size:12px;color:#555">주식 β</label><br>
+<input type="range" id="sl-b4b" min="0" max="2.5" step="0.1" value="1.2" style="width:120px">
+<span id="val-b4b" style="font-family:'Space Mono',monospace;font-size:12px">1.20</span>
+</div>
+<div>
+<label style="font-size:12px;color:#555">실제 수익률 (%)</label><br>
+<input type="range" id="sl-ar4b" min="-10" max="25" step="0.5" value="14" style="width:120px">
+<span id="val-ar4b" style="font-family:'Space Mono',monospace;font-size:12px">14%</span>
+</div>
+</div>
+<div id="lab3r4-info" style="font-family:'Space Mono',monospace;font-size:14px;padding:16px;background:#1e1e1e;color:#d4d4d4;border-radius:6px;line-height:2"></div>
 </div>
 
-<div class="def">
-<p class="ni"><strong>Q4. [Python 구현]</strong> yfinance로 삼성전자(005930.KS)와 KOSPI(^KS11)의 3년 월간 데이터를 다운로드하고, (a) OLS로 베타를 추정하고, (b) 12개월 롤링 베타를 계산하여 시각화하라.</p>
+<script>
+(function(){
+  var sRf=document.getElementById('sl-rf4b'),sErm=document.getElementById('sl-erm4b'),sB=document.getElementById('sl-b4b'),sAr=document.getElementById('sl-ar4b');
+  var vRf=document.getElementById('val-rf4b'),vErm=document.getElementById('val-erm4b'),vB=document.getElementById('val-b4b'),vAr=document.getElementById('val-ar4b');
+  function draw(){
+    var rf=parseFloat(sRf.value),erm=parseFloat(sErm.value),beta=parseFloat(sB.value),ar=parseFloat(sAr.value);
+    vRf.textContent=rf+'%'; vErm.textContent=erm+'%'; vB.textContent=beta.toFixed(2); vAr.textContent=ar+'%';
+    var expected=rf+beta*(erm-rf);
+    var alpha=ar-expected;
+    document.getElementById('lab3r4-info').innerHTML=
+      '<span style="color:#6a9955">// CAPM 알파 계산</span>\n'+
+      'CAPM 기대수익률 = r_f + β(E[r_m]-r_f)\n'+
+      '                = '+rf+'% + '+beta.toFixed(2)+' × '+(erm-rf).toFixed(1)+'%\n'+
+      '                = <span style="color:#569cd6">'+expected.toFixed(1)+'%</span>\n\n'+
+      '알파 = 실제 수익률 - CAPM 기대수익률\n'+
+      '     = '+ar+'% - '+expected.toFixed(1)+'%\n'+
+      '     = <span style="color:'+(alpha>=0?'#27ae60':'#e74c3c')+';font-size:18px;font-weight:bold">'+(alpha>=0?'+':'')+alpha.toFixed(1)+'%</span>\n\n'+
+      (alpha>0?'<span style="color:#27ae60">→ 양의 알파: CAPM 대비 초과 성과. 매니저 스킬 or 추가 팩터 노출?</span>':
+       alpha<0?'<span style="color:#e74c3c">→ 음의 알파: CAPM 대비 부진. 비용? 나쁜 타이밍?</span>':
+       '<span style="color:#f39c12">→ 알파 = 0: CAPM이 정확히 예측. 효율적 시장?</span>');
+  }
+  [sRf,sErm,sB,sAr].forEach(function(s){s.addEventListener('input',draw);});
+  setTimeout(draw,500);
+})();
+</script>
+
+
+<!-- Ch7: Quiz — 즉시 채점 -->
+<h2 id="ch7">7. Quiz — 즉시 채점</h2>
+
+<style>
+.quiz-box{background:#fff;border:2px solid #e0e0e0;border-radius:8px;padding:20px;margin:16px 0;transition:border-color .3s}
+.quiz-box.correct{border-color:#27ae60;background:#f0fff4}
+.quiz-box.wrong{border-color:#e74c3c;background:#fff5f5}
+.quiz-box h4{margin:0 0 12px;font-size:14px}
+.quiz-opt{display:block;margin:6px 0;padding:8px 12px;border:1px solid #ddd;border-radius:6px;cursor:pointer;font-size:13px;transition:all .2s}
+.quiz-opt:hover{background:#f0f4f8;border-color:#3498db}
+.quiz-opt.correct-answer{background:#d4edda;border-color:#27ae60}
+.quiz-opt.wrong-answer{background:#f8d7da;border-color:#e74c3c}
+.quiz-feedback{margin-top:10px;padding:10px;border-radius:6px;font-size:12px;display:none}
+.quiz-feedback.show{display:block}
+.quiz-score{text-align:center;padding:20px;background:#f8f9fa;border-radius:8px;margin:20px 0;font-size:16px}
+</style>
+
+<div class="quiz-box" id="q1">
+<h4>Q1. r_f=3%, E[r_m]=10%일 때, β=1.5인 주식의 CAPM 기대수익률은?</h4>
+<label class="quiz-opt" onclick="checkQ('q1',this,0)">A. 10.5%</label>
+<label class="quiz-opt" onclick="checkQ('q1',this,1)">B. 13.5%</label>
+<label class="quiz-opt" onclick="checkQ('q1',this,2)">C. 15.0%</label>
+<label class="quiz-opt" onclick="checkQ('q1',this,3)">D. 7.5%</label>
+<div class="quiz-feedback" id="q1-fb"></div>
 </div>
 
-<div class="def">
-<p class="ni"><strong>Q5. [R² 해석]</strong> CAPM 회귀에서 삼성전자의 \(R^2 = 0.51\), 한 바이오 소형주의 \(R^2 = 0.08\)이다. 각각의 총위험 중 체계적 위험과 고유 위험의 비율을 해석하라. 어떤 주식이 분산투자 효과가 더 큰가?</p>
+<div class="quiz-box" id="q2">
+<h4>Q2. β=0.7인 주식은 시장이 -10% 하락할 때 CAPM에 의하면 약 얼마나 하락하는가?</h4>
+<label class="quiz-opt" onclick="checkQ('q2',this,0)">A. -10%</label>
+<label class="quiz-opt" onclick="checkQ('q2',this,1)">B. -7%</label>
+<label class="quiz-opt" onclick="checkQ('q2',this,2)">C. -14%</label>
+<label class="quiz-opt" onclick="checkQ('q2',this,3)">D. -3%</label>
+<div class="quiz-feedback" id="q2-fb"></div>
 </div>
 
-<div class="def">
-<p class="ni"><strong>Q6. [CAPM의 한계]</strong> Fama-French(1992)가 발견한 규모 효과(size effect)와 가치 효과(value effect)를 설명하라. 이 이상현상이 CAPM의 어떤 예측과 모순되는지 서술하라.</p>
+<div class="quiz-box" id="q3">
+<h4>Q3. CAPM 회귀에서 R²=0.60이면, 이 주식의 총위험 중 체계적 위험의 비율은?</h4>
+<label class="quiz-opt" onclick="checkQ('q3',this,0)">A. 40%</label>
+<label class="quiz-opt" onclick="checkQ('q3',this,1)">B. 60%</label>
+<label class="quiz-opt" onclick="checkQ('q3',this,2)">C. 80%</label>
+<label class="quiz-opt" onclick="checkQ('q3',this,3)">D. 알 수 없다</label>
+<div class="quiz-feedback" id="q3-fb"></div>
 </div>
+
+<div class="quiz-box" id="q4">
+<h4>Q4. CAPM의 핵심 예측 중 Fama-French(1992)가 반박한 것은?</h4>
+<label class="quiz-opt" onclick="checkQ('q4',this,0)">A. 시장 포트폴리오가 효율적이다</label>
+<label class="quiz-opt" onclick="checkQ('q4',this,1)">B. 베타만이 기대수익률의 유일한 설명 변수이다</label>
+<label class="quiz-opt" onclick="checkQ('q4',this,2)">C. 무위험이자율이 존재한다</label>
+<label class="quiz-opt" onclick="checkQ('q4',this,3)">D. 투자자는 위험회피적이다</label>
+<div class="quiz-feedback" id="q4-fb"></div>
+</div>
+
+<div class="quiz-box" id="q5">
+<h4>Q5. 양의 알파(α > 0)를 가진 주식에 대한 해석으로 올바른 것은?</h4>
+<label class="quiz-opt" onclick="checkQ('q5',this,0)">A. 반드시 매니저의 스킬 때문이다</label>
+<label class="quiz-opt" onclick="checkQ('q5',this,1)">B. CAPM이 포착하지 못하는 추가 팩터에 노출되어 있을 수 있다</label>
+<label class="quiz-opt" onclick="checkQ('q5',this,2)">C. 미래에도 반드시 양의 알파를 유지한다</label>
+<label class="quiz-opt" onclick="checkQ('q5',this,3)">D. 베타가 잘못 추정된 것이다</label>
+<div class="quiz-feedback" id="q5-fb"></div>
+</div>
+
+<div class="quiz-score" id="quiz-score" style="display:none"></div>
+
+<script>
+var quizAnswers={q1:1,q2:1,q3:1,q4:1,q5:1};
+var quizExplain={
+  q1:'E[r_i] = r_f + β(E[r_m]-r_f) = 3% + 1.5×(10%-3%) = 3% + 10.5% = 13.5%. Lab 3에서 직접 계산해보세요!',
+  q2:'CAPM: Δr_i ≈ β × Δr_m = 0.7 × (-10%) = -7%. β<1이므로 시장보다 덜 하락 — 방어적 주식. Lab 2에서 확인!',
+  q3:'R² = 체계적 위험 / 총위험. R²=0.60이면 총위험의 60%가 시장 요인(체계적 위험)으로 설명되고, 40%가 고유 위험(분산투자로 제거 가능).',
+  q4:'Fama-French(1992)는 규모(size)와 가치(B/M)가 베타를 통제한 후에도 수익률을 설명함을 보였다. 즉, 베타만으로는 횡단면 수익률 차이를 설명할 수 없다 — CAPM의 핵심 예측 반박.',
+  q5:'양의 알파는 (1) 매니저 스킬, (2) CAPM이 누락한 팩터 노출(size, value 등), (3) 추정 오차, (4) 생존 편향 등 여러 원인이 가능. Ang은 "대부분의 알파는 누락된 팩터"라고 주장.'
+};
+var quizDone={},quizCorrect=0,quizTotal=5;
+function checkQ(qid,el,idx){
+  if(quizDone[qid])return;quizDone[qid]=true;
+  var box=document.getElementById(qid),opts=box.querySelectorAll('.quiz-opt'),correct=quizAnswers[qid];
+  el.classList.add(idx===correct?'correct-answer':'wrong-answer');
+  if(idx!==correct)opts[correct].classList.add('correct-answer');
+  box.classList.add(idx===correct?'correct':'wrong');
+  if(idx===correct)quizCorrect++;
+  var fb=document.getElementById(qid+'-fb');
+  fb.innerHTML=(idx===correct?'<span style="color:#27ae60">✓ 정답!</span> ':'<span style="color:#e74c3c">✗ 오답.</span> ')+quizExplain[qid];
+  fb.style.background=idx===correct?'#d4edda':'#f8d7da';fb.classList.add('show');
+  if(Object.keys(quizDone).length===quizTotal){
+    var sc=document.getElementById('quiz-score');sc.style.display='block';
+    var pct=Math.round(quizCorrect/quizTotal*100);
+    var emoji=pct>=80?'🎉':pct>=60?'👍':'💪';
+    sc.innerHTML=emoji+' <strong>'+quizCorrect+'/'+quizTotal+'</strong> ('+pct+'%) — '+(pct>=80?'훌륭합니다!':pct>=60?'좋아요!':'Lab에서 다시 실험해보세요!');
+  }
+}
+</script>
 
 <h3>7.1 핵심 수식 요약</h3>
 
