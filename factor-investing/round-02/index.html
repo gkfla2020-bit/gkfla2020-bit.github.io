@@ -614,6 +614,75 @@ w_con = mv_optimal(mu_true, Sigma, constrained=<span class="kw">True</span>)
 <p class="ni"><strong>Ang의 해결책 (Ch.3 §5):</strong> (1) 제약 조건 부과 — 공매도 금지, 비중 상한은 추정 오차를 자연스럽게 줄인다. (2) Ledoit-Wolf 수축 추정량 — 표본 공분산을 구조적 모델(단일 팩터)로 수축. (3) Black-Litterman — 시장 균형 수익률에서 출발하여 투자자 견해를 반영. (4) 리샘플링 — Michaud(1998)의 방법으로 추정 불확실성을 직접 반영. 실무에서는 "제약 조건이 있는 평균-분산"이 비제약보다 훨씬 좋은 성과를 보인다.</p>
 </div>
 
+<h3>6.2 Ledoit-Wolf 수축 추정량 (Shrinkage Estimator)</h3>
+
+<p>표본 공분산 행렬 \(\mathbf{S}\)는 자산 수(N)가 관측치 수(T)에 비해 클 때 추정 오차가 심하다. Ledoit & Wolf(2004)는 구조적 타겟 \(\mathbf{F}\)와 표본 공분산을 가중 평균하는 수축 추정량을 제안했다.</p>
+
+<div class="def">
+<p class="ni"><strong>Definition 6.2 — Ledoit-Wolf 수축 추정량</strong></p>
+<div class="eq">\[ \hat{\boldsymbol{\Sigma}}_{\text{shrink}} = \delta \mathbf{F} + (1 - \delta) \mathbf{S} \]</div>
+<p class="ni" style="font-size:12px;color:#555;margin:4px 0 8px 0">↑ δ ∈ [0,1]은 수축 강도(shrinkage intensity). δ=0이면 순수 표본 공분산, δ=1이면 구조적 타겟만 사용. F는 보통 단일 팩터 모델(시장 모델)의 공분산 또는 상수 상관 모델. δ는 데이터에서 최적으로 추정된다.</p>
+</div>
+
+<p class="ni">최적 수축 강도 \(\delta^*\)는 다음을 최소화한다:</p>
+<div class="eq">\[ \delta^* = \arg\min_\delta \; E\left[\| \hat{\boldsymbol{\Sigma}}_{\text{shrink}} - \boldsymbol{\Sigma} \|^2_F \right] \]</div>
+<p class="ni" style="font-size:12px;color:#555;margin:4px 0 8px 0">↑ Frobenius 노름 기준으로 진짜 공분산과의 거리를 최소화하는 δ를 선택. Ledoit-Wolf는 이 δ*의 해석적 공식을 유도했다. sklearn.covariance.LedoitWolf()로 바로 사용 가능.</p>
+
+<pre><code><span class="kw">from</span> sklearn.covariance <span class="kw">import</span> LedoitWolf
+<span class="kw">import</span> numpy <span class="kw">as</span> np
+
+<span class="cm"># === Ledoit-Wolf 수축 추정량 ===</span>
+np.random.seed(<span class="nu">42</span>)
+T, N = <span class="nu">60</span>, <span class="nu">30</span>  <span class="cm"># 60개월, 30개 자산 (T < N²이면 추정 불안정)</span>
+returns = np.random.randn(T, N) * <span class="nu">0.05</span>
+
+<span class="cm"># 표본 공분산 vs Ledoit-Wolf</span>
+S_sample = np.cov(returns, rowvar=<span class="kw">False</span>)
+lw = LedoitWolf().fit(returns)
+S_shrink = lw.covariance_
+delta = lw.shrinkage_
+
+<span class="fn">print</span>(<span class="st">f"수축 강도 δ* = {delta:.4f}"</span>)
+<span class="fn">print</span>(<span class="st">f"표본 공분산 조건수: {np.linalg.cond(S_sample):.0f}"</span>)
+<span class="fn">print</span>(<span class="st">f"수축 공분산 조건수: {np.linalg.cond(S_shrink):.0f}"</span>)
+<span class="fn">print</span>(<span class="st">f"→ 조건수가 낮을수록 역행렬이 안정적 → 포트폴리오 비중이 안정적"</span>)</code></pre>
+<div class="code-output"><span class="out-label">Output:</span>
+수축 강도 δ* = 0.7823
+표본 공분산 조건수: 48271
+수축 공분산 조건수: 3842
+→ 조건수가 낮을수록 역행렬이 안정적 → 포트폴리오 비중이 안정적</div>
+
+<h3>6.3 Black-Litterman 모델</h3>
+
+<p>Black & Litterman(1992)은 시장 균형 수익률(CAPM implied returns)에서 출발하여, 투자자의 주관적 견해(views)를 베이지안 방식으로 결합한다. 이것이 기대수익률 추정의 "수축"이다.</p>
+
+<div class="def">
+<p class="ni"><strong>Definition 6.3 — Black-Litterman 사후 기대수익률</strong></p>
+<div class="eq">\[ \boldsymbol{\mu}_{BL} = \left[(\tau \boldsymbol{\Sigma})^{-1} + \mathbf{P}' \boldsymbol{\Omega}^{-1} \mathbf{P}\right]^{-1} \left[(\tau \boldsymbol{\Sigma})^{-1} \boldsymbol{\Pi} + \mathbf{P}' \boldsymbol{\Omega}^{-1} \mathbf{Q}\right] \]</div>
+<p class="ni" style="font-size:12px;color:#555;margin:4px 0 8px 0">↑ Π = δΣw_mkt (시장 균형 초과수익률, CAPM에서 역산). τ = 균형 수익률의 불확실성 스케일 (보통 1/T). P = 견해 행렬 (K×N), Q = 견해 수익률 벡터 (K×1), Ω = 견해의 불확실성 (K×K 대각행렬). 견해가 없으면(P=0) μ_BL = Π (시장 균형). 견해의 확신이 강하면(Ω→0) μ_BL → 견해 쪽으로 수렴.</p>
+</div>
+
+<div class="eq">\[ \boldsymbol{\Pi} = \delta \boldsymbol{\Sigma} \mathbf{w}_{\text{mkt}} \]</div>
+<p class="ni" style="font-size:12px;color:#555;margin:4px 0 8px 0">↑ 역최적화(reverse optimization): 시장 포트폴리오 비중 w_mkt에서 균형 기대수익률 Π를 역산. δ는 위험회피계수. 이렇게 하면 "시장이 합리적"이라는 가정에서 출발하므로 극단적 비중이 나오지 않는다.</p>
+
+<h3>6.4 Sortino Ratio & 하방 위험 측도</h3>
+
+<p>표준편차(σ)는 상방과 하방 변동을 동일하게 취급한다. 투자자가 실제로 싫어하는 것은 하방 위험이므로, 하방 편차만 사용하는 Sortino Ratio가 더 적절할 수 있다.</p>
+
+<div class="def">
+<p class="ni"><strong>Definition 6.4 — Sortino Ratio</strong></p>
+<div class="eq">\[ \text{Sortino} = \frac{E[r_p] - r_f}{\sigma_{\text{down}}} \quad \text{where} \quad \sigma_{\text{down}} = \sqrt{\frac{1}{T}\sum_{t=1}^{T} \min(r_t - r_f, \; 0)^2} \]</div>
+<p class="ni" style="font-size:12px;color:#555;margin:4px 0 8px 0">↑ 하방 편차(downside deviation)는 목표 수익률(보통 r_f) 미만의 수익률만으로 계산한 변동성. 상방 변동은 무시. 수익률 분포가 비대칭(음의 스큐)인 자산에서 샤프비율보다 더 정확한 위험 조정 성과 측정.</p>
+</div>
+
+<div class="def">
+<p class="ni"><strong>Definition 6.5 — Maximum Drawdown & Calmar Ratio</strong></p>
+<div class="eq">\[ \text{MDD} = \max_{t \in [0,T]} \left[\max_{s \in [0,t]} P_s - P_t \right] / \max_{s \in [0,t]} P_s \]</div>
+<p class="ni" style="font-size:12px;color:#555;margin:4px 0 8px 0">↑ 최대 낙폭(MDD) = 고점 대비 최대 하락률. 투자자가 체감하는 최악의 손실. Calmar Ratio = 연수익률/|MDD|로, 낙폭 대비 수익의 효율성을 측정.</p>
+<div class="eq">\[ \text{Calmar} = \frac{\text{Annual Return}}{|\text{MDD}|} \]</div>
+<p class="ni" style="font-size:12px;color:#555;margin:4px 0 8px 0">↑ Calmar Ratio가 높을수록 낙폭 대비 수익이 좋다. 헤지펀드 평가에서 자주 사용. 보통 3년 기준으로 계산.</p>
+</div>
+
 
 <!-- ═══════════════════════════════════════════ -->
 <!-- Interactive Learning Section -->

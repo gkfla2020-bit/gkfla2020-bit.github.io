@@ -919,6 +919,31 @@ function checkQ(qid,el,idx){
 <p class="ni"><strong>Pass 2 Preview:</strong> 베타의 조건부 추정(conditional beta), Blume 베타 조정, 베이지안 수축 추정, 그리고 CAPM의 시계열 검정(time-series test)과 횡단면 검정(cross-sectional test) — Fama-MacBeth 회귀.</p>
 </div>
 
+<h3>7.2 베타 수축 추정 (Beta Shrinkage)</h3>
+
+<div class="def">
+<p class="ni"><strong>Definition 7.2 — Blume 베타 조정 (Blume, 1971)</strong></p>
+<div class="eq">\[ \beta_{\text{adj}} = \frac{2}{3}\hat{\beta}_{\text{OLS}} + \frac{1}{3} \cdot 1 \]</div>
+<p class="ni" style="font-size:12px;color:#555;margin:4px 0 8px 0">↑ 실증적으로 베타는 시간이 지나면 1로 회귀하는 경향(mean reversion). Blume은 과거 베타와 미래 베타의 횡단면 회귀에서 기울기 ≈ 2/3을 발견. Bloomberg 터미널의 "adjusted beta"가 이 공식. 극단적 베타를 1 쪽으로 수축시켜 예측력을 높인다.</p>
+</div>
+
+<div class="def">
+<p class="ni"><strong>Definition 7.3 — Vasicek 베이지안 수축 베타 (Vasicek, 1973)</strong></p>
+<div class="eq">\[ \beta_{\text{Vasicek}} = \frac{\sigma^2_{\text{prior}} \cdot \hat{\beta}_{\text{OLS}} + \sigma^2_{\hat{\beta}} \cdot \beta_{\text{prior}}}{\sigma^2_{\text{prior}} + \sigma^2_{\hat{\beta}}} \]</div>
+<p class="ni" style="font-size:12px;color:#555;margin:4px 0 8px 0">↑ 베이지안 수축: 사전 분포(prior, 보통 β_prior=1)와 OLS 추정치를 각각의 정밀도(분산의 역수)로 가중 평균. σ²_β̂이 크면(추정 불확실) → prior 쪽으로 수축. σ²_β̂이 작으면(추정 정확) → OLS 유지. Blume 조정의 이론적 근거.</p>
+</div>
+
+<h3>7.3 Fama-MacBeth 횡단면 검정</h3>
+
+<div class="def">
+<p class="ni"><strong>Definition 7.4 — Fama-MacBeth 2단계 회귀 (1973)</strong></p>
+<p class="ni">1단계 (시계열): 각 자산 i에 대해 \(\hat{\beta}_i\) 추정</p>
+<div class="eq">\[ r_{i,t} - r_{f,t} = \alpha_i + \beta_i (r_{m,t} - r_{f,t}) + \epsilon_{i,t} \]</div>
+<p class="ni">2단계 (횡단면): 매 시점 t마다 횡단면 회귀</p>
+<div class="eq">\[ r_{i,t} - r_{f,t} = \gamma_{0,t} + \gamma_{1,t} \hat{\beta}_i + \eta_{i,t} \]</div>
+<p class="ni" style="font-size:12px;color:#555;margin:4px 0 8px 0">↑ γ₁의 시계열 평균 = 시장 위험 프리미엄 추정치. t-통계량 = γ̄₁ / (SE(γ₁)/√T). CAPM이 맞으면 γ̄₀ ≈ 0 (절편 없음), γ̄₁ ≈ E[r_m]-r_f (SML 기울기). 실증에서는 γ̄₁ < E[r_m]-r_f → SML이 너무 평평 → 저베타 이상현상(BAB).</p>
+</div>
+
 </div></div></div>
 </body>
 </html>
