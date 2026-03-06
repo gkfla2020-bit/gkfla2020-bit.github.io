@@ -119,6 +119,7 @@ pre{font-size:11px;padding:14px}table{font-size:10px;display:block;overflow-x:au
 <li><a href="#ch4">4. 접선 포트폴리오</a></li>
 <li><a href="#ch5">5. CVXPY 최적화</a></li>
 <li><a href="#ch6">6. 실전: 한국 ETF 포트폴리오</a></li>
+<li><a href="#interactive">🎮 직접 해보기</a></li>
 <li><a href="#ch7">7. Quiz</a></li>
 </ul>
 </div>
@@ -613,27 +614,347 @@ w_con = mv_optimal(mu_true, Sigma, constrained=<span class="kw">True</span>)
 <p class="ni"><strong>Ang의 해결책 (Ch.3 §5):</strong> (1) 제약 조건 부과 — 공매도 금지, 비중 상한은 추정 오차를 자연스럽게 줄인다. (2) Ledoit-Wolf 수축 추정량 — 표본 공분산을 구조적 모델(단일 팩터)로 수축. (3) Black-Litterman — 시장 균형 수익률에서 출발하여 투자자 견해를 반영. (4) 리샘플링 — Michaud(1998)의 방법으로 추정 불확실성을 직접 반영. 실무에서는 "제약 조건이 있는 평균-분산"이 비제약보다 훨씬 좋은 성과를 보인다.</p>
 </div>
 
-<h2 id="ch7">7. Quiz</h2>
 
-<div class="def">
-<p class="ni"><strong>Q1. [행렬 계산]</strong> 2개 자산(주식: μ=12%, σ=25%, 채권: μ=5%, σ=8%, ρ=0.2)의 공분산 행렬을 구성하고, 60/40 포트폴리오의 기대수익률과 변동성을 계산하라.</p>
+<!-- ═══════════════════════════════════════════ -->
+<!-- Interactive Learning Section -->
+<!-- ═══════════════════════════════════════════ -->
+<h2 id="interactive">🎮 직접 해보기 — Interactive Lab</h2>
+
+<h3>Lab 1. 상관계수와 효율적 프론티어</h3>
+<p class="ni">두 자산(주식·채권)의 상관계수(ρ)를 바꿔보면서 효율적 프론티어가 어떻게 변하는지 확인하세요. ρ가 낮을수록 분산투자 효과가 커집니다.</p>
+
+<div style="background:#f0f4f8;padding:20px;border-radius:8px;margin:20px 0">
+<div style="display:flex;align-items:center;gap:16px;margin-bottom:12px;flex-wrap:wrap">
+<label style="font-size:14px;font-weight:600">ρ (상관계수):</label>
+<input type="range" id="sl-rho" min="-1" max="1" step="0.05" value="0.3" style="width:220px">
+<span id="val-rho" style="font-family:'Space Mono',monospace;font-size:16px;color:#e74c3c;font-weight:bold">0.30</span>
+</div>
+<div style="display:flex;gap:24px;flex-wrap:wrap;margin-bottom:8px">
+<div>
+<label style="font-size:12px;color:#555">주식 μ₁ (%)</label><br>
+<input type="range" id="sl-mu1" min="4" max="20" step="0.5" value="12" style="width:120px">
+<span id="val-mu1" style="font-family:'Space Mono',monospace;font-size:12px">12%</span>
+</div>
+<div>
+<label style="font-size:12px;color:#555">주식 σ₁ (%)</label><br>
+<input type="range" id="sl-s1" min="5" max="40" step="1" value="25" style="width:120px">
+<span id="val-s1" style="font-family:'Space Mono',monospace;font-size:12px">25%</span>
+</div>
+<div>
+<label style="font-size:12px;color:#555">채권 μ₂ (%)</label><br>
+<input type="range" id="sl-mu2" min="1" max="10" step="0.5" value="5" style="width:120px">
+<span id="val-mu2" style="font-family:'Space Mono',monospace;font-size:12px">5%</span>
+</div>
+<div>
+<label style="font-size:12px;color:#555">채권 σ₂ (%)</label><br>
+<input type="range" id="sl-s2" min="2" max="20" step="1" value="8" style="width:120px">
+<span id="val-s2" style="font-family:'Space Mono',monospace;font-size:12px">8%</span>
+</div>
+</div>
+<div id="plot-lab1" style="width:100%;height:400px"></div>
+<div id="lab1-info" style="font-family:'Space Mono',monospace;font-size:12px;margin-top:8px;padding:10px;background:#1e1e1e;color:#d4d4d4;border-radius:6px"></div>
 </div>
 
-<div class="def">
-<p class="ni"><strong>Q2. [GMV]</strong> Q1의 2개 자산으로 최소분산 포트폴리오를 해석적으로 구하라. 공매도 허용 시와 금지 시의 결과를 비교하라.</p>
+<script>
+(function(){
+  var sRho=document.getElementById('sl-rho'),sMu1=document.getElementById('sl-mu1'),sS1=document.getElementById('sl-s1'),sMu2=document.getElementById('sl-mu2'),sS2=document.getElementById('sl-s2');
+  var vRho=document.getElementById('val-rho'),vMu1=document.getElementById('val-mu1'),vS1=document.getElementById('val-s1'),vMu2=document.getElementById('val-mu2'),vS2=document.getElementById('val-s2');
+  function draw(){
+    var rho=parseFloat(sRho.value),mu1=parseFloat(sMu1.value)/100,s1=parseFloat(sS1.value)/100,mu2=parseFloat(sMu2.value)/100,s2=parseFloat(sS2.value)/100;
+    vRho.textContent=rho.toFixed(2); vMu1.textContent=(mu1*100).toFixed(0)+'%'; vS1.textContent=(s1*100).toFixed(0)+'%';
+    vMu2.textContent=(mu2*100).toFixed(0)+'%'; vS2.textContent=(s2*100).toFixed(0)+'%';
+    var fX=[],fY=[],gmvW=-1,gmvVol=999,gmvRet=0;
+    for(var w=0;w<=1.001;w+=0.005){
+      var rp=w*mu1+(1-w)*mu2;
+      var vp=Math.sqrt(w*w*s1*s1+(1-w)*(1-w)*s2*s2+2*w*(1-w)*s1*s2*rho);
+      fX.push(vp*100); fY.push(rp*100);
+      if(vp<gmvVol){gmvVol=vp;gmvRet=rp;gmvW=w;}
+    }
+    // tangency (rf=3%)
+    var rf=0.03,bestSR=-999,tanW=0,tanVol=0,tanRet=0;
+    for(var w=0;w<=1.001;w+=0.005){
+      var rp=w*mu1+(1-w)*mu2;
+      var vp=Math.sqrt(w*w*s1*s1+(1-w)*(1-w)*s2*s2+2*w*(1-w)*s1*s2*rho);
+      var sr=(rp-rf)/vp;
+      if(sr>bestSR){bestSR=sr;tanW=w;tanVol=vp;tanRet=rp;}
+    }
+    Plotly.react('plot-lab1',[
+      {x:fX,y:fY,mode:'lines',name:'포트폴리오 조합 (w: 0→1)',line:{color:'#0080c6',width:3}},
+      {x:[s1*100],y:[mu1*100],mode:'markers+text',name:'주식',marker:{size:14,color:'#e74c3c',symbol:'diamond'},text:['주식'],textposition:'top right'},
+      {x:[s2*100],y:[mu2*100],mode:'markers+text',name:'채권',marker:{size:14,color:'#27ae60',symbol:'diamond'},text:['채권'],textposition:'top right'},
+      {x:[gmvVol*100],y:[gmvRet*100],mode:'markers',name:'GMV (최소분산)',marker:{size:12,color:'#f39c12',symbol:'star',line:{width:2,color:'#333'}}},
+      {x:[tanVol*100],y:[tanRet*100],mode:'markers',name:'Tangency (최대SR)',marker:{size:12,color:'#9b59b6',symbol:'star',line:{width:2,color:'#333'}}},
+      {x:[0,Math.max(s1,s2)*120],y:[rf*100,rf*100+bestSR*Math.max(s1,s2)*120],mode:'lines',name:'CML (SR='+bestSR.toFixed(2)+')',line:{color:'#e74c3c',width:1.5,dash:'dash'}}
+    ],{
+      title:'2자산 효율적 프론티어 (ρ='+rho.toFixed(2)+')',
+      xaxis:{title:'변동성 σ (%)',range:[0,Math.max(s1*100,s2*100)+5]},
+      yaxis:{title:'기대수익률 E[r] (%)',range:[Math.min(mu2*100,rf*100)-1,mu1*100+2]},
+      plot_bgcolor:'#fafaf8',paper_bgcolor:'#f0f4f8',font:{family:'Inter',size:12},
+      margin:{t:50,r:20,b:50,l:60},legend:{x:0.55,y:0.15}
+    },{responsive:true});
+    document.getElementById('lab1-info').innerHTML=
+      '<span style="color:#6a9955">// 결과</span>\n'+
+      'GMV: w_stock='+(gmvW*100).toFixed(1)+'%, σ='+(gmvVol*100).toFixed(2)+'%, E[r]='+(gmvRet*100).toFixed(2)+'%\n'+
+      'Tangency: w_stock='+(tanW*100).toFixed(1)+'%, SR='+bestSR.toFixed(3)+'\n'+
+      'ρ='+rho.toFixed(2)+' → 분산투자 효과: '+(rho<0?'매우 강함 (음의 상관!)':rho<0.3?'강함':rho<0.7?'보통':'약함');
+  }
+  [sRho,sMu1,sS1,sMu2,sS2].forEach(function(s){s.addEventListener('input',draw);});
+  setTimeout(draw,300);
+})();
+</script>
+
+<h3>Lab 2. 포트폴리오 비중 탐색기</h3>
+<p class="ni">3개 자산(주식·채권·현금)의 비중을 직접 조절하면서 포트폴리오가 효율적 프론티어 위에 있는지 확인하세요.</p>
+
+<div style="background:#f0f4f8;padding:20px;border-radius:8px;margin:20px 0">
+<div style="display:flex;gap:24px;flex-wrap:wrap;margin-bottom:12px">
+<div>
+<label style="font-size:12px;color:#555">주식 비중 (%)</label><br>
+<input type="range" id="sl-ws" min="0" max="100" step="1" value="40" style="width:150px">
+<span id="val-ws" style="font-family:'Space Mono',monospace;font-size:13px;color:#e74c3c">40%</span>
+</div>
+<div>
+<label style="font-size:12px;color:#555">채권 비중 (%)</label><br>
+<input type="range" id="sl-wb" min="0" max="100" step="1" value="40" style="width:150px">
+<span id="val-wb" style="font-family:'Space Mono',monospace;font-size:13px;color:#27ae60">40%</span>
+</div>
+<div style="padding-top:18px">
+<span style="font-size:12px;color:#555">현금: </span>
+<span id="val-wc" style="font-family:'Space Mono',monospace;font-size:13px;color:#f39c12">20%</span>
+</div>
+</div>
+<div id="plot-lab2" style="width:100%;height:400px"></div>
+<div id="lab2-info" style="font-family:'Space Mono',monospace;font-size:12px;margin-top:8px;padding:10px;background:#1e1e1e;color:#d4d4d4;border-radius:6px"></div>
 </div>
 
-<div class="def">
-<p class="ni"><strong>Q3. [접선 포트폴리오]</strong> Q1의 자산에 무위험이자율 3%를 추가하여 접선 포트폴리오를 구하라. CML의 기울기(최대 샤프비율)는?</p>
+<script>
+(function(){
+  var sWs=document.getElementById('sl-ws'),sWb=document.getElementById('sl-wb');
+  var vWs=document.getElementById('val-ws'),vWb=document.getElementById('val-wb'),vWc=document.getElementById('val-wc');
+  // 3 assets: Stock(10%,20%), Bond(6%,10%), Cash(4%,2%), correlations: S-B=0.3, S-C=0, B-C=0.1
+  var mu=[0.10,0.06,0.04],vol=[0.20,0.10,0.02];
+  var corr=[[1,0.3,0],[0.3,1,0.1],[0,0.1,1]];
+  var S=[];
+  for(var i=0;i<3;i++){S[i]=[];for(var j=0;j<3;j++)S[i][j]=vol[i]*vol[j]*corr[i][j];}
+  function portStat(w){
+    var r=0,v=0;
+    for(var i=0;i<3;i++){r+=w[i]*mu[i];for(var j=0;j<3;j++)v+=w[i]*w[j]*S[i][j];}
+    return{ret:r,vol:Math.sqrt(v)};
+  }
+  // precompute EF
+  function inv3(m){var a=m[0][0],b=m[0][1],c=m[0][2],d=m[1][0],e=m[1][1],f=m[1][2],g=m[2][0],h=m[2][1],k=m[2][2];var det=a*(e*k-f*h)-b*(d*k-f*g)+c*(d*h-e*g);var r=[[0,0,0],[0,0,0],[0,0,0]];r[0][0]=(e*k-f*h)/det;r[0][1]=(c*h-b*k)/det;r[0][2]=(b*f-c*e)/det;r[1][0]=(f*g-d*k)/det;r[1][1]=(a*k-c*g)/det;r[1][2]=(c*d-a*f)/det;r[2][0]=(d*h-e*g)/det;r[2][1]=(b*g-a*h)/det;r[2][2]=(a*e-b*d)/det;return r;}
+  function dot(a,b){var s=0;for(var i=0;i<a.length;i++)s+=a[i]*b[i];return s;}
+  function mvmul(M,v){return M.map(function(r){return dot(r,v);});}
+  var iS=inv3(S),iSmu=mvmul(iS,mu),iS1=mvmul(iS,[1,1,1]);
+  var A=dot([1,1,1],iSmu),B=dot(mu,iSmu),C=dot([1,1,1],iS1),D=B*C-A*A;
+  var efX=[],efY=[];
+  for(var r=0.02;r<=0.12;r+=0.001){efY.push(r*100);efX.push(Math.sqrt((C*r*r-2*A*r+B)/D)*100);}
+
+  function draw(){
+    var ws=parseInt(sWs.value),wb=parseInt(sWb.value);
+    if(ws+wb>100){wb=100-ws;sWb.value=wb;}
+    var wc=100-ws-wb;
+    vWs.textContent=ws+'%'; vWb.textContent=wb+'%'; vWc.textContent=wc+'%';
+    var w=[ws/100,wb/100,wc/100];
+    var p=portStat(w);
+    var sr=(p.ret-0.03)/p.vol;
+    // also compute GMV and tangency for reference
+    var gmv=portStat(mvmul(iS,[1,1,1]).map(function(x){return x/C;}));
+    var ex=[mu[0]-0.03,mu[1]-0.03,mu[2]-0.03];
+    var iSex=mvmul(iS,ex),sumISex=dot([1,1,1],iSex);
+    var tanW=iSex.map(function(x){return x/sumISex;});
+    var tan=portStat(tanW);
+
+    Plotly.react('plot-lab2',[
+      {x:efX,y:efY,mode:'lines',name:'Efficient Frontier',line:{color:'#ccc',width:2}},
+      {x:[vol[0]*100,vol[1]*100,vol[2]*100],y:[mu[0]*100,mu[1]*100,mu[2]*100],mode:'markers+text',name:'개별 자산',marker:{size:10,color:['#e74c3c','#27ae60','#f1c40f']},text:['주식','채권','현금'],textposition:'top right'},
+      {x:[gmv.vol*100],y:[gmv.ret*100],mode:'markers',name:'GMV',marker:{size:10,color:'#f39c12',symbol:'star'}},
+      {x:[tan.vol*100],y:[tan.ret*100],mode:'markers',name:'Tangency',marker:{size:10,color:'#9b59b6',symbol:'star'}},
+      {x:[p.vol*100],y:[p.ret*100],mode:'markers',name:'내 포트폴리오',marker:{size:16,color:'#e74c3c',symbol:'circle',line:{width:3,color:'#333'}}}
+    ],{
+      title:'내 포트폴리오 위치 (주식:'+ws+'% 채권:'+wb+'% 현금:'+wc+'%)',
+      xaxis:{title:'변동성 (%)',range:[0,25]},yaxis:{title:'기대수익률 (%)',range:[2,12]},
+      plot_bgcolor:'#fafaf8',paper_bgcolor:'#f0f4f8',font:{family:'Inter',size:12},
+      margin:{t:50,r:20,b:50,l:60},legend:{x:0.6,y:0.2}
+    },{responsive:true});
+    document.getElementById('lab2-info').innerHTML=
+      '<span style="color:#6a9955">// 내 포트폴리오</span>\n'+
+      'E[r] = '+(p.ret*100).toFixed(2)+'%,  σ = '+(p.vol*100).toFixed(2)+'%,  Sharpe = '+sr.toFixed(3)+'\n'+
+      '<span style="color:#6a9955">// 비교</span>\n'+
+      'GMV: σ='+(gmv.vol*100).toFixed(2)+'%, Tangency SR='+(((tan.ret-0.03)/tan.vol)).toFixed(3)+'\n'+
+      (sr>=(((tan.ret-0.03)/tan.vol))-0.01?'<span style="color:#27ae60">→ 접선 포트폴리오에 가깝습니다!</span>':'<span style="color:#f39c12">→ 접선 포트폴리오보다 비효율적입니다. 비중을 조절해보세요.</span>');
+  }
+  sWs.addEventListener('input',draw); sWb.addEventListener('input',draw);
+  setTimeout(draw,400);
+})();
+</script>
+
+<h3>Lab 3. 무위험이자율과 CML</h3>
+<p class="ni">무위험이자율(r_f)을 바꾸면 접선 포트폴리오와 CML이 어떻게 변하는지 확인하세요.</p>
+
+<div style="background:#f0f4f8;padding:20px;border-radius:8px;margin:20px 0">
+<div style="display:flex;align-items:center;gap:16px;margin-bottom:12px;flex-wrap:wrap">
+<label style="font-size:14px;font-weight:600">r_f (무위험이자율 %):</label>
+<input type="range" id="sl-rf3" min="0" max="8" step="0.25" value="3" style="width:200px">
+<span id="val-rf3" style="font-family:'Space Mono',monospace;font-size:16px;color:#0080c6;font-weight:bold">3.00%</span>
+</div>
+<div id="plot-lab3" style="width:100%;height:400px"></div>
+<div id="lab3-info" style="font-family:'Space Mono',monospace;font-size:12px;margin-top:8px;padding:10px;background:#1e1e1e;color:#d4d4d4;border-radius:6px"></div>
 </div>
 
-<div class="def">
-<p class="ni"><strong>Q4. [CVXPY]</strong> yfinance로 AAPL, MSFT, GOOGL, AMZN, TSLA의 2년 데이터를 다운로드하고, 공매도 금지 + 최대 30% 집중 제약 하에서 최대 샤프비율 포트폴리오를 구하라.</p>
+<script>
+(function(){
+  var sRf=document.getElementById('sl-rf3'),vRf=document.getElementById('val-rf3');
+  var mu=[0.10,0.06,0.04],vol=[0.20,0.10,0.02];
+  var corr=[[1,0.3,0],[0.3,1,0.1],[0,0.1,1]];
+  var S=[];
+  for(var i=0;i<3;i++){S[i]=[];for(var j=0;j<3;j++)S[i][j]=vol[i]*vol[j]*corr[i][j];}
+  function inv3(m){var a=m[0][0],b=m[0][1],c=m[0][2],d=m[1][0],e=m[1][1],f=m[1][2],g=m[2][0],h=m[2][1],k=m[2][2];var det=a*(e*k-f*h)-b*(d*k-f*g)+c*(d*h-e*g);var r=[[0,0,0],[0,0,0],[0,0,0]];r[0][0]=(e*k-f*h)/det;r[0][1]=(c*h-b*k)/det;r[0][2]=(b*f-c*e)/det;r[1][0]=(f*g-d*k)/det;r[1][1]=(a*k-c*g)/det;r[1][2]=(c*d-a*f)/det;r[2][0]=(d*h-e*g)/det;r[2][1]=(b*g-a*h)/det;r[2][2]=(a*e-b*d)/det;return r;}
+  function dot(a,b){var s=0;for(var i=0;i<a.length;i++)s+=a[i]*b[i];return s;}
+  function mvmul(M,v){return M.map(function(r){return dot(r,v);});}
+  var iS=inv3(S),iSmu=mvmul(iS,mu),iS1=mvmul(iS,[1,1,1]);
+  var A=dot([1,1,1],iSmu),B=dot(mu,iSmu),C=dot([1,1,1],iS1),D=B*C-A*A;
+  var efX=[],efY=[];
+  for(var r=0.02;r<=0.12;r+=0.001){efY.push(r*100);efX.push(Math.sqrt((C*r*r-2*A*r+B)/D)*100);}
+
+  function draw(){
+    var rf=parseFloat(sRf.value)/100;
+    vRf.textContent=(rf*100).toFixed(2)+'%';
+    // compute tangency
+    var ex=[mu[0]-rf,mu[1]-rf,mu[2]-rf];
+    var iSex=mvmul(iS,ex),sumISex=dot([1,1,1],iSex);
+    var tanW=iSex.map(function(x){return x/sumISex;});
+    var tanRet=dot(tanW,mu),tanVar=0;
+    for(var i=0;i<3;i++)for(var j=0;j<3;j++)tanVar+=tanW[i]*tanW[j]*S[i][j];
+    var tanVol=Math.sqrt(tanVar);
+    var maxSR=(tanRet-rf)/tanVol;
+    // CML
+    var cmlX=[0,25],cmlY=[rf*100,rf*100+maxSR*25];
+
+    Plotly.react('plot-lab3',[
+      {x:efX,y:efY,mode:'lines',name:'Efficient Frontier',line:{color:'#0080c6',width:2}},
+      {x:cmlX,y:cmlY,mode:'lines',name:'CML (SR='+maxSR.toFixed(2)+')',line:{color:'#e74c3c',width:2.5,dash:'dash'}},
+      {x:[tanVol*100],y:[tanRet*100],mode:'markers',name:'Tangency',marker:{size:14,color:'#e74c3c',symbol:'star',line:{width:2,color:'#333'}}},
+      {x:[0],y:[rf*100],mode:'markers',name:'r_f='+(rf*100).toFixed(1)+'%',marker:{size:10,color:'#333',symbol:'diamond'}},
+      {x:[vol[0]*100,vol[1]*100,vol[2]*100],y:[mu[0]*100,mu[1]*100,mu[2]*100],mode:'markers+text',name:'Assets',marker:{size:10,color:['#e74c3c','#27ae60','#f1c40f']},text:['Stock','Bond','Cash'],textposition:'top right'}
+    ],{
+      title:'CML & Tangency Portfolio (r_f='+(rf*100).toFixed(1)+'%)',
+      xaxis:{title:'변동성 (%)',range:[0,25]},yaxis:{title:'기대수익률 (%)',range:[0,14]},
+      plot_bgcolor:'#fafaf8',paper_bgcolor:'#f0f4f8',font:{family:'Inter',size:12},
+      margin:{t:50,r:20,b:50,l:60},legend:{x:0.55,y:0.15}
+    },{responsive:true});
+    document.getElementById('lab3-info').innerHTML=
+      '<span style="color:#6a9955">// Tangency Portfolio</span>\n'+
+      'w = [Stock:'+(tanW[0]*100).toFixed(1)+'%, Bond:'+(tanW[1]*100).toFixed(1)+'%, Cash:'+(tanW[2]*100).toFixed(1)+'%]\n'+
+      'E[r] = '+(tanRet*100).toFixed(2)+'%,  σ = '+(tanVol*100).toFixed(2)+'%\n'+
+      'Max Sharpe Ratio = '+maxSR.toFixed(3)+'\n'+
+      '<span style="color:#6a9955">// r_f가 높아지면 → 접선점이 프론티어 왼쪽(보수적)으로 이동</span>';
+  }
+  sRf.addEventListener('input',draw);
+  setTimeout(draw,500);
+})();
+</script>
+
+
+<!-- Ch7: Quiz — 즉시 채점 -->
+<!-- ═══════════════════════════════════════════ -->
+<h2 id="ch7">7. Quiz — 즉시 채점</h2>
+
+<style>
+.quiz-box{background:#fff;border:2px solid #e0e0e0;border-radius:8px;padding:20px;margin:16px 0;transition:border-color .3s}
+.quiz-box.correct{border-color:#27ae60;background:#f0fff4}
+.quiz-box.wrong{border-color:#e74c3c;background:#fff5f5}
+.quiz-box h4{margin:0 0 12px;font-size:14px}
+.quiz-opt{display:block;margin:6px 0;padding:8px 12px;border:1px solid #ddd;border-radius:6px;cursor:pointer;font-size:13px;transition:all .2s}
+.quiz-opt:hover{background:#f0f4f8;border-color:#3498db}
+.quiz-opt.selected{background:#e8f4f8;border-color:#3498db;font-weight:600}
+.quiz-opt.correct-answer{background:#d4edda;border-color:#27ae60}
+.quiz-opt.wrong-answer{background:#f8d7da;border-color:#e74c3c}
+.quiz-feedback{margin-top:10px;padding:10px;border-radius:6px;font-size:12px;display:none}
+.quiz-feedback.show{display:block}
+.quiz-score{text-align:center;padding:20px;background:#f8f9fa;border-radius:8px;margin:20px 0;font-size:16px}
+</style>
+
+<div class="quiz-box" id="q1">
+<h4>Q1. 두 자산의 상관계수(ρ)가 -1이면 포트폴리오 변동성을 0으로 만들 수 있는가?</h4>
+<label class="quiz-opt" onclick="checkQ('q1',this,0)">A. 불가능하다 — 변동성은 항상 양수</label>
+<label class="quiz-opt" onclick="checkQ('q1',this,1)">B. 가능하다 — 적절한 비중 조합으로 σ_p = 0 달성 가능</label>
+<label class="quiz-opt" onclick="checkQ('q1',this,2)">C. ρ = -1이면 두 자산을 동시에 보유할 수 없다</label>
+<label class="quiz-opt" onclick="checkQ('q1',this,3)">D. ρ = 0일 때만 가능하다</label>
+<div class="quiz-feedback" id="q1-fb"></div>
 </div>
 
-<div class="def">
-<p class="ni"><strong>Q5. [효율적 프론티어]</strong> Q4의 5개 자산으로 효율적 프론티어를 그리고, 10,000개 랜덤 포트폴리오를 산점도로 함께 표시하라. 프론티어가 랜덤 포트폴리오의 상한선임을 확인하라.</p>
+<div class="quiz-box" id="q2">
+<h4>Q2. 60/40 포트폴리오(주식 60%, 채권 40%)에서 주식 μ=10%, σ=20%, 채권 μ=5%, σ=8%, ρ=0.2일 때 포트폴리오 변동성은?</h4>
+<label class="quiz-opt" onclick="checkQ('q2',this,0)">A. 약 14.0%</label>
+<label class="quiz-opt" onclick="checkQ('q2',this,1)">B. 약 13.1%</label>
+<label class="quiz-opt" onclick="checkQ('q2',this,2)">C. 약 16.0%</label>
+<label class="quiz-opt" onclick="checkQ('q2',this,3)">D. 약 10.5%</label>
+<div class="quiz-feedback" id="q2-fb"></div>
 </div>
+
+<div class="quiz-box" id="q3">
+<h4>Q3. 접선 포트폴리오(Tangency Portfolio)의 정의로 올바른 것은?</h4>
+<label class="quiz-opt" onclick="checkQ('q3',this,0)">A. 분산이 가장 작은 포트폴리오</label>
+<label class="quiz-opt" onclick="checkQ('q3',this,1)">B. 기대수익률이 가장 높은 포트폴리오</label>
+<label class="quiz-opt" onclick="checkQ('q3',this,2)">C. 샤프비율(Sharpe Ratio)을 극대화하는 포트폴리오</label>
+<label class="quiz-opt" onclick="checkQ('q3',this,3)">D. 모든 자산에 동일 비중을 투자하는 포트폴리오</label>
+<div class="quiz-feedback" id="q3-fb"></div>
+</div>
+
+<div class="quiz-box" id="q4">
+<h4>Q4. Ang이 말하는 "optimizer is an error maximizer"의 의미는?</h4>
+<label class="quiz-opt" onclick="checkQ('q4',this,0)">A. 최적화 알고리즘에 버그가 있다</label>
+<label class="quiz-opt" onclick="checkQ('q4',this,1)">B. 입력값(μ, Σ)의 추정 오차가 최적 비중을 극단적으로 왜곡한다</label>
+<label class="quiz-opt" onclick="checkQ('q4',this,2)">C. 컴퓨터의 부동소수점 오차가 문제다</label>
+<label class="quiz-opt" onclick="checkQ('q4',this,3)">D. 최적화는 항상 과적합(overfitting)된다</label>
+<div class="quiz-feedback" id="q4-fb"></div>
+</div>
+
+<div class="quiz-box" id="q5">
+<h4>Q5. GMV(최소분산 포트폴리오)의 비중 공식 w_GMV = Σ⁻¹1 / (1ᵀΣ⁻¹1)에서, 기대수익률 벡터 μ가 필요한가?</h4>
+<label class="quiz-opt" onclick="checkQ('q5',this,0)">A. 필요하다 — μ 없이는 최적화 불가</label>
+<label class="quiz-opt" onclick="checkQ('q5',this,1)">B. 필요하지 않다 — GMV는 공분산 행렬만으로 결정된다</label>
+<label class="quiz-opt" onclick="checkQ('q5',this,2)">C. μ의 부호만 필요하다</label>
+<label class="quiz-opt" onclick="checkQ('q5',this,3)">D. μ와 Σ 모두 필요하지 않다</label>
+<div class="quiz-feedback" id="q5-fb"></div>
+</div>
+
+<div class="quiz-score" id="quiz-score" style="display:none"></div>
+
+<script>
+var quizAnswers={q1:1,q2:1,q3:2,q4:1,q5:1};
+var quizExplain={
+  q1:'ρ=-1이면 σ_p = |w₁σ₁ - w₂σ₂|. w₁σ₁ = w₂σ₂가 되는 비중(w₁=σ₂/(σ₁+σ₂))에서 σ_p=0이 된다. Lab 1에서 ρ=-1로 놓고 확인해보세요!',
+  q2:'σ_p² = 0.6²×0.04 + 0.4²×0.0064 + 2×0.6×0.4×0.2×0.20×0.08 = 0.0144+0.001024+0.001536 = 0.01696. σ_p = √0.01696 ≈ 13.02%. 가장 가까운 답은 약 13.1%.',
+  q3:'접선 포트폴리오는 CML(자본시장선)과 효율적 프론티어의 접점으로, 샤프비율 SR=(E[r]-r_f)/σ를 극대화한다. GMV는 분산 최소화, 접선은 위험 대비 초과수익 극대화.',
+  q4:'Ang Ch.3의 핵심 메시지. 기대수익률의 작은 추정 오차(1%p)가 최적 비중을 극단적으로 바꾼다. 최적화기가 오차가 큰 자산에 과도한 비중을 부여하기 때문. 해결책: 제약조건, 수축추정량, Black-Litterman.',
+  q5:'GMV 공식 w=Σ⁻¹1/(1ᵀΣ⁻¹1)에는 μ가 없다! 오직 공분산 행렬(Σ)만 필요. 이것이 GMV의 실무적 장점 — 추정이 어려운 기대수익률에 의존하지 않는다.'
+};
+var quizDone={},quizCorrect=0,quizTotal=5;
+function checkQ(qid,el,idx){
+  if(quizDone[qid])return;
+  quizDone[qid]=true;
+  var box=document.getElementById(qid);
+  var opts=box.querySelectorAll('.quiz-opt');
+  var correct=quizAnswers[qid];
+  el.classList.add(idx===correct?'correct-answer':'wrong-answer');
+  if(idx!==correct) opts[correct].classList.add('correct-answer');
+  box.classList.add(idx===correct?'correct':'wrong');
+  if(idx===correct) quizCorrect++;
+  var fb=document.getElementById(qid+'-fb');
+  fb.innerHTML=(idx===correct?'<span style="color:#27ae60">✓ 정답!</span> ':'<span style="color:#e74c3c">✗ 오답.</span> ')+quizExplain[qid];
+  fb.style.background=idx===correct?'#d4edda':'#f8d7da';
+  fb.classList.add('show');
+  if(Object.keys(quizDone).length===quizTotal){
+    var sc=document.getElementById('quiz-score');
+    sc.style.display='block';
+    var pct=Math.round(quizCorrect/quizTotal*100);
+    var emoji=pct>=80?'🎉':pct>=60?'👍':'💪';
+    sc.innerHTML=emoji+' <strong>'+quizCorrect+'/'+quizTotal+'</strong> ('+pct+'%) — '+(pct>=80?'훌륭합니다!':pct>=60?'좋아요, 복습하면 완벽!':'위의 Lab에서 다시 실험해보세요!');
+  }
+}
+</script>
 
 <h3>7.1 핵심 수식 요약</h3>
 
