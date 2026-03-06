@@ -118,6 +118,7 @@ pre{font-size:11px;padding:14px}table{font-size:10px;display:block;overflow-x:au
 <li><a href="#ch4">4. 비유동성 프리미엄</a></li>
 <li><a href="#ch5">5. 세금 효율적 투자</a></li>
 <li><a href="#ch6">6. 파이썬 구현</a></li>
+<li><a href="#interactive">🎮 직접 해보기</a></li>
 <li><a href="#ch7">7. Quiz</a></li>
 </ul>
 </div>
@@ -1023,25 +1024,309 @@ Q1 SR / Q5 SR = 0.80 / 0.21
 
 <h2 id="ch7">7. Quiz</h2>
 
-<div class="def">
-<p class="ni"><strong>Q1. [알파]</strong> 펀드의 연간 수익률이 12%, CAPM 베타가 1.2, 시장 수익률 9%, 무위험이자율 3%일 때 Jensen's alpha를 계산하라. Fama-French 3팩터 모델에서 SMB 베타=0.5, HML 베타=0.3이고 SMB 프리미엄=3%, HML 프리미엄=4%일 때 3팩터 알파는?</p>
+<!-- ═══════════════════════════════════════════ -->
+<!-- Interactive Learning Section -->
+<!-- ═══════════════════════════════════════════ -->
+<h2 id="interactive">🎮 직접 해보기 — Interactive Lab</h2>
+
+<h3>Lab 1. 정보비율(IR) & 기본 법칙 계산기</h3>
+<p class="ni">IC(정보계수)와 BR(투자 폭)을 조절하면서 Grinold의 기본 법칙이 예측하는 IR을 확인하세요. 실제 알파와 추적오차도 입력하여 실현 IR과 비교합니다.</p>
+
+<div style="background:#f0f4f8;padding:20px;border-radius:8px;margin:20px 0">
+<div style="display:flex;gap:16px;flex-wrap:wrap;margin-bottom:12px">
+<div>
+<label style="font-size:11px;color:#555">IC (정보계수)</label><br>
+<input type="range" id="sl-ic" min="0.01" max="0.15" step="0.01" value="0.05" style="width:100px">
+<span id="val-ic" style="font-family:'Space Mono',monospace;font-size:12px">0.05</span>
+</div>
+<div>
+<label style="font-size:11px;color:#555">BR (투자 폭)</label><br>
+<input type="range" id="sl-br" min="10" max="1000" step="10" value="200" style="width:100px">
+<span id="val-br" style="font-family:'Space Mono',monospace;font-size:12px">200</span>
+</div>
+<div>
+<label style="font-size:11px;color:#555">실현 α (%/년)</label><br>
+<input type="range" id="sl-alp" min="-2" max="5" step="0.25" value="2" style="width:100px">
+<span id="val-alp" style="font-family:'Space Mono',monospace;font-size:12px">2.0%</span>
+</div>
+<div>
+<label style="font-size:11px;color:#555">추적오차 TE (%)</label><br>
+<input type="range" id="sl-te" min="1" max="15" step="0.5" value="5" style="width:100px">
+<span id="val-te" style="font-family:'Space Mono',monospace;font-size:12px">5.0%</span>
+</div>
+</div>
+<div id="plot-lab1r9" style="width:100%;height:380px"></div>
+<div id="lab1r9-info" style="font-family:'Space Mono',monospace;font-size:12px;margin-top:8px;padding:10px;background:#1e1e1e;color:#d4d4d4;border-radius:6px;line-height:1.8"></div>
 </div>
 
-<div class="def">
-<p class="ni"><strong>Q2. [IR]</strong> 매니저 A의 월간 알파가 0.3%, 추적오차가 2%이다. 연율화 IR은? Grinold의 기본 법칙에서 IC=0.05, BR=500이면 예상 IR은?</p>
+<script>
+(function(){
+  var sls={ic:document.getElementById('sl-ic'),br:document.getElementById('sl-br'),alp:document.getElementById('sl-alp'),te:document.getElementById('sl-te')};
+  var vls={ic:document.getElementById('val-ic'),br:document.getElementById('val-br'),alp:document.getElementById('val-alp'),te:document.getElementById('val-te')};
+  function draw(){
+    var ic=parseFloat(sls.ic.value),br=parseInt(sls.br.value),alp=parseFloat(sls.alp.value),te=parseFloat(sls.te.value);
+    vls.ic.textContent=ic.toFixed(2);vls.br.textContent=br;vls.alp.textContent=alp.toFixed(1)+'%';vls.te.textContent=te.toFixed(1)+'%';
+    var irFundamental=ic*Math.sqrt(br);
+    var irRealized=alp/te;
+    // IC vs BR surface: show IR contours
+    var brs=[],irs_pred=[];
+    for(var b=10;b<=1000;b+=10){brs.push(b);irs_pred.push(ic*Math.sqrt(b));}
+    Plotly.react('plot-lab1r9',[
+      {x:brs,y:irs_pred,name:'기본 법칙 IR = IC×√BR',line:{color:'#3498db',width:2}},
+      {x:[br],y:[irFundamental],name:'현재 설정 (예측)',mode:'markers',marker:{size:14,color:'#3498db',symbol:'star'}},
+      {x:[br],y:[irRealized],name:'실현 IR = α/TE',mode:'markers',marker:{size:14,color:'#e74c3c',symbol:'diamond'}},
+      {x:[10,1000],y:[0.5,0.5],name:'우수 IR (0.5)',line:{color:'#27ae60',dash:'dot',width:1}},
+      {x:[10,1000],y:[1.0,1.0],name:'탁월 IR (1.0)',line:{color:'#f39c12',dash:'dot',width:1}}
+    ],{
+      title:'Grinold 기본 법칙: IR = IC × √BR',
+      xaxis:{title:'BR (독립적 투자 결정 수)'},yaxis:{title:'Information Ratio',range:[0,Math.max(2,irFundamental+0.5)]},
+      plot_bgcolor:'#fafaf8',paper_bgcolor:'#f0f4f8',font:{family:'Inter',size:12},
+      margin:{t:50,r:20,b:50,l:60}
+    },{responsive:true});
+    var gap=irRealized-irFundamental;
+    document.getElementById('lab1r9-info').innerHTML=
+      '<span style="color:#6a9955">// Grinold 기본 법칙: IR = IC × √BR</span>\n'+
+      '예측 IR = '+ic.toFixed(2)+' × √'+br+' = <span style="color:#3498db">'+irFundamental.toFixed(2)+'</span>\n'+
+      '실현 IR = '+alp.toFixed(1)+'% / '+te.toFixed(1)+'% = <span style="color:#e74c3c">'+irRealized.toFixed(2)+'</span>\n'+
+      '차이: '+(gap>=0?'+':'')+gap.toFixed(2)+' → '+(gap>0.1?'실현이 예측 초과 (스킬 or 운)':gap<-0.1?'실현이 예측 미달 (구현 비용 or 과적합)':'예측과 실현이 유사')+'\n'+
+      (irRealized>=0.5?'<span style="color:#27ae60">IR ≥ 0.5: 우수한 매니저</span>':'<span style="color:#95a5a6">IR < 0.5: 평범한 수준</span>');
+  }
+  Object.keys(sls).forEach(function(k){sls[k].addEventListener('input',draw);});
+  setTimeout(draw,300);
+})();
+</script>
+
+<h3>Lab 2. 비유동성 프리미엄 시뮬레이터</h3>
+<p class="ni">유동성 수준과 투자 기간을 조절하면서 비유동성 프리미엄이 순수익에 미치는 영향을 확인하세요. 거래비용을 고려한 실질 프리미엄을 계산합니다.</p>
+
+<div style="background:#f0f4f8;padding:20px;border-radius:8px;margin:20px 0">
+<div style="display:flex;gap:16px;flex-wrap:wrap;margin-bottom:12px">
+<div>
+<label style="font-size:11px;color:#555">비유동성 프리미엄 (%)</label><br>
+<input type="range" id="sl-ilp" min="0" max="6" step="0.25" value="2" style="width:110px">
+<span id="val-ilp" style="font-family:'Space Mono',monospace;font-size:12px">2.0%</span>
+</div>
+<div>
+<label style="font-size:11px;color:#555">거래비용 (편도, %)</label><br>
+<input type="range" id="sl-tc" min="0" max="3" step="0.1" value="0.5" style="width:110px">
+<span id="val-tc" style="font-family:'Space Mono',monospace;font-size:12px">0.5%</span>
+</div>
+<div>
+<label style="font-size:11px;color:#555">투자 기간 (년)</label><br>
+<input type="range" id="sl-hor" min="1" max="20" step="1" value="5" style="width:100px">
+<span id="val-hor" style="font-family:'Space Mono',monospace;font-size:12px">5</span>
+</div>
+<div>
+<label style="font-size:11px;color:#555">유동자산 기대수익 (%)</label><br>
+<input type="range" id="sl-liq" min="3" max="10" step="0.5" value="7" style="width:100px">
+<span id="val-liq" style="font-family:'Space Mono',monospace;font-size:12px">7.0%</span>
+</div>
+</div>
+<div id="plot-lab2r9" style="width:100%;height:380px"></div>
+<div id="lab2r9-info" style="font-family:'Space Mono',monospace;font-size:12px;margin-top:8px;padding:10px;background:#1e1e1e;color:#d4d4d4;border-radius:6px;line-height:1.8"></div>
 </div>
 
-<div class="def">
-<p class="ni"><strong>Q3. [비유동성]</strong> yfinance로 삼성전자와 소형주 1개의 일간 데이터를 다운로드하고 Amihud ILLIQ를 계산하라. 비유동성 차이가 수익률 차이를 설명하는가?</p>
+<script>
+(function(){
+  var sls={ilp:document.getElementById('sl-ilp'),tc:document.getElementById('sl-tc'),hor:document.getElementById('sl-hor'),liq:document.getElementById('sl-liq')};
+  var vls={ilp:document.getElementById('val-ilp'),tc:document.getElementById('val-tc'),hor:document.getElementById('val-hor'),liq:document.getElementById('val-liq')};
+  function draw2(){
+    var ilp=parseFloat(sls.ilp.value),tc=parseFloat(sls.tc.value),hor=parseInt(sls.hor.value),liqRet=parseFloat(sls.liq.value);
+    vls.ilp.textContent=ilp.toFixed(1)+'%';vls.tc.textContent=tc.toFixed(1)+'%';vls.hor.textContent=hor;vls.liq.textContent=liqRet.toFixed(1)+'%';
+    var illiqRet=liqRet+ilp;
+    // annualized transaction cost impact = 2*tc/horizon (buy+sell)
+    var tcAnn=2*tc/hor;
+    var netIlliq=illiqRet-tcAnn;
+    var netAdv=netIlliq-liqRet;
+    // cumulative wealth
+    var years=[],wLiq=[],wIlliq=[],wNet=[];
+    var cL=100,cI=100,cN=100;
+    for(var t=0;t<=hor;t++){
+      years.push(t);wLiq.push(cL);wIlliq.push(cI);wNet.push(cN);
+      cL*=(1+liqRet/100);cI*=(1+illiqRet/100);cN*=(1+netIlliq/100);
+    }
+    Plotly.react('plot-lab2r9',[
+      {x:years,y:wLiq,name:'유동자산 ('+liqRet.toFixed(1)+'%)',line:{color:'#3498db',width:2}},
+      {x:years,y:wIlliq,name:'비유동자산 총수익 ('+illiqRet.toFixed(1)+'%)',line:{color:'#27ae60',width:2,dash:'dash'}},
+      {x:years,y:wNet,name:'비유동자산 순수익 ('+netIlliq.toFixed(1)+'%)',line:{color:'#e74c3c',width:2.5}}
+    ],{
+      title:'₩100 투자 시 '+hor+'년 후 자산 (순 프리미엄: '+(netAdv>=0?'+':'')+netAdv.toFixed(1)+'%p)',
+      xaxis:{title:'투자 기간 (년)'},yaxis:{title:'자산 가치 (₩)'},
+      plot_bgcolor:'#fafaf8',paper_bgcolor:'#f0f4f8',font:{family:'Inter',size:12},
+      margin:{t:50,r:20,b:50,l:60}
+    },{responsive:true});
+    document.getElementById('lab2r9-info').innerHTML=
+      '비유동성 프리미엄: +'+ilp.toFixed(1)+'% | 거래비용(연율화): -'+tcAnn.toFixed(2)+'% (=2×'+tc.toFixed(1)+'%/'+hor+'년)\n'+
+      '유동자산: '+liqRet.toFixed(1)+'% → '+hor+'년 후 ₩'+wLiq[hor].toFixed(0)+'\n'+
+      '비유동자산(순): '+netIlliq.toFixed(1)+'% → '+hor+'년 후 ₩'+wNet[hor].toFixed(0)+'\n'+
+      '<span style="color:'+(netAdv>0?'#27ae60':'#e74c3c')+'">순 프리미엄: '+(netAdv>=0?'+':'')+netAdv.toFixed(1)+'%p → '+(netAdv>0?'비유동자산 투자 가치 있음':'거래비용이 프리미엄을 잠식!')+'</span>\n'+
+      '<span style="color:#6a9955">→ 투자 기간이 길수록 거래비용의 연율화 영향 감소 → 비유동성 프리미엄 수확 용이</span>';
+  }
+  Object.keys(sls).forEach(function(k){sls[k].addEventListener('input',draw2);});
+  setTimeout(draw2,400);
+})();
+</script>
+
+<h3>Lab 3. 세금 드래그 계산기</h3>
+<p class="ni">세전 수익률, 세율, 투자 기간을 조절하면서 세금이 장기 복리에 미치는 영향을 확인하세요. 매년 과세 vs 이연 과세의 차이를 비교합니다.</p>
+
+<div style="background:#f0f4f8;padding:20px;border-radius:8px;margin:20px 0">
+<div style="display:flex;gap:16px;flex-wrap:wrap;margin-bottom:12px">
+<div>
+<label style="font-size:11px;color:#555">세전 수익률 (%)</label><br>
+<input type="range" id="sl-pre" min="3" max="15" step="0.5" value="10" style="width:100px">
+<span id="val-pre" style="font-family:'Space Mono',monospace;font-size:12px">10.0%</span>
+</div>
+<div>
+<label style="font-size:11px;color:#555">세율 (%)</label><br>
+<input type="range" id="sl-tax" min="10" max="40" step="1" value="22" style="width:100px">
+<span id="val-tax" style="font-family:'Space Mono',monospace;font-size:12px">22%</span>
+</div>
+<div>
+<label style="font-size:11px;color:#555">투자 기간 (년)</label><br>
+<input type="range" id="sl-yr" min="5" max="40" step="5" value="20" style="width:100px">
+<span id="val-yr" style="font-family:'Space Mono',monospace;font-size:12px">20</span>
+</div>
+</div>
+<div id="plot-lab3r9" style="width:100%;height:380px"></div>
+<div id="lab3r9-info" style="font-family:'Space Mono',monospace;font-size:12px;margin-top:8px;padding:10px;background:#1e1e1e;color:#d4d4d4;border-radius:6px;line-height:1.8"></div>
 </div>
 
-<div class="def">
-<p class="ni"><strong>Q4. [세금]</strong> 연 10% 수익률, 세율 22%로 20년 투자 시 세금 드래그를 계산하라. Tax-loss harvesting으로 연 1%p 세후 수익 개선 시 20년 후 차이는?</p>
+<script>
+(function(){
+  var sls={pre:document.getElementById('sl-pre'),tax:document.getElementById('sl-tax'),yr:document.getElementById('sl-yr')};
+  var vls={pre:document.getElementById('val-pre'),tax:document.getElementById('val-tax'),yr:document.getElementById('val-yr')};
+  function draw3(){
+    var pre=parseFloat(sls.pre.value)/100,tax=parseFloat(sls.tax.value)/100,yr=parseInt(sls.yr.value);
+    vls.pre.textContent=(pre*100).toFixed(1)+'%';vls.tax.textContent=(tax*100).toFixed(0)+'%';vls.yr.textContent=yr;
+    var postAnn=pre*(1-tax); // annual taxation
+    var years=[],wPre=[],wAnn=[],wDefer=[];
+    var cP=100,cA=100;
+    for(var t=0;t<=yr;t++){
+      years.push(t);wPre.push(cP);wAnn.push(cA);
+      // deferred: grow at pre-tax, pay tax on total gain at end
+      var totalGain=100*Math.pow(1+pre,t)-100;
+      wDefer.push(100+totalGain*(1-tax));
+      cP*=(1+pre);cA*=(1+postAnn);
+    }
+    var dragAnn=wPre[yr]-wAnn[yr];
+    var dragPct=(1-wAnn[yr]/wPre[yr])*100;
+    var deferAdv=wDefer[yr]-wAnn[yr];
+    Plotly.react('plot-lab3r9',[
+      {x:years,y:wPre,name:'세전 ('+((pre*100).toFixed(1))+'%)',line:{color:'#27ae60',width:2,dash:'dash'}},
+      {x:years,y:wAnn,name:'매년 과세 ('+((postAnn*100).toFixed(1))+'%)',line:{color:'#e74c3c',width:2}},
+      {x:years,y:wDefer,name:'이연 과세',line:{color:'#3498db',width:2.5}}
+    ],{
+      title:'₩100 투자 — 세금 드래그: ₩'+dragAnn.toFixed(0)+' ('+dragPct.toFixed(1)+'%)',
+      xaxis:{title:'투자 기간 (년)'},yaxis:{title:'자산 가치 (₩)'},
+      plot_bgcolor:'#fafaf8',paper_bgcolor:'#f0f4f8',font:{family:'Inter',size:12},
+      margin:{t:50,r:20,b:50,l:60}
+    },{responsive:true});
+    document.getElementById('lab3r9-info').innerHTML=
+      '세전: ₩100 → ₩'+wPre[yr].toFixed(0)+' | 매년과세: ₩'+wAnn[yr].toFixed(0)+' | 이연과세: ₩'+wDefer[yr].toFixed(0)+'\n'+
+      '세금 드래그 (매년과세): ₩'+dragAnn.toFixed(0)+' (세전 대비 '+dragPct.toFixed(1)+'% 손실)\n'+
+      '이연 과세 이점: ₩'+deferAdv.toFixed(0)+' (매년과세 대비)\n'+
+      '<span style="color:#569cd6">→ 세금 이연의 복리 효과: '+yr+'년간 ₩'+deferAdv.toFixed(0)+' 추가 수익</span>\n'+
+      '<span style="color:#6a9955">→ 투자 기간이 길수록 이연 효과 극대화 (세금의 시간가치)</span>';
+  }
+  Object.keys(sls).forEach(function(k){sls[k].addEventListener('input',draw3);});
+  setTimeout(draw3,500);
+})();
+</script>
+
+<!-- Quiz Section -->
+<h2 id="ch7">7. 객관식 퀴즈</h2>
+
+<style>
+.quiz-box{background:#fff;border:2px solid #e0e0e0;border-radius:8px;padding:20px;margin:16px 0;transition:border-color .3s}
+.quiz-box.correct{border-color:#27ae60;background:#f0fff4}
+.quiz-box.wrong{border-color:#e74c3c;background:#fff5f5}
+.quiz-box h4{margin:0 0 12px;font-size:14px}
+.quiz-opt{display:block;margin:6px 0;padding:8px 12px;border:1px solid #ddd;border-radius:6px;cursor:pointer;font-size:13px;transition:all .2s}
+.quiz-opt:hover{background:#f0f4f8;border-color:#3498db}
+.quiz-opt.selected{background:#e8f4f8;border-color:#3498db;font-weight:600}
+.quiz-opt.correct-answer{background:#d4edda;border-color:#27ae60}
+.quiz-opt.wrong-answer{background:#f8d7da;border-color:#e74c3c}
+.quiz-feedback{margin-top:10px;padding:10px;border-radius:6px;font-size:12px;display:none}
+.quiz-feedback.show{display:block}
+.quiz-score{text-align:center;padding:20px;background:#f8f9fa;border-radius:8px;margin:20px 0;font-size:16px}
+</style>
+
+<div class="quiz-box" id="q1">
+<h4>Q1. Jensen's alpha가 양수이고 t-통계량이 3.5인 펀드에 대한 해석은?</h4>
+<label class="quiz-opt" onclick="checkQ('q1',this,0)">A. 운이 좋았을 뿐이다</label>
+<label class="quiz-opt" onclick="checkQ('q1',this,1)">B. 벤치마크 대비 통계적으로 유의한 초과수익을 달성했다</label>
+<label class="quiz-opt" onclick="checkQ('q1',this,2)">C. 베타가 1보다 크다는 의미이다</label>
+<label class="quiz-opt" onclick="checkQ('q1',this,3)">D. 팩터 노출이 없다는 의미이다</label>
+<div class="quiz-feedback" id="q1-fb"></div>
 </div>
 
-<div class="def">
-<p class="ni"><strong>Q5. [종합]</strong> <code>PerformanceAnalyzer</code> 클래스를 확장하여 Calmar Ratio(연율화 수익/최대 낙폭)와 Sortino Ratio(하방 변동성 기준)를 추가 구현하라.</p>
+<div class="quiz-box" id="q2">
+<h4>Q2. Grinold 기본 법칙에서 IC=0.03, BR=900이면 예상 IR은?</h4>
+<label class="quiz-opt" onclick="checkQ('q2',this,0)">A. 0.27</label>
+<label class="quiz-opt" onclick="checkQ('q2',this,1)">B. 0.90</label>
+<label class="quiz-opt" onclick="checkQ('q2',this,2)">C. 2.70</label>
+<label class="quiz-opt" onclick="checkQ('q2',this,3)">D. 0.03</label>
+<div class="quiz-feedback" id="q2-fb"></div>
 </div>
+
+<div class="quiz-box" id="q3">
+<h4>Q3. 비유동성 프리미엄을 수확하기 위한 핵심 조건은?</h4>
+<label class="quiz-opt" onclick="checkQ('q3',this,0)">A. 단기 트레이딩으로 빈번하게 매매</label>
+<label class="quiz-opt" onclick="checkQ('q3',this,1)">B. 충분히 긴 투자 기간으로 거래비용을 상쇄</label>
+<label class="quiz-opt" onclick="checkQ('q3',this,2)">C. 레버리지를 최대한 활용</label>
+<label class="quiz-opt" onclick="checkQ('q3',this,3)">D. 유동성이 높은 자산만 보유</label>
+<div class="quiz-feedback" id="q3-fb"></div>
+</div>
+
+<div class="quiz-box" id="q4">
+<h4>Q4. 세전 수익률 8%, 세율 25%로 30년 투자 시 매년 과세의 세후 수익률은?</h4>
+<label class="quiz-opt" onclick="checkQ('q4',this,0)">A. 8%</label>
+<label class="quiz-opt" onclick="checkQ('q4',this,1)">B. 6%</label>
+<label class="quiz-opt" onclick="checkQ('q4',this,2)">C. 2%</label>
+<label class="quiz-opt" onclick="checkQ('q4',this,3)">D. 4%</label>
+<div class="quiz-feedback" id="q4-fb"></div>
+</div>
+
+<div class="quiz-box" id="q5">
+<h4>Q5. "어제의 알파는 오늘의 베타"라는 말의 의미는?</h4>
+<label class="quiz-opt" onclick="checkQ('q5',this,0)">A. 알파가 시간이 지나면 음수가 된다</label>
+<label class="quiz-opt" onclick="checkQ('q5',this,1)">B. 한때 초과수익으로 여겨진 것이 팩터 노출로 재분류된다</label>
+<label class="quiz-opt" onclick="checkQ('q5',this,2)">C. 베타가 항상 알파보다 크다</label>
+<label class="quiz-opt" onclick="checkQ('q5',this,3)">D. 과거 수익률이 미래를 예측한다</label>
+<div class="quiz-feedback" id="q5-fb"></div>
+</div>
+
+<div class="quiz-score" id="quiz-score" style="display:none"></div>
+
+<script>
+var quizAnswers={q1:1,q2:0,q3:1,q4:1,q5:1};
+var quizExplain={
+  q1:'t-통계량 3.5 > 2이므로 α가 통계적으로 유의하다. 벤치마크(팩터 모델) 대비 유의한 초과수익을 달성했다는 증거. 다만 과거 성과가 미래를 보장하지는 않는다.',
+  q2:'IR = IC × √BR = 0.03 × √900 = 0.03 × 30 = 0.90. IR 0.9는 매우 우수한 수준. 하지만 IC=0.03은 매우 작은 예측력이므로 BR(독립적 결정 수)이 커야 한다.',
+  q3:'비유동성 프리미엄은 거래비용이 높은 자산에서 발생. 이를 수확하려면 투자 기간이 충분히 길어야 거래비용(매수+매도)의 연율화 영향이 프리미엄보다 작아진다.',
+  q4:'매년 과세 세후 수익률 = 8% × (1-0.25) = 6%. 30년 후: ₩100 × (1.06)^30 = ₩574. 세전이면 ₩100 × (1.08)^30 = ₩1,006. 세금 드래그 = ₩432.',
+  q5:'가치 프리미엄(HML)이나 모멘텀(UMD)은 한때 "알파"(매니저 스킬)로 여겨졌지만, 이제는 체계적 팩터(β)로 인식된다. 팩터 ETF로 저렴하게 복제 가능하므로 높은 수수료를 정당화할 수 없다.'
+};
+var quizDone={},quizCorrect=0,quizTotal=5;
+function checkQ(qid,el,idx){
+  if(quizDone[qid])return;quizDone[qid]=true;
+  var box=document.getElementById(qid),opts=box.querySelectorAll('.quiz-opt'),correct=quizAnswers[qid];
+  el.classList.add(idx===correct?'correct-answer':'wrong-answer');
+  if(idx!==correct)opts[correct].classList.add('correct-answer');
+  box.classList.add(idx===correct?'correct':'wrong');
+  if(idx===correct)quizCorrect++;
+  var fb=document.getElementById(qid+'-fb');
+  fb.innerHTML=(idx===correct?'<span style="color:#27ae60">✓ 정답!</span> ':'<span style="color:#e74c3c">✗ 오답.</span> ')+quizExplain[qid];
+  fb.style.background=idx===correct?'#d4edda':'#f8d7da';fb.classList.add('show');
+  if(Object.keys(quizDone).length===quizTotal){
+    var sc=document.getElementById('quiz-score');sc.style.display='block';
+    var pct=Math.round(quizCorrect/quizTotal*100);
+    var emoji=pct>=80?'🎉':pct>=60?'👍':'💪';
+    sc.innerHTML=emoji+' <strong>'+quizCorrect+'/'+quizTotal+'</strong> ('+pct+'%) — '+(pct>=80?'훌륭합니다!':pct>=60?'좋아요, 복습하면 완벽!':'위의 Lab에서 다시 실험해보세요!');
+  }
+}
+</script>
 
 <div class="info">
 <p class="ni"><strong>Pass 2 Preview:</strong> 알파 지속성(persistence) 검정, Carhart 4팩터 알파 분해, 비유동성 팩터 포트폴리오 구축, 한국 세법 적용 세후 최적화, 거래비용 모델링.</p>
