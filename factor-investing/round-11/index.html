@@ -59,6 +59,7 @@ body{font-family:'Inter',sans-serif;background:#fafaf8;color:#1a1a1a;line-height
 <li><a href="#ch5">5. 수수료 구조와 인센티브</a></li>
 <li><a href="#ch6">6. 파이썬 구현: 펀드 분석</a></li>
 <li><a href="#ch6d">6.4 위임 운용 & 뮤추얼펀드 (Ang)</a></li>
+<li><a href="#interactive">🎮 직접 해보기</a></li>
 <li><a href="#ch7">7. Quiz</a></li>
 </ul>
 </div>
@@ -886,43 +887,249 @@ t_stats = net_returns.mean(axis=<span class="nu">0</span>) / (net_returns.std(ax
 
 <h2 id="ch7">7. Quiz</h2>
 
-<div class="def">
-<p class="ni"><strong>Q1. [알파 분해]</strong> 한 펀드의 CAPM 알파가 연 5%이고, Carhart 4-Factor 알파가 연 0.5%이다. 이 차이(4.5%p)는 무엇을 의미하는가? 어떤 팩터 노출이 이 차이를 만들었을 가능성이 높은지 설명하라.</p>
+<h2 id="interactive">🎮 직접 해보기 — Interactive Lab</h2>
+
+<h3>Lab 1. 수수료 드래그 계산기</h3>
+<p class="ni">총수익률과 수수료를 조절하면서 인덱스 펀드, 액티브 펀드, 헤지펀드의 순수익을 비교하세요. 각 구조의 손익분기 알파도 확인합니다.</p>
+
+<div style="background:#f0f4f8;padding:20px;border-radius:8px;margin:20px 0">
+<div style="display:flex;gap:16px;flex-wrap:wrap;margin-bottom:12px">
+<div>
+<label style="font-size:11px;color:#555">총수익률 (%)</label><br>
+<input type="range" id="sl-gr" min="3" max="15" step="0.5" value="8" style="width:100px">
+<span id="val-gr" style="font-family:'Space Mono',monospace;font-size:12px">8.0%</span>
+</div>
+<div>
+<label style="font-size:11px;color:#555">인덱스 수수료 (%)</label><br>
+<input type="range" id="sl-fi" min="0.03" max="0.5" step="0.01" value="0.1" style="width:100px">
+<span id="val-fi" style="font-family:'Space Mono',monospace;font-size:12px">0.10%</span>
+</div>
+<div>
+<label style="font-size:11px;color:#555">액티브 수수료 (%)</label><br>
+<input type="range" id="sl-fa" min="0.5" max="3" step="0.1" value="1.5" style="width:100px">
+<span id="val-fa" style="font-family:'Space Mono',monospace;font-size:12px">1.50%</span>
+</div>
+<div>
+<label style="font-size:11px;color:#555">투자 기간 (년)</label><br>
+<input type="range" id="sl-yf" min="5" max="30" step="5" value="20" style="width:80px">
+<span id="val-yf" style="font-family:'Space Mono',monospace;font-size:12px">20</span>
+</div>
+</div>
+<div id="plot-lab1r11" style="width:100%;height:380px"></div>
+<div id="lab1r11-info" style="font-family:'Space Mono',monospace;font-size:12px;margin-top:8px;padding:10px;background:#1e1e1e;color:#d4d4d4;border-radius:6px;line-height:1.8"></div>
 </div>
 
-<div class="def">
-<p class="ni"><strong>Q2. [RBSA]</strong> 6개 스타일 벤치마크(대형성장, 대형가치, 소형성장, 소형가치, 채권, 현금)로 RBSA를 수행하라. 36개월 롤링 윈도우로 스타일 비중의 시간 변화를 시각화하라. 스타일 드리프트(style drift)가 발생하는 펀드를 식별하라.</p>
+<script>
+(function(){
+  var sls={gr:document.getElementById('sl-gr'),fi:document.getElementById('sl-fi'),fa:document.getElementById('sl-fa'),yf:document.getElementById('sl-yf')};
+  var vls={gr:document.getElementById('val-gr'),fi:document.getElementById('val-fi'),fa:document.getElementById('val-fa'),yf:document.getElementById('val-yf')};
+  function draw(){
+    var gr=parseFloat(sls.gr.value)/100,fi=parseFloat(sls.fi.value)/100,fa=parseFloat(sls.fa.value)/100,T=parseInt(sls.yf.value);
+    vls.gr.textContent=(gr*100).toFixed(1)+'%';vls.fi.textContent=(fi*100).toFixed(2)+'%';vls.fa.textContent=(fa*100).toFixed(1)+'%';vls.yf.textContent=T;
+    // hedge fund: 2% mgmt + 20% performance (simplified)
+    var hfMgmt=0.02,hfPerf=0.20;
+    var hfNet=gr-hfMgmt;if(hfNet>0)hfNet=hfNet*(1-hfPerf);else hfNet=gr-hfMgmt;
+    var years=[],wIdx=[],wAct=[],wHF=[];
+    var cI=100,cA=100,cH=100;
+    for(var t=0;t<=T;t++){
+      years.push(t);wIdx.push(cI);wAct.push(cA);wHF.push(cH);
+      cI*=(1+gr-fi);cA*=(1+gr-fa);cH*=(1+hfNet);
+    }
+    var dragAct=wIdx[T]-wAct[T],dragHF=wIdx[T]-wHF[T];
+    Plotly.react('plot-lab1r11',[
+      {x:years,y:wIdx,name:'인덱스 ('+(fi*100).toFixed(2)+'%)',line:{color:'#27ae60',width:2.5}},
+      {x:years,y:wAct,name:'액티브 ('+(fa*100).toFixed(1)+'%)',line:{color:'#e74c3c',width:2}},
+      {x:years,y:wHF,name:'헤지펀드 (2/20)',line:{color:'#9b59b6',width:2,dash:'dash'}}
+    ],{
+      title:'₩100 투자 — '+T+'년 후 수수료 드래그',
+      xaxis:{title:'투자 기간 (년)'},yaxis:{title:'자산 가치 (₩)'},
+      plot_bgcolor:'#fafaf8',paper_bgcolor:'#f0f4f8',font:{family:'Inter',size:12},
+      margin:{t:50,r:20,b:50,l:60}
+    },{responsive:true});
+    document.getElementById('lab1r11-info').innerHTML=
+      T+'년 후: 인덱스 ₩'+wIdx[T].toFixed(0)+' | 액티브 ₩'+wAct[T].toFixed(0)+' | 헤지펀드 ₩'+wHF[T].toFixed(0)+'\n'+
+      '수수료 드래그: 액티브 ₩'+dragAct.toFixed(0)+' | 헤지펀드 ₩'+dragHF.toFixed(0)+'\n'+
+      '손익분기 α: 액티브 '+(fa*100-fi*100).toFixed(2)+'%p | 헤지펀드 ~'+(hfMgmt*100+hfPerf*(gr-hfMgmt)*100).toFixed(1)+'%p\n'+
+      '<span style="color:#6a9955">→ 액티브 매니저는 수수료 차이만큼의 α를 매년 창출해야 인덱스를 이긴다</span>';
+  }
+  Object.keys(sls).forEach(function(k){sls[k].addEventListener('input',draw);});
+  setTimeout(draw,300);
+})();
+</script>
+
+<h3>Lab 2. RBSA 스타일 분석 시뮬레이터</h3>
+<p class="ni">펀드의 스타일 비중을 조절하면서 벤치마크 대비 성과와 스타일 드리프트를 확인하세요.</p>
+
+<div style="background:#f0f4f8;padding:20px;border-radius:8px;margin:20px 0">
+<div style="display:flex;gap:16px;flex-wrap:wrap;margin-bottom:12px">
+<div>
+<label style="font-size:11px;color:#555">대형성장 (%)</label><br>
+<input type="range" id="sl-lg" min="0" max="60" step="5" value="30" style="width:90px">
+<span id="val-lg" style="font-family:'Space Mono',monospace;font-size:12px">30%</span>
+</div>
+<div>
+<label style="font-size:11px;color:#555">대형가치 (%)</label><br>
+<input type="range" id="sl-lv" min="0" max="60" step="5" value="25" style="width:90px">
+<span id="val-lv" style="font-family:'Space Mono',monospace;font-size:12px">25%</span>
+</div>
+<div>
+<label style="font-size:11px;color:#555">소형성장 (%)</label><br>
+<input type="range" id="sl-sg" min="0" max="40" step="5" value="15" style="width:90px">
+<span id="val-sg" style="font-family:'Space Mono',monospace;font-size:12px">15%</span>
+</div>
+<div>
+<label style="font-size:11px;color:#555">소형가치 (%)</label><br>
+<input type="range" id="sl-sv" min="0" max="40" step="5" value="10" style="width:90px">
+<span id="val-sv" style="font-family:'Space Mono',monospace;font-size:12px">10%</span>
+</div>
+<div>
+<label style="font-size:11px;color:#555">채권 (%)</label><br>
+<input type="range" id="sl-bd" min="0" max="40" step="5" value="15" style="width:90px">
+<span id="val-bd" style="font-family:'Space Mono',monospace;font-size:12px">15%</span>
+</div>
+<div>
+<label style="font-size:11px;color:#555">현금 (%)</label><br>
+<input type="range" id="sl-ca" min="0" max="20" step="5" value="5" style="width:90px">
+<span id="val-ca" style="font-family:'Space Mono',monospace;font-size:12px">5%</span>
+</div>
+</div>
+<div id="plot-lab2r11" style="width:100%;height:380px"></div>
+<div id="lab2r11-info" style="font-family:'Space Mono',monospace;font-size:12px;margin-top:8px;padding:10px;background:#1e1e1e;color:#d4d4d4;border-radius:6px;line-height:1.8"></div>
 </div>
 
-<div class="def">
-<p class="ni"><strong>Q3. [수수료]</strong> 동일한 총수익률(gross return)을 가정할 때, 다음 세 가지 수수료 구조의 10년 순수익을 비교하라: (a) 인덱스 펀드 0.1%, (b) 액티브 뮤추얼펀드 1.5%, (c) 헤지펀드 2/20+HWM. 각각의 손익분기 알파(breakeven alpha)를 계산하라.</p>
+<script>
+(function(){
+  var ids=['lg','lv','sg','sv','bd','ca'];
+  var names=['대형성장','대형가치','소형성장','소형가치','채권','현금'];
+  var colors=['#e74c3c','#27ae60','#f39c12','#9b59b6','#3498db','#95a5a6'];
+  var rets=[12,9,11,10,4,2]; // expected returns
+  var sls={},vls={};
+  ids.forEach(function(id){sls[id]=document.getElementById('sl-'+id);vls[id]=document.getElementById('val-'+id);});
+  function draw2(){
+    var ws=ids.map(function(id){return parseFloat(sls[id].value);});
+    var total=ws.reduce(function(a,b){return a+b;},0);
+    ids.forEach(function(id,i){vls[id].textContent=ws[i]+'%';});
+    // normalize
+    var wn=ws.map(function(w){return total>0?w/total:0;});
+    var portRet=wn.reduce(function(a,w,i){return a+w*rets[i];},0);
+    // R² approximation
+    var r2=1-(wn[5]*0.5+0.05); // simplified
+    Plotly.react('plot-lab2r11',[{
+      labels:names,values:ws,type:'pie',
+      marker:{colors:colors},
+      textinfo:'label+percent',hole:0.4
+    }],{
+      title:'RBSA 스타일 분해 (기대수익: '+portRet.toFixed(1)+'%)',
+      font:{family:'Inter',size:12},
+      margin:{t:50,r:20,b:20,l:20}
+    },{responsive:true});
+    var equity=ws[0]+ws[1]+ws[2]+ws[3];
+    var growth=ws[0]+ws[2];
+    var value=ws[1]+ws[3];
+    var small=ws[2]+ws[3];
+    document.getElementById('lab2r11-info').innerHTML=
+      '스타일 요약: 주식 '+equity+'% | 채권 '+ws[4]+'% | 현금 '+ws[5]+'%\n'+
+      '성장 vs 가치: '+growth+'% vs '+value+'% → '+(growth>value?'성장 틸트':'가치 틸트')+'\n'+
+      '소형주 비중: '+small+'% → '+(small>30?'소형주 과대비중':'정상 범위')+'\n'+
+      '기대 포트폴리오 수익률: <span style="color:#569cd6">'+portRet.toFixed(1)+'%</span>\n'+
+      (total!==100?'<span style="color:#e74c3c">⚠ 비중 합계: '+total+'% (100%가 아님)</span>':'<span style="color:#27ae60">✓ 비중 합계: 100%</span>');
+  }
+  ids.forEach(function(id){sls[id].addEventListener('input',draw2);});
+  setTimeout(draw2,400);
+})();
+</script>
+
+<h2 id="ch7">7. 객관식 퀴즈</h2>
+
+<style>
+.quiz-box{background:#fff;border:2px solid #e0e0e0;border-radius:8px;padding:20px;margin:16px 0;transition:border-color .3s}
+.quiz-box.correct{border-color:#27ae60;background:#f0fff4}
+.quiz-box.wrong{border-color:#e74c3c;background:#fff5f5}
+.quiz-box h4{margin:0 0 12px;font-size:14px}
+.quiz-opt{display:block;margin:6px 0;padding:8px 12px;border:1px solid #ddd;border-radius:6px;cursor:pointer;font-size:13px;transition:all .2s}
+.quiz-opt:hover{background:#f0f4f8;border-color:#3498db}
+.quiz-opt.correct-answer{background:#d4edda;border-color:#27ae60}
+.quiz-opt.wrong-answer{background:#f8d7da;border-color:#e74c3c}
+.quiz-feedback{margin-top:10px;padding:10px;border-radius:6px;font-size:12px;display:none}
+.quiz-feedback.show{display:block}
+.quiz-score{text-align:center;padding:20px;background:#f8f9fa;border-radius:8px;margin:20px 0;font-size:16px}
+</style>
+
+<div class="quiz-box" id="q1">
+<h4>Q1. CAPM α=5%, Carhart 4-Factor α=0.5%인 펀드의 해석은?</h4>
+<label class="quiz-opt" onclick="checkQ('q1',this,0)">A. 매니저 스킬이 5%이다</label>
+<label class="quiz-opt" onclick="checkQ('q1',this,1)">B. 4.5%p는 팩터 노출(SMB, HML, UMD)에 대한 보상이다</label>
+<label class="quiz-opt" onclick="checkQ('q1',this,2)">C. 4팩터 모델이 잘못되었다</label>
+<label class="quiz-opt" onclick="checkQ('q1',this,3)">D. 펀드가 시장을 5% 이겼다</label>
+<div class="quiz-feedback" id="q1-fb"></div>
 </div>
 
-<div class="def">
-<p class="ni"><strong>Q4. [매니저 선정]</strong> 100개 펀드의 10년 월별 수익률이 주어졌을 때, (1) 4-Factor 알파를 추정하고, (2) t-통계량 > 2인 펀드를 선별하고, (3) 다중검정 보정(Bonferroni 또는 FDR)을 적용하면 몇 개 펀드가 살아남는지 확인하라.</p>
+<div class="quiz-box" id="q2">
+<h4>Q2. 2/20 수수료 구조에서 총수익 10%, HWM 적용 시 순수익은 약?</h4>
+<label class="quiz-opt" onclick="checkQ('q2',this,0)">A. 10%</label>
+<label class="quiz-opt" onclick="checkQ('q2',this,1)">B. 8%</label>
+<label class="quiz-opt" onclick="checkQ('q2',this,2)">C. 6.4%</label>
+<label class="quiz-opt" onclick="checkQ('q2',this,3)">D. 4%</label>
+<div class="quiz-feedback" id="q2-fb"></div>
 </div>
+
+<div class="quiz-box" id="q3">
+<h4>Q3. RBSA(Returns-Based Style Analysis)의 핵심 제약 조건은?</h4>
+<label class="quiz-opt" onclick="checkQ('q3',this,0)">A. 스타일 비중의 합 = 1, 각 비중 ≥ 0</label>
+<label class="quiz-opt" onclick="checkQ('q3',this,1)">B. R² > 0.9 필수</label>
+<label class="quiz-opt" onclick="checkQ('q3',this,2)">C. 최소 100개 관측치 필요</label>
+<label class="quiz-opt" onclick="checkQ('q3',this,3)">D. 벤치마크가 3개 이하여야 함</label>
+<div class="quiz-feedback" id="q3-fb"></div>
+</div>
+
+<div class="quiz-box" id="q4">
+<h4>Q4. 100개 펀드에서 α의 t>2인 펀드가 8개일 때, Bonferroni 보정 후 유의한 펀드 수는?</h4>
+<label class="quiz-opt" onclick="checkQ('q4',this,0)">A. 8개 모두</label>
+<label class="quiz-opt" onclick="checkQ('q4',this,1)">B. 약 5개</label>
+<label class="quiz-opt" onclick="checkQ('q4',this,2)">C. 0~1개 (대부분 탈락)</label>
+<label class="quiz-opt" onclick="checkQ('q4',this,3)">D. 50개</label>
+<div class="quiz-feedback" id="q4-fb"></div>
+</div>
+
+<div class="quiz-box" id="q5">
+<h4>Q5. 헤지펀드 수익률 데이터의 주요 편향(bias)이 아닌 것은?</h4>
+<label class="quiz-opt" onclick="checkQ('q5',this,0)">A. 생존 편향 (Survivorship Bias)</label>
+<label class="quiz-opt" onclick="checkQ('q5',this,1)">B. 백필 편향 (Backfill Bias)</label>
+<label class="quiz-opt" onclick="checkQ('q5',this,2)">C. 스무딩 편향 (Smoothing/Stale Pricing)</label>
+<label class="quiz-opt" onclick="checkQ('q5',this,3)">D. 인플레이션 편향 (Inflation Bias)</label>
+<div class="quiz-feedback" id="q5-fb"></div>
+</div>
+
+<div class="quiz-score" id="quiz-score" style="display:none"></div>
+
+<script>
+var quizAnswers={q1:1,q2:2,q3:0,q4:2,q5:3};
+var quizExplain={
+  q1:'CAPM α 5% 중 4.5%p는 SMB, HML, UMD 팩터 노출에 대한 보상. 진짜 매니저 스킬(4팩터 α)은 0.5%에 불과. 저렴한 팩터 ETF로 4.5%p를 복제할 수 있다.',
+  q2:'2% 관리보수 차감 후 8%, 이 중 20% 성과보수 = 8%×0.2 = 1.6%. 순수익 = 10% - 2% - 1.6% = 6.4%. HWM은 이전 최고점 이상의 수익에만 성과보수 적용.',
+  q3:'Sharpe(1992)의 RBSA: 스타일 비중 합=1 (완전 투자), 각 비중≥0 (공매도 금지). 이 제약 하에서 펀드 수익률을 스타일 벤치마크의 가중합으로 회귀.',
+  q4:'Bonferroni 보정: 유의수준 0.05/100 = 0.0005, 즉 t > 3.5 정도 필요. t>2인 8개 중 t>3.5인 펀드는 0~1개일 가능성 높다. 다중검정 보정은 매우 보수적.',
+  q5:'헤지펀드 데이터의 3대 편향: 생존 편향(실패 펀드 제외), 백필 편향(좋은 성과만 소급 등록), 스무딩(비유동 자산의 시가평가 지연). 인플레이션 편향은 헤지펀드 특유의 문제가 아니다.'
+};
+var quizDone={},quizCorrect=0,quizTotal=5;
+function checkQ(qid,el,idx){
+  if(quizDone[qid])return;quizDone[qid]=true;
+  var box=document.getElementById(qid),opts=box.querySelectorAll('.quiz-opt'),correct=quizAnswers[qid];
+  el.classList.add(idx===correct?'correct-answer':'wrong-answer');
+  if(idx!==correct)opts[correct].classList.add('correct-answer');
+  box.classList.add(idx===correct?'correct':'wrong');
+  if(idx===correct)quizCorrect++;
+  var fb=document.getElementById(qid+'-fb');
+  fb.innerHTML=(idx===correct?'<span style="color:#27ae60">✓ 정답!</span> ':'<span style="color:#e74c3c">✗ 오답.</span> ')+quizExplain[qid];
+  fb.style.background=idx===correct?'#d4edda':'#f8d7da';fb.classList.add('show');
+  if(Object.keys(quizDone).length===quizTotal){var sc=document.getElementById('quiz-score');sc.style.display='block';var pct=Math.round(quizCorrect/quizTotal*100);var emoji=pct>=80?'🎉':pct>=60?'👍':'💪';sc.innerHTML=emoji+' <strong>'+quizCorrect+'/'+quizTotal+'</strong> ('+pct+'%) — '+(pct>=80?'훌륭합니다!':pct>=60?'좋아요, 복습하면 완벽!':'위의 Lab에서 다시 실험해보세요!');}
+}
+</script>
 
 <div class="info">
-<p class="ni"><strong>Pass 2 Preview:</strong> 롤링 RBSA, 조건부 알파(conditional alpha), 헤지펀드 전략별 팩터 모델(Equity L/S, Global Macro, CTA 등), 매니저 선정의 베이지안 접근법, 실전 펀드 데이터 분석.</p>
+<p class="ni"><strong>Pass 2 Preview:</strong> 롤링 RBSA, 조건부 알파(conditional alpha), 헤지펀드 전략별 팩터 모델, 매니저 선정의 베이지안 접근법, 실전 펀드 데이터 분석.</p>
 </div>
 
 </div></div></div>
-
-<style>
-.sidebar-nav{flex:1;margin-top:16px}.nav-section{margin-bottom:20px}.nav-section-title{font-size:.6rem;font-weight:600;color:#aaa;letter-spacing:.15em;text-transform:uppercase;margin-bottom:10px}.nav-list{list-style:none}.nav-list li{margin-bottom:5px}.nav-list a{font-size:.78rem;color:#555;text-decoration:none;transition:all .2s;display:block;padding:3px 0}.nav-list a:hover{color:#0080c6;padding-left:4px}.nav-list a.active{color:#0080c6;font-weight:500}.nav-list a.done{color:#28a745}.badge{display:inline-block;font-size:.5rem;background:#0080c6;color:#fff;padding:1px 5px;border-radius:8px;margin-left:3px;vertical-align:middle}.badge-done{background:#28a745}.sidebar-footer{padding-top:16px;border-top:1px solid rgba(0,0,0,.06);font-size:.65rem;color:#aaa;text-align:center}
-.main-wrapper{margin-left:260px;min-height:100vh}.container{max-width:1100px;margin:0 auto;padding:50px 40px 80px}
-.paper-content{font-family:'Times New Roman','Nanum Myeongjo',serif;line-height:1.8;background:#fff;padding:40px;border-radius:8px;box-shadow:0 2px 20px rgba(0,0,0,.05)}.paper-header{text-align:center;margin-bottom:40px;padding-bottom:30px;border-bottom:2px solid #333}.paper-category{font-size:14px;color:#666;margin-bottom:10px}.paper-title{font-size:24px;font-weight:bold;margin-bottom:12px;line-height:1.4}.paper-subtitle{font-size:14px;color:#555;margin-bottom:8px}.paper-team{font-size:13px;color:#444}
-.abstract{background:#f8f9fa;padding:25px;margin:30px 0;border-left:4px solid #2c3e50}.abstract-title{font-weight:bold;font-size:16px;margin-bottom:15px}
-h2{font-size:18px;margin:35px 0 20px;padding-bottom:8px;border-bottom:1px solid #ddd;color:#2c3e50}h3{font-size:15px;margin:25px 0 15px;color:#34495e}
-p{text-align:justify;margin-bottom:15px;text-indent:2em}p.ni{text-indent:0}
-table{width:100%;border-collapse:collapse;margin:20px 0;font-size:12px}th,td{border:1px solid #ddd;padding:10px 8px;text-align:center}th{background:#2c3e50;color:white;font-weight:bold}tr:nth-child(even){background:#f8f9fa}tr:hover{background:#e8f4f8}
-.tc{font-size:13px;font-weight:bold;margin:15px 0 10px;text-align:center}.eq{text-align:center;margin:20px 0;padding:15px;background:#f8f9fa;border-radius:4px;overflow-x:auto}ul,ol{margin-left:2em;margin-bottom:15px}li{margin-bottom:6px}
-.def{background:#fff9e6;border:1px solid #ffc107;border-radius:4px;padding:20px;margin:20px 0}.info{background:#e8f4f8;border-left:4px solid #3498db;padding:20px;margin:20px 0}.warn{background:#fff3cd;border-left:4px solid #f39c12;padding:20px;margin:20px 0}.ok{background:#d4edda;border-left:4px solid #28a745;padding:20px;margin:20px 0}
-pre{background:#1e1e1e;color:#d4d4d4;padding:20px;border-radius:6px;overflow-x:auto;margin:20px 0;font-family:'Space Mono','Consolas',monospace;font-size:13px;line-height:1.6}code{font-family:'Space Mono','Consolas',monospace;font-size:13px}p code,li code,td code{background:#f0f0f0;padding:2px 6px;border-radius:3px;color:#c7254e;font-size:12px}
-.cm{color:#6a9955}.kw{color:#569cd6}.st{color:#ce9178}.fn{color:#dcdcaa}.nb{color:#4ec9b0}.nu{color:#b5cea8}
-.progress-bar{width:100%;height:6px;background:#e0e0e0;border-radius:3px;margin-top:16px}.progress-fill{height:100%;background:linear-gradient(90deg,#0080c6,#00b894);border-radius:3px}.progress-label{font-size:11px;color:#888;margin-top:4px;text-align:center}
-.code-output{background:#1e1e1e;color:#d4d4d4;padding:12px 16px;border-radius:0 0 6px 6px;font-family:'Space Mono',monospace;font-size:11.5px;line-height:1.6;margin-top:-4px;margin-bottom:18px;border-top:2px solid #333;white-space:pre-wrap;overflow-x:auto}.code-output .out-label{color:#888;font-size:10px;margin-bottom:4px;display:block}
-@media(max-width:1024px){.sidebar{width:100%;height:auto;position:relative;border-right:none;border-bottom:1px solid rgba(0,0,0,.08);padding:16px}.sidebar-profile{margin-bottom:10px;padding-bottom:10px;display:flex;align-items:center;gap:12px;text-align:left}.profile-icon{font-size:32px;margin-bottom:0}.profile-bio{display:none}.nav-section{display:inline-block;margin-right:16px;margin-bottom:8px}.nav-list{display:flex;gap:10px;flex-wrap:wrap}.nav-list li{margin-bottom:0}.sidebar-footer{display:none}.main-wrapper{margin-left:0}.container{padding:0}.paper-content{padding:20px 16px;border-radius:0;box-shadow:none}.paper-title{font-size:18px}p{font-size:14px;text-indent:1.5em;text-align:left}pre{font-size:11px;padding:14px}table{font-size:10px;display:block;overflow-x:auto}}
-</style>
 </body>
 </html>
