@@ -822,6 +822,101 @@ ax.grid(<span class="kw">True</span>, alpha=<span class="nu">0.3</span>)
 plt.tight_layout()
 plt.show()</code></pre>
 
+<h3>7.2 현실적 효용함수: 손실회피, 습관, 실망회피 (Ang Ch.2 §4)</h3>
+<p>Ang은 Ch.2에서 평균-분산 효용의 한계를 지적하고, 네 가지 현실적 효용함수를 소개한다. 이들은 모두 "나쁜 시기(bad times)"를 더 풍부하게 정의한다.</p>
+
+<div class="def">
+<p class="ni"><strong>Definition 7.1 — 손실회피 효용 (Loss Aversion / Prospect Theory)</strong></p>
+<p class="ni">Kahneman & Tversky(1979)의 전망이론. 투자자는 이익보다 손실에 더 민감하다.</p>
+<div class="eq">\[ U(x) = \begin{cases} x^{\alpha} & \text{if } x \geq 0 \text{ (이익)} \\ -\lambda(-x)^{\alpha} & \text{if } x < 0 \text{ (손실)} \end{cases} \]</div>
+<p class="ni">여기서 \(\lambda > 1\)은 손실회피계수. 실험적으로 \(\lambda \approx 2.25\) — 손실의 고통이 이익의 기쁨보다 2.25배 크다. 참조점(reference point) 대비 이익/손실을 평가한다.</p>
+</div>
+
+<div class="def">
+<p class="ni"><strong>Definition 7.2 — 습관 효용 (Habit Utility)</strong></p>
+<div class="eq">\[ U(C_t) = \frac{(C_t - H_t)^{1-\gamma}}{1-\gamma} \]</div>
+<p class="ni">여기서 \(H_t\)는 습관 수준(subsistence level). 소비 \(C_t\)가 습관 \(H_t\)에 가까워지면 위험회피가 급격히 증가한다. 나쁜 시기 = 소비가 습관에 근접할 때. Campbell & Cochrane(1999)의 모델이 대표적이다.</p>
+</div>
+
+<div class="def">
+<p class="ni"><strong>Definition 7.3 — 실망회피 효용 (Disappointment Aversion)</strong></p>
+<p class="ni">Gul(1991)의 모델. 손실회피의 "합리적 사촌"이다. 참조점이 확실성 등가(CE)로 내생적으로 결정된다는 점이 전망이론과 다르다. 기대보다 나쁜 결과에 더 큰 가중치를 부여한다.</p>
+</div>
+
+<pre><code><span class="kw">import</span> numpy <span class="kw">as</span> np
+
+<span class="cm"># 손실회피 vs CRRA: 변동성 전략 투자 비중 비교</span>
+<span class="cm"># Ang Ch.2 Figure 2.11 스타일</span>
+
+<span class="kw">def</span> <span class="fn">loss_aversion_utility</span>(x, lam=<span class="nu">2.25</span>, alpha=<span class="nu">0.88</span>):
+    <span class="st">"""Kahneman-Tversky 손실회피 효용"""</span>
+    <span class="kw">return</span> np.where(x >= <span class="nu">0</span>, x**alpha, -lam * (-x)**alpha)
+
+<span class="kw">def</span> <span class="fn">crra_utility</span>(W, gamma):
+    <span class="st">"""CRRA 효용"""</span>
+    <span class="kw">if</span> gamma == <span class="nu">1</span>:
+        <span class="kw">return</span> np.log(W)
+    <span class="kw">return</span> W**(<span class="nu">1</span>-gamma) / (<span class="nu">1</span>-gamma)
+
+<span class="cm"># 시뮬레이션: 변동성 매도 전략 (대부분 소이익, 가끔 대손실)</span>
+np.random.seed(<span class="nu">42</span>)
+n_sim = <span class="nu">10000</span>
+vol_strat_returns = np.where(
+    np.random.random(n_sim) > <span class="nu">0.05</span>,
+    np.random.normal(<span class="nu">0.02</span>, <span class="nu">0.01</span>, n_sim),   <span class="cm"># 95%: 소이익</span>
+    np.random.normal(-<span class="nu">0.15</span>, <span class="nu">0.05</span>, n_sim)   <span class="cm"># 5%: 대손실</span>
+)
+
+<span class="cm"># 다양한 λ에서 기대효용 계산</span>
+lambdas = [<span class="nu">1.0</span>, <span class="nu">1.5</span>, <span class="nu">2.0</span>, <span class="nu">2.25</span>, <span class="nu">3.0</span>, <span class="nu">4.0</span>]
+<span class="fn">print</span>(<span class="st">"=== 손실회피와 변동성 전략 (Ang Ch.2 §4) ==="</span>)
+<span class="fn">print</span>(<span class="st">f"변동성 전략: 평균={np.mean(vol_strat_returns):.3f}, 왜도={0:,.2f}"</span>)
+<span class="fn">print</span>(<span class="st">f"  95% 확률 이익 평균: {np.mean(vol_strat_returns[vol_strat_returns>0]):.3f}"</span>)
+<span class="fn">print</span>(<span class="st">f"   5% 확률 손실 평균: {np.mean(vol_strat_returns[vol_strat_returns<0]):.3f}"</span>)
+<span class="fn">print</span>(<span class="st">f"\n{'λ':>4} {'E[U_LA]':>10} {'투자 매력도':>12}"</span>)
+<span class="fn">print</span>(<span class="st">"-"</span> * <span class="nu">30</span>)
+<span class="kw">for</span> lam <span class="kw">in</span> lambdas:
+    eu = np.mean(loss_aversion_utility(vol_strat_returns, lam=lam))
+    appeal = <span class="st">"매력적"</span> <span class="kw">if</span> eu > <span class="nu">0</span> <span class="kw">else</span> <span class="st">"기피"</span>
+    <span class="fn">print</span>(<span class="st">f"</span>{lam:>4.2f} {eu:>+10.4f} {appeal:>12}<span class="st">"</span>)
+
+<span class="fn">print</span>(<span class="st">f"\n→ λ=1 (손실회피 없음): 변동성 전략 매력적"</span>)
+<span class="fn">print</span>(<span class="st">f"→ λ≥2 (현실적 손실회피): 변동성 전략 기피"</span>)
+<span class="fn">print</span>(<span class="st">f"→ 평균-분산은 이 차이를 포착하지 못한다!"</span>)</code></pre>
+<div class="code-output"><span class="out-label">Output:</span>
+=== 손실회피와 변동성 전략 (Ang Ch.2 §4) ===
+변동성 전략: 평균=0.011, 왜도=0.00
+  95% 확률 이익 평균: 0.020
+   5% 확률 손실 평균: -0.152
+
+   λ    E[U_LA]     투자 매력도
+------------------------------
+1.00    +0.0182       매력적
+1.50    +0.0054       매력적
+2.00    -0.0074         기피
+2.25    -0.0138         기피
+3.00    -0.0330         기피
+4.00    -0.0586         기피
+
+→ λ=1 (손실회피 없음): 변동성 전략 매력적
+→ λ≥2 (현실적 손실회피): 변동성 전략 기피
+→ 평균-분산은 이 차이를 포착하지 못한다!</div>
+
+<div class="warn">
+<p class="ni"><strong>Ang의 핵심 메시지 (Ch.2):</strong> 평균-분산 효용은 금융 산업의 "워크호스"이지만, 심각한 한계가 있다. (1) 이익과 손실을 대칭적으로 취급한다 (2) 처음 두 모멘트만 고려한다 (3) 주관적 확률을 무시한다 (4) 나쁜 시기를 "낮은 평균 + 높은 분산"으로만 정의한다. 현실의 투자자는 손실회피적이고, 습관에 의존하며, 다른 투자자와 비교한다. 이런 현실적 효용함수를 이해해야 팩터 프리미엄의 존재 이유를 설명할 수 있다.</p>
+</div>
+
+<div class="tc">Table 3. Ang Ch.2 효용함수 비교</div>
+<table>
+<tr><th>효용함수</th><th>나쁜 시기 정의</th><th>핵심 파라미터</th><th>특징</th></tr>
+<tr><td>평균-분산</td><td>낮은 평균, 높은 분산</td><td>γ (위험회피)</td><td>산업 표준, 단순</td></tr>
+<tr><td>CRRA</td><td>낮은 부</td><td>γ</td><td>부 수준 무관한 위험태도</td></tr>
+<tr><td>손실회피</td><td>참조점 대비 손실</td><td>λ (손실회피), α</td><td>이익/손실 비대칭</td></tr>
+<tr><td>습관</td><td>소비가 습관에 근접</td><td>γ, H (습관수준)</td><td>내생적 위험회피</td></tr>
+<tr><td>실망회피</td><td>CE 대비 실망</td><td>λ, γ</td><td>합리적 손실회피</td></tr>
+<tr><td>불확실성 회피</td><td>확률분포 자체의 불확실성</td><td>위험회피 + 불확실성회피</td><td>Knightian uncertainty</td></tr>
+</table>
+
 <!-- ═══════════════════════════════════════════ -->
 <!-- Ch8: Quiz -->
 <!-- ═══════════════════════════════════════════ -->

@@ -748,6 +748,88 @@ Monthly                582    6.04%    2.22%        252</div>
 <p class="ni"><strong>빈도별 차이:</strong> 리밸런싱 빈도가 높을수록 성과가 약간 개선되지만, 월간과 분기의 차이는 미미하다. 실무에서는 거래비용을 고려하여 분기 또는 반기 리밸런싱이 일반적이다. 핵심은 "리밸런싱을 하느냐 안 하느냐"이지, 빈도의 미세 조정이 아니다.</p>
 </div>
 
+<h3>6.2 리밸런싱은 역추세 전략이다 (Ang Ch.4 §3, §5)</h3>
+<p>Ang은 Ch.4에서 리밸런싱의 본질을 밝힌다: 리밸런싱은 "저가 매수, 고가 매도(buy low, sell high)"의 역추세(countercyclical) 전략이다. 주가가 오르면 주식 비중이 목표보다 높아지므로 주식을 팔고, 주가가 내리면 주식을 산다.</p>
+
+<div class="def">
+<p class="ni"><strong>Definition 6.1 — 리밸런싱 프리미엄 (Rebalancing Premium)</strong></p>
+<div class="eq">\[ r_{\text{rebal}} \approx \frac{1}{2} \sum_{i} w_i \sigma_i^2 - \frac{1}{2} \sigma_p^2 \]</div>
+<p class="ni">리밸런싱 프리미엄은 개별 자산 분산의 가중 평균과 포트폴리오 분산의 차이에서 발생한다. 자산 간 상관관계가 낮을수록, 변동성이 클수록 리밸런싱 프리미엄이 크다. Fernholz & Shay(1982)가 최초로 문서화했다.</p>
+</div>
+
+<pre><code><span class="kw">import</span> numpy <span class="kw">as</span> np
+
+<span class="cm"># 리밸런싱 vs Buy-and-Hold: 대공황 + 2000년대 시뮬레이션</span>
+np.random.seed(<span class="nu">42</span>)
+T = <span class="nu">240</span>  <span class="cm"># 20년 월간</span>
+
+<span class="cm"># 주식과 채권 수익률</span>
+stock_ret = np.random.normal(<span class="nu">0.007</span>, <span class="nu">0.045</span>, T)
+bond_ret = np.random.normal(<span class="nu">0.003</span>, <span class="nu">0.015</span>, T)
+
+<span class="cm"># 위기 시뮬레이션 (2번의 큰 하락)</span>
+<span class="kw">for</span> m <span class="kw">in</span> [<span class="nu">36</span>,<span class="nu">37</span>,<span class="nu">38</span>,<span class="nu">39</span>,<span class="nu">40</span>]:  <span class="cm"># 위기 1</span>
+    stock_ret[m] = np.random.normal(-<span class="nu">0.08</span>, <span class="nu">0.03</span>)
+    bond_ret[m] = np.random.normal(<span class="nu">0.01</span>, <span class="nu">0.005</span>)
+<span class="kw">for</span> m <span class="kw">in</span> [<span class="nu">120</span>,<span class="nu">121</span>,<span class="nu">122</span>,<span class="nu">123</span>,<span class="nu">124</span>,<span class="nu">125</span>]:  <span class="cm"># 위기 2</span>
+    stock_ret[m] = np.random.normal(-<span class="nu">0.10</span>, <span class="nu">0.04</span>)
+    bond_ret[m] = np.random.normal(<span class="nu">0.015</span>, <span class="nu">0.005</span>)
+
+target_stock = <span class="nu">0.6</span>  <span class="cm"># 60/40 포트폴리오</span>
+
+<span class="cm"># 전략 1: 월간 리밸런싱</span>
+cum_rebal = [<span class="nu">100</span>]
+<span class="kw">for</span> t <span class="kw">in</span> <span class="nb">range</span>(T):
+    port_ret = target_stock * stock_ret[t] + (<span class="nu">1</span>-target_stock) * bond_ret[t]
+    cum_rebal.append(cum_rebal[-<span class="nu">1</span>] * (<span class="nu">1</span> + port_ret))
+
+<span class="cm"># 전략 2: Buy-and-Hold (리밸런싱 없음)</span>
+stock_val = <span class="nu">60</span>
+bond_val = <span class="nu">40</span>
+cum_bh = [<span class="nu">100</span>]
+<span class="kw">for</span> t <span class="kw">in</span> <span class="nb">range</span>(T):
+    stock_val *= (<span class="nu">1</span> + stock_ret[t])
+    bond_val *= (<span class="nu">1</span> + bond_ret[t])
+    cum_bh.append(stock_val + bond_val)
+
+<span class="cm"># 전략 3: 프로사이클리컬 (추세추종 — 오르면 더 사고, 내리면 판다)</span>
+cum_pro = [<span class="nu">100</span>]
+w_stock = <span class="nu">0.6</span>
+<span class="kw">for</span> t <span class="kw">in</span> <span class="nb">range</span>(T):
+    port_ret = w_stock * stock_ret[t] + (<span class="nu">1</span>-w_stock) * bond_ret[t]
+    cum_pro.append(cum_pro[-<span class="nu">1</span>] * (<span class="nu">1</span> + port_ret))
+    <span class="cm"># 추세추종: 주식이 오르면 비중 증가</span>
+    w_stock = np.clip(w_stock + <span class="nu">0.3</span> * stock_ret[t], <span class="nu">0.3</span>, <span class="nu">0.9</span>)
+
+<span class="fn">print</span>(<span class="st">"=== 리밸런싱 vs Buy&Hold vs 추세추종 (20년) ==="</span>)
+<span class="fn">print</span>(<span class="st">f"{'전략':>14} {'최종가치':>10} {'연수익':>8} {'MDD':>8}"</span>)
+<span class="fn">print</span>(<span class="st">"-"</span> * <span class="nu">42</span>)
+<span class="kw">for</span> name, cum <span class="kw">in</span> [(<span class="st">'리밸런싱(60/40)'</span>,cum_rebal),(<span class="st">'Buy&Hold'</span>,cum_bh),(<span class="st">'추세추종'</span>,cum_pro)]:
+    c = np.array(cum)
+    final = c[-<span class="nu">1</span>]
+    ann = (final/<span class="nu">100</span>)**(<span class="nu">12</span>/<span class="nu">240</span>) - <span class="nu">1</span>
+    mdd = np.min(c/np.maximum.accumulate(c) - <span class="nu">1</span>)
+    <span class="fn">print</span>(<span class="st">f"</span>{name:>14} ${final:>9,.0f} {ann:>+8.2%} {mdd:>8.2%}<span class="st">"</span>)
+
+<span class="fn">print</span>(<span class="st">f"\n리밸런싱 프리미엄: {(cum_rebal[-1]/cum_bh[-1]-1)*100:+.1f}%"</span>)
+<span class="fn">print</span>(<span class="st">f"→ Ang: '리밸런싱은 투자자의 행동적 본능에 반한다'"</span>)
+<span class="fn">print</span>(<span class="st">f"→ 위기 시 주식을 사는 것은 심리적으로 매우 어렵지만, 장기적으로 보상받는다"</span>)</code></pre>
+<div class="code-output"><span class="out-label">Output:</span>
+=== 리밸런싱 vs Buy&Hold vs 추세추종 (20년) ===
+          전략     최종가치     연수익      MDD
+------------------------------------------
+리밸런싱(60/40)   $      312  +5.85%  -18.23%
+     Buy&Hold   $      298  +5.60%  -22.45%
+      추세추종   $      275  +5.18%  -25.12%
+
+리밸런싱 프리미엄: +4.7%
+→ Ang: '리밸런싱은 투자자의 행동적 본능에 반한다'
+→ 위기 시 주식을 사는 것은 심리적으로 매우 어렵지만, 장기적으로 보상받는다</div>
+
+<div class="info">
+<p class="ni"><strong>Ang Ch.4의 핵심 — 부채 헤징 포트폴리오 (LDI):</strong> 장기 투자자(연기금)는 자산만이 아니라 부채도 고려해야 한다. Ang은 최적 포트폴리오를 세 부분으로 분해한다: (1) 부채 헤징 포트폴리오 — 부채의 현금흐름을 매칭 (2) 근시안적 시장 포트폴리오 — 단기 위험-수익 최적화 (3) 장기 기회주의 포트폴리오 — 장기 투자 지평의 이점 활용. 이 분해는 Merrill Lynch의 "보호-시장-열망" 3단계 포트폴리오와 동일한 구조다.</p>
+</div>
+
 <h2 id="ch7">7. Quiz</h2>
 
 <div class="def">

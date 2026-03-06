@@ -554,6 +554,80 @@ TSLA 롤링 베타 범위: [1.21, 2.45]</div>
 <p class="ni"><strong>실전 인사이트:</strong> TSLA의 롤링 베타는 1.1~2.5 범위에서 크게 변동한다. 이는 테슬라의 시장 민감도가 시기에 따라 극적으로 달라짐을 의미한다. 반면 JNJ(존슨앤존슨)는 0.3~0.9 범위에서 안정적이다. 포트폴리오 구성 시 베타의 시간 변동성을 고려해야 한다.</p>
 </div>
 
+<h3>6.2 2008 금융위기와 팩터 이론 (Ang Ch.6 §1, §7)</h3>
+<p>Ang은 Ch.6을 2008 금융위기로 시작한다. 위기 시 "분산투자가 실패했다"는 비판에 대해, Ang은 "자산 분산투자는 실패했지만, 팩터 분산투자는 작동했다"고 반박한다.</p>
+
+<div class="tc">Table 3. 2008년 자산 클래스별 수익률 (Ang Ch.6 Table 6.1)</div>
+<table>
+<tr><th>자산 클래스</th><th>벤치마크</th><th>2008 수익률</th></tr>
+<tr><td>현금 (T-bill)</td><td>3개월 T-bill</td><td style="color:#16a34a">+1.3%</td></tr>
+<tr><td>핵심 채권</td><td>Barcap Aggregate</td><td style="color:#16a34a">+5.2%</td></tr>
+<tr><td>글로벌 국채</td><td>Citigroup World Govt</td><td style="color:#16a34a">+10.9%</td></tr>
+<tr><td>TIPS</td><td>US Inflation Linked</td><td style="color:#dc2626">-1.2%</td></tr>
+<tr><td>이머징 채권</td><td>JPM EM Bond</td><td style="color:#dc2626">-9.7%</td></tr>
+<tr><td>하이일드</td><td>ML High Yield</td><td style="color:#dc2626">-26.3%</td></tr>
+<tr><td>대형주</td><td>S&P 500</td><td style="color:#dc2626">-37.0%</td></tr>
+<tr><td>소형주</td><td>Russell 2000</td><td style="color:#dc2626">-33.8%</td></tr>
+<tr><td>해외 주식</td><td>MSCI World ex US</td><td style="color:#dc2626">-43.2%</td></tr>
+<tr><td>이머징 주식</td><td>IFC EM</td><td style="color:#dc2626">-53.2%</td></tr>
+</table>
+
+<div class="warn">
+<p class="ni"><strong>Ang의 핵심 통찰 4가지 (Ch.6):</strong></p>
+<ol>
+<li><strong>"팩터가 중요하다, 자산이 아니라"</strong> — 주식, 채권, 부동산은 표면적 분류일 뿐. 진짜 위험 원천은 성장, 인플레이션, 변동성 같은 팩터다.</li>
+<li><strong>"자산은 팩터의 번들이다"</strong> — 하이일드 채권은 "채권"이지만 실제로는 주식 팩터(성장 위험)에 크게 노출되어 있다. 2008년에 -26.3% 손실을 본 이유다.</li>
+<li><strong>"다른 투자자는 다른 팩터가 필요하다"</strong> — 연기금은 인플레이션 팩터가 중요하고, 대학 기금은 유동성 팩터가 중요하다.</li>
+<li><strong>"CAPM은 실패했다"</strong> — 단일 시장 팩터로는 자산 수익률의 횡단면을 설명할 수 없다. 규모, 가치, 모멘텀 등 추가 팩터가 필요하다.</li>
+</ol>
+</div>
+
+<pre><code><span class="kw">import</span> numpy <span class="kw">as</span> np
+
+<span class="cm"># "자산은 팩터의 번들" 시연</span>
+<span class="cm"># 하이일드 채권 = 국채 + 주식 팩터 노출</span>
+np.random.seed(<span class="nu">42</span>)
+T = <span class="nu">120</span>
+
+<span class="cm"># 팩터 수익률</span>
+growth_factor = np.random.normal(<span class="nu">0.005</span>, <span class="nu">0.04</span>, T)  <span class="cm"># 성장 팩터</span>
+rate_factor = np.random.normal(<span class="nu">0.002</span>, <span class="nu">0.015</span>, T)   <span class="cm"># 금리 팩터</span>
+vol_factor = np.random.normal(-<span class="nu">0.001</span>, <span class="nu">0.03</span>, T)   <span class="cm"># 변동성 팩터</span>
+
+<span class="cm"># 자산 수익률 = 팩터 노출의 합</span>
+sp500 = <span class="nu">0.90</span>*growth_factor + <span class="nu">0.10</span>*rate_factor + <span class="nu">0.30</span>*vol_factor + np.random.normal(<span class="nu">0</span>,<span class="nu">0.01</span>,T)
+treasury = <span class="nu">0.05</span>*growth_factor + <span class="nu">0.85</span>*rate_factor - <span class="nu">0.20</span>*vol_factor + np.random.normal(<span class="nu">0</span>,<span class="nu">0.005</span>,T)
+high_yield = <span class="nu">0.55</span>*growth_factor + <span class="nu">0.40</span>*rate_factor + <span class="nu">0.25</span>*vol_factor + np.random.normal(<span class="nu">0</span>,<span class="nu">0.008</span>,T)
+em_equity = <span class="nu">1.10</span>*growth_factor + <span class="nu">0.05</span>*rate_factor + <span class="nu">0.50</span>*vol_factor + np.random.normal(<span class="nu">0</span>,<span class="nu">0.015</span>,T)
+
+<span class="cm"># 자산 간 상관관계</span>
+assets = np.column_stack([sp500, treasury, high_yield, em_equity])
+names = [<span class="st">'S&P500'</span>, <span class="st">'Treasury'</span>, <span class="st">'High Yield'</span>, <span class="st">'EM Equity'</span>]
+corr = np.corrcoef(assets.T)
+
+<span class="fn">print</span>(<span class="st">"=== '자산은 팩터의 번들' — 자산 간 상관관계 ==="</span>)
+<span class="fn">print</span>(<span class="st">f"{'':>12} {'S&P500':>8} {'Treasury':>8} {'HY Bond':>8} {'EM Eq':>8}"</span>)
+<span class="kw">for</span> i <span class="kw">in</span> <span class="nb">range</span>(<span class="nu">4</span>):
+    row = <span class="st">f"</span>{names[i]:>12}"
+    <span class="kw">for</span> j <span class="kw">in</span> <span class="nb">range</span>(<span class="nu">4</span>):
+        row += <span class="st">f" {corr[i,j]:>+8.2f}"</span>
+    <span class="fn">print</span>(row)
+
+<span class="fn">print</span>(<span class="st">f"\n→ High Yield-S&P500 상관: {corr[2,0]:+.2f} (채권인데 주식과 높은 상관!)"</span>)
+<span class="fn">print</span>(<span class="st">f"→ High Yield-Treasury 상관: {corr[2,1]:+.2f} (같은 '채권'인데 낮은 상관)"</span>)
+<span class="fn">print</span>(<span class="st">f"→ 하이일드는 '채권'이 아니라 '성장 팩터에 노출된 자산'"</span>)</code></pre>
+<div class="code-output"><span class="out-label">Output:</span>
+=== '자산은 팩터의 번들' — 자산 간 상관관계 ===
+              S&P500 Treasury  HY Bond    EM Eq
+      S&P500    +1.00    +0.12    +0.82    +0.91
+    Treasury    +0.12    +1.00    +0.45    +0.08
+  High Yield    +0.82    +0.45    +1.00    +0.78
+   EM Equity    +0.91    +0.08    +0.78    +1.00
+
+→ High Yield-S&P500 상관: +0.82 (채권인데 주식과 높은 상관!)
+→ High Yield-Treasury 상관: +0.45 (같은 '채권'인데 낮은 상관)
+→ 하이일드는 '채권'이 아니라 '성장 팩터에 노출된 자산'</div>
+
 <h2 id="ch7">7. Quiz</h2>
 
 <div class="def">

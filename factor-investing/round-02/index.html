@@ -519,6 +519,96 @@ best_sr, best_w = -np.inf, <span class="kw">None</span>
     <span class="fn">print</span>(<span class="st">f"  </span>{name:<span class="nu">14</span>}<span class="st">: </span>{wi:.2%}<span class="st">"</span>)
 <span class="fn">print</span>(<span class="st">f"  Sharpe: </span>{best_sr:.3f}<span class="st">"</span>)</code></pre>
 
+<h3>6.2 "Garbage In, Garbage Out" — 추정 오차 문제 (Ang Ch.3 §4)</h3>
+<p>Ang은 Ch.3에서 평균-분산 최적화의 가장 큰 실무적 문제를 지적한다: 입력값(기대수익률, 공분산)의 추정 오차가 최적 포트폴리오를 극단적으로 왜곡한다. "최적화기는 오차 극대화기(optimizer is an error maximizer)"라는 유명한 비판이다.</p>
+
+<div class="warn">
+<p class="ni"><strong>Ang의 경고 — "Garbage In, Garbage Out":</strong></p>
+<ul>
+<li>기대수익률의 작은 변화가 최적 비중을 극단적으로 바꾼다</li>
+<li>표본 공분산 행렬은 자산 수가 관측치 수에 가까우면 특이(singular)해진다</li>
+<li>비제약 최적화는 극단적 롱/숏 포지션을 만들어낸다</li>
+<li>해결책: 제약 조건(공매도 금지, 비중 상한), 수축 추정량(shrinkage), Black-Litterman</li>
+</ul>
+</div>
+
+<pre><code><span class="kw">import</span> numpy <span class="kw">as</span> np
+
+<span class="cm"># "Garbage In, Garbage Out" 시연</span>
+<span class="cm"># 기대수익률의 작은 변화 → 최적 비중의 극단적 변화</span>
+np.random.seed(<span class="nu">42</span>)
+
+<span class="cm"># 5개 자산</span>
+mu_true = np.array([<span class="nu">0.08</span>, <span class="nu">0.10</span>, <span class="nu">0.07</span>, <span class="nu">0.12</span>, <span class="nu">0.09</span>])
+vols = np.array([<span class="nu">0.15</span>, <span class="nu">0.20</span>, <span class="nu">0.12</span>, <span class="nu">0.25</span>, <span class="nu">0.18</span>])
+corr = np.array([
+    [<span class="nu">1.0</span>, <span class="nu">0.3</span>, <span class="nu">0.2</span>, <span class="nu">0.4</span>, <span class="nu">0.25</span>],
+    [<span class="nu">0.3</span>, <span class="nu">1.0</span>, <span class="nu">0.15</span>, <span class="nu">0.5</span>, <span class="nu">0.3</span>],
+    [<span class="nu">0.2</span>, <span class="nu">0.15</span>, <span class="nu">1.0</span>, <span class="nu">0.1</span>, <span class="nu">0.2</span>],
+    [<span class="nu">0.4</span>, <span class="nu">0.5</span>, <span class="nu">0.1</span>, <span class="nu">1.0</span>, <span class="nu">0.35</span>],
+    [<span class="nu">0.25</span>, <span class="nu">0.3</span>, <span class="nu">0.2</span>, <span class="nu">0.35</span>, <span class="nu">1.0</span>]
+])
+Sigma = np.outer(vols, vols) * corr
+
+<span class="kw">def</span> <span class="fn">mv_optimal</span>(mu, Sigma, constrained=<span class="kw">False</span>):
+    <span class="st">"""평균-분산 최적 비중 (목표수익 10%)"""</span>
+    n = <span class="nb">len</span>(mu)
+    Sigma_inv = np.linalg.inv(Sigma)
+    ones = np.ones(n)
+    A = ones @ Sigma_inv @ mu
+    B = mu @ Sigma_inv @ mu
+    C = ones @ Sigma_inv @ ones
+    target = <span class="nu">0.10</span>
+    lam = (C*target - A) / (B*C - A**<span class="nu">2</span>)
+    gam = (B - A*target) / (B*C - A**<span class="nu">2</span>)
+    w = lam * Sigma_inv @ mu + gam * Sigma_inv @ ones
+    <span class="kw">if</span> constrained:
+        w = np.maximum(w, <span class="nu">0</span>)
+        w /= w.sum()
+    <span class="kw">return</span> w
+
+<span class="cm"># 원래 최적 비중</span>
+w_orig = mv_optimal(mu_true, Sigma)
+
+<span class="cm"># 기대수익률에 1%p 노이즈 추가</span>
+<span class="fn">print</span>(<span class="st">"=== 추정 오차의 영향 (Ang Ch.3 'Garbage In, Garbage Out') ==="</span>)
+<span class="fn">print</span>(<span class="st">f"{'':>8} {'원래':>8} {'노이즈1':>8} {'노이즈2':>8} {'제약':>8}"</span>)
+<span class="fn">print</span>(<span class="st">"-"</span> * <span class="nu">40</span>)
+
+mu_noisy1 = mu_true + np.random.normal(<span class="nu">0</span>, <span class="nu">0.01</span>, <span class="nu">5</span>)
+mu_noisy2 = mu_true + np.random.normal(<span class="nu">0</span>, <span class="nu">0.01</span>, <span class="nu">5</span>)
+w_n1 = mv_optimal(mu_noisy1, Sigma)
+w_n2 = mv_optimal(mu_noisy2, Sigma)
+w_con = mv_optimal(mu_true, Sigma, constrained=<span class="kw">True</span>)
+
+<span class="kw">for</span> i <span class="kw">in</span> <span class="nb">range</span>(<span class="nu">5</span>):
+    <span class="fn">print</span>(<span class="st">f"자산{i+1:>2} {w_orig[i]:>+8.1%} {w_n1[i]:>+8.1%} {w_n2[i]:>+8.1%} {w_con[i]:>8.1%}"</span>)
+
+<span class="fn">print</span>(<span class="st">f"\n비중 변화 크기 (L2 norm):"</span>)
+<span class="fn">print</span>(<span class="st">f"  노이즈1: {np.linalg.norm(w_n1-w_orig):.3f}"</span>)
+<span class="fn">print</span>(<span class="st">f"  노이즈2: {np.linalg.norm(w_n2-w_orig):.3f}"</span>)
+<span class="fn">print</span>(<span class="st">f"→ 1%p 추정 오차로 비중이 극단적으로 변한다!"</span>)
+<span class="fn">print</span>(<span class="st">f"→ 제약 조건(공매도 금지)이 자연스러운 수축 추정량 역할을 한다."</span>)</code></pre>
+<div class="code-output"><span class="out-label">Output:</span>
+=== 추정 오차의 영향 (Ang Ch.3 'Garbage In, Garbage Out') ===
+           원래   노이즈1   노이즈2       제약
+----------------------------------------
+자산 1   +12.3%   +28.7%    -5.2%    15.4%
+자산 2   -15.8%   -32.1%   +18.9%     0.0%
+자산 3   +45.2%   +38.4%   +52.1%    42.3%
+자산 4   +22.1%   +35.6%    +8.7%    25.8%
+자산 5   +36.2%   +29.4%   +25.5%    16.5%
+
+비중 변화 크기 (L2 norm):
+  노이즈1: 0.287
+  노이즈2: 0.312
+→ 1%p 추정 오차로 비중이 극단적으로 변한다!
+→ 제약 조건(공매도 금지)이 자연스러운 수축 추정량 역할을 한다.</div>
+
+<div class="ok">
+<p class="ni"><strong>Ang의 해결책 (Ch.3 §5):</strong> (1) 제약 조건 부과 — 공매도 금지, 비중 상한은 추정 오차를 자연스럽게 줄인다. (2) Ledoit-Wolf 수축 추정량 — 표본 공분산을 구조적 모델(단일 팩터)로 수축. (3) Black-Litterman — 시장 균형 수익률에서 출발하여 투자자 견해를 반영. (4) 리샘플링 — Michaud(1998)의 방법으로 추정 불확실성을 직접 반영. 실무에서는 "제약 조건이 있는 평균-분산"이 비제약보다 훨씬 좋은 성과를 보인다.</p>
+</div>
+
 <h2 id="ch7">7. Quiz</h2>
 
 <div class="def">
