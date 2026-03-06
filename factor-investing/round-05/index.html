@@ -119,6 +119,7 @@ pre{font-size:11px;padding:14px}table{font-size:10px;display:block;overflow-x:au
 <li><a href="#ch4">4. 팩터 회귀분석</a></li>
 <li><a href="#ch5">5. 팩터 수익률 분석</a></li>
 <li><a href="#ch6">6. 파이썬 구현: 팩터 분해</a></li>
+<li><a href="#interactive">🎮 직접 해보기</a></li>
 <li><a href="#ch7">7. Quiz</a></li>
 </ul>
 </div>
@@ -842,29 +843,357 @@ improvement = r2_ff5 - r2_ff3
 
 <h2 id="ch7">7. Quiz</h2>
 
-<div class="def">
-<p class="ni"><strong>Q1. [FF3 모델]</strong> Fama-French 3팩터 모델에서 SMB와 HML 팩터의 구성 방법을 설명하라. 이중 정렬(2×3)에서 사용하는 기준 변수와 분위수를 명시하라.</p>
+<!-- ═══════════════════════════════════════════ -->
+<!-- Interactive Learning Section -->
+<!-- ═══════════════════════════════════════════ -->
+<h2 id="interactive">🎮 직접 해보기 — Interactive Lab</h2>
+
+<h3>Lab 1. 팩터 로딩 시각화</h3>
+<p class="ni">각 팩터 로딩(β)을 바꿔보면서 주식의 기대수익률이 어떻게 결정되는지 확인하세요. FF5 모델의 각 팩터 기여분을 실시간으로 분해합니다.</p>
+
+<div style="background:#f0f4f8;padding:20px;border-radius:8px;margin:20px 0">
+<div style="display:flex;gap:16px;flex-wrap:wrap;margin-bottom:12px">
+<div>
+<label style="font-size:11px;color:#555">β_MKT</label><br>
+<input type="range" id="sl-bm" min="-0.5" max="2" step="0.1" value="1.0" style="width:100px">
+<span id="val-bm" style="font-family:'Space Mono',monospace;font-size:12px">1.00</span>
+</div>
+<div>
+<label style="font-size:11px;color:#555">β_SMB</label><br>
+<input type="range" id="sl-bs" min="-1" max="1.5" step="0.1" value="0.3" style="width:100px">
+<span id="val-bs" style="font-family:'Space Mono',monospace;font-size:12px">0.30</span>
+</div>
+<div>
+<label style="font-size:11px;color:#555">β_HML</label><br>
+<input type="range" id="sl-bh" min="-1" max="1.5" step="0.1" value="0.5" style="width:100px">
+<span id="val-bh" style="font-family:'Space Mono',monospace;font-size:12px">0.50</span>
+</div>
+<div>
+<label style="font-size:11px;color:#555">β_RMW</label><br>
+<input type="range" id="sl-br" min="-1" max="1.5" step="0.1" value="0.2" style="width:100px">
+<span id="val-br" style="font-family:'Space Mono',monospace;font-size:12px">0.20</span>
+</div>
+<div>
+<label style="font-size:11px;color:#555">β_CMA</label><br>
+<input type="range" id="sl-bc" min="-1" max="1.5" step="0.1" value="0.1" style="width:100px">
+<span id="val-bc" style="font-family:'Space Mono',monospace;font-size:12px">0.10</span>
+</div>
+<div>
+<label style="font-size:11px;color:#555">α (%)</label><br>
+<input type="range" id="sl-a5" min="-3" max="3" step="0.1" value="0" style="width:80px">
+<span id="val-a5" style="font-family:'Space Mono',monospace;font-size:12px">0.0%</span>
+</div>
+</div>
+<div id="plot-lab1r5" style="width:100%;height:380px"></div>
+<div id="lab1r5-info" style="font-family:'Space Mono',monospace;font-size:12px;margin-top:8px;padding:10px;background:#1e1e1e;color:#d4d4d4;border-radius:6px;line-height:1.8"></div>
 </div>
 
-<div class="def">
-<p class="ni"><strong>Q2. [팩터 해석]</strong> 어떤 주식의 FF5 회귀 결과가 β_MKT=0.8, β_SMB=0.5, β_HML=0.7, β_RMW=-0.3, β_CMA=0.4일 때, 이 주식의 특성을 팩터 로딩 관점에서 해석하라.</p>
+<script>
+(function(){
+  var ids=['bm','bs','bh','br','bc','a5'];
+  var sls={},vls={};
+  ids.forEach(function(id){sls[id]=document.getElementById('sl-'+id);vls[id]=document.getElementById('val-'+id);});
+  var fp={MKT:7.0,SMB:2.5,HML:3.0,RMW:3.5,CMA:2.0};
+  function draw(){
+    var bm=parseFloat(sls.bm.value),bs=parseFloat(sls.bs.value),bh=parseFloat(sls.bh.value);
+    var br=parseFloat(sls.br.value),bc=parseFloat(sls.bc.value),alpha=parseFloat(sls.a5.value);
+    vls.bm.textContent=bm.toFixed(2);vls.bs.textContent=bs.toFixed(2);vls.bh.textContent=bh.toFixed(2);
+    vls.br.textContent=br.toFixed(2);vls.bc.textContent=bc.toFixed(2);vls.a5.textContent=alpha.toFixed(1)+'%';
+    var contribs=[alpha,bm*fp.MKT,bs*fp.SMB,bh*fp.HML,br*fp.RMW,bc*fp.CMA];
+    var labels=['α','MKT','SMB','HML','RMW','CMA'];
+    var colors=['#95a5a6','#e74c3c','#3498db','#27ae60','#f39c12','#9b59b6'];
+    var total=contribs.reduce(function(a,b){return a+b;},0);
+    Plotly.react('plot-lab1r5',[{
+      x:labels,y:contribs,type:'bar',
+      marker:{color:colors},
+      text:contribs.map(function(c){return (c>=0?'+':'')+c.toFixed(1)+'%';}),textposition:'outside'
+    }],{
+      title:'FF5 팩터 기여 분해 (총 기대초과수익률: '+(total>=0?'+':'')+total.toFixed(1)+'%)',
+      xaxis:{title:'팩터'},yaxis:{title:'기여분 (%)',range:[Math.min(-3,Math.min.apply(null,contribs)-1),Math.max(10,Math.max.apply(null,contribs)+2)]},
+      plot_bgcolor:'#fafaf8',paper_bgcolor:'#f0f4f8',font:{family:'Inter',size:12},
+      margin:{t:50,r:20,b:50,l:60}
+    },{responsive:true});
+    document.getElementById('lab1r5-info').innerHTML=
+      '<span style="color:#6a9955">// E[r_i]-r_f = α + β_M×MKT + β_S×SMB + β_H×HML + β_R×RMW + β_C×CMA</span>\n'+
+      '= '+alpha.toFixed(1)+'% + '+bm.toFixed(1)+'×'+fp.MKT+'% + '+bs.toFixed(1)+'×'+fp.SMB+'% + '+bh.toFixed(1)+'×'+fp.HML+'% + '+br.toFixed(1)+'×'+fp.RMW+'% + '+bc.toFixed(1)+'×'+fp.CMA+'%\n'+
+      '= <span style="color:#569cd6;font-weight:bold">'+(total>=0?'+':'')+total.toFixed(1)+'%</span> (연율화 기대초과수익률)\n'+
+      '주식 특성: '+(bs>0.2?'소형주':'대형주')+', '+(bh>0.2?'가치주':'성장주')+', '+(br>0.2?'고수익성':'저수익성')+', '+(bc>0.2?'보수적 투자':'공격적 투자');
+  }
+  ids.forEach(function(id){sls[id].addEventListener('input',draw);});
+  setTimeout(draw,300);
+})();
+</script>
+
+<h3>Lab 2. 팩터 프리미엄 비교</h3>
+<p class="ni">각 팩터의 연율화 프리미엄을 바꿔보면서 다양한 주식 스타일의 기대수익률이 어떻게 변하는지 확인하세요. 4가지 대표 스타일 포트폴리오의 기대수익률이 실시간으로 업데이트됩니다.</p>
+
+<div style="background:#f0f4f8;padding:20px;border-radius:8px;margin:20px 0">
+<div style="display:flex;gap:16px;flex-wrap:wrap;margin-bottom:12px">
+<div>
+<label style="font-size:11px;color:#555">MKT 프리미엄 (%)</label><br>
+<input type="range" id="sl-fpm" min="0" max="12" step="0.5" value="7" style="width:110px">
+<span id="val-fpm" style="font-family:'Space Mono',monospace;font-size:12px">7.0%</span>
+</div>
+<div>
+<label style="font-size:11px;color:#555">SMB 프리미엄 (%)</label><br>
+<input type="range" id="sl-fps" min="-2" max="6" step="0.5" value="2.5" style="width:110px">
+<span id="val-fps" style="font-family:'Space Mono',monospace;font-size:12px">2.5%</span>
+</div>
+<div>
+<label style="font-size:11px;color:#555">HML 프리미엄 (%)</label><br>
+<input type="range" id="sl-fph" min="-2" max="6" step="0.5" value="3" style="width:110px">
+<span id="val-fph" style="font-family:'Space Mono',monospace;font-size:12px">3.0%</span>
+</div>
+<div>
+<label style="font-size:11px;color:#555">RMW 프리미엄 (%)</label><br>
+<input type="range" id="sl-fpr" min="-2" max="6" step="0.5" value="3.5" style="width:110px">
+<span id="val-fpr" style="font-family:'Space Mono',monospace;font-size:12px">3.5%</span>
+</div>
+<div>
+<label style="font-size:11px;color:#555">CMA 프리미엄 (%)</label><br>
+<input type="range" id="sl-fpc" min="-2" max="6" step="0.5" value="2" style="width:110px">
+<span id="val-fpc" style="font-family:'Space Mono',monospace;font-size:12px">2.0%</span>
+</div>
+</div>
+<div id="plot-lab2r5" style="width:100%;height:400px"></div>
+<div id="lab2r5-info" style="font-family:'Space Mono',monospace;font-size:11px;margin-top:8px;padding:10px;background:#1e1e1e;color:#d4d4d4;border-radius:6px;line-height:1.7"></div>
 </div>
 
-<div class="def">
-<p class="ni"><strong>Q3. [데이터 수집]</strong> <code>pandas_datareader</code>를 사용하여 FF5 팩터 월별 데이터를 다운로드하고, 2010-2023 기간의 각 팩터 연율화 평균 수익률과 t-통계량을 계산하라. 어떤 팩터가 이 기간에 통계적으로 유의하지 않은가?</p>
+<script>
+(function(){
+  // 4 style portfolios with fixed factor loadings
+  var styles=[
+    {name:'대형 성장주 (AAPL형)',bm:1.2,bs:-0.3,bh:-0.5,br:-0.3,bc:0.1,color:'#e74c3c'},
+    {name:'소형 가치주 (Deep Value)',bm:0.9,bs:0.7,bh:0.8,br:0.2,bc:0.4,color:'#27ae60'},
+    {name:'대형 고수익 (Quality)',bm:0.8,bs:-0.2,bh:0.1,br:0.6,bc:0.3,color:'#3498db'},
+    {name:'소형 공격투자 (Speculative)',bm:1.4,bs:0.5,bh:-0.3,br:-0.5,bc:-0.4,color:'#f39c12'}
+  ];
+  var pids=['fpm','fps','fph','fpr','fpc'];
+  var sls={},vls={};
+  pids.forEach(function(id){sls[id]=document.getElementById('sl-'+id);vls[id]=document.getElementById('val-'+id);});
+  function draw2(){
+    var pm=parseFloat(sls.fpm.value),ps=parseFloat(sls.fps.value),ph=parseFloat(sls.fph.value);
+    var pr=parseFloat(sls.fpr.value),pc=parseFloat(sls.fpc.value);
+    vls.fpm.textContent=pm.toFixed(1)+'%';vls.fps.textContent=ps.toFixed(1)+'%';
+    vls.fph.textContent=ph.toFixed(1)+'%';vls.fpr.textContent=pr.toFixed(1)+'%';vls.fpc.textContent=pc.toFixed(1)+'%';
+    var traces=[];
+    var factors=['MKT','SMB','HML','RMW','CMA','Total'];
+    var infoLines=[];
+    styles.forEach(function(s){
+      var contribs=[s.bm*pm,s.bs*ps,s.bh*ph,s.br*pr,s.bc*pc];
+      var total=contribs.reduce(function(a,b){return a+b;},0);
+      contribs.push(total);
+      traces.push({x:factors,y:contribs,name:s.name,type:'bar',marker:{color:s.color,opacity:0.85}});
+      infoLines.push(s.name+': E[r]-rf = '+(total>=0?'+':'')+total.toFixed(1)+'%');
+    });
+    Plotly.react('plot-lab2r5',traces,{
+      title:'스타일별 기대초과수익률 분해',barmode:'group',
+      xaxis:{title:'팩터 기여'},yaxis:{title:'기여분 (%)'},
+      plot_bgcolor:'#fafaf8',paper_bgcolor:'#f0f4f8',font:{family:'Inter',size:11},
+      margin:{t:50,r:20,b:50,l:60},legend:{x:0,y:1.15,orientation:'h'}
+    },{responsive:true});
+    document.getElementById('lab2r5-info').innerHTML=
+      '<span style="color:#6a9955">// 각 스타일의 기대초과수익률 = Σ(β_k × 팩터프리미엄_k)</span>\n'+
+      infoLines.join('\n')+'\n\n'+
+      '<span style="color:#569cd6">→ 팩터 프리미엄이 바뀌면 "승자" 스타일도 바뀐다!</span>';
+  }
+  pids.forEach(function(id){sls[id].addEventListener('input',draw2);});
+  setTimeout(draw2,400);
+})();
+</script>
+
+<h3>Lab 3. FF3 vs FF5 R² 시뮬레이터</h3>
+<p class="ni">RMW, CMA 팩터의 "진짜 로딩"을 조절하면서 FF3와 FF5의 설명력(R²) 차이를 확인하세요. RMW/CMA 로딩이 클수록 FF3는 설명력이 떨어지고, FF5의 개선 효과가 커집니다.</p>
+
+<div style="background:#f0f4f8;padding:20px;border-radius:8px;margin:20px 0">
+<div style="display:flex;gap:16px;flex-wrap:wrap;margin-bottom:12px">
+<div>
+<label style="font-size:11px;color:#555">진짜 β_RMW</label><br>
+<input type="range" id="sl-trr" min="0" max="1" step="0.05" value="0.3" style="width:120px">
+<span id="val-trr" style="font-family:'Space Mono',monospace;font-size:12px">0.30</span>
+</div>
+<div>
+<label style="font-size:11px;color:#555">진짜 β_CMA</label><br>
+<input type="range" id="sl-trc" min="0" max="1" step="0.05" value="0.2" style="width:120px">
+<span id="val-trc" style="font-family:'Space Mono',monospace;font-size:12px">0.20</span>
+</div>
+<div>
+<label style="font-size:11px;color:#555">잔차 변동성 (σ_ε)</label><br>
+<input type="range" id="sl-sig" min="0.005" max="0.05" step="0.005" value="0.02" style="width:120px">
+<span id="val-sig" style="font-family:'Space Mono',monospace;font-size:12px">0.020</span>
+</div>
+</div>
+<div id="plot-lab3r5" style="width:100%;height:380px"></div>
+<div id="lab3r5-info" style="font-family:'Space Mono',monospace;font-size:12px;margin-top:8px;padding:10px;background:#1e1e1e;color:#d4d4d4;border-radius:6px;line-height:1.8"></div>
 </div>
 
-<div class="def">
-<p class="ni"><strong>Q4. [회귀분석]</strong> MSFT, AMZN, BRK-B, JNJ의 월별 수익률에 대해 FF3와 FF5 회귀를 각각 수행하라. R²의 변화를 비교하고, RMW와 CMA 팩터가 설명력을 얼마나 추가하는지 분석하라.</p>
+<script>
+(function(){
+  var slTrr=document.getElementById('sl-trr'),slTrc=document.getElementById('sl-trc'),slSig=document.getElementById('sl-sig');
+  var vlTrr=document.getElementById('val-trr'),vlTrc=document.getElementById('val-trc'),vlSig=document.getElementById('val-sig');
+  // seeded pseudo-random
+  function mulberry32(a){return function(){a|=0;a=a+0x6D2B79F5|0;var t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296;};}
+  var rng=mulberry32(42);
+  function randn(){var u=0,v=0;while(u===0)u=rng();while(v===0)v=rng();return Math.sqrt(-2*Math.log(u))*Math.cos(2*Math.PI*v);}
+  // pre-generate factor returns (T=240)
+  var T=240;
+  var mkt=[],smb=[],hml=[],rmw=[],cma=[];
+  for(var i=0;i<T;i++){mkt.push(0.006+0.045*randn());smb.push(0.002+0.030*randn());hml.push(0.003+0.028*randn());rmw.push(0.003+0.020*randn());cma.push(0.002+0.018*randn());}
+  function draw3(){
+    var trr=parseFloat(slTrr.value),trc=parseFloat(slTrc.value),sigE=parseFloat(slSig.value);
+    vlTrr.textContent=trr.toFixed(2);vlTrc.textContent=trc.toFixed(2);vlSig.textContent=sigE.toFixed(3);
+    // generate portfolio returns with true loadings
+    var rng2=mulberry32(99);
+    function randn2(){var u=0,v=0;while(u===0)u=rng2();while(v===0)v=rng2();return Math.sqrt(-2*Math.log(u))*Math.cos(2*Math.PI*v);}
+    var rp=[];
+    for(var i=0;i<T;i++){rp.push(1.0*mkt[i]+0.3*smb[i]+0.4*hml[i]+trr*rmw[i]+trc*cma[i]+sigE*randn2());}
+    // OLS helper
+    function ols(y,X){
+      var n=y.length,k=X[0].length;
+      // X'X
+      var XtX=[];for(var i=0;i<k;i++){XtX[i]=[];for(var j=0;j<k;j++){var s=0;for(var t=0;t<n;t++)s+=X[t][i]*X[t][j];XtX[i][j]=s;}}
+      // X'y
+      var Xty=[];for(var i=0;i<k;i++){var s=0;for(var t=0;t<n;t++)s+=X[t][i]*y[t];Xty[i]=s;}
+      // solve via Gauss elimination
+      var A=XtX.map(function(r,i){return r.concat(Xty[i]);});
+      for(var i=0;i<k;i++){var mx=i;for(var j=i+1;j<k;j++)if(Math.abs(A[j][i])>Math.abs(A[mx][i]))mx=j;var tmp=A[i];A[i]=A[mx];A[mx]=tmp;for(var j=i+1;j<k;j++){var f=A[j][i]/A[i][i];for(var l=i;l<=k;l++)A[j][l]-=f*A[i][l];}}
+      var b=[];for(var i=k-1;i>=0;i--){b[i]=A[i][k];for(var j=i+1;j<k;j++)b[i]-=A[i][j]*b[j];b[i]/=A[i][i];}
+      // R²
+      var yhat=y.map(function(_,t){var s=0;for(var j=0;j<k;j++)s+=X[t][j]*b[j];return s;});
+      var ym=y.reduce(function(a,b){return a+b;},0)/n;
+      var sst=y.reduce(function(a,v){return a+(v-ym)*(v-ym);},0);
+      var ssr=y.map(function(v,t){return(v-yhat[t])*(v-yhat[t]);}).reduce(function(a,b){return a+b;},0);
+      return {b:b,r2:1-ssr/sst};
+    }
+    // FF3
+    var X3=[];for(var i=0;i<T;i++)X3.push([1,mkt[i],smb[i],hml[i]]);
+    var res3=ols(rp,X3);
+    // FF5
+    var X5=[];for(var i=0;i<T;i++)X5.push([1,mkt[i],smb[i],hml[i],rmw[i],cma[i]]);
+    var res5=ols(rp,X5);
+    var imp=res5.r2-res3.r2;
+    Plotly.react('plot-lab3r5',[{
+      x:['FF3 R²','FF5 R²'],y:[res3.r2,res5.r2],type:'bar',
+      marker:{color:['#e74c3c','#3498db']},
+      text:[res3.r2.toFixed(4),res5.r2.toFixed(4)],textposition:'outside',
+      width:[0.4,0.4]
+    }],{
+      title:'FF3 vs FF5 설명력 비교 (R² 개선: '+(imp>=0?'+':'')+imp.toFixed(4)+')',
+      yaxis:{title:'R²',range:[0,1.05]},
+      plot_bgcolor:'#fafaf8',paper_bgcolor:'#f0f4f8',font:{family:'Inter',size:12},
+      margin:{t:50,r:20,b:50,l:60}
+    },{responsive:true});
+    document.getElementById('lab3r5-info').innerHTML=
+      'FF3 R² = '+res3.r2.toFixed(4)+'  |  FF5 R² = '+res5.r2.toFixed(4)+'  |  <span style="color:#569cd6">개선 = '+(imp>=0?'+':'')+imp.toFixed(4)+'</span>\n'+
+      '진짜 β_RMW='+trr.toFixed(2)+', β_CMA='+trc.toFixed(2)+', σ_ε='+sigE.toFixed(3)+'\n'+
+      '<span style="color:#6a9955">→ RMW/CMA 로딩이 클수록 FF3는 이 부분을 놓치므로 R² 차이가 커진다</span>\n'+
+      '<span style="color:#6a9955">→ σ_ε가 크면 어떤 모델이든 설명력이 떨어진다 (고유 위험 증가)</span>';
+  }
+  [slTrr,slTrc,slSig].forEach(function(s){s.addEventListener('input',draw3);});
+  setTimeout(draw3,500);
+})();
+</script>
+
+<!-- ═══════════════════════════════════════════ -->
+<!-- Quiz Section -->
+<!-- ═══════════════════════════════════════════ -->
+<h2 id="ch7">7. 객관식 퀴즈</h2>
+
+<style>
+.quiz-box{background:#fff;border:2px solid #e0e0e0;border-radius:8px;padding:20px;margin:16px 0;transition:border-color .3s}
+.quiz-box.correct{border-color:#27ae60;background:#f0fff4}
+.quiz-box.wrong{border-color:#e74c3c;background:#fff5f5}
+.quiz-box h4{margin:0 0 12px;font-size:14px}
+.quiz-opt{display:block;margin:6px 0;padding:8px 12px;border:1px solid #ddd;border-radius:6px;cursor:pointer;font-size:13px;transition:all .2s}
+.quiz-opt:hover{background:#f0f4f8;border-color:#3498db}
+.quiz-opt.selected{background:#e8f4f8;border-color:#3498db;font-weight:600}
+.quiz-opt.correct-answer{background:#d4edda;border-color:#27ae60}
+.quiz-opt.wrong-answer{background:#f8d7da;border-color:#e74c3c}
+.quiz-feedback{margin-top:10px;padding:10px;border-radius:6px;font-size:12px;display:none}
+.quiz-feedback.show{display:block}
+.quiz-score{text-align:center;padding:20px;background:#f8f9fa;border-radius:8px;margin:20px 0;font-size:16px}
+</style>
+
+<div class="quiz-box" id="q1">
+<h4>Q1. SMB 팩터의 구성에서 올바른 것은?</h4>
+<label class="quiz-opt" onclick="checkQ('q1',this,0)">A. SMB = (SV + SN) − (BV + BN)</label>
+<label class="quiz-opt" onclick="checkQ('q1',this,1)">B. SMB = ⅓(SV+SN+SG) − ⅓(BV+BN+BG)</label>
+<label class="quiz-opt" onclick="checkQ('q1',this,2)">C. SMB = SV − BG</label>
+<label class="quiz-opt" onclick="checkQ('q1',this,3)">D. SMB = ½(SV+SG) − ½(BV+BG)</label>
+<div class="quiz-feedback" id="q1-fb"></div>
 </div>
 
-<div class="def">
-<p class="ni"><strong>Q5. [팩터 분해]</strong> 60/40 포트폴리오(SPY 60%, AGG 40%)의 월별 수익률을 FF5 팩터로 분해하라. 각 팩터의 연율화 기여분을 계산하고, 이 포트폴리오가 주로 어떤 팩터에 노출되어 있는지 설명하라.</p>
+<div class="quiz-box" id="q2">
+<h4>Q2. FF5 회귀에서 β_HML = −0.6, β_RMW = −0.4인 주식의 특성은?</h4>
+<label class="quiz-opt" onclick="checkQ('q2',this,0)">A. 소형 가치주, 고수익성</label>
+<label class="quiz-opt" onclick="checkQ('q2',this,1)">B. 대형 성장주, 저수익성</label>
+<label class="quiz-opt" onclick="checkQ('q2',this,2)">C. 성장주, 저수익성</label>
+<label class="quiz-opt" onclick="checkQ('q2',this,3)">D. 가치주, 고수익성</label>
+<div class="quiz-feedback" id="q2-fb"></div>
 </div>
 
-<div class="def">
-<p class="ni"><strong>Q6. [GRS 검정]</strong> 25개 Size-B/M 포트폴리오(5×5)에 대해 FF3와 FF5 모델의 GRS 검정을 수행하라. 어떤 모델이 더 나은 설명력을 보이는가? GRS F-통계량과 p-value를 비교하라.</p>
+<div class="quiz-box" id="q3">
+<h4>Q3. FF5 모델에서 HML이 "redundant"할 수 있는 이유는?</h4>
+<label class="quiz-opt" onclick="checkQ('q3',this,0)">A. HML의 t-통계량이 2 미만이기 때문</label>
+<label class="quiz-opt" onclick="checkQ('q3',this,1)">B. HML이 RMW와 CMA에 의해 상당 부분 설명되기 때문</label>
+<label class="quiz-opt" onclick="checkQ('q3',this,2)">C. HML과 SMB의 상관관계가 0.9 이상이기 때문</label>
+<label class="quiz-opt" onclick="checkQ('q3',this,3)">D. HML 프리미엄이 음수로 전환되었기 때문</label>
+<div class="quiz-feedback" id="q3-fb"></div>
 </div>
+
+<div class="quiz-box" id="q4">
+<h4>Q4. 팩터 회귀에서 α=+0.5%/월 (t=0.8)인 전략에 대한 올바른 해석은?</h4>
+<label class="quiz-opt" onclick="checkQ('q4',this,0)">A. 매니저에게 스킬이 있다 — 연 6%의 초과수익</label>
+<label class="quiz-opt" onclick="checkQ('q4',this,1)">B. 전략이 가치를 파괴하고 있다</label>
+<label class="quiz-opt" onclick="checkQ('q4',this,2)">C. α가 통계적으로 유의하지 않아 팩터 노출로 설명 가능</label>
+<label class="quiz-opt" onclick="checkQ('q4',this,3)">D. 데이터가 부족하여 판단 불가</label>
+<div class="quiz-feedback" id="q4-fb"></div>
+</div>
+
+<div class="quiz-box" id="q5">
+<h4>Q5. FF5 팩터 상관행렬에서 HML-CMA 상관이 0.70으로 높은 것의 의미는?</h4>
+<label class="quiz-opt" onclick="checkQ('q5',this,0)">A. 가치주와 성장주의 수익률이 비슷하다</label>
+<label class="quiz-opt" onclick="checkQ('q5',this,1)">B. 가치 효과와 보수적 투자 효과가 상당히 겹친다</label>
+<label class="quiz-opt" onclick="checkQ('q5',this,2)">C. HML과 CMA를 동시에 사용하면 분산투자 효과가 극대화된다</label>
+<label class="quiz-opt" onclick="checkQ('q5',this,3)">D. CMA 팩터가 HML보다 항상 높은 수익률을 낸다</label>
+<div class="quiz-feedback" id="q5-fb"></div>
+</div>
+
+<div class="quiz-score" id="quiz-score" style="display:none"></div>
+
+<script>
+var quizAnswers={q1:1,q2:2,q3:1,q4:2,q5:1};
+var quizExplain={
+  q1:'SMB = ⅓(SV+SN+SG) − ⅓(BV+BN+BG). 소형주 3개 포트폴리오 평균에서 대형주 3개 포트폴리오 평균을 뺀다. B/M 효과를 통제하기 위해 Value/Neutral/Growth 모두 포함.',
+  q2:'β_HML = −0.6 → 성장주 특성 (낮은 B/M). β_RMW = −0.4 → 저수익성 기업. 문제에서 β_SMB 정보가 없으므로 규모(대형/소형)는 판단할 수 없다. 따라서 "성장주, 저수익성"이 정답.',
+  q3:'Fama & French(2015)에 따르면 HML은 RMW와 CMA의 조합으로 상당 부분 설명된다. 실제로 HML-CMA 상관이 0.70으로 매우 높다. 가치 효과가 수익성과 투자 패턴의 조합일 수 있다는 의미.',
+  q4:'t-통계량이 0.8로 2 미만이므로 α는 통계적으로 유의하지 않다. 양수이지만 우연일 가능성이 높다. 이 전략의 수익은 팩터 노출(β)에 대한 보상으로 설명 가능하며, 저렴한 팩터 ETF로 복제할 수 있다.',
+  q5:'HML-CMA 상관 0.70은 가치 효과(높은 B/M)와 보수적 투자 효과(낮은 자산 증가율)가 상당히 겹친다는 의미. 가치주는 대체로 투자를 적게 하는 기업이기 때문. 이 때문에 FF5에서 HML이 redundant할 수 있다.'
+};
+var quizDone={},quizCorrect=0,quizTotal=5;
+function checkQ(qid,el,idx){
+  if(quizDone[qid])return;
+  quizDone[qid]=true;
+  var box=document.getElementById(qid);
+  var opts=box.querySelectorAll('.quiz-opt');
+  var correct=quizAnswers[qid];
+  el.classList.add(idx===correct?'correct-answer':'wrong-answer');
+  if(idx!==correct) opts[correct].classList.add('correct-answer');
+  box.classList.add(idx===correct?'correct':'wrong');
+  if(idx===correct) quizCorrect++;
+  var fb=document.getElementById(qid+'-fb');
+  fb.innerHTML=(idx===correct?'<span style="color:#27ae60">✓ 정답!</span> ':'<span style="color:#e74c3c">✗ 오답.</span> ')+quizExplain[qid];
+  fb.style.background=idx===correct?'#d4edda':'#f8d7da';
+  fb.classList.add('show');
+  if(Object.keys(quizDone).length===quizTotal){
+    var sc=document.getElementById('quiz-score');
+    sc.style.display='block';
+    var pct=Math.round(quizCorrect/quizTotal*100);
+    var emoji=pct>=80?'🎉':pct>=60?'👍':'💪';
+    sc.innerHTML=emoji+' <strong>'+quizCorrect+'/'+quizTotal+'</strong> ('+pct+'%) — '+(pct>=80?'훌륭합니다!':pct>=60?'좋아요, 복습하면 완벽!':'위의 Lab에서 다시 실험해보세요!');
+  }
+}
+</script>
 
 <h3>7.1 핵심 수식 요약</h3>
 
