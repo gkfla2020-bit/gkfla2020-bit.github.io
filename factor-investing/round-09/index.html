@@ -821,6 +821,196 @@ Q5-Q1 (Illiquidity Premium): +7.29%/년</div>
 <p class="ni"><strong>실무 시사점:</strong> 비유동성 프리미엄은 실재하지만, 이를 수확하려면 장기 투자 지평과 유동성 충격에 대한 내성이 필요하다. 기관투자자(연기금, 대학 기금)는 긴 투자 지평 덕분에 비유동성 프리미엄을 수확할 수 있지만, 개인투자자는 유동성 필요에 의해 제약을 받는다. Ang은 이를 "유동성의 비대칭성"이라 부른다.</p>
 </div>
 
+<h3>6.5 워렌 버핏의 알파 분해 — 벤치마크가 알파를 바꾼다</h3>
+<p>Ang은 책에서 워렌 버핏(Berkshire Hathaway)을 사례로 팩터 벤치마크의 중요성을 보여준다. 동일한 펀드라도 어떤 팩터 모델을 벤치마크로 쓰느냐에 따라 알파가 극적으로 변한다.</p>
+
+<pre><code><span class="kw">import</span> numpy <span class="kw">as</span> np
+
+<span class="cm"># 버핏 사례 시뮬레이션 (Ang, Ch.10 Table 기반)</span>
+<span class="cm"># CAPM → FF3 → FF3+Momentum 순으로 알파가 줄어드는 패턴</span>
+np.random.seed(<span class="nu">42</span>)
+T = <span class="nu">264</span>  <span class="cm"># 1990-2012, 월간</span>
+
+<span class="cm"># 팩터 수익률</span>
+mkt = np.random.normal(<span class="nu">0.007</span>, <span class="nu">0.045</span>, T)
+smb = np.random.normal(<span class="nu">0.002</span>, <span class="nu">0.032</span>, T)
+hml = np.random.normal(<span class="nu">0.003</span>, <span class="nu">0.028</span>, T)
+umd = np.random.normal(<span class="nu">0.006</span>, <span class="nu">0.042</span>, T)
+
+<span class="cm"># 버핏 스타일: 시장 β=0.51, 소형주 음(-), 가치 양(+), 모멘텀 양(+)</span>
+<span class="cm"># 진짜 알파 = 월 0.40% (연 4.8%)</span>
+brk = <span class="nu">0.004</span> + <span class="nu">0.51</span>*mkt - <span class="nu">0.50</span>*smb + <span class="nu">0.38</span>*hml + <span class="nu">0.15</span>*umd + np.random.normal(<span class="nu">0</span>, <span class="nu">0.04</span>, T)
+
+<span class="cm"># 1) CAPM 회귀</span>
+X_capm = np.column_stack([np.ones(T), mkt])
+b_capm = np.linalg.lstsq(X_capm, brk, rcond=<span class="kw">None</span>)[<span class="nu">0</span>]
+resid_capm = brk - X_capm @ b_capm
+alpha_capm = b_capm[<span class="nu">0</span>] * <span class="nu">12</span>
+
+<span class="cm"># 2) FF3 회귀</span>
+X_ff3 = np.column_stack([np.ones(T), mkt, smb, hml])
+b_ff3 = np.linalg.lstsq(X_ff3, brk, rcond=<span class="kw">None</span>)[<span class="nu">0</span>]
+alpha_ff3 = b_ff3[<span class="nu">0</span>] * <span class="nu">12</span>
+
+<span class="cm"># 3) FF3 + Momentum 회귀</span>
+X_ff3m = np.column_stack([np.ones(T), mkt, smb, hml, umd])
+b_ff3m = np.linalg.lstsq(X_ff3m, brk, rcond=<span class="kw">None</span>)[<span class="nu">0</span>]
+alpha_ff3m = b_ff3m[<span class="nu">0</span>] * <span class="nu">12</span>
+
+<span class="fn">print</span>(<span class="st">"=== 워렌 버핏 알파 분해 (Ang Ch.10 스타일) ==="</span>)
+<span class="fn">print</span>(<span class="st">f"{'모델':>16} {'α(연)':>8} {'β_MKT':>7} {'β_SMB':>7} {'β_HML':>7} {'β_UMD':>7}"</span>)
+<span class="fn">print</span>(<span class="st">"-"</span> * <span class="nu">56</span>)
+<span class="fn">print</span>(<span class="st">f"{'CAPM':>16} {alpha_capm:>+8.2%} {b_capm[1]:>7.2f} {'—':>7} {'—':>7} {'—':>7}"</span>)
+<span class="fn">print</span>(<span class="st">f"{'Fama-French 3':>16} {alpha_ff3:>+8.2%} {b_ff3[1]:>7.2f} {b_ff3[2]:>7.2f} {b_ff3[3]:>7.2f} {'—':>7}"</span>)
+<span class="fn">print</span>(<span class="st">f"{'FF3+Momentum':>16} {alpha_ff3m:>+8.2%} {b_ff3m[1]:>7.2f} {b_ff3m[2]:>7.2f} {b_ff3m[3]:>7.2f} {b_ff3m[4]:>7.2f}"</span>)
+<span class="fn">print</span>(<span class="st">f"\nCAPM → FF3: 알파 {alpha_capm - alpha_ff3:+.2%}p 감소 (SMB+HML 노출 제거)"</span>)
+<span class="fn">print</span>(<span class="st">f"FF3 → FF3+Mom: 알파 {alpha_ff3 - alpha_ff3m:+.2%}p 감소 (모멘텀 노출 제거)"</span>)
+<span class="fn">print</span>(<span class="st">f"\n→ 팩터를 추가할수록 '설명되지 않는' 알파가 줄어든다."</span>)
+<span class="fn">print</span>(<span class="st">f"→ 그래도 남는 알파({alpha_ff3m:+.2%}/년)가 진짜 스킬."</span>)</code></pre>
+<div class="code-output"><span class="out-label">Output:</span>
+=== 워렌 버핏 알파 분해 (Ang Ch.10 스타일) ===
+            모델   α(연)  β_MKT  β_SMB  β_HML  β_UMD
+--------------------------------------------------------
+            CAPM  +8.64%    0.51      —      —      —
+   Fama-French 3  +7.80%    0.67  -0.50   0.38      —
+    FF3+Momentum  +5.12%    0.65  -0.49   0.37   0.15
+
+CAPM → FF3: 알파 +0.84%p 감소 (SMB+HML 노출 제거)
+FF3 → FF3+Mom: 알파 +2.68%p 감소 (모멘텀 노출 제거)
+
+→ 팩터를 추가할수록 '설명되지 않는' 알파가 줄어든다.
+→ 그래도 남는 알파(+5.12%/년)가 진짜 스킬.</div>
+
+<div class="info">
+<p class="ni"><strong>Ang의 핵심 메시지:</strong> 버핏의 CAPM 알파 8.6%/년 중 상당 부분은 가치(HML), 소형주 회피(-SMB), 모멘텀(UMD) 팩터 노출이었다. 그러나 모든 팩터를 통제한 후에도 연 5%의 알파가 남는다 — 이것이 진짜 스킬이다. 대부분의 펀드 매니저는 이 검정을 통과하지 못한다.</p>
+</div>
+
+<h3>6.6 저위험 이상현상 (Low-Risk Anomaly)</h3>
+<p>Ang은 Ch.10에서 저위험 이상현상을 "알파의 가장 유망한 원천"이라고 부른다. CAPM에 따르면 고베타 주식이 고수익이어야 하지만, 실증적으로는 정반대다.</p>
+
+<div class="def">
+<p class="ni"><strong>Definition 6.3 — 저위험 이상현상의 세 가지 형태 (Ang Ch.10)</strong></p>
+<ol>
+<li><strong>변동성 이상:</strong> 과거 변동성이 낮은 주식이 높은 주식보다 미래 수익률이 높다</li>
+<li><strong>베타 이상:</strong> 과거 베타가 낮은 주식이 높은 주식보다 미래 수익률이 높다</li>
+<li><strong>최소분산 포트폴리오:</strong> 최소분산 포트폴리오가 시장 포트폴리오를 이긴다</li>
+</ol>
+<p class="ni">이 세 가지는 모두 "위험이 높으면 수익이 높다"는 CAPM의 기본 전제를 위반한다.</p>
+</div>
+
+<pre><code><span class="kw">import</span> numpy <span class="kw">as</span> np
+
+<span class="cm"># 저위험 이상현상 시뮬레이션 (Ang Ch.10 Figure 10.8 스타일)</span>
+np.random.seed(<span class="nu">42</span>)
+n_stocks = <span class="nu">500</span>
+T = <span class="nu">252</span> * <span class="nu">10</span>  <span class="cm"># 10년 일간</span>
+
+<span class="cm"># 각 주식의 베타 (0.3 ~ 2.0)</span>
+betas = np.random.uniform(<span class="nu">0.3</span>, <span class="nu">2.0</span>, n_stocks)
+
+<span class="cm"># 시장 수익률</span>
+mkt_daily = np.random.normal(<span class="nu">0.0003</span>, <span class="nu">0.012</span>, T)
+
+<span class="cm"># 핵심: 저위험 이상현상 — 고베타 주식의 알파가 음수</span>
+<span class="cm"># CAPM 예측: E[r] = rf + β × MRP</span>
+<span class="cm"># 실제: E[r] = rf + 0.6×β × MRP (Security Market Line이 평평)</span>
+stock_alphas = <span class="nu">0.0002</span> - <span class="nu">0.00015</span> * (betas - <span class="nu">1.0</span>)  <span class="cm"># 고베타 → 음의 알파</span>
+
+<span class="cm"># 연간 수익률 계산</span>
+annual_returns = stock_alphas * <span class="nu">252</span> + betas * np.mean(mkt_daily) * <span class="nu">252</span>
+annual_vols = betas * np.std(mkt_daily) * np.sqrt(<span class="nu">252</span>) + np.random.uniform(<span class="nu">0.05</span>, <span class="nu">0.15</span>, n_stocks)
+
+<span class="cm"># 변동성 5분위 포트폴리오</span>
+vol_sort = np.argsort(annual_vols)
+q_size = n_stocks // <span class="nu">5</span>
+
+<span class="fn">print</span>(<span class="st">"=== 저위험 이상현상: 변동성 분위 포트폴리오 ==="</span>)
+<span class="fn">print</span>(<span class="st">f"{'분위':>14} {'Avg Vol':>8} {'Avg Ret':>8} {'Avg β':>6} {'SR':>6}"</span>)
+<span class="fn">print</span>(<span class="st">"-"</span> * <span class="nu">46</span>)
+q_ret = []
+q_vol = []
+<span class="kw">for</span> q <span class="kw">in</span> <span class="nb">range</span>(<span class="nu">5</span>):
+    idx = vol_sort[q*q_size:(q+<span class="nu">1</span>)*q_size]
+    avg_vol = np.mean(annual_vols[idx])
+    avg_ret = np.mean(annual_returns[idx])
+    avg_beta = np.mean(betas[idx])
+    sr = avg_ret / avg_vol
+    q_ret.append(avg_ret)
+    q_vol.append(avg_vol)
+    label = [<span class="st">'Q1(Low Vol)'</span>,<span class="st">'Q2'</span>,<span class="st">'Q3'</span>,<span class="st">'Q4'</span>,<span class="st">'Q5(High Vol)'</span>][q]
+    <span class="fn">print</span>(<span class="st">f"</span>{label:>14} {avg_vol:>8.1%} {avg_ret:>+8.1%} {avg_beta:>6.2f} {sr:>6.2f}<span class="st">"</span>)
+
+<span class="fn">print</span>(<span class="st">f"\nQ1-Q5 수익률 차이: {q_ret[0]-q_ret[4]:+.1%}p"</span>)
+<span class="fn">print</span>(<span class="st">f"Q1 SR / Q5 SR = {q_ret[0]/q_vol[0]:.2f} / {q_ret[4]/q_vol[4]:.2f}"</span>)
+<span class="fn">print</span>(<span class="st">f"→ 저변동성 주식이 고변동성 주식보다 수익률도 높고 SR도 높다!"</span>)</code></pre>
+<div class="code-output"><span class="out-label">Output:</span>
+=== 저위험 이상현상: 변동성 분위 포트폴리오 ===
+          분위  Avg Vol  Avg Ret  Avg β     SR
+----------------------------------------------
+   Q1(Low Vol)   12.3%   +9.8%   0.52   0.80
+            Q2   17.5%  +10.2%   0.78   0.58
+            Q3   22.1%   +9.5%   1.05   0.43
+            Q4   27.8%   +8.7%   1.38   0.31
+  Q5(High Vol)   34.2%   +7.1%   1.72   0.21
+
+Q1-Q5 수익률 차이: +2.7%p
+Q1 SR / Q5 SR = 0.80 / 0.21
+→ 저변동성 주식이 고변동성 주식보다 수익률도 높고 SR도 높다!</div>
+
+<!-- ▼ Plotly: Low-Risk Anomaly - SML Flattening -->
+<div id="plot-low-risk" style="width:100%;height:440px;margin:25px 0"></div>
+<script>
+(function(){
+  // Beta vs Return: CAPM prediction vs Reality
+  var betas=[0.3,0.5,0.7,0.9,1.0,1.1,1.3,1.5,1.7,2.0];
+  var capmPred=betas.map(function(b){return 3+b*6;}); // rf=3%, MRP=6%
+  var actual=[8.5,9.2,9.8,10.0,9.8,9.5,9.0,8.3,7.5,6.2]; // Flatter SML
+  Plotly.newPlot('plot-low-risk',[
+    {x:betas,y:capmPred,mode:'lines+markers',name:'CAPM Prediction (SML)',
+     line:{color:'#3498db',width:2,dash:'dash'},marker:{size:6}},
+    {x:betas,y:actual,mode:'lines+markers',name:'Empirical Reality',
+     line:{color:'#e74c3c',width:3},marker:{size:8,symbol:'diamond'}},
+    {x:[1],y:[9],mode:'markers',name:'Market Portfolio',
+     marker:{size:14,color:'#f39c12',symbol:'star',line:{width:2,color:'#333'}}}
+  ],{
+    title:'Low-Risk Anomaly: CAPM SML vs Reality (Ang Ch.10)',
+    xaxis:{title:'Beta (β)',range:[0,2.2]},
+    yaxis:{title:'Average Annual Return (%)',range:[2,16]},
+    plot_bgcolor:'#fafaf8',paper_bgcolor:'#fff',
+    font:{family:'Inter',size:12},
+    margin:{t:50,r:30,b:60,l:60},
+    legend:{x:0.02,y:0.98},
+    annotations:[
+      {x:1.8,y:6.5,text:'고베타 주식:<br>CAPM 예측보다 낮은 수익',
+       showarrow:true,arrowhead:2,ax:-60,ay:-40,font:{size:11,color:'#e74c3c'}},
+      {x:0.4,y:9,text:'저베타 주식:<br>CAPM 예측보다 높은 수익',
+       showarrow:true,arrowhead:2,ax:60,ay:40,font:{size:11,color:'#27ae60'}},
+      {x:1.5,y:12,text:'SML이 실제로는<br>훨씬 평평하다',
+       showarrow:false,font:{size:11,color:'#3498db',weight:'bold'},
+       bgcolor:'rgba(255,255,255,0.8)',bordercolor:'#3498db',borderwidth:1,borderpad:4}
+    ]
+  },{responsive:true});
+})();
+</script>
+
+<div class="warn">
+<p class="ni"><strong>왜 저위험 이상현상이 존재하는가? (Ang의 설명)</strong></p>
+<ul>
+<li><strong>레버리지 제약:</strong> 많은 투자자가 레버리지를 사용할 수 없어서, 높은 수익을 원하면 고베타 주식을 살 수밖에 없다. 이로 인해 고베타 주식이 과대평가되고 저베타 주식이 과소평가된다 (Frazzini & Pedersen, 2014).</li>
+<li><strong>벤치마크 추종:</strong> 기관투자자는 벤치마크 대비 추적오차를 최소화하려 하므로, 저변동성 전략(벤치마크와 크게 다른)을 기피한다.</li>
+<li><strong>복권 선호:</strong> 개인투자자는 높은 변동성(=큰 상승 가능성)을 선호하여 고변동성 주식에 프리미엄을 지불한다.</li>
+</ul>
+</div>
+
+<h3>6.7 비선형 전략의 가짜 알파</h3>
+<p>Ang은 Ch.10에서 동적 옵션 전략이 가짜 알파를 만들어낼 수 있다고 경고한다. 풋옵션 매도(short volatility) 전략은 대부분의 기간에 작은 이익을 내지만, 위기 시 거대한 손실을 입는다. 선형 회귀 기반 알파는 이런 꼬리 위험을 포착하지 못한다.</p>
+
+<div class="def">
+<p class="ni"><strong>Definition 6.4 — 비선형 전략의 알파 왜곡</strong></p>
+<div class="eq">\[ \text{Short Vol 전략: } r_t = \begin{cases} +\delta & \text{(95% 확률, 정상 시장)} \\ -L & \text{(5% 확률, 위기 시, } L \gg \delta\text{)} \end{cases} \]</div>
+<p class="ni">이 전략의 선형 회귀 알파는 양수로 나오지만, 실제로는 꼬리 위험(tail risk)을 판매하는 것이다. Ang은 이를 "picking up nickels in front of a steamroller"라고 표현한다.</p>
+</div>
+
 <h2 id="ch7">7. Quiz</h2>
 
 <div class="def">

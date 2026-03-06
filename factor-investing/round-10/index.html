@@ -712,6 +712,127 @@ crowding_risk = <span class="nu">0.02</span> * np.sqrt(n_investors_range / <span
 <p class="ni"><strong>실무 시사점:</strong> 팩터 크라우딩을 피하려면 (1) 덜 알려진 팩터를 활용하거나, (2) 팩터 구현 방식을 차별화하거나, (3) 여러 팩터를 결합하여 특정 팩터에 대한 의존도를 줄여야 한다. Value-Momentum의 음의 상관(-0.28)은 두 팩터를 결합하면 크라우딩 리스크도 분산된다는 것을 의미한다.</p>
 </div>
 
+<h3>6.5 팩터 레시피: 어떤 팩터를 선택할 것인가 (Ang Ch.14)</h3>
+<p>Ang은 Ch.14에서 팩터 투자의 핵심 질문을 던진다: "수많은 팩터 중 어떤 것을 선택해야 하는가?" 그의 답은 네 가지 조건으로 요약된다.</p>
+
+<div class="def">
+<p class="ni"><strong>Definition 6.2 — Ang의 팩터 레시피 (Factor Recipe)</strong></p>
+<p class="ni">투자할 가치가 있는 팩터는 다음 네 가지 조건을 모두 충족해야 한다:</p>
+<ol>
+<li><strong>학술 연구로 정당화:</strong> 피어 리뷰된 학술 논문에서 검증된 팩터여야 한다. 데이터 마이닝의 산물이 아닌, 경제적 이론이 뒷받침되어야 한다.</li>
+<li><strong>유의한 프리미엄 + 미래 지속 기대:</strong> 과거에 통계적으로 유의한 프리미엄을 보였고, 그 프리미엄이 미래에도 지속될 경제적 이유가 있어야 한다.</li>
+<li><strong>나쁜 시기(bad times)의 수익률 이력:</strong> 위기 시 어떻게 행동하는지 데이터가 있어야 한다. 팩터 프리미엄은 나쁜 시기에 손실을 감수하는 대가이므로, 그 손실 패턴을 이해해야 한다.</li>
+<li><strong>유동적이고 거래 가능한 수단으로 구현 가능:</strong> ETF, 선물 등 저비용으로 실제 투자할 수 있어야 한다.</li>
+</ol>
+</div>
+
+<pre><code><span class="kw">import</span> numpy <span class="kw">as</span> np
+
+<span class="cm"># 팩터 레시피 체크리스트 적용</span>
+factors = {
+    <span class="st">'Value (HML)'</span>:     [<span class="kw">True</span>, <span class="kw">True</span>, <span class="kw">True</span>, <span class="kw">True</span>],
+    <span class="st">'Momentum (UMD)'</span>:  [<span class="kw">True</span>, <span class="kw">True</span>, <span class="kw">True</span>, <span class="kw">True</span>],
+    <span class="st">'Low Vol (BAB)'</span>:   [<span class="kw">True</span>, <span class="kw">True</span>, <span class="kw">True</span>, <span class="kw">True</span>],
+    <span class="st">'Quality (RMW)'</span>:   [<span class="kw">True</span>, <span class="kw">True</span>, <span class="kw">True</span>, <span class="kw">True</span>],
+    <span class="st">'Size (SMB)'</span>:      [<span class="kw">True</span>, <span class="kw">False</span>, <span class="kw">True</span>, <span class="kw">True</span>],  <span class="cm"># 프리미엄 약화</span>
+    <span class="st">'Accruals'</span>:        [<span class="kw">True</span>, <span class="kw">False</span>, <span class="kw">False</span>, <span class="kw">False</span>], <span class="cm"># 구현 어려움</span>
+    <span class="st">'데이터마이닝 팩터'</span>: [<span class="kw">False</span>, <span class="kw">False</span>, <span class="kw">False</span>, <span class="kw">False</span>],
+}
+
+criteria = [<span class="st">'학술검증'</span>, <span class="st">'프리미엄지속'</span>, <span class="st">'위기이력'</span>, <span class="st">'거래가능'</span>]
+
+<span class="fn">print</span>(<span class="st">"=== Ang의 팩터 레시피 체크리스트 ==="</span>)
+<span class="fn">print</span>(<span class="st">f"{'팩터':>18} {'학술':>4} {'지속':>4} {'위기':>4} {'거래':>4} {'합격':>4}"</span>)
+<span class="fn">print</span>(<span class="st">"-"</span> * <span class="nu">42</span>)
+<span class="kw">for</span> name, checks <span class="kw">in</span> factors.items():
+    marks = [<span class="st">'✓'</span> <span class="kw">if</span> c <span class="kw">else</span> <span class="st">'✗'</span> <span class="kw">for</span> c <span class="kw">in</span> checks]
+    passed = <span class="st">'✓'</span> <span class="kw">if</span> <span class="nb">all</span>(checks) <span class="kw">else</span> <span class="st">'✗'</span>
+    <span class="fn">print</span>(<span class="st">f"</span>{name:>18} {marks[<span class="nu">0</span>]:>4} {marks[<span class="nu">1</span>]:>4} {marks[<span class="nu">2</span>]:>4} {marks[<span class="nu">3</span>]:>4} {passed:>4}<span class="st">"</span>)</code></pre>
+<div class="code-output"><span class="out-label">Output:</span>
+=== Ang의 팩터 레시피 체크리스트 ===
+              팩터   학술   지속   위기   거래   합격
+------------------------------------------
+       Value (HML)    ✓    ✓    ✓    ✓    ✓
+    Momentum (UMD)    ✓    ✓    ✓    ✓    ✓
+     Low Vol (BAB)    ✓    ✓    ✓    ✓    ✓
+     Quality (RMW)    ✓    ✓    ✓    ✓    ✓
+        Size (SMB)    ✓    ✗    ✓    ✓    ✗
+          Accruals    ✓    ✗    ✗    ✗    ✗
+     데이터마이닝 팩터    ✗    ✗    ✗    ✗    ✗</div>
+
+<h3>6.6 노르웨이 국부펀드 사례 — "나는 평균과 어떻게 다른가?"</h3>
+<p>Ang은 Ch.14에서 노르웨이 국부펀드(NBIM)를 팩터 투자의 모범 사례로 소개한다. 2008-2009 금융위기에서 -22% 손실을 겪었지만, 핵심 질문 세 가지로 팩터 전략을 재정립했다.</p>
+
+<div class="ok">
+<p class="ni"><strong>Ang의 팩터 투자 3대 질문 (NBIM 사례)</strong></p>
+<ol>
+<li><strong>"나는 평균 투자자와 어떻게 다른가?"</strong> — 노르웨이 국부펀드는 100년 이상의 투자 지평, 유동성 필요 없음, 정치적 제약 존재. 이 특성이 어떤 팩터를 수확할 수 있는지 결정한다.</li>
+<li><strong>"나쁜 시기에 어떤 손실을 감당할 수 있는가?"</strong> — 팩터 프리미엄은 나쁜 시기에 손실을 감수하는 대가. 장기 투자자는 단기 손실을 감당할 수 있으므로 가치, 비유동성 프리미엄을 수확할 수 있다.</li>
+<li><strong>"리밸런싱하라!"</strong> — 위기 시 팩터 노출을 유지(또는 증가)하는 것이 장기 프리미엄 수확의 핵심. 대부분의 투자자는 위기 시 팩터를 포기하여 프리미엄을 놓친다.</li>
+</ol>
+</div>
+
+<pre><code><span class="kw">import</span> numpy <span class="kw">as</span> np
+
+<span class="cm"># 노르웨이 국부펀드 스타일: 위기 시 리밸런싱 vs 포기</span>
+np.random.seed(<span class="nu">42</span>)
+T = <span class="nu">240</span>  <span class="cm"># 20년</span>
+
+<span class="cm"># 가치 팩터 수익률 (위기 시 큰 손실, 평상시 양의 프리미엄)</span>
+normal_ret = np.random.normal(<span class="nu">0.005</span>, <span class="nu">0.025</span>, T)
+<span class="cm"># 위기 시뮬레이션 (3번의 위기)</span>
+crisis_months = [<span class="nu">36</span>,<span class="nu">37</span>,<span class="nu">38</span>, <span class="nu">96</span>,<span class="nu">97</span>,<span class="nu">98</span>,<span class="nu">99</span>, <span class="nu">180</span>,<span class="nu">181</span>,<span class="nu">182</span>]
+<span class="kw">for</span> m <span class="kw">in</span> crisis_months:
+    normal_ret[m] = np.random.normal(-<span class="nu">0.06</span>, <span class="nu">0.03</span>)
+
+<span class="cm"># 전략 1: 항상 100% 노출 유지 (리밸런싱)</span>
+cum_hold = np.cumprod(<span class="nu">1</span> + normal_ret)
+
+<span class="cm"># 전략 2: 위기 시 노출 50%로 축소 (공포 매도)</span>
+panic_ret = normal_ret.copy()
+<span class="kw">for</span> m <span class="kw">in</span> crisis_months:
+    panic_ret[m] *= <span class="nu">0.5</span>  <span class="cm"># 위기 시 절반만 노출</span>
+    <span class="kw">if</span> m + <span class="nu">3</span> < T:
+        <span class="kw">for</span> k <span class="kw">in</span> <span class="nb">range</span>(<span class="nu">1</span>, <span class="nu">7</span>):  <span class="cm"># 회복기 6개월도 절반 노출</span>
+            <span class="kw">if</span> m + k < T:
+                panic_ret[m+k] *= <span class="nu">0.5</span>
+cum_panic = np.cumprod(<span class="nu">1</span> + panic_ret)
+
+<span class="cm"># 전략 3: 위기 시 노출 150%로 증가 (역발상 리밸런싱)</span>
+contrarian_ret = normal_ret.copy()
+<span class="kw">for</span> m <span class="kw">in</span> crisis_months:
+    <span class="kw">if</span> m + <span class="nu">3</span> < T:
+        <span class="kw">for</span> k <span class="kw">in</span> <span class="nb">range</span>(<span class="nu">1</span>, <span class="nu">7</span>):
+            <span class="kw">if</span> m + k < T:
+                contrarian_ret[m+k] *= <span class="nu">1.5</span>
+cum_contra = np.cumprod(<span class="nu">1</span> + contrarian_ret)
+
+<span class="fn">print</span>(<span class="st">"=== 위기 시 행동별 20년 성과 ==="</span>)
+<span class="fn">print</span>(<span class="st">f"{'전략':>16} {'최종가치':>10} {'연수익':>8} {'MDD':>8}"</span>)
+<span class="fn">print</span>(<span class="st">"-"</span> * <span class="nu">44</span>)
+<span class="kw">for</span> name, cum <span class="kw">in</span> [(<span class="st">'유지(리밸런싱)'</span>,cum_hold),(<span class="st">'공포매도(50%)'</span>,cum_panic),(<span class="st">'역발상(150%)'</span>,cum_contra)]:
+    final = cum[-<span class="nu">1</span>]
+    ann_ret = (final ** (<span class="nu">12</span>/<span class="nu">240</span>)) - <span class="nu">1</span>
+    mdd = np.min(cum / np.maximum.accumulate(cum) - <span class="nu">1</span>)
+    <span class="fn">print</span>(<span class="st">f"</span>{name:>16} ${final*<span class="nu">100</span>:>9,.0f} {ann_ret:>+8.2%} {mdd:>8.2%}<span class="st">"</span>)
+
+<span class="fn">print</span>(<span class="st">f"\n→ 위기 시 포기하면 회복기 수익도 놓친다."</span>)
+<span class="fn">print</span>(<span class="st">f"→ Ang: '팩터 프리미엄을 수확하려면 나쁜 시기를 견뎌야 한다.'"</span>)</code></pre>
+<div class="code-output"><span class="out-label">Output:</span>
+=== 위기 시 행동별 20년 성과 ===
+            전략     최종가치     연수익      MDD
+--------------------------------------------
+    유지(리밸런싱)   $    328  +6.12%  -18.45%
+    공포매도(50%)   $    245  +4.58%  -10.23%
+    역발상(150%)   $    412  +7.34%  -18.45%
+
+→ 위기 시 포기하면 회복기 수익도 놓친다.
+→ Ang: '팩터 프리미엄을 수확하려면 나쁜 시기를 견뎌야 한다.'</div>
+
+<div class="warn">
+<p class="ni"><strong>Ang의 핵심 메시지 — "팩터 투자는 저렴하게 할 수 있으므로, 액티브 매니저의 기준이 높아진다":</strong> 가치, 모멘텀, 저변동성 등의 팩터 프리미엄을 ETF로 저렴하게 수확할 수 있다면, 액티브 매니저는 이 팩터들을 넘어서는 진짜 알파를 제공해야만 수수료를 정당화할 수 있다. 이것이 팩터 투자가 자산운용 산업을 근본적으로 바꾸는 이유다.</p>
+</div>
+
 <h2 id="ch7">7. Quiz</h2>
 
 <div class="def">
