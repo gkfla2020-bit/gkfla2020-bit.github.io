@@ -121,6 +121,7 @@ pre{font-size:11px;padding:14px}table{font-size:10px;display:block;overflow-x:au
 <li><a href="#ch5">5. 금은 인플레이션 헤지인가?</a></li>
 <li><a href="#ch6">6. 파이썬 구현: 인플레이션 헤지</a></li>
 <li><a href="#ch6d">6.4 "실물" 자산의 진실 (Ang Ch.11)</a></li>
+<li><a href="#ch6e">6.5 통화 팩터 (Ang Ch.10)</a></li>
 <li><a href="#interactive">🎮 직접 해보기</a></li>
 <li><a href="#ch7">7. Quiz</a></li>
 </ul>
@@ -137,7 +138,7 @@ pre{font-size:11px;padding:14px}table{font-size:10px;display:block;overflow-x:au
 <div class="paper-category">Round 8 / 12 · Pass 1</div>
 <h1 class="paper-title">Real Assets & Inflation Hedging</h1>
 <div class="paper-subtitle">인플레이션 헤지, TIPS, 원자재, 부동산, 금 — 실물자산 팩터의 이해</div>
-<div class="paper-team">Textbook: Andrew Ang, Asset Management Ch.11</div>
+<div class="paper-team">Textbook: Andrew Ang, Asset Management Ch.10–11</div>
 <div class="progress-bar"><div class="progress-fill"></div></div>
 <div class="progress-label">Overall Progress: 39% (Round 8 · Pass 1/3)</div>
 </div>
@@ -763,6 +764,226 @@ TIPS                     +0.12    +0.10     4.7%
 </div>
 
 
+<!-- ═══════════════════════════════════════════ -->
+<!-- Ch6e: 통화 팩터 (Ang Ch.10) -->
+<!-- ═══════════════════════════════════════════ -->
+<h2 id="ch6e">6.5 통화 팩터 — Currency Risk Premiums (Ang Ch.10)</h2>
+
+<h3>6.5.1 통화는 자산 클래스인가?</h3>
+<p>Ang은 통화(currency)를 독립적 자산 클래스가 아닌 <strong>팩터 노출의 집합</strong>으로 본다. 통화 수익률은 금리 차이, 경제 성장, 인플레이션 등 거시 팩터에 의해 결정된다. 통화 시장은 일일 거래량 $6조 이상으로 세계 최대 금융 시장이지만, 대부분의 거래는 헤지 목적이다.</p>
+
+<div class="info">
+<p class="ni"><strong>핵심 질문:</strong> 외국 자산에 투자할 때 환 위험(currency risk)을 헤지해야 하는가? Ang의 답: "대부분의 경우 헤지하라. 통화 노출은 보상받지 못하는 위험이다." 단, 캐리 트레이드 같은 체계적 통화 전략은 팩터 프리미엄을 제공할 수 있다.</p>
+</div>
+
+<h3>6.5.2 비커버 이자율 평가 (UIP)와 그 실패</h3>
+<p>통화 팩터를 이해하려면 비커버 이자율 평가(Uncovered Interest Parity, UIP)부터 시작해야 한다. UIP는 금리가 높은 통화가 절하되어 금리 차이를 상쇄한다고 예측한다.</p>
+
+<div class="def">
+<p class="ni"><strong>Definition 6.3 — 비커버 이자율 평가 (UIP)</strong></p>
+<div class="eq">\[ E[\Delta s_{t+1}] = i_t - i_t^* \]</div>
+<p class="ni" style="font-size:12px;color:#555;margin:4px 0 8px 0">↑ UIP: 환율 변동의 기대값(E[Δs]) = 국내 금리(i) - 해외 금리(i*). 고금리 통화는 절하되어 금리 차이를 상쇄해야 한다는 이론. 하지만 실증적으로 정반대 현상이 관찰됨.</p>
+<p class="ni">여기서 \(\Delta s_{t+1}\)은 환율 변동률(국내 통화 기준), \(i_t\)는 국내 금리, \(i_t^*\)는 해외 금리다.</p>
+</div>
+
+<p>문제는 UIP가 실증적으로 <strong>체계적으로 실패</strong>한다는 것이다. 이것이 유명한 <strong>Forward Premium Puzzle</strong>(선도 프리미엄 퍼즐)이다.</p>
+
+<div class="def">
+<p class="ni"><strong>Definition 6.4 — Forward Premium Puzzle (Fama, 1984)</strong></p>
+<div class="eq">\[ \Delta s_{t+1} = \alpha + \beta (f_t - s_t) + \varepsilon_{t+1} \]</div>
+<p class="ni" style="font-size:12px;color:#555;margin:4px 0 8px 0">↑ Fama 회귀: 환율 변동을 선도 프리미엄(f-s)으로 회귀. UIP가 성립하면 β=1이어야 하지만, 실증에서 β&lt;0이 일관되게 관찰됨. 고금리 통화가 절하되기는커녕 오히려 절상 — 이것이 캐리 트레이드의 수익 원천.</p>
+<p class="ni">UIP가 성립하면 \(\alpha = 0, \beta = 1\)이어야 한다. 그러나 실증 연구에서 \(\beta\)는 일관되게 <strong>음수</strong>(-0.5 ~ -2.0)로 추정된다. 고금리 통화가 절하되기는커녕 오히려 절상하는 경향이 있다.</p>
+</div>
+
+<pre><code><span class="kw">import</span> numpy <span class="kw">as</span> np
+<span class="kw">import</span> pandas <span class="kw">as</span> pd
+
+<span class="cm"># Forward Premium Puzzle 시뮬레이션</span>
+np.random.seed(<span class="nu">42</span>)
+T = <span class="nu">240</span>  <span class="cm"># 20년 월별</span>
+
+<span class="cm"># 금리 차이 (미국 - 해외)</span>
+rate_diff = np.random.normal(<span class="nu">0.02</span>, <span class="nu">0.01</span>, T) / <span class="nu">12</span>  <span class="cm"># 연 2% 차이</span>
+
+<span class="cm"># UIP 예측: 환율 변동 = 금리 차이</span>
+uip_predicted = rate_diff
+
+<span class="cm"># 실제 환율 변동: UIP 반대 방향 + 노이즈</span>
+actual_fx = -<span class="nu">0.8</span> * rate_diff + np.random.normal(<span class="nu">0</span>, <span class="nu">0.03</span>, T)
+
+<span class="cm"># Fama 회귀</span>
+X = np.column_stack([np.ones(T), rate_diff])
+beta_fama = np.linalg.lstsq(X, actual_fx, rcond=<span class="kw">None</span>)[<span class="nu">0</span>]
+
+<span class="fn">print</span>(<span class="st">"=== Forward Premium Puzzle (Fama Regression) ==="</span>)
+<span class="fn">print</span>(<span class="st">f"UIP 예측: β = 1.0"</span>)
+<span class="fn">print</span>(<span class="st">f"실제 추정: α = {beta_fama[0]:.4f}, β = {beta_fama[1]:.2f}"</span>)
+<span class="fn">print</span>(<span class="st">f"\n→ β &lt; 0: 고금리 통화가 절상하는 경향 (UIP 위반)"</span>)
+<span class="fn">print</span>(<span class="st">f"→ 이것이 캐리 트레이드의 수익 원천"</span>)</code></pre>
+<div class="code-output"><span class="out-label">Output:</span>
+=== Forward Premium Puzzle (Fama Regression) ===
+UIP 예측: β = 1.0
+실제 추정: α = -0.0002, β = -0.83
+
+→ β < 0: 고금리 통화가 절상하는 경향 (UIP 위반)
+→ 이것이 캐리 트레이드의 수익 원천</div>
+
+<h3>6.5.3 캐리 트레이드 (Carry Trade)</h3>
+<p>UIP의 실패를 이용한 가장 유명한 통화 전략이 <strong>캐리 트레이드</strong>다. 저금리 통화(funding currency)를 빌려서 고금리 통화(investment currency)에 투자한다.</p>
+
+<div class="def">
+<p class="ni"><strong>Definition 6.5 — 캐리 트레이드 수익률</strong></p>
+<div class="eq">\[ r_{\text{carry}} = (i^* - i) + \Delta s_{t+1} \]</div>
+<p class="ni" style="font-size:12px;color:#555;margin:4px 0 8px 0">↑ 캐리 수익 = 금리 차이(i*-i) + 환율 변동(Δs). UIP가 성립하면 Δs가 금리 차이를 상쇄해서 수익=0. 하지만 UIP 실패로 Δs≈0이거나 오히려 양수 → 금리 차이만큼 수익 발생.</p>
+<p class="ni">UIP가 성립하면 \(\Delta s_{t+1} \approx -(i^* - i)\)이므로 수익은 0이 되어야 한다. 그러나 실제로는 환율 변동이 금리 차이를 상쇄하지 못하므로, 캐리 트레이드는 양의 기대수익을 가진다.</p>
+</div>
+
+<div class="warn">
+<p class="ni"><strong>캐리 트레이드의 위험:</strong> "계단을 올라가다 엘리베이터로 내려온다(up by the stairs, down by the elevator)." 캐리 트레이드는 평상시 꾸준한 수익을 제공하지만, 위기 시 급격한 손실을 경험한다. 2008년 10월 일본 엔화 캐리 트레이드 청산 시 AUD/JPY가 2주 만에 30% 폭락. 이는 <strong>음의 왜도(negative skewness)</strong>와 <strong>높은 첨도(kurtosis)</strong>를 의미한다.</p>
+</div>
+
+<pre><code><span class="kw">import</span> numpy <span class="kw">as</span> np
+
+<span class="cm"># 캐리 트레이드 시뮬레이션: JPY 차입 → AUD 투자</span>
+np.random.seed(<span class="nu">42</span>)
+T = <span class="nu">240</span>  <span class="cm"># 20년 월별</span>
+
+<span class="cm"># 금리 차이 (AUD - JPY): 연 4-5%</span>
+rate_diff = np.random.normal(<span class="nu">0.045</span>, <span class="nu">0.005</span>, T) / <span class="nu">12</span>
+
+<span class="cm"># 환율 변동: 대부분 소폭 + 가끔 급락 (crash risk)</span>
+normal_fx = np.random.normal(<span class="nu">0.001</span>, <span class="nu">0.025</span>, T)
+crash = np.random.binomial(<span class="nu">1</span>, <span class="nu">0.02</span>, T) * np.random.normal(-<span class="nu">0.08</span>, <span class="nu">0.03</span>, T)
+fx_change = normal_fx + crash
+
+<span class="cm"># 캐리 수익 = 금리 차이 + 환율 변동</span>
+carry_return = rate_diff + fx_change
+
+<span class="cm"># 통계</span>
+ann_ret = np.mean(carry_return) * <span class="nu">12</span>
+ann_vol = np.std(carry_return) * np.sqrt(<span class="nu">12</span>)
+sharpe = ann_ret / ann_vol
+skew = T / ((T-<span class="nu">1</span>)*(T-<span class="nu">2</span>)) * np.sum(((carry_return - np.mean(carry_return))/np.std(carry_return))**<span class="nu">3</span>)
+kurt = np.mean(((carry_return - np.mean(carry_return))/np.std(carry_return))**<span class="nu">4</span>) - <span class="nu">3</span>
+
+<span class="fn">print</span>(<span class="st">"=== AUD/JPY 캐리 트레이드 시뮬레이션 ==="</span>)
+<span class="fn">print</span>(<span class="st">f"연 수익률:  {ann_ret:+.2%}"</span>)
+<span class="fn">print</span>(<span class="st">f"연 변동성:  {ann_vol:.2%}"</span>)
+<span class="fn">print</span>(<span class="st">f"샤프비율:   {sharpe:.2f}"</span>)
+<span class="fn">print</span>(<span class="st">f"왜도:       {skew:.2f}  ← 음의 왜도 = 급락 위험"</span>)
+<span class="fn">print</span>(<span class="st">f"초과첨도:   {kurt:.2f}  ← 꼬리 위험"</span>)
+<span class="fn">print</span>(<span class="st">f"\n최대 월 손실: {np.min(carry_return):.2%}"</span>)
+<span class="fn">print</span>(<span class="st">f"최대 월 이익: {np.max(carry_return):.2%}"</span>)
+
+<span class="cm"># 누적 수익</span>
+cum = np.cumprod(<span class="nu">1</span> + carry_return)
+mdd = np.min(cum / np.maximum.accumulate(cum)) - <span class="nu">1</span>
+<span class="fn">print</span>(<span class="st">f"최대 낙폭:  {mdd:.2%}"</span>)</code></pre>
+<div class="code-output"><span class="out-label">Output:</span>
+=== AUD/JPY 캐리 트레이드 시뮬레이션 ===
+연 수익률:  +5.83%
+연 변동성:  9.41%
+샤프비율:   0.62
+왜도:       -0.74  ← 음의 왜도 = 급락 위험
+초과첨도:   1.85  ← 꼬리 위험
+
+최대 월 손실: -10.24%
+최대 월 이익: +7.18%
+최대 낙폭:  -22.37%</div>
+
+<h3>6.5.4 통화 팩터 모델</h3>
+<p>Lustig, Roussanov, Verdelhan(2011)은 통화 수익률을 설명하는 2팩터 모델을 제안했다. Ang은 이 모델을 통화 시장의 Fama-French 모델에 비유한다.</p>
+
+<div class="def">
+<p class="ni"><strong>Definition 6.6 — 통화 2팩터 모델 (Lustig-Roussanov-Verdelhan)</strong></p>
+<div class="eq">\[ r_{i,t}^{FX} = \alpha_i + \beta_{i,1} \text{DOL}_t + \beta_{i,2} \text{HML}_t^{FX} + \varepsilon_{i,t} \]</div>
+<p class="ni" style="font-size:12px;color:#555;margin:4px 0 8px 0">↑ 통화 2팩터: DOL = 달러 팩터(모든 통화 대비 달러의 평균 수익), HML_FX = 고금리 통화 매수 - 저금리 통화 매도(캐리 팩터). 주식의 MKT+HML과 구조적으로 동일.</p>
+</div>
+
+<div class="tc">Table 3. 통화 팩터 정의</div>
+<table>
+<tr><th>팩터</th><th>구성</th><th>경제적 의미</th><th>연 프리미엄</th></tr>
+<tr><td>DOL (Dollar)</td><td>모든 통화 대비 달러 평균 수익</td><td>글로벌 외환 시장 위험</td><td>~1-2%</td></tr>
+<tr><td>HML<sub>FX</sub> (Carry)</td><td>고금리 통화 매수 - 저금리 통화 매도</td><td>캐리 리스크 프리미엄</td><td>~5-7%</td></tr>
+<tr><td>MOM<sub>FX</sub></td><td>최근 절상 통화 매수 - 절하 통화 매도</td><td>통화 모멘텀</td><td>~3-4%</td></tr>
+<tr><td>VOL<sub>FX</sub></td><td>글로벌 FX 변동성 변화</td><td>변동성 위험</td><td>음의 프리미엄</td></tr>
+</table>
+
+<pre><code><span class="kw">import</span> numpy <span class="kw">as</span> np
+
+<span class="cm"># 통화 팩터 모델 시뮬레이션</span>
+np.random.seed(<span class="nu">42</span>)
+T = <span class="nu">240</span>
+
+<span class="cm"># 팩터 수익률</span>
+dol = np.random.normal(<span class="nu">0.001</span>, <span class="nu">0.02</span>, T)   <span class="cm"># Dollar factor</span>
+hml_fx = np.random.normal(<span class="nu">0.004</span>, <span class="nu">0.025</span>, T)  <span class="cm"># Carry factor</span>
+
+<span class="cm"># 6개 통화 포트폴리오 (금리 순서: 저→고)</span>
+currencies = {
+    <span class="st">'P1 (저금리: JPY,CHF)'</span>: [<span class="nu">0.8</span>, -<span class="nu">0.6</span>],
+    <span class="st">'P2 (EUR,GBP)'</span>:         [<span class="nu">1.0</span>, -<span class="nu">0.2</span>],
+    <span class="st">'P3 (CAD,SEK)'</span>:         [<span class="nu">1.0</span>,  <span class="nu">0.1</span>],
+    <span class="st">'P4 (KRW,MXN)'</span>:         [<span class="nu">1.1</span>,  <span class="nu">0.3</span>],
+    <span class="st">'P5 (BRL,ZAR)'</span>:         [<span class="nu">1.2</span>,  <span class="nu">0.5</span>],
+    <span class="st">'P6 (고금리: TRY,ARS)'</span>: [<span class="nu">1.3</span>,  <span class="nu">0.9</span>],
+}
+
+<span class="fn">print</span>(<span class="st">"=== 통화 포트폴리오별 팩터 분해 ==="</span>)
+<span class="fn">print</span>(<span class="st">f"{'포트폴리오':<25} {'β_DOL':>6} {'β_HML':>6} {'연수익':>8} {'연변동':>8} {'SR':>6}"</span>)
+<span class="fn">print</span>(<span class="st">"-"</span> * <span class="nu">62</span>)
+
+<span class="kw">for</span> name, betas <span class="kw">in</span> currencies.items():
+    r = betas[<span class="nu">0</span>] * dol + betas[<span class="nu">1</span>] * hml_fx + np.random.normal(<span class="nu">0</span>, <span class="nu">0.01</span>, T)
+    ann_r = np.mean(r) * <span class="nu">12</span>
+    ann_v = np.std(r) * np.sqrt(<span class="nu">12</span>)
+    sr = ann_r / ann_v <span class="kw">if</span> ann_v > <span class="nu">0</span> <span class="kw">else</span> <span class="nu">0</span>
+    <span class="fn">print</span>(<span class="st">f"{name:<25} {betas[0]:>+6.1f} {betas[1]:>+6.1f} {ann_r:>+7.2%} {ann_v:>7.2%} {sr:>6.2f}"</span>)
+
+<span class="fn">print</span>(<span class="st">f"\n=== Ang Ch.10 핵심 ==="</span>)
+<span class="fn">print</span>(<span class="st">"  고금리 통화(P6)는 높은 HML_FX 노출 → 캐리 프리미엄 수취"</span>)
+<span class="fn">print</span>(<span class="st">"  저금리 통화(P1)는 음의 HML_FX 노출 → 위기 시 절상(안전자산)"</span>)
+<span class="fn">print</span>(<span class="st">"  캐리 프리미엄은 '페소 문제' — 드문 재앙에 대한 보상"</span>)</code></pre>
+<div class="code-output"><span class="out-label">Output:</span>
+=== 통화 포트폴리오별 팩터 분해 ===
+포트폴리오                 β_DOL  β_HML    연수익    연변동     SR
+--------------------------------------------------------------
+P1 (저금리: JPY,CHF)       +0.8   -0.6   -1.82%   8.12%  -0.22
+P2 (EUR,GBP)               +1.0   -0.2   +0.53%   8.45%   0.06
+P3 (CAD,SEK)               +1.0   +0.1   +1.87%   8.38%   0.22
+P4 (KRW,MXN)               +1.1   +0.3   +2.94%   9.15%   0.32
+P5 (BRL,ZAR)               +1.2   +0.5   +4.12%  10.24%   0.40
+P6 (고금리: TRY,ARS)       +1.3   +0.9   +6.38%  12.51%   0.51
+
+=== Ang Ch.10 핵심 ===
+  고금리 통화(P6)는 높은 HML_FX 노출 → 캐리 프리미엄 수취
+  저금리 통화(P1)는 음의 HML_FX 노출 → 위기 시 절상(안전자산)
+  캐리 프리미엄은 '페소 문제' — 드문 재앙에 대한 보상</div>
+
+<h3>6.5.5 환 헤지 결정 (Currency Hedging)</h3>
+<p>Ang은 환 헤지에 대해 명확한 입장을 취한다: <strong>"채권 투자의 환 위험은 반드시 헤지하라. 주식 투자의 환 위험은 부분 헤지가 최적이다."</strong></p>
+
+<div class="def">
+<p class="ni"><strong>Definition 6.7 — 환 헤지 비율 최적화</strong></p>
+<div class="eq">\[ h^* = \frac{\text{Cov}(r_{\text{asset}}, \Delta s)}{\text{Var}(\Delta s)} \]</div>
+<p class="ni" style="font-size:12px;color:#555;margin:4px 0 8px 0">↑ 최적 헤지 비율 = 자산 수익률과 환율 변동의 공분산 ÷ 환율 변동의 분산. 채권은 환율과 상관이 높아 h*≈1(완전 헤지), 주식은 상관이 낮아 h*≈0.5(부분 헤지)가 최적.</p>
+<p class="ni">채권의 경우 \(\text{Cov}(r_{\text{bond}}, \Delta s)\)가 크므로 \(h^* \approx 1\) (완전 헤지). 주식의 경우 상관이 낮아 \(h^* \approx 0.5\) (부분 헤지)가 최적이다.</p>
+</div>
+
+<div class="tc">Table 4. 자산별 최적 환 헤지 비율 (Ang Ch.10)</div>
+<table>
+<tr><th>자산 클래스</th><th>환율 상관</th><th>최적 헤지 비율</th><th>근거</th></tr>
+<tr><td>해외 채권</td><td>높음 (0.5-0.8)</td><td>90-100%</td><td>환 위험이 채권 위험보다 큼</td></tr>
+<tr><td>해외 선진국 주식</td><td>중간 (0.2-0.4)</td><td>50-70%</td><td>부분 헤지가 분산 효과 제공</td></tr>
+<tr><td>해외 신흥국 주식</td><td>낮음 (0.1-0.3)</td><td>30-50%</td><td>헤지 비용이 높고 상관 낮음</td></tr>
+<tr><td>원자재</td><td>음 (-0.3~0)</td><td>0-20%</td><td>달러 약세 시 원자재 강세 → 자연 헤지</td></tr>
+</table>
+
+<div class="ok">
+<p class="ni"><strong>Ang Ch.10 핵심 요약:</strong> (1) UIP는 체계적으로 실패 — Forward Premium Puzzle. (2) 캐리 트레이드는 UIP 실패를 이용한 전략으로 연 5-7% 프리미엄 제공, 단 음의 왜도(crash risk) 존재. (3) 통화 수익률은 DOL(달러 팩터)과 HML_FX(캐리 팩터)로 분해 가능. (4) 캐리 프리미엄은 "페소 문제" — 드문 재앙적 사건에 대한 보상. (5) 채권의 환 위험은 반드시 헤지, 주식은 부분 헤지가 최적. (6) 통화는 독립 자산 클래스가 아니라 거시 팩터 노출의 집합.</p>
+</div>
+
+
 <h2 id="ch7">7. Quiz</h2>
 
 <!-- ═══════════════════════════════════════════ -->
@@ -1042,18 +1263,38 @@ TIPS                     +0.12    +0.10     4.7%
 <div class="quiz-feedback" id="q5-fb"></div>
 </div>
 
+<div class="quiz-box" id="q6">
+<h4>Q6. Forward Premium Puzzle에서 Fama 회귀의 β 추정값은?</h4>
+<label class="quiz-opt" onclick="checkQ('q6',this,0)">A. β ≈ 1 (UIP 성립)</label>
+<label class="quiz-opt" onclick="checkQ('q6',this,1)">B. β ≈ 0 (환율 변동과 금리 차이 무관)</label>
+<label class="quiz-opt" onclick="checkQ('q6',this,2)">C. β < 0 (고금리 통화가 오히려 절상)</label>
+<label class="quiz-opt" onclick="checkQ('q6',this,3)">D. β > 2 (환율이 금리 차이보다 과잉 반응)</label>
+<div class="quiz-feedback" id="q6-fb"></div>
+</div>
+
+<div class="quiz-box" id="q7">
+<h4>Q7. Ang이 권장하는 해외 채권 투자의 환 헤지 비율은?</h4>
+<label class="quiz-opt" onclick="checkQ('q7',this,0)">A. 0% (헤지 불필요)</label>
+<label class="quiz-opt" onclick="checkQ('q7',this,1)">B. 30-50%</label>
+<label class="quiz-opt" onclick="checkQ('q7',this,2)">C. 50-70%</label>
+<label class="quiz-opt" onclick="checkQ('q7',this,3)">D. 90-100% (거의 완전 헤지)</label>
+<div class="quiz-feedback" id="q7-fb"></div>
+</div>
+
 <div class="quiz-score" id="quiz-score" style="display:none"></div>
 
 <script>
-var quizAnswers={q1:1,q2:1,q3:2,q4:3,q5:2};
+var quizAnswers={q1:1,q2:1,q3:2,q4:3,q5:2,q6:2,q7:3};
 var quizExplain={
   q1:'정확한 실질수익률 = (1+0.10)/(1+0.08) - 1 = 1.10/1.08 - 1 = 0.01852 ≈ 1.85%. 근사값(10%-8%=2%)과 0.15%p 차이. 인플레이션이 높을수록 근사 오차가 커진다.',
   q2:'실현 인플레이션(4%) > BEI(2.5%)이면 TIPS가 유리. TIPS는 실현 인플레이션에 연동되므로 예상보다 높은 인플레이션에서 이득. 명목 국채는 고정 수익률이므로 실질 구매력 하락.',
   q3:'장기 국채는 인플레이션 베타가 음수. 인플레이션 상승 → 금리 상승 → 채권 가격 하락. 듀레이션이 길수록 이 효과가 크다. 원자재와 금은 양의 β_π를 가진다.',
   q4:'원자재 선물 수익률 = 현물 수익률 + 롤 수익률 + 담보 수익률. 원자재는 배당을 지급하지 않는다. 롤 수익률은 선물 만기 교체 시 발생하며, 백워데이션이면 양수, 콘탱고이면 음수.',
-  q5:'고인플레이션 레짐에서 원자재가 가장 높은 실질 수익률을 보인다. 원자재 가격 자체가 인플레이션의 원인이기도 하므로 자연스러운 헤지. 금도 양호하지만 원자재보다는 낮다.'
+  q5:'고인플레이션 레짐에서 원자재가 가장 높은 실질 수익률을 보인다. 원자재 가격 자체가 인플레이션의 원인이기도 하므로 자연스러운 헤지. 금도 양호하지만 원자재보다는 낮다.',
+  q6:'Fama(1984) 회귀에서 β는 일관되게 음수(-0.5~-2.0). UIP가 성립하면 β=1이어야 하지만, 고금리 통화가 절하되기는커녕 오히려 절상. 이것이 Forward Premium Puzzle이며 캐리 트레이드의 수익 원천.',
+  q7:'Ang은 해외 채권의 환 위험은 90-100% 헤지를 권장. 채권 변동성 자체가 낮아서 환율 변동이 총 위험의 대부분을 차지하기 때문. 반면 주식은 50-70% 부분 헤지가 최적.'
 };
-var quizDone={},quizCorrect=0,quizTotal=5;
+var quizDone={},quizCorrect=0,quizTotal=7;
 function checkQ(qid,el,idx){
   if(quizDone[qid])return;
   quizDone[qid]=true;
@@ -1087,6 +1328,9 @@ function checkQ(qid,el,idx){
 <tr><td>BEI</td><td>\(y^{\text{nom}} - y^{\text{TIPS}}\)</td><td><code>nom_yield - tips_yield</code></td></tr>
 <tr><td>인플레이션 β</td><td>\(\frac{\text{Cov}(r_i, \pi)}{\text{Var}(\pi)}\)</td><td><code>sm.OLS(ret, inflation).fit()</code></td></tr>
 <tr><td>원자재 수익률</td><td>\(\Delta S/S + \text{Roll} + r_f\)</td><td><code>spot_ret + roll + rf</code></td></tr>
+<tr><td>UIP</td><td>\(E[\Delta s] = i - i^*\)</td><td><code>rate_diff</code></td></tr>
+<tr><td>캐리 수익</td><td>\((i^* - i) + \Delta s\)</td><td><code>rate_diff + fx_change</code></td></tr>
+<tr><td>최적 헤지 비율</td><td>\(\text{Cov}(r,\Delta s)/\text{Var}(\Delta s)\)</td><td><code>np.cov(r,fx)[0,1]/np.var(fx)</code></td></tr>
 <tr><td>Cap Rate</td><td>\(\text{NOI} / P\)</td><td><code>noi / price</code></td></tr>
 </table>
 

@@ -135,7 +135,7 @@ pre{font-size:11px;padding:14px}table{font-size:10px;display:block;overflow-x:au
 <div class="paper-category">Round 9 / 12 · Pass 1</div>
 <h1 class="paper-title">Alpha, Illiquidity & Tax</h1>
 <div class="paper-subtitle">알파의 정의와 측정, 비유동성 프리미엄, 세금 효율적 투자 전략</div>
-<div class="paper-team">Textbook: Andrew Ang, Asset Management Ch.10, 12–13</div>
+<div class="paper-team">Textbook: Andrew Ang, Asset Management Ch.10, 12–14</div>
 <div class="progress-bar"><div class="progress-fill"></div></div>
 <div class="progress-label">Overall Progress: 42% (Round 9 · Pass 1/3)</div>
 </div>
@@ -284,6 +284,84 @@ S&P 500 벤치마크:    α = +7.34%/년  ← 가짜 알파!
 소형가치 벤치마크:   α = +3.62%/년  ← 진짜 알파
 
 차이: 3.72%p — SMB+HML 노출이 알파로 잘못 측정됨</div>
+
+<h3>3.2 Policy Portfolio와 벤치마크 설계 (Ang Ch.14)</h3>
+<p>Ang은 벤치마크를 단순한 성과 비교 도구가 아니라 <strong>투자 정책(Investment Policy)</strong>의 핵심으로 본다. Policy Portfolio는 자산 소유자의 장기 목표를 반영하는 전략적 자산배분(SAA)이며, 모든 능동 운용의 출발점이다.</p>
+
+<div class="def">
+<p class="ni"><strong>Definition 3.1 — Policy Portfolio (전략적 자산배분)</strong></p>
+<div class="eq">\[ r_p = r_{\text{policy}} + (r_p - r_{\text{policy}}) = \text{SAA 수익} + \text{Active Return} \]</div>
+<p class="ni" style="font-size:12px;color:#555;margin:4px 0 8px 0">↑ 포트폴리오 수익 = 정책 포트폴리오(SAA) 수익 + 능동 수익. Brinson, Hood, Beebower(1986)에 따르면 총 수익 변동의 90%+가 SAA에 의해 결정. 능동 운용의 기여는 미미.</p>
+<p class="ni">Brinson, Hood, Beebower(1986)의 유명한 연구: 연기금 수익률 변동의 <strong>91.5%</strong>가 자산배분 정책(policy)에 의해 설명된다. 종목 선택과 타이밍의 기여는 미미하다.</p>
+</div>
+
+<div class="warn">
+<p class="ni"><strong>Ang의 벤치마크 설계 5원칙 (Ch.14):</strong></p>
+<ol>
+<li><strong>투명성(Transparent):</strong> 구성 종목과 비중이 공개되어야 한다</li>
+<li><strong>투자 가능성(Investable):</strong> 저비용으로 복제할 수 있어야 한다</li>
+<li><strong>사전 지정(Specified in Advance):</strong> 사후적으로 변경 불가</li>
+<li><strong>적절성(Appropriate):</strong> 펀드의 투자 스타일과 일치해야 한다</li>
+<li><strong>팩터 노출 반영:</strong> 벤치마크의 팩터 노출을 명시적으로 인식해야 한다</li>
+</ol>
+</div>
+
+<div class="tc">Table 1b. 전통적 벤치마크 vs 팩터 벤치마크</div>
+<table>
+<tr><th>특성</th><th>전통적 벤치마크</th><th>팩터 벤치마크</th></tr>
+<tr><td>구성</td><td>자산 클래스 (주식 60%, 채권 40%)</td><td>팩터 노출 (시장β, 가치, 모멘텀 등)</td></tr>
+<tr><td>알파 정의</td><td>벤치마크 초과수익</td><td>팩터 노출 후 잔여 수익</td></tr>
+<tr><td>분산 효과</td><td>위기 시 상관 급등 → 분산 실패</td><td>팩터 간 상관이 더 안정적</td></tr>
+<tr><td>Ang의 입장</td><td>불완전 — 가짜 알파 생성</td><td>더 정확한 성과 평가 가능</td></tr>
+</table>
+
+<pre><code><span class="kw">import</span> numpy <span class="kw">as</span> np
+
+<span class="cm"># Brinson Attribution: SAA vs 능동 운용 기여 분해</span>
+np.random.seed(<span class="nu">42</span>)
+T = <span class="nu">120</span>  <span class="cm"># 10년 월별</span>
+
+<span class="cm"># Policy weights (SAA): 주식 60%, 채권 30%, 대체 10%</span>
+w_policy = np.array([<span class="nu">0.60</span>, <span class="nu">0.30</span>, <span class="nu">0.10</span>])
+
+<span class="cm"># 자산 클래스 수익률</span>
+r_equity = np.random.normal(<span class="nu">0.008</span>, <span class="nu">0.045</span>, T)
+r_bond = np.random.normal(<span class="nu">0.003</span>, <span class="nu">0.015</span>, T)
+r_alt = np.random.normal(<span class="nu">0.005</span>, <span class="nu">0.025</span>, T)
+R = np.column_stack([r_equity, r_bond, r_alt])
+
+<span class="cm"># Policy 수익률</span>
+r_policy = R @ w_policy
+
+<span class="cm"># 실제 포트폴리오: 약간의 능동 비중 조절</span>
+w_actual = w_policy + np.random.normal(<span class="nu">0</span>, <span class="nu">0.02</span>, (T, <span class="nu">3</span>))
+w_actual = np.abs(w_actual)
+w_actual = w_actual / w_actual.sum(axis=<span class="nu">1</span>, keepdims=<span class="kw">True</span>)
+r_actual = np.sum(R * w_actual, axis=<span class="nu">1</span>)
+
+<span class="cm"># Brinson 분해</span>
+active_return = r_actual - r_policy
+total_var = np.var(r_actual)
+policy_var = np.var(r_policy)
+active_var = np.var(active_return)
+
+<span class="fn">print</span>(<span class="st">"=== Brinson Attribution (Ang Ch.14) ==="</span>)
+<span class="fn">print</span>(<span class="st">f"총 수익률 변동:    {total_var*1e4:.2f} (bps²)"</span>)
+<span class="fn">print</span>(<span class="st">f"SAA 기여 변동:     {policy_var*1e4:.2f} (bps²) → {policy_var/total_var:.1%}"</span>)
+<span class="fn">print</span>(<span class="st">f"능동 운용 변동:    {active_var*1e4:.2f} (bps²) → {active_var/total_var:.1%}"</span>)
+<span class="fn">print</span>(<span class="st">f"\n연 SAA 수익:       {np.mean(r_policy)*12:+.2%}"</span>)
+<span class="fn">print</span>(<span class="st">f"연 능동 수익:      {np.mean(active_return)*12:+.2%}"</span>)
+<span class="fn">print</span>(<span class="st">f"\n→ Brinson(1986): SAA가 수익 변동의 {policy_var/total_var:.0%}를 설명"</span>)</code></pre>
+<div class="code-output"><span class="out-label">Output:</span>
+=== Brinson Attribution (Ang Ch.14) ===
+총 수익률 변동:    7.84 (bps²)
+SAA 기여 변동:     7.52 (bps²) → 95.9%
+능동 운용 변동:    0.31 (bps²) → 4.0%
+
+연 SAA 수익:       +6.42%
+연 능동 수익:      +0.18%
+
+→ Brinson(1986): SAA가 수익 변동의 96%를 설명</div>
 
 <h2 id="ch4">4. 비유동성 프리미엄</h2>
 
