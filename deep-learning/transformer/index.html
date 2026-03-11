@@ -3,9 +3,9 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Transformer: Attention Is All You Need | Deep Learning</title>
+<title>Transformer 완벽 정리 | 딥러닝 퀴즈 대비</title>
 <script>
-MathJax = { tex: { inlineMath: [['\\(','\\)']], displayMath: [['\\[','\\]']] } };
+MathJax = { tex: { inlineMath: [['\\(','\\)']], displayMath: [['\\[','\\]'],['$','$']] } };
 </script>
 <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;500&family=Space+Mono:wght@400&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
@@ -28,7 +28,7 @@ body{font-family:'Inter',sans-serif;background:#fafaf8;color:#1a1a1a;line-height
 .nav-list a:hover{color:#0080c6;padding-left:4px}
 .nav-list a.active{color:#0080c6;font-weight:500}
 .badge{display:inline-block;font-size:.5rem;background:#0080c6;color:#fff;padding:1px 5px;border-radius:8px;margin-left:3px;vertical-align:middle}
-.badge-core{background:#e74c3c}
+.badge-quiz{background:#e74c3c}
 .sidebar-footer{padding-top:16px;border-top:1px solid rgba(0,0,0,.06);font-size:.65rem;color:#aaa;text-align:center}
 .main-wrapper{margin-left:260px;min-height:100vh}
 .container{max-width:1100px;margin:0 auto;padding:50px 40px 80px}
@@ -62,6 +62,14 @@ pre{background:#1e1e1e;color:#d4d4d4;padding:20px;border-radius:6px;overflow-x:a
 code{font-family:'Space Mono','Consolas',monospace;font-size:13px}
 p code,li code,td code{background:#f0f0f0;padding:2px 6px;border-radius:3px;color:#c7254e;font-size:12px}
 .cm{color:#6a9955}.kw{color:#569cd6}.st{color:#ce9178}.fn{color:#dcdcaa}.nb{color:#4ec9b0}.nu{color:#b5cea8}
+.code-output{background:#1e1e1e;color:#d4d4d4;padding:12px 16px;border-radius:0 0 6px 6px;font-family:'Space Mono',monospace;font-size:11.5px;line-height:1.6;margin-top:-4px;margin-bottom:18px;border-top:2px solid #333;white-space:pre-wrap}
+.quiz-box{background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);color:#fff;padding:25px;border-radius:8px;margin:25px 0}
+.quiz-box h4{color:#fff;margin-top:0}
+.quiz-option{background:rgba(255,255,255,.15);padding:10px 15px;margin:8px 0;border-radius:4px;cursor:pointer;transition:all .2s}
+.quiz-option:hover{background:rgba(255,255,255,.25)}
+.quiz-option.correct{background:#28a745!important}
+.quiz-option.wrong{background:#dc3545!important}
+.quiz-answer{display:none;margin-top:15px;padding:15px;background:rgba(255,255,255,.1);border-radius:4px}
 @media(max-width:1024px){
 .sidebar{width:100%;height:auto;position:relative;border-right:none;border-bottom:1px solid rgba(0,0,0,.08);padding:16px}
 .sidebar-profile{margin-bottom:10px;padding-bottom:10px;display:flex;align-items:center;gap:12px;text-align:left}
@@ -81,32 +89,33 @@ pre{font-size:11px;padding:14px}table{font-size:10px;display:block;overflow-x:au
 <div class="sidebar">
 <div class="sidebar-profile">
 <div class="profile-icon">🤖</div>
-<div class="profile-name">Deep Learning Notes</div>
-<div class="profile-title">Transformer Architecture</div>
-<div class="profile-bio">Self-Attention부터 Training Tricks까지</div>
+<div class="profile-name">Transformer 완벽 정리</div>
+<div class="profile-title">Deep Learning Quiz Prep</div>
+<div class="profile-bio">3/12 퀴즈 대비 · Self-Attention부터 Training까지</div>
 </div>
 <div class="sidebar-nav">
 <div class="nav-section">
-<div class="nav-section-title">Contents</div>
+<div class="nav-section-title">Core Concepts</div>
 <ul class="nav-list">
-<li><a href="#ch1">1. Transformer 탄생 배경</a></li>
-<li><a class="active" href="#ch2">2. Self-Attention <span class="badge badge-core">핵심</span></a></li>
-<li><a href="#ch3">3. Multi-Head Attention</a></li>
-<li><a href="#ch4">4. Positional Encoding</a></li>
-<li><a href="#ch5">5. Encoder-Decoder 구조</a></li>
-<li><a href="#ch6">6. Training Tricks</a></li>
-<li><a href="#ch7">7. 핵심 요약</a></li>
+<li><a href="#ch1">1. NLP 기초 & 역사</a></li>
+<li><a href="#ch2">2. Tokenization</a></li>
+<li><a href="#ch3">3. Word2Vec</a></li>
+<li><a href="#ch4">4. RNN & LSTM</a></li>
+<li><a class="active" href="#ch5">5. Self-Attention <span class="badge">핵심</span></a></li>
+<li><a href="#ch6">6. Transformer 구조</a></li>
+<li><a href="#ch7">7. Training Tricks</a></li>
 </ul>
 </div>
 <div class="nav-section">
-<div class="nav-section-title">Reference</div>
+<div class="nav-section-title">Practice</div>
 <ul class="nav-list">
-<li><a href="https://arxiv.org/abs/1706.03762" target="_blank">📄 Original Paper</a></li>
-<li><a href="../../factor-investing/round-01/">← Factor Investing</a></li>
+<li><a href="#interactive">🎮 Interactive Lab</a></li>
+<li><a href="#quiz">📝 Quiz 40문제 <span class="badge badge-quiz">QUIZ</span></a></li>
+<li><a href="#cheatsheet">📋 Cheat Sheet</a></li>
 </ul>
 </div>
 </div>
-<div class="sidebar-footer">Vaswani et al. 2017 · NeurIPS</div>
+<div class="sidebar-footer">Quiz Date: 3/12 (내일) · 20문제</div>
 </div>
 
 <div class="main-wrapper">
@@ -114,106 +123,368 @@ pre{font-size:11px;padding:14px}table{font-size:10px;display:block;overflow-x:au
 <div class="paper-content">
 
 <div class="paper-header">
-<div class="paper-category">Deep Learning · NLP Architecture</div>
+<div class="paper-category">딥러닝 수업 · 퀴즈 대비 완벽 정리</div>
 <h1 class="paper-title">Transformer: Attention Is All You Need</h1>
 <div class="paper-subtitle">Self-Attention, Multi-Head Attention, Positional Encoding — 현대 NLP의 핵심</div>
-<div class="paper-team">Vaswani et al. (2017) · Google Brain</div>
+<div class="paper-team">Based on: 3/5, 3/6 강의 + Stanford CME 295 Lecture 1</div>
 </div>
 
 <div class="abstract">
-<div class="abstract-title">Key Takeaways</div>
-<p class="ni">이 글을 읽으면 다음을 이해할 수 있다:</p>
+<div class="abstract-title">Learning Objectives</div>
+<p class="ni">이 문서를 마치면 다음을 할 수 있다:</p>
 <ul>
-<li>Transformer가 탄생한 진짜 이유 (TPU와 RNN의 관계)</li>
-<li>Self-Attention 수식 \(\text{Attention}(Q,K,V) = \text{softmax}\left(\frac{QK^T}{\sqrt{d_k}}\right)V\)의 각 요소</li>
-<li>\(\sqrt{d_k}\)로 나누는 수학적 이유</li>
-<li>Multi-Head Attention이 CNN의 multiple filters와 유사한 이유</li>
-<li>Positional Encoding이 필요한 이유</li>
-<li>Teacher Forcing, Label Smoothing 등 학습 기법</li>
+<li>Self-Attention의 수식 \(\text{Attention}(Q,K,V) = \text{softmax}\left(\frac{QK^T}{\sqrt{d_k}}\right)V\)를 완벽히 이해하고 설명할 수 있다</li>
+<li>\(\sqrt{d_k}\)로 나누는 이유를 수학적으로 설명할 수 있다</li>
+<li>Multi-Head Attention의 목적과 구조를 설명할 수 있다</li>
+<li>Positional Encoding이 필요한 이유와 구현 방식을 이해한다</li>
+<li>Encoder-Decoder 구조와 Cross-Attention을 구분할 수 있다</li>
+<li>Teacher Forcing vs Autoregressive Inference의 차이를 설명할 수 있다</li>
+<li>Label Smoothing의 목적과 효과를 이해한다</li>
 </ul>
+<div style="font-size:13px;color:#555;margin-top:15px;font-style:italic"><strong>Keywords:</strong> Self-Attention, Scaled Dot-Product, Multi-Head, Positional Encoding, Layer Normalization, Teacher Forcing, Label Smoothing, Transformer</div>
 </div>
 
-<!-- Ch1 -->
-<h2 id="ch1">1. Transformer의 탄생 배경</h2>
+<!-- ═══════════════════════════════════════════ -->
+<!-- Ch1: NLP 기초 & 역사 -->
+<!-- ═══════════════════════════════════════════ -->
+<h2 id="ch1">1. NLP 기초 & 역사</h2>
 
-<h3>1.1 TPU가 RNN을 지원하지 않았다</h3>
-<p>2017년 Transformer가 등장한 배경에는 흥미로운 이야기가 있다. Google은 2016년 TPU(Tensor Processing Unit)를 개발했는데, TPU는 RNN 아키텍처를 효율적으로 지원하지 못했다. 당시 NLP 연구자들은 RNN/LSTM에 의존하고 있었기 때문에, TPU를 활용하려면 새로운 아키텍처가 필요했다.</p>
+<h3>1.1 NLP의 주요 태스크</h3>
+<p>자연어 처리(NLP)는 텍스트 데이터를 다루는 머신러닝 분야다. 주요 태스크는 다음과 같다:</p>
 
-<div class="warn">
-<p class="ni"><strong>Transformer의 진짜 탄생 이유:</strong></p>
-<p class="ni">"Google wanted to change the usage of GPU because GPU is too expensive. So they built the TPU in 2016. But the limitation of TPU is that TPU cannot support RNN architecture. So NLP researchers in Google decided to make their own architecture that can be supported by TPU. And that is the Transformer."</p>
-<p class="ni">— 자원의 제약이 기술 혁신을 이끈 사례다.</p>
-</div>
+<div class="tc">Table 1. NLP 주요 태스크</div>
+<table>
+<tr><th>태스크</th><th>설명</th><th>예시</th><th>평가지표</th></tr>
+<tr><td>Sentiment Analysis</td><td>텍스트의 감정 분류</td><td>영화 리뷰 긍/부정</td><td>Accuracy, F1</td></tr>
+<tr><td>Named Entity Recognition</td><td>텍스트에서 개체명 추출</td><td>사람, 장소, 조직 태깅</td><td>Token-level F1</td></tr>
+<tr><td>Machine Translation</td><td>언어 간 번역</td><td>영어 → 프랑스어</td><td>BLEU, ROUGE</td></tr>
+<tr><td>Text Generation</td><td>텍스트 생성</td><td>GPT, ChatGPT</td><td>Perplexity</td></tr>
+<tr><td>Question Answering</td><td>질문에 대한 답변</td><td>SQuAD 데이터셋</td><td>EM, F1</td></tr>
+</table>
 
-<h3>1.2 RNN의 한계</h3>
-<p>RNN은 순차적으로 처리해야 하므로 병렬화가 불가능하다. 또한 긴 시퀀스에서 vanishing gradient 문제가 발생하고, long-range dependency를 학습하기 어렵다. LSTM이 이를 완화했지만 완전히 해결하지는 못했다.</p>
-
-<p>Transformer의 핵심 아이디어는 간단하다: 출력 토큰을 모든 입력 토큰에 직접 연결하자. RNN처럼 순차적으로 정보를 전달하는 대신, 모든 위치를 한 번에 참조할 수 있게 하자.</p>
-
-<!-- Ch2 -->
-<h2 id="ch2">2. Self-Attention — 핵심 메커니즘</h2>
-
-<h3>2.1 Query, Key, Value</h3>
-<p>Self-Attention의 핵심 개념은 Query(Q), Key(K), Value(V)다. 도서관 비유로 이해하면:</p>
-<ul>
-<li><strong>Query:</strong> 내가 찾고 싶은 것 (검색어)</li>
-<li><strong>Key:</strong> 각 책의 제목/태그 (식별자)</li>
-<li><strong>Value:</strong> 책의 실제 내용 (정보)</li>
-</ul>
-
-<p>입력 임베딩 \(X\)에서 Q, K, V를 생성한다:</p>
-<div class="eq">\[ Q = XW_Q, \quad K = XW_K, \quad V = XW_V \]</div>
-
-<h3>2.2 Scaled Dot-Product Attention</h3>
+<h3>1.2 평가 지표</h3>
 
 <div class="def">
-<p class="ni"><strong>Definition — Scaled Dot-Product Attention</strong></p>
+<p class="ni"><strong>Definition 1.1 — BLEU Score (Bilingual Evaluation Understudy)</strong></p>
+<p class="ni">기계 번역 품질 평가. Precision 기반 — 생성된 텍스트가 참조 텍스트와 얼마나 일치하는가.</p>
+<div class="eq">\[ \text{BLEU} = \text{BP} \cdot \exp\left(\sum_{n=1}^{N} w_n \log p_n\right) \]</div>
+<p class="ni">여기서 \(p_n\)은 n-gram precision, BP는 brevity penalty (짧은 번역에 페널티).</p>
+</div>
+
+<div class="def">
+<p class="ni"><strong>Definition 1.2 — Perplexity</strong></p>
+<p class="ni">언어 모델의 품질 평가. Ground truth 없이 계산 가능!</p>
+<div class="eq">\[ \text{PPL} = \exp\left(-\frac{1}{N}\sum_{i=1}^{N} \log P(w_i | w_{<i})\right) \]</div>
+<p class="ni">모델이 다음 단어에 높은 확률을 부여할수록 PPL이 낮아진다. 낮을수록 좋다.</p>
+</div>
+
+<div class="info">
+<p class="ni"><strong>강의 포인트:</strong> BLEU, ROUGE는 ground truth가 필요해서 비용이 많이 든다. Perplexity는 ground truth 없이 계산 가능하므로 실용적이다.</p>
+</div>
+
+<h3>1.3 NLP 역사 타임라인</h3>
+
+<div class="tc">Table 2. NLP 주요 마일스톤</div>
+<table>
+<tr><th>연도</th><th>모델/기술</th><th>핵심 기여</th></tr>
+<tr><td>1980s</td><td>RNN</td><td>순차 데이터 처리의 시작</td></tr>
+<tr><td>1997</td><td>LSTM</td><td>Vanishing gradient 문제 해결</td></tr>
+<tr><td>2013</td><td>Word2Vec</td><td>단어의 분산 표현 (distributed representation)</td></tr>
+<tr><td>2014</td><td>Seq2Seq</td><td>Encoder-Decoder 구조</td></tr>
+<tr><td>2015</td><td>Attention (Bahdanau)</td><td>RNN + Attention</td></tr>
+<tr><td style="background:#e8f4f8;font-weight:bold">2017</td><td style="background:#e8f4f8;font-weight:bold">Transformer</td><td style="background:#e8f4f8;font-weight:bold">"Attention Is All You Need" — RNN 없이 Attention만으로</td></tr>
+<tr><td>2018</td><td>BERT</td><td>Bidirectional Transformer Encoder</td></tr>
+<tr><td>2018</td><td>GPT</td><td>Transformer Decoder for Generation</td></tr>
+<tr><td>2020+</td><td>GPT-3, LLaMA, etc.</td><td>Scaling Laws — 크기만 키우면 성능 향상</td></tr>
+</table>
+
+<div class="warn">
+<p class="ni"><strong>퀴즈 포인트:</strong> 2017년 이후 NLP의 핵심 아키텍처는 Transformer다. BERT, GPT, LLaMA 모두 Transformer 기반이다. "새로운 아키텍처 혁신 없이 스케일링만으로 성능 향상" — 이것이 현대 LLM의 특징이다.</p>
+</div>
+
+<!-- ═══════════════════════════════════════════ -->
+<!-- Ch2: Tokenization -->
+<!-- ═══════════════════════════════════════════ -->
+<h2 id="ch2">2. Tokenization</h2>
+
+<h3>2.1 토큰화란?</h3>
+<p>토큰화(Tokenization)는 텍스트를 모델이 처리할 수 있는 단위(토큰)로 분할하는 과정이다. 예를 들어 "A cute teddy bear is reading"을 ["A", "cute", "teddy", "bear", "is", "reading"]으로 나눈다.</p>
+
+<h3>2.2 토큰화 방법 비교</h3>
+
+<div class="tc">Table 3. 토큰화 방법 비교</div>
+<table>
+<tr><th>방법</th><th>설명</th><th>장점</th><th>단점</th></tr>
+<tr><td>Word-level</td><td>공백/구두점 기준 분할</td><td>구현 간단, 직관적</td><td>OOV 문제, "bears"≠"bear"</td></tr>
+<tr><td>Subword-level</td><td>BPE, WordPiece 등</td><td>OOV 감소, 접두사/접미사 공유</td><td>여전히 OOV 가능</td></tr>
+<tr><td>Character-level</td><td>글자 단위 분할</td><td>OOV 없음, 오타에 강함</td><td>시퀀스 길어짐, 해석 어려움</td></tr>
+</table>
+
+<div class="def">
+<p class="ni"><strong>Definition 2.1 — OOV (Out-of-Vocabulary) 문제</strong></p>
+<p class="ni">학습 시 보지 못한 단어가 추론 시 등장하는 문제. Word-level 토큰화에서 심각하다.</p>
+<p class="ni">예: 학습 데이터에 "reading"만 있고 "reads"가 없으면, "reads"는 [UNK] 토큰으로 처리된다.</p>
+</div>
+
+<div class="info">
+<p class="ni"><strong>강의 포인트:</strong></p>
+<ul>
+<li>Word-level: "bears"와 "bear"가 완전히 다른 토큰 — 의미적 유사성 무시</li>
+<li>Subword-level: "reading" = "read" + "ing" — 어근 공유로 효율적</li>
+<li>Character-level: "World Health Organization" = 24개 토큰 — 계산 비용 증가</li>
+</ul>
+</div>
+
+<pre><code><span class="cm"># 토큰화 예시</span>
+sentence = <span class="st">"A cute teddy bear is reading"</span>
+
+<span class="cm"># Word-level</span>
+word_tokens = sentence.split()
+<span class="fn">print</span>(<span class="st">f"Word-level: </span>{word_tokens}<span class="st">"</span>)
+<span class="cm"># ['A', 'cute', 'teddy', 'bear', 'is', 'reading']</span>
+
+<span class="cm"># Character-level</span>
+char_tokens = <span class="fn">list</span>(sentence.replace(<span class="st">" "</span>, <span class="st">""</span>))
+<span class="fn">print</span>(<span class="st">f"Char-level: </span>{char_tokens}<span class="st">"</span>)
+<span class="cm"># ['A', 'c', 'u', 't', 'e', 't', 'e', 'd', 'd', 'y', ...]</span>
+
+<span class="cm"># Subword (BPE 스타일 예시)</span>
+subword_tokens = [<span class="st">"A"</span>, <span class="st">"cute"</span>, <span class="st">"ted"</span>, <span class="st">"##dy"</span>, <span class="st">"bear"</span>, <span class="st">"is"</span>, <span class="st">"read"</span>, <span class="st">"##ing"</span>]
+<span class="fn">print</span>(<span class="st">f"Subword: </span>{subword_tokens}<span class="st">"</span>)</code></pre>
+
+<div class="ok">
+<p class="ni"><strong>실무 선택:</strong> 현대 LLM은 대부분 Subword 토큰화(BPE, SentencePiece)를 사용한다. OOV 문제를 줄이면서도 시퀀스 길이를 적절히 유지한다.</p>
+</div>
+
+<!-- ═══════════════════════════════════════════ -->
+<!-- Ch3: Word2Vec -->
+<!-- ═══════════════════════════════════════════ -->
+<h2 id="ch3">3. Word2Vec — 단어의 분산 표현</h2>
+
+<h3>3.1 왜 Word Embedding이 필요한가?</h3>
+<p>One-hot encoding의 문제: 모든 단어가 서로 직교(orthogonal)한다. "teddy bear"와 "soft"의 dot product = 0. 의미적 유사성을 전혀 반영하지 못한다.</p>
+
+<div class="def">
+<p class="ni"><strong>Definition 3.1 — Word Embedding</strong></p>
+<p class="ni">단어를 저차원 밀집 벡터(dense vector)로 표현. 의미적으로 유사한 단어는 벡터 공간에서 가깝다.</p>
+<div class="eq">\[ \text{similarity}(\text{teddy bear}, \text{soft}) = \cos(\vec{v}_{\text{teddy bear}}, \vec{v}_{\text{soft}}) \approx 1 \]</div>
+</div>
+
+<h3>3.2 Word2Vec 학습 방법</h3>
+<p>Word2Vec(2013, Mikolov et al.)은 두 가지 proxy task로 학습한다:</p>
+
+<div class="tc">Table 4. Word2Vec 학습 방법</div>
+<table>
+<tr><th>방법</th><th>입력</th><th>출력</th><th>설명</th></tr>
+<tr><td>CBOW</td><td>주변 단어들</td><td>중심 단어</td><td>"A", "cute", "is", "reading" → "teddy bear"</td></tr>
+<tr><td>Skip-gram</td><td>중심 단어</td><td>주변 단어들</td><td>"teddy bear" → "A", "cute", "is", "reading"</td></tr>
+</table>
+
+<div class="info">
+<p class="ni"><strong>핵심 아이디어:</strong> Ground truth 없이 학습 가능! 텍스트 자체가 레이블이다. "다음 단어 예측" 또는 "주변 단어 예측"이라는 proxy task를 통해 의미 있는 표현을 학습한다.</p>
+</div>
+
+<h3>3.3 Word2Vec 구조</h3>
+
+<pre><code><span class="cm"># Word2Vec 구조 (Skip-gram)</span>
+<span class="cm"># Input: one-hot vector (V차원, V=vocabulary size)</span>
+<span class="cm"># Hidden: embedding vector (d차원, d=embedding dimension)</span>
+<span class="cm"># Output: probability over vocabulary (V차원)</span>
+
+<span class="kw">import</span> numpy <span class="kw">as</span> np
+
+V = <span class="nu">10000</span>  <span class="cm"># vocabulary size</span>
+d = <span class="nu">300</span>    <span class="cm"># embedding dimension</span>
+
+<span class="cm"># 학습되는 파라미터</span>
+W_embed = np.random.randn(V, d)  <span class="cm"># input → hidden</span>
+W_out = np.random.randn(d, V)    <span class="cm"># hidden → output</span>
+
+<span class="cm"># Forward pass (Skip-gram)</span>
+<span class="kw">def</span> <span class="fn">forward</span>(word_idx):
+    <span class="cm"># 1. Embedding lookup (one-hot @ W_embed = W_embed[word_idx])</span>
+    h = W_embed[word_idx]  <span class="cm"># shape: (d,)</span>
+    
+    <span class="cm"># 2. Output projection</span>
+    logits = h @ W_out     <span class="cm"># shape: (V,)</span>
+    
+    <span class="cm"># 3. Softmax</span>
+    probs = np.exp(logits) / np.sum(np.exp(logits))
+    <span class="kw">return</span> probs
+
+<span class="cm"># Word2Vec의 결과물 = W_embed (embedding matrix)</span>
+<span class="cm"># 학습 후 W_embed[word_idx]가 해당 단어의 embedding vector</span></code></pre>
+
+<div class="ok">
+<p class="ni"><strong>Word2Vec의 마법:</strong> 학습 후 embedding space에서 의미적 관계가 보존된다.</p>
+<ul>
+<li>\(\vec{v}_{\text{king}} - \vec{v}_{\text{man}} + \vec{v}_{\text{woman}} \approx \vec{v}_{\text{queen}}\)</li>
+<li>유사한 단어는 가까운 벡터: \(\cos(\vec{v}_{\text{cat}}, \vec{v}_{\text{dog}}) \approx 0.8\)</li>
+</ul>
+</div>
+
+<!-- ═══════════════════════════════════════════ -->
+<!-- Ch4: RNN & LSTM -->
+<!-- ═══════════════════════════════════════════ -->
+<h2 id="ch4">4. RNN & LSTM — 순차 데이터 처리</h2>
+
+<h3>4.1 RNN의 필요성</h3>
+<p>Word2Vec의 한계: 단어의 위치/순서 정보를 반영하지 못한다. "I love you"와 "You love I"가 같은 표현이 된다. 순차 정보(sequential information)를 처리하려면 RNN이 필요하다.</p>
+
+<div class="def">
+<p class="ni"><strong>Definition 4.1 — RNN (Recurrent Neural Network)</strong></p>
+<div class="eq">\[ h_t = \tanh(W_{hh} h_{t-1} + W_{xh} x_t + b_h) \]</div>
+<div class="eq">\[ y_t = W_{hy} h_t + b_y \]</div>
+<p class="ni">현재 hidden state \(h_t\)는 이전 hidden state \(h_{t-1}\)와 현재 입력 \(x_t\)의 함수. 가중치 \(W_{hh}, W_{xh}, W_{hy}\)는 모든 time step에서 공유된다.</p>
+</div>
+
+<h3>4.2 RNN의 문제점: Vanishing/Exploding Gradient</h3>
+<p>긴 시퀀스에서 gradient가 소실되거나 폭발한다. 출력에서 입력까지 역전파할 때 hidden state를 여러 번 거치면서 gradient가 기하급수적으로 작아지거나 커진다.</p>
+
+<div class="warn">
+<p class="ni"><strong>Long-range dependency 문제:</strong> "The cat, which was sitting on the mat and looking at the bird through the window, was hungry." — "cat"과 "was hungry"의 관계를 학습하기 어렵다.</p>
+</div>
+
+<h3>4.3 LSTM — Vanishing Gradient 해결</h3>
+
+<div class="def">
+<p class="ni"><strong>Definition 4.2 — LSTM (Long Short-Term Memory)</strong></p>
+<p class="ni">1997년 Hochreiter & Schmidhuber가 제안. 핵심: Cell state \(C_t\)라는 "고속도로(highway)"를 추가하여 gradient가 직접 흐를 수 있게 한다.</p>
+</div>
+
+<div class="tc">Table 5. LSTM의 4개 게이트</div>
+<table>
+<tr><th>게이트</th><th>역할</th><th>수식</th></tr>
+<tr><td>Forget gate \(f_t\)</td><td>이전 정보 중 버릴 것 결정</td><td>\(\sigma(W_f \cdot [h_{t-1}, x_t] + b_f)\)</td></tr>
+<tr><td>Input gate \(i_t\)</td><td>새 정보 중 저장할 것 결정</td><td>\(\sigma(W_i \cdot [h_{t-1}, x_t] + b_i)\)</td></tr>
+<tr><td>Cell update \(\tilde{C}_t\)</td><td>새로운 후보 정보</td><td>\(\tanh(W_C \cdot [h_{t-1}, x_t] + b_C)\)</td></tr>
+<tr><td>Output gate \(o_t\)</td><td>출력할 정보 결정</td><td>\(\sigma(W_o \cdot [h_{t-1}, x_t] + b_o)\)</td></tr>
+</table>
+
+<div class="eq">\[ C_t = f_t \odot C_{t-1} + i_t \odot \tilde{C}_t \]</div>
+<div class="eq">\[ h_t = o_t \odot \tanh(C_t) \]</div>
+
+<div class="ok">
+<p class="ni"><strong>LSTM의 핵심:</strong> Cell state \(C_t\)는 \(C_{t-1}\)에서 직접 연결된다 (hidden state를 거치지 않음). 이 "고속도로" 덕분에 gradient가 멀리까지 전파될 수 있다.</p>
+</div>
+
+<h3>4.4 Seq2Seq (Encoder-Decoder)</h3>
+<p>2014년 Sutskever et al. 기계 번역을 위한 구조:</p>
+<ul>
+<li><strong>Encoder:</strong> 입력 시퀀스를 하나의 context vector로 압축</li>
+<li><strong>Decoder:</strong> context vector에서 출력 시퀀스 생성</li>
+</ul>
+
+<div class="warn">
+<p class="ni"><strong>Seq2Seq의 한계 (Transformer의 동기):</strong></p>
+<ul>
+<li>모든 입력 정보가 하나의 context vector에 압축 — 정보 손실</li>
+<li>긴 시퀀스에서 long-range dependency 문제 여전</li>
+<li>순차 처리 — 병렬화 불가능 (GPU 활용 어려움)</li>
+</ul>
+</div>
+
+<!-- ═══════════════════════════════════════════ -->
+<!-- Ch5: Self-Attention (핵심!) -->
+<!-- ═══════════════════════════════════════════ -->
+<h2 id="ch5">5. Self-Attention — Transformer의 핵심 ⭐</h2>
+
+<h3>5.1 Attention의 목표</h3>
+<p>RNN의 long-range dependency 문제를 해결하고 싶다. 핵심 아이디어: 출력 토큰을 모든 입력 토큰에 직접 연결하자!</p>
+
+<div class="info">
+<p class="ni"><strong>강의 인용:</strong> "The main goal of the attention is that we want to connect the long distance tokens... We want to connect the output token to all input tokens directly."</p>
+</div>
+
+<h3>5.2 Query, Key, Value (Q, K, V)</h3>
+
+<div class="def">
+<p class="ni"><strong>Definition 5.1 — Query, Key, Value</strong></p>
+<ul>
+<li><strong>Query (Q):</strong> "내가 찾고 싶은 것" — 현재 토큰의 질문</li>
+<li><strong>Key (K):</strong> "나를 찾을 때 사용할 키" — 각 토큰의 식별자</li>
+<li><strong>Value (V):</strong> "실제 정보" — 각 토큰이 가진 내용</li>
+</ul>
+<p class="ni">비유: 도서관에서 책 찾기. Query = 검색어, Key = 책 제목/태그, Value = 책 내용</p>
+</div>
+
+<p>입력 임베딩 \(X\)에서 Q, K, V를 생성:</p>
+<div class="eq">\[ Q = X W_Q, \quad K = X W_K, \quad V = X W_V \]</div>
+<p class="ni">여기서 \(W_Q, W_K, W_V \in \mathbb{R}^{d_{model} \times d_k}\)는 학습되는 파라미터.</p>
+
+<h3>5.3 Scaled Dot-Product Attention ⭐⭐⭐</h3>
+
+<div class="def">
+<p class="ni"><strong>Definition 5.2 — Scaled Dot-Product Attention (가장 중요한 수식!)</strong></p>
 <div class="eq" style="font-size:18px;padding:25px;background:#fff9e6;border:2px solid #ffc107">\[ \text{Attention}(Q, K, V) = \text{softmax}\left(\frac{QK^T}{\sqrt{d_k}}\right) V \]</div>
 </div>
 
-<p class="ni"><strong>단계별 분해:</strong></p>
-<ol>
-<li><strong>\(QK^T\):</strong> Query와 Key의 dot product로 유사도 계산. \((i,j)\) 원소는 Query \(i\)와 Key \(j\)의 관련성.</li>
-<li><strong>\(\div \sqrt{d_k}\):</strong> 스케일링. \(d_k\)가 크면 dot product의 분산이 커져서 softmax가 극단적이 됨.</li>
-<li><strong>Softmax:</strong> 각 Query에 대해 모든 Key의 중요도를 확률 분포로 변환.</li>
-<li><strong>\(\times V\):</strong> Attention weight로 Value를 가중 평균.</li>
-</ol>
+<h4>단계별 분해:</h4>
 
-<h3>2.3 왜 \(\sqrt{d_k}\)로 나누는가?</h3>
+<div class="tc">Step 1: \(QK^T\) — 유사도 계산</div>
+<div class="eq">\[ QK^T \in \mathbb{R}^{n \times n} \]</div>
+<p class="ni">\((i, j)\) 원소 = Query \(i\)와 Key \(j\)의 dot product = 유사도. Dot product가 클수록 두 토큰이 관련 있다.</p>
 
-<div class="info">
-<p class="ni"><strong>수학적 이유:</strong></p>
-<p class="ni">\(q, k\)가 평균 0, 분산 1인 독립 성분이면:</p>
+<div class="tc">Step 2: \(\frac{1}{\sqrt{d_k}}\) — 스케일링</div>
+<div class="eq">\[ \frac{QK^T}{\sqrt{d_k}} \]</div>
+
+<div class="def">
+<p class="ni"><strong>왜 \(\sqrt{d_k}\)로 나누는가? (퀴즈 단골 문제!)</strong></p>
+<p class="ni">\(d_k\)가 크면 dot product의 분산이 커진다. \(q, k\)가 평균 0, 분산 1인 독립 성분이면:</p>
 <div class="eq">\[ \text{Var}(q \cdot k) = \text{Var}\left(\sum_{i=1}^{d_k} q_i k_i\right) = d_k \]</div>
 <p class="ni">분산이 \(d_k\)에 비례하므로, \(\sqrt{d_k}\)로 나눠서 분산을 1로 정규화한다. 이렇게 하지 않으면 softmax 입력이 너무 커져서 gradient가 매우 작아진다 (softmax saturation).</p>
 </div>
 
+<div class="tc">Step 3: Softmax — 확률 분포로 변환</div>
+<div class="eq">\[ \text{softmax}\left(\frac{QK^T}{\sqrt{d_k}}\right)_{ij} = \frac{\exp(s_{ij})}{\sum_k \exp(s_{ik})} \]</div>
+<p class="ni">각 Query에 대해 모든 Key의 중요도를 확률로 변환. 합이 1이 되는 attention weight.</p>
+
+<div class="tc">Step 4: \(\times V\) — 가중 평균</div>
+<div class="eq">\[ \text{Output} = \text{Attention Weights} \times V \]</div>
+<p class="ni">Attention weight로 Value를 가중 평균. 중요한 토큰의 정보를 더 많이 반영.</p>
+
 <pre><code><span class="kw">import</span> numpy <span class="kw">as</span> np
 
 <span class="kw">def</span> <span class="fn">scaled_dot_product_attention</span>(Q, K, V):
-    <span class="st">"""Scaled Dot-Product Attention 구현"""</span>
+    <span class="st">"""
+    Q: (n, d_k) - n개 query
+    K: (n, d_k) - n개 key  
+    V: (n, d_v) - n개 value
+    """</span>
     d_k = Q.shape[-<span class="nu">1</span>]
     
     <span class="cm"># Step 1: QK^T (유사도)</span>
-    scores = Q @ K.T
+    scores = Q @ K.T  <span class="cm"># (n, n)</span>
     
     <span class="cm"># Step 2: Scale by sqrt(d_k)</span>
     scores = scores / np.sqrt(d_k)
     
-    <span class="cm"># Step 3: Softmax</span>
+    <span class="cm"># Step 3: Softmax (각 행이 확률 분포)</span>
     attention_weights = np.exp(scores) / np.sum(np.exp(scores), axis=-<span class="nu">1</span>, keepdims=<span class="kw">True</span>)
     
     <span class="cm"># Step 4: Weighted sum of values</span>
-    output = attention_weights @ V
+    output = attention_weights @ V  <span class="cm"># (n, d_v)</span>
     
-    <span class="kw">return</span> output, attention_weights</code></pre>
+    <span class="kw">return</span> output, attention_weights
 
-<!-- Ch3 -->
-<h2 id="ch3">3. Multi-Head Attention</h2>
+<span class="cm"># 예시: "A cute teddy bear" (4 tokens)</span>
+n, d_k, d_v = <span class="nu">4</span>, <span class="nu">64</span>, <span class="nu">64</span>
+Q = np.random.randn(n, d_k)
+K = np.random.randn(n, d_k)
+V = np.random.randn(n, d_v)
 
-<p>여러 개의 attention을 병렬로 수행하고 결과를 concat한다. 각 head가 다른 관점에서 정보를 추출한다.</p>
+output, weights = scaled_dot_product_attention(Q, K, V)
+<span class="fn">print</span>(<span class="st">f"Output shape: </span>{output.shape}<span class="st">"</span>)  <span class="cm"># (4, 64)</span>
+<span class="fn">print</span>(<span class="st">f"Attention weights:\n</span>{weights.round(3)}<span class="st">"</span>)</code></pre>
 
+<h3>5.4 Multi-Head Attention</h3>
+
+<div class="def">
+<p class="ni"><strong>Definition 5.3 — Multi-Head Attention</strong></p>
+<p class="ni">여러 개의 attention을 병렬로 수행하고 결과를 concat. 각 head가 다른 관점에서 정보를 추출한다.</p>
 <div class="eq">\[ \text{MultiHead}(Q, K, V) = \text{Concat}(\text{head}_1, ..., \text{head}_h) W^O \]</div>
+<div class="eq">\[ \text{head}_i = \text{Attention}(Q W_i^Q, K W_i^K, V W_i^V) \]</div>
+</div>
 
 <div class="info">
 <p class="ni"><strong>왜 Multi-Head인가?</strong></p>
@@ -221,10 +492,11 @@ pre{font-size:11px;padding:14px}table{font-size:10px;display:block;overflow-x:au
 <li>CNN의 multiple filters와 유사한 아이디어</li>
 <li>각 head가 다른 sub-task를 학습 (문법, 의미, 위치 관계 등)</li>
 <li>실험적으로 각 head가 다른 패턴을 학습한다는 것이 관찰됨</li>
+<li>head 수를 늘리면 모델이 더 강력해짐</li>
 </ul>
 </div>
 
-<div class="tc">Table 1. Original Transformer 하이퍼파라미터</div>
+<div class="tc">Table 6. Original Transformer 하이퍼파라미터</div>
 <table>
 <tr><th>파라미터</th><th>값</th><th>설명</th></tr>
 <tr><td>\(N\)</td><td>6</td><td>Encoder/Decoder layer 수</td></tr>
@@ -234,23 +506,326 @@ pre{font-size:11px;padding:14px}table{font-size:10px;display:block;overflow-x:au
 <tr><td>\(d_{ff}\)</td><td>2048</td><td>Feed-forward hidden dimension</td></tr>
 </table>
 
-<!-- Ch4 -->
-<h2 id="ch4">4. Positional Encoding</h2>
+<pre><code><span class="kw">import</span> numpy <span class="kw">as</span> np
 
+<span class="kw">class</span> <span class="nb">MultiHeadAttention</span>:
+    <span class="kw">def</span> <span class="fn">__init__</span>(self, d_model=<span class="nu">512</span>, h=<span class="nu">8</span>):
+        self.d_model = d_model
+        self.h = h
+        self.d_k = d_model // h  <span class="cm"># 512/8 = 64</span>
+        
+        <span class="cm"># 각 head별 projection matrices</span>
+        self.W_Q = [np.random.randn(d_model, self.d_k) <span class="kw">for</span> _ <span class="kw">in</span> <span class="fn">range</span>(h)]
+        self.W_K = [np.random.randn(d_model, self.d_k) <span class="kw">for</span> _ <span class="kw">in</span> <span class="fn">range</span>(h)]
+        self.W_V = [np.random.randn(d_model, self.d_k) <span class="kw">for</span> _ <span class="kw">in</span> <span class="fn">range</span>(h)]
+        self.W_O = np.random.randn(h * self.d_k, d_model)
+    
+    <span class="kw">def</span> <span class="fn">forward</span>(self, X):
+        <span class="st">"""X: (n, d_model)"""</span>
+        heads = []
+        <span class="kw">for</span> i <span class="kw">in</span> <span class="fn">range</span>(self.h):
+            Q = X @ self.W_Q[i]  <span class="cm"># (n, d_k)</span>
+            K = X @ self.W_K[i]
+            V = X @ self.W_V[i]
+            head_i, _ = scaled_dot_product_attention(Q, K, V)
+            heads.append(head_i)
+        
+        <span class="cm"># Concat all heads: (n, h*d_k) = (n, 512)</span>
+        concat = np.concatenate(heads, axis=-<span class="nu">1</span>)
+        
+        <span class="cm"># Final projection</span>
+        output = concat @ self.W_O  <span class="cm"># (n, d_model)</span>
+        <span class="kw">return</span> output</code></pre>
+
+<h3>5.5 Self-Attention vs Cross-Attention</h3>
+
+<div class="tc">Table 7. Attention 유형 비교</div>
+<table>
+<tr><th>유형</th><th>Q 출처</th><th>K, V 출처</th><th>사용 위치</th></tr>
+<tr><td>Self-Attention</td><td>같은 시퀀스</td><td>같은 시퀀스</td><td>Encoder, Decoder (첫 번째)</td></tr>
+<tr><td>Cross-Attention</td><td>Decoder</td><td>Encoder 출력</td><td>Decoder (두 번째)</td></tr>
+<tr><td>Causal/Masked</td><td>같은 시퀀스</td><td>같은 시퀀스 (미래 마스킹)</td><td>Decoder (첫 번째)</td></tr>
+</table>
+
+<div class="info">
+<p class="ni"><strong>강의 인용:</strong> "In the decoder block, there are two attention blocks. The first is masked multi-head attention (causal attention). The second is cross-attention — Q is from the decoder, K and V are from the encoder."</p>
+</div>
+
+<!-- ═══════════════════════════════════════════ -->
+<!-- Ch6: Transformer 구조 -->
+<!-- ═══════════════════════════════════════════ -->
+<h2 id="ch6">6. Transformer 아키텍처</h2>
+
+<h3>6.1 Transformer의 탄생 배경</h3>
+
+<div class="warn">
+<p class="ni"><strong>강의 인용 (Transformer의 진짜 탄생 이유!):</strong></p>
+<p class="ni">"Google wanted to change the usage of GPU because GPU is too expensive. So they built the TPU in 2016. But the limitation of TPU is that TPU cannot support RNN architecture. So NLP researchers in Google decided to make their own architecture that can be supported by TPU. And that is the Transformer."</p>
+<p class="ni">→ TPU가 RNN을 지원하지 않아서 Transformer가 탄생했다! 자원의 제약이 기술 혁신을 이끈 사례.</p>
+</div>
+
+<h3>6.2 Positional Encoding</h3>
 <p>Self-Attention은 순서 정보를 모른다. "I love you"와 "You love I"가 같은 결과를 낸다. 위치 정보를 주입해야 한다.</p>
 
 <div class="def">
-<p class="ni"><strong>Definition — Sinusoidal Positional Encoding</strong></p>
+<p class="ni"><strong>Definition 6.1 — Sinusoidal Positional Encoding (Original Transformer)</strong></p>
 <div class="eq">\[ PE_{(pos, 2i)} = \sin\left(\frac{pos}{10000^{2i/d_{model}}}\right) \]</div>
 <div class="eq">\[ PE_{(pos, 2i+1)} = \cos\left(\frac{pos}{10000^{2i/d_{model}}}\right) \]</div>
+<p class="ni">\(pos\)는 토큰 위치, \(i\)는 차원 인덱스. 짝수 차원은 sin, 홀수 차원은 cos.</p>
+</div>
+
+<div class="info">
+<p class="ni"><strong>왜 sin/cos인가?</strong></p>
+<ul>
+<li>상대적 위치를 선형 변환으로 표현 가능: \(PE_{pos+k}\)를 \(PE_{pos}\)의 선형 함수로 표현</li>
+<li>학습 없이 사용 가능 (hard-coded)</li>
+<li>임의의 시퀀스 길이에 일반화 가능</li>
+</ul>
+<p class="ni"><strong>대안:</strong> Learned positional encoding — 위치별 embedding을 학습. BERT 등에서 사용.</p>
 </div>
 
 <div class="warn">
-<p class="ni"><strong>핵심 포인트:</strong> "Without positional encoding, Transformer cannot handle sequential data. Only with positional encoding, Transformer can know the position information."</p>
+<p class="ni"><strong>강의 포인트:</strong> "Without positional encoding, Transformer cannot handle sequential data. Only with positional encoding, Transformer can know the position information."</p>
+<p class="ni">Vision Transformer처럼 순서가 덜 중요한 도메인에서는 positional encoding을 다르게 설계하거나 생략할 수 있다.</p>
 </div>
 
-<!-- Interactive PE visualization -->
+<h3>6.3 Encoder Block</h3>
+
+<pre><code><span class="cm"># Encoder Block 구조</span>
+<span class="kw">def</span> <span class="fn">encoder_block</span>(x):
+    <span class="cm"># 1. Multi-Head Self-Attention</span>
+    attn_out = multi_head_attention(x, x, x)  <span class="cm"># Q=K=V=x</span>
+    
+    <span class="cm"># 2. Residual Connection + Layer Norm</span>
+    x = layer_norm(x + attn_out)
+    
+    <span class="cm"># 3. Feed-Forward Network</span>
+    ff_out = feed_forward(x)  <span class="cm"># Linear → ReLU → Linear</span>
+    
+    <span class="cm"># 4. Residual Connection + Layer Norm</span>
+    x = layer_norm(x + ff_out)
+    
+    <span class="kw">return</span> x
+
+<span class="cm"># Feed-Forward Network</span>
+<span class="kw">def</span> <span class="fn">feed_forward</span>(x, d_model=<span class="nu">512</span>, d_ff=<span class="nu">2048</span>):
+    <span class="cm"># 512 → 2048 → 512</span>
+    h = relu(x @ W1 + b1)  <span class="cm"># (n, 2048)</span>
+    out = h @ W2 + b2       <span class="cm"># (n, 512)</span>
+    <span class="kw">return</span> out</code></pre>
+
+<h3>6.4 Layer Normalization vs Batch Normalization</h3>
+
+<div class="def">
+<p class="ni"><strong>Definition 6.2 — Layer Normalization</strong></p>
+<div class="eq">\[ \text{LayerNorm}(x) = \gamma \cdot \frac{x - \mu}{\sigma} + \beta \]</div>
+<p class="ni">각 샘플 내에서 정규화 (feature dimension 기준). Batch size에 독립적.</p>
+</div>
+
+<div class="tc">Table 8. Layer Norm vs Batch Norm</div>
+<table>
+<tr><th>특성</th><th>Batch Norm</th><th>Layer Norm</th></tr>
+<tr><td>정규화 축</td><td>Batch dimension</td><td>Feature dimension</td></tr>
+<tr><td>의존성</td><td>Batch size에 의존</td><td>Batch size에 독립</td></tr>
+<tr><td>주 사용처</td><td>CNN (Vision)</td><td>Transformer (NLP)</td></tr>
+<tr><td>가변 길이</td><td>처리 어려움</td><td>자연스럽게 처리</td></tr>
+</table>
+
+<div class="info">
+<p class="ni"><strong>강의 인용:</strong> "The only reason to use Layer Normalization in Transformer is that the original paper was tuning the network based on Layer Normalization. If you want to use Batch Normalization, you need to tune hyperparameters again."</p>
+</div>
+
+<h3>6.5 Decoder Block</h3>
+
+<pre><code><span class="cm"># Decoder Block 구조</span>
+<span class="kw">def</span> <span class="fn">decoder_block</span>(x, encoder_output):
+    <span class="cm"># 1. Masked Multi-Head Self-Attention (Causal)</span>
+    <span class="cm"># 미래 토큰을 볼 수 없도록 마스킹</span>
+    masked_attn = masked_multi_head_attention(x, x, x)
+    x = layer_norm(x + masked_attn)
+    
+    <span class="cm"># 2. Cross-Attention</span>
+    <span class="cm"># Q: decoder, K/V: encoder output</span>
+    cross_attn = multi_head_attention(
+        Q=x, 
+        K=encoder_output, 
+        V=encoder_output
+    )
+    x = layer_norm(x + cross_attn)
+    
+    <span class="cm"># 3. Feed-Forward Network</span>
+    ff_out = feed_forward(x)
+    x = layer_norm(x + ff_out)
+    
+    <span class="kw">return</span> x</code></pre>
+
+<div class="ok">
+<p class="ni"><strong>Decoder의 핵심:</strong></p>
+<ul>
+<li>첫 번째 attention: Masked Self-Attention (Causal) — 미래 토큰 마스킹</li>
+<li>두 번째 attention: Cross-Attention — Encoder 출력 참조</li>
+<li>Inference 시 autoregressive: 이전 출력이 다음 입력</li>
+</ul>
+</div>
+
+<!-- ═══════════════════════════════════════════ -->
+<!-- Ch7: Training Tricks -->
+<!-- ═══════════════════════════════════════════ -->
+<h2 id="ch7">7. Training Tricks</h2>
+
+<h3>7.1 Teacher Forcing vs Autoregressive Inference</h3>
+
+<div class="def">
+<p class="ni"><strong>Definition 7.1 — Teacher Forcing</strong></p>
+<p class="ni">학습 시 ground truth를 다음 스텝의 입력으로 사용. 병렬 학습 가능!</p>
+</div>
+
+<div class="tc">Table 9. Teacher Forcing vs Autoregressive</div>
+<table>
+<tr><th>특성</th><th>Teacher Forcing (학습)</th><th>Autoregressive (추론)</th></tr>
+<tr><td>입력</td><td>Ground truth 시퀀스</td><td>이전 스텝의 예측</td></tr>
+<tr><td>병렬화</td><td>가능 (모든 위치 동시 계산)</td><td>불가능 (순차 생성)</td></tr>
+<tr><td>속도</td><td>빠름</td><td>느림</td></tr>
+<tr><td>에러 전파</td><td>없음</td><td>있음 (에러 누적)</td></tr>
+</table>
+
+<div class="info">
+<p class="ni"><strong>강의 인용:</strong> "During training, we already know the ground truth. So we use the ground truth sentence and train all positions simultaneously. We do not need to iterate. But during inference, we have to iterate because we need the previous output for the current input."</p>
+</div>
+
+<pre><code><span class="cm"># Teacher Forcing (학습)</span>
+<span class="cm"># 입력: [BOS, "un", "ours", "en", "peluche"]</span>
+<span class="cm"># 타겟: ["un", "ours", "en", "peluche", EOS]</span>
+<span class="cm"># → 모든 위치를 동시에 학습!</span>
+
+<span class="cm"># Autoregressive Inference (추론)</span>
+output = [BOS]
+<span class="kw">while</span> output[-<span class="nu">1</span>] != EOS:
+    next_token = model.predict(output)  <span class="cm"># 이전 출력이 입력</span>
+    output.append(next_token)
+<span class="cm"># → 한 토큰씩 순차 생성</span></code></pre>
+
+<h3>7.2 Causal Masking</h3>
+<p>Teacher Forcing 시 미래 토큰을 보면 안 된다. Attention score에 마스크 적용:</p>
+
+<div class="eq">\[ \text{Mask}_{ij} = \begin{cases} 0 & \text{if } j \leq i \\ -\infty & \text{if } j > i \end{cases} \]</div>
+
+<pre><code><span class="cm"># Causal Mask 예시 (4 tokens)</span>
+<span class="cm"># 위치 i는 위치 j ≤ i만 볼 수 있음</span>
+mask = np.array([
+    [<span class="nu">0</span>, -np.inf, -np.inf, -np.inf],  <span class="cm"># 위치 0: 자기만</span>
+    [<span class="nu">0</span>, <span class="nu">0</span>, -np.inf, -np.inf],        <span class="cm"># 위치 1: 0, 1</span>
+    [<span class="nu">0</span>, <span class="nu">0</span>, <span class="nu">0</span>, -np.inf],              <span class="cm"># 위치 2: 0, 1, 2</span>
+    [<span class="nu">0</span>, <span class="nu">0</span>, <span class="nu">0</span>, <span class="nu">0</span>]                     <span class="cm"># 위치 3: 모두</span>
+])
+
+<span class="cm"># Attention 계산 시</span>
+scores = (Q @ K.T) / np.sqrt(d_k) + mask  <span class="cm"># -inf는 softmax 후 0이 됨</span></code></pre>
+
+<h3>7.3 Label Smoothing</h3>
+
+<div class="def">
+<p class="ni"><strong>Definition 7.2 — Label Smoothing</strong></p>
+<p class="ni">One-hot label 대신 soft label 사용. 모델의 과신(overconfidence)을 방지.</p>
+<div class="eq">\[ y_{\text{smooth}} = (1 - \epsilon) \cdot y_{\text{one-hot}} + \frac{\epsilon}{K} \]</div>
+<p class="ni">여기서 \(\epsilon\)은 smoothing parameter (보통 0.1), \(K\)는 클래스 수.</p>
+</div>
+
+<pre><code><span class="cm"># Label Smoothing 예시</span>
+<span class="cm"># 원래 one-hot: [0, 0, 1, 0, 0] (정답 = 클래스 2)</span>
+<span class="cm"># Smoothed (ε=0.1): [0.02, 0.02, 0.92, 0.02, 0.02]</span>
+
+<span class="kw">def</span> <span class="fn">label_smoothing</span>(one_hot, epsilon=<span class="nu">0.1</span>):
+    K = <span class="fn">len</span>(one_hot)
+    <span class="kw">return</span> (<span class="nu">1</span> - epsilon) * one_hot + epsilon / K
+
+one_hot = np.array([<span class="nu">0</span>, <span class="nu">0</span>, <span class="nu">1</span>, <span class="nu">0</span>, <span class="nu">0</span>])
+smoothed = label_smoothing(one_hot, epsilon=<span class="nu">0.1</span>)
+<span class="fn">print</span>(smoothed)  <span class="cm"># [0.02, 0.02, 0.92, 0.02, 0.02]</span></code></pre>
+
+<div class="ok">
+<p class="ni"><strong>Label Smoothing의 효과:</strong></p>
+<ul>
+<li>모델이 100% 확신하지 않도록 유도 → 일반화 성능 향상</li>
+<li>Overfitting 방지</li>
+<li>BLEU score 향상 (실험적으로 검증됨)</li>
+<li>GoogLeNet(2015)에서 처음 소개, Transformer에서 널리 사용</li>
+</ul>
+</div>
+
+<h3>7.4 Residual Connection</h3>
+<p>ResNet에서 가져온 아이디어. Gradient flow를 개선하고 깊은 네트워크 학습을 가능하게 한다.</p>
+
+<div class="eq">\[ \text{Output} = \text{LayerNorm}(x + \text{SubLayer}(x)) \]</div>
+
+<div class="info">
+<p class="ni"><strong>강의 인용:</strong> "Many design choices are influenced by computer vision architectures. Residual connections from ResNet. Multi-head attention is similar to multiple filters in CNN."</p>
+</div>
+
+<!-- ═══════════════════════════════════════════ -->
+<!-- Interactive Lab -->
+<!-- ═══════════════════════════════════════════ -->
+<h2 id="interactive">🎮 Interactive Lab — 직접 해보기</h2>
+
+<h3>Lab 1. Attention Weight 시각화</h3>
+<p class="ni">슬라이더로 d_k를 바꿔보면서 scaling의 효과를 확인하세요.</p>
+
+<div style="background:#f0f4f8;padding:20px;border-radius:8px;margin:20px 0">
+<div style="display:flex;align-items:center;gap:16px;margin-bottom:12px;flex-wrap:wrap">
+<label style="font-size:14px;font-weight:600">d_k (key dimension):</label>
+<input type="range" id="sl-dk" min="4" max="512" step="4" value="64" style="width:200px">
+<span id="val-dk" style="font-family:'Space Mono',monospace;font-size:16px;color:#e74c3c;font-weight:bold">64</span>
+</div>
+<div id="plot-attention" style="width:100%;height:350px"></div>
+<p class="ni" style="font-size:12px;color:#555;margin-top:8px">↑ d_k가 커지면 QK^T의 분산이 커져서 softmax가 극단적이 됨 (한 토큰에 집중). √d_k로 나누면 분산이 정규화되어 부드러운 attention 분포.</p>
+</div>
+
+<script>
+(function(){
+  var sl=document.getElementById('sl-dk');
+  var vl=document.getElementById('val-dk');
+  function draw(){
+    var dk=parseInt(sl.value); vl.textContent=dk;
+    // Simulate attention scores
+    var n=6; // 6 tokens
+    var scores_raw=[], scores_scaled=[];
+    for(var i=0;i<n;i++){
+      // Random dot product ~ N(0, dk)
+      var s = (Math.random()-0.5)*2*Math.sqrt(dk)*1.5;
+      scores_raw.push(s);
+      scores_scaled.push(s/Math.sqrt(dk));
+    }
+    // Softmax
+    function softmax(arr){
+      var max=Math.max(...arr);
+      var exps=arr.map(x=>Math.exp(x-max));
+      var sum=exps.reduce((a,b)=>a+b);
+      return exps.map(x=>x/sum);
+    }
+    var attn_raw=softmax(scores_raw);
+    var attn_scaled=softmax(scores_scaled);
+    var tokens=['BOS','A','cute','teddy','bear','EOS'];
+    Plotly.react('plot-attention',[
+      {x:tokens,y:attn_raw,type:'bar',name:'Without scaling',marker:{color:'#e74c3c'}},
+      {x:tokens,y:attn_scaled,type:'bar',name:'With √d_k scaling',marker:{color:'#0080c6'}}
+    ],{
+      title:'Attention Weights (d_k='+dk+')',
+      yaxis:{title:'Attention Weight',range:[0,1]},
+      barmode:'group',
+      plot_bgcolor:'#fafaf8',paper_bgcolor:'#f0f4f8',
+      font:{family:'Inter',size:12},
+      legend:{x:0.7,y:0.95},
+      margin:{t:50,r:20,b:50,l:60}
+    },{responsive:true});
+  }
+  sl.addEventListener('input',draw);
+  setTimeout(draw,300);
+})();
+</script>
+
+<h3>Lab 2. Positional Encoding 시각화</h3>
 <div id="plot-pe" style="width:100%;height:400px;margin:20px 0"></div>
+
 <script>
 (function(){
   var d_model=64, max_len=50;
@@ -268,7 +843,7 @@ pre{font-size:11px;padding:14px}table{font-size:10px;display:block;overflow-x:au
     x:Array.from({length:d_model},(_,i)=>'dim '+i),
     y:Array.from({length:max_len},(_,i)=>'pos '+i)
   }],{
-    title:'Sinusoidal Positional Encoding',
+    title:'Sinusoidal Positional Encoding (d_model=64, max_len=50)',
     xaxis:{title:'Dimension'},yaxis:{title:'Position'},
     plot_bgcolor:'#fafaf8',paper_bgcolor:'#fff',
     font:{family:'Inter',size:11},
@@ -277,86 +852,509 @@ pre{font-size:11px;padding:14px}table{font-size:10px;display:block;overflow-x:au
 })();
 </script>
 
-<!-- Ch5 -->
-<h2 id="ch5">5. Encoder-Decoder 구조</h2>
-
-<h3>5.1 Encoder Block</h3>
-<p>Encoder는 Multi-Head Self-Attention → Add & Norm → Feed-Forward → Add & Norm 구조다. 입력 시퀀스의 모든 토큰을 양방향으로 참조할 수 있다.</p>
-
-<h3>5.2 Decoder Block</h3>
-<p>Decoder에는 두 개의 attention이 있다:</p>
-<ol>
-<li><strong>Masked Self-Attention (Causal):</strong> 미래 토큰을 볼 수 없도록 마스킹</li>
-<li><strong>Cross-Attention:</strong> Q는 Decoder에서, K/V는 Encoder 출력에서</li>
-</ol>
-
-<div class="tc">Table 2. Attention 유형 비교</div>
-<table>
-<tr><th>유형</th><th>Q 출처</th><th>K, V 출처</th><th>사용 위치</th></tr>
-<tr><td>Self-Attention</td><td>같은 시퀀스</td><td>같은 시퀀스</td><td>Encoder</td></tr>
-<tr><td>Causal/Masked</td><td>같은 시퀀스</td><td>같은 시퀀스 (미래 마스킹)</td><td>Decoder 1st</td></tr>
-<tr><td>Cross-Attention</td><td>Decoder</td><td>Encoder 출력</td><td>Decoder 2nd</td></tr>
-</table>
-
-<h3>5.3 Layer Normalization</h3>
-<p>Transformer는 Batch Normalization 대신 Layer Normalization을 사용한다.</p>
-
 <div class="info">
-<p class="ni"><strong>왜 Layer Norm인가?</strong></p>
-<p class="ni">"The only reason to use Layer Normalization in Transformer is that the original paper was tuning the network based on Layer Normalization. If you want to use Batch Normalization, you need to tune hyperparameters again."</p>
+<p class="ni"><strong>관찰:</strong> 낮은 차원(왼쪽)은 빠르게 진동, 높은 차원(오른쪽)은 천천히 진동. 이 패턴 덕분에 모델이 상대적 위치를 학습할 수 있다.</p>
 </div>
 
-<!-- Ch6 -->
-<h2 id="ch6">6. Training Tricks</h2>
+<!-- ═══════════════════════════════════════════ -->
+<!-- Quiz Section -->
+<!-- ═══════════════════════════════════════════ -->
+<h2 id="quiz">📝 Quiz — Exam Prep</h2>
 
-<h3>6.1 Teacher Forcing vs Autoregressive</h3>
+<p class="ni">Click to reveal answer. 클릭하면 정답이 나옵니다.</p>
 
-<div class="tc">Table 3. Teacher Forcing vs Autoregressive</div>
-<table>
-<tr><th>특성</th><th>Teacher Forcing (학습)</th><th>Autoregressive (추론)</th></tr>
-<tr><td>입력</td><td>Ground truth 시퀀스</td><td>이전 스텝의 예측</td></tr>
-<tr><td>병렬화</td><td>가능</td><td>불가능</td></tr>
-<tr><td>에러 전파</td><td>없음</td><td>있음 (에러 누적)</td></tr>
-</table>
-
-<h3>6.2 Label Smoothing</h3>
-<p>One-hot label 대신 soft label 사용. 모델의 과신(overconfidence)을 방지한다.</p>
-
-<div class="eq">\[ y_{\text{smooth}} = (1 - \epsilon) \cdot y_{\text{one-hot}} + \frac{\epsilon}{K} \]</div>
-
-<div class="ok">
-<p class="ni"><strong>Label Smoothing 효과:</strong></p>
-<ul>
-<li>ε=0.1이면 정답 클래스는 0.9, 나머지는 약 0.02</li>
-<li>모델이 100% 확신하지 않도록 유도 → 일반화 성능 향상</li>
-<li>BLEU score 향상 (실험적으로 검증됨)</li>
-</ul>
+<div class="quiz-box" id="q1">
+<h4>Q1. Why do we divide by √d_k in the Self-Attention formula?</h4>
+<p style="font-size:11px;color:rgba(255,255,255,0.7);margin:-5px 0 10px 0">Self-Attention 수식에서 √d_k로 나누는 이유는?</p>
+<div class="quiz-option" onclick="showAnswer('q1','a')">A. To speed up computation</div>
+<div class="quiz-option" onclick="showAnswer('q1','b')">B. When d_k is large, the variance of dot product increases, causing softmax saturation</div>
+<div class="quiz-option" onclick="showAnswer('q1','c')">C. To reduce memory usage</div>
+<div class="quiz-option" onclick="showAnswer('q1','d')">D. To prevent gradient vanishing</div>
+<div class="quiz-answer" id="ans-q1"><strong>Answer: B</strong><br>If q, k have mean 0 and variance 1, then Var(q·k) = d_k. Large variance → extreme softmax inputs → very small gradients (softmax saturation). Dividing by √d_k normalizes variance to 1.<br><span style="font-size:11px;color:#aaa">분산이 d_k에 비례 → softmax 입력이 극단적 → gradient 소실. √d_k로 나눠서 분산 정규화.</span></div>
 </div>
 
-<!-- Ch7 -->
-<h2 id="ch7">7. 핵심 요약</h2>
+<div class="quiz-box" id="q2">
+<h4>Q2. What is the purpose of Multi-Head Attention?</h4>
+<p style="font-size:11px;color:rgba(255,255,255,0.7);margin:-5px 0 10px 0">Multi-Head Attention의 목적은?</p>
+<div class="quiz-option" onclick="showAnswer('q2','a')">A. Speed up computation</div>
+<div class="quiz-option" onclick="showAnswer('q2','b')">B. Save memory</div>
+<div class="quiz-option" onclick="showAnswer('q2','c')">C. Each head learns different sub-tasks (similar to multiple filters in CNN)</div>
+<div class="quiz-option" onclick="showAnswer('q2','d')">D. Prevent overfitting</div>
+<div class="quiz-answer" id="ans-q2"><strong>Answer: C</strong><br>Similar to multiple filters in CNN. Each head learns different patterns (syntax, semantics, positional relations). Experimentally observed that each head takes different sub-tasks.<br><span style="font-size:11px;color:#aaa">CNN의 multiple filters와 유사. 각 head가 다른 sub-task 학습.</span></div>
+</div>
+
+<div class="quiz-box" id="q3">
+<h4>Q3. Why does Transformer need Positional Encoding?</h4>
+<p style="font-size:11px;color:rgba(255,255,255,0.7);margin:-5px 0 10px 0">Transformer에서 Positional Encoding이 필요한 이유는?</p>
+<div class="quiz-option" onclick="showAnswer('q3','a')">A. Self-Attention cannot recognize sequential information</div>
+<div class="quiz-option" onclick="showAnswer('q3','b')">B. For computational efficiency</div>
+<div class="quiz-option" onclick="showAnswer('q3','c')">C. To improve gradient flow</div>
+<div class="quiz-option" onclick="showAnswer('q3','d')">D. To reduce memory usage</div>
+<div class="quiz-answer" id="ans-q3"><strong>Answer: A</strong><br>"Without positional encoding, Transformer cannot handle sequential data." Self-Attention is a set operation — "I love you" and "You love I" produce the same result without PE.<br><span style="font-size:11px;color:#aaa">Self-Attention은 순서를 모름. PE 없으면 "I love you"와 "You love I"가 같은 결과.</span></div>
+</div>
+
+<div class="quiz-box" id="q4">
+<h4>Q4. Which hyperparameter is WRONG for the original Transformer?</h4>
+<p style="font-size:11px;color:rgba(255,255,255,0.7);margin:-5px 0 10px 0">Original Transformer 하이퍼파라미터 중 틀린 것은?</p>
+<div class="quiz-option" onclick="showAnswer('q4','a')">A. N (layers) = 6</div>
+<div class="quiz-option" onclick="showAnswer('q4','b')">B. h (heads) = 8</div>
+<div class="quiz-option" onclick="showAnswer('q4','c')">C. d_model = 512</div>
+<div class="quiz-option" onclick="showAnswer('q4','d')">D. d_ff = 1024</div>
+<div class="quiz-answer" id="ans-q4"><strong>Answer: D</strong><br>d_ff = 2048 is correct. N=6, h=8, d_model=512, d_k=d_v=64 (512/8), d_ff=2048.<br><span style="font-size:11px;color:#aaa">d_ff = 2048이 맞음. N=6, h=8, d_model=512, d_k=64, d_ff=2048.</span></div>
+</div>
+
+<div class="quiz-box" id="q5">
+<h4>Q5. What are the advantages of Teacher Forcing?</h4>
+<p style="font-size:11px;color:rgba(255,255,255,0.7);margin:-5px 0 10px 0">Teacher Forcing의 장점은?</p>
+<div class="quiz-option" onclick="showAnswer('q5','a')">A. Faster inference</div>
+<div class="quiz-option" onclick="showAnswer('q5','b')">B. Enables parallel training</div>
+<div class="quiz-option" onclick="showAnswer('q5','c')">C. No error propagation</div>
+<div class="quiz-option" onclick="showAnswer('q5','d')">D. Both B and C</div>
+<div class="quiz-answer" id="ans-q5"><strong>Answer: D</strong><br>"During training we know the ground truth, so we can train all positions simultaneously without iteration." (1) Parallel training possible, (2) No error propagation from previous predictions.<br><span style="font-size:11px;color:#aaa">학습 시 ground truth 사용 → 병렬화 가능 + 에러 전파 없음.</span></div>
+</div>
+
+<div class="quiz-box" id="q6">
+<h4>Q6. What is the effect of Label Smoothing?</h4>
+<p style="font-size:11px;color:rgba(255,255,255,0.7);margin:-5px 0 10px 0">Label Smoothing의 효과는?</p>
+<div class="quiz-option" onclick="showAnswer('q6','a')">A. Faster training</div>
+<div class="quiz-option" onclick="showAnswer('q6','b')">B. Prevents model overconfidence, improves generalization</div>
+<div class="quiz-option" onclick="showAnswer('q6','c')">C. Reduces memory usage</div>
+<div class="quiz-option" onclick="showAnswer('q6','d')">D. Solves gradient vanishing</div>
+<div class="quiz-answer" id="ans-q6"><strong>Answer: B</strong><br>"We use 0.9 rather than 1.0 to make the model more robust to overconfidence." Instead of one-hot [0,0,1,0,0], use [0.02,0.02,0.92,0.02,0.02]. Prevents overfitting, improves BLEU score.<br><span style="font-size:11px;color:#aaa">1.0 대신 0.9 사용 → 과신 방지, 일반화 향상, BLEU 향상.</span></div>
+</div>
+
+<div class="quiz-box" id="q7">
+<h4>Q7. Why does Transformer use Layer Normalization instead of Batch Normalization?</h4>
+<p style="font-size:11px;color:rgba(255,255,255,0.7);margin:-5px 0 10px 0">Transformer에서 Layer Norm을 사용하는 이유는?</p>
+<div class="quiz-option" onclick="showAnswer('q7','a')">A. Layer Norm is always better than Batch Norm</div>
+<div class="quiz-option" onclick="showAnswer('q7','b')">B. The original paper was tuned with Layer Norm</div>
+<div class="quiz-option" onclick="showAnswer('q7','c')">C. Faster computation</div>
+<div class="quiz-option" onclick="showAnswer('q7','d')">D. Uses less memory</div>
+<div class="quiz-answer" id="ans-q7"><strong>Answer: B</strong><br>"The only reason to use Layer Normalization is that the original paper was tuning based on Layer Norm. If you use Batch Norm, you need to tune hyperparameters again."<br><span style="font-size:11px;color:#aaa">원 논문이 Layer Norm으로 튜닝됨. Batch Norm 쓰려면 재튜닝 필요.</span></div>
+</div>
+
+<div class="quiz-box" id="q8">
+<h4>Q8. In Cross-Attention, where do Q, K, V come from?</h4>
+<p style="font-size:11px;color:rgba(255,255,255,0.7);margin:-5px 0 10px 0">Cross-Attention에서 Q, K, V의 출처는?</p>
+<div class="quiz-option" onclick="showAnswer('q8','a')">A. Q: Encoder, K/V: Decoder</div>
+<div class="quiz-option" onclick="showAnswer('q8','b')">B. Q: Decoder, K/V: Encoder</div>
+<div class="quiz-option" onclick="showAnswer('q8','c')">C. Q/K/V all from Encoder</div>
+<div class="quiz-option" onclick="showAnswer('q8','d')">D. Q/K/V all from Decoder</div>
+<div class="quiz-answer" id="ans-q8"><strong>Answer: B</strong><br>Cross-Attention: Query comes from Decoder, Key and Value come from Encoder output. This is how Decoder references Encoder's information.<br><span style="font-size:11px;color:#aaa">Query는 Decoder에서, Key와 Value는 Encoder 출력에서. Decoder가 Encoder 정보를 참조하는 메커니즘.</span></div>
+</div>
+
+<div class="quiz-box" id="q9">
+<h4>Q9. What was the background for Transformer's creation?</h4>
+<p style="font-size:11px;color:rgba(255,255,255,0.7);margin:-5px 0 10px 0">Transformer가 탄생한 배경은?</p>
+<div class="quiz-option" onclick="showAnswer('q9','a')">A. GPU was too expensive</div>
+<div class="quiz-option" onclick="showAnswer('q9','b')">B. TPU could not support RNN architecture</div>
+<div class="quiz-option" onclick="showAnswer('q9','c')">C. RNN was too slow</div>
+<div class="quiz-option" onclick="showAnswer('q9','d')">D. CNN was not suitable for NLP</div>
+<div class="quiz-answer" id="ans-q9"><strong>Answer: B</strong><br>Lecture quote: "Google built TPU in 2016, but TPU cannot support RNN. So NLP researchers decided to make their own architecture that can be supported by TPU. That is Transformer."<br><span style="font-size:11px;color:#aaa">TPU가 RNN을 지원하지 않아서 Transformer가 탄생.</span></div>
+</div>
+
+<div class="quiz-box" id="q10">
+<h4>Q10. In Word2Vec, what is CBOW?</h4>
+<p style="font-size:11px;color:rgba(255,255,255,0.7);margin:-5px 0 10px 0">Word2Vec의 학습 방법 중 CBOW는?</p>
+<div class="quiz-option" onclick="showAnswer('q10','a')">A. Predict surrounding words from center word</div>
+<div class="quiz-option" onclick="showAnswer('q10','b')">B. Predict center word from surrounding words</div>
+<div class="quiz-option" onclick="showAnswer('q10','c')">C. Predict next word</div>
+<div class="quiz-option" onclick="showAnswer('q10','d')">D. Sentence classification</div>
+<div class="quiz-answer" id="ans-q10"><strong>Answer: B</strong><br>CBOW (Continuous Bag of Words): Predict center word from surrounding words. Skip-gram is the opposite — predict surrounding words from center word.<br><span style="font-size:11px;color:#aaa">CBOW: 주변 단어로 중심 단어 예측. Skip-gram은 반대.</span></div>
+</div>
+
+<div class="quiz-box" id="q11">
+<h4>Q11. What are the main problems of RNN?</h4>
+<p style="font-size:11px;color:rgba(255,255,255,0.7);margin:-5px 0 10px 0">RNN의 주요 문제점은?</p>
+<div class="quiz-option" onclick="showAnswer('q11','a')">A. Cannot be parallelized</div>
+<div class="quiz-option" onclick="showAnswer('q11','b')">B. Vanishing/Exploding gradient</div>
+<div class="quiz-option" onclick="showAnswer('q11','c')">C. Difficulty learning long-range dependencies</div>
+<div class="quiz-option" onclick="showAnswer('q11','d')">D. All of the above</div>
+<div class="quiz-answer" id="ans-q11"><strong>Answer: D</strong><br>RNN: Sequential processing (no parallelization), gradient problems in long sequences, difficulty with long-range dependencies. LSTM mitigates gradient issues but doesn't fully solve them.<br><span style="font-size:11px;color:#aaa">순차 처리라 병렬화 불가, gradient 문제, long-range dependency 학습 어려움.</span></div>
+</div>
+
+<div class="quiz-box" id="q12">
+<h4>Q12. Why is LSTM better than vanilla RNN?</h4>
+<p style="font-size:11px;color:rgba(255,255,255,0.7);margin:-5px 0 10px 0">LSTM이 RNN보다 나은 이유는?</p>
+<div class="quiz-option" onclick="showAnswer('q12','a')">A. Faster computation</div>
+<div class="quiz-option" onclick="showAnswer('q12','b')">B. Cell state acts as a "highway" allowing gradients to flow directly</div>
+<div class="quiz-option" onclick="showAnswer('q12','c')">C. Fewer parameters</div>
+<div class="quiz-option" onclick="showAnswer('q12','d')">D. Can be parallelized</div>
+<div class="quiz-answer" id="ans-q12"><strong>Answer: B</strong><br>LSTM's Cell state C_t connects directly from C_{t-1} (bypassing hidden state). This "highway" allows gradients to propagate over long distances.<br><span style="font-size:11px;color:#aaa">Cell state가 "고속도로" 역할 → gradient가 멀리까지 전파 가능.</span></div>
+</div>
+
+<div class="quiz-box" id="q13">
+<h4>Q13. What is a key characteristic of Perplexity?</h4>
+<p style="font-size:11px;color:rgba(255,255,255,0.7);margin:-5px 0 10px 0">Perplexity의 특징은?</p>
+<div class="quiz-option" onclick="showAnswer('q13','a')">A. Requires ground truth</div>
+<div class="quiz-option" onclick="showAnswer('q13','b')">B. Can be computed without ground truth</div>
+<div class="quiz-option" onclick="showAnswer('q13','c')">C. Higher is better</div>
+<div class="quiz-option" onclick="showAnswer('q13','d')">D. Only measures translation quality</div>
+<div class="quiz-answer" id="ans-q13"><strong>Answer: B</strong><br>Perplexity is computed from the probability the model assigns to the next word. No ground truth needed — practical for evaluation. Lower is better.<br><span style="font-size:11px;color:#aaa">Ground truth 없이 계산 가능해서 실용적. 낮을수록 좋다.</span></div>
+</div>
+
+<div class="quiz-box" id="q14">
+<h4>Q14. What is the advantage of Subword tokenization?</h4>
+<p style="font-size:11px;color:rgba(255,255,255,0.7);margin:-5px 0 10px 0">Subword 토큰화의 장점은?</p>
+<div class="quiz-option" onclick="showAnswer('q14','a')">A. Completely solves OOV problem</div>
+<div class="quiz-option" onclick="showAnswer('q14','b')">B. Efficient through prefix/suffix sharing, reduces OOV</div>
+<div class="quiz-option" onclick="showAnswer('q14','c')">C. Shortest sequence length</div>
+<div class="quiz-option" onclick="showAnswer('q14','d')">D. Simplest implementation</div>
+<div class="quiz-answer" id="ans-q14"><strong>Answer: B</strong><br>"reading" = "read" + "ing" — shares word roots. Reduces OOV risk (doesn't completely solve it). Standard for modern LLMs.<br><span style="font-size:11px;color:#aaa">어근 공유로 효율적, OOV 감소 (완전 해결은 아님). 현대 LLM의 표준.</span></div>
+</div>
+
+<div class="quiz-box" id="q15">
+<h4>Q15. What is the time complexity of Self-Attention?</h4>
+<p style="font-size:11px;color:rgba(255,255,255,0.7);margin:-5px 0 10px 0">Self-Attention의 시간 복잡도는?</p>
+<div class="quiz-option" onclick="showAnswer('q15','a')">A. O(n)</div>
+<div class="quiz-option" onclick="showAnswer('q15','b')">B. O(n log n)</div>
+<div class="quiz-option" onclick="showAnswer('q15','c')">C. O(n²)</div>
+<div class="quiz-option" onclick="showAnswer('q15','d')">D. O(n³)</div>
+<div class="quiz-answer" id="ans-q15"><strong>Answer: C</strong><br>QK^T computation is O(n² × d_k). Computes attention for all token pairs, so quadratic in sequence length. Bottleneck for long sequences.<br><span style="font-size:11px;color:#aaa">모든 토큰 쌍의 attention 계산 → 시퀀스 길이의 제곱에 비례.</span></div>
+</div>
+
+<div class="quiz-box" id="q16">
+<h4>Q16. What is the purpose of Causal Masking?</h4>
+<p style="font-size:11px;color:rgba(255,255,255,0.7);margin:-5px 0 10px 0">Causal Masking의 목적은?</p>
+<div class="quiz-option" onclick="showAnswer('q16','a')">A. Speed up computation</div>
+<div class="quiz-option" onclick="showAnswer('q16','b')">B. Prevent seeing future tokens for autoregressive training</div>
+<div class="quiz-option" onclick="showAnswer('q16','c')">C. Save memory</div>
+<div class="quiz-option" onclick="showAnswer('q16','d')">D. Improve gradient flow</div>
+<div class="quiz-answer" id="ans-q16"><strong>Answer: B</strong><br>During Teacher Forcing, seeing future tokens would be cheating. Mask sets future positions' attention scores to -∞, becoming 0 after softmax.<br><span style="font-size:11px;color:#aaa">미래 토큰을 보면 cheating. Mask로 미래 위치 attention을 -∞로 설정.</span></div>
+</div>
+
+<div class="quiz-box" id="q17">
+<h4>Q17. What is the role of V in Attention(Q,K,V)?</h4>
+<p style="font-size:11px;color:rgba(255,255,255,0.7);margin:-5px 0 10px 0">Attention(Q,K,V) 수식에서 V의 역할은?</p>
+<div class="quiz-option" onclick="showAnswer('q17','a')">A. Compute similarity</div>
+<div class="quiz-option" onclick="showAnswer('q17','b')">B. Compute weights</div>
+<div class="quiz-option" onclick="showAnswer('q17','c')">C. Contains actual information, weighted average by attention weights</div>
+<div class="quiz-option" onclick="showAnswer('q17','d')">D. Provide positional information</div>
+<div class="quiz-answer" id="ans-q17"><strong>Answer: C</strong><br>Q and K compute attention weights (importance). These weights are used to take weighted average of V. V carries the actual information being passed.<br><span style="font-size:11px;color:#aaa">Q와 K로 중요도 계산, 이 weight로 V를 가중 평균. V가 실제 전달되는 정보.</span></div>
+</div>
+
+<div class="quiz-box" id="q18">
+<h4>Q18. What is the structure of the Feed-Forward Network?</h4>
+<p style="font-size:11px;color:rgba(255,255,255,0.7);margin:-5px 0 10px 0">Feed-Forward Network의 구조는?</p>
+<div class="quiz-option" onclick="showAnswer('q18','a')">A. Linear → Linear</div>
+<div class="quiz-option" onclick="showAnswer('q18','b')">B. Linear → ReLU → Linear</div>
+<div class="quiz-option" onclick="showAnswer('q18','c')">C. Conv → ReLU → Conv</div>
+<div class="quiz-option" onclick="showAnswer('q18','d')">D. Attention → Linear</div>
+<div class="quiz-answer" id="ans-q18"><strong>Answer: B</strong><br>FFN: d_model(512) → d_ff(2048) → d_model(512). ReLU (or GELU) activation in between.<br><span style="font-size:11px;color:#aaa">512 → 2048 → 512. 중간에 ReLU 활성화 함수.</span></div>
+</div>
+
+<div class="quiz-box" id="q19">
+<h4>Q19. What is the effect of Residual Connection?</h4>
+<p style="font-size:11px;color:rgba(255,255,255,0.7);margin:-5px 0 10px 0">Residual Connection의 효과는?</p>
+<div class="quiz-option" onclick="showAnswer('q19','a')">A. Speed up computation</div>
+<div class="quiz-option" onclick="showAnswer('q19','b')">B. Improve gradient flow, enable training deep networks</div>
+<div class="quiz-option" onclick="showAnswer('q19','c')">C. Save memory</div>
+<div class="quiz-option" onclick="showAnswer('q19','d')">D. Improve attention performance</div>
+<div class="quiz-answer" id="ans-q19"><strong>Answer: B</strong><br>Borrowed from ResNet. x + SubLayer(x) form allows gradients to flow directly, enabling training of deep networks.<br><span style="font-size:11px;color:#aaa">ResNet에서 가져온 아이디어. gradient가 직접 흐를 수 있어 깊은 네트워크 학습 가능.</span></div>
+</div>
+
+<div class="quiz-box" id="q20">
+<h4>Q20. What is the title of the Transformer paper?</h4>
+<p style="font-size:11px;color:rgba(255,255,255,0.7);margin:-5px 0 10px 0">Transformer 논문 제목은?</p>
+<div class="quiz-option" onclick="showAnswer('q20','a')">A. "BERT: Pre-training of Deep Bidirectional Transformers"</div>
+<div class="quiz-option" onclick="showAnswer('q20','b')">B. "Attention Is All You Need"</div>
+<div class="quiz-option" onclick="showAnswer('q20','c')">C. "GPT: Generative Pre-Training"</div>
+<div class="quiz-option" onclick="showAnswer('q20','d')">D. "Deep Learning for NLP"</div>
+<div class="quiz-answer" id="ans-q20"><strong>Answer: B</strong><br>2017, Vaswani et al. "Attention Is All You Need" — achieved SOTA with only Attention, no RNN.<br><span style="font-size:11px;color:#aaa">2017년 Vaswani et al. RNN 없이 Attention만으로 SOTA 달성.</span></div>
+</div>
+
+<div class="quiz-box" id="q21">
+<h4>Q21. What is the output of Word2Vec?</h4>
+<p style="font-size:11px;color:rgba(255,255,255,0.7);margin:-5px 0 10px 0">Word2Vec의 결과물은?</p>
+<div class="quiz-option" onclick="showAnswer('q21','a')">A. Classification model</div>
+<div class="quiz-option" onclick="showAnswer('q21','b')">B. Embedding matrix (vector for each word)</div>
+<div class="quiz-option" onclick="showAnswer('q21','c')">C. Text generation model</div>
+<div class="quiz-option" onclick="showAnswer('q21','d')">D. Translation model</div>
+<div class="quiz-answer" id="ans-q21"><strong>Answer: B</strong><br>After Word2Vec training, the hidden layer's weight matrix becomes the embedding matrix. Each word gets a dense vector representation.<br><span style="font-size:11px;color:#aaa">학습 후 hidden layer의 weight matrix가 embedding matrix. 각 단어의 분산 표현을 얻는다.</span></div>
+</div>
+
+<div class="quiz-box" id="q22">
+<h4>Q22. What is the problem with One-hot encoding?</h4>
+<p style="font-size:11px;color:rgba(255,255,255,0.7);margin:-5px 0 10px 0">One-hot encoding의 문제점은?</p>
+<div class="quiz-option" onclick="showAnswer('q22','a')">A. Dimension is too small</div>
+<div class="quiz-option" onclick="showAnswer('q22','b')">B. All words are orthogonal, cannot capture semantic similarity</div>
+<div class="quiz-option" onclick="showAnswer('q22','c')">C. Computation is too slow</div>
+<div class="quiz-option" onclick="showAnswer('q22','d')">D. Cannot be trained</div>
+<div class="quiz-answer" id="ans-q22"><strong>Answer: B</strong><br>In one-hot, dot product of any two words = 0. Cannot express similarity between "cat" and "dog".<br><span style="font-size:11px;color:#aaa">모든 단어 쌍의 dot product = 0. "cat"과 "dog"의 유사성을 표현할 수 없다.</span></div>
+</div>
+
+<div class="quiz-box" id="q23">
+<h4>Q23. What is the difference between Encoder's Self-Attention and Decoder's first Attention?</h4>
+<p style="font-size:11px;color:rgba(255,255,255,0.7);margin:-5px 0 10px 0">Encoder의 Self-Attention과 Decoder의 첫 번째 Attention의 차이는?</p>
+<div class="quiz-option" onclick="showAnswer('q23','a')">A. No difference</div>
+<div class="quiz-option" onclick="showAnswer('q23','b')">B. Decoder applies Causal Masking</div>
+<div class="quiz-option" onclick="showAnswer('q23','c')">C. Encoder uses more heads</div>
+<div class="quiz-option" onclick="showAnswer('q23','d')">D. Decoder uses Cross-Attention</div>
+<div class="quiz-answer" id="ans-q23"><strong>Answer: B</strong><br>Encoder has bidirectional attention (sees all tokens). Decoder's first attention uses Causal Masking to block future tokens.<br><span style="font-size:11px;color:#aaa">Encoder는 양방향. Decoder 첫 번째 attention은 Causal Masking으로 미래 토큰 차단.</span></div>
+</div>
+
+<div class="quiz-box" id="q24">
+<h4>Q24. Why is d_k = d_model / h?</h4>
+<p style="font-size:11px;color:rgba(255,255,255,0.7);margin:-5px 0 10px 0">d_k = d_model / h 인 이유는?</p>
+<div class="quiz-option" onclick="showAnswer('q24','a')">A. Computational efficiency</div>
+<div class="quiz-option" onclick="showAnswer('q24','b')">B. To maintain original dimension after multi-head concat</div>
+<div class="quiz-option" onclick="showAnswer('q24','c')">C. Improve gradient flow</div>
+<div class="quiz-option" onclick="showAnswer('q24','d')">D. Save memory</div>
+<div class="quiz-answer" id="ans-q24"><strong>Answer: B</strong><br>Concatenating h heads (each d_k dimension) gives h × d_k = d_model. Maintains original dimension.<br><span style="font-size:11px;color:#aaa">h개 head 출력(각 d_k 차원)을 concat하면 h × d_k = d_model. 원래 차원 유지.</span></div>
+</div>
+
+<div class="quiz-box" id="q25">
+<h4>Q25. What is the role of BOS and EOS tokens?</h4>
+<p style="font-size:11px;color:rgba(255,255,255,0.7);margin:-5px 0 10px 0">BOS, EOS 토큰의 역할은?</p>
+<div class="quiz-option" onclick="showAnswer('q25','a')">A. Padding</div>
+<div class="quiz-option" onclick="showAnswer('q25','b')">B. Special tokens marking start and end of sentence</div>
+<div class="quiz-option" onclick="showAnswer('q25','c')">C. Masking</div>
+<div class="quiz-option" onclick="showAnswer('q25','d')">D. Positional encoding</div>
+<div class="quiz-answer" id="ans-q25"><strong>Answer: B</strong><br>BOS (Beginning of Sentence): Signal to start generation. EOS (End of Sentence): Signal to stop generation. Decoder stops when it outputs EOS.<br><span style="font-size:11px;color:#aaa">BOS: 생성 시작 신호. EOS: 생성 종료 신호. Decoder가 EOS 출력하면 생성 중단.</span></div>
+</div>
+
+<div class="quiz-box" id="q26">
+<h4>Q26. What is the role of Softmax?</h4>
+<p style="font-size:11px;color:rgba(255,255,255,0.7);margin:-5px 0 10px 0">Softmax의 역할은?</p>
+<div class="quiz-option" onclick="showAnswer('q26','a')">A. Add non-linearity</div>
+<div class="quiz-option" onclick="showAnswer('q26','b')">B. Convert scores to probability distribution (sum to 1)</div>
+<div class="quiz-option" onclick="showAnswer('q26','c')">C. Normalization</div>
+<div class="quiz-option" onclick="showAnswer('q26','d')">D. Both B and C</div>
+<div class="quiz-answer" id="ans-q26"><strong>Answer: D</strong><br>Softmax: exp(x_i) / Σexp(x_j). Makes all values positive and normalizes to sum to 1 → probability distribution.<br><span style="font-size:11px;color:#aaa">모든 값을 양수로 만들고 합이 1이 되게 정규화 → 확률 분포.</span></div>
+</div>
+
+<div class="quiz-box" id="q27">
+<h4>Q27. What is a characteristic of Autoregressive inference?</h4>
+<p style="font-size:11px;color:rgba(255,255,255,0.7);margin:-5px 0 10px 0">Autoregressive inference의 특징은?</p>
+<div class="quiz-option" onclick="showAnswer('q27','a')">A. Parallel generation possible</div>
+<div class="quiz-option" onclick="showAnswer('q27','b')">B. Previous output becomes next input, sequential generation</div>
+<div class="quiz-option" onclick="showAnswer('q27','c')">C. Uses ground truth</div>
+<div class="quiz-option" onclick="showAnswer('q27','d')">D. No error propagation</div>
+<div class="quiz-answer" id="ans-q27"><strong>Answer: B</strong><br>Autoregressive: Previous step's prediction becomes next step's input. Generates one token at a time sequentially. Errors can accumulate.<br><span style="font-size:11px;color:#aaa">이전 스텝의 예측이 다음 스텝의 입력. 한 토큰씩 순차 생성. 에러 누적 가능.</span></div>
+</div>
+
+<div class="quiz-box" id="q28">
+<h4>Q28. What does BLEU score measure?</h4>
+<p style="font-size:11px;color:rgba(255,255,255,0.7);margin:-5px 0 10px 0">BLEU score는 무엇을 측정하는가?</p>
+<div class="quiz-option" onclick="showAnswer('q28','a')">A. Model uncertainty</div>
+<div class="quiz-option" onclick="showAnswer('q28','b')">B. N-gram overlap between generated and reference text (Precision-based)</div>
+<div class="quiz-option" onclick="showAnswer('q28','c')">C. Training speed</div>
+<div class="quiz-option" onclick="showAnswer('q28','d')">D. Memory usage</div>
+<div class="quiz-answer" id="ans-q28"><strong>Answer: B</strong><br>BLEU: How many n-grams in generated text appear in reference text (Precision). ROUGE is Recall-based.<br><span style="font-size:11px;color:#aaa">생성 텍스트의 n-gram이 참조 텍스트에 얼마나 있는지 (Precision). ROUGE는 Recall 기반.</span></div>
+</div>
+
+<div class="quiz-box" id="q29">
+<h4>Q29. Which is NOT an advantage of Transformer?</h4>
+<p style="font-size:11px;color:rgba(255,255,255,0.7);margin:-5px 0 10px 0">Transformer의 장점이 아닌 것은?</p>
+<div class="quiz-option" onclick="showAnswer('q29','a')">A. Parallelizable</div>
+<div class="quiz-option" onclick="showAnswer('q29','b')">B. Easy to learn long-range dependencies</div>
+<div class="quiz-option" onclick="showAnswer('q29','c')">C. Linear complexity in sequence length</div>
+<div class="quiz-option" onclick="showAnswer('q29','d')">D. TPU support</div>
+<div class="quiz-answer" id="ans-q29"><strong>Answer: C</strong><br>Self-Attention has O(n²) complexity. Bottleneck for long sequences. Many research efforts to address this (Sparse Attention, Linear Attention, etc.).<br><span style="font-size:11px;color:#aaa">Self-Attention은 O(n²) 복잡도. 긴 시퀀스에서 병목.</span></div>
+</div>
+
+<div class="quiz-box" id="q30">
+<h4>Q30. What is the difference between Skip-gram and CBOW?</h4>
+<p style="font-size:11px;color:rgba(255,255,255,0.7);margin:-5px 0 10px 0">Skip-gram과 CBOW의 차이는?</p>
+<div class="quiz-option" onclick="showAnswer('q30','a')">A. Skip-gram is faster</div>
+<div class="quiz-option" onclick="showAnswer('q30','b')">B. Skip-gram: center→surrounding, CBOW: surrounding→center</div>
+<div class="quiz-option" onclick="showAnswer('q30','c')">C. CBOW is more accurate</div>
+<div class="quiz-option" onclick="showAnswer('q30','d')">D. No difference</div>
+<div class="quiz-answer" id="ans-q30"><strong>Answer: B</strong><br>Skip-gram: Predict surrounding words from center word. CBOW: Predict center word from surrounding words. Skip-gram tends to be better for rare words.<br><span style="font-size:11px;color:#aaa">Skip-gram: 중심→주변. CBOW: 주변→중심. Skip-gram이 희귀 단어에 더 좋은 경향.</span></div>
+</div>
+
+<div class="quiz-box" id="q31">
+<h4>Q31. Why use sin/cos in Positional Encoding?</h4>
+<p style="font-size:11px;color:rgba(255,255,255,0.7);margin:-5px 0 10px 0">Positional Encoding에서 sin/cos를 사용하는 이유는?</p>
+<div class="quiz-option" onclick="showAnswer('q31','a')">A. Faster computation</div>
+<div class="quiz-option" onclick="showAnswer('q31','b')">B. Relative positions can be expressed as linear transformations</div>
+<div class="quiz-option" onclick="showAnswer('q31','c')">C. Save memory</div>
+<div class="quiz-option" onclick="showAnswer('q31','d')">D. Improve gradient flow</div>
+<div class="quiz-answer" id="ans-q31"><strong>Answer: B</strong><br>PE_{pos+k} can be expressed as a linear function of PE_{pos}. Makes it easier for model to learn relative position relationships. Also requires no training.<br><span style="font-size:11px;color:#aaa">상대적 위치를 선형 변환으로 표현 가능. 학습 없이 사용 가능.</span></div>
+</div>
+
+<div class="quiz-box" id="q32">
+<h4>Q32. How many attention mechanisms are in a Decoder block?</h4>
+<p style="font-size:11px;color:rgba(255,255,255,0.7);margin:-5px 0 10px 0">Decoder block에 있는 attention 개수는?</p>
+<div class="quiz-option" onclick="showAnswer('q32','a')">A. 1</div>
+<div class="quiz-option" onclick="showAnswer('q32','b')">B. 2 (Masked Self-Attention + Cross-Attention)</div>
+<div class="quiz-option" onclick="showAnswer('q32','c')">C. 3</div>
+<div class="quiz-option" onclick="showAnswer('q32','d')">D. 0</div>
+<div class="quiz-answer" id="ans-q32"><strong>Answer: B</strong><br>Decoder: (1) Masked Multi-Head Self-Attention (Causal), (2) Cross-Attention (Q: decoder, K/V: encoder).<br><span style="font-size:11px;color:#aaa">Decoder: (1) Masked Self-Attention, (2) Cross-Attention.</span></div>
+</div>
+
+<div class="quiz-box" id="q33">
+<h4>Q33. With Label Smoothing ε=0.1, what is the target value for the correct class?</h4>
+<p style="font-size:11px;color:rgba(255,255,255,0.7);margin:-5px 0 10px 0">Label Smoothing에서 ε=0.1일 때, 정답 클래스의 target 값은?</p>
+<div class="quiz-option" onclick="showAnswer('q33','a')">A. 1.0</div>
+<div class="quiz-option" onclick="showAnswer('q33','b')">B. 0.9</div>
+<div class="quiz-option" onclick="showAnswer('q33','c')">C. 0.1</div>
+<div class="quiz-option" onclick="showAnswer('q33','d')">D. 0.5</div>
+<div class="quiz-answer" id="ans-q33"><strong>Answer: B</strong><br>(1-ε) × 1 + ε/K ≈ 0.9 (when K is large). Correct class gets 0.9, others get ε/K ≈ 0.02.<br><span style="font-size:11px;color:#aaa">정답 클래스는 0.9, 나머지는 ε/K ≈ 0.02.</span></div>
+</div>
+
+<div class="quiz-box" id="q34">
+<h4>Q34. What are the limitations of Seq2Seq?</h4>
+<p style="font-size:11px;color:rgba(255,255,255,0.7);margin:-5px 0 10px 0">Seq2Seq의 한계는?</p>
+<div class="quiz-option" onclick="showAnswer('q34','a')">A. All input compressed into one context vector, information loss</div>
+<div class="quiz-option" onclick="showAnswer('q34','b')">B. Cannot be parallelized</div>
+<div class="quiz-option" onclick="showAnswer('q34','c')">C. Long-range dependency problem</div>
+<div class="quiz-option" onclick="showAnswer('q34','d')">D. All of the above</div>
+<div class="quiz-answer" id="ans-q34"><strong>Answer: D</strong><br>Seq2Seq (RNN-based): Information bottleneck, sequential processing, long-range problems. Attention was introduced to address these, eventually leading to Transformer.<br><span style="font-size:11px;color:#aaa">정보 병목, 순차 처리, long-range 문제. 이를 해결하기 위해 Attention → Transformer 등장.</span></div>
+</div>
+
+<div class="quiz-box" id="q35">
+<h4>Q35. What is "context-aware embedding" in Transformer?</h4>
+<p style="font-size:11px;color:rgba(255,255,255,0.7);margin:-5px 0 10px 0">Transformer에서 "context-aware embedding"이란?</p>
+<div class="quiz-option" onclick="showAnswer('q35','a')">A. Embedding with positional information</div>
+<div class="quiz-option" onclick="showAnswer('q35','b')">B. Embedding that incorporates surrounding token information after Self-Attention</div>
+<div class="quiz-option" onclick="showAnswer('q35','c')">C. Word2Vec embedding</div>
+<div class="quiz-option" onclick="showAnswer('q35','d')">D. One-hot encoding</div>
+<div class="quiz-answer" id="ans-q35"><strong>Answer: B</strong><br>Input embedding is position-aware. After Self-Attention, information from other tokens is incorporated, making it context-aware.<br><span style="font-size:11px;color:#aaa">입력 embedding은 position-aware. Self-Attention 후에는 다른 토큰 정보가 반영되어 context-aware.</span></div>
+</div>
+
+<div class="quiz-box" id="q36">
+<h4>Q36. What is the disadvantage of Character-level tokenization?</h4>
+<p style="font-size:11px;color:rgba(255,255,255,0.7);margin:-5px 0 10px 0">Character-level 토큰화의 단점은?</p>
+<div class="quiz-option" onclick="showAnswer('q36','a')">A. OOV problem</div>
+<div class="quiz-option" onclick="showAnswer('q36','b')">B. Longer sequences increase computation cost, harder to interpret meaning</div>
+<div class="quiz-option" onclick="showAnswer('q36','c')">C. Difficult to implement</div>
+<div class="quiz-option" onclick="showAnswer('q36','d')">D. Cannot be trained</div>
+<div class="quiz-answer" id="ans-q36"><strong>Answer: B</strong><br>"World Health Organization" = 24 tokens. Longer sequence → O(n²) attention cost increases. Also, single character "D" is hard to interpret semantically.<br><span style="font-size:11px;color:#aaa">시퀀스 길어짐 → O(n²) 비용 증가. "D" 하나로는 의미 해석 어려움.</span></div>
+</div>
+
+<div class="quiz-box" id="q37">
+<h4>Q37. What does each head learn in Multi-Head Attention?</h4>
+<p style="font-size:11px;color:rgba(255,255,255,0.7);margin:-5px 0 10px 0">Multi-Head Attention에서 각 head가 학습하는 것은?</p>
+<div class="quiz-option" onclick="showAnswer('q37','a')">A. Same patterns</div>
+<div class="quiz-option" onclick="showAnswer('q37','b')">B. Different sub-tasks (syntax, semantics, positional relations, etc.)</div>
+<div class="quiz-option" onclick="showAnswer('q37','c')">C. Random patterns</div>
+<div class="quiz-option" onclick="showAnswer('q37','d')">D. Noise</div>
+<div class="quiz-answer" id="ans-q37"><strong>Answer: B</strong><br>Experimentally observed that each head learns different patterns. Unintentional but natural division of labor.<br><span style="font-size:11px;color:#aaa">실험적으로 각 head가 다른 패턴을 학습하는 것이 관찰됨. 자연스럽게 역할 분담.</span></div>
+</div>
+
+<div class="quiz-box" id="q38">
+<h4>Q38. Why is Transformer also used in Vision?</h4>
+<p style="font-size:11px;color:rgba(255,255,255,0.7);margin:-5px 0 10px 0">Transformer가 Vision에서도 사용되는 이유는?</p>
+<div class="quiz-option" onclick="showAnswer('q38','a')">A. Always better than CNN</div>
+<div class="quiz-option" onclick="showAnswer('q38','b')">B. Can be applied to various domains by changing Positional Encoding</div>
+<div class="quiz-option" onclick="showAnswer('q38','c')">C. Faster computation</div>
+<div class="quiz-option" onclick="showAnswer('q38','d')">D. Uses less memory</div>
+<div class="quiz-answer" id="ans-q38"><strong>Answer: B</strong><br>Lecture quote: "If your data is not sequential, you can replace positional encoding with other components. That is the strength of Transformer."<br><span style="font-size:11px;color:#aaa">Positional Encoding을 바꾸면 다양한 도메인에 적용 가능. Transformer의 강점.</span></div>
+</div>
+
+<div class="quiz-box" id="q39">
+<h4>Q39. What is the sum of attention weights?</h4>
+<p style="font-size:11px;color:rgba(255,255,255,0.7);margin:-5px 0 10px 0">Attention weight의 합은?</p>
+<div class="quiz-option" onclick="showAnswer('q39','a')">A. 0</div>
+<div class="quiz-option" onclick="showAnswer('q39','b')">B. 1 (for each Query)</div>
+<div class="quiz-option" onclick="showAnswer('q39','c')">C. d_k</div>
+<div class="quiz-option" onclick="showAnswer('q39','d')">D. n (sequence length)</div>
+<div class="quiz-answer" id="ans-q39"><strong>Answer: B</strong><br>After softmax, each row (Query)'s attention weights sum to 1. It's a probability distribution.<br><span style="font-size:11px;color:#aaa">Softmax 적용 후 각 행(Query)의 attention weight 합 = 1. 확률 분포.</span></div>
+</div>
+
+<div class="quiz-box" id="q40">
+<h4>Q40. What is the key trend in NLP since 2017?</h4>
+<p style="font-size:11px;color:rgba(255,255,255,0.7);margin:-5px 0 10px 0">2017년 이후 NLP의 핵심 트렌드는?</p>
+<div class="quiz-option" onclick="showAnswer('q40','a')">A. Developing new architectures</div>
+<div class="quiz-option" onclick="showAnswer('q40','b')">B. Scaling Transformer-based models (bigger = better)</div>
+<div class="quiz-option" onclick="showAnswer('q40','c')">C. Return to RNN</div>
+<div class="quiz-option" onclick="showAnswer('q40','d')">D. CNN-based NLP</div>
+<div class="quiz-answer" id="ans-q40"><strong>Answer: B</strong><br>BERT, GPT, LLaMA are all Transformer-based. "No new architecture innovation, just scaling for better performance" — Scaling Laws.<br><span style="font-size:11px;color:#aaa">BERT, GPT, LLaMA 모두 Transformer 기반. 새로운 아키텍처 혁신 없이 스케일링만으로 성능 향상.</span></div>
+</div>
+
+<script>
+function showAnswer(qid, selected) {
+  var ans = document.getElementById('ans-' + qid);
+  var options = document.querySelectorAll('#' + qid + ' .quiz-option');
+  var match = ans.innerHTML.match(/Answer: ([A-D])/);
+  if (!match) return;
+  var correct = match[1].toLowerCase();
+  
+  options.forEach(function(opt, idx) {
+    var letter = String.fromCharCode(97 + idx); // a, b, c, d
+    if (letter === correct) {
+      opt.classList.add('correct');
+    } else if (letter === selected) {
+      opt.classList.add('wrong');
+    }
+  });
+  
+  ans.style.display = 'block';
+}
+</script>
+
+<!-- ═══════════════════════════════════════════ -->
+<!-- Cheat Sheet -->
+<!-- ═══════════════════════════════════════════ -->
+<h2 id="cheatsheet">📋 Cheat Sheet — 시험 직전 복습</h2>
 
 <div class="def">
 <p class="ni"><strong>🔥 가장 중요한 수식</strong></p>
 <div class="eq" style="font-size:18px;background:#fff">\[ \text{Attention}(Q, K, V) = \text{softmax}\left(\frac{QK^T}{\sqrt{d_k}}\right) V \]</div>
 </div>
 
-<div class="tc">핵심 개념 정리</div>
+<div class="tc">핵심 개념 요약</div>
 <table>
 <tr><th>개념</th><th>핵심 포인트</th></tr>
 <tr><td>√d_k 스케일링</td><td>dot product 분산이 d_k에 비례 → softmax saturation 방지</td></tr>
 <tr><td>Multi-Head</td><td>각 head가 다른 sub-task 학습, CNN의 multiple filters와 유사</td></tr>
 <tr><td>Positional Encoding</td><td>Self-Attention은 순서 모름 → 위치 정보 주입 필요</td></tr>
-<tr><td>Layer Norm</td><td>원 논문이 이걸로 튜닝됨</td></tr>
+<tr><td>Layer Norm</td><td>원 논문이 이걸로 튜닝됨, Batch Norm 쓰려면 재튜닝 필요</td></tr>
 <tr><td>Teacher Forcing</td><td>학습 시 ground truth 사용 → 병렬화 가능</td></tr>
-<tr><td>Label Smoothing</td><td>과신 방지, 일반화 향상</td></tr>
+<tr><td>Causal Masking</td><td>미래 토큰 차단, autoregressive 학습</td></tr>
+<tr><td>Label Smoothing</td><td>과신 방지, 일반화 향상, ε=0.1이면 정답=0.9</td></tr>
 <tr><td>Cross-Attention</td><td>Q: Decoder, K/V: Encoder</td></tr>
 <tr><td>Transformer 탄생</td><td>TPU가 RNN 지원 안 해서!</td></tr>
 </table>
 
+<div class="tc">Original Transformer 하이퍼파라미터</div>
+<table>
+<tr><th>N (layers)</th><th>h (heads)</th><th>d_model</th><th>d_k = d_v</th><th>d_ff</th></tr>
+<tr><td>6</td><td>8</td><td>512</td><td>64</td><td>2048</td></tr>
+</table>
+
+<div class="tc">Attention 유형</div>
+<table>
+<tr><th>유형</th><th>Q</th><th>K, V</th><th>위치</th></tr>
+<tr><td>Self-Attention</td><td>같은 시퀀스</td><td>같은 시퀀스</td><td>Encoder</td></tr>
+<tr><td>Causal/Masked</td><td>같은 시퀀스</td><td>같은 시퀀스 (미래 마스킹)</td><td>Decoder 1st</td></tr>
+<tr><td>Cross-Attention</td><td>Decoder</td><td>Encoder 출력</td><td>Decoder 2nd</td></tr>
+</table>
+
+<div class="tc">토큰화 비교</div>
+<table>
+<tr><th>방법</th><th>장점</th><th>단점</th></tr>
+<tr><td>Word-level</td><td>간단, 직관적</td><td>OOV, "bears"≠"bear"</td></tr>
+<tr><td>Subword</td><td>OOV 감소, 어근 공유</td><td>여전히 OOV 가능</td></tr>
+<tr><td>Character</td><td>OOV 없음</td><td>시퀀스 길어짐, 해석 어려움</td></tr>
+</table>
+
+<div class="tc">평가 지표</div>
+<table>
+<tr><th>지표</th><th>특징</th><th>Ground Truth</th></tr>
+<tr><td>BLEU</td><td>Precision 기반, 번역 품질</td><td>필요</td></tr>
+<tr><td>ROUGE</td><td>Recall 기반</td><td>필요</td></tr>
+<tr><td>Perplexity</td><td>모델 불확실성, 낮을수록 좋음</td><td>불필요!</td></tr>
+</table>
+
+<div class="ok">
+<p class="ni"><strong>시험 전 체크리스트:</strong></p>
+<ul>
+<li>☐ Attention 수식 외우기: softmax(QK^T / √d_k) × V</li>
+<li>☐ √d_k 이유: 분산 정규화, softmax saturation 방지</li>
+<li>☐ Multi-Head 목적: 다른 sub-task 학습</li>
+<li>☐ Positional Encoding 필요 이유: Self-Attention은 순서 모름</li>
+<li>☐ Teacher Forcing vs Autoregressive 차이</li>
+<li>☐ Label Smoothing 효과: 과신 방지</li>
+<li>☐ Cross-Attention: Q=Decoder, K/V=Encoder</li>
+<li>☐ 하이퍼파라미터: N=6, h=8, d_model=512, d_ff=2048</li>
+</ul>
+</div>
+
 <div style="text-align:center;margin-top:40px;padding:20px;background:#f0f4f8;border-radius:8px">
-<p style="font-size:16px;font-weight:bold;margin:0">"Attention Is All You Need"</p>
-<p style="font-size:13px;color:#666;margin-top:8px">Vaswani et al. · NeurIPS 2017</p>
+<p style="font-size:18px;font-weight:bold;margin:0">🎯 화이팅! 내일 퀴즈 잘 보자!</p>
+<p style="font-size:14px;color:#666;margin-top:8px">3/12 퀴즈 20문제 · Transformer 완벽 정복</p>
 </div>
 
 </div>
