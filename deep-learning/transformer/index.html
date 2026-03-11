@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Transformer: Attention Is All You Need | Deep Learning</title>
+<script>
+MathJax = { tex: { inlineMath: [['\\(','\\)']], displayMath: [['\\[','\\]']] } };
+</script>
+<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;500&family=Space+Mono:wght@400&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+<script src="https://cdn.plot.ly/plotly-2.35.0.min.js"></script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Inter',sans-serif;background:#fafaf8;color:#1a1a1a;line-height:1.7;overflow-x:hidden}
+.sidebar{position:fixed;left:0;top:0;width:260px;height:100vh;background:rgba(255,255,255,.97);border-right:1px solid rgba(0,0,0,.06);padding:32px 24px;z-index:100;overflow-y:auto;display:flex;flex-direction:column}
+.sidebar-profile{text-align:center;margin-bottom:28px;padding-bottom:24px;border-bottom:1px solid rgba(0,0,0,.08)}
+.profile-icon{font-size:48px;margin-bottom:8px}
+.profile-name{font-family:'Cormorant Garamond',serif;font-size:1.3rem;font-weight:500;margin-bottom:4px}
+.profile-title{font-size:.68rem;color:#888;letter-spacing:.08em;text-transform:uppercase;margin-bottom:8px}
+.profile-bio{font-size:.78rem;color:#666;line-height:1.5}
+.sidebar-nav{flex:1;margin-top:16px}
+.nav-section{margin-bottom:20px}
+.nav-section-title{font-size:.6rem;font-weight:600;color:#aaa;letter-spacing:.15em;text-transform:uppercase;margin-bottom:10px}
+.nav-list{list-style:none}
+.nav-list li{margin-bottom:5px}
+.nav-list a{font-size:.78rem;color:#555;text-decoration:none;transition:all .2s;display:block;padding:3px 0}
+.nav-list a:hover{color:#0080c6;padding-left:4px}
+.nav-list a.active{color:#0080c6;font-weight:500}
+.badge{display:inline-block;font-size:.5rem;background:#0080c6;color:#fff;padding:1px 5px;border-radius:8px;margin-left:3px;vertical-align:middle}
+.badge-core{background:#e74c3c}
+.sidebar-footer{padding-top:16px;border-top:1px solid rgba(0,0,0,.06);font-size:.65rem;color:#aaa;text-align:center}
+.main-wrapper{margin-left:260px;min-height:100vh}
+.container{max-width:1100px;margin:0 auto;padding:50px 40px 80px}
+.paper-content{font-family:'Times New Roman','Nanum Myeongjo',serif;line-height:1.8;background:#fff;padding:40px;border-radius:8px;box-shadow:0 2px 20px rgba(0,0,0,.05)}
+.paper-header{text-align:center;margin-bottom:40px;padding-bottom:30px;border-bottom:2px solid #333}
+.paper-category{font-size:14px;color:#666;margin-bottom:10px}
+.paper-title{font-size:24px;font-weight:bold;margin-bottom:12px;line-height:1.4}
+.paper-subtitle{font-size:14px;color:#555;margin-bottom:8px}
+.paper-team{font-size:13px;color:#444}
+.abstract{background:#f8f9fa;padding:25px;margin:30px 0;border-left:4px solid #2c3e50}
+.abstract-title{font-weight:bold;font-size:16px;margin-bottom:15px}
+h2{font-size:18px;margin:35px 0 20px;padding-bottom:8px;border-bottom:1px solid #ddd;color:#2c3e50}
+h3{font-size:15px;margin:25px 0 15px;color:#34495e}
+h4{font-size:14px;margin:20px 0 12px;color:#34495e}
+p{text-align:justify;margin-bottom:15px;text-indent:2em}
+p.ni{text-indent:0}
+table{width:100%;border-collapse:collapse;margin:20px 0;font-size:12px}
+th,td{border:1px solid #ddd;padding:10px 8px;text-align:center}
+th{background:#2c3e50;color:white;font-weight:bold}
+tr:nth-child(even){background:#f8f9fa}
+tr:hover{background:#e8f4f8}
+.tc{font-size:13px;font-weight:bold;margin:15px 0 10px;text-align:center}
+.eq{text-align:center;margin:20px 0;padding:15px;background:#f8f9fa;border-radius:4px;overflow-x:auto}
+ul,ol{margin-left:2em;margin-bottom:15px}
+li{margin-bottom:6px}
+.def{background:#fff9e6;border:1px solid #ffc107;border-radius:4px;padding:20px;margin:20px 0}
+.info{background:#e8f4f8;border-left:4px solid #3498db;padding:20px;margin:20px 0}
+.warn{background:#fff3cd;border-left:4px solid #f39c12;padding:20px;margin:20px 0}
+.ok{background:#d4edda;border-left:4px solid #28a745;padding:20px;margin:20px 0}
+pre{background:#1e1e1e;color:#d4d4d4;padding:20px;border-radius:6px;overflow-x:auto;margin:20px 0;font-family:'Space Mono','Consolas',monospace;font-size:13px;line-height:1.6}
+code{font-family:'Space Mono','Consolas',monospace;font-size:13px}
+p code,li code,td code{background:#f0f0f0;padding:2px 6px;border-radius:3px;color:#c7254e;font-size:12px}
+.cm{color:#6a9955}.kw{color:#569cd6}.st{color:#ce9178}.fn{color:#dcdcaa}.nb{color:#4ec9b0}.nu{color:#b5cea8}
+@media(max-width:1024px){
+.sidebar{width:100%;height:auto;position:relative;border-right:none;border-bottom:1px solid rgba(0,0,0,.08);padding:16px}
+.sidebar-profile{margin-bottom:10px;padding-bottom:10px;display:flex;align-items:center;gap:12px;text-align:left}
+.profile-icon{font-size:32px;margin-bottom:0}.profile-bio{display:none}
+.nav-section{display:inline-block;margin-right:16px;margin-bottom:8px}
+.nav-list{display:flex;gap:10px;flex-wrap:wrap}.nav-list li{margin-bottom:0}
+.sidebar-footer{display:none}
+.main-wrapper{margin-left:0}
+.container{padding:0}.paper-content{padding:20px 16px;border-radius:0;box-shadow:none}
+.paper-title{font-size:18px}p{font-size:14px;text-indent:1.5em;text-align:left}
+pre{font-size:11px;padding:14px}table{font-size:10px;display:block;overflow-x:auto}
+}
+</style>
+</head>
+<body>
+
+<div class="sidebar">
+<div class="sidebar-profile">
+<div class="profile-icon">🤖</div>
+<div class="profile-name">Deep Learning Notes</div>
+<div class="profile-title">Transformer Architecture</div>
+<div class="profile-bio">Self-Attention부터 Training Tricks까지</div>
+</div>
+<div class="sidebar-nav">
+<div class="nav-section">
+<div class="nav-section-title">Contents</div>
+<ul class="nav-list">
+<li><a href="#ch1">1. Transformer 탄생 배경</a></li>
+<li><a class="active" href="#ch2">2. Self-Attention <span class="badge badge-core">핵심</span></a></li>
+<li><a href="#ch3">3. Multi-Head Attention</a></li>
+<li><a href="#ch4">4. Positional Encoding</a></li>
+<li><a href="#ch5">5. Encoder-Decoder 구조</a></li>
+<li><a href="#ch6">6. Training Tricks</a></li>
+<li><a href="#ch7">7. 핵심 요약</a></li>
+</ul>
+</div>
+<div class="nav-section">
+<div class="nav-section-title">Reference</div>
+<ul class="nav-list">
+<li><a href="https://arxiv.org/abs/1706.03762" target="_blank">📄 Original Paper</a></li>
+<li><a href="../../factor-investing/round-01/">← Factor Investing</a></li>
+</ul>
+</div>
+</div>
+<div class="sidebar-footer">Vaswani et al. 2017 · NeurIPS</div>
+</div>
+
+<div class="main-wrapper">
+<div class="container">
+<div class="paper-content">
+
+<div class="paper-header">
+<div class="paper-category">Deep Learning · NLP Architecture</div>
+<h1 class="paper-title">Transformer: Attention Is All You Need</h1>
+<div class="paper-subtitle">Self-Attention, Multi-Head Attention, Positional Encoding — 현대 NLP의 핵심</div>
+<div class="paper-team">Vaswani et al. (2017) · Google Brain</div>
+</div>
+
+<div class="abstract">
+<div class="abstract-title">Key Takeaways</div>
+<p class="ni">이 글을 읽으면 다음을 이해할 수 있다:</p>
+<ul>
+<li>Transformer가 탄생한 진짜 이유 (TPU와 RNN의 관계)</li>
+<li>Self-Attention 수식 \(\text{Attention}(Q,K,V) = \text{softmax}\left(\frac{QK^T}{\sqrt{d_k}}\right)V\)의 각 요소</li>
+<li>\(\sqrt{d_k}\)로 나누는 수학적 이유</li>
+<li>Multi-Head Attention이 CNN의 multiple filters와 유사한 이유</li>
+<li>Positional Encoding이 필요한 이유</li>
+<li>Teacher Forcing, Label Smoothing 등 학습 기법</li>
+</ul>
+</div>
+
+<!-- Ch1 -->
+<h2 id="ch1">1. Transformer의 탄생 배경</h2>
+
+<h3>1.1 TPU가 RNN을 지원하지 않았다</h3>
+<p>2017년 Transformer가 등장한 배경에는 흥미로운 이야기가 있다. Google은 2016년 TPU(Tensor Processing Unit)를 개발했는데, TPU는 RNN 아키텍처를 효율적으로 지원하지 못했다. 당시 NLP 연구자들은 RNN/LSTM에 의존하고 있었기 때문에, TPU를 활용하려면 새로운 아키텍처가 필요했다.</p>
+
+<div class="warn">
+<p class="ni"><strong>Transformer의 진짜 탄생 이유:</strong></p>
+<p class="ni">"Google wanted to change the usage of GPU because GPU is too expensive. So they built the TPU in 2016. But the limitation of TPU is that TPU cannot support RNN architecture. So NLP researchers in Google decided to make their own architecture that can be supported by TPU. And that is the Transformer."</p>
+<p class="ni">— 자원의 제약이 기술 혁신을 이끈 사례다.</p>
+</div>
+
+<h3>1.2 RNN의 한계</h3>
+<p>RNN은 순차적으로 처리해야 하므로 병렬화가 불가능하다. 또한 긴 시퀀스에서 vanishing gradient 문제가 발생하고, long-range dependency를 학습하기 어렵다. LSTM이 이를 완화했지만 완전히 해결하지는 못했다.</p>
+
+<p>Transformer의 핵심 아이디어는 간단하다: 출력 토큰을 모든 입력 토큰에 직접 연결하자. RNN처럼 순차적으로 정보를 전달하는 대신, 모든 위치를 한 번에 참조할 수 있게 하자.</p>
+
+<!-- Ch2 -->
+<h2 id="ch2">2. Self-Attention — 핵심 메커니즘</h2>
+
+<h3>2.1 Query, Key, Value</h3>
+<p>Self-Attention의 핵심 개념은 Query(Q), Key(K), Value(V)다. 도서관 비유로 이해하면:</p>
+<ul>
+<li><strong>Query:</strong> 내가 찾고 싶은 것 (검색어)</li>
+<li><strong>Key:</strong> 각 책의 제목/태그 (식별자)</li>
+<li><strong>Value:</strong> 책의 실제 내용 (정보)</li>
+</ul>
+
+<p>입력 임베딩 \(X\)에서 Q, K, V를 생성한다:</p>
+<div class="eq">\[ Q = XW_Q, \quad K = XW_K, \quad V = XW_V \]</div>
+
+<h3>2.2 Scaled Dot-Product Attention</h3>
+
+<div class="def">
+<p class="ni"><strong>Definition — Scaled Dot-Product Attention</strong></p>
+<div class="eq" style="font-size:18px;padding:25px;background:#fff9e6;border:2px solid #ffc107">\[ \text{Attention}(Q, K, V) = \text{softmax}\left(\frac{QK^T}{\sqrt{d_k}}\right) V \]</div>
+</div>
+
+<p class="ni"><strong>단계별 분해:</strong></p>
+<ol>
+<li><strong>\(QK^T\):</strong> Query와 Key의 dot product로 유사도 계산. \((i,j)\) 원소는 Query \(i\)와 Key \(j\)의 관련성.</li>
+<li><strong>\(\div \sqrt{d_k}\):</strong> 스케일링. \(d_k\)가 크면 dot product의 분산이 커져서 softmax가 극단적이 됨.</li>
+<li><strong>Softmax:</strong> 각 Query에 대해 모든 Key의 중요도를 확률 분포로 변환.</li>
+<li><strong>\(\times V\):</strong> Attention weight로 Value를 가중 평균.</li>
+</ol>
+
+<h3>2.3 왜 \(\sqrt{d_k}\)로 나누는가?</h3>
+
+<div class="info">
+<p class="ni"><strong>수학적 이유:</strong></p>
+<p class="ni">\(q, k\)가 평균 0, 분산 1인 독립 성분이면:</p>
+<div class="eq">\[ \text{Var}(q \cdot k) = \text{Var}\left(\sum_{i=1}^{d_k} q_i k_i\right) = d_k \]</div>
+<p class="ni">분산이 \(d_k\)에 비례하므로, \(\sqrt{d_k}\)로 나눠서 분산을 1로 정규화한다. 이렇게 하지 않으면 softmax 입력이 너무 커져서 gradient가 매우 작아진다 (softmax saturation).</p>
+</div>
+
+<pre><code><span class="kw">import</span> numpy <span class="kw">as</span> np
+
+<span class="kw">def</span> <span class="fn">scaled_dot_product_attention</span>(Q, K, V):
+    <span class="st">"""Scaled Dot-Product Attention 구현"""</span>
+    d_k = Q.shape[-<span class="nu">1</span>]
+    
+    <span class="cm"># Step 1: QK^T (유사도)</span>
+    scores = Q @ K.T
+    
+    <span class="cm"># Step 2: Scale by sqrt(d_k)</span>
+    scores = scores / np.sqrt(d_k)
+    
+    <span class="cm"># Step 3: Softmax</span>
+    attention_weights = np.exp(scores) / np.sum(np.exp(scores), axis=-<span class="nu">1</span>, keepdims=<span class="kw">True</span>)
+    
+    <span class="cm"># Step 4: Weighted sum of values</span>
+    output = attention_weights @ V
+    
+    <span class="kw">return</span> output, attention_weights</code></pre>
+
+<!-- Ch3 -->
+<h2 id="ch3">3. Multi-Head Attention</h2>
+
+<p>여러 개의 attention을 병렬로 수행하고 결과를 concat한다. 각 head가 다른 관점에서 정보를 추출한다.</p>
+
+<div class="eq">\[ \text{MultiHead}(Q, K, V) = \text{Concat}(\text{head}_1, ..., \text{head}_h) W^O \]</div>
+
+<div class="info">
+<p class="ni"><strong>왜 Multi-Head인가?</strong></p>
+<ul>
+<li>CNN의 multiple filters와 유사한 아이디어</li>
+<li>각 head가 다른 sub-task를 학습 (문법, 의미, 위치 관계 등)</li>
+<li>실험적으로 각 head가 다른 패턴을 학습한다는 것이 관찰됨</li>
+</ul>
+</div>
+
+<div class="tc">Table 1. Original Transformer 하이퍼파라미터</div>
+<table>
+<tr><th>파라미터</th><th>값</th><th>설명</th></tr>
+<tr><td>\(N\)</td><td>6</td><td>Encoder/Decoder layer 수</td></tr>
+<tr><td>\(h\)</td><td>8</td><td>Attention head 수</td></tr>
+<tr><td>\(d_{model}\)</td><td>512</td><td>Embedding dimension</td></tr>
+<tr><td>\(d_k = d_v\)</td><td>64</td><td>\(d_{model} / h = 512/8\)</td></tr>
+<tr><td>\(d_{ff}\)</td><td>2048</td><td>Feed-forward hidden dimension</td></tr>
+</table>
+
+<!-- Ch4 -->
+<h2 id="ch4">4. Positional Encoding</h2>
+
+<p>Self-Attention은 순서 정보를 모른다. "I love you"와 "You love I"가 같은 결과를 낸다. 위치 정보를 주입해야 한다.</p>
+
+<div class="def">
+<p class="ni"><strong>Definition — Sinusoidal Positional Encoding</strong></p>
+<div class="eq">\[ PE_{(pos, 2i)} = \sin\left(\frac{pos}{10000^{2i/d_{model}}}\right) \]</div>
+<div class="eq">\[ PE_{(pos, 2i+1)} = \cos\left(\frac{pos}{10000^{2i/d_{model}}}\right) \]</div>
+</div>
+
+<div class="warn">
+<p class="ni"><strong>핵심 포인트:</strong> "Without positional encoding, Transformer cannot handle sequential data. Only with positional encoding, Transformer can know the position information."</p>
+</div>
+
+<!-- Interactive PE visualization -->
+<div id="plot-pe" style="width:100%;height:400px;margin:20px 0"></div>
+<script>
+(function(){
+  var d_model=64, max_len=50;
+  var pe=[];
+  for(var pos=0;pos<max_len;pos++){
+    var row=[];
+    for(var i=0;i<d_model;i++){
+      var angle=pos/Math.pow(10000,2*Math.floor(i/2)/d_model);
+      row.push(i%2===0?Math.sin(angle):Math.cos(angle));
+    }
+    pe.push(row);
+  }
+  Plotly.newPlot('plot-pe',[{
+    z:pe,type:'heatmap',colorscale:'RdBu',
+    x:Array.from({length:d_model},(_,i)=>'dim '+i),
+    y:Array.from({length:max_len},(_,i)=>'pos '+i)
+  }],{
+    title:'Sinusoidal Positional Encoding',
+    xaxis:{title:'Dimension'},yaxis:{title:'Position'},
+    plot_bgcolor:'#fafaf8',paper_bgcolor:'#fff',
+    font:{family:'Inter',size:11},
+    margin:{t:50,r:20,b:50,l:60}
+  },{responsive:true});
+})();
+</script>
+
+<!-- Ch5 -->
+<h2 id="ch5">5. Encoder-Decoder 구조</h2>
+
+<h3>5.1 Encoder Block</h3>
+<p>Encoder는 Multi-Head Self-Attention → Add & Norm → Feed-Forward → Add & Norm 구조다. 입력 시퀀스의 모든 토큰을 양방향으로 참조할 수 있다.</p>
+
+<h3>5.2 Decoder Block</h3>
+<p>Decoder에는 두 개의 attention이 있다:</p>
+<ol>
+<li><strong>Masked Self-Attention (Causal):</strong> 미래 토큰을 볼 수 없도록 마스킹</li>
+<li><strong>Cross-Attention:</strong> Q는 Decoder에서, K/V는 Encoder 출력에서</li>
+</ol>
+
+<div class="tc">Table 2. Attention 유형 비교</div>
+<table>
+<tr><th>유형</th><th>Q 출처</th><th>K, V 출처</th><th>사용 위치</th></tr>
+<tr><td>Self-Attention</td><td>같은 시퀀스</td><td>같은 시퀀스</td><td>Encoder</td></tr>
+<tr><td>Causal/Masked</td><td>같은 시퀀스</td><td>같은 시퀀스 (미래 마스킹)</td><td>Decoder 1st</td></tr>
+<tr><td>Cross-Attention</td><td>Decoder</td><td>Encoder 출력</td><td>Decoder 2nd</td></tr>
+</table>
+
+<h3>5.3 Layer Normalization</h3>
+<p>Transformer는 Batch Normalization 대신 Layer Normalization을 사용한다.</p>
+
+<div class="info">
+<p class="ni"><strong>왜 Layer Norm인가?</strong></p>
+<p class="ni">"The only reason to use Layer Normalization in Transformer is that the original paper was tuning the network based on Layer Normalization. If you want to use Batch Normalization, you need to tune hyperparameters again."</p>
+</div>
+
+<!-- Ch6 -->
+<h2 id="ch6">6. Training Tricks</h2>
+
+<h3>6.1 Teacher Forcing vs Autoregressive</h3>
+
+<div class="tc">Table 3. Teacher Forcing vs Autoregressive</div>
+<table>
+<tr><th>특성</th><th>Teacher Forcing (학습)</th><th>Autoregressive (추론)</th></tr>
+<tr><td>입력</td><td>Ground truth 시퀀스</td><td>이전 스텝의 예측</td></tr>
+<tr><td>병렬화</td><td>가능</td><td>불가능</td></tr>
+<tr><td>에러 전파</td><td>없음</td><td>있음 (에러 누적)</td></tr>
+</table>
+
+<h3>6.2 Label Smoothing</h3>
+<p>One-hot label 대신 soft label 사용. 모델의 과신(overconfidence)을 방지한다.</p>
+
+<div class="eq">\[ y_{\text{smooth}} = (1 - \epsilon) \cdot y_{\text{one-hot}} + \frac{\epsilon}{K} \]</div>
+
+<div class="ok">
+<p class="ni"><strong>Label Smoothing 효과:</strong></p>
+<ul>
+<li>ε=0.1이면 정답 클래스는 0.9, 나머지는 약 0.02</li>
+<li>모델이 100% 확신하지 않도록 유도 → 일반화 성능 향상</li>
+<li>BLEU score 향상 (실험적으로 검증됨)</li>
+</ul>
+</div>
+
+<!-- Ch7 -->
+<h2 id="ch7">7. 핵심 요약</h2>
+
+<div class="def">
+<p class="ni"><strong>🔥 가장 중요한 수식</strong></p>
+<div class="eq" style="font-size:18px;background:#fff">\[ \text{Attention}(Q, K, V) = \text{softmax}\left(\frac{QK^T}{\sqrt{d_k}}\right) V \]</div>
+</div>
+
+<div class="tc">핵심 개념 정리</div>
+<table>
+<tr><th>개념</th><th>핵심 포인트</th></tr>
+<tr><td>√d_k 스케일링</td><td>dot product 분산이 d_k에 비례 → softmax saturation 방지</td></tr>
+<tr><td>Multi-Head</td><td>각 head가 다른 sub-task 학습, CNN의 multiple filters와 유사</td></tr>
+<tr><td>Positional Encoding</td><td>Self-Attention은 순서 모름 → 위치 정보 주입 필요</td></tr>
+<tr><td>Layer Norm</td><td>원 논문이 이걸로 튜닝됨</td></tr>
+<tr><td>Teacher Forcing</td><td>학습 시 ground truth 사용 → 병렬화 가능</td></tr>
+<tr><td>Label Smoothing</td><td>과신 방지, 일반화 향상</td></tr>
+<tr><td>Cross-Attention</td><td>Q: Decoder, K/V: Encoder</td></tr>
+<tr><td>Transformer 탄생</td><td>TPU가 RNN 지원 안 해서!</td></tr>
+</table>
+
+<div style="text-align:center;margin-top:40px;padding:20px;background:#f0f4f8;border-radius:8px">
+<p style="font-size:16px;font-weight:bold;margin:0">"Attention Is All You Need"</p>
+<p style="font-size:13px;color:#666;margin-top:8px">Vaswani et al. · NeurIPS 2017</p>
+</div>
+
+</div>
+</div>
+</div>
+
+</body>
+</html>
