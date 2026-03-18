@@ -1,0 +1,922 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="robots" content="noindex,nofollow">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>HANA ESG TradeGuard — 발표자료 v2</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&display=swap">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --hana:#008C73;--hana-dark:#006B57;--hana-deeper:#004D3D;--hana-light:#E6F5F1;--hana-pale:#F2FAF8;
+  --red:#C62828;--red-bg:#FFF5F5;--red-border:#FFCDD2;
+  --orange:#E65100;--orange-bg:#FFF8E1;
+  --blue:#1565C0;--blue-bg:#E3F2FD;
+  --green-bg:#E8F5E9;--green-border:#C8E6C9;
+  --bg:#FFFFFF;--bg2:#F7F8FA;--bg3:#F0F2F5;
+  --text:#1B1B1B;--text-sub:#5A6370;--text-light:#8C95A0;--border:#DDE1E6;
+  --mono:'JetBrains Mono',monospace;--sans:'Noto Sans KR','Apple SD Gothic Neo',sans-serif;
+}
+html,body{width:100%;height:100%;overflow:hidden;background:#111;font-family:var(--sans)}
+.deck{width:100%;height:100%;position:relative}
+.slide{position:absolute;top:0;left:0;width:100%;height:100%;display:flex;flex-direction:column;opacity:0;pointer-events:none;transition:opacity 0.35s ease}
+.slide.active{opacity:1;pointer-events:auto}
+.slide-inner{width:960px;height:540px;margin:auto;position:relative;overflow:hidden;border-radius:6px;box-shadow:0 8px 40px rgba(0,0,0,0.4)}
+
+/* 배경 */
+.s-white{background:#fff;color:var(--text)}
+.s-hana{background:linear-gradient(135deg,var(--hana-deeper) 0%,var(--hana) 60%,#00A67E 100%);color:#fff}
+.s-dark{background:#1B1F23;color:#fff}
+.s-light{background:var(--bg2);color:var(--text)}
+.s-red{background:linear-gradient(135deg,#2D1B1B 0%,#3D1F1F 100%);color:#fff}
+
+.s-pad{padding:44px 52px}
+.s-label{font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;margin-bottom:6px;opacity:0.5}
+.s-title{font-size:26px;font-weight:800;line-height:1.35;letter-spacing:-0.5px}
+.s-sub{font-size:12px;margin-top:6px;opacity:0.6;line-height:1.6}
+
+/* 프로그레스 바 */
+.progress{position:absolute;top:0;left:0;right:0;height:3px;background:rgba(0,0,0,0.1);z-index:10}
+.progress-fill{height:100%;background:var(--hana);transition:width 0.4s ease}
+.s-hana .progress,.s-dark .progress,.s-red .progress{background:rgba(255,255,255,0.15)}
+
+/* 그리드 */
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.g3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px}
+.g4{display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:12px}
+
+/* 카드 */
+.card{background:#fff;border:1px solid var(--border);border-radius:10px;padding:16px}
+.card-dark{background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.1);border-radius:10px;padding:16px;color:#fff}
+.card h4{font-size:12px;font-weight:700;margin-bottom:6px}
+.card p,.card-dark p{font-size:10px;line-height:1.6;opacity:0.75}
+
+/* 메트릭 */
+.metric{text-align:center;padding:14px 8px}
+.metric .val{font-family:var(--mono);font-size:26px;font-weight:800}
+.metric .lbl{font-size:9px;margin-top:3px;opacity:0.6}
+
+/* 테이블 */
+.tbl{width:100%;border-collapse:separate;border-spacing:0;font-size:10px}
+.tbl thead th{background:var(--hana);color:#fff;padding:7px 10px;text-align:center;font-weight:600;font-size:9px}
+.tbl thead th:first-child{text-align:left;border-radius:6px 0 0 0}
+.tbl thead th:last-child{border-radius:0 6px 0 0;background:var(--hana-deeper)}
+.tbl tbody td{padding:7px 10px;border-bottom:1px solid var(--bg3);text-align:center}
+.tbl tbody td:first-child{text-align:left}
+.tbl .hl{background:var(--hana-pale);font-weight:700;color:var(--hana-dark)}
+
+/* 플로우 */
+.flow{display:flex;align-items:center;gap:0}
+.flow-box{flex:1;background:#fff;border:1px solid var(--border);border-radius:8px;padding:10px 8px;text-align:center}
+.flow-box h5{font-size:9px;font-weight:700;margin-bottom:2px}
+.flow-box p{font-size:8px;color:var(--text-sub);line-height:1.4}
+.flow-arr{padding:0 3px;color:var(--hana);font-size:12px}
+
+/* 뱃지 */
+.badge{display:inline-block;padding:2px 8px;border-radius:12px;font-size:8px;font-weight:700;font-family:var(--mono)}
+.badge-red{background:rgba(198,40,40,0.12);color:var(--red)}
+.badge-green{background:rgba(0,140,115,0.12);color:var(--hana)}
+.badge-orange{background:rgba(230,81,0,0.12);color:var(--orange)}
+.badge-blue{background:rgba(21,101,192,0.12);color:var(--blue)}
+
+/* 스텝 넘버 */
+.sn{display:inline-flex;align-items:center;justify-content:center;width:20px;height:20px;border-radius:50%;background:var(--hana);color:#fff;font-size:9px;font-weight:800;margin-right:4px}
+
+/* 리스트 */
+.cl{list-style:none;padding:0}
+.cl li{font-size:10px;padding:3px 0;display:flex;align-items:flex-start;gap:5px;line-height:1.5}
+.cl li::before{content:'';width:5px;height:5px;border-radius:50%;background:var(--hana);flex-shrink:0;margin-top:5px}
+
+/* 타임라인 */
+.tl{position:relative;padding-left:18px}
+.tl::before{content:'';position:absolute;left:5px;top:5px;bottom:5px;width:2px;background:var(--hana)}
+.tl-i{position:relative;margin-bottom:10px}
+.tl-i::before{content:'';position:absolute;left:-16px;top:4px;width:7px;height:7px;border-radius:50%;background:var(--hana)}
+.tl-i .t{font-size:10px;font-weight:700;color:var(--hana)}
+.tl-i .d{font-size:9px;color:var(--text-sub);line-height:1.4}
+
+/* 하나 로고 */
+.hana-logo{display:flex;align-items:center;gap:8px}
+.hana-mark{width:28px;height:28px;border-radius:7px;background:var(--hana);display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:900;color:#fff;font-family:sans-serif}
+
+/* 페이지 */
+.pg{position:absolute;bottom:14px;right:20px;font-size:8px;font-family:var(--mono);opacity:0.25}
+
+/* 네비게이션 */
+.nav-bar{position:fixed;bottom:0;left:0;right:0;height:32px;background:rgba(0,0,0,0.9);display:flex;align-items:center;justify-content:center;gap:16px;z-index:100}
+.nav-bar span{font-size:10px;color:rgba(255,255,255,0.4);font-family:var(--mono)}
+
+/* vs 박스 */
+.vs-box{display:flex;gap:16px;align-items:stretch}
+.vs-side{flex:1;border-radius:10px;padding:20px}
+.vs-before{background:var(--red-bg);border:1px solid var(--red-border)}
+.vs-after{background:var(--green-bg);border:1px solid var(--green-border)}
+.vs-side h4{font-size:13px;font-weight:800;margin-bottom:10px}
+.vs-before h4{color:var(--red)}
+.vs-after h4{color:var(--hana)}
+
+/* 동심원 */
+.funnel{position:relative;width:200px;height:200px;margin:0 auto}
+.funnel-ring{position:absolute;border-radius:50%;display:flex;align-items:center;justify-content:center;text-align:center}
+
+/* 심볼 */
+.sym{font-size:14px;font-weight:700}
+.sym-o{color:var(--hana)}
+.sym-t{color:var(--orange)}
+.sym-x{color:var(--red)}
+
+/* Leaflet maps in slides */
+.slide-map{width:100%;height:100%;border-radius:8px;overflow:hidden}
+.leaflet-container{font-family:var(--sans);background:#1a2e1a}
+.ndvi-legend{position:absolute;z-index:1000;bottom:6px;left:6px;background:rgba(0,0,0,0.75);color:#fff;padding:6px 8px;border-radius:6px;font-size:8px;line-height:1.5;pointer-events:none}
+</style>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+</head>
+<body>
+<div class="deck" id="deck">
+
+<!-- ===== SLIDE 1: 표지 ===== -->
+<div class="slide active" data-n="1">
+  <div class="slide-inner s-hana">
+    <div class="progress"><div class="progress-fill" style="width:7.1%"></div></div>
+    <div class="s-pad" style="height:100%;display:flex;flex-direction:column;justify-content:center">
+      <div class="hana-logo" style="margin-bottom:28px">
+        <div class="hana-mark">H</div>
+        <span style="font-size:14px;font-weight:700;color:#fff">하나금융그룹 x AI ESG</span>
+      </div>
+      <div style="font-size:36px;font-weight:900;line-height:1.3;letter-spacing:-1px">
+        ESG TradeGuard
+      </div>
+      <div style="font-size:20px;font-weight:600;color:#A8E6CF;margin-top:8px;line-height:1.4">
+        AI 수출환어음 ESG 컴플라이언스<br>심사 플랫폼
+      </div>
+      <div style="font-size:13px;opacity:0.65;margin-top:20px;line-height:1.7;max-width:520px">
+        수출 서류 업로드 → OCR 파싱 → EU CBAM/EUDR 규제 매칭 →<br>
+        위성 NDVI 환경 검증 → 리스크 보고서 자동 생성
+      </div>
+      <div style="margin-top:32px;display:flex;gap:10px">
+        <span style="font-size:9px;background:rgba(255,255,255,0.15);padding:4px 12px;border-radius:16px;border:1px solid rgba(255,255,255,0.2)">2026 하나 청년 금융인재 프로젝트</span>
+        <span style="font-size:9px;background:rgba(255,255,255,0.15);padding:4px 12px;border-radius:16px;border:1px solid rgba(255,255,255,0.2)">디지털기술(AI) x ESG 미래금융서비스</span>
+      </div>
+    </div>
+    <div class="pg" style="color:rgba(255,255,255,0.25)">01 / 14</div>
+  </div>
+</div>
+
+<!-- ===== SLIDE 2: 문제 정의 ===== -->
+<div class="slide" data-n="2">
+  <div class="slide-inner s-white">
+    <div class="progress"><div class="progress-fill" style="width:14.3%"></div></div>
+    <div class="s-pad" style="height:100%;display:flex;flex-direction:column">
+      <div class="s-label" style="color:var(--red)">PROBLEM</div>
+      <div class="s-title">2026년 EU CBAM 본격 시행 — 한국 수출기업은 준비가 되어 있는가?</div>
+      <div style="flex:1;display:flex;flex-direction:column;justify-content:center;gap:16px">
+        <div class="g4">
+          <div class="metric" style="background:var(--red-bg);border-radius:10px;border:1px solid var(--red-border)">
+            <div class="val" style="color:var(--red)">$64.3B</div>
+            <div class="lbl">한국 대EU 수출액</div>
+          </div>
+          <div class="metric" style="background:var(--red-bg);border-radius:10px;border:1px solid var(--red-border)">
+            <div class="val" style="color:var(--red)">~23%</div>
+            <div class="lbl">CBAM 대상 품목 비중</div>
+          </div>
+          <div class="metric" style="background:var(--red-bg);border-radius:10px;border:1px solid var(--red-border)">
+            <div class="val" style="color:var(--red)">~3,000</div>
+            <div class="lbl">CBAM 대상 수출기업</div>
+          </div>
+          <div class="metric" style="background:var(--red-bg);border-radius:10px;border:1px solid var(--red-border)">
+            <div class="val" style="color:var(--red)">87%</div>
+            <div class="lbl">EUDR 미준비 기업 (KOTRA)</div>
+          </div>
+        </div>
+        <div class="g2">
+          <div class="card" style="border-left:3px solid var(--red);padding:14px">
+            <h4 style="color:var(--red)">준비 안 된 현실</h4>
+            <ul class="cl" style="margin-top:4px">
+              <li>EUDR 대응 완료 12%, 중소기업 5% 미만</li>
+              <li>Due Diligence Statement 작성법 모르는 기업 87%</li>
+              <li>중소 수출기업 ESG 전담 인력 부재</li>
+            </ul>
+          </div>
+          <div class="card" style="border-left:3px solid var(--orange);padding:14px">
+            <h4 style="color:var(--orange)">안 하면 벌어지는 일</h4>
+            <ul class="cl" style="margin-top:4px">
+              <li>CBAM 인증서 없이 EU 통관 거부 — 수출 자체 불가</li>
+              <li>철강 기준 톤당 EUR 50~80 추가 비용</li>
+              <li>EU 바이어들이 ESG 미준수 공급업체 선제 교체</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="pg">02 / 14</div>
+  </div>
+</div>
+
+<!-- ===== SLIDE 3: 기존 방식의 한계 (Before/After) ===== -->
+<div class="slide" data-n="3">
+  <div class="slide-inner s-white">
+    <div class="progress"><div class="progress-fill" style="width:21.4%"></div></div>
+    <div class="s-pad" style="height:100%;display:flex;flex-direction:column">
+      <div class="s-label" style="color:var(--hana)">BEFORE → AFTER</div>
+      <div class="s-title">기존 수작업 심사 vs AI 자동 심사</div>
+      <div style="flex:1;display:flex;flex-direction:column;justify-content:center">
+        <div class="vs-box">
+          <div class="vs-side vs-before">
+            <h4>BEFORE — 수작업 심사</h4>
+            <div style="font-size:11px;color:var(--text-sub);line-height:1.8">
+              <div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid var(--red-border)"><span>심사 소요시간</span><b style="color:var(--red)">3~5일</b></div>
+              <div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid var(--red-border)"><span>ESG 규제 확인</span><b style="color:var(--red)">수동 검색</b></div>
+              <div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid var(--red-border)"><span>위성 환경 검증</span><b style="color:var(--red)">불가능</b></div>
+              <div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid var(--red-border)"><span>규제 업데이트</span><b style="color:var(--red)">수동 (월 1회)</b></div>
+              <div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid var(--red-border)"><span>처리 가능 건수</span><b style="color:var(--red)">일 5~10건</b></div>
+              <div style="display:flex;justify-content:space-between;padding:5px 0"><span>인력 필요</span><b style="color:var(--red)">전담 2~3명</b></div>
+            </div>
+          </div>
+          <div style="display:flex;align-items:center;font-size:24px;color:var(--hana);font-weight:900;padding:0 8px">→</div>
+          <div class="vs-side vs-after">
+            <h4>AFTER — AI 자동 심사</h4>
+            <div style="font-size:11px;color:var(--text-sub);line-height:1.8">
+              <div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid var(--green-border)"><span>심사 소요시간</span><b style="color:var(--hana)">4.2초</b></div>
+              <div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid var(--green-border)"><span>ESG 규제 확인</span><b style="color:var(--hana)">자동 매칭</b></div>
+              <div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid var(--green-border)"><span>위성 환경 검증</span><b style="color:var(--hana)">Sentinel-2 NDVI</b></div>
+              <div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid var(--green-border)"><span>규제 업데이트</span><b style="color:var(--hana)">자동 (실시간)</b></div>
+              <div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid var(--green-border)"><span>처리 가능 건수</span><b style="color:var(--hana)">일 500건+</b></div>
+              <div style="display:flex;justify-content:space-between;padding:5px 0"><span>인력 필요</span><b style="color:var(--hana)">검토자 1명</b></div>
+            </div>
+          </div>
+        </div>
+        <div style="display:flex;gap:12px;margin-top:16px">
+          <div style="flex:1;background:var(--hana-pale);border:1px solid var(--hana-light);border-radius:8px;padding:12px;text-align:center">
+            <div style="font-family:var(--mono);font-size:22px;font-weight:800;color:var(--hana)">99.7%</div>
+            <div style="font-size:9px;color:var(--text-sub)">시간 단축 (3일→4.2초)</div>
+          </div>
+          <div style="flex:1;background:var(--hana-pale);border:1px solid var(--hana-light);border-radius:8px;padding:12px;text-align:center">
+            <div style="font-family:var(--mono);font-size:22px;font-weight:800;color:var(--hana)">50x</div>
+            <div style="font-size:9px;color:var(--text-sub)">처리량 증가</div>
+          </div>
+          <div style="flex:1;background:var(--hana-pale);border:1px solid var(--hana-light);border-radius:8px;padding:12px;text-align:center">
+            <div style="font-family:var(--mono);font-size:22px;font-weight:800;color:var(--hana)">67%</div>
+            <div style="font-size:9px;color:var(--text-sub)">인건비 절감</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="pg">03 / 14</div>
+  </div>
+</div>
+
+<!-- ===== SLIDE 4: 솔루션 개요 ===== -->
+<div class="slide" data-n="4">
+  <div class="slide-inner s-hana">
+    <div class="progress"><div class="progress-fill" style="width:28.6%"></div></div>
+    <div class="s-pad" style="height:100%;display:flex;flex-direction:column">
+      <div class="s-label" style="color:#A8E6CF">SOLUTION</div>
+      <div class="s-title">수출환어음 심사 시점에 ESG 규제를 자동 검증</div>
+      <div class="s-sub">기존 하나은행 수출환어음 매입 심사 프로세스에 ESG 레이어를 추가합니다</div>
+      <div style="flex:1;display:flex;flex-direction:column;justify-content:center;gap:16px">
+        <div class="g4" style="gap:12px">
+          <div class="card-dark" style="text-align:center;padding:18px 12px">
+            <div style="width:36px;height:36px;border-radius:10px;background:rgba(255,255,255,0.12);display:flex;align-items:center;justify-content:center;margin:0 auto 8px;font-size:18px">1</div>
+            <h4 style="color:#fff;font-size:11px">READIT OCR</h4>
+            <p style="font-size:9px">GS인증 1등급 AI-OCR<br>수출 서류 자동 인식<br>98%+ 정확도</p>
+          </div>
+          <div class="card-dark" style="text-align:center;padding:18px 12px">
+            <div style="width:36px;height:36px;border-radius:10px;background:rgba(255,255,255,0.12);display:flex;align-items:center;justify-content:center;margin:0 auto 8px;font-size:18px">2</div>
+            <h4 style="color:#fff;font-size:11px">LLM 규제 매칭</h4>
+            <p style="font-size:9px">HS코드 기반<br>CBAM/EUDR 자동 판단<br>필수 인증서 체크</p>
+          </div>
+          <div class="card-dark" style="text-align:center;padding:18px 12px">
+            <div style="width:36px;height:36px;border-radius:10px;background:rgba(255,255,255,0.12);display:flex;align-items:center;justify-content:center;margin:0 auto 8px;font-size:18px">3</div>
+            <h4 style="color:#fff;font-size:11px">위성 NDVI 검증</h4>
+            <p style="font-size:9px">Sentinel-2 위성 데이터<br>원산지 환경 1차 스크리닝<br>FSC/PEFC API 최종 검증</p>
+          </div>
+          <div class="card-dark" style="text-align:center;padding:18px 12px">
+            <div style="width:36px;height:36px;border-radius:10px;background:rgba(255,255,255,0.12);display:flex;align-items:center;justify-content:center;margin:0 auto 8px;font-size:18px">4</div>
+            <h4 style="color:#fff;font-size:11px">리스크 보고서</h4>
+            <p style="font-size:9px">3단계 등급 시각화<br>조치사항 체크리스트<br>담당자 최종 판단</p>
+          </div>
+        </div>
+        <div style="display:flex;gap:12px">
+          <div class="card-dark" style="flex:1;display:flex;align-items:center;gap:10px;padding:12px 16px">
+            <div style="width:8px;height:8px;border-radius:50%;background:#A8E6CF;flex-shrink:0"></div>
+            <span style="font-size:11px">AI는 정보 정리와 리스크 분석만 수행 — 최종 판단은 사람이 합니다</span>
+          </div>
+          <div class="card-dark" style="flex:1;display:flex;align-items:center;gap:10px;padding:12px 16px">
+            <div style="width:8px;height:8px;border-radius:50%;background:#A8E6CF;flex-shrink:0"></div>
+            <span style="font-size:11px">은행 내부용 + 기업 자가검진용 B2B SaaS 투트랙 전략</span>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="pg" style="color:rgba(255,255,255,0.25)">04 / 14</div>
+  </div>
+</div>
+
+<!-- ===== SLIDE 5: 데모 (은행 내부용) ===== -->
+<div class="slide" data-n="5">
+  <div class="slide-inner s-white">
+    <div class="progress"><div class="progress-fill" style="width:35.7%"></div></div>
+    <div class="s-pad" style="height:100%;display:flex;flex-direction:column">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px">
+        <div class="s-label" style="color:var(--hana);margin:0">LIVE DEMO</div>
+        <span class="badge badge-green">은행 내부용</span>
+        <span style="font-size:9px;color:var(--text-light);margin-left:auto;font-family:var(--mono)">gkfla2020-bit.github.io/esg-demo</span>
+      </div>
+      <div class="s-title" style="font-size:20px">수출환어음 ESG 심사 — Step 1~5 실시간 데모</div>
+      <div style="flex:1;display:flex;flex-direction:column;justify-content:center;gap:10px;margin-top:8px">
+        <div class="flow">
+          <div class="flow-box" style="border-color:var(--hana)"><h5><span class="sn">1</span>서류 업로드</h5><p>인보이스, C/O, B/L</p></div>
+          <div class="flow-arr">→</div>
+          <div class="flow-box" style="border-color:var(--hana)"><h5><span class="sn">2</span>OCR 파싱</h5><p>READIT OCR 자동</p></div>
+          <div class="flow-arr">→</div>
+          <div class="flow-box" style="border-color:var(--blue)"><h5><span class="sn">3</span>ESG 규제</h5><p>CBAM/EUDR 매칭</p></div>
+          <div class="flow-arr">→</div>
+          <div class="flow-box" style="border-color:var(--orange)"><h5><span class="sn">4</span>위성 NDVI</h5><p>Sentinel-2 검증</p></div>
+          <div class="flow-arr">→</div>
+          <div class="flow-box" style="border-color:var(--hana)"><h5><span class="sn">5</span>보고서</h5><p>3단계 리스크 등급</p></div>
+        </div>
+        <div class="g2" style="gap:12px">
+          <div>
+            <div class="card" style="margin-bottom:8px;padding:12px">
+              <h4>OCR 파싱 결과 — 에이스틸 (주)</h4>
+              <div style="font-size:9px;color:var(--text-sub);line-height:1.7">
+                <div style="display:flex;justify-content:space-between;padding:2px 0;border-bottom:1px solid var(--bg3)"><span>HS코드</span><b style="color:var(--hana)">7208.51 (열연강판)</b></div>
+                <div style="display:flex;justify-content:space-between;padding:2px 0;border-bottom:1px solid var(--bg3)"><span>수입국</span><b>독일 (EU)</b></div>
+                <div style="display:flex;justify-content:space-between;padding:2px 0"><span>금액</span><b>USD 847,200</b></div>
+              </div>
+            </div>
+            <div class="card" style="padding:12px">
+              <h4>ESG 규제 매칭</h4>
+              <div style="font-size:9px;line-height:1.7;margin-top:3px">
+                <div style="display:flex;align-items:center;gap:4px;padding:2px 0"><span class="badge badge-red">HIGH</span> EU CBAM — 철강 1순위 대상</div>
+                <div style="display:flex;align-items:center;gap:4px;padding:2px 0"><span class="badge badge-orange">REVIEW</span> EUDR — 목재 포장재 간접 적용</div>
+                <div style="display:flex;align-items:center;gap:4px;padding:2px 0"><span class="badge badge-red">MISSING</span> 탄소배출량 보고서 미첨부</div>
+              </div>
+            </div>
+          </div>
+          <div>
+            <div style="position:relative;height:160px;border-radius:8px;overflow:hidden;margin-bottom:8px;border:1px solid var(--border)">
+              <div id="pres-sat-map" style="width:100%;height:100%"></div>
+              <div class="ndvi-legend">
+                <div style="font-weight:700;margin-bottom:2px">Sentinel-2 NDVI</div>
+                <div>POSCO 포항제철소 35.99N, 129.36E</div>
+                <div style="display:flex;gap:8px;margin-top:3px">
+                  <span style="color:#E65100;font-weight:700">NDVI 0.42</span>
+                  <span style="color:#C62828;font-weight:700">-18% (3yr)</span>
+                </div>
+              </div>
+            </div>
+            <div class="card" style="background:var(--hana-pale);border-color:var(--hana-light);padding:10px">
+              <h4 style="color:var(--hana-dark);font-size:10px">최종 리스크 등급</h4>
+              <div style="display:flex;align-items:center;gap:10px;margin-top:4px">
+                <div style="width:38px;height:38px;border-radius:50%;border:3px solid var(--orange);display:flex;align-items:center;justify-content:center">
+                  <span style="font-family:var(--mono);font-size:16px;font-weight:800;color:var(--orange)">62</span>
+                </div>
+                <div style="font-size:9px;color:var(--text-sub);line-height:1.5">
+                  <div style="font-weight:700;color:var(--orange)">조건부 승인 (REVIEW)</div>
+                  탄소배출량 보고서 보완 후 매입 가능
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="pg">05 / 14</div>
+  </div>
+</div>
+
+
+<!-- ===== SLIDE 6: 지오데이터 시각화 ===== -->
+<div class="slide" data-n="6">
+  <div class="slide-inner s-dark">
+    <div class="progress"><div class="progress-fill" style="width:0%"></div></div>
+    <div class="s-pad" style="height:100%;display:flex;flex-direction:column">
+      <div class="s-label" style="color:#A8E6CF">GEO DATA</div>
+      <div class="s-title" style="font-size:20px">위성 데이터 + 지오 인텔리전스 — 실제 데이터 기반 검증</div>
+      <div style="flex:1;display:flex;gap:14px;margin-top:10px">
+        <div style="flex:1;display:flex;flex-direction:column;gap:6px">
+          <div style="font-size:9px;font-weight:700;color:#A8E6CF;letter-spacing:1px">CBAM 수출 경로</div>
+          <div style="flex:1;border-radius:8px;overflow:hidden;border:1px solid rgba(255,255,255,0.1);position:relative">
+            <div id="pres-route-map" style="width:100%;height:100%"></div>
+          </div>
+          <div style="font-size:8px;color:rgba(255,255,255,0.4)">부산항 → EU 주요 수입항 | $12B CBAM 대상 수출</div>
+        </div>
+        <div style="flex:1;display:flex;flex-direction:column;gap:6px">
+          <div style="font-size:9px;font-weight:700;color:#A8E6CF;letter-spacing:1px">CBAM 산업 거점</div>
+          <div style="flex:1;border-radius:8px;overflow:hidden;border:1px solid rgba(255,255,255,0.1);position:relative">
+            <div id="pres-hub-map" style="width:100%;height:100%"></div>
+          </div>
+          <div style="font-size:8px;color:rgba(255,255,255,0.4)">철강 $5.2B | 석유화학 $3.1B | 알루미늄 $2.4B | 시멘트 $1.3B</div>
+        </div>
+      </div>
+      <div style="display:flex;gap:10px;margin-top:8px">
+        <div class="card-dark" style="flex:1;padding:8px 12px;display:flex;align-items:center;gap:8px">
+          <div style="width:6px;height:6px;border-radius:50%;background:#C62828;flex-shrink:0"></div>
+          <span style="font-size:9px;opacity:0.8">실제 좌표 기반 — 부산/인천/광양/울산항 → 로테르담/함부르크/앤트워프</span>
+        </div>
+        <div class="card-dark" style="flex:1;padding:8px 12px;display:flex;align-items:center;gap:8px">
+          <div style="width:6px;height:6px;border-radius:50%;background:#008C73;flex-shrink:0"></div>
+          <span style="font-size:9px;opacity:0.8">POSCO/현대제철/SK에너지 등 14개 산업 거점 실시간 모니터링</span>
+        </div>
+      </div>
+    </div>
+    <div class="pg" style="color:rgba(255,255,255,0.25)">06 / 14</div>
+  </div>
+</div>
+
+<!-- ===== SLIDE 7: 아키텍처 + 기술 한계 대응 ===== -->
+<div class="slide" data-n="7">
+  <div class="slide-inner s-white">
+    <div class="progress"><div class="progress-fill" style="width:50%"></div></div>
+    <div class="s-pad" style="height:100%;display:flex;flex-direction:column">
+      <div class="s-label" style="color:var(--hana)">ARCHITECTURE</div>
+      <div class="s-title" style="font-size:22px">시스템 아키텍처 + 기술 리스크 대응</div>
+      <div style="flex:1;display:flex;flex-direction:column;justify-content:center;gap:12px">
+        <div class="flow">
+          <div class="flow-box"><h5>입력 레이어</h5><p>인보이스, C/O<br>B/L, 신용장</p></div>
+          <div class="flow-arr">→</div>
+          <div class="flow-box" style="border-color:var(--hana)"><h5>READIT OCR</h5><p>GS인증 1등급<br>HS코드 추출</p></div>
+          <div class="flow-arr">→</div>
+          <div class="flow-box" style="border-color:var(--blue)"><h5>AI 분석 엔진</h5><p>Transformer NER<br>LLM 규제 매칭</p></div>
+          <div class="flow-arr">→</div>
+          <div class="flow-box" style="border-color:var(--orange)"><h5>위성 검증</h5><p>Sentinel-2 NDVI<br>FSC/PEFC API</p></div>
+          <div class="flow-arr">→</div>
+          <div class="flow-box"><h5>리스크 보고서</h5><p>3단계 등급<br>최종 판단</p></div>
+        </div>
+        <div class="g3" style="gap:10px">
+          <div class="card" style="padding:12px;border-left:3px solid var(--red)">
+            <h4 style="font-size:10px;color:var(--red)">리스크: LLM 환각</h4>
+            <p style="font-size:9px">→ RAG 기반 규제DB 검색으로 해결. LLM은 규제 원문 기반으로만 답변. 신뢰도 점수 표시.</p>
+          </div>
+          <div class="card" style="padding:12px;border-left:3px solid var(--red)">
+            <h4 style="font-size:10px;color:var(--red)">리스크: OCR 오인식</h4>
+            <p style="font-size:9px">→ READIT 98%+ 정확도. 불확실 구간은 하이라이트 표시 + 담당자 수동 검수 워크플로.</p>
+          </div>
+          <div class="card" style="padding:12px;border-left:3px solid var(--red)">
+            <h4 style="font-size:10px;color:var(--red)">리스크: 위성 데이터 한계</h4>
+            <p style="font-size:9px">→ 위성은 1차 스크리닝만. FSC/PEFC 인증기관 API로 최종 검증하는 하이브리드 구조.</p>
+          </div>
+        </div>
+        <div class="g3" style="gap:10px">
+          <div class="card" style="padding:12px;background:var(--hana-pale);border-color:var(--hana-light)">
+            <h4 style="font-size:10px;color:var(--hana-dark)">ESG 규제 DB</h4>
+            <p style="font-size:9px">CBAM/EUDR 규정, HS코드-규제 매핑. 웹크롤링 자동 업데이트.</p>
+          </div>
+          <div class="card" style="padding:12px;background:var(--blue-bg);border-color:#BBDEFB">
+            <h4 style="font-size:10px;color:var(--blue)">하나은행 시스템 연동</h4>
+            <p style="font-size:9px">비대면 AI 수출환어음매입 심사(2025) API 연동. READIT OCR 결과 재활용.</p>
+          </div>
+          <div class="card" style="padding:12px">
+            <h4 style="font-size:10px">보안</h4>
+            <p style="font-size:9px">AES-256 문서 암호화, 개인정보 마스킹, 감사 로그 자동화.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="pg">07 / 14</div>
+  </div>
+</div>
+
+<!-- ===== SLIDE 8: 시장 규모 TAM/SAM/SOM ===== -->
+<div class="slide" data-n="8">
+  <div class="slide-inner s-white">
+    <div class="progress"><div class="progress-fill" style="width:57.1%"></div></div>
+    <div class="s-pad" style="height:100%;display:flex;flex-direction:column">
+      <div class="s-label" style="color:var(--hana)">MARKET SIZE</div>
+      <div class="s-title" style="font-size:22px">시장 규모 — TAM / SAM / SOM</div>
+      <div style="flex:1;display:flex;align-items:center;gap:24px">
+        <!-- 동심원 시각화 -->
+        <div style="flex:0 0 260px;position:relative;height:260px">
+          <!-- TAM 원 -->
+          <div style="position:absolute;width:260px;height:260px;border-radius:50%;background:rgba(0,140,115,0.06);border:2px solid var(--hana);display:flex;align-items:flex-start;justify-content:center;padding-top:16px">
+            <div style="text-align:center"><div style="font-size:8px;font-weight:700;color:var(--hana);letter-spacing:1px">TAM</div><div style="font-family:var(--mono);font-size:20px;font-weight:800;color:var(--hana)">$64.3B</div><div style="font-size:8px;color:var(--text-light)">대EU 수출 전체</div></div>
+          </div>
+          <!-- SAM 원 -->
+          <div style="position:absolute;width:170px;height:170px;border-radius:50%;background:rgba(21,101,192,0.06);border:2px solid var(--blue);top:60px;left:45px;display:flex;align-items:flex-start;justify-content:center;padding-top:14px">
+            <div style="text-align:center"><div style="font-size:8px;font-weight:700;color:var(--blue);letter-spacing:1px">SAM</div><div style="font-family:var(--mono);font-size:18px;font-weight:800;color:var(--blue)">750개사</div><div style="font-size:8px;color:var(--text-light)">하나은행 EU 수출 고객</div></div>
+          </div>
+          <!-- SOM 원 -->
+          <div style="position:absolute;width:80px;height:80px;border-radius:50%;background:rgba(230,81,0,0.1);border:2px solid var(--orange);top:120px;left:90px;display:flex;align-items:center;justify-content:center">
+            <div style="text-align:center"><div style="font-size:7px;font-weight:700;color:var(--orange);letter-spacing:1px">SOM</div><div style="font-family:var(--mono);font-size:14px;font-weight:800;color:var(--orange)">50</div></div>
+          </div>
+        </div>
+        <!-- 우측 상세 -->
+        <div style="flex:1;display:flex;flex-direction:column;gap:10px">
+          <div class="card" style="padding:12px;border-left:3px solid var(--hana)">
+            <h4 style="color:var(--hana);font-size:11px">TAM — $64.3B (한국 대EU 수출 전체)</h4>
+            <p style="font-size:9px">~3,000개 수출기업, CBAM 대상 ~$12B, EUDR 대상 ~$2B</p>
+          </div>
+          <div class="card" style="padding:12px;border-left:3px solid var(--blue)">
+            <h4 style="color:var(--blue);font-size:11px">SAM — 750개사 (하나은행 무역금융 고객)</h4>
+            <p style="font-size:9px">하나은행 무역금융 고객 3,500개사 중 EU 수출 기업. CBAM 직접 대상 ~150개사.</p>
+          </div>
+          <div class="card" style="padding:12px;border-left:3px solid var(--orange)">
+            <h4 style="color:var(--orange);font-size:11px">SOM — 50개사 (1년차 목표)</h4>
+            <p style="font-size:9px">B2B SaaS 월 30만원 x 50개사 = 연 1.8억 + 수출환어음 수수료 프리미엄</p>
+          </div>
+          <div class="card" style="padding:10px 12px;background:var(--bg2)">
+            <h4 style="font-size:10px">3년 매출 전망</h4>
+            <table class="tbl" style="margin-top:4px">
+              <thead><tr><th style="text-align:left;width:38%">구분</th><th>1년차</th><th>2년차</th><th>3년차</th></tr></thead>
+              <tbody>
+                <tr><td style="text-align:left">B2B SaaS</td><td style="font-family:var(--mono)">1.8억</td><td style="font-family:var(--mono)">5.4억</td><td style="font-family:var(--mono)">12억</td></tr>
+                <tr><td style="text-align:left">수수료 프리미엄</td><td style="font-family:var(--mono)">0.5억</td><td style="font-family:var(--mono)">2억</td><td style="font-family:var(--mono)">5억</td></tr>
+                <tr><td style="text-align:left">ESG 리포트</td><td style="font-family:var(--mono)">0.2억</td><td style="font-family:var(--mono)">1억</td><td style="font-family:var(--mono)">3억</td></tr>
+                <tr><td style="text-align:left;font-weight:700" class="hl">합계</td><td class="hl" style="font-family:var(--mono)">2.5억</td><td class="hl" style="font-family:var(--mono)">8.4억</td><td class="hl" style="font-family:var(--mono)">20억</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="pg">08 / 14</div>
+  </div>
+</div>
+
+<!-- ===== SLIDE 8: 매출 근거 ===== -->
+<div class="slide" data-n="9">
+  <div class="slide-inner s-light">
+    <div class="progress"><div class="progress-fill" style="width:64.3%"></div></div>
+    <div class="s-pad" style="height:100%;display:flex;flex-direction:column">
+      <div class="s-label" style="color:var(--hana)">REVENUE DETAIL</div>
+      <div class="s-title" style="font-size:22px">매출 근거 — 어떻게 20억이 나오는가</div>
+      <div style="flex:1;display:flex;flex-direction:column;justify-content:center;gap:14px">
+        <div class="g3" style="gap:14px">
+          <div class="card" style="padding:16px;border-top:3px solid var(--hana)">
+            <div style="font-size:9px;font-weight:700;color:var(--hana);letter-spacing:1px;margin-bottom:8px">1년차</div>
+            <div style="font-size:9px;color:var(--text-sub);line-height:1.8">
+              <div style="display:flex;justify-content:space-between;padding:3px 0;border-bottom:1px solid var(--bg3)"><span>SaaS 고객</span><b>10개사</b></div>
+              <div style="display:flex;justify-content:space-between;padding:3px 0;border-bottom:1px solid var(--bg3)"><span>월 구독료</span><b>30만원</b></div>
+              <div style="display:flex;justify-content:space-between;padding:3px 0;border-bottom:1px solid var(--bg3)"><span>SaaS 매출</span><b>0.36억 → 1.8억*</b></div>
+              <div style="display:flex;justify-content:space-between;padding:3px 0;border-bottom:1px solid var(--bg3)"><span>수수료 프리미엄</span><b>0.5억</b></div>
+              <div style="display:flex;justify-content:space-between;padding:3px 0;border-bottom:1px solid var(--bg3)"><span>ESG 리포트</span><b>0.2억</b></div>
+              <div style="display:flex;justify-content:space-between;padding:3px 0;font-weight:700;color:var(--hana)"><span>합계</span><b>2.5억</b></div>
+            </div>
+            <div style="font-size:8px;color:var(--text-light);margin-top:4px">* 분기별 10→20→35→50개사 확대</div>
+          </div>
+          <div class="card" style="padding:16px;border-top:3px solid var(--blue)">
+            <div style="font-size:9px;font-weight:700;color:var(--blue);letter-spacing:1px;margin-bottom:8px">2년차</div>
+            <div style="font-size:9px;color:var(--text-sub);line-height:1.8">
+              <div style="display:flex;justify-content:space-between;padding:3px 0;border-bottom:1px solid var(--bg3)"><span>SaaS 고객</span><b>150개사</b></div>
+              <div style="display:flex;justify-content:space-between;padding:3px 0;border-bottom:1px solid var(--bg3)"><span>월 구독료</span><b>30만원</b></div>
+              <div style="display:flex;justify-content:space-between;padding:3px 0;border-bottom:1px solid var(--bg3)"><span>SaaS 매출</span><b>5.4억</b></div>
+              <div style="display:flex;justify-content:space-between;padding:3px 0;border-bottom:1px solid var(--bg3)"><span>수수료 프리미엄</span><b>2억</b></div>
+              <div style="display:flex;justify-content:space-between;padding:3px 0;border-bottom:1px solid var(--bg3)"><span>ESG 리포트</span><b>1억</b></div>
+              <div style="display:flex;justify-content:space-between;padding:3px 0;font-weight:700;color:var(--blue)"><span>합계</span><b>8.4억</b></div>
+            </div>
+            <div style="font-size:8px;color:var(--text-light);margin-top:4px">타행 수출기업 확대 시작</div>
+          </div>
+          <div class="card" style="padding:16px;border-top:3px solid var(--orange)">
+            <div style="font-size:9px;font-weight:700;color:var(--orange);letter-spacing:1px;margin-bottom:8px">3년차</div>
+            <div style="font-size:9px;color:var(--text-sub);line-height:1.8">
+              <div style="display:flex;justify-content:space-between;padding:3px 0;border-bottom:1px solid var(--bg3)"><span>SaaS 고객</span><b>400개사</b></div>
+              <div style="display:flex;justify-content:space-between;padding:3px 0;border-bottom:1px solid var(--bg3)"><span>월 구독료</span><b>25만원 (볼륨 할인)</b></div>
+              <div style="display:flex;justify-content:space-between;padding:3px 0;border-bottom:1px solid var(--bg3)"><span>SaaS 매출</span><b>12억</b></div>
+              <div style="display:flex;justify-content:space-between;padding:3px 0;border-bottom:1px solid var(--bg3)"><span>수수료 프리미엄</span><b>5억</b></div>
+              <div style="display:flex;justify-content:space-between;padding:3px 0;border-bottom:1px solid var(--bg3)"><span>ESG 리포트</span><b>3억</b></div>
+              <div style="display:flex;justify-content:space-between;padding:3px 0;font-weight:700;color:var(--orange)"><span>합계</span><b>20억</b></div>
+            </div>
+            <div style="font-size:8px;color:var(--text-light);margin-top:4px">글로벌 확장 (미국 CCA, 일본 GX)</div>
+          </div>
+        </div>
+        <div style="background:#fff;border:1px solid var(--border);border-radius:8px;padding:10px 16px;display:flex;align-items:center;gap:16px">
+          <div style="font-size:10px;font-weight:700;color:var(--text)">핵심 가정</div>
+          <div style="font-size:9px;color:var(--text-sub)">CBAM 대상 기업 ~3,000개 중 하나은행 고객 750개사 | 1년차 전환율 6.7% (50/750) | 월 이탈률 3% | ARPU 월 30만원</div>
+        </div>
+      </div>
+    </div>
+    <div class="pg">09 / 14</div>
+  </div>
+</div>
+
+<!-- ===== SLIDE 9: 경쟁 분석 (간소화) ===== -->
+<div class="slide" data-n="10">
+  <div class="slide-inner s-white">
+    <div class="progress"><div class="progress-fill" style="width:71.4%"></div></div>
+    <div class="s-pad" style="height:100%;display:flex;flex-direction:column">
+      <div class="s-label" style="color:var(--hana)">COMPETITIVE EDGE</div>
+      <div class="s-title" style="font-size:22px">경쟁 분석 — 기존 ESG 솔루션과의 차별점</div>
+      <div style="flex:1;display:flex;flex-direction:column;justify-content:center;gap:14px">
+        <table class="tbl">
+          <thead><tr><th style="text-align:left;width:18%">비교</th><th style="width:22%">기존 ESG 솔루션</th><th style="width:22%">컨설팅사</th><th style="width:38%">ESG TradeGuard</th></tr></thead>
+          <tbody>
+            <tr><td style="text-align:left;font-weight:600">영역</td><td>ESG 공시/평가</td><td>CBAM 컨설팅</td><td class="hl">무역금융 실시간 ESG 심사</td></tr>
+            <tr><td style="text-align:left;font-weight:600">타이밍</td><td>사후 평가</td><td>프로젝트 단위</td><td class="hl">수출 거래 시점 실시간</td></tr>
+            <tr><td style="text-align:left;font-weight:600">비용</td><td>연간 구독료</td><td>건당 수천만원</td><td class="hl">수출환어음 수수료에 포함</td></tr>
+            <tr><td style="text-align:left;font-weight:600">접근성</td><td><span class="sym sym-x">×</span> 대기업 위주</td><td><span class="sym sym-x">×</span> 대기업 위주</td><td class="hl"><span class="sym sym-o">○</span> 모든 수출 중소기업</td></tr>
+            <tr><td style="text-align:left;font-weight:600">금융 연계</td><td><span class="sym sym-x">×</span></td><td><span class="sym sym-x">×</span></td><td class="hl"><span class="sym sym-o">○</span> 수출환어음 동시 처리</td></tr>
+            <tr><td style="text-align:left;font-weight:600">위성 검증</td><td><span class="sym sym-x">×</span></td><td><span class="sym sym-t">△</span></td><td class="hl"><span class="sym sym-o">○</span> Sentinel-2 NDVI</td></tr>
+          </tbody>
+        </table>
+        <div class="g3" style="gap:10px">
+          <div class="card" style="padding:12px;background:var(--hana-pale);border-color:var(--hana-light)">
+            <h4 style="color:var(--hana-dark);font-size:10px">거래 시점 실시간 검증</h4>
+            <p style="font-size:9px">수출 서류 제출 시 즉시 ESG 규제 체크. 사후 평가가 아닌 사전 예방.</p>
+          </div>
+          <div class="card" style="padding:12px;background:var(--hana-pale);border-color:var(--hana-light)">
+            <h4 style="color:var(--hana-dark);font-size:10px">금융 + ESG 자연스러운 융합</h4>
+            <p style="font-size:9px">별도 서비스가 아닌, 기존 수출환어음 심사에 ESG 레이어 추가.</p>
+          </div>
+          <div class="card" style="padding:12px;background:var(--hana-pale);border-color:var(--hana-light)">
+            <h4 style="color:var(--hana-dark);font-size:10px">중소기업 접근성</h4>
+            <p style="font-size:9px">컨설팅 비용 없이 은행 거래만으로 ESG 컴플라이언스 확인.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="pg">10 / 14</div>
+  </div>
+</div>
+
+<!-- ===== SLIDE 10: 하나금융 시너지 ===== -->
+<div class="slide" data-n="11">
+  <div class="slide-inner s-hana">
+    <div class="progress"><div class="progress-fill" style="width:78.6%"></div></div>
+    <div class="s-pad" style="height:100%;display:flex;flex-direction:column">
+      <div class="s-label" style="color:#A8E6CF">HANA SYNERGY</div>
+      <div class="s-title">왜 하나금융에서 해야 하는가</div>
+      <div style="flex:1;display:flex;flex-direction:column;justify-content:center;gap:14px">
+        <div class="g2" style="gap:14px">
+          <div class="card-dark" style="padding:16px">
+            <h4 style="color:#A8E6CF;font-size:11px">기존 기술 자산 활용</h4>
+            <ul class="cl" style="margin-top:6px">
+              <li style="color:rgba(255,255,255,0.8)">READIT OCR (GS인증 1등급) — 이미 수출환어음 심사에 적용 중 (2024.06~)</li>
+              <li style="color:rgba(255,255,255,0.8)">비대면 AI 수출환어음매입 심사 시스템 (2025.05 시행)</li>
+              <li style="color:rgba(255,255,255,0.8)">AI 기술력 기반 ML모형 (2024.10 개발)</li>
+              <li style="color:rgba(255,255,255,0.8)">하나금융융합기술원 자체 AI 개발 역량</li>
+            </ul>
+          </div>
+          <div class="card-dark" style="padding:16px">
+            <h4 style="color:#A8E6CF;font-size:11px">무역금융 고객 기반</h4>
+            <ul class="cl" style="margin-top:6px">
+              <li style="color:rgba(255,255,255,0.8)">무역금융 고객 3,500개사 — 즉시 접근 가능한 고객 풀</li>
+              <li style="color:rgba(255,255,255,0.8)">EU 수출 기업 750개사 — 직접 타겟</li>
+              <li style="color:rgba(255,255,255,0.8)">수출환어음 매입 시점 = 자연스러운 ESG 체크 접점</li>
+              <li style="color:rgba(255,255,255,0.8)">별도 영업 비용 없이 기존 채널 활용</li>
+            </ul>
+          </div>
+        </div>
+        <div class="g3" style="gap:10px">
+          <div class="card-dark" style="padding:14px;text-align:center">
+            <div style="font-family:var(--mono);font-size:22px;font-weight:800;color:#A8E6CF">3,500</div>
+            <div style="font-size:9px;opacity:0.6;margin-top:2px">무역금융 고객사</div>
+          </div>
+          <div class="card-dark" style="padding:14px;text-align:center">
+            <div style="font-family:var(--mono);font-size:22px;font-weight:800;color:#A8E6CF">47개국</div>
+            <div style="font-size:9px;opacity:0.6;margin-top:2px">글로벌 네트워크</div>
+          </div>
+          <div class="card-dark" style="padding:14px;text-align:center">
+            <div style="font-family:var(--mono);font-size:22px;font-weight:800;color:#A8E6CF">GS 1등급</div>
+            <div style="font-size:9px;opacity:0.6;margin-top:2px">READIT OCR 인증</div>
+          </div>
+        </div>
+        <div style="background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.12);border-radius:8px;padding:12px 16px;text-align:center">
+          <div style="font-size:12px;font-weight:700;color:#A8E6CF">기존 인프라 + 고객 기반 + AI 기술 = 추가 투자 최소화로 빠른 상용화 가능</div>
+        </div>
+      </div>
+    </div>
+    <div class="pg" style="color:rgba(255,255,255,0.25)">11 / 14</div>
+  </div>
+</div>
+
+<!-- ===== SLIDE 11: 수익 모델 ===== -->
+<div class="slide" data-n="12">
+  <div class="slide-inner s-light">
+    <div class="progress"><div class="progress-fill" style="width:85.7%"></div></div>
+    <div class="s-pad" style="height:100%;display:flex;flex-direction:column">
+      <div class="s-label" style="color:var(--hana)">REVENUE MODEL</div>
+      <div class="s-title" style="font-size:22px">수익 모델 — 하나금융에 어떤 이익인가</div>
+      <div style="flex:1;display:flex;flex-direction:column;justify-content:center;gap:12px">
+        <div class="g2" style="gap:14px">
+          <div class="card" style="padding:14px">
+            <h4 style="color:var(--hana);font-size:11px">직접 수익</h4>
+            <ul class="cl" style="margin-top:6px">
+              <li><b>수출환어음 수수료:</b> ESG 체크 포함 시 프리미엄 수수료</li>
+              <li><b>B2B SaaS:</b> 기업 자가검진 월 30만원 (14일 무료 체험)</li>
+              <li><b>ESG 리포트:</b> 기업별 맞춤 규제 대응 보고서 유료 제공</li>
+              <li><b>ESG 우대 금리:</b> 컴플라이언스 우수 기업 우대 대출</li>
+            </ul>
+          </div>
+          <div class="card" style="padding:14px">
+            <h4 style="color:var(--blue);font-size:11px">간접 수익</h4>
+            <ul class="cl" style="margin-top:6px">
+              <li><b>고객 유입:</b> "하나은행 = ESG 자동 체크" 차별화</li>
+              <li><b>외환 거래:</b> 수출기업 록인 → 환전/파생상품 증가</li>
+              <li><b>무역보험:</b> ESG 리스크 데이터 기반 보험 상품</li>
+              <li><b>글로벌:</b> EU → 미국 CCA, 일본 GX 확장</li>
+            </ul>
+          </div>
+        </div>
+        <div class="g4" style="gap:8px">
+          <div style="background:#fff;border:1px solid var(--border);border-radius:8px;padding:12px;text-align:center">
+            <div style="font-size:14px;font-weight:800;color:var(--hana)">수수료</div>
+            <div style="font-size:8px;color:var(--text-sub);margin-top:2px">수출환어음 매입 증대</div>
+          </div>
+          <div style="background:#fff;border:1px solid var(--border);border-radius:8px;padding:12px;text-align:center">
+            <div style="font-size:14px;font-weight:800;color:var(--hana)">SaaS</div>
+            <div style="font-size:8px;color:var(--text-sub);margin-top:2px">월 30만원 구독</div>
+          </div>
+          <div style="background:#fff;border:1px solid var(--border);border-radius:8px;padding:12px;text-align:center">
+            <div style="font-size:14px;font-weight:800;color:var(--hana)">록인</div>
+            <div style="font-size:8px;color:var(--text-sub);margin-top:2px">외환 거래 수익</div>
+          </div>
+          <div style="background:#fff;border:1px solid var(--border);border-radius:8px;padding:12px;text-align:center">
+            <div style="font-size:14px;font-weight:800;color:var(--hana)">우대</div>
+            <div style="font-size:8px;color:var(--text-sub);margin-top:2px">ESG 우수기업 대출</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="pg">12 / 14</div>
+  </div>
+</div>
+
+<!-- ===== SLIDE 12: 로드맵 ===== -->
+<div class="slide" data-n="13">
+  <div class="slide-inner s-white">
+    <div class="progress"><div class="progress-fill" style="width:92.9%"></div></div>
+    <div class="s-pad" style="height:100%;display:flex;flex-direction:column">
+      <div class="s-label" style="color:var(--hana)">ROADMAP</div>
+      <div class="s-title" style="font-size:22px">구현 로드맵 — 6개월 프로토타입, 12개월 상용화</div>
+      <div style="flex:1;display:flex;gap:20px;align-items:center">
+        <div style="flex:1">
+          <div class="tl">
+            <div class="tl-i"><div class="t">M1~2: 규제 DB 구축</div><div class="d">CBAM/EUDR 규정 분석, HS코드-규제 매핑, 필수 서류 체크리스트</div></div>
+            <div class="tl-i"><div class="t">M2~3: OCR + LLM 파이프라인</div><div class="d">READIT OCR 연동, LLM 프롬프트 엔지니어링, 규제 매칭 알고리즘</div></div>
+            <div class="tl-i"><div class="t">M3~4: 프로토타입 통합</div><div class="d">웹 UI, 전체 파이프라인 통합, 위성 NDVI 모듈 연동</div></div>
+            <div class="tl-i"><div class="t">M4~5: 파일럿 테스트</div><div class="d">실제 수출기업 10개사 대상 테스트, 정확도 개선</div></div>
+            <div class="tl-i"><div class="t">M5~6: 최종 데모 + 런칭</div><div class="d">라이브 데모, B2B SaaS 모듈 완성, 초기 고객 온보딩</div></div>
+          </div>
+        </div>
+        <div style="flex:1;display:flex;flex-direction:column;gap:10px">
+          <div class="card" style="padding:12px">
+            <h4 style="font-size:10px">기술 스택</h4>
+            <div style="font-size:9px;color:var(--text-sub);line-height:1.7">
+              <div style="display:flex;justify-content:space-between;padding:3px 0;border-bottom:1px solid var(--bg3)"><span>OCR</span><b style="color:var(--text)">READIT (GS인증 1등급)</b></div>
+              <div style="display:flex;justify-content:space-between;padding:3px 0;border-bottom:1px solid var(--bg3)"><span>LLM</span><b style="color:var(--text)">GPT-4 / Claude API</b></div>
+              <div style="display:flex;justify-content:space-between;padding:3px 0;border-bottom:1px solid var(--bg3)"><span>NER</span><b style="color:var(--text)">Transformer 기반</b></div>
+              <div style="display:flex;justify-content:space-between;padding:3px 0;border-bottom:1px solid var(--bg3)"><span>위성</span><b style="color:var(--text)">Sentinel-2 NDVI</b></div>
+              <div style="display:flex;justify-content:space-between;padding:3px 0;border-bottom:1px solid var(--bg3)"><span>인증</span><b style="color:var(--text)">FSC/PEFC API</b></div>
+              <div style="display:flex;justify-content:space-between;padding:3px 0"><span>프론트</span><b style="color:var(--text)">React / Streamlit</b></div>
+            </div>
+          </div>
+          <div class="card" style="padding:12px">
+            <h4 style="font-size:10px">향후 확장</h4>
+            <ul class="cl" style="margin-top:4px">
+              <li>GNN 공급망 분석: 그래프 신경망 리스크 탐지</li>
+              <li>RAG 규제 해석: 규제 원문 기반 Q&A 엔진</li>
+              <li>글로벌: 미국 CCA, 일본 GX, 영국 CBAM</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="pg">13 / 14</div>
+  </div>
+</div>
+
+<!-- ===== SLIDE 13: 마무리 ===== -->
+<div class="slide" data-n="14">
+  <div class="slide-inner s-hana">
+    <div class="progress"><div class="progress-fill" style="width:100%"></div></div>
+    <div class="s-pad" style="height:100%;display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center">
+      <div class="hana-logo" style="margin-bottom:24px;justify-content:center">
+        <div class="hana-mark" style="width:36px;height:36px;font-size:18px;border-radius:9px">H</div>
+        <span style="font-size:16px;font-weight:700;color:#fff">ESG TradeGuard</span>
+      </div>
+      <div style="font-size:30px;font-weight:900;line-height:1.4;letter-spacing:-0.5px;max-width:680px">
+        2026년 CBAM 본격 시행,<br>
+        수출 심사 시점에 ESG 규제를<br>
+        <span style="color:#A8E6CF">자동 검증합니다</span>
+      </div>
+      <div style="font-size:12px;opacity:0.5;margin-top:14px">무역금융 x ESG 컴플라이언스 — 하나금융의 새로운 가치</div>
+      <div style="margin-top:28px;display:flex;gap:16px">
+        <div style="background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.2);border-radius:8px;padding:12px 20px;text-align:center">
+          <div style="font-size:9px;opacity:0.5;margin-bottom:2px">라이브 데모</div>
+          <div style="font-family:var(--mono);font-size:11px">gkfla2020-bit.github.io/esg-demo</div>
+        </div>
+      </div>
+      <div style="margin-top:20px;display:flex;gap:16px;font-size:10px;opacity:0.35">
+        <span>2026 하나 청년 금융인재 프로젝트</span>
+        <span>|</span>
+        <span>디지털기술(AI) x ESG 미래금융서비스</span>
+      </div>
+    </div>
+    <div class="pg" style="color:rgba(255,255,255,0.25)">14 / 14</div>
+  </div>
+</div>
+
+</div><!-- end deck -->
+
+<div class="nav-bar">
+  <span style="font-size:9px;color:rgba(255,255,255,0.25)">← → 키보드 / 클릭 / 스와이프</span>
+  <span id="pg-indicator">1 / 14</span>
+</div>
+
+<script>
+(function(){
+  var slides=document.querySelectorAll('.slide'),total=slides.length,cur=0;
+  var ind=document.getElementById('pg-indicator');
+  function show(n){
+    if(n<0)n=0;if(n>=total)n=total-1;
+    slides[cur].classList.remove('active');cur=n;slides[cur].classList.add('active');
+    ind.textContent=(cur+1)+' / '+total;
+  }
+  document.addEventListener('keydown',function(e){
+    if(e.key==='ArrowRight'||e.key===' '||e.key==='PageDown')show(cur+1);
+    else if(e.key==='ArrowLeft'||e.key==='PageUp')show(cur-1);
+    else if(e.key==='Home')show(0);else if(e.key==='End')show(total-1);
+  });
+  document.addEventListener('click',function(e){
+    if(e.clientX>window.innerWidth/2)show(cur+1);else show(cur-1);
+  });
+  var tx=0;
+  document.addEventListener('touchstart',function(e){tx=e.touches[0].clientX;});
+  document.addEventListener('touchend',function(e){
+    var d=e.changedTouches[0].clientX-tx;
+    if(d<-50)show(cur+1);else if(d>50)show(cur-1);
+  });
+  function scale(){
+    var vw=window.innerWidth,vh=window.innerHeight-32,s=Math.min(vw/960,vh/540);
+    document.querySelectorAll('.slide-inner').forEach(function(el){el.style.transform='scale('+s+')';});
+  }
+  scale();window.addEventListener('resize',scale);
+})();
+</script>
+
+<script>
+// === 위성 NDVI 지도 (슬라이드 5) ===
+(function(){
+  var center=[35.9856,129.3594];
+  var map=L.map('pres-sat-map',{center:center,zoom:13,zoomControl:false,attributionControl:false});
+  L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',{maxZoom:18}).addTo(map);
+  L.polygon([[35.992,129.348],[35.992,129.372],[35.978,129.372],[35.978,129.348]],{color:'#E67E22',weight:2,dashArray:'8',fillColor:'#E67E22',fillOpacity:0.15}).addTo(map);
+  L.circle([35.9856,129.3594],{radius:1500,color:'#C62828',weight:1.5,dashArray:'6',fillColor:'#C62828',fillOpacity:0.08}).addTo(map);
+  L.circleMarker([35.9856,129.3594],{radius:6,color:'#fff',weight:2,fillColor:'#C62828',fillOpacity:1}).addTo(map);
+  L.circle([36.005,129.33],{radius:800,color:'#2d8a4e',weight:1,fillColor:'#2d8a4e',fillOpacity:0.2}).addTo(map);
+  L.circle([35.97,129.38],{radius:600,color:'#2d8a4e',weight:1,fillColor:'#2d8a4e',fillOpacity:0.2}).addTo(map);
+  // invalidateSize when slide becomes visible
+  var obs=new MutationObserver(function(){
+    var s=document.querySelector('[data-n="5"]');
+    if(s&&s.classList.contains('active'))setTimeout(function(){map.invalidateSize()},100);
+  });
+  obs.observe(document.querySelector('[data-n="5"]'),{attributes:true,attributeFilter:['class']});
+})();
+
+// === 수출 경로 지도 (슬라이드 6) ===
+(function(){
+  var routeMap=L.map('pres-route-map',{center:[40,50],zoom:2,minZoom:2,maxZoom:6,zoomControl:false,attributionControl:false});
+  L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png',{maxZoom:19}).addTo(routeMap);
+  var krPorts=[{n:'부산항',c:[35.0796,129.0756],v:'$8.2B',t:'main'},{n:'인천항',c:[37.4563,126.5922],v:'$2.1B',t:'main'},{n:'광양항',c:[34.9164,127.6953],v:'$1.4B',t:'sub'},{n:'울산항',c:[35.501,129.387],v:'$0.9B',t:'sub'}];
+  var euPorts=[{n:'로테르담',c:[51.9225,4.4792],v:'$3.8B'},{n:'함부르크',c:[53.5511,9.9937],v:'$2.1B'},{n:'앤트워프',c:[51.2194,4.4025],v:'$1.6B'},{n:'르아브르',c:[49.4944,0.1079],v:'$0.9B'},{n:'바르셀로나',c:[41.3851,2.1734],v:'$0.7B'},{n:'피레우스',c:[37.9475,23.6372],v:'$0.4B'}];
+  krPorts.forEach(function(p){var r=p.t==='main'?7:5;var m=L.circleMarker(p.c,{radius:r,color:'#fff',weight:2,fillColor:'#008C73',fillOpacity:0.9}).addTo(routeMap);m.bindTooltip('<b>'+p.n+'</b><br>'+p.v,{direction:'top'});});
+  euPorts.forEach(function(p){var m=L.circleMarker(p.c,{radius:6,color:'#fff',weight:2,fillColor:'#C62828',fillOpacity:0.6}).addTo(routeMap);m.bindTooltip('<b>'+p.n+'</b><br>'+p.v,{direction:'top'});});
+  var busan=[35.0796,129.0756];
+  euPorts.forEach(function(p,i){var mid=[(busan[0]+p.c[0])/2+12,(busan[1]+p.c[1])/2];var w=i<3?2.5:1.5;var c=i<3?'#C62828':'#E65100';var o=i<3?0.7:0.4;L.polyline([busan,mid,p.c],{color:c,weight:w,opacity:o,dashArray:i>=3?'6,4':null,smoothFactor:3}).addTo(routeMap);});
+  L.circle([50.5,10],{radius:1200000,color:'#C62828',weight:1,dashArray:'8',fillColor:'#C62828',fillOpacity:0.04}).addTo(routeMap);
+  L.circle([36.5,128],{radius:200000,color:'#008C73',weight:1.5,dashArray:'6',fillColor:'#008C73',fillOpacity:0.08}).addTo(routeMap);
+  L.marker([36.5,128],{icon:L.divIcon({className:'',html:'<div style="font-size:10px;font-weight:700;color:#008C73;text-shadow:0 0 4px #000,0 0 4px #000;white-space:nowrap">KOREA</div>',iconAnchor:[20,-10]})}).addTo(routeMap);
+  L.marker([50.5,10],{icon:L.divIcon({className:'',html:'<div style="font-size:10px;font-weight:700;color:#C62828;text-shadow:0 0 4px #000,0 0 4px #000;white-space:nowrap">EU CBAM</div>',iconAnchor:[30,-15]})}).addTo(routeMap);
+  L.marker([48,65],{icon:L.divIcon({className:'',html:'<div style="background:rgba(0,0,0,0.75);color:#fff;padding:4px 8px;border-radius:4px;font-size:9px;line-height:1.4;white-space:nowrap;font-family:monospace"><span style="font-weight:700;color:#C62828">$12B CBAM</span><br>철강 $5.2B | 석유화학 $3.1B</div>',iconAnchor:[60,15]})}).addTo(routeMap);
+  var obs=new MutationObserver(function(){
+    var s=document.querySelector('[data-n="6"]');
+    if(s&&s.classList.contains('active'))setTimeout(function(){routeMap.invalidateSize()},100);
+  });
+  obs.observe(document.querySelector('[data-n="6"]'),{attributes:true,attributeFilter:['class']});
+})();
+
+// === 산업 거점 지도 (슬라이드 6) ===
+(function(){
+  var hubMap=L.map('pres-hub-map',{center:[36.0,127.8],zoom:7,zoomControl:false,attributionControl:false});
+  L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png',{maxZoom:19}).addTo(hubMap);
+  var hubs=[
+    {n:'POSCO 포항',c:[35.9856,129.3594],cat:'철강',cl:'#C62828',r:10},
+    {n:'POSCO 광양',c:[34.91,127.7],cat:'철강',cl:'#C62828',r:9},
+    {n:'현대제철 당진',c:[36.8917,126.6297],cat:'철강',cl:'#C62828',r:8},
+    {n:'SK에너지 울산',c:[35.501,129.387],cat:'석유화학',cl:'#E65100',r:8},
+    {n:'여천NCC 여수',c:[34.7604,127.6622],cat:'석유화학',cl:'#E65100',r:7},
+    {n:'LG화학 대산',c:[36.95,126.35],cat:'석유화학',cl:'#E65100',r:6},
+    {n:'노벨리스 영주',c:[36.8057,128.724],cat:'알루미늄',cl:'#1565C0',r:7},
+    {n:'삼아알미늄 인천',c:[37.42,126.65],cat:'알루미늄',cl:'#1565C0',r:6},
+    {n:'쌍용C&E 영월',c:[37.1839,128.4614],cat:'시멘트',cl:'#008C73',r:5},
+    {n:'한일시멘트 단양',c:[36.9847,128.3653],cat:'시멘트',cl:'#008C73',r:5}
+  ];
+  var ports=[{n:'부산항',c:[35.0796,129.0756]},{n:'인천항',c:[37.4563,126.5922]},{n:'광양항',c:[34.9164,127.6953]},{n:'울산항',c:[35.501,129.387]}];
+  hubs.forEach(function(h){var m=L.circleMarker(h.c,{radius:h.r,color:'#fff',weight:1.5,fillColor:h.cl,fillOpacity:0.75}).addTo(hubMap);m.bindTooltip('<b>'+h.n+'</b><br>'+h.cat,{direction:'top'});});
+  ports.forEach(function(p){var m=L.circleMarker(p.c,{radius:4,color:'#FFD700',weight:2,fillColor:'#FFD700',fillOpacity:0.8}).addTo(hubMap);m.bindTooltip('<b>'+p.n+'</b>',{direction:'top'});});
+  var legend=L.control({position:'bottomleft'});
+  legend.onAdd=function(){var d=L.DomUtil.create('div');d.style.cssText='background:rgba(0,0,0,0.8);color:#fff;padding:6px 10px;border-radius:6px;font-size:8px;line-height:1.7';d.innerHTML='<div style="font-weight:700;margin-bottom:2px">CBAM 산업</div><div><span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:#C62828;margin-right:4px"></span>철강</div><div><span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:#E65100;margin-right:4px"></span>석유화학</div><div><span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:#1565C0;margin-right:4px"></span>알루미늄</div><div><span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:#008C73;margin-right:4px"></span>시멘트</div>';return d;};
+  legend.addTo(hubMap);
+  var obs=new MutationObserver(function(){
+    var s=document.querySelector('[data-n="6"]');
+    if(s&&s.classList.contains('active'))setTimeout(function(){hubMap.invalidateSize()},100);
+  });
+  obs.observe(document.querySelector('[data-n="6"]'),{attributes:true,attributeFilter:['class']});
+})();
+</script>
+</body>
+</html>
