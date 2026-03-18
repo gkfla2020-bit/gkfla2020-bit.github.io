@@ -26,7 +26,7 @@
 body{font-family:var(--sans);background:#FFFFFF;color:#1B1B1B;-webkit-font-smoothing:antialiased;line-height:1.6}
 
 /* NAV */
-.nav{display:flex;align-items:center;justify-content:space-between;padding:0 40px;height:60px;background:#fff;border-bottom:1px solid var(--border);position:sticky;top:0;z-index:100}
+.nav{display:flex;align-items:center;justify-content:space-between;padding:0 40px;height:60px;background:#fff;border-bottom:1px solid var(--border);position:relative;z-index:100}
 .nav-left{display:flex;align-items:center;gap:32px}
 .nav-brand{display:flex;align-items:center;gap:10px}
 .nav-brand svg{width:28px;height:28px}
@@ -272,9 +272,23 @@ body{font-family:var(--sans);background:#FFFFFF;color:#1B1B1B;-webkit-font-smoot
 
 /* MODE PANEL OPEN (탭 없이 전부 펼침) */
 .mode-panel-open{display:block}
-.mode-divider{max-width:1200px;margin:0 auto;padding:56px 40px 0}
-.mode-divider h2{font-size:22px;font-weight:800;color:var(--hana-deeper);padding-bottom:16px;border-bottom:3px solid var(--hana);display:inline-block}
-.mode-divider p{font-size:13px;color:var(--text-sub);margin-top:8px}
+
+/* MODE SEPARATOR — 두 모드 사이 큰 구분선 */
+.mode-separator{padding:80px 40px 0;max-width:1200px;margin:0 auto}
+.mode-sep-inner{display:flex;align-items:center;gap:24px;padding:32px 36px;border-radius:16px;border:2px solid var(--border)}
+.bank-sep .mode-sep-inner{background:linear-gradient(135deg,var(--hana-pale),#fff);border-color:var(--hana)}
+.biz-sep .mode-sep-inner{background:linear-gradient(135deg,var(--blue-bg),#fff);border-color:var(--blue)}
+.biz-sep{padding-top:100px}
+.biz-sep::before{content:'';display:block;height:2px;background:linear-gradient(90deg,transparent,var(--border),transparent);margin-bottom:100px}
+.mode-sep-badge{width:56px;height:56px;border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:24px;font-weight:900;color:#fff;flex-shrink:0}
+.bank-badge{background:var(--hana)}
+.biz-badge{background:var(--blue)}
+.mode-sep-text h2{font-size:22px;font-weight:800;color:var(--text);margin-bottom:6px}
+.mode-sep-text p{font-size:13px;color:var(--text-sub);line-height:1.6}
+
+/* INLINE NAV (모드별 별도 네비게이션) */
+.nav-inline{position:relative;top:auto;margin:24px auto 0;max-width:1200px;border-radius:12px;border:1px solid var(--border);box-shadow:var(--shadow)}
+.biz-badge-tag{background:var(--blue-bg);color:var(--blue)}
 
 /* ===== MOBILE RESPONSIVE ===== */
 @media(max-width:768px){
@@ -288,8 +302,13 @@ body{font-family:var(--sans);background:#FFFFFF;color:#1B1B1B;-webkit-font-smoot
   .hero-stats{gap:20px}
   .hero-stat .val{font-size:22px}
   .hero-stat .lbl{font-size:10px}
-  .mode-divider{padding:36px 20px 0}
-  .mode-divider h2{font-size:18px}
+  .mode-separator{padding:48px 20px 0}
+  .biz-sep{padding-top:60px}
+  .biz-sep::before{margin-bottom:60px}
+  .mode-sep-inner{flex-direction:column;text-align:center;padding:24px 20px;gap:16px}
+  .mode-sep-badge{width:44px;height:44px;font-size:20px}
+  .mode-sep-text h2{font-size:18px}
+  .nav-inline{margin:16px 20px 0;border-radius:10px}
   .sec{padding:36px 20px}
   .sec-title{font-size:20px}
   .sec-sub{font-size:12px}
@@ -389,7 +408,36 @@ body{font-family:var(--sans);background:#FFFFFF;color:#1B1B1B;-webkit-font-smoot
 <!-- ============================================================ -->
 <!-- BANK MODE PANEL -->
 <!-- ============================================================ -->
-<div class="mode-divider"><h2>A. 은행 내부용 — 무역금융 심사</h2><p>하나은행 무역금융 담당자가 수출환어음 매입 심사 시 사용하는 화면입니다.</p></div>
+
+<div class="mode-separator bank-sep">
+  <div class="mode-sep-inner">
+    <div class="mode-sep-badge bank-badge">A</div>
+    <div class="mode-sep-text">
+      <h2>은행 내부용 — 무역금융 심사</h2>
+      <p>하나은행 무역금융 담당자가 수출환어음 매입 심사 시 사용하는 화면입니다.</p>
+    </div>
+  </div>
+</div>
+<nav class="nav nav-inline">
+  <div class="nav-left">
+    <div class="nav-brand">
+      <svg viewBox="0 0 28 28" fill="none"><rect width="28" height="28" rx="6" fill="#008C73"/><text x="14" y="19" text-anchor="middle" fill="#fff" font-size="14" font-weight="800" font-family="sans-serif">H</text></svg>
+      <span class="name">ESG TradeGuard</span>
+      <span class="badge">INTERNAL</span>
+    </div>
+    <div class="nav-menu">
+      <a class="on">대시보드</a>
+      <a>심사 내역</a>
+      <a>규제 DB</a>
+      <a>위성 모니터링</a>
+      <a>리포트</a>
+    </div>
+  </div>
+  <div class="nav-right">
+    <div class="nav-noti"><svg width="16" height="16"><use href="#i-bell"/></svg><div class="dot"></div></div>
+    <div class="nav-user"><div class="avatar">김</div><span>김하나 과장</span></div>
+  </div>
+</nav>
 <div class="mode-panel-open" id="panel-bank">
 
 <!-- STEP 1: 서류 업로드 -->
@@ -649,7 +697,36 @@ body{font-family:var(--sans);background:#FFFFFF;color:#1B1B1B;-webkit-font-smoot
 <!-- ============================================================ -->
 <!-- BIZ MODE PANEL (기업 자가검진용 B2B SaaS) -->
 <!-- ============================================================ -->
-<div class="mode-divider"><h2>B. 기업 자가검진용 — B2B SaaS</h2><p>수출기업이 직접 ESG 규제 리스크를 사전 점검하는 화면입니다. (월 30만원)</p></div>
+
+<div class="mode-separator biz-sep">
+  <div class="mode-sep-inner">
+    <div class="mode-sep-badge biz-badge">B</div>
+    <div class="mode-sep-text">
+      <h2>기업 자가검진용 — B2B SaaS</h2>
+      <p>수출기업이 직접 ESG 규제 리스크를 사전 점검하는 화면입니다. (월 30만원)</p>
+    </div>
+  </div>
+</div>
+<nav class="nav nav-inline">
+  <div class="nav-left">
+    <div class="nav-brand">
+      <svg viewBox="0 0 28 28" fill="none"><rect width="28" height="28" rx="6" fill="#008C73"/><text x="14" y="19" text-anchor="middle" fill="#fff" font-size="14" font-weight="800" font-family="sans-serif">H</text></svg>
+      <span class="name">ESG TradeGuard</span>
+      <span class="badge biz-badge-tag">B2B SaaS</span>
+    </div>
+    <div class="nav-menu">
+      <a class="on">자가검진</a>
+      <a>검진 이력</a>
+      <a>규제 가이드</a>
+      <a>비용 시뮬레이션</a>
+      <a>고객지원</a>
+    </div>
+  </div>
+  <div class="nav-right">
+    <div class="nav-noti"><svg width="16" height="16"><use href="#i-bell"/></svg></div>
+    <div class="nav-user"><div class="avatar" style="background:#1565C0">박</div><span>박수진 대리 · 에이스틸</span></div>
+  </div>
+</nav>
 <div class="mode-panel-open" id="panel-biz">
 
 <div class="sec">
