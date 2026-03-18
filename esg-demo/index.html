@@ -1030,15 +1030,48 @@ body{font-family:var(--sans);background:#FFFFFF;color:#1B1B1B;-webkit-font-smoot
     </div>
   </div>
 
+
+  <!-- 한국 CBAM 대상 수출 산업 거점 지도 -->
+  <div style="background:#fff;border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;margin-bottom:24px">
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:12px 20px;border-bottom:1px solid var(--border);background:var(--bg2)">
+      <div style="display:flex;align-items:center;gap:8px">
+        <svg width="14" height="14" stroke="var(--hana)"><use href="#i-pin"/></svg>
+        <span style="font-size:13px;font-weight:700;color:var(--text)">한국 CBAM 대상 수출 산업 거점</span>
+      </div>
+      <span style="font-size:10px;font-family:var(--mono);color:var(--text-light)">산업통상자원부 | 2024</span>
+    </div>
+    <div id="cbam-hub-map" style="width:100%;height:380px;background:#1a2636"></div>
+    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:0;border-top:1px solid var(--border)">
+      <div style="padding:12px 16px;text-align:center;border-right:1px solid var(--border)">
+        <div style="font-family:var(--mono);font-size:16px;font-weight:800;color:var(--red)">$5.2B</div>
+        <div style="font-size:10px;color:var(--text-sub)">철강 (포항/광양)</div>
+      </div>
+      <div style="padding:12px 16px;text-align:center;border-right:1px solid var(--border)">
+        <div style="font-family:var(--mono);font-size:16px;font-weight:800;color:var(--orange)">$3.1B</div>
+        <div style="font-size:10px;color:var(--text-sub)">석유화학 (울산/여수)</div>
+      </div>
+      <div style="padding:12px 16px;text-align:center;border-right:1px solid var(--border)">
+        <div style="font-family:var(--mono);font-size:16px;font-weight:800;color:var(--blue)">$2.4B</div>
+        <div style="font-size:10px;color:var(--text-sub)">알루미늄 (당진/인천)</div>
+      </div>
+      <div style="padding:12px 16px;text-align:center">
+        <div style="font-family:var(--mono);font-size:16px;font-weight:800;color:var(--hana)">$1.3B</div>
+        <div style="font-size:10px;color:var(--text-sub)">시멘트/비료 (충북/전남)</div>
+      </div>
+    </div>
+  </div>
+
   <div class="revenue-card" style="margin-bottom:0">
     <h4><svg width="16" height="16" stroke="var(--hana)"><use href="#i-chart"/></svg> 3년 매출 전망</h4>
-    <div style="font-size:12px;color:var(--text-sub)">
-      <div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--bg3);font-weight:600;color:var(--text)"><span>구분</span><span>1년차</span><span>2년차</span><span>3년차</span></div>
-      <div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--bg3)"><span>B2B SaaS (기업 자가검진)</span><span>1.8억</span><span>5.4억</span><span>12억</span></div>
-      <div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--bg3)"><span>수출환어음 수수료 프리미엄</span><span>0.5억</span><span>2억</span><span>5억</span></div>
-      <div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--bg3)"><span>ESG 리포트 유료 제공</span><span>0.2억</span><span>1억</span><span>3억</span></div>
-      <div style="display:flex;justify-content:space-between;padding:8px 0;font-weight:700;color:var(--hana)"><span>합계</span><span>2.5억</span><span>8.4억</span><span>20억</span></div>
-    </div>
+    <table class="compare-tbl" style="margin-top:12px">
+      <thead><tr><th style="text-align:left;width:40%">구분</th><th style="width:20%">1년차</th><th style="width:20%">2년차</th><th style="width:20%">3년차</th></tr></thead>
+      <tbody>
+        <tr><td style="text-align:left">B2B SaaS (기업 자가검진)</td><td>1.8억</td><td>5.4억</td><td>12억</td></tr>
+        <tr><td style="text-align:left">수출환어음 수수료 프리미엄</td><td>0.5억</td><td>2억</td><td>5억</td></tr>
+        <tr><td style="text-align:left">ESG 리포트 유료 제공</td><td>0.2억</td><td>1억</td><td>3억</td></tr>
+        <tr style="font-weight:700;color:var(--hana)"><td style="text-align:left">합계</td><td>2.5억</td><td>8.4억</td><td>20억</td></tr>
+      </tbody>
+    </table>
   </div>
 </div>
 
@@ -1292,6 +1325,169 @@ body{font-family:var(--sans);background:#FFFFFF;color:#1B1B1B;-webkit-font-smoot
 
   // 줌 컨트롤 우측 상단
   L.control.zoom({position:'topright'}).addTo(map);
+})();
+</script>
+
+
+<script>
+(function(){
+  // ===== 한국→EU CBAM 수출 경로 지도 =====
+  var routeMap = L.map('cbam-route-map', {
+    center: [40, 50],
+    zoom: 2,
+    minZoom: 2,
+    maxZoom: 6,
+    zoomControl: false,
+    attributionControl: false
+  });
+  L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+    maxZoom: 19
+  }).addTo(routeMap);
+  L.control.zoom({position:'topright'}).addTo(routeMap);
+
+  // 한국 수출 거점 (실제 좌표)
+  var krPorts = [
+    {name:'부산항', coord:[35.0796,129.0756], vol:'$8.2B', type:'main'},
+    {name:'인천항', coord:[37.4563,126.5922], vol:'$2.1B', type:'main'},
+    {name:'광양항', coord:[34.9164,127.6953], vol:'$1.4B', type:'sub'},
+    {name:'울산항', coord:[35.5010,129.3870], vol:'$0.9B', type:'sub'},
+    {name:'포항', coord:[35.9856,129.3594], vol:'POSCO', type:'factory'},
+    {name:'광양제철소', coord:[34.9100,127.7000], vol:'POSCO', type:'factory'}
+  ];
+
+  // EU 주요 수입항 (실제 좌표)
+  var euPorts = [
+    {name:'로테르담', coord:[51.9225,4.4792], vol:'$3.8B'},
+    {name:'함부르크', coord:[53.5511,9.9937], vol:'$2.1B'},
+    {name:'앤트워프', coord:[51.2194,4.4025], vol:'$1.6B'},
+    {name:'르아브르', coord:[49.4944,0.1079], vol:'$0.9B'},
+    {name:'바르셀로나', coord:[41.3851,2.1734], vol:'$0.7B'},
+    {name:'피레우스', coord:[37.9475,23.6372], vol:'$0.4B'}
+  ];
+
+  // 한국 거점 마커
+  krPorts.forEach(function(p){
+    var color = p.type === 'factory' ? '#E65100' : '#008C73';
+    var radius = p.type === 'main' ? 7 : 5;
+    var m = L.circleMarker(p.coord, {radius:radius, color:'#fff', weight:2, fillColor:color, fillOpacity:0.9}).addTo(routeMap);
+    m.bindTooltip('<b>'+p.name+'</b><br>'+p.vol, {direction:'top'});
+  });
+
+  // EU 수입항 마커
+  euPorts.forEach(function(p){
+    var m = L.circleMarker(p.coord, {radius:6, color:'#fff', weight:2, fillColor:'#C62828', fillOpacity:0.6}).addTo(routeMap);
+    m.bindTooltip('<b>'+p.name+'</b><br>'+p.vol, {direction:'top'});
+  });
+
+  // CBAM 수출 경로 (부산→EU 주요항)
+  var busan = [35.0796, 129.0756];
+  euPorts.forEach(function(p, i){
+    // 곡선 효과: 중간점을 위로 올림
+    var mid = [(busan[0]+p.coord[0])/2 + 12, (busan[1]+p.coord[1])/2];
+    var latlngs = [busan, mid, p.coord];
+    var weight = i < 3 ? 2.5 : 1.5;
+    var color = i < 3 ? '#C62828' : '#E65100';
+    var opacity = i < 3 ? 0.7 : 0.4;
+    L.polyline(latlngs, {color:color, weight:weight, opacity:opacity, dashArray: i >= 3 ? '6,4' : null, smoothFactor:3}).addTo(routeMap);
+  });
+
+  // EU CBAM 대상국 영역 표시 (간략 원형)
+  L.circle([50.5, 10], {radius:1200000, color:'#C62828', weight:1, dashArray:'8', fillColor:'#C62828', fillOpacity:0.04}).addTo(routeMap);
+
+  // 한국 영역
+  L.circle([36.5, 128], {radius:200000, color:'#008C73', weight:1.5, dashArray:'6', fillColor:'#008C73', fillOpacity:0.08}).addTo(routeMap);
+
+  // 라벨
+  L.marker([36.5, 128], {icon: L.divIcon({className:'', html:'<div style="font-size:11px;font-weight:700;color:#008C73;text-shadow:0 0 4px #000,0 0 4px #000;white-space:nowrap">KOREA</div>', iconAnchor:[20,-10]})}).addTo(routeMap);
+  L.marker([50.5, 10], {icon: L.divIcon({className:'', html:'<div style="font-size:11px;font-weight:700;color:#C62828;text-shadow:0 0 4px #000,0 0 4px #000;white-space:nowrap">EU CBAM ZONE</div>', iconAnchor:[40,-15]})}).addTo(routeMap);
+
+  // 수출액 라벨
+  L.marker([48, 65], {icon: L.divIcon({className:'', html:'<div style="background:rgba(0,0,0,0.75);color:#fff;padding:6px 10px;border-radius:6px;font-size:10px;line-height:1.5;white-space:nowrap;font-family:monospace"><div style="font-weight:700;color:#C62828;font-size:12px">$12B CBAM 대상</div>철강 $5.2B | 석유화학 $3.1B<br>알루미늄 $2.4B | 시멘트 $1.3B</div>', iconAnchor:[80,20]})}).addTo(routeMap);
+})();
+</script>
+
+<script>
+(function(){
+  // ===== 한국 CBAM 수출 산업 거점 지도 =====
+  var hubMap = L.map('cbam-hub-map', {
+    center: [36.0, 127.8],
+    zoom: 7,
+    zoomControl: false,
+    attributionControl: false
+  });
+  L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+    maxZoom: 19
+  }).addTo(hubMap);
+  L.control.zoom({position:'topright'}).addTo(hubMap);
+
+  // CBAM 대상 산업 거점 (실제 좌표)
+  var hubs = [
+    // 철강
+    {name:'POSCO 포항제철소', coord:[35.9856,129.3594], cat:'철강', vol:'$2.8B', color:'#C62828', radius:12},
+    {name:'POSCO 광양제철소', coord:[34.9100,127.7000], cat:'철강', vol:'$2.4B', color:'#C62828', radius:11},
+    {name:'현대제철 당진', coord:[36.8917,126.6297], cat:'철강', vol:'$1.2B', color:'#C62828', radius:9},
+    {name:'현대제철 인천', coord:[37.4100,126.6800], cat:'철강', vol:'$0.4B', color:'#C62828', radius:6},
+    {name:'동국제강 부산', coord:[35.0977,129.0300], cat:'철강', vol:'$0.3B', color:'#C62828', radius:5},
+    // 석유화학
+    {name:'SK에너지 울산', coord:[35.5010,129.3870], cat:'석유화학', vol:'$1.4B', color:'#E65100', radius:10},
+    {name:'여천NCC 여수', coord:[34.7604,127.6622], cat:'석유화학', vol:'$1.0B', color:'#E65100', radius:8},
+    {name:'LG화학 대산', coord:[36.9500,126.3500], cat:'석유화학', vol:'$0.7B', color:'#E65100', radius:7},
+    // 알루미늄
+    {name:'노벨리스 영주', coord:[36.8057,128.7240], cat:'알루미늄', vol:'$1.2B', color:'#1565C0', radius:9},
+    {name:'삼아알미늄 인천', coord:[37.4200,126.6500], cat:'알루미늄', vol:'$0.8B', color:'#1565C0', radius:7},
+    {name:'조일알미늄 시흥', coord:[37.3800,126.8000], cat:'알루미늄', vol:'$0.4B', color:'#1565C0', radius:5},
+    // 시멘트/비료
+    {name:'쌍용C&E 영월', coord:[37.1839,128.4614], cat:'시멘트', vol:'$0.5B', color:'#008C73', radius:6},
+    {name:'한일시멘트 단양', coord:[36.9847,128.3653], cat:'시멘트', vol:'$0.4B', color:'#008C73', radius:5},
+    {name:'남해화학 여수', coord:[34.7500,127.7400], cat:'비료', vol:'$0.3B', color:'#008C73', radius:5}
+  ];
+
+  // 주요 수출항
+  var ports = [
+    {name:'부산항', coord:[35.0796,129.0756]},
+    {name:'인천항', coord:[37.4563,126.5922]},
+    {name:'광양항', coord:[34.9164,127.6953]},
+    {name:'울산항', coord:[35.5010,129.3870]}
+  ];
+
+  // 산업 거점 마커
+  hubs.forEach(function(h){
+    var m = L.circleMarker(h.coord, {
+      radius: h.radius,
+      color: '#fff',
+      weight: 1.5,
+      fillColor: h.color,
+      fillOpacity: 0.75
+    }).addTo(hubMap);
+    m.bindTooltip('<b>'+h.name+'</b><br>'+h.cat+' | '+h.vol, {direction:'top'});
+  });
+
+  // 수출항 마커 (다이아몬드 느낌)
+  ports.forEach(function(p){
+    var m = L.circleMarker(p.coord, {
+      radius: 5,
+      color: '#FFD700',
+      weight: 2,
+      fillColor: '#FFD700',
+      fillOpacity: 0.8
+    }).addTo(hubMap);
+    m.bindTooltip('<b>'+p.name+'</b> (수출항)', {direction:'top'});
+  });
+
+  // 범례
+  var legend = L.control({position:'bottomleft'});
+  legend.onAdd = function(){
+    var d = L.DomUtil.create('div');
+    d.style.cssText = 'background:rgba(0,0,0,0.8);color:#fff;padding:10px 14px;border-radius:8px;font-size:10px;line-height:1.8';
+    d.innerHTML = '<div style="font-weight:700;margin-bottom:4px">CBAM 대상 산업</div>'
+      + '<div style="display:flex;align-items:center;gap:6px"><span style="width:10px;height:10px;border-radius:50%;background:#C62828;display:inline-block"></span> 철강 $5.2B</div>'
+      + '<div style="display:flex;align-items:center;gap:6px"><span style="width:10px;height:10px;border-radius:50%;background:#E65100;display:inline-block"></span> 석유화학 $3.1B</div>'
+      + '<div style="display:flex;align-items:center;gap:6px"><span style="width:10px;height:10px;border-radius:50%;background:#1565C0;display:inline-block"></span> 알루미늄 $2.4B</div>'
+      + '<div style="display:flex;align-items:center;gap:6px"><span style="width:10px;height:10px;border-radius:50%;background:#008C73;display:inline-block"></span> 시멘트/비료 $1.3B</div>'
+      + '<div style="display:flex;align-items:center;gap:6px"><span style="width:10px;height:10px;border-radius:50%;background:#FFD700;display:inline-block"></span> 수출항</div>';
+    return d;
+  };
+  legend.addTo(hubMap);
 })();
 </script>
 
