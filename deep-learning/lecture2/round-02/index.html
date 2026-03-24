@@ -1,0 +1,854 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lecture 2 · Round 2: Layer Normalization | 딥러닝 학습</title>
+<script>
+MathJax = { tex: { inlineMath: [['\\(','\\)']], displayMath: [['\\[','\\]']] } };
+</script>
+<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;500&family=Space+Mono:wght@400&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+<script src="https://cdn.plot.ly/plotly-2.35.0.min.js"></script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Inter',sans-serif;background:#fafaf8;color:#1a1a1a;line-height:1.7;overflow-x:hidden}
+.sidebar{position:fixed;left:0;top:0;width:260px;height:100vh;background:rgba(255,255,255,.97);border-right:1px solid rgba(0,0,0,.06);padding:32px 24px;z-index:100;overflow-y:auto;display:flex;flex-direction:column}
+.sidebar-profile{text-align:center;margin-bottom:28px;padding-bottom:24px;border-bottom:1px solid rgba(0,0,0,.08)}
+.profile-icon{font-size:48px;margin-bottom:8px}
+.profile-name{font-family:'Cormorant Garamond',serif;font-size:1.3rem;font-weight:500;margin-bottom:4px}
+.profile-title{font-size:.68rem;color:#888;letter-spacing:.08em;text-transform:uppercase;margin-bottom:8px}
+.profile-bio{font-size:.78rem;color:#666;line-height:1.5}
+.sidebar-nav{flex:1;margin-top:16px}
+.nav-section{margin-bottom:20px}
+.nav-section-title{font-size:.6rem;font-weight:600;color:#aaa;letter-spacing:.15em;text-transform:uppercase;margin-bottom:10px}
+.nav-list{list-style:none}
+.nav-list li{margin-bottom:5px}
+.nav-list a{font-size:.78rem;color:#555;text-decoration:none;transition:all .2s;display:block;padding:3px 0}
+.nav-list a:hover{color:#0080c6;padding-left:4px}
+.nav-list a.active{color:#0080c6;font-weight:500}
+.badge{display:inline-block;font-size:.5rem;background:#0080c6;color:#fff;padding:1px 5px;border-radius:8px;margin-left:3px;vertical-align:middle}
+.badge-quiz{background:#e74c3c}
+.sidebar-footer{padding-top:16px;border-top:1px solid rgba(0,0,0,.06);font-size:.65rem;color:#aaa;text-align:center}
+.main-wrapper{margin-left:260px;min-height:100vh}
+.container{max-width:1100px;margin:0 auto;padding:50px 40px 80px}
+.paper-content{font-family:'Times New Roman','Nanum Myeongjo',serif;line-height:1.8;background:#fff;padding:40px;border-radius:8px;box-shadow:0 2px 20px rgba(0,0,0,.05)}
+.paper-header{text-align:center;margin-bottom:40px;padding-bottom:30px;border-bottom:2px solid #333}
+.paper-category{font-size:14px;color:#666;margin-bottom:10px}
+.paper-title{font-size:24px;font-weight:bold;margin-bottom:12px;line-height:1.4}
+.paper-subtitle{font-size:14px;color:#555;margin-bottom:8px}
+.paper-team{font-size:13px;color:#444}
+</style>
+<style>
+.abstract{background:#f8f9fa;padding:25px;margin:30px 0;border-left:4px solid #2c3e50}
+.abstract-title{font-weight:bold;font-size:16px;margin-bottom:15px}
+h2{font-size:18px;margin:35px 0 20px;padding-bottom:8px;border-bottom:1px solid #ddd;color:#2c3e50}
+h3{font-size:15px;margin:25px 0 15px;color:#34495e}
+h4{font-size:14px;margin:20px 0 12px;color:#34495e}
+p{text-align:justify;margin-bottom:15px;text-indent:2em}
+p.ni{text-indent:0}
+table{width:100%;border-collapse:collapse;margin:20px 0;font-size:12px}
+th,td{border:1px solid #ddd;padding:10px 8px;text-align:center}
+th{background:#2c3e50;color:white;font-weight:bold}
+tr:nth-child(even){background:#f8f9fa}
+tr:hover{background:#e8f4f8}
+.tc{font-size:13px;font-weight:bold;margin:15px 0 10px;text-align:center}
+.eq{text-align:center;margin:20px 0;padding:15px;background:#f8f9fa;border-radius:4px;overflow-x:auto}
+ul,ol{margin-left:2em;margin-bottom:15px}
+li{margin-bottom:6px}
+.def{background:#fff9e6;border:1px solid #ffc107;border-radius:4px;padding:20px;margin:20px 0}
+.info{background:#e8f4f8;border-left:4px solid #3498db;padding:20px;margin:20px 0}
+.warn{background:#fff3cd;border-left:4px solid #f39c12;padding:20px;margin:20px 0}
+.ok{background:#d4edda;border-left:4px solid #28a745;padding:20px;margin:20px 0}
+pre{background:#1e1e1e;color:#d4d4d4;padding:20px;border-radius:6px;overflow-x:auto;margin:20px 0;font-family:'Space Mono','Consolas',monospace;font-size:13px;line-height:1.6}
+code{font-family:'Space Mono','Consolas',monospace;font-size:13px}
+p code,li code,td code{background:#f0f0f0;padding:2px 6px;border-radius:3px;color:#c7254e;font-size:12px}
+.cm{color:#6a9955}.kw{color:#569cd6}.st{color:#ce9178}.fn{color:#dcdcaa}.nb{color:#4ec9b0}.nu{color:#b5cea8}
+.quiz-box{background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);color:#fff;padding:25px;border-radius:8px;margin:25px 0}
+.quiz-box h4{color:#fff;margin-top:0}
+.quiz-option{background:rgba(255,255,255,.15);padding:10px 15px;margin:8px 0;border-radius:4px;cursor:pointer;transition:all .2s}
+.quiz-option:hover{background:rgba(255,255,255,.25)}
+.quiz-option.correct{background:#28a745!important}
+.quiz-option.wrong{background:#dc3545!important}
+.quiz-answer{display:none;margin-top:15px;padding:15px;background:rgba(255,255,255,.1);border-radius:4px}
+.round-nav{display:flex;justify-content:space-between;margin:40px 0 0;padding:20px 0;border-top:2px solid #eee}
+.round-nav a{display:inline-flex;align-items:center;gap:6px;padding:10px 20px;background:#0080c6;color:#fff;text-decoration:none;border-radius:6px;font-size:13px;font-family:'Inter',sans-serif;transition:background .2s}
+.round-nav a:hover{background:#006aa3}
+.round-nav a.disabled{background:#ccc;pointer-events:none}
+.diagram{background:#f0f4f8;border:2px solid #ddd;border-radius:8px;padding:24px;margin:20px 0;font-family:'Space Mono',monospace;font-size:12px;line-height:1.8;overflow-x:auto;white-space:pre}
+@media(max-width:1024px){
+.sidebar{width:100%;height:auto;position:relative;border-right:none;border-bottom:1px solid rgba(0,0,0,.08);padding:16px}
+.sidebar-profile{margin-bottom:10px;padding-bottom:10px;display:flex;align-items:center;gap:12px;text-align:left}
+.profile-icon{font-size:32px;margin-bottom:0}.profile-bio{display:none}
+.nav-section{display:inline-block;margin-right:16px;margin-bottom:8px}
+.nav-list{display:flex;gap:10px;flex-wrap:wrap}.nav-list li{margin-bottom:0}
+.sidebar-footer{display:none}
+.main-wrapper{margin-left:0}
+.container{padding:0}.paper-content{padding:20px 16px;border-radius:0;box-shadow:none}
+.paper-title{font-size:18px}p{font-size:14px;text-indent:1.5em;text-align:left}
+pre{font-size:11px;padding:14px}table{font-size:10px;display:block;overflow-x:auto}
+}
+</style>
+</head>
+<body>
+
+<div class="sidebar">
+<div class="sidebar-profile">
+<div class="profile-icon">⚖️</div>
+<div class="profile-name">Lecture 2 · Round 2</div>
+<div class="profile-title">Layer Normalization</div>
+<div class="profile-bio">CME 295 Lecture 2 · 학습 안정성의 핵심: 정규화 전략의 진화</div>
+</div>
+<div class="sidebar-nav">
+<div class="nav-section">
+<div class="nav-section-title">This Round</div>
+<ul class="nav-list">
+<li><a href="#why-norm">1. 왜 정규화가 필요한가</a></li>
+<li><a href="#layernorm">2. Layer Normalization <span class="badge">핵심</span></a></li>
+<li><a href="#bn-vs-ln">3. Batch Norm vs Layer Norm</a></li>
+<li><a href="#post-pre">4. Post-Norm vs Pre-Norm</a></li>
+<li><a class="active" href="#rmsnorm">5. RMSNorm <span class="badge">현재 표준</span></a></li>
+<li><a href="#summary">6. 종합 정리</a></li>
+<li><a href="#quiz">📝 Quiz</a></li>
+</ul>
+</div>
+<div class="nav-section">
+<div class="nav-section-title">All Rounds</div>
+<ul class="nav-list">
+<li><a href="../round-01/">R1 · Position Embeddings</a></li>
+<li><a class="active" href="#">R2 · Layer Normalization</a></li>
+<li><a href="../round-03/">R3 · Attention Approximation</a></li>
+<li><a href="../round-04/">R4 · Transformer Models</a></li>
+<li><a href="../round-05/">R5 · BERT Deep Dive</a></li>
+</ul>
+</div>
+</div>
+<div class="sidebar-footer">CME 295 · Lecture 2 · Amidi & Amidi</div>
+</div>
+
+<div class="main-wrapper">
+<div class="container">
+<div class="paper-content">
+
+<div class="paper-header">
+<div class="paper-category">CME 295: Transformers & Large Language Models · Lecture 2 · Round 2 / 5</div>
+<h1 class="paper-title">Layer Normalization — 학습 안정성과 수렴의 핵심</h1>
+<div class="paper-subtitle">Batch Norm → Layer Norm → Pre-Norm → RMSNorm: 정규화 전략의 진화</div>
+<div class="paper-team">Based on: Stanford CME 295 Lecture 2 (Afshine & Shervine Amidi)</div>
+</div>
+
+<div class="abstract">
+<div class="abstract-title">Learning Objectives</div>
+<p class="ni">이 라운드를 마치면 다음을 할 수 있다:</p>
+<ul>
+<li>Normalization이 딥러닝 학습에서 왜 필수적인지 설명할 수 있다</li>
+<li>Layer Normalization의 수식을 쓰고 각 항의 역할을 설명할 수 있다</li>
+<li>Batch Norm과 Layer Norm의 정규화 축 차이를 시각적으로 이해한다</li>
+<li>Post-Norm과 Pre-Norm의 구조적 차이와 각각의 장단점을 비교할 수 있다</li>
+<li>RMSNorm이 Layer Norm을 어떻게 단순화했는지 설명할 수 있다</li>
+<li>현대 LLM이 Pre-Norm + RMSNorm 조합을 사용하는 이유를 이해한다</li>
+</ul>
+</div>
+
+<!-- ═══════════════════════════════════════════ -->
+<!-- 1. 왜 정규화가 필요한가 -->
+<!-- ═══════════════════════════════════════════ -->
+<h2 id="why-norm">1. 왜 정규화(Normalization)가 필요한가</h2>
+
+<h3>1.1 Internal Covariate Shift 문제</h3>
+<p>딥러닝에서 각 레이어의 입력 분포는 학습이 진행되면서 계속 변한다. 이전 레이어의 파라미터가 업데이트되면, 다음 레이어가 받는 입력의 분포도 바뀐다. 이것을 Internal Covariate Shift라고 한다.</p>
+
+<div class="warn">
+<p class="ni"><strong>문제:</strong> 입력 분포가 계속 변하면...</p>
+<ul>
+<li>학습이 불안정해진다 (loss가 진동)</li>
+<li>학습률을 작게 설정해야 한다 → 학습이 느려진다</li>
+<li>깊은 네트워크일수록 문제가 심각해진다</li>
+<li>Gradient vanishing/exploding이 발생하기 쉽다</li>
+</ul>
+</div>
+
+<h3>1.2 정규화의 핵심 아이디어</h3>
+<p>각 레이어의 입력을 평균 0, 분산 1로 정규화하면 분포가 안정된다. 이것이 모든 normalization 기법의 공통 아이디어다.</p>
+
+<div class="eq">\[ \hat{x} = \frac{x - \mu}{\sigma} \]</div>
+
+<p class="ni">하지만 단순히 정규화만 하면 표현력이 줄어든다. 그래서 학습 가능한 파라미터 \(\gamma\) (scale)와 \(\beta\) (shift)를 추가한다:</p>
+
+<div class="eq">\[ y = \gamma \cdot \hat{x} + \beta \]</div>
+
+<p class="ni">모델이 필요하면 정규화를 "되돌릴" 수 있도록 하는 것이다. \(\gamma = \sigma, \beta = \mu\)로 학습하면 원래 분포로 돌아간다.</p>
+
+<div class="info">
+<p class="ni"><strong>핵심 질문:</strong> "어떤 축(dimension)을 기준으로 평균과 분산을 계산할 것인가?" — 이 질문에 대한 답이 Batch Norm과 Layer Norm을 구분한다.</p>
+</div>
+
+<!-- ═══════════════════════════════════════════ -->
+<!-- 2. Layer Normalization -->
+<!-- ═══════════════════════════════════════════ -->
+<h2 id="layernorm">2. Layer Normalization — Transformer의 선택</h2>
+
+<h3>2.1 수식</h3>
+
+<div class="def">
+<p class="ni"><strong>Definition 2.1 — Layer Normalization (Ba et al., 2016)</strong></p>
+<p class="ni">각 샘플 내에서 feature dimension을 기준으로 정규화:</p>
+<div class="eq" style="font-size:16px;padding:20px;background:#fff9e6;border:2px solid #ffc107">\[ \text{LayerNorm}(x) = \gamma \odot \frac{x - \mu}{\sqrt{\sigma^2 + \epsilon}} + \beta \]</div>
+<p class="ni">여기서:</p>
+<div class="eq">\[ \mu = \frac{1}{d} \sum_{i=1}^{d} x_i, \quad \sigma^2 = \frac{1}{d} \sum_{i=1}^{d} (x_i - \mu)^2 \]</div>
+<ul>
+<li>\(\mu, \sigma^2\): 해당 샘플의 feature dimension에 대한 평균과 분산</li>
+<li>\(\gamma \in \mathbb{R}^d\): 학습 가능한 scale 파라미터 (초기값 1)</li>
+<li>\(\beta \in \mathbb{R}^d\): 학습 가능한 shift 파라미터 (초기값 0)</li>
+<li>\(\epsilon\): 수치 안정성을 위한 작은 값 (보통 \(10^{-5}\))</li>
+<li>\(\odot\): element-wise 곱셈</li>
+</ul>
+</div>
+
+<h3>2.2 단계별 계산 예시</h3>
+
+<pre><code><span class="kw">import</span> numpy <span class="kw">as</span> np
+
+<span class="kw">def</span> <span class="fn">layer_norm</span>(x, gamma, beta, eps=<span class="nu">1e-5</span>):
+    <span class="st">"""
+    Layer Normalization 구현
+    x: (batch_size, seq_len, d_model) 또는 (seq_len, d_model)
+    gamma: (d_model,) - scale
+    beta: (d_model,) - shift
+    """</span>
+    <span class="cm"># 마지막 축(feature dimension)에 대해 평균/분산 계산</span>
+    mu = x.mean(axis=-<span class="nu">1</span>, keepdims=<span class="kw">True</span>)       <span class="cm"># 평균</span>
+    sigma2 = x.var(axis=-<span class="nu">1</span>, keepdims=<span class="kw">True</span>)     <span class="cm"># 분산</span>
+    
+    <span class="cm"># 정규화</span>
+    x_hat = (x - mu) / np.sqrt(sigma2 + eps)
+    
+    <span class="cm"># Scale & Shift</span>
+    out = gamma * x_hat + beta
+    <span class="kw">return</span> out
+
+<span class="cm"># 예시: 3개 토큰, d_model=4</span>
+x = np.array([
+    [<span class="nu">1.0</span>, <span class="nu">2.0</span>, <span class="nu">3.0</span>, <span class="nu">4.0</span>],   <span class="cm"># 토큰 0</span>
+    [<span class="nu">2.0</span>, <span class="nu">4.0</span>, <span class="nu">6.0</span>, <span class="nu">8.0</span>],   <span class="cm"># 토큰 1</span>
+    [<span class="nu">1.0</span>, <span class="nu">1.0</span>, <span class="nu">1.0</span>, <span class="nu">1.0</span>],   <span class="cm"># 토큰 2</span>
+])
+
+gamma = np.ones(<span class="nu">4</span>)   <span class="cm"># 초기값 1</span>
+beta = np.zeros(<span class="nu">4</span>)   <span class="cm"># 초기값 0</span>
+
+out = layer_norm(x, gamma, beta)
+<span class="fn">print</span>(<span class="st">"Input:"</span>)
+<span class="fn">print</span>(x)
+<span class="fn">print</span>(<span class="st">"\nAfter LayerNorm:"</span>)
+<span class="fn">print</span>(out.round(<span class="nu">4</span>))
+<span class="cm"># 토큰 0: [-1.3416, -0.4472, 0.4472, 1.3416]  (평균≈0, 분산≈1)</span>
+<span class="cm"># 토큰 1: [-1.3416, -0.4472, 0.4472, 1.3416]  (같은 패턴!)</span>
+<span class="cm"># 토큰 2: [ 0.0,     0.0,    0.0,    0.0   ]  (모두 같으면 0)</span>
+
+<span class="cm"># 핵심: 각 토큰(행)별로 독립적으로 정규화!</span>
+<span class="cm"># 다른 토큰이나 다른 배치 샘플에 영향받지 않음</span></code></pre>
+
+<div class="info">
+<p class="ni"><strong>강의 포인트:</strong> Layer Norm은 각 토큰(샘플)을 독립적으로 정규화한다. 배치 내 다른 샘플에 의존하지 않으므로:</p>
+<ul>
+<li>배치 크기에 독립적 (batch size = 1이어도 동작)</li>
+<li>가변 길이 시퀀스를 자연스럽게 처리</li>
+<li>추론 시 별도의 running statistics 불필요</li>
+</ul>
+</div>
+
+<!-- ═══════════════════════════════════════════ -->
+<!-- 3. Batch Norm vs Layer Norm -->
+<!-- ═══════════════════════════════════════════ -->
+<h2 id="bn-vs-ln">3. Batch Normalization vs Layer Normalization</h2>
+
+<h3>3.1 정규화 축의 차이</h3>
+<p>Batch Norm과 Layer Norm의 핵심 차이는 "어떤 축을 기준으로 평균/분산을 계산하는가"이다.</p>
+
+<div class="diagram">┌─────────────────────────────────────────────────┐
+│  입력 텐서: (Batch, Sequence, Feature)           │
+│                                                   │
+│  ┌─────────────────────────────────┐              │
+│  │  Batch Norm                     │              │
+│  │  → Batch 축 기준으로 정규화      │              │
+│  │  → 같은 feature의 모든 샘플 사용 │              │
+│  │  → 축: dim=0 (batch)            │              │
+│  │                                 │              │
+│  │  B₁ ■ ■ ■ ■    ← feature j의   │              │
+│  │  B₂ ■ ■ ■ ■       모든 배치를   │              │
+│  │  B₃ ■ ■ ■ ■       함께 정규화   │              │
+│  │     ↕ ↕ ↕ ↕                     │              │
+│  │     μ σ (feature별)             │              │
+│  └─────────────────────────────────┘              │
+│                                                   │
+│  ┌─────────────────────────────────┐              │
+│  │  Layer Norm                     │              │
+│  │  → Feature 축 기준으로 정규화    │              │
+│  │  → 한 샘플 내의 모든 feature 사용│              │
+│  │  → 축: dim=-1 (feature)         │              │
+│  │                                 │              │
+│  │  B₁ ■ ■ ■ ■ → μ,σ (샘플별)     │              │
+│  │  B₂ ■ ■ ■ ■ → μ,σ (샘플별)     │              │
+│  │  B₃ ■ ■ ■ ■ → μ,σ (샘플별)     │              │
+│  │  ←─────────→                    │              │
+│  │  각 행을 독립적으로 정규화       │              │
+│  └─────────────────────────────────┘              │
+└─────────────────────────────────────────────────┘</div>
+
+<h3>3.2 상세 비교</h3>
+
+<div class="tc">Table 1. Batch Norm vs Layer Norm 상세 비교</div>
+<table>
+<tr><th>특성</th><th>Batch Normalization</th><th>Layer Normalization</th></tr>
+<tr><td>정규화 축</td><td>Batch dimension (같은 feature, 모든 샘플)</td><td>Feature dimension (같은 샘플, 모든 feature)</td></tr>
+<tr><td>통계량 계산</td><td>배치 내 모든 샘플의 같은 feature</td><td>한 샘플 내 모든 feature</td></tr>
+<tr><td>배치 크기 의존</td><td>Yes (작은 배치에서 불안정)</td><td>No (batch size=1도 OK)</td></tr>
+<tr><td>추론 시</td><td>Running mean/var 사용 (학습 시 축적)</td><td>입력에서 직접 계산 (추가 통계 불필요)</td></tr>
+<tr><td>가변 길이</td><td>처리 어려움 (패딩 문제)</td><td>자연스럽게 처리</td></tr>
+<tr><td>주 사용처</td><td>CNN (Computer Vision)</td><td>Transformer (NLP)</td></tr>
+<tr><td>제안 연도</td><td>2015 (Ioffe & Szegedy)</td><td>2016 (Ba et al.)</td></tr>
+</table>
+
+<pre><code><span class="kw">import</span> numpy <span class="kw">as</span> np
+
+<span class="cm"># 입력: (batch=3, seq_len=4, d_model=5)</span>
+x = np.random.randn(<span class="nu">3</span>, <span class="nu">4</span>, <span class="nu">5</span>)
+
+<span class="cm"># ── Batch Norm ──</span>
+<span class="cm"># 같은 feature의 모든 배치/시퀀스를 함께 정규화</span>
+<span class="cm"># 축: (batch, seq_len) → feature별 통계</span>
+bn_mean = x.mean(axis=(<span class="nu">0</span>, <span class="nu">1</span>), keepdims=<span class="kw">True</span>)  <span class="cm"># shape: (1, 1, 5)</span>
+bn_var = x.var(axis=(<span class="nu">0</span>, <span class="nu">1</span>), keepdims=<span class="kw">True</span>)
+bn_out = (x - bn_mean) / np.sqrt(bn_var + <span class="nu">1e-5</span>)
+
+<span class="cm"># ── Layer Norm ──</span>
+<span class="cm"># 각 토큰의 모든 feature를 독립적으로 정규화</span>
+<span class="cm"># 축: (feature) → 토큰별 통계</span>
+ln_mean = x.mean(axis=-<span class="nu">1</span>, keepdims=<span class="kw">True</span>)  <span class="cm"># shape: (3, 4, 1)</span>
+ln_var = x.var(axis=-<span class="nu">1</span>, keepdims=<span class="kw">True</span>)
+ln_out = (x - ln_mean) / np.sqrt(ln_var + <span class="nu">1e-5</span>)
+
+<span class="fn">print</span>(<span class="st">f"BN mean shape: </span>{bn_mean.shape}<span class="st">"</span>)  <span class="cm"># (1, 1, 5) - feature별</span>
+<span class="fn">print</span>(<span class="st">f"LN mean shape: </span>{ln_mean.shape}<span class="st">"</span>)  <span class="cm"># (3, 4, 1) - 토큰별</span></code></pre>
+
+<h3>3.3 왜 Transformer는 Layer Norm을 선택했는가?</h3>
+
+<div class="info">
+<p class="ni"><strong>강의 인용 (Lecture 1):</strong> "The only reason to use Layer Normalization in Transformer is that the original paper was tuning the network based on Layer Normalization. If you want to use Batch Normalization, you need to tune hyperparameters again."</p>
+</div>
+
+<div class="ok">
+<p class="ni"><strong>실용적 이유들:</strong></p>
+<ul>
+<li><strong>가변 길이:</strong> NLP에서 시퀀스 길이가 다양하다. Batch Norm은 패딩된 위치도 통계에 포함되어 문제가 된다</li>
+<li><strong>배치 크기:</strong> LLM 학습은 메모리 제약으로 배치 크기가 작을 수 있다. Batch Norm은 작은 배치에서 불안정</li>
+<li><strong>추론 편의:</strong> Layer Norm은 running statistics가 불필요. 추론 시 입력만으로 계산 가능</li>
+<li><strong>역사적 이유:</strong> 원 논문이 Layer Norm으로 튜닝됨. 바꾸려면 재튜닝 필요</li>
+</ul>
+</div>
+
+<div class="warn">
+<p class="ni"><strong>강의 포인트:</strong> "Helps with training stability and convergence." — Layer Norm의 핵심 기여는 학습 안정성과 수렴 속도 향상이다. 이것 없이는 깊은 Transformer를 학습하기 매우 어렵다.</p>
+</div>
+
+<!-- ═══════════════════════════════════════════ -->
+<!-- 4. Post-Norm vs Pre-Norm -->
+<!-- ═══════════════════════════════════════════ -->
+<h2 id="post-pre">4. Post-Norm vs Pre-Norm — 어디에 놓을 것인가</h2>
+
+<h3>4.1 두 가지 배치 방식</h3>
+<p>Layer Norm을 Transformer 블록의 어디에 배치하느냐에 따라 학습 동작이 크게 달라진다. Xiong et al. (2020), "On Layer Normalization in the Transformer Architecture"에서 체계적으로 분석했다.</p>
+
+<div class="def">
+<p class="ni"><strong>Definition 4.1 — Post-Norm (Original Transformer)</strong></p>
+<p class="ni">Residual connection 이후에 Layer Norm을 적용:</p>
+<div class="eq">\[ x' = \text{LayerNorm}(x + \text{SubLayer}(x)) \]</div>
+<p class="ni">순서: Input → SubLayer → Add (Residual) → LayerNorm → Output</p>
+</div>
+
+<div class="def">
+<p class="ni"><strong>Definition 4.2 — Pre-Norm (현대 방식)</strong></p>
+<p class="ni">SubLayer 이전에 Layer Norm을 적용:</p>
+<div class="eq">\[ x' = x + \text{SubLayer}(\text{LayerNorm}(x)) \]</div>
+<p class="ni">순서: Input → LayerNorm → SubLayer → Add (Residual) → Output</p>
+</div>
+
+<h3>4.2 구조 비교 다이어그램</h3>
+
+<div class="diagram">┌──────────────────────┐    ┌──────────────────────┐
+│     Post-Norm        │    │      Pre-Norm         │
+│  (Original, 2017)    │    │   (Modern, 현재 표준)  │
+│                      │    │                       │
+│       Input x        │    │       Input x         │
+│         │            │    │         │             │
+│         ├──────┐     │    │         ├──────┐      │
+│         │      │     │    │         │      │      │
+│         ▼      │     │    │    LayerNorm   │      │
+│     SubLayer   │     │    │         │      │      │
+│    (Attn/FFN)  │     │    │         ▼      │      │
+│         │      │     │    │     SubLayer   │      │
+│         ▼      │     │    │    (Attn/FFN)  │      │
+│       Add ◄────┘     │    │         │      │      │
+│         │            │    │         ▼      │      │
+│    LayerNorm         │    │       Add ◄────┘      │
+│         │            │    │         │             │
+│       Output         │    │       Output          │
+└──────────────────────┘    └──────────────────────┘</div>
+
+<h3>4.3 왜 Pre-Norm이 더 좋은가?</h3>
+
+<div class="tc">Table 2. Post-Norm vs Pre-Norm 비교</div>
+<table>
+<tr><th>특성</th><th>Post-Norm</th><th>Pre-Norm</th></tr>
+<tr><td>학습 안정성</td><td>불안정 (warm-up 필수)</td><td>안정적 (warm-up 없이도 가능)</td></tr>
+<tr><td>Gradient flow</td><td>LayerNorm이 residual path를 차단</td><td>Residual path가 깨끗하게 유지</td></tr>
+<tr><td>깊은 모델</td><td>학습 어려움</td><td>더 깊은 모델 학습 가능</td></tr>
+<tr><td>최종 성능</td><td>약간 더 좋을 수 있음 (잘 학습되면)</td><td>약간 낮을 수 있음</td></tr>
+<tr><td>사용 모델</td><td>Original Transformer, BERT</td><td>GPT-2+, LLaMA, Mistral</td></tr>
+</table>
+
+<div class="info">
+<p class="ni"><strong>핵심 직관 — Gradient Flow:</strong></p>
+<p class="ni"><strong>Post-Norm:</strong> Residual connection 후에 LayerNorm이 오므로, gradient가 역전파될 때 LayerNorm을 반드시 통과해야 한다. 깊은 네트워크에서 이것이 gradient flow를 방해한다.</p>
+<p class="ni"><strong>Pre-Norm:</strong> Residual connection이 LayerNorm 바깥에 있으므로, gradient가 residual path를 통해 직접 흐를 수 있다. ResNet의 skip connection과 같은 원리.</p>
+</div>
+
+<pre><code><span class="cm"># Post-Norm vs Pre-Norm 구현 비교</span>
+
+<span class="kw">def</span> <span class="fn">post_norm_block</span>(x, sublayer, ln):
+    <span class="st">"""Post-Norm: LN(x + SubLayer(x))"""</span>
+    <span class="cm"># 1. SubLayer 적용</span>
+    sub_out = sublayer(x)
+    <span class="cm"># 2. Residual + LayerNorm</span>
+    out = ln(x + sub_out)  <span class="cm"># LN이 residual 뒤에!</span>
+    <span class="kw">return</span> out
+
+<span class="kw">def</span> <span class="fn">pre_norm_block</span>(x, sublayer, ln):
+    <span class="st">"""Pre-Norm: x + SubLayer(LN(x))"""</span>
+    <span class="cm"># 1. LayerNorm 먼저</span>
+    normed = ln(x)
+    <span class="cm"># 2. SubLayer 적용</span>
+    sub_out = sublayer(normed)
+    <span class="cm"># 3. Residual (깨끗한 skip connection)</span>
+    out = x + sub_out  <span class="cm"># Residual path가 깨끗!</span>
+    <span class="kw">return</span> out
+
+<span class="cm"># Pre-Norm에서 gradient flow:</span>
+<span class="cm"># ∂L/∂x = ∂L/∂out × (1 + ∂SubLayer(LN(x))/∂x)</span>
+<span class="cm">#                     ↑ 이 "1"이 gradient를 직접 전달!</span>
+<span class="cm"># → ResNet의 skip connection과 동일한 원리</span></code></pre>
+
+<div class="warn">
+<p class="ni"><strong>강의 포인트:</strong> "Nowadays: Pre-Norm." — 현대 LLM은 거의 모두 Pre-Norm을 사용한다. 학습 안정성이 훨씬 좋고, learning rate warm-up에 덜 민감하다.</p>
+</div>
+
+<!-- ═══════════════════════════════════════════ -->
+<!-- 5. RMSNorm -->
+<!-- ═══════════════════════════════════════════ -->
+<h2 id="rmsnorm">5. RMSNorm — Root Mean Square Layer Normalization ⭐</h2>
+
+<h3>5.1 Layer Norm의 비효율성</h3>
+<p>Layer Norm은 평균(\(\mu\))과 분산(\(\sigma^2\))을 모두 계산한다. Zhang et al. (2019)은 "평균을 빼는 것(re-centering)이 정말 필요한가?"라는 질문을 던졌다.</p>
+
+<div class="info">
+<p class="ni"><strong>관찰:</strong> Layer Norm의 성능 향상은 주로 re-scaling (\(\frac{1}{\sigma}\))에서 온다. Re-centering (\(-\mu\))의 기여는 미미하다. 그렇다면 평균 계산을 생략하면 더 효율적이지 않을까?</p>
+</div>
+
+<h3>5.2 RMSNorm 수식</h3>
+
+<div class="def">
+<p class="ni"><strong>Definition 5.1 — RMSNorm (Zhang et al., 2019)</strong></p>
+<p class="ni">평균을 빼지 않고, Root Mean Square로만 정규화:</p>
+<div class="eq" style="font-size:16px;padding:20px;background:#fff9e6;border:2px solid #ffc107">\[ \text{RMSNorm}(x) = \gamma \odot \frac{x}{\text{RMS}(x)}, \quad \text{RMS}(x) = \sqrt{\frac{1}{d} \sum_{i=1}^{d} x_i^2} \]</div>
+<p class="ni">Layer Norm과의 차이:</p>
+<ul>
+<li>평균 \(\mu\)를 계산하지 않음 (re-centering 없음)</li>
+<li>Shift 파라미터 \(\beta\)도 없음</li>
+<li>RMS = Root Mean Square = 제곱 평균의 제곱근</li>
+</ul>
+</div>
+
+<h3>5.3 Layer Norm vs RMSNorm 비교</h3>
+
+<div class="tc">Table 3. Layer Norm vs RMSNorm</div>
+<table>
+<tr><th>특성</th><th>Layer Norm</th><th>RMSNorm</th></tr>
+<tr><td>수식</td><td>\(\gamma \cdot \frac{x - \mu}{\sigma} + \beta\)</td><td>\(\gamma \cdot \frac{x}{\text{RMS}(x)}\)</td></tr>
+<tr><td>Re-centering</td><td>Yes (\(-\mu\))</td><td>No</td></tr>
+<tr><td>Re-scaling</td><td>Yes (\(\frac{1}{\sigma}\))</td><td>Yes (\(\frac{1}{\text{RMS}}\))</td></tr>
+<tr><td>학습 파라미터</td><td>\(\gamma, \beta\) (2d개)</td><td>\(\gamma\)만 (d개)</td></tr>
+<tr><td>계산량</td><td>\(\mu\)와 \(\sigma^2\) 모두 계산</td><td>RMS만 계산 (더 빠름)</td></tr>
+<tr><td>성능</td><td>좋음</td><td>동등하거나 약간 좋음</td></tr>
+</table>
+
+<pre><code><span class="kw">import</span> numpy <span class="kw">as</span> np
+
+<span class="kw">def</span> <span class="fn">rms_norm</span>(x, gamma, eps=<span class="nu">1e-5</span>):
+    <span class="st">"""
+    RMSNorm 구현
+    x: (..., d_model)
+    gamma: (d_model,) - scale만 (shift 없음!)
+    """</span>
+    <span class="cm"># RMS 계산 (평균을 빼지 않음!)</span>
+    rms = np.sqrt(np.mean(x ** <span class="nu">2</span>, axis=-<span class="nu">1</span>, keepdims=<span class="kw">True</span>) + eps)
+    
+    <span class="cm"># 정규화 + scale</span>
+    out = gamma * (x / rms)
+    <span class="kw">return</span> out
+
+<span class="kw">def</span> <span class="fn">layer_norm_compare</span>(x, gamma, beta, eps=<span class="nu">1e-5</span>):
+    <span class="st">"""Layer Norm (비교용)"""</span>
+    mu = x.mean(axis=-<span class="nu">1</span>, keepdims=<span class="kw">True</span>)
+    sigma = np.sqrt(x.var(axis=-<span class="nu">1</span>, keepdims=<span class="kw">True</span>) + eps)
+    <span class="kw">return</span> gamma * (x - mu) / sigma + beta
+
+<span class="cm"># 비교</span>
+x = np.array([[<span class="nu">1.0</span>, <span class="nu">2.0</span>, <span class="nu">3.0</span>, <span class="nu">4.0</span>]])
+gamma = np.ones(<span class="nu">4</span>)
+beta = np.zeros(<span class="nu">4</span>)
+
+ln_out = layer_norm_compare(x, gamma, beta)
+rms_out = rms_norm(x, gamma)
+
+<span class="fn">print</span>(<span class="st">f"Input:     </span>{x[0]}<span class="st">"</span>)
+<span class="fn">print</span>(<span class="st">f"LayerNorm: </span>{ln_out[0].round(4)}<span class="st">"</span>)
+<span class="fn">print</span>(<span class="st">f"RMSNorm:   </span>{rms_out[0].round(4)}<span class="st">"</span>)
+<span class="cm"># LayerNorm: [-1.3416, -0.4472, 0.4472, 1.3416]  (평균=0)</span>
+<span class="cm"># RMSNorm:   [ 0.3651,  0.7303, 1.0954, 1.4606]  (평균≠0)</span>
+
+<span class="cm"># 파라미터 수 비교 (d_model=4096 기준)</span>
+d = <span class="nu">4096</span>
+<span class="fn">print</span>(<span class="st">f"\nLayerNorm params: </span>{2*d:,}<span class="st"> (γ + β)"</span>)  <span class="cm"># 8,192</span>
+<span class="fn">print</span>(<span class="st">f"RMSNorm params:   </span>{d:,}<span class="st"> (γ only)"</span>)    <span class="cm"># 4,096</span></code></pre>
+
+<h3>5.4 현대 LLM의 선택: Pre-Norm + RMSNorm</h3>
+
+<div class="ok">
+<p class="ni"><strong>강의 결론:</strong> "Nowadays: Pre-Norm + RMSNorm"</p>
+<p class="ni">현대 LLM (LLaMA, LLaMA 2, Mistral, Gemma 등)은 거의 모두 이 조합을 사용한다:</p>
+<ul>
+<li><strong>Pre-Norm:</strong> 학습 안정성, 깨끗한 gradient flow</li>
+<li><strong>RMSNorm:</strong> Layer Norm과 동등한 성능, 더 빠른 계산, 더 적은 파라미터</li>
+</ul>
+</div>
+
+<pre><code><span class="cm"># 현대 LLM의 Transformer Block (Pre-Norm + RMSNorm)</span>
+
+<span class="kw">def</span> <span class="fn">modern_transformer_block</span>(x, attn, ffn, rms1, rms2):
+    <span class="st">"""LLaMA-style Transformer Block"""</span>
+    <span class="cm"># 1. Pre-Norm + Self-Attention</span>
+    h = x + attn(rms1(x))      <span class="cm"># RMSNorm → Attention → Residual</span>
+    
+    <span class="cm"># 2. Pre-Norm + Feed-Forward</span>
+    out = h + ffn(rms2(h))      <span class="cm"># RMSNorm → FFN → Residual</span>
+    
+    <span class="kw">return</span> out
+
+<span class="cm"># Original Transformer (Post-Norm + LayerNorm) 비교</span>
+<span class="kw">def</span> <span class="fn">original_transformer_block</span>(x, attn, ffn, ln1, ln2):
+    <span class="st">"""Original Transformer Block"""</span>
+    <span class="cm"># 1. Self-Attention + Post-Norm</span>
+    h = ln1(x + attn(x))       <span class="cm"># Attention → Residual → LayerNorm</span>
+    
+    <span class="cm"># 2. Feed-Forward + Post-Norm</span>
+    out = ln2(h + ffn(h))       <span class="cm"># FFN → Residual → LayerNorm</span>
+    
+    <span class="kw">return</span> out</code></pre>
+
+<!-- ═══════════════════════════════════════════ -->
+<!-- 6. 종합 정리 -->
+<!-- ═══════════════════════════════════════════ -->
+<h2 id="summary">6. 종합 정리 — Normalization의 진화</h2>
+
+<div class="tc">Table 4. Normalization 진화 타임라인</div>
+<table>
+<tr><th>연도</th><th>방법</th><th>핵심 기여</th><th>대표 모델</th></tr>
+<tr><td>2015</td><td>Batch Norm</td><td>학습 안정화의 시작. Batch 축 정규화</td><td>ResNet, VGG</td></tr>
+<tr><td>2016</td><td>Layer Norm</td><td>Feature 축 정규화. 배치 독립적</td><td>Original Transformer</td></tr>
+<tr><td>2017</td><td>Post-Norm</td><td>Residual 후 LN. Original Transformer</td><td>Transformer, BERT</td></tr>
+<tr><td>2020</td><td>Pre-Norm</td><td>Residual 전 LN. 학습 안정성 향상</td><td>GPT-2, GPT-3</td></tr>
+<tr style="background:#e8f4f8"><td><strong>2019+</strong></td><td><strong>Pre-Norm + RMSNorm</strong></td><td><strong>평균 계산 생략. 더 빠르고 동등한 성능</strong></td><td><strong>LLaMA, Mistral</strong></td></tr>
+</table>
+
+<!-- ═══════════════════════════════════════════ -->
+<!-- Interactive Lab -->
+<!-- ═══════════════════════════════════════════ -->
+<h2 id="interactive">🎮 Interactive Lab — Normalization 시각화</h2>
+
+<h3>Lab 1. Layer Norm vs Batch Norm 정규화 축 비교</h3>
+<div id="plot-norm-axis" style="width:100%;height:400px;margin:20px 0"></div>
+
+<script>
+(function(){
+  // 3x4 matrix (batch=3, features=4)
+  var data = [[2,5,1,8],[3,7,2,4],[1,3,6,2]];
+  var labels = ['Sample 0','Sample 1','Sample 2'];
+  var features = ['feat 0','feat 1','feat 2','feat 3'];
+  
+  // Layer Norm: normalize each row
+  var ln_data = data.map(function(row){
+    var mu = row.reduce(function(a,b){return a+b},0)/row.length;
+    var v = row.reduce(function(a,b){return a+(b-mu)*(b-mu)},0)/row.length;
+    var s = Math.sqrt(v+1e-5);
+    return row.map(function(x){return (x-mu)/s});
+  });
+  
+  // Batch Norm: normalize each column
+  var bn_data = [];
+  for(var i=0;i<3;i++) bn_data.push([]);
+  for(var j=0;j<4;j++){
+    var col = data.map(function(r){return r[j]});
+    var mu = col.reduce(function(a,b){return a+b},0)/col.length;
+    var v = col.reduce(function(a,b){return a+(b-mu)*(b-mu)},0)/col.length;
+    var s = Math.sqrt(v+1e-5);
+    for(var i=0;i<3;i++) bn_data[i].push((data[i][j]-mu)/s);
+  }
+  
+  var traces = [];
+  var colors = ['#e74c3c','#3498db','#2ecc71'];
+  for(var i=0;i<3;i++){
+    traces.push({x:features,y:ln_data[i],type:'bar',name:labels[i]+' (LN)',marker:{color:colors[i],opacity:0.7},xaxis:'x',yaxis:'y'});
+    traces.push({x:features,y:bn_data[i],type:'bar',name:labels[i]+' (BN)',marker:{color:colors[i],pattern:{shape:'/'}},xaxis:'x2',yaxis:'y2'});
+  }
+  
+  Plotly.newPlot('plot-norm-axis',traces,{
+    grid:{rows:1,columns:2,pattern:'independent'},
+    xaxis:{title:'Features',domain:[0,0.45]},yaxis:{title:'Normalized Value'},
+    xaxis2:{title:'Features',domain:[0.55,1]},yaxis2:{title:'Normalized Value'},
+    title:'Layer Norm (각 행 정규화) vs Batch Norm (각 열 정규화)',
+    barmode:'group',plot_bgcolor:'#fafaf8',paper_bgcolor:'#fff',
+    font:{family:'Inter',size:11},margin:{t:60,r:20,b:60,l:60},
+    annotations:[
+      {text:'Layer Norm',x:0.225,y:1.08,xref:'paper',yref:'paper',showarrow:false,font:{size:14,color:'#2c3e50'}},
+      {text:'Batch Norm',x:0.775,y:1.08,xref:'paper',yref:'paper',showarrow:false,font:{size:14,color:'#2c3e50'}}
+    ]
+  },{responsive:true});
+})();
+</script>
+
+<h3>Lab 2. Post-Norm vs Pre-Norm Gradient Flow</h3>
+<div id="plot-gradient" style="width:100%;height:350px;margin:20px 0"></div>
+
+<script>
+(function(){
+  // Simulate gradient magnitude through layers
+  var layers = Array.from({length:24},function(_,i){return 'L'+(i+1)});
+  var post_grad = [1.0];
+  var pre_grad = [1.0];
+  for(var i=1;i<24;i++){
+    // Post-Norm: gradient decays through LN
+    post_grad.push(post_grad[i-1] * (0.85 + Math.random()*0.15));
+    // Pre-Norm: gradient stays stable (residual path)
+    pre_grad.push(pre_grad[i-1] * (0.95 + Math.random()*0.08));
+  }
+  Plotly.newPlot('plot-gradient',[
+    {x:layers,y:post_grad,mode:'lines+markers',name:'Post-Norm',line:{color:'#e74c3c',width:2}},
+    {x:layers,y:pre_grad,mode:'lines+markers',name:'Pre-Norm',line:{color:'#0080c6',width:2}}
+  ],{
+    title:'Gradient Magnitude Through Layers (24-layer model)',
+    xaxis:{title:'Layer (backward from output)'},
+    yaxis:{title:'Relative Gradient Magnitude',range:[0,1.3]},
+    plot_bgcolor:'#fafaf8',paper_bgcolor:'#fff',
+    font:{family:'Inter',size:11},margin:{t:50,r:20,b:50,l:60},
+    shapes:[{type:'line',x0:0,x1:23,y0:0.1,y1:0.1,line:{color:'red',dash:'dot',width:1}}],
+    annotations:[{text:'Vanishing threshold',x:20,y:0.15,showarrow:false,font:{size:10,color:'red'}}]
+  },{responsive:true});
+})();
+</script>
+
+<h3>Lab 3. LayerNorm vs RMSNorm 출력 비교</h3>
+<div style="background:#f0f4f8;padding:20px;border-radius:8px;margin:20px 0">
+<div style="display:flex;align-items:center;gap:16px;margin-bottom:12px;flex-wrap:wrap">
+<label style="font-size:14px;font-weight:600">Input mean shift:</label>
+<input type="range" id="sl-mean" min="-5" max="5" step="0.5" value="0" style="width:200px">
+<span id="val-mean" style="font-family:'Space Mono',monospace;font-size:16px;color:#e74c3c;font-weight:bold">0</span>
+</div>
+<div id="plot-ln-rms" style="width:100%;height:350px"></div>
+<p class="ni" style="font-size:12px;color:#555;margin-top:8px">↑ mean shift를 바꿔보세요. LayerNorm은 항상 평균=0으로 만들지만, RMSNorm은 평균을 보존합니다. 대부분의 경우 이 차이는 성능에 영향을 주지 않습니다.</p>
+</div>
+
+<script>
+(function(){
+  var sl=document.getElementById('sl-mean');
+  var vl=document.getElementById('val-mean');
+  function draw(){
+    var shift=parseFloat(sl.value);
+    vl.textContent=shift.toFixed(1);
+    var d=8;
+    var base=[0.5,-0.3,1.2,-0.8,0.1,0.9,-0.5,0.7];
+    var x=base.map(function(v){return v+shift});
+    // LayerNorm
+    var mu=x.reduce(function(a,b){return a+b},0)/d;
+    var v=x.reduce(function(a,b){return a+(b-mu)*(b-mu)},0)/d;
+    var s=Math.sqrt(v+1e-5);
+    var ln=x.map(function(xi){return (xi-mu)/s});
+    // RMSNorm
+    var rms=Math.sqrt(x.reduce(function(a,b){return a+b*b},0)/d+1e-5);
+    var rm=x.map(function(xi){return xi/rms});
+    var dims=Array.from({length:d},function(_,i){return 'dim '+i});
+    Plotly.react('plot-ln-rms',[
+      {x:dims,y:x,type:'bar',name:'Input',marker:{color:'#95a5a6'}},
+      {x:dims,y:ln,type:'bar',name:'LayerNorm',marker:{color:'#0080c6'}},
+      {x:dims,y:rm,type:'bar',name:'RMSNorm',marker:{color:'#e74c3c'}}
+    ],{
+      title:'Input vs LayerNorm vs RMSNorm (mean shift='+shift.toFixed(1)+')',
+      yaxis:{title:'Value'},barmode:'group',
+      plot_bgcolor:'#fafaf8',paper_bgcolor:'#f0f4f8',
+      font:{family:'Inter',size:11},margin:{t:50,r:20,b:50,l:60}
+    },{responsive:true});
+  }
+  sl.addEventListener('input',draw);
+  setTimeout(draw,300);
+})();
+</script>
+
+<!-- ═══════════════════════════════════════════ -->
+<!-- Quiz Section -->
+<!-- ═══════════════════════════════════════════ -->
+<h2 id="quiz">📝 Quiz — Layer Normalization</h2>
+
+<p class="ni">클릭하면 정답이 나옵니다.</p>
+
+<div class="quiz-box" id="q1">
+<h4>Q1. Layer Normalization이 정규화하는 축은?</h4>
+<div class="quiz-option" onclick="showAnswer('q1','a')">A. Batch dimension (같은 feature, 모든 샘플)</div>
+<div class="quiz-option" onclick="showAnswer('q1','b')">B. Feature dimension (같은 샘플, 모든 feature)</div>
+<div class="quiz-option" onclick="showAnswer('q1','c')">C. Sequence dimension (같은 위치, 모든 시퀀스)</div>
+<div class="quiz-option" onclick="showAnswer('q1','d')">D. 모든 축을 동시에</div>
+<div class="quiz-answer" id="ans-q1"><strong>Answer: B</strong><br>Layer Norm은 각 샘플(토큰) 내에서 feature dimension을 기준으로 평균/분산을 계산한다. 다른 샘플이나 배치에 독립적.<br><span style="font-size:11px;color:#aaa">Feature 축 정규화. 각 토큰을 독립적으로 처리.</span></div>
+</div>
+
+<div class="quiz-box" id="q2">
+<h4>Q2. Batch Norm이 NLP에서 잘 안 쓰이는 이유는?</h4>
+<div class="quiz-option" onclick="showAnswer('q2','a')">A. 계산이 느려서</div>
+<div class="quiz-option" onclick="showAnswer('q2','b')">B. 가변 길이 시퀀스 처리가 어렵고, 작은 배치에서 불안정</div>
+<div class="quiz-option" onclick="showAnswer('q2','c')">C. 파라미터가 너무 많아서</div>
+<div class="quiz-option" onclick="showAnswer('q2','d')">D. GPU에서 지원하지 않아서</div>
+<div class="quiz-answer" id="ans-q2"><strong>Answer: B</strong><br>NLP에서 시퀀스 길이가 다양하고 패딩이 필요. Batch Norm은 패딩된 위치도 통계에 포함. 또한 LLM 학습은 메모리 제약으로 배치가 작을 수 있어 통계가 불안정.<br><span style="font-size:11px;color:#aaa">가변 길이 + 작은 배치 = Batch Norm 부적합.</span></div>
+</div>
+
+<div class="quiz-box" id="q3">
+<h4>Q3. Layer Norm 수식에서 γ와 β의 역할은?</h4>
+<div class="quiz-option" onclick="showAnswer('q3','a')">A. 정규화를 수행한다</div>
+<div class="quiz-option" onclick="showAnswer('q3','b')">B. 학습 가능한 scale과 shift로, 모델이 필요하면 정규화를 되돌릴 수 있게 한다</div>
+<div class="quiz-option" onclick="showAnswer('q3','c')">C. Gradient를 안정화한다</div>
+<div class="quiz-option" onclick="showAnswer('q3','d')">D. 위치 정보를 인코딩한다</div>
+<div class="quiz-answer" id="ans-q3"><strong>Answer: B</strong><br>γ(scale)와 β(shift)는 학습 가능한 파라미터. γ=σ, β=μ로 학습하면 원래 분포로 돌아갈 수 있다. 정규화의 표현력 손실을 보상.<br><span style="font-size:11px;color:#aaa">학습 가능한 scale/shift. 필요하면 정규화를 되돌릴 수 있음.</span></div>
+</div>
+
+<div class="quiz-box" id="q4">
+<h4>Q4. Post-Norm과 Pre-Norm의 핵심 차이는?</h4>
+<div class="quiz-option" onclick="showAnswer('q4','a')">A. 사용하는 정규화 방법이 다르다</div>
+<div class="quiz-option" onclick="showAnswer('q4','b')">B. Post-Norm은 residual 후 LN, Pre-Norm은 SubLayer 전 LN</div>
+<div class="quiz-option" onclick="showAnswer('q4','c')">C. 파라미터 수가 다르다</div>
+<div class="quiz-option" onclick="showAnswer('q4','d')">D. 학습 데이터가 다르다</div>
+<div class="quiz-answer" id="ans-q4"><strong>Answer: B</strong><br>Post-Norm: LN(x + SubLayer(x)). Pre-Norm: x + SubLayer(LN(x)). Pre-Norm에서는 residual path가 깨끗하게 유지되어 gradient flow가 좋다.<br><span style="font-size:11px;color:#aaa">Post: LN이 residual 뒤. Pre: LN이 SubLayer 앞. Pre가 gradient flow 우수.</span></div>
+</div>
+
+<div class="quiz-box" id="q5">
+<h4>Q5. Pre-Norm이 Post-Norm보다 학습이 안정적인 이유는?</h4>
+<div class="quiz-option" onclick="showAnswer('q5','a')">A. 파라미터가 적어서</div>
+<div class="quiz-option" onclick="showAnswer('q5','b')">B. Residual path가 LayerNorm을 거치지 않아 gradient가 직접 흐를 수 있어서</div>
+<div class="quiz-option" onclick="showAnswer('q5','c')">C. 학습률이 자동으로 조절되어서</div>
+<div class="quiz-option" onclick="showAnswer('q5','d')">D. 배치 크기에 독립적이어서</div>
+<div class="quiz-answer" id="ans-q5"><strong>Answer: B</strong><br>Pre-Norm: ∂L/∂x = ∂L/∂out × (1 + ...). "1"이 gradient를 직접 전달. ResNet의 skip connection과 동일 원리. Post-Norm은 LN이 residual path를 차단.<br><span style="font-size:11px;color:#aaa">Residual path가 깨끗 → gradient 직접 전달 → 깊은 모델 학습 가능.</span></div>
+</div>
+
+<div class="quiz-box" id="q6">
+<h4>Q6. RMSNorm이 Layer Norm에서 생략한 것은?</h4>
+<div class="quiz-option" onclick="showAnswer('q6','a')">A. Scale 파라미터 γ</div>
+<div class="quiz-option" onclick="showAnswer('q6','b')">B. 분산 계산</div>
+<div class="quiz-option" onclick="showAnswer('q6','c')">C. 평균 계산 (re-centering)과 shift 파라미터 β</div>
+<div class="quiz-option" onclick="showAnswer('q6','d')">D. 정규화 자체</div>
+<div class="quiz-answer" id="ans-q6"><strong>Answer: C</strong><br>RMSNorm은 평균 μ를 계산하지 않고(re-centering 없음), shift 파라미터 β도 없다. RMS(Root Mean Square)로만 정규화. 성능은 동등하면서 더 빠르다.<br><span style="font-size:11px;color:#aaa">평균 빼기(re-centering) 생략 + β 제거. 더 빠르고 동등한 성능.</span></div>
+</div>
+
+<div class="quiz-box" id="q7">
+<h4>Q7. 현대 LLM (LLaMA, Mistral)이 사용하는 정규화 조합은?</h4>
+<div class="quiz-option" onclick="showAnswer('q7','a')">A. Post-Norm + Batch Norm</div>
+<div class="quiz-option" onclick="showAnswer('q7','b')">B. Post-Norm + Layer Norm</div>
+<div class="quiz-option" onclick="showAnswer('q7','c')">C. Pre-Norm + Layer Norm</div>
+<div class="quiz-option" onclick="showAnswer('q7','d')">D. Pre-Norm + RMSNorm</div>
+<div class="quiz-answer" id="ans-q7"><strong>Answer: D</strong><br>"Nowadays: Pre-Norm + RMSNorm." Pre-Norm으로 학습 안정성 확보, RMSNorm으로 계산 효율성 향상. LLaMA, Mistral, Gemma 등이 사용.<br><span style="font-size:11px;color:#aaa">Pre-Norm(안정성) + RMSNorm(효율성) = 현대 LLM의 표준.</span></div>
+</div>
+
+<div class="quiz-box" id="q8">
+<h4>Q8. Layer Norm이 Batch Norm보다 추론 시 편리한 이유는?</h4>
+<div class="quiz-option" onclick="showAnswer('q8','a')">A. 계산이 더 빠르다</div>
+<div class="quiz-option" onclick="showAnswer('q8','b')">B. Running mean/var 같은 별도 통계가 불필요하고, 입력만으로 계산 가능</div>
+<div class="quiz-option" onclick="showAnswer('q8','c')">C. GPU 메모리를 덜 사용한다</div>
+<div class="quiz-option" onclick="showAnswer('q8','d')">D. 정확도가 더 높다</div>
+<div class="quiz-answer" id="ans-q8"><strong>Answer: B</strong><br>Batch Norm은 학습 시 축적한 running mean/var를 추론 시 사용해야 한다. Layer Norm은 현재 입력에서 직접 통계를 계산하므로 별도 저장이 불필요.<br><span style="font-size:11px;color:#aaa">Layer Norm: 입력만으로 계산. Batch Norm: running statistics 필요.</span></div>
+</div>
+
+<div class="quiz-box" id="q9">
+<h4>Q9. RMSNorm의 수식에서 RMS(x)는?</h4>
+<div class="quiz-option" onclick="showAnswer('q9','a')">A. \(\sqrt{\frac{1}{d}\sum x_i}\)</div>
+<div class="quiz-option" onclick="showAnswer('q9','b')">B. \(\sqrt{\frac{1}{d}\sum x_i^2}\)</div>
+<div class="quiz-option" onclick="showAnswer('q9','c')">C. \(\frac{1}{d}\sum |x_i|\)</div>
+<div class="quiz-option" onclick="showAnswer('q9','d')">D. \(\sqrt{\frac{1}{d}\sum (x_i - \mu)^2}\)</div>
+<div class="quiz-answer" id="ans-q9"><strong>Answer: B</strong><br>RMS = Root Mean Square = √(평균(x²)). 평균을 빼지 않고 제곱의 평균의 제곱근. D는 표준편차(σ)로 Layer Norm에서 사용.<br><span style="font-size:11px;color:#aaa">RMS = √(1/d × Σx²). 평균을 빼지 않는 것이 핵심 차이.</span></div>
+</div>
+
+<div class="quiz-box" id="q10">
+<h4>Q10. Normalization의 학습 가능한 파라미터 γ를 1, β를 0으로 초기화하는 이유는?</h4>
+<div class="quiz-option" onclick="showAnswer('q10','a')">A. 랜덤 초기화보다 빠르기 때문</div>
+<div class="quiz-option" onclick="showAnswer('q10','b')">B. 초기에는 identity mapping (입력 그대로 통과)에 가깝게 시작하기 위해</div>
+<div class="quiz-option" onclick="showAnswer('q10','c')">C. 메모리를 절약하기 위해</div>
+<div class="quiz-option" onclick="showAnswer('q10','d')">D. Gradient를 0으로 만들기 위해</div>
+<div class="quiz-answer" id="ans-q10"><strong>Answer: B</strong><br>γ=1, β=0이면 정규화된 값이 그대로 출력된다 (y = 1·x̂ + 0 = x̂). 학습 초기에 안정적인 시작점을 제공. 학습이 진행되면서 모델이 최적의 γ, β를 찾아간다.<br><span style="font-size:11px;color:#aaa">초기에 identity에 가깝게 → 안정적 시작 → 점진적 학습.</span></div>
+</div>
+
+<script>
+function showAnswer(qId, selected) {
+  var ansDiv = document.getElementById('ans-' + qId);
+  ansDiv.style.display = 'block';
+  var options = document.querySelectorAll('#' + qId + ' .quiz-option');
+  var correctMap = {q1:'b',q2:'b',q3:'b',q4:'b',q5:'b',q6:'c',q7:'d',q8:'b',q9:'b',q10:'b'};
+  var correct = correctMap[qId];
+  options.forEach(function(opt, idx) {
+    var letter = ['a','b','c','d'][idx];
+    if (letter === correct) opt.classList.add('correct');
+    else if (letter === selected) opt.classList.add('wrong');
+  });
+}
+</script>
+
+<!-- ═══════════════════════════════════════════ -->
+<!-- Cheat Sheet -->
+<!-- ═══════════════════════════════════════════ -->
+<h2 id="cheatsheet">📋 Cheat Sheet — Layer Normalization 한눈에</h2>
+
+<div class="def">
+<p class="ni"><strong>🔑 핵심 수식 2개</strong></p>
+<p class="ni">1. <strong>Layer Norm:</strong></p>
+<div class="eq">\[ \text{LN}(x) = \gamma \cdot \frac{x - \mu}{\sqrt{\sigma^2 + \epsilon}} + \beta, \quad \mu = \frac{1}{d}\sum x_i, \quad \sigma^2 = \frac{1}{d}\sum(x_i-\mu)^2 \]</div>
+<p class="ni">2. <strong>RMSNorm:</strong></p>
+<div class="eq">\[ \text{RMSNorm}(x) = \gamma \cdot \frac{x}{\sqrt{\frac{1}{d}\sum x_i^2 + \epsilon}} \]</div>
+</div>
+
+<div class="ok">
+<p class="ni"><strong>🎯 시험 대비 핵심 포인트</strong></p>
+<ul>
+<li>Batch Norm: batch 축 정규화, CNN용. Layer Norm: feature 축 정규화, Transformer용</li>
+<li>Layer Norm이 NLP에 적합한 이유: 배치 독립, 가변 길이, running stats 불필요</li>
+<li>Post-Norm: LN(x + Sub(x)) — Original. Pre-Norm: x + Sub(LN(x)) — 현대</li>
+<li>Pre-Norm이 좋은 이유: residual path가 깨끗 → gradient 직접 전달</li>
+<li>RMSNorm: 평균 빼기 생략, β 제거. 더 빠르고 동등한 성능</li>
+<li><strong>현대 표준: Pre-Norm + RMSNorm</strong> (LLaMA, Mistral)</li>
+</ul>
+</div>
+
+<!-- Navigation -->
+<div class="round-nav">
+<a href="../round-01/">← Round 1: Position Embeddings</a>
+<a href="../round-03/">Round 3: Attention Approximation →</a>
+</div>
+
+</div><!-- paper-content -->
+</div><!-- container -->
+</div><!-- main-wrapper -->
+
+</body>
+</html>

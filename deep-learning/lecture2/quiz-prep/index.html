@@ -1,0 +1,663 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Quiz Prep: Lecture 1 + Lecture 2 (~ Layer Norm) | 딥러닝 학습</title>
+<script>
+MathJax = { tex: { inlineMath: [['\\(','\\)']], displayMath: [['\\[','\\]']] } };
+</script>
+<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;500&family=Space+Mono:wght@400&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Inter',sans-serif;background:#fafaf8;color:#1a1a1a;line-height:1.7;overflow-x:hidden}
+.sidebar{position:fixed;left:0;top:0;width:260px;height:100vh;background:rgba(255,255,255,.97);border-right:1px solid rgba(0,0,0,.06);padding:32px 24px;z-index:100;overflow-y:auto;display:flex;flex-direction:column}
+.sidebar-profile{text-align:center;margin-bottom:28px;padding-bottom:24px;border-bottom:1px solid rgba(0,0,0,.08)}
+.profile-icon{font-size:48px;margin-bottom:8px}
+.profile-name{font-family:'Cormorant Garamond',serif;font-size:1.3rem;font-weight:500;margin-bottom:4px}
+.profile-title{font-size:.68rem;color:#888;letter-spacing:.08em;text-transform:uppercase;margin-bottom:8px}
+.profile-bio{font-size:.78rem;color:#666;line-height:1.5}
+.sidebar-nav{flex:1;margin-top:16px}
+.nav-section{margin-bottom:20px}
+.nav-section-title{font-size:.6rem;font-weight:600;color:#aaa;letter-spacing:.15em;text-transform:uppercase;margin-bottom:10px}
+.nav-list{list-style:none}
+.nav-list li{margin-bottom:5px}
+.nav-list a{font-size:.78rem;color:#555;text-decoration:none;transition:all .2s;display:block;padding:3px 0}
+.nav-list a:hover{color:#0080c6;padding-left:4px}
+.nav-list a.active{color:#0080c6;font-weight:500}
+.badge{display:inline-block;font-size:.5rem;background:#0080c6;color:#fff;padding:1px 5px;border-radius:8px;margin-left:3px;vertical-align:middle}
+.badge-quiz{background:#e74c3c}
+.badge-lec1{background:#8e44ad}
+.badge-lec2{background:#27ae60}
+.sidebar-footer{padding-top:16px;border-top:1px solid rgba(0,0,0,.06);font-size:.65rem;color:#aaa;text-align:center}
+.main-wrapper{margin-left:260px;min-height:100vh}
+.container{max-width:1100px;margin:0 auto;padding:50px 40px 80px}
+.paper-content{font-family:'Times New Roman','Nanum Myeongjo',serif;line-height:1.8;background:#fff;padding:40px;border-radius:8px;box-shadow:0 2px 20px rgba(0,0,0,.05)}
+.paper-header{text-align:center;margin-bottom:40px;padding-bottom:30px;border-bottom:2px solid #333}
+.paper-category{font-size:14px;color:#666;margin-bottom:10px}
+.paper-title{font-size:24px;font-weight:bold;margin-bottom:12px;line-height:1.4}
+.paper-subtitle{font-size:14px;color:#555;margin-bottom:8px}
+.paper-team{font-size:13px;color:#444}
+</style>
+<style>
+h2{font-size:18px;margin:35px 0 20px;padding-bottom:8px;border-bottom:1px solid #ddd;color:#2c3e50}
+h3{font-size:15px;margin:25px 0 15px;color:#34495e}
+p{text-align:justify;margin-bottom:15px;text-indent:2em}
+p.ni{text-indent:0}
+.eq{text-align:center;margin:20px 0;padding:15px;background:#f8f9fa;border-radius:4px;overflow-x:auto}
+ul,ol{margin-left:2em;margin-bottom:15px}
+li{margin-bottom:6px}
+.def{background:#fff9e6;border:1px solid #ffc107;border-radius:4px;padding:20px;margin:20px 0}
+.info{background:#e8f4f8;border-left:4px solid #3498db;padding:20px;margin:20px 0}
+.warn{background:#fff3cd;border-left:4px solid #f39c12;padding:20px;margin:20px 0}
+.ok{background:#d4edda;border-left:4px solid #28a745;padding:20px;margin:20px 0}
+.quiz-box{background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);color:#fff;padding:25px;border-radius:8px;margin:25px 0}
+.quiz-box h4{color:#fff;margin-top:0}
+.quiz-box .source-tag{display:inline-block;font-size:10px;padding:2px 8px;border-radius:10px;margin-left:8px;vertical-align:middle}
+.quiz-box .source-tag.lec1{background:rgba(142,68,173,.6)}
+.quiz-box .source-tag.lec2{background:rgba(39,174,96,.6)}
+.quiz-option{background:rgba(255,255,255,.15);padding:10px 15px;margin:8px 0;border-radius:4px;cursor:pointer;transition:all .2s;font-size:14px}
+.quiz-option:hover{background:rgba(255,255,255,.25)}
+.quiz-option.correct{background:#28a745!important}
+.quiz-option.wrong{background:#dc3545!important}
+.quiz-answer{display:none;margin-top:15px;padding:15px;background:rgba(255,255,255,.1);border-radius:4px}
+.score-board{background:linear-gradient(135deg,#2c3e50,#3498db);color:#fff;padding:30px;border-radius:12px;margin:30px 0;text-align:center}
+.score-board h3{color:#fff;margin:0 0 15px}
+.score-display{font-size:48px;font-weight:bold;margin:10px 0}
+.score-bar{height:20px;background:rgba(255,255,255,.2);border-radius:10px;margin:15px 0;overflow:hidden}
+.score-fill{height:100%;background:#2ecc71;border-radius:10px;transition:width .5s ease}
+.reset-btn{background:#e74c3c;color:#fff;border:none;padding:10px 24px;border-radius:6px;cursor:pointer;font-size:14px;margin-top:10px;font-family:'Inter',sans-serif}
+.reset-btn:hover{background:#c0392b}
+.section-divider{text-align:center;margin:40px 0;padding:15px;background:#f0f4f8;border-radius:8px;font-family:'Inter',sans-serif;font-size:13px;color:#555;font-weight:600}
+@media(max-width:1024px){
+.sidebar{width:100%;height:auto;position:relative;border-right:none;border-bottom:1px solid rgba(0,0,0,.08);padding:16px}
+.sidebar-profile{margin-bottom:10px;padding-bottom:10px;display:flex;align-items:center;gap:12px;text-align:left}
+.profile-icon{font-size:32px;margin-bottom:0}.profile-bio{display:none}
+.nav-section{display:inline-block;margin-right:16px;margin-bottom:8px}
+.nav-list{display:flex;gap:10px;flex-wrap:wrap}.nav-list li{margin-bottom:0}
+.sidebar-footer{display:none}
+.main-wrapper{margin-left:0}
+.container{padding:0}.paper-content{padding:20px 16px;border-radius:0;box-shadow:none}
+.paper-title{font-size:18px}p{font-size:14px;text-indent:1.5em;text-align:left}
+}
+</style>
+</head>
+<body>
+
+<div class="sidebar">
+<div class="sidebar-profile">
+<div class="profile-icon">📝</div>
+<div class="profile-name">Quiz Prep</div>
+<div class="profile-title">Lecture 1 + 2 (~LayerNorm)</div>
+<div class="profile-bio">오늘 퀴즈 대비 · Lecture 1 전체 + Lecture 2 Position Embeddings & Layer Norm</div>
+</div>
+<div class="sidebar-nav">
+<div class="nav-section">
+<div class="nav-section-title">Quiz Sections</div>
+<ul class="nav-list">
+<li><a href="#score">📊 Score Board</a></li>
+<li><a href="#lec1-basics">Lec1: NLP 기초 <span class="badge badge-lec1">L1</span></a></li>
+<li><a href="#lec1-attention">Lec1: Self-Attention <span class="badge badge-lec1">L1</span></a></li>
+<li><a href="#lec1-transformer">Lec1: Transformer <span class="badge badge-lec1">L1</span></a></li>
+<li><a href="#lec1-training">Lec1: Training <span class="badge badge-lec1">L1</span></a></li>
+<li><a href="#lec2-pe">Lec2: Position Embed <span class="badge badge-lec2">L2</span></a></li>
+<li><a href="#lec2-ln">Lec2: Layer Norm <span class="badge badge-lec2">L2</span></a></li>
+<li><a href="#cheatsheet">📋 Cheat Sheet</a></li>
+</ul>
+</div>
+<div class="nav-section">
+<div class="nav-section-title">Study Materials</div>
+<ul class="nav-list">
+<li><a href="../../transformer/">Lecture 1 정리</a></li>
+<li><a href="../round-01/">L2 R1: Position Embed</a></li>
+<li><a href="../round-02/">L2 R2: Layer Norm</a></li>
+</ul>
+</div>
+</div>
+<div class="sidebar-footer">총 40문제 · 시험 범위 완벽 커버</div>
+</div>
+
+<div class="main-wrapper">
+<div class="container">
+<div class="paper-content">
+
+<div class="paper-header">
+<div class="paper-category">딥러닝 수업 · 퀴즈 대비</div>
+<h1 class="paper-title">Quiz Prep — Lecture 1 + Lecture 2 (~Layer Normalization)</h1>
+<div class="paper-subtitle">NLP 기초, Tokenization, Word2Vec, RNN/LSTM, Self-Attention, Transformer, Position Embeddings, Layer Norm</div>
+<div class="paper-team">40문제 · 클릭하면 정답 & 해설 · 자동 채점</div>
+</div>
+
+<!-- Score Board -->
+<div class="score-board" id="score">
+<h3>📊 실시간 채점</h3>
+<div class="score-display"><span id="correct-count">0</span> / <span id="total-answered">0</span></div>
+<p class="ni" style="font-size:13px;opacity:.8">정답률: <span id="accuracy">-</span>%</p>
+<div class="score-bar"><div class="score-fill" id="score-bar-fill" style="width:0%"></div></div>
+<p class="ni" style="font-size:11px;opacity:.6;margin-top:8px">
+<span style="color:#2ecc71">■</span> Lecture 1: <span id="lec1-score">0/0</span> · 
+<span style="color:#27ae60">■</span> Lecture 2: <span id="lec2-score">0/0</span>
+</p>
+<button class="reset-btn" onclick="resetQuiz()">🔄 Reset Quiz</button>
+</div>
+
+<!-- ═══════════════════════════════════════════ -->
+<!-- LECTURE 1: NLP 기초 & Tokenization & Word2Vec -->
+<!-- ═══════════════════════════════════════════ -->
+<div class="section-divider" id="lec1-basics">📚 LECTURE 1 — NLP 기초 · Tokenization · Word2Vec · RNN/LSTM (Q1-10)</div>
+
+<div class="quiz-box" id="q1">
+<h4>Q1. Perplexity의 특징으로 올바른 것은? <span class="source-tag lec1">Lec1</span></h4>
+<div class="quiz-option" onclick="checkAnswer('q1','a','b','lec1')">A. Ground truth가 반드시 필요하다</div>
+<div class="quiz-option" onclick="checkAnswer('q1','b','b','lec1')">B. Ground truth 없이 계산 가능하며, 낮을수록 좋다</div>
+<div class="quiz-option" onclick="checkAnswer('q1','c','b','lec1')">C. 높을수록 좋은 모델이다</div>
+<div class="quiz-option" onclick="checkAnswer('q1','d','b','lec1')">D. 번역 품질만 측정한다</div>
+<div class="quiz-answer" id="ans-q1"><strong>정답: B</strong><br>PPL = exp(-1/N Σ log P(w_i|w_{&lt;i})). 모델이 다음 단어에 높은 확률을 부여할수록 PPL이 낮아진다. Ground truth 없이 계산 가능해서 실용적.<br><span style="font-size:11px;color:#aaa">BLEU/ROUGE는 ground truth 필요. Perplexity는 모델 자체의 확률로 계산.</span></div>
+</div>
+
+<div class="quiz-box" id="q2">
+<h4>Q2. Subword 토큰화(BPE)의 장점은? <span class="source-tag lec1">Lec1</span></h4>
+<div class="quiz-option" onclick="checkAnswer('q2','a','b','lec1')">A. OOV 문제를 완전히 해결한다</div>
+<div class="quiz-option" onclick="checkAnswer('q2','b','b','lec1')">B. 어근/접사 공유로 효율적이며 OOV를 크게 줄인다</div>
+<div class="quiz-option" onclick="checkAnswer('q2','c','b','lec1')">C. 시퀀스 길이가 가장 짧다</div>
+<div class="quiz-option" onclick="checkAnswer('q2','d','b','lec1')">D. 구현이 가장 간단하다</div>
+<div class="quiz-answer" id="ans-q2"><strong>정답: B</strong><br>"reading" = "read" + "ing" → 어근 공유. OOV를 완전히 해결하지는 않지만 크게 줄인다. 현대 LLM의 표준 토큰화 방식.<br><span style="font-size:11px;color:#aaa">Word-level은 OOV 심각, Character-level은 시퀀스 너무 길어짐. Subword가 균형점.</span></div>
+</div>
+
+<div class="quiz-box" id="q3">
+<h4>Q3. Word2Vec에서 Skip-gram과 CBOW의 차이는? <span class="source-tag lec1">Lec1</span></h4>
+<div class="quiz-option" onclick="checkAnswer('q3','a','b','lec1')">A. Skip-gram이 항상 더 빠르다</div>
+<div class="quiz-option" onclick="checkAnswer('q3','b','b','lec1')">B. Skip-gram: 중심→주변 예측, CBOW: 주변→중심 예측</div>
+<div class="quiz-option" onclick="checkAnswer('q3','c','b','lec1')">C. CBOW가 항상 더 정확하다</div>
+<div class="quiz-option" onclick="checkAnswer('q3','d','b','lec1')">D. 차이가 없다</div>
+<div class="quiz-answer" id="ans-q3"><strong>정답: B</strong><br>Skip-gram: 중심 단어로 주변 단어 예측. CBOW: 주변 단어로 중심 단어 예측. Skip-gram이 희귀 단어에 더 좋은 경향.<br><span style="font-size:11px;color:#aaa">둘 다 proxy task로 학습. 결과물은 embedding matrix.</span></div>
+</div>
+
+<div class="quiz-box" id="q4">
+<h4>Q4. One-hot encoding의 근본적 문제는? <span class="source-tag lec1">Lec1</span></h4>
+<div class="quiz-option" onclick="checkAnswer('q4','a','c','lec1')">A. 차원이 너무 작다</div>
+<div class="quiz-option" onclick="checkAnswer('q4','b','c','lec1')">B. 학습이 불가능하다</div>
+<div class="quiz-option" onclick="checkAnswer('q4','c','c','lec1')">C. 모든 단어가 직교하여 의미적 유사성을 표현할 수 없다</div>
+<div class="quiz-option" onclick="checkAnswer('q4','d','c','lec1')">D. 계산이 너무 느리다</div>
+<div class="quiz-answer" id="ans-q4"><strong>정답: C</strong><br>One-hot에서 모든 단어 쌍의 dot product = 0. "cat"과 "dog"의 유사성을 표현할 수 없다. → Word Embedding이 필요한 이유.<br><span style="font-size:11px;color:#aaa">Word2Vec이 이 문제를 해결: 의미적으로 유사한 단어 → 가까운 벡터.</span></div>
+</div>
+
+<div class="quiz-box" id="q5">
+<h4>Q5. RNN의 주요 문제점으로 올바른 것은? <span class="source-tag lec1">Lec1</span></h4>
+<div class="quiz-option" onclick="checkAnswer('q5','a','d','lec1')">A. 병렬화가 불가능하다</div>
+<div class="quiz-option" onclick="checkAnswer('q5','b','d','lec1')">B. Vanishing/Exploding gradient 문제</div>
+<div class="quiz-option" onclick="checkAnswer('q5','c','d','lec1')">C. Long-range dependency 학습이 어렵다</div>
+<div class="quiz-option" onclick="checkAnswer('q5','d','d','lec1')">D. 위의 모두</div>
+<div class="quiz-answer" id="ans-q5"><strong>정답: D</strong><br>RNN: (1) 순차 처리라 병렬화 불가, (2) 긴 시퀀스에서 gradient 소실/폭발, (3) 먼 토큰 간 관계 학습 어려움. LSTM이 gradient 문제를 완화하지만 완전히 해결하지는 못함.<br><span style="font-size:11px;color:#aaa">이 세 가지 문제가 Transformer 탄생의 동기.</span></div>
+</div>
+
+<div class="quiz-box" id="q6">
+<h4>Q6. LSTM이 vanilla RNN보다 나은 핵심 이유는? <span class="source-tag lec1">Lec1</span></h4>
+<div class="quiz-option" onclick="checkAnswer('q6','a','b','lec1')">A. 계산이 더 빠르다</div>
+<div class="quiz-option" onclick="checkAnswer('q6','b','b','lec1')">B. Cell state가 "고속도로" 역할을 하여 gradient가 직접 흐를 수 있다</div>
+<div class="quiz-option" onclick="checkAnswer('q6','c','b','lec1')">C. 파라미터가 더 적다</div>
+<div class="quiz-option" onclick="checkAnswer('q6','d','b','lec1')">D. 병렬화가 가능하다</div>
+<div class="quiz-answer" id="ans-q6"><strong>정답: B</strong><br>LSTM의 Cell state C_t는 C_{t-1}에서 직접 연결 (hidden state를 거치지 않음). 이 "고속도로" 덕분에 gradient가 멀리까지 전파 가능.<br><span style="font-size:11px;color:#aaa">C_t = f_t ⊙ C_{t-1} + i_t ⊙ C̃_t. Forget gate가 gradient flow를 제어.</span></div>
+</div>
+
+<div class="quiz-box" id="q7">
+<h4>Q7. BLEU score의 특징은? <span class="source-tag lec1">Lec1</span></h4>
+<div class="quiz-option" onclick="checkAnswer('q7','a','c','lec1')">A. Recall 기반 지표이다</div>
+<div class="quiz-option" onclick="checkAnswer('q7','b','c','lec1')">B. Ground truth 없이 계산 가능하다</div>
+<div class="quiz-option" onclick="checkAnswer('q7','c','c','lec1')">C. Precision 기반이며, 생성 텍스트의 n-gram이 참조 텍스트에 얼마나 있는지 측정</div>
+<div class="quiz-option" onclick="checkAnswer('q7','d','c','lec1')">D. 분류 태스크에 사용된다</div>
+<div class="quiz-answer" id="ans-q7"><strong>정답: C</strong><br>BLEU = Precision 기반 (생성→참조). ROUGE = Recall 기반 (참조→생성). 둘 다 ground truth 필요.<br><span style="font-size:11px;color:#aaa">BLEU는 번역 품질 평가의 표준. Brevity penalty로 짧은 번역에 페널티.</span></div>
+</div>
+
+<div class="quiz-box" id="q8">
+<h4>Q8. Character-level 토큰화의 단점은? <span class="source-tag lec1">Lec1</span></h4>
+<div class="quiz-option" onclick="checkAnswer('q8','a','b','lec1')">A. OOV 문제가 심각하다</div>
+<div class="quiz-option" onclick="checkAnswer('q8','b','b','lec1')">B. 시퀀스가 길어져 O(n²) 비용 증가, 의미 해석 어려움</div>
+<div class="quiz-option" onclick="checkAnswer('q8','c','b','lec1')">C. 구현이 불가능하다</div>
+<div class="quiz-option" onclick="checkAnswer('q8','d','b','lec1')">D. 학습이 불가능하다</div>
+<div class="quiz-answer" id="ans-q8"><strong>정답: B</strong><br>"World Health Organization" = 24개 토큰. 시퀀스 길어짐 → O(n²) attention 비용 증가. 글자 "D" 하나로는 의미 해석 어려움.<br><span style="font-size:11px;color:#aaa">장점: OOV 없음, 오타에 강함. 단점: 길이, 의미 해석.</span></div>
+</div>
+
+<div class="quiz-box" id="q9">
+<h4>Q9. Seq2Seq의 한계로 Transformer가 등장한 이유는? <span class="source-tag lec1">Lec1</span></h4>
+<div class="quiz-option" onclick="checkAnswer('q9','a','d','lec1')">A. 모든 입력이 하나의 context vector에 압축되어 정보 손실</div>
+<div class="quiz-option" onclick="checkAnswer('q9','b','d','lec1')">B. 순차 처리라 병렬화 불가</div>
+<div class="quiz-option" onclick="checkAnswer('q9','c','d','lec1')">C. Long-range dependency 문제</div>
+<div class="quiz-option" onclick="checkAnswer('q9','d','d','lec1')">D. 위의 모두</div>
+<div class="quiz-answer" id="ans-q9"><strong>정답: D</strong><br>Seq2Seq (RNN 기반): 정보 병목, 순차 처리, long-range 문제. Attention → Transformer로 이어지는 발전의 동기.<br><span style="font-size:11px;color:#aaa">Transformer: 병렬화 가능 + 직접 연결로 long-range 해결 + 정보 병목 없음.</span></div>
+</div>
+
+<div class="quiz-box" id="q10">
+<h4>Q10. Transformer가 탄생한 실제 배경은? <span class="source-tag lec1">Lec1</span></h4>
+<div class="quiz-option" onclick="checkAnswer('q10','a','b','lec1')">A. GPU가 너무 비싸서</div>
+<div class="quiz-option" onclick="checkAnswer('q10','b','b','lec1')">B. Google의 TPU가 RNN 아키텍처를 지원하지 않아서</div>
+<div class="quiz-option" onclick="checkAnswer('q10','c','b','lec1')">C. RNN이 너무 느려서</div>
+<div class="quiz-option" onclick="checkAnswer('q10','d','b','lec1')">D. CNN이 NLP에 적합하지 않아서</div>
+<div class="quiz-answer" id="ans-q10"><strong>정답: B</strong><br>강의 인용: "Google built TPU in 2016, but TPU cannot support RNN. So NLP researchers decided to make their own architecture that can be supported by TPU. That is Transformer."<br><span style="font-size:11px;color:#aaa">자원의 제약이 기술 혁신을 이끈 사례.</span></div>
+</div>
+
+<!-- ═══════════════════════════════════════════ -->
+<!-- LECTURE 1: Self-Attention -->
+<!-- ═══════════════════════════════════════════ -->
+<div class="section-divider" id="lec1-attention">⭐ LECTURE 1 — Self-Attention · Multi-Head Attention (Q11-20)</div>
+
+<div class="quiz-box" id="q11">
+<h4>Q11. Self-Attention에서 √d_k로 나누는 이유는? <span class="source-tag lec1">Lec1</span></h4>
+<div class="quiz-option" onclick="checkAnswer('q11','a','b','lec1')">A. 계산 속도를 높이기 위해</div>
+<div class="quiz-option" onclick="checkAnswer('q11','b','b','lec1')">B. d_k가 크면 dot product의 분산이 d_k에 비례하여 커지고, softmax가 극단적이 되어 gradient가 소실되므로</div>
+<div class="quiz-option" onclick="checkAnswer('q11','c','b','lec1')">C. 메모리를 절약하기 위해</div>
+<div class="quiz-option" onclick="checkAnswer('q11','d','b','lec1')">D. Gradient vanishing을 방지하기 위해</div>
+<div class="quiz-answer" id="ans-q11"><strong>정답: B</strong><br>q, k가 평균 0, 분산 1이면 Var(q·k) = d_k. 분산이 커지면 softmax 입력이 극단적 → gradient 매우 작아짐 (softmax saturation). √d_k로 나눠서 분산을 1로 정규화.<br><span style="font-size:11px;color:#aaa">D도 관련 있지만, 핵심 원인은 "분산이 d_k에 비례"하는 것.</span></div>
+</div>
+
+<div class="quiz-box" id="q12">
+<h4>Q12. Multi-Head Attention의 목적은? <span class="source-tag lec1">Lec1</span></h4>
+<div class="quiz-option" onclick="checkAnswer('q12','a','c','lec1')">A. 계산 속도 향상</div>
+<div class="quiz-option" onclick="checkAnswer('q12','b','c','lec1')">B. 메모리 절약</div>
+<div class="quiz-option" onclick="checkAnswer('q12','c','c','lec1')">C. 각 head가 다른 sub-task를 학습 (CNN의 multiple filters와 유사)</div>
+<div class="quiz-option" onclick="checkAnswer('q12','d','c','lec1')">D. Overfitting 방지</div>
+<div class="quiz-answer" id="ans-q12"><strong>정답: C</strong><br>CNN의 multiple filters와 유사한 아이디어. 각 head가 문법, 의미, 위치 관계 등 다른 패턴을 학습. 실험적으로 관찰됨.<br><span style="font-size:11px;color:#aaa">h개 head의 출력을 concat → W_O로 projection. d_k = d_model / h.</span></div>
+</div>
+
+<div class="quiz-box" id="q13">
+<h4>Q13. Attention(Q,K,V)에서 V의 역할은? <span class="source-tag lec1">Lec1</span></h4>
+<div class="quiz-option" onclick="checkAnswer('q13','a','c','lec1')">A. 유사도를 계산한다</div>
+<div class="quiz-option" onclick="checkAnswer('q13','b','c','lec1')">B. 가중치를 계산한다</div>
+<div class="quiz-option" onclick="checkAnswer('q13','c','c','lec1')">C. 실제 정보를 담고 있으며, attention weight로 가중 평균된다</div>
+<div class="quiz-option" onclick="checkAnswer('q13','d','c','lec1')">D. 위치 정보를 제공한다</div>
+<div class="quiz-answer" id="ans-q13"><strong>정답: C</strong><br>Q와 K로 attention weight(중요도) 계산. 이 weight로 V를 가중 평균. V가 실제 전달되는 정보.<br><span style="font-size:11px;color:#aaa">비유: Q=검색어, K=책 제목, V=책 내용. 검색어와 제목으로 관련도 계산, 내용을 가중 평균.</span></div>
+</div>
+
+<div class="quiz-box" id="q14">
+<h4>Q14. Cross-Attention에서 Q, K, V의 출처는? <span class="source-tag lec1">Lec1</span></h4>
+<div class="quiz-option" onclick="checkAnswer('q14','a','b','lec1')">A. Q: Encoder, K/V: Decoder</div>
+<div class="quiz-option" onclick="checkAnswer('q14','b','b','lec1')">B. Q: Decoder, K/V: Encoder 출력</div>
+<div class="quiz-option" onclick="checkAnswer('q14','c','b','lec1')">C. Q/K/V 모두 Encoder에서</div>
+<div class="quiz-option" onclick="checkAnswer('q14','d','b','lec1')">D. Q/K/V 모두 Decoder에서</div>
+<div class="quiz-answer" id="ans-q14"><strong>정답: B</strong><br>Cross-Attention: Query는 Decoder에서, Key와 Value는 Encoder 출력에서. Decoder가 "질문"하고 Encoder가 "답변"하는 구조.<br><span style="font-size:11px;color:#aaa">Decoder block에는 2개 attention: (1) Masked Self-Attn, (2) Cross-Attn.</span></div>
+</div>
+
+<div class="quiz-box" id="q15">
+<h4>Q15. Self-Attention의 시간 복잡도는? <span class="source-tag lec1">Lec1</span></h4>
+<div class="quiz-option" onclick="checkAnswer('q15','a','c','lec1')">A. O(n)</div>
+<div class="quiz-option" onclick="checkAnswer('q15','b','c','lec1')">B. O(n log n)</div>
+<div class="quiz-option" onclick="checkAnswer('q15','c','c','lec1')">C. O(n² · d_k)</div>
+<div class="quiz-option" onclick="checkAnswer('q15','d','c','lec1')">D. O(n³)</div>
+<div class="quiz-answer" id="ans-q15"><strong>정답: C</strong><br>QK^T 계산: (n, d_k) × (d_k, n) = O(n² · d_k). 모든 토큰 쌍의 attention 계산. 시퀀스 길이의 제곱에 비례.<br><span style="font-size:11px;color:#aaa">n이 2배 → 계산량 4배. 긴 시퀀스에서 병목. Lecture 2 Round 3에서 해결책 다룸.</span></div>
+</div>
+
+<div class="quiz-box" id="q16">
+<h4>Q16. d_k = d_model / h 인 이유는? <span class="source-tag lec1">Lec1</span></h4>
+<div class="quiz-option" onclick="checkAnswer('q16','a','b','lec1')">A. 계산 효율성을 위해</div>
+<div class="quiz-option" onclick="checkAnswer('q16','b','b','lec1')">B. h개 head를 concat하면 h × d_k = d_model이 되어 원래 차원을 유지하기 위해</div>
+<div class="quiz-option" onclick="checkAnswer('q16','c','b','lec1')">C. Gradient flow 개선을 위해</div>
+<div class="quiz-option" onclick="checkAnswer('q16','d','b','lec1')">D. 메모리 절약을 위해</div>
+<div class="quiz-answer" id="ans-q16"><strong>정답: B</strong><br>MultiHead = Concat(head_1, ..., head_h) × W_O. 각 head 출력이 d_k 차원이므로 concat하면 h × d_k. 이것이 d_model과 같아야 W_O로 projection 가능.<br><span style="font-size:11px;color:#aaa">Original Transformer: d_model=512, h=8, d_k=64.</span></div>
+</div>
+
+<div class="quiz-box" id="q17">
+<h4>Q17. Original Transformer의 하이퍼파라미터 중 틀린 것은? <span class="source-tag lec1">Lec1</span></h4>
+<div class="quiz-option" onclick="checkAnswer('q17','a','d','lec1')">A. N (layers) = 6</div>
+<div class="quiz-option" onclick="checkAnswer('q17','b','d','lec1')">B. h (heads) = 8</div>
+<div class="quiz-option" onclick="checkAnswer('q17','c','d','lec1')">C. d_model = 512</div>
+<div class="quiz-option" onclick="checkAnswer('q17','d','d','lec1')">D. d_ff = 1024</div>
+<div class="quiz-answer" id="ans-q17"><strong>정답: D</strong><br>d_ff = 2048이 맞다. N=6, h=8, d_model=512, d_k=d_v=64, d_ff=2048.<br><span style="font-size:11px;color:#aaa">FFN: 512 → 2048 → 512. d_ff는 d_model의 4배.</span></div>
+</div>
+
+<div class="quiz-box" id="q18">
+<h4>Q18. Softmax의 역할은? <span class="source-tag lec1">Lec1</span></h4>
+<div class="quiz-option" onclick="checkAnswer('q18','a','d','lec1')">A. 비선형성 추가</div>
+<div class="quiz-option" onclick="checkAnswer('q18','b','d','lec1')">B. 확률 분포로 변환 (합이 1)</div>
+<div class="quiz-option" onclick="checkAnswer('q18','c','d','lec1')">C. 정규화</div>
+<div class="quiz-option" onclick="checkAnswer('q18','d','d','lec1')">D. B와 C 모두</div>
+<div class="quiz-answer" id="ans-q18"><strong>정답: D</strong><br>softmax(x_i) = exp(x_i) / Σexp(x_j). 모든 값을 양수로 만들고 합이 1이 되게 정규화 → 확률 분포.<br><span style="font-size:11px;color:#aaa">Attention에서: 각 Query에 대해 모든 Key의 중요도를 확률로 변환.</span></div>
+</div>
+
+<div class="quiz-box" id="q19">
+<h4>Q19. Self-Attention이 RNN보다 나은 핵심 이유는? <span class="source-tag lec1">Lec1</span></h4>
+<div class="quiz-option" onclick="checkAnswer('q19','a','a','lec1')">A. 모든 토큰 쌍을 직접 연결하여 long-range dependency를 해결하고 병렬화 가능</div>
+<div class="quiz-option" onclick="checkAnswer('q19','b','a','lec1')">B. 파라미터가 더 적다</div>
+<div class="quiz-option" onclick="checkAnswer('q19','c','a','lec1')">C. 메모리를 덜 사용한다</div>
+<div class="quiz-option" onclick="checkAnswer('q19','d','a','lec1')">D. 구현이 더 간단하다</div>
+<div class="quiz-answer" id="ans-q19"><strong>정답: A</strong><br>강의 인용: "We want to connect the output token to all input tokens directly." 모든 토큰 쌍을 직접 연결 → long-range dependency 해결. 또한 행렬 연산으로 병렬화 가능.<br><span style="font-size:11px;color:#aaa">RNN: 순차 처리, 먼 토큰 간 간접 연결. Transformer: 병렬 처리, 직접 연결.</span></div>
+</div>
+
+<div class="quiz-box" id="q20">
+<h4>Q20. "Context-aware embedding"이란? <span class="source-tag lec1">Lec1</span></h4>
+<div class="quiz-option" onclick="checkAnswer('q20','a','b','lec1')">A. 위치 정보가 포함된 embedding</div>
+<div class="quiz-option" onclick="checkAnswer('q20','b','b','lec1')">B. Self-Attention 후 주변 토큰 정보가 반영된 embedding</div>
+<div class="quiz-option" onclick="checkAnswer('q20','c','b','lec1')">C. Word2Vec embedding</div>
+<div class="quiz-option" onclick="checkAnswer('q20','d','b','lec1')">D. One-hot encoding</div>
+<div class="quiz-answer" id="ans-q20"><strong>정답: B</strong><br>입력 embedding은 position-aware (PE 추가). Self-Attention 후에는 다른 토큰의 정보가 반영되어 context-aware가 된다.<br><span style="font-size:11px;color:#aaa">"bank"의 의미가 주변 문맥에 따라 달라지는 것을 표현 가능.</span></div>
+</div>
+
+<!-- ═══════════════════════════════════════════ -->
+<!-- LECTURE 1: Transformer 구조 & Training -->
+<!-- ═══════════════════════════════════════════ -->
+<div class="section-divider" id="lec1-transformer">🏗️ LECTURE 1 — Transformer 구조 · Training Tricks (Q21-28)</div>
+
+<div class="quiz-box" id="q21">
+<h4>Q21. Transformer에서 Positional Encoding이 필요한 이유는? <span class="source-tag lec1">Lec1</span></h4>
+<div class="quiz-option" onclick="checkAnswer('q21','a','a','lec1')">A. Self-Attention은 순서 정보를 모르므로 "I love you"와 "You love I"가 같은 결과</div>
+<div class="quiz-option" onclick="checkAnswer('q21','b','a','lec1')">B. 계산 효율성을 위해</div>
+<div class="quiz-option" onclick="checkAnswer('q21','c','a','lec1')">C. Gradient flow 개선을 위해</div>
+<div class="quiz-option" onclick="checkAnswer('q21','d','a','lec1')">D. 메모리 절약을 위해</div>
+<div class="quiz-answer" id="ans-q21"><strong>정답: A</strong><br>Self-Attention은 set operation — 순서를 모른다. PE 없으면 "I love you"와 "You love I"가 동일한 결과. 위치 정보를 주입해야 한다.<br><span style="font-size:11px;color:#aaa">Original Transformer: Sinusoidal PE. BERT: Learned PE. 현대: RoPE.</span></div>
+</div>
+
+<div class="quiz-box" id="q22">
+<h4>Q22. Feed-Forward Network의 구조는? <span class="source-tag lec1">Lec1</span></h4>
+<div class="quiz-option" onclick="checkAnswer('q22','a','b','lec1')">A. Linear → Linear</div>
+<div class="quiz-option" onclick="checkAnswer('q22','b','b','lec1')">B. Linear → ReLU → Linear (512 → 2048 → 512)</div>
+<div class="quiz-option" onclick="checkAnswer('q22','c','b','lec1')">C. Conv → ReLU → Conv</div>
+<div class="quiz-option" onclick="checkAnswer('q22','d','b','lec1')">D. Attention → Linear</div>
+<div class="quiz-answer" id="ans-q22"><strong>정답: B</strong><br>FFN(x) = ReLU(xW_1 + b_1)W_2 + b_2. d_model(512) → d_ff(2048) → d_model(512). 중간에 ReLU (또는 GELU) 활성화.<br><span style="font-size:11px;color:#aaa">각 토큰에 독립적으로 적용 (position-wise).</span></div>
+</div>
+
+<div class="quiz-box" id="q23">
+<h4>Q23. Teacher Forcing의 장점은? <span class="source-tag lec1">Lec1</span></h4>
+<div class="quiz-option" onclick="checkAnswer('q23','a','d','lec1')">A. 추론 속도가 빨라진다</div>
+<div class="quiz-option" onclick="checkAnswer('q23','b','d','lec1')">B. 병렬 학습이 가능하다</div>
+<div class="quiz-option" onclick="checkAnswer('q23','c','d','lec1')">C. 이전 예측의 에러가 전파되지 않는다</div>
+<div class="quiz-option" onclick="checkAnswer('q23','d','d','lec1')">D. B와 C 모두</div>
+<div class="quiz-answer" id="ans-q23"><strong>정답: D</strong><br>학습 시 ground truth를 입력으로 사용 → (1) 모든 위치를 동시에 학습 가능 (병렬화), (2) 이전 예측의 에러가 다음 스텝에 전파되지 않음.<br><span style="font-size:11px;color:#aaa">추론 시에는 autoregressive (순차 생성). 학습과 추론의 차이를 이해하는 것이 중요.</span></div>
+</div>
+
+<div class="quiz-box" id="q24">
+<h4>Q24. Causal Masking의 목적은? <span class="source-tag lec1">Lec1</span></h4>
+<div class="quiz-option" onclick="checkAnswer('q24','a','b','lec1')">A. 계산 속도 향상</div>
+<div class="quiz-option" onclick="checkAnswer('q24','b','b','lec1')">B. Teacher Forcing 시 미래 토큰을 보지 못하게 하여 cheating 방지</div>
+<div class="quiz-option" onclick="checkAnswer('q24','c','b','lec1')">C. 메모리 절약</div>
+<div class="quiz-option" onclick="checkAnswer('q24','d','b','lec1')">D. Gradient flow 개선</div>
+<div class="quiz-answer" id="ans-q24"><strong>정답: B</strong><br>미래 토큰을 보면 cheating. Mask로 미래 위치의 attention score를 -∞로 설정 → softmax 후 0이 됨.<br><span style="font-size:11px;color:#aaa">하삼각 행렬 형태. 위치 i는 위치 j ≤ i만 attend 가능.</span></div>
+</div>
+
+<div class="quiz-box" id="q25">
+<h4>Q25. Label Smoothing (ε=0.1)에서 정답 클래스의 target 값은? <span class="source-tag lec1">Lec1</span></h4>
+<div class="quiz-option" onclick="checkAnswer('q25','a','b','lec1')">A. 1.0</div>
+<div class="quiz-option" onclick="checkAnswer('q25','b','b','lec1')">B. 약 0.9 (정확히는 (1-ε) + ε/K)</div>
+<div class="quiz-option" onclick="checkAnswer('q25','c','b','lec1')">C. 0.1</div>
+<div class="quiz-option" onclick="checkAnswer('q25','d','b','lec1')">D. 0.5</div>
+<div class="quiz-answer" id="ans-q25"><strong>정답: B</strong><br>y_smooth = (1-ε)·y_one-hot + ε/K. 정답 클래스: ≈0.9, 나머지: ≈0.02. 모델의 과신(overconfidence) 방지, 일반화 향상.<br><span style="font-size:11px;color:#aaa">GoogLeNet(2015)에서 처음 소개. Transformer에서 BLEU score 향상에 기여.</span></div>
+</div>
+
+<div class="quiz-box" id="q26">
+<h4>Q26. Residual Connection의 효과는? <span class="source-tag lec1">Lec1</span></h4>
+<div class="quiz-option" onclick="checkAnswer('q26','a','b','lec1')">A. 계산 속도 향상</div>
+<div class="quiz-option" onclick="checkAnswer('q26','b','b','lec1')">B. Gradient가 직접 흐를 수 있어 깊은 네트워크 학습 가능 (ResNet에서 차용)</div>
+<div class="quiz-option" onclick="checkAnswer('q26','c','b','lec1')">C. 메모리 절약</div>
+<div class="quiz-option" onclick="checkAnswer('q26','d','b','lec1')">D. Attention 성능 향상</div>
+<div class="quiz-answer" id="ans-q26"><strong>정답: B</strong><br>Output = LayerNorm(x + SubLayer(x)). x + SubLayer(x) 형태로 gradient가 직접 흐를 수 있다. ResNet에서 가져온 아이디어.<br><span style="font-size:11px;color:#aaa">강의: "Many design choices are influenced by computer vision architectures."</span></div>
+</div>
+
+<div class="quiz-box" id="q27">
+<h4>Q27. Decoder block에 있는 attention 메커니즘의 개수는? <span class="source-tag lec1">Lec1</span></h4>
+<div class="quiz-option" onclick="checkAnswer('q27','a','b','lec1')">A. 1개</div>
+<div class="quiz-option" onclick="checkAnswer('q27','b','b','lec1')">B. 2개 (Masked Self-Attention + Cross-Attention)</div>
+<div class="quiz-option" onclick="checkAnswer('q27','c','b','lec1')">C. 3개</div>
+<div class="quiz-option" onclick="checkAnswer('q27','d','b','lec1')">D. 0개</div>
+<div class="quiz-answer" id="ans-q27"><strong>정답: B</strong><br>Decoder: (1) Masked Multi-Head Self-Attention (Causal), (2) Cross-Attention (Q: decoder, K/V: encoder). 그 후 FFN.<br><span style="font-size:11px;color:#aaa">Encoder는 Self-Attention 1개만. Decoder는 2개.</span></div>
+</div>
+
+<div class="quiz-box" id="q28">
+<h4>Q28. Autoregressive inference의 특징은? <span class="source-tag lec1">Lec1</span></h4>
+<div class="quiz-option" onclick="checkAnswer('q28','a','b','lec1')">A. 병렬 생성이 가능하다</div>
+<div class="quiz-option" onclick="checkAnswer('q28','b','b','lec1')">B. 이전 출력이 다음 입력이 되며, 한 토큰씩 순차 생성</div>
+<div class="quiz-option" onclick="checkAnswer('q28','c','b','lec1')">C. Ground truth를 사용한다</div>
+<div class="quiz-option" onclick="checkAnswer('q28','d','b','lec1')">D. 에러가 전파되지 않는다</div>
+<div class="quiz-answer" id="ans-q28"><strong>정답: B</strong><br>이전 스텝의 예측이 다음 스텝의 입력. 한 토큰씩 순차 생성. EOS 토큰이 나올 때까지 반복. 에러가 누적될 수 있음.<br><span style="font-size:11px;color:#aaa">Teacher Forcing(학습)과 Autoregressive(추론)의 차이를 이해하는 것이 핵심.</span></div>
+</div>
+
+<!-- ═══════════════════════════════════════════ -->
+<!-- LECTURE 2: Position Embeddings -->
+<!-- ═══════════════════════════════════════════ -->
+<div class="section-divider" id="lec2-pe">📐 LECTURE 2 — Position Embeddings: Sinusoidal, Learned, ALiBi, RoPE (Q29-34)</div>
+
+<div class="quiz-box" id="q29">
+<h4>Q29. Sinusoidal PE에서 PE_{pos+k}를 PE_{pos}로부터 얻을 수 있는 이유는? <span class="source-tag lec2">Lec2</span></h4>
+<div class="quiz-option" onclick="checkAnswer('q29','a','b','lec2')">A. 선형 보간이 가능하기 때문</div>
+<div class="quiz-option" onclick="checkAnswer('q29','b','b','lec2')">B. 삼각함수 덧셈 정리에 의해 회전 행렬(선형 변환)로 표현 가능</div>
+<div class="quiz-option" onclick="checkAnswer('q29','c','b','lec2')">C. 학습된 변환 행렬이 있기 때문</div>
+<div class="quiz-option" onclick="checkAnswer('q29','d','b','lec2')">D. 모든 PE가 같은 값이기 때문</div>
+<div class="quiz-answer" id="ans-q29"><strong>정답: B</strong><br>sin(ω(pos+k)) = cos(ωk)sin(ωpos) + sin(ωk)cos(ωpos). 삼각함수 덧셈 정리에 의해 PE_{pos+k}는 PE_{pos}에 k에만 의존하는 회전 행렬을 곱한 것.<br><span style="font-size:11px;color:#aaa">이 성질 덕분에 모델이 상대적 위치를 학습할 수 있다.</span></div>
+</div>
+
+<div class="quiz-box" id="q30">
+<h4>Q30. Learned Positional Embedding의 한계는? <span class="source-tag lec2">Lec2</span></h4>
+<div class="quiz-option" onclick="checkAnswer('q30','a','c','lec2')">A. 학습이 불가능하다</div>
+<div class="quiz-option" onclick="checkAnswer('q30','b','c','lec2')">B. 계산이 너무 느리다</div>
+<div class="quiz-option" onclick="checkAnswer('q30','c','c','lec2')">C. 학습 시 본 최대 길이(L_max)를 초과하는 시퀀스에 일반화 불가</div>
+<div class="quiz-option" onclick="checkAnswer('q30','d','c','lec2')">D. 상대적 위치를 표현할 수 없다</div>
+<div class="quiz-answer" id="ans-q30"><strong>정답: C</strong><br>Learned PE는 위치별 embedding을 학습. L_max까지만 학습하므로 그 이상의 위치에는 embedding이 없다. BERT(L_max=512), GPT-2(L_max=1024).<br><span style="font-size:11px;color:#aaa">Sinusoidal PE는 임의 길이에 일반화 가능. 이것이 Learned PE의 핵심 한계.</span></div>
+</div>
+
+<div class="quiz-box" id="q31">
+<h4>Q31. ALiBi의 핵심 아이디어는? <span class="source-tag lec2">Lec2</span></h4>
+<div class="quiz-option" onclick="checkAnswer('q31','a','b','lec2')">A. 입력 embedding에 위치 벡터를 더한다</div>
+<div class="quiz-option" onclick="checkAnswer('q31','b','b','lec2')">B. Attention score에 거리에 비례하는 선형 bias를 빼서 가까운 토큰을 선호하게 한다</div>
+<div class="quiz-option" onclick="checkAnswer('q31','c','b','lec2')">C. Q와 K를 회전시킨다</div>
+<div class="quiz-option" onclick="checkAnswer('q31','d','b','lec2')">D. 위치별 학습 파라미터를 사용한다</div>
+<div class="quiz-answer" id="ans-q31"><strong>정답: B</strong><br>ALiBi: score_ij = (q_i^T k_j)/√d_k + m·(-|i-j|). 거리가 멀수록 큰 음수 bias → 가까운 토큰에 더 높은 attention. "Train Short, Test Long" 가능.<br><span style="font-size:11px;color:#aaa">입력을 수정하지 않고 attention score를 수정. 학습 파라미터 없음 (m은 고정).</span></div>
+</div>
+
+<div class="quiz-box" id="q32">
+<h4>Q32. ALiBi에서 head별 slope(m)의 역할은? <span class="source-tag lec2">Lec2</span></h4>
+<div class="quiz-option" onclick="checkAnswer('q32','a','b','lec2')">A. 모든 head가 같은 범위를 본다</div>
+<div class="quiz-option" onclick="checkAnswer('q32','b','b','lec2')">B. 큰 slope → 가까운 토큰에 집중, 작은 slope → 먼 토큰도 참조</div>
+<div class="quiz-option" onclick="checkAnswer('q32','c','b','lec2')">C. Slope는 학습되는 파라미터다</div>
+<div class="quiz-option" onclick="checkAnswer('q32','d','b','lec2')">D. Slope는 attention weight를 정규화한다</div>
+<div class="quiz-answer" id="ans-q32"><strong>정답: B</strong><br>큰 slope(m=1/2): steep → 가까운 토큰에 강하게 집중 (local). 작은 slope(m=1/256): gentle → 먼 토큰도 참조 (global). Multi-Head의 다양성과 유사.<br><span style="font-size:11px;color:#aaa">Slope는 고정값 (학습 안 함). 기하급수적으로 감소: 2^(-8/h), ..., 2^(-1).</span></div>
+</div>
+
+<div class="quiz-box" id="q33">
+<h4>Q33. RoPE의 핵심 성질은? <span class="source-tag lec2">Lec2</span></h4>
+<div class="quiz-option" onclick="checkAnswer('q33','a','c','lec2')">A. Attention score에 bias를 더한다</div>
+<div class="quiz-option" onclick="checkAnswer('q33','b','c','lec2')">B. 위치별 embedding을 학습한다</div>
+<div class="quiz-option" onclick="checkAnswer('q33','c','c','lec2')">C. Q와 K를 회전시켜 내적이 상대 위치에만 의존하게 한다</div>
+<div class="quiz-option" onclick="checkAnswer('q33','d','c','lec2')">D. 입력 embedding에 sin/cos를 더한다</div>
+<div class="quiz-answer" id="ans-q33"><strong>정답: C</strong><br>RoPE: q̃_m = R(θ_m)·q_m, k̃_n = R(θ_n)·k_n. 내적 q̃_m^T k̃_n = q_m^T R(θ_{n-m}) k_n → 상대 위치 (n-m)에만 의존. 현재 LLM의 표준 (LLaMA, Mistral).<br><span style="font-size:11px;color:#aaa">Long-term decay: 먼 토큰일수록 attention score 상한이 자연스럽게 감소.</span></div>
+</div>
+
+<div class="quiz-box" id="q34">
+<h4>Q34. Position Embedding의 진화 순서로 올바른 것은? <span class="source-tag lec2">Lec2</span></h4>
+<div class="quiz-option" onclick="checkAnswer('q34','a','b','lec2')">A. Learned → Sinusoidal → ALiBi → RoPE</div>
+<div class="quiz-option" onclick="checkAnswer('q34','b','b','lec2')">B. Sinusoidal(2017) → Learned(2018) → T5 Bias(2020) → ALiBi(2021) → RoPE(2021)</div>
+<div class="quiz-option" onclick="checkAnswer('q34','c','b','lec2')">C. RoPE → ALiBi → Sinusoidal → Learned</div>
+<div class="quiz-option" onclick="checkAnswer('q34','d','b','lec2')">D. ALiBi → RoPE → Sinusoidal → Learned</div>
+<div class="quiz-answer" id="ans-q34"><strong>정답: B</strong><br>절대 위치(Sinusoidal, Learned) → 상대 위치(T5 Bias, ALiBi, RoPE). 입력 수정 → attention 수정으로 진화. RoPE가 현재 표준.<br><span style="font-size:11px;color:#aaa">Sinusoidal: Transformer. Learned: BERT/GPT-2. ALiBi: BLOOM. RoPE: LLaMA/Mistral.</span></div>
+</div>
+
+<!-- ═══════════════════════════════════════════ -->
+<!-- LECTURE 2: Layer Normalization -->
+<!-- ═══════════════════════════════════════════ -->
+<div class="section-divider" id="lec2-ln">🔧 LECTURE 2 — Layer Normalization · Pre-Norm · RMSNorm (Q35-40)</div>
+
+<div class="quiz-box" id="q35">
+<h4>Q35. Layer Norm과 Batch Norm의 핵심 차이는? <span class="source-tag lec2">Lec2</span></h4>
+<div class="quiz-option" onclick="checkAnswer('q35','a','c','lec2')">A. Layer Norm이 항상 더 좋다</div>
+<div class="quiz-option" onclick="checkAnswer('q35','b','c','lec2')">B. Batch Norm이 더 빠르다</div>
+<div class="quiz-option" onclick="checkAnswer('q35','c','c','lec2')">C. Layer Norm은 feature 축, Batch Norm은 batch 축 기준으로 정규화</div>
+<div class="quiz-option" onclick="checkAnswer('q35','d','c','lec2')">D. 차이가 없다</div>
+<div class="quiz-answer" id="ans-q35"><strong>정답: C</strong><br>Batch Norm: 같은 feature의 모든 배치 샘플로 μ, σ 계산 (batch 축). Layer Norm: 한 샘플 내 모든 feature로 μ, σ 계산 (feature 축).<br><span style="font-size:11px;color:#aaa">Layer Norm: batch size에 독립, 가변 길이 자연스럽게 처리, 추론 시 running stats 불필요.</span></div>
+</div>
+
+<div class="quiz-box" id="q36">
+<h4>Q36. Transformer에서 Layer Norm을 사용하는 이유는? <span class="source-tag lec2">Lec2</span></h4>
+<div class="quiz-option" onclick="checkAnswer('q36','a','b','lec2')">A. Layer Norm이 항상 Batch Norm보다 우수하다</div>
+<div class="quiz-option" onclick="checkAnswer('q36','b','b','lec2')">B. 원 논문이 Layer Norm으로 튜닝되었고, 가변 길이/작은 배치에 적합</div>
+<div class="quiz-option" onclick="checkAnswer('q36','c','b','lec2')">C. 계산이 더 빠르다</div>
+<div class="quiz-option" onclick="checkAnswer('q36','d','b','lec2')">D. 메모리를 덜 사용한다</div>
+<div class="quiz-answer" id="ans-q36"><strong>정답: B</strong><br>강의 인용: "The only reason to use Layer Normalization is that the original paper was tuning based on Layer Norm." 추가로: 가변 길이 시퀀스 처리, 작은 배치에서도 안정적, 추론 시 running stats 불필요.<br><span style="font-size:11px;color:#aaa">Batch Norm을 쓰려면 하이퍼파라미터를 다시 튜닝해야 한다.</span></div>
+</div>
+
+<div class="quiz-box" id="q37">
+<h4>Q37. Post-Norm과 Pre-Norm의 차이는? <span class="source-tag lec2">Lec2</span></h4>
+<div class="quiz-option" onclick="checkAnswer('q37','a','c','lec2')">A. 성능 차이가 없다</div>
+<div class="quiz-option" onclick="checkAnswer('q37','b','c','lec2')">B. Post-Norm이 항상 더 좋다</div>
+<div class="quiz-option" onclick="checkAnswer('q37','c','c','lec2')">C. Post-Norm: LN(x + SubLayer(x)), Pre-Norm: x + SubLayer(LN(x)). Pre-Norm이 gradient flow가 더 좋아 학습이 안정적</div>
+<div class="quiz-option" onclick="checkAnswer('q37','d','c','lec2')">D. Pre-Norm은 더 많은 파라미터가 필요하다</div>
+<div class="quiz-answer" id="ans-q37"><strong>정답: C</strong><br>Post-Norm: residual 후 LN → LN이 gradient path를 차단. Pre-Norm: LN 후 SubLayer → residual path가 깨끗하게 유지 → gradient 직접 흐름.<br><span style="font-size:11px;color:#aaa">현대 LLM은 거의 모두 Pre-Norm. GPT-2+, LLaMA, Mistral 등.</span></div>
+</div>
+
+<div class="quiz-box" id="q38">
+<h4>Q38. RMSNorm이 Layer Norm과 다른 점은? <span class="source-tag lec2">Lec2</span></h4>
+<div class="quiz-option" onclick="checkAnswer('q38','a','b','lec2')">A. 분산을 계산하지 않는다</div>
+<div class="quiz-option" onclick="checkAnswer('q38','b','b','lec2')">B. 평균을 빼지 않고(re-centering 없음) RMS로만 정규화하며, β 파라미터도 없다</div>
+<div class="quiz-option" onclick="checkAnswer('q38','c','b','lec2')">C. 학습 파라미터가 없다</div>
+<div class="quiz-option" onclick="checkAnswer('q38','d','b','lec2')">D. Batch 축으로 정규화한다</div>
+<div class="quiz-answer" id="ans-q38"><strong>정답: B</strong><br>RMSNorm(x) = γ ⊙ x/RMS(x). Layer Norm에서 평균 빼기(re-centering)와 β(shift)를 제거. 성능은 동등하면서 계산이 더 빠름.<br><span style="font-size:11px;color:#aaa">RMS(x) = √(1/d Σx_i²). 학습 파라미터는 γ만 (d개). Layer Norm은 γ+β (2d개).</span></div>
+</div>
+
+<div class="quiz-box" id="q39">
+<h4>Q39. 현대 LLM (LLaMA, Mistral)이 사용하는 정규화 조합은? <span class="source-tag lec2">Lec2</span></h4>
+<div class="quiz-option" onclick="checkAnswer('q39','a','c','lec2')">A. Post-Norm + Batch Norm</div>
+<div class="quiz-option" onclick="checkAnswer('q39','b','c','lec2')">B. Post-Norm + Layer Norm</div>
+<div class="quiz-option" onclick="checkAnswer('q39','c','c','lec2')">C. Pre-Norm + RMSNorm</div>
+<div class="quiz-option" onclick="checkAnswer('q39','d','c','lec2')">D. Pre-Norm + Batch Norm</div>
+<div class="quiz-answer" id="ans-q39"><strong>정답: C</strong><br>현대 LLM의 표준: Pre-Norm (학습 안정성) + RMSNorm (효율성). LLaMA, Mistral, PaLM 등이 이 조합 사용.<br><span style="font-size:11px;color:#aaa">진화: Post-Norm+LayerNorm(2017) → Pre-Norm+LayerNorm(GPT-2) → Pre-Norm+RMSNorm(LLaMA).</span></div>
+</div>
+
+<div class="quiz-box" id="q40">
+<h4>Q40. Layer Normalization의 학습 가능한 파라미터 γ와 β의 역할은? <span class="source-tag lec2">Lec2</span></h4>
+<div class="quiz-option" onclick="checkAnswer('q40','a','b','lec2')">A. Gradient를 안정화한다</div>
+<div class="quiz-option" onclick="checkAnswer('q40','b','b','lec2')">B. 정규화 후 표현력을 복원한다 (γ=σ, β=μ로 학습하면 원래 분포로 되돌릴 수 있음)</div>
+<div class="quiz-option" onclick="checkAnswer('q40','c','b','lec2')">C. 학습 속도를 높인다</div>
+<div class="quiz-option" onclick="checkAnswer('q40','d','b','lec2')">D. 메모리를 절약한다</div>
+<div class="quiz-answer" id="ans-q40"><strong>정답: B</strong><br>단순 정규화만 하면 표현력이 줄어든다. γ(scale)와 β(shift)로 모델이 필요하면 정규화를 "되돌릴" 수 있다. γ=σ, β=μ로 학습하면 원래 분포 복원.<br><span style="font-size:11px;color:#aaa">γ 초기값=1, β 초기값=0. 학습을 통해 최적의 scale/shift를 찾는다.</span></div>
+</div>
+
+<!-- ═══════════════════════════════════════════ -->
+<!-- Cheat Sheet -->
+<!-- ═══════════════════════════════════════════ -->
+<h2 id="cheatsheet">📋 Cheat Sheet — 시험 직전 최종 정리</h2>
+
+<div class="def">
+<p class="ni"><strong>🔑 Lecture 1 핵심 수식</strong></p>
+<p class="ni">1. <strong>Scaled Dot-Product Attention:</strong></p>
+<div class="eq">\[ \text{Attention}(Q,K,V) = \text{softmax}\!\left(\frac{QK^T}{\sqrt{d_k}}\right)V \]</div>
+<p class="ni">2. <strong>Multi-Head Attention:</strong></p>
+<div class="eq">\[ \text{MultiHead} = \text{Concat}(\text{head}_1, \ldots, \text{head}_h)W^O, \quad \text{head}_i = \text{Attention}(QW_i^Q, KW_i^K, VW_i^V) \]</div>
+<p class="ni">3. <strong>Perplexity:</strong></p>
+<div class="eq">\[ \text{PPL} = \exp\!\left(-\frac{1}{N}\sum_{i=1}^{N}\log P(w_i|w_{<i})\right) \]</div>
+<p class="ni">4. <strong>Label Smoothing:</strong></p>
+<div class="eq">\[ y_{\text{smooth}} = (1-\epsilon)\cdot y_{\text{one-hot}} + \frac{\epsilon}{K} \]</div>
+</div>
+
+<div class="def">
+<p class="ni"><strong>🔑 Lecture 2 핵심 수식</strong></p>
+<p class="ni">5. <strong>Sinusoidal PE:</strong></p>
+<div class="eq">\[ PE_{(pos,2i)} = \sin\!\left(\frac{pos}{10000^{2i/d}}\right), \quad PE_{(pos,2i+1)} = \cos\!\left(\frac{pos}{10000^{2i/d}}\right) \]</div>
+<p class="ni">6. <strong>ALiBi:</strong></p>
+<div class="eq">\[ \text{score}_{ij} = \frac{q_i^Tk_j}{\sqrt{d_k}} + m\cdot(-|i-j|) \]</div>
+<p class="ni">7. <strong>RoPE:</strong></p>
+<div class="eq">\[ \tilde{q}_m^T\tilde{k}_n = q_m^T R_{n-m} k_n \quad \text{(상대 위치에만 의존)} \]</div>
+<p class="ni">8. <strong>Layer Norm:</strong></p>
+<div class="eq">\[ \text{LN}(x) = \gamma \odot \frac{x-\mu}{\sqrt{\sigma^2+\epsilon}} + \beta \]</div>
+<p class="ni">9. <strong>RMSNorm:</strong></p>
+<div class="eq">\[ \text{RMSNorm}(x) = \gamma \odot \frac{x}{\text{RMS}(x)}, \quad \text{RMS}(x) = \sqrt{\frac{1}{d}\sum x_i^2} \]</div>
+</div>
+
+<div class="ok">
+<p class="ni"><strong>🎯 시험 핵심 키워드 (빈출)</strong></p>
+<ul>
+<li>√d_k: Var(q·k) = d_k → softmax saturation 방지</li>
+<li>Multi-Head: CNN의 multiple filters와 유사, 각 head가 다른 sub-task</li>
+<li>Teacher Forcing: 학습 시 ground truth 사용 → 병렬화 + 에러 전파 없음</li>
+<li>Causal Mask: 미래 토큰 차단, -∞ → softmax 후 0</li>
+<li>Label Smoothing: 과신 방지, ε=0.1 → 정답 0.9</li>
+<li>Residual Connection: ResNet에서 차용, gradient 직접 흐름</li>
+<li>PE 진화: Sinusoidal → Learned → ALiBi → RoPE (절대→상대)</li>
+<li>ALiBi: attention score에 선형 bias, "Train Short Test Long"</li>
+<li>RoPE: Q/K 회전, 내적이 상대 위치에만 의존, 현재 표준</li>
+<li>Layer Norm vs Batch Norm: feature 축 vs batch 축</li>
+<li>Post-Norm vs Pre-Norm: Pre-Norm이 gradient flow 좋음, 현재 표준</li>
+<li>RMSNorm: 평균 안 빼고 RMS만, β 없음, 더 효율적</li>
+<li>현대 LLM: Pre-Norm + RMSNorm + RoPE + GQA</li>
+</ul>
+</div>
+
+<div class="warn">
+<p class="ni"><strong>⚠️ 자주 틀리는 포인트</strong></p>
+<ul>
+<li>d_ff = 2048 (1024 아님!). d_model의 4배</li>
+<li>BLEU = Precision 기반, ROUGE = Recall 기반 (반대로 외우기 쉬움)</li>
+<li>Perplexity는 낮을수록 좋다 (높을수록 아님!)</li>
+<li>Cross-Attention: Q는 Decoder, K/V는 Encoder (반대 아님!)</li>
+<li>ALiBi의 slope는 학습 안 함 (고정값)</li>
+<li>RMSNorm에는 β(shift) 파라미터가 없다</li>
+<li>Transformer 탄생 이유: TPU가 RNN을 지원 안 해서 (GPU 비용 아님!)</li>
+</ul>
+</div>
+
+<!-- Score Script -->
+<script>
+var state = {
+  answered: {},
+  lec1: {correct: 0, total: 0},
+  lec2: {correct: 0, total: 0}
+};
+
+function checkAnswer(qId, selected, correct, source) {
+  if (state.answered[qId]) return;
+  state.answered[qId] = true;
+  
+  var isCorrect = (selected === correct);
+  var src = source === 'lec1' ? state.lec1 : state.lec2;
+  src.total++;
+  if (isCorrect) src.correct++;
+  
+  // Show answer
+  document.getElementById('ans-' + qId).style.display = 'block';
+  
+  // Highlight options
+  var options = document.querySelectorAll('#' + qId + ' .quiz-option');
+  options.forEach(function(opt, idx) {
+    var letter = ['a','b','c','d'][idx];
+    if (letter === correct) opt.classList.add('correct');
+    else if (letter === selected && !isCorrect) opt.classList.add('wrong');
+  });
+  
+  updateScore();
+}
+
+function updateScore() {
+  var totalCorrect = state.lec1.correct + state.lec2.correct;
+  var totalAnswered = state.lec1.total + state.lec2.total;
+  
+  document.getElementById('correct-count').textContent = totalCorrect;
+  document.getElementById('total-answered').textContent = totalAnswered;
+  
+  var acc = totalAnswered > 0 ? Math.round(totalCorrect / totalAnswered * 100) : '-';
+  document.getElementById('accuracy').textContent = acc;
+  document.getElementById('score-bar-fill').style.width = (totalAnswered > 0 ? (totalCorrect / 40 * 100) : 0) + '%';
+  
+  document.getElementById('lec1-score').textContent = state.lec1.correct + '/' + state.lec1.total;
+  document.getElementById('lec2-score').textContent = state.lec2.correct + '/' + state.lec2.total;
+}
+
+function resetQuiz() {
+  state = {answered: {}, lec1: {correct:0, total:0}, lec2: {correct:0, total:0}};
+  
+  // Reset all quiz boxes
+  for (var i = 1; i <= 40; i++) {
+    var qId = 'q' + i;
+    var ans = document.getElementById('ans-' + qId);
+    if (ans) ans.style.display = 'none';
+    var options = document.querySelectorAll('#' + qId + ' .quiz-option');
+    options.forEach(function(opt) {
+      opt.classList.remove('correct', 'wrong');
+    });
+  }
+  
+  updateScore();
+  window.scrollTo({top: 0, behavior: 'smooth'});
+}
+</script>
+
+</div><!-- paper-content -->
+</div><!-- container -->
+</div><!-- main-wrapper -->
+
+</body>
+</html>

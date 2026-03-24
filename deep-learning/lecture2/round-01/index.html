@@ -1,0 +1,789 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lecture 2 · Round 1: Position Embeddings | 딥러닝 학습</title>
+<script>
+MathJax = { tex: { inlineMath: [['\\(','\\)']], displayMath: [['\\[','\\]']] } };
+</script>
+<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;500&family=Space+Mono:wght@400&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+<script src="https://cdn.plot.ly/plotly-2.35.0.min.js"></script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Inter',sans-serif;background:#fafaf8;color:#1a1a1a;line-height:1.7;overflow-x:hidden}
+.sidebar{position:fixed;left:0;top:0;width:260px;height:100vh;background:rgba(255,255,255,.97);border-right:1px solid rgba(0,0,0,.06);padding:32px 24px;z-index:100;overflow-y:auto;display:flex;flex-direction:column}
+.sidebar-profile{text-align:center;margin-bottom:28px;padding-bottom:24px;border-bottom:1px solid rgba(0,0,0,.08)}
+.profile-icon{font-size:48px;margin-bottom:8px}
+.profile-name{font-family:'Cormorant Garamond',serif;font-size:1.3rem;font-weight:500;margin-bottom:4px}
+.profile-title{font-size:.68rem;color:#888;letter-spacing:.08em;text-transform:uppercase;margin-bottom:8px}
+.profile-bio{font-size:.78rem;color:#666;line-height:1.5}
+.sidebar-nav{flex:1;margin-top:16px}
+.nav-section{margin-bottom:20px}
+.nav-section-title{font-size:.6rem;font-weight:600;color:#aaa;letter-spacing:.15em;text-transform:uppercase;margin-bottom:10px}
+.nav-list{list-style:none}
+.nav-list li{margin-bottom:5px}
+.nav-list a{font-size:.78rem;color:#555;text-decoration:none;transition:all .2s;display:block;padding:3px 0}
+.nav-list a:hover{color:#0080c6;padding-left:4px}
+.nav-list a.active{color:#0080c6;font-weight:500}
+.badge{display:inline-block;font-size:.5rem;background:#0080c6;color:#fff;padding:1px 5px;border-radius:8px;margin-left:3px;vertical-align:middle}
+.badge-quiz{background:#e74c3c}
+.sidebar-footer{padding-top:16px;border-top:1px solid rgba(0,0,0,.06);font-size:.65rem;color:#aaa;text-align:center}
+.main-wrapper{margin-left:260px;min-height:100vh}
+.container{max-width:1100px;margin:0 auto;padding:50px 40px 80px}
+.paper-content{font-family:'Times New Roman','Nanum Myeongjo',serif;line-height:1.8;background:#fff;padding:40px;border-radius:8px;box-shadow:0 2px 20px rgba(0,0,0,.05)}
+.paper-header{text-align:center;margin-bottom:40px;padding-bottom:30px;border-bottom:2px solid #333}
+.paper-category{font-size:14px;color:#666;margin-bottom:10px}
+.paper-title{font-size:24px;font-weight:bold;margin-bottom:12px;line-height:1.4}
+.paper-subtitle{font-size:14px;color:#555;margin-bottom:8px}
+.paper-team{font-size:13px;color:#444}
+</style>
+<style>
+.abstract{background:#f8f9fa;padding:25px;margin:30px 0;border-left:4px solid #2c3e50}
+.abstract-title{font-weight:bold;font-size:16px;margin-bottom:15px}
+h2{font-size:18px;margin:35px 0 20px;padding-bottom:8px;border-bottom:1px solid #ddd;color:#2c3e50}
+h3{font-size:15px;margin:25px 0 15px;color:#34495e}
+h4{font-size:14px;margin:20px 0 12px;color:#34495e}
+p{text-align:justify;margin-bottom:15px;text-indent:2em}
+p.ni{text-indent:0}
+table{width:100%;border-collapse:collapse;margin:20px 0;font-size:12px}
+th,td{border:1px solid #ddd;padding:10px 8px;text-align:center}
+th{background:#2c3e50;color:white;font-weight:bold}
+tr:nth-child(even){background:#f8f9fa}
+tr:hover{background:#e8f4f8}
+.tc{font-size:13px;font-weight:bold;margin:15px 0 10px;text-align:center}
+.eq{text-align:center;margin:20px 0;padding:15px;background:#f8f9fa;border-radius:4px;overflow-x:auto}
+ul,ol{margin-left:2em;margin-bottom:15px}
+li{margin-bottom:6px}
+.def{background:#fff9e6;border:1px solid #ffc107;border-radius:4px;padding:20px;margin:20px 0}
+.info{background:#e8f4f8;border-left:4px solid #3498db;padding:20px;margin:20px 0}
+.warn{background:#fff3cd;border-left:4px solid #f39c12;padding:20px;margin:20px 0}
+.ok{background:#d4edda;border-left:4px solid #28a745;padding:20px;margin:20px 0}
+pre{background:#1e1e1e;color:#d4d4d4;padding:20px;border-radius:6px;overflow-x:auto;margin:20px 0;font-family:'Space Mono','Consolas',monospace;font-size:13px;line-height:1.6}
+code{font-family:'Space Mono','Consolas',monospace;font-size:13px}
+p code,li code,td code{background:#f0f0f0;padding:2px 6px;border-radius:3px;color:#c7254e;font-size:12px}
+.cm{color:#6a9955}.kw{color:#569cd6}.st{color:#ce9178}.fn{color:#dcdcaa}.nb{color:#4ec9b0}.nu{color:#b5cea8}
+.quiz-box{background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);color:#fff;padding:25px;border-radius:8px;margin:25px 0}
+.quiz-box h4{color:#fff;margin-top:0}
+.quiz-option{background:rgba(255,255,255,.15);padding:10px 15px;margin:8px 0;border-radius:4px;cursor:pointer;transition:all .2s}
+.quiz-option:hover{background:rgba(255,255,255,.25)}
+.quiz-option.correct{background:#28a745!important}
+.quiz-option.wrong{background:#dc3545!important}
+.quiz-answer{display:none;margin-top:15px;padding:15px;background:rgba(255,255,255,.1);border-radius:4px}
+.round-nav{display:flex;justify-content:space-between;margin:40px 0 0;padding:20px 0;border-top:2px solid #eee}
+.round-nav a{display:inline-flex;align-items:center;gap:6px;padding:10px 20px;background:#0080c6;color:#fff;text-decoration:none;border-radius:6px;font-size:13px;font-family:'Inter',sans-serif;transition:background .2s}
+.round-nav a:hover{background:#006aa3}
+.round-nav a.disabled{background:#ccc;pointer-events:none}
+@media(max-width:1024px){
+.sidebar{width:100%;height:auto;position:relative;border-right:none;border-bottom:1px solid rgba(0,0,0,.08);padding:16px}
+.sidebar-profile{margin-bottom:10px;padding-bottom:10px;display:flex;align-items:center;gap:12px;text-align:left}
+.profile-icon{font-size:32px;margin-bottom:0}.profile-bio{display:none}
+.nav-section{display:inline-block;margin-right:16px;margin-bottom:8px}
+.nav-list{display:flex;gap:10px;flex-wrap:wrap}.nav-list li{margin-bottom:0}
+.sidebar-footer{display:none}
+.main-wrapper{margin-left:0}
+.container{padding:0}.paper-content{padding:20px 16px;border-radius:0;box-shadow:none}
+.paper-title{font-size:18px}p{font-size:14px;text-indent:1.5em;text-align:left}
+pre{font-size:11px;padding:14px}table{font-size:10px;display:block;overflow-x:auto}
+}
+</style>
+</head>
+<body>
+
+<div class="sidebar">
+<div class="sidebar-profile">
+<div class="profile-icon">📐</div>
+<div class="profile-name">Lecture 2 · Round 1</div>
+<div class="profile-title">Position Embeddings</div>
+<div class="profile-bio">CME 295 Lecture 2 · 위치 정보를 Transformer에 주입하는 4가지 방법</div>
+</div>
+<div class="sidebar-nav">
+<div class="nav-section">
+<div class="nav-section-title">This Round</div>
+<ul class="nav-list">
+<li><a href="#motivation">1. 위치 정보의 필요성</a></li>
+<li><a href="#sinusoidal">2. Sinusoidal PE <span class="badge">Original</span></a></li>
+<li><a href="#learned">3. Learned PE</a></li>
+<li><a href="#alibi">4. ALiBi</a></li>
+<li><a class="active" href="#rope">5. RoPE <span class="badge">현재 표준</span></a></li>
+<li><a href="#comparison">6. 비교 정리</a></li>
+<li><a href="#quiz">📝 Quiz</a></li>
+</ul>
+</div>
+<div class="nav-section">
+<div class="nav-section-title">All Rounds</div>
+<ul class="nav-list">
+<li><a class="active" href="#">R1 · Position Embeddings</a></li>
+<li><a href="../round-02/">R2 · Layer Normalization</a></li>
+<li><a href="../round-03/">R3 · Attention Approximation</a></li>
+<li><a href="../round-04/">R4 · Transformer Models</a></li>
+<li><a href="../round-05/">R5 · BERT Deep Dive</a></li>
+</ul>
+</div>
+</div>
+<div class="sidebar-footer">CME 295 · Lecture 2 · Amidi & Amidi</div>
+</div>
+
+<div class="main-wrapper">
+<div class="container">
+<div class="paper-content">
+
+<div class="paper-header">
+<div class="paper-category">CME 295: Transformers & Large Language Models · Lecture 2 · Round 1 / 5</div>
+<h1 class="paper-title">Position Embeddings — 위치 정보를 Transformer에 주입하는 방법</h1>
+<div class="paper-subtitle">Sinusoidal → Learned → ALiBi → RoPE: 절대 위치에서 상대 위치로의 진화</div>
+<div class="paper-team">Based on: Stanford CME 295 Lecture 2 (Afshine & Shervine Amidi)</div>
+</div>
+
+<div class="abstract">
+<div class="abstract-title">Learning Objectives</div>
+<p class="ni">이 라운드를 마치면 다음을 할 수 있다:</p>
+<ul>
+<li>Self-Attention이 왜 위치 정보를 잃는지 수학적으로 설명할 수 있다</li>
+<li>Sinusoidal Positional Encoding의 수식과 장단점을 설명할 수 있다</li>
+<li>Learned PE의 한계와 Sinusoidal PE와의 차이를 비교할 수 있다</li>
+<li>ALiBi가 attention layer를 어떻게 변형하는지 이해한다</li>
+<li>RoPE의 핵심 아이디어(회전 행렬)와 왜 현재 표준인지 설명할 수 있다</li>
+<li>절대 위치 vs 상대 위치 인코딩의 차이를 구분할 수 있다</li>
+</ul>
+</div>
+
+<!-- ═══════════════════════════════════════════ -->
+<!-- 1. 위치 정보의 필요성 -->
+<!-- ═══════════════════════════════════════════ -->
+<h2 id="motivation">1. 위치 정보의 필요성 — Why Position Matters</h2>
+
+<h3>1.1 Self-Attention은 순서를 모른다</h3>
+<p>Lecture 1에서 배운 Self-Attention을 떠올려보자. \(\text{Attention}(Q,K,V) = \text{softmax}\left(\frac{QK^T}{\sqrt{d_k}}\right)V\) 이 수식에서 토큰의 순서 정보는 어디에도 없다. Q, K, V는 입력 임베딩 \(X\)에 projection matrix를 곱해서 만드는데, 이 과정에서 "몇 번째 토큰인지"는 반영되지 않는다.</p>
+
+<div class="warn">
+<p class="ni"><strong>핵심 문제:</strong> Self-Attention은 set operation이다. 입력 토큰의 순서를 바꿔도 (permutation) 출력이 동일하다.</p>
+<ul>
+<li>"I love you" → Attention 결과 A</li>
+<li>"You love I" → Attention 결과 A (동일!)</li>
+</ul>
+<p class="ni">이것은 NLP에서 치명적이다. 어순이 의미를 결정하기 때문이다.</p>
+</div>
+
+<div class="info">
+<p class="ni"><strong>강의 인용:</strong> "Direct links 'lose' position info. We need to add position-specific information to the token vector."</p>
+<p class="ni">→ 해결책: 토큰 임베딩에 위치 정보를 더해주자!</p>
+</div>
+
+<h3>1.2 위치 인코딩의 기본 아이디어</h3>
+<p>토큰 임베딩 벡터에 위치 벡터를 더한다:</p>
+<div class="eq">\[ \text{Input} = \text{Token Embedding} + \text{Position Embedding} \]</div>
+<p class="ni">이렇게 하면 같은 단어라도 위치에 따라 다른 벡터가 된다. "love"가 2번째 위치에 있을 때와 5번째 위치에 있을 때 다른 표현을 갖게 된다.</p>
+
+<div class="def">
+<p class="ni"><strong>Position Embedding의 두 가지 접근법:</strong></p>
+<ul>
+<li><strong>절대 위치 (Absolute):</strong> 각 위치에 고유한 벡터를 할당. "나는 3번째 위치야"</li>
+<li><strong>상대 위치 (Relative):</strong> 토큰 간의 거리를 인코딩. "나는 너보다 2칸 앞이야"</li>
+</ul>
+<p class="ni">역사적으로 절대 위치 → 상대 위치로 발전해왔다.</p>
+</div>
+
+<pre><code><span class="cm"># 위치 인코딩의 기본 개념</span>
+<span class="kw">import</span> numpy <span class="kw">as</span> np
+
+d_model = <span class="nu">512</span>
+seq_len = <span class="nu">6</span>  <span class="cm"># "A cute teddy bear is reading"</span>
+
+<span class="cm"># Token embedding (Word2Vec 등으로 학습된 것)</span>
+token_embed = np.random.randn(seq_len, d_model)
+
+<span class="cm"># Position embedding (방법에 따라 다름)</span>
+pos_embed = np.zeros((seq_len, d_model))  <span class="cm"># 이걸 어떻게 채울 것인가?</span>
+
+<span class="cm"># 최종 입력 = 토큰 + 위치</span>
+input_embed = token_embed + pos_embed
+<span class="fn">print</span>(<span class="st">f"Input shape: </span>{input_embed.shape}<span class="st">"</span>)  <span class="cm"># (6, 512)</span></code></pre>
+
+<!-- ═══════════════════════════════════════════ -->
+<!-- 2. Sinusoidal PE -->
+<!-- ═══════════════════════════════════════════ -->
+<h2 id="sinusoidal">2. Sinusoidal Positional Encoding — Original Transformer (2017)</h2>
+
+<h3>2.1 수식</h3>
+<p>Vaswani et al. (2017)의 "Attention Is All You Need"에서 제안한 방법. 학습 없이 수학적 함수로 위치를 인코딩한다.</p>
+
+<div class="def">
+<p class="ni"><strong>Definition 2.1 — Sinusoidal Positional Encoding</strong></p>
+<div class="eq" style="font-size:16px;padding:20px;background:#fff9e6;border:2px solid #ffc107">\[ PE_{(pos, 2i)} = \sin\left(\frac{pos}{10000^{2i/d_{model}}}\right) \]</div>
+<div class="eq" style="font-size:16px;padding:20px;background:#fff9e6;border:2px solid #ffc107">\[ PE_{(pos, 2i+1)} = \cos\left(\frac{pos}{10000^{2i/d_{model}}}\right) \]</div>
+<p class="ni">여기서:</p>
+<ul>
+<li>\(pos\): 토큰의 위치 (0, 1, 2, ...)</li>
+<li>\(i\): 차원 인덱스 (0, 1, 2, ..., d_model/2 - 1)</li>
+<li>짝수 차원(2i)은 sin, 홀수 차원(2i+1)은 cos</li>
+<li>10000은 base frequency (하이퍼파라미터)</li>
+</ul>
+</div>
+
+<h3>2.2 직관적 이해</h3>
+<p>이 수식이 하는 일을 직관적으로 이해해보자. 각 차원마다 다른 주파수의 sin/cos 파동을 사용한다:</p>
+
+<div class="tc">Table 1. 차원별 주파수</div>
+<table>
+<tr><th>차원 \(i\)</th><th>주파수 \(\frac{1}{10000^{2i/d}}\)</th><th>파장</th><th>의미</th></tr>
+<tr><td>0 (낮은 차원)</td><td>높은 주파수</td><td>짧은 파장</td><td>가까운 위치 구분</td></tr>
+<tr><td>128</td><td>중간 주파수</td><td>중간 파장</td><td>중간 거리 구분</td></tr>
+<tr><td>255 (높은 차원)</td><td>낮은 주파수</td><td>긴 파장</td><td>먼 위치 구분</td></tr>
+</table>
+
+<div class="info">
+<p class="ni"><strong>비유:</strong> 시계의 초침, 분침, 시침과 같다!</p>
+<ul>
+<li>초침 (낮은 차원) = 빠르게 회전 → 가까운 시간(위치) 구분</li>
+<li>분침 (중간 차원) = 중간 속도 → 중간 거리 구분</li>
+<li>시침 (높은 차원) = 느리게 회전 → 먼 시간(위치) 구분</li>
+</ul>
+<p class="ni">이 조합으로 모든 위치를 고유하게 표현할 수 있다.</p>
+</div>
+
+<h3>2.3 핵심 성질: 상대 위치의 선형 표현</h3>
+<p>Sinusoidal PE의 가장 중요한 수학적 성질: 위치 \(pos+k\)의 인코딩을 위치 \(pos\)의 인코딩으로부터 선형 변환으로 얻을 수 있다.</p>
+
+<div class="def">
+<p class="ni"><strong>Theorem 2.1 — 상대 위치의 선형 표현</strong></p>
+<p class="ni">삼각함수의 덧셈 정리에 의해:</p>
+<div class="eq">\[ \begin{pmatrix} \sin(\omega \cdot (pos+k)) \\ \cos(\omega \cdot (pos+k)) \end{pmatrix} = \begin{pmatrix} \cos(\omega k) & \sin(\omega k) \\ -\sin(\omega k) & \cos(\omega k) \end{pmatrix} \begin{pmatrix} \sin(\omega \cdot pos) \\ \cos(\omega \cdot pos) \end{pmatrix} \]</div>
+<p class="ni">즉, \(PE_{pos+k}\)는 \(PE_{pos}\)에 \(k\)에만 의존하는 회전 행렬을 곱한 것이다. 이 덕분에 모델이 상대적 위치를 학습할 수 있다.</p>
+</div>
+
+<h3>2.4 위치 간 유사도</h3>
+<p>Sinusoidal PE의 또 다른 중요한 성질: 가까운 위치일수록 PE 벡터의 내적(유사도)이 크다.</p>
+
+<div class="eq">\[ \text{similarity}(PE_{pos}, PE_{pos+k}) \propto \sum_i \cos(\omega_i \cdot k) \]</div>
+
+<p class="ni">\(k\)가 작을수록 (가까운 위치) 유사도가 높고, \(k\)가 클수록 (먼 위치) 유사도가 낮아진다. 이것은 자연어에서 가까운 단어가 더 관련 있다는 직관과 일치한다.</p>
+
+<pre><code><span class="kw">import</span> numpy <span class="kw">as</span> np
+
+<span class="kw">def</span> <span class="fn">sinusoidal_pe</span>(max_len, d_model):
+    <span class="st">"""Sinusoidal Positional Encoding 구현"""</span>
+    pe = np.zeros((max_len, d_model))
+    position = np.arange(max_len)[:, np.newaxis]  <span class="cm"># (max_len, 1)</span>
+    
+    <span class="cm"># 각 차원의 주파수 계산</span>
+    div_term = np.exp(
+        np.arange(<span class="nu">0</span>, d_model, <span class="nu">2</span>) * (-np.log(<span class="nu">10000.0</span>) / d_model)
+    )  <span class="cm"># (d_model/2,)</span>
+    
+    <span class="cm"># 짝수 차원: sin, 홀수 차원: cos</span>
+    pe[:, <span class="nu">0</span>::<span class="nu">2</span>] = np.sin(position * div_term)
+    pe[:, <span class="nu">1</span>::<span class="nu">2</span>] = np.cos(position * div_term)
+    
+    <span class="kw">return</span> pe
+
+<span class="cm"># 생성 및 확인</span>
+pe = sinusoidal_pe(max_len=<span class="nu">100</span>, d_model=<span class="nu">512</span>)
+<span class="fn">print</span>(<span class="st">f"PE shape: </span>{pe.shape}<span class="st">"</span>)  <span class="cm"># (100, 512)</span>
+
+<span class="cm"># 위치 간 유사도 확인</span>
+sim_1 = np.dot(pe[<span class="nu">0</span>], pe[<span class="nu">1</span>])   <span class="cm"># 가까운 위치 → 높은 유사도</span>
+sim_50 = np.dot(pe[<span class="nu">0</span>], pe[<span class="nu">50</span>])  <span class="cm"># 먼 위치 → 낮은 유사도</span>
+<span class="fn">print</span>(<span class="st">f"Similarity(pos 0, pos 1): </span>{sim_1:.2f}<span class="st">"</span>)
+<span class="fn">print</span>(<span class="st">f"Similarity(pos 0, pos 50): </span>{sim_50:.2f}<span class="st">"</span>)</code></pre>
+
+<h3>2.5 장단점</h3>
+
+<div class="ok">
+<p class="ni"><strong>장점:</strong></p>
+<ul>
+<li>학습 파라미터 없음 (hard-coded) → 추가 학습 비용 없음</li>
+<li>임의의 시퀀스 길이에 일반화 가능 (학습 시 보지 못한 길이도 처리)</li>
+<li>상대 위치를 선형 변환으로 표현 가능</li>
+</ul>
+</div>
+
+<div class="warn">
+<p class="ni"><strong>한계:</strong></p>
+<ul>
+<li>절대 위치 인코딩 — 실제로 attention에서 중요한 것은 상대 위치</li>
+<li>위치 정보가 토큰 임베딩에 더해지므로 (additive), 정보가 섞일 수 있음</li>
+<li>긴 시퀀스에서 위치 구분력이 떨어질 수 있음</li>
+</ul>
+</div>
+
+<!-- ═══════════════════════════════════════════ -->
+<!-- 3. Learned PE -->
+<!-- ═══════════════════════════════════════════ -->
+<h2 id="learned">3. Learned Positional Embedding</h2>
+
+<h3>3.1 아이디어</h3>
+<p>Sinusoidal PE가 수학적 함수로 위치를 인코딩했다면, Learned PE는 각 위치의 임베딩을 학습 가능한 파라미터로 만든다. BERT, GPT-2 등에서 사용.</p>
+
+<div class="def">
+<p class="ni"><strong>Definition 3.1 — Learned Positional Embedding</strong></p>
+<p class="ni">위치 임베딩 행렬 \(P \in \mathbb{R}^{L_{max} \times d_{model}}\)을 학습 가능한 파라미터로 정의. \(L_{max}\)는 최대 시퀀스 길이.</p>
+<div class="eq">\[ \text{Input}_i = \text{TokenEmbed}(x_i) + P_i \]</div>
+<p class="ni">여기서 \(P_i\)는 위치 \(i\)에 해당하는 학습된 벡터.</p>
+</div>
+
+<pre><code><span class="kw">import</span> numpy <span class="kw">as</span> np
+
+<span class="cm"># Learned PE: 학습 가능한 파라미터</span>
+L_max = <span class="nu">512</span>    <span class="cm"># 최대 시퀀스 길이</span>
+d_model = <span class="nu">768</span>  <span class="cm"># BERT-Base의 d_model</span>
+
+<span class="cm"># 이 행렬이 학습됨 (random init → backprop으로 업데이트)</span>
+P = np.random.randn(L_max, d_model) * <span class="nu">0.02</span>  <span class="cm"># 작은 값으로 초기화</span>
+
+<span class="cm"># 위치 i의 임베딩</span>
+pos_3 = P[<span class="nu">3</span>]  <span class="cm"># 3번째 위치의 학습된 벡터</span>
+<span class="fn">print</span>(<span class="st">f"Position 3 embedding shape: </span>{pos_3.shape}<span class="st">"</span>)  <span class="cm"># (768,)</span>
+
+<span class="cm"># 총 추가 파라미터 수</span>
+<span class="fn">print</span>(<span class="st">f"추가 파라미터: </span>{L_max * d_model:,}<span class="st">"</span>)  <span class="cm"># 393,216개</span></code></pre>
+
+<h3>3.2 Sinusoidal vs Learned 비교</h3>
+
+<div class="tc">Table 2. Sinusoidal PE vs Learned PE</div>
+<table>
+<tr><th>특성</th><th>Sinusoidal PE</th><th>Learned PE</th></tr>
+<tr><td>파라미터</td><td>없음 (hard-coded)</td><td>\(L_{max} \times d_{model}\)개</td></tr>
+<tr><td>길이 일반화</td><td>가능 (임의 길이)</td><td>불가능 (\(L_{max}\) 초과 시 재학습 필요)</td></tr>
+<tr><td>성능</td><td>좋음</td><td>비슷하거나 약간 좋음</td></tr>
+<tr><td>사용 모델</td><td>Original Transformer</td><td>BERT, GPT-2</td></tr>
+<tr><td>유연성</td><td>고정된 패턴</td><td>데이터에 맞게 적응</td></tr>
+</table>
+
+<div class="info">
+<p class="ni"><strong>강의 포인트:</strong> Original Transformer 논문에서 Sinusoidal과 Learned PE의 성능 차이가 거의 없었다고 보고했다. 하지만 Learned PE는 최대 길이를 넘는 시퀀스를 처리할 수 없다는 치명적 한계가 있다. "Need to retrain for longer sequences."</p>
+</div>
+
+<div class="warn">
+<p class="ni"><strong>Learned PE의 치명적 한계:</strong></p>
+<p class="ni">BERT는 \(L_{max} = 512\)로 학습되었다. 513번째 토큰이 오면? 해당 위치의 임베딩이 존재하지 않는다! 더 긴 시퀀스를 처리하려면 모델을 재학습해야 한다.</p>
+<p class="ni">→ 이 한계가 "절대 위치에서 상대 위치로"의 전환을 촉발했다.</p>
+</div>
+
+<!-- ═══════════════════════════════════════════ -->
+<!-- 4. ALiBi -->
+<!-- ═══════════════════════════════════════════ -->
+<h2 id="alibi">4. ALiBi — Attention with Linear Biases</h2>
+
+<h3>4.1 절대 위치에서 상대 위치로의 전환</h3>
+<p>Sinusoidal PE와 Learned PE는 모두 절대 위치를 인코딩한다. 하지만 실제로 attention에서 중요한 것은 상대 위치다. "이 단어가 3번째에 있다"보다 "이 단어가 저 단어보다 2칸 앞에 있다"가 더 유용하다.</p>
+
+<div class="info">
+<p class="ni"><strong>강의 인용:</strong> "Actually, we really care about relative position with attention layer. Let's change the attention layer instead."</p>
+<p class="ni">→ 핵심 발상의 전환: 입력에 위치를 더하는 대신, attention 메커니즘 자체를 변형하자!</p>
+</div>
+
+<h3>4.2 ALiBi의 아이디어</h3>
+<p>Press et al. (2021), "Train Short, Test Long"에서 제안. Attention score에 위치 기반 bias를 더한다.</p>
+
+<div class="def">
+<p class="ni"><strong>Definition 4.1 — ALiBi (Attention with Linear Biases)</strong></p>
+<p class="ni">기존 attention score에 선형 bias를 더한다:</p>
+<div class="eq" style="font-size:16px;padding:20px;background:#fff9e6;border:2px solid #ffc107">\[ \text{Attention}(Q, K, V) = \text{softmax}\left(\frac{QK^T}{\sqrt{d_k}} + m \cdot B\right) V \]</div>
+<p class="ni">여기서:</p>
+<ul>
+<li>\(B_{ij} = -|i - j|\): 위치 \(i\)와 \(j\)의 거리에 비례하는 페널티</li>
+<li>\(m\): head별 기울기 (slope). 각 head마다 다른 값</li>
+<li>학습 파라미터 없음! \(m\)은 기하급수적으로 설정 (deterministic)</li>
+</ul>
+</div>
+
+<h3>4.3 Bias 행렬의 구조</h3>
+<pre><code><span class="cm"># ALiBi bias 행렬 예시 (5 tokens)</span>
+<span class="cm"># B[i][j] = -|i - j|</span>
+<span class="cm">#</span>
+<span class="cm">#     pos0  pos1  pos2  pos3  pos4</span>
+<span class="cm"># pos0 [  0,  -1,  -2,  -3,  -4 ]</span>
+<span class="cm"># pos1 [ -1,   0,  -1,  -2,  -3 ]</span>
+<span class="cm"># pos2 [ -2,  -1,   0,  -1,  -2 ]</span>
+<span class="cm"># pos3 [ -3,  -2,  -1,   0,  -1 ]</span>
+<span class="cm"># pos4 [ -4,  -3,  -2,  -1,   0 ]</span>
+
+<span class="kw">import</span> numpy <span class="kw">as</span> np
+
+<span class="kw">def</span> <span class="fn">alibi_bias</span>(seq_len):
+    <span class="st">"""ALiBi bias 행렬 생성"""</span>
+    positions = np.arange(seq_len)
+    <span class="cm"># B[i][j] = -|i - j|</span>
+    bias = -np.abs(positions[:, <span class="kw">None</span>] - positions[<span class="kw">None</span>, :])
+    <span class="kw">return</span> bias
+
+B = alibi_bias(<span class="nu">5</span>)
+<span class="fn">print</span>(<span class="st">"ALiBi Bias Matrix:"</span>)
+<span class="fn">print</span>(B)
+<span class="cm"># [[ 0 -1 -2 -3 -4]</span>
+<span class="cm">#  [-1  0 -1 -2 -3]</span>
+<span class="cm">#  [-2 -1  0 -1 -2]</span>
+<span class="cm">#  [-3 -2 -1  0 -1]</span>
+<span class="cm">#  [-4 -3 -2 -1  0]]</span>
+
+<span class="cm"># Head별 slope (기하급수적)</span>
+<span class="cm"># 8 heads: m = 1/2, 1/4, 1/8, 1/16, 1/32, 1/64, 1/128, 1/256</span>
+n_heads = <span class="nu">8</span>
+slopes = [<span class="nu">1</span> / (<span class="nu">2</span> ** (i + <span class="nu">1</span>)) <span class="kw">for</span> i <span class="kw">in</span> <span class="fn">range</span>(n_heads)]
+<span class="fn">print</span>(<span class="st">f"Slopes: </span>{slopes}<span class="st">"</span>)
+<span class="cm"># [0.5, 0.25, 0.125, 0.0625, 0.03125, ...]</span>
+
+<span class="cm"># Head 0 (steep slope): 가까운 토큰에 강하게 집중</span>
+<span class="cm"># Head 7 (gentle slope): 먼 토큰도 어느 정도 참조</span></code></pre>
+
+<h3>4.4 T5 Bias vs ALiBi 비교</h3>
+
+<div class="tc">Table 3. T5 Bias vs ALiBi</div>
+<table>
+<tr><th>특성</th><th>T5 Bias</th><th>ALiBi</th></tr>
+<tr><td>Bias 값</td><td>학습됨 (per head)</td><td>선형, 결정적 (deterministic)</td></tr>
+<tr><td>파라미터</td><td>있음</td><td>없음</td></tr>
+<tr><td>길이 일반화</td><td>제한적</td><td>우수 ("Train Short, Test Long")</td></tr>
+<tr><td>Bounded</td><td>Yes</td><td>No (unbounded)</td></tr>
+</table>
+
+<div class="ok">
+<p class="ni"><strong>ALiBi의 핵심 장점: "Train Short, Test Long"</strong></p>
+<p class="ni">짧은 시퀀스로 학습하고 긴 시퀀스에서 추론할 수 있다! Bias가 선형이고 결정적이므로, 학습 시 보지 못한 긴 거리에도 자연스럽게 확장된다. 이것이 Learned PE의 한계를 극복한 핵심.</p>
+</div>
+
+<!-- ═══════════════════════════════════════════ -->
+<!-- 5. RoPE -->
+<!-- ═══════════════════════════════════════════ -->
+<h2 id="rope">5. RoPE — Rotary Position Embeddings ⭐ (현재 표준)</h2>
+
+<h3>5.1 핵심 아이디어</h3>
+<p>Su et al. (2021), "RoFormer"에서 제안. 현재 LLaMA, Mistral, GPT-NeoX 등 대부분의 최신 LLM이 사용하는 표준 방법.</p>
+
+<div class="def">
+<p class="ni"><strong>Definition 5.1 — RoPE (Rotary Position Embeddings)</strong></p>
+<p class="ni">핵심 아이디어: Query와 Key 벡터를 위치에 따라 회전시킨다.</p>
+<div class="eq" style="font-size:16px;padding:20px;background:#fff9e6;border:2px solid #ffc107">\[ \tilde{q}_m = R_m \cdot q_m, \quad \tilde{k}_n = R_n \cdot k_n \]</div>
+<p class="ni">여기서 \(R_m\)은 위치 \(m\)에 대한 회전 행렬:</p>
+<div class="eq">\[ R_m = \begin{pmatrix} \cos(m\theta) & -\sin(m\theta) \\ \sin(m\theta) & \cos(m\theta) \end{pmatrix} \]</div>
+<p class="ni">\(\theta\)는 차원별 주파수 (Sinusoidal PE와 유사한 개념).</p>
+</div>
+
+<h3>5.2 왜 회전인가? — 상대 위치의 자연스러운 인코딩</h3>
+<p>RoPE의 마법: 회전된 Q와 K의 내적이 자동으로 상대 위치를 반영한다!</p>
+
+<div class="def">
+<p class="ni"><strong>Theorem 5.1 — RoPE의 핵심 성질</strong></p>
+<div class="eq">\[ \tilde{q}_m^T \tilde{k}_n = (R_m q_m)^T (R_n k_n) = q_m^T R_m^T R_n k_n = q_m^T R_{n-m} k_n \]</div>
+<p class="ni">회전 행렬의 성질 \(R_m^T R_n = R_{n-m}\)에 의해, attention score가 자동으로 상대 위치 \(n-m\)에만 의존한다!</p>
+<p class="ni">→ 절대 위치를 인코딩하지만, attention 계산에서는 상대 위치만 반영된다. 두 마리 토끼를 잡은 것.</p>
+</div>
+
+<h3>5.3 고차원으로의 확장</h3>
+<p>실제 \(d_k\)는 2보다 훨씬 크다 (보통 64 또는 128). 2차원 회전을 블록 단위로 적용한다:</p>
+
+<div class="eq">\[ R_m^{(d)} = \begin{pmatrix} R_m^{(\theta_0)} & & \\ & R_m^{(\theta_1)} & \\ & & \ddots \\ & & & R_m^{(\theta_{d/2-1})} \end{pmatrix} \]</div>
+
+<p class="ni">각 2차원 블록마다 다른 주파수 \(\theta_i\)로 회전. 총 \(d/2\)개의 독립적인 회전.</p>
+
+<pre><code><span class="kw">import</span> numpy <span class="kw">as</span> np
+
+<span class="kw">def</span> <span class="fn">rope_embedding</span>(x, position, d_model, base=<span class="nu">10000</span>):
+    <span class="st">"""
+    RoPE: 벡터 x를 position에 따라 회전
+    x: (d_model,) - query 또는 key 벡터
+    position: int - 토큰 위치
+    """</span>
+    output = np.zeros_like(x)
+    
+    <span class="kw">for</span> i <span class="kw">in</span> <span class="fn">range</span>(<span class="nu">0</span>, d_model, <span class="nu">2</span>):
+        <span class="cm"># 각 2차원 블록의 주파수</span>
+        theta = <span class="nu">1.0</span> / (base ** (i / d_model))
+        angle = position * theta
+        
+        <span class="cm"># 2D 회전 적용</span>
+        cos_a = np.cos(angle)
+        sin_a = np.sin(angle)
+        
+        output[i]   = x[i] * cos_a - x[i+<span class="nu">1</span>] * sin_a
+        output[i+<span class="nu">1</span>] = x[i] * sin_a + x[i+<span class="nu">1</span>] * cos_a
+    
+    <span class="kw">return</span> output
+
+<span class="cm"># 예시</span>
+d_model = <span class="nu">8</span>  <span class="cm"># 간단한 예시</span>
+q = np.random.randn(d_model)
+k = np.random.randn(d_model)
+
+<span class="cm"># 위치 3의 query, 위치 5의 key</span>
+q_rot = rope_embedding(q, position=<span class="nu">3</span>, d_model=d_model)
+k_rot = rope_embedding(k, position=<span class="nu">5</span>, d_model=d_model)
+
+<span class="cm"># 내적 = 상대 위치 (5-3=2)에만 의존!</span>
+score = np.dot(q_rot, k_rot)
+<span class="fn">print</span>(<span class="st">f"Attention score: </span>{score:.4f}<span class="st">"</span>)
+<span class="fn">print</span>(<span class="st">"이 score는 상대 위치 2에만 의존한다"</span>)</code></pre>
+
+<h3>5.4 Attention Weight의 Long-term Decay</h3>
+<p>RoPE의 또 다른 중요한 성질: attention weight가 거리에 따라 자연스럽게 감소한다.</p>
+
+<div class="def">
+<p class="ni"><strong>Property 5.1 — Long-term Decay</strong></p>
+<p class="ni">RoPE를 적용한 attention score의 상한:</p>
+<div class="eq">\[ |\tilde{q}_m^T \tilde{k}_n| \leq f(|m-n|) \]</div>
+<p class="ni">여기서 \(f\)는 거리 \(|m-n|\)에 대해 감소하는 함수. 즉, 먼 토큰일수록 attention score의 상한이 작아진다.</p>
+<p class="ni">→ 가까운 토큰에 자연스럽게 더 많은 attention을 부여. 이것은 자연어의 locality 특성과 일치한다.</p>
+</div>
+
+<h3>5.5 왜 RoPE가 현재 표준인가?</h3>
+
+<div class="ok">
+<p class="ni"><strong>RoPE의 장점 종합:</strong></p>
+<ul>
+<li>상대 위치를 자연스럽게 인코딩 (회전 행렬의 수학적 성질)</li>
+<li>Long-term decay: 가까운 토큰에 자연스럽게 더 많은 attention</li>
+<li>길이 일반화 가능 (학습 시보다 긴 시퀀스 처리 가능)</li>
+<li>구현이 효율적 (element-wise 연산)</li>
+<li>추가 파라미터 없음</li>
+</ul>
+<p class="ni">→ LLaMA, LLaMA 2, Mistral, GPT-NeoX, PaLM 등 현대 LLM의 사실상 표준.</p>
+</div>
+
+<!-- ═══════════════════════════════════════════ -->
+<!-- 6. 비교 정리 -->
+<!-- ═══════════════════════════════════════════ -->
+<h2 id="comparison">6. Position Embedding 방법 종합 비교</h2>
+
+<div class="tc">Table 4. Position Embedding 방법 종합 비교</div>
+<table>
+<tr><th>방법</th><th>유형</th><th>적용 위치</th><th>파라미터</th><th>길이 일반화</th><th>대표 모델</th></tr>
+<tr><td>Sinusoidal PE</td><td>절대</td><td>입력 임베딩에 더함</td><td>없음</td><td>가능</td><td>Original Transformer</td></tr>
+<tr><td>Learned PE</td><td>절대</td><td>입력 임베딩에 더함</td><td>\(L_{max} \times d\)</td><td>불가능</td><td>BERT, GPT-2</td></tr>
+<tr><td>T5 Bias</td><td>상대</td><td>Attention score에 더함</td><td>있음 (per head)</td><td>제한적</td><td>T5</td></tr>
+<tr><td>ALiBi</td><td>상대</td><td>Attention score에 더함</td><td>없음</td><td>우수</td><td>BLOOM</td></tr>
+<tr style="background:#e8f4f8"><td><strong>RoPE</strong></td><td><strong>상대</strong></td><td><strong>Q, K 벡터 회전</strong></td><td><strong>없음</strong></td><td><strong>우수</strong></td><td><strong>LLaMA, Mistral</strong></td></tr>
+</table>
+
+<div class="info">
+<p class="ni"><strong>진화의 흐름:</strong></p>
+<ol>
+<li><strong>Sinusoidal (2017):</strong> 입력에 sin/cos 더함 → 절대 위치, 길이 일반화 가능</li>
+<li><strong>Learned (2018):</strong> 위치 임베딩 학습 → 절대 위치, 길이 제한</li>
+<li><strong>T5 Bias (2020):</strong> Attention에 학습된 bias → 상대 위치, 파라미터 필요</li>
+<li><strong>ALiBi (2021):</strong> Attention에 선형 bias → 상대 위치, 파라미터 없음</li>
+<li><strong>RoPE (2021):</strong> Q, K 회전 → 상대 위치, 파라미터 없음, long-term decay</li>
+</ol>
+</div>
+
+<!-- ═══════════════════════════════════════════ -->
+<!-- Interactive Visualization -->
+<!-- ═══════════════════════════════════════════ -->
+<h2 id="interactive">🎮 Interactive Lab — Position Embedding 시각화</h2>
+
+<h3>Lab 1. Sinusoidal PE Heatmap</h3>
+<div id="plot-pe-heatmap" style="width:100%;height:400px;margin:20px 0"></div>
+
+<script>
+(function(){
+  var d=64, L=50, pe=[];
+  for(var p=0;p<L;p++){var row=[];for(var i=0;i<d;i++){var angle=p/Math.pow(10000,2*Math.floor(i/2)/d);row.push(i%2===0?Math.sin(angle):Math.cos(angle));}pe.push(row);}
+  Plotly.newPlot('plot-pe-heatmap',[{z:pe,type:'heatmap',colorscale:'RdBu',x:Array.from({length:d},(_,i)=>'dim '+i),y:Array.from({length:L},(_,i)=>'pos '+i)}],{title:'Sinusoidal PE (d=64, L=50)',xaxis:{title:'Dimension'},yaxis:{title:'Position'},plot_bgcolor:'#fafaf8',paper_bgcolor:'#fff',font:{family:'Inter',size:11},margin:{t:50,r:20,b:50,l:60}},{responsive:true});
+})();
+</script>
+
+<h3>Lab 2. ALiBi Bias 시각화</h3>
+<div style="background:#f0f4f8;padding:20px;border-radius:8px;margin:20px 0">
+<div style="display:flex;align-items:center;gap:16px;margin-bottom:12px;flex-wrap:wrap">
+<label style="font-size:14px;font-weight:600">Head slope (m):</label>
+<input type="range" id="sl-alibi" min="1" max="8" step="1" value="1" style="width:200px">
+<span id="val-alibi" style="font-family:'Space Mono',monospace;font-size:16px;color:#e74c3c;font-weight:bold">1/2</span>
+</div>
+<div id="plot-alibi" style="width:100%;height:350px"></div>
+<p class="ni" style="font-size:12px;color:#555;margin-top:8px">↑ slope가 클수록 (head 0) 가까운 토큰에 강하게 집중. slope가 작을수록 (head 7) 먼 토큰도 참조.</p>
+</div>
+
+<script>
+(function(){
+  var sl=document.getElementById('sl-alibi');
+  var vl=document.getElementById('val-alibi');
+  function draw(){
+    var headIdx=parseInt(sl.value);
+    var m=1/Math.pow(2,headIdx);
+    vl.textContent='1/'+Math.pow(2,headIdx)+' = '+m.toFixed(4);
+    var n=20;
+    var bias=[];
+    for(var i=0;i<n;i++){var row=[];for(var j=0;j<n;j++){row.push(-Math.abs(i-j)*m);}bias.push(row);}
+    var tokens=Array.from({length:n},(_,i)=>'tok'+i);
+    Plotly.react('plot-alibi',[{z:bias,type:'heatmap',colorscale:'Viridis',x:tokens,y:tokens}],{title:'ALiBi Bias (Head '+headIdx+', m='+m.toFixed(4)+')',xaxis:{title:'Key position'},yaxis:{title:'Query position'},plot_bgcolor:'#fafaf8',paper_bgcolor:'#f0f4f8',font:{family:'Inter',size:11},margin:{t:50,r:20,b:50,l:60}},{responsive:true});
+  }
+  sl.addEventListener('input',draw);
+  setTimeout(draw,300);
+})();
+</script>
+
+<h3>Lab 3. RoPE 회전 시각화</h3>
+<div id="plot-rope" style="width:100%;height:400px;margin:20px 0"></div>
+
+<script>
+(function(){
+  var theta=1.0;
+  var traces=[];
+  var colors=['#e74c3c','#3498db','#2ecc71','#f39c12','#9b59b6'];
+  for(var pos=0;pos<5;pos++){
+    var angle=pos*theta;
+    var x=[0,Math.cos(angle)];
+    var y=[0,Math.sin(angle)];
+    traces.push({x:x,y:y,mode:'lines+markers',name:'pos='+pos,line:{color:colors[pos],width:3},marker:{size:[0,10]}});
+  }
+  traces.push({x:[0],y:[0],mode:'markers',marker:{size:8,color:'black'},name:'origin',showlegend:false});
+  Plotly.newPlot('plot-rope',traces,{title:'RoPE: 위치에 따른 벡터 회전 (2D)',xaxis:{title:'dim 0',range:[-1.5,1.5],scaleanchor:'y'},yaxis:{title:'dim 1',range:[-1.5,1.5]},plot_bgcolor:'#fafaf8',paper_bgcolor:'#fff',font:{family:'Inter',size:11},margin:{t:50,r:20,b:50,l:60},shapes:[{type:'circle',x0:-1,y0:-1,x1:1,y1:1,line:{color:'#ddd',dash:'dot'}}]},{responsive:true});
+})();
+</script>
+
+<div class="info">
+<p class="ni"><strong>관찰:</strong> 각 위치의 벡터가 원점을 중심으로 회전한다. 인접한 위치(pos 0, pos 1)는 각도 차이가 작고, 먼 위치(pos 0, pos 4)는 각도 차이가 크다. 이것이 RoPE가 상대 위치를 인코딩하는 방식이다.</p>
+</div>
+
+<!-- ═══════════════════════════════════════════ -->
+<!-- Quiz Section -->
+<!-- ═══════════════════════════════════════════ -->
+<h2 id="quiz">📝 Quiz — Position Embeddings</h2>
+
+<p class="ni">클릭하면 정답이 나옵니다.</p>
+
+<div class="quiz-box" id="q1">
+<h4>Q1. Self-Attention이 위치 정보를 잃는 이유는?</h4>
+<div class="quiz-option" onclick="showAnswer('q1','a')">A. Softmax가 위치를 무시하기 때문</div>
+<div class="quiz-option" onclick="showAnswer('q1','b')">B. Self-Attention은 set operation이라 입력 순서를 바꿔도 결과가 동일</div>
+<div class="quiz-option" onclick="showAnswer('q1','c')">C. Q, K, V 행렬이 위치를 삭제하기 때문</div>
+<div class="quiz-option" onclick="showAnswer('q1','d')">D. Residual connection이 위치를 제거하기 때문</div>
+<div class="quiz-answer" id="ans-q1"><strong>Answer: B</strong><br>Self-Attention의 QK^T 계산은 토큰 간 내적이므로 순서에 무관하다. 입력을 permutation해도 출력이 동일한 set operation이다.<br><span style="font-size:11px;color:#aaa">Self-Attention은 순서 불변 연산. "I love you"와 "You love I"가 같은 결과.</span></div>
+</div>
+
+<div class="quiz-box" id="q2">
+<h4>Q2. Sinusoidal PE에서 낮은 차원과 높은 차원의 차이는?</h4>
+<div class="quiz-option" onclick="showAnswer('q2','a')">A. 낮은 차원은 느린 주파수, 높은 차원은 빠른 주파수</div>
+<div class="quiz-option" onclick="showAnswer('q2','b')">B. 낮은 차원은 빠른 주파수(가까운 위치 구분), 높은 차원은 느린 주파수(먼 위치 구분)</div>
+<div class="quiz-option" onclick="showAnswer('q2','c')">C. 모든 차원이 같은 주파수</div>
+<div class="quiz-option" onclick="showAnswer('q2','d')">D. 차원에 따른 차이 없음</div>
+<div class="quiz-answer" id="ans-q2"><strong>Answer: B</strong><br>시계 비유: 초침(낮은 차원)=빠른 주파수→가까운 위치 구분, 시침(높은 차원)=느린 주파수→먼 위치 구분. 이 조합으로 모든 위치를 고유하게 표현.<br><span style="font-size:11px;color:#aaa">낮은 차원=빠른 진동=가까운 위치, 높은 차원=느린 진동=먼 위치.</span></div>
+</div>
+
+<div class="quiz-box" id="q3">
+<h4>Q3. Learned PE의 치명적 한계는?</h4>
+<div class="quiz-option" onclick="showAnswer('q3','a')">A. 학습이 느리다</div>
+<div class="quiz-option" onclick="showAnswer('q3','b')">B. 메모리를 많이 사용한다</div>
+<div class="quiz-option" onclick="showAnswer('q3','c')">C. 최대 시퀀스 길이(L_max)를 넘는 입력을 처리할 수 없다</div>
+<div class="quiz-option" onclick="showAnswer('q3','d')">D. 상대 위치를 인코딩할 수 없다</div>
+<div class="quiz-answer" id="ans-q3"><strong>Answer: C</strong><br>Learned PE는 L_max개의 위치 벡터만 학습한다. L_max+1번째 위치의 벡터가 존재하지 않으므로 처리 불가. "Need to retrain for longer sequences."<br><span style="font-size:11px;color:#aaa">BERT의 L_max=512. 513번째 토큰이 오면 처리 불가 → 재학습 필요.</span></div>
+</div>
+
+<div class="quiz-box" id="q4">
+<h4>Q4. ALiBi의 핵심 아이디어는?</h4>
+<div class="quiz-option" onclick="showAnswer('q4','a')">A. 입력 임베딩에 위치 벡터를 더한다</div>
+<div class="quiz-option" onclick="showAnswer('q4','b')">B. Attention score에 거리 기반 선형 bias를 더한다</div>
+<div class="quiz-option" onclick="showAnswer('q4','c')">C. Q, K 벡터를 회전시킨다</div>
+<div class="quiz-option" onclick="showAnswer('q4','d')">D. 위치별 학습 가능한 벡터를 사용한다</div>
+<div class="quiz-answer" id="ans-q4"><strong>Answer: B</strong><br>ALiBi: Attention score에 -|i-j| × m (선형 bias)을 더한다. 먼 토큰일수록 큰 페널티. 학습 파라미터 없이 "Train Short, Test Long" 가능.<br><span style="font-size:11px;color:#aaa">Attention score에 거리 비례 페널티. 파라미터 없음, 길이 일반화 우수.</span></div>
+</div>
+
+<div class="quiz-box" id="q5">
+<h4>Q5. RoPE가 상대 위치를 인코딩하는 원리는?</h4>
+<div class="quiz-option" onclick="showAnswer('q5','a')">A. 입력에 상대 위치 벡터를 더한다</div>
+<div class="quiz-option" onclick="showAnswer('q5','b')">B. Attention score에 bias를 더한다</div>
+<div class="quiz-option" onclick="showAnswer('q5','c')">C. Q, K를 위치에 따라 회전시켜, 내적이 상대 위치에만 의존하게 한다</div>
+<div class="quiz-option" onclick="showAnswer('q5','d')">D. 위치별 mask를 적용한다</div>
+<div class="quiz-answer" id="ans-q5"><strong>Answer: C</strong><br>RoPE: R_m^T × R_n = R_{n-m}. 회전된 Q, K의 내적이 자동으로 상대 위치 (n-m)에만 의존. 절대 위치를 인코딩하지만 attention에서는 상대 위치만 반영.<br><span style="font-size:11px;color:#aaa">회전 행렬의 성질로 내적이 상대 위치에만 의존. 두 마리 토끼.</span></div>
+</div>
+
+<div class="quiz-box" id="q6">
+<h4>Q6. 현재 대부분의 최신 LLM (LLaMA, Mistral 등)이 사용하는 Position Embedding은?</h4>
+<div class="quiz-option" onclick="showAnswer('q6','a')">A. Sinusoidal PE</div>
+<div class="quiz-option" onclick="showAnswer('q6','b')">B. Learned PE</div>
+<div class="quiz-option" onclick="showAnswer('q6','c')">C. ALiBi</div>
+<div class="quiz-option" onclick="showAnswer('q6','d')">D. RoPE (Rotary Position Embeddings)</div>
+<div class="quiz-answer" id="ans-q6"><strong>Answer: D</strong><br>RoPE는 상대 위치 인코딩, 파라미터 없음, long-term decay, 길이 일반화 등의 장점으로 현재 사실상 표준. LLaMA, Mistral, GPT-NeoX, PaLM 등이 사용.<br><span style="font-size:11px;color:#aaa">RoPE = 현재 표준. 상대 위치 + 파라미터 없음 + long-term decay.</span></div>
+</div>
+
+<div class="quiz-box" id="q7">
+<h4>Q7. Sinusoidal PE에서 PE_{pos+k}를 PE_{pos}로부터 얻을 수 있는 이유는?</h4>
+<div class="quiz-option" onclick="showAnswer('q7','a')">A. 선형 보간이 가능하기 때문</div>
+<div class="quiz-option" onclick="showAnswer('q7','b')">B. 삼각함수의 덧셈 정리에 의해 선형 변환(회전 행렬)으로 표현 가능</div>
+<div class="quiz-option" onclick="showAnswer('q7','c')">C. 학습된 변환 행렬이 있기 때문</div>
+<div class="quiz-option" onclick="showAnswer('q7','d')">D. 모든 PE가 같은 값이기 때문</div>
+<div class="quiz-answer" id="ans-q7"><strong>Answer: B</strong><br>sin(ω(pos+k)) = cos(ωk)sin(ωpos) + sin(ωk)cos(ωpos). 삼각함수 덧셈 정리에 의해 PE_{pos+k}는 PE_{pos}에 k에만 의존하는 회전 행렬을 곱한 것.<br><span style="font-size:11px;color:#aaa">삼각함수 덧셈 정리 → 상대 위치 k에 대한 회전 행렬로 표현.</span></div>
+</div>
+
+<div class="quiz-box" id="q8">
+<h4>Q8. ALiBi에서 head별 slope의 역할은?</h4>
+<div class="quiz-option" onclick="showAnswer('q8','a')">A. 모든 head가 같은 범위를 본다</div>
+<div class="quiz-option" onclick="showAnswer('q8','b')">B. 큰 slope의 head는 가까운 토큰에 집중, 작은 slope의 head는 먼 토큰도 참조</div>
+<div class="quiz-option" onclick="showAnswer('q8','c')">C. Slope는 학습되는 파라미터다</div>
+<div class="quiz-option" onclick="showAnswer('q8','d')">D. Slope는 attention weight를 정규화한다</div>
+<div class="quiz-answer" id="ans-q8"><strong>Answer: B</strong><br>Head 0 (m=1/2): steep slope → 가까운 토큰에 강하게 집중. Head 7 (m=1/256): gentle slope → 먼 토큰도 어느 정도 참조. Multi-Head의 다양성과 유사한 효과.<br><span style="font-size:11px;color:#aaa">큰 slope=local attention, 작은 slope=global attention. 다양한 범위 커버.</span></div>
+</div>
+
+<div class="quiz-box" id="q9">
+<h4>Q9. RoPE의 "long-term decay" 성질이란?</h4>
+<div class="quiz-option" onclick="showAnswer('q9','a')">A. 학습이 진행될수록 attention이 감소</div>
+<div class="quiz-option" onclick="showAnswer('q9','b')">B. 먼 토큰일수록 attention score의 상한이 자연스럽게 감소</div>
+<div class="quiz-option" onclick="showAnswer('q9','c')">C. 시퀀스가 길수록 모델 성능이 감소</div>
+<div class="quiz-option" onclick="showAnswer('q9','d')">D. 학습률이 시간에 따라 감소</div>
+<div class="quiz-answer" id="ans-q9"><strong>Answer: B</strong><br>RoPE에서 |q̃_m^T k̃_n| ≤ f(|m-n|), f는 감소 함수. 먼 토큰일수록 attention score 상한이 작아져 가까운 토큰에 자연스럽게 더 많은 attention 부여.<br><span style="font-size:11px;color:#aaa">거리가 멀수록 attention 상한 감소 → 자연어의 locality와 일치.</span></div>
+</div>
+
+<div class="quiz-box" id="q10">
+<h4>Q10. Position Embedding의 진화 순서로 올바른 것은?</h4>
+<div class="quiz-option" onclick="showAnswer('q10','a')">A. Learned → Sinusoidal → ALiBi → RoPE</div>
+<div class="quiz-option" onclick="showAnswer('q10','b')">B. Sinusoidal → Learned → T5 Bias → ALiBi → RoPE</div>
+<div class="quiz-option" onclick="showAnswer('q10','c')">C. RoPE → ALiBi → Sinusoidal → Learned</div>
+<div class="quiz-option" onclick="showAnswer('q10','d')">D. ALiBi → RoPE → Sinusoidal → Learned</div>
+<div class="quiz-answer" id="ans-q10"><strong>Answer: B</strong><br>Sinusoidal(2017) → Learned(2018, BERT) → T5 Bias(2020) → ALiBi(2021) → RoPE(2021). 절대 위치에서 상대 위치로, 입력 수정에서 attention 수정으로 진화.<br><span style="font-size:11px;color:#aaa">절대→상대, 입력 수정→attention 수정으로의 진화.</span></div>
+</div>
+
+<script>
+function showAnswer(qId, selected) {
+  var ansDiv = document.getElementById('ans-' + qId);
+  ansDiv.style.display = 'block';
+  var options = document.querySelectorAll('#' + qId + ' .quiz-option');
+  var correctMap = {q1:'b',q2:'b',q3:'c',q4:'b',q5:'c',q6:'d',q7:'b',q8:'b',q9:'b',q10:'b'};
+  var correct = correctMap[qId];
+  options.forEach(function(opt, idx) {
+    var letter = ['a','b','c','d'][idx];
+    if (letter === correct) opt.classList.add('correct');
+    else if (letter === selected) opt.classList.add('wrong');
+  });
+}
+</script>
+
+<!-- ═══════════════════════════════════════════ -->
+<!-- Cheat Sheet -->
+<!-- ═══════════════════════════════════════════ -->
+<h2 id="cheatsheet">📋 Cheat Sheet — Position Embeddings 한눈에</h2>
+
+<div class="def">
+<p class="ni"><strong>🔑 핵심 수식 3개</strong></p>
+<p class="ni">1. <strong>Sinusoidal PE:</strong></p>
+<div class="eq">\[ PE_{(pos, 2i)} = \sin\left(\frac{pos}{10000^{2i/d}}\right), \quad PE_{(pos, 2i+1)} = \cos\left(\frac{pos}{10000^{2i/d}}\right) \]</div>
+<p class="ni">2. <strong>ALiBi:</strong></p>
+<div class="eq">\[ \text{score}_{ij} = \frac{q_i^T k_j}{\sqrt{d_k}} + m \cdot (-|i-j|) \]</div>
+<p class="ni">3. <strong>RoPE:</strong></p>
+<div class="eq">\[ \tilde{q}_m^T \tilde{k}_n = q_m^T R_{n-m} k_n \quad \text{(상대 위치에만 의존)} \]</div>
+</div>
+
+<div class="ok">
+<p class="ni"><strong>🎯 시험 대비 핵심 포인트</strong></p>
+<ul>
+<li>Self-Attention은 set operation → 위치 정보 필요</li>
+<li>Sinusoidal: sin/cos, 학습 없음, 길이 일반화 가능, 절대 위치</li>
+<li>Learned: 학습 파라미터, L_max 제한, BERT/GPT-2</li>
+<li>ALiBi: attention score에 선형 bias, "Train Short Test Long"</li>
+<li>RoPE: Q/K 회전, 내적이 상대 위치에만 의존, long-term decay, <strong>현재 표준</strong></li>
+<li>진화: 절대→상대, 입력 수정→attention 수정</li>
+</ul>
+</div>
+
+<!-- Navigation -->
+<div class="round-nav">
+<a class="disabled">← Previous</a>
+<a href="../round-02/">Round 2: Layer Normalization →</a>
+</div>
+
+</div><!-- paper-content -->
+</div><!-- container -->
+</div><!-- main-wrapper -->
+
+</body>
+</html>

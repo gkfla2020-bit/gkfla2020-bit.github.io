@@ -1,0 +1,791 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lecture 2 · Round 3: Attention Approximation | 딥러닝 학습</title>
+<script>
+MathJax = { tex: { inlineMath: [['\\(','\\)']], displayMath: [['\\[','\\]']] } };
+</script>
+<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;500&family=Space+Mono:wght@400&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+<script src="https://cdn.plot.ly/plotly-2.35.0.min.js"></script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Inter',sans-serif;background:#fafaf8;color:#1a1a1a;line-height:1.7;overflow-x:hidden}
+.sidebar{position:fixed;left:0;top:0;width:260px;height:100vh;background:rgba(255,255,255,.97);border-right:1px solid rgba(0,0,0,.06);padding:32px 24px;z-index:100;overflow-y:auto;display:flex;flex-direction:column}
+.sidebar-profile{text-align:center;margin-bottom:28px;padding-bottom:24px;border-bottom:1px solid rgba(0,0,0,.08)}
+.profile-icon{font-size:48px;margin-bottom:8px}
+.profile-name{font-family:'Cormorant Garamond',serif;font-size:1.3rem;font-weight:500;margin-bottom:4px}
+.profile-title{font-size:.68rem;color:#888;letter-spacing:.08em;text-transform:uppercase;margin-bottom:8px}
+.profile-bio{font-size:.78rem;color:#666;line-height:1.5}
+.sidebar-nav{flex:1;margin-top:16px}
+.nav-section{margin-bottom:20px}
+.nav-section-title{font-size:.6rem;font-weight:600;color:#aaa;letter-spacing:.15em;text-transform:uppercase;margin-bottom:10px}
+.nav-list{list-style:none}
+.nav-list li{margin-bottom:5px}
+.nav-list a{font-size:.78rem;color:#555;text-decoration:none;transition:all .2s;display:block;padding:3px 0}
+.nav-list a:hover{color:#0080c6;padding-left:4px}
+.nav-list a.active{color:#0080c6;font-weight:500}
+.badge{display:inline-block;font-size:.5rem;background:#0080c6;color:#fff;padding:1px 5px;border-radius:8px;margin-left:3px;vertical-align:middle}
+.badge-quiz{background:#e74c3c}
+.sidebar-footer{padding-top:16px;border-top:1px solid rgba(0,0,0,.06);font-size:.65rem;color:#aaa;text-align:center}
+.main-wrapper{margin-left:260px;min-height:100vh}
+.container{max-width:1100px;margin:0 auto;padding:50px 40px 80px}
+.paper-content{font-family:'Times New Roman','Nanum Myeongjo',serif;line-height:1.8;background:#fff;padding:40px;border-radius:8px;box-shadow:0 2px 20px rgba(0,0,0,.05)}
+.paper-header{text-align:center;margin-bottom:40px;padding-bottom:30px;border-bottom:2px solid #333}
+.paper-category{font-size:14px;color:#666;margin-bottom:10px}
+.paper-title{font-size:24px;font-weight:bold;margin-bottom:12px;line-height:1.4}
+.paper-subtitle{font-size:14px;color:#555;margin-bottom:8px}
+.paper-team{font-size:13px;color:#444}
+</style>
+<style>
+.abstract{background:#f8f9fa;padding:25px;margin:30px 0;border-left:4px solid #2c3e50}
+.abstract-title{font-weight:bold;font-size:16px;margin-bottom:15px}
+h2{font-size:18px;margin:35px 0 20px;padding-bottom:8px;border-bottom:1px solid #ddd;color:#2c3e50}
+h3{font-size:15px;margin:25px 0 15px;color:#34495e}
+h4{font-size:14px;margin:20px 0 12px;color:#34495e}
+p{text-align:justify;margin-bottom:15px;text-indent:2em}
+p.ni{text-indent:0}
+table{width:100%;border-collapse:collapse;margin:20px 0;font-size:12px}
+th,td{border:1px solid #ddd;padding:10px 8px;text-align:center}
+th{background:#2c3e50;color:white;font-weight:bold}
+tr:nth-child(even){background:#f8f9fa}
+tr:hover{background:#e8f4f8}
+.tc{font-size:13px;font-weight:bold;margin:15px 0 10px;text-align:center}
+.eq{text-align:center;margin:20px 0;padding:15px;background:#f8f9fa;border-radius:4px;overflow-x:auto}
+ul,ol{margin-left:2em;margin-bottom:15px}
+li{margin-bottom:6px}
+.def{background:#fff9e6;border:1px solid #ffc107;border-radius:4px;padding:20px;margin:20px 0}
+.info{background:#e8f4f8;border-left:4px solid #3498db;padding:20px;margin:20px 0}
+.warn{background:#fff3cd;border-left:4px solid #f39c12;padding:20px;margin:20px 0}
+.ok{background:#d4edda;border-left:4px solid #28a745;padding:20px;margin:20px 0}
+pre{background:#1e1e1e;color:#d4d4d4;padding:20px;border-radius:6px;overflow-x:auto;margin:20px 0;font-family:'Space Mono','Consolas',monospace;font-size:13px;line-height:1.6}
+code{font-family:'Space Mono','Consolas',monospace;font-size:13px}
+p code,li code,td code{background:#f0f0f0;padding:2px 6px;border-radius:3px;color:#c7254e;font-size:12px}
+.cm{color:#6a9955}.kw{color:#569cd6}.st{color:#ce9178}.fn{color:#dcdcaa}.nb{color:#4ec9b0}.nu{color:#b5cea8}
+.quiz-box{background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);color:#fff;padding:25px;border-radius:8px;margin:25px 0}
+.quiz-box h4{color:#fff;margin-top:0}
+.quiz-option{background:rgba(255,255,255,.15);padding:10px 15px;margin:8px 0;border-radius:4px;cursor:pointer;transition:all .2s}
+.quiz-option:hover{background:rgba(255,255,255,.25)}
+.quiz-option.correct{background:#28a745!important}
+.quiz-option.wrong{background:#dc3545!important}
+.quiz-answer{display:none;margin-top:15px;padding:15px;background:rgba(255,255,255,.1);border-radius:4px}
+.round-nav{display:flex;justify-content:space-between;margin:40px 0 0;padding:20px 0;border-top:2px solid #eee}
+.round-nav a{display:inline-flex;align-items:center;gap:6px;padding:10px 20px;background:#0080c6;color:#fff;text-decoration:none;border-radius:6px;font-size:13px;font-family:'Inter',sans-serif;transition:background .2s}
+.round-nav a:hover{background:#006aa3}
+.round-nav a.disabled{background:#ccc;pointer-events:none}
+.diagram{background:#f0f4f8;border:2px solid #ddd;border-radius:8px;padding:24px;margin:20px 0;font-family:'Space Mono',monospace;font-size:12px;line-height:1.8;overflow-x:auto;white-space:pre}
+@media(max-width:1024px){
+.sidebar{width:100%;height:auto;position:relative;border-right:none;border-bottom:1px solid rgba(0,0,0,.08);padding:16px}
+.sidebar-profile{margin-bottom:10px;padding-bottom:10px;display:flex;align-items:center;gap:12px;text-align:left}
+.profile-icon{font-size:32px;margin-bottom:0}.profile-bio{display:none}
+.nav-section{display:inline-block;margin-right:16px;margin-bottom:8px}
+.nav-list{display:flex;gap:10px;flex-wrap:wrap}.nav-list li{margin-bottom:0}
+.sidebar-footer{display:none}
+.main-wrapper{margin-left:0}
+.container{padding:0}.paper-content{padding:20px 16px;border-radius:0;box-shadow:none}
+.paper-title{font-size:18px}p{font-size:14px;text-indent:1.5em;text-align:left}
+pre{font-size:11px;padding:14px}table{font-size:10px;display:block;overflow-x:auto}
+}
+</style>
+</head>
+<body>
+
+<div class="sidebar">
+<div class="sidebar-profile">
+<div class="profile-icon">⚡</div>
+<div class="profile-name">Lecture 2 · Round 3</div>
+<div class="profile-title">Attention Approximation</div>
+<div class="profile-bio">CME 295 Lecture 2 · O(n²) 병목을 극복하는 효율적 Attention 전략</div>
+</div>
+<div class="sidebar-nav">
+<div class="nav-section">
+<div class="nav-section-title">This Round</div>
+<ul class="nav-list">
+<li><a href="#bottleneck">1. O(n²) 병목</a></li>
+<li><a href="#longformer">2. Longformer <span class="badge">Sparse</span></a></li>
+<li><a href="#swa">3. Sliding Window Attention</a></li>
+<li><a class="active" href="#gqa">4. MHA → GQA → MQA <span class="badge">핵심</span></a></li>
+<li><a href="#comparison">5. 종합 비교</a></li>
+<li><a href="#quiz">📝 Quiz</a></li>
+</ul>
+</div>
+<div class="nav-section">
+<div class="nav-section-title">All Rounds</div>
+<ul class="nav-list">
+<li><a href="../round-01/">R1 · Position Embeddings</a></li>
+<li><a href="../round-02/">R2 · Layer Normalization</a></li>
+<li><a class="active" href="#">R3 · Attention Approximation</a></li>
+<li><a href="../round-04/">R4 · Transformer Models</a></li>
+<li><a href="../round-05/">R5 · BERT Deep Dive</a></li>
+</ul>
+</div>
+</div>
+<div class="sidebar-footer">CME 295 · Lecture 2 · Amidi & Amidi</div>
+</div>
+
+<div class="main-wrapper">
+<div class="container">
+<div class="paper-content">
+
+<div class="paper-header">
+<div class="paper-category">CME 295: Transformers & Large Language Models · Lecture 2 · Round 3 / 5</div>
+<h1 class="paper-title">Attention Approximation — 효율적 Attention의 세계</h1>
+<div class="paper-subtitle">Longformer, Sliding Window, GQA, MQA: O(n²) 병목을 극복하는 전략들</div>
+<div class="paper-team">Based on: Stanford CME 295 Lecture 2 (Afshine & Shervine Amidi)</div>
+</div>
+
+<div class="abstract">
+<div class="abstract-title">Learning Objectives</div>
+<p class="ni">이 라운드를 마치면 다음을 할 수 있다:</p>
+<ul>
+<li>Self-Attention의 O(n²) 복잡도가 왜 문제인지 구체적으로 설명할 수 있다</li>
+<li>Sparse Attention (Longformer)의 local + global 전략을 이해한다</li>
+<li>Sliding Window Attention의 원리와 "receptive field" 개념을 설명할 수 있다</li>
+<li>MHA, GQA, MQA의 차이를 그림으로 설명할 수 있다</li>
+<li>GQA가 MHA와 MQA 사이의 trade-off인 이유를 이해한다</li>
+<li>각 방법이 어떤 모델에서 사용되는지 알고 있다</li>
+</ul>
+</div>
+
+<!-- ═══════════════════════════════════════════ -->
+<!-- 1. O(n²) 병목 -->
+<!-- ═══════════════════════════════════════════ -->
+<h2 id="bottleneck">1. Self-Attention의 O(n²) 병목</h2>
+
+<h3>1.1 문제의 본질</h3>
+<p>Lecture 1에서 배운 Self-Attention의 핵심 연산은 \(QK^T\)이다. Q와 K가 각각 \((n, d_k)\) 행렬일 때, \(QK^T\)는 \((n, n)\) 행렬이 된다. 이 행렬의 각 원소는 모든 토큰 쌍의 유사도를 나타낸다.</p>
+
+<div class="warn">
+<p class="ni"><strong>복잡도 분석:</strong></p>
+<ul>
+<li><strong>시간 복잡도:</strong> \(O(n^2 \cdot d_k)\) — 모든 토큰 쌍에 대해 내적 계산</li>
+<li><strong>공간 복잡도:</strong> \(O(n^2)\) — attention weight 행렬 저장</li>
+</ul>
+<p class="ni">시퀀스 길이 \(n\)이 2배가 되면 계산량은 4배, 메모리는 4배가 된다!</p>
+</div>
+
+<div class="tc">Table 1. 시퀀스 길이별 Attention 행렬 크기</div>
+<table>
+<tr><th>시퀀스 길이 \(n\)</th><th>Attention 행렬 크기</th><th>메모리 (FP16)</th><th>대표 사용처</th></tr>
+<tr><td>512</td><td>262K</td><td>0.5 MB</td><td>BERT</td></tr>
+<tr><td>2,048</td><td>4.2M</td><td>8 MB</td><td>GPT-2</td></tr>
+<tr><td>8,192</td><td>67M</td><td>128 MB</td><td>LLaMA</td></tr>
+<tr><td>32,768</td><td>1.07B</td><td>2 GB</td><td>LLaMA 2 Long</td></tr>
+<tr><td>128,000</td><td>16.4B</td><td>31 GB</td><td>GPT-4 Turbo</td></tr>
+<tr><td>1,000,000</td><td>1T</td><td>1.9 TB</td><td>Gemini 1.5 Pro</td></tr>
+</table>
+
+<div class="info">
+<p class="ni"><strong>핵심 문제:</strong> 현대 LLM은 수만~수백만 토큰의 context window를 지원해야 한다. Full attention의 O(n²)은 이를 불가능하게 만든다. 해결책이 필요하다.</p>
+</div>
+
+<pre><code><span class="kw">import</span> numpy <span class="kw">as</span> np
+
+<span class="cm"># Full Attention의 메모리 계산</span>
+<span class="kw">def</span> <span class="fn">attention_memory</span>(n, n_heads=<span class="nu">32</span>, dtype_bytes=<span class="nu">2</span>):
+    <span class="st">"""Attention 행렬의 메모리 사용량 (bytes)"""</span>
+    <span class="cm"># 각 head마다 (n, n) 행렬</span>
+    total = n_heads * n * n * dtype_bytes
+    <span class="kw">return</span> total
+
+<span class="cm"># 시퀀스 길이별 메모리</span>
+<span class="kw">for</span> n <span class="kw">in</span> [<span class="nu">512</span>, <span class="nu">2048</span>, <span class="nu">8192</span>, <span class="nu">32768</span>, <span class="nu">128000</span>]:
+    mem = attention_memory(n)
+    <span class="fn">print</span>(<span class="st">f"n={n:>7,}: </span>{mem / 1e9:.2f}<span class="st"> GB"</span>)
+<span class="cm"># n=    512: 0.03 GB</span>
+<span class="cm"># n=  2,048: 0.54 GB</span>
+<span class="cm"># n=  8,192: 8.59 GB</span>
+<span class="cm"># n= 32,768: 137.4 GB  ← GPU 메모리 초과!</span>
+<span class="cm"># n=128,000: 2,097 GB  ← 불가능</span></code></pre>
+
+<h3>1.2 해결 전략 개요</h3>
+<p>O(n²) 병목을 극복하는 두 가지 주요 전략이 있다:</p>
+
+<div class="def">
+<p class="ni"><strong>전략 1: Sparse Attention — 어디를 볼 것인가</strong></p>
+<p class="ni">모든 토큰 쌍을 보지 않고, 중요한 쌍만 선택적으로 본다.</p>
+<ul>
+<li>Longformer: Local window + Global tokens</li>
+<li>Sliding Window Attention (SWA): 고정 크기 윈도우</li>
+</ul>
+</div>
+
+<div class="def">
+<p class="ni"><strong>전략 2: Head Sharing — K/V를 공유</strong></p>
+<p class="ni">Attention head 간에 Key/Value를 공유하여 메모리와 계산을 절약한다.</p>
+<ul>
+<li>GQA (Grouped Query Attention): 그룹별 K/V 공유</li>
+<li>MQA (Multi-Query Attention): 모든 head가 하나의 K/V 공유</li>
+</ul>
+</div>
+
+<!-- ═══════════════════════════════════════════ -->
+<!-- 2. Longformer -->
+<!-- ═══════════════════════════════════════════ -->
+<h2 id="longformer">2. Longformer — Sparse Attention의 시작</h2>
+
+<h3>2.1 핵심 아이디어</h3>
+<p>Beltagy et al. (2020), "Longformer: The Long-Document Transformer". 모든 토큰이 모든 토큰을 볼 필요는 없다. 대부분의 attention은 가까운 토큰에 집중된다는 관찰에 기반한다.</p>
+
+<div class="def">
+<p class="ni"><strong>Definition 2.1 — Longformer의 Attention 패턴</strong></p>
+<p class="ni">두 가지 attention을 결합한다:</p>
+<ul>
+<li><strong>Local Attention (Sliding Window):</strong> 각 토큰이 주변 \(w\)개 토큰만 본다. 복잡도: \(O(n \cdot w)\)</li>
+<li><strong>Global Attention:</strong> 특정 토큰(예: [CLS])이 모든 토큰을 본다. 복잡도: \(O(n \cdot g)\)</li>
+</ul>
+<p class="ni">총 복잡도: \(O(n \cdot (w + g))\) — \(w, g \ll n\)이면 \(O(n)\)에 가까움!</p>
+</div>
+
+<h3>2.2 Attention 패턴 시각화</h3>
+
+<div class="diagram">Full Attention (O(n²))        Longformer (O(n·w))
+                              
+  [CLS] A  cute teddy bear     [CLS] A  cute teddy bear
+[CLS] ■  ■  ■    ■    ■     [CLS] ■  ■  ■    ■    ■   ← Global
+  A   ■  ■  ■    ■    ■       A   ■  ■  ■    ·    ·   ← Local
+cute  ■  ■  ■    ■    ■     cute  ■  ■  ■    ■    ·   ← Local
+teddy ■  ■  ■    ■    ■     teddy ·  ■  ■    ■    ■   ← Local
+bear  ■  ■  ■    ■    ■     bear  ·  ·  ■    ■    ■   ← Local
+
+■ = attend    · = skip         ■ = attend    · = skip
+25 connections                 17 connections (32% 절약)</div>
+
+<pre><code><span class="kw">import</span> numpy <span class="kw">as</span> np
+
+<span class="kw">def</span> <span class="fn">longformer_mask</span>(n, window_size, global_tokens):
+    <span class="st">"""
+    Longformer attention mask 생성
+    n: 시퀀스 길이
+    window_size: local attention 윈도우 크기 (한쪽)
+    global_tokens: global attention을 받는 토큰 인덱스 리스트
+    """</span>
+    mask = np.zeros((n, n), dtype=np.bool_)
+    
+    <span class="cm"># 1. Local attention (sliding window)</span>
+    <span class="kw">for</span> i <span class="kw">in</span> <span class="fn">range</span>(n):
+        start = <span class="fn">max</span>(<span class="nu">0</span>, i - window_size)
+        end = <span class="fn">min</span>(n, i + window_size + <span class="nu">1</span>)
+        mask[i, start:end] = <span class="kw">True</span>
+    
+    <span class="cm"># 2. Global attention (특정 토큰이 모든 토큰을 봄)</span>
+    <span class="kw">for</span> g <span class="kw">in</span> global_tokens:
+        mask[g, :] = <span class="kw">True</span>   <span class="cm"># global 토큰 → 모든 토큰</span>
+        mask[:, g] = <span class="kw">True</span>   <span class="cm"># 모든 토큰 → global 토큰</span>
+    
+    <span class="kw">return</span> mask
+
+<span class="cm"># 예시: 10 토큰, window=2, [CLS]=global</span>
+mask = longformer_mask(n=<span class="nu">10</span>, window_size=<span class="nu">2</span>, global_tokens=[<span class="nu">0</span>])
+<span class="fn">print</span>(<span class="st">"Longformer Mask:"</span>)
+<span class="fn">print</span>(mask.astype(<span class="fn">int</span>))
+
+<span class="cm"># Full attention: 10×10 = 100 connections</span>
+<span class="cm"># Longformer:    mask.sum() connections</span>
+<span class="fn">print</span>(<span class="st">f"\nFull: </span>{10*10}<span class="st"> connections"</span>)
+<span class="fn">print</span>(<span class="st">f"Longformer: </span>{mask.sum()}<span class="st"> connections"</span>)
+<span class="fn">print</span>(<span class="st">f"절약: </span>{(1 - mask.sum()/(10*10))*100:.0f}<span class="st">%"</span>)</code></pre>
+
+<div class="info">
+<p class="ni"><strong>왜 Global Token이 필요한가?</strong></p>
+<p class="ni">Local attention만으로는 먼 토큰 간의 정보 교환이 불가능하다. [CLS] 같은 global token이 "허브" 역할을 하여 전체 시퀀스의 정보를 집약한다. 분류 태스크에서 [CLS]의 임베딩을 사용하는 것과 같은 원리.</p>
+</div>
+
+<!-- ═══════════════════════════════════════════ -->
+<!-- 3. Sliding Window Attention -->
+<!-- ═══════════════════════════════════════════ -->
+<h2 id="swa">3. Sliding Window Attention (SWA) — Mistral의 선택</h2>
+
+<h3>3.1 핵심 아이디어</h3>
+<p>Longformer의 local attention 부분을 더 체계적으로 발전시킨 것. Mistral 7B (2023)에서 핵심 기법으로 사용되었다.</p>
+
+<div class="def">
+<p class="ni"><strong>Definition 3.1 — Sliding Window Attention</strong></p>
+<p class="ni">각 토큰이 고정 크기 윈도우 \(W\) 내의 토큰만 attend한다:</p>
+<div class="eq">\[ \text{Attend}(i) = \{j : |i - j| \leq W/2\} \]</div>
+<p class="ni">복잡도: \(O(n \cdot W)\) — \(W\)가 고정이면 \(n\)에 대해 선형!</p>
+</div>
+
+<h3>3.2 Receptive Field — CNN과의 연결</h3>
+<p>SWA의 가장 중요한 통찰: 레이어를 쌓으면 receptive field가 확장된다. 이것은 CNN의 receptive field 개념과 정확히 동일하다.</p>
+
+<div class="def">
+<p class="ni"><strong>Definition 3.2 — Receptive Field in SWA</strong></p>
+<p class="ni">윈도우 크기 \(W\), 레이어 수 \(L\)일 때:</p>
+<div class="eq" style="font-size:16px;padding:20px;background:#fff9e6;border:2px solid #ffc107">\[ \text{Effective Receptive Field} = L \times W \]</div>
+<p class="ni">각 레이어에서 \(W\)개 토큰을 보고, \(L\)개 레이어를 쌓으면 총 \(L \times W\)개 토큰의 정보가 전파된다.</p>
+</div>
+
+<div class="diagram">Layer 1 (W=3):  각 토큰이 좌우 1개씩 봄
+                 
+  tok0  tok1  tok2  tok3  tok4  tok5  tok6
+   ├──┤  ├──┤  ├──┤  ├──┤  ├──┤  ├──┤  ├──┤
+   
+Layer 2 (W=3):  Layer 1의 출력에서 다시 좌우 1개씩
+                 → tok2는 tok0~tok4의 정보를 가짐!
+                 
+  tok0  tok1  tok2  tok3  tok4  tok5  tok6
+   ├────────┤  ├────────┤  ├────────┤
+   
+Layer 3 (W=3):  → tok3은 tok0~tok6 전체 정보!
+                 
+  tok0  tok1  tok2  tok3  tok4  tok5  tok6
+   ├──────────────┤  ├──────────────┤
+
+Receptive Field = L × W = 3 × 3 = 9 토큰</div>
+
+<pre><code><span class="cm"># Mistral 7B의 SWA 설정</span>
+W = <span class="nu">4096</span>   <span class="cm"># 윈도우 크기</span>
+L = <span class="nu">32</span>     <span class="cm"># 레이어 수</span>
+
+effective_rf = L * W
+<span class="fn">print</span>(<span class="st">f"Window size: </span>{W:,}<span class="st">"</span>)
+<span class="fn">print</span>(<span class="st">f"Layers: </span>{L}<span class="st">"</span>)
+<span class="fn">print</span>(<span class="st">f"Effective receptive field: </span>{effective_rf:,}<span class="st"> tokens"</span>)
+<span class="cm"># Effective receptive field: 131,072 tokens</span>
+<span class="cm"># → 128K 토큰의 정보를 O(n·W) 복잡도로 처리!</span>
+
+<span class="cm"># 메모리 비교</span>
+n = <span class="nu">32768</span>
+full_mem = n * n  <span class="cm"># O(n²)</span>
+swa_mem = n * W   <span class="cm"># O(n·W)</span>
+<span class="fn">print</span>(<span class="st">f"\nFull attention: </span>{full_mem:,}<span class="st"> elements"</span>)
+<span class="fn">print</span>(<span class="st">f"SWA (W={W}):    </span>{swa_mem:,}<span class="st"> elements"</span>)
+<span class="fn">print</span>(<span class="st">f"절약: </span>{(1 - swa_mem/full_mem)*100:.1f}<span class="st">%"</span>)
+<span class="cm"># 절약: 87.5%</span></code></pre>
+
+<div class="info">
+<p class="ni"><strong>강의 인용:</strong> "Similar to 'receptive field' in computer vision." — SWA에서 레이어를 쌓아 receptive field를 확장하는 것은 CNN에서 작은 커널을 여러 층 쌓아 넓은 영역을 보는 것과 동일한 원리다.</p>
+</div>
+
+<div class="ok">
+<p class="ni"><strong>SWA의 변형: Interleaving</strong></p>
+<p class="ni">일부 모델은 local attention 레이어와 global attention 레이어를 번갈아 배치한다. 예를 들어 홀수 레이어는 SWA, 짝수 레이어는 full attention. 이렇게 하면 효율성과 전역 정보 접근을 모두 확보할 수 있다.</p>
+</div>
+
+<!-- ═══════════════════════════════════════════ -->
+<!-- 4. MHA → GQA → MQA -->
+<!-- ═══════════════════════════════════════════ -->
+<h2 id="gqa">4. Attention Head 공유: MHA → GQA → MQA ⭐</h2>
+
+<h3>4.1 문제: KV Cache의 메모리 부담</h3>
+<p>Autoregressive 추론에서 이전 토큰의 Key와 Value를 캐싱한다 (KV Cache). Multi-Head Attention에서는 각 head마다 별도의 K, V가 있으므로 캐시 크기가 head 수에 비례한다.</p>
+
+<div class="warn">
+<p class="ni"><strong>KV Cache 메모리:</strong></p>
+<div class="eq">\[ \text{KV Cache} = 2 \times L \times h \times n \times d_k \times \text{bytes} \]</div>
+<p class="ni">여기서 \(L\)=레이어 수, \(h\)=head 수, \(n\)=시퀀스 길이, \(d_k\)=head 차원. 2는 K와 V 두 개.</p>
+<p class="ni">예: LLaMA 7B (L=32, h=32, d_k=128, n=4096, FP16) → KV Cache = 2 GB!</p>
+</div>
+
+<h3>4.2 Multi-Head Attention (MHA) — 기본</h3>
+
+<div class="def">
+<p class="ni"><strong>Definition 4.1 — MHA (Multi-Head Attention)</strong></p>
+<p class="ni">각 head가 독립적인 Q, K, V projection을 가진다:</p>
+<ul>
+<li>Q heads: \(h\)개 (각각 독립적인 \(W_Q^i\))</li>
+<li>K heads: \(h\)개 (각각 독립적인 \(W_K^i\))</li>
+<li>V heads: \(h\)개 (각각 독립적인 \(W_V^i\))</li>
+</ul>
+<p class="ni">총 KV 파라미터: \(2 \times h \times d_{model} \times d_k\)</p>
+</div>
+
+<h3>4.3 Multi-Query Attention (MQA) — 극단적 공유</h3>
+
+<div class="def">
+<p class="ni"><strong>Definition 4.2 — MQA (Multi-Query Attention)</strong></p>
+<p class="ni">모든 Query head가 하나의 K, V를 공유한다:</p>
+<ul>
+<li>Q heads: \(h\)개 (각각 독립적)</li>
+<li>K heads: <strong>1개</strong> (모든 Q head가 공유)</li>
+<li>V heads: <strong>1개</strong> (모든 Q head가 공유)</li>
+</ul>
+<p class="ni">KV Cache 절약: \(h\)배 감소!</p>
+</div>
+
+<h3>4.4 Grouped Query Attention (GQA) — 균형점</h3>
+
+<div class="def">
+<p class="ni"><strong>Definition 4.3 — GQA (Grouped Query Attention)</strong></p>
+<p class="ni">Query head를 \(G\)개 그룹으로 나누고, 각 그룹이 하나의 K, V를 공유:</p>
+<ul>
+<li>Q heads: \(h\)개 (각각 독립적)</li>
+<li>K heads: \(G\)개 (그룹당 1개)</li>
+<li>V heads: \(G\)개 (그룹당 1개)</li>
+<li>각 그룹에 \(h/G\)개의 Q head가 속함</li>
+</ul>
+<p class="ni">MHA (\(G=h\))와 MQA (\(G=1\))의 일반화!</p>
+</div>
+
+<h3>4.5 시각적 비교</h3>
+
+<div class="diagram">Multi-Head Attention (MHA)     Group-Query Attention (GQA)    Multi-Query Attention (MQA)
+G = h (그룹 = head 수)         G = h/4 (4개 그룹)              G = 1 (1개 그룹)
+
+Q: Q₁ Q₂ Q₃ Q₄ Q₅ Q₆ Q₇ Q₈   Q: Q₁ Q₂ Q₃ Q₄ Q₅ Q₆ Q₇ Q₈   Q: Q₁ Q₂ Q₃ Q₄ Q₅ Q₆ Q₇ Q₈
+   │  │  │  │  │  │  │  │      ╲╱    ╲╱    ╲╱    ╲╱         ╲  ╲  │  │  │  │  ╱  ╱
+K: K₁ K₂ K₃ K₄ K₅ K₆ K₇ K₈   K: K₁   K₂   K₃   K₄         K:        K₁
+V: V₁ V₂ V₃ V₄ V₅ V₆ V₇ V₈   V: V₁   V₂   V₃   V₄         V:        V₁
+
+KV heads: 8                    KV heads: 4                    KV heads: 1
+KV Cache: 100%                 KV Cache: 50%                  KV Cache: 12.5%
+성능: 최고                      성능: MHA에 근접                성능: 약간 하락</div>
+
+<div class="tc">Table 2. MHA vs GQA vs MQA 비교</div>
+<table>
+<tr><th>특성</th><th>MHA</th><th>GQA</th><th>MQA</th></tr>
+<tr><td>Q heads</td><td>\(h\)</td><td>\(h\)</td><td>\(h\)</td></tr>
+<tr><td>KV heads</td><td>\(h\)</td><td>\(G\) (1 &lt; G &lt; h)</td><td>1</td></tr>
+<tr><td>KV Cache</td><td>100%</td><td>\(G/h \times 100\%\)</td><td>\(1/h \times 100\%\)</td></tr>
+<tr><td>추론 속도</td><td>기준</td><td>빠름</td><td>가장 빠름</td></tr>
+<tr><td>성능</td><td>최고</td><td>MHA에 근접</td><td>약간 하락</td></tr>
+<tr><td>대표 모델</td><td>BERT, GPT-2</td><td>LLaMA 2, Mistral</td><td>PaLM, Falcon</td></tr>
+</table>
+
+<pre><code><span class="kw">import</span> numpy <span class="kw">as</span> np
+
+<span class="kw">class</span> <span class="nb">GroupedQueryAttention</span>:
+    <span class="kw">def</span> <span class="fn">__init__</span>(self, d_model=<span class="nu">512</span>, n_heads=<span class="nu">8</span>, n_kv_heads=<span class="nu">2</span>):
+        <span class="st">"""
+        GQA 구현
+        n_heads: Query head 수
+        n_kv_heads: KV head 수 (그룹 수)
+        """</span>
+        self.n_heads = n_heads
+        self.n_kv_heads = n_kv_heads
+        self.heads_per_group = n_heads // n_kv_heads
+        self.d_k = d_model // n_heads
+        
+        <span class="cm"># Q: n_heads개의 독립적인 projection</span>
+        self.W_Q = [np.random.randn(d_model, self.d_k) 
+                    <span class="kw">for</span> _ <span class="kw">in</span> <span class="fn">range</span>(n_heads)]
+        
+        <span class="cm"># K, V: n_kv_heads개만! (그룹별 공유)</span>
+        self.W_K = [np.random.randn(d_model, self.d_k) 
+                    <span class="kw">for</span> _ <span class="kw">in</span> <span class="fn">range</span>(n_kv_heads)]
+        self.W_V = [np.random.randn(d_model, self.d_k) 
+                    <span class="kw">for</span> _ <span class="kw">in</span> <span class="fn">range</span>(n_kv_heads)]
+    
+    <span class="kw">def</span> <span class="fn">forward</span>(self, X):
+        heads = []
+        <span class="kw">for</span> i <span class="kw">in</span> <span class="fn">range</span>(self.n_heads):
+            <span class="cm"># 각 Q head는 독립적</span>
+            Q = X @ self.W_Q[i]
+            
+            <span class="cm"># K, V는 그룹 내 공유</span>
+            group_idx = i // self.heads_per_group
+            K = X @ self.W_K[group_idx]  <span class="cm"># 같은 그룹 = 같은 K</span>
+            V = X @ self.W_V[group_idx]  <span class="cm"># 같은 그룹 = 같은 V</span>
+            
+            <span class="cm"># Scaled dot-product attention</span>
+            d_k = Q.shape[-<span class="nu">1</span>]
+            scores = Q @ K.T / np.sqrt(d_k)
+            weights = np.exp(scores) / np.exp(scores).sum(axis=-<span class="nu">1</span>, keepdims=<span class="kw">True</span>)
+            head_out = weights @ V
+            heads.append(head_out)
+        
+        <span class="kw">return</span> np.concatenate(heads, axis=-<span class="nu">1</span>)
+
+<span class="cm"># MHA: n_kv_heads = n_heads = 8</span>
+mha = GroupedQueryAttention(n_heads=<span class="nu">8</span>, n_kv_heads=<span class="nu">8</span>)
+<span class="cm"># GQA: n_kv_heads = 2 (4개 Q head가 1개 KV 공유)</span>
+gqa = GroupedQueryAttention(n_heads=<span class="nu">8</span>, n_kv_heads=<span class="nu">2</span>)
+<span class="cm"># MQA: n_kv_heads = 1 (모든 Q head가 1개 KV 공유)</span>
+mqa = GroupedQueryAttention(n_heads=<span class="nu">8</span>, n_kv_heads=<span class="nu">1</span>)
+
+<span class="fn">print</span>(<span class="st">f"MHA KV params: </span>{8 * 2}<span class="st"> matrices"</span>)   <span class="cm"># 16</span>
+<span class="fn">print</span>(<span class="st">f"GQA KV params: </span>{2 * 2}<span class="st"> matrices"</span>)   <span class="cm"># 4 (75% 절약)</span>
+<span class="fn">print</span>(<span class="st">f"MQA KV params: </span>{1 * 2}<span class="st"> matrices"</span>)   <span class="cm"># 2 (87.5% 절약)</span></code></pre>
+
+<div class="ok">
+<p class="ni"><strong>GQA가 현재 가장 인기 있는 이유:</strong></p>
+<ul>
+<li>MHA 대비 KV Cache를 크게 절약 (보통 4~8배)</li>
+<li>MQA보다 성능 하락이 적음 (다양성 유지)</li>
+<li>추론 속도 향상 (KV Cache 접근 감소)</li>
+<li>LLaMA 2 (70B)에서 GQA 채택 후 사실상 표준이 됨</li>
+</ul>
+</div>
+
+<!-- ═══════════════════════════════════════════ -->
+<!-- 5. 종합 비교 -->
+<!-- ═══════════════════════════════════════════ -->
+<h2 id="comparison">5. 종합 비교 — 효율적 Attention 전략</h2>
+
+<div class="tc">Table 3. 효율적 Attention 방법 종합</div>
+<table>
+<tr><th>방법</th><th>전략</th><th>복잡도</th><th>핵심 아이디어</th><th>대표 모델</th></tr>
+<tr><td>Full Attention</td><td>-</td><td>\(O(n^2)\)</td><td>모든 토큰 쌍 계산</td><td>BERT, GPT-2</td></tr>
+<tr><td>Longformer</td><td>Sparse</td><td>\(O(n \cdot w)\)</td><td>Local + Global attention</td><td>Longformer</td></tr>
+<tr><td>SWA</td><td>Sparse</td><td>\(O(n \cdot W)\)</td><td>고정 윈도우, receptive field 확장</td><td>Mistral 7B</td></tr>
+<tr><td>MQA</td><td>Head sharing</td><td>\(O(n^2)\)*</td><td>모든 head가 1개 KV 공유</td><td>PaLM, Falcon</td></tr>
+<tr style="background:#e8f4f8"><td><strong>GQA</strong></td><td><strong>Head sharing</strong></td><td>\(O(n^2)\)*</td><td><strong>그룹별 KV 공유</strong></td><td><strong>LLaMA 2, Mistral</strong></td></tr>
+</table>
+<p class="ni" style="font-size:11px;color:#888">* MQA/GQA는 시간 복잡도는 O(n²)이지만, KV Cache 메모리를 크게 절약하여 추론 속도를 향상시킨다.</p>
+
+<div class="info">
+<p class="ni"><strong>실무에서의 조합:</strong> 현대 LLM은 이 기법들을 조합하여 사용한다. 예를 들어 Mistral 7B는 SWA + GQA를 함께 사용한다:</p>
+<ul>
+<li>SWA: 긴 시퀀스의 attention 복잡도를 O(n·W)로 줄임</li>
+<li>GQA: KV Cache 메모리를 절약하여 추론 속도 향상</li>
+<li>이 조합으로 7B 파라미터로도 13B 모델에 필적하는 성능</li>
+</ul>
+</div>
+
+<!-- ═══════════════════════════════════════════ -->
+<!-- Interactive Lab -->
+<!-- ═══════════════════════════════════════════ -->
+<h2 id="interactive">🎮 Interactive Lab — Attention Pattern 시각화</h2>
+
+<h3>Lab 1. Full vs Sparse Attention 패턴</h3>
+<div style="background:#f0f4f8;padding:20px;border-radius:8px;margin:20px 0">
+<div style="display:flex;align-items:center;gap:16px;margin-bottom:12px;flex-wrap:wrap">
+<label style="font-size:14px;font-weight:600">Window size (W):</label>
+<input type="range" id="sl-window" min="1" max="8" step="1" value="3" style="width:200px">
+<span id="val-window" style="font-family:'Space Mono',monospace;font-size:16px;color:#e74c3c;font-weight:bold">3</span>
+</div>
+<div style="display:flex;gap:20px;flex-wrap:wrap">
+<div id="plot-full" style="flex:1;min-width:300px;height:350px"></div>
+<div id="plot-sparse" style="flex:1;min-width:300px;height:350px"></div>
+</div>
+<p class="ni" style="font-size:12px;color:#555;margin-top:8px">↑ Window size를 바꿔보세요. 작을수록 sparse해지고 계산이 줄어들지만, 정보 접근 범위가 좁아집니다.</p>
+</div>
+
+<script>
+(function(){
+  var sl=document.getElementById('sl-window');
+  var vl=document.getElementById('val-window');
+  var n=16;
+  var tokens=Array.from({length:n},function(_,i){return 't'+i});
+  function draw(){
+    var w=parseInt(sl.value);
+    vl.textContent=w;
+    // Full attention
+    var full=[];
+    for(var i=0;i<n;i++){var row=[];for(var j=0;j<n;j++) row.push(1);full.push(row);}
+    // Sparse (SWA + global token 0)
+    var sparse=[];
+    for(var i=0;i<n;i++){var row=[];for(var j=0;j<n;j++){
+      var inWindow=Math.abs(i-j)<=w;
+      var isGlobal=(i===0||j===0);
+      row.push((inWindow||isGlobal)?1:0);
+    }sparse.push(row);}
+    var sparsity=(1-sparse.flat().reduce(function(a,b){return a+b},0)/(n*n))*100;
+    Plotly.react('plot-full',[{z:full,type:'heatmap',colorscale:[[0,'#fff'],[1,'#2c3e50']],showscale:false,x:tokens,y:tokens}],{title:'Full Attention ('+n*n+' connections)',xaxis:{title:'Key'},yaxis:{title:'Query',autorange:'reversed'},plot_bgcolor:'#fafaf8',paper_bgcolor:'#f0f4f8',font:{family:'Inter',size:10},margin:{t:50,r:10,b:50,l:50}},{responsive:true});
+    Plotly.react('plot-sparse',[{z:sparse,type:'heatmap',colorscale:[[0,'#fff'],[1,'#0080c6']],showscale:false,x:tokens,y:tokens}],{title:'SWA+Global (W='+w+', sparsity='+sparsity.toFixed(0)+'%)',xaxis:{title:'Key'},yaxis:{title:'Query',autorange:'reversed'},plot_bgcolor:'#fafaf8',paper_bgcolor:'#f0f4f8',font:{family:'Inter',size:10},margin:{t:50,r:10,b:50,l:50}},{responsive:true});
+  }
+  sl.addEventListener('input',draw);
+  setTimeout(draw,300);
+})();
+</script>
+
+<h3>Lab 2. KV Cache 메모리 비교 (MHA vs GQA vs MQA)</h3>
+<div id="plot-kv" style="width:100%;height:400px;margin:20px 0"></div>
+
+<script>
+(function(){
+  var seqLens=[512,1024,2048,4096,8192,16384,32768];
+  var h=32,dk=128,L=32,bytes=2;
+  function kvMem(n,kvHeads){return 2*L*kvHeads*n*dk*bytes/1e9;}
+  var mha=seqLens.map(function(n){return kvMem(n,32)});
+  var gqa4=seqLens.map(function(n){return kvMem(n,4)});
+  var mqa=seqLens.map(function(n){return kvMem(n,1)});
+  var labels=seqLens.map(function(n){return n>=1024?(n/1024)+'K':n+''});
+  Plotly.newPlot('plot-kv',[
+    {x:labels,y:mha,type:'bar',name:'MHA (32 KV heads)',marker:{color:'#e74c3c'}},
+    {x:labels,y:gqa4,type:'bar',name:'GQA (4 KV heads)',marker:{color:'#0080c6'}},
+    {x:labels,y:mqa,type:'bar',name:'MQA (1 KV head)',marker:{color:'#2ecc71'}}
+  ],{
+    title:'KV Cache Memory (32-layer, 32 Q-heads, d_k=128, FP16)',
+    xaxis:{title:'Sequence Length'},yaxis:{title:'Memory (GB)'},
+    barmode:'group',plot_bgcolor:'#fafaf8',paper_bgcolor:'#fff',
+    font:{family:'Inter',size:11},margin:{t:50,r:20,b:50,l:60},
+    shapes:[{type:'line',x0:-0.5,x1:6.5,y0:24,y1:24,line:{color:'red',dash:'dot',width:1}}],
+    annotations:[{text:'A100 24GB VRAM',x:5,y:25,showarrow:false,font:{size:10,color:'red'}}]
+  },{responsive:true});
+})();
+</script>
+
+<h3>Lab 3. Receptive Field 확장</h3>
+<div id="plot-rf" style="width:100%;height:350px;margin:20px 0"></div>
+
+<script>
+(function(){
+  var layers=Array.from({length:32},function(_,i){return i+1});
+  var rf3=layers.map(function(l){return l*3});
+  var rf8=layers.map(function(l){return l*8});
+  var rf4096=layers.map(function(l){return l*4096});
+  Plotly.newPlot('plot-rf',[
+    {x:layers,y:rf3,mode:'lines+markers',name:'W=3',line:{width:2}},
+    {x:layers,y:rf8,mode:'lines+markers',name:'W=8',line:{width:2}},
+    {x:layers,y:rf4096,mode:'lines+markers',name:'W=4096 (Mistral)',line:{width:2,color:'#e74c3c'}}
+  ],{
+    title:'Receptive Field = L × W',
+    xaxis:{title:'Number of Layers (L)'},yaxis:{title:'Effective Receptive Field (tokens)',type:'log'},
+    plot_bgcolor:'#fafaf8',paper_bgcolor:'#fff',
+    font:{family:'Inter',size:11},margin:{t:50,r:20,b:50,l:60}
+  },{responsive:true});
+})();
+</script>
+
+<!-- ═══════════════════════════════════════════ -->
+<!-- Quiz Section -->
+<!-- ═══════════════════════════════════════════ -->
+<h2 id="quiz">📝 Quiz — Attention Approximation</h2>
+
+<p class="ni">클릭하면 정답이 나옵니다.</p>
+
+<div class="quiz-box" id="q1">
+<h4>Q1. Self-Attention의 시간 복잡도가 O(n²)인 이유는?</h4>
+<div class="quiz-option" onclick="showAnswer('q1','a')">A. Softmax 계산이 O(n²)이기 때문</div>
+<div class="quiz-option" onclick="showAnswer('q1','b')">B. QK^T 계산에서 모든 토큰 쌍의 내적을 계산하기 때문</div>
+<div class="quiz-option" onclick="showAnswer('q1','c')">C. Value 행렬이 O(n²) 크기이기 때문</div>
+<div class="quiz-option" onclick="showAnswer('q1','d')">D. Positional encoding이 O(n²)이기 때문</div>
+<div class="quiz-answer" id="ans-q1"><strong>Answer: B</strong><br>QK^T는 (n, d_k) × (d_k, n) = (n, n) 행렬. 모든 토큰 쌍(n²개)에 대해 내적을 계산하므로 O(n² × d_k).<br><span style="font-size:11px;color:#aaa">QK^T가 n×n 행렬 → 모든 토큰 쌍의 유사도 계산 → O(n²).</span></div>
+</div>
+
+<div class="quiz-box" id="q2">
+<h4>Q2. Longformer의 두 가지 attention 유형은?</h4>
+<div class="quiz-option" onclick="showAnswer('q2','a')">A. Self-Attention + Cross-Attention</div>
+<div class="quiz-option" onclick="showAnswer('q2','b')">B. Local (Sliding Window) + Global Attention</div>
+<div class="quiz-option" onclick="showAnswer('q2','c')">C. Causal + Bidirectional Attention</div>
+<div class="quiz-option" onclick="showAnswer('q2','d')">D. Multi-Head + Single-Head Attention</div>
+<div class="quiz-answer" id="ans-q2"><strong>Answer: B</strong><br>Longformer: Local attention(주변 w개 토큰만 봄) + Global attention([CLS] 등 특정 토큰이 모든 토큰을 봄). 총 복잡도 O(n·(w+g)).<br><span style="font-size:11px;color:#aaa">Local(주변만) + Global(특정 토큰이 전체) = Longformer.</span></div>
+</div>
+
+<div class="quiz-box" id="q3">
+<h4>Q3. Sliding Window Attention에서 receptive field를 확장하는 방법은?</h4>
+<div class="quiz-option" onclick="showAnswer('q3','a')">A. 윈도우 크기를 키운다</div>
+<div class="quiz-option" onclick="showAnswer('q3','b')">B. 레이어를 쌓는다 (Effective RF = L × W)</div>
+<div class="quiz-option" onclick="showAnswer('q3','c')">C. Head 수를 늘린다</div>
+<div class="quiz-option" onclick="showAnswer('q3','d')">D. A와 B 모두</div>
+<div class="quiz-answer" id="ans-q3"><strong>Answer: D</strong><br>Effective Receptive Field = L × W. 윈도우 크기(W)를 키우거나 레이어(L)를 쌓으면 확장된다. CNN의 receptive field와 동일한 원리.<br><span style="font-size:11px;color:#aaa">RF = L × W. 윈도우 키우기 또는 레이어 쌓기. CNN receptive field와 동일.</span></div>
+</div>
+
+<div class="quiz-box" id="q4">
+<h4>Q4. GQA에서 G=h이면 어떤 방법과 동일한가?</h4>
+<div class="quiz-option" onclick="showAnswer('q4','a')">A. MQA</div>
+<div class="quiz-option" onclick="showAnswer('q4','b')">B. MHA (Multi-Head Attention)</div>
+<div class="quiz-option" onclick="showAnswer('q4','c')">C. Longformer</div>
+<div class="quiz-option" onclick="showAnswer('q4','d')">D. SWA</div>
+<div class="quiz-answer" id="ans-q4"><strong>Answer: B</strong><br>GQA에서 G=h이면 각 그룹에 Q head 1개 = 각 head가 독립적인 KV를 가짐 = MHA. G=1이면 MQA. GQA는 MHA와 MQA의 일반화.<br><span style="font-size:11px;color:#aaa">G=h → MHA, G=1 → MQA. GQA는 둘의 일반화.</span></div>
+</div>
+
+<div class="quiz-box" id="q5">
+<h4>Q5. MQA의 장점과 단점은?</h4>
+<div class="quiz-option" onclick="showAnswer('q5','a')">A. 장점: 성능 최고, 단점: 메모리 많이 사용</div>
+<div class="quiz-option" onclick="showAnswer('q5','b')">B. 장점: KV Cache 최소, 추론 가장 빠름. 단점: 성능 약간 하락</div>
+<div class="quiz-option" onclick="showAnswer('q5','c')">C. 장점: 학습 빠름, 단점: 추론 느림</div>
+<div class="quiz-option" onclick="showAnswer('q5','d')">D. 장점: 구현 간단, 단점: GPU 활용 어려움</div>
+<div class="quiz-answer" id="ans-q5"><strong>Answer: B</strong><br>MQA: 모든 Q head가 1개 KV 공유 → KV Cache h배 절약, 추론 가장 빠름. 하지만 KV의 다양성이 줄어 성능이 약간 하락할 수 있음.<br><span style="font-size:11px;color:#aaa">KV Cache 최소(1/h) + 추론 최고속. 대신 성능 약간 하락.</span></div>
+</div>
+
+<div class="quiz-box" id="q6">
+<h4>Q6. SWA가 CNN의 어떤 개념과 유사한가?</h4>
+<div class="quiz-option" onclick="showAnswer('q6','a')">A. Pooling</div>
+<div class="quiz-option" onclick="showAnswer('q6','b')">B. Receptive field</div>
+<div class="quiz-option" onclick="showAnswer('q6','c')">C. Batch normalization</div>
+<div class="quiz-option" onclick="showAnswer('q6','d')">D. Skip connection</div>
+<div class="quiz-answer" id="ans-q6"><strong>Answer: B</strong><br>"Similar to 'receptive field' in computer vision." SWA에서 레이어를 쌓아 정보 범위를 확장하는 것은 CNN에서 작은 커널을 여러 층 쌓아 넓은 영역을 보는 것과 동일.<br><span style="font-size:11px;color:#aaa">SWA의 레이어 쌓기 = CNN의 receptive field 확장. 강의에서 직접 언급.</span></div>
+</div>
+
+<div class="quiz-box" id="q7">
+<h4>Q7. KV Cache가 필요한 이유는?</h4>
+<div class="quiz-option" onclick="showAnswer('q7','a')">A. 학습 속도를 높이기 위해</div>
+<div class="quiz-option" onclick="showAnswer('q7','b')">B. Autoregressive 추론에서 이전 토큰의 K, V를 재계산하지 않기 위해</div>
+<div class="quiz-option" onclick="showAnswer('q7','c')">C. 모델 파라미터를 줄이기 위해</div>
+<div class="quiz-option" onclick="showAnswer('q7','d')">D. Gradient를 저장하기 위해</div>
+<div class="quiz-answer" id="ans-q7"><strong>Answer: B</strong><br>Autoregressive 추론에서 새 토큰 생성 시 이전 토큰의 K, V를 매번 재계산하면 비효율적. 캐싱하면 새 토큰의 Q만 계산하면 됨. 하지만 캐시 크기가 문제.<br><span style="font-size:11px;color:#aaa">이전 토큰 K, V 재계산 방지. 추론 효율화의 핵심.</span></div>
+</div>
+
+<div class="quiz-box" id="q8">
+<h4>Q8. Longformer에서 Global token의 역할은?</h4>
+<div class="quiz-option" onclick="showAnswer('q8','a')">A. 학습 속도를 높인다</div>
+<div class="quiz-option" onclick="showAnswer('q8','b')">B. 먼 토큰 간 정보 교환의 "허브" 역할</div>
+<div class="quiz-option" onclick="showAnswer('q8','c')">C. 메모리를 절약한다</div>
+<div class="quiz-option" onclick="showAnswer('q8','d')">D. Gradient flow를 개선한다</div>
+<div class="quiz-answer" id="ans-q8"><strong>Answer: B</strong><br>Local attention만으로는 먼 토큰 간 정보 교환 불가. [CLS] 같은 global token이 모든 토큰을 보고, 모든 토큰이 global token을 봄 → 전체 정보 집약의 허브.<br><span style="font-size:11px;color:#aaa">Global token = 정보 허브. 먼 토큰 간 간접적 정보 교환 가능.</span></div>
+</div>
+
+<div class="quiz-box" id="q9">
+<h4>Q9. Mistral 7B가 사용하는 효율적 Attention 조합은?</h4>
+<div class="quiz-option" onclick="showAnswer('q9','a')">A. Full Attention + MHA</div>
+<div class="quiz-option" onclick="showAnswer('q9','b')">B. Longformer + MQA</div>
+<div class="quiz-option" onclick="showAnswer('q9','c')">C. Sliding Window Attention + GQA</div>
+<div class="quiz-option" onclick="showAnswer('q9','d')">D. Sparse Attention + Batch Norm</div>
+<div class="quiz-answer" id="ans-q9"><strong>Answer: C</strong><br>Mistral 7B: SWA(W=4096)로 긴 시퀀스 처리 + GQA로 KV Cache 절약. 이 조합으로 7B 파라미터로 13B 모델에 필적하는 성능.<br><span style="font-size:11px;color:#aaa">SWA + GQA = Mistral의 핵심 조합. 효율성과 성능의 균형.</span></div>
+</div>
+
+<div class="quiz-box" id="q10">
+<h4>Q10. 시퀀스 길이가 2배가 되면 Full Attention의 메모리는?</h4>
+<div class="quiz-option" onclick="showAnswer('q10','a')">A. 2배</div>
+<div class="quiz-option" onclick="showAnswer('q10','b')">B. 4배</div>
+<div class="quiz-option" onclick="showAnswer('q10','c')">C. 8배</div>
+<div class="quiz-option" onclick="showAnswer('q10','d')">D. 변화 없음</div>
+<div class="quiz-answer" id="ans-q10"><strong>Answer: B</strong><br>Attention 행렬은 (n, n). n이 2배 → n² = 4배. 시간 복잡도도 4배. 이것이 O(n²)의 의미이며, 긴 시퀀스에서 치명적인 이유.<br><span style="font-size:11px;color:#aaa">O(n²): n이 2배 → 메모리/계산 4배. 이것이 효율적 attention이 필요한 이유.</span></div>
+</div>
+
+<script>
+function showAnswer(qId, selected) {
+  var ansDiv = document.getElementById('ans-' + qId);
+  ansDiv.style.display = 'block';
+  var options = document.querySelectorAll('#' + qId + ' .quiz-option');
+  var correctMap = {q1:'b',q2:'b',q3:'d',q4:'b',q5:'b',q6:'b',q7:'b',q8:'b',q9:'c',q10:'b'};
+  var correct = correctMap[qId];
+  options.forEach(function(opt, idx) {
+    var letter = ['a','b','c','d'][idx];
+    if (letter === correct) opt.classList.add('correct');
+    else if (letter === selected) opt.classList.add('wrong');
+  });
+}
+</script>
+
+
+<!-- ═══════════════════════════════════════════ -->
+<!-- Cheat Sheet -->
+<!-- ═══════════════════════════════════════════ -->
+<h2 id="cheatsheet">📋 Cheat Sheet — Attention Approximation 한눈에</h2>
+
+<div class="def">
+<p class="ni"><strong>🔑 핵심 수식 & 복잡도</strong></p>
+<p class="ni">1. <strong>Full Attention:</strong></p>
+<div class="eq">\[ \text{Attention}(Q,K,V) = \text{softmax}\!\left(\frac{QK^T}{\sqrt{d_k}}\right)V, \quad O(n^2 \cdot d_k) \]</div>
+<p class="ni">2. <strong>Longformer:</strong></p>
+<div class="eq">\[ O(n \cdot (w + g)) \approx O(n) \quad \text{where } w = \text{window}, \; g = \text{global tokens} \]</div>
+<p class="ni">3. <strong>SWA Receptive Field:</strong></p>
+<div class="eq">\[ \text{Effective RF} = L \times W \quad \text{(layers × window size)} \]</div>
+<p class="ni">4. <strong>KV Cache (MHA):</strong></p>
+<div class="eq">\[ \text{KV Cache} = 2 \times L \times h \times n \times d_k \times \text{bytes} \]</div>
+<p class="ni">5. <strong>GQA KV Cache 절약:</strong></p>
+<div class="eq">\[ \text{GQA ratio} = \frac{g}{h}, \quad \text{MQA} = \frac{1}{h} \quad \text{(g = KV groups)} \]</div>
+</div>
+
+<div class="ok">
+<p class="ni"><strong>🎯 시험 대비 핵심 포인트</strong></p>
+<ul>
+<li>Full Attention: O(n²) — n이 2배 → 메모리/계산 4배</li>
+<li>Longformer: Local window + Global tokens → O(n). [CLS]가 정보 허브 역할</li>
+<li>SWA: 고정 윈도우 W, 레이어 쌓으면 RF 확장 (CNN과 동일 원리). Mistral 7B: W=4096</li>
+<li>MHA: 각 head 독립 K/V → KV Cache 큼</li>
+<li>GQA: h개 Q head를 g개 그룹으로 묶어 K/V 공유 → KV Cache g/h로 축소. LLaMA 2 70B, Mistral</li>
+<li>MQA: 모든 head가 1개 K/V 공유 → KV Cache 1/h. 빠르지만 품질 저하 가능</li>
+<li>Mistral 7B = SWA + GQA 조합 → 효율성과 성능의 균형</li>
+<li>Sparse Attention은 "어디를 볼 것인가", Head Sharing은 "K/V를 어떻게 공유할 것인가"</li>
+</ul>
+</div>
+
+<!-- Navigation -->
+<div class="round-nav">
+<a href="../round-02/">← Round 2: Layer Normalization</a>
+<a href="../round-04/">Round 4: Transformer Models →</a>
+</div>
+
+</div><!-- paper-content -->
+</div><!-- container -->
+</div><!-- main-wrapper -->
+
+</body>
+</html>

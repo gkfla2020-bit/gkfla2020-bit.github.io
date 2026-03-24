@@ -1,0 +1,838 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lecture 2 · Round 4: Transformer-based Models | 딥러닝 학습</title>
+<script>
+MathJax = { tex: { inlineMath: [['\\(','\\)']], displayMath: [['\\[','\\]']] } };
+</script>
+<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;500&family=Space+Mono:wght@400&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+<script src="https://cdn.plot.ly/plotly-2.35.0.min.js"></script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Inter',sans-serif;background:#fafaf8;color:#1a1a1a;line-height:1.7;overflow-x:hidden}
+.sidebar{position:fixed;left:0;top:0;width:260px;height:100vh;background:rgba(255,255,255,.97);border-right:1px solid rgba(0,0,0,.06);padding:32px 24px;z-index:100;overflow-y:auto;display:flex;flex-direction:column}
+.sidebar-profile{text-align:center;margin-bottom:28px;padding-bottom:24px;border-bottom:1px solid rgba(0,0,0,.08)}
+.profile-icon{font-size:48px;margin-bottom:8px}
+.profile-name{font-family:'Cormorant Garamond',serif;font-size:1.3rem;font-weight:500;margin-bottom:4px}
+.profile-title{font-size:.68rem;color:#888;letter-spacing:.08em;text-transform:uppercase;margin-bottom:8px}
+.profile-bio{font-size:.78rem;color:#666;line-height:1.5}
+.sidebar-nav{flex:1;margin-top:16px}
+.nav-section{margin-bottom:20px}
+.nav-section-title{font-size:.6rem;font-weight:600;color:#aaa;letter-spacing:.15em;text-transform:uppercase;margin-bottom:10px}
+.nav-list{list-style:none}
+.nav-list li{margin-bottom:5px}
+.nav-list a{font-size:.78rem;color:#555;text-decoration:none;transition:all .2s;display:block;padding:3px 0}
+.nav-list a:hover{color:#0080c6;padding-left:4px}
+.nav-list a.active{color:#0080c6;font-weight:500}
+.badge{display:inline-block;font-size:.5rem;background:#0080c6;color:#fff;padding:1px 5px;border-radius:8px;margin-left:3px;vertical-align:middle}
+.badge-quiz{background:#e74c3c}
+.sidebar-footer{padding-top:16px;border-top:1px solid rgba(0,0,0,.06);font-size:.65rem;color:#aaa;text-align:center}
+.main-wrapper{margin-left:260px;min-height:100vh}
+.container{max-width:1100px;margin:0 auto;padding:50px 40px 80px}
+.paper-content{font-family:'Times New Roman','Nanum Myeongjo',serif;line-height:1.8;background:#fff;padding:40px;border-radius:8px;box-shadow:0 2px 20px rgba(0,0,0,.05)}
+.paper-header{text-align:center;margin-bottom:40px;padding-bottom:30px;border-bottom:2px solid #333}
+.paper-category{font-size:14px;color:#666;margin-bottom:10px}
+.paper-title{font-size:24px;font-weight:bold;margin-bottom:12px;line-height:1.4}
+.paper-subtitle{font-size:14px;color:#555;margin-bottom:8px}
+.paper-team{font-size:13px;color:#444}
+</style>
+<style>
+.abstract{background:#f8f9fa;padding:25px;margin:30px 0;border-left:4px solid #2c3e50}
+.abstract-title{font-weight:bold;font-size:16px;margin-bottom:15px}
+h2{font-size:18px;margin:35px 0 20px;padding-bottom:8px;border-bottom:1px solid #ddd;color:#2c3e50}
+h3{font-size:15px;margin:25px 0 15px;color:#34495e}
+h4{font-size:14px;margin:20px 0 12px;color:#34495e}
+p{text-align:justify;margin-bottom:15px;text-indent:2em}
+p.ni{text-indent:0}
+table{width:100%;border-collapse:collapse;margin:20px 0;font-size:12px}
+th,td{border:1px solid #ddd;padding:10px 8px;text-align:center}
+th{background:#2c3e50;color:white;font-weight:bold}
+tr:nth-child(even){background:#f8f9fa}
+tr:hover{background:#e8f4f8}
+.tc{font-size:13px;font-weight:bold;margin:15px 0 10px;text-align:center}
+.eq{text-align:center;margin:20px 0;padding:15px;background:#f8f9fa;border-radius:4px;overflow-x:auto}
+ul,ol{margin-left:2em;margin-bottom:15px}
+li{margin-bottom:6px}
+.def{background:#fff9e6;border:1px solid #ffc107;border-radius:4px;padding:20px;margin:20px 0}
+.info{background:#e8f4f8;border-left:4px solid #3498db;padding:20px;margin:20px 0}
+.warn{background:#fff3cd;border-left:4px solid #f39c12;padding:20px;margin:20px 0}
+.ok{background:#d4edda;border-left:4px solid #28a745;padding:20px;margin:20px 0}
+pre{background:#1e1e1e;color:#d4d4d4;padding:20px;border-radius:6px;overflow-x:auto;margin:20px 0;font-family:'Space Mono','Consolas',monospace;font-size:13px;line-height:1.6}
+code{font-family:'Space Mono','Consolas',monospace;font-size:13px}
+p code,li code,td code{background:#f0f0f0;padding:2px 6px;border-radius:3px;color:#c7254e;font-size:12px}
+.cm{color:#6a9955}.kw{color:#569cd6}.st{color:#ce9178}.fn{color:#dcdcaa}.nb{color:#4ec9b0}.nu{color:#b5cea8}
+.diagram{background:#f0f4f8;border:1px solid #d0d7de;border-radius:6px;padding:20px;margin:20px 0;font-family:'Space Mono',monospace;font-size:12px;line-height:1.5;white-space:pre;overflow-x:auto}
+.quiz-box{background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);color:#fff;padding:25px;border-radius:8px;margin:25px 0}
+.quiz-box h4{color:#fff;margin-top:0}
+.quiz-option{background:rgba(255,255,255,.15);padding:10px 15px;margin:8px 0;border-radius:4px;cursor:pointer;transition:all .2s}
+.quiz-option:hover{background:rgba(255,255,255,.25)}
+.quiz-option.correct{background:#28a745!important}
+.quiz-option.wrong{background:#dc3545!important}
+.quiz-answer{display:none;margin-top:15px;padding:15px;background:rgba(255,255,255,.1);border-radius:4px}
+.round-nav{display:flex;justify-content:space-between;margin:40px 0 0;padding:20px 0;border-top:2px solid #eee}
+.round-nav a{display:inline-flex;align-items:center;gap:6px;padding:10px 20px;background:#0080c6;color:#fff;text-decoration:none;border-radius:6px;font-size:13px;font-family:'Inter',sans-serif;transition:background .2s}
+.round-nav a:hover{background:#006aa3}
+.round-nav a.disabled{background:#ccc;pointer-events:none}
+.timeline{position:relative;padding:20px 0 20px 40px;margin:20px 0}
+.timeline::before{content:'';position:absolute;left:18px;top:0;bottom:0;width:3px;background:linear-gradient(to bottom,#3498db,#e74c3c,#2ecc71)}
+.timeline-item{position:relative;margin-bottom:25px;padding:15px 20px;background:#f8f9fa;border-radius:8px;border-left:3px solid #3498db}
+.timeline-item::before{content:'';position:absolute;left:-29px;top:20px;width:14px;height:14px;border-radius:50%;background:#3498db;border:3px solid #fff;box-shadow:0 0 0 2px #3498db}
+.timeline-item.enc-dec{border-left-color:#3498db}.timeline-item.enc-dec::before{background:#3498db;box-shadow:0 0 0 2px #3498db}
+.timeline-item.enc-only{border-left-color:#e74c3c}.timeline-item.enc-only::before{background:#e74c3c;box-shadow:0 0 0 2px #e74c3c}
+.timeline-item.dec-only{border-left-color:#2ecc71}.timeline-item.dec-only::before{background:#2ecc71;box-shadow:0 0 0 2px #2ecc71}
+.timeline-year{font-weight:bold;font-size:14px;margin-bottom:4px}
+.timeline-desc{font-size:12px;color:#555;text-indent:0}
+.arch-card{border:2px solid #ddd;border-radius:10px;padding:20px;margin:15px 0;transition:all .3s}
+.arch-card:hover{box-shadow:0 4px 15px rgba(0,0,0,.1)}
+.arch-card.blue{border-color:#3498db;background:linear-gradient(135deg,#ebf5fb,#fff)}
+.arch-card.red{border-color:#e74c3c;background:linear-gradient(135deg,#fdedec,#fff)}
+.arch-card.green{border-color:#2ecc71;background:linear-gradient(135deg,#eafaf1,#fff)}
+.arch-card h4{margin-top:0}
+@media(max-width:1024px){
+.sidebar{width:100%;height:auto;position:relative;border-right:none;border-bottom:1px solid rgba(0,0,0,.08);padding:16px}
+.sidebar-profile{margin-bottom:10px;padding-bottom:10px;display:flex;align-items:center;gap:12px;text-align:left}
+.profile-icon{font-size:32px;margin-bottom:0}.profile-bio{display:none}
+.nav-section{display:inline-block;margin-right:16px;margin-bottom:8px}
+.nav-list{display:flex;gap:10px;flex-wrap:wrap}.nav-list li{margin-bottom:0}
+.sidebar-footer{display:none}
+.main-wrapper{margin-left:0}
+.container{padding:0}.paper-content{padding:20px 16px;border-radius:0;box-shadow:none}
+.paper-title{font-size:18px}p{font-size:14px;text-indent:1.5em;text-align:left}
+pre{font-size:11px;padding:14px}table{font-size:10px;display:block;overflow-x:auto}
+}
+</style>
+</head>
+<body>
+
+<div class="sidebar">
+<div class="sidebar-profile">
+<div class="profile-icon">🏗️</div>
+<div class="profile-name">Lecture 2 · Round 4</div>
+<div class="profile-title">Transformer-based Models</div>
+<div class="profile-bio">CME 295 Lecture 2 · Encoder-Decoder, Encoder-only, Decoder-only 아키텍처의 세계</div>
+</div>
+<div class="sidebar-nav">
+<div class="nav-section">
+<div class="nav-section-title">This Round</div>
+<ul class="nav-list">
+<li><a href="#overview">1. 세 가지 아키텍처</a></li>
+<li><a href="#enc-dec">2. Encoder-Decoder <span class="badge">T5</span></a></li>
+<li><a href="#enc-only">3. Encoder-only <span class="badge">BERT</span></a></li>
+<li><a href="#dec-only">4. Decoder-only <span class="badge">GPT</span></a></li>
+<li><a href="#comparison">5. 종합 비교 & 진화</a></li>
+<li><a href="#labs">🔬 Labs</a></li>
+<li><a href="#quiz">📝 Quiz</a></li>
+<li><a href="#cheatsheet">📋 Cheat Sheet</a></li>
+</ul>
+</div>
+<div class="nav-section">
+<div class="nav-section-title">All Rounds</div>
+<ul class="nav-list">
+<li><a href="../round-01/">R1 · Position Embeddings</a></li>
+<li><a href="../round-02/">R2 · Layer Normalization</a></li>
+<li><a href="../round-03/">R3 · Attention Approximation</a></li>
+<li><a class="active" href="#">R4 · Transformer Models</a></li>
+<li><a href="../round-05/">R5 · BERT Deep Dive</a></li>
+</ul>
+</div>
+</div>
+<div class="sidebar-footer">CME 295 · Lecture 2 · Amidi & Amidi</div>
+</div>
+
+<div class="main-wrapper">
+<div class="container">
+<div class="paper-content">
+
+<div class="paper-header">
+<div class="paper-category">CME 295: Transformers & Large Language Models · Lecture 2 · Round 4 / 5</div>
+<h1 class="paper-title">Transformer-based Models — 세 가지 아키텍처 패러다임</h1>
+<div class="paper-subtitle">Encoder-Decoder (T5), Encoder-only (BERT), Decoder-only (GPT): 같은 뿌리, 다른 진화</div>
+<div class="paper-team">Based on: Stanford CME 295 Lecture 2 (Afshine & Shervine Amidi)</div>
+</div>
+
+<div class="abstract">
+<div class="abstract-title">Learning Objectives</div>
+<p class="ni">이 라운드를 마치면 다음을 할 수 있다:</p>
+<ul>
+<li>Transformer의 세 가지 아키텍처 변형을 구분하고 각각의 특징을 설명할 수 있다</li>
+<li>Encoder-Decoder 모델(T5)의 구조와 "text-to-text" 프레임워크를 이해한다</li>
+<li>Encoder-only 모델(BERT)의 양방향 attention과 적합한 태스크를 설명할 수 있다</li>
+<li>Decoder-only 모델(GPT)의 causal attention과 autoregressive 생성을 이해한다</li>
+<li>각 아키텍처가 어떤 태스크에 적합한지 판단할 수 있다</li>
+<li>2017년부터 현재까지의 아키텍처 진화 흐름을 설명할 수 있다</li>
+</ul>
+</div>
+
+<!-- ═══════════════════════════════════════════ -->
+<!-- 1. 세 가지 아키텍처 개요 -->
+<!-- ═══════════════════════════════════════════ -->
+<h2 id="overview">1. 원조 Transformer에서 세 가지 변형으로</h2>
+
+<h3>1.1 원조 Transformer 복습</h3>
+<p>Vaswani et al. (2017)의 "Attention Is All You Need"에서 제안된 원조 Transformer는 Encoder-Decoder 구조였다. 기계 번역을 위해 설계되었으며, Encoder가 입력 시퀀스를 이해하고 Decoder가 출력 시퀀스를 생성한다.</p>
+
+<div class="diagram">Original Transformer (2017)
+
+  Input: "The cat sat"          Output: "Le chat assis"
+         │                              ▲
+         ▼                              │
+  ┌─────────────┐              ┌─────────────┐
+  │   Encoder   │──────────────│   Decoder   │
+  │             │  Cross-Attn  │             │
+  │ Self-Attn   │──────────────│ Masked      │
+  │ (양방향)    │              │ Self-Attn   │
+  │ + FFN       │              │ + Cross-Attn│
+  │ × N layers  │              │ + FFN       │
+  └─────────────┘              │ × N layers  │
+                               └─────────────┘
+
+  Encoder: 입력을 "이해"        Decoder: 출력을 "생성"
+  (Bidirectional)              (Autoregressive, Left-to-Right)</div>
+
+<p>이후 연구자들은 이 구조에서 Encoder만, 또는 Decoder만 사용해도 강력한 모델을 만들 수 있음을 발견했다. 이것이 세 가지 아키텍처 패러다임의 시작이다.</p>
+
+<div class="def">
+<p class="ni"><strong>Definition 1.1 — 세 가지 Transformer 아키텍처</strong></p>
+<ol>
+<li><strong>Encoder-Decoder:</strong> 원조 구조. 입력→이해→생성. 번역, 요약 등 sequence-to-sequence 태스크에 적합. 대표: T5, BART</li>
+<li><strong>Encoder-only:</strong> Encoder만 사용. 양방향 context로 입력을 "이해"하는 데 특화. 분류, NER 등에 적합. 대표: BERT, RoBERTa</li>
+<li><strong>Decoder-only:</strong> Decoder만 사용. 왼쪽→오른쪽 autoregressive 생성에 특화. 텍스트 생성, 현재 LLM의 주류. 대표: GPT, LLaMA, Claude</li>
+</ol>
+</div>
+
+<h3>1.2 핵심 차이: Attention Mask</h3>
+<p>세 아키텍처의 가장 근본적인 차이는 attention mask에 있다. 각 토큰이 어떤 토큰을 볼 수 있는가가 모델의 성격을 결정한다.</p>
+
+<div class="diagram">Attention Mask 비교 (시퀀스: [A, B, C, D])
+
+Encoder (Bidirectional)     Decoder (Causal/Masked)
+  A  B  C  D                  A  B  C  D
+A ✓  ✓  ✓  ✓              A  ✓  ✗  ✗  ✗
+B ✓  ✓  ✓  ✓              B  ✓  ✓  ✗  ✗
+C ✓  ✓  ✓  ✓              C  ✓  ✓  ✓  ✗
+D ✓  ✓  ✓  ✓              D  ✓  ✓  ✓  ✓
+
+→ 모든 토큰이 모든 토큰을 봄    → 각 토큰은 자신과 이전 토큰만 봄
+→ "이해"에 최적               → "생성"에 최적
+→ 양방향 context              → 단방향 (left-to-right)</div>
+
+<div class="info">
+<p class="ni"><strong>왜 Decoder는 미래를 못 보는가?</strong></p>
+<p class="ni">Autoregressive 생성에서 토큰은 하나씩 순서대로 생성된다. 생성 시점에 미래 토큰은 아직 존재하지 않으므로, 학습 시에도 미래 토큰을 보지 못하게 마스킹한다. 이것이 "causal mask" 또는 "look-ahead mask"이다. 학습과 추론의 일관성을 위한 설계.</p>
+</div>
+
+<pre><code><span class="kw">import</span> torch
+<span class="kw">import</span> torch.nn.functional <span class="kw">as</span> F
+
+<span class="kw">def</span> <span class="fn">create_attention_masks</span>(seq_len):
+    <span class="st">"""세 가지 아키텍처의 attention mask 생성"""</span>
+    
+    <span class="cm"># 1. Encoder: Bidirectional (모든 위치 attend)</span>
+    encoder_mask = torch.ones(seq_len, seq_len)
+    
+    <span class="cm"># 2. Decoder: Causal (하삼각 행렬)</span>
+    decoder_mask = torch.tril(torch.ones(seq_len, seq_len))
+    
+    <span class="cm"># 3. Encoder-Decoder: Cross-attention</span>
+    <span class="cm">#    Decoder의 각 위치가 Encoder의 모든 위치를 봄</span>
+    enc_len, dec_len = <span class="nu">4</span>, <span class="nu">3</span>
+    cross_mask = torch.ones(dec_len, enc_len)
+    
+    <span class="kw">return</span> encoder_mask, decoder_mask, cross_mask
+
+enc, dec, cross = create_attention_masks(<span class="nu">4</span>)
+<span class="fn">print</span>(<span class="st">"Encoder (Bidirectional):"</span>)
+<span class="fn">print</span>(enc.int())
+<span class="cm"># tensor([[1, 1, 1, 1],</span>
+<span class="cm">#         [1, 1, 1, 1],</span>
+<span class="cm">#         [1, 1, 1, 1],</span>
+<span class="cm">#         [1, 1, 1, 1]])</span>
+
+<span class="fn">print</span>(<span class="st">"\nDecoder (Causal):"</span>)
+<span class="fn">print</span>(dec.int())
+<span class="cm"># tensor([[1, 0, 0, 0],</span>
+<span class="cm">#         [1, 1, 0, 0],</span>
+<span class="cm">#         [1, 1, 1, 0],</span>
+<span class="cm">#         [1, 1, 1, 1]])</span></code></pre>
+
+<h3>1.3 아키텍처 진화 타임라인</h3>
+
+<div class="timeline">
+<div class="timeline-item enc-dec">
+<div class="timeline-year">2017 — Transformer (Vaswani et al.)</div>
+<p class="timeline-desc">원조 Encoder-Decoder. 기계 번역용. "Attention Is All You Need"</p>
+</div>
+<div class="timeline-item enc-only">
+<div class="timeline-year">2018 — BERT (Devlin et al.)</div>
+<p class="timeline-desc">Encoder-only. 양방향 pre-training. NLU 태스크 지배. "Pre-training of Deep Bidirectional Transformers"</p>
+</div>
+<div class="timeline-item dec-only">
+<div class="timeline-year">2018 — GPT (Radford et al.)</div>
+<p class="timeline-desc">Decoder-only. Autoregressive pre-training. "Improving Language Understanding by Generative Pre-Training"</p>
+</div>
+<div class="timeline-item enc-dec">
+<div class="timeline-year">2019 — T5 (Raffel et al.)</div>
+<p class="timeline-desc">Encoder-Decoder. "Text-to-Text Transfer Transformer". 모든 NLP를 text-to-text로 통일</p>
+</div>
+<div class="timeline-item enc-dec">
+<div class="timeline-year">2019 — BART (Lewis et al.)</div>
+<p class="timeline-desc">Encoder-Decoder. Denoising autoencoder. 요약에 강점</p>
+</div>
+<div class="timeline-item dec-only">
+<div class="timeline-year">2020 — GPT-3 (Brown et al.)</div>
+<p class="timeline-desc">175B 파라미터. Few-shot learning의 등장. Scaling law의 시작</p>
+</div>
+<div class="timeline-item dec-only">
+<div class="timeline-year">2023~ — LLaMA, Mistral, GPT-4, Claude</div>
+<p class="timeline-desc">Decoder-only가 주류. 거의 모든 최신 LLM이 이 구조 채택</p>
+</div>
+</div>
+
+<div class="warn">
+<p class="ni"><strong>강의 핵심 인용:</strong></p>
+<p class="ni">"Encoder-only models were popular from 2018 to 2022. Decoder-only models are the most popular now." — 현재 LLM 생태계는 Decoder-only가 지배하고 있다. 하지만 각 아키텍처의 장단점을 이해하는 것이 중요하다.</p>
+</div>
+
+<!-- ═══════════════════════════════════════════ -->
+<!-- 2. Encoder-Decoder -->
+<!-- ═══════════════════════════════════════════ -->
+<h2 id="enc-dec">2. Encoder-Decoder 모델 — T5와 Text-to-Text</h2>
+
+<h3>2.1 구조 상세</h3>
+<p>Encoder-Decoder 모델은 원조 Transformer의 구조를 그대로 유지한다. Encoder가 입력을 처리하고, Decoder가 Encoder의 출력을 참조하면서 출력을 생성한다. 핵심은 Cross-Attention이다.</p>
+
+<div class="def">
+<p class="ni"><strong>Definition 2.1 — Encoder-Decoder 구조</strong></p>
+<p class="ni"><strong>Encoder:</strong></p>
+<ul>
+<li>입력 시퀀스를 받아 contextual representation 생성</li>
+<li>Bidirectional Self-Attention: 모든 토큰이 모든 토큰을 봄</li>
+<li>각 레이어: Self-Attention → Add & Norm → FFN → Add & Norm</li>
+</ul>
+<p class="ni"><strong>Decoder:</strong></p>
+<ul>
+<li>출력 시퀀스를 autoregressive하게 생성</li>
+<li>Masked Self-Attention: causal mask로 미래 토큰 차단</li>
+<li>Cross-Attention: Encoder 출력을 K, V로 사용, Decoder 상태를 Q로 사용</li>
+<li>각 레이어: Masked Self-Attn → Add & Norm → Cross-Attn → Add & Norm → FFN → Add & Norm</li>
+</ul>
+</div>
+
+<div class="diagram">Encoder-Decoder 상세 구조
+
+  Encoder Side                    Decoder Side
+  ────────────                    ────────────
+  Input: "Translate: The cat"     Output: "&lt;s&gt; Le chat"
+         │                                │
+    [Embedding + PE]                 [Embedding + PE]
+         │                                │
+    ┌────┴────┐                      ┌────┴────┐
+    │Self-Attn│ (Bidirectional)      │Masked   │ (Causal)
+    │ Q,K,V   │                      │Self-Attn│
+    │from input│                     │Q,K,V    │
+    └────┬────┘                      │from output│
+    [Add & Norm]                     └────┬────┘
+         │                          [Add & Norm]
+    ┌────┴────┐                          │
+    │  FFN    │                     ┌────┴────┐
+    └────┬────┘                     │Cross-Attn│
+    [Add & Norm]                    │Q: Decoder│
+         │                          │K,V: Encoder──────┐
+    Encoder Output ─────────────────│ output   │       │
+         │                          └────┬────┘       │
+         │                          [Add & Norm]       │
+         │                               │             │
+         │                          ┌────┴────┐       │
+         │                          │  FFN    │       │
+         │                          └────┬────┘       │
+         │                          [Add & Norm]       │
+         │                               │             │
+         └───────────────────────────────┘             │
+                                         │
+                                    [Linear + Softmax]
+                                         │
+                                    Next token: "assis"</div>
+
+<h3>2.2 Cross-Attention의 수학</h3>
+<p>Cross-Attention은 Encoder-Decoder 모델의 핵심 메커니즘이다. Decoder가 "어떤 입력 토큰에 주목해야 하는가"를 결정한다.</p>
+
+<div class="def">
+<p class="ni"><strong>Definition 2.2 — Cross-Attention</strong></p>
+<div class="eq">\[ \text{CrossAttn}(Q_{\text{dec}}, K_{\text{enc}}, V_{\text{enc}}) = \text{softmax}\!\left(\frac{Q_{\text{dec}} K_{\text{enc}}^T}{\sqrt{d_k}}\right) V_{\text{enc}} \]</div>
+<p class="ni">여기서:</p>
+<ul>
+<li>\(Q_{\text{dec}} = H_{\text{dec}} W_Q\): Decoder의 현재 상태에서 Query 생성</li>
+<li>\(K_{\text{enc}} = H_{\text{enc}} W_K\): Encoder 출력에서 Key 생성</li>
+<li>\(V_{\text{enc}} = H_{\text{enc}} W_V\): Encoder 출력에서 Value 생성</li>
+</ul>
+<p class="ni">→ Decoder가 "질문"하고, Encoder가 "답변"하는 구조</p>
+</div>
+
+<pre><code><span class="kw">import</span> torch
+<span class="kw">import</span> torch.nn <span class="kw">as</span> nn
+
+<span class="kw">class</span> <span class="nb">CrossAttention</span>(nn.Module):
+    <span class="st">"""Encoder-Decoder Cross-Attention"""</span>
+    <span class="kw">def</span> <span class="fn">__init__</span>(self, d_model, n_heads):
+        <span class="fn">super</span>().__init__()
+        self.n_heads = n_heads
+        self.d_k = d_model // n_heads
+        
+        <span class="cm"># Q는 Decoder에서, K/V는 Encoder에서</span>
+        self.W_q = nn.Linear(d_model, d_model)  <span class="cm"># Decoder → Q</span>
+        self.W_k = nn.Linear(d_model, d_model)  <span class="cm"># Encoder → K</span>
+        self.W_v = nn.Linear(d_model, d_model)  <span class="cm"># Encoder → V</span>
+        self.W_o = nn.Linear(d_model, d_model)
+    
+    <span class="kw">def</span> <span class="fn">forward</span>(self, dec_hidden, enc_output):
+        <span class="st">"""
+        dec_hidden: (batch, dec_len, d_model) - Decoder 상태
+        enc_output: (batch, enc_len, d_model) - Encoder 출력
+        """</span>
+        B, dec_len, _ = dec_hidden.shape
+        enc_len = enc_output.shape[<span class="nu">1</span>]
+        
+        <span class="cm"># Q from Decoder, K/V from Encoder</span>
+        Q = self.W_q(dec_hidden).view(B, dec_len, self.n_heads, self.d_k).transpose(<span class="nu">1</span>,<span class="nu">2</span>)
+        K = self.W_k(enc_output).view(B, enc_len, self.n_heads, self.d_k).transpose(<span class="nu">1</span>,<span class="nu">2</span>)
+        V = self.W_v(enc_output).view(B, enc_len, self.n_heads, self.d_k).transpose(<span class="nu">1</span>,<span class="nu">2</span>)
+        
+        <span class="cm"># Attention: (dec_len, enc_len) — Decoder가 Encoder의 어디를 볼지</span>
+        scores = torch.matmul(Q, K.transpose(-<span class="nu">2</span>,-<span class="nu">1</span>)) / (self.d_k ** <span class="nu">0.5</span>)
+        attn = torch.softmax(scores, dim=-<span class="nu">1</span>)
+        
+        out = torch.matmul(attn, V)
+        out = out.transpose(<span class="nu">1</span>,<span class="nu">2</span>).contiguous().view(B, dec_len, -<span class="nu">1</span>)
+        <span class="kw">return</span> self.W_o(out)
+
+<span class="cm"># 예시: 번역 "The cat sat" → "Le chat assis"</span>
+cross_attn = CrossAttention(d_model=<span class="nu">512</span>, n_heads=<span class="nu">8</span>)
+enc_out = torch.randn(<span class="nu">1</span>, <span class="nu">3</span>, <span class="nu">512</span>)   <span class="cm"># Encoder: 3 토큰</span>
+dec_hid = torch.randn(<span class="nu">1</span>, <span class="nu">3</span>, <span class="nu">512</span>)   <span class="cm"># Decoder: 3 토큰</span>
+output = cross_attn(dec_hid, enc_out)
+<span class="fn">print</span>(output.shape)  <span class="cm"># (1, 3, 512)</span></code></pre>
+
+<h3>2.3 T5 — Text-to-Text Transfer Transformer</h3>
+<p>Raffel et al. (2019)의 T5는 Encoder-Decoder 아키텍처의 대표 모델이다. 핵심 아이디어: 모든 NLP 태스크를 "text-to-text" 형식으로 통일한다.</p>
+
+<div class="def">
+<p class="ni"><strong>Definition 2.3 — T5의 Text-to-Text 프레임워크</strong></p>
+<p class="ni">모든 태스크를 "입력 텍스트 → 출력 텍스트"로 변환:</p>
+<ul>
+<li><strong>번역:</strong> "translate English to German: That is good" → "Das ist gut"</li>
+<li><strong>요약:</strong> "summarize: [긴 문서]" → "[요약문]"</li>
+<li><strong>분류:</strong> "sentiment: This movie is great" → "positive"</li>
+<li><strong>QA:</strong> "question: What is...? context: ..." → "answer"</li>
+</ul>
+<p class="ni">태스크 prefix가 모델에게 무엇을 해야 하는지 알려준다.</p>
+</div>
+
+<div class="diagram">T5 Text-to-Text 예시
+
+┌─────────────────────────────────────────────────────┐
+│ Task          Input                    Output        │
+├─────────────────────────────────────────────────────┤
+│ Translation   "translate English to    "Das ist gut" │
+│               German: That is good"                  │
+│                                                      │
+│ Summarize     "summarize: state        "california"  │
+│               authorities dispatched..."             │
+│                                                      │
+│ Sentiment     "sst2 sentence: this     "positive"    │
+│               movie is great"                        │
+│                                                      │
+│ Similarity    "stsb sentence1: The     "3.8"         │
+│               cat sat. sentence2:                    │
+│               The dog sat."                          │
+└─────────────────────────────────────────────────────┘
+
+→ 하나의 모델, 하나의 학습 방식, 모든 태스크!</div>
+
+<div class="info">
+<p class="ni"><strong>T5의 의의:</strong> 태스크별로 다른 head(분류 head, 생성 head 등)를 붙일 필요 없이, 모든 것을 텍스트 생성으로 통일했다. 이 아이디어는 이후 GPT-3의 "prompt engineering"과 instruction tuning의 기반이 된다.</p>
+</div>
+
+<h3>2.4 BART — Denoising Sequence-to-Sequence</h3>
+<p>Lewis et al. (2019)의 BART도 Encoder-Decoder 모델이다. T5와 유사하지만 pre-training 방식이 다르다.</p>
+
+<div class="def">
+<p class="ni"><strong>Definition 2.4 — BART의 Pre-training</strong></p>
+<p class="ni">입력 텍스트를 다양한 방식으로 "손상(corrupt)"시키고, 원본을 복원하도록 학습:</p>
+<ul>
+<li><strong>Token Masking:</strong> BERT처럼 랜덤 토큰을 [MASK]로 대체</li>
+<li><strong>Token Deletion:</strong> 랜덤 토큰 삭제 (모델이 어디가 빠졌는지도 알아야 함)</li>
+<li><strong>Text Infilling:</strong> 연속된 토큰 span을 하나의 [MASK]로 대체</li>
+<li><strong>Sentence Permutation:</strong> 문장 순서 섞기</li>
+<li><strong>Document Rotation:</strong> 문서의 시작점 변경</li>
+</ul>
+<p class="ni">→ Encoder가 손상된 입력을 이해하고, Decoder가 원본을 복원</p>
+</div>
+
+<pre><code><span class="cm"># T5 vs BART 비교 (HuggingFace)</span>
+<span class="kw">from</span> transformers <span class="kw">import</span> T5ForConditionalGeneration, BartForConditionalGeneration
+
+<span class="cm"># T5: text-to-text</span>
+<span class="cm"># 입력: "translate English to German: That is good"</span>
+<span class="cm"># 출력: "Das ist gut"</span>
+
+<span class="cm"># BART: denoising</span>
+<span class="cm"># 입력: "The &lt;mask&gt; sat on the mat"  (손상된 텍스트)</span>
+<span class="cm"># 출력: "The cat sat on the mat"     (복원된 텍스트)</span>
+
+<span class="cm"># 둘 다 Encoder-Decoder 구조!</span>
+<span class="cm"># 차이: pre-training objective</span>
+<span class="cm"># T5: span corruption + text-to-text</span>
+<span class="cm"># BART: multiple noise functions + denoising</span>
+
+<span class="cm"># T5 모델 크기 변형</span>
+t5_sizes = {
+    <span class="st">"T5-Small"</span>:  <span class="nu">60</span>,     <span class="cm"># 60M params</span>
+    <span class="st">"T5-Base"</span>:   <span class="nu">220</span>,    <span class="cm"># 220M params</span>
+    <span class="st">"T5-Large"</span>:  <span class="nu">770</span>,    <span class="cm"># 770M params</span>
+    <span class="st">"T5-3B"</span>:     <span class="nu">3000</span>,   <span class="cm"># 3B params</span>
+    <span class="st">"T5-11B"</span>:    <span class="nu">11000</span>,  <span class="cm"># 11B params</span>
+}
+<span class="kw">for</span> name, params <span class="kw">in</span> t5_sizes.items():
+    <span class="fn">print</span>(<span class="st">f"</span>{name:<span class="nu">12</span>}<span class="st">: </span>{params:>6,}<span class="st">M parameters"</span>)</code></pre>
+
+<!-- ═══════════════════════════════════════════ -->
+<!-- 3. Encoder-only -->
+<!-- ═══════════════════════════════════════════ -->
+<h2 id="enc-only">3. Encoder-only 모델 — BERT와 양방향 이해</h2>
+
+<h3>3.1 핵심 아이디어</h3>
+<p>Encoder-only 모델은 Transformer의 Encoder 부분만 사용한다. 핵심 특징은 양방향(bidirectional) attention이다. 각 토큰이 시퀀스의 모든 토큰을 볼 수 있으므로, 문맥을 완전히 이해하는 데 최적화되어 있다.</p>
+
+<div class="def">
+<p class="ni"><strong>Definition 3.1 — Encoder-only 모델</strong></p>
+<p class="ni"><strong>구조:</strong></p>
+<ul>
+<li>Transformer Encoder 블록만 N개 쌓음</li>
+<li>각 블록: Bidirectional Self-Attention → Add & Norm → FFN → Add & Norm</li>
+<li>Causal mask 없음 — 모든 토큰이 모든 토큰을 봄</li>
+</ul>
+<p class="ni"><strong>출력:</strong></p>
+<ul>
+<li>각 토큰의 contextual representation \(h_i \in \mathbb{R}^{d}\)</li>
+<li>[CLS] 토큰의 representation → 시퀀스 전체를 대표</li>
+<li>각 토큰의 representation → 토큰 수준 태스크 (NER 등)</li>
+</ul>
+</div>
+
+<div class="diagram">Encoder-only 구조 (BERT)
+
+  Input: [CLS] The cat sat on the mat [SEP]
+              │
+         [Token Embedding + Segment Embedding + Position Embedding]
+              │
+         ┌────┴────┐
+         │Self-Attn│  ← Bidirectional! 모든 토큰이 모든 토큰을 봄
+         │(no mask)│
+         └────┬────┘
+         [Add & Norm]
+              │
+         ┌────┴────┐
+         │   FFN   │
+         └────┬────┘
+         [Add & Norm]
+              │
+         × 12 layers (BERT-Base) / 24 layers (BERT-Large)
+              │
+         ┌────┴────────────────────────────────┐
+         │                                      │
+    h_[CLS]                              h_1, h_2, ..., h_n
+         │                                      │
+  [Classification Head]                  [Token-level Head]
+         │                                      │
+  Sentiment, NLI, ...                    NER, POS tagging, ...</div>
+
+<h3>3.2 양방향 Attention의 힘</h3>
+<p>양방향 attention이 왜 "이해" 태스크에 강력한지 예시로 살펴보자.</p>
+
+<div class="warn">
+<p class="ni"><strong>예시: "The bank of the river was steep"</strong></p>
+<p class="ni">"bank"의 의미를 결정하려면:</p>
+<ul>
+<li><strong>Decoder-only (왼쪽만 봄):</strong> "The bank" — 은행? 강둑? 모호함</li>
+<li><strong>Encoder-only (양방향):</strong> "The bank of the <u>river</u> was steep" — "river"를 보고 "강둑"으로 확정</li>
+</ul>
+<p class="ni">→ 양방향 context가 단어 의미 해소(Word Sense Disambiguation)에 결정적</p>
+</div>
+
+<h3>3.3 BERT의 Pre-training (개요)</h3>
+<p>BERT의 pre-training은 Round 5에서 상세히 다루지만, 여기서 핵심 아이디어만 짚는다.</p>
+
+<div class="def">
+<p class="ni"><strong>Definition 3.2 — BERT Pre-training 목표 (Preview)</strong></p>
+<ol>
+<li><strong>Masked Language Model (MLM):</strong> 입력 토큰의 15%를 [MASK]로 대체하고, 원래 토큰을 예측
+<div class="eq">\[ \mathcal{L}_{\text{MLM}} = -\sum_{i \in \text{masked}} \log P(x_i | x_{\backslash i}) \]</div>
+양방향 context를 활용하여 빈칸 채우기 → "이해"를 학습</li>
+<li><strong>Next Sentence Prediction (NSP):</strong> 두 문장이 연속인지 판별
+<div class="eq">\[ P(\text{IsNext} | \text{[CLS]}) = \sigma(W \cdot h_{\text{[CLS]}}) \]</div></li>
+</ol>
+</div>
+
+<h3>3.4 Encoder-only의 적합한 태스크</h3>
+
+<div class="tc">Table 1. Encoder-only 모델의 대표 태스크</div>
+<table>
+<tr><th>태스크 유형</th><th>예시</th><th>사용하는 출력</th><th>왜 Encoder가 적합한가</th></tr>
+<tr><td>문장 분류</td><td>감성 분석, 스팸 탐지</td><td>h_[CLS]</td><td>전체 문맥 이해 필요</td></tr>
+<tr><td>자연어 추론 (NLI)</td><td>전제-가설 관계 판별</td><td>h_[CLS]</td><td>두 문장 간 관계 이해</td></tr>
+<tr><td>개체명 인식 (NER)</td><td>인명, 지명 태깅</td><td>h_1, ..., h_n</td><td>각 토큰의 양방향 문맥</td></tr>
+<tr><td>질의응답 (Extractive)</td><td>SQuAD</td><td>h_1, ..., h_n</td><td>답 위치의 시작/끝 예측</td></tr>
+<tr><td>문장 유사도</td><td>STS-B</td><td>h_[CLS]</td><td>두 문장의 의미 비교</td></tr>
+<tr><td>토큰 분류</td><td>POS tagging</td><td>h_1, ..., h_n</td><td>각 토큰의 문법적 역할</td></tr>
+</table>
+
+<div class="info">
+<p class="ni"><strong>핵심 통찰:</strong> Encoder-only 모델은 "생성"이 아닌 "이해"에 특화되어 있다. 텍스트를 생성할 수 없지만, 주어진 텍스트를 분석하고 분류하는 데는 Decoder-only보다 효율적이다. 파라미터 수 대비 NLU 성능이 뛰어나다.</p>
+</div>
+
+<pre><code><span class="cm"># BERT를 이용한 감성 분석 (HuggingFace)</span>
+<span class="kw">from</span> transformers <span class="kw">import</span> BertTokenizer, BertForSequenceClassification
+<span class="kw">import</span> torch
+
+<span class="cm"># 1. 모델 로드</span>
+tokenizer = BertTokenizer.from_pretrained(<span class="st">'bert-base-uncased'</span>)
+model = BertForSequenceClassification.from_pretrained(
+    <span class="st">'bert-base-uncased'</span>, num_labels=<span class="nu">2</span>
+)
+
+<span class="cm"># 2. 입력 처리</span>
+text = <span class="st">"This movie is absolutely wonderful!"</span>
+inputs = tokenizer(text, return_tensors=<span class="st">'pt'</span>, padding=<span class="kw">True</span>)
+<span class="cm"># inputs: {input_ids, attention_mask, token_type_ids}</span>
+
+<span class="cm"># 3. 추론</span>
+<span class="kw">with</span> torch.no_grad():
+    outputs = model(**inputs)
+    logits = outputs.logits  <span class="cm"># (1, 2) — 2 classes</span>
+    pred = torch.argmax(logits, dim=-<span class="nu">1</span>)
+    <span class="fn">print</span>(<span class="st">f"Prediction: </span>{<span class="st">'positive'</span> <span class="kw">if</span> pred == <span class="nu">1</span> <span class="kw">else</span> <span class="st">'negative'</span>}<span class="st">"</span>)
+
+<span class="cm"># 내부 동작:</span>
+<span class="cm"># [CLS] This movie is absolutely wonderful ! [SEP]</span>
+<span class="cm">#   ↓ 12 layers of bidirectional self-attention</span>
+<span class="cm"># h_[CLS] → Linear(768, 2) → softmax → prediction</span></code></pre>
+
+<div class="ok">
+<p class="ni"><strong>BERT 모델 크기:</strong></p>
+<ul>
+<li>BERT-Base: 12 layers, 768 hidden, 12 heads, 110M params</li>
+<li>BERT-Large: 24 layers, 1024 hidden, 16 heads, 340M params</li>
+</ul>
+<p class="ni">현재 LLM (수십~수백B)에 비하면 매우 작지만, NLU 태스크에서는 여전히 효율적이다.</p>
+</div>
+
+<!-- ═══════════════════════════════════════════ -->
+<!-- 4. Decoder-only -->
+<!-- ═══════════════════════════════════════════ -->
+<h2 id="dec-only">4. Decoder-only 모델 — GPT와 Autoregressive 생성 ⭐</h2>
+
+<h3>4.1 핵심 아이디어</h3>
+<p>Decoder-only 모델은 Transformer의 Decoder 부분만 사용하되, Cross-Attention을 제거한다. Encoder가 없으므로 참조할 대상이 없기 때문이다. 오직 Masked Self-Attention과 FFN만으로 구성된다.</p>
+
+<div class="def">
+<p class="ni"><strong>Definition 4.1 — Decoder-only 모델</strong></p>
+<p class="ni"><strong>구조:</strong></p>
+<ul>
+<li>Transformer Decoder 블록 (Cross-Attention 제거) × N layers</li>
+<li>각 블록: Causal Self-Attention → Add & Norm → FFN → Add & Norm</li>
+<li>Causal mask: 각 토큰은 자신과 이전 토큰만 attend</li>
+</ul>
+<p class="ni"><strong>학습 목표 — Next Token Prediction:</strong></p>
+<div class="eq">\[ \mathcal{L} = -\sum_{t=1}^{T} \log P(x_t | x_1, x_2, \ldots, x_{t-1}; \theta) \]</div>
+<p class="ni">주어진 이전 토큰들로부터 다음 토큰을 예측. 이것이 Language Modeling의 본질.</p>
+</div>
+
+<div class="diagram">Decoder-only 구조 (GPT)
+
+  Input: "The cat sat on"
+              │
+         [Token Embedding + Position Embedding]
+              │
+         ┌────┴────┐
+         │ Causal  │  ← 각 토큰은 이전 토큰만 봄!
+         │Self-Attn│
+         │(masked) │     "The" → sees: [The]
+         └────┬────┘     "cat" → sees: [The, cat]
+         [Add & Norm]    "sat" → sees: [The, cat, sat]
+              │          "on"  → sees: [The, cat, sat, on]
+         ┌────┴────┐
+         │   FFN   │
+         └────┬────┘
+         [Add & Norm]
+              │
+         × N layers
+              │
+         [Linear → Softmax over Vocabulary]
+              │
+         Next token prediction:
+         "The"  → predict "cat"
+         "cat"  → predict "sat"
+         "sat"  → predict "on"
+         "on"   → predict "the"  ← 다음 토큰!</div>
+
+<h3>4.2 Causal Mask의 구현</h3>
+
+<pre><code><span class="kw">import</span> torch
+<span class="kw">import</span> torch.nn <span class="kw">as</span> nn
+
+<span class="kw">class</span> <span class="nb">CausalSelfAttention</span>(nn.Module):
+    <span class="st">"""GPT-style Causal Self-Attention"""</span>
+    <span class="kw">def</span> <span class="fn">__init__</span>(self, d_model, n_heads, max_len=<span class="nu">2048</span>):
+        <span class="fn">super</span>().__init__()
+        self.n_heads = n_heads
+        self.d_k = d_model // n_heads
+        
+        self.qkv = nn.Linear(d_model, <span class="nu">3</span> * d_model)
+        self.proj = nn.Linear(d_model, d_model)
+        
+        <span class="cm"># Causal mask: 하삼각 행렬 (미리 생성)</span>
+        self.register_buffer(
+            <span class="st">"causal_mask"</span>,
+            torch.tril(torch.ones(max_len, max_len)).view(<span class="nu">1</span>,<span class="nu">1</span>,max_len,max_len)
+        )
+    
+    <span class="kw">def</span> <span class="fn">forward</span>(self, x):
+        B, T, C = x.shape
+        
+        <span class="cm"># Q, K, V를 한번에 계산</span>
+        qkv = self.qkv(x).reshape(B, T, <span class="nu">3</span>, self.n_heads, self.d_k)
+        qkv = qkv.permute(<span class="nu">2</span>,<span class="nu">0</span>,<span class="nu">3</span>,<span class="nu">1</span>,<span class="nu">4</span>)
+        Q, K, V = qkv[<span class="nu">0</span>], qkv[<span class="nu">1</span>], qkv[<span class="nu">2</span>]
+        
+        <span class="cm"># Attention scores</span>
+        scores = torch.matmul(Q, K.transpose(-<span class="nu">2</span>,-<span class="nu">1</span>)) / (self.d_k ** <span class="nu">0.5</span>)
+        
+        <span class="cm"># ★ Causal mask 적용: 미래 토큰을 -inf로</span>
+        scores = scores.masked_fill(
+            self.causal_mask[:,:,:T,:T] == <span class="nu">0</span>, 
+            <span class="fn">float</span>(<span class="st">'-inf'</span>)
+        )
+        
+        attn = torch.softmax(scores, dim=-<span class="nu">1</span>)
+        out = torch.matmul(attn, V)
+        out = out.transpose(<span class="nu">1</span>,<span class="nu">2</span>).contiguous().view(B, T, -<span class="nu">1</span>)
+        <span class="kw">return</span> self.proj(out)
+
+<span class="cm"># 테스트</span>
+attn = CausalSelfAttention(d_model=<span class="nu">256</span>, n_heads=<span class="nu">8</span>)
+x = torch.randn(<span class="nu">2</span>, <span class="nu">10</span>, <span class="nu">256</span>)  <span class="cm"># batch=2, seq_len=10</span>
+out = attn(x)
+<span class="fn">print</span>(out.shape)  <span class="cm"># (2, 10, 256)</span></code></pre>
+
+<h3>4.3 Autoregressive 생성 과정</h3>
+<p>Decoder-only 모델의 텍스트 생성은 한 토큰씩 순차적으로 이루어진다. 이것이 "autoregressive" 생성이다.</p>
+
+<div class="def">
+<p class="ni"><strong>Definition 4.2 — Autoregressive Generation</strong></p>
+<p class="ni">시퀀스 \(x = (x_1, x_2, \ldots, x_T)\)의 확률을 chain rule로 분해:</p>
+<div class="eq">\[ P(x) = \prod_{t=1}^{T} P(x_t | x_1, \ldots, x_{t-1}) \]</div>
+<p class="ni">각 스텝에서:</p>
+<ol>
+<li>이전까지 생성된 토큰을 모델에 입력</li>
+<li>다음 토큰의 확률 분포 \(P(x_t | x_{&lt;t})\) 계산</li>
+<li>확률 분포에서 토큰 선택 (greedy, sampling, beam search 등)</li>
+<li>선택된 토큰을 시퀀스에 추가</li>
+<li>[EOS] 토큰이 나올 때까지 반복</li>
+</ol>
+</div>
+
+<div class="diagram">Autoregressive 생성 예시
+
+Step 1: Input: "Once"
+         Model → P(next | "Once") → "upon" (가장 높은 확률)
+
+Step 2: Input: "Once upon"
+         Model → P(next | "Once upon") → "a"
+
+Step 3: Input: "Once upon a"
+         Model → P(next | "Once upon a") → "time"
+
+Step 4: Input: "Once upon a time"
+         Model → P(next | "Once upon a time") → ","
+
+...계속 반복...
+
+Step N: Input: "Once upon a time, there was a..."
+         Model → P(next | ...) → [EOS]  ← 생성 종료
+
+★ 핵심: 각 스텝에서 이전 토큰의 KV Cache를 재사용!
+  → 새 토큰의 Q만 계산하면 됨 (Round 3에서 배운 KV Cache)</div>
+
+<pre><code><span class="cm"># Autoregressive 생성 (간단한 구현)</span>
+<span class="kw">import</span> torch
+
+<span class="kw">def</span> <span class="fn">generate</span>(model, tokenizer, prompt, max_new_tokens=<span class="nu">50</span>, temperature=<span class="nu">1.0</span>):
+    <span class="st">"""간단한 autoregressive 텍스트 생성"""</span>
+    input_ids = tokenizer.encode(prompt, return_tensors=<span class="st">'pt'</span>)
+    
+    <span class="kw">for</span> _ <span class="kw">in</span> <span class="fn">range</span>(max_new_tokens):
+        <span class="cm"># 1. 모델에 현재 시퀀스 입력</span>
+        <span class="kw">with</span> torch.no_grad():
+            logits = model(input_ids).logits  <span class="cm"># (1, seq_len, vocab_size)</span>
+        
+        <span class="cm"># 2. 마지막 토큰의 logits만 사용</span>
+        next_logits = logits[:, -<span class="nu">1</span>, :] / temperature
+        
+        <span class="cm"># 3. 확률 분포에서 샘플링</span>
+        probs = torch.softmax(next_logits, dim=-<span class="nu">1</span>)
+        next_token = torch.multinomial(probs, num_samples=<span class="nu">1</span>)
+        
+        <span class="cm"># 4. 시퀀스에 추가</span>
+        input_ids = torch.cat([input_ids, next_token], dim=-<span class="nu">1</span>)
+        
+        <span class="cm"># 5. EOS 체크</span>
+        <span class="kw">if</span> next_token.item() == tokenizer.eos_token_id:
+            <span class="kw">break</span>
+    
+    <span class="kw">return</span> tokenizer.decode(input_ids[<span class="nu">0</span>])
+
+<span class="cm"># 사용 예시 (pseudo-code)</span>
+<span class="cm"># result = generate(gpt2_model, gpt2_tokenizer, "Once upon a time")</span>
+<span class="cm"># print(result)</span>
+<span class="cm"># "Once upon a time, there was a young girl who lived in a small village..."</span></code></pre>
+
+<h3>4.4 왜 Decoder-only가 현재 주류인가?</h3>
+
+<div class="ok">
+<p class="ni"><strong>Decoder-only의 장점:</strong></p>
+<ol>
+<li><strong>단순성:</strong> 하나의 구조, 하나의 학습 목표 (next token prediction). Encoder-Decoder보다 구현이 간단</li>
+<li><strong>Scaling:</strong> 파라미터를 늘리면 성능이 예측 가능하게 향상 (Scaling Laws, Kaplan et al. 2020)</li>
+<li><strong>범용성:</strong> 생성 능력으로 거의 모든 태스크를 수행 가능. 분류도 "positive"/"negative" 텍스트 생성으로 해결</li>
+<li><strong>In-context Learning:</strong> Few-shot 예시를 prompt에 넣으면 fine-tuning 없이 새 태스크 수행</li>
+<li><strong>KV Cache 효율:</strong> Autoregressive 생성에서 KV Cache로 효율적 추론 가능</li>
+</ol>
+</div>
+
+<div class="warn">
+<p class="ni"><strong>Decoder-only의 한계:</strong></p>
+<ul>
+<li>단방향 attention → 양방향 이해가 필요한 태스크에서 비효율적 (같은 파라미터 대비)</li>
+<li>Autoregressive 생성은 본질적으로 순차적 → 병렬화 어려움</li>
+<li>긴 출력 생성 시 KV Cache 메모리 문제 (Round 3에서 다룸)</li>
+<li>Hallucination: 그럴듯하지만 틀린 내용 생성 가능</li>
+</ul>
+</div>
+
+<h3>4.5 대표 Decoder-only 모델들</h3>
+
+<div class="tc">Table 2. 주요 Decoder-only 모델 비교</div>
+<table>
+<tr><th>모델</th><th>연도</th><th>파라미터</th><th>Context Length</th><th>핵심 특징</th></tr>
+<tr><td>GPT-1</td><td>2018</td><td>117M</td><td>512</td><td>최초의 Decoder-only pre-training</td></tr>
+<tr><td>GPT-2</td><td>2019</td><td>1.5B</td><td>1,024</td><td>Zero-shot 능력 시연</td></tr>
+<tr><td>GPT-3</td><td>2020</td><td>175B</td><td>2,048</td><td>Few-shot learning, Scaling</td></tr>
+<tr><td>LLaMA</td><td>2023</td><td>7-65B</td><td>2,048</td><td>오픈소스, RoPE, Pre-Norm</td></tr>
+<tr><td>LLaMA 2</td><td>2023</td><td>7-70B</td><td>4,096</td><td>GQA, 더 많은 데이터</td></tr>
+<tr><td>Mistral 7B</td><td>2023</td><td>7B</td><td>32K</td><td>SWA + GQA (Round 3)</td></tr>
+<tr><td>GPT-4</td><td>2023</td><td>~1.8T*</td><td>128K</td><td>Multimodal, MoE (추정)</td></tr>
+</table>
+<p class="ni" style="font-size:11px;color:#888">* GPT-4의 정확한 파라미터 수는 공개되지 않음</p>
