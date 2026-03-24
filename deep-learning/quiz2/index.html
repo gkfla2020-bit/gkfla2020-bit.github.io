@@ -1,0 +1,788 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Quiz 2 복습 (135/150) | 딥러닝</title>
+<script>MathJax={tex:{inlineMath:[['\\(','\\)']],displayMath:[['\\[','\\]']]}}</script>
+<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;500&family=Inter:wght@300;400;500&family=Space+Mono:wght@400&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Inter',sans-serif;background:#fafaf8;color:#1a1a1a;line-height:1.7;overflow-x:hidden}
+.sidebar{position:fixed;left:0;top:0;width:260px;height:100vh;background:rgba(255,255,255,.97);border-right:1px solid rgba(0,0,0,.06);padding:32px 24px;z-index:100;overflow-y:auto;display:flex;flex-direction:column}
+.sidebar-profile{text-align:center;margin-bottom:28px;padding-bottom:24px;border-bottom:1px solid rgba(0,0,0,.08)}
+.profile-icon{font-size:48px;margin-bottom:8px}
+.profile-name{font-family:'Cormorant Garamond',serif;font-size:1.3rem;font-weight:500;margin-bottom:4px}
+.profile-title{font-size:.68rem;color:#888;letter-spacing:.08em;text-transform:uppercase;margin-bottom:8px}
+.profile-bio{font-size:.78rem;color:#666;line-height:1.5}
+.sidebar-nav{flex:1;margin-top:16px}
+.nav-section{margin-bottom:20px}
+.nav-section-title{font-size:.6rem;font-weight:600;color:#aaa;letter-spacing:.15em;text-transform:uppercase;margin-bottom:10px}
+.nav-list{list-style:none}
+.nav-list li{margin-bottom:5px}
+.nav-list a{font-size:.78rem;color:#555;text-decoration:none;transition:all .2s;display:block;padding:3px 0}
+.nav-list a:hover{color:#0080c6;padding-left:4px}
+.nav-list a.active{color:#0080c6;font-weight:500}
+.badge{display:inline-block;font-size:.5rem;background:#0080c6;color:#fff;padding:1px 5px;border-radius:8px;margin-left:3px;vertical-align:middle}
+.badge-quiz{background:#e74c3c}
+.badge-score{background:#27ae60}
+.sidebar-footer{padding-top:16px;border-top:1px solid rgba(0,0,0,.06);font-size:.65rem;color:#aaa;text-align:center}
+.main-wrapper{margin-left:260px;min-height:100vh}
+.container{max-width:1100px;margin:0 auto;padding:50px 40px 80px}
+.paper-content{font-family:'Times New Roman','Nanum Myeongjo',serif;line-height:1.8;background:#fff;padding:40px;border-radius:8px;box-shadow:0 2px 20px rgba(0,0,0,.05)}
+.paper-header{text-align:center;margin-bottom:40px;padding-bottom:30px;border-bottom:2px solid #333}
+.paper-category{font-size:14px;color:#666;margin-bottom:10px}
+.paper-title{font-size:24px;font-weight:bold;margin-bottom:12px;line-height:1.4}
+.paper-subtitle{font-size:14px;color:#555;margin-bottom:8px}
+.paper-team{font-size:13px;color:#444}
+h2{font-size:18px;margin:35px 0 20px;padding-bottom:8px;border-bottom:1px solid #ddd;color:#2c3e50}
+h3{font-size:15px;margin:25px 0 15px;color:#34495e}
+p{text-align:justify;margin-bottom:15px;text-indent:2em}
+p.ni{text-indent:0}
+.info{background:#e8f4f8;border-left:4px solid #3498db;padding:20px;margin:20px 0;border-radius:0 4px 4px 0}
+.warn{background:#fff3cd;border-left:4px solid #f39c12;padding:20px;margin:20px 0;border-radius:0 4px 4px 0}
+.ok{background:#d4edda;border-left:4px solid #28a745;padding:20px;margin:20px 0;border-radius:0 4px 4px 0}
+.def{background:#fff9e6;border:1px solid #ffc107;border-radius:4px;padding:20px;margin:20px 0}
+.eq{text-align:center;margin:20px 0;padding:15px;background:#f8f9fa;border-radius:4px}
+table{width:100%;border-collapse:collapse;margin:20px 0;font-size:12px}
+th,td{border:1px solid #ddd;padding:10px 8px;text-align:center}
+th{background:#2c3e50;color:white;font-weight:bold}
+tr:nth-child(even){background:#f8f9fa}
+.tc{font-size:13px;font-weight:bold;margin:15px 0 10px;text-align:center}
+ul,ol{margin-left:2em;margin-bottom:15px}
+li{margin-bottom:6px}
+p code,li code{background:#f0f0f0;padding:2px 6px;border-radius:3px;color:#c7254e;font-size:12px}
+
+/* Quiz styling */
+.q-card{background:#fff;border:1px solid #e0e0e0;border-radius:8px;padding:24px;margin:20px 0;transition:all .3s}
+.q-card.answered-correct{border-color:#28a745;background:#f8fff8}
+.q-card.answered-wrong{border-color:#dc3545;background:#fff8f8}
+.q-num{font-size:.7rem;color:#888;letter-spacing:.1em;text-transform:uppercase;margin-bottom:8px}
+.q-text{font-size:14px;font-weight:600;margin-bottom:16px;line-height:1.6;text-indent:0}
+.q-options{list-style:none;margin:0;padding:0}
+.q-options li{padding:10px 14px;margin:6px 0;border:1px solid #e8e8e8;border-radius:6px;cursor:pointer;font-size:13px;transition:all .2s;position:relative}
+.q-options li:hover{background:#f0f4ff;border-color:#667eea}
+.q-options li.selected{background:#667eea;color:#fff;border-color:#667eea}
+.q-options li.correct-answer{background:#28a745;color:#fff;border-color:#28a745}
+.q-options li.wrong-answer{background:#dc3545;color:#fff;border-color:#dc3545}
+.q-options li.show-correct{border:2px solid #28a745;background:#d4edda}
+.q-explain{display:none;margin-top:16px;padding:16px;background:#f8f9fa;border-radius:6px;font-size:13px;line-height:1.7;border-left:3px solid #667eea}
+.q-explain.visible{display:block}
+.q-tag{display:inline-block;font-size:.6rem;padding:2px 8px;border-radius:10px;margin-right:4px;font-weight:600}
+.tag-nlp{background:#3498db20;color:#3498db}
+.tag-attn{background:#9b59b620;color:#9b59b6}
+.tag-tfm{background:#e67e2220;color:#e67e22}
+.tag-pe{background:#2ecc7120;color:#2ecc71}
+.tag-norm{background:#e74c3c20;color:#e74c3c}
+.tag-rnn{background:#f39c1220;color:#f39c12}
+
+/* Score bar */
+.score-bar{position:sticky;top:0;background:rgba(255,255,255,.95);backdrop-filter:blur(10px);padding:12px 20px;border-bottom:1px solid rgba(0,0,0,.08);z-index:50;display:flex;align-items:center;justify-content:space-between;font-size:13px}
+.score-display{font-weight:600;color:#2c3e50}
+.score-progress{flex:1;max-width:300px;height:6px;background:#e8e8e8;border-radius:3px;margin:0 16px;overflow:hidden}
+.score-fill{height:100%;background:linear-gradient(90deg,#667eea,#764ba2);border-radius:3px;transition:width .3s}
+.btn-check{background:linear-gradient(135deg,#667eea,#764ba2);color:#fff;border:none;padding:8px 20px;border-radius:6px;cursor:pointer;font-size:13px;font-weight:500;transition:all .2s}
+.btn-check:hover{transform:translateY(-1px);box-shadow:0 4px 12px rgba(102,126,234,.4)}
+.btn-reset{background:#f0f0f0;color:#555;border:none;padding:8px 16px;border-radius:6px;cursor:pointer;font-size:12px;margin-left:8px}
+
+/* Topic summary */
+.topic-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px;margin:20px 0}
+.topic-card{background:#f8f9fa;border-radius:8px;padding:16px;text-align:center;border:1px solid #e8e8e8}
+.topic-card .count{font-size:24px;font-weight:700;color:#2c3e50}
+.topic-card .label{font-size:.75rem;color:#888;margin-top:4px}
+
+@media(max-width:1024px){
+.sidebar{width:100%;height:auto;position:relative;border-right:none;border-bottom:1px solid rgba(0,0,0,.08);padding:16px}
+.sidebar-profile{margin-bottom:10px;padding-bottom:10px;display:flex;align-items:center;gap:12px;text-align:left}
+.profile-icon{font-size:32px;margin-bottom:0}.profile-bio{display:none}
+.nav-section{display:inline-block;margin-right:16px;margin-bottom:8px}
+.nav-list{display:flex;gap:10px;flex-wrap:wrap}.nav-list li{margin-bottom:0}
+.sidebar-footer{display:none}
+.main-wrapper{margin-left:0}
+.container{padding:20px 16px}.paper-content{padding:20px 16px;border-radius:0;box-shadow:none}
+.paper-title{font-size:18px}p{font-size:14px;text-indent:1.5em;text-align:left}
+.score-bar{flex-wrap:wrap;gap:8px}
+}
+</style>
+</head>
+<body>
+
+<div class="sidebar">
+<div class="sidebar-profile">
+<div class="profile-icon">📝</div>
+<div class="profile-name">Quiz 2 복습</div>
+<div class="profile-title">135 / 150 · 90%</div>
+<div class="profile-bio">2026.03.24 시험 · Lecture 1+2 범위 · 30문제 5점</div>
+</div>
+<div class="sidebar-nav">
+<div class="nav-section">
+<div class="nav-section-title">Topics</div>
+<ul class="nav-list">
+<li><a href="#topic-overview">📊 토픽별 분석</a></li>
+<li><a href="#sec-nlp">NLP 기초 (Q1-5)</a></li>
+<li><a href="#sec-rnn">RNN & LSTM (Q6-8)</a></li>
+<li><a href="#sec-attn">Attention (Q9-14)</a></li>
+<li><a href="#sec-tfm">Transformer (Q15-20)</a></li>
+<li><a href="#sec-pe">Position Encoding (Q21-27)</a></li>
+<li><a href="#sec-norm">Norm & Advanced (Q28-30)</a></li>
+</ul>
+</div>
+<div class="nav-section">
+<div class="nav-section-title">Navigation</div>
+<ul class="nav-list">
+<li><a href="#cheatsheet">📋 Cheat Sheet</a></li>
+<li><a href="../transformer/">← Lecture 1 정리</a></li>
+<li><a href="../lecture2/">← Lecture 2 Rounds</a></li>
+</ul>
+</div>
+</div>
+<div class="sidebar-footer">Quiz Date: 2026.03.24 · 30분 제한</div>
+</div>
+
+<div class="main-wrapper">
+
+<div class="score-bar">
+<span class="score-display">Score: <span id="score">0</span> / 150</span>
+<div class="score-progress"><div class="score-fill" id="scoreFill" style="width:0%"></div></div>
+<button class="btn-check" onclick="checkAll()">전체 채점</button>
+<button class="btn-reset" onclick="resetAll()">초기화</button>
+</div>
+
+<div class="container">
+<div class="paper-content">
+
+<div class="paper-header">
+<div class="paper-category">딥러닝(01) · Quiz 2 · 2026.03.24</div>
+<h1 class="paper-title">Quiz 2 복습 & 해설</h1>
+<div class="paper-subtitle">135/150 (90%) · 30문제 × 5점 · Lecture 1 + 2 범위</div>
+<div class="paper-team">응시: 16:38 ~ 16:43 (약 5분) · 시험시간 30분</div>
+</div>
+
+<!-- Topic Overview -->
+<h2 id="topic-overview">토픽별 출제 분석</h2>
+<div class="topic-grid">
+<div class="topic-card"><div class="count">5</div><div class="label">NLP 기초 · Embedding</div></div>
+<div class="topic-card"><div class="count">3</div><div class="label">RNN · LSTM</div></div>
+<div class="topic-card"><div class="count">6</div><div class="label">Attention</div></div>
+<div class="topic-card"><div class="count">6</div><div class="label">Transformer 구조</div></div>
+<div class="topic-card"><div class="count">7</div><div class="label">Position Encoding</div></div>
+<div class="topic-card"><div class="count">3</div><div class="label">Norm · 종합</div></div>
+</div>
+
+<!-- ═══════════════════════════════════════ -->
+<!-- NLP 기초 Q1-5 -->
+<!-- ═══════════════════════════════════════ -->
+<h2 id="sec-nlp">NLP 기초 & Embedding (Q1–5)</h2>
+</div></div></div>
+</body>
+</html>
+<h2 id="sec-nlp">NLP 기초 & Embedding (Q1–5)</h2>
+
+<div class="q-card" data-correct="2" data-points="5">
+<div class="q-num">Question 1 <span class="q-tag tag-nlp">Embedding</span></div>
+<p class="q-text ni">Which property best explains why one-hot vectors fail to capture semantic similarity?</p>
+<ol class="q-options">
+<li data-idx="1">High dimensionality</li>
+<li data-idx="2">Orthogonality between vectors</li>
+<li data-idx="3">Sparsity</li>
+<li data-idx="4">Fixed vocabulary</li>
+</ol>
+<div class="q-explain">
+<strong>정답: ② Orthogonality between vectors</strong><br>
+One-hot 벡터는 모든 단어 쌍의 dot product = 0 (직교). 따라서 cos similarity도 0이 되어 의미적 유사성을 전혀 반영 못 함. High dimensionality나 sparsity도 문제지만, semantic similarity 실패의 직접적 원인은 orthogonality.
+</div>
+</div>
+
+<div class="q-card" data-correct="2" data-points="5">
+<div class="q-num">Question 2 <span class="q-tag tag-nlp">Word2Vec</span></div>
+<p class="q-text ni">Which limitation of Word2Vec is most critical for sentence-level understanding?</p>
+<ol class="q-options">
+<li data-idx="1">High memory usage</li>
+<li data-idx="2">Lack of contextual awareness</li>
+<li data-idx="3">Slow training</li>
+<li data-idx="4">Poor generalization</li>
+</ol>
+<div class="q-explain">
+<strong>정답: ② Lack of contextual awareness</strong><br>
+Word2Vec은 단어마다 하나의 고정 벡터를 부여. "bank"가 은행인지 강둑인지 문맥에 따라 달라져야 하는데, 항상 같은 벡터. 이것이 BERT/GPT 같은 contextual embedding의 등장 동기.
+</div>
+</div>
+
+<div class="q-card" data-correct="2" data-points="5">
+<div class="q-num">Question 3 <span class="q-tag tag-nlp">Word2Vec</span></div>
+<p class="q-text ni">Which statement is TRUE about Word2Vec?</p>
+<ol class="q-options">
+<li data-idx="1">CBOW uses future context only</li>
+<li data-idx="2">Skip-gram predicts context from center word</li>
+<li data-idx="3">CBOW captures word order</li>
+<li data-idx="4">Skip-gram requires labeled data</li>
+</ol>
+<div class="q-explain">
+<strong>정답: ② Skip-gram predicts context from center word</strong><br>
+Skip-gram: 중심 단어 → 주변 단어 예측. CBOW: 주변 단어 → 중심 단어 예측. 둘 다 self-supervised (labeled data 불필요). CBOW는 bag-of-words라 word order 무시.
+</div>
+</div>
+
+<div class="q-card" data-correct="2" data-points="5">
+<div class="q-num">Question 4 <span class="q-tag tag-nlp">Tokenization</span></div>
+<p class="q-text ni">Why does subword tokenization outperform word-level tokenization?</p>
+<ol class="q-options">
+<li data-idx="1">Removes need for embeddings</li>
+<li data-idx="2">Captures morphology and reduces OOV</li>
+<li data-idx="3">Always produces shorter sequences</li>
+<li data-idx="4">Requires smaller vocabulary</li>
+</ol>
+<div class="q-explain">
+<strong>정답: ② Captures morphology and reduces OOV</strong><br>
+Subword (BPE, WordPiece): "reading" = "read" + "ing". 어근을 공유하므로 OOV 감소 + 형태소 정보 활용. 시퀀스가 항상 짧아지는 건 아님 (character보다는 짧지만 word보다는 길 수 있음).
+</div>
+</div>
+
+<div class="q-card" data-correct="2" data-points="5">
+<div class="q-num">Question 5 <span class="q-tag tag-nlp">Tokenization</span></div>
+<p class="q-text ni">Which trade-off is MOST accurate for character-level tokenization?</p>
+<ol class="q-options">
+<li data-idx="1">High interpretability / low robustness</li>
+<li data-idx="2">Low OOV / higher computational cost</li>
+<li data-idx="3">Low dimensionality / high sparsity</li>
+<li data-idx="4">High speed / low flexibility</li>
+</ol>
+<div class="q-explain">
+<strong>정답: ② Low OOV / higher computational cost</strong><br>
+Character-level: 알파벳 26자 + 특수문자만 있으면 되니 OOV 거의 없음. 하지만 "World Health Organization" = 24+ 토큰 → 시퀀스 길어져서 계산 비용 증가.
+</div>
+</div>
+
+<!-- ═══════════════════════════════════════ -->
+<!-- RNN & LSTM Q6-8 -->
+<!-- ═══════════════════════════════════════ -->
+<h2 id="sec-rnn">RNN & LSTM (Q6–8)</h2>
+
+<div class="q-card" data-correct="2" data-points="5">
+<div class="q-num">Question 6 <span class="q-tag tag-rnn">RNN</span></div>
+<p class="q-text ni">Why do RNNs struggle with long sequences?</p>
+<ol class="q-options">
+<li data-idx="1">Attention bottleneck</li>
+<li data-idx="2">Gradient instability (vanishing/exploding)</li>
+<li data-idx="3">Tokenization error</li>
+<li data-idx="4">Memory overflow</li>
+</ol>
+<div class="q-explain">
+<strong>정답: ② Gradient instability (vanishing/exploding)</strong><br>
+RNN은 역전파 시 hidden state를 여러 번 거치면서 gradient가 기하급수적으로 작아지거나(vanishing) 커짐(exploding). 이것이 long-range dependency 학습을 어렵게 만드는 핵심 원인.
+</div>
+</div>
+
+<div class="q-card" data-correct="2" data-points="5">
+<div class="q-num">Question 7 <span class="q-tag tag-rnn">LSTM</span></div>
+<p class="q-text ni">What is the key innovation of LSTM over vanilla RNN?</p>
+<ol class="q-options">
+<li data-idx="1">Parallel computation</li>
+<li data-idx="2">Gated control of information flow</li>
+<li data-idx="3">Larger hidden dimension</li>
+<li data-idx="4">Removal of recurrence</li>
+</ol>
+<div class="q-explain">
+<strong>정답: ② Gated control of information flow</strong><br>
+LSTM의 핵심 = forget gate, input gate, output gate로 정보 흐름을 제어. Cell state라는 "고속도로"를 통해 gradient가 직접 흐를 수 있게 함. 병렬 처리는 여전히 불가 (그건 Transformer의 장점).
+</div>
+</div>
+
+<div class="q-card" data-correct="2" data-points="5">
+<div class="q-num">Question 8 <span class="q-tag tag-rnn">RNN</span></div>
+<p class="q-text ni">Which scenario best demonstrates RNN limitation?</p>
+<ol class="q-options">
+<li data-idx="1">Short sentence classification</li>
+<li data-idx="2">Predicting next word in long paragraph</li>
+<li data-idx="3">Tokenization</li>
+<li data-idx="4">Word embedding</li>
+</ol>
+<div class="q-explain">
+<strong>정답: ② Predicting next word in long paragraph</strong><br>
+긴 문단에서 다음 단어 예측 = long-range dependency가 필요한 전형적 태스크. RNN은 vanishing gradient 때문에 먼 과거 정보를 잃어버림. 짧은 문장 분류는 RNN도 잘 함.
+</div>
+</div>
+
+<!-- ═══════════════════════════════════════ -->
+<!-- Attention Q9-14 -->
+<!-- ═══════════════════════════════════════ -->
+<h2 id="sec-attn">Attention Mechanism (Q9–14)</h2>
+
+<div class="q-card" data-correct="3" data-points="5">
+<div class="q-num">Question 9 <span class="q-tag tag-attn">Attention</span></div>
+<p class="q-text ni">Why was attention introduced in seq2seq models?</p>
+<ol class="q-options">
+<li data-idx="1">Reduce training cost</li>
+<li data-idx="2">Eliminate embeddings</li>
+<li data-idx="3">Overcome fixed-length context bottleneck</li>
+<li data-idx="4">Improve tokenization</li>
+</ol>
+<div class="q-explain">
+<strong>정답: ③ Overcome fixed-length context bottleneck</strong><br>
+Seq2Seq의 문제: 전체 입력을 하나의 고정 길이 context vector로 압축 → 정보 손실. Attention은 디코더가 인코더의 모든 hidden state에 직접 접근하게 해서 이 bottleneck을 해결.
+</div>
+</div>
+
+<div class="q-card" data-correct="2" data-points="5">
+<div class="q-num">Question 10 <span class="q-tag tag-attn">Attention</span></div>
+<p class="q-text ni">What does attention compute fundamentally?</p>
+<ol class="q-options">
+<li data-idx="1">Convolution</li>
+<li data-idx="2">Weighted average of values</li>
+<li data-idx="3">Matrix factorization</li>
+<li data-idx="4">Token classification</li>
+</ol>
+<div class="q-explain">
+<strong>정답: ② Weighted average of values</strong><br>
+\(\text{Attention}(Q,K,V) = \text{softmax}(\frac{QK^T}{\sqrt{d_k}})V\). softmax가 weight를 만들고, 그 weight로 V의 가중 평균을 구함. 핵심은 "어떤 value에 얼마나 주목할지"를 결정하는 것.
+</div>
+</div>
+
+<div class="q-card" data-correct="2" data-points="5">
+<div class="q-num">Question 11 <span class="q-tag tag-attn">Q/K/V</span></div>
+<p class="q-text ni">Which is TRUE about Query-Key interaction?</p>
+<ol class="q-options">
+<li data-idx="1">Key selects Query</li>
+<li data-idx="2">Query compares against Keys</li>
+<li data-idx="3">Values determine similarity</li>
+<li data-idx="4">Query stores output</li>
+</ol>
+<div class="q-explain">
+<strong>정답: ② Query compares against Keys</strong><br>
+Q·K^T = Query가 모든 Key와 비교하여 유사도(similarity score)를 계산. Query = "내가 찾고 싶은 것", Key = "나를 찾을 때 쓸 식별자". Value는 유사도 계산에 관여하지 않고, 최종 출력에만 사용됨.
+</div>
+</div>
+
+<div class="q-card" data-correct="2" data-points="5">
+<div class="q-num">Question 12 <span class="q-tag tag-attn">Attention</span></div>
+<p class="q-text ni">Why is dot product used in attention?</p>
+<ol class="q-options">
+<li data-idx="1">Minimizes memory</li>
+<li data-idx="2">Efficient similarity computation</li>
+<li data-idx="3">Ensures normalization</li>
+<li data-idx="4">Reduces sequence length</li>
+</ol>
+<div class="q-explain">
+<strong>정답: ② Efficient similarity computation</strong><br>
+Dot product = 두 벡터의 유사도를 O(d)로 빠르게 계산. 행렬 곱으로 배치 처리 가능 → GPU 친화적. Normalization은 softmax + scaling이 담당.
+</div>
+</div>
+
+<div class="q-card" data-correct="2" data-points="5">
+<div class="q-num">Question 13 <span class="q-tag tag-attn">Attention</span></div>
+<p class="q-text ni">What happens if attention weights are uniform?</p>
+<ol class="q-options">
+<li data-idx="1">Model fails</li>
+<li data-idx="2">Output becomes average of all values</li>
+<li data-idx="3">Gradients explode</li>
+<li data-idx="4">No embeddings</li>
+</ol>
+<div class="q-explain">
+<strong>정답: ② Output becomes average of all values</strong><br>
+Uniform weights = 모든 토큰에 동일한 가중치 (1/n). 그러면 output = V의 단순 평균. 특정 토큰에 "주목"하는 능력을 잃어버림. 모델이 완전히 실패하진 않지만 성능이 크게 떨어짐.
+</div>
+</div>
+
+<div class="q-card" data-correct="3" data-points="5">
+<div class="q-num">Question 14 <span class="q-tag tag-attn">Self-Attention</span></div>
+<p class="q-text ni">Which is TRUE about self-attention?</p>
+<ol class="q-options">
+<li data-idx="1">Only attends to previous tokens</li>
+<li data-idx="2">Requires recurrence</li>
+<li data-idx="3">Each token attends to all tokens</li>
+<li data-idx="4">Uses convolution</li>
+</ol>
+<div class="q-explain">
+<strong>정답: ③ Each token attends to all tokens</strong><br>
+Self-attention에서 Q, K, V 모두 같은 시퀀스에서 옴. 각 토큰이 시퀀스의 모든 토큰과 attention을 계산. ①은 causal/masked attention (decoder)의 특성. Self-attention 자체는 양방향.
+</div>
+</div>
+
+<!-- ═══════════════════════════════════════ -->
+<!-- Transformer Q15-20 -->
+<!-- ═══════════════════════════════════════ -->
+<h2 id="sec-tfm">Transformer 구조 (Q15–20)</h2>
+
+<div class="q-card" data-correct="4" data-points="5">
+<div class="q-num">Question 15 <span class="q-tag tag-tfm">Transformer</span></div>
+<p class="q-text ni">Which component is NOT in Transformer encoder?</p>
+<ol class="q-options">
+<li data-idx="1">Self-attention</li>
+<li data-idx="2">FFN</li>
+<li data-idx="3">Positional encoding</li>
+<li data-idx="4">Recurrence</li>
+</ol>
+<div class="q-explain">
+<strong>정답: ④ Recurrence</strong><br>
+Transformer의 핵심 = "Attention Is All You Need" → RNN의 recurrence를 완전히 제거. Encoder는 Self-Attention + FFN + Residual + LayerNorm으로 구성. Recurrence 없이 병렬 처리 가능.
+</div>
+</div>
+
+<div class="q-card" data-correct="2" data-points="5">
+<div class="q-num">Question 16 <span class="q-tag tag-tfm">Transformer</span></div>
+<p class="q-text ni">Why is Transformer more parallelizable than RNN?</p>
+<ol class="q-options">
+<li data-idx="1">No embeddings</li>
+<li data-idx="2">No sequential dependency in computation</li>
+<li data-idx="3">No gradients</li>
+<li data-idx="4">Smaller model</li>
+</ol>
+<div class="q-explain">
+<strong>정답: ② No sequential dependency in computation</strong><br>
+RNN: h_t는 h_{t-1}에 의존 → 순차 처리 필수. Transformer: self-attention은 모든 토큰을 동시에 처리 (행렬 곱). 이것이 GPU/TPU 활용의 핵심 이점.
+</div>
+</div>
+
+<div class="q-card" data-correct="3" data-points="5">
+<div class="q-num">Question 17 <span class="q-tag tag-tfm">FFN</span></div>
+<p class="q-text ni">What is the main role of FFN layer?</p>
+<ol class="q-options">
+<li data-idx="1">Token interaction</li>
+<li data-idx="2">Position encoding</li>
+<li data-idx="3">Non-linear transformation per token</li>
+<li data-idx="4">Reduce sequence length</li>
+</ol>
+<div class="q-explain">
+<strong>정답: ③ Non-linear transformation per token</strong><br>
+FFN = position-wise feed-forward network. 각 토큰에 독립적으로 적용 (토큰 간 상호작용 없음 — 그건 attention의 역할). FFN(x) = ReLU(xW₁+b₁)W₂+b₂. 비선형 변환으로 표현력 증가.
+</div>
+</div>
+
+<div class="q-card" data-correct="2" data-points="5">
+<div class="q-num">Question 18 <span class="q-tag tag-tfm">Multi-Head</span></div>
+<p class="q-text ni">Why is multi-head attention useful?</p>
+<ol class="q-options">
+<li data-idx="1">Reduces parameters</li>
+<li data-idx="2">Captures diverse relationships</li>
+<li data-idx="3">Removes positional encoding</li>
+<li data-idx="4">Reduces vocabulary</li>
+</ol>
+<div class="q-explain">
+<strong>정답: ② Captures diverse relationships</strong><br>
+각 head가 다른 subspace에서 attention을 계산 → 문법적 관계, 의미적 관계, 위치 관계 등 다양한 패턴을 동시에 포착. CNN의 multiple filters와 유사한 아이디어.
+</div>
+</div>
+
+<div class="q-card" data-correct="2" data-points="5">
+<div class="q-num">Question 19 <span class="q-tag tag-tfm">Transformer</span></div>
+<p class="q-text ni">If we remove attention but keep FFN, what happens?</p>
+<ol class="q-options">
+<li data-idx="1">Model still captures dependencies</li>
+<li data-idx="2">Model cannot model interactions between tokens</li>
+<li data-idx="3">Model becomes RNN</li>
+<li data-idx="4">No effect</li>
+</ol>
+<div class="q-explain">
+<strong>정답: ② Model cannot model interactions between tokens</strong><br>
+FFN은 각 토큰에 독립적으로 적용 (position-wise). 토큰 간 상호작용은 오직 attention이 담당. Attention 없으면 각 토큰이 다른 토큰의 정보를 전혀 참조 못 함.
+</div>
+</div>
+
+<div class="q-card" data-correct="2" data-points="5">
+<div class="q-num">Question 20 <span class="q-tag tag-tfm">Output</span></div>
+<p class="q-text ni">Which is TRUE about Transformer output layer?</p>
+<ol class="q-options">
+<li data-idx="1">Regression task</li>
+<li data-idx="2">Predicts token probabilities over vocabulary</li>
+<li data-idx="3">Removes embeddings</li>
+<li data-idx="4">Uses convolution</li>
+</ol>
+<div class="q-explain">
+<strong>정답: ② Predicts token probabilities over vocabulary</strong><br>
+최종 linear layer + softmax → vocabulary 크기의 확률 분포 출력. 각 위치에서 다음 토큰(또는 마스킹된 토큰)의 확률을 예측.
+</div>
+</div>
+
+<!-- ═══════════════════════════════════════ -->
+<!-- Position Encoding Q21-27 -->
+<!-- ═══════════════════════════════════════ -->
+<h2 id="sec-pe">Position Encoding (Q21–27)</h2>
+
+<div class="q-card" data-correct="3" data-points="5">
+<div class="q-num">Question 21 <span class="q-tag tag-pe">PE</span></div>
+<p class="q-text ni">Without positional encoding, Transformer becomes:</p>
+<ol class="q-options">
+<li data-idx="1">Sequential model</li>
+<li data-idx="2">Order-aware</li>
+<li data-idx="3">Permutation-equivariant</li>
+<li data-idx="4">Recurrent</li>
+</ol>
+<div class="q-explain">
+<strong>정답: ③ Permutation-equivariant</strong><br>
+PE 없으면 입력 토큰 순서를 바꿔도 출력이 같은 순서로 바뀜 (permutation-equivariant). "I love you" = "You love I". Self-attention 자체는 순서 정보가 없기 때문.
+</div>
+</div>
+
+<div class="q-card" data-correct="2" data-points="5">
+<div class="q-num">Question 22 <span class="q-tag tag-pe">Learned PE</span></div>
+<p class="q-text ni">Why do learned positional embeddings fail on longer sequences?</p>
+<ol class="q-options">
+<li data-idx="1">Overfitting</li>
+<li data-idx="2">Fixed embedding table size</li>
+<li data-idx="3">Gradient vanishing</li>
+<li data-idx="4">Token mismatch</li>
+</ol>
+<div class="q-explain">
+<strong>정답: ② Fixed embedding table size</strong><br>
+Learned PE = 위치별로 학습된 embedding 벡터 테이블. 학습 시 최대 길이(예: 512)까지만 테이블이 있으므로, 그보다 긴 시퀀스에는 대응하는 embedding이 없음. 외삽(extrapolation) 불가.
+</div>
+</div>
+
+<div class="q-card" data-correct="2" data-points="5">
+<div class="q-num">Question 23 <span class="q-tag tag-pe">Sinusoidal</span></div>
+<p class="q-text ni">Key idea of sinusoidal encoding:</p>
+<ol class="q-options">
+<li data-idx="1">Random noise</li>
+<li data-idx="2">Encode positions using periodic functions</li>
+<li data-idx="3">Learn embeddings</li>
+<li data-idx="4">Reduce parameters</li>
+</ol>
+<div class="q-explain">
+<strong>정답: ② Encode positions using periodic functions</strong><br>
+\(PE_{(pos,2i)} = \sin(pos/10000^{2i/d})\), \(PE_{(pos,2i+1)} = \cos(pos/10000^{2i/d})\). 주기 함수로 위치를 인코딩 → 학습 파라미터 없이 사용 가능 (hard-coded).
+</div>
+</div>
+
+<div class="q-card" data-correct="2" data-points="5">
+<div class="q-num">Question 24 <span class="q-tag tag-pe">Sinusoidal</span></div>
+<p class="q-text ni">Why does sinusoidal encoding generalize?</p>
+<ol class="q-options">
+<li data-idx="1">Uses learned weights</li>
+<li data-idx="2">Mathematical structure allows extrapolation</li>
+<li data-idx="3">Smaller embedding</li>
+<li data-idx="4">Uses attention</li>
+</ol>
+<div class="q-explain">
+<strong>정답: ② Mathematical structure allows extrapolation</strong><br>
+Sin/cos의 수학적 성질: PE_{pos+k}를 PE_{pos}의 선형 변환으로 표현 가능. 이 구조 덕분에 학습 시 보지 못한 더 긴 위치에도 자연스럽게 확장(extrapolation) 가능.
+</div>
+</div>
+
+<div class="q-card" data-correct="2" data-points="5">
+<div class="q-num">Question 25 <span class="q-tag tag-pe">Relative PE</span></div>
+<p class="q-text ni">Why is relative position more important than absolute?</p>
+<ol class="q-options">
+<li data-idx="1">Reduces memory</li>
+<li data-idx="2">Attention depends on relative distances</li>
+<li data-idx="3">Easier to train</li>
+<li data-idx="4">Removes embeddings</li>
+</ol>
+<div class="q-explain">
+<strong>정답: ② Attention depends on relative distances</strong><br>
+"The cat sat" — "cat"과 "sat"의 관계는 절대 위치(2번, 3번)보다 상대 거리(1칸 차이)가 중요. Attention score는 본질적으로 토큰 간 상대적 거리에 의존. ALiBi, RoPE 모두 상대 위치 인코딩.
+</div>
+</div>
+
+<div class="q-card" data-correct="2" data-points="5">
+<div class="q-num">Question 26 <span class="q-tag tag-pe">ALiBi</span></div>
+<p class="q-text ni">What does ALiBi do?</p>
+<ol class="q-options">
+<li data-idx="1">Adds positional embeddings</li>
+<li data-idx="2">Adds bias to attention scores</li>
+<li data-idx="3">Rotates embeddings</li>
+<li data-idx="4">Removes position info</li>
+</ol>
+<div class="q-explain">
+<strong>정답: ② Adds bias to attention scores</strong><br>
+ALiBi = Attention with Linear Biases. Attention score에 거리 비례 페널티를 <strong>더함</strong> (additive bias): score -= m·|i-j|. 학습 파라미터 없음. 멀리 있는 토큰일수록 attention score가 낮아짐. 키워드: bias, additive, penalty.
+</div>
+</div>
+
+<div class="q-card" data-correct="2" data-points="5">
+<div class="q-num">Question 27 <span class="q-tag tag-pe">RoPE</span></div>
+<p class="q-text ni">What is RoPE doing mathematically?</p>
+<ol class="q-options">
+<li data-idx="1">Scaling embeddings</li>
+<li data-idx="2">Rotating Q/K vectors</li>
+<li data-idx="3">Masking tokens</li>
+<li data-idx="4">Adding bias</li>
+</ol>
+<div class="q-explain">
+<strong>정답: ② Rotating Q/K vectors</strong><br>
+RoPE = Rotary Position Embedding. Q, K 벡터를 위치에 따라 <strong>회전</strong> (multiplicative). 회전 행렬 R(θ)을 곱함. 내적 q·k가 자동으로 상대 위치에 의존하게 됨. 키워드: rotate, multiply, Q/K 변환.<br><br>
+<strong>ALiBi vs RoPE 구분:</strong><br>
+• ALiBi = 덧셈 (attention score에 bias 더함)<br>
+• RoPE = 곱셈 (Q/K에 회전 행렬 곱함)
+</div>
+</div>
+
+<!-- ═══════════════════════════════════════ -->
+<!-- Norm & Advanced Q28-30 -->
+<!-- ═══════════════════════════════════════ -->
+<h2 id="sec-norm">Normalization & 종합 (Q28–30)</h2>
+
+<div class="q-card" data-correct="2" data-points="5">
+<div class="q-num">Question 28 <span class="q-tag tag-norm">LayerNorm</span></div>
+<p class="q-text ni">Why is Pre-Norm more stable than Post-Norm?</p>
+<ol class="q-options">
+<li data-idx="1">Reduces parameters</li>
+<li data-idx="2">Improves gradient flow in deep networks</li>
+<li data-idx="3">Removes residuals</li>
+<li data-idx="4">Eliminates attention</li>
+</ol>
+<div class="q-explain">
+<strong>정답: ② Improves gradient flow in deep networks</strong><br>
+Pre-Norm: LayerNorm을 sublayer 앞에 배치 → residual path가 깨끗하게 유지됨 → gradient가 직접 흐를 수 있음. Post-Norm은 sublayer 뒤에 norm → 깊은 네트워크에서 gradient 흐름이 불안정. GPT 계열은 대부분 Pre-Norm 사용.
+</div>
+</div>
+
+<div class="q-card" data-correct="2" data-points="5">
+<div class="q-num">Question 29 <span class="q-tag tag-tfm">종합</span> ⭐ 고난도</div>
+<p class="q-text ni">Consider a Transformer without positional encoding trained on sequence data. Which of the following tasks would be least affected by removing positional encoding?</p>
+<ol class="q-options">
+<li data-idx="1">Machine translation</li>
+<li data-idx="2">Sentiment classification of a sentence</li>
+<li data-idx="3">Next-word prediction</li>
+<li data-idx="4">Part-of-speech tagging</li>
+</ol>
+<div class="q-explain">
+<strong>정답: ② Sentiment classification of a sentence</strong><br>
+Sentiment classification = 문장 전체의 감정 판단. 단어 순서보다 어떤 단어가 있는지(bag-of-words적 특성)가 더 중요. "I love this movie" vs "this movie I love" → 둘 다 긍정. 반면 번역, 다음 단어 예측, POS 태깅은 순서가 핵심.
+</div>
+</div>
+
+<div class="q-card" data-correct="2" data-points="5">
+<div class="q-num">Question 30 <span class="q-tag tag-attn">종합</span> ⭐ 고난도</div>
+<p class="q-text ni">Suppose we modify self-attention by replacing the dot product QK^T with a constant matrix (i.e., all similarities are equal). What is the most likely consequence?</p>
+<ol class="q-options">
+<li data-idx="1">Model becomes equivalent to an RNN</li>
+<li data-idx="2">Attention layer reduces to averaging value vectors</li>
+<li data-idx="3">Model learns positional encoding automatically</li>
+<li data-idx="4">Model cannot be trained</li>
+</ol>
+<div class="q-explain">
+<strong>정답: ② Attention layer reduces to averaging value vectors</strong><br>
+QK^T가 상수 → softmax 후 모든 weight가 동일 (1/n) → output = V의 단순 평균. Q13과 연결되는 문제. Attention의 "선택적 주목" 능력이 사라지고, 모든 토큰 정보를 균등하게 섞는 것과 같아짐.
+</div>
+</div>
+
+<!-- ═══════════════════════════════════════ -->
+<!-- Cheat Sheet -->
+<!-- ═══════════════════════════════════════ -->
+<h2 id="cheatsheet">📋 Cheat Sheet — 시험 직전 요약</h2>
+
+<div class="def">
+<p class="ni"><strong>One-hot의 문제</strong> = Orthogonality (직교 → 유사도 0)</p>
+<p class="ni"><strong>Word2Vec의 한계</strong> = No contextual awareness (문맥 무시)</p>
+<p class="ni"><strong>Skip-gram</strong> = center → context 예측 / <strong>CBOW</strong> = context → center 예측</p>
+<p class="ni"><strong>Subword 장점</strong> = Morphology 활용 + OOV 감소</p>
+<p class="ni"><strong>Character-level trade-off</strong> = Low OOV ↔ High computational cost</p>
+</div>
+
+<div class="info">
+<p class="ni"><strong>RNN 문제</strong> = Gradient instability (vanishing/exploding)</p>
+<p class="ni"><strong>LSTM 혁신</strong> = Gated control (forget/input/output gate)</p>
+<p class="ni"><strong>Seq2Seq 한계</strong> = Fixed-length context bottleneck → Attention 등장</p>
+</div>
+
+<div class="ok">
+<p class="ni"><strong>Attention 핵심</strong> = Weighted average of Values (softmax(QK^T/√d_k)·V)</p>
+<p class="ni"><strong>Q-K interaction</strong> = Query가 Key와 비교하여 유사도 계산</p>
+<p class="ni"><strong>Dot product 이유</strong> = Efficient similarity computation</p>
+<p class="ni"><strong>Uniform weights</strong> = Output = average of all values</p>
+<p class="ni"><strong>Self-attention</strong> = Each token attends to ALL tokens</p>
+</div>
+
+<div class="warn">
+<p class="ni"><strong>Transformer에 없는 것</strong> = Recurrence</p>
+<p class="ni"><strong>병렬화 가능 이유</strong> = No sequential dependency</p>
+<p class="ni"><strong>FFN 역할</strong> = Non-linear transformation per token (토큰 간 상호작용 X)</p>
+<p class="ni"><strong>Multi-head 이유</strong> = Captures diverse relationships</p>
+<p class="ni"><strong>Attention 제거 시</strong> = 토큰 간 상호작용 불가</p>
+<p class="ni"><strong>Output layer</strong> = Token probabilities over vocabulary</p>
+</div>
+
+<div class="def">
+<p class="ni"><strong>PE 없으면</strong> = Permutation-equivariant</p>
+<p class="ni"><strong>Learned PE 한계</strong> = Fixed embedding table size (외삽 불가)</p>
+<p class="ni"><strong>Sinusoidal</strong> = Periodic functions로 위치 인코딩</p>
+<p class="ni"><strong>Sinusoidal 일반화</strong> = Mathematical structure → extrapolation</p>
+<p class="ni"><strong>상대 위치 > 절대 위치</strong> = Attention은 relative distance에 의존</p>
+</div>
+
+<div style="background:linear-gradient(135deg,#667eea15,#764ba215);border:2px solid #667eea;border-radius:8px;padding:20px;margin:20px 0">
+<p class="ni" style="font-size:15px;font-weight:700;color:#667eea;margin-bottom:12px">🔑 ALiBi vs RoPE — 절대 헷갈리지 말 것</p>
+<table>
+<tr><th></th><th>ALiBi</th><th>RoPE</th></tr>
+<tr><td>이름</td><td>Attention with Linear <strong>Biases</strong></td><td><strong>Rotary</strong> Position Embedding</td></tr>
+<tr><td>연산</td><td><strong>덧셈</strong> (additive bias)</td><td><strong>곱셈</strong> (rotation matrix)</td></tr>
+<tr><td>적용 위치</td><td>Attention score에 더함</td><td>Q, K 벡터에 곱함</td></tr>
+<tr><td>수식</td><td>score -= m·|i-j|</td><td>q' = R(θ)·q, k' = R(θ)·k</td></tr>
+<tr><td>키워드</td><td>bias, penalty, linear, add</td><td>rotate, multiply, Q/K 변환</td></tr>
+</table>
+</div>
+
+<div class="info">
+<p class="ni"><strong>Pre-Norm > Post-Norm</strong> = Gradient flow 개선 (residual path 깨끗)</p>
+<p class="ni"><strong>PE 없어도 괜찮은 태스크</strong> = Sentiment classification (순서보다 단어 존재 여부가 중요)</p>
+<p class="ni"><strong>QK^T = 상수</strong> = Attention → 단순 평균 (선택적 주목 능력 상실)</p>
+</div>
+
+<!-- Navigation -->
+<div style="text-align:center;margin-top:40px;padding-top:20px;border-top:1px solid #eee;font-size:.85rem;color:#888">
+<a href="../transformer/" style="color:#667eea;text-decoration:none">← Lecture 1 정리</a>
+&nbsp;&nbsp;·&nbsp;&nbsp;
+<a href="../lecture2/" style="color:#667eea;text-decoration:none">Lecture 2 Rounds →</a>
+</div>
+
+</div><!-- paper-content -->
+</div><!-- container -->
+</div><!-- main-wrapper -->
+
+<script>
+const answers={};
+document.querySelectorAll('.q-options li').forEach(li=>{
+  li.addEventListener('click',function(){
+    const card=this.closest('.q-card');
+    card.querySelectorAll('.q-options li').forEach(o=>o.classList.remove('selected'));
+    this.classList.add('selected');
+    const qIdx=[...document.querySelectorAll('.q-card')].indexOf(card);
+    answers[qIdx]=parseInt(this.dataset.idx);
+  });
+});
+
+function checkAll(){
+  let score=0;
+  document.querySelectorAll('.q-card').forEach((card,i)=>{
+    const correct=parseInt(card.dataset.correct);
+    const pts=parseInt(card.dataset.points);
+    const selected=answers[i];
+    card.querySelectorAll('.q-options li').forEach(li=>{
+      li.classList.remove('correct-answer','wrong-answer','show-correct');
+      if(parseInt(li.dataset.idx)===correct) li.classList.add('show-correct');
+    });
+    if(selected!==undefined){
+      const selLi=card.querySelector(`li[data-idx="${selected}"]`);
+      if(selected===correct){
+        selLi.classList.add('correct-answer');
+        card.classList.add('answered-correct');
+        card.classList.remove('answered-wrong');
+        score+=pts;
+      }else{
+        selLi.classList.add('wrong-answer');
+        card.classList.add('answered-wrong');
+        card.classList.remove('answered-correct');
+      }
+    }
+    card.querySelector('.q-explain').classList.add('visible');
+  });
+  document.getElementById('score').textContent=score;
+  document.getElementById('scoreFill').style.width=(score/150*100)+'%';
+}
+
+function resetAll(){
+  document.querySelectorAll('.q-card').forEach((card,i)=>{
+    card.classList.remove('answered-correct','answered-wrong');
+    card.querySelectorAll('.q-options li').forEach(li=>{
+      li.classList.remove('selected','correct-answer','wrong-answer','show-correct');
+    });
+    card.querySelector('.q-explain').classList.remove('visible');
+  });
+  Object.keys(answers).forEach(k=>delete answers[k]);
+  document.getElementById('score').textContent='0';
+  document.getElementById('scoreFill').style.width='0%';
+}
+</script>
+</body>
+</html>
