@@ -836,3 +836,367 @@ Step N: Input: "Once upon a time, there was a..."
 <tr><td>GPT-4</td><td>2023</td><td>~1.8T*</td><td>128K</td><td>Multimodal, MoE (추정)</td></tr>
 </table>
 <p class="ni" style="font-size:11px;color:#888">* GPT-4의 정확한 파라미터 수는 공개되지 않음</p>
+
+<!-- ═══════════════════════════════════════════ -->
+<!-- 5. 종합 비교 & 진화 -->
+<!-- ═══════════════════════════════════════════ -->
+<h2 id="comparison">5. 종합 비교 & 아키텍처 진화</h2>
+
+<h3>5.1 세 아키텍처 한눈에 비교</h3>
+
+<div class="tc">Table 3. Transformer 아키텍처 종합 비교</div>
+<table>
+<tr><th>특성</th><th>Encoder-Decoder</th><th>Encoder-only</th><th>Decoder-only</th></tr>
+<tr><td>대표 모델</td><td>T5, BART, mBART</td><td>BERT, RoBERTa, ELECTRA</td><td>GPT, LLaMA, Mistral</td></tr>
+<tr><td>Attention</td><td>Bi (Enc) + Causal (Dec) + Cross</td><td>Bidirectional</td><td>Causal (Masked)</td></tr>
+<tr><td>학습 목표</td><td>Span corruption / Denoising</td><td>MLM, NSP</td><td>Next token prediction</td></tr>
+<tr><td>입출력</td><td>Seq → Seq</td><td>Seq → Representation</td><td>Prefix → Continuation</td></tr>
+<tr><td>강점 태스크</td><td>번역, 요약, QA</td><td>분류, NER, 유사도</td><td>생성, 대화, 코딩</td></tr>
+<tr><td>파라미터 효율</td><td>Enc+Dec 분리 → 2배 구조</td><td>Enc만 → 컴팩트</td><td>Dec만 → 스케일링 용이</td></tr>
+<tr><td>추론 방식</td><td>Autoregressive (Dec)</td><td>Single forward pass</td><td>Autoregressive</td></tr>
+<tr><td>길이 일반화</td><td>입출력 독립 길이</td><td>고정 길이 (L_max)</td><td>KV Cache로 효율적</td></tr>
+<tr><td>현재 트렌드</td><td>특수 태스크에 사용</td><td>임베딩/분류에 사용</td><td>⭐ 주류 (LLM)</td></tr>
+</table>
+
+<h3>5.2 아키텍처 진화 타임라인</h3>
+
+<div class="timeline">
+<div class="timeline-item enc-dec">
+<div class="timeline-year">2017 — Transformer (Vaswani et al.)</div>
+<div class="timeline-desc">원조 Encoder-Decoder. "Attention Is All You Need." 기계 번역을 위해 설계.</div>
+</div>
+<div class="timeline-item enc-only">
+<div class="timeline-year">2018 — BERT (Devlin et al.)</div>
+<div class="timeline-desc">Encoder-only. MLM + NSP. NLU 태스크에서 SOTA 달성. Fine-tuning 패러다임 확립.</div>
+</div>
+<div class="timeline-item dec-only">
+<div class="timeline-year">2018 — GPT-1 (Radford et al.)</div>
+<div class="timeline-desc">Decoder-only. Autoregressive pre-training + fine-tuning. 117M 파라미터.</div>
+</div>
+<div class="timeline-item dec-only">
+<div class="timeline-year">2019 — GPT-2 (Radford et al.)</div>
+<div class="timeline-desc">1.5B 파라미터. Zero-shot 능력 시연. "Language Models are Unsupervised Multitask Learners."</div>
+</div>
+<div class="timeline-item enc-dec">
+<div class="timeline-year">2019 — T5 (Raffel et al.)</div>
+<div class="timeline-desc">"Text-to-Text Transfer Transformer." 모든 NLP 태스크를 text-to-text로 통일.</div>
+</div>
+<div class="timeline-item enc-dec">
+<div class="timeline-year">2019 — BART (Lewis et al.)</div>
+<div class="timeline-desc">Denoising autoencoder. 요약에서 특히 강력한 성능.</div>
+</div>
+<div class="timeline-item dec-only">
+<div class="timeline-year">2020 — GPT-3 (Brown et al.)</div>
+<div class="timeline-desc">175B 파라미터. Few-shot learning의 위력 증명. Scaling Laws.</div>
+</div>
+<div class="timeline-item enc-only">
+<div class="timeline-year">2019-2020 — RoBERTa, ELECTRA, DeBERTa</div>
+<div class="timeline-desc">BERT 개선 모델들. 더 많은 데이터, 더 나은 학습 전략.</div>
+</div>
+<div class="timeline-item dec-only">
+<div class="timeline-year">2022-2023 — ChatGPT, GPT-4</div>
+<div class="timeline-desc">RLHF로 정렬. Instruction following. Multimodal. Decoder-only의 승리.</div>
+</div>
+<div class="timeline-item dec-only">
+<div class="timeline-year">2023 — LLaMA, Mistral, Mixtral</div>
+<div class="timeline-desc">오픈소스 LLM 혁명. RoPE + Pre-Norm + RMSNorm + GQA. 효율적 아키텍처.</div>
+</div>
+</div>
+
+<h3>5.3 왜 Decoder-only가 승리했는가?</h3>
+
+<div class="info">
+<p class="ni"><strong>핵심 통찰: Scaling + Simplicity = Victory</strong></p>
+<p class="ni">Decoder-only가 주류가 된 이유는 단순하다:</p>
+<ol>
+<li><strong>하나의 목표:</strong> Next token prediction만으로 모든 것을 학습. MLM, NSP 같은 복잡한 목표 불필요</li>
+<li><strong>Scaling Laws:</strong> 파라미터, 데이터, 컴퓨팅을 늘리면 예측 가능하게 성능 향상 (Kaplan et al. 2020)</li>
+<li><strong>Emergent Abilities:</strong> 충분히 크면 few-shot, chain-of-thought, instruction following 등 새로운 능력 출현</li>
+<li><strong>범용성:</strong> 생성 능력으로 분류, 번역, 요약, 코딩 등 거의 모든 태스크 수행 가능</li>
+</ol>
+</div>
+
+<div class="warn">
+<p class="ni"><strong>그렇다고 다른 아키텍처가 죽은 것은 아니다:</strong></p>
+<ul>
+<li><strong>Encoder-only:</strong> 임베딩 생성 (검색, RAG), 분류, NER 등에서 여전히 효율적. 같은 파라미터 대비 이해 능력이 우수</li>
+<li><strong>Encoder-Decoder:</strong> 번역, 음성 인식 (Whisper), 특수 seq2seq 태스크에서 여전히 사용</li>
+<li><strong>하이브리드:</strong> 일부 최신 모델은 Encoder-Decoder 요소를 다시 도입 (예: retrieval-augmented generation)</li>
+</ul>
+</div>
+
+<h3>5.4 현대 LLM의 표준 구성</h3>
+
+<div class="ok">
+<p class="ni"><strong>2023-2024 LLM 표준 레시피 (LLaMA, Mistral 기준):</strong></p>
+<table>
+<tr><th>구성 요소</th><th>선택</th><th>이유</th></tr>
+<tr><td>아키텍처</td><td>Decoder-only</td><td>스케일링 + 범용성</td></tr>
+<tr><td>Position Embedding</td><td>RoPE</td><td>상대 위치, 길이 일반화 (R1)</td></tr>
+<tr><td>Normalization</td><td>Pre-Norm + RMSNorm</td><td>학습 안정성 + 효율 (R2)</td></tr>
+<tr><td>Attention</td><td>GQA</td><td>MHA 성능 + MQA 효율 (R3)</td></tr>
+<tr><td>Long Context</td><td>SWA (선택적)</td><td>긴 시퀀스 효율 (R3)</td></tr>
+<tr><td>Activation</td><td>SwiGLU</td><td>ReLU보다 우수한 성능</td></tr>
+<tr><td>Vocabulary</td><td>BPE (32K-128K)</td><td>효율적 토큰화</td></tr>
+</table>
+</div>
+
+<!-- ═══════════════════════════════════════════ -->
+<!-- Interactive Labs -->
+<!-- ═══════════════════════════════════════════ -->
+<h2 id="labs">🔬 Interactive Labs</h2>
+
+<h3>Lab 1: 아키텍처별 Attention 패턴 비교</h3>
+<p class="ni">세 아키텍처의 attention mask 패턴을 시각적으로 비교합니다. Encoder는 양방향(full), Decoder는 causal(하삼각), Encoder-Decoder는 cross-attention을 포함합니다.</p>
+<div id="lab1-attention" style="width:100%;height:350px"></div>
+
+<h3>Lab 2: 아키텍처 진화 & 모델 크기 타임라인</h3>
+<p class="ni">2017년부터 현재까지 주요 모델들의 파라미터 수와 아키텍처 유형을 시각화합니다.</p>
+<div id="lab2-timeline" style="width:100%;height:400px"></div>
+
+<h3>Lab 3: 태스크별 최적 아키텍처 매칭</h3>
+<p class="ni">각 태스크에 어떤 아키텍처가 가장 적합한지 레이더 차트로 비교합니다.</p>
+<div id="lab3-radar" style="width:100%;height:400px"></div>
+
+<script>
+// Lab 1: Attention Pattern Comparison
+(function(){
+  var n=8;
+  function makeMatrix(type){
+    var z=[];
+    for(var i=0;i<n;i++){var row=[];for(var j=0;j<n;j++){
+      if(type==='bi') row.push(1);
+      else if(type==='causal') row.push(j<=i?1:0);
+      else row.push(1); // cross: full
+    }z.push(row);}return z;
+  }
+  var labels=['t1','t2','t3','t4','t5','t6','t7','t8'];
+  var biZ=makeMatrix('bi'), causalZ=makeMatrix('causal'), crossZ=makeMatrix('cross');
+  var common={type:'heatmap',colorscale:[[0,'#f0f0f0'],[1,'#3498db']],showscale:false,hovertemplate:'Row %{y}, Col %{x}<extra></extra>'};
+  Plotly.newPlot('lab1-attention',[
+    Object.assign({z:biZ,x:labels,y:labels,xaxis:'x',yaxis:'y',name:'Encoder (Bidirectional)'},common),
+    Object.assign({z:causalZ,x:labels,y:labels,xaxis:'x2',yaxis:'y2',name:'Decoder (Causal)',colorscale:[[0,'#f0f0f0'],[1,'#2ecc71']]},common,{colorscale:[[0,'#f0f0f0'],[1,'#2ecc71']]}),
+    Object.assign({z:causalZ,x:labels,y:labels,xaxis:'x3',yaxis:'y3',name:'Cross-Attention',colorscale:[[0,'#f0f0f0'],[1,'#e74c3c']]},common,{colorscale:[[0,'#f0f0f0'],[1,'#e74c3c']]})
+  ],{
+    grid:{rows:1,columns:3,pattern:'independent'},
+    annotations:[
+      {text:'<b>Encoder</b><br>Bidirectional',x:0.13,y:1.12,xref:'paper',yref:'paper',showarrow:false,font:{size:11}},
+      {text:'<b>Decoder</b><br>Causal Mask',x:0.5,y:1.12,xref:'paper',yref:'paper',showarrow:false,font:{size:11}},
+      {text:'<b>Cross-Attn</b><br>Enc→Dec',x:0.87,y:1.12,xref:'paper',yref:'paper',showarrow:false,font:{size:11}}
+    ],
+    margin:{t:60,b:30,l:40,r:20},height:300,
+    xaxis:{domain:[0,.3]},yaxis:{domain:[0,1],autorange:'reversed'},
+    xaxis2:{domain:[.35,.65]},yaxis2:{domain:[0,1],autorange:'reversed'},
+    xaxis3:{domain:[.7,1]},yaxis3:{domain:[0,1],autorange:'reversed'}
+  },{responsive:true});
+})();
+
+// Lab 2: Model Size Timeline
+(function(){
+  var models=[
+    {name:'Transformer',year:2017,params:0.065,type:'Enc-Dec',color:'#3498db'},
+    {name:'GPT-1',year:2018,params:0.117,type:'Dec-only',color:'#2ecc71'},
+    {name:'BERT-base',year:2018,params:0.11,type:'Enc-only',color:'#e74c3c'},
+    {name:'BERT-large',year:2018,params:0.34,type:'Enc-only',color:'#e74c3c'},
+    {name:'GPT-2',year:2019,params:1.5,type:'Dec-only',color:'#2ecc71'},
+    {name:'T5-11B',year:2019,params:11,type:'Enc-Dec',color:'#3498db'},
+    {name:'BART',year:2019,params:0.4,type:'Enc-Dec',color:'#3498db'},
+    {name:'GPT-3',year:2020,params:175,type:'Dec-only',color:'#2ecc71'},
+    {name:'LLaMA-65B',year:2023,params:65,type:'Dec-only',color:'#2ecc71'},
+    {name:'Mistral-7B',year:2023,params:7,type:'Dec-only',color:'#2ecc71'},
+    {name:'GPT-4',year:2023,params:1800,type:'Dec-only',color:'#2ecc71'}
+  ];
+  var traces={};
+  models.forEach(function(m){
+    if(!traces[m.type]) traces[m.type]={x:[],y:[],text:[],marker:{size:[],color:m.color},mode:'markers+text',textposition:'top center',name:m.type,type:'scatter'};
+    var t=traces[m.type];
+    t.x.push(m.year+(Math.random()-.5)*.3);
+    t.y.push(Math.log10(m.params*1e9));
+    t.text.push(m.name);
+    t.marker.size.push(Math.max(8,Math.log10(m.params*1e9)*4));
+  });
+  Plotly.newPlot('lab2-timeline',Object.values(traces),{
+    xaxis:{title:'Year',dtick:1,range:[2016.5,2024]},
+    yaxis:{title:'Parameters (log scale)',tickvals:[8,9,10,11,12],ticktext:['100M','1B','10B','100B','1T']},
+    margin:{t:30,b:50,l:60,r:20},height:380,
+    legend:{x:0.02,y:0.98}
+  },{responsive:true});
+})();
+
+// Lab 3: Task Suitability Radar
+(function(){
+  var cats=['분류','NER','번역','요약','생성','대화','코딩','검색'];
+  Plotly.newPlot('lab3-radar',[
+    {type:'scatterpolar',r:[5,5,8,8,7,6,5,6],theta:cats,fill:'toself',name:'Encoder-Decoder',line:{color:'#3498db'},opacity:0.6},
+    {type:'scatterpolar',r:[9,9,3,4,2,3,2,9],theta:cats,fill:'toself',name:'Encoder-only',line:{color:'#e74c3c'},opacity:0.6},
+    {type:'scatterpolar',r:[7,6,7,7,10,10,10,5],theta:cats,fill:'toself',name:'Decoder-only',line:{color:'#2ecc71'},opacity:0.6}
+  ],{
+    polar:{radialaxis:{visible:true,range:[0,10]}},
+    margin:{t:40,b:40,l:60,r:60},height:380,
+    legend:{x:0.35,y:-0.15,orientation:'h'}
+  },{responsive:true});
+})();
+</script>
+
+<!-- ═══════════════════════════════════════════ -->
+<!-- Quiz -->
+<!-- ═══════════════════════════════════════════ -->
+<h2 id="quiz">📝 Quiz — Transformer-based Models</h2>
+
+<div class="quiz-box" id="q1">
+<h4>Q1. 원조 Transformer (2017)의 구조는?</h4>
+<div class="quiz-option" onclick="showAnswer('q1','a')">A. Encoder-only</div>
+<div class="quiz-option" onclick="showAnswer('q1','b')">B. Decoder-only</div>
+<div class="quiz-option" onclick="showAnswer('q1','c')">C. Encoder-Decoder</div>
+<div class="quiz-option" onclick="showAnswer('q1','d')">D. Mixture of Experts</div>
+<div class="quiz-answer" id="ans-q1"><strong>Answer: C</strong><br>Vaswani et al. (2017)의 원조 Transformer는 기계 번역을 위한 Encoder-Decoder 구조. Encoder가 입력을 이해하고, Decoder가 출력을 생성한다.</div>
+</div>
+
+<div class="quiz-box" id="q2">
+<h4>Q2. Encoder-only 모델의 attention 방식은?</h4>
+<div class="quiz-option" onclick="showAnswer('q2','a')">A. Causal (left-to-right only)</div>
+<div class="quiz-option" onclick="showAnswer('q2','b')">B. Bidirectional (모든 토큰 참조)</div>
+<div class="quiz-option" onclick="showAnswer('q2','c')">C. Cross-attention only</div>
+<div class="quiz-option" onclick="showAnswer('q2','d')">D. Sliding Window Attention</div>
+<div class="quiz-answer" id="ans-q2"><strong>Answer: B</strong><br>Encoder-only (BERT)는 양방향 self-attention. 모든 토큰이 모든 토큰을 참조할 수 있어 문맥 이해에 강하다. Causal mask 없음.</div>
+</div>
+
+<div class="quiz-box" id="q3">
+<h4>Q3. T5의 "text-to-text" 프레임워크의 핵심 아이디어는?</h4>
+<div class="quiz-option" onclick="showAnswer('q3','a')">A. 모든 태스크를 분류 문제로 변환</div>
+<div class="quiz-option" onclick="showAnswer('q3','b')">B. 모든 NLP 태스크를 "텍스트 입력 → 텍스트 출력"으로 통일</div>
+<div class="quiz-option" onclick="showAnswer('q3','c')">C. 텍스트를 이미지로 변환</div>
+<div class="quiz-option" onclick="showAnswer('q3','d')">D. 텍스트를 벡터로만 표현</div>
+<div class="quiz-answer" id="ans-q3"><strong>Answer: B</strong><br>T5는 번역, 요약, 분류, QA 등 모든 태스크를 "텍스트→텍스트"로 통일. 예: 감정 분석도 "sentiment: positive" 텍스트를 생성하는 방식.</div>
+</div>
+
+<div class="quiz-box" id="q4">
+<h4>Q4. Decoder-only 모델에서 causal mask의 역할은?</h4>
+<div class="quiz-option" onclick="showAnswer('q4','a')">A. 학습 속도를 높인다</div>
+<div class="quiz-option" onclick="showAnswer('q4','b')">B. 미래 토큰을 볼 수 없게 하여 autoregressive 생성을 가능하게 한다</div>
+<div class="quiz-option" onclick="showAnswer('q4','c')">C. 메모리 사용량을 줄인다</div>
+<div class="quiz-option" onclick="showAnswer('q4','d')">D. 양방향 문맥을 제공한다</div>
+<div class="quiz-answer" id="ans-q4"><strong>Answer: B</strong><br>Causal mask는 하삼각 행렬로, 각 토큰이 자신과 이전 토큰만 참조 가능. 이를 통해 "다음 토큰 예측" 학습과 autoregressive 생성이 가능.</div>
+</div>
+
+<div class="quiz-box" id="q5">
+<h4>Q5. BERT의 학습 목표 중 MLM (Masked Language Modeling)이란?</h4>
+<div class="quiz-option" onclick="showAnswer('q5','a')">A. 다음 토큰을 예측</div>
+<div class="quiz-option" onclick="showAnswer('q5','b')">B. 입력의 15%를 마스킹하고 원래 토큰을 예측</div>
+<div class="quiz-option" onclick="showAnswer('q5','c')">C. 문장 순서를 예측</div>
+<div class="quiz-option" onclick="showAnswer('q5','d')">D. 문장을 번역</div>
+<div class="quiz-answer" id="ans-q5"><strong>Answer: B</strong><br>MLM: 입력 토큰의 15%를 [MASK]로 대체하고 원래 토큰을 예측. 양방향 문맥을 활용하여 단어의 의미를 깊이 이해. BERT의 핵심 학습 방법.</div>
+</div>
+
+<div class="quiz-box" id="q6">
+<h4>Q6. GPT-3가 보여준 "few-shot learning"이란?</h4>
+<div class="quiz-option" onclick="showAnswer('q6','a')">A. 적은 데이터로 처음부터 학습</div>
+<div class="quiz-option" onclick="showAnswer('q6','b')">B. Fine-tuning 없이 prompt에 몇 개의 예시만 주면 새 태스크 수행</div>
+<div class="quiz-option" onclick="showAnswer('q6','c')">C. 모델 크기를 줄여서 학습</div>
+<div class="quiz-option" onclick="showAnswer('q6','d')">D. Transfer learning의 다른 이름</div>
+<div class="quiz-answer" id="ans-q6"><strong>Answer: B</strong><br>Few-shot: prompt에 2-3개 예시를 넣으면 gradient update 없이 새 태스크 수행. GPT-3 (175B)에서 이 능력이 극적으로 나타남. In-context learning이라고도 함.</div>
+</div>
+
+<div class="quiz-box" id="q7">
+<h4>Q7. Encoder-Decoder에서 Cross-Attention의 역할은?</h4>
+<div class="quiz-option" onclick="showAnswer('q7','a')">A. Encoder 내부의 self-attention</div>
+<div class="quiz-option" onclick="showAnswer('q7','b')">B. Decoder가 Encoder의 출력을 참조하여 입력 정보를 활용</div>
+<div class="quiz-option" onclick="showAnswer('q7','c')">C. 두 개의 다른 모델을 연결</div>
+<div class="quiz-option" onclick="showAnswer('q7','d')">D. Attention score를 정규화</div>
+<div class="quiz-answer" id="ans-q7"><strong>Answer: B</strong><br>Cross-Attention: Q는 Decoder에서, K와 V는 Encoder 출력에서 가져옴. Decoder가 출력을 생성할 때 입력 시퀀스의 관련 부분에 "주목"할 수 있게 해줌.</div>
+</div>
+
+<div class="quiz-box" id="q8">
+<h4>Q8. 분류(classification) 태스크에 가장 효율적인 아키텍처는?</h4>
+<div class="quiz-option" onclick="showAnswer('q8','a')">A. Decoder-only (GPT)</div>
+<div class="quiz-option" onclick="showAnswer('q8','b')">B. Encoder-only (BERT)</div>
+<div class="quiz-option" onclick="showAnswer('q8','c')">C. Encoder-Decoder (T5)</div>
+<div class="quiz-option" onclick="showAnswer('q8','d')">D. 모두 동일</div>
+<div class="quiz-answer" id="ans-q8"><strong>Answer: B</strong><br>Encoder-only는 양방향 attention으로 입력을 깊이 이해. 분류는 입력→라벨이므로 생성 능력 불필요. 같은 파라미터 대비 BERT가 분류에서 가장 효율적.</div>
+</div>
+
+<div class="quiz-box" id="q9">
+<h4>Q9. Decoder-only 모델이 현재 주류인 가장 큰 이유는?</h4>
+<div class="quiz-option" onclick="showAnswer('q9','a')">A. 학습이 가장 빠르다</div>
+<div class="quiz-option" onclick="showAnswer('q9','b')">B. 메모리를 가장 적게 사용한다</div>
+<div class="quiz-option" onclick="showAnswer('q9','c')">C. 단순한 목표(next token)로 스케일링이 예측 가능하고 범용적이다</div>
+<div class="quiz-option" onclick="showAnswer('q9','d')">D. 양방향 attention이 가능하다</div>
+<div class="quiz-answer" id="ans-q9"><strong>Answer: C</strong><br>Next token prediction이라는 단순한 목표 + Scaling Laws (파라미터↑ → 성능↑ 예측 가능) + 생성 능력으로 거의 모든 태스크 수행 가능. 단순성 + 스케일링 + 범용성.</div>
+</div>
+
+<div class="quiz-box" id="q10">
+<h4>Q10. 현대 LLM (LLaMA, Mistral)의 표준 구성으로 올바른 것은?</h4>
+<div class="quiz-option" onclick="showAnswer('q10','a')">A. Encoder-Decoder + Learned PE + Post-Norm + MHA</div>
+<div class="quiz-option" onclick="showAnswer('q10','b')">B. Encoder-only + Sinusoidal PE + Layer Norm + MHA</div>
+<div class="quiz-option" onclick="showAnswer('q10','c')">C. Decoder-only + RoPE + Pre-Norm + RMSNorm + GQA</div>
+<div class="quiz-option" onclick="showAnswer('q10','d')">D. Decoder-only + ALiBi + Post-Norm + MQA</div>
+<div class="quiz-answer" id="ans-q10"><strong>Answer: C</strong><br>현대 LLM 표준: Decoder-only + RoPE (R1) + Pre-Norm + RMSNorm (R2) + GQA (R3). 이 조합이 LLaMA, Mistral 등에서 사용되는 검증된 레시피.</div>
+</div>
+
+<script>
+function showAnswer(qId, selected) {
+  var ansDiv = document.getElementById('ans-' + qId);
+  ansDiv.style.display = 'block';
+  var options = document.querySelectorAll('#' + qId + ' .quiz-option');
+  var correctMap = {q1:'c',q2:'b',q3:'b',q4:'b',q5:'b',q6:'b',q7:'b',q8:'b',q9:'c',q10:'c'};
+  var correct = correctMap[qId];
+  options.forEach(function(opt, idx) {
+    var letter = ['a','b','c','d'][idx];
+    if (letter === correct) opt.classList.add('correct');
+    else if (letter === selected) opt.classList.add('wrong');
+  });
+}
+</script>
+
+<!-- ═══════════════════════════════════════════ -->
+<!-- Cheat Sheet -->
+<!-- ═══════════════════════════════════════════ -->
+<h2 id="cheatsheet">📋 Cheat Sheet — Transformer-based Models 한눈에</h2>
+
+<div class="def">
+<p class="ni"><strong>🏗️ 세 아키텍처 핵심 구분</strong></p>
+<table>
+<tr><th></th><th>Encoder-Decoder</th><th>Encoder-only</th><th>Decoder-only</th></tr>
+<tr><td>Attention</td><td>Bi + Causal + Cross</td><td>Bidirectional</td><td>Causal</td></tr>
+<tr><td>학습</td><td>Span corruption</td><td>MLM (+NSP)</td><td>Next token</td></tr>
+<tr><td>대표</td><td>T5, BART</td><td>BERT, RoBERTa</td><td>GPT, LLaMA</td></tr>
+<tr><td>강점</td><td>번역, 요약</td><td>분류, NER, 검색</td><td>생성, 대화, 코딩</td></tr>
+</table>
+</div>
+
+<div class="ok">
+<p class="ni"><strong>🎯 시험 대비 핵심 포인트</strong></p>
+<ul>
+<li>원조 Transformer = Encoder-Decoder (2017, 기계 번역)</li>
+<li>BERT = Encoder-only, 양방향, MLM+NSP, 분류/NER에 최적</li>
+<li>GPT = Decoder-only, causal mask, next token prediction, 생성에 최적</li>
+<li>T5 = Encoder-Decoder, "text-to-text", 모든 태스크를 텍스트 변환으로 통일</li>
+<li>Cross-Attention: Q=Decoder, K/V=Encoder → Decoder가 입력 참조</li>
+<li>Decoder-only가 주류인 이유: Scaling Laws + 단순성 + 범용성</li>
+<li>현대 LLM 레시피: Decoder-only + RoPE + Pre-Norm + RMSNorm + GQA</li>
+<li>Encoder-only는 죽지 않았다: 임베딩, 분류, 검색에서 여전히 효율적</li>
+</ul>
+</div>
+
+<div class="info">
+<p class="ni"><strong>📐 기억할 수식/개념</strong></p>
+<ul>
+<li><strong>Causal Mask:</strong> \( M_{ij} = \begin{cases} 0 & \text{if } j \leq i \\ -\infty & \text{if } j > i \end{cases} \) → softmax 후 미래 토큰 attention = 0</li>
+<li><strong>Cross-Attention:</strong> \( \text{Attn}(Q_{\text{dec}}, K_{\text{enc}}, V_{\text{enc}}) \) → Q는 Decoder, K/V는 Encoder</li>
+<li><strong>MLM:</strong> 15% 마스킹 → 80% [MASK], 10% random, 10% 유지</li>
+<li><strong>Next Token:</strong> \( P(x_t | x_1, \ldots, x_{t-1}) \) → autoregressive factorization</li>
+</ul>
+</div>
+
+<!-- Navigation -->
+<div class="round-nav">
+<a href="../round-03/">← Round 3: Attention Approximation</a>
+<a href="../round-05/">Round 5: BERT Deep Dive →</a>
+</div>
+
+</div><!-- paper-content -->
+</div><!-- container -->
+</div><!-- main-wrapper -->
+
+</body>
+</html>

@@ -1,0 +1,821 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lecture 2 · Round 5: BERT Deep Dive | 딥러닝 학습</title>
+<script>
+MathJax = { tex: { inlineMath: [['\\(','\\)']], displayMath: [['\\[','\\]']] } };
+</script>
+<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;500&family=Space+Mono:wght@400&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+<script src="https://cdn.plot.ly/plotly-2.35.0.min.js"></script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Inter',sans-serif;background:#fafaf8;color:#1a1a1a;line-height:1.7;overflow-x:hidden}
+.sidebar{position:fixed;left:0;top:0;width:260px;height:100vh;background:rgba(255,255,255,.97);border-right:1px solid rgba(0,0,0,.06);padding:32px 24px;z-index:100;overflow-y:auto;display:flex;flex-direction:column}
+.sidebar-profile{text-align:center;margin-bottom:28px;padding-bottom:24px;border-bottom:1px solid rgba(0,0,0,.08)}
+.profile-icon{font-size:48px;margin-bottom:8px}
+.profile-name{font-family:'Cormorant Garamond',serif;font-size:1.3rem;font-weight:500;margin-bottom:4px}
+.profile-title{font-size:.68rem;color:#888;letter-spacing:.08em;text-transform:uppercase;margin-bottom:8px}
+.profile-bio{font-size:.78rem;color:#666;line-height:1.5}
+.sidebar-nav{flex:1;margin-top:16px}
+.nav-section{margin-bottom:20px}
+.nav-section-title{font-size:.6rem;font-weight:600;color:#aaa;letter-spacing:.15em;text-transform:uppercase;margin-bottom:10px}
+.nav-list{list-style:none}
+.nav-list li{margin-bottom:5px}
+.nav-list a{font-size:.78rem;color:#555;text-decoration:none;transition:all .2s;display:block;padding:3px 0}
+.nav-list a:hover{color:#0080c6;padding-left:4px}
+.nav-list a.active{color:#0080c6;font-weight:500}
+.badge{display:inline-block;font-size:.5rem;background:#0080c6;color:#fff;padding:1px 5px;border-radius:8px;margin-left:3px;vertical-align:middle}
+.badge-quiz{background:#e74c3c}
+.sidebar-footer{padding-top:16px;border-top:1px solid rgba(0,0,0,.06);font-size:.65rem;color:#aaa;text-align:center}
+.main-wrapper{margin-left:260px;min-height:100vh}
+.container{max-width:1100px;margin:0 auto;padding:50px 40px 80px}
+.paper-content{font-family:'Times New Roman','Nanum Myeongjo',serif;line-height:1.8;background:#fff;padding:40px;border-radius:8px;box-shadow:0 2px 20px rgba(0,0,0,.05)}
+.paper-header{text-align:center;margin-bottom:40px;padding-bottom:30px;border-bottom:2px solid #333}
+.paper-category{font-size:14px;color:#666;margin-bottom:10px}
+.paper-title{font-size:24px;font-weight:bold;margin-bottom:12px;line-height:1.4}
+.paper-subtitle{font-size:14px;color:#555;margin-bottom:8px}
+.paper-team{font-size:13px;color:#444}
+</style>
+<style>
+.abstract{background:#f8f9fa;padding:25px;margin:30px 0;border-left:4px solid #2c3e50}
+.abstract-title{font-weight:bold;font-size:16px;margin-bottom:15px}
+h2{font-size:18px;margin:35px 0 20px;padding-bottom:8px;border-bottom:1px solid #ddd;color:#2c3e50}
+h3{font-size:15px;margin:25px 0 15px;color:#34495e}
+h4{font-size:14px;margin:20px 0 12px;color:#34495e}
+p{text-align:justify;margin-bottom:15px;text-indent:2em}
+p.ni{text-indent:0}
+table{width:100%;border-collapse:collapse;margin:20px 0;font-size:12px}
+th,td{border:1px solid #ddd;padding:10px 8px;text-align:center}
+th{background:#2c3e50;color:white;font-weight:bold}
+tr:nth-child(even){background:#f8f9fa}
+tr:hover{background:#e8f4f8}
+.tc{font-size:13px;font-weight:bold;margin:15px 0 10px;text-align:center}
+.eq{text-align:center;margin:20px 0;padding:15px;background:#f8f9fa;border-radius:4px;overflow-x:auto}
+ul,ol{margin-left:2em;margin-bottom:15px}
+li{margin-bottom:6px}
+.def{background:#fff9e6;border:1px solid #ffc107;border-radius:4px;padding:20px;margin:20px 0}
+.info{background:#e8f4f8;border-left:4px solid #3498db;padding:20px;margin:20px 0}
+.warn{background:#fff3cd;border-left:4px solid #f39c12;padding:20px;margin:20px 0}
+.ok{background:#d4edda;border-left:4px solid #28a745;padding:20px;margin:20px 0}
+pre{background:#1e1e1e;color:#d4d4d4;padding:20px;border-radius:6px;overflow-x:auto;margin:20px 0;font-family:'Space Mono','Consolas',monospace;font-size:13px;line-height:1.6}
+code{font-family:'Space Mono','Consolas',monospace;font-size:13px}
+p code,li code,td code{background:#f0f0f0;padding:2px 6px;border-radius:3px;color:#c7254e;font-size:12px}
+.cm{color:#6a9955}.kw{color:#569cd6}.st{color:#ce9178}.fn{color:#dcdcaa}.nb{color:#4ec9b0}.nu{color:#b5cea8}
+.diagram{background:#f0f4f8;border:1px solid #d0d7de;border-radius:6px;padding:20px;margin:20px 0;font-family:'Space Mono',monospace;font-size:12px;line-height:1.5;white-space:pre;overflow-x:auto}
+.quiz-box{background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);color:#fff;padding:25px;border-radius:8px;margin:25px 0}
+.quiz-box h4{color:#fff;margin-top:0}
+.quiz-option{background:rgba(255,255,255,.15);padding:10px 15px;margin:8px 0;border-radius:4px;cursor:pointer;transition:all .2s}
+.quiz-option:hover{background:rgba(255,255,255,.25)}
+.quiz-option.correct{background:#28a745!important}
+.quiz-option.wrong{background:#dc3545!important}
+.quiz-answer{display:none;margin-top:15px;padding:15px;background:rgba(255,255,255,.1);border-radius:4px}
+.round-nav{display:flex;justify-content:space-between;margin:40px 0 0;padding:20px 0;border-top:2px solid #eee}
+.round-nav a{display:inline-flex;align-items:center;gap:6px;padding:10px 20px;background:#0080c6;color:#fff;text-decoration:none;border-radius:6px;font-size:13px;font-family:'Inter',sans-serif;transition:background .2s}
+.round-nav a:hover{background:#006aa3}
+.round-nav a.disabled{background:#ccc;pointer-events:none}
+.bert-flow{background:linear-gradient(135deg,#e74c3c10,#e74c3c05);border:2px solid #e74c3c;border-radius:10px;padding:20px;margin:20px 0}
+.bert-flow h4{color:#e74c3c;margin-top:0}
+@media(max-width:1024px){
+.sidebar{width:100%;height:auto;position:relative;border-right:none;border-bottom:1px solid rgba(0,0,0,.08);padding:16px}
+.sidebar-profile{margin-bottom:10px;padding-bottom:10px;display:flex;align-items:center;gap:12px;text-align:left}
+.profile-icon{font-size:32px;margin-bottom:0}.profile-bio{display:none}
+.nav-section{display:inline-block;margin-right:16px;margin-bottom:8px}
+.nav-list{display:flex;gap:10px;flex-wrap:wrap}.nav-list li{margin-bottom:0}
+.sidebar-footer{display:none}
+.main-wrapper{margin-left:0}
+.container{padding:0}.paper-content{padding:20px 16px;border-radius:0;box-shadow:none}
+.paper-title{font-size:18px}p{font-size:14px;text-indent:1.5em;text-align:left}
+pre{font-size:11px;padding:14px}table{font-size:10px;display:block;overflow-x:auto}
+}
+</style>
+</head>
+<body>
+
+<div class="sidebar">
+<div class="sidebar-profile">
+<div class="profile-icon">🔬</div>
+<div class="profile-name">Lecture 2 · Round 5</div>
+<div class="profile-title">BERT Deep Dive</div>
+<div class="profile-bio">CME 295 Lecture 2 · BERT의 모든 것: MLM, NSP, Fine-tuning, DistilBERT, RoBERTa</div>
+</div>
+<div class="sidebar-nav">
+<div class="nav-section">
+<div class="nav-section-title">This Round</div>
+<ul class="nav-list">
+<li><a href="#overview">1. BERT 개요</a></li>
+<li><a href="#architecture">2. 아키텍처 <span class="badge">구조</span></a></li>
+<li><a href="#pretraining">3. Pre-training <span class="badge">MLM+NSP</span></a></li>
+<li><a href="#finetuning">4. Fine-tuning</a></li>
+<li><a href="#variants">5. BERT 변형들</a></li>
+<li><a href="#labs">🔬 Labs</a></li>
+<li><a href="#quiz">📝 Quiz <span class="badge badge-quiz">10</span></a></li>
+<li><a href="#cheatsheet">📋 Cheat Sheet</a></li>
+</ul>
+</div>
+<div class="nav-section">
+<div class="nav-section-title">All Rounds</div>
+<ul class="nav-list">
+<li><a href="../round-01/">R1 · Position Embeddings</a></li>
+<li><a href="../round-02/">R2 · Layer Normalization</a></li>
+<li><a href="../round-03/">R3 · Attention Approximation</a></li>
+<li><a href="../round-04/">R4 · Transformer Models</a></li>
+<li><a class="active" href="#">R5 · BERT Deep Dive</a></li>
+</ul>
+</div>
+</div>
+<div class="sidebar-footer">CME 295 · Lecture 2 · Amidi & Amidi</div>
+</div>
+
+<div class="main-wrapper">
+<div class="container">
+<div class="paper-content">
+
+<div class="paper-header">
+<div class="paper-category">CME 295: Transformers & Large Language Models · Lecture 2 · Round 5 / 5</div>
+<h1 class="paper-title">BERT Deep Dive — 양방향 이해의 혁명</h1>
+<div class="paper-subtitle">MLM, NSP, Fine-tuning, DistilBERT, RoBERTa: BERT 생태계 완전 정복</div>
+<div class="paper-team">Based on: Stanford CME 295 Lecture 2 (Afshine & Shervine Amidi) · Slides 61-109</div>
+</div>
+
+<div class="abstract">
+<div class="abstract-title">Learning Objectives</div>
+<p class="ni">이 라운드를 마치면 다음을 할 수 있다:</p>
+<ul>
+<li>BERT의 입력 표현 (Token + Segment + Position Embeddings)을 설명할 수 있다</li>
+<li>MLM (Masked Language Modeling)의 15% 마스킹 전략과 80/10/10 규칙을 이해한다</li>
+<li>NSP (Next Sentence Prediction)의 목적과 한계를 설명할 수 있다</li>
+<li>BERT를 다양한 downstream 태스크에 fine-tuning하는 방법을 이해한다</li>
+<li>DistilBERT의 Knowledge Distillation과 RoBERTa의 개선점을 비교할 수 있다</li>
+</ul>
+</div>
+
+<!-- ═══════════════════════════════════════════ -->
+<!-- 1. BERT 개요 -->
+<!-- ═══════════════════════════════════════════ -->
+<h2 id="overview">1. BERT — Bidirectional Encoder Representations from Transformers</h2>
+
+<h3>1.1 BERT가 해결한 문제</h3>
+<p>2018년 이전의 언어 모델은 대부분 단방향이었다. GPT-1은 왼쪽에서 오른쪽으로만 문맥을 읽었고, ELMo는 양방향이었지만 두 개의 단방향 LSTM을 단순히 결합한 것이었다. Devlin et al. (2018)은 "진정한 양방향" 사전학습이 가능한 BERT를 제안했다.</p>
+
+<div class="def">
+<p class="ni"><strong>Definition 1.1 — BERT (Devlin et al., 2018)</strong></p>
+<p class="ni">BERT는 Transformer의 Encoder만 사용하는 모델로, Masked Language Modeling (MLM)과 Next Sentence Prediction (NSP)을 통해 양방향 문맥 표현을 학습한다.</p>
+<div class="eq">\[ \text{BERT} = \text{Transformer Encoder} + \text{MLM} + \text{NSP} \]</div>
+</div>
+
+<h3>1.2 BERT의 핵심 아이디어</h3>
+
+<div class="info">
+<p class="ni"><strong>왜 양방향이 중요한가?</strong></p>
+<p class="ni">예문: "The bank of the river was steep."</p>
+<ul>
+<li><strong>단방향 (GPT):</strong> "The bank of the" → "bank"의 의미를 왼쪽 문맥만으로 판단. 금융? 강둑?</li>
+<li><strong>양방향 (BERT):</strong> "The __ of the river was steep" → 왼쪽("The")과 오른쪽("river", "steep") 모두 참조 → "bank" = 강둑</li>
+</ul>
+<p class="ni">양방향 문맥이 단어의 의미를 정확히 파악하는 데 결정적이다.</p>
+</div>
+
+<h3>1.3 BERT 모델 사양</h3>
+
+<div class="tc">Table 1. BERT 모델 사양</div>
+<table>
+<tr><th>사양</th><th>BERT-base</th><th>BERT-large</th></tr>
+<tr><td>Layers (L)</td><td>12</td><td>24</td></tr>
+<tr><td>Hidden size (H)</td><td>768</td><td>1024</td></tr>
+<tr><td>Attention heads</td><td>12</td><td>16</td></tr>
+<tr><td>Parameters</td><td>110M</td><td>340M</td></tr>
+<tr><td>Max sequence length</td><td colspan="2">512</td></tr>
+<tr><td>Vocabulary</td><td colspan="2">30,522 (WordPiece)</td></tr>
+<tr><td>Position Embedding</td><td colspan="2">Learned</td></tr>
+<tr><td>Normalization</td><td colspan="2">Post-Norm + Layer Norm</td></tr>
+</table>
+
+<!-- ═══════════════════════════════════════════ -->
+<!-- 2. 아키텍처 -->
+<!-- ═══════════════════════════════════════════ -->
+<h2 id="architecture">2. BERT 아키텍처 상세</h2>
+
+<h3>2.1 입력 표현 (Input Representation)</h3>
+<p>BERT의 입력은 세 가지 임베딩의 합으로 구성된다. 이것이 BERT를 다른 모델과 구분짓는 핵심 설계 중 하나다.</p>
+
+<div class="diagram">BERT Input Representation
+
+  Input:    [CLS] I love deep learning [SEP] It is fun [SEP]
+              │    │  │    │     │       │    │  │  │    │
+  Token     E_CLS E_I E_love ... E_learning E_SEP E_It ...  E_SEP
+  Embed       +    +   +    +     +       +    +   +   +     +
+  Segment    E_A  E_A E_A  E_A   E_A    E_A  E_B E_B E_B   E_B
+  Embed       +    +   +    +     +       +    +   +   +     +
+  Position   E_0  E_1 E_2  E_3   E_4    E_5  E_6 E_7 E_8   E_9
+  Embed       ↓    ↓   ↓    ↓     ↓       ↓    ↓   ↓   ↓     ↓
+            ┌──────────────────────────────────────────────────┐
+            │              Sum of 3 Embeddings                 │
+            └──────────────────────────────────────────────────┘</div>
+
+<div class="def">
+<p class="ni"><strong>Definition 2.1 — BERT 입력 임베딩</strong></p>
+<div class="eq">\[ \mathbf{x}_i = \mathbf{E}_{\text{token}}(w_i) + \mathbf{E}_{\text{segment}}(s_i) + \mathbf{E}_{\text{position}}(i) \]</div>
+<ul>
+<li><strong>Token Embedding:</strong> WordPiece 토큰을 벡터로 변환. 30,522개 어휘</li>
+<li><strong>Segment Embedding:</strong> 문장 A/B 구분. \( E_A \) 또는 \( E_B \). NSP를 위해 필요</li>
+<li><strong>Position Embedding:</strong> Learned PE. 0~511까지 512개 위치 벡터 학습</li>
+</ul>
+</div>
+
+<h3>2.2 특수 토큰</h3>
+
+<div class="info">
+<p class="ni"><strong>[CLS]와 [SEP]의 역할</strong></p>
+<ul>
+<li><strong>[CLS] (Classification):</strong> 항상 입력의 첫 번째 토큰. 이 토큰의 최종 hidden state가 전체 시퀀스의 "요약" 표현으로 사용됨. 분류 태스크에서 이 벡터에 classifier를 붙임</li>
+<li><strong>[SEP] (Separator):</strong> 두 문장을 구분하는 토큰. 문장 A와 B 사이, 그리고 입력의 끝에 위치</li>
+<li><strong>[MASK]:</strong> MLM에서 마스킹된 토큰을 대체. Pre-training에서만 사용</li>
+</ul>
+</div>
+
+<h3>2.3 Encoder 구조</h3>
+<p>BERT는 Transformer Encoder를 L개 쌓은 구조다. 각 레이어는 Multi-Head Self-Attention + Feed-Forward Network로 구성되며, Post-Norm (Add & Norm) 방식을 사용한다.</p>
+
+<div class="diagram">BERT Encoder Layer (×L)
+
+  Input x
+    │
+    ├──────────────────┐
+    ▼                  │
+  Multi-Head           │ (Residual)
+  Self-Attention       │
+  (Bidirectional)      │
+    │                  │
+    ▼                  │
+  Add & LayerNorm ◄────┘
+    │
+    ├──────────────────┐
+    ▼                  │
+  Feed-Forward         │ (Residual)
+  Network              │
+  (2 linear + GELU)    │
+    │                  │
+    ▼                  │
+  Add & LayerNorm ◄────┘
+    │
+    ▼
+  Output h</div>
+
+<div class="warn">
+<p class="ni"><strong>BERT vs 현대 LLM 아키텍처 차이:</strong></p>
+<table>
+<tr><th>구성 요소</th><th>BERT (2018)</th><th>현대 LLM (2023+)</th></tr>
+<tr><td>아키텍처</td><td>Encoder-only</td><td>Decoder-only</td></tr>
+<tr><td>Attention</td><td>Bidirectional</td><td>Causal</td></tr>
+<tr><td>Normalization</td><td>Post-Norm + LayerNorm</td><td>Pre-Norm + RMSNorm</td></tr>
+<tr><td>Position</td><td>Learned PE (L_max=512)</td><td>RoPE</td></tr>
+<tr><td>Activation</td><td>GELU</td><td>SwiGLU</td></tr>
+<tr><td>Attention 효율</td><td>MHA</td><td>GQA</td></tr>
+</table>
+</div>
+
+<!-- ═══════════════════════════════════════════ -->
+<!-- 3. Pre-training -->
+<!-- ═══════════════════════════════════════════ -->
+<h2 id="pretraining">3. Pre-training: MLM + NSP</h2>
+
+<h3>3.1 Masked Language Modeling (MLM)</h3>
+<p>MLM은 BERT의 핵심 학습 목표다. 입력 토큰의 15%를 무작위로 선택하여 마스킹하고, 모델이 양방향 문맥을 사용하여 원래 토큰을 예측하도록 학습한다.</p>
+
+<div class="def">
+<p class="ni"><strong>Definition 3.1 — Masked Language Modeling</strong></p>
+<p class="ni">입력 토큰의 15%를 선택한 후, 다음 규칙으로 변환:</p>
+<ul>
+<li><strong>80%:</strong> [MASK] 토큰으로 대체 → "I love [MASK] learning"</li>
+<li><strong>10%:</strong> 랜덤 토큰으로 대체 → "I love pizza learning"</li>
+<li><strong>10%:</strong> 원래 토큰 유지 → "I love deep learning"</li>
+</ul>
+<div class="eq">\[ \mathcal{L}_{\text{MLM}} = -\sum_{i \in \mathcal{M}} \log P(x_i | \mathbf{x}_{\backslash \mathcal{M}}) \]</div>
+<p class="ni">여기서 \( \mathcal{M} \)은 마스킹된 위치의 집합, \( \mathbf{x}_{\backslash \mathcal{M}} \)은 마스킹되지 않은 토큰들.</p>
+</div>
+
+<div class="info">
+<p class="ni"><strong>왜 80/10/10인가? (Pre-training vs Fine-tuning Mismatch 해결)</strong></p>
+<ul>
+<li><strong>문제:</strong> Pre-training에서는 [MASK] 토큰이 있지만, fine-tuning에서는 [MASK]가 없다. 이 불일치가 성능을 저하시킬 수 있다</li>
+<li><strong>80% [MASK]:</strong> 모델이 마스킹된 토큰을 예측하는 주요 학습 신호</li>
+<li><strong>10% Random:</strong> 모델이 모든 위치에서 올바른 토큰인지 판단하도록 강제. "이 토큰이 맞는지" 항상 의심하게 만듦</li>
+<li><strong>10% Unchanged:</strong> 실제 입력(fine-tuning 시)과의 분포 차이를 줄임. 마스킹되지 않은 토큰도 예측 대상이 될 수 있음을 학습</li>
+</ul>
+</div>
+
+<pre><span class="cm"># MLM 예시 (PyTorch-style pseudocode)</span>
+<span class="kw">import</span> torch
+
+<span class="cm"># 입력: "The cat sat on the mat"</span>
+tokens = [<span class="st">"The"</span>, <span class="st">"cat"</span>, <span class="st">"sat"</span>, <span class="st">"on"</span>, <span class="st">"the"</span>, <span class="st">"mat"</span>]
+
+<span class="cm"># 15% 선택 → "cat" 선택됨</span>
+mask_prob = <span class="nu">0.15</span>
+selected_idx = <span class="nu">1</span>  <span class="cm"># "cat"</span>
+
+<span class="cm"># 80/10/10 규칙 적용</span>
+r = torch.rand(<span class="nu">1</span>).item()
+<span class="kw">if</span> r < <span class="nu">0.8</span>:
+    tokens[<span class="nu">1</span>] = <span class="st">"[MASK]"</span>     <span class="cm"># 80%: "The [MASK] sat on the mat"</span>
+<span class="kw">elif</span> r < <span class="nu">0.9</span>:
+    tokens[<span class="nu">1</span>] = <span class="st">"dog"</span>        <span class="cm"># 10%: "The dog sat on the mat"</span>
+<span class="kw">else</span>:
+    <span class="kw">pass</span>                      <span class="cm"># 10%: "The cat sat on the mat" (유지)</span>
+
+<span class="cm"># 모델은 위치 1에서 "cat"을 예측해야 함</span>
+<span class="cm"># loss = CrossEntropy(model_output[1], vocab_id("cat"))</span></pre>
+
+<h3>3.2 Next Sentence Prediction (NSP)</h3>
+<p>NSP는 두 문장 간의 관계를 이해하기 위한 학습 목표다. 모델에 문장 A와 B를 주고, B가 A의 실제 다음 문장인지(IsNext) 아닌지(NotNext)를 예측한다.</p>
+
+<div class="def">
+<p class="ni"><strong>Definition 3.2 — Next Sentence Prediction</strong></p>
+<ul>
+<li><strong>50% IsNext:</strong> 실제 연속된 문장 쌍. "I went to the store. [SEP] I bought some milk."</li>
+<li><strong>50% NotNext:</strong> 랜덤으로 선택된 문장. "I went to the store. [SEP] The sun is a star."</li>
+</ul>
+<div class="eq">\[ \mathcal{L}_{\text{NSP}} = -\log P(\text{IsNext} | \mathbf{h}_{\text{[CLS]}}) \]</div>
+<p class="ni">[CLS] 토큰의 최종 hidden state에 binary classifier를 붙여 예측.</p>
+</div>
+
+<div class="warn">
+<p class="ni"><strong>NSP의 한계 (RoBERTa에서 제거됨):</strong></p>
+<ul>
+<li>NSP 태스크가 너무 쉬움: 다른 문서에서 가져온 문장은 주제 자체가 달라서 topic 차이만으로 구분 가능</li>
+<li>실제로 문장 간 "논리적 연결"을 학습하는 것이 아니라 "주제 유사성"만 학습</li>
+<li>RoBERTa (2019)는 NSP를 제거하고도 더 좋은 성능을 달성 → NSP는 불필요했다</li>
+</ul>
+</div>
+
+<h3>3.3 전체 Pre-training Loss</h3>
+
+<div class="eq">\[ \mathcal{L}_{\text{BERT}} = \mathcal{L}_{\text{MLM}} + \mathcal{L}_{\text{NSP}} \]</div>
+
+<div class="ok">
+<p class="ni"><strong>Pre-training 세부 사항:</strong></p>
+<ul>
+<li><strong>데이터:</strong> BooksCorpus (800M words) + English Wikipedia (2,500M words)</li>
+<li><strong>배치 크기:</strong> 256 sequences × 512 tokens = 131,072 tokens/batch</li>
+<li><strong>학습 스텝:</strong> 1,000,000 steps (~40 epochs)</li>
+<li><strong>Optimizer:</strong> Adam (lr=1e-4, warmup 10,000 steps)</li>
+<li><strong>학습 시간:</strong> 4일 (TPU v3 × 16 pods) — BERT-large 기준</li>
+</ul>
+</div>
+
+<!-- ═══════════════════════════════════════════ -->
+<!-- 4. Fine-tuning -->
+<!-- ═══════════════════════════════════════════ -->
+<h2 id="finetuning">4. Fine-tuning: BERT를 실전에 투입하기</h2>
+
+<h3>4.1 Fine-tuning의 핵심 아이디어</h3>
+<p>BERT의 혁신은 "pre-train once, fine-tune for many tasks"에 있다. 거대한 코퍼스에서 언어를 이해하는 능력을 학습한 후, 소량의 라벨 데이터로 특정 태스크에 적응시킨다.</p>
+
+<div class="diagram">BERT Fine-tuning Pipeline
+
+  Pre-trained BERT (110M params)
+         │
+         │  모든 파라미터를 가져옴
+         ▼
+  ┌─────────────────────────────────────┐
+  │  BERT Encoder (frozen or fine-tuned)│
+  │  + Task-specific Head (새로 추가)    │
+  └─────────────────────────────────────┘
+         │
+    ┌────┼────┬────────┐
+    ▼    ▼    ▼        ▼
+  분류  NER  QA    유사도
+  
+  학습: 소량 라벨 데이터 (수천~수만 개)
+  시간: 수 시간 (GPU 1개)
+  핵심: Pre-trained 가중치가 좋은 초기값 역할</div>
+
+<h3>4.2 태스크별 Fine-tuning 방법</h3>
+
+<h4>4.2.1 문장 분류 (Sentence Classification)</h4>
+<div class="info">
+<p class="ni"><strong>감정 분석, 주제 분류 등</strong></p>
+<p class="ni">입력: [CLS] This movie is great [SEP]</p>
+<p class="ni">방법: [CLS] 토큰의 hidden state \( \mathbf{h}_{\text{[CLS]}} \in \mathbb{R}^H \)에 linear classifier 추가</p>
+<div class="eq">\[ P(y | \mathbf{x}) = \text{softmax}(\mathbf{W} \cdot \mathbf{h}_{\text{[CLS]}} + \mathbf{b}) \]</div>
+<p class="ni">여기서 \( \mathbf{W} \in \mathbb{R}^{K \times H} \), K = 클래스 수</p>
+</div>
+
+<h4>4.2.2 토큰 분류 (Token Classification / NER)</h4>
+<div class="info">
+<p class="ni"><strong>Named Entity Recognition, POS Tagging 등</strong></p>
+<p class="ni">입력: [CLS] John lives in New York [SEP]</p>
+<p class="ni">방법: 각 토큰의 hidden state에 classifier 추가</p>
+<div class="eq">\[ P(y_i | \mathbf{x}) = \text{softmax}(\mathbf{W} \cdot \mathbf{h}_i + \mathbf{b}), \quad \forall i \]</div>
+<p class="ni">출력: John→B-PER, lives→O, in→O, New→B-LOC, York→I-LOC</p>
+</div>
+
+<h4>4.2.3 문장 쌍 분류 (Sentence Pair Classification)</h4>
+<div class="info">
+<p class="ni"><strong>자연어 추론 (NLI), 의미 유사도 등</strong></p>
+<p class="ni">입력: [CLS] A man is eating [SEP] Someone is having lunch [SEP]</p>
+<p class="ni">방법: [CLS] 토큰으로 두 문장의 관계 분류 (entailment / contradiction / neutral)</p>
+</div>
+
+<h4>4.2.4 질의응답 (Question Answering)</h4>
+<div class="info">
+<p class="ni"><strong>SQuAD 스타일 Extractive QA</strong></p>
+<p class="ni">입력: [CLS] Where is Paris? [SEP] Paris is the capital of France. [SEP]</p>
+<p class="ni">방법: 답의 시작 위치(start)와 끝 위치(end)를 예측</p>
+<div class="eq">\[ P_{\text{start}}(i) = \text{softmax}(\mathbf{w}_s^T \cdot \mathbf{h}_i), \quad P_{\text{end}}(i) = \text{softmax}(\mathbf{w}_e^T \cdot \mathbf{h}_i) \]</div>
+<p class="ni">답: "the capital of France" (start=5, end=8)</p>
+</div>
+
+<pre><span class="cm"># BERT Fine-tuning for Classification (HuggingFace)</span>
+<span class="kw">from</span> transformers <span class="kw">import</span> BertForSequenceClassification, BertTokenizer, Trainer
+
+<span class="cm"># 1. Pre-trained BERT 로드</span>
+model = <span class="fn">BertForSequenceClassification</span>.from_pretrained(
+    <span class="st">"bert-base-uncased"</span>,
+    num_labels=<span class="nu">2</span>  <span class="cm"># positive / negative</span>
+)
+tokenizer = <span class="fn">BertTokenizer</span>.from_pretrained(<span class="st">"bert-base-uncased"</span>)
+
+<span class="cm"># 2. 입력 토큰화</span>
+inputs = tokenizer(<span class="st">"This movie is great!"</span>, return_tensors=<span class="st">"pt"</span>)
+<span class="cm"># {'input_ids': [101, 2023, 3185, 2003, 2307, 999, 102],</span>
+<span class="cm">#  'token_type_ids': [0, 0, 0, 0, 0, 0, 0],  ← Segment A</span>
+<span class="cm">#  'attention_mask': [1, 1, 1, 1, 1, 1, 1]}</span>
+
+<span class="cm"># 3. Fine-tuning (Trainer API)</span>
+trainer = <span class="fn">Trainer</span>(
+    model=model,
+    train_dataset=train_data,
+    eval_dataset=val_data,
+    <span class="cm"># lr=2e-5, epochs=3, batch_size=32 (BERT 논문 권장)</span>
+)
+trainer.train()</pre>
+
+<!-- ═══════════════════════════════════════════ -->
+<!-- 5. BERT 변형들 -->
+<!-- ═══════════════════════════════════════════ -->
+<h2 id="variants">5. BERT 변형: DistilBERT & RoBERTa</h2>
+
+<h3>5.1 DistilBERT — 작지만 강한 BERT</h3>
+<p>DistilBERT (Sanh et al., 2019)는 Knowledge Distillation을 사용하여 BERT의 크기를 40% 줄이면서 97%의 성능을 유지한 모델이다.</p>
+
+<div class="def">
+<p class="ni"><strong>Definition 5.1 — Knowledge Distillation</strong></p>
+<p class="ni">큰 모델(Teacher)의 "지식"을 작은 모델(Student)에게 전달하는 기법. Teacher의 soft probability distribution을 Student가 모방하도록 학습한다.</p>
+<div class="eq">\[ \mathcal{L}_{\text{distil}} = \alpha \cdot \mathcal{L}_{\text{CE}}(y, p_S) + \beta \cdot \mathcal{L}_{\text{KD}}(p_T^\tau, p_S^\tau) + \gamma \cdot \mathcal{L}_{\text{cos}}(h_T, h_S) \]</div>
+<ul>
+<li>\( \mathcal{L}_{\text{CE}} \): Student의 예측과 실제 라벨 간 Cross-Entropy</li>
+<li>\( \mathcal{L}_{\text{KD}} \): Teacher와 Student의 soft label 간 KL Divergence (temperature \( \tau \))</li>
+<li>\( \mathcal{L}_{\text{cos}} \): Teacher와 Student의 hidden state 간 Cosine Similarity</li>
+</ul>
+</div>
+
+<div class="diagram">Knowledge Distillation
+
+  Teacher (BERT-base: 12 layers, 110M)
+    │
+    │  Soft labels (probability distribution)
+    │  p_T = softmax(logits / τ)    ← temperature τ로 "부드럽게"
+    │
+    ▼
+  Student (DistilBERT: 6 layers, 66M)
+    │
+    │  Student도 같은 temperature로 예측
+    │  p_S = softmax(logits / τ)
+    │
+    ▼
+  Loss = α·CE(y, p_S) + β·KL(p_T, p_S) + γ·cos(h_T, h_S)
+  
+  핵심: Teacher의 "dark knowledge" (틀린 답에 대한 확률 분포)를 학습
+  예: "cat" 예측 시 Teacher가 P(cat)=0.8, P(dog)=0.15, P(car)=0.01
+      → "cat과 dog이 비슷하다"는 정보를 Student가 학습</div>
+
+<div class="tc">Table 2. BERT vs DistilBERT 비교</div>
+<table>
+<tr><th>사양</th><th>BERT-base</th><th>DistilBERT</th><th>비율</th></tr>
+<tr><td>Layers</td><td>12</td><td>6</td><td>50%</td></tr>
+<tr><td>Parameters</td><td>110M</td><td>66M</td><td>60%</td></tr>
+<tr><td>추론 속도</td><td>1×</td><td>1.6×</td><td>60% 빠름</td></tr>
+<tr><td>GLUE 성능</td><td>79.5</td><td>77.0</td><td>97%</td></tr>
+<tr><td>모델 크기</td><td>438MB</td><td>263MB</td><td>60%</td></tr>
+</table>
+
+<div class="ok">
+<p class="ni"><strong>DistilBERT의 핵심 설계 결정:</strong></p>
+<ul>
+<li>레이어 수를 12→6으로 줄임 (2개 중 1개 제거). Hidden size는 유지 (768)</li>
+<li>Token type embedding (Segment) 제거 → NSP도 제거</li>
+<li>Teacher의 가중치로 Student 초기화 (매 2번째 레이어)</li>
+<li>Triple loss: CE + KD + Cosine embedding loss</li>
+</ul>
+</div>
+
+<h3>5.2 RoBERTa — Robustly Optimized BERT</h3>
+<p>RoBERTa (Liu et al., 2019)는 BERT의 학습 방법을 최적화하여 같은 아키텍처에서 훨씬 더 좋은 성능을 달성했다. "BERT was significantly undertrained"라는 것을 증명한 연구다.</p>
+
+<div class="def">
+<p class="ni"><strong>Definition 5.2 — RoBERTa의 4가지 개선</strong></p>
+<ol>
+<li><strong>NSP 제거:</strong> NSP 태스크가 오히려 성능을 저하시킴을 발견. 제거 후 성능 향상</li>
+<li><strong>Dynamic Masking:</strong> BERT는 데이터 전처리 시 마스킹을 고정 (static). RoBERTa는 매 epoch마다 다른 마스킹 패턴 적용</li>
+<li><strong>더 많은 데이터:</strong> 16GB → 160GB (10배). CC-News, OpenWebText, Stories 추가</li>
+<li><strong>더 큰 배치 & 더 긴 학습:</strong> 배치 크기 8K, 학습 스텝 500K. BERT보다 훨씬 오래 학습</li>
+</ol>
+</div>
+
+<div class="tc">Table 3. BERT vs RoBERTa 학습 설정 비교</div>
+<table>
+<tr><th>설정</th><th>BERT</th><th>RoBERTa</th></tr>
+<tr><td>데이터</td><td>16GB (Books + Wiki)</td><td>160GB (+CC-News, Web, Stories)</td></tr>
+<tr><td>배치 크기</td><td>256</td><td>8,192</td></tr>
+<tr><td>학습 스텝</td><td>1M</td><td>500K</td></tr>
+<tr><td>NSP</td><td>✅ 사용</td><td>❌ 제거</td></tr>
+<tr><td>Masking</td><td>Static (고정)</td><td>Dynamic (매 epoch 변경)</td></tr>
+<tr><td>Sequence Length</td><td>128→512 (2단계)</td><td>512 (처음부터)</td></tr>
+<tr><td>GLUE 성능</td><td>79.5</td><td>88.5</td></tr>
+</table>
+
+<div class="warn">
+<p class="ni"><strong>RoBERTa의 교훈:</strong></p>
+<p class="ni">아키텍처를 바꾸지 않고도 학습 방법만 최적화하면 성능이 크게 향상될 수 있다. 이는 "BERT가 충분히 학습되지 않았다"는 것을 의미하며, 학습 레시피의 중요성을 보여준다.</p>
+</div>
+
+<h3>5.3 BERT 생태계 종합</h3>
+
+<div class="tc">Table 4. BERT 변형 모델 종합 비교</div>
+<table>
+<tr><th>모델</th><th>연도</th><th>핵심 변경</th><th>파라미터</th><th>GLUE</th></tr>
+<tr><td>BERT-base</td><td>2018</td><td>원조 (MLM + NSP)</td><td>110M</td><td>79.5</td></tr>
+<tr><td>BERT-large</td><td>2018</td><td>더 큰 모델</td><td>340M</td><td>81.9</td></tr>
+<tr><td>DistilBERT</td><td>2019</td><td>Knowledge Distillation</td><td>66M</td><td>77.0</td></tr>
+<tr><td>RoBERTa</td><td>2019</td><td>학습 최적화, NSP 제거</td><td>355M</td><td>88.5</td></tr>
+<tr><td>ALBERT</td><td>2019</td><td>파라미터 공유, Factorized Embed</td><td>12M</td><td>82.3</td></tr>
+<tr><td>ELECTRA</td><td>2020</td><td>Replaced Token Detection</td><td>110M</td><td>85.1</td></tr>
+<tr><td>DeBERTa</td><td>2020</td><td>Disentangled Attention</td><td>390M</td><td>90.0</td></tr>
+</table>
+
+<!-- ═══════════════════════════════════════════ -->
+<!-- Interactive Labs -->
+<!-- ═══════════════════════════════════════════ -->
+<h2 id="labs">🔬 Interactive Labs</h2>
+
+<h3>Lab 1: MLM 마스킹 시뮬레이션</h3>
+<p class="ni">15% 마스킹과 80/10/10 규칙이 실제로 어떻게 적용되는지 시뮬레이션합니다. 버튼을 클릭하면 새로운 마스킹 패턴이 생성됩니다.</p>
+<div style="margin:20px 0">
+<button onclick="simulateMLM()" style="padding:10px 20px;background:#3498db;color:#fff;border:none;border-radius:6px;cursor:pointer;font-family:'Inter',sans-serif;font-size:13px">🎲 새로운 마스킹 생성</button>
+<div id="mlm-demo" style="margin-top:15px;padding:20px;background:#f8f9fa;border-radius:8px;font-family:'Space Mono',monospace;font-size:13px;line-height:2"></div>
+<div id="mlm-stats" style="margin-top:10px;font-size:12px;color:#666;font-family:'Inter',sans-serif"></div>
+</div>
+
+<h3>Lab 2: BERT 변형 모델 성능 비교</h3>
+<p class="ni">BERT 생태계 모델들의 파라미터 수 대비 GLUE 성능을 비교합니다.</p>
+<div id="lab2-scatter" style="width:100%;height:400px"></div>
+
+<h3>Lab 3: Fine-tuning 태스크별 입력 형식</h3>
+<p class="ni">각 downstream 태스크에서 BERT 입력이 어떻게 구성되는지 시각화합니다.</p>
+<div id="lab3-tasks" style="width:100%;height:380px"></div>
+
+<script>
+// Lab 1: MLM Simulation
+function simulateMLM(){
+  var sentence=["The","quick","brown","fox","jumps","over","the","lazy","dog","and","runs","through","the","forest","quickly"];
+  var n=sentence.length;
+  var numMask=Math.max(1,Math.round(n*0.15));
+  var indices=[];
+  while(indices.length<numMask){var r=Math.floor(Math.random()*n);if(indices.indexOf(r)===-1)indices.push(r);}
+  var result=[];var stats={mask:0,random:0,keep:0};
+  var randoms=["apple","blue","run","big","cat","happy","water","green","fast","small"];
+  for(var i=0;i<n;i++){
+    if(indices.indexOf(i)!==-1){
+      var r=Math.random();
+      if(r<0.8){result.push('<span style="background:#e74c3c;color:#fff;padding:2px 6px;border-radius:3px">[MASK]</span>');stats.mask++;}
+      else if(r<0.9){var rw=randoms[Math.floor(Math.random()*randoms.length)];result.push('<span style="background:#f39c12;color:#fff;padding:2px 6px;border-radius:3px">'+rw+'</span>');stats.random++;}
+      else{result.push('<span style="background:#27ae60;color:#fff;padding:2px 6px;border-radius:3px">'+sentence[i]+'</span>');stats.keep++;}
+    }else{result.push(sentence[i]);}
+  }
+  document.getElementById('mlm-demo').innerHTML='<strong>Original:</strong> '+sentence.join(' ')+'<br><strong>Masked:</strong> '+result.join(' ');
+  document.getElementById('mlm-stats').innerHTML='선택된 토큰: '+numMask+'/'+n+' ('+Math.round(numMask/n*100)+'%) | <span style="color:#e74c3c">[MASK]: '+stats.mask+'</span> | <span style="color:#f39c12">Random: '+stats.random+'</span> | <span style="color:#27ae60">Keep: '+stats.keep+'</span>';
+}
+simulateMLM();
+
+// Lab 2: Model Comparison Scatter
+(function(){
+  var models=[
+    {name:'BERT-base',params:110,glue:79.5,color:'#3498db'},
+    {name:'BERT-large',params:340,glue:81.9,color:'#2980b9'},
+    {name:'DistilBERT',params:66,glue:77.0,color:'#e67e22'},
+    {name:'RoBERTa',params:355,glue:88.5,color:'#e74c3c'},
+    {name:'ALBERT',params:12,glue:82.3,color:'#9b59b6'},
+    {name:'ELECTRA',params:110,glue:85.1,color:'#2ecc71'},
+    {name:'DeBERTa',params:390,glue:90.0,color:'#1abc9c'}
+  ];
+  Plotly.newPlot('lab2-scatter',[{
+    x:models.map(function(m){return m.params}),
+    y:models.map(function(m){return m.glue}),
+    text:models.map(function(m){return m.name}),
+    mode:'markers+text',
+    textposition:'top center',
+    marker:{size:models.map(function(m){return Math.max(12,m.params/10)}),color:models.map(function(m){return m.color}),line:{width:2,color:'#fff'}},
+    type:'scatter'
+  }],{
+    xaxis:{title:'Parameters (M)',type:'log',dtick:1},
+    yaxis:{title:'GLUE Score',range:[74,92]},
+    margin:{t:30,b:50,l:60,r:20},height:380,
+    annotations:[{x:Math.log10(66),y:77,text:'40% smaller<br>97% performance',showarrow:true,arrowhead:2,ax:60,ay:-40,font:{size:10,color:'#e67e22'}}]
+  },{responsive:true});
+})();
+
+// Lab 3: Task Input Visualization
+(function(){
+  var tasks=['Classification','NER','Sentence Pair','QA'];
+  var inputs=[
+    '[CLS] This movie is great [SEP]',
+    '[CLS] John lives in New York [SEP]',
+    '[CLS] Sentence A [SEP] Sentence B [SEP]',
+    '[CLS] Question [SEP] Context passage [SEP]'
+  ];
+  var outputs=[
+    'h_[CLS] → Linear → softmax → positive/negative',
+    'h_i → Linear → softmax → B-PER, O, O, B-LOC, I-LOC',
+    'h_[CLS] → Linear → entailment/contradiction/neutral',
+    'h_i → start/end scores → extract answer span'
+  ];
+  var colors=['#3498db','#e74c3c','#2ecc71','#9b59b6'];
+  Plotly.newPlot('lab3-tasks',[{
+    type:'table',
+    header:{values:['<b>Task</b>','<b>Input Format</b>','<b>Output Method</b>'],fill:{color:'#2c3e50'},font:{color:'white',size:12},align:'left',height:35},
+    cells:{values:[tasks,inputs,outputs],fill:{color:[colors.map(function(c){return c+'20'})]},font:{size:11},align:'left',height:55}
+  }],{margin:{t:10,b:10,l:10,r:10},height:280},{responsive:true});
+})();
+</script>
+
+<!-- ═══════════════════════════════════════════ -->
+<!-- Quiz -->
+<!-- ═══════════════════════════════════════════ -->
+<h2 id="quiz">📝 Quiz — BERT Deep Dive</h2>
+
+<div class="quiz-box" id="q1">
+<h4>Q1. BERT의 입력 표현은 어떤 임베딩들의 합인가?</h4>
+<div class="quiz-option" onclick="showAnswer('q1','a')">A. Token + Position</div>
+<div class="quiz-option" onclick="showAnswer('q1','b')">B. Token + Segment + Position</div>
+<div class="quiz-option" onclick="showAnswer('q1','c')">C. Token + Segment + Rotary</div>
+<div class="quiz-option" onclick="showAnswer('q1','d')">D. Word2Vec + Position</div>
+<div class="quiz-answer" id="ans-q1"><strong>Answer: B</strong><br>BERT 입력 = Token Embedding (WordPiece) + Segment Embedding (문장 A/B 구분) + Position Embedding (Learned, 0~511). 세 가지의 element-wise sum.</div>
+</div>
+
+<div class="quiz-box" id="q2">
+<h4>Q2. MLM에서 선택된 토큰의 80/10/10 규칙 중 "10% random replacement"의 목적은?</h4>
+<div class="quiz-option" onclick="showAnswer('q2','a')">A. 데이터 증강</div>
+<div class="quiz-option" onclick="showAnswer('q2','b')">B. 모델이 모든 위치에서 올바른 토큰인지 판단하도록 강제</div>
+<div class="quiz-option" onclick="showAnswer('q2','c')">C. 학습 속도 향상</div>
+<div class="quiz-option" onclick="showAnswer('q2','d')">D. 과적합 방지</div>
+<div class="quiz-answer" id="ans-q2"><strong>Answer: B</strong><br>10% random replacement는 모델이 "[MASK]가 아닌 토큰도 틀릴 수 있다"고 인식하게 만든다. 모든 위치에서 올바른 표현을 유지하도록 강제하여 pre-train/fine-tune 불일치를 줄인다.</div>
+</div>
+
+<div class="quiz-box" id="q3">
+<h4>Q3. [CLS] 토큰의 역할은?</h4>
+<div class="quiz-option" onclick="showAnswer('q3','a')">A. 문장의 시작을 표시</div>
+<div class="quiz-option" onclick="showAnswer('q3','b')">B. 전체 시퀀스의 요약 표현으로 사용되며, 분류 태스크에서 classifier 입력</div>
+<div class="quiz-option" onclick="showAnswer('q3','c')">C. 마스킹된 토큰을 대체</div>
+<div class="quiz-option" onclick="showAnswer('q3','d')">D. 두 문장을 구분</div>
+<div class="quiz-answer" id="ans-q3"><strong>Answer: B</strong><br>[CLS]의 최종 hidden state는 전체 시퀀스의 aggregate representation. NSP에서는 IsNext/NotNext 분류에, fine-tuning에서는 문장 분류의 입력으로 사용된다.</div>
+</div>
+
+<div class="quiz-box" id="q4">
+<h4>Q4. RoBERTa가 BERT에서 제거한 것은?</h4>
+<div class="quiz-option" onclick="showAnswer('q4','a')">A. MLM</div>
+<div class="quiz-option" onclick="showAnswer('q4','b')">B. Position Embedding</div>
+<div class="quiz-option" onclick="showAnswer('q4','c')">C. Next Sentence Prediction (NSP)</div>
+<div class="quiz-option" onclick="showAnswer('q4','d')">D. [CLS] 토큰</div>
+<div class="quiz-answer" id="ans-q4"><strong>Answer: C</strong><br>RoBERTa는 NSP가 오히려 성능을 저하시킨다는 것을 발견하고 제거. NSP 태스크가 너무 쉬워서 topic 차이만 학습하고 실제 문장 관계는 학습하지 못했기 때문.</div>
+</div>
+
+<div class="quiz-box" id="q5">
+<h4>Q5. DistilBERT의 Knowledge Distillation에서 "dark knowledge"란?</h4>
+<div class="quiz-option" onclick="showAnswer('q5','a')">A. 학습되지 않은 파라미터</div>
+<div class="quiz-option" onclick="showAnswer('q5','b')">B. Teacher 모델의 soft probability distribution에 담긴 클래스 간 유사성 정보</div>
+<div class="quiz-option" onclick="showAnswer('q5','c')">C. 숨겨진 레이어의 가중치</div>
+<div class="quiz-option" onclick="showAnswer('q5','d')">D. 학습 데이터의 노이즈</div>
+<div class="quiz-answer" id="ans-q5"><strong>Answer: B</strong><br>Hard label "cat"은 정보가 적지만, Teacher의 soft label P(cat)=0.8, P(dog)=0.15, P(car)=0.01은 "cat과 dog이 비슷하다"는 풍부한 정보를 담고 있다. 이것이 dark knowledge.</div>
+</div>
+
+<div class="quiz-box" id="q6">
+<h4>Q6. BERT의 QA fine-tuning에서 답을 추출하는 방법은?</h4>
+<div class="quiz-option" onclick="showAnswer('q6','a')">A. [CLS] 토큰으로 답을 생성</div>
+<div class="quiz-option" onclick="showAnswer('q6','b')">B. 각 토큰에 대해 start/end 확률을 계산하여 답 span을 추출</div>
+<div class="quiz-option" onclick="showAnswer('q6','c')">C. Decoder로 답을 autoregressive하게 생성</div>
+<div class="quiz-option" onclick="showAnswer('q6','d')">D. 가장 높은 attention score를 가진 토큰을 선택</div>
+<div class="quiz-answer" id="ans-q6"><strong>Answer: B</strong><br>Extractive QA: 각 토큰 위치에 대해 P_start(i)와 P_end(i)를 계산. argmax(P_start) ~ argmax(P_end) 범위의 토큰이 답. 생성이 아닌 "추출".</div>
+</div>
+
+<div class="quiz-box" id="q7">
+<h4>Q7. RoBERTa의 "Dynamic Masking"이란?</h4>
+<div class="quiz-option" onclick="showAnswer('q7','a')">A. 마스킹 비율을 동적으로 변경</div>
+<div class="quiz-option" onclick="showAnswer('q7','b')">B. 매 epoch마다 다른 마스킹 패턴을 적용 (BERT는 고정)</div>
+<div class="quiz-option" onclick="showAnswer('q7','c')">C. 학습 중 마스킹 비율을 점진적으로 증가</div>
+<div class="quiz-option" onclick="showAnswer('q7','d')">D. 중요한 토큰만 선택적으로 마스킹</div>
+<div class="quiz-answer" id="ans-q7"><strong>Answer: B</strong><br>BERT: 전처리 시 마스킹 고정 (static) → 같은 입력은 항상 같은 마스킹. RoBERTa: 매 epoch마다 새로운 마스킹 패턴 → 더 다양한 학습 신호.</div>
+</div>
+
+<div class="quiz-box" id="q8">
+<h4>Q8. BERT가 GPT와 달리 양방향 학습이 가능한 이유는?</h4>
+<div class="quiz-option" onclick="showAnswer('q8','a')">A. 더 많은 파라미터를 사용하기 때문</div>
+<div class="quiz-option" onclick="showAnswer('q8','b')">B. MLM이 마스킹된 토큰만 예측하므로 정보 누출 없이 양방향 문맥 사용 가능</div>
+<div class="quiz-option" onclick="showAnswer('q8','c')">C. Decoder를 사용하기 때문</div>
+<div class="quiz-option" onclick="showAnswer('q8','d')">D. Cross-attention을 사용하기 때문</div>
+<div class="quiz-answer" id="ans-q8"><strong>Answer: B</strong><br>GPT는 next token prediction → 미래 토큰을 보면 "답을 미리 보는 것" → causal mask 필수. BERT는 [MASK] 토큰을 예측 → 마스킹된 위치의 정보가 이미 숨겨져 있으므로 양방향 참조 가능.</div>
+</div>
+
+<div class="quiz-box" id="q9">
+<h4>Q9. DistilBERT에서 temperature (τ)의 역할은?</h4>
+<div class="quiz-option" onclick="showAnswer('q9','a')">A. 학습률을 조절</div>
+<div class="quiz-option" onclick="showAnswer('q9','b')">B. softmax 출력을 "부드럽게" 만들어 클래스 간 관계 정보를 더 많이 전달</div>
+<div class="quiz-option" onclick="showAnswer('q9','c')">C. 모델 크기를 조절</div>
+<div class="quiz-option" onclick="showAnswer('q9','d')">D. 배치 크기를 조절</div>
+<div class="quiz-answer" id="ans-q9"><strong>Answer: B</strong><br>τ>1이면 softmax가 더 uniform해짐 → 작은 확률의 클래스도 의미 있는 값을 가짐 → Teacher의 "dark knowledge"가 더 잘 전달됨. τ=1이면 일반 softmax.</div>
+</div>
+
+<div class="quiz-box" id="q10">
+<h4>Q10. BERT의 Position Embedding 방식과 그 한계는?</h4>
+<div class="quiz-option" onclick="showAnswer('q10','a')">A. Sinusoidal PE — 학습이 불안정</div>
+<div class="quiz-option" onclick="showAnswer('q10','b')">B. RoPE — 계산 비용이 높음</div>
+<div class="quiz-option" onclick="showAnswer('q10','c')">C. Learned PE — 최대 512 토큰까지만 처리 가능</div>
+<div class="quiz-option" onclick="showAnswer('q10','d')">D. ALiBi — 가까운 토큰만 참조 가능</div>
+<div class="quiz-answer" id="ans-q10"><strong>Answer: C</strong><br>BERT는 Learned PE 사용. 512개 위치 벡터만 학습하므로 L_max=512. 513번째 토큰부터는 처리 불가. 이것이 BERT의 고정 길이 한계. (Round 1에서 학습한 내용!)</div>
+</div>
+
+<script>
+function showAnswer(qId, selected) {
+  var ansDiv = document.getElementById('ans-' + qId);
+  ansDiv.style.display = 'block';
+  var options = document.querySelectorAll('#' + qId + ' .quiz-option');
+  var correctMap = {q1:'b',q2:'b',q3:'b',q4:'c',q5:'b',q6:'b',q7:'b',q8:'b',q9:'b',q10:'c'};
+  var correct = correctMap[qId];
+  options.forEach(function(opt, idx) {
+    var letter = ['a','b','c','d'][idx];
+    if (letter === correct) opt.classList.add('correct');
+    else if (letter === selected) opt.classList.add('wrong');
+  });
+}
+</script>
+
+<!-- ═══════════════════════════════════════════ -->
+<!-- Cheat Sheet -->
+<!-- ═══════════════════════════════════════════ -->
+<h2 id="cheatsheet">📋 Cheat Sheet — BERT Deep Dive 한눈에</h2>
+
+<div class="def">
+<p class="ni"><strong>🔑 핵심 수식</strong></p>
+<p class="ni">1. <strong>입력 표현:</strong></p>
+<div class="eq">\[ \mathbf{x}_i = \mathbf{E}_{\text{token}}(w_i) + \mathbf{E}_{\text{segment}}(s_i) + \mathbf{E}_{\text{position}}(i) \]</div>
+<p class="ni">2. <strong>MLM Loss:</strong></p>
+<div class="eq">\[ \mathcal{L}_{\text{MLM}} = -\sum_{i \in \mathcal{M}} \log P(x_i | \mathbf{x}_{\backslash \mathcal{M}}) \]</div>
+<p class="ni">3. <strong>Fine-tuning (분류):</strong></p>
+<div class="eq">\[ P(y | \mathbf{x}) = \text{softmax}(\mathbf{W} \cdot \mathbf{h}_{\text{[CLS]}} + \mathbf{b}) \]</div>
+<p class="ni">4. <strong>Distillation:</strong></p>
+<div class="eq">\[ \mathcal{L} = \alpha \cdot \text{CE} + \beta \cdot \text{KL}(p_T^\tau \| p_S^\tau) + \gamma \cdot \text{cos}(h_T, h_S) \]</div>
+</div>
+
+<div class="ok">
+<p class="ni"><strong>🎯 시험 대비 핵심 포인트</strong></p>
+<ul>
+<li>BERT = Encoder-only, 양방향, MLM + NSP, Learned PE (L_max=512)</li>
+<li>입력 = Token + Segment + Position Embedding의 합</li>
+<li>[CLS] = 시퀀스 요약 표현, [SEP] = 문장 구분, [MASK] = MLM용</li>
+<li>MLM: 15% 마스킹 → 80% [MASK] + 10% random + 10% keep</li>
+<li>80/10/10 이유: pre-train/fine-tune 불일치 해결</li>
+<li>NSP: 50% IsNext + 50% NotNext → RoBERTa에서 제거 (너무 쉬움)</li>
+<li>Fine-tuning: [CLS]→분류, 각 토큰→NER, start/end→QA</li>
+<li>DistilBERT: 6 layers, 66M params, 97% 성능, Knowledge Distillation</li>
+<li>RoBERTa: NSP 제거 + Dynamic Masking + 10× 데이터 + 큰 배치 → GLUE 88.5</li>
+<li>Dark knowledge: Teacher의 soft label에 담긴 클래스 간 유사성 정보</li>
+</ul>
+</div>
+
+<div class="info">
+<p class="ni"><strong>🔗 Lecture 2 전체 연결 (Round 1~5)</strong></p>
+<table>
+<tr><th>Round</th><th>주제</th><th>BERT에서의 적용</th></tr>
+<tr><td>R1</td><td>Position Embeddings</td><td>Learned PE (L_max=512) → 길이 제한의 원인</td></tr>
+<tr><td>R2</td><td>Layer Normalization</td><td>Post-Norm + LayerNorm (현대 LLM은 Pre-Norm + RMSNorm)</td></tr>
+<tr><td>R3</td><td>Attention Approximation</td><td>MHA 사용 (현대 LLM은 GQA)</td></tr>
+<tr><td>R4</td><td>Transformer Models</td><td>Encoder-only 아키텍처 (현재 주류는 Decoder-only)</td></tr>
+<tr><td>R5</td><td>BERT Deep Dive</td><td>MLM, NSP, Fine-tuning, DistilBERT, RoBERTa</td></tr>
+</table>
+</div>
+
+<!-- Navigation -->
+<div class="round-nav">
+<a href="../round-04/">← Round 4: Transformer Models</a>
+<a class="disabled">Last Round</a>
+</div>
+
+</div><!-- paper-content -->
+</div><!-- container -->
+</div><!-- main-wrapper -->
+
+</body>
+</html>
