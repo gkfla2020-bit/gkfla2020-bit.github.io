@@ -1,0 +1,431 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HW #1 Solution - 암호학기초 (2026-1학기)</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f5f5f5; color: #333; line-height: 1.7; padding: 20px; }
+  .container { max-width: 1100px; margin: 0 auto; background: #fff; border-radius: 12px; box-shadow: 0 2px 20px rgba(0,0,0,0.08); padding: 40px; }
+  h1 { text-align: center; color: #1a237e; font-size: 2em; margin-bottom: 5px; }
+  .subtitle { text-align: center; color: #666; font-size: 1em; margin-bottom: 30px; }
+  .score-summary { background: #e8eaf6; border-radius: 8px; padding: 20px; margin-bottom: 30px; }
+  .score-summary h2 { color: #283593; margin-bottom: 10px; font-size: 1.3em; }
+  .score-table { width: 100%; border-collapse: collapse; }
+  .score-table th, .score-table td { border: 1px solid #c5cae9; padding: 8px 12px; text-align: center; }
+  .score-table th { background: #3949ab; color: #fff; font-weight: 600; }
+  .score-table td { background: #fff; }
+  .score-table tr:last-child td { background: #e8eaf6; font-weight: 700; color: #1a237e; }
+  .chapter-header { background: #1a237e; color: #fff; padding: 12px 20px; border-radius: 8px 8px 0 0; margin-top: 30px; font-size: 1.2em; }
+  .problem { border: 1px solid #e0e0e0; border-radius: 0 0 8px 8px; margin-bottom: 20px; padding: 20px; background: #fafafa; }
+  .problem-title { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+  .problem-title h3 { color: #283593; font-size: 1.15em; }
+  .badge { background: #ff6f00; color: #fff; padding: 3px 12px; border-radius: 20px; font-size: 0.85em; font-weight: 600; }
+  .answer-box { background: #e3f2fd; border-left: 4px solid #1565c0; padding: 12px 16px; margin: 10px 0; border-radius: 0 6px 6px 0; }
+  .answer-box.correct { background: #e8f5e9; border-left-color: #2e7d32; }
+  .answer-box.important { background: #fff3e0; border-left-color: #e65100; }
+  .sub-problem { margin: 10px 0 10px 10px; padding: 10px 15px; border-radius: 6px; background: #fff; border: 1px solid #e8e8e8; }
+  .sub-label { font-weight: 700; color: #1565c0; margin-right: 6px; }
+  .formula { font-family: 'Courier New', monospace; background: #f5f5f5; padding: 2px 8px; border-radius: 4px; font-size: 0.95em; }
+  .keyword { color: #c62828; font-weight: 600; }
+  .grading-criteria { background: #fce4ec; border-radius: 6px; padding: 10px 15px; margin-top: 8px; font-size: 0.9em; }
+  .grading-criteria strong { color: #b71c1c; }
+  table.gf-table { border-collapse: collapse; margin: 10px 0; font-family: 'Courier New', monospace; font-size: 0.9em; }
+  table.gf-table th, table.gf-table td { border: 1px solid #bbb; padding: 4px 10px; text-align: center; }
+  table.gf-table th { background: #e8eaf6; }
+  .poly-list { margin: 8px 0 8px 20px; }
+  .poly-list li { margin: 3px 0; }
+  .note { background: #fff8e1; border: 1px solid #ffe082; border-radius: 6px; padding: 10px 15px; margin: 10px 0; font-size: 0.92em; }
+  .note strong { color: #f57f17; }
+  .eea-table { border-collapse: collapse; margin: 10px 0; font-size: 0.88em; }
+  .eea-table th, .eea-table td { border: 1px solid #bbb; padding: 5px 10px; text-align: center; font-family: 'Courier New', monospace; }
+  .eea-table th { background: #e8eaf6; }
+</style>
+</head>
+<body>
+<div class="container">
+
+<h1>HW #1 Solution</h1>
+<p class="subtitle">암호학기초 · 2026-1학기 · 총점 10점</p>
+
+<!-- ==================== 배점 요약 ==================== -->
+<div class="score-summary">
+  <h2>📊 배점 요약</h2>
+  <table class="score-table">
+    <tr>
+      <th>Chapter</th><th>문제</th><th>소문항</th><th>배점</th>
+    </tr>
+    <tr><td rowspan="5">Ch.3</td><td>18 (a-f)</td><td>6개</td><td>1.5점 (각 0.25점)</td></tr>
+    <tr><td>19 (a-b)</td><td>2개</td><td>0.5점 (각 0.25점)</td></tr>
+    <tr><td>27 (a-b)</td><td>2개</td><td>1.0점 (각 0.5점)</td></tr>
+    <tr><td>29</td><td>1개</td><td>2.0점</td></tr>
+    <tr><td>39</td><td>1개</td><td>1.0점</td></tr>
+    <tr><td rowspan="4">Ch.4</td><td>21</td><td>1개</td><td>1.5점</td></tr>
+    <tr><td>22 (a-b)</td><td>2개</td><td>0.5점 (각 0.25점)</td></tr>
+    <tr><td>30</td><td>1개</td><td>1.0점</td></tr>
+    <tr><td>33</td><td>1개</td><td>1.0점</td></tr>
+    <tr><td colspan="3">합계</td><td>10.0점</td></tr>
+  </table>
+</div>
+
+<!-- ==================== CHAPTER 3 ==================== -->
+<div class="chapter-header">📘 Chapter 3 Exercises</div>
+
+<!-- ===== 18번 ===== -->
+<div class="problem">
+  <div class="problem-title">
+    <h3>18) Plaintext 한 글자 변경 시 Ciphertext 변화 개수</h3>
+    <span class="badge">1.5점 (각 0.25점)</span>
+  </div>
+  <p>각 암호 방식에서 plaintext의 한 문자를 변경했을 때, ciphertext에서 몇 개의 문자가 변하는지 답하시오.</p>
+
+  <div class="sub-problem">
+    <span class="sub-label">a. Additive Cipher (Caesar)</span>
+    <div class="answer-box correct">
+      <strong>정답: 1</strong><br>
+      C<sub>i</sub> = (P<sub>i</sub> + k) mod 26. C<sub>i</sub>는 P<sub>i</sub>에만 의존하므로 한 글자만 변함.
+    </div>
+    <div class="grading-criteria">
+      <strong>채점:</strong> 정답 1 → 0.25점. "1글자" 또는 "only one"이면 정답. 설명 없어도 답만 맞으면 OK.
+    </div>
+  </div>
+
+  <div class="sub-problem">
+    <span class="sub-label">b. Multiplicative Cipher</span>
+    <div class="answer-box correct">
+      <strong>정답: 1</strong><br>
+      C<sub>i</sub> = (P<sub>i</sub> × k) mod 26. C<sub>i</sub>는 P<sub>i</sub>에만 의존하므로 한 글자만 변함.
+    </div>
+    <div class="grading-criteria">
+      <strong>채점:</strong> 정답 1 → 0.25점.
+    </div>
+  </div>
+
+  <div class="sub-problem">
+    <span class="sub-label">c. Affine Cipher</span>
+    <div class="answer-box correct">
+      <strong>정답: 1</strong><br>
+      C<sub>i</sub> = (P<sub>i</sub> × k<sub>1</sub> + k<sub>2</sub>) mod 26. C<sub>i</sub>는 P<sub>i</sub>에만 의존.
+    </div>
+    <div class="grading-criteria">
+      <strong>채점:</strong> 정답 1 → 0.25점.
+    </div>
+  </div>
+
+  <div class="sub-problem">
+    <span class="sub-label">d. Vigenere Cipher</span>
+    <div class="answer-box correct">
+      <strong>정답: 1</strong><br>
+      C<sub>i</sub> = (P<sub>i</sub> + k<sub>i</sub>) mod 26. k<sub>i</sub>는 위치에 따라 달라지지만 다른 plaintext 문자에 의존하지 않음. 한 글자만 변함.
+    </div>
+    <div class="grading-criteria">
+      <strong>채점:</strong> 정답 1 → 0.25점.
+    </div>
+  </div>
+
+  <div class="sub-problem">
+    <span class="sub-label">e. Autokey Cipher</span>
+    <div class="answer-box important">
+      <strong>⚠️ 정답: 2 (답지 원본 수정됨)</strong><br>
+      C<sub>i</sub> = (P<sub>i</sub> + k<sub>i</sub>) mod 26 = (P<sub>i</sub> + P<sub>i-1</sub>) mod 26.<br>
+      한 글자를 바꾸면 해당 위치의 ciphertext + 바로 다음 위치의 ciphertext, <span class="keyword">총 2개</span>가 변함.<br>
+      그 이후의 ciphertext는 영향 없음 (key가 원래 plaintext 값으로 돌아가므로).
+    </div>
+    <div class="grading-criteria">
+      <strong>채점:</strong> 정답 2 → 0.25점. 답지 원본에 오류가 있었으나 정정됨. "all characters after"라고 답한 경우 0점.
+    </div>
+  </div>
+
+  <div class="sub-problem">
+    <span class="sub-label">f. One-Time Pad</span>
+    <div class="answer-box correct">
+      <strong>정답: 1</strong><br>
+      키 스트림은 한 번만 사용. 각 ciphertext 문자는 해당 위치의 plaintext에만 의존. 한 글자만 변함.
+    </div>
+    <div class="grading-criteria">
+      <strong>채점:</strong> 정답 1 → 0.25점.
+    </div>
+  </div>
+</div>
+
+<!-- ===== 19번 ===== -->
+<div class="problem">
+  <div class="problem-title">
+    <h3>19) Transposition Cipher에서 Plaintext 한 글자 변경 시</h3>
+    <span class="badge">0.5점 (각 0.25점)</span>
+  </div>
+
+  <div class="sub-problem">
+    <span class="sub-label">a. Single Transposition</span>
+    <div class="answer-box correct">
+      <strong>정답: 1</strong><br>
+      Single transposition은 문자의 순서만 재배열. 문자 자체는 변하지 않으므로 한 글자만 영향.
+    </div>
+    <div class="grading-criteria">
+      <strong>채점:</strong> 정답 1 → 0.25점.
+    </div>
+  </div>
+
+  <div class="sub-problem">
+    <span class="sub-label">b. Double Transposition</span>
+    <div class="answer-box correct">
+      <strong>정답: 1</strong><br>
+      Double transposition도 순서만 두 번 재배열. 문자 값 자체는 변하지 않으므로 한 글자만 영향.
+    </div>
+    <div class="grading-criteria">
+      <strong>채점:</strong> 정답 1 → 0.25점.
+    </div>
+  </div>
+</div>
+
+<!-- ===== 27번 ===== -->
+<div class="problem">
+  <div class="problem-title">
+    <h3>27) Transposition Cipher 공격 유형 및 컬럼 수</h3>
+    <span class="badge">1.0점 (각 0.5점)</span>
+  </div>
+
+  <div class="sub-problem">
+    <span class="sub-label">a. 공격 유형</span>
+    <div class="answer-box correct">
+      <strong>정답: Chosen-plaintext attack</strong><br>
+      Eve가 Alice의 컴퓨터에 접근하여 원하는 plaintext를 암호화할 수 있으므로 chosen-plaintext attack.
+    </div>
+    <div class="grading-criteria">
+      <strong>채점:</strong> "chosen-plaintext attack" 명시 → 0.5점. "known-plaintext"라고 쓰면 0점.
+    </div>
+  </div>
+
+  <div class="sub-problem">
+    <span class="sub-label">b. 컬럼 수 추정</span>
+    <div class="answer-box correct">
+      <strong>정답: 2 또는 5</strong><br>
+      메시지 길이 10 = 2 × 5. 가능한 컬럼 수: 1, 2, 5, 10.<br>
+      1이나 10은 transposition의 의미가 없으므로 비현실적 → <span class="keyword">2 또는 5</span>.
+    </div>
+    <div class="grading-criteria">
+      <strong>채점:</strong> "2 또는 5" (또는 "2 or 5") → 0.5점. 1, 2, 5, 10 전부 나열만 하고 필터링 안 하면 0.25점. 약수만 구하고 끝내면 0.25점.
+    </div>
+  </div>
+</div>
+
+<!-- ===== 29번 ===== -->
+<div class="problem">
+  <div class="problem-title">
+    <h3>29) Affine Cipher 해독</h3>
+    <span class="badge">2.0점</span>
+  </div>
+  <p>Known-plaintext: "ab" → "GL"</p>
+
+  <div class="answer-box correct">
+    <strong>풀이 과정:</strong><br><br>
+    1. 문자 → 숫자 변환: a=00, b=01, G=06, L=11<br><br>
+    2. Affine cipher: C = (P × k<sub>1</sub> + k<sub>2</sub>) mod 26<br><br>
+    3. 연립방정식 수립:<br>
+    &nbsp;&nbsp;&nbsp; <span class="formula">00 × k₁ + k₂ ≡ 06 (mod 26)</span> → k₂ = 6<br>
+    &nbsp;&nbsp;&nbsp; <span class="formula">01 × k₁ + k₂ ≡ 11 (mod 26)</span> → k₁ + 6 ≡ 11 → k₁ = 5<br><br>
+    4. 키: <span class="keyword">k₁ = 5, k₂ = 6</span><br><br>
+    5. 복호화 공식:<br>
+    &nbsp;&nbsp;&nbsp; <span class="formula">P = ((C - k₂) × k₁⁻¹) mod 26 = ((C - 6) × 21) mod 26 = ((C + 20) × 21) mod 26</span><br>
+    &nbsp;&nbsp;&nbsp; (k₁⁻¹ = 5⁻¹ mod 26 = 21, 왜냐하면 5 × 21 = 105 ≡ 1 mod 26)<br><br>
+    6. Ciphertext: <span class="keyword">XPALASXYFGFUKPXUSOGEUTKCDGFXANMGNVS</span><br><br>
+    7. Plaintext: <span class="keyword">the best of a fight is making up afterwards</span>
+  </div>
+
+  <div class="grading-criteria">
+    <strong>채점 기준 (2.0점):</strong><br>
+    • 연립방정식 수립 및 k₁=5, k₂=6 도출: 0.8점<br>
+    • k₁⁻¹ = 21 계산 및 복호화 공식 유도: 0.6점<br>
+    • 최종 plaintext 정답: 0.6점<br>
+    ※ 최종 답만 맞고 과정 없으면 1.0점. 과정은 맞는데 계산 실수로 plaintext 틀리면 1.4점.
+  </div>
+</div>
+
+<!-- ===== 39번 ===== -->
+<div class="problem">
+  <div class="problem-title">
+    <h3>39) Hill Cipher의 Chosen-Plaintext Attack 취약성</h3>
+    <span class="badge">1.0점</span>
+  </div>
+
+  <div class="answer-box correct">
+    <strong>정답:</strong><br>
+    Hill cipher에서 <span class="formula">C = P × K</span>.<br>
+    Plaintext로 identity matrix <strong>I</strong>를 선택하면 <span class="formula">C = I × K = K</span>.<br>
+    즉, ciphertext가 곧 key가 됨.<br><br>
+    따라서 Eve가 Alice의 컴퓨터에 접근하여 identity matrix를 plaintext로 암호화하면 key를 바로 알아낼 수 있음.<br>
+    → <span class="keyword">Hill cipher는 chosen-plaintext attack에 매우 취약</span>.
+  </div>
+
+  <div class="grading-criteria">
+    <strong>채점 기준 (1.0점):</strong><br>
+    • C = P × K에서 P = I이면 C = K라는 핵심 논리: 0.6점<br>
+    • chosen-plaintext attack에 취약하다는 결론: 0.4점<br>
+    ※ 결론만 쓰고 이유 없으면 0.4점.
+  </div>
+</div>
+
+<!-- ==================== CHAPTER 4 ==================== -->
+<div class="chapter-header">📗 Chapter 4 Exercises</div>
+
+<!-- ===== 21번 ===== -->
+<div class="problem">
+  <div class="problem-title">
+    <h3>21) GF(2⁴) 원소의 4-bit 표현</h3>
+    <span class="badge">1.5점</span>
+  </div>
+  <p>Irreducible polynomial: <span class="formula">f(g) = g⁴ + g³ + 1 = 0</span> → <span class="formula">g⁴ = g³ + 1</span></p>
+
+  <div class="answer-box correct">
+    <strong>정답 테이블:</strong>
+    <table class="gf-table">
+      <tr><th>원소</th><th>다항식 표현</th><th>4-bit</th></tr>
+      <tr><td>0</td><td>0</td><td>0000</td></tr>
+      <tr><td>g⁰</td><td>1</td><td>0001</td></tr>
+      <tr><td>g¹</td><td>g</td><td>0010</td></tr>
+      <tr><td>g²</td><td>g²</td><td>0100</td></tr>
+      <tr><td>g³</td><td>g³</td><td>1000</td></tr>
+      <tr><td>g⁴</td><td>g³ + 1</td><td>1001</td></tr>
+      <tr><td>g⁵</td><td>g³ + g + 1</td><td>1011</td></tr>
+      <tr><td>g⁶</td><td>g³ + g² + g + 1</td><td>1111</td></tr>
+      <tr><td>g⁷</td><td>g² + g + 1</td><td>0111</td></tr>
+      <tr><td>g⁸</td><td>g³ + g² + g</td><td>1110</td></tr>
+      <tr><td>g⁹</td><td>g² + 1</td><td>0101</td></tr>
+      <tr><td>g¹⁰</td><td>g³ + g</td><td>1010</td></tr>
+      <tr><td>g¹¹</td><td>g³ + g² + 1</td><td>1101</td></tr>
+      <tr><td>g¹²</td><td>g + 1</td><td>0011</td></tr>
+      <tr><td>g¹³</td><td>g² + g</td><td>0110</td></tr>
+      <tr><td>g¹⁴</td><td>g³ + g²</td><td>1100</td></tr>
+    </table>
+  </div>
+
+  <div class="grading-criteria">
+    <strong>채점 기준 (1.5점):</strong><br>
+    • g⁴ = g³ + 1 관계식 사용하여 올바르게 전개: 0.5점<br>
+    • g⁰ ~ g⁷ 정확: 0.5점<br>
+    • g⁸ ~ g¹⁴ 정확: 0.5점<br>
+    ※ 1~2개 틀리면 해당 구간에서 0.25점 감점. 3개 이상 틀리면 해당 구간 0점.
+  </div>
+</div>
+
+<!-- ===== 22번 ===== -->
+<div class="problem">
+  <div class="problem-title">
+    <h3>22) GF(2⁴)에서 덧셈과 뺄셈</h3>
+    <span class="badge">0.5점 (각 0.25점)</span>
+  </div>
+  <p>지수의 modulus: 2<sup>n</sup> - 1 = 15. GF(2)에서 덧셈 = 뺄셈 = XOR.</p>
+
+  <div class="sub-problem">
+    <span class="sub-label">a. 덧셈 예시</span>
+    <div class="answer-box correct">
+      <strong>정답:</strong><br>
+      • g³ + g¹² = g³ + (g + 1) = g³ + g + 1 → <span class="formula">(1011) = (1000) + (0011)</span><br>
+      • g¹⁰ + g¹² = (g³ + g) + (g + 1) = g³ + 1 → <span class="formula">(1001) = (1010) + (0011)</span>
+    </div>
+    <div class="grading-criteria">
+      <strong>채점:</strong> 덧셈 예시 2개 중 최소 1개 정확 → 0.25점. 둘 다 틀리면 0점.
+    </div>
+  </div>
+
+  <div class="sub-problem">
+    <span class="sub-label">b. 뺄셈 예시</span>
+    <div class="answer-box correct">
+      <strong>정답:</strong><br>
+      • g³ - g⁹ = g³ - (g² + 1) = g³ + g² + 1 → <span class="formula">(1101) = (1000) - (0101)</span><br>
+      • g¹⁰ - g⁴ = (g³ + g) - (g³ + 1) = g + 1 → <span class="formula">(0011) = (1010) - (1001)</span>
+    </div>
+    <div class="grading-criteria">
+      <strong>채점:</strong> 뺄셈 예시 2개 중 최소 1개 정확 → 0.25점. 둘 다 틀리면 0점.
+    </div>
+  </div>
+
+  <div class="note">
+    <strong>참고:</strong> 22번은 21번 결과를 활용하는 문제. 학생이 다른 예시를 사용해도 계산이 맞으면 정답 처리.
+  </div>
+</div>
+
+<!-- ===== 30번 ===== -->
+<div class="problem">
+  <div class="problem-title">
+    <h3>30) GF(2)에서 Degree 3 Irreducible Polynomial 찾기</h3>
+    <span class="badge">1.0점</span>
+  </div>
+
+  <div class="answer-box correct">
+    <strong>풀이:</strong><br>
+    Degree 3 다항식이 reducible이면 degree 1 + degree 2로 인수분해 가능.<br>
+    GF(2)에서 degree 1 다항식: x, (x+1) 뿐.<br><br>
+    모든 degree 3 다항식 검사:
+    <ul class="poly-list">
+      <li><span class="formula">x³ = x × x²</span> → reducible</li>
+      <li><span class="formula">x³ + 1 = (x+1)(x²+x+1)</span> → reducible</li>
+      <li><span class="formula">x³ + x = x(x²+1)</span> → reducible</li>
+      <li><span class="formula">x³ + x + 1</span> → <span class="keyword">irreducible</span> (x=0: 1≠0, x=1: 1≠0)</li>
+      <li><span class="formula">x³ + x² = x²(x+1)</span> → reducible</li>
+      <li><span class="formula">x³ + x² + 1</span> → <span class="keyword">irreducible</span> (x=0: 1≠0, x=1: 1≠0)</li>
+      <li><span class="formula">x³ + x² + x = x(x²+x+1)</span> → reducible</li>
+      <li><span class="formula">x³ + x² + x + 1 = (x+1)(x²+x+1)</span> → reducible</li>
+    </ul>
+    <strong>정답: f₁(x) = x³ + x + 1, f₂(x) = x³ + x² + 1</strong>
+  </div>
+
+  <div class="grading-criteria">
+    <strong>채점 기준 (1.0점):</strong><br>
+    • 두 irreducible polynomial 모두 정확히 찾음: 1.0점<br>
+    • 하나만 찾음: 0.5점<br>
+    • 방법은 맞지만 계산 실수: 0.5점<br>
+    • 전체 다항식 나열 + 인수분해 과정 보여주면 가산점 없음 (기본)
+  </div>
+</div>
+
+<!-- ===== 33번 ===== -->
+<div class="problem">
+  <div class="problem-title">
+    <h3>33) Extended Euclidean Algorithm으로 역원 구하기</h3>
+    <span class="badge">1.0점</span>
+  </div>
+  <p>GF(2⁴)에서 <span class="formula">x³ + x</span>의 역원을 구하시오. (modulus: <span class="formula">x⁴ + x + 1</span> 또는 해당 irreducible polynomial)</p>
+
+  <div class="answer-box correct">
+    <strong>정답: x³ + x</strong><br><br>
+    Extended Euclidean Algorithm 과정:
+    <table class="eea-table">
+      <tr><th>q</th><th>r₁</th><th>r₂</th><th>r</th><th>t₁</th><th>t₂</th><th>t</th></tr>
+      <tr><td></td><td>x⁵+x²+1</td><td>x⁴+x³+1</td><td></td><td>0</td><td>1</td><td></td></tr>
+      <tr><td>x+1</td><td>x⁴+x³+1</td><td>x³+x²+x</td><td>x³+x²+x</td><td>1</td><td>x+1</td><td>x+1</td></tr>
+      <tr><td>x</td><td>x³+x²+x</td><td>x²+1</td><td>x²+1</td><td>x+1</td><td>x²+x+1</td><td>x²+x+1</td></tr>
+      <tr><td>x+1</td><td>x²+1</td><td>x+1</td><td>1</td><td>x²+x+1</td><td>x³+x</td><td>x³+x</td></tr>
+      <tr><td>x²+1</td><td>x+1</td><td>1</td><td>0</td><td>x³+x</td><td></td><td></td></tr>
+      <tr><td></td><td>1</td><td>0</td><td></td><td><span class="keyword">x³+x</span></td><td></td><td>1</td></tr>
+    </table>
+    <br>
+    역원: <span class="keyword">x³ + x</span>
+  </div>
+
+  <div class="grading-criteria">
+    <strong>채점 기준 (1.0점):</strong><br>
+    • EEA 과정 정확히 전개: 0.6점<br>
+    • 최종 역원 x³ + x 정답: 0.4점<br>
+    ※ 과정 없이 답만 맞으면 0.4점. 과정은 맞는데 최종 답 계산 실수면 0.6점.
+  </div>
+</div>
+
+<!-- ==================== 채점 가이드 ==================== -->
+<div class="chapter-header">📝 채점 가이드 (조교용)</div>
+<div class="problem">
+  <div class="note">
+    <strong>일반 원칙:</strong><br>
+    1. 답만 맞고 풀이 없는 경우: 해당 문제 배점의 50% (단, 18/19번처럼 단답형은 답만 맞아도 만점)<br>
+    2. 풀이 과정은 맞지만 계산 실수: 해당 문제 배점의 70%<br>
+    3. 완전히 다른 접근이지만 논리적으로 타당: 만점 가능<br>
+    4. 18-e 문제: 정답은 <span class="keyword">2</span>. 답지 원본의 오류가 정정됨. "all subsequent characters" 등으로 답하면 0점.<br>
+    5. 22번: 학생이 답지와 다른 예시를 사용해도 계산이 맞으면 정답 처리.<br>
+    6. 소수점 이하 점수 합산 시 반올림하여 최종 정수 점수로 기록.
+  </div>
+</div>
+
+</div><!-- container -->
+</body>
+</html>
