@@ -91,9 +91,10 @@ td.worst{background:#FFEBEE;color:#C62828}
 <h1>§1 Introduction: 이 논문이 풀려는 문제 <span class="time">~2분</span></h1>
 <p>투자를 할 때 가장 기본적인 질문은 "어떤 자산에 얼마씩 투자할 것인가"이다. 이것이 포트폴리오 구축(portfolio construction) 문제이다.</p>
 <p>1952년 Markowitz는 평균-분산(Mean-Variance) 최적화를 제시했다. 기대수익률 \(\mu\)과 공분산 행렬 \(\Sigma\)을 입력하면 "최적"인 가중치가 나온다. 이론적으로는 완벽하지만 실무에서 심각한 문제가 발생한다.</p>
+<p>Markowitz의 핵심 아이디어는 단순하다: 같은 기대수익률이면 변동성이 낮은 포트폴리오가 좋고, 같은 변동성이면 기대수익률이 높은 포트폴리오가 좋다. 이 두 조건을 만족하는 포트폴리오의 집합이 효율적 프론티어(efficient frontier)이다. 수학적으로 \(\min_x x^\top\Sigma x\) s.t. \(x^\top\mu \geq \mu_0\), \(\mathbf{1}^\top x = 1\)을 풀면 된다. 이 문제는 이차계획법(quadratic programming)으로 쉽게 풀 수 있고, 해가 유일하다. 하지만 "쉽게 풀 수 있다"는 것이 "좋은 결과를 준다"는 것을 의미하지는 않는다.</p>
 <div class="q">"Optimal portfolios tend to be excessively concentrated in a limited subset of the full set of assets or securities. Second, the mean-variance solution is overly sensitive to the input parameters." — p.2</div>
 <p><strong>첫 번째 문제: 집중 투자.</strong> 최적화 결과가 소수 자산에 극단적으로 몰린다. 공분산 행렬의 역행렬을 구하는 과정에서 작은 고유값에 대응하는 방향으로 가중치가 폭발하기 때문이다. Michaud(1989)는 이를 "error maximization"이라 불렀다. 수학적으로 MV 해는 \(x^* = \Sigma^{-1}\mathbf{1}/(\mathbf{1}^\top\Sigma^{-1}\mathbf{1})\)인데, \(\Sigma\)의 고유값 분해 \(\Sigma = Q\Lambda Q^\top\)에서 작은 고유값 \(\lambda_k\)에 대응하는 고유벡터 방향으로 \(1/\lambda_k\)에 비례하는 가중치가 부여된다. 추정 오류가 가장 큰 방향(작은 고유값)에 가장 큰 가중치가 가는 것이다.</p>
-<p><strong>두 번째 문제: 입력 민감도.</strong> 기대수익률 추정치를 0.1%만 바꿔도 포트폴리오 구성이 완전히 달라진다. Merton(1980)은 기대수익률을 유의미하게 추정하려면 수백 년의 데이터가 필요하다는 것을 보였다.</p>
+<p><strong>두 번째 문제: 입력 민감도.</strong> 기대수익률 추정치를 0.1%만 바꿔도 포트폴리오 구성이 완전히 달라진다. Merton(1980)은 기대수익률을 유의미하게 추정하려면 수백 년의 데이터가 필요하다는 것을 보였다. 예를 들어 10개 자산의 기대수익률을 각각 0.5% 오차로 추정하면, MV 최적화 결과의 가중치가 50% 이상 변할 수 있다. 이것은 "최적화"가 아니라 "노이즈 증폭"이다. Black과 Litterman(1992)은 이 문제를 해결하기 위해 베이지안 접근을 제안했지만, 여전히 기대수익률에 대한 사전 분포(prior)가 필요하다.</p>
 <p>그래서 실무에서는 기대수익률에 의존하지 않는 단순한 방법을 쓴다:</p>
 <ul>
 <li><strong>동일가중(1/n)</strong>: 모든 자산에 같은 비중. DeMiguel et al.(2009)은 14개 모델 중 1/n이 out-of-sample에서 가장 좋았다고 보고.</li>
@@ -140,6 +141,7 @@ td.worst{background:#FFEBEE;color:#C62828}
 <div class="math-block">\[\sigma_i(x) = x_i \cdot \frac{\partial\sigma(x)}{\partial x_i} = \frac{x_i(\Sigma x)_i}{\sigma(x)}\]</div>
 <h3>오일러 정리에 의한 분해</h3>
 <p>변동성 \(\sigma(x)\)는 가중치의 1차 동차함수(homogeneous of degree 1)이다. 따라서 오일러 정리가 적용된다:</p>
+<div class="proof"><strong>1차 동차함수 증명:</strong> \(\sigma(\lambda x) = \sqrt{(\lambda x)^\top\Sigma(\lambda x)} = \sqrt{\lambda^2 x^\top\Sigma x} = \lambda\sqrt{x^\top\Sigma x} = \lambda\sigma(x)\) for all \(\lambda > 0\). 따라서 \(\sigma\)는 1차 동차함수이다. ∎</div>
 <div class="math-block">\[\sigma(x) = \sum_{i=1}^{n} x_i \cdot \frac{\partial\sigma}{\partial x_i} = \sum_{i=1}^{n}\sigma_i(x)\]</div>
 <div class="q">"The volatility \(\sigma\) is a homogeneous function of degree 1. It thus satisfies Euler's theorem." — p.4</div>
 <p>즉 <strong>포트폴리오 전체 리스크 = 각 자산의 총 RC의 합</strong>. 근사가 아니라 수학적 등식이다.</p>
@@ -204,6 +206,15 @@ td.worst{background:#FFEBEE;color:#C62828}
 <p>가장 단순한 경우부터 시작한다. 2자산(\(n=2\))일 때 ERC 조건 \(x_1(\Sigma x)_1 = x_2(\Sigma x)_2\)를 풀면:</p>
 <div class="math-block">\[x_1^* = \frac{\sigma_2}{\sigma_1 + \sigma_2}, \quad x_2^* = \frac{\sigma_1}{\sigma_1 + \sigma_2} \tag{3}\]</div>
 <div class="proof"><strong>증명 스케치:</strong> ERC 조건을 전개하면 \(x_1(\sigma_1^2 x_1 + \rho\sigma_1\sigma_2 x_2) = x_2(\sigma_2^2 x_2 + \rho\sigma_1\sigma_2 x_1)\). \(x_1+x_2=1\)을 대입하고 정리하면 \(x_1\sigma_1 = x_2\sigma_2\), 즉 \(x_1/x_2 = \sigma_2/\sigma_1\). 상관계수 \(\rho\)가 소거된다.</div>
+<div class="proof"><strong>완전한 증명 (Proposition 1):</strong><br>
+Step 1: ERC 조건 \(\sigma_1(x) = \sigma_2(x)\)를 전개한다.<br>
+\(x_1(\Sigma x)_1 = x_2(\Sigma x)_2\)<br>
+\(x_1(\sigma_1^2 x_1 + \rho\sigma_1\sigma_2 x_2) = x_2(\sigma_2^2 x_2 + \rho\sigma_1\sigma_2 x_1)\)<br>
+Step 2: 좌변 = \(\sigma_1^2 x_1^2 + \rho\sigma_1\sigma_2 x_1 x_2\), 우변 = \(\sigma_2^2 x_2^2 + \rho\sigma_1\sigma_2 x_1 x_2\)<br>
+Step 3: 양변에서 \(\rho\sigma_1\sigma_2 x_1 x_2\)가 소거된다 → \(\sigma_1^2 x_1^2 = \sigma_2^2 x_2^2\)<br>
+Step 4: \(x_1, x_2 > 0\)이므로 양변에 제곱근 → \(\sigma_1 x_1 = \sigma_2 x_2\)<br>
+Step 5: \(x_1 + x_2 = 1\)과 결합 → \(x_1 = \sigma_2/(\sigma_1 + \sigma_2)\), \(x_2 = \sigma_1/(\sigma_1 + \sigma_2)\) ∎<br>
+<strong>핵심:</strong> Step 3에서 \(\rho\)가 완전히 소거된다. 이것은 2자산 ERC의 가장 중요한 성질이다.</div>
 <h3>핵심 발견: 상관계수에 무관!</h3>
 <p>2자산 ERC는 오직 개별 변동성의 비율에만 의존한다. 상관계수가 0이든 0.9이든 −0.5이든 가중치는 동일하다. 이것은 변동성 역수 가중(inverse volatility weighting)과 정확히 같다.</p>
 <h3>MV와의 비교</h3>
@@ -219,6 +230,8 @@ td.worst{background:#FFEBEE;color:#C62828}
 <tr><td>10%</td><td>20%</td><td>−0.5</td><td>66.7%</td><td>85.7%</td><td>50%</td></tr>
 </table>
 <p>ERC는 항상 66.7%로 안정적. MV는 62.5~85.7%로 상관에 따라 크게 변동.</p>
+<h3>3자산 이상에서는?</h3>
+<p>2자산에서 상관이 소거되는 것은 특수한 성질이다. 3자산 이상에서는 상관이 ERC 가중치에 영향을 미친다. 예를 들어 3자산(σ₁=10%, σ₂=20%, σ₃=30%)에서 ρ₁₂=0.8, ρ₁₃=ρ₂₃=0이면, ERC는 Asset 1과 2의 높은 상관을 고려하여 두 자산의 비중을 줄이고 Asset 3의 비중을 상대적으로 높인다. 하지만 MV만큼 극단적이지는 않다. 이것은 ERC가 "변동성만 보는 것이 아니라 상관 구조도 활용하되, MV처럼 극단적으로 반응하지는 않는다"는 것을 보여준다.</p>
 <div id="plotly-2asset" style="width:100%;height:220px"></div>
 <div class="point"><strong>🔍 발표 포인트</strong>: "2자산 ERC의 놀라운 성질은 상관계수에 무관하다는 것입니다. 변동성 비율만으로 가중치가 결정됩니다. 이것은 ERC가 상관 추정 오류에 강건하다는 것을 시사합니다."</div>
 <div class="script">2자산 케이스를 보겠습니다. σ₁=10%, σ₂=20%일 때 ERC 가중치는 x₁=66.7%, x₂=33.3%입니다. 놀라운 것은 상관계수가 0이든, 0.9이든, −0.5이든 가중치가 항상 같다는 것입니다. 표를 보시면 ERC x₁은 항상 66.7%인데, MV x₁은 62.5%에서 85.7%까지 상관에 따라 크게 변합니다. 이것은 실무적으로 매우 중요합니다 — 상관계수는 추정 오류가 크기로 유명한데, ERC는 이 오류에 면역입니다. 아래 차트에서 ERC(초록)는 수평선이고 MV(주황)는 기울어진 곡선인 것이 이 성질을 시각적으로 보여줍니다.</div>
@@ -242,6 +255,8 @@ td.worst{background:#FFEBEE;color:#C62828}
 <p>반대로 \(\sigma_i = \sigma\) for all \(i\)이지만 상관이 다른 경우:</p>
 <div class="math-block">\[x_i = \frac{\left(\sum_{k=1}^n x_k\rho_{ik}\right)^{-1}}{\sum_{j=1}^n\left(\sum_{k=1}^n x_k\rho_{jk}\right)^{-1}} \tag{4'}\]</div>
 <p>가중치가 "가중 평균 상관의 역수"에 비례한다. 다른 자산과의 상관이 낮은 자산일수록 비중이 높아진다. 하지만 이것은 내생적(endogenous)이므로 닫힌 해가 아니다.</p>
+<h3>실무적 근사: Inverse Volatility Weighting</h3>
+<p>등상관 케이스의 결과는 실무에서 중요한 근사 방법을 제공한다. 자산 간 상관이 비교적 균일한 유니버스(예: 미국 주식 섹터)에서는 ERC ≈ 변동성 역수 가중이다. 이것은 최적화 없이 각 자산의 변동성만 알면 즉시 계산할 수 있으므로, ERC의 빠른 근사로 유용하다. 실무에서 "Risk Parity의 간편 버전"으로 널리 사용된다. 다만 자산 간 상관이 크게 다른 이질적 유니버스(주식+채권)에서는 이 근사가 부정확하므로, 정확한 ERC 최적화가 필요하다.</p>
 <div class="point"><strong>🔍 발표 포인트</strong>: "등상관에서 ERC = 변동성 역수 가중. 그리고 상관이 최소일 때 MV와 ERC가 일치합니다. ERC는 분산 효과가 극대화된 MV라고 해석할 수 있습니다."</div>
 <div class="script">등상관 케이스는 모든 자산 쌍의 상관이 동일한 특수한 경우입니다. 이때 ERC 해는 매우 깔끔합니다 — 변동성의 역수에 비례하는 가중치입니다. 변동성이 높은 자산은 비중을 줄이고, 낮은 자산은 비중을 높입니다. 그리고 흥미로운 것은 상관이 하한값 ρ=−1/(n−1)에 접근하면 MV와 ERC가 일치한다는 것입니다. 이 하한은 교차 분산이 최대인 지점입니다. 즉 ERC는 "분산 효과가 극대화된 MV"로 해석할 수 있습니다. 반대로 등변동성이지만 상관이 다른 경우에는 가중치가 "가중 평균 상관의 역수"에 비례합니다 — 다른 자산과의 상관이 낮은 자산일수록 비중이 높아집니다.</div>
 <div class="script">등상관 케이스의 수학적 의미를 좀 더 깊이 설명드리겠습니다. 상관행렬이 R = Cₙ(ρ)인 경우, 즉 모든 off-diagonal 원소가 ρ인 경우입니다. 이때 공분산 행렬은 Σ = diag(σ) · Cₙ(ρ) · diag(σ)이고, ERC 해는 xᵢ* = σᵢ⁻¹ / Σⱼσⱼ⁻¹입니다. 이것은 변동성 역수 가중(inverse volatility weighting)과 정확히 같습니다. 증명은 간단합니다 — 이 가중치를 ERC 조건에 대입하면 xᵢ(Σx)ᵢ가 모든 i에 대해 같아지는 것을 확인할 수 있습니다. 등상관에서 MV 해는 훨씬 복잡합니다. Appendix A.1에서 유도하는데, 상관 ρ에 복잡하게 의존합니다. 하지만 상관의 하한 ρ → −1/(n−1)에서 MV 해가 ERC 해로 수렴합니다. 이 하한은 n개 자산의 상관행렬이 양정치(positive definite)가 되기 위한 최소 상관입니다. 물리적으로 이것은 "모든 자산이 최대한 반대 방향으로 움직이는" 상황이며, 교차 분산(cross-diversification) 효과가 극대화됩니다. 이 결과의 실무적 의미는 중요합니다. 등상관 가정은 현실에서 정확히 성립하지 않지만, 같은 자산군 내에서는 합리적인 근사입니다. 예를 들어 미국 주식 섹터 10개의 평균 상관이 ~63%이고 범위가 43~80%이므로, 등상관 ρ=0.63으로 근사하면 ERC ≈ 변동성 역수 가중이 됩니다. 이것은 ERC의 빠른 근사 방법으로 실무에서 유용합니다. 또한 식 (4')의 등변동성·이상관 케이스도 흥미롭습니다. 모든 자산의 변동성이 같지만 상관이 다른 경우, ERC 가중치는 "가중 평균 상관의 역수"에 비례합니다. 다른 자산과의 상관이 낮은 자산 — 즉 분산 효과가 큰 자산 — 일수록 비중이 높아집니다. 이것은 ERC가 단순히 변동성만 보는 것이 아니라 상관 구조도 활용한다는 것을 보여줍니다.</div>
@@ -268,6 +283,25 @@ td.worst{background:#FFEBEE;color:#C62828}
 <tr><td>식 (7) 변환</td><td><strong>볼록</strong></td><td><strong>전역 최적</strong></td><td>수학적 보장</td><td>비선형 부등식 제약</td></tr>
 </table>
 <p>논문 저자들은 식 (6)을 선호한다고 밝힘: "Our preference goes to the first optimization problem which is easier to solve numerically since it does not incorporate a non-linear inequality constraint." (p.7)</p>
+<h3>Python 구현 (제 실증에서 사용한 코드)</h3>
+<pre>
+def erc_objective(x, cov):
+    """논문 식 (6): RC 차이의 제곱합"""
+    sigma = np.sqrt(x @ cov @ x)
+    rc = x * (cov @ x) / sigma  # 각 자산의 RC
+    n = len(x)
+    # 모든 (i,j) 쌍의 RC 차이 제곱합
+    return sum((rc[i]-rc[j])**2 
+               for i in range(n) for j in range(n))
+
+from scipy.optimize import minimize
+x0 = np.ones(n) / n  # 초기값: 1/n
+res = minimize(erc_objective, x0, args=(cov,),
+    method='SLSQP',
+    constraints={'type':'eq','fun':lambda x: sum(x)-1},
+    bounds=[(0.001,1)]*n)  # 공매도 금지
+</pre>
+<p style="font-size:9px;color:#555">131회 리밸런싱 모두에서 f(x*) < 10⁻²⁰으로 수렴. 평균 최적화 시간: 0.02초/회.</p>
 <div class="point"><strong>🔍 발표 포인트</strong>: "ERC의 본질은 베타 역수 가중입니다. 수치적으로는 두 가지 방법이 있는데, 식 (7)이 볼록이라 전역 최적을 보장하지만, 논문 저자들은 구현이 쉬운 식 (6)을 선호합니다."</div>
 <div class="script">일반적 경우로 넘어갑니다. 변동성도 다르고 상관도 다른 현실적인 상황에서 ERC 해는 "베타 역수 가중"입니다. 여기서 베타는 CAPM의 시장 베타가 아니라, ERC 포트폴리오 자체에 대한 민감도입니다. 포트폴리오에 대한 민감도가 높은 자산일수록 비중을 줄입니다. 하지만 이것은 내생적이라 닫힌 해가 아니고 수치적으로 풀어야 합니다. 논문은 두 가지 방법을 제시합니다. 식 (6)은 RC 차이의 제곱합을 최소화하는 직접 방법인데, 비볼록이라 국소 최적에 빠질 수 있습니다. 식 (7)은 로그 제약으로 변환하면 볼록 문제가 되어 전역 최적을 보장합니다. 하지만 논문 저자들은 식 (6)이 구현이 쉽고 실무에서 잘 작동한다고 밝힙니다. 제 실증에서도 scipy의 SLSQP로 식 (6)을 풀었고, 131회 리밸런싱 모두에서 수렴했습니다.</div>
 <div class="script">베타 해석을 좀 더 자세히 설명드리겠습니다. 식 (5)에서 βᵢ = (Σx*)ᵢ/σ(x*)는 자산 i의 ERC 포트폴리오에 대한 베타입니다. 이것은 CAPM에서 시장 포트폴리오에 대한 베타와 형식적으로 동일하지만, 기준 포트폴리오가 시장이 아니라 ERC 자체라는 점이 다릅니다. βᵢ가 높다는 것은 자산 i가 ERC 포트폴리오와 같은 방향으로 강하게 움직인다는 뜻이고, ERC는 이런 자산의 비중을 줄여서 리스크 기여도를 균등화합니다. 이것은 내생적(endogenous) 조건입니다 — 가중치 x*가 베타를 결정하고, 베타가 다시 가중치를 결정합니다. 따라서 닫힌 해가 아니라 고정점(fixed-point) 조건이며, 수치적으로 풀어야 합니다. 수치 최적화에 대해 좀 더 설명드리겠습니다. 식 (6)은 f(x) = ΣᵢΣⱼ(xᵢ(Σx)ᵢ − xⱼ(Σx)ⱼ)²를 최소화합니다. 이것은 모든 자산 쌍의 RC 차이의 제곱합이므로, f(x*) = 0이면 ERC 조건이 만족됩니다. 비볼록 문제이지만, 실무에서는 1/n을 초기값으로 사용하면 거의 항상 전역 최적에 수렴합니다. 식 (7)은 Spinu(2013)가 제안한 볼록 변환입니다. 변수 변환 yᵢ = xᵢ · σ(x)를 적용하고 로그 제약 Σln(yᵢ) ≥ c를 추가하면 볼록 문제가 됩니다. Appendix A.2에서 라그랑지안 1차 조건을 풀면 ERC 조건이 나옵니다. 전역 최적을 수학적으로 보장하지만, 비선형 부등식 제약 때문에 구현이 복잡합니다. 제 실증에서는 논문 저자들의 권고대로 식 (6)을 scipy.optimize.minimize(method='SLSQP')로 풀었습니다. 초기값은 1/n, 제약조건은 Σxᵢ = 1과 xᵢ ≥ 0.001(수치 안정성을 위해 0이 아닌 작은 하한). 131회 리밸런싱 모두에서 f(x*) < 10⁻²⁰으로 수렴하여 ERC 조건이 거의 완벽히 만족되었습니다.</div>
@@ -287,6 +321,8 @@ td.worst{background:#FFEBEE;color:#C62828}
 <p>즉 <strong>모든 자산의 초과수익률이 리스크 기여도에 비례</strong>할 때 ERC가 최적이다.</p>
 <div class="h"><strong>특수 케이스:</strong> 모든 자산의 기대수익률이 동일하면 (\(\mu_i = \mu\;\forall\;i\)), ERC = MSR. 기대수익률에 대한 정보가 없어서 "모두 같다"고 가정하는 것이 합리적인 상황에서 ERC는 최적 전략이다.</div>
 <p>이것은 ERC의 <strong>암묵적 가정</strong>을 드러낸다: "리스크 기여도가 같으면 기대수익률 기여도도 같다." 즉 리스크 프리미엄이 리스크에 비례한다는 가정이다.</p>
+<h3>효율적 프론티어 위의 ERC 위치</h3>
+<p>ERC는 효율적 프론티어 위에 있을 수도 있고 아닐 수도 있다. 모든 자산의 기대수익률이 동일하면 ERC = MSR이므로 효율적 프론티어 위에 있다. 하지만 기대수익률이 다르면 ERC는 일반적으로 효율적 프론티어 아래에 위치한다. 그럼에도 ERC가 실무적으로 유용한 이유는, 효율적 프론티어 자체가 추정 오류에 극도로 민감하기 때문이다. "진짜" 효율적 프론티어를 모르는 상황에서, 추정 오류에 강건한 ERC가 "추정된" 효율적 프론티어 위의 포트폴리오보다 out-of-sample 성과가 좋을 수 있다.</p>
 <div class="point"><strong>🔍 발표 포인트</strong>: "ERC가 최적이 되려면 모든 자산의 기대수익률이 같아야 합니다. 현실에서 기대수익률을 모르니까 '다 같다'고 가정하는 것이 합리적이고, 그때 ERC가 최적입니다. 이것이 ERC의 철학적 근거입니다."</div>
 <h3>실무적 해석: 왜 기대수익률을 안 쓰는 것이 장점인가?</h3>
 <p>기대수익률 추정은 포트폴리오 최적화에서 가장 어려운 부분이다. Merton(1980)은 기대수익률을 1% 정밀도로 추정하려면 약 <strong>500년</strong>의 데이터가 필요하다는 것을 보였다. 반면 공분산 행렬은 상대적으로 안정적이며, 1~3년의 데이터로도 합리적인 추정이 가능하다.</p>
@@ -368,6 +404,7 @@ td.worst{background:#FFEBEE;color:#C62828}
 <h3>Gini 지수 \(\bar{G}\)</h3>
 <div class="math-block">\[G = 1 - 2\int_0^1 L(x)\,dx\]</div>
 <p>로렌츠 곡선 기반. \(G = 0\)이면 완전 균등, \(G = 1\)이면 완전 집중. Herfindahl보다 분포의 비대칭성에 민감하다.</p>
+<p style="font-size:10px"><strong>Gini 계산 예시 (4자산 1/n RC):</strong> RC = (12.3%, 14.1%, 26.4%, 47.2%)를 오름차순 정렬. 누적 비율: (12.3%, 26.4%, 52.8%, 100%). 로렌츠 곡선 아래 면적을 사다리꼴 공식으로 계산하면 G ≈ 0.30. 즉 1/n의 RC가 30% 불균등하다. ERC의 RC = (25%, 25%, 25%, 25%)이면 G = 0 — 완벽 균등.</p>
 <h3>Turnover \(\bar{T}\)</h3>
 <div class="math-block">\[\bar{T}_w = \frac{1}{T}\sum_{t=1}^{T}\sum_{i=1}^{n}|x_{i,t} - x_{i,t-1}|\]</div>
 <p>리밸런싱 시 가중치 변화의 평균. 거래비용의 대리변수(proxy)이다.</p>
@@ -390,6 +427,7 @@ td.worst{background:#FFEBEE;color:#C62828}
 <div class="s">
 <h1>§4.2 실증 1: US Equity Sectors — 논문 Table 1 &amp; 2 <span class="time">~1.5분</span></h1>
 <p><strong>데이터:</strong> 미국(US) 주식시장의 10개 섹터 지수. Datastream에서 수집. OILGS(에너지), BMATR(소재), INDUS(산업재), CNSMG(필수소비재), HLTHC(헬스케어), CNSMS(경기소비재), TELCM(통신), UTILS(유틸리티), FINAN(금융), TECNO(기술). 기간: <strong>1973년 1월 ~ 2008년 10월 (35년)</strong>. 월간 리밸런싱, 1년(12개월) 롤링 공분산 추정. 모든 자산이 미국 주식이므로 <strong>동질적(homogeneous) 유니버스</strong>이다.</p>
+<p style="font-size:10px"><strong>왜 동질적인가?</strong> 10개 섹터 모두 미국 주식시장에 속한다. 미국 GDP 성장, 연준 금리 정책, 달러 가치 등 공통 거시경제 요인에 노출되어 있다. 변동성 범위가 14.5%(UTILS)~26.2%(TECNO)로 1.8배밖에 차이 안 나고, 평균 상관이 ~63%로 높다. 이것은 "같은 바구니 안의 다른 과일"과 같다 — 개별 특성은 다르지만 공통 요인(바구니)의 영향이 지배적이다. 이런 환경에서는 MV가 "가장 안정적인 과일"(UTILS, HLTHC)에 집중하는 전략이 효과적이다.</p>
 <div class="c2">
 <div class="paper">
 <h3><span class="tag tag-paper">PAPER</span> Table 1: 기술통계</h3>
@@ -408,7 +446,8 @@ td.worst{background:#FFEBEE;color:#C62828}
 <!-- ===== SLIDE 13: §4.2 실증 2 — Agricultural Commodity (논문) ===== -->
 <div class="s">
 <h1>§4.2 실증 2: Agricultural Commodity — 논문 Table 3 &amp; 4 <span class="time">~1.5분</span></h1>
-<p><strong>데이터:</strong> 8개 농산물 선물(commodity futures). CC(코코아), CLC(원유 WTI), CLH(난방유), CS(대두), CW(밀), NCT(면화), NKC(커피), NSB(설탕). 출처: Bloomberg. 기간: <strong>1979년 1월 ~ 2008년 10월 (29년)</strong>. 월간 리밸런싱, 1년 롤링 공분산. 농산물 선물은 주식과 달리 자산 간 상관이 매우 낮다(평균 ~10%). 변동성 범위도 15~30%로 넓다. 이것은 US Sectors와 대조적인 <strong>저상관·이질적 유니버스</strong>이다.</p>
+<p><strong>데이터:</strong> 8개 농산물 선물(commodity futures). CC(코코아), CLC(원유 WTI), CLH(난방유), CS(대두), CW(밀), NCT(면화), NKC(커피), NSB(설탕). 출처: Bloomberg. 기간: <strong>1979년 1월 ~ 2008년 10월 (29년)</strong>. 월간 리밸런싱, 1년 롤링 공분산. 농산물 선물은 주식와 달리 자산 간 상관이 매우 낮다(평균 ~10%). 변동성 범위도 15~30%로 넓다. 이것은 US Sectors와 대조적인 <strong>저상관·이질적 유니버스</strong>이다.</p>
+<p style="font-size:10px"><strong>선물 시장의 특수성:</strong> 농산물 선물은 현물(spot) 가격이 아니라 선물(futures) 가격을 추적한다. 선물 수익률은 세 가지 요소로 분해된다: (1) 현물 가격 변동(spot return), (2) 롤오버 수익(roll yield) — 선물 만기 시 다음 계약으로 교체할 때 발생하는 수익/손실, (3) 담보 수익(collateral yield) — 선물 증거금에 대한 이자 수익. 백워데이션(backwardation) 시장에서는 롤오버 수익이 양수이고, 콘탱고(contango) 시장에서는 음수이다. 이 특성 때문에 농산물 선물의 장기 수익률은 현물 가격 변동과 다를 수 있다.</p>
 <div class="c2">
 <div class="paper">
 <h3><span class="tag tag-paper">PAPER</span> Table 3 &amp; 4</h3>
@@ -505,6 +544,8 @@ td.worst{background:#FFEBEE;color:#C62828}
 <li><strong>이질적 유니버스(Global):</strong> 주식·채권·원자재를 혼합. 변동성 범위가 넓고(4.3~29.8%) 상관 구조가 복잡(주식-채권 음의 상관). 이 환경에서 ERC가 샤프 0.67로 압도적 최고.</li>
 </ol>
 <p>이 패턴의 직관적 이유: 이질적 자산군에서 MV는 저변동성 자산(채권)에 극단적으로 집중하여 수익률을 희생한다. 1/n은 고변동성 자산(주식)에 과다한 리스크를 배분하여 위기 시 폭락한다. ERC는 리스크를 균등 배분하여 채권의 안정성과 주식의 성장성을 균형있게 활용한다. 이것이 "리스크의 민주주의"가 "자본의 민주주의"(1/n)와 "리스크의 독재"(MV)를 모두 이기는 환경이다.</p>
+<h3>실무적 함의: 대부분의 기관투자자 포트폴리오는 이질적이다</h3>
+<p style="font-size:10.5px">국민연금, CalPERS, 노르웨이 국부펀드 등 대형 기관투자자의 포트폴리오는 거의 항상 주식+채권+대체자산으로 구성된 이질적 유니버스이다. 따라서 논문의 핵심 발견 — "이질적 자산군에서 ERC가 강력하다" — 는 실무적으로 매우 중요하다. 동질적 유니버스(주식만)에서 MV가 유리하다는 결과는 학술적으로 흥미롭지만, 실무적 적용 범위가 좁다.</p>
 <div class="script">논문의 3개 실증을 종합하면 명확한 패턴이 보입니다. 동질적 자산(미국 주식 섹터, 농산물 선물)에서는 MV가 최고입니다. 하지만 이질적 자산(글로벌 멀티에셋)에서는 ERC가 압도적입니다. 이유는 간단합니다 — MV는 채권에 극단적으로 집중하고, 1/n은 주식에 과다한 리스크를 배분합니다. ERC만이 리스크를 균등하게 분배하여 두 극단의 장점을 모두 취합니다. 이제 이 패턴을 실제 글로벌 ETF 데이터로 검증하겠습니다.</div>
 <div class="script">이 패턴의 경제학적 직관을 좀 더 설명드리겠습니다. 동질적 유니버스(US Sectors, Commodity)에서는 모든 자산이 같은 자산군에 속합니다. 변동성 범위가 좁고(1.8~2배), 상관이 비교적 균일합니다. 이런 환경에서 MV는 "같은 종류의 자산 중 가장 안정적인 것을 골라 집중"하는 전략이 효과적입니다. 미국 주식 섹터에서 유틸리티(σ=14.5%)에 집중하는 것은, 같은 미국 주식이지만 가장 안정적인 섹터를 선택하는 것이므로 합리적입니다. 하지만 이질적 유니버스(Global)에서는 상황이 완전히 다릅니다. 주식(σ=15~30%)과 채권(σ=4~8%)의 변동성 차이가 3~7배이고, 주식-채권 상관이 음수(−19%)입니다. MV는 이 환경에서 채권에 극단적으로 집중합니다 — 변동성이 낮고 주식과 음의 상관이라 분산 효과가 극대화되기 때문입니다. 하지만 이것은 "주식의 성장성을 완전히 포기"하는 것입니다. 1/n은 반대로 주식에 과다한 리스크를 배분합니다 — 13개 자산 중 주식이 8개이므로 자본의 62%가 주식에 가고, 리스크의 80% 이상이 주식에서 옵니다. ERC는 이 두 극단의 균형점입니다. 채권에 높은 비중을 두되(변동성이 낮으므로), 주식도 유지합니다(리스크 기여도를 균등화하기 위해). 결과적으로 채권의 안정성과 주식의 성장성을 모두 활용하여 최고의 위험조정수익률을 달성합니다. 이것이 논문의 핵심 발견이며, 실무에서 ERC/Risk Parity가 멀티에셋 포트폴리오의 기본 프레임워크로 채택된 이유입니다. 이제 이 패턴을 제가 직접 수집한 글로벌 ETF 데이터로 검증하겠습니다.</div>
 <div class="sn">16</div></div>
@@ -635,6 +676,10 @@ td.worst{background:#FFEBEE;color:#C62828}
 <h3>결과 해석</h3>
 <p style="font-size:10.5px"><strong>Return:</strong> 1/n이 4.71%로 최고. 주식 비중이 높아서(6/13 = 46%) 주식 시장 회복기(2009~2018)의 상승을 가장 많이 누림. MV는 3.32%로 최저 — IEF(중기국채)에 57.6% 집중하여 채권 수익률에 갇힘.</p>
 <p style="font-size:10.5px"><strong>Volatility:</strong> MV가 5.15%로 압도적 최저. 채권 집중 효과. ERC는 7.98%로 중간. 1/n은 13.88%로 주식 변동성에 노출.</p>
+<h3>MV 평균 가중치 상세</h3>
+<p style="font-size:10px">MV의 131회 리밸런싱 평균 가중치: IEF <strong>57.6%</strong>, TLT 11.2%, LQD 14.8%, GLD 5.1%, 나머지 9개 자산 합계 11.3%. 채권 3종(IEF+TLT+LQD)이 <strong>83.6%</strong>를 차지한다. 주식 6개의 합계는 5.8%에 불과하다. 이것은 "멀티에셋 포트폴리오"라고 부르기 어려운 수준이다. 실무에서 이런 극단적 집중은 규제 한도(단일 자산 30% 이하 등), 유동성 리스크(대량 매매 시 시장 충격), 운용 리스크(해당 자산의 구조적 변화)로 인해 수용하기 어렵다.</p>
+<h3>ERC 평균 가중치 상세</h3>
+<p style="font-size:10px">ERC의 131회 리밸런싱 평균 가중치: IEF <strong>29.8%</strong>, TLT 13.1%, LQD 12.4%, GLD 9.2%, HYG 7.8%, SPY 4.8%, EWJ 4.3%, DBC 4.1%, EWU 3.9%, EWH 3.6%, EEM 3.1%, EWY 2.3%, VNQ 1.6%. 채권 3종 합계 55.3%, 주식 6개 합계 22.0%, 대체 3개 합계 14.9%. MV보다 훨씬 균등하면서도 채권의 안정성을 활용한다.</p>
 <p style="font-size:10.5px"><strong>Sharpe:</strong> MV 0.64 > ERC 0.43 > 1/n 0.34. MV가 최고인 이유는 2008 위기가 백테스트 초반에 있어서 채권 집중이 극도로 유리했기 때문. 논문 Global(1995~2008)에서는 위기 전 상승장이 길어 ERC가 최고(0.67)였음.</p>
 <p style="font-size:10.5px"><strong>DD Max:</strong> 1/n −40.34%(2008 위기), MV −14.55%, ERC −29.23%. MV의 채권 집중이 위기 방어에 극도로 효과적이었지만, 이것은 "사후적으로 채권이 안전자산이었기 때문"이지 사전적으로 보장된 것이 아님.</p>
 <p style="font-size:10.5px"><strong>집중도:</strong> MV의 G_w = 81.96%로 극단적 집중(IEF 57.6%). ERC의 G_rc = 0.27%로 RC가 거의 완벽히 균등. 이것은 ERC의 정의에 의한 구조적 성질이며, 시장 환경에 무관하게 항상 성립.</p>
@@ -700,6 +745,8 @@ td.worst{background:#FFEBEE;color:#C62828}
 • <strong>2013 Taper Tantrum:</strong> 미국 연준의 양적완화 축소 시사로 채권 가격 하락. MV와 ERC가 일시적으로 하락하지만 1/n보다 영향 적음.<br>
 • <strong>2015 중국 위기:</strong> 중국 주식시장 폭락으로 EEM, EWH, EWY 하락. 1/n이 가장 큰 영향. ERC는 주식 비중이 낮아 방어.</p>
 </div>
+<h3>드로다운(Drawdown) 상세 분석</h3>
+<p style="font-size:10px"><strong>2008 금융위기 드로다운 타임라인:</strong> 1/n은 2008년 2월~2009년 3월까지 13개월간 하락하여 DD Max −40.34%를 기록. 회복에 2009년 3월~2013년 1월까지 약 46개월 소요. 총 드로다운 기간 59개월(약 5년). MV는 2008년 9월~2008년 11월까지 3개월간 하락하여 DD Max −14.55%. 회복에 2009년 4월까지 5개월 소요. 총 8개월. ERC는 2008년 2월~2009년 3월까지 13개월간 하락하여 DD Max −29.23%. 회복에 2009년 3월~2011년 2월까지 약 23개월 소요. 총 36개월(약 3년). MV의 빠른 회복은 채권 집중 덕분이지만, 이것은 "사후적으로 채권이 안전자산이었기 때문"이지 사전적으로 보장된 것이 아니다.</p>
 <div class="script">누적 수익률 차트에서 2008 위기가 명확히 보입니다. 1/n은 미국·한국·신흥국 주식에 균등 투자하므로 가장 큰 폭락을 겪지만, 2009년 이후 미국 주식 랠리 덕분에 회복도 빠릅니다. MV는 미국 중기국채(IEF)에 57.6% 집중하여 위기를 거의 무사히 통과합니다. ERC는 채권과 주식에 리스크를 균등 배분하여 중간 경로를 걷습니다. 논문 Figure 2와 동일한 패턴입니다 — 1/n이 가장 변동적이고, MV가 가장 안정적이고, ERC가 중간입니다.</div>
 <div class="script">누적 수익률 차트의 주요 이벤트를 시간순으로 설명드리겠습니다. 2008년 2월 백테스트 시작 시점에서 세 전략 모두 100에서 출발합니다. 2008년 3~10월 글로벌 금융위기가 본격화됩니다. Bear Stearns 인수(3월), Lehman Brothers 파산(9월), AIG 구제금융(9월)이 연이어 발생합니다. 1/n은 100에서 66까지 하락하여 −34%를 기록합니다. 미국 주식 SPY가 −37%, 한국 EWY가 −55%, 신흥국 EEM이 −53%, 리츠 VNQ가 −72% 폭락하면서 주식 비중이 높은 1/n이 가장 큰 타격을 받습니다. MV는 100에서 89까지 하락하여 −11%를 기록합니다. IEF가 +18% 상승하면서 채권 집중이 방어 역할을 합니다. ERC는 100에서 79까지 하락하여 −21%를 기록합니다. 채권 비중이 1/n보다 높아 방어적이지만, 주식도 보유하고 있어 MV보다는 하락합니다. 2009~2013년 회복기에는 1/n이 가장 빠르게 회복합니다. 미국 주식 SPY가 연평균 +15% 상승하고, 한국 EWY와 신흥국 EEM도 강하게 반등합니다. 2013년 5월 Taper Tantrum — 미국 연준의 양적완화 축소 시사 — 으로 채권 가격이 하락합니다. TLT가 −13%, IEF가 −6% 하락하면서 MV와 ERC가 일시적으로 하락합니다. 하지만 1/n보다 영향이 적습니다. 2015년 8월 중국 위기 — 중국 주식시장 폭락과 위안화 평가절하 — 로 EEM, EWH, EWY가 하락합니다. 1/n이 가장 큰 영향을 받고, ERC는 주식 비중이 낮아 방어적입니다. 2018년 12월 백테스트 종료 시점에서 1/n 150.6, MV 141.5, ERC 141.1입니다. 1/n이 절대 수익률 최고이지만, 위험조정수익률(샤프)은 MV 0.64 > ERC 0.43 > 1/n 0.34입니다.</div>
 <div class="sn">20</div></div>
@@ -787,7 +834,9 @@ td.worst{background:#FFEBEE;color:#C62828}
 <li><strong>Roncalli (2013):</strong> <em>Introduction to Risk Parity and Budgeting</em> — Risk Parity 분야의 교과서. 유일성 증명, 일반화된 리스크 버짓팅(\(c_i = b_i\)), 레버리지 최적화 등을 다룸.</li>
 <li><strong>Bridgewater All Weather:</strong> Ray Dalio가 1996년 시작한 Risk Parity 전략. 2023년 기준 AUM $150B+. ERC + 레버리지 + 동적 리밸런싱.</li>
 <li><strong>AQR Risk Parity:</strong> Cliff Asness가 운용하는 Risk Parity 펀드. 학술적 근거를 강조하며 이 논문을 핵심 참고문헌으로 인용.</li>
-<li><strong>한국:</strong> 국민연금, 사학연금 등 대형 기관투자자들이 Risk Parity 개념을 자산배분에 부분적으로 도입. 삼성자산운용, 미래에셋 등에서 Risk Parity ETF/펀드 출시.</li>
+<li><strong>Invesco Balanced-Risk Allocation:</strong> 2009년 출시. ERC 기반 멀티에셋 전략. AUM $10B+.</li>
+<li><strong>PIMCO All Asset All Authority:</strong> 채권 중심 Risk Parity 전략. 다양한 채권 섹터에 리스크를 균등 배분.</li>
+<li><strong>한국:</strong> 국민연금, 사학연금 등 대형 기관투자자들이 Risk Parity 개념을 자산배분에 부분적으로 도입. 삼성자산운용, 미래에셋 등에서 Risk Parity ETF/펀드 출시. 2020년대 들어 한국투자증권, NH투자증권 등 증권사 WM 부문에서도 Risk Parity 기반 자문 서비스를 제공하기 시작.</li>
 </ul>
 <div class="script">결론 슬라이드입니다. 논문의 핵심 기여를 다섯 가지로 정리하겠습니다. 첫째, ERC를 리스크 기여도 균등화로 수학적으로 엄밀하게 정의했습니다. Qian(2005)이 직관적으로 제안한 Risk Parity를 최초로 형식화한 학술 논문입니다. 둘째, 닫힌 해를 도출했습니다. 2자산에서는 변동성 역수 가중이고 상관에 무관합니다. 등상관에서는 변동성 역수 가중의 n자산 확장입니다. 일반적 경우에는 베타 역수 고정점 조건입니다. 셋째, 두 가지 수치 최적화 방법을 제시했습니다. 식 (6)의 직접 최적화와 식 (7)의 볼록 변환입니다. 넷째, 부등식 σ_MV ≤ σ_ERC ≤ σ_1/n을 증명했습니다. 다섯째, 3개 유니버스에서 실증 검증했습니다. 특히 이질적 자산군에서 ERC가 최고 샤프를 달성했습니다.</div>
 <div class="script">제 실증이 확인한 것을 정리하겠습니다. 글로벌 ETF 13종으로 2008~2018년 백테스트를 수행했습니다. 부등식 5.15% ≤ 7.98% ≤ 13.88%가 성립했습니다. ERC의 RC Gini 0.27%로 거의 완벽한 균등을 확인했습니다. MV의 가중치 Gini 82%로 극단적 집중을 확인했습니다. ERC 턴오버 5.96%로 MV(10.85%)의 약 절반입니다. ERC 샤프 0.43이 1/n 샤프 0.34보다 높아 ERC가 1/n을 지배합니다. 논문의 한계도 인정해야 합니다. 유일성 완전 증명이 미완이었고, 대규모 포트폴리오에서 계산 비용이 높고, 거래비용과 유동성 제약을 반영하지 않았고, 공분산 추정 오류의 영향을 체계적으로 분석하지 않았고, 레버리지를 고려하지 않았습니다. 하지만 이런 한계에도 불구하고 이 논문은 Risk Parity 분야의 기초를 놓은 역사적 논문입니다. 후속 연구로 Roncalli(2013)가 유일성을 증명하고 일반화된 리스크 버짓팅을 다루었고, Bridgewater All Weather와 AQR Risk Parity 등 수조 달러 규모의 전략이 이 프레임워크에 기반합니다. 한국에서도 국민연금, 사학연금 등이 Risk Parity 개념을 부분적으로 도입하고 있습니다.</div>
@@ -826,6 +875,7 @@ td.worst{background:#FFEBEE;color:#C62828}
 <p>🔹 <strong>위기 대응</strong> → ERC는 사전에 리스크를 균등화하므로 위기 시 자동 방어. 2008 금융위기에서 1/n은 −40% 폭락했지만 ERC는 −29%로 방어. 별도의 위기 감지 모델이나 동적 헤징 없이도 리스크 분산 효과가 내재되어 있음.</p>
 <p>🔹 <strong>레버리지</strong> → ERC의 변동성(7.98%)이 1/n(13.88%)보다 낮으므로, 동일 변동성 목표(예: 10%)를 달성하려면 ERC에 1.25배 레버리지를 적용. 이것이 Bridgewater All Weather 방식의 Risk Parity 전략. 레버리지 비용(차입 금리)이 낮은 환경에서 특히 유효.</p>
 <p>🔹 <strong>한국 시장 적용</strong> → 한국 투자자 입장에서 ERC는 글로벌 분산 투자의 기본 프레임워크로 활용 가능. 국내 주식(KOSPI200) + 미국 국채(TLT/IEF) + 금(GLD) + 원자재(DBC) 등으로 구성하면 논문의 Global 유니버스와 유사한 이질적 포트폴리오 구축 가능.</p>
+<p>🔹 <strong>한국 시장 구체적 구현 예시</strong> → KODEX 200(KOSPI200 추적), TIGER 미국채10년선물(IEF 대체), KODEX 골드선물(GLD 대체), KODEX WTI원유선물(DBC 대체)로 4자산 ERC 포트폴리오를 구성할 수 있다. 한국 주식(σ≈25%)과 미국 국채(σ≈7%)의 변동성 차이가 3.6배이고, 상관이 약 −30%이므로 이질적 유니버스의 조건을 만족한다. 월간 리밸런싱으로 운용하면 논문의 방법론을 그대로 적용할 수 있다.</p>
 </div>
 <h3>논문의 역사적 의의</h3>
 <p>이 논문은 2009년 발표 이후 Risk Parity 전략의 수학적 기초가 되었다. Bridgewater의 All Weather($150B+), AQR의 Risk Parity, Invesco의 Balanced-Risk Allocation 등 수조 달러 규모의 전략이 이 논문의 프레임워크에 기반한다. Google Scholar 인용 수 1,500+ (2026년 기준). Risk Parity는 2010년대 이후 기관투자자들의 자산배분에서 가장 영향력 있는 패러다임 중 하나가 되었으며, 이 논문이 그 학술적 출발점이다.</p>
