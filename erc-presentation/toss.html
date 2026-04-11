@@ -179,7 +179,7 @@ ul.toss li.orange-dot::before{background:var(--orange)}
 <div class="math-md">$$c_i = \frac{\sigma_i}{\sigma} = \frac{1}{n} \quad \forall\, i$$</div>
 <div class="body-md">모든 자산이 전체 리스크의 정확히 1/n씩 기여</div>
 </div>
-<div class="img-ph mt-md" style="min-height:100px">📸 60/40 vs ERC 리스크 기여도 파이차트<br>주식 RC 110% vs 50% 비교</div>
+<div class="card mt-md" style="text-align:center;padding:16px"><div style="display:flex;gap:24px;justify-content:center;align-items:center"><div><div class="body-sm">60/40</div><div style="font-size:36px;font-weight:800;color:var(--red)">110%</div><div class="body-sm">주식 RC</div></div><div style="font-size:24px;color:var(--gray-300)">→</div><div><div class="body-sm">ERC</div><div style="font-size:36px;font-weight:800;color:var(--green)">50%</div><div class="body-sm">주식 RC</div></div></div></div>
 </div>
 </div>
 </div>
@@ -272,7 +272,7 @@ ul.toss li.orange-dot::before{background:var(--orange)}
 </table>
 <div class="body-sm mt-sm">ERC는 항상 66.7% (수평선)<br>MV는 62.5~85.7% (상관에 따라 크게 변동)</div>
 </div>
-<div class="img-ph mt-lg" style="min-height:200px">📸 2자산 ERC vs MV 상관 민감도 차트<br>ERC = 수평선(초록), MV = 곡선(주황)<br>→ erc_30min.html의 plotly-2asset 캡처</div>
+<div class="card-green mt-lg" style="text-align:center;padding:20px"><div class="title-sm green mb-sm">ERC = 항상 수평선</div><div style="display:flex;justify-content:center;gap:8px;align-items:end;height:80px"><div style="width:40px;background:var(--green);height:67%;border-radius:6px 6px 0 0"></div><div style="width:40px;background:var(--green);height:67%;border-radius:6px 6px 0 0"></div><div style="width:40px;background:var(--green);height:67%;border-radius:6px 6px 0 0"></div><div style="width:40px;background:var(--green);height:67%;border-radius:6px 6px 0 0"></div></div><div class="body-sm mt-sm">ρ=−0.5 <div class="img-ph mt-lg" style="min-height:200px">📸 2자산 ERC vs MV 상관 민감도 차트<br>ERC = 수평선(초록), MV = 곡선(주황)<br>→ erc_30min.html의 plotly-2asset 캡처</div>nbsp; ρ=0 <div class="img-ph mt-lg" style="min-height:200px">📸 2자산 ERC vs MV 상관 민감도 차트<br>ERC = 수평선(초록), MV = 곡선(주황)<br>→ erc_30min.html의 plotly-2asset 캡처</div>nbsp; ρ=0.5 <div class="img-ph mt-lg" style="min-height:200px">📸 2자산 ERC vs MV 상관 민감도 차트<br>ERC = 수평선(초록), MV = 곡선(주황)<br>→ erc_30min.html의 plotly-2asset 캡처</div>nbsp; ρ=0.9</div><div class="body-sm mt-sm" style="color:var(--orange)">MV는 62.5%~85.7%로 변동 (상관에 민감)</div></div>
 </div>
 </div>
 </div>
@@ -354,7 +354,14 @@ ul.toss li.orange-dot::before{background:var(--orange)}
 <div class="title-sm mb-sm">식 (7) 볼록 변환</div>
 <div class="body-md">전역 최적 보장하지만 구현 복잡<br>→ 논문 저자들도 식 (6) 선호<br>→ 실무에서도 식 (6)이 표준</div>
 </div>
-<div class="img-ph mt-md">📸 Python 코드 스크린샷<br>erc_objective 함수 + scipy minimize</div>
+<div class="card-dark mt-md" style="font-family:monospace;font-size:12px;line-height:1.6;padding:16px 20px;white-space:pre;overflow-x:auto;color:#e0e0e0"><span style="color:#82aaff">def</span> <span style="color:#c3e88d">erc_objective</span>(x, cov):
+    sigma = np.sqrt(x @ cov @ x)
+    rc = x * (cov @ x) / sigma
+    <span style="color:#82aaff">return</span> sum((rc[i]-rc[j])**2
+               <span style="color:#82aaff">for</span> i <span style="color:#82aaff">in</span> range(n) <span style="color:#82aaff">for</span> j <span style="color:#82aaff">in</span> range(n))
+
+res = minimize(erc_objective, x0=1/n,
+    method=<span style="color:#c3e88d">'SLSQP'</span>, bounds=[(0.001,1)]*n)</div>
 </div>
 </div>
 </div>
@@ -536,8 +543,8 @@ ul.toss li.orange-dot::before{background:var(--orange)}
 </div>
 </div>
 <div class="col">
-<div class="img-ph" style="min-height:250px">📸 논문 Table 1: 기술통계<br>→ img_table1.png</div>
-<div class="img-ph mt-md" style="min-height:250px">📸 논문 Table 2: 전략 비교<br>→ img_table2.png</div>
+<div style="border-radius:16px;overflow:hidden"><img src="img_table1.png" style="width:100%" alt="Table 1"></div>
+<div style="border-radius:16px;overflow:hidden;margin-top:12px"><img src="img_table2.png" style="width:100%" alt="Table 2"></div>
 </div>
 </div>
 </div>
@@ -631,11 +638,11 @@ ul.toss li.orange-dot::before{background:var(--orange)}
 <div class="row gap-lg" style="height:calc(100% - 100px)">
 <div class="col" style="display:flex;flex-direction:column;gap:12px">
 <div class="title-sm">Figure 1: Weights & RC (Commodity)</div>
-<div class="img-ph" style="flex:1">📸 논문 Figure 1<br>→ img_figure1.png<br><br>상단: Weights (1/n, MV, ERC)<br>하단: RC (1/n, MV, ERC)<br><strong>ERC RC만 수평선!</strong></div>
+<div style="flex:1;border-radius:16px;overflow:hidden"><img src="img_figure1.png" style="width:100%;height:100%;object-fit:contain" alt="Figure 1"></div>
 </div>
 <div class="col" style="display:flex;flex-direction:column;gap:12px">
 <div class="title-sm">Figure 2: Cumulative Returns (Global)</div>
-<div class="img-ph" style="flex:1">📸 논문 Figure 2<br>→ img_figure2.png<br><br>1/n(빨간) 급등락<br>MV(검정) 안정적<br>ERC(파란) 중간<br><strong>2008 위기: 1/n −34%, MV −9%, ERC −14%</strong></div>
+<div style="flex:1;border-radius:16px;overflow:hidden"><img src="img_figure2.png" style="width:100%;height:100%;object-fit:contain" alt="Figure 2"></div>
 </div>
 </div>
 </div>
@@ -778,7 +785,7 @@ ul.toss li.orange-dot::before{background:var(--orange)}
 <div class="title-lg mb-md">Figure 1 재현 — Weights & RC 분포</div>
 <div class="row gap-lg" style="height:calc(100% - 120px)">
 <div class="col" style="display:flex;flex-direction:column;gap:12px">
-<div class="img-ph" style="flex:1">📸 논문 Figure 1 원본 (Commodity, 8자산)<br>→ img_figure1.png</div>
+<div style="flex:1;border-radius:16px;overflow:hidden"><img src="img_figure1.png" style="width:100%;height:100%;object-fit:contain" alt="Figure 1"></div>
 <div class="card" style="padding:16px">
 <div class="title-sm mb-sm">핵심 관찰</div>
 <ul class="toss">
@@ -838,11 +845,11 @@ ul.toss li.orange-dot::before{background:var(--orange)}
 <div class="title-lg mb-md">Figure 1 재현 — Weights & RC 박스플롯</div>
 <div class="row gap-lg">
 <div class="col">
-<div class="img-ph" style="min-height:280px">📸 논문 Figure 1 원본 (Commodity, 8자산)<br>→ img_figure1.png</div>
+<div style="border-radius:16px;overflow:hidden"><img src="img_figure1.png" style="width:100%" alt="Figure 1"></div>
 </div>
 <div class="col col-2">
 <div class="img-ph mb-md" style="min-height:130px">📸 상단 3패널: Weights 박스플롯 (1/n, MV, ERC)<br>→ erc_30min.html 캡처</div>
-<div class="img-ph" style="min-height:130px">📸 하단 3패널: RC 박스플롯 (1/n, MV, ERC)<br>→ ERC RC = 거의 완벽한 수평선!</div>
+<div class="img-ph" style="min-height:130px">📊 RC 박스플롯 (3패널)<br><strong>ERC RC = 완벽한 수평선</strong></div>
 </div>
 </div>
 <div class="row gap-lg mt-md">
@@ -870,7 +877,7 @@ ul.toss li.orange-dot::before{background:var(--orange)}
 <div class="title-lg mb-md">누적 수익률 시계열 — 세 전략의 "경로"가 다르다</div>
 <div class="row gap-lg">
 <div class="col">
-<div class="img-ph" style="min-height:260px">📸 논문 Figure 2 원본<br>→ img_figure2.png</div>
+<div style="border-radius:16px;overflow:hidden"><img src="img_figure2.png" style="width:100%" alt="Figure 2"></div>
 </div>
 <div class="col">
 <div class="img-ph" style="min-height:260px">📸 실제 누적 수익률 차트 (Plotly)<br>→ erc_30min.html의 plotly-driven-cumret 캡처<br>1/n(빨간) 롤러코스터, MV(검정) 직선, ERC(초록) 중간</div>
