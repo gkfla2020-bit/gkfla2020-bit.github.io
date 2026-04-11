@@ -1,0 +1,1147 @@
+<!DOCTYPE html><html lang="ko"><head><meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>ERC Portfolio — 30min 발표 (Toss Style)</title>
+<script>MathJax={tex:{inlineMath:[['$','$'],['\\(','\\)']],displayMath:[['$$','$$'],['\\[','\\]']]},svg:{fontCache:'global'}};</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js" async></script>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Pretendard:wght@300;400;500;600;700;800&display=swap');
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--blue:#3182f6;--blue-bg:#e8f3ff;--dark:#191f28;--gray-900:#333d4b;--gray-700:#4e5968;--gray-500:#8b95a1;--gray-300:#d1d6db;--gray-100:#f2f4f6;--gray-50:#f9fafb;--green:#00c471;--green-bg:#e8faf0;--red:#f04452;--red-bg:#ffebee;--orange:#f59f00;--orange-bg:#fff8e1;--white:#fff;--radius:16px;--radius-sm:12px;--shadow:0 2px 8px rgba(0,0,0,0.04),0 1px 2px rgba(0,0,0,0.06)}
+body{font-family:'Pretendard',-apple-system,BlinkMacSystemFont,sans-serif;color:var(--dark);background:var(--gray-50);-webkit-font-smoothing:antialiased;overflow:hidden;height:100vh}
+.deck{width:100vw;height:100vh;position:relative}
+.slide{position:absolute;top:0;left:0;width:100%;height:100%;display:none;padding:60px 80px;background:var(--white);flex-direction:column;overflow-y:auto}
+.slide.active{display:flex}
+.slide-num{position:fixed;bottom:24px;right:40px;font-size:13px;color:var(--gray-500);font-weight:500;z-index:10}
+.progress{position:fixed;top:0;left:0;height:3px;background:var(--blue);transition:width .4s ease;z-index:100}
+/* Typography */
+.title-xl{font-size:42px;font-weight:800;line-height:1.3;letter-spacing:-1px;color:var(--dark)}
+.title-lg{font-size:32px;font-weight:700;line-height:1.35;letter-spacing:-.5px}
+.title-md{font-size:24px;font-weight:700;line-height:1.4}
+.title-sm{font-size:18px;font-weight:600;line-height:1.5}
+.body-lg{font-size:18px;line-height:1.7;color:var(--gray-700);font-weight:400}
+.body-md{font-size:15px;line-height:1.7;color:var(--gray-700)}
+.body-sm{font-size:13px;line-height:1.6;color:var(--gray-500)}
+.caption{font-size:12px;color:var(--gray-500);font-weight:400}
+.blue{color:var(--blue)}.green{color:var(--green)}.red{color:var(--red)}.orange{color:var(--orange)}
+.bold{font-weight:700}.semi{font-weight:600}.medium{font-weight:500}
+/* Cards */
+.card{background:var(--gray-50);border-radius:var(--radius);padding:24px 28px;margin:8px 0}
+.card-blue{background:var(--blue-bg);border-radius:var(--radius);padding:24px 28px;margin:8px 0}
+.card-green{background:var(--green-bg);border-radius:var(--radius);padding:24px 28px;margin:8px 0}
+.card-red{background:var(--red-bg);border-radius:var(--radius);padding:24px 28px;margin:8px 0}
+.card-orange{background:var(--orange-bg);border-radius:var(--radius);padding:24px 28px;margin:8px 0}
+.card-dark{background:var(--dark);color:var(--white);border-radius:var(--radius);padding:24px 28px;margin:8px 0}
+/* Layout */
+.row{display:flex;gap:16px;align-items:stretch}
+.col{flex:1;min-width:0}
+.col-2{flex:2;min-width:0}
+.gap-sm{gap:8px}.gap-md{gap:16px}.gap-lg{gap:24px}.gap-xl{gap:32px}
+.mt-sm{margin-top:8px}.mt-md{margin-top:16px}.mt-lg{margin-top:24px}.mt-xl{margin-top:32px}
+.mb-sm{margin-bottom:8px}.mb-md{margin-bottom:16px}
+.flex-center{display:flex;align-items:center;justify-content:center;flex-direction:column;height:100%}
+/* Section header */
+.section-tag{display:inline-block;padding:4px 12px;border-radius:20px;font-size:12px;font-weight:600;margin-bottom:12px}
+.tag-theory{background:var(--blue-bg);color:var(--blue)}
+.tag-paper{background:var(--orange-bg);color:var(--orange)}
+.tag-driven{background:var(--green-bg);color:var(--green)}
+.tag-conclusion{background:var(--gray-100);color:var(--gray-700)}
+/* Table */
+table{width:100%;border-collapse:separate;border-spacing:0;font-size:13px;border-radius:var(--radius-sm);overflow:hidden;margin:8px 0}
+th{background:var(--gray-100);padding:10px 12px;font-weight:600;color:var(--gray-900);text-align:center;border-bottom:1px solid var(--gray-300)}
+td{padding:8px 12px;text-align:center;border-bottom:1px solid var(--gray-100);color:var(--gray-700)}
+tr:last-child td{border-bottom:none}
+td.best{background:var(--green-bg);color:var(--green);font-weight:700}
+td.worst{background:var(--red-bg);color:var(--red);font-weight:600}
+/* Math */
+.math-big{font-size:28px;text-align:center;margin:20px 0;font-weight:600;color:var(--blue)}
+.math-md{font-size:18px;text-align:center;margin:12px 0;color:var(--gray-900)}
+/* Image placeholder */
+.img-ph{background:var(--gray-100);border:2px dashed var(--gray-300);border-radius:var(--radius);display:flex;align-items:center;justify-content:center;color:var(--gray-500);font-size:13px;text-align:center;padding:16px;min-height:120px}
+/* Bullet */
+ul.toss{list-style:none;padding:0}
+ul.toss li{padding:6px 0 6px 20px;position:relative;font-size:15px;line-height:1.7;color:var(--gray-700)}
+ul.toss li::before{content:'';position:absolute;left:0;top:14px;width:6px;height:6px;border-radius:50%;background:var(--blue)}
+ul.toss li.green-dot::before{background:var(--green)}
+ul.toss li.red-dot::before{background:var(--red)}
+ul.toss li.orange-dot::before{background:var(--orange)}
+/* Speaker notes */
+.notes{display:none;position:fixed;bottom:0;left:0;right:0;background:rgba(25,31,40,.95);color:#e0e0e0;padding:16px 40px;font-size:13px;line-height:1.6;max-height:35vh;overflow-y:auto;z-index:200;backdrop-filter:blur(8px)}
+.notes.show{display:block}
+.notes-label{color:var(--blue);font-weight:600;margin-bottom:4px;font-size:11px}
+/* Keyboard hint */
+.hint{position:fixed;bottom:24px;left:40px;font-size:11px;color:var(--gray-300);z-index:10}
+</style>
+</head><body>
+<div class="progress" id="prog"></div>
+<div class="slide-num" id="snum"></div>
+<div class="hint">← → 슬라이드 이동 &nbsp;|&nbsp; N 발표 노트 &nbsp;|&nbsp; F 전체화면</div>
+<div class="notes" id="notes"><div class="notes-label">🎤 발표 노트</div><div id="notes-text"></div></div>
+
+<div class="deck" id="deck">
+
+<!-- ══════════ SLIDE 1: TITLE ══════════ -->
+<div class="slide" data-notes="안녕하세요, 오늘 발표할 논문은 Maillard, Roncalli, Teiletche의 ERC 포트폴리오 논문입니다. 핵심 질문은 간단합니다 — 포트폴리오를 어떻게 짜야 하는가? 이 논문은 '자본이 아니라 리스크를 균등하게 나누자'는 아이디어의 수학적 기초를 놓은 최초의 학술 논문입니다. 발표는 이론 12분, 논문 실증 10분, 데이터 드리븐 5분, 결론 3분으로 구성됩니다.">
+<div class="flex-center">
+<div style="text-align:center;max-width:800px">
+<div class="body-sm mb-sm" style="letter-spacing:2px">PAPER REVIEW & DATA-DRIVEN ANALYSIS</div>
+<div class="title-xl mb-md">On the Properties of<br>Equally-Weighted Risk<br>Contributions Portfolios</div>
+<div class="body-lg mt-md" style="color:var(--gray-500)">Maillard, Roncalli & Teiletche (2009)</div>
+<div class="body-md" style="color:var(--gray-300)">Journal of Portfolio Management, 36(4), pp.60-70</div>
+<div class="mt-xl" style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap">
+<span class="section-tag tag-theory">이론 §1-§3 · ~12분</span>
+<span class="section-tag tag-paper">논문 실증 §4 · ~10분</span>
+<span class="section-tag tag-driven">데이터 드리븐 · ~5분</span>
+<span class="section-tag tag-conclusion">결론 & Q&A · ~3분</span>
+</div>
+<div class="body-sm mt-lg">글로벌 멀티에셋 ETF 13종 · 2026.04.14</div>
+</div>
+</div>
+</div>
+
+<!-- ══════════ SLIDE 2: 문제 제기 ══════════ -->
+<div class="slide" data-notes="핵심 질문은 간단합니다 — 포트폴리오를 어떻게 짜야 하는가? Markowitz 최적화는 미래 수익률을 알면 최적 비중을 계산할 수 있다고 하지만, 문제는 미래 수익률을 아무도 모른다는 겁니다. 수익률 추정치를 0.1%만 바꿔도 포트폴리오가 완전히 뒤집어집니다. 그래서 실무에서는 두 가지 단순한 방법을 씁니다. 1/n은 아무것도 모르니까 다 똑같이 넣자입니다. 삼성전자든 미국 국채든 금이든 다 같은 비중. 단순하지만 문제가 있습니다 — 삼성전자가 하루에 3% 움직이고 국채가 0.3% 움직이면, 포트폴리오 손익의 대부분이 삼성전자에서 옵니다. MV는 변동성을 최소화하자입니다. 결과적으로 국채에 90% 넣고 주식은 거의 0%가 됩니다. 사실상 채권 포트폴리오입니다. ERC는 제3의 방법입니다 — 돈이 아니라 리스크를 균등하게 나누자.">
+<span class="section-tag tag-theory">§1 Introduction</span>
+<div class="title-lg mb-md">포트폴리오를 어떻게 짜야 하는가?</div>
+<div class="row gap-lg">
+<div class="col">
+<div class="card">
+<div class="title-sm red mb-sm">❌ Markowitz 최적화의 문제</div>
+<ul class="toss">
+<li class="red-dot">미래 수익률을 아무도 모름</li>
+<li class="red-dot">추정치 0.1% 변경 → 비중 완전 뒤집힘</li>
+<li class="red-dot">소수 자산에 극단적 집중 (error maximization)</li>
+</ul>
+</div>
+<div class="row gap-md mt-md">
+<div class="col">
+<div class="card-orange">
+<div class="title-sm orange mb-sm">1/n 동일가중</div>
+<div class="body-md">모든 자산에 같은 돈</div>
+<div class="body-sm mt-sm">삼성전자(σ=30%)와 국채(σ=7%)에 같은 돈 → 리스크는 한쪽에 몰림</div>
+</div>
+</div>
+<div class="col">
+<div class="card-red">
+<div class="title-sm red mb-sm">MV 최소분산</div>
+<div class="body-md">변동성을 최소화</div>
+<div class="body-sm mt-sm">국채에 90% 집중 → 사실상 채권 펀드</div>
+</div>
+</div>
+</div>
+</div>
+<div class="col">
+<div class="card-blue" style="height:100%;display:flex;flex-direction:column;justify-content:center">
+<div class="title-md blue mb-md">💡 ERC = 제3의 방법</div>
+<div class="title-sm" style="color:var(--dark)">"돈이 아니라 리스크를 균등하게 나누자"</div>
+<ul class="toss mt-md">
+<li class="green-dot">변동성이 큰 자산 → 비중 ↓</li>
+<li class="green-dot">변동성이 작은 자산 → 비중 ↑</li>
+<li class="green-dot">각 자산의 리스크 기여도를 같게</li>
+</ul>
+<div class="card-dark mt-lg">
+<div class="body-md" style="color:#90caf9">2008 금융위기가 전환점</div>
+<div class="body-sm" style="color:#bbb">60/40 포트폴리오: 자본 6:4인데 리스크 110:−10<br>S&P 500 −57% → 60/40도 −30% 폭락<br>Bridgewater All Weather: 같은 위기에서 −3.9%</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+
+<!-- ══════════ SLIDE 3: RC 정의 ══════════ -->
+<div class="slide" data-notes="이 수식이 의미하는 것을 실제 주가로 설명하겠습니다. σᵢ(x) = xᵢ(Σx)ᵢ/σ(x)에서 (Σx)ᵢ는 자산 i가 포트폴리오 전체와 얼마나 같이 움직이는가입니다. 여기에 비중 xᵢ를 곱하면 이 자산이 실제로 포트폴리오 변동성에 얼마나 기여하는가가 됩니다. 핵심은 이겁니다 — 주식 50%, 채권 50%로 투자하면 돈은 반반이지만, 주식이 하루에 2% 움직이고 채권이 0.3% 움직이면, 포트폴리오의 일간 손익 변동의 거의 전부가 주식에서 옵니다. 리스크 기여도는 이것을 정확히 수치화합니다. ERC는 이 기여도를 모든 자산이 1/13 = 7.69%씩 똑같이 만드는 전략입니다.">
+<span class="section-tag tag-theory">§2.1 Risk Contributions</span>
+<div class="title-lg mb-md">리스크 기여도 — 이 수식이 의미하는 것</div>
+<div class="row gap-lg">
+<div class="col">
+<div class="card">
+<div class="math-big">$$\sigma_i(x) = \frac{x_i \cdot (\Sigma x)_i}{\sigma(x)}$$</div>
+<table>
+<tr><th>기호</th><th>의미</th><th>실제로 뭘 보는가</th></tr>
+<tr><td>$(\Sigma x)_i$</td><td>자산 i와 포트폴리오의 공분산</td><td>"이 자산이 포트폴리오와 얼마나 같이 움직이는가"</td></tr>
+<tr><td>$x_i$</td><td>현재 비중</td><td>"이 자산에 얼마나 넣었는가"</td></tr>
+<tr><td>$\sigma_i(x)$</td><td>총 리스크 기여도</td><td>"이 자산이 포트폴리오 변동성에 실제로 얼마나 기여하는가"</td></tr>
+</table>
+</div>
+<div class="card-blue mt-md">
+<div class="title-sm blue">오일러 정리: $\sigma(x) = \sum_i \sigma_i(x)$</div>
+<div class="body-md mt-sm">포트폴리오 전체 리스크 = 각 자산 RC의 합 (근사 아님, 수학적 등식)</div>
+</div>
+</div>
+<div class="col">
+<div class="card-red">
+<div class="title-sm red mb-sm">주식 50% + 채권 50% 투자하면?</div>
+<div class="body-lg bold">돈은 반반인데<br>리스크 기여도는 94 : 6</div>
+<div class="body-md mt-sm">주식이 하루 2% 움직이고 채권이 0.3% 움직이면, 포트폴리오 손익의 거의 전부가 주식에서 옴</div>
+<div class="body-sm mt-sm">"분산 투자"라고 생각했는데 실제로는 주식 올인</div>
+</div>
+<div class="card-green mt-md">
+<div class="title-sm green mb-sm">ERC 조건</div>
+<div class="math-md">$$c_i = \frac{\sigma_i}{\sigma} = \frac{1}{n} \quad \forall\, i$$</div>
+<div class="body-md">모든 자산이 전체 리스크의 정확히 1/n씩 기여</div>
+</div>
+<div class="img-ph mt-md" style="min-height:100px">📸 60/40 vs ERC 리스크 기여도 파이차트<br>주식 RC 110% vs 50% 비교</div>
+</div>
+</div>
+</div>
+
+<!-- ══════════ SLIDE 4: 세 전략 비교 ══════════ -->
+<div class="slide" data-notes="세 전략이 실제로 뭘 하는지 주가 움직임으로 설명하겠습니다. 주식(σ=20%)과 채권(σ=5%)에 투자한다고 합시다. 1/n은 50:50으로 넣습니다. 주식이 하루에 −2% 빠지고 채권이 +0.3% 오르면, 포트폴리오는 −0.85%입니다. 이 −0.85% 중 주식이 −1.0%를 기여하고 채권이 +0.15%를 기여합니다. 돈은 반반인데 손실의 거의 전부가 주식에서 옵니다. MV는 채권에 94% 넣습니다. 안전하지만 상승장에서도 +0.4%밖에 안 됩니다. 사실상 채권 포트폴리오입니다. ERC는 주식 20%, 채권 80%로 넣습니다. 위기 시 손실이 한쪽에 몰리지 않고, 상승장에서도 주식의 수혜를 일부 받습니다.">
+<span class="section-tag tag-theory">§2.2 세 전략 비교</span>
+<div class="title-lg mb-lg">1/n vs MV vs ERC — 주가가 움직이면 어떻게 되는가</div>
+<div class="row gap-lg">
+<div class="col">
+<div class="card" style="border-left:4px solid var(--orange)">
+<div class="title-sm orange mb-sm">1/n 동일가중</div>
+<div class="body-sm mb-sm" style="color:var(--gray-500)">조건: $x_i = 1/n$</div>
+<div class="body-md">"모든 자산에 같은 돈"</div>
+<ul class="toss mt-sm">
+<li class="orange-dot">주식 −2%, 채권 +0.3% → 포트폴리오 −0.85%</li>
+<li class="orange-dot">손실의 거의 전부가 주식에서</li>
+<li class="red-dot"><strong>자본의 민주주의, 리스크의 독재</strong></li>
+</ul>
+</div>
+</div>
+<div class="col">
+<div class="card" style="border-left:4px solid var(--red)">
+<div class="title-sm red mb-sm">MV 최소분산</div>
+<div class="body-sm mb-sm" style="color:var(--gray-500)">조건: $\partial\sigma/\partial x_i = \partial\sigma/\partial x_j$</div>
+<div class="body-md">"추가 1원 넣어도 리스크 증가 같다"</div>
+<ul class="toss mt-sm">
+<li class="red-dot">채권에 94% 집중</li>
+<li class="red-dot">상승장에서도 +0.4%밖에 안됨</li>
+<li class="red-dot"><strong>사실상 채권 펀드</strong></li>
+</ul>
+</div>
+</div>
+<div class="col">
+<div class="card-blue" style="border-left:4px solid var(--blue)">
+<div class="title-sm blue mb-sm">ERC 리스크 균등</div>
+<div class="body-sm mb-sm" style="color:var(--gray-500)">조건: $x_i(\Sigma x)_i = x_j(\Sigma x)_j$</div>
+<div class="body-md">"각 자산의 리스크 기여도가 같다"</div>
+<ul class="toss mt-sm">
+<li class="green-dot">주식 20%, 채권 80%</li>
+<li class="green-dot">위기 시 한쪽에 안 몰림</li>
+<li class="green-dot"><strong>리스크의 민주주의</strong></li>
+</ul>
+</div>
+</div>
+</div>
+<div class="card mt-lg">
+<div class="title-sm mb-sm">수치 예시: 주식(σ=20%) + 채권(σ=5%), ρ=0</div>
+<table>
+<tr><th>전략</th><th>주식 비중</th><th>채권 비중</th><th>주식 RC</th><th>채권 RC</th><th>포트폴리오 σ</th></tr>
+<tr><td>1/n</td><td>50%</td><td>50%</td><td class="worst">94.1%</td><td>5.9%</td><td>10.31%</td></tr>
+<tr><td>MV</td><td>5.9%</td><td>94.1%</td><td>50%</td><td>50%</td><td class="best">4.85%</td></tr>
+<tr><td>ERC</td><td>20%</td><td>80%</td><td class="best">50%</td><td class="best">50%</td><td>5.66%</td></tr>
+</table>
+<div class="body-sm mt-sm blue bold">부등식: σ_MV(4.85%) ≤ σ_ERC(5.66%) ≤ σ_1/n(10.31%) ✓</div>
+</div>
+</div>
+
+<!-- ══════════ SLIDE 5: 2자산 닫힌 해 ══════════ -->
+<div class="slide" data-notes="2자산 ERC의 닫힌 해 x₁ = σ₂/(σ₁+σ₂)가 의미하는 것을 설명하겠습니다. 삼성전자(σ=30%)와 미국 국채(σ=7%)로 ERC를 만들면, 삼성전자 비중 = 7/(30+7) = 19%, 국채 비중 = 81%입니다. 놀라운 것은 이 비중이 상관계수에 무관하다는 것입니다. 삼성전자와 국채의 상관이 −0.5이든 0이든 +0.5이든, ERC 비중은 항상 19:81입니다. MV는 상관에 따라 62.5%에서 85.7%까지 크게 변합니다. 상관계수는 추정하기 가장 어려운 파라미터인데, ERC는 2자산에서 완전히 면역입니다.">
+<span class="section-tag tag-theory">§3.1 2자산 닫힌 해</span>
+<div class="title-lg mb-lg">2자산 ERC = 변동성 역수 가중</div>
+<div class="row gap-lg">
+<div class="col">
+<div class="card-blue">
+<div class="math-big">$$x_1^* = \frac{\sigma_2}{\sigma_1 + \sigma_2}$$</div>
+<div class="body-lg" style="text-align:center;color:var(--dark)">변동성이 큰 자산은 비중 ↓, 작은 자산은 비중 ↑</div>
+</div>
+<div class="card mt-lg">
+<div class="title-sm mb-sm">예시: 삼성전자(σ=30%) + 미국 국채(σ=7%)</div>
+<div class="body-lg">삼성전자 = 7/(30+7) = <strong class="blue">19%</strong></div>
+<div class="body-lg">미국 국채 = 30/(30+7) = <strong class="blue">81%</strong></div>
+<div class="body-md mt-sm" style="color:var(--gray-500)">삼성전자가 하루 3% 움직이고 국채가 0.7% 움직이면,<br>같은 리스크 기여를 하려면 삼성전자를 적게 넣어야 함</div>
+</div>
+<div class="card-red mt-md">
+<div class="title-sm red mb-sm">🔑 놀라운 성질: 상관계수에 완전히 무관!</div>
+<div class="body-md">삼성전자-국채 상관이 −0.5이든 0이든 +0.5이든<br>ERC 비중은 <strong>항상 19:81</strong></div>
+<div class="body-sm mt-sm">상관 추정이 틀려도 ERC 비중은 변하지 않음</div>
+</div>
+</div>
+<div class="col">
+<div class="card">
+<div class="title-sm mb-sm">ERC vs MV: 상관에 따른 비중 변화</div>
+<table>
+<tr><th>ρ</th><th>ERC x₁</th><th>MV x₁</th></tr>
+<tr><td>−0.5</td><td class="best">66.7%</td><td>85.7%</td></tr>
+<tr><td>0.0</td><td class="best">66.7%</td><td>80.0%</td></tr>
+<tr><td>0.5</td><td class="best">66.7%</td><td>75.0%</td></tr>
+<tr><td>0.9</td><td class="best">66.7%</td><td>62.5%</td></tr>
+</table>
+<div class="body-sm mt-sm">ERC는 항상 66.7% (수평선)<br>MV는 62.5~85.7% (상관에 따라 크게 변동)</div>
+</div>
+<div class="img-ph mt-lg" style="min-height:200px">📸 2자산 ERC vs MV 상관 민감도 차트<br>ERC = 수평선(초록), MV = 곡선(주황)<br>→ erc_30min.html의 plotly-2asset 캡처</div>
+</div>
+</div>
+</div>
+
+<!-- ══════════ SLIDE 6: 등상관 ══════════ -->
+<div class="slide" data-notes="등상관 케이스의 핵심은 이겁니다 — 모든 자산 쌍의 상관이 같으면, ERC 비중은 단순히 변동성의 역수에 비례합니다. 최적화를 돌릴 필요도 없이 각 자산의 변동성만 알면 바로 계산됩니다. 이것이 실무에서 inverse volatility weighting이라고 불리는 방법이고, 같은 자산군 내에서 상관이 비교적 균일하면 ERC의 좋은 근사가 됩니다. 그리고 상관이 하한값에 접근하면 MV와 ERC가 일치합니다. 즉 분산 효과가 극대화되면 리스크를 최소화하는 것과 리스크를 균등화하는 것이 같은 결과를 낳습니다.">
+<span class="section-tag tag-theory">§3.2 등상관 케이스</span>
+<div class="title-lg mb-lg">등상관 → 변동성 역수 가중 (최적화 불필요)</div>
+<div class="row gap-lg">
+<div class="col">
+<div class="card-blue">
+<div class="math-big">$$x_i^* = \frac{\sigma_i^{-1}}{\sum_j \sigma_j^{-1}}$$</div>
+<div class="body-md" style="text-align:center">모든 자산 쌍의 상관이 같으면 (ρᵢⱼ = ρ ∀i≠j)<br>→ ERC 비중 = 변동성의 역수에 비례</div>
+</div>
+<div class="card mt-md">
+<div class="title-sm mb-sm">실제 데이터로 보면</div>
+<table>
+<tr><th>ETF</th><th>σ</th><th>1/σ</th><th>ERC 비중 (근사)</th></tr>
+<tr><td>IEF</td><td>6.76%</td><td>0.148</td><td class="best">높음 (~30%)</td></tr>
+<tr><td>GLD</td><td>18.45%</td><td>0.054</td><td>중간 (~9%)</td></tr>
+<tr><td>VNQ</td><td>33.19%</td><td>0.030</td><td class="worst">낮음 (~2%)</td></tr>
+</table>
+<div class="body-sm mt-sm">IEF가 하루 0.4% 움직이고 VNQ가 2% 움직이면,<br>IEF에 많은 돈, VNQ에 적은 돈 → "충격의 크기"를 같게</div>
+</div>
+</div>
+<div class="col">
+<div class="card-green">
+<div class="title-sm green mb-sm">학술적 발견</div>
+<div class="body-lg bold">ρ → −1/(n−1) 일 때 MV = ERC</div>
+<div class="body-md mt-sm">"모든 자산이 최대한 반대로 움직이는" 극단적 분산 상황<br>→ 분산 효과 극대화 시 "리스크 최소화" = "리스크 균등화"</div>
+<div class="body-md mt-md bold green">ERC는 "분산 효과가 극대화된 MV"로 해석 가능</div>
+</div>
+<div class="card-orange mt-md">
+<div class="title-sm orange mb-sm">등변동성 + 이상관 케이스 (식 4')</div>
+<div class="body-md">다른 자산과의 상관이 낮은 자산일수록 비중 ↑</div>
+<div class="body-sm mt-sm">금(GLD)이 주식과 거의 무상관(2.8%)이라<br>ERC에서 높은 비중을 받는 이유</div>
+<div class="body-sm mt-sm bold">→ ERC는 변동성만 보는 게 아니라 상관 구조도 활용</div>
+</div>
+</div>
+</div>
+</div>
+
+<!-- ══════════ SLIDE 7: 베타 해석 + 수치 최적화 ══════════ -->
+<div class="slide" data-notes="일반적 경우의 ERC 해는 베타 역수 가중입니다. 여기서 베타는 자산 i가 ERC 포트폴리오와 얼마나 같이 움직이는가를 나타냅니다. 포트폴리오가 빠질 때 같이 많이 빠지는 자산은 비중을 줄이고, 덜 빠지거나 반대로 움직이는 자산은 비중을 높입니다. 예를 들어 한국 주식 EWY는 포트폴리오와 같이 움직이는 경향이 강하므로 비중이 2.3%로 낮고, 금 GLD는 독립적으로 움직이므로 비중이 9.2%로 높습니다. 수치 최적화는 논문 식 (6)을 사용했습니다.">
+<span class="section-tag tag-theory">§3.3-3.4 일반적 경우</span>
+<div class="title-lg mb-lg">베타 역수 가중 & 수치 최적화</div>
+<div class="row gap-lg">
+<div class="col">
+<div class="card-blue">
+<div class="math-big">$$x_i^* = \frac{\beta_i^{-1}}{\sum_j \beta_j^{-1}}$$</div>
+<div class="body-md" style="text-align:center">$\beta_i = (\Sigma x^*)_i / \sigma(x^*)$<br>"자산 i가 ERC 포트폴리오와 얼마나 같이 움직이는가"</div>
+</div>
+<div class="card mt-md">
+<div class="title-sm mb-sm">의미: 주가가 어떻게 움직이면?</div>
+<ul class="toss">
+<li class="red-dot">포트폴리오 빠질 때 같이 많이 빠지는 자산 (높은 β) → 비중 ↓</li>
+<li class="green-dot">덜 빠지거나 반대로 움직이는 자산 (낮은 β) → 비중 ↑</li>
+</ul>
+<table class="mt-sm">
+<tr><th>ETF</th><th>β 수준</th><th>ERC 비중</th><th>이유</th></tr>
+<tr><td>EWY (한국)</td><td>높음</td><td>2.3%</td><td>포트폴리오와 같이 움직임</td></tr>
+<tr><td>GLD (금)</td><td>낮음</td><td>9.2%</td><td>독립적으로 움직임</td></tr>
+<tr><td>IEF (국채)</td><td>매우 낮음</td><td>29.8%</td><td>반대로 움직임</td></tr>
+</table>
+</div>
+</div>
+<div class="col">
+<div class="card">
+<div class="title-sm mb-sm">수치 최적화: 논문 식 (6)</div>
+<div class="math-md">$$f(x) = \sum_i\sum_j\left(x_i(\Sigma x)_i - x_j(\Sigma x)_j\right)^2$$</div>
+<div class="body-md mt-sm">"모든 자산 쌍의 RC 차이를 0으로 만들어라"<br>f(x*)=0 → 모든 자산의 RC가 같다 = ERC 조건</div>
+<ul class="toss mt-md">
+<li>scipy SLSQP, 초기값 1/n</li>
+<li>131회 리밸런싱 모두 수렴</li>
+<li>f(x*) < 10⁻²⁰</li>
+</ul>
+</div>
+<div class="card mt-md">
+<div class="title-sm mb-sm">식 (7) 볼록 변환</div>
+<div class="body-md">전역 최적 보장하지만 구현 복잡<br>→ 논문 저자들도 식 (6) 선호<br>→ 실무에서도 식 (6)이 표준</div>
+</div>
+<div class="img-ph mt-md">📸 Python 코드 스크린샷<br>erc_objective 함수 + scipy minimize</div>
+</div>
+</div>
+</div>
+
+<!-- ══════════ SLIDE 8: 최적성 ══════════ -->
+<div class="slide" data-notes="ERC가 최적이 되는 조건은 간단합니다 — 모든 자산의 기대수익률이 같을 때입니다. 현실에서 기대수익률이 정확히 같지는 않지만, 핵심은 기대수익률을 모르면 다 같다고 가정하는 게 합리적이라는 겁니다. 잘못된 추정으로 MV 최적화가 폭발하는 것보다, 다 같다고 가정하고 리스크만 균등화하는 게 훨씬 안전합니다. 이것이 ERC의 철학입니다 — 미래 수익률은 모르지만, 리스크는 측정할 수 있다. 그러니 리스크만 관리하자.">
+<span class="section-tag tag-theory">§3.5 최적성</span>
+<div class="title-lg mb-lg">ERC는 언제 최적인가?</div>
+<div class="row gap-lg">
+<div class="col">
+<div class="card-blue" style="padding:32px">
+<div class="title-md blue mb-md">모든 자산의 기대수익률이 같을 때<br>→ ERC = Maximum Sharpe Ratio</div>
+<div class="body-lg mt-lg">ERC의 암묵적 가정:</div>
+<div class="title-sm mt-sm" style="color:var(--dark)">"기대수익률을 모르면<br>다 같다고 가정하는 게 합리적"</div>
+<ul class="toss mt-lg">
+<li>주식이 연 8% 오를지 5% 오를지 아무도 모름</li>
+<li>잘못된 추정으로 MV 폭발하는 것보다</li>
+<li>"다 같다"고 가정하고 리스크만 균등화하는 게 안전</li>
+</ul>
+</div>
+</div>
+<div class="col">
+<div class="card-green" style="padding:32px">
+<div class="title-md green mb-md">ERC의 철학</div>
+<div class="title-lg" style="color:var(--dark);line-height:1.5">"미래 수익률은 모르지만,<br>리스크는 측정할 수 있다.<br>그러니 리스크만 관리하자."</div>
+<div class="card-dark mt-xl">
+<div class="body-md" style="color:#90caf9">Bridgewater All Weather가 이 철학을 구현</div>
+<div class="body-md mt-sm" style="color:#e0e0e0">"경제가 어떻게 변하든 리스크가 균등하면 견딜 수 있다"</div>
+<div class="body-lg mt-md bold" style="color:#fff">2008 위기: All Weather −3.9% vs 60/40 −30%</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+
+<!-- ══════════ SLIDE 9: 부등식 ══════════ -->
+<div class="slide" data-notes="부등식 σ_MV ≤ σ_ERC ≤ σ_1/n이 의미하는 것은 직관적입니다. MV는 변동성을 최소화하는 극단이니까 당연히 가장 낮고, 1/n은 리스크를 전혀 고려하지 않으니까 가장 높습니다. ERC는 리스크를 균등화하는 것이지 최소화하는 것이 아니므로 MV보다 높지만, 리스크를 고려하니까 1/n보다는 낮습니다. 제 데이터에서 5.15% ≤ 7.98% ≤ 13.88%로 확인됩니다. 이것은 어떤 시장에서든 항상 성립하는 수학적 정리입니다.">
+<span class="section-tag tag-theory">§3 핵심 정리</span>
+<div class="flex-center" style="padding-top:40px">
+<div style="text-align:center;max-width:900px">
+<div class="body-sm mb-md" style="color:var(--gray-500)">어떤 시장에서든 항상 성립하는 수학적 정리</div>
+<div style="font-size:48px;font-weight:800;letter-spacing:-1px;color:var(--blue);margin:24px 0">
+σ<sub style="font-size:28px">MV</sub> &nbsp;≤&nbsp; σ<sub style="font-size:28px">ERC</sub> &nbsp;≤&nbsp; σ<sub style="font-size:28px">1/n</sub>
+</div>
+<div class="row gap-lg mt-xl" style="text-align:left">
+<div class="col">
+<div class="card">
+<div class="title-sm mb-sm">주가 움직임으로 이해하면</div>
+<ul class="toss">
+<li class="red-dot"><strong>MV:</strong> IEF에 57.6% → IEF 0.4% 움직이면 포트폴리오 0.23%. 안정적이지만 IEF 하나에 운명이 걸림</li>
+<li class="orange-dot"><strong>1/n:</strong> 13개 균등 → 주식 6개 동시 폭락 시 상쇄 안됨</li>
+<li class="green-dot"><strong>ERC:</strong> 채권 63% + 주식 22% → 어느 한쪽에 운명 안 걸림</li>
+</ul>
+</div>
+</div>
+<div class="col">
+<div class="card-blue">
+<div class="title-sm blue mb-sm">실증 확인</div>
+<div class="body-lg bold">논문: 3.20% ≤ 4.92% ≤ 10.87% ✓</div>
+<div class="body-lg bold mt-sm">내 데이터: 5.15% ≤ 7.98% ≤ 13.88% ✓</div>
+<div class="body-md mt-md">ERC 선택 시 MV 대비 +2.83%p 변동성<br>→ 대가: 13개 자산 모두 투자, 턴오버 절반</div>
+<div class="body-md mt-sm">1/n 대비 −5.90%p 변동성 절감<br>→ 1억 원 투자 시 하루 최대 손실 261만→128만원</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+
+<!-- ══════════ SLIDE 10: 4자산 Toy Example ══════════ -->
+<div class="slide" data-notes="4자산 예제입니다. 변동성 10/20/30/40%, Asset 1-2 상관 0.80, Asset 3-4 상관 −0.50. 1/n에서 Asset 4가 리스크의 47%를 차지합니다. 돈은 균등한데 리스크는 극도로 불균등합니다. MV에서 Asset 2가 비중 0%입니다 — Asset 1과 상관 0.80이라 열등한 복제품으로 취급되어 완전 배제됩니다. 이것이 MV의 구조적 문제입니다. ERC는 모든 자산이 정확히 25%씩 리스크를 기여합니다. Asset 2도 19.2%로 배제하지 않습니다.">
+<span class="section-tag tag-paper">§4.1 Toy Example</span>
+<div class="title-lg mb-md">4자산 예제 — 세 전략의 차이가 극명하게 드러남</div>
+<div class="body-md mb-md" style="color:var(--gray-500)">변동성: 10% / 20% / 30% / 40% &nbsp;|&nbsp; 상관: Asset 1-2 = 0.80, Asset 3-4 = −0.50, 나머지 = 0</div>
+<div class="row gap-lg">
+<div class="col">
+<div class="card" style="border-left:4px solid var(--orange)">
+<div class="title-sm orange">1/n: 모두 25%씩</div>
+<table class="mt-sm">
+<tr><th></th><th>A1(σ=10%)</th><th>A2(σ=20%)</th><th>A3(σ=30%)</th><th>A4(σ=40%)</th></tr>
+<tr><td>비중</td><td>25%</td><td>25%</td><td>25%</td><td>25%</td></tr>
+<tr><td>RC</td><td>12.3%</td><td>26.4%</td><td>14.1%</td><td class="worst">47.2%</td></tr>
+</table>
+<div class="body-sm mt-sm red">Asset 4가 리스크의 47% 차지 — 극도로 불균등</div>
+</div>
+</div>
+<div class="col">
+<div class="card" style="border-left:4px solid var(--red)">
+<div class="title-sm red">MV: 74.5% / 0% / 15% / 10.4%</div>
+<div class="body-md mt-sm bold red">Asset 2 완전 배제!</div>
+<div class="body-sm mt-sm">Asset 1과 상관 0.80 → "열등한 복제품"<br>같은 방향으로 움직이지만 변동성이 2배 높음<br>→ MV는 비슷한 자산 중 하나를 무조건 배제</div>
+</div>
+</div>
+<div class="col">
+<div class="card-green" style="border-left:4px solid var(--green)">
+<div class="title-sm green">ERC: 38.4% / 19.2% / 24.3% / 18.2%</div>
+<div class="body-md mt-sm bold green">RC: 25% / 25% / 25% / 25% ← 완벽 균등</div>
+<div class="body-sm mt-sm">모든 자산에 양의 비중<br>Asset 2도 19.2% (배제 안 함)<br>변동성 낮은 자산에 더 많은 비중</div>
+</div>
+</div>
+</div>
+<div class="row gap-lg mt-md">
+<div class="col"><div class="img-ph">📸 4자산 Weights 막대그래프 (plotly-fig1-weights 캡처)</div></div>
+<div class="col"><div class="img-ph">📸 4자산 RC 막대그래프 (plotly-fig1-rc 캡처)</div></div>
+</div>
+<div class="body-md mt-sm blue bold" style="text-align:center">부등식: σ_MV(8.6%) ≤ σ_ERC(10.3%) ≤ σ_1/n(11.5%) ✓</div>
+</div>
+
+<!-- ══════════ SLIDE 11: 집중도 지표 ══════════ -->
+<div class="slide" data-notes="집중도 지표가 왜 중요한지 실제 상황으로 설명하겠습니다. MV의 가중치 Gini가 82%라는 것은, 13개 자산 중 IEF 하나에 57.6%가 몰려 있다는 뜻입니다. 만약 미국 국채 시장에 구조적 변화가 오면 이 포트폴리오는 큰 타격을 받습니다. ERC의 가중치 Gini는 38%입니다. 어떤 단일 자산에 문제가 생겨도 포트폴리오 전체가 무너지지 않습니다. 그리고 ERC의 RC Gini는 0.27% — 거의 완벽한 0입니다. 턴오버도 ERC 5.96% vs MV 10.85%로 거래비용이 절반입니다.">
+<span class="section-tag tag-paper">Appendix A.4</span>
+<div class="title-lg mb-lg">집중도 측정: Herfindahl, Gini, Turnover</div>
+<div class="row gap-lg">
+<div class="col">
+<div class="card">
+<div class="title-sm mb-md">세 가지 집중도 지표</div>
+<ul class="toss">
+<li><strong>Herfindahl H̄:</strong> 가중치 제곱합 → "가장 큰 비중이 얼마나 큰가"</li>
+<li><strong>Gini Ḡ:</strong> 로렌츠 곡선 → "전체 분포가 얼마나 불균등한가"</li>
+<li><strong>Turnover T̄:</strong> 리밸런싱 시 비중 변화 → 거래비용 대리변수</li>
+<li>0 = 완전 균등, 1 = 단일 자산 집중</li>
+</ul>
+</div>
+<div class="card mt-md">
+<div class="title-sm mb-sm">제 실증 결과</div>
+<table>
+<tr><th></th><th>H̄_w</th><th>Ḡ_w</th><th>T̄_w</th><th>H̄_rc</th><th>Ḡ_rc</th></tr>
+<tr><td>1/n</td><td>0.59%</td><td>0.00%</td><td>0.00%</td><td>5.46%</td><td class="worst">42.64%</td></tr>
+<tr><td>MV</td><td class="worst">40.78%</td><td class="worst">81.96%</td><td class="worst">10.85%</td><td class="worst">40.78%</td><td class="worst">81.96%</td></tr>
+<tr><td>ERC</td><td>6.36%</td><td>38.02%</td><td>5.96%</td><td class="best">0.61%</td><td class="best">0.27%</td></tr>
+</table>
+</div>
+</div>
+<div class="col">
+<div class="card-red">
+<div class="title-sm red mb-sm">MV의 문제: Gini 82%</div>
+<div class="body-lg bold">IEF 하나에 57.6% 몰림</div>
+<div class="body-md mt-sm">"멀티에셋 포트폴리오"인데<br>실질적으로 국채 펀드</div>
+<div class="body-sm mt-sm">미국 국채에 구조적 변화 오면<br>(예: 2022년 금리 급등) 포트폴리오 붕괴</div>
+</div>
+<div class="card-green mt-md">
+<div class="title-sm green mb-sm">ERC의 장점</div>
+<div class="body-lg bold green">RC Gini 0.27% ≈ 완벽 균등</div>
+<div class="body-md mt-sm">돈의 배분은 불균등하지만<br>리스크의 배분은 완벽히 균등</div>
+</div>
+<div class="card mt-md">
+<div class="title-sm mb-sm">턴오버 = 거래비용</div>
+<div class="body-lg">ERC <strong class="green">5.96%</strong> vs MV <strong class="red">10.85%</strong></div>
+<div class="body-md mt-sm">매월 비중 조정량이 절반<br>= 거래비용 절반<br>대형 기관에서 연간 수십억 원 차이</div>
+</div>
+</div>
+</div>
+</div>
+
+<!-- ══════════ SLIDE 12: US Sectors ══════════ -->
+<div class="slide" data-notes="US Sectors는 미국 주식 10개 섹터입니다. 핵심은 이것들이 전부 미국 주식이라는 겁니다. 변동성이 1.8배밖에 차이 안 나고, 평균 상관이 63%로 높습니다. 이런 동질적 환경에서는 MV가 샤프 0.77로 최고입니다. 하지만 MV의 가중치 Gini가 79%라는 것은 10개 섹터 중 2~3개에만 투자한다는 뜻입니다. 동질적 자산에서는 ERC의 장점이 제한적입니다.">
+<span class="section-tag tag-paper">§4.2 실증 1</span>
+<div class="title-lg mb-md">US Equity Sectors — 동질적 유니버스</div>
+<div class="row gap-lg">
+<div class="col">
+<div class="card">
+<div class="title-sm mb-sm">10개 미국 주식 섹터 (1973-2008, 35년)</div>
+<ul class="toss">
+<li>에너지, 소재, 산업재, 필수소비재, 헬스케어</li>
+<li>경기소비재, 통신, 유틸리티, 금융, 기술</li>
+<li>변동성: 14.5%(유틸리티) ~ 26.2%(기술) = <strong>1.8배</strong></li>
+<li>평균 상관: <strong>~63%</strong> — 미국 경제 좋으면 다 같이 오르고 나쁘면 다 같이 빠짐</li>
+</ul>
+</div>
+<div class="card-orange mt-md">
+<div class="title-sm orange mb-sm">결과: MV 샤프 0.77 최고</div>
+<div class="body-md">동질적 환경에서는 MV가 유리<br>비슷한 자산 중 가장 안정적인 것에 집중하는 전략이 효과적</div>
+<div class="body-sm mt-sm red">하지만 MV Gini 79% = 10개 중 2~3개에만 투자</div>
+</div>
+<div class="card mt-md">
+<div class="title-sm mb-sm">학술적 의미</div>
+<div class="body-md bold">동질적 자산군에서는 ERC의 장점이 제한적</div>
+<div class="body-sm mt-sm">모든 자산이 비슷하게 움직이면, "리스크 균등화"와 "리스크 최소화"의 차이가 크지 않음</div>
+</div>
+</div>
+<div class="col">
+<div class="img-ph" style="min-height:250px">📸 논문 Table 1: 기술통계<br>→ img_table1.png</div>
+<div class="img-ph mt-md" style="min-height:250px">📸 논문 Table 2: 전략 비교<br>→ img_table2.png</div>
+</div>
+</div>
+</div>
+
+<!-- ══════════ SLIDE 13: Commodity ══════════ -->
+<div class="slide" data-notes="농산물 선물은 주식과 완전히 다른 세계입니다. 코코아 가격은 서아프리카 날씨에, 밀 가격은 미국 중서부 작황에, 커피 가격은 브라질 서리에 의해 결정됩니다. 상관이 10%로 매우 낮습니다. 이런 저상관 환경에서도 MV가 샤프 최고이지만, 원유에 38% 집중하는 극단적 포트폴리오입니다. ERC는 8개 농산물에 리스크를 균등하게 분배합니다.">
+<span class="section-tag tag-paper">§4.2 실증 2</span>
+<div class="title-lg mb-md">Agricultural Commodity — 저상관 유니버스</div>
+<div class="row gap-lg">
+<div class="col">
+<div class="card">
+<div class="title-sm mb-sm">8개 농산물 선물 (1979-2008, 29년)</div>
+<ul class="toss">
+<li>코코아, 원유, 난방유, 대두, 밀, 면화, 커피, 설탕</li>
+<li>상관: <strong>~10%</strong> — 각 농산물이 독립적으로 움직임</li>
+<li>코코아→서아프리카 날씨, 밀→미국 작황, 커피→브라질 서리</li>
+<li>각 농산물이 <strong>독립적인 리스크 소스</strong></li>
+</ul>
+</div>
+<div class="card-orange mt-md">
+<div class="title-sm orange mb-sm">결과: MV 샤프 0.74 최고</div>
+<div class="body-md">원유(CLC)에 38% 집중 — 극단적 포트폴리오</div>
+<div class="body-sm mt-sm">단일 농산물에 38% 넣는 것은 수급 충격에 극도로 취약</div>
+</div>
+<div class="card-green mt-md">
+<div class="title-sm green mb-sm">ERC의 의미</div>
+<div class="body-md bold">"8개 독립적 베팅에 같은 리스크 예산 배분"</div>
+<div class="body-sm mt-sm">각 농산물이 독립적 리스크 소스이므로,<br>ERC는 가장 직관적인 분배 전략</div>
+</div>
+</div>
+<div class="col">
+<div class="img-ph" style="min-height:250px">📸 논문 Table 3 & 4<br>→ img_table3.png, img_table4.png</div>
+<div class="card mt-md">
+<div class="title-sm mb-sm">패턴 정리</div>
+<div class="body-md">동질적 자산(주식만, 원자재만) → <strong class="orange">MV 우위</strong></div>
+<div class="body-md mt-sm bold blue">다음 슬라이드: 이질적 자산에서는?</div>
+</div>
+</div>
+</div>
+</div>
+
+<!-- ══════════ SLIDE 14: Global ★ ══════════ -->
+<div class="slide" data-notes="이것이 논문의 가장 중요한 결과입니다. 13개 글로벌 자산 — 주식, 채권, 원자재를 모두 포함하는 이질적 유니버스입니다. 변동성 범위가 6.9배 차이납니다. 여기서 ERC 샤프 0.67이 최고입니다. MV는 채권에 80% 이상 집중해서 수익률이 5.42%에 갇힙니다. 1/n은 주식 8개에 62%가 가서 2008 위기에 −34% 폭락합니다. ERC는 채권의 안정성과 주식의 성장성을 균형있게 활용합니다.">
+<span class="section-tag tag-paper">§4.2 실증 3 ★ 핵심 결과</span>
+<div class="title-lg mb-md">Global Diversified — 이질적 유니버스에서 ERC가 압도적</div>
+<div class="row gap-lg">
+<div class="col">
+<div class="card-blue" style="padding:28px">
+<div class="title-md blue mb-md">13개 글로벌 자산 (1995-2008)</div>
+<ul class="toss">
+<li>미국·유럽·일본·신흥국·중남미·아시아 주식 8개</li>
+<li>미국·유럽 국채, 하이일드, 신흥국 채권 4개</li>
+<li>원자재(GSCI) 1개</li>
+<li>변동성: 4.3% ~ 29.8% = <strong>6.9배</strong></li>
+<li>주식-채권 상관: <strong>−19%</strong> (주식 빠지면 채권 오름)</li>
+</ul>
+</div>
+<div class="card-green mt-md" style="padding:28px">
+<div class="title-md green mb-sm">ERC 샤프 0.67 최고! ★</div>
+<table>
+<tr><th></th><th>1/n</th><th>MV</th><th>ERC</th></tr>
+<tr><td>Return</td><td>7.83%</td><td>5.42%</td><td>6.65%</td></tr>
+<tr><td>Volatility</td><td>10.87%</td><td class="best">3.20%</td><td>4.92%</td></tr>
+<tr><td>Sharpe</td><td>0.27</td><td>0.49</td><td class="best">0.67 ★</td></tr>
+<tr><td>DD Max</td><td class="worst">−33.73%</td><td class="best">−8.96%</td><td>−14.45%</td></tr>
+</table>
+</div>
+</div>
+<div class="col">
+<div class="card" style="padding:28px">
+<div class="title-sm mb-md">왜 이질적 자산에서 ERC가 이기는가?</div>
+<div class="card-red mb-md">
+<div class="body-md"><strong class="red">MV:</strong> 채권에 80%+ 올인 → 수익률 5.42%에 갇힘<br>주식 시장이 연 15% 올라도 수혜 못 받음</div>
+</div>
+<div class="card-orange mb-md">
+<div class="body-md"><strong class="orange">1/n:</strong> 주식 8개에 62% → 2008 위기 시 −34% 폭락<br>주식이 동시에 빠지면 상쇄 안됨</div>
+</div>
+<div class="card-green">
+<div class="body-md"><strong class="green">ERC:</strong> 채권 안정성 + 주식 성장성 균형<br>위기 시 채권이 방어, 상승장에서 주식이 수익</div>
+</div>
+</div>
+<div class="img-ph mt-md" style="min-height:150px">📸 논문 Table 5 & 6<br>→ img_table5.png, img_table6.png</div>
+</div>
+</div>
+</div>
+
+<!-- ══════════ SLIDE 15: Figure 1 & 2 ══════════ -->
+<div class="slide" data-notes="Figure 1의 핵심은 하단 패널입니다. 1/n과 MV의 RC는 자산별로 크게 다르지만, ERC만 수평선입니다. 8개 농산물 선물 각각이 정확히 12.5%씩 리스크를 기여합니다. Figure 2에서는 13개 글로벌 자산의 누적 수익률을 보여줍니다. 2008 위기 시 1/n이 가장 큰 폭락을 겪지만, 전체 기간 ERC 샤프가 0.67로 최고입니다.">
+<span class="section-tag tag-paper">Figure 1 & 2</span>
+<div class="title-lg mb-lg">논문 원본 시각화</div>
+<div class="row gap-lg" style="height:calc(100% - 100px)">
+<div class="col" style="display:flex;flex-direction:column;gap:12px">
+<div class="title-sm">Figure 1: Weights & RC (Commodity)</div>
+<div class="img-ph" style="flex:1">📸 논문 Figure 1<br>→ img_figure1.png<br><br>상단: Weights (1/n, MV, ERC)<br>하단: RC (1/n, MV, ERC)<br><strong>ERC RC만 수평선!</strong></div>
+</div>
+<div class="col" style="display:flex;flex-direction:column;gap:12px">
+<div class="title-sm">Figure 2: Cumulative Returns (Global)</div>
+<div class="img-ph" style="flex:1">📸 논문 Figure 2<br>→ img_figure2.png<br><br>1/n(빨간) 급등락<br>MV(검정) 안정적<br>ERC(파란) 중간<br><strong>2008 위기: 1/n −34%, MV −9%, ERC −14%</strong></div>
+</div>
+</div>
+</div>
+
+<!-- ══════════ SLIDE 16: 논문 실증 종합 ══════════ -->
+<div class="slide" data-notes="3개 유니버스를 종합하면 패턴이 명확합니다. 동질적 자산에서는 MV가 최고이지만, 이질적 자산에서는 ERC가 압도적입니다. 이유는 간단합니다 — MV는 채권에 올인해서 주식의 성장성을 포기하고, 1/n은 주식에 과다 노출되어 위기 시 폭락합니다. ERC만이 두 극단의 장점을 모두 취합니다. 변동성 범위가 3~4배 이상 벌어지면 ERC가 강력해집니다.">
+<span class="section-tag tag-paper">실증 종합</span>
+<div class="title-lg mb-lg">3개 유니버스 비교 — 핵심 패턴</div>
+<div class="card mb-lg">
+<table>
+<tr><th>유니버스</th><th>자산수</th><th>유형</th><th>σ 비율</th><th>평균상관</th><th>1/n 샤프</th><th>MV 샤프</th><th>ERC 샤프</th><th>최고</th></tr>
+<tr><td>US Sectors</td><td>10</td><td>주식</td><td>1.8배</td><td>~63%</td><td>0.62</td><td class="best">0.77</td><td>0.65</td><td class="orange bold">MV</td></tr>
+<tr><td>Commodity</td><td>8</td><td>원자재</td><td>2.0배</td><td>~10%</td><td>0.27</td><td class="best">0.74</td><td>0.49</td><td class="orange bold">MV</td></tr>
+<tr><td>Global</td><td>13</td><td>멀티에셋</td><td class="best">6.9배</td><td>이질적</td><td>0.27</td><td>0.49</td><td class="best">0.67</td><td class="green bold">ERC ★</td></tr>
+</table>
+</div>
+<div class="row gap-lg">
+<div class="col">
+<div class="card-green" style="padding:28px">
+<div class="title-md green mb-md">핵심 발견</div>
+<div class="title-lg" style="color:var(--dark)">동질적 → MV 우위<br>이질적 → ERC 압도적</div>
+<div class="body-md mt-md">σ 비율(max/min)이 3~4배 이상이면 ERC가 강력</div>
+</div>
+</div>
+<div class="col">
+<div class="card-blue" style="padding:28px">
+<div class="title-sm blue mb-sm">왜?</div>
+<ul class="toss">
+<li class="red-dot"><strong>MV:</strong> 채권에 올인 → 주식 성장성 포기</li>
+<li class="orange-dot"><strong>1/n:</strong> 주식에 과다 노출 → 위기 시 폭락</li>
+<li class="green-dot"><strong>ERC:</strong> 각 자산의 "충격 크기"를 같게 → 안전성 + 성장성</li>
+</ul>
+</div>
+</div>
+<div class="col">
+<div class="card-dark" style="padding:28px">
+<div class="body-md" style="color:#90caf9">실무적 의미</div>
+<div class="body-lg mt-sm" style="color:#fff">현실의 기관투자자 포트폴리오는<br>거의 항상 이질적 유니버스</div>
+<div class="body-sm mt-sm" style="color:#bbb">(주식+채권+대체자산)</div>
+<div class="body-md mt-md" style="color:#90caf9">→ ERC가 가장 적합한 프레임워크</div>
+</div>
+</div>
+</div>
+</div>
+
+<!-- ══════════ SLIDE 17: 데이터 드리븐 유니버스 ══════════ -->
+<div class="slide" data-notes="데이터를 설명하겠습니다. 13개 ETF를 Yahoo Finance에서 12년치 일간 가격을 다운로드했습니다. 주식 6개는 미국, 한국, 일본, 영국, 신흥국, 홍콩입니다. 채권 4개는 미국 장기국채, 중기국채, 투자등급 회사채, 하이일드입니다. 대체 3개는 금, 원자재, 리츠입니다. 변동성 범위가 6.76%에서 33.19%까지 4.9배 차이나고, 주식-채권 상관이 −43%로 강한 음의 상관입니다. 논문 Global과 유사한 이질적 유니버스입니다.">
+<span class="section-tag tag-driven">데이터 드리븐</span>
+<div class="title-lg mb-md">데이터 소스 & 유니버스 상세</div>
+<div class="card-green mb-md" style="padding:12px 20px"><div class="body-sm green bold">13개 ETF | yfinance Adj Close | 2007.01~2018.12 (3,020일) | 252일 롤링 공분산 | 월간 리밸런싱 131회</div></div>
+<div class="row gap-lg">
+<div class="col">
+<div class="card-blue">
+<div class="title-sm blue mb-sm">주식 6개 (σ 19.75~33.19%)</div>
+<table><tr><th>ETF</th><th>국가</th><th>σ</th></tr>
+<tr><td>SPY</td><td>미국</td><td>19.75%</td></tr>
+<tr><td>EWY</td><td>한국</td><td>32.90%</td></tr>
+<tr><td>EWJ</td><td>일본</td><td>21.63%</td></tr>
+<tr><td>EWU</td><td>영국</td><td>24.71%</td></tr>
+<tr><td>EEM</td><td>신흥국</td><td>31.40%</td></tr>
+<tr><td>EWH</td><td>홍콩</td><td>26.21%</td></tr></table>
+</div>
+</div>
+<div class="col">
+<div class="card-orange">
+<div class="title-sm orange mb-sm">채권 4개 (σ 6.76~14.39%)</div>
+<table><tr><th>ETF</th><th>유형</th><th>σ</th></tr>
+<tr><td>TLT</td><td>미국 장기국채</td><td>14.39%</td></tr>
+<tr><td>IEF</td><td>미국 중기국채</td><td class="best">6.76%</td></tr>
+<tr><td>LQD</td><td>투자등급 회사채</td><td>8.18%</td></tr>
+<tr><td>HYG</td><td>하이일드</td><td>11.78%</td></tr></table>
+<div class="body-sm mt-sm">주식-채권 상관: <strong class="red">−43%</strong></div>
+</div>
+</div>
+<div class="col">
+<div class="card-green">
+<div class="title-sm green mb-sm">대체 3개 (σ 18.45~33.19%)</div>
+<table><tr><th>ETF</th><th>유형</th><th>σ</th></tr>
+<tr><td>GLD</td><td>금</td><td>18.45%</td></tr>
+<tr><td>DBC</td><td>원자재</td><td>19.49%</td></tr>
+<tr><td>VNQ</td><td>리츠</td><td class="worst">33.19%</td></tr></table>
+<div class="body-sm mt-sm">금-주식 상관: <strong class="blue">~3%</strong> (무상관)</div>
+</div>
+</div>
+</div>
+<div class="card mt-md">
+<div class="body-md">상관행렬 핵심: <strong>주식끼리 71~89%</strong> (동시 폭락 위험) | <strong class="red">주식-채권 −43%</strong> (방어 효과) | <strong class="blue">금-주식 ~3%</strong> (독립적 리스크 소스) | σ 범위 6.76~33.19% = <strong>4.9배</strong></div>
+</div>
+</div>
+
+<!-- ══════════ SLIDE 18: Table 2 전략 비교 ══════════ -->
+<div class="slide" data-notes="1억 원을 투자한다고 합시다. 1/n은 13개 ETF에 각각 770만원씩 넣습니다. 단순하지만, 한국 주식 EWY의 변동성이 33%이고 미국 국채 IEF의 변동성이 7%이니까, 같은 돈을 넣어도 리스크는 EWY가 5배 더 큽니다. MV는 IEF에 5,760만원을 넣습니다. 사실상 미국 국채 펀드입니다. ERC는 IEF에 2,980만원, TLT에 1,310만원... 모든 자산이 리스크의 정확히 7.69%씩 기여하도록 조절합니다. MV 샤프가 0.64로 최고인 이유는 2008 위기 때문입니다. 백테스트 첫 해에 SPY가 −37%, EWY가 −55% 폭락할 때 IEF는 +18% 올랐습니다. 이 한 해의 차이가 11년 전체 샤프를 결정합니다.">
+<span class="section-tag tag-driven">데이터 드리븐</span>
+<div class="title-lg mb-md">Table 2 — 세 전략 성과 비교</div>
+<div class="row gap-lg">
+<div class="col col-2">
+<div class="card">
+<table>
+<tr><th></th><th>1/n</th><th>MV</th><th>ERC</th></tr>
+<tr><td class="bold">Return</td><td>4.71%</td><td>3.32%</td><td>3.47%</td></tr>
+<tr><td class="bold">Volatility</td><td class="worst">13.88%</td><td class="best">5.15%</td><td>7.98%</td></tr>
+<tr><td class="bold">Sharpe</td><td>0.34</td><td class="best">0.64</td><td>0.43</td></tr>
+<tr><td class="bold">DD Max</td><td class="worst">−40.34%</td><td class="best">−14.55%</td><td>−29.23%</td></tr>
+<tr><td class="bold">Ḡ_w (가중치 집중도)</td><td class="best">0.00%</td><td class="worst">81.96%</td><td>38.02%</td></tr>
+<tr><td class="bold">Ḡ_rc (RC 집중도)</td><td class="worst">42.64%</td><td class="worst">81.96%</td><td class="best">0.27%</td></tr>
+<tr><td class="bold">Turnover</td><td class="best">0.00%</td><td class="worst">10.85%</td><td>5.96%</td></tr>
+</table>
+<div class="body-md mt-sm blue bold">부등식: 5.15% ≤ 7.98% ≤ 13.88% ✓</div>
+</div>
+<div class="card-blue mt-md">
+<div class="title-sm blue mb-sm">1억 원 투자 시</div>
+<div class="body-md"><strong>1/n:</strong> 13개 ETF에 각 770만원 → 리스크는 주식에 몰림</div>
+<div class="body-md"><strong>MV:</strong> IEF에 5,760만원 → 사실상 "미국 국채 펀드"</div>
+<div class="body-md"><strong>ERC:</strong> IEF 2,980만원, TLT 1,310만원... 모든 자산이 리스크의 7.69%씩</div>
+</div>
+</div>
+<div class="col">
+<div class="card-orange">
+<div class="title-sm orange mb-sm">MV 샤프 0.64 최고인 이유</div>
+<div class="body-md">2008 위기 첫 해에<br>SPY −37%, EWY −55% 폭락할 때<br>IEF <strong>+18%</strong> 상승</div>
+<div class="body-md mt-sm">→ MV의 채권 집중이 극도로 유리<br>→ 이 한 해의 차이가 11년 전체 샤프를 결정</div>
+<div class="body-sm mt-md">논문 Global(1995-2008)에서는<br>위기 전 상승장이 길어 ERC가 최고(0.67)</div>
+</div>
+<div class="card-green mt-md">
+<div class="title-sm green mb-sm">핵심은 샤프 순위가 아니라 구조적 성질</div>
+<ul class="toss">
+<li class="green-dot">부등식 항상 성립 ✓</li>
+<li class="green-dot">ERC RC Gini 0.27% ≈ 0 ✓</li>
+<li class="green-dot">MV Gini 82% 극단적 집중 ✓</li>
+<li class="green-dot">ERC 턴오버 = MV의 절반 ✓</li>
+</ul>
+</div>
+</div>
+</div>
+</div>
+
+<!-- ══════════ SLIDE 19: 박스플롯 ══════════ -->
+<div class="slide" data-notes="이 6패널 박스플롯이 논문 Figure 1의 재현입니다. 핵심만 보겠습니다. 1/n Weights는 모든 자산이 7.69%로 수평선. MV Weights는 IEF에 25~81%까지 극단적으로 집중. ERC Weights는 IEF가 가장 높지만 15~54% 범위이고 나머지도 2~19%로 유지됩니다. 하단 RC가 핵심입니다. 1/n RC는 신흥국 EEM이 16%로 가장 높고 미국 장기국채 TLT가 −7%까지 음수입니다. 그리고 ERC RC — 모든 자산이 7.69%로 거의 완벽한 수평선입니다. 가중치는 시장 환경에 따라 변하지만, 리스크 기여도는 항상 균등합니다.">
+<span class="section-tag tag-driven">데이터 드리븐</span>
+<div class="title-lg mb-md">Figure 1 재현 — Weights & RC 분포</div>
+<div class="row gap-lg" style="height:calc(100% - 120px)">
+<div class="col" style="display:flex;flex-direction:column;gap:12px">
+<div class="img-ph" style="flex:1">📸 논문 Figure 1 원본 (Commodity, 8자산)<br>→ img_figure1.png</div>
+<div class="card" style="padding:16px">
+<div class="title-sm mb-sm">핵심 관찰</div>
+<ul class="toss">
+<li class="orange-dot"><strong>1/n Weights:</strong> 모두 7.69% 수평선</li>
+<li class="red-dot"><strong>MV Weights:</strong> IEF에 25~81% 극단 집중</li>
+<li class="green-dot"><strong>ERC Weights:</strong> IEF 15~54%, 나머지 2~19%</li>
+<li class="red-dot"><strong>1/n RC:</strong> EEM 16%, TLT −7% (극도로 불균등)</li>
+<li class="green-dot"><strong>ERC RC:</strong> 모든 자산 ~7.69% <strong class="green">완벽한 수평선!</strong></li>
+</ul>
+</div>
+</div>
+<div class="col" style="display:flex;flex-direction:column;gap:12px">
+<div class="img-ph" style="flex:1">📸 실제 데이터 재현 — 상단: Weights 박스플롯 (3패널)<br>→ erc_30min.html의 box-w-ew, box-w-mv, box-w-erc 캡처</div>
+<div class="img-ph" style="flex:1">�� 실제 데이터 재현 — 하단: RC 박스플롯 (3패널)<br>→ erc_30min.html의 box-rc-ew, box-rc-mv, box-rc-erc 캡처<br><strong>ERC RC = 거의 완벽한 수평선!</strong></div>
+</div>
+</div>
+</div>
+
+<!-- ══════════ SLIDE 20: 누적 수익률 ══════════ -->
+<div class="slide" data-notes="누적 수익률 차트를 주가 움직임으로 읽겠습니다. 2008년 2월 100에서 출발합니다. 9월 리먼 파산 이후 1/n은 100에서 66으로 −34% 폭락합니다. SPY −37%, EWY −55%, VNQ −72%가 동시에 터지면서 주식 비중이 높은 1/n이 가장 큰 타격을 받습니다. MV는 100에서 89로 −11%만 하락합니다. IEF가 +18% 올라서 방어합니다. ERC는 100에서 79로 −21% 하락합니다. 최종 2018년 12월: 1/n 150.6, MV 141.5, ERC 141.1. 1/n이 절대 수익률 최고이지만 −40% 폭락을 겪었습니다.">
+<span class="section-tag tag-driven">데이터 드리븐</span>
+<div class="title-lg mb-md">누적 수익률 시계열 (2008.02~2018.12)</div>
+<div class="row gap-lg">
+<div class="col">
+<div class="img-ph" style="min-height:280px">📸 논문 Figure 2 원본<br>→ img_figure2.png</div>
+<div class="img-ph mt-md" style="min-height:280px">📸 실제 누적 수익률 차트 (Plotly)<br>→ erc_30min.html의 plotly-driven-cumret 캡처<br>1/n(빨간) 롤러코스터, MV(검정) 직선, ERC(초록) 중간</div>
+</div>
+<div class="col">
+<div class="card">
+<div class="title-sm mb-sm">2008 금융위기 타임라인</div>
+<table>
+<tr><th>전략</th><th>최저점</th><th>DD Max</th><th>회복 기간</th></tr>
+<tr><td>1/n</td><td>100→66</td><td class="worst">−40.34%</td><td>~5년</td></tr>
+<tr><td>MV</td><td>100→89</td><td class="best">−14.55%</td><td>~8개월</td></tr>
+<tr><td>ERC</td><td>100→79</td><td>−29.23%</td><td>~3년</td></tr>
+</table>
+<div class="body-sm mt-sm">SPY −37%, EWY −55%, VNQ −72% 동시 폭락<br>IEF +18% 상승 → MV 방어</div>
+</div>
+<div class="card mt-md">
+<div class="title-sm mb-sm">최종 (2018.12)</div>
+<div class="body-lg">1/n <strong>150.6</strong> | MV <strong>141.5</strong> | ERC <strong>141.1</strong></div>
+<div class="body-sm mt-sm">1/n이 절대 수익률 최고이지만 −40% 폭락 경험</div>
+</div>
+<div class="card-green mt-md">
+<div class="title-sm green mb-sm">핵심: "경로"가 다르다</div>
+<div class="body-md">−40% 폭락 경험 → 대부분 패닉 매도 → 회복 수혜 못 받음</div>
+<div class="body-md mt-sm">ERC의 −29%가 1/n의 −40%보다 심리적으로 견딜 만함</div>
+<div class="body-md mt-md bold green">레버리지: ERC×1.74배 → 1/n과 동일 변동성에서<br>수익률 6.04% > 1/n 4.71%</div>
+</div>
+</div>
+</div>
+</div>
+
+<!-- ══════════ SLIDE 19: 박스플롯 ══════════ -->
+<div class="slide" data-notes="이 6패널 박스플롯이 논문 Figure 1의 재현입니다. 핵심만 보겠습니다. 1/n Weights는 모든 자산이 7.69%로 수평선. MV Weights는 IEF에 25~81%까지 극단적으로 집중되고, 한국 주식 EWY나 신흥국 EEM은 거의 0%. ERC Weights는 IEF가 가장 높지만 15~54% 범위이고, 나머지도 2~19%로 유지됩니다. 하단 RC가 핵심입니다. 1/n RC는 신흥국 EEM이 16%로 가장 높고 미국 장기국채 TLT가 −7%까지 음수입니다. 그리고 ERC RC — 모든 자산이 7.69%로 거의 완벽한 수평선입니다. 가중치는 시장 환경에 따라 변하지만, 리스크 기여도는 항상 균등합니다.">
+<span class="section-tag tag-driven">데이터 드리븐</span>
+<div class="title-lg mb-md">Figure 1 재현 — Weights & RC 박스플롯</div>
+<div class="row gap-lg">
+<div class="col">
+<div class="img-ph" style="min-height:280px">📸 논문 Figure 1 원본 (Commodity, 8자산)<br>→ img_figure1.png</div>
+</div>
+<div class="col col-2">
+<div class="img-ph mb-md" style="min-height:130px">📸 상단 3패널: Weights 박스플롯 (1/n, MV, ERC)<br>→ erc_30min.html 캡처</div>
+<div class="img-ph" style="min-height:130px">📸 하단 3패널: RC 박스플롯 (1/n, MV, ERC)<br>→ ERC RC = 거의 완벽한 수평선!</div>
+</div>
+</div>
+<div class="row gap-lg mt-md">
+<div class="col"><div class="card">
+<div class="title-sm mb-sm">핵심 관찰</div>
+<ul class="toss">
+<li class="orange-dot"><strong>1/n Weights:</strong> 모두 7.69% 수평선</li>
+<li class="red-dot"><strong>MV Weights:</strong> IEF에 25~81% 극단 집중, EWY·EEM ≈ 0%</li>
+<li class="green-dot"><strong>ERC Weights:</strong> IEF 15~54%, 나머지 2~19%</li>
+</ul>
+</div></div>
+<div class="col"><div class="card">
+<ul class="toss">
+<li class="red-dot"><strong>1/n RC:</strong> EEM 16%, TLT −7% → 극도로 불균등</li>
+<li class="green-dot"><strong>ERC RC:</strong> 모든 자산 ~7.69% → <strong class="green">완벽한 수평선</strong></li>
+</ul>
+<div class="body-sm mt-sm">자산군별 ERC: 채권 자본 63% → 리스크 31%<br>주식 자본 22% → 리스크 46% → <strong>돈은 불균등, 리스크는 균등</strong></div>
+</div></div>
+</div>
+</div>
+
+<!-- ══════════ SLIDE 20: 누적 수익률 ══════════ -->
+<div class="slide" data-notes="누적 수익률 차트를 주가 움직임으로 읽겠습니다. 2008년 2월 100에서 출발합니다. 9월 리먼 파산 이후 1/n은 100에서 66으로 −34% 폭락합니다. SPY −37%, EWY −55%, VNQ −72%가 동시에 터지면서 주식 비중이 높은 1/n이 가장 큰 타격을 받습니다. MV는 100에서 89로 −11%만 하락합니다. IEF가 +18% 올라서 채권 집중이 방어 역할을 합니다. ERC는 100에서 79로 −21% 하락합니다. 최종 2018년 12월: 1/n 150.6, MV 141.5, ERC 141.1. 1/n이 절대 수익률 최고이지만 −40% 폭락을 겪었습니다.">
+<span class="section-tag tag-driven">데이터 드리븐</span>
+<div class="title-lg mb-md">누적 수익률 시계열 — 세 전략의 "경로"가 다르다</div>
+<div class="row gap-lg">
+<div class="col">
+<div class="img-ph" style="min-height:260px">📸 논문 Figure 2 원본<br>→ img_figure2.png</div>
+</div>
+<div class="col">
+<div class="img-ph" style="min-height:260px">📸 실제 누적 수익률 차트 (Plotly)<br>→ erc_30min.html의 plotly-driven-cumret 캡처<br>1/n(빨간) 롤러코스터, MV(검정) 직선, ERC(초록) 중간</div>
+</div>
+</div>
+<div class="row gap-lg mt-md">
+<div class="col">
+<div class="card">
+<div class="title-sm mb-sm">2008 위기 타임라인</div>
+<table>
+<tr><th>전략</th><th>최저점</th><th>DD Max</th><th>회복 기간</th></tr>
+<tr><td>1/n</td><td>100→66</td><td class="worst">−40.34%</td><td>~5년</td></tr>
+<tr><td>MV</td><td>100→89</td><td class="best">−14.55%</td><td>~8개월</td></tr>
+<tr><td>ERC</td><td>100→79</td><td>−29.23%</td><td>~3년</td></tr>
+</table>
+<div class="body-sm mt-sm">SPY −37%, EWY −55%, EEM −53%, VNQ −72% 동시 폭락<br>IEF +18%, TLT +33% 상승 → 채권이 방어</div>
+</div>
+</div>
+<div class="col">
+<div class="card-green">
+<div class="title-sm green mb-sm">핵심: 경로가 다르면 투자자 경험이 다르다</div>
+<div class="body-md">최종값: 1/n 150.6, MV 141.5, ERC 141.1<br>→ 비슷해 보이지만...</div>
+<ul class="toss mt-sm">
+<li class="red-dot">1/n: −40% 폭락 경험 → 대부분 패닉 매도</li>
+<li class="orange-dot">MV: 안정적이지만 수익률 낮음</li>
+<li class="green-dot">ERC: −29%로 견딜 만함 + 회복도 합리적</li>
+</ul>
+<div class="body-md mt-md bold blue">레버리지: ERC×1.74배 → 1/n과 동일 변동성에서<br>수익률 6.04% > 1/n 4.71%</div>
+</div>
+</div>
+</div>
+</div>
+
+<!-- ══════════ SLIDE 21: 드리븐 vs 논문 비교 ══════════ -->
+<div class="slide" data-notes="논문과 제 데이터의 가장 큰 차이는 샤프 순위입니다. 논문에서는 ERC 0.67이 최고, 제 데이터에서는 MV 0.64가 최고입니다. 이유는 백테스트 시작 시점입니다. 하지만 차이점보다 공통점이 더 중요합니다. 다섯 가지 구조적 성질이 양쪽 모두에서 확인됩니다. 부등식 성립, RC Gini 약 0, MV Gini 79% 이상, 턴오버 절반, ERC가 1/n 지배. 이 구조적 성질들은 시장 환경에 무관하게 보편적입니다.">
+<span class="section-tag tag-driven">데이터 드리븐</span>
+<div class="title-lg mb-md">드리븐 vs 논문 — 차이점보다 공통점이 중요</div>
+<div class="card mb-md">
+<table>
+<tr><th></th><th colspan="3">논문 Global (1995-2008)</th><th colspan="3">내 ETF (2008-2018)</th></tr>
+<tr><th></th><th>1/n</th><th>MV</th><th>ERC</th><th>1/n</th><th>MV</th><th>ERC</th></tr>
+<tr><td class="bold">Return</td><td>7.83%</td><td>5.42%</td><td>6.65%</td><td>4.71%</td><td>3.32%</td><td>3.47%</td></tr>
+<tr><td class="bold">Volatility</td><td>10.87%</td><td>3.20%</td><td>4.92%</td><td>13.88%</td><td>5.15%</td><td>7.98%</td></tr>
+<tr><td class="bold">Sharpe</td><td>0.27</td><td>0.49</td><td class="best">0.67</td><td>0.34</td><td class="best">0.64</td><td>0.43</td></tr>
+<tr><td class="bold">DD Max</td><td>−33.73%</td><td>−8.96%</td><td>−14.45%</td><td>−40.34%</td><td>−14.55%</td><td>−29.23%</td></tr>
+</table>
+</div>
+<div class="row gap-lg">
+<div class="col">
+<div class="card-orange">
+<div class="title-sm orange mb-sm">차이: 샤프 순위</div>
+<div class="body-md">논문: <strong>ERC 0.67</strong> 최고<br>내 데이터: <strong>MV 0.64</strong> 최고</div>
+<div class="body-sm mt-sm">원인: 백테스트 시작 시점<br>내 데이터 = 2008 위기 직전 → MV 채권 집중 유리<br>논문 = 1995년 시작 → 위기 전 상승장이 ERC에 유리</div>
+</div>
+</div>
+<div class="col col-2">
+<div class="card-green">
+<div class="title-sm green mb-sm">공통점 (더 중요!) — 5가지 구조적 성질</div>
+<div class="row gap-md">
+<div class="col">
+<ul class="toss">
+<li class="green-dot">① 부등식 σ_MV ≤ σ_ERC ≤ σ_1/n 양쪽 모두 ✓</li>
+<li class="green-dot">② ERC RC Gini ≈ 0% 양쪽 모두 ✓</li>
+<li class="green-dot">③ MV 가중치 Gini > 79% 양쪽 모두 ✓</li>
+</ul>
+</div>
+<div class="col">
+<ul class="toss">
+<li class="green-dot">④ ERC 턴오버 ≈ MV의 절반 ✓</li>
+<li class="green-dot">⑤ 이질적 자산군에서 ERC > 1/n ✓</li>
+</ul>
+<div class="body-md mt-md bold green">샤프 순위는 기간에 따라 달라지지만<br>구조적 성질은 보편적</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+
+<!-- ══════════ SLIDE 22: 가중치/RC 시계열 ══════════ -->
+<div class="slide" data-notes="가중치 시계열에서 ERC의 자동 방어 메커니즘이 보입니다. 2008 위기 직후 주식 변동성이 급등하면서 ERC가 자동으로 채권 비중을 높입니다 — IEF가 54%까지 올라갑니다. 별도의 위기 감지 모델 없이도 공분산 변화에 반응하여 리스크를 재배분하는 겁니다. RC 시계열이 핵심입니다. ERC는 모든 자산이 약 7.69%로 거의 완벽한 수평선입니다. 가중치는 시간에 따라 크게 변하지만 RC는 항상 균등합니다. 이것이 ERC의 본질입니다.">
+<span class="section-tag tag-driven">데이터 드리븐</span>
+<div class="title-lg mb-md">가중치 & RC 시계열 — ERC의 "자동 방어" 메커니즘</div>
+<div class="img-ph mb-md" style="min-height:240px">📸 ERC 가중치 시계열 차트<br>→ erc_30min.html의 plotly-driven-weight-ts 캡처<br>IEF 15~54%, TLT 7~24%, 주식 각 2~10% | 2008 위기 직후 채권 비중 급증</div>
+<div class="img-ph mb-md" style="min-height:240px">📸 ERC RC 시계열 차트<br>→ erc_30min.html의 plotly-driven-rc-ts 캡처<br>ERC RC(초록 실선) = 모든 자산 ~7.69% 완벽한 수평선 | 1/n RC(점선) = EEM 16%, TLT −1.3%</div>
+<div class="row gap-lg">
+<div class="col"><div class="card-blue">
+<div class="title-sm blue mb-sm">자동 방어 메커니즘</div>
+<div class="body-md">2008 위기 → 주식 σ 급등 → ERC가 자동으로 채권 비중↑<br>2014~17 저변동성기 → 주식 비중 상대적으로↑<br>→ 별도의 위기 감지 모델 없이 공분산 변화에 반응</div>
+</div></div>
+<div class="col"><div class="card-green">
+<div class="title-sm green mb-sm">핵심: 가중치 ≠ RC</div>
+<div class="body-md">가중치는 IEF 15~54%로 크게 변동<br>하지만 RC는 항상 ~7.69%로 균등<br><strong>"가중치가 아니라 리스크를 균등화한다"</strong></div>
+</div></div>
+</div>
+</div>
+
+<!-- ══════════ SLIDE 23: 결론 ══════════ -->
+<div class="slide" data-notes="결론입니다. 이 논문의 핵심 기여는 다섯 가지입니다. 첫째, ERC를 모든 자산의 리스크 기여도가 같다로 수학적으로 정의했습니다. 둘째, 2자산에서는 변동성 역수 가중이고 상관에 무관하다는 닫힌 해를 구했습니다. 셋째, 수치 최적화 방법을 제시했습니다. 넷째, 부등식을 보였습니다. 다섯째, 이질적 자산군에서 ERC가 최고 샤프를 달성함을 실증했습니다. 제 실증에서도 모두 확인되었습니다. 한계도 있습니다. 거래비용 미반영, 공분산 추정 오류, 레버리지 미고려. 하지만 이 논문은 자본이 아니라 리스크를 균등하게 나누자는 아이디어의 수학적 기초를 놓은 최초의 학술 논문입니다.">
+<span class="section-tag tag-conclusion">§5 Conclusion</span>
+<div class="title-lg mb-lg">논문의 결론 & 내 실증의 확인</div>
+<div class="row gap-lg">
+<div class="col">
+<div class="card-blue" style="padding:28px">
+<div class="title-md blue mb-md">논문의 핵심 기여 5가지</div>
+<ul class="toss">
+<li class="green-dot"><strong>① 수학적 정의:</strong> σᵢ(x) = σⱼ(x) ∀i,j</li>
+<li class="green-dot"><strong>② 닫힌 해:</strong> 2자산 x₁=σ₂/(σ₁+σ₂), 상관에 무관</li>
+<li class="green-dot"><strong>③ 수치 최적화:</strong> 식(6) 직접 + 식(7) 볼록 변환</li>
+<li class="green-dot"><strong>④ 부등식:</strong> σ_MV ≤ σ_ERC ≤ σ_1/n (항상 성립)</li>
+<li class="green-dot"><strong>⑤ 실증:</strong> 이질적 자산군에서 ERC 샤프 최고 (0.67)</li>
+</ul>
+</div>
+<div class="card-orange mt-md">
+<div class="title-sm orange mb-sm">한계</div>
+<ul class="toss">
+<li class="orange-dot">거래비용 미반영</li>
+<li class="orange-dot">공분산 추정 오류 영향 미분석</li>
+<li class="orange-dot">레버리지 미고려</li>
+<li class="orange-dot">변동성만 사용 (왜도·첨도 무시)</li>
+</ul>
+</div>
+</div>
+<div class="col">
+<div class="card-green" style="padding:28px">
+<div class="title-md green mb-md">내 실증이 확인한 것</div>
+<ul class="toss">
+<li class="green-dot">부등식 5.15% ≤ 7.98% ≤ 13.88% ✓</li>
+<li class="green-dot">ERC RC Gini 0.27% ≈ 0 (완벽 균등) ✓</li>
+<li class="green-dot">MV 가중치 Gini 82% (극단적 집중) ✓</li>
+<li class="green-dot">ERC 턴오버 5.96% = MV의 절반 ✓</li>
+<li class="green-dot">ERC 샤프 0.43 > 1/n 0.34 ✓</li>
+</ul>
+</div>
+<div class="card mt-md">
+<div class="title-sm mb-sm">후속 연구 & 실무</div>
+<ul class="toss">
+<li>Roncalli (2013): 유일성 증명, 리스크 버짓팅 교과서</li>
+<li>Bridgewater All Weather: AUM $150B+</li>
+<li>AQR Risk Parity, Invesco Balanced-Risk</li>
+<li>Lopez de Prado (2016): Hierarchical Risk Parity</li>
+<li>한국: 국민연금, 사학연금 부분 도입</li>
+</ul>
+</div>
+</div>
+</div>
+</div>
+
+<!-- ══════════ SLIDE 24: Q&A ══════════ -->
+<div class="slide" data-notes="예상 질문에 대한 답변을 준비했습니다. Q1 논문은 ERC 최고인데 왜 내 데이터는 MV 최고? 백테스트 시작 시점 차이입니다. Q2 ERC가 항상 좋은가? 아닙니다. 동질적 자산에서는 MV가 유리합니다. Q3 Risk Parity와 ERC는 같은가? ERC는 Risk Parity의 수학적 정의입니다. 실무에서 Risk Parity는 ERC + 레버리지입니다.">
+<span class="section-tag tag-conclusion">Q&A</span>
+<div class="title-lg mb-lg">예상 질문 & 답변</div>
+<div class="row gap-md">
+<div class="col">
+<div class="card mb-md" style="border-left:4px solid var(--blue)">
+<div class="title-sm blue mb-sm">Q1: 논문은 ERC 최고인데 왜 내 데이터는 MV?</div>
+<div class="body-md">백테스트 시작 시점 차이. 2008 위기 직전 시작 → MV 채권 집중 유리. 구조적 성질은 동일.</div>
+</div>
+<div class="card mb-md" style="border-left:4px solid var(--blue)">
+<div class="title-sm blue mb-sm">Q2: ERC가 MV보다 항상 좋은가?</div>
+<div class="body-md">아니다. 동질적 자산(주식만)에서는 MV 유리. ERC는 이질적 자산(주식+채권+대체)에서 강하다.</div>
+</div>
+<div class="card mb-md" style="border-left:4px solid var(--blue)">
+<div class="title-sm blue mb-sm">Q3: Risk Parity와 ERC는 같은가?</div>
+<div class="body-md">ERC = Risk Parity의 수학적 정의. 실무에서 Risk Parity = ERC + 레버리지. Bridgewater All Weather가 대표적.</div>
+</div>
+</div>
+<div class="col">
+<div class="card mb-md" style="border-left:4px solid var(--green)">
+<div class="title-sm green mb-sm">Q4: MV가 IEF에 57.6% 집중하는 건 문제?</div>
+<div class="body-md">맞다. 가중치 Gini 82%. 단일 자산에 57% 넣는 것은 실무적으로 수용 불가. ERC는 Gini 38%로 훨씬 균등.</div>
+</div>
+<div class="card mb-md" style="border-left:4px solid var(--green)">
+<div class="title-sm green mb-sm">Q5: 60/40과 ERC의 차이는?</div>
+<div class="body-md">60/40: 자본 6:4, 리스크 110:−10 → 사실상 주식 올인. ERC: 리스크 50:50 → 진짜 분산.</div>
+</div>
+<div class="card mb-md" style="border-left:4px solid var(--green)">
+<div class="title-sm green mb-sm">Q6: 레버리지 적용하면?</div>
+<div class="body-md">ERC×1.74배 → 1/n과 동일 변동성에서 수익률 6.04% > 4.71%. Bridgewater 방식.</div>
+</div>
+</div>
+</div>
+</div>
+
+<!-- ══════════ SLIDE 25: 마무리 ══════════ -->
+<div class="slide" style="background:var(--dark)" data-notes="마무리하겠습니다. 이 논문의 핵심 메시지는 세 가지입니다. 첫째, 1/n은 돈을 균등하게 나누지만 리스크는 불균등합니다. MV는 리스크를 최소화하지만 한두 자산에 올인합니다. ERC는 리스크를 균등하게 나눕니다. 둘째, 이질적 자산군에서 ERC가 가장 강력합니다. 셋째, 부등식은 어떤 시장에서든 항상 성립합니다. 실무적으로 한 가지만 기억하시면 됩니다 — 돈이 아니라 리스크를 나눠라. 감사합니다.">
+<div class="flex-center">
+<div style="text-align:center;max-width:800px">
+<div style="font-size:14px;color:var(--gray-500);letter-spacing:3px;margin-bottom:24px">CONCLUSION</div>
+<div style="font-size:44px;font-weight:800;color:var(--white);line-height:1.4;letter-spacing:-1px">
+"돈이 아니라<br>리스크를 나눠라"
+</div>
+<div style="margin:40px 0;display:flex;gap:16px;justify-content:center;flex-wrap:wrap">
+<div style="background:rgba(49,130,246,.15);border-radius:12px;padding:16px 24px;text-align:left;flex:1;min-width:200px">
+<div style="color:var(--blue);font-weight:600;font-size:14px;margin-bottom:4px">1/n의 문제</div>
+<div style="color:#bbb;font-size:13px">돈은 균등, 리스크는 불균등<br>주식 빠지면 포트폴리오도 빠짐</div>
+</div>
+<div style="background:rgba(240,68,82,.12);border-radius:12px;padding:16px 24px;text-align:left;flex:1;min-width:200px">
+<div style="color:var(--red);font-weight:600;font-size:14px;margin-bottom:4px">MV의 문제</div>
+<div style="color:#bbb;font-size:13px">리스크 최소화하지만<br>한두 자산에 올인 = 채권 펀드</div>
+</div>
+<div style="background:rgba(0,196,113,.12);border-radius:12px;padding:16px 24px;text-align:left;flex:1;min-width:200px">
+<div style="color:var(--green);font-weight:600;font-size:14px;margin-bottom:4px">ERC의 해답</div>
+<div style="color:#bbb;font-size:13px">리스크를 균등하게 나눔<br>어떤 자산이 빠져도 충격 비슷</div>
+</div>
+</div>
+<div style="color:var(--gray-500);font-size:15px;margin-top:32px;line-height:1.8">
+이질적 자산군에서 ERC가 가장 강력 · σ_MV ≤ σ_ERC ≤ σ_1/n 항상 성립<br>
+Bridgewater All Weather ($150B+)의 수학적 기초
+</div>
+<div style="margin-top:40px;font-size:18px;color:var(--white);font-weight:600">감사합니다</div>
+</div>
+</div>
+</div>
+
+</div><!-- end .deck -->
+
+<!-- ══════════ NAVIGATION JS ══════════ -->
+<script>
+(function(){
+  const slides = document.querySelectorAll('.slide');
+  const total = slides.length;
+  let cur = 0;
+  const prog = document.getElementById('prog');
+  const snum = document.getElementById('snum');
+  const notesEl = document.getElementById('notes');
+  const notesTxt = document.getElementById('notes-text');
+  let notesVisible = false;
+
+  function go(i){
+    if(i<0||i>=total) return;
+    slides[cur].classList.remove('active');
+    cur = i;
+    slides[cur].classList.add('active');
+    prog.style.width = ((cur+1)/total*100)+'%';
+    snum.textContent = (cur+1)+' / '+total;
+    notesTxt.textContent = slides[cur].dataset.notes || '';
+    history.replaceState(null,null,'#'+(cur+1));
+  }
+
+  document.addEventListener('keydown', function(e){
+    if(e.key==='ArrowRight'||e.key===' '||e.key==='PageDown') { e.preventDefault(); go(cur+1); }
+    else if(e.key==='ArrowLeft'||e.key==='PageUp') { e.preventDefault(); go(cur-1); }
+    else if(e.key==='Home') { e.preventDefault(); go(0); }
+    else if(e.key==='End') { e.preventDefault(); go(total-1); }
+    else if(e.key==='n'||e.key==='N') { notesVisible=!notesVisible; notesEl.classList.toggle('show',notesVisible); }
+    else if(e.key==='f'||e.key==='F') {
+      if(!document.fullscreenElement) document.documentElement.requestFullscreen();
+      else document.exitFullscreen();
+    }
+  });
+
+  // Touch support
+  let touchX = 0;
+  document.addEventListener('touchstart', function(e){ touchX = e.touches[0].clientX; });
+  document.addEventListener('touchend', function(e){
+    const dx = e.changedTouches[0].clientX - touchX;
+    if(dx < -50) go(cur+1);
+    else if(dx > 50) go(cur-1);
+  });
+
+  // Click navigation (left/right halves)
+  document.addEventListener('click', function(e){
+    if(e.target.closest('.notes')) return;
+    if(e.clientX > window.innerWidth * 0.65) go(cur+1);
+    else if(e.clientX < window.innerWidth * 0.35) go(cur-1);
+  });
+
+  // Hash navigation
+  const hash = parseInt(location.hash.replace('#',''));
+  go(hash > 0 && hash <= total ? hash-1 : 0);
+})();
+</script>
+</body></html>
