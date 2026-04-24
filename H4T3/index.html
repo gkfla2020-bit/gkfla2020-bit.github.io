@@ -117,6 +117,33 @@ tr:nth-child(even) td { background: #f4f4f4; }
 .check::before { content: "✓ 체크포인트 — "; font-weight: 900; }
 .small { font-size: 14px; color: #333; }
 hr { border: none; border-top: 2px solid #000; margin: 40px 0; }
+.diagram {
+  border: 2px solid #000; background: #fff;
+  margin: 20px 0; padding: 20px;
+  text-align: center; overflow-x: auto;
+}
+.diagram .caption {
+  font-size: 13px; font-weight: 700; margin-top: 10px;
+  border-top: 1px solid #000; padding-top: 8px;
+}
+.ascii {
+  font-family: "SF Mono", Menlo, monospace;
+  white-space: pre;
+  background: #fff; color: #000;
+  border: 2px solid #000;
+  padding: 16px; margin: 16px 0;
+  line-height: 1.4; font-size: 13px;
+  overflow-x: auto;
+}
+svg { max-width: 100%; height: auto; display: inline-block; }
+svg .box { fill: #fff; stroke: #000; stroke-width: 2; }
+svg .box-fill { fill: #000; stroke: #000; stroke-width: 2; }
+svg .line { stroke: #000; stroke-width: 2; fill: none; }
+svg .line-dash { stroke: #000; stroke-width: 2; fill: none; stroke-dasharray: 5,3; }
+svg .arrow { stroke: #000; stroke-width: 2; fill: none; marker-end: url(#arr); }
+svg text { fill: #000; font-family: -apple-system, sans-serif; font-size: 13px; }
+svg text.white { fill: #fff; }
+svg text.bold { font-weight: 800; }
 .nav-top {
   position: sticky; top: 0;
   background: #fff; border-bottom: 2px solid #000;
@@ -198,6 +225,49 @@ hr { border: none; border-top: 2px solid #000; margin: 40px 0; }
 <h2 id="s1">제 1 과목 · 소프트웨어 설계</h2>
 
 <h3>1-1. 소프트웨어 생명주기 모형 <span class="tag hot">HOT</span></h3>
+<div class="diagram">
+<svg viewBox="0 0 700 260" width="700">
+  <defs>
+    <marker id="arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+      <path d="M0,0 L10,5 L0,10 z" fill="#000"/>
+    </marker>
+  </defs>
+  <!-- 폭포수 모델 -->
+  <text x="350" y="20" text-anchor="middle" class="bold" style="font-size:15px">▼ 폭포수(Waterfall) 모형 - 단방향 진행</text>
+  <rect class="box" x="20" y="50" width="100" height="40"/>
+  <text x="70" y="75" text-anchor="middle">타당성</text>
+  <path class="arrow" d="M 120 70 L 150 70 L 150 110"/>
+  <rect class="box" x="140" y="110" width="100" height="40"/>
+  <text x="190" y="135" text-anchor="middle">요구분석</text>
+  <path class="arrow" d="M 240 130 L 270 130 L 270 170"/>
+  <rect class="box" x="260" y="170" width="100" height="40"/>
+  <text x="310" y="195" text-anchor="middle">설계</text>
+  <path class="arrow" d="M 360 190 L 390 190 L 390 150 L 420 150"/>
+  <rect class="box" x="420" y="130" width="100" height="40"/>
+  <text x="470" y="155" text-anchor="middle">구현</text>
+  <path class="arrow" d="M 520 150 L 550 150 L 550 90 L 580 90"/>
+  <rect class="box" x="580" y="70" width="100" height="40"/>
+  <text x="630" y="95" text-anchor="middle">테스트·유지보수</text>
+</svg>
+<div class="caption">폭포수 모델 — 전 단계 완료 후 다음 단계. 되돌리기 어려움.</div>
+</div>
+
+<div class="diagram">
+<svg viewBox="0 0 520 400" width="480">
+  <text x="260" y="20" text-anchor="middle" class="bold" style="font-size:15px">▼ 나선형(Spiral) 모형 - 위험 분석 중심 반복</text>
+  <line x1="260" y1="40" x2="260" y2="380" stroke="#000" stroke-width="1" stroke-dasharray="3,3"/>
+  <line x1="60" y1="210" x2="460" y2="210" stroke="#000" stroke-width="1" stroke-dasharray="3,3"/>
+  <text x="150" y="60">① 계획 및 정의</text>
+  <text x="310" y="60">② 위험 분석</text>
+  <text x="310" y="370">③ 공학적 개발</text>
+  <text x="150" y="370">④ 고객 평가</text>
+  <!-- 나선 -->
+  <path class="line" d="M 260 210 Q 310 170 310 210 Q 310 260 240 260 Q 170 260 170 180 Q 170 100 300 100 Q 420 100 420 240 Q 420 360 230 360"/>
+  <circle cx="230" cy="360" r="4" fill="#000"/>
+</svg>
+<div class="caption">나선형 — 4분면 반복. 위험 관리가 핵심. 대규모 프로젝트에 적합.</div>
+</div>
+
 <ul>
   <li><strong>폭포수(Waterfall)</strong> — 고전적, 단계적 진행, 변경 어려움. "타당성→요구→설계→구현→테스트→유지보수".</li>
   <li><strong>프로토타입(Prototyping)</strong> — 시제품으로 요구사항 명확화. <u>최종 결과물 일부를 먼저 의뢰자에게 보여주는 모델.</u> 요구사항 반영 가능(기출 함정: "반영 불가능" = 틀림).</li>
@@ -210,6 +280,39 @@ hr { border: none; border-top: 2px solid #000; margin: 40px 0; }
 <div class="mem">생명주기 = "폭프나 V 애" → 폭포수·프로토타입·나선형·V모델·애자일</div>
 
 <h3>1-2. 애자일 기법 — XP, Scrum, Lean</h3>
+<div class="diagram">
+<svg viewBox="0 0 600 220" width="600">
+  <text x="300" y="20" text-anchor="middle" class="bold" style="font-size:14px">▼ 스크럼(Scrum) 프로세스</text>
+  <!-- Product Backlog -->
+  <rect class="box" x="20" y="50" width="120" height="60"/>
+  <text x="80" y="75" text-anchor="middle" class="bold">Product</text>
+  <text x="80" y="95" text-anchor="middle" class="bold">Backlog</text>
+  <path class="arrow" d="M 140 80 L 185 80"/>
+  <!-- Sprint Backlog -->
+  <rect class="box" x="185" y="50" width="120" height="60"/>
+  <text x="245" y="75" text-anchor="middle" class="bold">Sprint</text>
+  <text x="245" y="95" text-anchor="middle" class="bold">Backlog</text>
+  <path class="arrow" d="M 305 80 L 350 80"/>
+  <!-- Sprint -->
+  <rect class="box-fill" x="350" y="50" width="120" height="60"/>
+  <text x="410" y="75" text-anchor="middle" class="white bold">Sprint</text>
+  <text x="410" y="95" text-anchor="middle" class="white" style="font-size:10px">(2~4주)</text>
+  <path class="arrow" d="M 470 80 L 515 80"/>
+  <!-- Release -->
+  <rect class="box" x="515" y="50" width="80" height="60"/>
+  <text x="555" y="85" text-anchor="middle" class="bold">증분</text>
+
+  <!-- Daily Scrum cycle -->
+  <ellipse cx="410" cy="160" rx="45" ry="20" fill="none" stroke="#000" stroke-width="2"/>
+  <text x="410" y="165" text-anchor="middle" style="font-size:11px">Daily Scrum</text>
+  <path class="arrow" d="M 410 120 L 410 140"/>
+
+  <text x="80" y="195" text-anchor="middle" style="font-size:11px">요구사항</text>
+  <text x="245" y="195" text-anchor="middle" style="font-size:11px">이번 주기에 할 일</text>
+  <text x="555" y="195" text-anchor="middle" style="font-size:11px">완료된 제품</text>
+</svg>
+</div>
+
 <ul>
   <li><strong>XP(eXtreme Programming)</strong> 5가지 핵심가치: 의사소통(Communication)·단순성(Simplicity)·용기(Courage)·존중(Respect)·피드백(Feedback). 기법: Pair Programming, TDD, 리팩토링, 사용자 스토리, 지속적 통합(CI).</li>
   <li><strong>Scrum</strong> — Sprint(2~4주), 제품책임자(PO)·스크럼마스터(SM)·개발팀. 일일 스크럼, 백로그.</li>
@@ -226,6 +329,44 @@ hr { border: none; border-top: 2px solid #000; margin: 40px 0; }
 
 <h3>1-4. 자료흐름도(DFD) · 자료사전(DD) <span class="tag hot">HOT</span></h3>
 <p>DFD 4요소: <strong>Process(원)·Data Flow(화살표)·Data Store(평행선 두 줄)·Terminator(사각형)</strong>. (함정: Data Store를 "삼각형"이라 하면 틀림)</p>
+
+<div class="diagram">
+<svg viewBox="0 0 600 260" width="600">
+  <text x="300" y="20" text-anchor="middle" class="bold" style="font-size:14px">▼ DFD 4대 기호</text>
+  <!-- Process: 원 -->
+  <circle class="box" cx="90" cy="90" r="40"/>
+  <text x="90" y="95" text-anchor="middle">Process</text>
+  <text x="90" y="150" text-anchor="middle" style="font-size:12px">처리 (원)</text>
+  <!-- Data Flow: 화살표 -->
+  <path class="arrow" d="M 180 90 L 280 90"/>
+  <text x="230" y="80" text-anchor="middle">Data Flow</text>
+  <text x="230" y="150" text-anchor="middle" style="font-size:12px">흐름 (화살표)</text>
+  <!-- Data Store: 평행선 -->
+  <line x1="320" y1="75" x2="420" y2="75" stroke="#000" stroke-width="2"/>
+  <line x1="320" y1="105" x2="420" y2="105" stroke="#000" stroke-width="2"/>
+  <text x="370" y="95" text-anchor="middle">Data Store</text>
+  <text x="370" y="150" text-anchor="middle" style="font-size:12px">저장소 (평행선)</text>
+  <!-- Terminator: 사각형 -->
+  <rect class="box" x="460" y="65" width="100" height="50"/>
+  <text x="510" y="95" text-anchor="middle">Terminator</text>
+  <text x="510" y="150" text-anchor="middle" style="font-size:12px">외부 (사각형)</text>
+  <!-- 예시 -->
+  <text x="300" y="185" text-anchor="middle" class="bold">예시: 주문 처리</text>
+  <rect class="box" x="30" y="205" width="80" height="35"/>
+  <text x="70" y="227" text-anchor="middle" style="font-size:12px">고객</text>
+  <path class="arrow" d="M 115 222 L 160 222"/>
+  <text x="138" y="215" text-anchor="middle" style="font-size:11px">주문</text>
+  <circle class="box" cx="210" cy="222" r="30"/>
+  <text x="210" y="226" text-anchor="middle" style="font-size:11px">주문처리</text>
+  <path class="arrow" d="M 245 222 L 290 222"/>
+  <line x1="295" y1="208" x2="400" y2="208" stroke="#000" stroke-width="2"/>
+  <line x1="295" y1="238" x2="400" y2="238" stroke="#000" stroke-width="2"/>
+  <text x="347" y="228" text-anchor="middle" style="font-size:11px">주문DB</text>
+  <path class="arrow" d="M 405 222 L 460 222"/>
+  <rect class="box" x="465" y="205" width="80" height="35"/>
+  <text x="505" y="227" text-anchor="middle" style="font-size:12px">배송팀</text>
+</svg>
+</div>
 <table>
 <tr><th>기호</th><th>의미</th><th>예시</th></tr>
 <tr><td><code>=</code></td><td>정의(is composed of)</td><td>A = B + C</td></tr>
@@ -245,6 +386,92 @@ hr { border: none; border-top: 2px solid #000; margin: 40px 0; }
 
 <h3>1-6. UML (Unified Modeling Language) <span class="tag hot">HOT</span></h3>
 <p>OMG 제정. 14종 다이어그램. <strong>구조(정적) 7 / 행위(동적) 7</strong>.</p>
+
+<div class="diagram">
+<svg viewBox="0 0 680 420" width="680">
+  <text x="340" y="20" text-anchor="middle" class="bold" style="font-size:15px">▼ UML 대표 다이어그램 샘플</text>
+
+  <!-- Use Case -->
+  <text x="100" y="50" text-anchor="middle" class="bold">① Use Case</text>
+  <rect class="box" x="20" y="60" width="160" height="110" fill="none"/>
+  <text x="100" y="75" text-anchor="middle" style="font-size:11px">주문 시스템</text>
+  <ellipse cx="100" cy="100" rx="40" ry="15" fill="#fff" stroke="#000" stroke-width="2"/>
+  <text x="100" y="104" text-anchor="middle" style="font-size:11px">주문</text>
+  <ellipse cx="100" cy="140" rx="40" ry="15" fill="#fff" stroke="#000" stroke-width="2"/>
+  <text x="100" y="144" text-anchor="middle" style="font-size:11px">결제</text>
+  <!-- Actor -->
+  <circle cx="30" cy="200" r="8" fill="#fff" stroke="#000" stroke-width="2"/>
+  <line x1="30" y1="208" x2="30" y2="230" stroke="#000" stroke-width="2"/>
+  <line x1="15" y1="218" x2="45" y2="218" stroke="#000" stroke-width="2"/>
+  <line x1="30" y1="230" x2="20" y2="245" stroke="#000" stroke-width="2"/>
+  <line x1="30" y1="230" x2="40" y2="245" stroke="#000" stroke-width="2"/>
+  <text x="55" y="225" style="font-size:11px">고객</text>
+  <line x1="50" y1="215" x2="65" y2="140" stroke="#000" stroke-width="1"/>
+
+  <!-- Class -->
+  <text x="290" y="50" text-anchor="middle" class="bold">② Class</text>
+  <rect class="box" x="240" y="60" width="100" height="90"/>
+  <line x1="240" y1="80" x2="340" y2="80" stroke="#000" stroke-width="1"/>
+  <line x1="240" y1="115" x2="340" y2="115" stroke="#000" stroke-width="1"/>
+  <text x="290" y="75" text-anchor="middle" class="bold" style="font-size:11px">Customer</text>
+  <text x="250" y="95" style="font-size:10px">- name</text>
+  <text x="250" y="108" style="font-size:10px">- email</text>
+  <text x="250" y="130" style="font-size:10px">+ order()</text>
+  <text x="250" y="143" style="font-size:10px">+ pay()</text>
+
+  <!-- 상속 화살표 -->
+  <line x1="290" y1="165" x2="290" y2="200" stroke="#000" stroke-width="2"/>
+  <polygon points="282,200 298,200 290,185" fill="#fff" stroke="#000" stroke-width="2"/>
+  <rect class="box" x="240" y="200" width="100" height="60"/>
+  <line x1="240" y1="220" x2="340" y2="220" stroke="#000" stroke-width="1"/>
+  <text x="290" y="215" text-anchor="middle" class="bold" style="font-size:11px">VIPCustomer</text>
+  <text x="250" y="238" style="font-size:10px">- grade</text>
+  <text x="250" y="252" style="font-size:10px">+ discount()</text>
+
+  <!-- Sequence -->
+  <text x="520" y="50" text-anchor="middle" class="bold">③ Sequence</text>
+  <rect class="box" x="420" y="65" width="60" height="25"/>
+  <text x="450" y="82" text-anchor="middle" style="font-size:11px">Client</text>
+  <rect class="box" x="510" y="65" width="60" height="25"/>
+  <text x="540" y="82" text-anchor="middle" style="font-size:11px">Server</text>
+  <rect class="box" x="600" y="65" width="60" height="25"/>
+  <text x="630" y="82" text-anchor="middle" style="font-size:11px">DB</text>
+  <line x1="450" y1="90" x2="450" y2="280" stroke="#000" stroke-width="1" stroke-dasharray="3,3"/>
+  <line x1="540" y1="90" x2="540" y2="280" stroke="#000" stroke-width="1" stroke-dasharray="3,3"/>
+  <line x1="630" y1="90" x2="630" y2="280" stroke="#000" stroke-width="1" stroke-dasharray="3,3"/>
+  <!-- Activation bars -->
+  <rect x="446" y="110" width="8" height="140" fill="#fff" stroke="#000"/>
+  <rect x="536" y="130" width="8" height="100" fill="#fff" stroke="#000"/>
+  <rect x="626" y="155" width="8" height="50" fill="#fff" stroke="#000"/>
+  <!-- Messages -->
+  <path class="arrow" d="M 455 120 L 535 130"/>
+  <text x="475" y="118" style="font-size:10px">request()</text>
+  <path class="arrow" d="M 545 155 L 625 160"/>
+  <text x="555" y="150" style="font-size:10px">query()</text>
+  <path class="line" d="M 625 200 L 545 205" stroke-dasharray="3,3"/>
+  <text x="555" y="196" style="font-size:10px">data</text>
+  <path class="line" d="M 535 245 L 455 250" stroke-dasharray="3,3"/>
+  <text x="475" y="240" style="font-size:10px">response</text>
+
+  <!-- Activity -->
+  <text x="150" y="295" text-anchor="middle" class="bold">④ Activity</text>
+  <circle cx="50" cy="315" r="6" fill="#000"/>
+  <line x1="50" y1="321" x2="50" y2="340" stroke="#000" stroke-width="2" marker-end="url(#arr)"/>
+  <rect class="box" x="20" y="345" width="60" height="25" rx="12" ry="12"/>
+  <text x="50" y="362" text-anchor="middle" style="font-size:10px">로그인</text>
+  <line x1="50" y1="370" x2="50" y2="385" stroke="#000" stroke-width="2"/>
+  <polygon points="40,385 60,385 50,400" fill="#fff" stroke="#000"/>
+  <text x="15" y="395" style="font-size:10px">성공?</text>
+  <line x1="45" y1="400" x2="30" y2="415" stroke="#000" stroke-width="2" marker-end="url(#arr)"/>
+  <line x1="55" y1="400" x2="80" y2="415" stroke="#000" stroke-width="2" marker-end="url(#arr)"/>
+  <rect class="box" x="5" y="415" width="50" height="20" rx="8" ry="8"/>
+  <text x="30" y="429" text-anchor="middle" style="font-size:9px">재시도</text>
+  <rect class="box" x="65" y="415" width="50" height="20" rx="8" ry="8"/>
+  <text x="90" y="429" text-anchor="middle" style="font-size:9px">메인</text>
+</svg>
+<div class="caption">UML 4대 대표 다이어그램 — Use Case / Class / Sequence / Activity</div>
+</div>
+
 <table>
 <tr><th>구조(정적)</th><th>행위(동적)</th></tr>
 <tr>
@@ -290,6 +517,52 @@ hr { border: none; border-top: 2px solid #000; margin: 40px 0; }
 <div class="mem">SOLID = S·O·L·I·D 순서대로</div>
 
 <h3>1-10. 결합도 & 응집도 <span class="tag hot">HOT</span></h3>
+<div class="diagram">
+<svg viewBox="0 0 700 230" width="700">
+  <text x="350" y="20" text-anchor="middle" class="bold" style="font-size:14px">▼ 결합도 - 약할수록 좋음 (↓)</text>
+  <!-- 6단계 -->
+  <rect class="box" x="20" y="40" width="100" height="45"/>
+  <text x="70" y="60" text-anchor="middle" class="bold">자료</text>
+  <text x="70" y="77" text-anchor="middle" style="font-size:11px">Data</text>
+  <rect class="box" x="130" y="40" width="100" height="45"/>
+  <text x="180" y="60" text-anchor="middle" class="bold">스탬프</text>
+  <text x="180" y="77" text-anchor="middle" style="font-size:11px">Stamp</text>
+  <rect class="box" x="240" y="40" width="100" height="45"/>
+  <text x="290" y="60" text-anchor="middle" class="bold">제어</text>
+  <text x="290" y="77" text-anchor="middle" style="font-size:11px">Control</text>
+  <rect class="box" x="350" y="40" width="100" height="45"/>
+  <text x="400" y="60" text-anchor="middle" class="bold">외부</text>
+  <text x="400" y="77" text-anchor="middle" style="font-size:11px">External</text>
+  <rect class="box" x="460" y="40" width="100" height="45"/>
+  <text x="510" y="60" text-anchor="middle" class="bold">공통</text>
+  <text x="510" y="77" text-anchor="middle" style="font-size:11px">Common</text>
+  <rect class="box-fill" x="570" y="40" width="100" height="45"/>
+  <text x="620" y="60" text-anchor="middle" class="white bold">내용</text>
+  <text x="620" y="77" text-anchor="middle" class="white" style="font-size:11px">Content</text>
+  <!-- 화살표 -->
+  <path class="arrow" d="M 20 110 L 680 110"/>
+  <text x="60" y="130" style="font-size:12px">약함 (좋음)</text>
+  <text x="580" y="130" style="font-size:12px">강함 (나쁨)</text>
+
+  <text x="350" y="170" text-anchor="middle" class="bold" style="font-size:14px">▼ 응집도 - 강할수록 좋음 (↑)</text>
+  <rect class="box-fill" x="10" y="185" width="80" height="35"/>
+  <text x="50" y="207" text-anchor="middle" class="white" style="font-size:11px">기능</text>
+  <rect class="box" x="95" y="185" width="80" height="35"/>
+  <text x="135" y="207" text-anchor="middle" style="font-size:11px">순차</text>
+  <rect class="box" x="180" y="185" width="80" height="35"/>
+  <text x="220" y="207" text-anchor="middle" style="font-size:11px">통신</text>
+  <rect class="box" x="265" y="185" width="80" height="35"/>
+  <text x="305" y="207" text-anchor="middle" style="font-size:11px">절차</text>
+  <rect class="box" x="350" y="185" width="80" height="35"/>
+  <text x="390" y="207" text-anchor="middle" style="font-size:11px">시간</text>
+  <rect class="box" x="435" y="185" width="80" height="35"/>
+  <text x="475" y="207" text-anchor="middle" style="font-size:11px">논리</text>
+  <rect class="box" x="520" y="185" width="80" height="35"/>
+  <text x="560" y="207" text-anchor="middle" style="font-size:11px">우연</text>
+</svg>
+<div class="caption">결합도 · 응집도 스펙트럼 - 좋은 모듈 = 왼쪽으로</div>
+</div>
+
 <div class="callout">
   <strong>결합도(Coupling): 약할수록 좋음</strong><br>
   자료(Data) &lt; 스탬프(Stamp) &lt; 제어(Control) &lt; 외부(External) &lt; 공통(Common) &lt; 내용(Content)
@@ -469,6 +742,33 @@ hr { border: none; border-top: 2px solid #000; margin: 40px 0; }
 <p>함정: "큐는 비선형" = 틀림.</p>
 
 <h3>2-2. 트리(Tree) <span class="tag hot">HOT</span></h3>
+<div class="diagram">
+<svg viewBox="0 0 600 280" width="600">
+  <text x="300" y="20" text-anchor="middle" class="bold" style="font-size:14px">▼ 이진 트리 순회 예시</text>
+  <!-- Nodes -->
+  <circle class="box" cx="300" cy="50" r="22"/><text x="300" y="55" text-anchor="middle" class="bold">A</text>
+  <circle class="box" cx="200" cy="120" r="22"/><text x="200" y="125" text-anchor="middle" class="bold">B</text>
+  <circle class="box" cx="400" cy="120" r="22"/><text x="400" y="125" text-anchor="middle" class="bold">C</text>
+  <circle class="box" cx="140" cy="190" r="22"/><text x="140" y="195" text-anchor="middle" class="bold">D</text>
+  <circle class="box" cx="260" cy="190" r="22"/><text x="260" y="195" text-anchor="middle" class="bold">E</text>
+  <circle class="box" cx="340" cy="190" r="22"/><text x="340" y="195" text-anchor="middle" class="bold">F</text>
+  <circle class="box" cx="460" cy="190" r="22"/><text x="460" y="195" text-anchor="middle" class="bold">G</text>
+  <!-- Edges -->
+  <line class="line" x1="283" y1="65" x2="218" y2="105"/>
+  <line class="line" x1="317" y1="65" x2="383" y2="105"/>
+  <line class="line" x1="185" y1="135" x2="155" y2="175"/>
+  <line class="line" x1="215" y1="135" x2="245" y2="175"/>
+  <line class="line" x1="385" y1="135" x2="355" y2="175"/>
+  <line class="line" x1="415" y1="135" x2="445" y2="175"/>
+  <!-- 순회 결과 -->
+  <text x="20" y="240" class="bold">전위(Pre): 루트→좌→우</text>
+  <text x="230" y="240">A - B - D - E - C - F - G</text>
+  <text x="20" y="258" class="bold">중위(In): 좌→루트→우</text>
+  <text x="230" y="258">D - B - E - A - F - C - G</text>
+  <text x="20" y="276" class="bold">후위(Post): 좌→우→루트</text>
+  <text x="230" y="276">D - E - B - F - G - C - A</text>
+</svg>
+</div>
 <ul>
   <li><strong>차수(Degree)</strong>: 노드가 가진 자식 수. 트리의 차수 = 전체 노드 중 최대 차수.</li>
   <li><strong>단말(Leaf)</strong>: 자식 없는 노드.</li>
@@ -514,12 +814,71 @@ hr { border: none; border-top: 2px solid #000; margin: 40px 0; }
 <tr><td>기법</td><td>문장/분기/조건/경로 커버리지, 기초경로, 제어흐름, 데이터흐름, 루프</td><td>동등분할(Equivalence Partitioning), 경계값 분석(BVA), 원인-결과, 오류추측, 비교</td></tr>
 </table>
 
-<h3>2-6. McCabe Cyclomatic Complexity</h3>
+<h3><h3>2-6. McCabe Cyclomatic Complexity</h3>
 <p>공식: <strong>V(G) = E - N + 2</strong> (E=간선, N=노드)<br>
 혹은 <strong>V(G) = P + 1</strong> (P=결정점 수)</p>
 <p>기출 전형: 제어흐름 그래프 주고 V(G) 계산.</p>
 
+<div class="diagram">
+<svg viewBox="0 0 500 260" width="500">
+  <text x="250" y="20" text-anchor="middle" class="bold" style="font-size:14px">▼ 제어 흐름 그래프 예시</text>
+  <!-- Nodes -->
+  <circle class="box" cx="250" cy="50" r="20"/><text x="250" y="55" text-anchor="middle">1</text>
+  <circle class="box" cx="250" cy="110" r="20"/><text x="250" y="115" text-anchor="middle">2</text>
+  <circle class="box" cx="150" cy="170" r="20"/><text x="150" y="175" text-anchor="middle">3</text>
+  <circle class="box" cx="350" cy="170" r="20"/><text x="350" y="175" text-anchor="middle">4</text>
+  <circle class="box" cx="250" cy="230" r="20"/><text x="250" y="235" text-anchor="middle">5</text>
+  <!-- Edges (화살표) -->
+  <path class="arrow" d="M 250 70 L 250 90"/>
+  <path class="arrow" d="M 235 125 L 165 155"/>
+  <path class="arrow" d="M 265 125 L 335 155"/>
+  <path class="arrow" d="M 165 185 L 235 215"/>
+  <path class="arrow" d="M 335 185 L 265 215"/>
+  <!-- Calculation -->
+  <text x="20" y="60" class="bold">N = 5 (노드)</text>
+  <text x="20" y="80" class="bold">E = 5 (간선)</text>
+  <text x="20" y="100" class="bold">P = 1 (결정점 2번)</text>
+  <text x="20" y="130" class="bold">V(G) = E−N+2</text>
+  <text x="20" y="150" class="bold">     = 5−5+2 = 2</text>
+  <text x="20" y="180" class="bold">독립 경로: 2개</text>
+</svg>
+</div>
+
 <h3>2-7. 테스트 전략 — V·통합 <span class="tag hot">HOT</span></h3>
+<div class="diagram">
+<svg viewBox="0 0 620 340" width="620">
+  <text x="310" y="20" text-anchor="middle" class="bold" style="font-size:14px">▼ V-모델 (개발과 테스트의 대칭 구조)</text>
+  <!-- Left descending -->
+  <rect class="box" x="30" y="50" width="130" height="30"/><text x="95" y="70" text-anchor="middle">요구분석</text>
+  <rect class="box" x="90" y="100" width="130" height="30"/><text x="155" y="120" text-anchor="middle">시스템 설계</text>
+  <rect class="box" x="150" y="150" width="130" height="30"/><text x="215" y="170" text-anchor="middle">상세 설계</text>
+  <rect class="box" x="210" y="200" width="130" height="30"/><text x="275" y="220" text-anchor="middle">코딩</text>
+  <!-- Right ascending -->
+  <rect class="box" x="460" y="50" width="130" height="30"/><text x="525" y="70" text-anchor="middle">인수 테스트</text>
+  <rect class="box" x="400" y="100" width="130" height="30"/><text x="465" y="120" text-anchor="middle">시스템 테스트</text>
+  <rect class="box" x="340" y="150" width="130" height="30"/><text x="405" y="170" text-anchor="middle">통합 테스트</text>
+  <rect class="box" x="280" y="200" width="130" height="30"/><text x="345" y="220" text-anchor="middle">단위 테스트</text>
+  <!-- Connecting dashed lines -->
+  <line class="line-dash" x1="160" y1="65" x2="460" y2="65"/>
+  <line class="line-dash" x1="220" y1="115" x2="400" y2="115"/>
+  <line class="line-dash" x1="280" y1="165" x2="340" y2="165"/>
+  <!-- V path -->
+  <line class="line" x1="160" y1="80" x2="220" y2="100"/>
+  <line class="line" x1="220" y1="130" x2="280" y2="150"/>
+  <line class="line" x1="280" y1="180" x2="340" y2="200"/>
+  <line class="line" x1="340" y1="230" x2="410" y2="200"/>
+  <line class="line" x1="410" y1="180" x2="470" y2="150"/>
+  <line class="line" x1="470" y1="130" x2="530" y2="100"/>
+
+  <!-- 통합 전략 -->
+  <text x="310" y="275" text-anchor="middle" class="bold" style="font-size:13px">통합 전략: 상향식=Driver / 하향식=Stub</text>
+  <rect class="box-fill" x="80" y="290" width="150" height="35"/>
+  <text x="155" y="312" text-anchor="middle" class="white">상향식 + Driver</text>
+  <rect class="box-fill" x="390" y="290" width="150" height="35"/>
+  <text x="465" y="312" text-anchor="middle" class="white">하향식 + Stub</text>
+</svg>
+</div>
+
 <ul>
   <li><strong>단위→통합→시스템→인수</strong> 순.</li>
   <li><strong>상향식(Bottom-up)</strong>: 하위 모듈부터 · <strong>드라이버(Driver)</strong> 필요.</li>
@@ -853,6 +1212,48 @@ isEmpty() / isFull()</pre>
 </ul>
 
 <h3>3-3. 관계형 데이터베이스 용어 <span class="tag hot">HOT</span></h3>
+<div class="diagram">
+<svg viewBox="0 0 640 260" width="640">
+  <text x="320" y="20" text-anchor="middle" class="bold" style="font-size:14px">▼ 릴레이션 구조</text>
+  <!-- Header -->
+  <rect class="box-fill" x="70" y="50" width="130" height="30"/>
+  <text x="135" y="70" text-anchor="middle" class="white bold">학번</text>
+  <rect class="box-fill" x="200" y="50" width="130" height="30"/>
+  <text x="265" y="70" text-anchor="middle" class="white bold">이름</text>
+  <rect class="box-fill" x="330" y="50" width="130" height="30"/>
+  <text x="395" y="70" text-anchor="middle" class="white bold">학과</text>
+  <rect class="box-fill" x="460" y="50" width="130" height="30"/>
+  <text x="525" y="70" text-anchor="middle" class="white bold">학년</text>
+  <!-- Rows -->
+  <rect class="box" x="70" y="80" width="130" height="30"/><text x="135" y="100" text-anchor="middle">2021001</text>
+  <rect class="box" x="200" y="80" width="130" height="30"/><text x="265" y="100" text-anchor="middle">김철수</text>
+  <rect class="box" x="330" y="80" width="130" height="30"/><text x="395" y="100" text-anchor="middle">컴공</text>
+  <rect class="box" x="460" y="80" width="130" height="30"/><text x="525" y="100" text-anchor="middle">3</text>
+  <rect class="box" x="70" y="110" width="130" height="30"/><text x="135" y="130" text-anchor="middle">2021002</text>
+  <rect class="box" x="200" y="110" width="130" height="30"/><text x="265" y="130" text-anchor="middle">이영희</text>
+  <rect class="box" x="330" y="110" width="130" height="30"/><text x="395" y="130" text-anchor="middle">수학</text>
+  <rect class="box" x="460" y="110" width="130" height="30"/><text x="525" y="130" text-anchor="middle">2</text>
+  <rect class="box" x="70" y="140" width="130" height="30"/><text x="135" y="160" text-anchor="middle">2021003</text>
+  <rect class="box" x="200" y="140" width="130" height="30"/><text x="265" y="160" text-anchor="middle">박민수</text>
+  <rect class="box" x="330" y="140" width="130" height="30"/><text x="395" y="160" text-anchor="middle">물리</text>
+  <rect class="box" x="460" y="140" width="130" height="30"/><text x="525" y="160" text-anchor="middle">4</text>
+
+  <!-- Annotations -->
+  <line class="arrow" x1="35" y1="65" x2="65" y2="65"/>
+  <text x="5" y="45" style="font-size:11px">속성(Attribute)</text>
+  <text x="5" y="60" style="font-size:11px">= 열 / 필드</text>
+
+  <line class="arrow" x1="620" y1="125" x2="595" y2="125"/>
+  <text x="600" y="210" style="font-size:11px">튜플(Tuple)</text>
+  <text x="600" y="225" style="font-size:11px">= 행 / 레코드</text>
+  <line class="arrow" x1="625" y1="200" x2="545" y2="170"/>
+
+  <text x="135" y="200" text-anchor="middle" class="bold">차수 Degree = 4</text>
+  <text x="135" y="215" text-anchor="middle" style="font-size:11px">(속성의 개수)</text>
+  <text x="320" y="200" text-anchor="middle" class="bold">카디널리티 = 3</text>
+  <text x="320" y="215" text-anchor="middle" style="font-size:11px">(튜플의 개수)</text>
+</svg>
+</div>
 <ul>
   <li><strong>릴레이션(Relation)</strong> = 테이블.</li>
   <li><strong>튜플(Tuple)</strong> = 행(Row) = 레코드. <strong>카디널리티(Cardinality)</strong> = 튜플 수.</li>
@@ -881,6 +1282,34 @@ isEmpty() / isFull()</pre>
 <div class="warn">"보안 무결성·정보 무결성" 같은 용어는 기출에서 가짜 선지!</div>
 
 <h3>3-6. 정규화(Normalization) <span class="tag hot">HOT</span></h3>
+<div class="diagram">
+<svg viewBox="0 0 700 200" width="700">
+  <text x="350" y="20" text-anchor="middle" class="bold" style="font-size:14px">▼ 정규화 단계</text>
+  <rect class="box" x="10" y="50" width="100" height="60"/>
+  <text x="60" y="75" text-anchor="middle" class="bold">1NF</text>
+  <text x="60" y="95" text-anchor="middle" style="font-size:10px">원자값</text>
+  <path class="arrow" d="M 115 80 L 150 80"/>
+  <rect class="box" x="155" y="50" width="100" height="60"/>
+  <text x="205" y="75" text-anchor="middle" class="bold">2NF</text>
+  <text x="205" y="95" text-anchor="middle" style="font-size:10px">부분종속 제거</text>
+  <path class="arrow" d="M 260 80 L 295 80"/>
+  <rect class="box" x="300" y="50" width="100" height="60"/>
+  <text x="350" y="75" text-anchor="middle" class="bold">3NF</text>
+  <text x="350" y="95" text-anchor="middle" style="font-size:10px">이행종속 제거</text>
+  <path class="arrow" d="M 405 80 L 440 80"/>
+  <rect class="box-fill" x="445" y="50" width="100" height="60"/>
+  <text x="495" y="75" text-anchor="middle" class="white bold">BCNF</text>
+  <text x="495" y="95" text-anchor="middle" class="white" style="font-size:10px">결정자=후보키</text>
+  <path class="arrow" d="M 550 80 L 585 80"/>
+  <rect class="box" x="590" y="50" width="100" height="60"/>
+  <text x="640" y="75" text-anchor="middle" class="bold">4NF·5NF</text>
+  <text x="640" y="95" text-anchor="middle" style="font-size:10px">다치·조인종속</text>
+
+  <!-- 암기 -->
+  <text x="350" y="145" text-anchor="middle" class="bold" style="font-size:13px">"도 부 이 결 다 조" 암기</text>
+  <text x="350" y="168" text-anchor="middle" style="font-size:11px">도메인원자 → 부분종속 제거 → 이행종속 제거 → 결정자 후보키 → 다치 → 조인</text>
+</svg>
+</div>
 <table>
 <tr><th>정규형</th><th>조건</th></tr>
 <tr><td>1NF</td><td>모든 속성이 <strong>원자값</strong> (도메인 분할 불가)</td></tr>
@@ -950,6 +1379,28 @@ DROP VIEW V1;</pre>
 <div class="warn">함정: "뷰는 저장장치 내에 물리적으로 존재한다" = 틀림.</div>
 
 <h3>3-11. 트랜잭션 ACID <span class="tag hot">HOT</span></h3>
+<div class="diagram">
+<svg viewBox="0 0 600 180" width="600">
+  <text x="300" y="20" text-anchor="middle" class="bold" style="font-size:14px">▼ 트랜잭션 상태 전이도</text>
+  <rect class="box" x="30" y="50" width="80" height="40"/>
+  <text x="70" y="73" text-anchor="middle">활동(Active)</text>
+  <path class="arrow" d="M 110 70 L 155 70"/>
+  <rect class="box" x="155" y="50" width="100" height="40"/>
+  <text x="205" y="73" text-anchor="middle">부분 완료</text>
+  <path class="arrow" d="M 255 70 L 300 70"/>
+  <rect class="box-fill" x="300" y="50" width="100" height="40"/>
+  <text x="350" y="73" text-anchor="middle" class="white">완료(Commit)</text>
+  <!-- 실패/철회 경로 -->
+  <path class="arrow" d="M 70 90 L 70 130 L 430 130 L 430 90"/>
+  <rect class="box" x="430" y="50" width="80" height="40"/>
+  <text x="470" y="73" text-anchor="middle">실패</text>
+  <path class="arrow" d="M 510 70 L 560 70"/>
+  <rect class="box" x="520" y="100" width="80" height="40"/>
+  <text x="560" y="123" text-anchor="middle">철회(Rollback)</text>
+  <path class="arrow" d="M 510 85 L 520 100"/>
+  <text x="230" y="155" text-anchor="middle" style="font-size:11px">오류 발생 시 Active → 실패 → Rollback 으로 이동</text>
+</svg>
+</div>
 <ul>
   <li><strong>Atomicity</strong> 원자성 — 모두 반영 or 모두 취소.</li>
   <li><strong>Consistency</strong> 일관성 — 실행 전후 DB 일관된 상태.</li>
@@ -1118,6 +1569,43 @@ ROLLBACK TO s1;</pre>
 <p>저장 레코드 형식, 접근 경로, 인덱스, 블록 크기 결정. 성능 목표 달성.</p>
 
 <h3>3-28. 스키마 3계층</h3>
+<div class="diagram">
+<svg viewBox="0 0 640 280" width="640">
+  <text x="320" y="20" text-anchor="middle" class="bold" style="font-size:14px">▼ DB 스키마 3계층 구조</text>
+  <!-- External -->
+  <rect class="box" x="40" y="50" width="150" height="40"/>
+  <text x="115" y="74" text-anchor="middle">사용자 뷰 A</text>
+  <rect class="box" x="240" y="50" width="150" height="40"/>
+  <text x="315" y="74" text-anchor="middle">사용자 뷰 B</text>
+  <rect class="box" x="440" y="50" width="150" height="40"/>
+  <text x="515" y="74" text-anchor="middle">사용자 뷰 C</text>
+  <text x="605" y="74" style="font-size:11px" class="bold">외부</text>
+
+  <!-- Mapping -->
+  <line class="line-dash" x1="115" y1="90" x2="250" y2="140"/>
+  <line class="line-dash" x1="315" y1="90" x2="315" y2="140"/>
+  <line class="line-dash" x1="515" y1="90" x2="380" y2="140"/>
+  <text x="20" y="130" style="font-size:10px">외부/개념</text>
+  <text x="20" y="145" style="font-size:10px">사상</text>
+
+  <!-- Conceptual -->
+  <rect class="box-fill" x="150" y="140" width="330" height="45"/>
+  <text x="315" y="167" text-anchor="middle" class="white bold">개념 스키마 (논리적 전체 구조)</text>
+  <text x="605" y="167" style="font-size:11px" class="bold">개념</text>
+
+  <!-- Mapping 2 -->
+  <line class="line-dash" x1="315" y1="185" x2="315" y2="220"/>
+  <text x="20" y="208" style="font-size:10px">개념/내부</text>
+  <text x="20" y="223" style="font-size:10px">사상</text>
+
+  <!-- Internal -->
+  <rect class="box" x="150" y="220" width="330" height="45"/>
+  <text x="315" y="247" text-anchor="middle">내부 스키마 (물리적 저장 구조·인덱스)</text>
+  <text x="605" y="247" style="font-size:11px" class="bold">내부</text>
+</svg>
+<div class="caption">독립성: 외부↔개념 = 논리적 독립성 · 개념↔내부 = 물리적 독립성</div>
+</div>
+
 <ul>
   <li><strong>외부 스키마(서브스키마)</strong> — 사용자·응용별 뷰.</li>
   <li><strong>개념 스키마</strong> — 전체 논리적 구조. DB 관리자 관점.</li>
@@ -1263,6 +1751,34 @@ for k, v in d.items(): print(k, v)</pre>
 </ul>
 
 <h3>4-7. 프로세스 & 스케줄링</h3>
+<div class="diagram">
+<svg viewBox="0 0 600 220" width="600">
+  <text x="300" y="20" text-anchor="middle" class="bold" style="font-size:14px">▼ 프로세스 상태 전이도</text>
+  <rect class="box" x="30" y="80" width="90" height="40"/>
+  <text x="75" y="104" text-anchor="middle">생성(New)</text>
+  <path class="arrow" d="M 120 100 L 180 100"/>
+  <text x="150" y="92" text-anchor="middle" style="font-size:10px">admit</text>
+  <rect class="box" x="180" y="80" width="90" height="40"/>
+  <text x="225" y="104" text-anchor="middle">준비(Ready)</text>
+  <path class="arrow" d="M 270 95 L 360 95"/>
+  <text x="315" y="85" text-anchor="middle" style="font-size:10px">dispatch</text>
+  <path class="arrow" d="M 360 115 L 270 115"/>
+  <text x="315" y="130" text-anchor="middle" style="font-size:10px">timeout</text>
+  <rect class="box-fill" x="360" y="80" width="90" height="40"/>
+  <text x="405" y="104" text-anchor="middle" class="white">실행(Run)</text>
+  <path class="arrow" d="M 450 100 L 510 100"/>
+  <text x="480" y="92" text-anchor="middle" style="font-size:10px">exit</text>
+  <rect class="box" x="510" y="80" width="80" height="40"/>
+  <text x="550" y="104" text-anchor="middle">종료</text>
+  <!-- Blocked -->
+  <path class="arrow" d="M 405 120 L 405 170 L 320 170"/>
+  <text x="370" y="162" text-anchor="middle" style="font-size:10px">I/O 요청</text>
+  <rect class="box" x="230" y="155" width="90" height="40"/>
+  <text x="275" y="179" text-anchor="middle">대기(Blocked)</text>
+  <path class="arrow" d="M 230 175 L 180 175 L 180 120"/>
+  <text x="195" y="165" text-anchor="middle" style="font-size:10px">I/O 완료</text>
+</svg>
+</div>
 <ul>
   <li>프로세스 상태: 생성→준비→실행→대기(Blocked)→종료.</li>
   <li><strong>선점형</strong>: SRT, RR(Round Robin), MLQ, MLFQ.</li>
@@ -1281,6 +1797,43 @@ for k, v in d.items(): print(k, v)</pre>
 </div>
 
 <h3>4-9. 가상 메모리 & 페이지 교체 <span class="tag hot">HOT</span></h3>
+<div class="diagram">
+<svg viewBox="0 0 680 240" width="680">
+  <text x="340" y="20" text-anchor="middle" class="bold" style="font-size:14px">▼ FIFO 페이지 교체 예시 (프레임 3개)</text>
+  <text x="30" y="50" class="bold">참조:</text>
+  <!-- 참조열 -->
+  <g font-size="14" text-anchor="middle">
+    <rect class="box" x="80" y="35" width="40" height="25"/><text x="100" y="52">1</text>
+    <rect class="box" x="120" y="35" width="40" height="25"/><text x="140" y="52">2</text>
+    <rect class="box" x="160" y="35" width="40" height="25"/><text x="180" y="52">3</text>
+    <rect class="box" x="200" y="35" width="40" height="25"/><text x="220" y="52">4</text>
+    <rect class="box" x="240" y="35" width="40" height="25"/><text x="260" y="52">1</text>
+    <rect class="box" x="280" y="35" width="40" height="25"/><text x="300" y="52">2</text>
+    <rect class="box" x="320" y="35" width="40" height="25"/><text x="340" y="52">5</text>
+    <rect class="box" x="360" y="35" width="40" height="25"/><text x="380" y="52">1</text>
+    <rect class="box" x="400" y="35" width="40" height="25"/><text x="420" y="52">2</text>
+    <rect class="box" x="440" y="35" width="40" height="25"/><text x="460" y="52">3</text>
+    <rect class="box" x="480" y="35" width="40" height="25"/><text x="500" y="52">4</text>
+    <rect class="box" x="520" y="35" width="40" height="25"/><text x="540" y="52">5</text>
+  </g>
+
+  <!-- 프레임 상태 -->
+  <text x="30" y="90" class="bold">F1:</text>
+  <text x="30" y="115" class="bold">F2:</text>
+  <text x="30" y="140" class="bold">F3:</text>
+  <g font-size="13" text-anchor="middle">
+    <text x="100" y="90">1</text><text x="140" y="90">1</text><text x="180" y="90">1</text><text x="220" y="90">4</text><text x="260" y="90">4</text><text x="300" y="90">4</text><text x="340" y="90">4</text><text x="380" y="90">1</text><text x="420" y="90">1</text><text x="460" y="90">1</text><text x="500" y="90">1</text><text x="540" y="90">5</text>
+    <text x="100" y="115">-</text><text x="140" y="115">2</text><text x="180" y="115">2</text><text x="220" y="115">2</text><text x="260" y="115">2</text><text x="300" y="115">2</text><text x="340" y="115">5</text><text x="380" y="115">5</text><text x="420" y="115">5</text><text x="460" y="115">5</text><text x="500" y="115">4</text><text x="540" y="115">4</text>
+    <text x="100" y="140">-</text><text x="140" y="140">-</text><text x="180" y="140">3</text><text x="220" y="140">3</text><text x="260" y="140">3</text><text x="300" y="140">3</text><text x="340" y="140">3</text><text x="380" y="140">3</text><text x="420" y="140">2</text><text x="460" y="140">3</text><text x="500" y="140">3</text><text x="540" y="140">3</text>
+  </g>
+  <text x="30" y="170" class="bold">부재:</text>
+  <g font-size="13" text-anchor="middle" font-weight="bold">
+    <text x="100" y="170">F</text><text x="140" y="170">F</text><text x="180" y="170">F</text><text x="220" y="170">F</text><text x="260" y="170">·</text><text x="300" y="170">·</text><text x="340" y="170">F</text><text x="380" y="170">F</text><text x="420" y="170">F</text><text x="460" y="170">F</text><text x="500" y="170">F</text><text x="540" y="170">F</text>
+  </g>
+  <text x="330" y="210" text-anchor="middle" style="font-size:12px">총 참조 12회 / 페이지 부재 10회 → 부재율 83%</text>
+</svg>
+</div>
+
 <ul>
   <li><strong>FIFO</strong> — 먼저 들어온 페이지 먼저 교체.</li>
   <li><strong>LRU</strong> — 최근 가장 덜 사용된 페이지.</li>
@@ -1300,6 +1853,52 @@ for k, v in d.items(): print(k, v)</pre>
 </ul>
 
 <h3>4-11. 네트워크 OSI 7계층 <span class="tag hot">HOT</span></h3>
+<div class="diagram">
+<svg viewBox="0 0 680 380" width="680">
+  <text x="340" y="20" text-anchor="middle" class="bold" style="font-size:14px">▼ OSI 7계층 & TCP/IP 대응</text>
+  <!-- Layer 7~1 -->
+  <rect class="box" x="50" y="40" width="130" height="38"/><text x="115" y="64" text-anchor="middle">7. 응용(Application)</text>
+  <rect class="box" x="50" y="78" width="130" height="38"/><text x="115" y="102" text-anchor="middle">6. 표현(Presentation)</text>
+  <rect class="box" x="50" y="116" width="130" height="38"/><text x="115" y="140" text-anchor="middle">5. 세션(Session)</text>
+  <rect class="box-fill" x="50" y="154" width="130" height="38"/><text x="115" y="178" text-anchor="middle" class="white">4. 전송(Transport)</text>
+  <rect class="box-fill" x="50" y="192" width="130" height="38"/><text x="115" y="216" text-anchor="middle" class="white">3. 네트워크(Network)</text>
+  <rect class="box" x="50" y="230" width="130" height="38"/><text x="115" y="254" text-anchor="middle">2. 데이터링크</text>
+  <rect class="box" x="50" y="268" width="130" height="38"/><text x="115" y="292" text-anchor="middle">1. 물리(Physical)</text>
+
+  <!-- PDU -->
+  <text x="200" y="35" class="bold" style="font-size:12px">PDU</text>
+  <text x="200" y="65">Message / Data</text>
+  <text x="200" y="103">Message</text>
+  <text x="200" y="141">Message</text>
+  <text x="200" y="179" class="bold">Segment / Datagram</text>
+  <text x="200" y="217" class="bold">Packet</text>
+  <text x="200" y="255">Frame</text>
+  <text x="200" y="293">Bit</text>
+
+  <!-- 프로토콜 -->
+  <text x="380" y="35" class="bold" style="font-size:12px">주요 프로토콜·장비</text>
+  <text x="380" y="65">HTTP·FTP·SMTP·DNS·SSH</text>
+  <text x="380" y="103">JPEG·MPEG·SSL·암호화</text>
+  <text x="380" y="141">RPC·NetBIOS·세션관리</text>
+  <text x="380" y="179" class="bold">TCP · UDP</text>
+  <text x="380" y="217" class="bold">IP · ICMP · ARP · 라우터</text>
+  <text x="380" y="255">MAC · 스위치·브리지</text>
+  <text x="380" y="293">리피터 · 허브·케이블</text>
+
+  <!-- TCP/IP 대응 -->
+  <text x="115" y="330" text-anchor="middle" class="bold" style="font-size:13px">TCP/IP 4계층 대응</text>
+  <rect class="box" x="20" y="340" width="110" height="30"/><text x="75" y="360" text-anchor="middle" style="font-size:11px">Application (7-5)</text>
+  <rect class="box" x="135" y="340" width="80" height="30"/><text x="175" y="360" text-anchor="middle" style="font-size:11px">Transport (4)</text>
+  <rect class="box" x="220" y="340" width="80" height="30"/><text x="260" y="360" text-anchor="middle" style="font-size:11px">Internet (3)</text>
+  <rect class="box" x="305" y="340" width="130" height="30"/><text x="370" y="360" text-anchor="middle" style="font-size:11px">Network Access (2-1)</text>
+
+  <!-- 암기법 -->
+  <text x="500" y="340" class="bold" style="font-size:12px">암기:</text>
+  <text x="500" y="358" style="font-size:11px">"아프세트 네데피"</text>
+  <text x="500" y="372" style="font-size:11px">7→1 위에서 아래로</text>
+</svg>
+</div>
+
 <table>
 <tr><th>계층</th><th>PDU</th><th>장비·프로토콜</th></tr>
 <tr><td>7 Application</td><td>Message</td><td>HTTP, FTP, SMTP, DNS, Telnet</td></tr>
@@ -1486,12 +2085,43 @@ except ValueError:
 </ul>
 
 <h3>4-26. 교착 상태(Deadlock)</h3>
+<div class="diagram">
+<svg viewBox="0 0 480 240" width="480">
+  <text x="240" y="20" text-anchor="middle" class="bold" style="font-size:14px">▼ 교착상태 환형 대기 (Circular Wait)</text>
+  <!-- 4 프로세스 -->
+  <circle class="box" cx="240" cy="60" r="30"/>
+  <text x="240" y="65" text-anchor="middle" class="bold">P1</text>
+  <circle class="box" cx="360" cy="140" r="30"/>
+  <text x="360" y="145" text-anchor="middle" class="bold">P2</text>
+  <circle class="box" cx="240" cy="210" r="30"/>
+  <text x="240" y="215" text-anchor="middle" class="bold">P3</text>
+  <circle class="box" cx="120" cy="140" r="30"/>
+  <text x="120" y="145" text-anchor="middle" class="bold">P4</text>
+  <!-- 자원 표시 -->
+  <rect class="box-fill" x="290" y="85" width="35" height="25"/>
+  <text x="308" y="103" text-anchor="middle" class="white" style="font-size:10px">R1</text>
+  <rect class="box-fill" x="290" y="170" width="35" height="25"/>
+  <text x="308" y="188" text-anchor="middle" class="white" style="font-size:10px">R2</text>
+  <rect class="box-fill" x="155" y="170" width="35" height="25"/>
+  <text x="173" y="188" text-anchor="middle" class="white" style="font-size:10px">R3</text>
+  <rect class="box-fill" x="155" y="85" width="35" height="25"/>
+  <text x="173" y="103" text-anchor="middle" class="white" style="font-size:10px">R4</text>
+  <!-- 환형 화살표 -->
+  <path class="arrow" d="M 265 80 Q 320 80 340 125"/>
+  <path class="arrow" d="M 345 170 Q 320 210 265 205"/>
+  <path class="arrow" d="M 215 205 Q 160 210 135 170"/>
+  <path class="arrow" d="M 135 110 Q 160 80 215 80"/>
+</svg>
+<div class="caption">각 프로세스가 자원을 보유하며 서로 상대의 자원을 대기 → 영원히 진행 불가</div>
+</div>
+
+<h4>4가지 필수 조건 (모두 성립시 발생)</h4>
 <h4>4가지 필수 조건 (모두 성립시 발생)</h4>
 <ul>
-  <li><strong>상호 배제(Mutual Exclusion)</strong></li>
-  <li><strong>점유와 대기(Hold and Wait)</strong></li>
-  <li><strong>비선점(Non-preemption)</strong></li>
-  <li><strong>환형 대기(Circular Wait)</strong></li>
+  <li><strong>상호 배제(Mutual Exclusion)</strong> — 한 번에 하나의 프로세스만 자원 사용.</li>
+  <li><strong>점유와 대기(Hold and Wait)</strong> — 자원 보유 + 추가 대기.</li>
+  <li><strong>비선점(Non-preemption)</strong> — 강제 회수 불가.</li>
+  <li><strong>환형 대기(Circular Wait)</strong> — 대기 사이클.</li>
 </ul>
 <h4>해결 기법</h4>
 <ul>
@@ -1558,11 +2188,27 @@ except ValueError:
 </ul>
 
 <h3>4-32. TCP 3-Way Handshake</h3>
-<pre>Client             Server
-  | --- SYN -------→ |
-  | ←-- SYN+ACK ---- |
-  | --- ACK -------→ |
-    (연결 수립)</pre>
+<div class="diagram">
+<svg viewBox="0 0 500 260" width="500">
+  <text x="250" y="20" text-anchor="middle" class="bold" style="font-size:14px">▼ TCP 3-Way Handshake (연결 수립)</text>
+  <rect class="box" x="60" y="45" width="80" height="30"/>
+  <text x="100" y="65" text-anchor="middle">Client</text>
+  <rect class="box" x="360" y="45" width="80" height="30"/>
+  <text x="400" y="65" text-anchor="middle">Server</text>
+  <line x1="100" y1="75" x2="100" y2="240" stroke="#000" stroke-width="2"/>
+  <line x1="400" y1="75" x2="400" y2="240" stroke="#000" stroke-width="2"/>
+  <!-- SYN -->
+  <path class="arrow" d="M 100 100 L 398 120"/>
+  <text x="250" y="95" text-anchor="middle" class="bold">① SYN (seq=x)</text>
+  <!-- SYN+ACK -->
+  <path class="arrow" d="M 400 150 L 102 170"/>
+  <text x="250" y="145" text-anchor="middle" class="bold">② SYN+ACK (seq=y, ack=x+1)</text>
+  <!-- ACK -->
+  <path class="arrow" d="M 100 200 L 398 220"/>
+  <text x="250" y="195" text-anchor="middle" class="bold">③ ACK (ack=y+1)</text>
+  <text x="250" y="255" text-anchor="middle" style="font-size:12px">→ 연결 수립 완료 (ESTABLISHED)</text>
+</svg>
+</div>
 <p>종료는 4-Way Handshake (FIN·ACK·FIN·ACK).</p>
 
 <h3>4-33. 흐름 제어 & 혼잡 제어</h3>
@@ -1586,6 +2232,86 @@ except ValueError:
 </ul>
 
 <h3>4-35. 네트워크 토폴로지 특징</h3>
+<div class="diagram">
+<svg viewBox="0 0 700 240" width="700">
+  <text x="350" y="20" text-anchor="middle" class="bold" style="font-size:14px">▼ 네트워크 토폴로지 5종</text>
+  <!-- Bus -->
+  <text x="70" y="50" text-anchor="middle" class="bold">버스 Bus</text>
+  <line x1="20" y1="100" x2="130" y2="100" stroke="#000" stroke-width="3"/>
+  <circle class="box" cx="35" cy="100" r="8"/>
+  <circle class="box" cx="60" cy="100" r="8"/>
+  <circle class="box" cx="85" cy="100" r="8"/>
+  <circle class="box" cx="115" cy="100" r="8"/>
+  <!-- Ring -->
+  <text x="215" y="50" text-anchor="middle" class="bold">링 Ring</text>
+  <circle cx="215" cy="110" r="45" fill="none" stroke="#000" stroke-width="2"/>
+  <circle class="box" cx="215" cy="65" r="8"/>
+  <circle class="box" cx="260" cy="110" r="8"/>
+  <circle class="box" cx="215" cy="155" r="8"/>
+  <circle class="box" cx="170" cy="110" r="8"/>
+  <!-- Star -->
+  <text x="370" y="50" text-anchor="middle" class="bold">성(Star)</text>
+  <circle class="box-fill" cx="370" cy="110" r="10"/>
+  <circle class="box" cx="370" cy="65" r="8"/>
+  <circle class="box" cx="420" cy="110" r="8"/>
+  <circle class="box" cx="370" cy="155" r="8"/>
+  <circle class="box" cx="320" cy="110" r="8"/>
+  <line class="line" x1="370" y1="73" x2="370" y2="100"/>
+  <line class="line" x1="412" y1="110" x2="380" y2="110"/>
+  <line class="line" x1="370" y1="147" x2="370" y2="120"/>
+  <line class="line" x1="328" y1="110" x2="360" y2="110"/>
+  <!-- Tree -->
+  <text x="525" y="50" text-anchor="middle" class="bold">트리 Tree</text>
+  <circle class="box" cx="525" cy="65" r="8"/>
+  <line class="line" x1="525" y1="73" x2="490" y2="105"/>
+  <line class="line" x1="525" y1="73" x2="560" y2="105"/>
+  <circle class="box" cx="490" cy="110" r="8"/>
+  <circle class="box" cx="560" cy="110" r="8"/>
+  <line class="line" x1="490" y1="118" x2="470" y2="150"/>
+  <line class="line" x1="490" y1="118" x2="510" y2="150"/>
+  <line class="line" x1="560" y1="118" x2="540" y2="150"/>
+  <line class="line" x1="560" y1="118" x2="580" y2="150"/>
+  <circle class="box" cx="470" cy="155" r="8"/>
+  <circle class="box" cx="510" cy="155" r="8"/>
+  <circle class="box" cx="540" cy="155" r="8"/>
+  <circle class="box" cx="580" cy="155" r="8"/>
+  <!-- Mesh -->
+  <text x="660" y="50" text-anchor="middle" class="bold">망 Mesh</text>
+  <circle class="box" cx="660" cy="70" r="8"/>
+  <circle class="box" cx="625" cy="110" r="8"/>
+  <circle class="box" cx="695" cy="110" r="8"/>
+  <circle class="box" cx="645" cy="155" r="8"/>
+  <circle class="box" cx="675" cy="155" r="8"/>
+  <line class="line" x1="660" y1="78" x2="625" y2="102"/>
+  <line class="line" x1="660" y1="78" x2="695" y2="102"/>
+  <line class="line" x1="660" y1="78" x2="645" y2="147"/>
+  <line class="line" x1="660" y1="78" x2="675" y2="147"/>
+  <line class="line" x1="625" y1="118" x2="645" y2="147"/>
+  <line class="line" x1="625" y1="118" x2="695" y2="110"/>
+  <line class="line" x1="695" y1="118" x2="675" y2="147"/>
+  <line class="line" x1="645" y1="155" x2="675" y2="155"/>
+
+  <!-- 설명 -->
+  <text x="70" y="195" text-anchor="middle" style="font-size:10px">선 하나에 연결</text>
+  <text x="70" y="210" text-anchor="middle" style="font-size:10px">설치 쉬움</text>
+  <text x="70" y="225" text-anchor="middle" style="font-size:10px">회선 장애=전체</text>
+
+  <text x="215" y="195" text-anchor="middle" style="font-size:10px">원형 연결</text>
+  <text x="215" y="210" text-anchor="middle" style="font-size:10px">단·양방향</text>
+  <text x="215" y="225" text-anchor="middle" style="font-size:10px">노드 장애=전체</text>
+
+  <text x="370" y="195" text-anchor="middle" style="font-size:10px">중앙장비 중심</text>
+  <text x="370" y="210" text-anchor="middle" style="font-size:10px">관리 편함</text>
+  <text x="370" y="225" text-anchor="middle" style="font-size:10px">중앙 장애=전체</text>
+
+  <text x="525" y="195" text-anchor="middle" style="font-size:10px">계층적 구조</text>
+  <text x="525" y="210" text-anchor="middle" style="font-size:10px">확장 용이</text>
+
+  <text x="660" y="195" text-anchor="middle" style="font-size:10px">완전/부분망</text>
+  <text x="660" y="210" text-anchor="middle" style="font-size:10px">신뢰성 최고</text>
+  <text x="660" y="225" text-anchor="middle" style="font-size:10px">비용 높음</text>
+</svg>
+</div>
 <table>
 <tr><th>형태</th><th>특징</th></tr>
 <tr><td>버스(Bus)</td><td>하나의 회선에 모든 노드 연결. 설치 쉬움, 한 회선 장애시 전체 영향</td></tr>
@@ -1729,6 +2455,60 @@ except ValueError:
 <div class="warn">기출 핵심: "군대 보안 레벨처럼 기밀성에 따라 상하 구분" = <strong>MAC / Bell-LaPadula</strong>.</div>
 
 <h3>5-9. 암호화 알고리즘 <span class="tag hot">HOT</span></h3>
+<div class="diagram">
+<svg viewBox="0 0 700 260" width="700">
+  <text x="350" y="20" text-anchor="middle" class="bold" style="font-size:14px">▼ 대칭키 vs 공개키 vs 해시</text>
+  <!-- 대칭키 -->
+  <rect class="box" x="20" y="50" width="200" height="160"/>
+  <text x="120" y="70" text-anchor="middle" class="bold">대칭키 (비공개키)</text>
+  <rect class="box" x="40" y="85" width="60" height="30"/>
+  <text x="70" y="105" text-anchor="middle" style="font-size:11px">평문</text>
+  <path class="arrow" d="M 100 100 L 135 100"/>
+  <rect class="box-fill" x="135" y="85" width="70" height="30"/>
+  <text x="170" y="105" text-anchor="middle" class="white" style="font-size:11px">암호화</text>
+  <text x="170" y="130" text-anchor="middle" style="font-size:10px">키 K</text>
+  <path class="arrow" d="M 135 145 L 205 145"/>
+  <rect class="box" x="40" y="155" width="60" height="30"/>
+  <text x="70" y="175" text-anchor="middle" style="font-size:11px">평문</text>
+  <path class="arrow" d="M 135 170 L 100 170"/>
+  <rect class="box-fill" x="135" y="155" width="70" height="30"/>
+  <text x="170" y="175" text-anchor="middle" class="white" style="font-size:11px">복호화</text>
+  <text x="170" y="198" text-anchor="middle" class="bold" style="font-size:10px">AES·DES·SEED</text>
+
+  <!-- 공개키 -->
+  <rect class="box" x="240" y="50" width="220" height="160"/>
+  <text x="350" y="70" text-anchor="middle" class="bold">공개키 (비대칭)</text>
+  <rect class="box" x="255" y="85" width="60" height="30"/>
+  <text x="285" y="105" text-anchor="middle" style="font-size:11px">평문</text>
+  <path class="arrow" d="M 315 100 L 350 100"/>
+  <rect class="box-fill" x="350" y="85" width="70" height="30"/>
+  <text x="385" y="105" text-anchor="middle" class="white" style="font-size:11px">암호화</text>
+  <text x="385" y="130" text-anchor="middle" style="font-size:10px">수신자 공개키</text>
+  <path class="arrow" d="M 350 145 L 420 145"/>
+  <rect class="box" x="255" y="155" width="60" height="30"/>
+  <text x="285" y="175" text-anchor="middle" style="font-size:11px">평문</text>
+  <path class="arrow" d="M 350 170 L 315 170"/>
+  <rect class="box-fill" x="350" y="155" width="70" height="30"/>
+  <text x="385" y="175" text-anchor="middle" class="white" style="font-size:11px">복호화</text>
+  <text x="385" y="198" text-anchor="middle" class="bold" style="font-size:10px">RSA·ECC·DSA</text>
+
+  <!-- 해시 -->
+  <rect class="box" x="480" y="50" width="200" height="160"/>
+  <text x="580" y="70" text-anchor="middle" class="bold">해시 (일방향)</text>
+  <rect class="box" x="510" y="100" width="60" height="30"/>
+  <text x="540" y="120" text-anchor="middle" style="font-size:11px">평문</text>
+  <path class="arrow" d="M 570 115 L 605 115"/>
+  <rect class="box-fill" x="605" y="100" width="60" height="30"/>
+  <text x="635" y="120" text-anchor="middle" class="white" style="font-size:11px">해시함수</text>
+  <text x="580" y="155" text-anchor="middle" style="font-size:11px">→ 고정 길이 해시값</text>
+  <text x="580" y="175" text-anchor="middle" style="font-size:10px">(복호화 불가!)</text>
+  <text x="580" y="198" text-anchor="middle" class="bold" style="font-size:10px">MD5·SHA-256·HAS-160</text>
+
+  <!-- 키 수 -->
+  <text x="350" y="235" text-anchor="middle" class="bold" style="font-size:12px">키 개수: 대칭 = n(n-1)/2  vs  공개키 = 2n</text>
+  <text x="350" y="253" text-anchor="middle" style="font-size:11px">10명 사용시: 대칭 45개 / 공개키 20개</text>
+</svg>
+</div>
 <table>
 <tr><th>구분</th><th>알고리즘</th><th>키</th></tr>
 <tr><td><strong>대칭키(비공개키)</strong></td><td>DES, 3DES, <strong>AES</strong>, SEED, ARIA, IDEA, RC4, RC5</td><td>암·복호화 동일</td></tr>
@@ -1750,6 +2530,47 @@ except ValueError:
 </ul>
 
 <h3>5-11. 침입탐지 & 방화벽</h3>
+<div class="diagram">
+<svg viewBox="0 0 680 220" width="680">
+  <text x="340" y="20" text-anchor="middle" class="bold" style="font-size:14px">▼ 방화벽 유형별 구조</text>
+  <!-- Screened Subnet (DMZ) 구성 -->
+  <text x="340" y="45" text-anchor="middle" class="bold" style="font-size:13px">스크린드 서브넷 (DMZ) — 가장 안전</text>
+
+  <rect class="box" x="20" y="70" width="80" height="40"/>
+  <text x="60" y="94" text-anchor="middle">인터넷</text>
+
+  <path class="arrow" d="M 100 90 L 145 90"/>
+
+  <rect class="box-fill" x="145" y="70" width="80" height="40"/>
+  <text x="185" y="94" text-anchor="middle" class="white">외부 방화벽</text>
+
+  <path class="arrow" d="M 225 90 L 275 90"/>
+
+  <!-- DMZ -->
+  <rect x="275" y="50" width="160" height="100" fill="#eee" stroke="#000" stroke-width="2" stroke-dasharray="4,2"/>
+  <text x="355" y="68" text-anchor="middle" class="bold" style="font-size:11px">DMZ</text>
+  <rect class="box" x="290" y="80" width="60" height="25"/>
+  <text x="320" y="97" text-anchor="middle" style="font-size:10px">웹서버</text>
+  <rect class="box" x="360" y="80" width="60" height="25"/>
+  <text x="390" y="97" text-anchor="middle" style="font-size:10px">메일서버</text>
+  <rect class="box" x="325" y="115" width="60" height="25"/>
+  <text x="355" y="132" text-anchor="middle" style="font-size:10px">DNS</text>
+
+  <path class="arrow" d="M 435 90 L 485 90"/>
+
+  <rect class="box-fill" x="485" y="70" width="80" height="40"/>
+  <text x="525" y="94" text-anchor="middle" class="white">내부 방화벽</text>
+
+  <path class="arrow" d="M 565 90 L 605 90"/>
+
+  <rect class="box" x="605" y="70" width="60" height="40"/>
+  <text x="635" y="94" text-anchor="middle">내부망</text>
+
+  <text x="340" y="190" text-anchor="middle" style="font-size:11px">외부→DMZ→내부 2중 방어</text>
+  <text x="340" y="207" text-anchor="middle" style="font-size:11px">다른 유형: 스크리닝 라우터 / 베스천 호스트 / 듀얼홈드 / 스크린드 호스트</text>
+</svg>
+</div>
+
 <ul>
   <li><strong>IDS</strong> 침입탐지 — 오용 탐지(시그니처) / 이상 탐지(행위).</li>
   <li><strong>IPS</strong> 침입방지 — 탐지 + 차단.</li>
