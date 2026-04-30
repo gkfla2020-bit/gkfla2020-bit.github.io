@@ -624,16 +624,90 @@
   }
   .course-pill .nm { font-weight: 600; font-size: 13.5px; margin-top: 2px; }
   .course-pill .meta { font-size: 11px; color: var(--muted); margin-top: 3px; }
-  .course-pill .load-badge {
-    display: inline-block; font-size: 10.5px;
-    padding: 1px 7px; border-radius: 4px;
-    font-family: "JetBrains Mono", monospace;
-    margin-top: 4px;
+  .course-pill .badge-row {
+    display: flex; flex-wrap: wrap; gap: 4px; margin-top: 6px;
+  }
+  .course-pill .badge {
+    display: inline-flex; align-items: center; gap: 3px;
+    font-size: 10.5px; padding: 1px 7px; border-radius: 4px;
+    font-family: "JetBrains Mono", monospace; font-weight: 600;
   }
   .course-pill .load-중 { background: #fef3c7; color: #92400e; }
   .course-pill .load-중상 { background: #fed7aa; color: #9a3412; }
   .course-pill .load-상 { background: #fecaca; color: #991b1b; }
+  /* Rarity badges — the juicy bit */
+  .course-pill .offered-연1회 { background: #fef3c7; color: #854d0e; border: 1px solid #fde68a; }
+  .course-pill .offered-격년 { background: #fee2e2; color: #991b1b; border: 1px solid #fecaca; }
+  .course-pill .offered-비정기 { background: #1a1d24; color: #f0d99a; border: 1px solid #1a1d24; }
+  .course-pill .alt-hint {
+    font-size: 10.5px; color: var(--info);
+    background: #e0eafc; padding: 1px 6px; border-radius: 4px;
+    font-family: "JetBrains Mono", monospace; font-weight: 600;
+    display: inline-flex; align-items: center; gap: 3px;
+  }
   .course-pill.req { border-left-color: var(--sg-red); background: #fff7f7; }
+  .course-pill.rare { border-left-style: dashed; }
+  .course-pill.unavailable {
+    opacity: 0.55;
+    background: repeating-linear-gradient(45deg, var(--paper-2) 0 8px, #fff 8px 16px);
+  }
+
+  /* Rarity legend above roadmap */
+  .rarity-legend {
+    display: flex; gap: 10px; flex-wrap: wrap;
+    padding: 10px 14px; background: var(--paper-2);
+    border-radius: 8px; font-size: 11.5px; margin-bottom: 16px;
+    font-family: "JetBrains Mono", monospace; color: var(--muted);
+  }
+  .rarity-legend .item { display: inline-flex; align-items: center; gap: 5px; }
+  .rarity-legend .swatch {
+    width: 10px; height: 10px; border-radius: 2px; display: inline-block;
+  }
+
+  /* Alternate popover */
+  .alt-popover {
+    position: absolute; z-index: 60;
+    background: #fff; border: 1px solid var(--border);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow-lg);
+    padding: 14px; min-width: 260px; max-width: 320px;
+    font-size: 13px;
+    animation: fadeUp 0.15s ease;
+  }
+  .alt-popover .head {
+    font-weight: 700; font-size: 12px; color: var(--muted);
+    letter-spacing: 0.1em; text-transform: uppercase;
+    margin-bottom: 10px;
+    display: flex; align-items: center; gap: 6px;
+  }
+  .alt-popover .alt-item {
+    padding: 8px 10px; border-radius: 6px;
+    background: var(--paper-2); margin-bottom: 6px;
+    cursor: pointer; transition: all 0.12s ease;
+    display: flex; justify-content: space-between; align-items: flex-start;
+    gap: 8px;
+  }
+  .alt-popover .alt-item:hover {
+    background: #fff; border: 1px solid var(--sg-red);
+    transform: translateX(2px);
+  }
+  .alt-popover .alt-item .nm {
+    font-weight: 600; font-size: 13px; color: var(--ink);
+  }
+  .alt-popover .alt-item .cd {
+    font-family: "JetBrains Mono", monospace;
+    font-size: 10px; color: var(--muted); margin-top: 2px;
+  }
+  .alt-popover .alt-empty {
+    font-size: 12px; color: var(--muted); font-style: italic;
+  }
+  .alt-popover::after {
+    content: ''; position: absolute; top: -6px; left: 20px;
+    width: 12px; height: 12px; background: #fff;
+    border-top: 1px solid var(--border); border-left: 1px solid var(--border);
+    transform: rotate(45deg);
+  }
+  .alt-close-hit { position: fixed; inset: 0; z-index: 59; }
   .sem-sum {
     font-size: 11.5px; color: var(--muted);
     margin-top: 10px; padding-top: 10px;
@@ -771,6 +845,40 @@
     background: #fffbeb; border-left: 3px solid var(--gold);
     padding: 10px 14px; border-radius: 6px;
     font-size: 12.5px; color: var(--muted); margin-top: 14px;
+  }
+  .offered-box {
+    padding: 12px 14px; border-radius: 8px;
+    display: flex; align-items: flex-start; gap: 10px;
+    font-size: 13px;
+  }
+  .offered-box .ico-wrap {
+    width: 28px; height: 28px; border-radius: 6px;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+  }
+  .offered-box.level-매학기 { background: #f0fdf4; border: 1px solid #bbf7d0; color: #166534; }
+  .offered-box.level-매학기 .ico-wrap { background: #bbf7d0; color: #166534; }
+  .offered-box.level-연1회 { background: #fef3c7; border: 1px solid #fde68a; color: #854d0e; }
+  .offered-box.level-연1회 .ico-wrap { background: #fde68a; color: #854d0e; }
+  .offered-box.level-격년 { background: #fee2e2; border: 1px solid #fecaca; color: #991b1b; }
+  .offered-box.level-격년 .ico-wrap { background: #fecaca; color: #991b1b; }
+  .offered-box.level-비정기 { background: #1a1d24; border: 1px solid #0f1115; color: #f0d99a; }
+  .offered-box.level-비정기 .ico-wrap { background: rgba(240, 217, 154, 0.15); color: #f0d99a; }
+  .offered-box .offered-title { font-weight: 700; margin-bottom: 2px; }
+  .offered-box .offered-sub { font-size: 12px; opacity: 0.85; }
+
+  .alternates-inline {
+    display: flex; flex-wrap: wrap; gap: 6px;
+  }
+  .alternates-inline .alt-chip {
+    background: #e0eafc; color: var(--info);
+    padding: 5px 10px; border-radius: 999px;
+    font-size: 12px; font-weight: 500; cursor: pointer;
+    border: 1px solid transparent;
+    transition: all 0.12s ease;
+  }
+  .alternates-inline .alt-chip:hover {
+    background: #fff; border-color: var(--info);
   }
 
   /* ---------- Scorecard ---------- */
@@ -1461,6 +1569,7 @@
           <h3 style="display:flex;align-items:center;gap:10px"><svg class="icn icn-lg" style="color:var(--sg-red)"><use href="#i-route"/></svg> 추천 로드맵</h3>
           <div class="roadmap-stats" id="semester-count"></div>
         </div>
+        <div id="rarity-legend-wrap"></div>
         <div class="roadmap" id="roadmap"></div>
         <div class="explain-box" id="explain"></div>
 
@@ -1590,9 +1699,19 @@
         <div id="modal-time">—</div>
       </div>
 
+      <div class="modal-section">
+        <div class="modal-label"><svg class="icn" style="width:12px;height:12px"><use href="#i-calendar"/></svg> 개설 빈도</div>
+        <div id="modal-offered"></div>
+      </div>
+
       <div class="modal-section" id="modal-prereq-section">
         <div class="modal-label"><svg class="icn" style="width:12px;height:12px"><use href="#i-link"/></svg> 선수과목 체인</div>
         <div class="modal-prereq-chain" id="modal-prereq">—</div>
+      </div>
+
+      <div class="modal-section" id="modal-alternates-section">
+        <div class="modal-label"><svg class="icn" style="width:12px;height:12px"><use href="#i-route"/></svg> 대체 가능한 과목</div>
+        <div class="alternates-inline" id="modal-alternates"></div>
       </div>
 
       <div class="modal-section">
@@ -1665,6 +1784,31 @@
   document.getElementById('stat-tracks').textContent = Object.keys(DATA.tracks).length;
   document.getElementById('stat-prereq').textContent = DATA.courses.reduce((s, c) => s + c.prereq.length, 0);
 
+  // --- Rarity helpers ---
+  function isRare(c) { return c.offered && c.offered !== '매학기'; }
+  function isUnavailable(c) { return c.offered === '비정기'; }
+  function rarityLabel(c) {
+    if (!c.offered || c.offered === '매학기') return '';
+    if (c.offered === '연1회') return '연 1회';
+    return c.offered;
+  }
+  function rarityIcon(offered) {
+    if (offered === '비정기') return 'i-ban';
+    if (offered === '격년') return 'i-clock';
+    if (offered === '연1회') return 'i-calendar';
+    return 'i-check';
+  }
+  function badgeRowHtml(c) {
+    const parts = [`<span class="badge load-${c.load}">부담 ${c.load}</span>`];
+    if (isRare(c)) {
+      parts.push(`<span class="badge offered-${c.offered}"><svg class="icn" style="width:10px;height:10px"><use href="#${rarityIcon(c.offered)}"/></svg>${rarityLabel(c)}</span>`);
+    }
+    if (c.alternates && c.alternates.length > 0) {
+      parts.push(`<span class="alt-hint"><svg class="icn" style="width:10px;height:10px"><use href="#i-route"/></svg>대체 ${c.alternates.length}</span>`);
+    }
+    return `<div class="badge-row">${parts.join('')}</div>`;
+  }
+
   // --- Catalog ---
   function renderCatalog() {
     const filter = document.getElementById('cat-major').value;
@@ -1673,13 +1817,17 @@
     const list = DATA.courses.filter(c => filter === 'all' || c.major === filter);
     list.forEach(c => {
       const div = document.createElement('div');
-      div.className = 'course-pill' + (c.type === '전공필수' ? ' req' : '');
+      const classes = ['course-pill'];
+      if (c.type === '전공필수') classes.push('req');
+      if (isRare(c)) classes.push('rare');
+      if (isUnavailable(c)) classes.push('unavailable');
+      div.className = classes.join(' ');
       div.innerHTML = `
         <div class="code">${c.code} · ${c.major} · ${c.type}</div>
         <div class="nm">${c.name}</div>
         <div style="font-size:12px; color:var(--muted); margin:4px 0; line-height:1.45">${c.summary}</div>
         <div class="meta">${c.credits}학점 · ${c.grade_level}학년 · ${c.professor}${c.prereq.length ? ' · 선수: ' + c.prereq.join(', ') : ''}</div>
-        <div class="load-badge load-${c.load}">부담 ${c.load}</div>
+        ${badgeRowHtml(c)}
       `;
       div.addEventListener('click', () => openModal(c));
       wrap.appendChild(div);
@@ -1729,6 +1877,26 @@
       return `<div class="modal-time-block"><div class="day">${dayMap[m[1]]}</div><span>${m[2]}</span></div>`;
     }).join('');
 
+    // Offered frequency box
+    const offeredEl = document.getElementById('modal-offered');
+    const lvl = course.offered || '매학기';
+    const levelText = {
+      '매학기': '매 학기 개설',
+      '연1회': '매년 1회만 개설',
+      '격년': '2년에 1회 개설',
+      '비정기': '비정기 개설 — 계획 주의'
+    }[lvl] || lvl;
+    const subText = course.offered_note || (course.offered_semester ? `개설 학기: ${course.offered_semester}` : '안정적으로 매 학기 열립니다');
+    offeredEl.innerHTML = `
+      <div class="offered-box level-${lvl}">
+        <div class="ico-wrap"><svg class="icn" style="width:16px;height:16px"><use href="#${rarityIcon(lvl)}"/></svg></div>
+        <div>
+          <div class="offered-title">${levelText}</div>
+          <div class="offered-sub">${subText}</div>
+        </div>
+      </div>
+    `;
+
     const prereqSec = document.getElementById('modal-prereq-section');
     if (course.prereq.length === 0) {
       prereqSec.style.display = 'none';
@@ -1742,10 +1910,91 @@
       document.getElementById('modal-prereq').innerHTML = chain.join('<span class="arr">+</span>');
     }
 
+    // Alternates
+    const altSec = document.getElementById('modal-alternates-section');
+    const alts = (course.alternates || []).map(code => DATA.courses.find(x => x.code === code)).filter(Boolean);
+    if (alts.length === 0) {
+      altSec.style.display = 'none';
+    } else {
+      altSec.style.display = 'block';
+      document.getElementById('modal-alternates').innerHTML = alts.map(a =>
+        `<span class="alt-chip" data-code="${a.code}">${a.code} · ${a.name}</span>`
+      ).join('');
+      document.querySelectorAll('#modal-alternates .alt-chip').forEach(chip => {
+        chip.addEventListener('click', () => {
+          const target = DATA.courses.find(x => x.code === chip.dataset.code);
+          if (target) openModal(target);
+        });
+      });
+    }
+
     document.getElementById('modal-tags').innerHTML = (course.ai_tags || []).map(t => `<span class="modal-tag">${t}</span>`).join('');
     modalBackdrop.classList.add('open');
   }
   function closeModal() { modalBackdrop.classList.remove('open'); }
+
+  // --- Alternate swap popover ---
+  let currentPopover = null;
+  let currentHit = null;
+  function closePopover() {
+    if (currentPopover) { currentPopover.remove(); currentPopover = null; }
+    if (currentHit) { currentHit.remove(); currentHit = null; }
+  }
+  function showAlternatePopover(pillEl, course, semIdx, courseIdx, sem) {
+    closePopover();
+    const alts = (course.alternates || []).map(c => DATA.courses.find(x => x.code === c)).filter(Boolean);
+    const hit = document.createElement('div');
+    hit.className = 'alt-close-hit';
+    hit.addEventListener('click', closePopover);
+    document.body.appendChild(hit);
+    currentHit = hit;
+
+    const pop = document.createElement('div');
+    pop.className = 'alt-popover';
+    pop.addEventListener('click', e => e.stopPropagation());
+    if (alts.length === 0) {
+      pop.innerHTML = `<div class="head"><svg class="icn" style="width:14px;height:14px"><use href="#i-route"/></svg> 대체 과목</div><div class="alt-empty">이 과목에는 등록된 대체 과목이 없습니다.</div>`;
+    } else {
+      const items = alts.map(a => {
+        const rare = isRare(a) ? `<span class="badge offered-${a.offered}" style="font-size:9.5px;padding:1px 5px">${rarityLabel(a)}</span>` : '';
+        return `
+          <div class="alt-item" data-code="${a.code}">
+            <div>
+              <div class="nm">${a.name}</div>
+              <div class="cd">${a.code} · ${a.credits}학점 · 부담 ${a.load}</div>
+            </div>
+            ${rare}
+          </div>
+        `;
+      }).join('');
+      pop.innerHTML = `<div class="head"><svg class="icn" style="width:14px;height:14px"><use href="#i-route"/></svg> 스왑 가능한 과목</div>${items}`;
+    }
+
+    // Position relative to pill
+    const rect = pillEl.getBoundingClientRect();
+    pop.style.top = (window.scrollY + rect.bottom + 10) + 'px';
+    pop.style.left = (window.scrollX + rect.left) + 'px';
+    document.body.appendChild(pop);
+    currentPopover = pop;
+
+    pop.querySelectorAll('.alt-item').forEach(item => {
+      item.addEventListener('click', () => {
+        const code = item.dataset.code;
+        const newCourse = DATA.courses.find(x => x.code === code);
+        if (newCourse) {
+          // Swap in the semester (in-place)
+          sem.courses[courseIdx] = newCourse;
+          sem.credits = sem.courses.reduce((s, c) => s + c.credits, 0);
+          closePopover();
+          // Re-render roadmap (pull params from last state)
+          if (window._lastPlan) {
+            renderRoadmap(window._lastPlan.semesters, window._lastPlan.track, window._lastPlan.req, window._lastPlan.freeText, window._lastPlan.violationCount, window._lastPlan.maxPerSem);
+          }
+        }
+      });
+    });
+  }
+  document.addEventListener('scroll', () => { if (currentPopover) closePopover(); }, true);
   modalClose.addEventListener('click', closeModal);
   modalBackdrop.addEventListener('click', (e) => { if (e.target === modalBackdrop) closeModal(); });
   document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeModal(); });
@@ -1835,16 +2084,64 @@
     const remaining = [...neededList];
     let violationCount = 0;
 
+    // Check rarity issues upfront
+    const unavailable = neededList.filter(isUnavailable);
+    const rareOnes = neededList.filter(c => isRare(c) && !isUnavailable(c));
+    if (unavailable.length + rareOnes.length > 0) {
+      await traceLog(trace, `<span class="t-step">[2b/4 RarityCheck]</span> 개설 빈도 점검 중<span class="loading-dots"></span>`);
+      await sleep(300);
+    }
+    if (rareOnes.length > 0) {
+      const rareNames = rareOnes.slice(0, 3).map(c => `${c.name}(${rarityLabel(c)})`).join(', ');
+      await traceLog(trace, `<span class="t-info">  ℹ 희귀 개설 과목 ${rareOnes.length}개: ${rareNames}${rareOnes.length > 3 ? ' 외' : ''} — 개설 학기 매칭 적용</span>`);
+    }
+    if (unavailable.length > 0) {
+      await traceLog(trace, `<span class="t-think">  ⚠ 비정기 과목 ${unavailable.length}개 감지 (미개설) — 대체 후보로 교체 예정</span>`);
+      // Replace unavailable with their alternates (recursive-ish)
+      for (const u of unavailable) {
+        const altCode = (u.alternates || []).find(ac => {
+          const alt = findCourse(ac);
+          return alt && !isUnavailable(alt) && !takenSet.has(ac) && !neededList.find(x => x.code === ac);
+        });
+        const idx = remaining.indexOf(u);
+        if (idx >= 0) remaining.splice(idx, 1);
+        if (altCode) {
+          const alt = findCourse(altCode);
+          if (alt && !remaining.find(x => x.code === alt.code)) {
+            remaining.push(alt);
+            await traceLog(trace, `<span class="t-info">  ↪ ${u.code} ${u.name} → ${alt.code} ${alt.name} 로 교체</span>`);
+          }
+        }
+      }
+    }
+
+    let swappedOut = 0;
     while (remaining.length > 0 && semesters.length < 8) {
       const sem = { label: `${curGrade}학년 ${curSemNum}학기`, courses: [], credits: 0 };
       const picked = [];
       for (let i = 0; i < remaining.length; i++) {
         const c = remaining[i];
+        if (isUnavailable(c)) continue; // safety
         if (!c.prereq.every(p => takenSet.has(p))) continue;
         if (c.grade_level > curGrade + 1) continue;
         if (sem.credits + c.credits > maxPerSem) continue;
         if (picked.some(q => conflicts(q, c))) continue;
         if (violatesFreeConstraint(c, freeText)) { violationCount++; continue; }
+        // 격년 course offered in wrong semester check (heuristic)
+        if (c.offered === '격년' && c.offered_note) {
+          const isEvenSem = curSemNum === 2;
+          if (c.offered_note.includes('짝수') && (curGrade % 2 !== 0 || !isEvenSem)) {
+            // skip but keep in remaining — try another semester
+            continue;
+          }
+          if (c.offered_note.includes('홀수') && (curGrade % 2 === 0 || isEvenSem)) {
+            continue;
+          }
+        }
+        if (c.offered === '연1회' && c.offered_semester) {
+          const targetSem = c.offered_semester === '1학기' ? 1 : 2;
+          if (curSemNum !== targetSem) continue;
+        }
         picked.push(c);
         sem.courses.push(c);
         sem.credits += c.credits;
@@ -1854,6 +2151,13 @@
         const idx = remaining.indexOf(p);
         if (idx >= 0) remaining.splice(idx, 1);
       });
+      if (picked.length === 0 && remaining.length > 0) {
+        // No course fits — advance anyway to avoid infinite loop
+        // but skip empty semester
+        if (curSemNum === 1) curSemNum = 2; else { curSemNum = 1; curGrade++; }
+        if (curGrade > grade + 4) break;
+        continue;
+      }
       if (picked.length === 0) break;
       semesters.push(sem);
       if (curSemNum === 1) curSemNum = 2;
@@ -1867,26 +2171,54 @@
     await sleep(600);
     await traceLog(trace, `<span class="t-ok">✓</span> 완료 — 총 ${semesters.reduce((s,x) => s+x.courses.length, 0)}과목 · ${semesters.reduce((s,x) => s+x.credits, 0)}학점 추천`);
 
+    window._lastPlan = { semesters, track, req, freeText, violationCount, maxPerSem };
     renderRoadmap(semesters, track, req, freeText, violationCount, maxPerSem);
   }
 
   function renderRoadmap(semesters, track, req, freeText, violationCount, maxPerSem) {
     const wrap = document.getElementById('roadmap');
     wrap.innerHTML = '';
-    semesters.forEach(sem => {
+
+    // Legend (shown once, above semester cards)
+    const legendContainer = document.getElementById('rarity-legend-wrap');
+    if (legendContainer) {
+      const rareCount = semesters.reduce((s, sem) => s + sem.courses.filter(isRare).length, 0);
+      legendContainer.innerHTML = `
+        <div class="rarity-legend">
+          <span class="item"><span class="swatch" style="background:#bbf7d0"></span> 매학기</span>
+          <span class="item"><span class="swatch" style="background:#fde68a"></span> 연 1회</span>
+          <span class="item"><span class="swatch" style="background:#fecaca"></span> 격년</span>
+          <span class="item"><span class="swatch" style="background:#1a1d24"></span> 비정기 (제외됨)</span>
+          <span style="margin-left:auto"><svg class="icn" style="width:12px;height:12px;vertical-align:-2px"><use href="#i-route"/></svg> 대체 후보 있는 과목은 스왑 가능</span>
+        </div>
+      `;
+    }
+
+    semesters.forEach((sem, semIdx) => {
       const card = document.createElement('div');
       card.className = 'sem-card';
       card.innerHTML = `<div class="sem-label">${sem.label}</div>`;
-      sem.courses.forEach(c => {
+      sem.courses.forEach((c, courseIdx) => {
         const pill = document.createElement('div');
-        pill.className = 'course-pill' + (c.type === '전공필수' ? ' req' : '');
+        const classes = ['course-pill'];
+        if (c.type === '전공필수') classes.push('req');
+        if (isRare(c)) classes.push('rare');
+        pill.className = classes.join(' ');
         pill.innerHTML = `
           <div class="code">${c.code} · ${c.type}</div>
           <div class="nm">${c.name}</div>
           <div class="meta">${c.credits}학점 · ${c.time.split(',')[0].trim()} · ${c.professor}</div>
-          <div class="load-badge load-${c.load}">부담 ${c.load}</div>
+          ${badgeRowHtml(c)}
         `;
-        pill.addEventListener('click', () => openModal(c));
+        pill.addEventListener('click', (e) => {
+          // If click on the alt-hint chip, open swap popover instead
+          if (e.target.closest('.alt-hint')) {
+            e.stopPropagation();
+            showAlternatePopover(pill, c, semIdx, courseIdx, sem);
+            return;
+          }
+          openModal(c);
+        });
         card.appendChild(pill);
       });
       const sum = document.createElement('div');
