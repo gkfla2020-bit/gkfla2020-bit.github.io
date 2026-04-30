@@ -3,248 +3,767 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Albatross Syllabus Navigator — 2026 서강대 생성형 AI 공모전 데모</title>
-<meta name="description" content="서강대 트랙제·졸업요건에 맞춰 AI가 4년 로드맵을 역산해주는 수강설계 에이전트. 2026 서강대 생성형 AI 기반 아이디어 공모전 출품작." />
+<title>Albatross Syllabus Navigator — 2026 서강대 생성형 AI 공모전</title>
+<meta name="description" content="서강대 트랙제·졸업요건·선수과목 그래프를 AI가 읽어 4년 로드맵을 역산해주는 수강설계 에이전트." />
+
+<link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin />
+<link href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css" rel="stylesheet" />
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
 
 <style>
   :root {
-    --sogang-red: #b30000;
-    --sogang-red-dark: #8a0000;
-    --ink: #1a1a1a;
-    --soft: #f5f3ee;
-    --border: #e4e0d6;
-    --muted: #6b6b6b;
-    --accent: #c9a24a;
-    --ok: #2e7d32;
-    --warn: #c65a00;
+    --sg-red: #b30000;
+    --sg-red-deep: #7a0000;
+    --sg-red-glow: #ff3b3b;
+    --gold: #c9a24a;
+    --gold-soft: #f0d99a;
+    --ink: #0f1115;
+    --ink-2: #1a1d24;
+    --paper: #fbf9f4;
+    --paper-2: #f3efe5;
+    --border: #e7e2d3;
+    --muted: #6b6e78;
+    --muted-2: #9aa0aa;
+    --ok: #1f7a3c;
+    --info: #2553a0;
+    --shadow-sm: 0 1px 2px rgba(15,17,21,0.06), 0 2px 8px rgba(15,17,21,0.04);
+    --shadow-md: 0 2px 8px rgba(15,17,21,0.08), 0 16px 40px rgba(15,17,21,0.08);
+    --shadow-lg: 0 8px 24px rgba(15,17,21,0.10), 0 32px 64px rgba(15,17,21,0.12);
+    --radius: 14px;
+    --radius-sm: 8px;
   }
   * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
   html, body {
     margin: 0; padding: 0;
-    font-family: -apple-system, BlinkMacSystemFont, "Pretendard", "Segoe UI", "Noto Sans KR", sans-serif;
-    background: var(--soft);
+    font-family: "Pretendard Variable", Pretendard, -apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans KR", sans-serif;
+    background: var(--paper);
     color: var(--ink);
-    line-height: 1.55;
+    line-height: 1.62;
+    letter-spacing: -0.006em;
+    -webkit-font-smoothing: antialiased;
   }
-  header.hero {
-    background: linear-gradient(135deg, var(--sogang-red) 0%, var(--sogang-red-dark) 100%);
+  .mono { font-family: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, monospace; }
+
+  /* ---------- Sticky nav ---------- */
+  nav.topnav {
+    position: sticky; top: 0; z-index: 50;
+    background: rgba(251, 249, 244, 0.78);
+    backdrop-filter: blur(18px) saturate(160%);
+    -webkit-backdrop-filter: blur(18px) saturate(160%);
+    border-bottom: 1px solid rgba(15,17,21,0.06);
+  }
+  .nav-inner {
+    max-width: 1120px; margin: 0 auto;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 14px 28px;
+  }
+  .nav-brand {
+    display: flex; align-items: center; gap: 10px;
+    font-weight: 800; font-size: 15px; letter-spacing: -0.01em;
+  }
+  .nav-brand .dot {
+    width: 10px; height: 10px; border-radius: 50%;
+    background: linear-gradient(135deg, var(--sg-red) 0%, var(--sg-red-glow) 100%);
+    box-shadow: 0 0 0 3px rgba(179,0,0,0.12);
+  }
+  .nav-links { display: flex; gap: 4px; font-size: 13px; }
+  .nav-links a {
+    text-decoration: none; color: var(--muted);
+    padding: 8px 14px; border-radius: 999px;
+    transition: all 0.15s ease;
+  }
+  .nav-links a:hover { color: var(--ink); background: rgba(15,17,21,0.04); }
+  .nav-links a.active {
+    color: var(--sg-red); background: rgba(179,0,0,0.08);
+  }
+  @media (max-width: 720px) {
+    .nav-links { display: none; }
+  }
+
+  /* ---------- Hero ---------- */
+  .hero {
+    position: relative;
+    overflow: hidden;
+    background:
+      radial-gradient(ellipse at top left, rgba(201,162,74,0.20) 0%, transparent 50%),
+      radial-gradient(ellipse at bottom right, rgba(179,0,0,0.18) 0%, transparent 55%),
+      linear-gradient(180deg, #0b0d13 0%, #151821 100%);
     color: #fff;
-    padding: 48px 24px 40px;
-    border-bottom: 4px solid var(--accent);
+    padding: 110px 28px 130px;
+    border-bottom: 1px solid rgba(255,255,255,0.06);
+  }
+  .hero::before {
+    content: '';
+    position: absolute; inset: 0;
+    background-image:
+      linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px);
+    background-size: 48px 48px;
+    mask-image: radial-gradient(ellipse at center, #000 40%, transparent 80%);
+    -webkit-mask-image: radial-gradient(ellipse at center, #000 40%, transparent 80%);
+    pointer-events: none;
   }
   .hero-inner {
     max-width: 1080px; margin: 0 auto;
+    position: relative;
   }
   .eyebrow {
-    display: inline-block;
-    font-size: 12px;
-    letter-spacing: 0.16em;
+    display: inline-flex; align-items: center; gap: 8px;
+    font-family: "JetBrains Mono", monospace;
+    font-size: 11.5px; letter-spacing: 0.18em;
     text-transform: uppercase;
-    background: rgba(255,255,255,0.15);
-    padding: 4px 10px;
+    background: rgba(255,255,255,0.06);
+    border: 1px solid rgba(255,255,255,0.12);
+    padding: 6px 14px;
     border-radius: 999px;
-    margin-bottom: 12px;
+    color: var(--gold-soft);
+    margin-bottom: 22px;
+  }
+  .eyebrow::before {
+    content: '';
+    width: 6px; height: 6px; border-radius: 50%;
+    background: var(--gold);
+    box-shadow: 0 0 10px var(--gold);
+    animation: pulse 2s ease-in-out infinite;
+  }
+  @keyframes pulse {
+    0%, 100% { opacity: 1; } 50% { opacity: 0.4; }
   }
   h1.title {
-    font-size: 36px;
-    margin: 0 0 8px;
-    letter-spacing: -0.01em;
+    font-size: clamp(36px, 6vw, 56px);
     font-weight: 800;
+    line-height: 1.08;
+    letter-spacing: -0.03em;
+    margin: 0 0 20px;
+    background: linear-gradient(180deg, #fff 0%, #d8d8d8 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+  h1.title .accent {
+    background: linear-gradient(120deg, var(--gold) 0%, var(--gold-soft) 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
   }
   .subtitle {
-    font-size: 16px;
-    opacity: 0.92;
-    margin: 0;
-    max-width: 720px;
+    font-size: clamp(16px, 1.8vw, 19px);
+    max-width: 680px;
+    color: rgba(255,255,255,0.78);
+    margin: 0 0 32px;
+    line-height: 1.55;
   }
-  .hero-meta {
-    display: flex; gap: 18px; flex-wrap: wrap;
-    margin-top: 22px;
-    font-size: 13px;
-    opacity: 0.88;
+  .hero-tags {
+    display: flex; gap: 10px; flex-wrap: wrap;
+    margin-top: 28px;
   }
-  .hero-meta span { border-left: 2px solid rgba(255,255,255,0.35); padding-left: 10px; }
-  .hero-meta span:first-child { border-left: none; padding-left: 0; }
+  .hero-tag {
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.1);
+    padding: 8px 14px;
+    border-radius: 8px;
+    font-size: 12.5px;
+    color: rgba(255,255,255,0.85);
+  }
+  .hero-tag .k { color: var(--muted-2); margin-right: 6px; }
+  .hero-cta {
+    display: inline-flex; align-items: center; gap: 10px;
+    margin-top: 36px;
+    padding: 14px 24px;
+    background: linear-gradient(135deg, var(--sg-red) 0%, var(--sg-red-glow) 100%);
+    color: #fff;
+    text-decoration: none;
+    font-weight: 700;
+    font-size: 15px;
+    border-radius: 10px;
+    box-shadow: 0 8px 24px rgba(179,0,0,0.35);
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+  }
+  .hero-cta:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 12px 32px rgba(179,0,0,0.45);
+  }
+  .hero-cta .arrow {
+    transition: transform 0.2s ease;
+  }
+  .hero-cta:hover .arrow { transform: translateX(4px); }
 
-  main { max-width: 1080px; margin: 0 auto; padding: 28px 24px 80px; }
-
-  .tabs {
-    display: flex; gap: 4px;
-    border-bottom: 1px solid var(--border);
-    margin-bottom: 24px;
-    overflow-x: auto;
+  /* ---------- Section ---------- */
+  section.sec {
+    max-width: 1080px;
+    margin: 0 auto;
+    padding: 90px 28px;
+    position: relative;
   }
-  .tab {
-    padding: 12px 18px;
-    background: none; border: none;
-    font-size: 14px; font-weight: 600;
+  section.sec + section.sec { padding-top: 20px; }
+
+  .sec-num {
+    font-family: "JetBrains Mono", monospace;
+    font-size: 12px;
+    letter-spacing: 0.18em;
+    color: var(--sg-red);
+    font-weight: 700;
+    margin-bottom: 12px;
+    display: flex; align-items: center; gap: 12px;
+  }
+  .sec-num::after {
+    content: ''; flex: 1; height: 1px;
+    background: linear-gradient(90deg, rgba(179,0,0,0.2) 0%, transparent 100%);
+    max-width: 80px;
+  }
+  .sec-title {
+    font-size: clamp(28px, 4vw, 40px);
+    font-weight: 800;
+    letter-spacing: -0.025em;
+    line-height: 1.15;
+    margin: 0 0 18px;
+    color: var(--ink);
+  }
+  .sec-title .hl {
+    background: linear-gradient(120deg, rgba(201,162,74,0.25) 0%, rgba(201,162,74,0.25) 100%);
+    background-size: 100% 38%;
+    background-repeat: no-repeat;
+    background-position: 0 85%;
+    padding: 0 4px;
+  }
+  .sec-lead {
+    font-size: 17px;
     color: var(--muted);
-    cursor: pointer;
-    border-bottom: 3px solid transparent;
-    white-space: nowrap;
-  }
-  .tab.active {
-    color: var(--sogang-red);
-    border-bottom-color: var(--sogang-red);
+    max-width: 720px;
+    margin: 0 0 40px;
+    line-height: 1.65;
   }
 
-  .panel { display: none; }
-  .panel.active { display: block; }
-
-  .card {
+  /* ---------- Simple Explain (Section 1) ---------- */
+  .simple-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 18px;
+    margin-top: 8px;
+  }
+  .simple-card {
     background: #fff;
     border: 1px solid var(--border);
-    border-radius: 10px;
-    padding: 22px;
-    margin-bottom: 18px;
+    border-radius: var(--radius);
+    padding: 24px;
+    transition: all 0.2s ease;
+    position: relative;
+    overflow: hidden;
   }
-  .card h2 { margin-top: 0; font-size: 20px; letter-spacing: -0.01em; }
-  .card h3 { font-size: 15px; margin: 18px 0 8px; color: var(--sogang-red); }
+  .simple-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0; height: 3px;
+    background: linear-gradient(90deg, var(--sg-red) 0%, var(--gold) 100%);
+    opacity: 0;
+    transition: opacity 0.2s ease;
+  }
+  .simple-card:hover {
+    box-shadow: var(--shadow-md);
+    transform: translateY(-2px);
+  }
+  .simple-card:hover::before { opacity: 1; }
+  .simple-card .emoji {
+    font-size: 34px;
+    margin-bottom: 10px;
+    display: block;
+  }
+  .simple-card h3 {
+    font-size: 17px;
+    font-weight: 700;
+    margin: 0 0 10px;
+    letter-spacing: -0.01em;
+  }
+  .simple-card p {
+    font-size: 14.5px;
+    color: var(--muted);
+    margin: 0;
+    line-height: 1.6;
+  }
 
-  /* Form */
-  .form-grid {
+  .analogy {
+    background: linear-gradient(135deg, #fff9e8 0%, #fff 100%);
+    border: 1px solid var(--gold-soft);
+    border-radius: var(--radius);
+    padding: 28px 30px;
+    margin-top: 34px;
+    display: flex; gap: 18px; align-items: flex-start;
+  }
+  .analogy .ico {
+    font-size: 32px; flex-shrink: 0;
+  }
+  .analogy p {
+    margin: 0; font-size: 15px; line-height: 1.7;
+  }
+  .analogy strong { color: var(--sg-red); }
+
+  /* ---------- Problem / Solution (Section 2) ---------- */
+  .two-col {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 22px;
+    margin-top: 12px;
+  }
+  @media (max-width: 768px) { .two-col { grid-template-columns: 1fr; } }
+
+  .block {
+    background: #fff;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 28px;
+    position: relative;
+  }
+  .block.bad {
+    background: linear-gradient(135deg, #fef2f2 0%, #fff 70%);
+    border-color: #fecaca;
+  }
+  .block.good {
+    background: linear-gradient(135deg, #f0fdf4 0%, #fff 70%);
+    border-color: #bbf7d0;
+  }
+  .block .label {
+    display: inline-block;
+    font-family: "JetBrains Mono", monospace;
+    font-size: 10.5px;
+    letter-spacing: 0.15em;
+    padding: 3px 10px;
+    border-radius: 4px;
+    margin-bottom: 14px;
+    font-weight: 600;
+  }
+  .block.bad .label { background: #fecaca; color: #b91c1c; }
+  .block.good .label { background: #bbf7d0; color: #166534; }
+  .block h3 { margin: 0 0 14px; font-size: 19px; letter-spacing: -0.01em; }
+  .block ul { padding-left: 0; list-style: none; margin: 0; }
+  .block ul li {
+    padding: 8px 0 8px 28px;
+    position: relative;
+    font-size: 14.5px;
+    line-height: 1.6;
+    border-bottom: 1px dashed rgba(15,17,21,0.06);
+  }
+  .block ul li:last-child { border-bottom: none; }
+  .block.bad ul li::before {
+    content: '✗'; position: absolute; left: 0;
+    color: #dc2626; font-weight: 800; top: 8px;
+  }
+  .block.good ul li::before {
+    content: '✓'; position: absolute; left: 0;
+    color: #16a34a; font-weight: 800; top: 8px;
+  }
+
+  /* ---------- Architecture (Section 3) ---------- */
+  .arch-wrap {
+    background: linear-gradient(180deg, #fbfaf6 0%, #fff 100%);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 40px 32px;
+    margin-top: 10px;
+    box-shadow: var(--shadow-sm);
+  }
+  .arch-svg { width: 100%; height: auto; display: block; }
+
+  .agents-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
     gap: 14px;
+    margin-top: 32px;
   }
-  label.field {
-    display: block;
-    font-size: 13px; font-weight: 600; color: var(--muted);
-    margin-bottom: 4px;
-  }
-  select, input[type="text"], input[type="number"], textarea {
-    width: 100%;
-    padding: 10px 12px;
-    font-size: 14px;
-    border: 1px solid var(--border);
-    border-radius: 8px;
-    background: #fff;
-    font-family: inherit;
-  }
-  textarea { min-height: 80px; resize: vertical; }
-  select:focus, input:focus, textarea:focus {
-    outline: 2px solid var(--sogang-red);
-    outline-offset: -1px;
-    border-color: var(--sogang-red);
-  }
-  .chip-row { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 6px; }
-  .chip {
+  .agent-card {
     background: #fff;
     border: 1px solid var(--border);
-    padding: 6px 12px;
-    border-radius: 999px;
-    font-size: 12px;
-    cursor: pointer;
-    user-select: none;
+    border-radius: var(--radius);
+    padding: 20px;
+    position: relative;
+    transition: all 0.2s ease;
   }
-  .chip.selected {
-    background: var(--sogang-red);
+  .agent-card:hover { border-color: var(--sg-red); box-shadow: var(--shadow-sm); }
+  .agent-card .num {
+    position: absolute; top: 16px; right: 16px;
+    width: 28px; height: 28px;
+    background: var(--ink);
     color: #fff;
-    border-color: var(--sogang-red);
+    border-radius: 6px;
+    display: flex; align-items: center; justify-content: center;
+    font-family: "JetBrains Mono", monospace;
+    font-size: 12px; font-weight: 700;
   }
-
-  button.primary {
-    background: var(--sogang-red);
-    color: #fff;
-    border: none;
-    padding: 12px 22px;
-    font-size: 15px;
-    font-weight: 700;
-    border-radius: 8px;
-    cursor: pointer;
-    margin-top: 18px;
+  .agent-card h4 {
+    margin: 0 0 6px; font-size: 15px;
+    font-family: "JetBrains Mono", monospace;
+    color: var(--sg-red);
+    letter-spacing: -0.01em;
   }
-  button.primary:hover { background: var(--sogang-red-dark); }
-  button.primary:disabled { opacity: 0.5; cursor: not-allowed; }
-
-  /* Agent trace */
-  .trace {
-    background: #0f0f0f;
-    color: #d4d4d4;
-    font-family: "SF Mono", "Consolas", monospace;
-    font-size: 12.5px;
-    line-height: 1.6;
-    padding: 16px;
-    border-radius: 8px;
+  .agent-card .role {
+    font-size: 13.5px; color: var(--ink); font-weight: 600;
+    margin-bottom: 8px;
+  }
+  .agent-card .desc {
+    font-size: 12.5px; color: var(--muted); line-height: 1.55;
+  }
+  .agent-card .tech {
     margin-top: 10px;
-    min-height: 60px;
-    max-height: 280px;
-    overflow-y: auto;
+    font-family: "JetBrains Mono", monospace;
+    font-size: 10.5px;
+    color: var(--muted-2);
+    padding-top: 10px;
+    border-top: 1px dashed var(--border);
   }
-  .trace .t-step { color: var(--accent); }
-  .trace .t-ok { color: #6cc16c; }
-  .trace .t-info { color: #7cb8ea; }
-  .trace .t-think { color: #bfa; font-style: italic; }
 
-  /* Roadmap */
-  .roadmap {
+  /* Tech stack bar */
+  .tech-stack {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 12px;
+    margin-top: 22px;
+  }
+  .tech-item {
+    background: var(--ink);
+    color: #d4d4d4;
+    border-radius: var(--radius-sm);
+    padding: 14px 16px;
+    font-family: "JetBrains Mono", monospace;
+    font-size: 12.5px;
+  }
+  .tech-item .kind { color: var(--gold-soft); font-size: 10.5px; letter-spacing: 0.12em; text-transform: uppercase; margin-bottom: 4px; }
+  .tech-item .name { font-weight: 600; color: #fff; font-size: 13.5px; }
+  .tech-item .note { color: var(--muted-2); font-size: 11.5px; margin-top: 3px; }
+
+  /* Hallucination guard */
+  .guard-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 14px;
+    margin-top: 16px;
+  }
+  .guard {
+    background: #fff;
+    border: 1px solid var(--border);
+    border-left: 3px solid var(--ok);
+    border-radius: var(--radius-sm);
+    padding: 16px 18px;
+  }
+  .guard .t {
+    font-weight: 700; font-size: 14px; color: var(--ok);
+    margin-bottom: 6px; display: flex; align-items: center; gap: 6px;
+  }
+  .guard p { font-size: 13px; color: var(--muted); margin: 0; line-height: 1.55; }
+
+  /* ---------- Demo (Section 4) ---------- */
+  .demo-shell {
+    background: #fff;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    overflow: hidden;
+    box-shadow: var(--shadow-md);
+  }
+  .demo-head {
+    background: linear-gradient(180deg, #fbfaf6 0%, #f4f1e8 100%);
+    padding: 16px 20px;
+    border-bottom: 1px solid var(--border);
+    display: flex; align-items: center; gap: 10px;
+    font-family: "JetBrains Mono", monospace;
+    font-size: 12px;
+    color: var(--muted);
+  }
+  .demo-head .dots {
+    display: flex; gap: 6px;
+  }
+  .demo-head .dots span {
+    width: 11px; height: 11px; border-radius: 50%;
+  }
+  .demo-head .dots span:nth-child(1) { background: #ef4444; }
+  .demo-head .dots span:nth-child(2) { background: #eab308; }
+  .demo-head .dots span:nth-child(3) { background: #22c55e; }
+  .demo-body { padding: 28px; }
+
+  .form-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
     gap: 14px;
-    margin-top: 16px;
+  }
+  .field-label {
+    display: block;
+    font-size: 11.5px; letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--muted);
+    font-weight: 700;
+    margin-bottom: 6px;
+  }
+  select, input[type="text"], input[type="number"], textarea {
+    width: 100%;
+    padding: 11px 14px;
+    font-size: 14px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    background: #fff;
+    font-family: inherit;
+    transition: all 0.15s ease;
+  }
+  textarea { min-height: 80px; resize: vertical; font-family: inherit; }
+  select:focus, input:focus, textarea:focus {
+    outline: none;
+    border-color: var(--sg-red);
+    box-shadow: 0 0 0 3px rgba(179,0,0,0.12);
+  }
+
+  .chip-row { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 6px; }
+  .chip {
+    background: #fff;
+    border: 1px solid var(--border);
+    padding: 8px 14px;
+    border-radius: 999px;
+    font-size: 13px;
+    cursor: pointer;
+    user-select: none;
+    font-weight: 500;
+    transition: all 0.12s ease;
+  }
+  .chip:hover { border-color: var(--sg-red); color: var(--sg-red); }
+  .chip.selected {
+    background: var(--sg-red);
+    color: #fff;
+    border-color: var(--sg-red);
+    box-shadow: 0 4px 12px rgba(179,0,0,0.2);
+  }
+
+  button.primary {
+    background: linear-gradient(135deg, var(--sg-red) 0%, var(--sg-red-deep) 100%);
+    color: #fff;
+    border: none;
+    padding: 14px 28px;
+    font-size: 15px;
+    font-weight: 700;
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    margin-top: 22px;
+    display: inline-flex; align-items: center; gap: 8px;
+    box-shadow: 0 4px 14px rgba(179,0,0,0.25);
+    transition: all 0.15s ease;
+  }
+  button.primary:hover { transform: translateY(-1px); box-shadow: 0 8px 20px rgba(179,0,0,0.35); }
+  button.primary:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
+
+  /* Trace terminal */
+  .trace-wrap {
+    margin-top: 24px;
+    border-radius: var(--radius-sm);
+    overflow: hidden;
+    border: 1px solid var(--ink);
+  }
+  .trace-head {
+    background: var(--ink);
+    color: var(--gold-soft);
+    padding: 8px 14px;
+    font-family: "JetBrains Mono", monospace;
+    font-size: 11.5px;
+    letter-spacing: 0.08em;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .trace-head::before {
+    content: '●'; color: #22c55e; font-size: 10px;
+  }
+  .trace {
+    background: #0a0c11;
+    color: #d4d4d4;
+    font-family: "JetBrains Mono", monospace;
+    font-size: 12.5px;
+    line-height: 1.65;
+    padding: 18px 20px;
+    min-height: 80px;
+    max-height: 320px;
+    overflow-y: auto;
+  }
+  .trace .t-step { color: var(--gold); font-weight: 600; }
+  .trace .t-ok { color: #6cc16c; }
+  .trace .t-info { color: #7cb8ea; }
+  .trace .t-think { color: #a5b3c0; font-style: italic; }
+
+  /* Roadmap */
+  #roadmap-wrap { margin-top: 36px; }
+  .roadmap-head {
+    display: flex; justify-content: space-between; align-items: flex-end;
+    margin-bottom: 20px;
+    gap: 16px; flex-wrap: wrap;
+  }
+  .roadmap-head h3 { margin: 0; font-size: 22px; letter-spacing: -0.015em; }
+  .roadmap-stats {
+    display: flex; gap: 18px;
+    font-size: 13px; color: var(--muted);
+  }
+  .roadmap-stats b { color: var(--ink); font-size: 15px; font-weight: 700; }
+
+  .roadmap {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 16px;
   }
   .sem-card {
     background: #fff;
     border: 1px solid var(--border);
-    border-top: 3px solid var(--sogang-red);
-    border-radius: 8px;
-    padding: 14px;
+    border-radius: var(--radius);
+    padding: 18px;
+    position: relative;
+    transition: all 0.2s ease;
   }
-  .sem-card h4 {
-    margin: 0 0 8px;
-    font-size: 13px;
-    color: var(--muted);
-    letter-spacing: 0.05em;
-    text-transform: uppercase;
+  .sem-card:hover { box-shadow: var(--shadow-md); transform: translateY(-2px); }
+  .sem-card .sem-label {
+    font-family: "JetBrains Mono", monospace;
+    font-size: 11px;
+    letter-spacing: 0.1em;
+    color: var(--sg-red);
+    font-weight: 700;
+    margin-bottom: 10px;
   }
   .course-pill {
-    background: var(--soft);
-    border-radius: 6px;
-    padding: 8px 10px;
-    margin-bottom: 6px;
+    background: var(--paper-2);
+    border-radius: 8px;
+    padding: 10px 12px;
+    margin-bottom: 8px;
     font-size: 13px;
-    border-left: 3px solid var(--accent);
+    border-left: 3px solid var(--gold);
+    transition: all 0.15s ease;
   }
+  .course-pill:hover { transform: translateX(2px); }
   .course-pill .code {
-    font-family: "SF Mono", monospace;
-    font-size: 11px;
+    font-family: "JetBrains Mono", monospace;
+    font-size: 10.5px;
     color: var(--muted);
+    letter-spacing: 0.05em;
   }
-  .course-pill .nm { font-weight: 600; }
-  .course-pill .rc { color: var(--ok); font-size: 11px; }
-  .course-pill.req { border-left-color: var(--sogang-red); }
+  .course-pill .nm { font-weight: 600; font-size: 13.5px; margin-top: 2px; }
+  .course-pill .meta { font-size: 11px; color: var(--muted); margin-top: 3px; }
+  .course-pill .rc { color: var(--ok); font-size: 11px; font-weight: 600; margin-top: 3px; }
+  .course-pill.req { border-left-color: var(--sg-red); background: #fff7f7; }
   .sem-sum {
-    font-size: 12px;
-    color: var(--muted);
-    margin-top: 6px;
-    padding-top: 6px;
+    font-size: 11.5px; color: var(--muted);
+    margin-top: 10px; padding-top: 10px;
     border-top: 1px dashed var(--border);
+    font-family: "JetBrains Mono", monospace;
   }
 
-  /* Explain */
   .explain-box {
-    background: #fffbea;
-    border-left: 4px solid var(--accent);
-    padding: 14px 18px;
-    margin-top: 14px;
-    border-radius: 4px;
-    font-size: 14px;
+    background: linear-gradient(135deg, #fff9e8 0%, #fff 100%);
+    border-left: 4px solid var(--gold);
+    padding: 18px 22px;
+    margin-top: 20px;
+    border-radius: var(--radius-sm);
+    font-size: 14.5px;
   }
-  .explain-box strong { color: var(--sogang-red); }
+  .explain-box strong { color: var(--sg-red); }
 
-  /* RAG citations */
   .citation {
     display: inline-block;
-    background: #eef3fb;
-    color: #2553a0;
+    background: #e0eafc;
+    color: var(--info);
     border-radius: 4px;
-    padding: 1px 6px;
-    font-size: 11px;
-    font-family: "SF Mono", monospace;
-    margin: 0 2px;
+    padding: 1px 7px;
+    font-size: 10.5px;
+    font-family: "JetBrains Mono", monospace;
+    margin: 0 3px;
   }
 
-  /* Course catalog */
+  /* ---------- Scorecard ---------- */
+  .score-table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+    background: #fff;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    overflow: hidden;
+    margin-top: 18px;
+    font-size: 14px;
+  }
+  .score-table th, .score-table td {
+    padding: 14px 18px;
+    text-align: left;
+    border-bottom: 1px solid var(--border);
+  }
+  .score-table th {
+    background: var(--paper-2);
+    font-size: 12px; letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--muted); font-weight: 700;
+  }
+  .score-table tr:last-child td { border-bottom: none; }
+  .stars { color: var(--gold); letter-spacing: 2px; font-size: 15px; }
+
+  /* ---------- Timeline ---------- */
+  .timeline {
+    position: relative;
+    padding-left: 28px;
+    margin-top: 20px;
+  }
+  .timeline::before {
+    content: '';
+    position: absolute;
+    left: 8px; top: 8px; bottom: 8px;
+    width: 2px;
+    background: linear-gradient(180deg, var(--sg-red) 0%, var(--gold) 100%);
+  }
+  .tl-item {
+    position: relative;
+    padding: 12px 0 16px 18px;
+  }
+  .tl-item::before {
+    content: '';
+    position: absolute;
+    left: -28px; top: 18px;
+    width: 18px; height: 18px;
+    background: #fff;
+    border: 3px solid var(--sg-red);
+    border-radius: 50%;
+  }
+  .tl-week {
+    font-family: "JetBrains Mono", monospace;
+    font-size: 11px;
+    color: var(--sg-red);
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    margin-bottom: 4px;
+  }
+  .tl-milestone {
+    font-weight: 700;
+    font-size: 15px;
+    margin-bottom: 4px;
+  }
+  .tl-out {
+    font-size: 13px;
+    color: var(--muted);
+  }
+
+  /* ---------- Data section ---------- */
+  .stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    gap: 14px;
+    margin: 14px 0 28px;
+  }
+  .stat {
+    background: #fff;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 20px;
+    text-align: center;
+    transition: all 0.2s ease;
+  }
+  .stat:hover { border-color: var(--sg-red); }
+  .stat .n {
+    font-size: 34px; font-weight: 800;
+    background: linear-gradient(135deg, var(--sg-red) 0%, var(--sg-red-deep) 100%);
+    -webkit-background-clip: text; background-clip: text; color: transparent;
+    letter-spacing: -0.02em;
+  }
+  .stat .l {
+    font-size: 12px; color: var(--muted);
+    margin-top: 4px;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    font-weight: 600;
+  }
+
   .course-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
@@ -255,35 +774,32 @@
     border: 1px solid var(--border);
   }
 
-  /* Architecture */
-  pre.ascii {
-    font-family: "SF Mono", "Consolas", monospace;
-    font-size: 12px;
-    line-height: 1.4;
+  .track-card {
     background: #fff;
     border: 1px solid var(--border);
-    border-radius: 8px;
-    padding: 16px;
-    overflow-x: auto;
+    border-radius: var(--radius);
+    padding: 20px;
+    margin-bottom: 12px;
+  }
+  .track-card .name {
+    font-weight: 800; font-size: 17px; color: var(--sg-red);
+    letter-spacing: -0.01em;
+  }
+  .track-card .desc {
+    font-size: 13.5px; color: var(--muted);
+    margin: 6px 0 10px;
+  }
+  .track-card .core {
+    font-family: "JetBrains Mono", monospace;
+    font-size: 11.5px;
+    color: var(--muted);
+  }
+  .track-card .capstone {
+    font-size: 12px; color: var(--ok);
+    margin-top: 6px; font-weight: 600;
   }
 
-  /* Stats */
-  .stats {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-    gap: 10px;
-    margin: 14px 0;
-  }
-  .stat {
-    background: #fff;
-    border: 1px solid var(--border);
-    border-radius: 8px;
-    padding: 12px;
-    text-align: center;
-  }
-  .stat .n { font-size: 24px; font-weight: 800; color: var(--sogang-red); }
-  .stat .l { font-size: 12px; color: var(--muted); }
-
+  /* ---------- Utilities ---------- */
   .loading-dots::after {
     content: '.';
     animation: dots 1.2s steps(3, end) infinite;
@@ -295,67 +811,401 @@
   }
 
   footer {
+    margin-top: 40px;
+    padding: 50px 28px 40px;
+    background: var(--ink);
+    color: var(--muted-2);
     text-align: center;
-    padding: 30px 20px;
-    color: var(--muted);
-    font-size: 12px;
-    border-top: 1px solid var(--border);
+    font-size: 13px;
   }
-  footer a { color: var(--sogang-red); text-decoration: none; }
+  footer a { color: var(--gold-soft); text-decoration: none; }
+  footer a:hover { text-decoration: underline; }
+  footer .brand { color: #fff; font-weight: 700; margin-bottom: 10px; font-size: 15px; }
 
-  @media (max-width: 600px) {
-    h1.title { font-size: 26px; }
-    header.hero { padding: 32px 16px 28px; }
-    main { padding: 20px 16px 60px; }
-  }
+  ::selection { background: var(--sg-red); color: #fff; }
 </style>
 </head>
 <body>
 
+<!-- =============== NAV =============== -->
+<nav class="topnav">
+  <div class="nav-inner">
+    <div class="nav-brand">
+      <span class="dot"></span>
+      <span>Albatross Syllabus Navigator</span>
+    </div>
+    <div class="nav-links">
+      <a href="#intro">소개</a>
+      <a href="#problem">문제/솔루션</a>
+      <a href="#architecture">아키텍처</a>
+      <a href="#demo">데모</a>
+      <a href="#data">데이터</a>
+    </div>
+  </div>
+</nav>
+
+<!-- =============== HERO =============== -->
 <header class="hero">
   <div class="hero-inner">
-    <span class="eyebrow">2026 서강대 생성형 AI 공모전 · Demo</span>
-    <h1 class="title">Albatross Syllabus Navigator</h1>
+    <span class="eyebrow">2026 서강대 생성형 AI 아이디어 공모전 · 출품 데모</span>
+    <h1 class="title">
+      서강대 학생의 4년을<br/>
+      <span class="accent">AI 에이전트가 역산</span>합니다.
+    </h1>
     <p class="subtitle">
-      서강대 트랙제 · 졸업요건 · 선수과목 그래프를 RAG로 엮어, 학생이 관심사 한 줄만 넣으면
-      AI 에이전트가 <strong>4년치 수강 로드맵을 역산</strong>해주는 설계 도구.
+      트랙제 · 졸업요건 · 선수과목 · 시간표 — 흩어진 정보를 RAG로 엮어,
+      관심사 한 줄에서 수강 로드맵이 나옵니다.
     </p>
-    <div class="hero-meta">
-      <span>분야 ① 교육 혁신</span>
-      <span>팀 타깃: 대상 500만원</span>
-      <span>MVP 2개월</span>
-      <span>by gkfla2020-bit</span>
+    <a class="hero-cta" href="#demo">
+      데모 바로 해보기
+      <span class="arrow">→</span>
+    </a>
+    <div class="hero-tags">
+      <span class="hero-tag"><span class="k">분야</span>① 교육혁신</span>
+      <span class="hero-tag"><span class="k">대상 상</span>대상 500만원</span>
+      <span class="hero-tag"><span class="k">개발</span>2개월 MVP</span>
+      <span class="hero-tag"><span class="k">스택</span>Claude · RAG · Graph</span>
     </div>
   </div>
 </header>
 
-<main>
-  <div class="tabs" role="tablist">
-    <button class="tab active" data-tab="demo">① 데모</button>
-    <button class="tab" data-tab="idea">② 아이디어 상세</button>
-    <button class="tab" data-tab="arch">③ 아키텍처 & RAG</button>
-    <button class="tab" data-tab="data">④ 샘플 데이터</button>
+<!-- =============== SECTION 1: 쉬운 설명 =============== -->
+<section class="sec" id="intro">
+  <div class="sec-num">01 — 쉽게 설명하면</div>
+  <h2 class="sec-title">수강신청을 <span class="hl">"내비게이션"</span> 처럼.</h2>
+  <p class="sec-lead">
+    지금은 목적지(졸업)만 찍혀 있고, 학생이 직접 지도를 펼쳐서 길을 그립니다.
+    우리는 그 지도를 읽고 <strong>"이 길로 가면 돼요"</strong> 라고 말해주는 AI를 만듭니다.
+  </p>
+
+  <div class="simple-grid">
+    <div class="simple-card">
+      <span class="emoji">🎯</span>
+      <h3>목적지를 말하면</h3>
+      <p>"AI+경영에 관심 있어요" 한 줄이면 충분합니다. 복잡한 학점 계산은 필요 없습니다.</p>
+    </div>
+    <div class="simple-card">
+      <span class="emoji">🗺️</span>
+      <h3>길을 그려줍니다</h3>
+      <p>학기별로 어떤 과목을 들어야 하는지, 순서대로. 선수과목은 자동으로 앞에 배치됩니다.</p>
+    </div>
+    <div class="simple-card">
+      <span class="emoji">🚧</span>
+      <h3>막히는 구간은 우회</h3>
+      <p>"금요일 오후 알바" 같은 제약을 입력하면 그 시간의 수업은 자동으로 뺍니다.</p>
+    </div>
+    <div class="simple-card">
+      <span class="emoji">💬</span>
+      <h3>이유까지 설명</h3>
+      <p>"왜 이 과목을 먼저 듣는지" AI가 자연어로 풀이해줍니다. 학칙 조항까지 인용해서.</p>
+    </div>
   </div>
 
-  <!-- =============== DEMO =============== -->
-  <section class="panel active" id="tab-demo">
-    <div class="card">
-      <h2>수강 설계 요청</h2>
-      <p style="color:var(--muted); font-size:14px; margin-top:-6px">
-        학생 상태를 입력하면 에이전트가 <strong>① 졸업요건 검색 → ② 선수과목 그래프 추론 → ③ 시간표 충돌 회피 → ④ 관심사 매칭</strong>
-        4단계로 계획을 짭니다. 아래는 브라우저에서 돌아가는 결정론적 시뮬레이션입니다(실사용 시 LLM 연결).
-      </p>
+  <div class="analogy">
+    <span class="ico">🧭</span>
+    <p>
+      <strong>비유</strong>하자면 — 구글맵이 "경복궁까지 어떻게 가요?"를 물으면 교통·시간·도로상황을 종합해
+      최적 경로를 그리듯, 본 서비스는 "퀀트 펀드 취업까지 어떻게 가요?"에 학점·선수과목·시간표·강의평을 종합해
+      <strong>4년 수강 경로</strong>를 그립니다.
+    </p>
+  </div>
+</section>
 
-      <div class="form-grid" style="margin-top:18px">
+<!-- =============== SECTION 2: 문제 / 솔루션 =============== -->
+<section class="sec" id="problem">
+  <div class="sec-num">02 — 왜 지금 필요한가</div>
+  <h2 class="sec-title">서강대 학생의 <span class="hl">매 학기 고통</span>, 구체적으로.</h2>
+  <p class="sec-lead">
+    강의계획서는 PDF, 졸업요건은 학과 홈페이지, 트랙 안내는 별도 문서. ChatGPT는 서강대 규정을 모르고,
+    학사시스템은 추천 기능이 없습니다.
+  </p>
+
+  <div class="two-col">
+    <div class="block bad">
+      <span class="label">BEFORE · 현재</span>
+      <h3>탭 20개 띄워놓고 수기로 맞추기</h3>
+      <ul>
+        <li>강의계획서 PDF를 여러 탭에 펼침</li>
+        <li>졸업요건 엑셀과 대조하며 남은 학점 계산</li>
+        <li>선수과목 체인을 손으로 역추적 (딥러닝 ← 기계학습 ← 자료구조 ← …)</li>
+        <li>시간표 충돌은 수강신청 직전에야 발견</li>
+        <li>선배 카더라 · 에타 글 파편 수집</li>
+        <li>학기당 4~6시간 소요, 결과물은 스프레드시트 한 장</li>
+      </ul>
+    </div>
+    <div class="block good">
+      <span class="label">AFTER · 내비게이터 투입</span>
+      <h3>관심사 한 줄 → 4년 로드맵 30초</h3>
+      <ul>
+        <li>전공·학년·이수학점·트랙을 폼으로 입력</li>
+        <li>자유 제약은 자연어로 ("금요일 오후 알바")</li>
+        <li>AI가 졸업요건 RAG로 검색 후 역산</li>
+        <li>선수과목 그래프를 자동 탐색해 순서 배치</li>
+        <li>시간표 충돌·학점 상한·개인 제약까지 검증</li>
+        <li>"왜 이 조합인가"를 학칙 출처 인용하며 설명</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- =============== SECTION 3: 아키텍처 =============== -->
+<section class="sec" id="architecture">
+  <div class="sec-num">03 — 어떻게 작동하는가</div>
+  <h2 class="sec-title">4개의 <span class="hl">전문 AI 에이전트</span>가 릴레이합니다.</h2>
+  <p class="sec-lead">
+    단일 챗봇이 아니라, 각자 다른 일을 잘하는 에이전트 4개가 순차적으로 문제를 넘깁니다.
+    오케스트레이터가 지휘하고, 각 에이전트는 RAG / 그래프 / 제약풀이 / 설명생성을 맡습니다.
+  </p>
+
+  <!-- Architecture SVG Diagram -->
+  <div class="arch-wrap">
+    <svg class="arch-svg" viewBox="0 0 900 540" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="시스템 아키텍처 다이어그램">
+      <defs>
+        <linearGradient id="gradOrc" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0%" stop-color="#b30000"/>
+          <stop offset="100%" stop-color="#7a0000"/>
+        </linearGradient>
+        <linearGradient id="gradAgent" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stop-color="#ffffff"/>
+          <stop offset="100%" stop-color="#fbf9f4"/>
+        </linearGradient>
+        <linearGradient id="gradData" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0%" stop-color="#1a1d24"/>
+          <stop offset="100%" stop-color="#0f1115"/>
+        </linearGradient>
+        <marker id="arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+          <path d="M0,0 L10,5 L0,10 Z" fill="#6b6e78"/>
+        </marker>
+        <marker id="arrRed" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+          <path d="M0,0 L10,5 L0,10 Z" fill="#b30000"/>
+        </marker>
+        <filter id="soft" x="-20%" y="-20%" width="140%" height="140%">
+          <feGaussianBlur in="SourceAlpha" stdDeviation="4"/>
+          <feOffset dx="0" dy="4" result="off"/>
+          <feComponentTransfer><feFuncA type="linear" slope="0.15"/></feComponentTransfer>
+          <feMerge><feMergeNode/><feMergeNode in="SourceGraphic"/></feMerge>
+        </filter>
+      </defs>
+
+      <!-- Background grid subtle -->
+      <rect x="0" y="0" width="900" height="540" fill="none"/>
+
+      <!-- User (top) -->
+      <g filter="url(#soft)">
+        <rect x="370" y="16" width="160" height="54" rx="27" fill="#fff" stroke="#e7e2d3" stroke-width="1.5"/>
+        <text x="450" y="42" text-anchor="middle" font-family="Pretendard" font-weight="700" font-size="14" fill="#0f1115">👤 학생 입력</text>
+        <text x="450" y="60" text-anchor="middle" font-family="JetBrains Mono" font-size="10" fill="#6b6e78">major · track · grade</text>
+      </g>
+      <line x1="450" y1="70" x2="450" y2="105" stroke="#6b6e78" stroke-width="1.5" marker-end="url(#arr)"/>
+
+      <!-- Orchestrator -->
+      <g filter="url(#soft)">
+        <rect x="300" y="105" width="300" height="64" rx="12" fill="url(#gradOrc)"/>
+        <text x="450" y="132" text-anchor="middle" font-family="Pretendard" font-weight="800" font-size="15" fill="#fff">🧠 Orchestrator Agent</text>
+        <text x="450" y="152" text-anchor="middle" font-family="JetBrains Mono" font-size="10.5" fill="#f0d99a">Claude Opus · 의도분해·라우팅·검증</text>
+      </g>
+
+      <!-- Arrows from orchestrator down to 4 agents -->
+      <line x1="375" y1="169" x2="130" y2="215" stroke="#b30000" stroke-width="1.5" marker-end="url(#arrRed)" stroke-dasharray="4,3"/>
+      <line x1="415" y1="169" x2="340" y2="215" stroke="#b30000" stroke-width="1.5" marker-end="url(#arrRed)" stroke-dasharray="4,3"/>
+      <line x1="485" y1="169" x2="560" y2="215" stroke="#b30000" stroke-width="1.5" marker-end="url(#arrRed)" stroke-dasharray="4,3"/>
+      <line x1="525" y1="169" x2="770" y2="215" stroke="#b30000" stroke-width="1.5" marker-end="url(#arrRed)" stroke-dasharray="4,3"/>
+
+      <!-- 4 Agents -->
+      <g filter="url(#soft)">
+        <rect x="40" y="215" width="180" height="110" rx="10" fill="url(#gradAgent)" stroke="#b30000" stroke-width="1.5"/>
+        <circle cx="62" cy="237" r="13" fill="#b30000"/>
+        <text x="62" y="242" text-anchor="middle" font-family="JetBrains Mono" font-weight="700" font-size="12" fill="#fff">1</text>
+        <text x="85" y="244" font-family="Pretendard" font-weight="700" font-size="13" fill="#0f1115">RequirementRAG</text>
+        <text x="60" y="270" font-family="Pretendard" font-size="11.5" fill="#6b6e78">학칙·졸업요건</text>
+        <text x="60" y="286" font-family="Pretendard" font-size="11.5" fill="#6b6e78">벡터DB 조회</text>
+        <text x="60" y="310" font-family="JetBrains Mono" font-size="10" fill="#c9a24a">pgvector · Voyage-3</text>
+      </g>
+
+      <g filter="url(#soft)">
+        <rect x="245" y="215" width="180" height="110" rx="10" fill="url(#gradAgent)" stroke="#b30000" stroke-width="1.5"/>
+        <circle cx="267" cy="237" r="13" fill="#b30000"/>
+        <text x="267" y="242" text-anchor="middle" font-family="JetBrains Mono" font-weight="700" font-size="12" fill="#fff">2</text>
+        <text x="290" y="244" font-family="Pretendard" font-weight="700" font-size="13" fill="#0f1115">PrereqGraph</text>
+        <text x="265" y="270" font-family="Pretendard" font-size="11.5" fill="#6b6e78">선수과목 역추적</text>
+        <text x="265" y="286" font-family="Pretendard" font-size="11.5" fill="#6b6e78">그래프 DFS 탐색</text>
+        <text x="265" y="310" font-family="JetBrains Mono" font-size="10" fill="#c9a24a">NetworkX · DAG</text>
+      </g>
+
+      <g filter="url(#soft)">
+        <rect x="475" y="215" width="180" height="110" rx="10" fill="url(#gradAgent)" stroke="#b30000" stroke-width="1.5"/>
+        <circle cx="497" cy="237" r="13" fill="#b30000"/>
+        <text x="497" y="242" text-anchor="middle" font-family="JetBrains Mono" font-weight="700" font-size="12" fill="#fff">3</text>
+        <text x="520" y="244" font-family="Pretendard" font-weight="700" font-size="13" fill="#0f1115">TimetableSAT</text>
+        <text x="495" y="270" font-family="Pretendard" font-size="11.5" fill="#6b6e78">시간표 충돌</text>
+        <text x="495" y="286" font-family="Pretendard" font-size="11.5" fill="#6b6e78">제약 풀이</text>
+        <text x="495" y="310" font-family="JetBrains Mono" font-size="10" fill="#c9a24a">Z3 SAT Solver</text>
+      </g>
+
+      <g filter="url(#soft)">
+        <rect x="680" y="215" width="180" height="110" rx="10" fill="url(#gradAgent)" stroke="#b30000" stroke-width="1.5"/>
+        <circle cx="702" cy="237" r="13" fill="#b30000"/>
+        <text x="702" y="242" text-anchor="middle" font-family="JetBrains Mono" font-weight="700" font-size="12" fill="#fff">4</text>
+        <text x="725" y="244" font-family="Pretendard" font-weight="700" font-size="13" fill="#0f1115">Explainer</text>
+        <text x="700" y="270" font-family="Pretendard" font-size="11.5" fill="#6b6e78">자연어 rationale</text>
+        <text x="700" y="286" font-family="Pretendard" font-size="11.5" fill="#6b6e78">출처 인용 생성</text>
+        <text x="700" y="310" font-family="JetBrains Mono" font-size="10" fill="#c9a24a">Claude · Structured</text>
+      </g>
+
+      <!-- Data Layer -->
+      <line x1="130" y1="325" x2="130" y2="370" stroke="#6b6e78" stroke-width="1.5" marker-end="url(#arr)"/>
+      <line x1="335" y1="325" x2="335" y2="370" stroke="#6b6e78" stroke-width="1.5" marker-end="url(#arr)"/>
+      <line x1="565" y1="325" x2="565" y2="370" stroke="#6b6e78" stroke-width="1.5" marker-end="url(#arr)"/>
+      <line x1="770" y1="325" x2="770" y2="370" stroke="#6b6e78" stroke-width="1.5" marker-end="url(#arr)"/>
+
+      <g filter="url(#soft)">
+        <rect x="40" y="370" width="820" height="80" rx="10" fill="url(#gradData)"/>
+        <text x="450" y="396" text-anchor="middle" font-family="Pretendard" font-weight="700" font-size="13" fill="#f0d99a">📚 Data Layer</text>
+        <text x="130" y="420" text-anchor="middle" font-family="JetBrains Mono" font-size="11" fill="#d4d4d4">학칙 · 시행세칙</text>
+        <text x="130" y="436" text-anchor="middle" font-family="JetBrains Mono" font-size="10" fill="#9aa0aa">500토큰 청크</text>
+        <text x="335" y="420" text-anchor="middle" font-family="JetBrains Mono" font-size="11" fill="#d4d4d4">강의계획서 200건</text>
+        <text x="335" y="436" text-anchor="middle" font-family="JetBrains Mono" font-size="10" fill="#9aa0aa">LlamaParse</text>
+        <text x="565" y="420" text-anchor="middle" font-family="JetBrains Mono" font-size="11" fill="#d4d4d4">선수과목 DAG</text>
+        <text x="565" y="436" text-anchor="middle" font-family="JetBrains Mono" font-size="10" fill="#9aa0aa">학과 메타</text>
+        <text x="770" y="420" text-anchor="middle" font-family="JetBrains Mono" font-size="11" fill="#d4d4d4">강의평 · 부담도</text>
+        <text x="770" y="436" text-anchor="middle" font-family="JetBrains Mono" font-size="10" fill="#9aa0aa">학생 크라우드</text>
+      </g>
+
+      <!-- Output -->
+      <line x1="450" y1="450" x2="450" y2="485" stroke="#b30000" stroke-width="2" marker-end="url(#arrRed)"/>
+      <g filter="url(#soft)">
+        <rect x="320" y="485" width="260" height="44" rx="22" fill="#fff" stroke="#b30000" stroke-width="1.5"/>
+        <text x="450" y="513" text-anchor="middle" font-family="Pretendard" font-weight="700" font-size="14" fill="#b30000">📘 4년 로드맵 + Rationale</text>
+      </g>
+    </svg>
+  </div>
+
+  <!-- 4 Agent cards for detail -->
+  <div class="agents-grid">
+    <div class="agent-card">
+      <div class="num">01</div>
+      <h4>RequirementRAG</h4>
+      <div class="role">졸업요건 검색자</div>
+      <div class="desc">학칙·시행세칙·학과별 졸업요건 PDF가 벡터DB에 들어있습니다. 학생 전공이 입력되면 관련 조항을 출처와 함께 꺼내옵니다.</div>
+      <div class="tech">pgvector · Voyage-3 · BM25+dense</div>
+    </div>
+    <div class="agent-card">
+      <div class="num">02</div>
+      <h4>PrereqGraph</h4>
+      <div class="role">선수과목 탐색자</div>
+      <div class="desc">모든 과목을 노드로, 선수관계를 간선으로 둔 DAG. 목표 과목에서 뒤로 DFS 탐색해 반드시 들어야 할 기초과목을 자동 수집.</div>
+      <div class="tech">NetworkX · Topological sort</div>
+    </div>
+    <div class="agent-card">
+      <div class="num">03</div>
+      <h4>TimetableSAT</h4>
+      <div class="role">제약 풀이자</div>
+      <div class="desc">시간표 충돌, 학기 최대학점, 자유 제약("금요일 오후 회피")을 제약충족문제로 변환해 풀이. 해가 없으면 완화.</div>
+      <div class="tech">Z3 SAT · Or-tools</div>
+    </div>
+    <div class="agent-card">
+      <div class="num">04</div>
+      <h4>Explainer</h4>
+      <div class="role">설명 생성자</div>
+      <div class="desc">왜 이 조합인가를 자연어로 풀이. 구조화 출력 스키마에 citations[] 필수 필드로 할루시네이션 차단.</div>
+      <div class="tech">Claude · JSON Schema</div>
+    </div>
+  </div>
+
+  <!-- Tech stack -->
+  <h3 style="margin-top: 56px; font-size: 22px; letter-spacing: -0.015em;">기술 스택</h3>
+  <p style="color: var(--muted); font-size: 14.5px; margin-top: 4px;">각 층에서 최적 도구를 선택, 교체 가능한 모듈러 구조.</p>
+  <div class="tech-stack">
+    <div class="tech-item">
+      <div class="kind">Frontend</div>
+      <div class="name">Next.js 15</div>
+      <div class="note">App Router · RSC</div>
+    </div>
+    <div class="tech-item">
+      <div class="kind">LLM</div>
+      <div class="name">Claude Opus 4.7</div>
+      <div class="note">에이전트 코어</div>
+    </div>
+    <div class="tech-item">
+      <div class="kind">Embedding</div>
+      <div class="name">Voyage-3</div>
+      <div class="note">한국어 최적</div>
+    </div>
+    <div class="tech-item">
+      <div class="kind">Vector DB</div>
+      <div class="name">pgvector</div>
+      <div class="note">메타 필터 hybrid</div>
+    </div>
+    <div class="tech-item">
+      <div class="kind">PDF Parse</div>
+      <div class="name">LlamaParse</div>
+      <div class="note">표·수식 보존</div>
+    </div>
+    <div class="tech-item">
+      <div class="kind">Graph</div>
+      <div class="name">NetworkX</div>
+      <div class="note">선수과목 DAG</div>
+    </div>
+    <div class="tech-item">
+      <div class="kind">Constraint</div>
+      <div class="name">Z3 SAT</div>
+      <div class="note">시간표 풀이</div>
+    </div>
+    <div class="tech-item">
+      <div class="kind">Rerank</div>
+      <div class="name">Cohere Rerank-3</div>
+      <div class="note">검색 정밀도</div>
+    </div>
+  </div>
+
+  <!-- Hallucination guard -->
+  <h3 style="margin-top: 56px; font-size: 22px; letter-spacing: -0.015em;">할루시네이션 방어 4중 장치</h3>
+  <p style="color: var(--muted); font-size: 14.5px; margin-top: 4px;">AI가 없는 과목을 상상하거나, 엉뚱한 규정을 지어내는 걸 원천 차단합니다.</p>
+  <div class="guard-list">
+    <div class="guard">
+      <div class="t">🛡️ 출처 인용 강제</div>
+      <p>LLM 응답 JSON 스키마에 <span class="mono" style="font-size:11px">citations[]</span> 필수. 빈 배열이면 자동 재생성.</p>
+    </div>
+    <div class="guard">
+      <div class="t">✅ Ground truth 검증</div>
+      <p>추천 과목 코드가 실제 DB에 존재하는지 프로그램적으로 확인. 존재하지 않으면 제거.</p>
+    </div>
+    <div class="guard">
+      <div class="t">🔗 결정론적 그래프</div>
+      <p>선수과목 탐색은 LLM이 아닌 NetworkX DFS. AI가 "상상한 선수과목"이 끼어들 여지 없음.</p>
+    </div>
+    <div class="guard">
+      <div class="t">📊 확신도 분리</div>
+      <p>UI에서 "규정 조회"(초록)와 "AI 추천"(노랑)을 시각적으로 구분. 사용자 신뢰 확보.</p>
+    </div>
+  </div>
+</section>
+
+<!-- =============== SECTION 4: 데모 =============== -->
+<section class="sec" id="demo">
+  <div class="sec-num">04 — 직접 돌려보기</div>
+  <h2 class="sec-title">지금 바로 <span class="hl">수강 로드맵</span>을 받아보세요.</h2>
+  <p class="sec-lead">
+    아래는 브라우저에서 돌아가는 결정론적 시뮬레이션입니다. 실사용 시 각 단계가 Claude API로 연결됩니다.
+    <strong>4단계 에이전트 체인</strong>이 콘솔처럼 실시간 표시됩니다.
+  </p>
+
+  <div class="demo-shell">
+    <div class="demo-head">
+      <div class="dots"><span></span><span></span><span></span></div>
+      <span>syllabus-navigator · demo.session</span>
+    </div>
+    <div class="demo-body">
+      <div class="form-grid">
         <div>
-          <label class="field">전공</label>
+          <label class="field-label">전공</label>
           <select id="inp-major">
             <option value="경영학과">경영학과</option>
             <option value="컴퓨터공학">컴퓨터공학</option>
           </select>
         </div>
         <div>
-          <label class="field">학년</label>
+          <label class="field-label">학년</label>
           <select id="inp-grade">
             <option value="1">1학년</option>
             <option value="2" selected>2학년</option>
@@ -363,17 +1213,17 @@
           </select>
         </div>
         <div>
-          <label class="field">이수 학점</label>
+          <label class="field-label">이수 학점</label>
           <input type="number" id="inp-credits" value="36" min="0" max="130" />
         </div>
         <div>
-          <label class="field">학기 최대 학점</label>
+          <label class="field-label">학기 최대 학점</label>
           <input type="number" id="inp-max" value="18" min="12" max="21" />
         </div>
       </div>
 
-      <div style="margin-top:14px">
-        <label class="field">관심 트랙</label>
+      <div style="margin-top: 18px">
+        <label class="field-label">관심 트랙</label>
         <div class="chip-row" id="track-chips">
           <div class="chip selected" data-v="AI+경영">AI+경영</div>
           <div class="chip" data-v="핀테크 창업">핀테크 창업</div>
@@ -382,271 +1232,170 @@
         </div>
       </div>
 
-      <div style="margin-top:14px">
-        <label class="field">자유 기술 (예: "금요일 오후 알바, 캡스톤 필수")</label>
-        <textarea id="inp-free" placeholder="금요일 오후 3시 이후 알바가 있어서 금요일 오후 수업은 피하고 싶어요. 캡스톤 과목을 꼭 넣고 싶습니다."></textarea>
+      <div style="margin-top: 18px">
+        <label class="field-label">자유 제약 (자연어)</label>
+        <textarea id="inp-free" placeholder="예: 금요일 오후 3시 이후 알바가 있어서 금요일 오후 수업은 피하고 싶어요. 캡스톤 과목을 꼭 넣고 싶습니다."></textarea>
       </div>
 
-      <button class="primary" id="btn-plan">🚀 로드맵 생성하기</button>
-    </div>
+      <button class="primary" id="btn-plan">
+        <span>🚀</span>
+        <span>로드맵 생성하기</span>
+      </button>
 
-    <div class="card" id="result-card" style="display:none">
-      <h2>에이전트 추론 로그</h2>
-      <div class="trace" id="trace"></div>
+      <!-- Trace -->
+      <div class="trace-wrap" id="trace-wrap" style="display:none">
+        <div class="trace-head">AGENT TRACE · LIVE</div>
+        <div class="trace" id="trace"></div>
+      </div>
 
+      <!-- Roadmap -->
       <div id="roadmap-wrap" style="display:none">
-        <h2 style="margin-top:28px">추천 로드맵 <span style="font-size:13px;color:var(--muted);font-weight:400" id="semester-count"></span></h2>
+        <div class="roadmap-head">
+          <h3>📘 추천 로드맵</h3>
+          <div class="roadmap-stats" id="semester-count"></div>
+        </div>
         <div class="roadmap" id="roadmap"></div>
-
         <div class="explain-box" id="explain"></div>
 
-        <h3>왜 이 조합인가 (Rationale)</h3>
-        <div id="rationale" style="font-size:14px"></div>
+        <h4 style="margin-top: 28px; font-size: 16px; letter-spacing: -0.01em;">🎯 왜 이 조합인가</h4>
+        <div id="rationale" style="font-size: 14.5px; color: var(--ink);"></div>
       </div>
     </div>
-  </section>
+  </div>
+</section>
 
-  <!-- =============== IDEA =============== -->
-  <section class="panel" id="tab-idea">
-    <div class="card">
-      <h2>① 문제 정의</h2>
-      <p>
-        서강대 수강신청 시즌마다 반복되는 풍경 — 학생은 <strong>강의계획서 PDF 수백 건</strong>을
-        여러 탭에 띄워놓고 전공필수·선수과목·시간표 충돌을 수기로 맞추느라 하루를 보냅니다.
-        특히 트랙제·융합전공·복수전공 학생은 <strong>"내 커리어에 맞는 4년 경로"</strong>를 그릴 도구가 없어
-        선배의 구전 조언이나 SNS 카더라에 의존합니다.
-      </p>
-      <h3>페인 포인트 3가지</h3>
-      <ul>
-        <li><strong>분산된 정보</strong>: 강의계획서·졸업요건·트랙 안내가 3개 이상의 시스템에 흩어져 있음</li>
-        <li><strong>정적 안내</strong>: 학과 홈페이지의 커리큘럼은 평면 PDF — 내 학점·관심사로 필터링 불가</li>
-        <li><strong>개인화 부재</strong>: ChatGPT는 서강대 규정을 모르고, 학사시스템은 추천 기능이 없음</li>
-      </ul>
+<!-- =============== SECTION 5: 심사 자가평가 + 일정 =============== -->
+<section class="sec">
+  <div class="sec-num">05 — 심사 관점 자가평가</div>
+  <h2 class="sec-title">4개 평가축에서 <span class="hl">어떻게 강한가</span>.</h2>
+
+  <table class="score-table">
+    <thead>
+      <tr><th>심사 기준</th><th>자체 점수</th><th>근거</th></tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>혁신성</strong></td>
+        <td><span class="stars">★★★★☆</span></td>
+        <td>역산 플래닝 + RAG + 그래프 탐색의 결합은 국내 대학 서비스 중 최초</td>
+      </tr>
+      <tr>
+        <td><strong>문제 해결 타당성</strong></td>
+        <td><span class="stars">★★★★★</span></td>
+        <td>서강대 전 구성원이 학기마다 겪는 보편 문제. 심사위원도 직접 수혜자</td>
+      </tr>
+      <tr>
+        <td><strong>구현 가능성</strong></td>
+        <td><span class="stars">★★★★★</span></td>
+        <td>본 데모로 핵심 로직 실증 완료. 2개월 안에 실제 RAG + Claude API 연결 가능</td>
+      </tr>
+      <tr>
+        <td><strong>AI 활용 적절성</strong></td>
+        <td><span class="stars">★★★★☆</span></td>
+        <td>RAG로 할루시네이션 제어, LLM이 없으면 불가능한 자연어 설명 + 도메인 특화 필요성 명확</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h3 style="margin-top: 56px; font-size: 22px; letter-spacing: -0.015em;">2개월 개발 로드맵</h3>
+  <p style="color: var(--muted); font-size: 14.5px; margin-top: 4px;">2026.6.30 ~ 8.31 · 주차별 마일스톤</p>
+  <div class="timeline">
+    <div class="tl-item">
+      <div class="tl-week">WEEK 1-2</div>
+      <div class="tl-milestone">데이터 수집 · 파싱 · 임베딩</div>
+      <div class="tl-out">→ pgvector DB (강의계획서 200건 인덱싱)</div>
     </div>
-
-    <div class="card">
-      <h2>② 솔루션 — "역산" 접근</h2>
-      <p>
-        학생이 <strong>목표(트랙·관심사)</strong>와 <strong>제약(학년·학점·스케줄)</strong>을 입력하면,
-        에이전트가 졸업까지의 경로를 <strong>역순 계획(backward chaining)</strong>으로 풀어냅니다.
-      </p>
-      <ol>
-        <li><strong>요건 수집</strong> — 해당 학과의 졸업 요건과 트랙 코어과목을 RAG로 불러옴</li>
-        <li><strong>필수 배치</strong> — 전공필수를 개설학기 조건에 맞게 우선 할당</li>
-        <li><strong>선수과목 역추적</strong> — 관심 상급과목(예: <code>딥러닝</code>)에서 <code>기계학습 → 자료구조 → 프로그래밍입문</code> 체인을 자동 확장</li>
-        <li><strong>제약 풀이</strong> — 시간표 충돌·학기 최대학점·자유 제약(예: 금요일 오후 회피)을 SAT처럼 검증</li>
-        <li><strong>설명 생성</strong> — LLM이 "왜 이 조합인가"를 자연어로 풀이 + 출처 인용</li>
-      </ol>
+    <div class="tl-item">
+      <div class="tl-week">WEEK 3-4</div>
+      <div class="tl-milestone">RequirementRAG + PrereqGraph 구현</div>
+      <div class="tl-out">→ CLI로 쿼리 가능한 2개 에이전트</div>
     </div>
-
-    <div class="card">
-      <h2>③ 차별점</h2>
-      <div class="stats">
-        <div class="stat"><div class="n">vs</div><div class="l">ChatGPT 범용</div></div>
-        <div class="stat"><div class="n">→</div><div class="l">서강 규정 RAG</div></div>
-        <div class="stat"><div class="n">vs</div><div class="l">학사시스템</div></div>
-        <div class="stat"><div class="n">→</div><div class="l">LLM 개인화</div></div>
-      </div>
-      <ul>
-        <li>범용 LLM은 서강대 학칙·선수과목·트랙을 모름 → <strong>도메인 RAG</strong>로 해결</li>
-        <li>학사시스템은 조회만 제공 → 본 서비스는 <strong>역산 플래닝 + 설명 생성</strong></li>
-        <li>에타 선배 조언은 개인화·검증 불가 → <strong>출처 인용 + 확신도 표시</strong>로 신뢰 확보</li>
-      </ul>
+    <div class="tl-item">
+      <div class="tl-week">WEEK 5</div>
+      <div class="tl-milestone">TimetableSAT + Explainer 통합</div>
+      <div class="tl-out">→ 전체 4단계 파이프라인</div>
     </div>
-
-    <div class="card">
-      <h2>④ 2개월 MVP 범위</h2>
-      <ul>
-        <li><strong>학과 2개</strong>: 경영학과 · 컴퓨터공학 (타 전공 확장 구조 확보)</li>
-        <li><strong>강의계획서 200건</strong> 인덱싱 (PDF 텍스트 추출 + 벡터 임베딩)</li>
-        <li><strong>로드맵 생성기</strong>: 관심사 → 학기별 추천 + Rationale</li>
-        <li><strong>시간표 충돌 검증기</strong>: 제약 기반 필터</li>
-        <li><strong>웹 UI</strong>: 이 데모 수준 완성도 + 실제 LLM 백엔드 연결</li>
-      </ul>
-      <h3>이후 확장 (본선 이후)</h3>
-      <ul>
-        <li>교환학생 학점인정 매칭</li>
-        <li>복수·부전공·마이크로디그리 시뮬레이션</li>
-        <li>동료 수강 이력 협업 필터링 (프라이버시 옵트인)</li>
-      </ul>
+    <div class="tl-item">
+      <div class="tl-week">WEEK 6</div>
+      <div class="tl-milestone">웹 UI + Claude API 프로덕션 연결</div>
+      <div class="tl-out">→ 베타 배포 (Vercel)</div>
     </div>
-
-    <div class="card">
-      <h2>⑤ 심사 4축 자가 평가</h2>
-      <table style="width:100%; border-collapse: collapse; font-size:14px">
-        <tr style="background:var(--soft); text-align:left">
-          <th style="padding:10px; border:1px solid var(--border)">심사 기준</th>
-          <th style="padding:10px; border:1px solid var(--border)">자체 점수</th>
-          <th style="padding:10px; border:1px solid var(--border)">근거</th>
-        </tr>
-        <tr><td style="padding:10px; border:1px solid var(--border)">혁신성</td>
-            <td style="padding:10px; border:1px solid var(--border)">★★★★☆</td>
-            <td style="padding:10px; border:1px solid var(--border)">역산 플래닝 + RAG 도메인 결합은 국내 대학 최초</td></tr>
-        <tr><td style="padding:10px; border:1px solid var(--border)">문제 해결 타당성</td>
-            <td style="padding:10px; border:1px solid var(--border)">★★★★★</td>
-            <td style="padding:10px; border:1px solid var(--border)">전 구성원이 학기마다 겪는 보편 문제</td></tr>
-        <tr><td style="padding:10px; border:1px solid var(--border)">구현 가능성</td>
-            <td style="padding:10px; border:1px solid var(--border)">★★★★★</td>
-            <td style="padding:10px; border:1px solid var(--border)">본 데모로 핵심 로직 실증, 2개월 충분</td></tr>
-        <tr><td style="padding:10px; border:1px solid var(--border)">AI 활용 적절성</td>
-            <td style="padding:10px; border:1px solid var(--border)">★★★★☆</td>
-            <td style="padding:10px; border:1px solid var(--border)">RAG로 할루시네이션 제어, LLM이 없으면 불가능한 자연어 설명 생성</td></tr>
-      </table>
+    <div class="tl-item">
+      <div class="tl-week">WEEK 7</div>
+      <div class="tl-milestone">사용자 테스트 (학생 10명) · 프롬프트 튜닝</div>
+      <div class="tl-out">→ UX 로그 기반 개선</div>
     </div>
-  </section>
-
-  <!-- =============== ARCH =============== -->
-  <section class="panel" id="tab-arch">
-    <div class="card">
-      <h2>시스템 아키텍처</h2>
-      <pre class="ascii">┌─────────────────────────────────────────────────────────────────┐
-│                     Albatross Syllabus Navigator                │
-└─────────────────────────────────────────────────────────────────┘
-
-   [학생]
-     │  "AI+경영 트랙, 2학년, 36학점 이수, 금요일 오후 알바"
-     ▼
-  ┌──────────────┐    ┌────────────────────────────────────────┐
-  │  웹 UI (SPA) │───▶│    오케스트레이터 에이전트 (Claude)     │
-  └──────────────┘    │  - 의도 분해  - 도구 호출  - 검증       │
-                     └───────────┬────────────┬───────────────┘
-                                 │            │
-                  ┌──────────────▼──┐   ┌─────▼──────────┐
-                  │ 1. RequirementRAG│   │ 4. Explainer   │
-                  │   학칙·졸업요건   │   │   자연어 설명  │
-                  └──────────────┬──┘   └────────────────┘
-                                 │
-                  ┌──────────────▼──┐
-                  │ 2. PrereqGraph  │──▶ NetworkX 선수과목 그래프
-                  │   역추적 추론    │
-                  └──────────────┬──┘
-                                 │
-                  ┌──────────────▼──┐
-                  │ 3. TimetableSAT │──▶ 시간표 충돌 · 자유 제약
-                  │   제약 풀이      │     풀이 (Z3 or 규칙)
-                  └─────────────────┘
-
-  데이터: 강의계획서 PDF 200건 → LlamaParse → pgvector 임베딩
-         학칙 / 시행세칙 → 청크 500토큰 + hybrid BM25+dense 검색</pre>
+    <div class="tl-item">
+      <div class="tl-week">WEEK 8</div>
+      <div class="tl-milestone">발표 자료 · 데모 영상 · 랜딩페이지</div>
+      <div class="tl-out">→ 9/4 최종 발표 준비 완료</div>
     </div>
+  </div>
+</section>
 
-    <div class="card">
-      <h2>RAG 파이프라인 상세</h2>
-      <h3>인덱싱</h3>
-      <ol>
-        <li><strong>수집</strong>: 서강대 공개 강의계획서 PDF · 학칙 PDF · 학과 공지사항</li>
-        <li><strong>파싱</strong>: LlamaParse로 표·수식 보존, 과목 코드·시간·선수과목을 구조화 메타로 추출</li>
-        <li><strong>청킹</strong>: 과목 단위(semantic chunk) + 500토큰 슬라이딩 윈도우</li>
-        <li><strong>임베딩</strong>: Voyage-3 한국어 최적, pgvector 저장</li>
-        <li><strong>메타 필터</strong>: 학과 / 학년 / 학기로 사전 필터 → 검색 정밀도 향상</li>
-      </ol>
-      <h3>검색 (쿼리 타임)</h3>
-      <ol>
-        <li>사용자 질의를 쿼리 재작성 LLM이 3가지 변형으로 확장</li>
-        <li>Hybrid: BM25 + Dense 가중 결합</li>
-        <li>Rerank: Cohere rerank-3으로 상위 20→5 정제</li>
-        <li>LLM에 컨텍스트 전달 시 <strong>출처 인용 강제</strong>(구조화 출력 스키마)</li>
-      </ol>
-    </div>
+<!-- =============== SECTION 6: DATA =============== -->
+<section class="sec" id="data">
+  <div class="sec-num">06 — 샘플 데이터</div>
+  <h2 class="sec-title">데모용 <span class="hl">가상 데이터셋</span>.</h2>
+  <p class="sec-lead">
+    본선 개발 시 서강대 공개 강의계획서 200건으로 대체. 현재는 공모전 시연용 가상 데이터입니다.
+  </p>
 
-    <div class="card">
-      <h2>할루시네이션 방어</h2>
-      <ul>
-        <li><strong>Citation required</strong>: LLM 출력 JSON 스키마에 <code>citations[]</code> 필수 필드. 빈 배열이면 재생성</li>
-        <li><strong>Ground truth 체크</strong>: 추천된 과목 코드가 실제 DB에 존재하는지 프로그램적 검증</li>
-        <li><strong>선수과목 확정성</strong>: 그래프 탐색은 결정론적. LLM이 선수과목을 "상상"할 여지 없음</li>
-        <li><strong>확신도 표시</strong>: UI에 "이 부분은 규정 조회, 이 부분은 AI 추천"을 시각적으로 분리</li>
-      </ul>
-    </div>
+  <div class="stats">
+    <div class="stat"><div class="n" id="stat-courses">—</div><div class="l">강의 수</div></div>
+    <div class="stat"><div class="n" id="stat-majors">—</div><div class="l">전공</div></div>
+    <div class="stat"><div class="n" id="stat-tracks">—</div><div class="l">트랙</div></div>
+    <div class="stat"><div class="n" id="stat-prereq">—</div><div class="l">선수과목 관계</div></div>
+  </div>
 
-    <div class="card">
-      <h2>2개월 개발 일정 (6월 30일 ~ 8월 31일)</h2>
-      <table style="width:100%; border-collapse:collapse; font-size:13.5px">
-        <tr style="background:var(--soft)">
-          <th style="padding:8px;border:1px solid var(--border); width:80px">주차</th>
-          <th style="padding:8px;border:1px solid var(--border)">마일스톤</th>
-          <th style="padding:8px;border:1px solid var(--border)">산출물</th>
-        </tr>
-        <tr><td style="padding:8px;border:1px solid var(--border)">W1-2</td>
-            <td style="padding:8px;border:1px solid var(--border)">데이터 수집·파싱·임베딩</td>
-            <td style="padding:8px;border:1px solid var(--border)">pgvector DB (200건)</td></tr>
-        <tr><td style="padding:8px;border:1px solid var(--border)">W3-4</td>
-            <td style="padding:8px;border:1px solid var(--border)">RequirementRAG + PrereqGraph 구현</td>
-            <td style="padding:8px;border:1px solid var(--border)">CLI로 쿼리 가능</td></tr>
-        <tr><td style="padding:8px;border:1px solid var(--border)">W5</td>
-            <td style="padding:8px;border:1px solid var(--border)">TimetableSAT · Explainer 통합</td>
-            <td style="padding:8px;border:1px solid var(--border)">전체 파이프라인</td></tr>
-        <tr><td style="padding:8px;border:1px solid var(--border)">W6</td>
-            <td style="padding:8px;border:1px solid var(--border)">웹 UI (Next.js) + Claude API 연결</td>
-            <td style="padding:8px;border:1px solid var(--border)">베타 배포</td></tr>
-        <tr><td style="padding:8px;border:1px solid var(--border)">W7</td>
-            <td style="padding:8px;border:1px solid var(--border)">사용자 테스트 (학생 10명) · 튜닝</td>
-            <td style="padding:8px;border:1px solid var(--border)">UX 로그</td></tr>
-        <tr><td style="padding:8px;border:1px solid var(--border)">W8</td>
-            <td style="padding:8px;border:1px solid var(--border)">최종 발표 자료 · 데모 영상 · 랜딩페이지</td>
-            <td style="padding:8px;border:1px solid var(--border)">9/4 발표 준비 완료</td></tr>
-      </table>
-    </div>
-  </section>
+  <h3 style="margin-top: 24px; font-size: 20px; letter-spacing: -0.015em;">강의 카탈로그</h3>
+  <div style="margin: 14px 0">
+    <label class="field-label" style="display: inline-block; margin-right: 12px">전공 필터</label>
+    <select id="cat-major" style="width: auto; display: inline-block">
+      <option value="all">전체</option>
+      <option value="경영학과">경영학과</option>
+      <option value="컴퓨터공학">컴퓨터공학</option>
+      <option value="교양">교양</option>
+    </select>
+  </div>
+  <div class="course-grid" id="catalog"></div>
 
-  <!-- =============== DATA =============== -->
-  <section class="panel" id="tab-data">
-    <div class="card">
-      <h2>가상 데이터셋 스코프</h2>
-      <div class="stats">
-        <div class="stat"><div class="n" id="stat-courses">—</div><div class="l">강의 수</div></div>
-        <div class="stat"><div class="n" id="stat-majors">—</div><div class="l">전공</div></div>
-        <div class="stat"><div class="n" id="stat-tracks">—</div><div class="l">트랙</div></div>
-        <div class="stat"><div class="n" id="stat-prereq">—</div><div class="l">선수과목 관계</div></div>
-      </div>
-      <p style="color:var(--muted); font-size:13px">
-        ⚠️ 본 데이터는 <strong>공모전 데모용 가상 데이터</strong>입니다. 실제 서강대 강의계획서·시간·교수명과 무관합니다.
-      </p>
-    </div>
-
-    <div class="card">
-      <h2>강의 카탈로그</h2>
-      <div style="margin-bottom:10px">
-        <label class="field" style="display:inline; margin-right:10px">전공 필터:</label>
-        <select id="cat-major" style="width:auto; display:inline-block">
-          <option value="all">전체</option>
-          <option value="경영학과">경영학과</option>
-          <option value="컴퓨터공학">컴퓨터공학</option>
-          <option value="교양">교양</option>
-        </select>
-      </div>
-      <div class="course-grid" id="catalog"></div>
-    </div>
-
-    <div class="card">
-      <h2>트랙 정의</h2>
-      <div id="tracks-view"></div>
-    </div>
-  </section>
-</main>
+  <h3 style="margin-top: 48px; font-size: 20px; letter-spacing: -0.015em;">트랙 정의</h3>
+  <div id="tracks-view" style="margin-top: 16px"></div>
+</section>
 
 <footer>
-  Albatross Syllabus Navigator · 2026 서강대 생성형 AI 공모전 데모 ·
-  <a href="https://github.com/gkfla2020-bit/gkfla2020-bit.github.io/tree/main/syllabus-navigator">소스 보기</a> ·
-  <a href="/">← 블로그로</a>
+  <div class="brand">🎓 Albatross Syllabus Navigator</div>
+  <div>2026 서강대학교 생성형 AI 기반 아이디어 공모전 · 출품 데모</div>
+  <div style="margin-top: 12px">
+    <a href="https://github.com/gkfla2020-bit/gkfla2020-bit.github.io/tree/main/syllabus-navigator">GitHub 소스</a>
+    &nbsp;·&nbsp;
+    <a href="/">블로그로 돌아가기</a>
+  </div>
+  <div style="margin-top: 18px; font-size: 11px; color: var(--muted-2);">
+    본 페이지의 강의계획서·교수명·시간표는 시연용 가상 데이터입니다.
+  </div>
 </footer>
 
 <script>
 (async function() {
-  // --- Load data ---
   const DATA = await fetch('./data/courses.json').then(r => r.json());
 
-  // --- Tabs ---
-  document.querySelectorAll('.tab').forEach(btn => {
-    btn.addEventListener('click', () => {
-      document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-      document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
-      btn.classList.add('active');
-      document.getElementById('tab-' + btn.dataset.tab).classList.add('active');
+  // --- Scroll spy ---
+  const navLinks = document.querySelectorAll('.nav-links a');
+  const sections = ['intro','problem','architecture','demo','data'].map(id => document.getElementById(id));
+  function updateActiveLink() {
+    const scrollY = window.scrollY + 120;
+    let current = sections[0];
+    sections.forEach(s => { if (s && s.offsetTop <= scrollY) current = s; });
+    navLinks.forEach(a => {
+      a.classList.toggle('active', a.getAttribute('href') === '#' + (current ? current.id : ''));
     });
-  });
+  }
+  window.addEventListener('scroll', updateActiveLink, { passive: true });
+  updateActiveLink();
 
-  // --- Chips (track selection) ---
+  // --- Chips ---
   let selectedTrack = 'AI+경영';
   document.querySelectorAll('#track-chips .chip').forEach(c => {
     c.addEventListener('click', () => {
@@ -656,14 +1405,14 @@
     });
   });
 
-  // --- Data tab: stats ---
+  // --- Data stats ---
   document.getElementById('stat-courses').textContent = DATA.courses.length;
   document.getElementById('stat-majors').textContent = new Set(DATA.courses.map(c => c.major)).size;
   document.getElementById('stat-tracks').textContent = Object.keys(DATA.tracks).length;
   document.getElementById('stat-prereq').textContent =
     DATA.courses.reduce((s, c) => s + c.prereq.length, 0);
 
-  // --- Catalog render ---
+  // --- Catalog ---
   function renderCatalog() {
     const filter = document.getElementById('cat-major').value;
     const wrap = document.getElementById('catalog');
@@ -675,12 +1424,12 @@
       div.innerHTML = `
         <div class="code">${c.code} · ${c.major} · ${c.type}</div>
         <div class="nm">${c.name}</div>
-        <div style="font-size:12px; color:var(--muted); margin:4px 0">${c.summary}</div>
-        <div style="font-size:11px; color:var(--muted)">
+        <div style="font-size:12px; color:var(--muted); margin:4px 0; line-height:1.45">${c.summary}</div>
+        <div class="meta">
           ${c.credits}학점 · ${c.grade_level}학년 · ${c.time} · ${c.professor}
           ${c.prereq.length ? ' · 선수: ' + c.prereq.join(', ') : ''}
         </div>
-        <div class="rc" style="font-size:11px; margin-top:4px">강의평 ${c.review_score} / 부담 ${c.load}</div>
+        <div class="rc">⭐ ${c.review_score} · 부담 ${c.load}</div>
       `;
       wrap.appendChild(div);
     });
@@ -692,60 +1441,48 @@
   const tv = document.getElementById('tracks-view');
   Object.entries(DATA.tracks).forEach(([name, t]) => {
     const div = document.createElement('div');
-    div.style.cssText = 'padding:12px 0; border-bottom:1px dashed var(--border)';
+    div.className = 'track-card';
     div.innerHTML = `
-      <div style="font-weight:700; font-size:15px; color:var(--sogang-red)">${name}</div>
-      <div style="font-size:13px; color:var(--muted); margin:4px 0">${t.description}</div>
-      <div style="font-size:12px; font-family: SF Mono, monospace">코어: ${t.core_courses.join(', ')}</div>
-      <div style="font-size:12px; color:var(--ok); margin-top:3px">캡스톤: ${t.capstone}</div>
+      <div class="name">${name}</div>
+      <div class="desc">${t.description}</div>
+      <div class="core">코어: ${t.core_courses.join(', ')}</div>
+      <div class="capstone">🎓 캡스톤: ${t.capstone}</div>
     `;
     tv.appendChild(div);
   });
 
-  // --- Planner logic ---
-  function findCourse(code) {
-    return DATA.courses.find(c => c.code === code);
-  }
-
+  // --- Planner ---
+  function findCourse(code) { return DATA.courses.find(c => c.code === code); }
   function parseTime(timeStr) {
-    // Returns array of {day, start, end} in minutes
     const slots = [];
     const dayMap = {'월':1,'화':2,'수':3,'목':4,'금':5};
     timeStr.split(',').forEach(s => {
       s = s.trim();
       const m = s.match(/([월화수목금])\s*(\d{1,2}):(\d{2})-(\d{1,2}):(\d{2})/);
-      if (m) {
-        slots.push({
-          day: dayMap[m[1]],
-          start: parseInt(m[2])*60 + parseInt(m[3]),
-          end: parseInt(m[4])*60 + parseInt(m[5])
-        });
-      }
+      if (m) slots.push({
+        day: dayMap[m[1]],
+        start: parseInt(m[2])*60 + parseInt(m[3]),
+        end: parseInt(m[4])*60 + parseInt(m[5])
+      });
     });
     return slots;
   }
-
   function conflicts(a, b) {
-    const as = parseTime(a.time);
-    const bs = parseTime(b.time);
+    const as = parseTime(a.time), bs = parseTime(b.time);
     for (const x of as) for (const y of bs) {
       if (x.day === y.day && !(x.end <= y.start || y.end <= x.start)) return true;
     }
     return false;
   }
-
   function violatesFreeConstraint(course, freeText) {
     if (!freeText) return false;
     const slots = parseTime(course.time);
-    // Simple heuristic: "금요일 오후" avoid
     if (/금\s*요?일?\s*오후/.test(freeText) || /금.*오후/.test(freeText) || /friday\s*afternoon/i.test(freeText)) {
       if (slots.some(s => s.day === 5 && s.start >= 12*60)) return true;
     }
     return false;
   }
-
   async function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
-
   async function traceLog(el, text, cls) {
     const line = document.createElement('div');
     if (cls) line.className = cls;
@@ -763,25 +1500,24 @@
     const freeText = document.getElementById('inp-free').value;
     const track = selectedTrack;
 
-    document.getElementById('btn-plan').disabled = true;
-    document.getElementById('btn-plan').textContent = '🔄 에이전트 실행 중...';
-    document.getElementById('result-card').style.display = 'block';
+    const btn = document.getElementById('btn-plan');
+    btn.disabled = true;
+    btn.innerHTML = '<span>⚙️</span><span>에이전트 실행 중...</span>';
+    document.getElementById('trace-wrap').style.display = 'block';
     document.getElementById('roadmap-wrap').style.display = 'none';
     const trace = document.getElementById('trace');
     trace.innerHTML = '';
 
-    await traceLog(trace, `<span class="t-step">[Orchestrator]</span> 의도 분해: major=${major}, grade=${grade}, track="${track}", taken=${taken}학점`, 't-info');
-    await traceLog(trace, `<span class="t-step">[Orchestrator]</span> 계획: 4단계 에이전트 체인 실행`);
+    await traceLog(trace, `<span class="t-step">[Orchestrator]</span> 의도 분해 → major=${major}, grade=${grade}, track="${track}", taken=${taken}학점`, 't-info');
+    await traceLog(trace, `<span class="t-step">[Orchestrator]</span> 계획 → 4단계 에이전트 체인 실행`);
 
-    // Step 1: RequirementRAG
     await traceLog(trace, `<span class="t-step">[1/4 RequirementRAG]</span> 학칙 벡터DB 조회 중<span class="loading-dots"></span>`);
     await sleep(500);
     const req = DATA.requirements[major];
-    await traceLog(trace, `<span class="t-ok">✓</span> "${major} 졸업요건" 검색 — 총 ${req.total_credits}학점, 전공필수 ${req.major_required.length}과목, 전공선택 최소 ${req.major_elective_min_credits}학점 <span class="citation">§학칙-${major}</span>`);
-    await traceLog(trace, `<span class="t-think">  → 남은 학점: ${req.total_credits - taken}학점. 약 ${Math.ceil((req.total_credits - taken) / maxPerSem)}개 학기 필요.</span>`);
+    await traceLog(trace, `<span class="t-ok">✓</span> "${major} 졸업요건" 검색 완료 — 총 ${req.total_credits}학점, 전공필수 ${req.major_required.length}과목, 전공선택 최소 ${req.major_elective_min_credits}학점 <span class="citation">§학칙-${major}</span>`);
+    await traceLog(trace, `<span class="t-think">  → 남은 학점 ${req.total_credits - taken}학점. 약 ${Math.ceil((req.total_credits - taken) / maxPerSem)}개 학기 필요.</span>`);
 
-    // Step 2: PrereqGraph
-    await traceLog(trace, `<span class="t-step">[2/4 PrereqGraph]</span> 트랙 "${track}" 코어과목의 선수과목 그래프 역추적<span class="loading-dots"></span>`);
+    await traceLog(trace, `<span class="t-step">[2/4 PrereqGraph]</span> 트랙 "${track}" 코어과목의 선수과목 DAG 역추적<span class="loading-dots"></span>`);
     await sleep(500);
     const trackDef = DATA.tracks[track];
     const needed = new Set();
@@ -793,24 +1529,19 @@
     }
     trackDef.core_courses.forEach(expand);
     req.major_required.forEach(c => needed.add(c));
-    await traceLog(trace, `<span class="t-ok">✓</span> 타깃 ${trackDef.core_courses.length}과목 → 선수과목 확장 후 총 ${needed.size}과목 필요 <span class="citation">prereq_graph</span>`);
+    await traceLog(trace, `<span class="t-ok">✓</span> 타깃 ${trackDef.core_courses.length}과목 → DFS 확장 후 총 ${needed.size}과목 필요 <span class="citation">prereq_graph</span>`);
 
-    // Step 3: TimetableSAT
-    await traceLog(trace, `<span class="t-step">[3/4 TimetableSAT]</span> 시간표 충돌 + 자유 제약 검증<span class="loading-dots"></span>`);
+    await traceLog(trace, `<span class="t-step">[3/4 TimetableSAT]</span> 시간표 충돌 + 자유 제약 풀이<span class="loading-dots"></span>`);
     await sleep(500);
 
-    // Schedule into semesters
-    const takenSet = new Set(); // courses already placed (assume nothing taken; grade-level approximates)
+    const takenSet = new Set();
     const semesters = [];
     const neededList = Array.from(needed).map(findCourse).filter(Boolean);
-
-    // Sort by grade_level, prereq count
     neededList.sort((a, b) => {
       if (a.grade_level !== b.grade_level) return a.grade_level - b.grade_level;
       return a.prereq.length - b.prereq.length;
     });
 
-    // Assume starting semester = current grade & sem 1
     let curGrade = grade;
     let curSemNum = 1;
     const remaining = [...neededList];
@@ -821,16 +1552,11 @@
       const picked = [];
       for (let i = 0; i < remaining.length; i++) {
         const c = remaining[i];
-        // Prereq satisfied?
         const pOk = c.prereq.every(p => takenSet.has(p));
         if (!pOk) continue;
-        // Grade level not too advanced
         if (c.grade_level > curGrade + 1) continue;
-        // Credit budget
         if (sem.credits + c.credits > maxPerSem) continue;
-        // Time conflict
         if (picked.some(q => conflicts(q, c))) continue;
-        // Free constraint
         if (violatesFreeConstraint(c, freeText)) { violationCount++; continue; }
         picked.push(c);
         sem.courses.push(c);
@@ -841,31 +1567,25 @@
         const idx = remaining.indexOf(p);
         if (idx >= 0) remaining.splice(idx, 1);
       });
-      if (picked.length === 0) {
-        // Can't progress — break
-        break;
-      }
+      if (picked.length === 0) break;
       semesters.push(sem);
-      // Advance
       if (curSemNum === 1) curSemNum = 2;
       else { curSemNum = 1; curGrade++; }
     }
 
-    await traceLog(trace, `<span class="t-ok">✓</span> ${semesters.length}개 학기 배치 완료. 충돌 0건. 자유제약 위반으로 제외한 개설: ${violationCount}회`);
+    await traceLog(trace, `<span class="t-ok">✓</span> ${semesters.length}개 학기 배치 완료 — 시간표 충돌 0건, 자유제약 위반 회피 ${violationCount}회`);
     if (freeText) {
-      await traceLog(trace, `<span class="t-think">  → "${freeText.substring(0, 40)}${freeText.length > 40 ? '...' : ''}" 제약을 충족.</span>`);
+      await traceLog(trace, `<span class="t-think">  → "${freeText.substring(0, 40)}${freeText.length > 40 ? '...' : ''}" 만족</span>`);
     }
 
-    // Step 4: Explainer
     await traceLog(trace, `<span class="t-step">[4/4 Explainer]</span> 자연어 rationale 생성<span class="loading-dots"></span>`);
     await sleep(600);
-    await traceLog(trace, `<span class="t-ok">✓</span> 완료. 총 추천: ${semesters.reduce((s,x) => s+x.courses.length, 0)}과목, ${semesters.reduce((s,x) => s+x.credits, 0)}학점`);
+    await traceLog(trace, `<span class="t-ok">✓</span> 완료 — 총 ${semesters.reduce((s,x) => s+x.courses.length, 0)}과목 · ${semesters.reduce((s,x) => s+x.credits, 0)}학점 추천`);
 
-    // Render roadmap
     renderRoadmap(semesters, track, req, freeText, violationCount);
 
-    document.getElementById('btn-plan').disabled = false;
-    document.getElementById('btn-plan').textContent = '🚀 로드맵 생성하기';
+    btn.disabled = false;
+    btn.innerHTML = '<span>🚀</span><span>로드맵 생성하기</span>';
   }
 
   function renderRoadmap(semesters, track, req, freeText, violationCount) {
@@ -874,49 +1594,48 @@
     semesters.forEach(sem => {
       const card = document.createElement('div');
       card.className = 'sem-card';
-      card.innerHTML = `<h4>${sem.label}</h4>`;
+      card.innerHTML = `<div class="sem-label">${sem.label}</div>`;
       sem.courses.forEach(c => {
         const pill = document.createElement('div');
         pill.className = 'course-pill' + (c.type === '전공필수' ? ' req' : '');
         pill.innerHTML = `
           <div class="code">${c.code} · ${c.type}</div>
           <div class="nm">${c.name}</div>
-          <div style="font-size:11px;color:var(--muted)">${c.credits}학점 · ${c.time.split(',')[0].trim()}</div>
+          <div class="meta">${c.credits}학점 · ${c.time.split(',')[0].trim()}</div>
           <div class="rc">⭐ ${c.review_score} · 부담 ${c.load}</div>
         `;
         card.appendChild(pill);
       });
       const sum = document.createElement('div');
       sum.className = 'sem-sum';
-      sum.textContent = `합계 ${sem.credits}학점 · ${sem.courses.length}과목`;
+      sum.textContent = `∑ ${sem.credits}학점 · ${sem.courses.length}과목`;
       card.appendChild(sum);
       wrap.appendChild(card);
     });
 
-    document.getElementById('semester-count').textContent =
-      `— ${semesters.length}학기 · 총 ${semesters.reduce((s,x) => s+x.courses.length, 0)}과목 · ${semesters.reduce((s,x) => s+x.credits, 0)}학점`;
+    document.getElementById('semester-count').innerHTML =
+      `<span><b>${semesters.length}</b> 학기</span>
+       <span><b>${semesters.reduce((s,x) => s+x.courses.length, 0)}</b> 과목</span>
+       <span><b>${semesters.reduce((s,x) => s+x.credits, 0)}</b> 학점</span>`;
 
-    // Explain box
     const trackDef = DATA.tracks[track];
     const capstone = trackDef.capstone;
     document.getElementById('explain').innerHTML = `
       <strong>트랙 "${track}"</strong> 기준으로 설계했습니다.
-      캡스톤 <code>${capstone}</code>에 도달하기 위해 선수과목 체인을 역추적했고,
+      캡스톤 <span class="mono" style="font-size:12.5px; background:#fff; padding:2px 6px; border-radius:4px; border:1px solid var(--border)">${capstone}</span>에 도달하기 위해 선수과목 체인을 역추적했고,
       각 학기 학점은 ${document.getElementById('inp-max').value}학점 이하로 균형화했습니다.
       ${freeText ? `자유 제약 "<em>${freeText.replace(/</g,'&lt;')}</em>"을 만족하는 시간표만 채택했습니다.` : ''}
     `;
 
-    // Rationale
     const rationale = [];
-    rationale.push(`<p><strong>1. 졸업요건 충족</strong> — ${req.note}</p>`);
-    rationale.push(`<p><strong>2. 트랙 포커싱</strong> — ${trackDef.description} 코어과목 ${trackDef.core_courses.length}개가 로드맵에 포함됩니다.</p>`);
-    rationale.push(`<p><strong>3. 선수과목 순서</strong> — 상급과목으로 갈수록 부담이 누적되지 않도록, 기초(코딩/통계)를 앞 학기로 배치했습니다.</p>`);
+    rationale.push(`<p style="margin-top:12px"><strong>1. 졸업요건 충족</strong> — ${req.note}</p>`);
+    rationale.push(`<p><strong>2. 트랙 포커싱</strong> — ${trackDef.description} 코어과목 ${trackDef.core_courses.length}개가 로드맵에 포함.</p>`);
+    rationale.push(`<p><strong>3. 선수과목 순서</strong> — 상급과목으로 갈수록 부담이 누적되지 않도록, 기초(코딩/통계)를 앞 학기에 배치.</p>`);
     if (violationCount > 0) {
-      rationale.push(`<p><strong>4. 자유 제약</strong> — 입력하신 제약을 위반하는 개설 ${violationCount}회를 자동 회피했습니다.</p>`);
+      rationale.push(`<p><strong>4. 자유 제약</strong> — 입력한 제약을 위반하는 개설 <b>${violationCount}회</b>를 자동 회피.</p>`);
     }
-    rationale.push(`<p style="color:var(--muted); font-size:12px; margin-top:16px">
-      ⚠️ 본 로드맵은 데모용 결정론적 시뮬레이션 결과입니다.
-      실제 구현에서는 LLM이 "왜 이 학기에 이 과목인가"를 학생의 자유 기술과 맞춰 자연어로 더 풍부하게 설명하며, 대안 로드맵 3가지를 제시합니다.
+    rationale.push(`<p style="color:var(--muted); font-size:12.5px; margin-top:18px; padding:14px; background:var(--paper-2); border-radius:8px;">
+      ⚠️ 본 로드맵은 데모용 결정론적 시뮬레이션 결과입니다. 실구현에서는 Claude LLM이 학생의 자유 기술과 매칭해 자연어로 더 풍부하게 설명하며, 대안 로드맵 3가지를 제시합니다.
     </p>`);
     document.getElementById('rationale').innerHTML = rationale.join('');
 
