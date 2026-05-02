@@ -1,0 +1,845 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<title>금융권 IT 코딩테스트 마스터 플랜 · 정하림</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Noto+Serif+KR:wght@300;500;700;900&family=JetBrains+Mono:wght@400;500;700&family=Pretendard:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --ink: #111418;
+    --paper: #f6f2ea;
+    --paper-2: #ede7da;
+    --rule: #1a1d22;
+    --accent: #c8382f;
+    --accent-2: #0b5d3b;
+    --gold: #b08a3e;
+    --muted: #5a5a58;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body {
+    background: #2a2824;
+    font-family: 'Pretendard', 'Inter', -apple-system, sans-serif;
+    color: var(--ink);
+  }
+  body { padding: 40px 20px; display: flex; justify-content: center; }
+
+  .poster {
+    width: 297mm;   /* A3 portrait */
+    min-height: 420mm;
+    background: var(--paper);
+    background-image:
+      radial-gradient(circle at 20% 10%, rgba(176,138,62,.06) 0, transparent 50%),
+      radial-gradient(circle at 90% 80%, rgba(200,56,47,.04) 0, transparent 50%);
+    padding: 22mm 18mm 18mm;
+    position: relative;
+    box-shadow: 0 30px 80px rgba(0,0,0,.5);
+    overflow: hidden;
+  }
+  .poster::before {
+    content: '';
+    position: absolute; inset: 10mm;
+    border: 1px solid rgba(17,20,24,.12);
+    pointer-events: none;
+  }
+
+  /* Header */
+  .top-bar {
+    display: flex; justify-content: space-between; align-items: flex-end;
+    border-bottom: 1.5px solid var(--ink);
+    padding-bottom: 10px; margin-bottom: 18px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9.5px; letter-spacing: .12em; text-transform: uppercase;
+    color: var(--muted);
+  }
+  .top-bar .issue { color: var(--accent); font-weight: 700; }
+
+  .masthead {
+    font-family: 'Noto Serif KR', serif;
+    font-weight: 900;
+    line-height: .88;
+    letter-spacing: -.04em;
+    margin-bottom: 8px;
+  }
+  .masthead .line-1 {
+    font-size: 66px;
+    color: var(--ink);
+  }
+  .masthead .line-2 {
+    font-size: 88px;
+    color: var(--accent);
+    font-style: italic;
+    display: inline-block;
+    margin-top: -4px;
+  }
+  .masthead .line-2 .amp {
+    color: var(--gold);
+    font-weight: 300;
+    font-style: normal;
+    margin: 0 6px;
+  }
+
+  .subhead {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    align-items: end;
+    gap: 20px;
+    border-top: 4px double var(--ink);
+    border-bottom: 1px solid var(--ink);
+    padding: 12px 0;
+    margin-top: 14px;
+    margin-bottom: 20px;
+  }
+  .subhead .tagline {
+    font-family: 'Noto Serif KR', serif;
+    font-size: 16px;
+    font-weight: 500;
+    font-style: italic;
+    color: var(--ink);
+    letter-spacing: -.01em;
+  }
+  .subhead .meta {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    text-align: right;
+    color: var(--muted);
+    line-height: 1.5;
+  }
+  .subhead .meta b { color: var(--ink); }
+
+  /* Hero TL;DR */
+  .tldr {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 0;
+    border: 1.5px solid var(--ink);
+    margin-bottom: 22px;
+    background: var(--paper-2);
+  }
+  .tldr .cell {
+    padding: 14px 16px;
+    border-right: 1px solid var(--ink);
+    position: relative;
+  }
+  .tldr .cell:last-child { border-right: none; }
+  .tldr .num {
+    font-family: 'Noto Serif KR', serif;
+    font-size: 42px;
+    font-weight: 900;
+    line-height: 1;
+    color: var(--accent);
+    letter-spacing: -.04em;
+  }
+  .tldr .label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 8.5px;
+    letter-spacing: .18em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin: 8px 0 4px;
+  }
+  .tldr .desc {
+    font-size: 11.5px;
+    color: var(--ink);
+    line-height: 1.5;
+    font-weight: 500;
+  }
+
+  /* Section titles */
+  .section-title {
+    font-family: 'Noto Serif KR', serif;
+    font-weight: 900;
+    font-size: 22px;
+    letter-spacing: -.02em;
+    color: var(--ink);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin: 18px 0 12px;
+  }
+  .section-title .dot {
+    width: 10px; height: 10px;
+    background: var(--accent);
+    border-radius: 50%;
+  }
+  .section-title .en {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9.5px;
+    letter-spacing: .18em;
+    color: var(--muted);
+    font-weight: 400;
+    text-transform: uppercase;
+    margin-left: auto;
+  }
+
+  /* Phase grid */
+  .phases {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 8px;
+    margin-bottom: 20px;
+  }
+  .phase {
+    border: 1px solid var(--ink);
+    padding: 12px 12px 14px;
+    background: var(--paper);
+    position: relative;
+    min-height: 190px;
+  }
+  .phase.p0 { background: #fefbf4; }
+  .phase.p1 { background: #f4ede1; }
+  .phase.p2 { background: #ede4d0; border-color: var(--accent-2); }
+  .phase.p3 { background: #e4d6b8; border-color: var(--accent); }
+
+  .phase .tag {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9px;
+    letter-spacing: .15em;
+    color: var(--muted);
+    display: flex; justify-content: space-between;
+    border-bottom: 1px solid var(--ink);
+    padding-bottom: 5px; margin-bottom: 8px;
+  }
+  .phase .name {
+    font-family: 'Noto Serif KR', serif;
+    font-weight: 900;
+    font-size: 17px;
+    letter-spacing: -.02em;
+    color: var(--ink);
+    line-height: 1.15;
+    margin-bottom: 6px;
+  }
+  .phase .period {
+    font-size: 10px;
+    color: var(--muted);
+    font-weight: 500;
+    margin-bottom: 10px;
+  }
+  .phase ul {
+    list-style: none;
+    font-size: 10.5px;
+    line-height: 1.55;
+  }
+  .phase ul li {
+    padding-left: 10px;
+    position: relative;
+    margin-bottom: 2px;
+  }
+  .phase ul li::before {
+    content: '·';
+    position: absolute; left: 2px; top: -2px;
+    font-weight: 900;
+    color: var(--accent);
+  }
+  .phase .footer {
+    position: absolute;
+    bottom: 10px; left: 12px; right: 12px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9px;
+    color: var(--ink);
+    padding-top: 6px;
+    border-top: 1px dashed rgba(0,0,0,.3);
+    display: flex; justify-content: space-between;
+  }
+  .phase .footer b { color: var(--accent); font-weight: 700; }
+
+  /* Timeline */
+  .timeline {
+    border: 1.5px solid var(--ink);
+    padding: 14px 18px;
+    margin-bottom: 20px;
+    background: var(--paper-2);
+  }
+  .timeline-track {
+    display: grid;
+    grid-template-columns: repeat(12, 1fr);
+    gap: 2px;
+    margin-top: 10px;
+  }
+  .timeline-track .cell {
+    border-left: 1px solid rgba(0,0,0,.2);
+    padding: 4px 4px 6px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 8.5px;
+    min-height: 50px;
+    position: relative;
+  }
+  .timeline-track .cell .mo { color: var(--muted); letter-spacing: .1em; }
+  .timeline-track .cell .ev {
+    font-size: 8.5px;
+    font-weight: 700;
+    color: var(--ink);
+    margin-top: 2px;
+    line-height: 1.3;
+  }
+  .timeline-track .cell.key { background: rgba(200,56,47,.08); }
+  .timeline-track .cell.key .ev { color: var(--accent); }
+  .timeline-track .cell.prep { background: rgba(176,138,62,.1); }
+  .timeline-track .cell.focus { background: rgba(11,93,59,.08); }
+  .timeline-year {
+    display: flex; justify-content: space-between; align-items: center;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    font-weight: 700;
+    color: var(--ink);
+    padding-bottom: 6px;
+    border-bottom: 1px solid var(--ink);
+  }
+  .timeline-year .badge {
+    background: var(--ink); color: var(--paper);
+    padding: 2px 8px;
+    font-size: 9px;
+  }
+
+  /* 3-col layout */
+  .triple {
+    display: grid;
+    grid-template-columns: 1.1fr 1fr 1fr;
+    gap: 14px;
+    margin-bottom: 20px;
+  }
+  .panel {
+    border: 1px solid var(--ink);
+    padding: 12px 14px;
+    background: var(--paper);
+  }
+  .panel h3 {
+    font-family: 'Noto Serif KR', serif;
+    font-size: 14px;
+    font-weight: 900;
+    letter-spacing: -.02em;
+    margin-bottom: 8px;
+    padding-bottom: 4px;
+    border-bottom: 1px solid var(--ink);
+    display: flex; justify-content: space-between; align-items: baseline;
+  }
+  .panel h3 .sub {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 8.5px;
+    letter-spacing: .15em;
+    color: var(--muted);
+    font-weight: 400;
+  }
+  .panel ul { list-style: none; font-size: 10.5px; line-height: 1.6; }
+  .panel ul li {
+    padding-left: 14px; position: relative;
+  }
+  .panel ul li::before {
+    content: '→';
+    position: absolute; left: 0; top: 0;
+    color: var(--accent);
+    font-weight: 700;
+  }
+  .panel .highlight {
+    background: rgba(200,56,47,.08);
+    padding: 6px 8px;
+    margin-top: 6px;
+    font-size: 10px;
+    border-left: 2px solid var(--accent);
+    line-height: 1.45;
+  }
+
+  /* Daily routine */
+  .routine {
+    border: 1.5px solid var(--ink);
+    background: var(--paper);
+    display: grid;
+    grid-template-columns: 180px 1fr;
+    margin-bottom: 20px;
+  }
+  .routine .left {
+    background: var(--ink);
+    color: var(--paper);
+    padding: 16px 14px;
+  }
+  .routine .left h3 {
+    font-family: 'Noto Serif KR', serif;
+    font-size: 18px;
+    font-weight: 900;
+    letter-spacing: -.02em;
+    margin-bottom: 4px;
+    line-height: 1.1;
+  }
+  .routine .left .meta {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9px;
+    letter-spacing: .12em;
+    color: rgba(246,242,234,.6);
+    margin-bottom: 12px;
+  }
+  .routine .left p {
+    font-size: 10.5px;
+    line-height: 1.55;
+    color: rgba(246,242,234,.9);
+  }
+  .routine .right { padding: 12px 16px; }
+  .routine-row {
+    display: grid;
+    grid-template-columns: 80px 1fr auto;
+    gap: 12px;
+    align-items: center;
+    padding: 8px 0;
+    border-bottom: 1px dashed rgba(0,0,0,.2);
+  }
+  .routine-row:last-child { border-bottom: none; }
+  .routine-row .time {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--accent);
+  }
+  .routine-row .act {
+    font-size: 12px;
+    font-weight: 600;
+  }
+  .routine-row .act small {
+    display: block;
+    font-size: 10px;
+    font-weight: 400;
+    color: var(--muted);
+  }
+  .routine-row .badge {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9px;
+    background: var(--ink);
+    color: var(--paper);
+    padding: 2px 6px;
+    letter-spacing: .1em;
+  }
+
+  /* Commandments */
+  .laws {
+    border: 1.5px solid var(--accent);
+    padding: 16px 18px;
+    margin-bottom: 20px;
+    background: linear-gradient(180deg, rgba(200,56,47,.05), rgba(200,56,47,.02));
+  }
+  .laws h3 {
+    font-family: 'Noto Serif KR', serif;
+    font-weight: 900;
+    font-size: 20px;
+    letter-spacing: -.02em;
+    color: var(--accent);
+    margin-bottom: 12px;
+    display: flex; align-items: baseline; gap: 10px;
+  }
+  .laws h3 .en {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9.5px;
+    letter-spacing: .18em;
+    color: var(--muted);
+    font-weight: 400;
+    margin-left: auto;
+  }
+  .laws-grid {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 10px;
+  }
+  .law {
+    padding: 10px 10px;
+    border-top: 2px solid var(--ink);
+    position: relative;
+  }
+  .law .num {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--accent);
+    margin-bottom: 4px;
+    letter-spacing: .1em;
+  }
+  .law .title {
+    font-family: 'Noto Serif KR', serif;
+    font-size: 13px;
+    font-weight: 900;
+    letter-spacing: -.02em;
+    line-height: 1.15;
+    margin-bottom: 6px;
+    color: var(--ink);
+  }
+  .law .body {
+    font-size: 10px;
+    color: var(--muted);
+    line-height: 1.5;
+  }
+
+  /* Companies */
+  .companies {
+    border: 1.5px solid var(--ink);
+    margin-bottom: 16px;
+  }
+  .companies-head {
+    background: var(--ink); color: var(--paper);
+    padding: 8px 14px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    letter-spacing: .18em;
+    display: flex; justify-content: space-between;
+  }
+  .companies-body {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+  }
+  .company {
+    padding: 10px 14px;
+    border-right: 1px solid var(--ink);
+    border-bottom: 1px solid var(--ink);
+  }
+  .company:nth-child(3n) { border-right: none; }
+  .company:nth-last-child(-n+3) { border-bottom: none; }
+  .company .head {
+    display: flex; justify-content: space-between; align-items: baseline;
+    margin-bottom: 4px;
+  }
+  .company .name {
+    font-family: 'Noto Serif KR', serif;
+    font-size: 15px;
+    font-weight: 900;
+    letter-spacing: -.02em;
+    color: var(--ink);
+  }
+  .company .chip {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9px;
+    padding: 1px 6px;
+    background: var(--accent);
+    color: var(--paper);
+    letter-spacing: .1em;
+  }
+  .company .chip.blue { background: var(--accent-2); }
+  .company .chip.gold { background: var(--gold); }
+  .company .format {
+    font-size: 10.5px;
+    line-height: 1.5;
+    color: var(--ink);
+    font-weight: 500;
+  }
+  .company .format b { color: var(--accent); }
+  .company .note {
+    font-size: 9.5px;
+    color: var(--muted);
+    font-style: italic;
+    margin-top: 4px;
+  }
+
+  /* Footer */
+  .footer-bar {
+    display: flex; justify-content: space-between; align-items: center;
+    border-top: 4px double var(--ink);
+    padding-top: 10px;
+    margin-top: 16px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9px;
+    letter-spacing: .15em;
+    color: var(--muted);
+    text-transform: uppercase;
+  }
+  .footer-bar .quote {
+    font-family: 'Noto Serif KR', serif;
+    font-size: 13px;
+    font-style: italic;
+    font-weight: 500;
+    color: var(--ink);
+    letter-spacing: -.01em;
+    text-transform: none;
+  }
+  .footer-bar .quote::before { content: '"'; color: var(--accent); font-size: 18px; }
+  .footer-bar .quote::after { content: '"'; color: var(--accent); font-size: 18px; }
+
+  /* Print */
+  @media print {
+    body { background: white; padding: 0; }
+    .poster { box-shadow: none; margin: 0; }
+    @page { size: A3 portrait; margin: 0; }
+  }
+
+  /* Small print helper */
+  .print-hint {
+    position: fixed; bottom: 14px; right: 14px;
+    background: var(--accent); color: white;
+    padding: 8px 14px; border-radius: 20px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px; letter-spacing: .1em;
+    cursor: pointer; border: none;
+    box-shadow: 0 6px 20px rgba(200,56,47,.5);
+    z-index: 100;
+  }
+  .print-hint:hover { background: #a52a22; }
+  @media print { .print-hint { display: none; } }
+</style>
+</head>
+<body>
+
+<div class="poster">
+
+  <!-- Top Bar -->
+  <div class="top-bar">
+    <div><span class="issue">VOL. 01 / 2026</span> &nbsp;·&nbsp; MASTER PLAN &nbsp;·&nbsp; FINANCIAL IT CODING TEST</div>
+    <div>FOR · 정하림 &nbsp;|&nbsp; D-500 &nbsp;|&nbsp; EST. 2026</div>
+  </div>
+
+  <!-- Masthead -->
+  <div class="masthead">
+    <div class="line-1">THE CODING TEST</div>
+    <div class="line-2"><em>Master</em><span class="amp">&</span><em>Plan</em></div>
+  </div>
+
+  <div class="subhead">
+    <div class="tagline">— 투자·연구·공학을 종주하는 한 명의 금융권 IT 엔지니어를 위한 500일 지도.</div>
+    <div class="meta">
+      <b>TARGET</b> · 하나금융티아이 · 신한DS · KB국민은행 ICT<br>
+      <b>DEADLINE</b> · 2027년 하반기 공채 &nbsp;|&nbsp; <b>D-DAY</b> · 2027.09
+    </div>
+  </div>
+
+  <!-- TL;DR -->
+  <div class="tldr">
+    <div class="cell">
+      <div class="num">3+α</div>
+      <div class="label">체감 합격컷 · 후기 기반</div>
+      <div class="desc">6사 공통 실질 컷은 <b>3솔 + SQL 정답</b>. 1솔은 탈락권, 풀솔 가까이 갈수록 안정.</div>
+    </div>
+    <div class="cell">
+      <div class="num">50</div>
+      <div class="label">SQL Problems</div>
+      <div class="desc">SQLD·정처기 실기로 70% 커버. KB 정규식까지 대비하려면 SQL Kit 전량.</div>
+    </div>
+    <div class="cell">
+      <div class="num">G5</div>
+      <div class="label">Gold 5 · 도달 티어</div>
+      <div class="desc">하나TI·신한DS·NH 모두 실버 상위~골드 5. 프로그래머스 Lv2~3.</div>
+    </div>
+  </div>
+
+  <!-- Phases -->
+  <div class="section-title">
+    <span class="dot"></span> 4-PHASE 종주 루트 <span class="en">The Four Phases · 2027.03 → 2027.09</span>
+  </div>
+
+  <div class="phases">
+    <div class="phase p0">
+      <div class="tag"><span>PHASE</span><span>01 / 04</span></div>
+      <div class="name">Python<br>& 자료구조</div>
+      <div class="period">2027.03 · 4주 · 주 10~12h</div>
+      <ul>
+        <li>점프 투 파이썬 1회독</li>
+        <li>이코테 Part 1·2 절반</li>
+        <li>백준 단계별 1~10 · 80문제</li>
+        <li>AI 자동완성 차단 · 입출력 완전 숙지</li>
+      </ul>
+      <div class="footer"><span>누적 <b>100</b></span><span>Bronze</span></div>
+    </div>
+    <div class="phase p1">
+      <div class="tag"><span>PHASE</span><span>02 / 04</span></div>
+      <div class="name">Bronze→<br>Silver 돌파</div>
+      <div class="period">2027.04~05 · 8주 · 주 13~14h</div>
+      <ul>
+        <li>코드트리 Intermediate Low</li>
+        <li>프로그래머스 Lv1 전체 + Lv2 핵심 50</li>
+        <li>자료구조 5종 자가구현</li>
+        <li>정렬·해시·스택·큐·힙·이분탐색</li>
+      </ul>
+      <div class="footer"><span>누적 <b>210</b></span><span>Silver 1</span></div>
+    </div>
+    <div class="phase p2">
+      <div class="tag"><span>PHASE</span><span>03 / 04</span></div>
+      <div class="name">Gold 빈출<br>알고리즘</div>
+      <div class="period">2027.06~07 · 8주 · 주 14~16h</div>
+      <ul>
+        <li>DFS·BFS·DP·다익스트라·플로이드</li>
+        <li>백트래킹·위상정렬·유니온파인드</li>
+        <li>프로그래머스 Lv3 핵심 30</li>
+        <li><b>SQL Kit 50문제 완주</b></li>
+      </ul>
+      <div class="footer"><span>누적 <b>350</b></span><span>Gold 5~4</span></div>
+    </div>
+    <div class="phase p3">
+      <div class="tag"><span>PHASE</span><span>04 / 04</span></div>
+      <div class="name">실전 모의<br>& 기출</div>
+      <div class="period">2027.08 · 4~6주 · 주 16~18h</div>
+      <ul>
+        <li>매주 토 2h 4문제 모의시험</li>
+        <li>Codility Lessons 1~7</li>
+        <li>KB·신한DS·NH·미래 기출 복원</li>
+        <li>CS 면접노트 200개 + 모의 5회</li>
+      </ul>
+      <div class="footer"><span>누적 <b>400~500</b></span><span>Gold 4 +</span></div>
+    </div>
+  </div>
+
+  <!-- Timeline -->
+  <div class="section-title">
+    <span class="dot"></span> 500일 종합 타임라인 <span class="en">Overall Timeline · 2026.05 → 2027.09</span>
+  </div>
+
+  <div class="timeline">
+    <div class="timeline-year">
+      <span>◆ 2026</span>
+      <span class="badge">PREPARATION YEAR</span>
+      <span>코딩테스트 학습 No-Go · 자격증·인턴·어학에 집중</span>
+    </div>
+    <div class="timeline-track">
+      <div class="cell prep"><div class="mo">05</div><div class="ev">신청금융<br>인베베</div></div>
+      <div class="cell prep"><div class="mo">06</div><div class="ev">SQLD</div></div>
+      <div class="cell prep"><div class="mo">07</div><div class="ev">정처기<br>실기</div></div>
+      <div class="cell focus"><div class="mo">08</div><div class="ev">CFA L1<br>시작</div></div>
+      <div class="cell focus"><div class="mo">09</div><div class="ev">CFA</div></div>
+      <div class="cell focus"><div class="mo">10</div><div class="ev">CFA</div></div>
+      <div class="cell key"><div class="mo">11</div><div class="ev">CFA L1<br>시험</div></div>
+      <div class="cell"><div class="mo">12</div><div class="ev">토익·<br>오픽</div></div>
+      <div class="cell"><div class="mo">01</div><div class="ev">토익·<br>오픽</div></div>
+      <div class="cell"><div class="mo">02</div><div class="ev">어학<br>마무리</div></div>
+      <div class="cell key"><div class="mo">03</div><div class="ev">★ P0<br>시작</div></div>
+      <div class="cell key"><div class="mo">04</div><div class="ev">P1</div></div>
+    </div>
+    <div class="timeline-year" style="margin-top: 14px; border-top: 1px solid var(--ink); padding-top: 6px;">
+      <span>◆ 2027</span>
+      <span class="badge" style="background: var(--accent);">EXECUTION YEAR</span>
+      <span>본격 코딩테스트 학습 · 상반기 어학 · 하반기 공채 D-DAY</span>
+    </div>
+    <div class="timeline-track">
+      <div class="cell"><div class="mo">01</div><div class="ev">토익·<br>오픽</div></div>
+      <div class="cell"><div class="mo">02</div><div class="ev">워밍업</div></div>
+      <div class="cell key"><div class="mo">03</div><div class="ev">★ Phase 0<br>Python</div></div>
+      <div class="cell key"><div class="mo">04</div><div class="ev">Phase 1<br>Silver</div></div>
+      <div class="cell key"><div class="mo">05</div><div class="ev">Phase 1</div></div>
+      <div class="cell key"><div class="mo">06</div><div class="ev">Phase 2<br>Gold</div></div>
+      <div class="cell key"><div class="mo">07</div><div class="ev">Phase 2<br>+ SQL</div></div>
+      <div class="cell key"><div class="mo">08</div><div class="ev">Phase 3<br>모의</div></div>
+      <div class="cell" style="background: var(--accent); color: white;"><div class="mo" style="color: rgba(255,255,255,.7);">09</div><div class="ev" style="color: white;">🎯 공채<br>D-DAY</div></div>
+      <div class="cell" style="background: rgba(200,56,47,.15);"><div class="mo">10</div><div class="ev">면접<br>시즌</div></div>
+      <div class="cell" style="background: rgba(200,56,47,.15);"><div class="mo">11</div><div class="ev">면접</div></div>
+      <div class="cell" style="background: rgba(200,56,47,.15);"><div class="mo">12</div><div class="ev">합류<br>준비</div></div>
+    </div>
+  </div>
+
+  <!-- Daily Routine -->
+  <div class="section-title">
+    <span class="dot"></span> 본격기 하루 루틴 <span class="en">Daily Routine · Phase 1~3 Execution</span>
+  </div>
+
+  <div class="routine">
+    <div class="left">
+      <h3>집중 4시간<br>원칙주의</h3>
+      <div class="meta">MON — FRI</div>
+      <p>연구실·논문 낮시간 4~6h를 지키되, 저녁 22시 이후 2시간 집중 블록을 비타협으로 사수한다. 주말엔 인베베·종료 후 3~5h 가능.</p>
+    </div>
+    <div class="right">
+      <div class="routine-row">
+        <div class="time">22:00</div>
+        <div class="act">알고리즘 집중 블록<br><small>프로그래머스/백준 보존 문제 1~2문항 · AI 차단</small></div>
+        <div class="badge">1.5h</div>
+      </div>
+      <div class="routine-row">
+        <div class="time">23:30</div>
+        <div class="act">CS 개념 복습<br><small>OS·DB·네트워크 면접 노트 작성, 하루 1주제</small></div>
+        <div class="badge">0.5h</div>
+      </div>
+      <div class="routine-row">
+        <div class="time">SAT 오전</div>
+        <div class="act">모의시험 풀 세트<br><small>4문제 2h · 실제 시험 환경 재현 · 채점 후 30분 복기</small></div>
+        <div class="badge">2h</div>
+      </div>
+      <div class="routine-row">
+        <div class="time">SAT 오후</div>
+        <div class="act">신 알고리즘 학습<br><small>코드트리 강의 + 같은 유형 3문제 연속 풀이</small></div>
+        <div class="badge">3h</div>
+      </div>
+      <div class="routine-row">
+        <div class="time">SUN 오후</div>
+        <div class="act">깃허브 프로젝트 or 논문<br><small>코테는 가벼운 1문제만 · 휴식도 훈련의 일부</small></div>
+        <div class="badge">휴식</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Laws / Commandments -->
+  <div class="laws">
+    <h3>지현림의 다섯 가지 계율 <span class="en">The Five Non-Negotiables</span></h3>
+    <div class="laws-grid">
+      <div class="law">
+        <div class="num">I.</div>
+        <div class="title">AI를 끈다</div>
+        <div class="body">첫 50문제는 Cursor·Copilot 완전 차단. 맨손 코딩으로 heapq·deque·bisect를 근육에 새긴다.</div>
+      </div>
+      <div class="law">
+        <div class="num">II.</div>
+        <div class="title">감을 끊지 않는다</div>
+        <div class="body">어떤 날도 0문제는 금지. 최소 15분 1문제로 뇌의 문법 회로를 살려둔다.</div>
+      </div>
+      <div class="law">
+        <div class="num">III.</div>
+        <div class="title">손으로 먼저 쓴다</div>
+        <div class="body">문제를 읽고 10분간 종이에 의사코드. 코드 키보드는 사고 후에만 허용.</div>
+      </div>
+      <div class="law">
+        <div class="num">IV.</div>
+        <div class="title">SQL을 우습게 보지 않는다</div>
+        <div class="body">KB 합격선을 가르는 건 SQL 1문제. 정규표현식·윈도우 함수까지 손끝에 둔다.</div>
+      </div>
+      <div class="law">
+        <div class="num">V.</div>
+        <div class="title">자격증은 코테의 자산</div>
+        <div class="body">SQLD·정처기·CFA는 낭비가 아니다. SQL·CS·도메인 지식이 그대로 면접의 탄환이 된다.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Companies -->
+  <div class="section-title">
+    <span class="dot"></span> 목표 6사 시험 포맷 <span class="en">Target Companies · Test Format Matrix</span>
+  </div>
+
+  <div class="companies">
+    <div class="companies-head">
+      <span>■ COMPANY</span><span>■ FORMAT</span><span>■ DIFFICULTY · SQL</span>
+    </div>
+    <div class="companies-body">
+      <div class="company">
+        <div class="head"><span class="name">하나금융티아이</span><span class="chip">★ 본진</span></div>
+        <div class="format">알고리즘 3 + <b>SQL 2~3</b> / 120분 · 프로그래머스 · 백준 골드5 수준</div>
+        <div class="note">서류→필기(코테+인성)→1·2차 다대다 면접. 하나은행 ICT와 함께 1순위</div>
+      </div>
+      <div class="company">
+        <div class="head"><span class="name">하나은행 ICT</span><span class="chip">★ 본진</span></div>
+        <div class="format">알고리즘 3 + SQL 2 / 120분 · 프로그래머스 · 하나TI보다 난도↑</div>
+        <div class="note">인성검사는 몬스터 플랫폼 별도. 체감 컷 3솔+SQL</div>
+      </div>
+      <div class="company">
+        <div class="head"><span class="name">신한DS</span><span class="chip blue">SI</span></div>
+        <div class="format">알고리즘 3 + SQL 2 / 2시간 · 프로그래머스 · 구현·시뮬·문자열</div>
+        <div class="note">실버 상위~골드 하위. SSAFY 연계 루트 존재</div>
+      </div>
+      <div class="company">
+        <div class="head"><span class="name">KB국민은행 ICT</span><span class="chip blue">보안</span></div>
+        <div class="format">알고리즘 3 + SQL 1 / 120분 · 프로그래머스 IDE · <b>정규식 SQL ↑</b></div>
+        <div class="note">'24 하반기 SQL 정규표현식 출제. 금융권 최고난도 SQL</div>
+      </div>
+      <div class="company">
+        <div class="head"><span class="name">미래에셋증권</span><span class="chip gold">AI/IT</span></div>
+        <div class="format">알고리즘 2 + SQL 2 · Lv2 이하 · 계산형·DFS, SQL UNION/CONCAT</div>
+        <div class="note">Codility 사용 미확인 · 합격 후기 다수 올솔</div>
+      </div>
+      <div class="company">
+        <div class="head"><span class="name">NH투자증권 ICT</span><span class="chip gold">AI/IT</span></div>
+        <div class="format">인적성 90문항 + 알고리즘 3 + SQL 1 / 120분 · 프로그래머스</div>
+        <div class="note">백트래킹·BFS·그리디·DP 빈출. 3솔+SQL이면 통과권</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <div class="footer-bar">
+    <div>ISSUE 01 · 2026</div>
+    <div class="quote">일관된 루틴이 재능을 이긴다.</div>
+    <div>PRINTED FOR · 정하림</div>
+  </div>
+
+</div>
+
+<button class="print-hint" onclick="window.print()">⌘ P · 인쇄 / PDF 저장</button>
+
+</body>
+</html>

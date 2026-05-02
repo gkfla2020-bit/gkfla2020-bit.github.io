@@ -1,0 +1,2237 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, maximum-scale=1">
+<meta name="theme-color" content="#3182F6">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<title>Daily · 정하림 마스터 플랜</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Pretendard:wght@300;400;500;600;700;800;900&family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --blue-50: #F2F7FF;
+    --blue-100: #DBE9FF;
+    --blue-400: #578DF6;
+    --blue-500: #3182F6;
+    --blue-600: #2272EB;
+    --blue-700: #1B64DA;
+    --green-100: #E0F7EE;
+    --green-500: #00C471;
+    --green-600: #00A660;
+    --red-100: #FFEBEE;
+    --red-500: #F04452;
+    --red-600: #D63A47;
+    --yellow-100: #FFF4D6;
+    --yellow-500: #FF9500;
+    --yellow-600: #E68600;
+    --purple-100: #F0EAFE;
+    --purple-500: #8865F8;
+
+    --gray-50:  #F9FAFB;
+    --gray-100: #F2F4F6;
+    --gray-200: #E5E8EB;
+    --gray-300: #D1D6DB;
+    --gray-400: #B0B8C1;
+    --gray-500: #8B95A1;
+    --gray-600: #6B7684;
+    --gray-700: #4E5968;
+    --gray-800: #333D4B;
+    --gray-900: #191F28;
+
+    --shadow-sm: 0 1px 3px rgba(0,0,0,.04), 0 1px 2px rgba(0,0,0,.03);
+    --shadow: 0 2px 8px rgba(0,0,0,.04), 0 1px 2px rgba(0,0,0,.03);
+    --shadow-lg: 0 10px 30px rgba(0,0,0,.08), 0 2px 6px rgba(0,0,0,.04);
+
+    --r-sm: 10px;
+    --r-md: 14px;
+    --r-lg: 20px;
+    --r-xl: 28px;
+
+    --safe-bottom: env(safe-area-inset-bottom, 0px);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+  html, body {
+    background: var(--gray-100);
+    color: var(--gray-900);
+    font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, sans-serif;
+    font-size: 15px;
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+    letter-spacing: -.01em;
+  }
+  body { min-height: 100vh; padding-bottom: calc(96px + var(--safe-bottom)); }
+  button, input, select, textarea { font-family: inherit; letter-spacing: inherit; }
+  input[type="number"] { -moz-appearance: textfield; }
+  input[type="number"]::-webkit-outer-spin-button,
+  input[type="number"]::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+
+  .app {
+    max-width: 480px;
+    margin: 0 auto;
+    background: var(--gray-100);
+    min-height: 100vh;
+    position: relative;
+  }
+  @media (min-width: 768px) {
+    body { background: var(--gray-200); }
+    .app { box-shadow: 0 0 60px rgba(0,0,0,.06); }
+  }
+
+  /* Top bar */
+  .topbar {
+    position: sticky; top: 0; z-index: 50;
+    background: rgba(255,255,255,.85);
+    backdrop-filter: saturate(180%) blur(20px);
+    -webkit-backdrop-filter: saturate(180%) blur(20px);
+    padding: 14px 20px;
+    display: flex; align-items: center; justify-content: space-between;
+    border-bottom: 1px solid rgba(0,0,0,.04);
+  }
+  .topbar .date { font-size: 13px; color: var(--gray-600); font-weight: 500; }
+  .topbar .title { font-size: 18px; font-weight: 700; }
+  .topbar .menu-btn {
+    background: var(--gray-100); border: none;
+    width: 36px; height: 36px; border-radius: 50%;
+    display: grid; place-items: center; cursor: pointer;
+  }
+  .topbar .menu-btn:active { background: var(--gray-200); }
+  .topbar .menu-btn svg { width: 18px; height: 18px; color: var(--gray-700); }
+
+  /* Hero */
+  .hero {
+    background: linear-gradient(135deg, var(--blue-500) 0%, var(--blue-700) 100%);
+    color: white;
+    padding: 24px 24px 28px;
+    margin: 16px 16px 0;
+    border-radius: var(--r-xl);
+    box-shadow: 0 12px 28px rgba(49,130,246,.25);
+    position: relative; overflow: hidden;
+  }
+  .hero.exam { background: linear-gradient(135deg, #F04452 0%, #D63A47 100%); box-shadow: 0 12px 28px rgba(240,68,82,.25); }
+  .hero.intern { background: linear-gradient(135deg, #8865F8 0%, #6D47E0 100%); box-shadow: 0 12px 28px rgba(136,101,248,.25); }
+  .hero.cert { background: linear-gradient(135deg, #00C471 0%, #00A660 100%); box-shadow: 0 12px 28px rgba(0,196,113,.25); }
+  .hero::before {
+    content: '';
+    position: absolute;
+    width: 220px; height: 220px;
+    background: radial-gradient(circle, rgba(255,255,255,.12) 0%, transparent 70%);
+    top: -60px; right: -60px; border-radius: 50%;
+  }
+  .hero-head {
+    display: flex; justify-content: space-between; align-items: center;
+    margin-bottom: 20px; position: relative;
+  }
+  .hero-chip {
+    background: rgba(255,255,255,.2);
+    padding: 6px 12px;
+    border-radius: 999px;
+    font-size: 12px; font-weight: 600;
+  }
+  .hero-dday { font-size: 12px; opacity: .85; font-weight: 500; font-family: 'Inter', sans-serif; }
+  .hero-body { position: relative; display: grid; grid-template-columns: 1fr auto; align-items: center; gap: 16px; }
+  .hero-text .greeting { font-size: 14px; opacity: .9; margin-bottom: 4px; font-weight: 500; }
+  .hero-text .focus { font-size: 21px; font-weight: 800; line-height: 1.3; letter-spacing: -.02em; }
+  .hero-text .sub { font-size: 12.5px; opacity: .9; margin-top: 6px; font-weight: 500; line-height: 1.5; }
+  .hero-ring { width: 88px; height: 88px; position: relative; flex-shrink: 0; }
+  .hero-ring svg { transform: rotate(-90deg); }
+  .hero-ring .track { stroke: rgba(255,255,255,.2); }
+  .hero-ring .fill { stroke: white; stroke-linecap: round; transition: stroke-dashoffset .6s cubic-bezier(.2,.8,.2,1); }
+  .hero-ring .pct {
+    position: absolute; inset: 0;
+    display: grid; place-items: center;
+    font-size: 20px; font-weight: 800;
+    font-family: 'Inter', sans-serif;
+  }
+
+  /* Active context banner */
+  .context-banner {
+    margin: 12px 16px 0;
+    background: white;
+    border-radius: var(--r-md);
+    padding: 12px 16px;
+    display: flex;
+    gap: 12px;
+    align-items: center;
+    box-shadow: var(--shadow-sm);
+  }
+  .context-banner .dot {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    background: var(--red-500);
+    flex-shrink: 0;
+    animation: pulse 2s infinite;
+  }
+  @keyframes pulse {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: .5; transform: scale(1.3); }
+  }
+  .context-banner .ctx-text { flex: 1; min-width: 0; }
+  .context-banner .ctx-title {
+    font-size: 13.5px; font-weight: 700; color: var(--gray-900);
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  }
+  .context-banner .ctx-sub {
+    font-size: 11.5px; color: var(--gray-600); margin-top: 1px;
+  }
+  .context-banner .ctx-action {
+    background: var(--gray-100); border: none; border-radius: 8px;
+    padding: 6px 10px; font-size: 11px; font-weight: 700; color: var(--gray-700);
+    cursor: pointer;
+  }
+
+  /* Strip */
+  .strip {
+    display: grid; grid-template-columns: 1fr 1fr 1fr;
+    gap: 10px; padding: 12px 16px 0;
+  }
+  .chip-stat {
+    background: white; border-radius: var(--r-md);
+    padding: 14px; box-shadow: var(--shadow-sm);
+  }
+  .chip-stat .v {
+    font-size: 22px; font-weight: 800; line-height: 1;
+    font-family: 'Inter', sans-serif; letter-spacing: -.02em;
+  }
+  .chip-stat .v .u { font-size: 13px; color: var(--gray-500); font-weight: 600; margin-left: 2px; }
+  .chip-stat .l { font-size: 12px; color: var(--gray-600); margin-top: 6px; font-weight: 500; }
+  .chip-stat.accent .v { color: var(--blue-500); }
+
+  /* Sections */
+  .section { margin: 20px 16px 0; }
+  .section-title {
+    display: flex; justify-content: space-between; align-items: center;
+    margin-bottom: 10px; padding: 0 4px;
+  }
+  .section-title h3 { font-size: 17px; font-weight: 800; letter-spacing: -.02em; }
+  .section-title .action {
+    font-size: 13px; color: var(--blue-500);
+    background: none; border: none; cursor: pointer;
+    font-weight: 600; padding: 4px 8px; margin: -4px -8px;
+  }
+  .card {
+    background: white; border-radius: var(--r-lg);
+    padding: 20px; box-shadow: var(--shadow-sm);
+  }
+
+  /* Lead */
+  .lead {
+    background: linear-gradient(135deg, #FFFBEB 0%, #FFF4D6 100%);
+    border: 1px solid var(--yellow-100);
+    padding: 16px 18px;
+    border-radius: var(--r-lg);
+    display: flex; gap: 14px; align-items: flex-start;
+  }
+  .lead.good { background: linear-gradient(135deg, #F0FBF5 0%, #E0F7EE 100%); border-color: var(--green-100); }
+  .lead.info { background: linear-gradient(135deg, var(--blue-50) 0%, var(--blue-100) 100%); border-color: var(--blue-100); }
+  .lead.bad  { background: linear-gradient(135deg, #FFF5F5 0%, #FFEBEE 100%); border-color: var(--red-100); }
+  .lead .lead-icon {
+    flex: 0 0 36px; height: 36px;
+    background: white; border-radius: 10px;
+    display: grid; place-items: center;
+    box-shadow: var(--shadow-sm);
+  }
+  .lead .lead-icon svg { width: 18px; height: 18px; }
+  .lead .title { font-size: 14.5px; font-weight: 700; color: var(--gray-900); margin-bottom: 2px; line-height: 1.4; }
+  .lead .desc { font-size: 13px; color: var(--gray-700); line-height: 1.5; }
+
+  /* Timeline / Schedule view */
+  .schedule-wrap { display: grid; gap: 2px; }
+  .sched-row {
+    display: grid;
+    grid-template-columns: 62px 1fr;
+    gap: 10px;
+    align-items: flex-start;
+    position: relative;
+    padding: 6px 0;
+  }
+  .sched-row .time-col {
+    font-family: 'Inter', sans-serif;
+    font-size: 11px;
+    color: var(--gray-500);
+    font-weight: 700;
+    padding-top: 14px;
+    line-height: 1.3;
+    text-align: right;
+  }
+  .sched-row .time-col .duration { font-size: 10px; color: var(--gray-400); font-weight: 500; }
+  .sched-item {
+    background: var(--gray-50);
+    border-radius: var(--r-md);
+    padding: 14px 16px;
+    border-left: 4px solid var(--gray-300);
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 10px;
+    align-items: center;
+    cursor: pointer;
+    transition: all .2s;
+  }
+  .sched-item:active { transform: scale(.99); }
+  .sched-item.done { opacity: .55; }
+  .sched-item.done .title { text-decoration: line-through; color: var(--gray-500); }
+  .sched-item.carried { background: #FFF8F9; border-left-color: var(--red-500); }
+  .sched-item.carried .carried-tag {
+    font-size: 10.5px; font-weight: 700; color: var(--red-600);
+    background: var(--red-100); padding: 2px 7px; border-radius: 999px; margin-left: 6px;
+  }
+  .sched-item.type-algo    { border-left-color: var(--blue-500); }
+  .sched-item.type-sql     { border-left-color: var(--green-500); }
+  .sched-item.type-cs      { border-left-color: var(--purple-500); }
+  .sched-item.type-exam    { border-left-color: var(--red-500); background: #FFF5F5; }
+  .sched-item.type-cert    { border-left-color: var(--green-600); background: #F0FBF5; }
+  .sched-item.type-intern  { border-left-color: var(--purple-500); background: #F6F3FE; }
+  .sched-item.type-lab     { border-left-color: var(--yellow-500); }
+  .sched-item.type-lang    { border-left-color: var(--blue-400); }
+  .sched-item.type-mock    { border-left-color: var(--gray-900); }
+  .sched-item.type-rest    { border-left-color: var(--gray-300); background: var(--gray-50); }
+
+  .sched-item .body { min-width: 0; }
+  .sched-item .title {
+    font-size: 14.5px; font-weight: 700; color: var(--gray-900);
+    margin-bottom: 3px; line-height: 1.35;
+    word-break: keep-all;
+  }
+  .sched-item .sub {
+    font-size: 12px; color: var(--gray-600);
+    display: flex; flex-wrap: wrap; gap: 6px; align-items: center;
+  }
+  .sched-item .tag {
+    font-size: 10.5px; font-weight: 600;
+    background: var(--gray-200); color: var(--gray-700);
+    padding: 2px 8px; border-radius: 999px;
+  }
+  .sched-item .tag.blue  { background: var(--blue-100); color: var(--blue-600); }
+  .sched-item .tag.green { background: var(--green-100); color: var(--green-600); }
+  .sched-item .tag.red   { background: var(--red-100); color: var(--red-600); }
+  .sched-item .tag.purple { background: var(--purple-100); color: var(--purple-500); }
+  .sched-item .tag.yellow { background: var(--yellow-100); color: var(--yellow-600); }
+
+  .sched-item .check-col { display: flex; gap: 2px; align-items: center; }
+  .sched-check {
+    width: 28px; height: 28px;
+    border-radius: 50%;
+    border: 2px solid var(--gray-300);
+    background: white;
+    display: grid; place-items: center;
+    cursor: pointer;
+    transition: all .2s;
+    flex-shrink: 0;
+  }
+  .sched-item.done .sched-check {
+    background: var(--blue-500);
+    border-color: var(--blue-500);
+  }
+  .sched-item.done .sched-check svg { display: block; }
+  .sched-check svg { display: none; width: 14px; height: 14px; color: white; }
+  .sched-del {
+    width: 28px; height: 28px; border-radius: 6px;
+    background: transparent; border: none;
+    display: grid; place-items: center;
+    color: var(--gray-400); cursor: pointer;
+  }
+  .sched-del:active { background: var(--gray-100); }
+  .sched-del svg { width: 14px; height: 14px; }
+
+  /* Meta row */
+  .todo-meta {
+    display: flex; justify-content: space-between; align-items: center;
+    margin-bottom: 14px;
+  }
+  .todo-meta .count {
+    display: flex; align-items: baseline; gap: 6px;
+    font-family: 'Inter', sans-serif;
+  }
+  .todo-meta .count .done {
+    font-size: 24px; font-weight: 800; color: var(--blue-500); letter-spacing: -.02em;
+  }
+  .todo-meta .count .total { font-size: 14px; color: var(--gray-500); font-weight: 600; }
+  .todo-meta .hours-chip {
+    font-size: 11px; font-weight: 700; color: var(--gray-700);
+    background: var(--gray-100); padding: 4px 10px; border-radius: 999px;
+  }
+
+  .add-todo-btn {
+    margin-top: 10px;
+    background: var(--gray-50);
+    border: 1.5px dashed var(--gray-300);
+    border-radius: var(--r-md);
+    padding: 12px; width: 100%;
+    font-size: 13px; color: var(--gray-600); font-weight: 600;
+    cursor: pointer; transition: all .15s;
+  }
+  .add-todo-btn:hover { background: var(--gray-100); border-color: var(--gray-400); color: var(--gray-700); }
+
+  .empty {
+    padding: 24px 16px; text-align: center;
+    color: var(--gray-500); font-size: 13px;
+  }
+
+  /* Quick actions */
+  .quick-grid {
+    display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px;
+  }
+  .quick-btn {
+    background: var(--gray-50); border: none;
+    border-radius: var(--r-md); padding: 14px 8px;
+    cursor: pointer; transition: all .15s; text-align: center;
+  }
+  .quick-btn:active { transform: scale(.96); background: var(--gray-100); }
+  .quick-btn .icon {
+    width: 40px; height: 40px; margin: 0 auto 8px;
+    border-radius: 50%;
+    background: var(--blue-100); color: var(--blue-600);
+    display: grid; place-items: center;
+  }
+  .quick-btn .icon.green { background: var(--green-100); color: var(--green-600); }
+  .quick-btn .icon.purple { background: var(--purple-100); color: var(--purple-500); }
+  .quick-btn .icon svg { width: 20px; height: 20px; }
+  .quick-btn .l { font-size: 13px; font-weight: 700; }
+  .quick-btn .s { font-size: 11px; color: var(--gray-500); font-weight: 500; margin-top: 2px; }
+
+  /* Upcoming horizontal scroll */
+  .upcoming-scroll {
+    display: flex;
+    gap: 10px;
+    overflow-x: auto;
+    padding: 2px 2px 4px;
+    scroll-snap-type: x mandatory;
+    -webkit-overflow-scrolling: touch;
+  }
+  .upcoming-scroll::-webkit-scrollbar { display: none; }
+  .upcoming-card {
+    flex: 0 0 auto;
+    min-width: 180px;
+    max-width: 220px;
+    background: white;
+    border-radius: var(--r-md);
+    padding: 14px 16px;
+    box-shadow: var(--shadow-sm);
+    cursor: pointer;
+    position: relative;
+    scroll-snap-align: start;
+    border-left: 4px solid var(--gray-300);
+    transition: transform .15s;
+  }
+  .upcoming-card:active { transform: scale(.98); }
+  .upcoming-card.type-exam   { border-left-color: var(--red-500); }
+  .upcoming-card.type-cert   { border-left-color: var(--green-500); }
+  .upcoming-card.type-intern { border-left-color: var(--purple-500); }
+  .upcoming-card.type-lang   { border-left-color: var(--blue-400); }
+  .upcoming-card.type-lab    { border-left-color: var(--yellow-500); }
+  .upcoming-card.type-other  { border-left-color: var(--gray-400); }
+  .upcoming-card.type-phase  { border-left-color: var(--blue-500); background: var(--blue-50); }
+  .upcoming-card.type-dday   { border-left-color: var(--red-500); background: #FFF5F5; }
+  .upcoming-card .uc-head {
+    display: flex; justify-content: space-between; align-items: center;
+    margin-bottom: 8px;
+  }
+  .upcoming-card .uc-type {
+    font-size: 10.5px; font-weight: 700; letter-spacing: .02em;
+    background: var(--gray-100); color: var(--gray-700);
+    padding: 2px 8px; border-radius: 999px;
+  }
+  .upcoming-card.type-exam   .uc-type { background: var(--red-100); color: var(--red-600); }
+  .upcoming-card.type-cert   .uc-type { background: var(--green-100); color: var(--green-600); }
+  .upcoming-card.type-intern .uc-type { background: var(--purple-100); color: var(--purple-500); }
+  .upcoming-card.type-lang   .uc-type { background: var(--blue-100); color: var(--blue-600); }
+  .upcoming-card.type-lab    .uc-type { background: var(--yellow-100); color: var(--yellow-600); }
+  .upcoming-card.type-phase  .uc-type { background: var(--blue-100); color: var(--blue-600); }
+  .upcoming-card.type-dday   .uc-type { background: var(--red-500); color: white; }
+  .upcoming-card .uc-dday {
+    font-size: 17px; font-weight: 800;
+    font-family: 'Inter', sans-serif;
+    color: var(--gray-900);
+    letter-spacing: -.02em;
+  }
+  .upcoming-card.type-dday .uc-dday,
+  .upcoming-card.type-dday .uc-name { color: var(--red-600); }
+  .upcoming-card .uc-dday .unit {
+    font-size: 12px; font-weight: 600;
+    color: var(--gray-500); margin-left: 2px;
+  }
+  .upcoming-card .uc-name {
+    font-size: 14px; font-weight: 700;
+    color: var(--gray-900);
+    line-height: 1.3;
+    margin-bottom: 4px;
+    overflow: hidden;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    word-break: keep-all;
+  }
+  .upcoming-card .uc-date {
+    font-size: 11px; color: var(--gray-500);
+    font-family: 'Inter', sans-serif;
+    font-weight: 500;
+  }
+  .upcoming-card .uc-progress {
+    margin-top: 8px;
+    height: 3px;
+    background: var(--gray-100);
+    border-radius: 2px;
+    overflow: hidden;
+  }
+  .upcoming-card .uc-progress-fill {
+    height: 100%;
+    background: var(--gray-400);
+    border-radius: 2px;
+    transition: width .4s;
+  }
+  .upcoming-card.type-exam .uc-progress-fill { background: var(--red-500); }
+  .upcoming-card.type-cert .uc-progress-fill { background: var(--green-500); }
+  .upcoming-card.type-intern .uc-progress-fill { background: var(--purple-500); }
+  .upcoming-card.type-phase .uc-progress-fill { background: var(--blue-500); }
+  .upcoming-card.type-dday .uc-progress-fill { background: var(--red-500); }
+
+  /* Week dots */
+  .week-dots {
+    display: grid; grid-template-columns: repeat(7, 1fr);
+    gap: 6px; margin-bottom: 12px;
+  }
+  .week-day { text-align: center; }
+  .week-day .lbl { font-size: 11px; color: var(--gray-500); margin-bottom: 6px; font-weight: 600; }
+  .week-day .dot {
+    width: 36px; height: 36px; margin: 0 auto;
+    border-radius: 50%;
+    background: var(--gray-100);
+    display: grid; place-items: center;
+    font-size: 13px; color: var(--gray-500); font-weight: 700;
+    font-family: 'Inter', sans-serif;
+  }
+  .week-day.done .dot { background: var(--blue-500); color: white; }
+  .week-day.partial .dot { background: var(--blue-100); color: var(--blue-600); }
+  .week-day.today .dot { outline: 2px solid var(--blue-500); outline-offset: 3px; }
+  .week-day.future .dot { color: var(--gray-400); }
+  .week-summary {
+    background: var(--gray-50); border-radius: var(--r-md);
+    padding: 12px 14px;
+    display: flex; justify-content: space-between; align-items: center;
+    font-size: 13px;
+  }
+  .week-summary .k { color: var(--gray-600); font-weight: 500; }
+  .week-summary .v {
+    font-weight: 700; font-family: 'Inter', sans-serif; letter-spacing: -.01em;
+  }
+
+  /* Events list */
+  .event-card {
+    padding: 14px 16px;
+    border-radius: var(--r-md);
+    background: var(--gray-50);
+    margin-bottom: 8px;
+    display: grid;
+    gap: 6px;
+    border-left: 4px solid var(--gray-400);
+  }
+  .event-card.type-exam { border-left-color: var(--red-500); background: #FFF5F5; }
+  .event-card.type-cert { border-left-color: var(--green-500); background: #F0FBF5; }
+  .event-card.type-intern { border-left-color: var(--purple-500); background: #F6F3FE; }
+  .event-card.type-lang { border-left-color: var(--blue-400); background: var(--blue-50); }
+  .event-card.type-lab { border-left-color: var(--yellow-500); background: #FFFBEB; }
+  .event-card.type-other { border-left-color: var(--gray-400); }
+  .event-card-head {
+    display: flex; justify-content: space-between; align-items: baseline;
+  }
+  .event-card-head .name { font-size: 15px; font-weight: 700; }
+  .event-card-head .state {
+    font-size: 10.5px; font-weight: 700; padding: 2px 8px; border-radius: 999px;
+    background: var(--gray-200); color: var(--gray-700);
+  }
+  .event-card-head .state.active { background: var(--red-500); color: white; }
+  .event-card-head .state.upcoming { background: var(--blue-500); color: white; }
+  .event-card-head .state.done { background: var(--gray-300); color: var(--gray-600); }
+  .event-card .period {
+    font-size: 12px; color: var(--gray-600);
+    font-family: 'Inter', sans-serif;
+  }
+  .event-card .meta {
+    display: flex; gap: 8px; flex-wrap: wrap; font-size: 11px; color: var(--gray-600);
+  }
+  .event-card .meta span {
+    background: white; padding: 2px 8px; border-radius: 999px; font-weight: 600;
+  }
+  .event-card-actions {
+    display: flex; gap: 6px; margin-top: 4px;
+  }
+  .event-card-actions button {
+    flex: 1; background: white;
+    border: 1px solid var(--gray-200); border-radius: 8px;
+    padding: 6px 10px; font-size: 12px; font-weight: 600;
+    color: var(--gray-700); cursor: pointer;
+  }
+  .event-card-actions button:active { background: var(--gray-100); }
+  .event-card-actions button.danger { color: var(--red-500); }
+
+  /* Bottom nav */
+  .bottom-nav {
+    position: fixed; bottom: 0; left: 0; right: 0;
+    max-width: 480px; margin: 0 auto;
+    background: rgba(255,255,255,.95);
+    backdrop-filter: saturate(180%) blur(20px);
+    -webkit-backdrop-filter: saturate(180%) blur(20px);
+    border-top: 1px solid var(--gray-200);
+    padding: 8px 8px calc(8px + var(--safe-bottom));
+    display: grid; grid-template-columns: repeat(4, 1fr); gap: 2px;
+    z-index: 100;
+  }
+  .nav-btn {
+    background: none; border: none;
+    padding: 8px 4px;
+    display: grid; place-items: center; gap: 2px;
+    cursor: pointer; color: var(--gray-500); border-radius: 10px;
+  }
+  .nav-btn svg { width: 22px; height: 22px; }
+  .nav-btn .nav-l { font-size: 10.5px; font-weight: 700; letter-spacing: -.01em; }
+  .nav-btn.active { color: var(--blue-500); }
+  .nav-btn:active { background: var(--gray-100); }
+
+  /* FAB */
+  .fab {
+    position: fixed;
+    bottom: calc(80px + var(--safe-bottom));
+    right: 24px;
+    width: 56px; height: 56px;
+    border-radius: 50%;
+    background: var(--blue-500); color: white;
+    border: none;
+    box-shadow: 0 10px 30px rgba(49,130,246,.4);
+    cursor: pointer;
+    display: grid; place-items: center;
+    z-index: 99; transition: all .2s;
+  }
+  .fab:active { transform: scale(.92); }
+  .fab svg { width: 24px; height: 24px; }
+  @media (min-width: 768px) {
+    .fab { right: calc(50% - 240px + 24px); }
+  }
+
+  /* Sheet */
+  .backdrop {
+    position: fixed; inset: 0;
+    background: rgba(0,0,0,.4);
+    z-index: 200; opacity: 0; pointer-events: none;
+    transition: opacity .25s;
+  }
+  .backdrop.show { opacity: 1; pointer-events: auto; }
+  .sheet {
+    position: fixed; bottom: 0; left: 0; right: 0;
+    max-width: 480px; margin: 0 auto;
+    background: white;
+    border-radius: 24px 24px 0 0;
+    padding: 8px 20px calc(24px + var(--safe-bottom));
+    z-index: 201;
+    transform: translateY(100%);
+    transition: transform .3s cubic-bezier(.2,.8,.2,1);
+    max-height: 90vh; overflow-y: auto;
+  }
+  .sheet.show { transform: translateY(0); }
+  .sheet .handle {
+    width: 40px; height: 4px;
+    background: var(--gray-300); border-radius: 2px;
+    margin: 8px auto 16px;
+  }
+  .sheet h2 { font-size: 20px; font-weight: 800; margin-bottom: 6px; letter-spacing: -.02em; }
+  .sheet .sheet-sub { font-size: 13px; color: var(--gray-600); margin-bottom: 20px; }
+
+  /* Form */
+  .field { margin-bottom: 16px; }
+  .field label {
+    display: block; font-size: 12px; font-weight: 700;
+    color: var(--gray-600); margin-bottom: 6px;
+  }
+  .field input, .field select, .field textarea {
+    width: 100%;
+    background: var(--gray-50);
+    border: 1.5px solid transparent;
+    border-radius: var(--r-md);
+    padding: 14px 16px; font-size: 15px;
+    color: var(--gray-900); outline: none; transition: all .15s;
+  }
+  .field input:focus, .field select:focus, .field textarea:focus {
+    border-color: var(--blue-500); background: white;
+  }
+  .field textarea { min-height: 72px; resize: vertical; }
+  .row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .row3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; }
+
+  .chips { display: flex; flex-wrap: wrap; gap: 6px; }
+  .chips .chip {
+    background: var(--gray-100); border: none;
+    padding: 8px 14px; border-radius: 999px;
+    font-size: 13px; color: var(--gray-700);
+    cursor: pointer; font-weight: 600; transition: all .15s;
+  }
+  .chips .chip.active { background: var(--blue-500); color: white; }
+  .chips .chip:active { transform: scale(.96); }
+
+  .btn-primary {
+    width: 100%; background: var(--blue-500); color: white;
+    border: none; border-radius: var(--r-md);
+    padding: 16px; font-size: 16px; font-weight: 700;
+    cursor: pointer; transition: all .15s; margin-top: 8px;
+  }
+  .btn-primary:active { background: var(--blue-700); transform: scale(.99); }
+  .btn-secondary {
+    width: 100%; background: var(--gray-100); color: var(--gray-800);
+    border: none; border-radius: var(--r-md);
+    padding: 14px; font-size: 14px; font-weight: 700;
+    cursor: pointer; margin-top: 8px;
+  }
+
+  /* Toast */
+  .toast {
+    position: fixed; bottom: calc(120px + var(--safe-bottom)); left: 50%;
+    transform: translate(-50%, 20px);
+    background: var(--gray-900); color: white;
+    padding: 12px 20px; border-radius: 999px;
+    font-size: 14px; font-weight: 600;
+    opacity: 0; transition: all .3s;
+    z-index: 300; pointer-events: none;
+    box-shadow: var(--shadow-lg);
+  }
+  .toast.show { opacity: 1; transform: translate(-50%, 0); }
+
+  /* Screens */
+  .screen { display: none; padding-top: 4px; }
+  .screen.active { display: block; }
+
+  .divider { height: 1px; background: var(--gray-200); margin: 12px 0; }
+  .section-note {
+    font-size: 12px; color: var(--gray-500);
+    padding: 0 4px; margin-bottom: 6px;
+  }
+
+  ::-webkit-scrollbar { width: 0; height: 0; }
+</style>
+</head>
+<body>
+
+<div class="app">
+
+  <!-- Topbar -->
+  <div class="topbar">
+    <div>
+      <div class="date" id="topDate">—</div>
+      <div class="title" id="topTitle">오늘</div>
+    </div>
+    <button class="menu-btn" onclick="openSheet('settingsSheet')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+    </button>
+  </div>
+
+  <!-- ============ HOME ============ -->
+  <div class="screen active" id="screenHome">
+
+    <div class="hero" id="hero">
+      <div class="hero-head">
+        <div class="hero-chip" id="heroChip">모드 —</div>
+        <div class="hero-dday" id="heroDday">D-—</div>
+      </div>
+      <div class="hero-body">
+        <div class="hero-text">
+          <div class="greeting" id="heroGreeting">오늘도 한 걸음</div>
+          <div class="focus" id="heroFocus">—</div>
+          <div class="sub" id="heroSub"></div>
+        </div>
+        <div class="hero-ring">
+          <svg width="88" height="88" viewBox="0 0 88 88">
+            <circle class="track" cx="44" cy="44" r="36" fill="none" stroke-width="7"/>
+            <circle class="fill" id="heroRingFill" cx="44" cy="44" r="36" fill="none" stroke-width="7"
+              stroke-dasharray="226.2" stroke-dashoffset="226.2"/>
+          </svg>
+          <div class="pct" id="heroPct">0%</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Active context -->
+    <div id="contextBannerHost"></div>
+
+    <!-- Strip -->
+    <div class="strip">
+      <div class="chip-stat accent">
+        <div class="v" id="stripStreak">0<span class="u">일</span></div>
+        <div class="l">연속 기록</div>
+      </div>
+      <div class="chip-stat">
+        <div class="v" id="stripTotal">0<span class="u">/500</span></div>
+        <div class="l">코테 누적</div>
+      </div>
+      <div class="chip-stat">
+        <div class="v" id="stripHours">0<span class="u">h</span></div>
+        <div class="l">오늘 학습</div>
+      </div>
+    </div>
+
+    <!-- Lead -->
+    <div class="section">
+      <div class="lead" id="leadCard">
+        <div class="lead-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: var(--yellow-600);"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+        </div>
+        <div>
+          <div class="title" id="leadTitle">오늘의 조언을 준비 중…</div>
+          <div class="desc" id="leadDesc">—</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Upcoming events -->
+    <div class="section" id="upcomingSection" style="display: none;">
+      <div class="section-title">
+        <h3>다가오는 일정</h3>
+        <button class="action" onclick="switchTab('todo')">+ 추가</button>
+      </div>
+      <div class="upcoming-scroll" id="upcomingList"></div>
+    </div>
+
+    <!-- Today Schedule -->
+    <div class="section">
+      <div class="section-title">
+        <h3>오늘의 시간표</h3>
+        <button class="action" onclick="regenerateTodos()">다시 생성</button>
+      </div>
+      <div class="card">
+        <div class="todo-meta">
+          <div class="count">
+            <span class="done" id="todoDone">0</span>
+            <span class="total" id="todoTotal">/ 0</span>
+          </div>
+          <div class="hours-chip" id="todoHours">총 0h</div>
+        </div>
+        <div class="schedule-wrap" id="todoList"></div>
+        <button class="add-todo-btn" onclick="openSheet('addTodoSheet')">+ 할 일 직접 추가</button>
+      </div>
+    </div>
+
+    <!-- Quick -->
+    <div class="section">
+      <div class="section-title"><h3>빠른 기록</h3></div>
+      <div class="card">
+        <div class="quick-grid">
+          <button class="quick-btn" onclick="quickLog('problem')">
+            <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg></div>
+            <div class="l">+1 문제</div>
+            <div class="s">알고리즘</div>
+          </button>
+          <button class="quick-btn" onclick="quickLog('sql')">
+            <div class="icon green"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/></svg></div>
+            <div class="l">+1 SQL</div>
+            <div class="s">데이터베이스</div>
+          </button>
+          <button class="quick-btn" onclick="quickLog('hour')">
+            <div class="icon purple"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></div>
+            <div class="l">+30분</div>
+            <div class="s">학습시간</div>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Week -->
+    <div class="section">
+      <div class="section-title">
+        <h3>이번 주</h3>
+        <button class="action" onclick="switchTab('stats')">자세히</button>
+      </div>
+      <div class="card">
+        <div class="week-dots" id="weekDots"></div>
+        <div class="week-summary">
+          <div><span class="k">이번 주 문제</span></div>
+          <div><span class="v" id="weekProbs">0문제</span></div>
+        </div>
+      </div>
+    </div>
+
+    <div style="height: 20px;"></div>
+  </div>
+
+  <!-- ============ TODO ============ -->
+  <div class="screen" id="screenTodo">
+    <div class="section" style="margin-top: 16px;">
+      <div class="section-title">
+        <h3>오늘 전체 일정</h3>
+        <button class="action" onclick="regenerateTodos()">새로 생성</button>
+      </div>
+      <div class="card">
+        <div class="section-note" id="todoPhaseNote"></div>
+        <div class="schedule-wrap" id="todoListFull"></div>
+        <button class="add-todo-btn" onclick="openSheet('addTodoSheet')">+ 할 일 직접 추가</button>
+      </div>
+
+      <div class="section-title" style="margin-top: 20px;"><h3>이벤트 / 컨텍스트</h3>
+        <button class="action" onclick="openSheet('addEventSheet')">+ 이벤트 추가</button>
+      </div>
+      <div class="card">
+        <div class="section-note">시험·자격증·인턴 등 지금 겹쳐있는 일정을 추가하면, 그 기간에는 자동으로 할 일이 재배치돼요.</div>
+        <div id="eventList"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ STATS ============ -->
+  <div class="screen" id="screenStats">
+    <div class="section" style="margin-top: 16px;">
+      <div class="section-title"><h3>주간 요약</h3></div>
+      <div class="card">
+        <div class="week-dots" id="weekDotsFull"></div>
+        <div class="divider"></div>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-top: 4px;">
+          <div>
+            <div style="font-size: 12px; color: var(--gray-600); margin-bottom: 4px;">이번 주 문제</div>
+            <div style="font-size: 22px; font-weight: 800; font-family: 'Inter', sans-serif;" id="wkProblems">0</div>
+          </div>
+          <div>
+            <div style="font-size: 12px; color: var(--gray-600); margin-bottom: 4px;">이번 주 학습시간</div>
+            <div style="font-size: 22px; font-weight: 800; font-family: 'Inter', sans-serif;" id="wkHours">0h</div>
+          </div>
+          <div>
+            <div style="font-size: 12px; color: var(--gray-600); margin-bottom: 4px;">이번 주 SQL</div>
+            <div style="font-size: 22px; font-weight: 800; font-family: 'Inter', sans-serif;" id="wkSql">0</div>
+          </div>
+          <div>
+            <div style="font-size: 12px; color: var(--gray-600); margin-bottom: 4px;">완료율</div>
+            <div style="font-size: 22px; font-weight: 800; font-family: 'Inter', sans-serif;" id="wkPct">0%</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="section-title"><h3>누적 통계</h3></div>
+      <div class="card">
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px;">
+          <div>
+            <div style="font-size: 12px; color: var(--gray-600); margin-bottom: 4px;">총 문제</div>
+            <div style="font-size: 22px; font-weight: 800; font-family: 'Inter', sans-serif;" id="totProblems">0</div>
+          </div>
+          <div>
+            <div style="font-size: 12px; color: var(--gray-600); margin-bottom: 4px;">총 학습시간</div>
+            <div style="font-size: 22px; font-weight: 800; font-family: 'Inter', sans-serif;" id="totHours">0h</div>
+          </div>
+          <div>
+            <div style="font-size: 12px; color: var(--gray-600); margin-bottom: 4px;">총 SQL</div>
+            <div style="font-size: 22px; font-weight: 800; font-family: 'Inter', sans-serif;" id="totSql">0</div>
+          </div>
+          <div>
+            <div style="font-size: 12px; color: var(--gray-600); margin-bottom: 4px;">체크인 일수</div>
+            <div style="font-size: 22px; font-weight: 800; font-family: 'Inter', sans-serif;" id="totDays">0</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="section-title"><h3>최근 기록</h3></div>
+      <div class="card">
+        <div id="recentLogs" style="display: grid; gap: 10px;"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ PLAN ============ -->
+  <div class="screen" id="screenPlan">
+    <div class="section" style="margin-top: 16px;">
+      <div class="section-title"><h3>500일 종주 계획</h3></div>
+      <div class="card">
+        <div id="fullPhaseList"></div>
+      </div>
+
+      <div class="section-title"><h3>목표 회사</h3></div>
+      <div class="card">
+        <div id="companyList"></div>
+      </div>
+
+      <div class="section-title"><h3>5가지 원칙</h3></div>
+      <div class="card" style="padding: 4px 20px;">
+        <div id="lawsList"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Bottom Nav -->
+  <nav class="bottom-nav">
+    <button class="nav-btn active" data-tab="home" onclick="switchTab('home')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+      <div class="nav-l">홈</div>
+    </button>
+    <button class="nav-btn" data-tab="todo" onclick="switchTab('todo')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+      <div class="nav-l">할 일</div>
+    </button>
+    <button class="nav-btn" data-tab="stats" onclick="switchTab('stats')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="20" x2="12" y2="10"/><line x1="18" y1="20" x2="18" y2="4"/><line x1="6" y1="20" x2="6" y2="16"/></svg>
+      <div class="nav-l">통계</div>
+    </button>
+    <button class="nav-btn" data-tab="plan" onclick="switchTab('plan')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+      <div class="nav-l">계획</div>
+    </button>
+  </nav>
+
+  <button class="fab" onclick="openSheet('checkinSheet')" aria-label="체크인">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+  </button>
+
+</div>
+
+<!-- Backdrop -->
+<div class="backdrop" id="backdrop" onclick="closeAllSheets()"></div>
+
+<!-- Check-in -->
+<div class="sheet" id="checkinSheet">
+  <div class="handle"></div>
+  <h2>오늘 체크인</h2>
+  <div class="sheet-sub">오늘 실제로 푼 문제 수와 학습시간을 기록해요</div>
+  <div class="field">
+    <div class="row3">
+      <div>
+        <div style="font-size: 11px; color: var(--gray-500); margin-bottom: 4px;">문제</div>
+        <input type="number" id="ciProblems" min="0" value="0">
+      </div>
+      <div>
+        <div style="font-size: 11px; color: var(--gray-500); margin-bottom: 4px;">SQL</div>
+        <input type="number" id="ciSql" min="0" value="0">
+      </div>
+      <div>
+        <div style="font-size: 11px; color: var(--gray-500); margin-bottom: 4px;">시간(h)</div>
+        <input type="number" id="ciHours" min="0" step="0.5" value="0">
+      </div>
+    </div>
+  </div>
+  <div class="field">
+    <label>한 줄 회고 (선택)</label>
+    <textarea id="ciNote" placeholder="오늘 배운 것, 내일 개선할 점"></textarea>
+  </div>
+  <button class="btn-primary" onclick="submitCheckin()">저장</button>
+</div>
+
+<!-- Add Todo -->
+<div class="sheet" id="addTodoSheet">
+  <div class="handle"></div>
+  <h2>할 일 추가</h2>
+  <div class="sheet-sub">오늘 시간표에 추가해요</div>
+  <div class="field">
+    <label>할 일</label>
+    <input type="text" id="newTodoText" placeholder="예: 정처기 4과목 2단원 정리">
+  </div>
+  <div class="row2">
+    <div class="field">
+      <label>시작 시간</label>
+      <input type="time" id="newTodoStart" value="21:00">
+    </div>
+    <div class="field">
+      <label>소요 시간 (h)</label>
+      <input type="number" id="newTodoHours" min="0.5" step="0.5" value="1">
+    </div>
+  </div>
+  <div class="field">
+    <label>분류</label>
+    <div class="chips" id="newTodoType">
+      <button class="chip active" data-v="algo">알고리즘</button>
+      <button class="chip" data-v="sql">SQL</button>
+      <button class="chip" data-v="cs">CS</button>
+      <button class="chip" data-v="exam">시험공부</button>
+      <button class="chip" data-v="cert">자격증</button>
+      <button class="chip" data-v="intern">인턴</button>
+      <button class="chip" data-v="lab">연구실</button>
+      <button class="chip" data-v="lang">어학</button>
+      <button class="chip" data-v="rest">휴식</button>
+    </div>
+  </div>
+  <button class="btn-primary" onclick="addCustomTodo()">추가</button>
+</div>
+
+<!-- Add Event -->
+<div class="sheet" id="addEventSheet">
+  <div class="handle"></div>
+  <h2>이벤트 추가</h2>
+  <div class="sheet-sub">시험·자격증·인턴처럼 기간이 있는 일정을 등록하면, 그 기간 동안 오늘 할 일이 자동 재구성돼요</div>
+  <div class="field">
+    <label>이벤트 이름</label>
+    <input type="text" id="evName" placeholder="예: 대학원 기말고사, 정처기 실기, 미래에셋 인턴">
+  </div>
+  <div class="field">
+    <label>분류</label>
+    <div class="chips" id="evType">
+      <button class="chip active" data-v="exam">시험기간</button>
+      <button class="chip" data-v="cert">자격증</button>
+      <button class="chip" data-v="intern">인턴/업무</button>
+      <button class="chip" data-v="lang">어학</button>
+      <button class="chip" data-v="lab">연구실/논문</button>
+      <button class="chip" data-v="other">기타</button>
+    </div>
+  </div>
+  <div class="row2">
+    <div class="field">
+      <label>시작일</label>
+      <input type="date" id="evStart">
+    </div>
+    <div class="field">
+      <label>종료일</label>
+      <input type="date" id="evEnd">
+    </div>
+  </div>
+  <div class="field">
+    <label>이 기간 동안 하루에 몇 시간 쓰나요?</label>
+    <input type="number" id="evDailyHours" min="0" step="0.5" value="4" placeholder="예: 4">
+  </div>
+  <div class="field">
+    <label>우선순위 — 코테 학습을 얼마나 줄일까요?</label>
+    <div class="chips" id="evPriority">
+      <button class="chip" data-v="1">거의 안 줄임 (1)</button>
+      <button class="chip" data-v="2">조금 (2)</button>
+      <button class="chip active" data-v="3">중간 (3)</button>
+      <button class="chip" data-v="4">많이 (4)</button>
+      <button class="chip" data-v="5">코테는 감만 (5)</button>
+    </div>
+  </div>
+  <div class="field">
+    <label>세부 과목/업무 (줄바꿈으로 여러 개)</label>
+    <textarea id="evSubjects" placeholder="예: 정처기 1과목&#10;정처기 2과목&#10;SQL 실기"></textarea>
+  </div>
+  <button class="btn-primary" onclick="submitEvent()">추가</button>
+</div>
+
+<!-- Settings -->
+<div class="sheet" id="settingsSheet">
+  <div class="handle"></div>
+  <h2>설정</h2>
+  <button class="btn-secondary" onclick="openSheet('addEventSheet')">+ 이벤트(시험·인턴 등) 추가</button>
+  <button class="btn-secondary" onclick="regenerateTodos(true); closeAllSheets();">오늘 할 일 다시 생성</button>
+  <button class="btn-secondary" onclick="exportJson()">데이터 내보내기 (JSON)</button>
+  <button class="btn-secondary" onclick="document.getElementById('importInp').click()">데이터 불러오기</button>
+  <input type="file" id="importInp" accept=".json" style="display:none" onchange="importJson(event)">
+  <button class="btn-secondary" onclick="resetAll()" style="background: var(--red-100); color: var(--red-600); margin-top: 20px;">전체 초기화</button>
+  <div style="font-size: 11px; color: var(--gray-500); text-align: center; margin-top: 20px;">
+    v2.0 · 정하림 · 모든 데이터는 이 기기에만 저장됩니다
+  </div>
+</div>
+
+<div class="toast" id="toast">저장되었습니다</div>
+
+<script>
+// =====================================================================
+// Daily Tracker v2 · 정하림 · 하나금융 IT 공채 준비
+// =====================================================================
+const STORAGE_KEY = 'ctmp-tracker-v3';
+const DDAY = new Date('2027-09-01');
+
+// ---------- Phase Definitions ----------
+const PHASES = [
+  { id: 0, name: '준비기', chip: 'PHASE 0', start: new Date('2026-05-01'), end: new Date('2027-02-28'),
+    weeklyProblems: 3, dailyProblems: 1, dailySql: 0,
+    desc: '자격증·인턴·어학 집중. 코테는 감만 유지.',
+    advice: 'SQLD·정처기·어학·CFA가 우선이에요. 코테는 주 2~3문제만 풀어도 감은 이어집니다.',
+    targetTotal: 50
+  },
+  { id: 1, name: 'Python & 자료구조', chip: 'PHASE 1', start: new Date('2027-03-01'), end: new Date('2027-03-31'),
+    weeklyProblems: 20, dailyProblems: 3, dailySql: 0,
+    desc: '점프 투 파이썬 1회독 + 백준 단계별 1~10 · 80문제.',
+    advice: 'AI 자동완성을 완전히 끄세요. heapq·deque·bisect를 손끝으로 외우는 단계입니다.',
+    targetTotal: 100
+  },
+  { id: 2, name: 'Bronze → Silver 돌파', chip: 'PHASE 2', start: new Date('2027-04-01'), end: new Date('2027-05-31'),
+    weeklyProblems: 26, dailyProblems: 4, dailySql: 1,
+    desc: '프로그래머스 Lv1 전체 + Lv2 핵심 50 + 자료구조 자가구현.',
+    advice: '자료구조를 직접 구현한 뒤 라이브러리를 쓰세요. 목표 solved.ac 실버 1.',
+    targetTotal: 210
+  },
+  { id: 3, name: 'Gold 빈출 + SQL', chip: 'PHASE 3', start: new Date('2027-06-01'), end: new Date('2027-07-31'),
+    weeklyProblems: 28, dailyProblems: 4, dailySql: 2,
+    desc: 'DFS·BFS·DP·다익스트라 + SQL Kit 50문제 완주. KB 정규표현식 SQL도 이 단계에서.',
+    advice: '하나은행·KB 합격선은 여기서 갈립니다 (2024 후기: KB는 정규식 SQL 등장). SQL Kit을 이 구간에서 반드시 전량 돌파.',
+    targetTotal: 350
+  },
+  { id: 4, name: '실전 모의 & 기출', chip: 'PHASE 4', start: new Date('2027-08-01'), end: new Date('2027-08-31'),
+    weeklyProblems: 30, dailyProblems: 4, dailySql: 1,
+    desc: '주 1회 모의 + Codility + 기출 복원 + CS 면접노트.',
+    advice: '시험 환경 재현이 전부. AI 차단 + 타이머 + 브라우저 IDE로 주 1회 풀 세트.',
+    targetTotal: 500
+  },
+  { id: 5, name: 'D-DAY · 공채 시즌', chip: 'PHASE 5', start: new Date('2027-09-01'), end: new Date('2027-12-31'),
+    weeklyProblems: 10, dailyProblems: 1, dailySql: 0,
+    desc: '하나금융 본진 + 신한DS·KB·NH·미래·한투 지원. 컨디션 유지.',
+    advice: '새 알고리즘 금지. 풀던 문제 복기만 하며 감을 유지하세요.',
+    targetTotal: 600
+  },
+];
+
+const LAWS = [
+  { n: 'I',   t: 'AI를 끈다',              b: '첫 50문제는 Cursor·Copilot 완전 차단. 맨손 코딩으로 근육에 새긴다.' },
+  { n: 'II',  t: '감을 끊지 않는다',       b: '어떤 날도 0문제 금지. 최소 15분 1문제로 뇌의 회로를 살려둔다.' },
+  { n: 'III', t: '손으로 먼저 쓴다',       b: '문제를 읽고 10분간 종이에 의사코드. 코드는 사고 후에만.' },
+  { n: 'IV',  t: 'SQL을 우습게 보지 않는다', b: 'KB 합격선을 가르는 건 SQL 1문제. 정규표현식·윈도우 함수까지.' },
+  { n: 'V',   t: '자격증은 코테의 자산',    b: 'SQLD·정처기·CFA는 낭비가 아니다. 그대로 면접의 탄환이 된다.' },
+];
+
+const COMPANIES = [
+  { n: '하나금융티아이',   f: '알고리즘 3 + SQL 2~3 / 120분 · 프로그래머스 · 골드5 수준 (2024 후기)',  tag: '★ 본진',   c: 'red' },
+  { n: '하나은행 ICT',     f: '알고리즘 3 + SQL 2 / 120분 · 하나TI보다 어려움 (2024 후기)',           tag: '★ 본진',   c: 'red' },
+  { n: '신한DS',           f: '알고리즘 3 + SQL 2 / 2시간 · 프로그래머스 · 구현/시뮬/문자열',         tag: 'SI',      c: 'blue' },
+  { n: 'KB국민은행 ICT',   f: '알고리즘 3 + SQL 1 / 120분 · 2024 SQL 정규식 출제',                    tag: '보안',    c: 'blue' },
+  { n: '미래에셋증권',     f: '알고리즘 2 + SQL 2 · Lv2 이하 (2025 후기)',                            tag: 'AI/IT',  c: 'gold' },
+  { n: 'NH투자증권 ICT',   f: '알고리즘 3 + SQL 1 / 120분 · 프로그래머스 · 3솔+SQL 통과권',           tag: 'AI/IT',  c: 'gold' },
+  { n: '한국투자증권',     f: '알고리즘 3 / Lv2.5 · 다익스트라 응용 (2024 후기)',                     tag: 'AI/IT',  c: 'gold' },
+];
+
+// ---------- Storage ----------
+function loadData() {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (!raw) return { logs: [], todos: [], events: [], meta: {} };
+    const d = JSON.parse(raw);
+    if (!d.logs) d.logs = [];
+    if (!d.todos) d.todos = [];
+    if (!d.events) d.events = [];
+    if (!d.meta) d.meta = {};
+    return d;
+  } catch { return { logs: [], todos: [], events: [], meta: {} }; }
+}
+function saveData(data) { localStorage.setItem(STORAGE_KEY, JSON.stringify(data)); }
+
+// ---------- Date helpers ----------
+const dateStr = (d = new Date()) =>
+  `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+const todayStr = () => dateStr(new Date());
+const daysBetween = (a, b) => Math.round((b - a) / 86400000);
+function getWeekStart(d = new Date()) {
+  const dt = new Date(d);
+  const day = dt.getDay();
+  const diff = day === 0 ? 6 : day - 1;
+  dt.setDate(dt.getDate() - diff);
+  dt.setHours(0,0,0,0);
+  return dt;
+}
+function getCurrentPhase() {
+  const now = new Date();
+  for (const p of PHASES) if (now >= p.start && now <= p.end) return p;
+  if (now < PHASES[0].start) return PHASES[0];
+  return PHASES[PHASES.length - 1];
+}
+function getActiveEvents(data, d = new Date()) {
+  return data.events.filter(e => {
+    const s = new Date(e.start);
+    const end = new Date(e.end);
+    end.setHours(23,59,59);
+    return d >= s && d <= end;
+  });
+}
+
+// Format minutes since midnight as HH:MM
+function fmtTime(min) {
+  const h = Math.floor(min / 60);
+  const m = min % 60;
+  return `${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}`;
+}
+function parseTime(hhmm) {
+  if (!hhmm) return 0;
+  const [h, m] = hhmm.split(':').map(Number);
+  return h * 60 + (m || 0);
+}
+
+// ---------- TODO Generation ----------
+// Returns array of {id, type, title, topic, durationMin, startMin (optional), auto, priority}
+function genTodosForDate(dateS, data) {
+  const d = new Date(dateS);
+  const phase = (() => {
+    for (const p of PHASES) if (d >= p.start && d <= p.end) return p;
+    if (d < PHASES[0].start) return PHASES[0];
+    return PHASES[PHASES.length - 1];
+  })();
+  const dow = d.getDay();
+  const weekend = dow === 0 || dow === 6;
+  const events = getActiveEvents(data, d);
+
+  // Priority factor: events reduce coding test time
+  const maxPri = events.reduce((m, e) => Math.max(m, +e.priority || 3), 0);
+  // eventFactor: fraction of coding test effort that remains
+  // priority 5 → 0.1 (감만), 4 → 0.3, 3 → 0.6, 2 → 0.8, 1 → 1.0
+  const factorMap = { 0: 1.0, 1: 1.0, 2: 0.8, 3: 0.6, 4: 0.3, 5: 0.1 };
+  const codeFactor = events.length === 0 ? 1.0 : (factorMap[maxPri] ?? 0.6);
+
+  const todos = [];
+  let cursor = 9 * 60; // 09:00 baseline if building a full schedule
+
+  // ---- EVENT TASKS FIRST (they own most of the day) ----
+  events.forEach(ev => {
+    const hours = Math.max(0.5, +ev.dailyHours || 2);
+    const subjects = (ev.subjects || []).filter(s => s.trim());
+    if (subjects.length > 0 && subjects.length <= 4) {
+      // split hours across subjects
+      const per = hours / subjects.length;
+      subjects.forEach((subj, idx) => {
+        const dur = Math.round(per * 60);
+        const startMin = cursor;
+        cursor += dur + 10; // buffer
+        todos.push({
+          id: `${dateS}-ev-${ev.id}-${idx}`,
+          type: ev.type, auto: true,
+          title: `${ev.name} · ${subj.trim()}`,
+          topic: ev.name,
+          startMin, durationMin: dur,
+          createdFor: dateS, done: false, carriedFrom: null,
+          eventId: ev.id
+        });
+      });
+    } else {
+      const dur = Math.round(hours * 60);
+      const startMin = cursor;
+      cursor += dur + 10;
+      todos.push({
+        id: `${dateS}-ev-${ev.id}`,
+        type: ev.type, auto: true,
+        title: ev.name + (subjects.length > 0 ? ' · ' + subjects.join(', ') : ''),
+        topic: ev.name,
+        startMin, durationMin: dur,
+        createdFor: dateS, done: false, carriedFrom: null,
+        eventId: ev.id
+      });
+    }
+  });
+
+  // Move evening block forward if still early
+  if (events.length === 0) cursor = 21 * 60; // normal day: coding at 21:00
+  else if (cursor < 21 * 60) cursor = 21 * 60;
+
+  // ---- CODING TEST BLOCK (scaled by codeFactor) ----
+  const probTarget = Math.max(
+    events.length > 0 && maxPri >= 5 ? 1 : 0, // at least 1 to keep streak
+    Math.ceil((weekend ? phase.dailyProblems * 1.3 : phase.dailyProblems) * codeFactor)
+  );
+  if (probTarget > 0) {
+    // minutes per problem depending on phase
+    const perProbMin = phase.id <= 1 ? 20 : phase.id <= 3 ? 30 : 25;
+    const dur = probTarget * perProbMin;
+    todos.push({
+      id: `${dateS}-algo`,
+      type: 'algo', auto: true,
+      title: `알고리즘 ${probTarget}문제 ${events.length > 0 && maxPri >= 4 ? '(감만 유지)' : ''}`.trim(),
+      topic: phase.name,
+      startMin: cursor,
+      durationMin: dur,
+      createdFor: dateS, done: false, carriedFrom: null,
+    });
+    cursor += dur + 10;
+  }
+
+  // ---- SQL BLOCK ----
+  const sqlTarget = Math.max(0, Math.ceil(phase.dailySql * codeFactor));
+  if (sqlTarget > 0) {
+    const dur = sqlTarget * 20;
+    todos.push({
+      id: `${dateS}-sql`,
+      type: 'sql', auto: true,
+      title: `SQL ${sqlTarget}문제`,
+      topic: 'SQL Kit',
+      startMin: cursor,
+      durationMin: dur,
+      createdFor: dateS, done: false, carriedFrom: null,
+    });
+    cursor += dur + 10;
+  } else if (phase.id === 1 && dow === 2 && codeFactor > 0.3) {
+    todos.push({
+      id: `${dateS}-sql`,
+      type: 'sql', auto: true,
+      title: 'SQL 1문제 (주간)',
+      topic: 'SQL Kit',
+      startMin: cursor, durationMin: 20,
+      createdFor: dateS, done: false, carriedFrom: null,
+    });
+    cursor += 30;
+  }
+
+  // ---- CS NOTE (phase 2+, every 2nd day, only if light event load) ----
+  if (phase.id >= 2 && dow % 2 === 1 && codeFactor >= 0.6) {
+    todos.push({
+      id: `${dateS}-cs`,
+      type: 'cs', auto: true,
+      title: 'CS 개념 1주제 정리',
+      topic: 'OS·DB·네트워크',
+      startMin: cursor, durationMin: 30,
+      createdFor: dateS, done: false, carriedFrom: null,
+    });
+    cursor += 40;
+  }
+
+  // ---- Weekend mock ----
+  if (phase.id === 4 && dow === 6 && codeFactor >= 0.5) {
+    todos.push({
+      id: `${dateS}-mock`,
+      type: 'mock', auto: true,
+      title: '모의시험 4문제 (풀 세트)',
+      topic: '실전 훈련',
+      startMin: 10 * 60, durationMin: 120,
+      createdFor: dateS, done: false, carriedFrom: null,
+    });
+  }
+
+  return todos.sort((a, b) => (a.startMin || 0) - (b.startMin || 0));
+}
+
+function ensureTodos(data) {
+  const today = todayStr();
+  const todayDate = new Date();
+
+  const hasTodayAuto = data.todos.some(t => t.createdFor === today && t.auto);
+  if (!hasTodayAuto) {
+    const generated = genTodosForDate(today, data);
+    const existingIds = new Set(data.todos.map(t => t.id));
+    generated.forEach(g => { if (!existingIds.has(g.id)) data.todos.push(g); });
+  }
+
+  // Carry over undone auto items (past 7 days max)
+  const cutoff = new Date(todayDate);
+  cutoff.setDate(cutoff.getDate() - 7);
+  data.todos.forEach(t => {
+    if (t.done || !t.auto) return;
+    if (t.createdFor === today) return;
+    const cDate = new Date(t.createdFor);
+    if (cDate >= cutoff && cDate < todayDate) {
+      const daysLate = daysBetween(cDate, todayDate);
+      t.carriedFrom = t.carriedFrom || t.createdFor;
+      t.carriedDays = daysLate;
+      t.createdFor = today;
+    }
+  });
+
+  // Cap carried auto at 4 per day
+  const carriedToday = data.todos.filter(t => t.createdFor === today && t.carriedFrom && !t.done && t.auto);
+  if (carriedToday.length > 4) {
+    carriedToday.sort((a, b) => (b.carriedDays || 0) - (a.carriedDays || 0));
+    const keep = new Set(carriedToday.slice(0, 4).map(t => t.id));
+    data.todos = data.todos.filter(t => {
+      if (t.createdFor === today && t.carriedFrom && !t.done && t.auto && !keep.has(t.id)) return false;
+      return true;
+    });
+  }
+  saveData(data);
+}
+
+// ---------- UI State ----------
+let currentTab = 'home';
+let newTodoType = 'algo';
+let newEventType = 'exam';
+let newEventPriority = 3;
+
+// ---------- Rendering ----------
+function render() {
+  const data = loadData();
+  ensureTodos(data);
+  renderTopbar();
+  renderHero(data);
+  renderContextBanner(data);
+  renderStrip(data);
+  renderLead(data);
+  renderUpcoming(data);
+  renderTodos(data);
+  renderWeek(data);
+  renderStatsScreen(data);
+  renderPlanScreen(data);
+  renderEventList(data);
+}
+
+function renderUpcoming(data) {
+  const section = document.getElementById('upcomingSection');
+  const host = document.getElementById('upcomingList');
+  const now = new Date();
+  now.setHours(0, 0, 0, 0);
+
+  const items = [];
+
+  // 1) User events (upcoming + active)
+  data.events.forEach(ev => {
+    const start = new Date(ev.start);
+    const end = new Date(ev.end);
+    start.setHours(0, 0, 0, 0);
+    end.setHours(23, 59, 59);
+    if (end < now) return; // past
+    const daysUntilStart = daysBetween(now, start);
+    const daysUntilEnd = daysBetween(now, end);
+    const isActive = now >= start && now <= end;
+    const total = Math.max(1, daysBetween(start, end));
+    const elapsed = isActive ? daysBetween(start, now) : 0;
+    const progress = isActive ? Math.min(100, Math.round(elapsed / total * 100)) : 0;
+    items.push({
+      type: ev.type,
+      name: ev.name,
+      days: isActive ? daysUntilEnd : daysUntilStart,
+      sortKey: isActive ? -1 : daysUntilStart,
+      label: isActive ? '진행중' : (ev.type === 'exam' ? '시험' : ev.type === 'cert' ? '자격증' : ev.type === 'intern' ? '인턴' : ev.type === 'lang' ? '어학' : ev.type === 'lab' ? '연구' : '기타'),
+      dateRange: `${ev.start} ~ ${ev.end}`,
+      progress: isActive ? progress : null,
+      active: isActive,
+    });
+  });
+
+  // 2) Upcoming Phases (within 180 days)
+  PHASES.forEach(p => {
+    const start = new Date(p.start);
+    start.setHours(0, 0, 0, 0);
+    const daysUntil = daysBetween(now, start);
+    if (daysUntil > 0 && daysUntil <= 180) {
+      items.push({
+        type: 'phase',
+        name: `${p.chip} · ${p.name}`,
+        days: daysUntil,
+        sortKey: daysUntil + 1000, // push phases after user events
+        label: '단계',
+        dateRange: `${dateStr(p.start).slice(0,7)} 시작`,
+        progress: null,
+        active: false,
+      });
+    }
+  });
+
+  // 3) D-Day (공채) always show within 365 days
+  const dd = daysBetween(now, DDAY);
+  if (dd >= 0 && dd <= 365) {
+    items.push({
+      type: 'dday',
+      name: '하반기 공채 D-DAY',
+      days: dd,
+      sortKey: 9999, // at the very end
+      label: 'D-DAY',
+      dateRange: '2027.09.01',
+      progress: null,
+      active: false,
+    });
+  }
+
+  // Sort: active first, then by days ascending
+  items.sort((a, b) => a.sortKey - b.sortKey);
+  // Limit to 8 cards
+  const shown = items.slice(0, 8);
+
+  if (shown.length === 0) {
+    section.style.display = 'none';
+    return;
+  }
+  section.style.display = '';
+
+  host.innerHTML = shown.map(it => {
+    const ddayText = it.active
+      ? `D-${it.days}`
+      : it.days === 0 ? 'D-DAY' : `D-${it.days}`;
+    return `
+      <div class="upcoming-card type-${it.type}" onclick="switchTab('todo')">
+        <div class="uc-head">
+          <span class="uc-type">${it.label}</span>
+          <span class="uc-dday">${ddayText}</span>
+        </div>
+        <div class="uc-name">${it.name}</div>
+        <div class="uc-date">${it.dateRange}</div>
+        ${it.progress !== null ? `
+          <div class="uc-progress">
+            <div class="uc-progress-fill" style="width: ${it.progress}%"></div>
+          </div>
+        ` : ''}
+      </div>
+    `;
+  }).join('');
+}
+
+function renderTopbar() {
+  const d = new Date();
+  const weekdays = ['일','월','화','수','목','금','토'];
+  document.getElementById('topDate').textContent =
+    `${d.getMonth()+1}월 ${d.getDate()}일 · ${weekdays[d.getDay()]}요일`;
+  document.getElementById('topTitle').textContent =
+    currentTab === 'home' ? '오늘'
+    : currentTab === 'todo' ? '할 일'
+    : currentTab === 'stats' ? '통계' : '계획';
+}
+
+function renderHero(data) {
+  const phase = getCurrentPhase();
+  const events = getActiveEvents(data);
+  const hero = document.getElementById('hero');
+  hero.className = 'hero';
+  let chipText, modeLabel, modeColor;
+
+  if (events.length > 0) {
+    const top = events.sort((a,b) => (b.priority||0) - (a.priority||0))[0];
+    modeLabel = top.name;
+    if (top.type === 'exam') hero.classList.add('exam');
+    else if (top.type === 'intern') hero.classList.add('intern');
+    else if (top.type === 'cert') hero.classList.add('cert');
+    chipText = `${top.type === 'exam' ? '시험기간' : top.type === 'cert' ? '자격증' : top.type === 'intern' ? '인턴기간' : top.type === 'lang' ? '어학기간' : top.type === 'lab' ? '연구기간' : '집중기간'} · ${top.name}`;
+  } else {
+    chipText = `${phase.chip} · ${phase.name}`;
+  }
+
+  document.getElementById('heroChip').textContent = chipText;
+  const dd = daysBetween(new Date(), DDAY);
+  document.getElementById('heroDday').textContent = `D${dd >= 0 ? '-'+dd : '+'+Math.abs(dd)}`;
+
+  const today = todayStr();
+  const todayTodos = data.todos.filter(t => t.createdFor === today);
+  const doneCount = todayTodos.filter(t => t.done).length;
+  const totalCount = Math.max(1, todayTodos.length);
+  const pct = Math.round(doneCount / totalCount * 100);
+
+  const hour = new Date().getHours();
+  const greet = hour < 6 ? '밤 늦게도 수고해요'
+              : hour < 12 ? '좋은 아침이에요'
+              : hour < 18 ? '좋은 오후예요'
+              : '오늘 하루 수고했어요';
+  document.getElementById('heroGreeting').textContent = greet + ', 정하림';
+
+  let focusText;
+  if (doneCount >= totalCount && totalCount > 0) focusText = '오늘 할 일을 모두 끝냈어요';
+  else if (totalCount === 0) focusText = '오늘은 할 일이 비어있어요';
+  else focusText = `오늘 ${totalCount}개 중 ${doneCount}개 완료`;
+  document.getElementById('heroFocus').textContent = focusText;
+
+  const totalMin = todayTodos.reduce((s, t) => s + (t.durationMin || 0), 0);
+  const totalH = (totalMin / 60).toFixed(1);
+  document.getElementById('heroSub').textContent = totalMin > 0 ? `예상 학습시간 · ${totalH}시간` : '';
+
+  const circ = 2 * Math.PI * 36;
+  const offset = circ * (1 - pct / 100);
+  document.getElementById('heroRingFill').style.strokeDasharray = circ;
+  document.getElementById('heroRingFill').style.strokeDashoffset = offset;
+  document.getElementById('heroPct').textContent = `${pct}%`;
+}
+
+function renderContextBanner(data) {
+  const host = document.getElementById('contextBannerHost');
+  const events = getActiveEvents(data);
+  if (events.length === 0) {
+    host.innerHTML = `
+      <div style="margin: 12px 16px 0; padding: 10px 16px; background: white; border-radius: 12px; font-size: 12.5px; color: var(--gray-600); box-shadow: var(--shadow-sm); display:flex; justify-content: space-between; align-items: center;">
+        <span>활성 이벤트 없음 · 기본 코테 모드</span>
+        <button class="ctx-action" style="background: var(--blue-50); color: var(--blue-500); border: none; border-radius: 8px; padding: 6px 10px; font-size: 11px; font-weight: 700; cursor: pointer;" onclick="openSheet('addEventSheet')">시험·인턴 추가</button>
+      </div>
+    `;
+    return;
+  }
+  host.innerHTML = events.map(ev => {
+    const end = new Date(ev.end);
+    const left = Math.max(0, daysBetween(new Date(), end));
+    return `
+      <div class="context-banner" style="margin-top: ${host.children.length > 0 ? '8px' : '12px'};">
+        <div class="dot" style="background: ${ev.type === 'exam' ? 'var(--red-500)' : ev.type === 'cert' ? 'var(--green-500)' : ev.type === 'intern' ? 'var(--purple-500)' : 'var(--blue-500)'}"></div>
+        <div class="ctx-text">
+          <div class="ctx-title">${ev.name} · ${ev.type === 'exam' ? '시험기간' : ev.type === 'cert' ? '자격증' : ev.type === 'intern' ? '인턴' : ev.type === 'lang' ? '어학' : ev.type === 'lab' ? '연구' : '기타'}</div>
+          <div class="ctx-sub">D-${left} · ${ev.end} · 하루 ${ev.dailyHours}h 배정</div>
+        </div>
+        <button class="ctx-action" onclick="switchTab('todo')">관리</button>
+      </div>
+    `;
+  }).join('');
+}
+
+function renderStrip(data) {
+  const dates = new Set(data.logs.map(l => l.date));
+  let streak = 0;
+  let c = new Date();
+  while (dates.has(dateStr(c))) { streak++; c.setDate(c.getDate() - 1); }
+  if (streak === 0) {
+    c = new Date(); c.setDate(c.getDate() - 1);
+    while (dates.has(dateStr(c))) { streak++; c.setDate(c.getDate() - 1); }
+  }
+  document.getElementById('stripStreak').innerHTML = `${streak}<span class="u">일</span>`;
+  const totalP = data.logs.reduce((s, l) => s + (+l.problems || 0), 0);
+  document.getElementById('stripTotal').innerHTML = `${totalP}<span class="u">/500</span>`;
+  const todayLog = data.logs.find(l => l.date === todayStr());
+  const todayH = todayLog ? (+todayLog.hours || 0) : 0;
+  document.getElementById('stripHours').innerHTML = `${todayH.toFixed(1)}<span class="u">h</span>`;
+}
+
+function renderLead(data) {
+  const phase = getCurrentPhase();
+  const events = getActiveEvents(data);
+  const today = todayStr();
+  const todayTodos = data.todos.filter(t => t.createdFor === today);
+  const carried = todayTodos.filter(t => t.carriedFrom && !t.done);
+  const doneToday = todayTodos.filter(t => t.done).length;
+  const ws = getWeekStart();
+  const weekP = data.logs.filter(l => new Date(l.date) >= ws).reduce((s, l) => s + (+l.problems || 0), 0);
+
+  const lead = document.getElementById('leadCard');
+  let title, desc, cls = '';
+
+  if (events.length > 0) {
+    const top = events.sort((a,b) => (b.priority||0)-(a.priority||0))[0];
+    const end = new Date(top.end);
+    const daysLeft = daysBetween(new Date(), end);
+    cls = 'bad';
+    if (top.type === 'exam') {
+      title = `시험기간이에요 · ${top.name}까지 D-${daysLeft}`;
+      desc = `코테는 오늘 감만 유지하는 수준으로 줄였어요. 시험 ${top.dailyHours}시간에 집중하세요. 시험 끝나면 자동으로 원래 페이스로 돌아와요.`;
+    } else if (top.type === 'cert') {
+      title = `${top.name} 준비중 · D-${daysLeft}`;
+      desc = `자격증 하루 ${top.dailyHours}h 우선. 코테는 줄어든 만큼 나중에 복구 계획이 필요해요.`;
+    } else if (top.type === 'intern') {
+      title = `${top.name} 진행중 · D-${daysLeft}`;
+      desc = `낮에는 업무 집중, 저녁 2시간이 황금시간이에요. 그 시간에 코테 ${phase.dailyProblems-1}문제만 깔끔히.`;
+      cls = 'info';
+    } else {
+      title = `${top.name} 기간 · D-${daysLeft}`;
+      desc = `${top.name}을 우선순위로 두고, 코테는 지금 감만 유지하는 모드예요.`;
+    }
+  } else if (carried.length >= 3) {
+    title = `밀린 할 일이 ${carried.length}개 있어요`;
+    desc = `주말에 몰아하기보다 오늘 2~3개는 해치우는 걸 추천해요. 이대로 가면 이번 주 목표 달성이 어려워져요.`;
+  } else if (doneToday === todayTodos.length && todayTodos.length > 0) {
+    title = `오늘 할 일을 모두 끝냈어요`;
+    desc = `잘했어요. 오른쪽 아래 체크 버튼으로 실제 푼 문제 수를 기록하면 Streak이 유지돼요.`;
+    cls = 'good';
+  } else if (weekP === 0 && new Date().getDay() >= 4) {
+    title = `이번 주 아직 0문제에요`;
+    desc = `오늘 최소 1문제만 풀어도 감은 이어져요. ${phase.advice}`;
+  } else if (weekP >= phase.weeklyProblems) {
+    title = `이번 주 목표 달성 ✓`;
+    desc = `남은 시간은 복기·CS·자소서에 투자하는 게 효율적이에요.`;
+    cls = 'good';
+  } else {
+    title = `${phase.name} 단계 · 오늘의 지침`;
+    desc = phase.advice;
+    cls = 'info';
+  }
+  lead.className = 'lead ' + cls;
+  document.getElementById('leadTitle').textContent = title;
+  document.getElementById('leadDesc').textContent = desc;
+}
+
+function renderSchedItem(t) {
+  const el = document.createElement('div');
+  const typeClass = `type-${t.type || 'algo'}`;
+  el.className = 'sched-item ' + typeClass + (t.done ? ' done' : '') + (t.carriedFrom && !t.done ? ' carried' : '');
+  el.onclick = (e) => {
+    if (e.target.closest('.sched-del')) return;
+    toggleTodo(t.id);
+  };
+
+  let durationText = '';
+  if (t.durationMin) {
+    const h = Math.floor(t.durationMin / 60);
+    const m = t.durationMin % 60;
+    durationText = h > 0 ? `${h}h${m > 0 ? ` ${m}m` : ''}` : `${m}분`;
+  }
+
+  const tagColor = {
+    algo: 'blue', sql: 'green', cs: 'purple', exam: 'red',
+    cert: 'green', intern: 'purple', lang: 'blue', lab: 'yellow',
+    mock: '', rest: ''
+  }[t.type] || '';
+  const typeLabel = {
+    algo: '알고리즘', sql: 'SQL', cs: 'CS', exam: '시험공부',
+    cert: '자격증', intern: '인턴', lang: '어학', lab: '연구',
+    mock: '모의시험', rest: '휴식', other: '기타'
+  }[t.type] || t.type;
+
+  el.innerHTML = `
+    <div class="body">
+      <div class="title">${t.title}${t.carriedFrom && !t.done ? `<span class="carried-tag">+${t.carriedDays || 1}일 밀림</span>` : ''}</div>
+      <div class="sub">
+        <span class="tag ${tagColor}">${typeLabel}</span>
+        ${t.topic ? `<span class="tag">${t.topic}</span>` : ''}
+        ${durationText ? `<span style="font-family: 'Inter', sans-serif; font-size: 11px; color: var(--gray-500); font-weight: 600;">⏱ ${durationText}</span>` : ''}
+      </div>
+    </div>
+    <div class="check-col">
+      <div class="sched-check">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+      </div>
+      ${!t.done ? `<button class="sched-del" onclick="event.stopPropagation(); deleteTodo('${t.id}')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>` : ''}
+    </div>
+  `;
+  return el;
+}
+
+function buildScheduleRows(list) {
+  // Build rows as time-col + item
+  const frag = document.createDocumentFragment();
+  const sorted = [...list].sort((a,b) => (a.startMin || 9999) - (b.startMin || 9999));
+  sorted.forEach(t => {
+    const row = document.createElement('div');
+    row.className = 'sched-row';
+    const timeText = t.startMin != null ? fmtTime(t.startMin) : '—';
+    const endMin = (t.startMin || 0) + (t.durationMin || 0);
+    const endText = t.startMin != null ? fmtTime(endMin) : '';
+    row.innerHTML = `
+      <div class="time-col">
+        ${timeText}
+        ${endText ? `<div class="duration">~${endText}</div>` : ''}
+      </div>
+    `;
+    row.appendChild(renderSchedItem(t));
+    frag.appendChild(row);
+  });
+  return frag;
+}
+
+function renderTodos(data) {
+  const today = todayStr();
+  const todayTodos = data.todos.filter(t => t.createdFor === today);
+  const done = todayTodos.filter(t => t.done).length;
+  const totalMin = todayTodos.reduce((s, t) => s + (t.durationMin || 0), 0);
+  document.getElementById('todoDone').textContent = done;
+  document.getElementById('todoTotal').textContent = `/ ${todayTodos.length}`;
+  document.getElementById('todoHours').textContent = `총 ${(totalMin / 60).toFixed(1)}h`;
+
+  const list = document.getElementById('todoList');
+  list.innerHTML = '';
+  if (todayTodos.length === 0) {
+    list.innerHTML = `<div class="empty">오늘 할 일이 없어요.<br>+ 할 일 직접 추가 또는 다시 생성을 눌러요.</div>`;
+  } else {
+    list.appendChild(buildScheduleRows(todayTodos));
+  }
+
+  // Full page
+  const listFull = document.getElementById('todoListFull');
+  listFull.innerHTML = '';
+  document.getElementById('todoPhaseNote').textContent =
+    `오늘 · ${today} · 예상 ${(totalMin/60).toFixed(1)}시간 · ${todayTodos.length}개 일정`;
+  if (todayTodos.length === 0) {
+    listFull.innerHTML = `<div class="empty">오늘 일정이 비어있어요.</div>`;
+  } else {
+    listFull.appendChild(buildScheduleRows(todayTodos));
+  }
+}
+
+function renderEventList(data) {
+  const host = document.getElementById('eventList');
+  host.innerHTML = '';
+  const now = new Date();
+  const sorted = [...data.events].sort((a, b) => new Date(a.start) - new Date(b.start));
+  if (sorted.length === 0) {
+    host.innerHTML = `<div class="empty" style="padding: 20px 12px;">이벤트가 없어요.<br>상단 '+ 이벤트 추가'로 시험·자격증·인턴 일정을 등록하세요.</div>`;
+    return;
+  }
+  sorted.forEach(ev => {
+    const s = new Date(ev.start);
+    const e = new Date(ev.end);
+    const active = now >= s && now <= new Date(e.getTime() + 86400000);
+    const upcoming = now < s;
+    const state = active ? 'active' : upcoming ? 'upcoming' : 'done';
+    const stateKo = active ? '진행중' : upcoming ? '예정' : '종료';
+    const daysLeft = active ? daysBetween(now, e) : upcoming ? daysBetween(now, s) : 0;
+    const typeKo = ev.type === 'exam' ? '시험' : ev.type === 'cert' ? '자격증' : ev.type === 'intern' ? '인턴' : ev.type === 'lang' ? '어학' : ev.type === 'lab' ? '연구' : '기타';
+
+    const div = document.createElement('div');
+    div.className = 'event-card type-' + ev.type;
+    div.innerHTML = `
+      <div class="event-card-head">
+        <div class="name">${ev.name}</div>
+        <div class="state ${state}">${stateKo}${active ? ` · D-${daysLeft}` : upcoming ? ` · ${daysLeft}일 후` : ''}</div>
+      </div>
+      <div class="period">${ev.start} ~ ${ev.end}</div>
+      <div class="meta">
+        <span>${typeKo}</span>
+        <span>하루 ${ev.dailyHours}h</span>
+        <span>우선순위 ${ev.priority}/5</span>
+        ${(ev.subjects||[]).length > 0 ? `<span>${ev.subjects.length}개 과목</span>` : ''}
+      </div>
+      <div class="event-card-actions">
+        <button onclick="deleteEvent('${ev.id}')" class="danger">삭제</button>
+        <button onclick="regenerateTodos(); toast('오늘 일정을 다시 생성했어요')">오늘 반영</button>
+      </div>
+    `;
+    host.appendChild(div);
+  });
+}
+
+function renderWeek(data) {
+  const ws = getWeekStart();
+  const dateMap = {};
+  data.logs.forEach(l => { dateMap[l.date] = (dateMap[l.date] || 0) + (+l.problems || 0); });
+  const phase = getCurrentPhase();
+  const today = todayStr();
+  const labels = ['월','화','수','목','금','토','일'];
+  function build(id) {
+    const host = document.getElementById(id);
+    host.innerHTML = '';
+    let weekP = 0;
+    for (let i = 0; i < 7; i++) {
+      const d = new Date(ws);
+      d.setDate(ws.getDate() + i);
+      const s = dateStr(d);
+      const probs = dateMap[s] || 0;
+      weekP += probs;
+      const el = document.createElement('div');
+      el.className = 'week-day';
+      if (s === today) el.classList.add('today');
+      if (d > new Date()) el.classList.add('future');
+      if (probs >= phase.dailyProblems && phase.dailyProblems > 0) el.classList.add('done');
+      else if (probs > 0) el.classList.add('partial');
+      el.innerHTML = `<div class="lbl">${labels[i]}</div><div class="dot">${probs > 0 ? probs : d.getDate()}</div>`;
+      host.appendChild(el);
+    }
+    return weekP;
+  }
+  const weekP = build('weekDots');
+  build('weekDotsFull');
+  document.getElementById('weekProbs').textContent = `${weekP}문제`;
+}
+
+function renderStatsScreen(data) {
+  const ws = getWeekStart();
+  const weekLogs = data.logs.filter(l => new Date(l.date) >= ws);
+  const weekP = weekLogs.reduce((s, l) => s + (+l.problems || 0), 0);
+  const weekH = weekLogs.reduce((s, l) => s + (+l.hours || 0), 0);
+  const weekS = weekLogs.reduce((s, l) => s + (+l.sql || 0), 0);
+  const phase = getCurrentPhase();
+  document.getElementById('wkProblems').textContent = weekP;
+  document.getElementById('wkHours').textContent = weekH.toFixed(1) + 'h';
+  document.getElementById('wkSql').textContent = weekS;
+  document.getElementById('wkPct').textContent = Math.round(weekP / phase.weeklyProblems * 100) + '%';
+
+  const totP = data.logs.reduce((s, l) => s + (+l.problems || 0), 0);
+  const totH = data.logs.reduce((s, l) => s + (+l.hours || 0), 0);
+  const totS = data.logs.reduce((s, l) => s + (+l.sql || 0), 0);
+  document.getElementById('totProblems').textContent = totP;
+  document.getElementById('totHours').textContent = totH.toFixed(1) + 'h';
+  document.getElementById('totSql').textContent = totS;
+  document.getElementById('totDays').textContent = new Set(data.logs.map(l => l.date)).size;
+
+  const recent = document.getElementById('recentLogs');
+  recent.innerHTML = '';
+  const sorted = [...data.logs].sort((a,b) => b.date.localeCompare(a.date)).slice(0, 10);
+  if (sorted.length === 0) {
+    recent.innerHTML = `<div class="empty">아직 기록이 없어요</div>`;
+  } else {
+    sorted.forEach(l => {
+      const div = document.createElement('div');
+      div.style.cssText = 'padding: 12px; background: var(--gray-50); border-radius: 12px;';
+      div.innerHTML = `
+        <div style="display:flex; justify-content: space-between; margin-bottom: 4px;">
+          <span style="font-size: 13px; font-weight: 700;">${l.date}</span>
+          <span style="font-size: 12px; color: var(--blue-500); font-weight: 700; font-family: 'Inter', sans-serif;">${l.problems || 0}문제 · ${l.hours || 0}h</span>
+        </div>
+        ${l.note ? `<div style="font-size: 12.5px; color: var(--gray-700); line-height: 1.4;">${l.note}</div>` : ''}
+      `;
+      recent.appendChild(div);
+    });
+  }
+}
+
+function renderPlanScreen(data) {
+  const host = document.getElementById('fullPhaseList');
+  host.innerHTML = '';
+  const now = new Date();
+  PHASES.forEach(p => {
+    const logs = data.logs.filter(l => {
+      const d = new Date(l.date);
+      return d >= p.start && d <= p.end;
+    });
+    const total = logs.reduce((s, l) => s + (+l.problems || 0), 0);
+    const prevTarget = p.id > 0 ? (PHASES[p.id - 1].targetTotal || 0) : 0;
+    const target = Math.max(1, p.targetTotal - prevTarget);
+    const pct = Math.min(100, Math.round(total / target * 100));
+    const state = now > p.end ? 'done' : now >= p.start ? 'active' : 'upcoming';
+    const stateKo = state === 'active' ? '진행중' : state === 'done' ? '완료' : '예정';
+
+    const card = document.createElement('div');
+    card.className = 'event-card';
+    const color = state === 'active' ? 'var(--blue-500)' : state === 'done' ? 'var(--green-500)' : 'var(--gray-400)';
+    card.style.borderLeftColor = color;
+    card.innerHTML = `
+      <div class="event-card-head">
+        <div class="name">${p.chip} · ${p.name}</div>
+        <div class="state ${state}">${stateKo}</div>
+      </div>
+      <div class="period">${dateStr(p.start).slice(0,7)} ~ ${dateStr(p.end).slice(0,7)} · 주 ${p.weeklyProblems}문제</div>
+      <div style="font-size: 12.5px; color: var(--gray-700); line-height: 1.5;">${p.desc}</div>
+      <div style="height: 6px; background: var(--gray-200); border-radius: 3px; margin-top: 4px; overflow: hidden;">
+        <div style="height: 100%; background: ${color}; width: ${pct}%; border-radius: 3px;"></div>
+      </div>
+      <div style="display: flex; justify-content: space-between; font-size: 12px; color: var(--gray-600); font-family: 'Inter', sans-serif; font-weight: 600;">
+        <span>${total} / ${target} 문제</span>
+        <span>${pct}%</span>
+      </div>
+    `;
+    host.appendChild(card);
+  });
+
+  const lawsHost = document.getElementById('lawsList');
+  lawsHost.innerHTML = '';
+  LAWS.forEach((l, i) => {
+    const div = document.createElement('div');
+    div.style.cssText = 'padding: 14px 0;' + (i < LAWS.length - 1 ? 'border-bottom: 1px solid var(--gray-100);' : '');
+    div.innerHTML = `
+      <div style="display: flex; gap: 12px; align-items: flex-start;">
+        <div style="width: 28px; height: 28px; background: var(--blue-50); color: var(--blue-600); border-radius: 50%; display: grid; place-items: center; font-weight: 700; font-size: 12px; font-family: 'Inter', sans-serif; flex-shrink: 0;">${l.n}</div>
+        <div>
+          <div style="font-size: 14.5px; font-weight: 700; margin-bottom: 2px;">${l.t}</div>
+          <div style="font-size: 12.5px; color: var(--gray-600); line-height: 1.5;">${l.b}</div>
+        </div>
+      </div>
+    `;
+    lawsHost.appendChild(div);
+  });
+
+  const cHost = document.getElementById('companyList');
+  cHost.innerHTML = '';
+  COMPANIES.forEach((co, i) => {
+    const div = document.createElement('div');
+    div.style.cssText = 'padding: 14px 0;' + (i < COMPANIES.length - 1 ? 'border-bottom: 1px solid var(--gray-100);' : '');
+    const color = co.c === 'red' ? 'var(--red-500)' : co.c === 'blue' ? 'var(--blue-500)' : 'var(--yellow-600)';
+    const bg = co.c === 'red' ? 'var(--red-100)' : co.c === 'blue' ? 'var(--blue-100)' : 'var(--yellow-100)';
+    div.innerHTML = `
+      <div style="display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 4px;">
+        <div style="font-size: 15px; font-weight: 700;">${co.n}</div>
+        <div style="font-size: 10.5px; font-weight: 700; background: ${bg}; color: ${color}; padding: 2px 8px; border-radius: 999px;">${co.tag}</div>
+      </div>
+      <div style="font-size: 12.5px; color: var(--gray-600);">${co.f}</div>
+    `;
+    cHost.appendChild(div);
+  });
+}
+
+// ---------- Actions ----------
+function toggleTodo(id) {
+  const data = loadData();
+  const t = data.todos.find(x => x.id === id);
+  if (!t) return;
+  t.done = !t.done;
+  t.doneAt = t.done ? Date.now() : null;
+  saveData(data);
+  render();
+  toast(t.done ? '완료! ✓' : '되돌렸어요');
+  const today = todayStr();
+  const todayTodos = data.todos.filter(x => x.createdFor === today);
+  if (todayTodos.length > 0 && todayTodos.every(x => x.done)) {
+    setTimeout(() => toast('모두 완료! 체크인으로 기록을 남겨보세요'), 1500);
+  }
+}
+function deleteTodo(id) {
+  const data = loadData();
+  data.todos = data.todos.filter(t => t.id !== id);
+  saveData(data);
+  render();
+  toast('삭제되었어요');
+}
+function addCustomTodo() {
+  const text = document.getElementById('newTodoText').value.trim();
+  if (!text) { toast('내용을 입력해주세요'); return; }
+  const startStr = document.getElementById('newTodoStart').value;
+  const hours = +document.getElementById('newTodoHours').value || 1;
+  const data = loadData();
+  data.todos.push({
+    id: `${todayStr()}-custom-${Date.now()}`,
+    createdFor: todayStr(),
+    title: text, type: newTodoType, topic: '',
+    startMin: parseTime(startStr),
+    durationMin: Math.round(hours * 60),
+    done: false, carriedFrom: null, auto: false,
+  });
+  saveData(data);
+  document.getElementById('newTodoText').value = '';
+  closeAllSheets();
+  render();
+  toast('일정이 추가되었어요');
+}
+function regenerateTodos(silent) {
+  const data = loadData();
+  const today = todayStr();
+  data.todos = data.todos.filter(t => !(t.createdFor === today && t.auto));
+  const gen = genTodosForDate(today, data);
+  const existing = new Set(data.todos.map(t => t.id));
+  gen.forEach(g => { if (!existing.has(g.id)) data.todos.push(g); });
+  saveData(data);
+  render();
+  if (!silent) toast('오늘 시간표를 새로 만들었어요');
+}
+function submitEvent() {
+  const name = document.getElementById('evName').value.trim();
+  if (!name) { toast('이벤트 이름을 입력해주세요'); return; }
+  const start = document.getElementById('evStart').value;
+  const end = document.getElementById('evEnd').value;
+  if (!start || !end) { toast('시작·종료일을 입력해주세요'); return; }
+  if (new Date(start) > new Date(end)) { toast('종료일이 시작일보다 빨라요'); return; }
+  const data = loadData();
+  const dailyHours = +document.getElementById('evDailyHours').value || 2;
+  const subjectsRaw = document.getElementById('evSubjects').value.trim();
+  const subjects = subjectsRaw ? subjectsRaw.split('\n').map(s => s.trim()).filter(Boolean) : [];
+  const ev = {
+    id: 'ev-' + Date.now(),
+    name, type: newEventType,
+    start, end,
+    dailyHours, priority: newEventPriority,
+    subjects,
+    createdAt: Date.now()
+  };
+  data.events.push(ev);
+  // Regenerate today's todos if event covers today
+  const today = todayStr();
+  if (new Date(today) >= new Date(start) && new Date(today) <= new Date(end)) {
+    data.todos = data.todos.filter(t => !(t.createdFor === today && t.auto));
+  }
+  saveData(data);
+  document.getElementById('evName').value = '';
+  document.getElementById('evStart').value = '';
+  document.getElementById('evEnd').value = '';
+  document.getElementById('evDailyHours').value = 4;
+  document.getElementById('evSubjects').value = '';
+  closeAllSheets();
+  render();
+  toast('이벤트가 추가되고 오늘 일정이 반영됐어요');
+}
+function deleteEvent(id) {
+  if (!confirm('이벤트를 삭제할까요?')) return;
+  const data = loadData();
+  data.events = data.events.filter(e => e.id !== id);
+  // remove auto-todos tied to this event for today so they regenerate
+  const today = todayStr();
+  data.todos = data.todos.filter(t => !(t.createdFor === today && t.eventId === id));
+  saveData(data);
+  render();
+  toast('삭제되었어요');
+}
+function quickLog(kind) {
+  const data = loadData();
+  const today = todayStr();
+  let log = data.logs.find(l => l.date === today);
+  if (!log) {
+    log = { date: today, problems: 0, sql: 0, hours: 0, note: '', ts: Date.now() };
+    data.logs.push(log);
+  }
+  if (kind === 'problem') log.problems += 1;
+  else if (kind === 'sql') { log.sql += 1; log.problems += 1; }
+  else if (kind === 'hour') log.hours = +(log.hours + 0.5).toFixed(1);
+  log.ts = Date.now();
+  const match = data.todos.find(t =>
+    t.createdFor === today && !t.done &&
+    ((kind === 'problem' && t.type === 'algo') || (kind === 'sql' && t.type === 'sql'))
+  );
+  if (match) { match.done = true; match.doneAt = Date.now(); }
+  saveData(data);
+  render();
+  toast(kind === 'problem' ? '문제 +1' : kind === 'sql' ? 'SQL +1' : '+30분');
+}
+function submitCheckin() {
+  const data = loadData();
+  const today = todayStr();
+  const p = +document.getElementById('ciProblems').value || 0;
+  const s = +document.getElementById('ciSql').value || 0;
+  const h = +document.getElementById('ciHours').value || 0;
+  if (p === 0 && s === 0 && h === 0) { toast('최소 1개는 입력해주세요'); return; }
+  let log = data.logs.find(l => l.date === today);
+  if (!log) {
+    log = { date: today, problems: 0, sql: 0, hours: 0, note: '', ts: Date.now() };
+    data.logs.push(log);
+  }
+  log.problems += p;
+  log.sql += s;
+  log.hours = +(log.hours + h).toFixed(1);
+  const note = document.getElementById('ciNote').value.trim();
+  if (note) log.note = log.note ? log.note + ' | ' + note : note;
+  log.ts = Date.now();
+  document.getElementById('ciProblems').value = 0;
+  document.getElementById('ciSql').value = 0;
+  document.getElementById('ciHours').value = 0;
+  document.getElementById('ciNote').value = '';
+  saveData(data);
+  closeAllSheets();
+  render();
+  toast('체크인 완료 · 수고했어요');
+}
+function exportJson() {
+  const data = loadData();
+  const blob = new Blob([JSON.stringify(data, null, 2)], {type: 'application/json'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = `ctmp-tracker-${todayStr()}.json`;
+  a.click();
+  toast('JSON으로 저장됐어요');
+}
+function importJson(e) {
+  const file = e.target.files[0];
+  if (!file) return;
+  const r = new FileReader();
+  r.onload = () => {
+    try {
+      const d = JSON.parse(r.result);
+      if (!d.logs) throw new Error('Invalid');
+      if (!d.events) d.events = [];
+      if (!d.todos) d.todos = [];
+      saveData(d);
+      render();
+      toast('불러왔어요');
+    } catch { toast('올바른 JSON 파일이 아닙니다'); }
+  };
+  r.readAsText(file);
+}
+function resetAll() {
+  if (!confirm('모든 기록을 초기화합니다. 계속할까요?')) return;
+  if (!confirm('정말로 초기화할까요? 되돌릴 수 없습니다.')) return;
+  localStorage.removeItem(STORAGE_KEY);
+  closeAllSheets();
+  render();
+  toast('초기화되었어요');
+}
+
+// ---------- Nav & Sheet ----------
+function switchTab(tab) {
+  currentTab = tab;
+  ['home','todo','stats','plan'].forEach(t => {
+    document.getElementById('screen' + t.charAt(0).toUpperCase() + t.slice(1)).classList.toggle('active', t === tab);
+    const btn = document.querySelector(`[data-tab="${t}"]`);
+    if (btn) btn.classList.toggle('active', t === tab);
+  });
+  renderTopbar();
+  window.scrollTo({top: 0, behavior: 'smooth'});
+}
+function openSheet(id) {
+  document.getElementById('backdrop').classList.add('show');
+  document.getElementById(id).classList.add('show');
+  document.body.style.overflow = 'hidden';
+}
+function closeAllSheets() {
+  document.getElementById('backdrop').classList.remove('show');
+  document.querySelectorAll('.sheet').forEach(s => s.classList.remove('show'));
+  document.body.style.overflow = '';
+}
+function toast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  clearTimeout(window._tt);
+  window._tt = setTimeout(() => t.classList.remove('show'), 2200);
+}
+
+// ---------- Init ----------
+function setupChips() {
+  document.querySelectorAll('#newTodoType .chip').forEach(c => {
+    c.onclick = () => {
+      document.querySelectorAll('#newTodoType .chip').forEach(x => x.classList.remove('active'));
+      c.classList.add('active');
+      newTodoType = c.dataset.v;
+    };
+  });
+  document.querySelectorAll('#evType .chip').forEach(c => {
+    c.onclick = () => {
+      document.querySelectorAll('#evType .chip').forEach(x => x.classList.remove('active'));
+      c.classList.add('active');
+      newEventType = c.dataset.v;
+    };
+  });
+  document.querySelectorAll('#evPriority .chip').forEach(c => {
+    c.onclick = () => {
+      document.querySelectorAll('#evPriority .chip').forEach(x => x.classList.remove('active'));
+      c.classList.add('active');
+      newEventPriority = +c.dataset.v;
+    };
+  });
+  // default dates
+  const t = new Date();
+  const inWeek = new Date(t); inWeek.setDate(t.getDate() + 7);
+  document.getElementById('evStart').value = dateStr(t);
+  document.getElementById('evEnd').value = dateStr(inWeek);
+}
+
+setupChips();
+render();
+setInterval(() => {
+  const now = new Date();
+  if (now.getHours() === 0 && now.getMinutes() < 2) render();
+}, 60000);
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closeAllSheets(); });
+</script>
+
+</body>
+</html>
