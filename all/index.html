@@ -1,0 +1,129 @@
+---
+layout: default
+permalink: /all/
+title: "All Posts"
+description: "모든 글 목록 — Research, Reports, Blog Posts, Guides"
+---
+<style>
+.all-title{font-family:var(--font-serif);font-size:clamp(2rem,5vw,2.8rem);font-weight:300;margin-bottom:10px;opacity:0}
+.all-subtitle{font-family:var(--font-mono);font-size:11px;color:var(--text-muted);letter-spacing:.2em;text-transform:uppercase;margin-bottom:40px;opacity:0}
+.all-stats{display:flex;gap:15px;flex-wrap:wrap;margin-bottom:50px}
+.all-stat{font-family:var(--font-mono);font-size:.7rem;color:var(--text-faint);letter-spacing:.05em;padding:6px 14px;border:1px solid var(--border-medium);cursor:pointer;transition:all .2s;user-select:none}
+.all-stat:hover,.all-stat.active{background:var(--text);color:var(--bg);border-color:var(--text)}
+.cat-section{margin-bottom:50px;opacity:0;transform:translateY(15px)}
+.cat-section.visible{opacity:1;transform:none;transition:opacity .4s,transform .4s}
+.cat-header{font-family:var(--font-serif);font-size:1.4rem;font-weight:400;margin-bottom:20px;padding-bottom:12px;border-bottom:1px solid var(--border-medium);display:flex;align-items:baseline;gap:12px}
+.cat-header .count{font-family:var(--font-mono);font-size:.65rem;color:var(--text-faint);letter-spacing:.05em}
+.all-item{display:block;padding:20px 0;border-bottom:1px solid var(--border-light);text-decoration:none;transition:all .2s}
+.all-item:hover{padding-left:12px}
+.all-item-top{display:flex;align-items:baseline;gap:12px;margin-bottom:6px;flex-wrap:wrap}
+.all-item-date{font-family:var(--font-mono);font-size:.65rem;color:var(--text-faint);letter-spacing:.08em;white-space:nowrap}
+.all-item-title{font-family:var(--font-serif);font-size:1.2rem;color:var(--text);font-weight:400}
+.all-item-desc{font-size:.85rem;color:var(--text-secondary);line-height:1.6;margin-bottom:8px}
+.all-item-tags{display:flex;gap:6px;flex-wrap:wrap}
+.all-item-tags span{font-size:.55rem;padding:3px 8px;background:var(--tag-bg);color:var(--tag-text);letter-spacing:.05em;text-transform:uppercase}
+.all-item:hover .all-item-tags span{background:var(--text);color:var(--bg)}
+.all-empty{font-size:.85rem;color:var(--text-faint);padding:20px 0;font-style:italic}
+@media(max-width:1024px){
+    .all-item{padding:16px 0}
+    .all-item:hover{padding-left:0}
+    .all-item-title{font-size:1.05rem}
+    .all-item-desc{font-size:.8rem}
+    .all-stats{gap:8px}
+    .all-stat{font-size:.65rem;padding:5px 10px}
+}
+</style>
+
+<h1 class="all-title">All Posts</h1>
+<p class="all-subtitle">전체 글 목록</p>
+
+<div class="all-stats" id="filterBar"></div>
+<div id="allContent"></div>
+
+<script>
+document.addEventListener('DOMContentLoaded',function(){
+    if(typeof gsap!=='undefined'){
+        gsap.to('.all-title',{opacity:1,duration:.5,delay:.1});
+        gsap.to('.all-subtitle',{opacity:1,duration:.4,delay:.2});
+    }else{
+        document.querySelector('.all-title').style.opacity='1';
+        document.querySelector('.all-subtitle').style.opacity='1';
+    }
+
+    fetch('/data/posts.json').then(function(r){return r.json()}).then(function(posts){
+        posts.sort(function(a,b){return b.date.localeCompare(a.date)});
+
+        var catNames={research:'Research',reports:'Reports',blog:'Blog Posts',guide:'Guides'};
+        var catOrder=['research','reports','blog','guide'];
+        var groups={};
+        posts.forEach(function(p){
+            if(!groups[p.category])groups[p.category]=[];
+            groups[p.category].push(p);
+        });
+
+        /* Filter bar */
+        var bar=document.getElementById('filterBar');
+        var allBtn=document.createElement('div');
+        allBtn.className='all-stat active';
+        allBtn.textContent='All ('+posts.length+')';
+        allBtn.setAttribute('data-cat','all');
+        bar.appendChild(allBtn);
+
+        catOrder.forEach(function(cat){
+            if(!groups[cat])return;
+            var btn=document.createElement('div');
+            btn.className='all-stat';
+            btn.textContent=(catNames[cat]||cat)+' ('+groups[cat].length+')';
+            btn.setAttribute('data-cat',cat);
+            bar.appendChild(btn);
+        });
+
+        function getHref(p){return p.url||('/'+p.category+'/'+p.slug+'/');}
+
+        function render(filter){
+            var container=document.getElementById('allContent');
+            container.innerHTML='';
+            var catsToShow=filter==='all'?catOrder:[filter];
+
+            catsToShow.forEach(function(cat){
+                if(!groups[cat]||!groups[cat].length)return;
+                var sec=document.createElement('div');
+                sec.className='cat-section';
+                var items=groups[cat];
+                var hdr='<div class="cat-header">'+(catNames[cat]||cat)+' <span class="count">'+items.length+' posts</span></div>';
+                var html=hdr;
+                items.forEach(function(p){
+                    var d=new Date(p.date+'T00:00:00');
+                    var ds=d.toLocaleDateString('en-US',{year:'numeric',month:'short',day:'2-digit'});
+                    var tags=(p.tags||[]).map(function(t){return '<span>'+t+'</span>'}).join('');
+                    html+='<a href="'+getHref(p)+'" class="all-item">';
+                    html+='<div class="all-item-top"><span class="all-item-date">'+ds+'</span><span class="all-item-title">'+p.title+'</span></div>';
+                    if(p.description)html+='<div class="all-item-desc">'+p.description+'</div>';
+                    if(tags)html+='<div class="all-item-tags">'+tags+'</div>';
+                    html+='</a>';
+                });
+                sec.innerHTML=html;
+                container.appendChild(sec);
+                requestAnimationFrame(function(){sec.classList.add('visible');});
+            });
+
+            if(!container.children.length){
+                container.innerHTML='<div class="all-empty">No posts found.</div>';
+            }
+        }
+
+        render('all');
+
+        /* Filter click */
+        bar.addEventListener('click',function(e){
+            var btn=e.target.closest('.all-stat');
+            if(!btn)return;
+            bar.querySelectorAll('.all-stat').forEach(function(b){b.classList.remove('active');});
+            btn.classList.add('active');
+            render(btn.getAttribute('data-cat'));
+        });
+    }).catch(function(e){
+        document.getElementById('allContent').innerHTML='<div class="all-empty">Failed to load posts.</div>';
+    });
+});
+</script>

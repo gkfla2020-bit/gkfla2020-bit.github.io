@@ -1,12 +1,105 @@
 <script>
-const FINNHUB_KEY='d62k939r01qldki8gjq0d62k939r01qldki8gjqg';
-async function fetchQuote(s){try{const r=await fetch('https://finnhub.io/api/v1/quote?symbol='+s+'&token='+FINNHUB_KEY);return await r.json();}catch(e){return null;}}
+(function(){
+/* Finnhub API — key injected via Jekyll config or fallback */
+const FINNHUB_KEY='{{ site.finnhub_key }}';
+let marketTimer=null;
+
+async function fetchQuote(s){
+    try{const r=await fetch('https://finnhub.io/api/v1/quote?symbol='+s+'&token='+FINNHUB_KEY);return await r.json();}
+    catch(e){return null;}
+}
+
+function setVal(id,text){
+    var el=document.getElementById(id);
+    if(el) el.textContent=text;
+    /* Mirror to mobile widget */
+    var mel=document.getElementById('m-'+id);
+    if(mel) mel.textContent=text;
+}
+
+function setChg(id,val){
+    var text=(val>=0?'▲ +':'▼ ')+val.toFixed(2)+'%';
+    var cls='market-change '+(val>=0?'up':'down');
+    [id, 'm-'+id].forEach(function(eid){
+        var el=document.getElementById(eid);
+        if(el){el.textContent=text;el.className=cls;}
+    });
+}
+
 async function updateMarketData(){
-const[spy,qqq,btc]=await Promise.all([fetchQuote('SPY'),fetchQuote('QQQ'),fetchQuote('BINANCE:BTCUSDT')]);
-const d={kospi:{v:2650,c:-1.2},sp500:spy?.c?{v:Math.round(spy.c*10),c:spy.dp||0}:{v:6050,c:.8},nasdaq:qqq?.c?{v:Math.round(qqq.c*40),c:qqq.dp||0}:{v:19800,c:1.1},us10y:{v:4.21,c:-.05},usdkrw:{v:1472,c:.3},vix:{v:21.8,c:2.5},move:{v:119.7,c:-1.2},btc:btc?.c?{v:btc.c,c:btc.dp||0}:{v:97500,c:-2.1}};
-for(const[k,o]of Object.entries(d)){const el=document.getElementById(k),ch=document.getElementById(k+'-chg');
-if(el){if(k==='usdkrw')el.textContent=o.v.toLocaleString();else if(k==='us10y')el.textContent=o.v.toFixed(2)+'%';else if(k==='btc')el.textContent='$'+(o.v/1000).toFixed(1)+'K';else if(k==='vix'||k==='move')el.textContent=o.v.toFixed(1);else el.textContent=o.v.toLocaleString();}
-if(ch){ch.textContent=(o.c>=0?'+':'')+o.c.toFixed(2)+'%';ch.className='market-change '+(o.c>=0?'up':'down');}}
-document.getElementById('update-time').textContent=(spy?.c||btc?.c?'Live':'Sample')+' · '+new Date().toLocaleTimeString('ko-KR');}
-setTimeout(updateMarketData,2000);setInterval(updateMarketData,60000);
+    var spy=null,qqq=null,btc=null;
+    try{
+        [spy,qqq,btc]=await Promise.all([fetchQuote('SPY'),fetchQuote('QQQ'),fetchQuote('BINANCE:BTCUSDT')]);
+    }catch(e){}
+
+    var d={
+        kospi:{v:2650,c:-1.2,live:false},
+        sp500:spy&&spy.c?{v:Math.round(spy.c*10),c:spy.dp||0,live:true}:{v:6050,c:.8,live:false},
+        nasdaq:qqq&&qqq.c?{v:Math.round(qqq.c*40),c:qqq.dp||0,live:true}:{v:19800,c:1.1,live:false},
+        us10y:{v:4.21,c:-.05,live:false},
+        usdkrw:{v:1472,c:.3,live:false},
+        vix:{v:21.8,c:2.5,live:false},
+        move:{v:119.7,c:-1.2,live:false},
+        btc:btc&&btc.c?{v:btc.c,c:btc.dp||0,live:true}:{v:97500,c:-2.1,live:false}
+    };
+
+    var anyLive=false;
+    for(var k in d){
+        if(!d.hasOwnProperty(k))continue;
+        var o=d[k];
+        if(o.live) anyLive=true;
+        if(k==='usdkrw') setVal(k,o.v.toLocaleString());
+        else if(k==='us10y') setVal(k,o.v.toFixed(2)+'%');
+        else if(k==='btc') setVal(k,'$'+(o.v/1000).toFixed(1)+'K');
+        else if(k==='vix'||k==='move') setVal(k,o.v.toFixed(1));
+        else setVal(k,o.v.toLocaleString());
+        setChg(k+'-chg',o.c);
+    }
+
+    var timeStr=(anyLive?'Live':'Sample')+' · '+new Date().toLocaleTimeString('ko-KR');
+    setVal('update-time',timeStr);
+}
+
+/* Start with delay, refresh every 60s */
+setTimeout(updateMarketData,2000);
+marketTimer=setInterval(updateMarketData,60000);
+
+/* Pause when tab is hidden */
+document.addEventListener('visibilitychange',function(){
+    if(document.hidden){
+        if(marketTimer){clearInterval(marketTimer);marketTimer=null;}
+    }else{
+        updateMarketData();
+        marketTimer=setInterval(updateMarketData,60000);
+    }
+});
+
+/* Conditional Giscus loading — only load for the visible container */
+function loadGiscus(){
+    var isDesktop=window.innerWidth>1100;
+    var targetId=isDesktop?'giscus-desktop':'giscus-mobile';
+    var target=document.getElementById(targetId);
+    if(!target||target.querySelector('iframe,.giscus'))return;
+    var s=document.createElement('script');
+    s.src='https://giscus.app/client.js';
+    s.setAttribute('data-repo','gkfla2020-bit/gkfla2020-bit.github.io');
+    s.setAttribute('data-repo-id','R_kgDONqJqYQ');
+    s.setAttribute('data-category','General');
+    s.setAttribute('data-category-id','DIC_kwDONqJqYc4CmVvM');
+    s.setAttribute('data-mapping','specific');
+    s.setAttribute('data-term','guestbook');
+    s.setAttribute('data-strict','0');
+    s.setAttribute('data-reactions-enabled','1');
+    s.setAttribute('data-emit-metadata','0');
+    s.setAttribute('data-input-position','top');
+    s.setAttribute('data-theme','light');
+    s.setAttribute('data-lang','ko');
+    s.setAttribute('data-loading','lazy');
+    s.crossOrigin='anonymous';
+    s.async=true;
+    target.appendChild(s);
+}
+if(document.readyState==='loading'){document.addEventListener('DOMContentLoaded',loadGiscus);}
+else{loadGiscus();}
+})();
 </script>
