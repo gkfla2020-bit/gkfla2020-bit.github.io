@@ -15,7 +15,7 @@ toc_sticky: true
         --wsj-black: #111111;
         --wsj-gray: #666666;
         --wsj-light: #f5f5f5;
-        --wsj-cream: #faf9f6;
+        --wsj-cream: #ffffff;
         --wsj-accent: #0080c6;
         --wsj-red: #c41200;
         --wsj-green: #00843d;
