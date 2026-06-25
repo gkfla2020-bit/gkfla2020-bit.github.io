@@ -3,7 +3,7 @@ layout: post
 title: "바이낸스 데이터 수집기 — 전체 코드 한 줄씩 리뷰"
 date: 2026-02-27 20:00:00
 permalink: /research/binance-collector-full-code-review-kr/
-categories: [research, data-engineering]
+categories: [research, data-engineering, private]
 tags: [binance, websocket, python, code-review, asyncio, parquet, line-by-line]
 toc: true
 toc_sticky: true

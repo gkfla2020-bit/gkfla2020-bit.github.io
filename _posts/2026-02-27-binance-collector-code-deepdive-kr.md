@@ -3,7 +3,7 @@ layout: post
 title: "바이낸스 데이터 수집기 코드 딥다이브 — 모듈별 구현 해설"
 date: 2026-02-27
 permalink: /research/binance-collector-code-deepdive-kr/
-categories: [research, data-engineering]
+categories: [research, data-engineering, private]
 tags: [binance, websocket, orderbook, asyncio, python, parquet, code-review]
 toc: true
 toc_sticky: true

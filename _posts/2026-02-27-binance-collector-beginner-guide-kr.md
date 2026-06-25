@@ -3,7 +3,7 @@ layout: post
 title: "바이낸스 데이터 수집기 — 비전공자도 이해하는 완전 해설"
 date: 2026-02-27 18:00:00
 permalink: /research/binance-collector-beginner-guide-kr/
-categories: [research, data-engineering]
+categories: [research, data-engineering, private]
 tags: [binance, websocket, python, beginner, tutorial]
 toc: true
 toc_sticky: true
