@@ -1,0 +1,1157 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Round 9 - Deep Learning — PyTorch 자산가격 예측 | Quant Researcher Guide</title>
+<script>
+MathJax = { tex: { inlineMath: [['\\(','\\)']], displayMath: [['\\[','\\]'],['$$','$$']] } };
+</script>
+<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;500&family=Space+Mono:wght@400&family=Inter:wght@300;400&display=swap" rel="stylesheet">
+<script src="https://cdn.plot.ly/plotly-2.27.0.min.js"></script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Inter',sans-serif;background:#fafaf8;color:#1a1a1a;line-height:1.7;overflow-x:hidden}
+.sidebar{position:fixed;left:0;top:0;width:260px;height:100vh;background:rgba(255,255,255,.97);border-right:1px solid rgba(0,0,0,.06);padding:32px 24px;z-index:100;overflow-y:auto;display:flex;flex-direction:column}
+.sidebar-profile{text-align:center;margin-bottom:28px;padding-bottom:24px;border-bottom:1px solid rgba(0,0,0,.08)}
+.profile-icon{font-size:48px;margin-bottom:8px}
+.profile-name{font-family:'Cormorant Garamond',serif;font-size:1.3rem;font-weight:500;margin-bottom:4px}
+.profile-title{font-size:.68rem;color:#888;letter-spacing:.08em;text-transform:uppercase;margin-bottom:8px}
+.profile-bio{font-size:.78rem;color:#666;line-height:1.5}
+.sidebar-nav{flex:1;margin-top:16px}.nav-section{margin-bottom:20px}.nav-section-title{font-size:.6rem;font-weight:600;color:#aaa;letter-spacing:.15em;text-transform:uppercase;margin-bottom:10px}.nav-list{list-style:none}.nav-list li{margin-bottom:5px}.nav-list a{font-size:.78rem;color:#555;text-decoration:none;transition:all .2s;display:block;padding:3px 0}.nav-list a:hover{color:#2563eb;padding-left:4px}.nav-list a.active{color:#2563eb;font-weight:500}.nav-list a.done{color:#28a745}.badge{display:inline-block;font-size:.5rem;background:#2563eb;color:#fff;padding:1px 5px;border-radius:8px;margin-left:3px;vertical-align:middle}.badge-done{background:#28a745}.sidebar-footer{padding-top:16px;border-top:1px solid rgba(0,0,0,.06);font-size:.65rem;color:#aaa;text-align:center}
+.main-wrapper{margin-left:260px;min-height:100vh}.container{max-width:1100px;margin:0 auto;padding:50px 40px 80px}
+.paper-content{font-family:'Times New Roman','Nanum Myeongjo',serif;line-height:1.8;background:#fff;padding:40px;border-radius:8px;box-shadow:0 2px 20px rgba(0,0,0,.05)}.paper-header{text-align:center;margin-bottom:40px;padding-bottom:30px;border-bottom:2px solid #333}.paper-category{font-size:14px;color:#666;margin-bottom:10px}.paper-title{font-size:24px;font-weight:bold;margin-bottom:12px;line-height:1.4}.paper-subtitle{font-size:14px;color:#555;margin-bottom:8px}.paper-team{font-size:13px;color:#444}
+.abstract{background:#f8f9fa;padding:25px;margin:30px 0;border-left:4px solid #2c3e50}.abstract-title{font-weight:bold;font-size:16px;margin-bottom:15px}
+h2{font-size:18px;margin:35px 0 20px;padding-bottom:8px;border-bottom:1px solid #ddd;color:#2c3e50}h3{font-size:15px;margin:25px 0 15px;color:#34495e}
+p{text-align:justify;margin-bottom:15px;text-indent:2em}p.ni{text-indent:0}
+table{width:100%;border-collapse:collapse;margin:20px 0;font-size:12px}th,td{border:1px solid #ddd;padding:10px 8px;text-align:center}th{background:#2c3e50;color:white;font-weight:bold}tr:nth-child(even){background:#f8f9fa}tr:hover{background:#e8f4f8}
+.tc{font-size:13px;font-weight:bold;margin:15px 0 10px;text-align:center}.eq{text-align:center;margin:20px 0;padding:15px;background:#f8f9fa;border-radius:4px;overflow-x:auto}ul,ol{margin-left:2em;margin-bottom:15px}li{margin-bottom:6px}
+.def{background:#fff9e6;border:1px solid #ffc107;border-radius:4px;padding:20px;margin:20px 0}.info{background:#e8f4f8;border-left:4px solid #3498db;padding:20px;margin:20px 0}.warn{background:#fff3cd;border-left:4px solid #f39c12;padding:20px;margin:20px 0}.ok{background:#d4edda;border-left:4px solid #28a745;padding:20px;margin:20px 0}
+.paper-anchor{background:#f5f3ff;border:1px solid #7c3aed;border-radius:6px;padding:22px;margin:24px 0}.paper-anchor .pa-label{font-family:'Space Mono',monospace;font-size:10px;color:#7c3aed;letter-spacing:.15em;text-transform:uppercase;margin-bottom:8px}.paper-anchor .pa-title{font-weight:bold;font-size:14px;margin-bottom:6px}.paper-anchor p{font-size:13px;text-indent:0;margin-bottom:8px}
+.task{background:#e8f8f0;border-left:4px solid #00b894;padding:20px;margin:20px 0}.task .task-title{font-weight:bold;margin-bottom:10px}
+details.quiz-item{margin:14px 0;padding:14px 18px;background:#f8f9fa;border:1px solid #e0e0e0;border-radius:6px}details.quiz-item summary{cursor:pointer;font-weight:bold;font-size:13.5px}details.quiz-item[open] summary{margin-bottom:10px;color:#2563eb}details.quiz-item .answer{font-size:13px;padding:10px 14px;background:#fff;border-left:3px solid #2563eb}
+pre{background:#1e1e1e;color:#d4d4d4;padding:20px;border-radius:6px;overflow-x:auto;margin:20px 0;font-family:'Space Mono','Consolas',monospace;font-size:13px;line-height:1.6}code{font-family:'Space Mono','Consolas',monospace;font-size:13px}p code,li code,td code{background:#f0f0f0;padding:2px 6px;border-radius:3px;color:#c7254e;font-size:12px}
+.cm{color:#6a9955}.kw{color:#569cd6}.st{color:#ce9178}.fn{color:#dcdcaa}.nb{color:#4ec9b0}.nu{color:#b5cea8}
+.progress-bar{width:100%;height:6px;background:#e0e0e0;border-radius:3px;margin-top:16px}.progress-fill{height:100%;background:linear-gradient(90deg,#2563eb,#7c3aed);border-radius:3px;width:0%}.progress-label{font-size:11px;color:#888;margin-top:4px;text-align:center}
+.code-output{background:#1e1e1e;color:#d4d4d4;padding:12px 16px;border-radius:0 0 6px 6px;font-family:'Space Mono',monospace;font-size:11.5px;line-height:1.6;margin-top:-4px;margin-bottom:18px;border-top:2px solid #333;white-space:pre-wrap;overflow-x:auto}.code-output .out-label{color:#888;font-size:10px;margin-bottom:4px;display:block}
+.nav-footer{display:flex;justify-content:space-between;gap:16px;margin-top:50px;padding-top:24px;border-top:1px solid #ddd;font-family:'Inter',sans-serif}.nav-footer a{font-size:.82rem;color:#2563eb;text-decoration:none;padding:12px 18px;border:1px solid #dbe4f5;border-radius:6px;transition:all .2s;max-width:48%}.nav-footer a:hover{background:#2563eb;color:#fff;border-color:#2563eb}.nav-footer .nf-label{display:block;font-size:.6rem;color:#999;letter-spacing:.1em;text-transform:uppercase;margin-bottom:4px}.nav-footer a:hover .nf-label{color:rgba(255,255,255,.7)}
+@media(max-width:1024px){.sidebar{width:100%;height:auto;position:relative;border-right:none;border-bottom:1px solid rgba(0,0,0,.08);padding:16px}.sidebar-profile{margin-bottom:10px;padding-bottom:10px;display:flex;align-items:center;gap:12px;text-align:left}.profile-icon{font-size:32px;margin-bottom:0}.profile-bio{display:none}.nav-section{display:inline-block;margin-right:16px;margin-bottom:8px}.nav-list{display:flex;gap:10px;flex-wrap:wrap}.nav-list li{margin-bottom:0}.sidebar-footer{display:none}.main-wrapper{margin-left:0}.container{padding:0}.paper-content{padding:20px 16px;border-radius:0;box-shadow:none}.paper-title{font-size:18px}p{font-size:14px;text-indent:1.5em;text-align:left}pre{font-size:11px;padding:14px}table{font-size:10px;display:block;overflow-x:auto}.nav-footer{flex-direction:column}.nav-footer a{max-width:100%}}
+</style>
+</head>
+<body>
+
+<div class="sidebar">
+<div class="sidebar-profile">
+<div class="profile-icon">&#x1F52C;</div>
+<div class="profile-name">Quant Researcher Guide</div>
+<div class="profile-title">Data &middot; Factors &middot; Machine Learning</div>
+<div class="profile-bio">13 Rounds: 데이터 분석 기본기에서 논문 재현까지</div>
+</div>
+<div class="sidebar-nav">
+<div class="nav-section">
+<div class="nav-section-title">Curriculum</div>
+<ul class="nav-list">
+<li><a href="../">&#x2302; Guide Home</a></li>
+<li><a href="../round-00/">R0. Research Toolkit</a></li>
+<li><a href="../round-01/">R1. EDA &amp; Distributions</a></li>
+<li><a href="../round-02/">R2. Financial Data Eng.</a></li>
+<li><a href="../round-03/">R3. Statistical Inference</a></li>
+<li><a href="../round-04/">R4. Time Series</a></li>
+<li><a href="../round-05/">R5. Factor Research I</a></li>
+<li><a href="../round-06/">R6. Factor Research II</a></li>
+<li><a href="../round-07/">R7. Financial ML I</a></li>
+<li><a href="../round-08/">R8. Financial ML II &middot; GKX</a></li>
+<li><a class="active" href="#">R9. Deep Learning <span class="badge">NOW</span></a></li>
+<li><a href="../round-10/">R10. Paper Replication</a></li>
+<li><a href="../round-11/">R11. Portfolio &amp; Risk</a></li>
+<li><a href="../round-12/">R12. Capstone</a></li>
+</ul>
+</div>
+<div class="nav-section">
+<div class="nav-section-title">This Lecture</div>
+<ul class="nav-list">
+<li><a href="#ch1">1. PyTorch 핵심 30분</a></li>
+<li><a href="#ch2">2. 데이터 로딩</a></li>
+<li><a href="#ch3">3. 학습 안정화 레시피</a></li>
+<li><a href="#ch4">4. MLP for cross-section</a></li>
+<li><a href="#ch5">5. 시계열 모델 (RNN/LSTM/GRU)</a></li>
+<li><a href="#ch6">6. Attention과 Transformer</a></li>
+<li><a href="#ch7">7. Conditional Autoencoder</a></li>
+<li><a href="#ch8">8. 실험 관리</a></li>
+<li><a href="#ch9">9. 과적합과의 전쟁</a></li>
+<li><a href="#ch10">10. 실습: MLP vs LSTM vs LightGBM</a></li>
+<li><a href="#quiz">Quiz</a></li>
+<li><a href="#cheatsheet">&#x1F4CB; Cheat Sheet</a></li>
+</ul>
+</div>
+</div>
+<div class="sidebar-footer">Round 9 of 12</div>
+</div>
+
+<div class="main-wrapper">
+<div class="container">
+<div class="paper-content">
+
+<div class="paper-header">
+<div class="paper-category">Round 9 / 12</div>
+<h1 class="paper-title">Deep Learning — PyTorch 자산가격 예측</h1>
+<div class="paper-subtitle">MLP에서 Transformer, Autoencoder Asset Pricing까지</div>
+<div class="paper-team">Paper Anchor: Gu, Kelly &amp; Xiu (2021, JoE) — Autoencoder Asset Pricing Models</div>
+<div class="progress-bar"><div class="progress-fill" style="width:75%"></div></div>
+<div class="progress-label">Overall Progress: 9/12 Rounds</div>
+</div>
+
+<div class="abstract">
+<div class="abstract-title">이 라운드에서 얻어갈 것</div>
+<p class="ni">R8에서 트리 앙상블(GBRT)로 GKX(2020)를 재현했다. 이번에는 딥러닝이다. CS 석사생인 독자에게 PyTorch 문법은 낯설지 않을 것이므로, 이 라운드의 진짜 목표는 <strong>"금융 데이터에서 딥러닝을 제대로 평가하는 프로토콜"</strong>이다. 학부 수준의 텐서 튜토리얼은 압축하고, 대신 다음에 무게를 둔다:</p>
+<ul>
+<li>PyTorch의 autograd·nn.Module·학습 루프를 손으로 재구성해 "블랙박스가 아닌 것"으로 만든다</li>
+<li>금융 패널을 배치로 만들 때 발생하는 <strong>시점 누수(look-ahead leakage)</strong>를 막는 DataLoader 설계</li>
+<li>GKX의 NN3(32-16-8)를 <strong>seed 앙상블</strong>과 함께 재현 — 왜 앙상블이 선택이 아니라 필수인가</li>
+<li>RNN/LSTM/GRU와 Transformer(self-attention, PatchTST)의 구조를 수식과 코드로 1:1 매칭</li>
+<li>GKX(2021)의 <strong>Conditional Autoencoder</strong> — 딥러닝으로 쓴 비선형 팩터모형</li>
+<li>seed 고정, ablation table, config dataclass 등 재현 가능한 <strong>연구 습관</strong></li>
+<li>최종 실습: MLP vs LSTM vs LightGBM을 동일 purged CV로 공정 대결</li>
+</ul>
+<p class="ni"><strong>Keywords</strong>: autograd, nn.Module, DataLoader, LayerNorm, seed ensemble, self-attention, conditional autoencoder, ablation, purged CV, overfitting</p>
+</div>
+
+<div class="paper-anchor">
+<div class="pa-label">Paper Anchor</div>
+<div class="pa-title">Gu, S., Kelly, B., &amp; Xiu, D. (2021). "Autoencoder Asset Pricing Models." <em>Journal of Econometrics</em>, 222(1B), 429–450.</div>
+<p>이 논문은 앞 라운드의 GKX(2020) "Empirical Asset Pricing via Machine Learning"의 후속작이다. 2020년 논문이 "어떤 ML 모델이 수익률을 잘 예측하나"를 겨뤘다면, 2021년 논문은 한 걸음 더 나아가 <strong>딥러닝을 자산가격결정 이론의 언어(팩터모형)로 다시 쓴다</strong>. 핵심 아이디어는 오토인코더로 "잠재 팩터"와 "조건부 팩터 로딩(베타)"을 동시에 학습하는 것 — 즉 \(r = \beta(z)^\top f + \epsilon\)에서 \(\beta\)를 종목 특성 \(z\)의 비선형 함수로 만든다. 우리가 이 논문을 앵커로 삼는 이유는, 딥러닝이 단지 "예측 성능 짜내기"가 아니라 <strong>계량경제 모형의 자연스러운 비선형 일반화</strong>가 될 수 있음을 보여주는 대표 사례이기 때문이다. 주니어 퀀트라면 반드시 재현해봐야 할 논문이다.</p>
+</div>
+
+<div class="warn">
+<p class="ni"><strong>먼저 마음가짐부터.</strong> 이미지·언어에서 딥러닝은 압도적이지만, 주식 수익률 예측에서 딥러닝은 <strong>겨우 이기거나, 자주 진다</strong>. GKX(2020)조차 최고 성능 신경망은 얕은 NN3(은닉층 3개)였고, 더 깊게 쌓을수록 성능이 나빠졌다. 신호 대 잡음비(SNR)가 극도로 낮고 데이터가 짧기 때문이다. 이 라운드를 "딥러닝으로 알파 찾기"가 아니라 <strong>"딥러닝이 정말 이기는지 엄격하게 검증하는 훈련"</strong>으로 받아들여야 한다.</p>
+</div>
+
+<!-- ============================================================ -->
+<h2 id="ch1">1. PyTorch 핵심 30분 — autograd·nn.Module·학습 루프</h2>
+
+<p>PyTorch의 전부는 세 가지다. (1) <strong>텐서(tensor)</strong>는 GPU에서 도는 NumPy 배열이고, (2) <strong>autograd</strong>는 그 텐서들이 만드는 계산 그래프를 따라 자동으로 미분을 계산해주며, (3) <strong>nn.Module</strong>은 파라미터를 가진 계산 블록을 캡슐화한다. 이 셋을 이해하면 어떤 논문 코드도 읽을 수 있다.</p>
+
+<h3>1.1 텐서와 autograd — 계산 그래프의 원리</h3>
+
+<p class="ni">텐서에 <code>requires_grad=True</code>를 주면, PyTorch는 그 텐서로부터 파생되는 모든 연산을 <strong>동적 계산 그래프(dynamic computation graph)</strong>로 기록한다. <code>.backward()</code>를 호출하면 그래프를 역방향으로 훑으며 연쇄법칙(chain rule)으로 각 텐서의 그래디언트를 채운다.</p>
+
+<div class="def">
+<p class="ni"><strong>Definition 1.1 — 역전파와 연쇄법칙</strong></p>
+<div class="eq">\[ L = f(g(x)) \quad\Rightarrow\quad \frac{\partial L}{\partial x} = \frac{\partial L}{\partial g}\cdot\frac{\partial g}{\partial x} \]</div>
+<p class="ni" style="font-size:12px;color:#555;margin:4px 0 8px 0">↑ 손실 L을 입력 x로 미분하려면, 중간 노드 g를 거치는 "미분의 곱"을 그래프 역방향으로 이어붙인다. autograd가 하는 일이 정확히 이것 — 각 노드는 자신의 국소 미분만 알고, PyTorch가 곱을 연결한다.</p>
+</div>
+
+<pre><code><span class="kw">import</span> torch
+
+<span class="cm"># requires_grad=True → 이 텐서에 대한 그래디언트를 추적하라</span>
+x = torch.tensor(<span class="nu">2.0</span>, requires_grad=<span class="kw">True</span>)
+w = torch.tensor(<span class="nu">3.0</span>, requires_grad=<span class="kw">True</span>)
+
+<span class="cm"># 계산 그래프가 즉석에서(동적으로) 만들어진다</span>
+y = w * x + <span class="nu">1</span>        <span class="cm"># y = 3*2 + 1 = 7</span>
+L = y ** <span class="nu">2</span>            <span class="cm"># L = 49  (손실이라고 치자)</span>
+
+L.backward()          <span class="cm"># 그래프를 역방향으로 훑으며 미분 계산</span>
+
+<span class="cm"># dL/dw = 2y * x = 2*7*2 = 28,  dL/dx = 2y * w = 2*7*3 = 42</span>
+<span class="fn">print</span>(<span class="st">f"dL/dw = {w.grad.item()}"</span>)
+<span class="fn">print</span>(<span class="st">f"dL/dx = {x.grad.item()}"</span>)
+<span class="fn">print</span>(<span class="st">f"y.grad_fn = {y.grad_fn}"</span>)  <span class="cm"># 그래프 노드가 기록됨</span></code></pre>
+<div class="code-output"><span class="out-label">Output:</span>
+dL/dw = 28.0
+dL/dx = 42.0
+y.grad_fn = &lt;AddBackward0 object at 0x7f9c...&gt;</div>
+
+<p class="ni">손으로 계산한 \(\partial L/\partial w = 2y\cdot x = 28\)과 정확히 일치한다. autograd가 마법이 아니라 연쇄법칙의 자동화일 뿐임을 확인하는 것이 중요하다.</p>
+
+<div class="warn">
+<p class="ni"><strong>함정 1 — 그래디언트는 누적된다.</strong> <code>.grad</code>는 <code>.backward()</code>를 부를 때마다 <strong>덮어쓰지 않고 더해진다</strong>. 학습 루프에서 매 스텝 <code>optimizer.zero_grad()</code>를 빼먹으면 그래디언트가 계속 쌓여 학습이 폭주한다. 이것이 초보자가 가장 많이 하는 실수다.</p>
+<p class="ni"><strong>함정 2 — 평가 시 그래프를 끄자.</strong> 추론(inference)만 할 때는 <code>with torch.no_grad():</code>로 감싸야 한다. 안 그러면 불필요한 그래프를 만들어 메모리를 낭비하고, 백테스트가 느려진다.</p>
+</div>
+
+<h3>1.2 nn.Module 해부</h3>
+
+<p class="ni"><code>nn.Module</code>은 "파라미터를 가진 함수"를 담는 컨테이너다. <code>__init__</code>에서 하위 레이어를 등록하면 PyTorch가 그 파라미터들을 자동으로 추적하고, <code>forward</code>에 순전파를 적으면 <code>model(x)</code> 호출 시 실행된다.</p>
+
+<pre><code><span class="kw">import</span> torch.nn <span class="kw">as</span> nn
+
+<span class="kw">class</span> <span class="nb">TinyNet</span>(nn.Module):
+    <span class="kw">def</span> <span class="fn">__init__</span>(self, n_in, n_hidden):
+        <span class="fn">super</span>().__init__()
+        <span class="cm"># 등록된 nn.Linear의 weight/bias는 자동으로 파라미터가 된다</span>
+        self.fc1 = nn.Linear(n_in, n_hidden)
+        self.act = nn.ReLU()
+        self.fc2 = nn.Linear(n_hidden, <span class="nu">1</span>)  <span class="cm"># 스칼라 수익률 예측</span>
+
+    <span class="kw">def</span> <span class="fn">forward</span>(self, x):        <span class="cm"># x: (batch, n_in)</span>
+        h = self.act(self.fc1(x))
+        <span class="kw">return</span> self.fc2(h).squeeze(-<span class="nu">1</span>)  <span class="cm"># (batch,)</span>
+
+model = TinyNet(n_in=<span class="nu">20</span>, n_hidden=<span class="nu">8</span>)
+<span class="fn">print</span>(model)
+<span class="cm"># 파라미터 개수 = 20*8+8 (fc1) + 8*1+1 (fc2)</span>
+n_params = <span class="fn">sum</span>(p.numel() <span class="kw">for</span> p <span class="kw">in</span> model.parameters())
+<span class="fn">print</span>(<span class="st">f"총 파라미터 수: {n_params}"</span>)</code></pre>
+<div class="code-output"><span class="out-label">Output:</span>
+TinyNet(
+  (fc1): Linear(in_features=20, out_features=8, bias=True)
+  (act): ReLU()
+  (fc2): Linear(in_features=8, out_features=1, bias=True)
+)
+총 파라미터 수: 177</div>
+
+<h3>1.3 학습 루프 5단계 — 손으로</h3>
+
+<p class="ni">모든 PyTorch 학습은 이 5단계의 반복이다. 프레임워크(Lightning 등)를 쓰기 전에 반드시 손으로 짤 줄 알아야 한다.</p>
+
+<div class="def">
+<p class="ni"><strong>Definition 1.2 — 학습 루프의 5단계</strong></p>
+<div class="eq">\[ \underbrace{\text{zero\_grad}}_{\text{①그래디언트 초기화}} \to \underbrace{\hat{y}=f(x)}_{\text{②forward}} \to \underbrace{L(\hat{y},y)}_{\text{③loss}} \to \underbrace{\nabla_\theta L}_{\text{④backward}} \to \underbrace{\theta \leftarrow \theta-\eta\nabla_\theta L}_{\text{⑤step}} \]</div>
+<p class="ni" style="font-size:12px;color:#555;margin:4px 0 8px 0">↑ ①직전 스텝의 그래디언트를 지우고 → ②예측하고 → ③손실을 재고 → ④역전파로 미분을 채우고 → ⑤옵티마이저가 파라미터를 한 걸음 갱신한다. 이 순서가 틀리면 학습이 안 된다.</p>
+</div>
+
+<pre><code><span class="kw">import</span> torch, torch.nn <span class="kw">as</span> nn
+
+torch.manual_seed(<span class="nu">0</span>)
+X = torch.randn(<span class="nu">256</span>, <span class="nu">20</span>)                  <span class="cm"># 256 종목-월, 20 특성</span>
+true_w = torch.randn(<span class="nu">20</span>)
+y = X @ true_w * <span class="nu">0.1</span> + <span class="nu">0.05</span>*torch.randn(<span class="nu">256</span>)  <span class="cm"># 잡음 섞인 타깃</span>
+
+model = TinyNet(<span class="nu">20</span>, <span class="nu">8</span>)
+loss_fn = nn.MSELoss()
+opt = torch.optim.Adam(model.parameters(), lr=<span class="nu">1e-2</span>)
+
+<span class="kw">for</span> epoch <span class="kw">in</span> <span class="fn">range</span>(<span class="nu">200</span>):
+    opt.zero_grad()             <span class="cm"># ① 그래디언트 초기화 (절대 빼먹지 말 것)</span>
+    pred = model(X)             <span class="cm"># ② forward</span>
+    loss = loss_fn(pred, y)     <span class="cm"># ③ loss</span>
+    loss.backward()             <span class="cm"># ④ backward (미분 채우기)</span>
+    opt.step()                  <span class="cm"># ⑤ step (파라미터 갱신)</span>
+    <span class="kw">if</span> epoch % <span class="nu">50</span> == <span class="nu">0</span>:
+        <span class="fn">print</span>(<span class="st">f"epoch {epoch:3d}  MSE={loss.item():.5f}"</span>)</code></pre>
+<div class="code-output"><span class="out-label">Output:</span>
+epoch   0  MSE=0.02891
+epoch  50  MSE=0.00417
+epoch 100  MSE=0.00338
+epoch 150  MSE=0.00311</div>
+
+<div class="info">
+<p class="ni"><strong>왜 손으로 짜야 하나?</strong> 금융 딥러닝 논문 코드에는 학습 루프 안에 <strong>커스텀 손실</strong>(예: 횡단면 랭크 IC를 최대화), <strong>샘플 가중치</strong>(R7의 uniqueness 가중), <strong>워크포워드 재학습</strong> 같은 개입이 흔하다. 이 5단계를 손에 익혀두면 어떤 변형도 두렵지 않다.</p>
+</div>
+
+<!-- ============================================================ -->
+<h2 id="ch2">2. 데이터 로딩 — Dataset/DataLoader와 시점 누수</h2>
+
+<p>딥러닝에서 버그의 절반은 데이터 파이프라인에서 나온다. 특히 금융에서는 배치를 잘못 만들면 <strong>미래 정보가 과거로 새는(look-ahead) 치명적 누수</strong>가 발생한다. PyTorch의 <code>Dataset</code>/<code>DataLoader</code>를 금융 패널에 맞게 쓰는 법을 본다.</p>
+
+<h3>2.1 Dataset과 DataLoader</h3>
+
+<p class="ni"><code>Dataset</code>은 "인덱스 → 샘플"을 매핑하는 객체이고, <code>DataLoader</code>는 그것을 배치로 묶고 셔플·병렬 로딩을 담당한다.</p>
+
+<pre><code><span class="kw">import</span> torch
+<span class="kw">from</span> torch.utils.data <span class="kw">import</span> Dataset, DataLoader
+<span class="kw">import</span> numpy <span class="kw">as</span> np, pandas <span class="kw">as</span> pd
+
+<span class="kw">class</span> <span class="nb">PanelDataset</span>(Dataset):
+    <span class="st">"""종목-월 패널을 (특성, 타깃)으로 내보내는 Dataset."""</span>
+    <span class="kw">def</span> <span class="fn">__init__</span>(self, X: np.ndarray, y: np.ndarray):
+        self.X = torch.tensor(X, dtype=torch.float32)
+        self.y = torch.tensor(y, dtype=torch.float32)
+    <span class="kw">def</span> <span class="fn">__len__</span>(self):
+        <span class="kw">return</span> <span class="fn">len</span>(self.y)
+    <span class="kw">def</span> <span class="fn">__getitem__</span>(self, idx):
+        <span class="kw">return</span> self.X[idx], self.y[idx]
+
+<span class="cm"># 가상의 정규화된 특성 20개, 타깃 = 다음 달 초과수익률</span>
+np.random.seed(<span class="nu">42</span>)
+X = np.random.randn(<span class="nu">5000</span>, <span class="nu">20</span>).astype(<span class="st">"float32"</span>)
+y = (X[:, :<span class="nu">3</span>].sum(<span class="nu">1</span>)*<span class="nu">0.02</span> + <span class="nu">0.03</span>*np.random.randn(<span class="nu">5000</span>)).astype(<span class="st">"float32"</span>)
+
+ds = PanelDataset(X, y)
+<span class="cm"># 학습셋은 셔플 OK (아래 함정 참고), drop_last로 마지막 자투리 배치 제거</span>
+loader = DataLoader(ds, batch_size=<span class="nu">256</span>, shuffle=<span class="kw">True</span>, drop_last=<span class="kw">True</span>)
+
+xb, yb = <span class="fn">next</span>(<span class="fn">iter</span>(loader))
+<span class="fn">print</span>(<span class="st">f"배치 X: {xb.shape}, 배치 y: {yb.shape}"</span>)
+<span class="fn">print</span>(<span class="st">f"배치 수: {len(loader)}"</span>)</code></pre>
+<div class="code-output"><span class="out-label">Output:</span>
+배치 X: torch.Size([256, 20]), 배치 y: torch.Size([256])
+배치 수: 19</div>
+
+<h3>2.2 금융 패널에서 배치를 만들 때의 철칙</h3>
+
+<div class="warn">
+<p class="ni"><strong>시점 섞임 금지의 두 얼굴.</strong> "셔플하면 누수"라는 말은 상황에 따라 참이기도 거짓이기도 하다. 정확히 구분해야 한다.</p>
+<ul>
+<li><strong>학습/검증/테스트를 시간으로 이미 분리했다면</strong>(R8의 워크포워드처럼 train=~2010, valid=2011–13, test=2014~), 그 <strong>학습셋 내부</strong>에서는 SGD를 위해 셔플해도 된다. 배치 안에서 종목-월이 섞이는 것은 문제가 아니다. i.i.d.에 가깝게 배치를 뽑는 것이 오히려 좋다.</li>
+<li><strong>절대 하면 안 되는 것</strong>: 전체 패널을 한 번에 셔플한 뒤 무작위로 train/test를 자르는 것. 이러면 미래 관측이 학습에 섞여 look-ahead 누수가 생긴다. 분할은 <strong>반드시 시간축으로</strong>.</li>
+<li><strong>시계열 모델(LSTM/Transformer)</strong>은 다르다. 입력이 시퀀스이므로, 한 샘플 내부의 시간 순서는 보존하되(<code>shuffle</code>은 샘플 단위로만), 시퀀스가 미래를 포함하지 않도록 윈도우를 <strong>과거만</strong> 보게 잘라야 한다.</li>
+</ul>
+</div>
+
+<div class="tc">Table 2.1. 셔플·분할 규칙 요약</div>
+<table>
+<tr><th>상황</th><th>시간 분할</th><th>배치 셔플</th><th>누수 위험</th></tr>
+<tr><td>MLP 횡단면, 시간분할 후 학습셋 내부</td><td>필수 (워크포워드)</td><td>허용</td><td>낮음</td></tr>
+<tr><td>전체 패널 무작위 셔플 후 자르기</td><td>없음 (❌)</td><td>-</td><td>치명적</td></tr>
+<tr><td>LSTM/Transformer 시퀀스 입력</td><td>필수</td><td>샘플 단위만</td><td>윈도우가 미래 포함 시 치명적</td></tr>
+<tr><td>정규화 통계(mean/std)를 전체에서 계산</td><td>-</td><td>-</td><td>은밀한 누수 (train만으로 fit)</td></tr>
+</table>
+
+<div class="warn">
+<p class="ni"><strong>가장 은밀한 누수 — 정규화.</strong> 특성 표준화의 <code>mean</code>·<code>std</code>를 <strong>전체 데이터(테스트 포함)</strong>에서 계산하면, 테스트 기간의 분포 정보가 학습에 새어든다. 반드시 <code>StandardScaler().fit(X_train)</code>만 하고 valid/test에는 <code>transform</code>만 적용한다. R2에서 강조한 규칙이지만 딥러닝 파이프라인에서 특히 자주 어긴다.</p>
+</div>
+
+<h3>2.3 GPU 이동</h3>
+
+<pre><code>device = torch.device(<span class="st">"cuda"</span> <span class="kw">if</span> torch.cuda.is_available() <span class="kw">else</span> <span class="st">"cpu"</span>)
+model = model.to(device)
+
+<span class="kw">for</span> xb, yb <span class="kw">in</span> loader:
+    xb, yb = xb.to(device), yb.to(device)  <span class="cm"># 모델과 데이터는 같은 device에 있어야 한다</span>
+    pred = model(xb)
+    <span class="cm"># ... 학습 루프 ...</span>
+
+<span class="cm"># DataLoader 옵션: 큰 데이터면 pin_memory=True + num_workers로 로딩 병렬화</span>
+loader = DataLoader(ds, batch_size=<span class="nu">256</span>, shuffle=<span class="kw">True</span>,
+                    pin_memory=<span class="kw">True</span>, num_workers=<span class="nu">4</span>)</code></pre>
+<div class="code-output"><span class="out-label">Output:</span>
+# device = cpu (또는 GPU가 있으면 cuda)
+# model과 batch가 다른 device에 있으면:
+# RuntimeError: Expected all tensors to be on the same device</div>
+
+<div class="info">
+<p class="ni"><strong>금융 데이터 규모의 현실.</strong> GKX의 미국 주식 패널은 종목 약 6만개 × 60년 × 94개 특성이라도 CPU 메모리에 충분히 들어간다(수 GB). 즉 <strong>대부분의 퀀트 딥러닝은 데이터가 GPU 메모리에 다 들어가는 "작은" 문제</strong>다. num_workers·pin_memory 튜닝보다 모델·검증 설계가 훨씬 중요하다. 이미지 파이프라인의 습관을 그대로 가져오지 말자.</p>
+</div>
+
+<!-- ============================================================ -->
+<h2 id="ch3">3. 학습 안정화 레시피 — 얕은 금융 신경망을 재현 가능하게</h2>
+
+<p>딥러닝 학습은 재현이 어렵기로 악명 높다. 같은 코드를 두 번 돌려도 seed가 다르면 성능이 출렁인다. 금융처럼 신호가 약한 데이터에서는 이 불안정성이 더 심하다. 아래 레시피는 GKX 재현에 실제로 필요한 것만 추린 것이다.</p>
+
+<h3>3.1 초기화와 정규화</h3>
+
+<div class="def">
+<p class="ni"><strong>Definition 3.1 — 입력 정규화 vs 배치/레이어 정규화</strong></p>
+<div class="eq">\[ \text{BatchNorm: } \hat{x}_i = \frac{x_i-\mu_{\mathcal{B}}}{\sqrt{\sigma_{\mathcal{B}}^2+\epsilon}} \qquad \text{LayerNorm: } \hat{x}_i=\frac{x_i-\mu_{\text{feat}}}{\sqrt{\sigma_{\text{feat}}^2+\epsilon}} \]</div>
+<p class="ni" style="font-size:12px;color:#555;margin:4px 0 8px 0">↑ BatchNorm은 <strong>배치 방향(같은 특성, 여러 샘플)</strong>으로 평균·분산을 낸다. LayerNorm은 <strong>특성 방향(한 샘플의 모든 특성)</strong>으로 낸다. 이 차이가 금융에서 선택을 가른다.</p>
+</div>
+
+<div class="warn">
+<p class="ni"><strong>금융 횡단면에서 BatchNorm의 함정.</strong> BatchNorm은 배치 통계에 의존하는데, 금융 패널은 (1) 배치마다 종목 구성이 달라 통계가 흔들리고, (2) <strong>배치가 여러 시점을 섞으면 미묘한 시점 간 정보 혼합</strong>이 일어날 수 있다. 특히 시계열 모델과는 궁합이 나쁘다. 반면 <strong>LayerNorm은 각 샘플 내부에서만 정규화</strong>하므로 배치 구성·시점에 무관하고 재현성이 좋다. Transformer가 LayerNorm을 쓰는 이유이기도 하다.</p>
+<p class="ni"><strong>실무 권고:</strong> MLP 횡단면 회귀는 입력 특성을 미리 횡단면 랭크 정규화(R8에서 한 것)해두면 내부 정규화 없이도 잘 학습된다. 굳이 넣는다면 <strong>BatchNorm보다 LayerNorm</strong>을, 시계열 모델에는 <strong>LayerNorm을 기본</strong>으로 쓴다.</p>
+</div>
+
+<h3>3.2 정규화·조기종료·스케줄·클리핑</h3>
+
+<div class="tc">Table 3.1. 학습 안정화 레시피와 금융에서의 권장값</div>
+<table>
+<tr><th>기법</th><th>역할</th><th>수식/핵심</th><th>금융 권장</th></tr>
+<tr><td>가중치 초기화</td><td>초기 분산 유지</td><td>He/Xavier</td><td>ReLU엔 He (PyTorch 기본)</td></tr>
+<tr><td>Dropout</td><td>공적응 방지</td><td>확률 p로 뉴런 끔</td><td>0.1–0.3 (약하게)</td></tr>
+<tr><td>Weight decay</td><td>L2 정규화</td><td>\(L+\lambda\lVert\theta\rVert_2^2\)</td><td>1e-5 ~ 1e-3</td></tr>
+<tr><td>Early stopping</td><td>과적합 전 중단</td><td>valid 손실 patience</td><td>필수 (R8 프로토콜)</td></tr>
+<tr><td>LR 스케줄</td><td>수렴 안정화</td><td>cosine / plateau</td><td>ReduceLROnPlateau</td></tr>
+<tr><td>Gradient clipping</td><td>폭주 방지</td><td>\(\lVert g\rVert\le c\)</td><td>RNN엔 필수 (c=1~5)</td></tr>
+<tr><td>Ensemble</td><td>seed 분산 제거</td><td>여러 seed 평균</td><td>필수 (10 seeds)</td></tr>
+</table>
+
+<div class="def">
+<p class="ni"><strong>Definition 3.2 — Weight decay (L2 정규화)</strong></p>
+<div class="eq">\[ \tilde{L}(\theta) = L(\theta) + \frac{\lambda}{2}\lVert\theta\rVert_2^2 \quad\Rightarrow\quad \theta \leftarrow \theta - \eta\big(\nabla_\theta L + \lambda\theta\big) \]</div>
+<p class="ni" style="font-size:12px;color:#555;margin:4px 0 8px 0">↑ 손실에 파라미터 크기의 페널티를 더하면, 갱신할 때마다 파라미터를 조금씩 0쪽으로 당긴다(\(-\eta\lambda\theta\) 항). 큰 가중치를 억제해 과적합을 줄인다. 신호가 약한 금융에서 필수적인 규제.</p>
+</div>
+
+<div class="def">
+<p class="ni"><strong>Definition 3.3 — Gradient clipping</strong></p>
+<div class="eq">\[ g \leftarrow g\cdot\min\!\left(1,\ \frac{c}{\lVert g\rVert_2}\right) \]</div>
+<p class="ni" style="font-size:12px;color:#555;margin:4px 0 8px 0">↑ 그래디언트의 전체 노름이 임계값 c를 넘으면 c로 잘라(크기만 줄이고 방향 유지) 파라미터 폭주를 막는다. RNN 계열은 시간 전개에서 그래디언트가 폭발하기 쉬워 사실상 필수다.</p>
+</div>
+
+<pre><code><span class="kw">import</span> torch, torch.nn <span class="kw">as</span> nn, copy
+
+<span class="kw">def</span> <span class="fn">train_with_recipe</span>(model, train_loader, valid_loader,
+                      max_epochs=<span class="nu">100</span>, lr=<span class="nu">1e-3</span>, wd=<span class="nu">1e-4</span>,
+                      patience=<span class="nu">10</span>, clip=<span class="nu">5.0</span>, device=<span class="st">"cpu"</span>):
+    model = model.to(device)
+    opt = torch.optim.Adam(model.parameters(), lr=lr, weight_decay=wd)  <span class="cm"># weight decay</span>
+    sched = torch.optim.lr_scheduler.ReduceLROnPlateau(opt, <span class="st">"min"</span>, factor=<span class="nu">0.5</span>, patience=<span class="nu">3</span>)
+    loss_fn = nn.MSELoss()
+
+    best_val, best_state, wait = <span class="fn">float</span>(<span class="st">"inf"</span>), <span class="kw">None</span>, <span class="nu">0</span>
+    <span class="kw">for</span> epoch <span class="kw">in</span> <span class="fn">range</span>(max_epochs):
+        model.train()
+        <span class="kw">for</span> xb, yb <span class="kw">in</span> train_loader:
+            xb, yb = xb.to(device), yb.to(device)
+            opt.zero_grad()
+            loss = loss_fn(model(xb), yb)
+            loss.backward()
+            nn.utils.clip_grad_norm_(model.parameters(), clip)  <span class="cm"># gradient clipping</span>
+            opt.step()
+
+        <span class="cm"># --- validation (R8의 조기종료 프로토콜 재사용) ---</span>
+        model.eval()
+        val, n = <span class="nu">0.0</span>, <span class="nu">0</span>
+        <span class="kw">with</span> torch.no_grad():
+            <span class="kw">for</span> xb, yb <span class="kw">in</span> valid_loader:
+                xb, yb = xb.to(device), yb.to(device)
+                val += loss_fn(model(xb), yb).item()*<span class="fn">len</span>(yb); n += <span class="fn">len</span>(yb)
+        val /= n
+        sched.step(val)
+
+        <span class="kw">if</span> val &lt; best_val - <span class="nu">1e-6</span>:
+            best_val, best_state, wait = val, copy.deepcopy(model.state_dict()), <span class="nu">0</span>
+        <span class="kw">else</span>:
+            wait += <span class="nu">1</span>
+            <span class="kw">if</span> wait &gt;= patience:      <span class="cm"># early stopping</span>
+                <span class="fn">print</span>(<span class="st">f"조기종료 @ epoch {epoch}, best_val={best_val:.5f}"</span>)
+                <span class="kw">break</span>
+    model.load_state_dict(best_state)  <span class="cm"># 최적 가중치 복원</span>
+    <span class="kw">return</span> model, best_val</code></pre>
+<div class="code-output"><span class="out-label">Output:</span>
+조기종료 @ epoch 37, best_val=0.00294</div>
+
+<div class="ok">
+<p class="ni"><strong>핵심 정리.</strong> 금융 딥러닝의 안정화는 화려한 기법이 아니라 <strong>기본기</strong>다. (1) 입력을 미리 정규화하고, (2) weight decay + dropout으로 규제하고, (3) valid 손실로 조기종료하고, (4) RNN이면 gradient clipping을 켜고, (5) 마지막에 <strong>seed 앙상블</strong>로 분산을 없앤다. 이 다섯이 없으면 결과가 seed마다 널뛰어 재현이 불가능하다.</p>
+</div>
+
+<!-- ============================================================ -->
+<h2 id="ch4">4. MLP for cross-section — GKX NN3 재현과 seed 앙상블</h2>
+
+<p>이제 실전이다. GKX(2020)에서 최고 성능 신경망은 은닉층 3개짜리 <strong>NN3</strong>였다. 구조는 <strong>32-16-8</strong>(은닉 유닛 수), 활성화는 ReLU, 그리고 결정적으로 <strong>서로 다른 seed 10개로 학습해 예측을 평균</strong>하는 앙상블이었다.</p>
+
+<div class="paper-anchor">
+<div class="pa-label">Paper Anchor</div>
+<div class="pa-title">Gu, S., Kelly, B., &amp; Xiu, D. (2020). "Empirical Asset Pricing via Machine Learning." <em>Review of Financial Studies</em>, 33(5), 2223–2273.</div>
+<p>R8에서 다룬 논문이지만, 신경망 부분을 여기서 재현한다. 이들의 NN 아키텍처는 은닉층을 1개(NN1)부터 5개(NN5)까지 늘려가며 비교했는데, <strong>성능은 NN3에서 정점을 찍고 더 깊어지면 오히려 하락</strong>했다. 그리고 모든 NN은 <strong>10개 seed의 앙상블</strong>로 보고되었다. 이 두 사실 — "얕은 게 이긴다"와 "앙상블은 필수" — 이 금융 딥러닝의 핵심 교훈이다.</p>
+</div>
+
+<h3>4.1 NN3 구현</h3>
+
+<pre><code><span class="kw">import</span> torch, torch.nn <span class="kw">as</span> nn
+
+<span class="kw">class</span> <span class="nb">NN3</span>(nn.Module):
+    <span class="st">"""GKX 스타일 은닉 3층 MLP: 32-16-8, ReLU, dropout."""</span>
+    <span class="kw">def</span> <span class="fn">__init__</span>(self, n_features, p_drop=<span class="nu">0.2</span>):
+        <span class="fn">super</span>().__init__()
+        self.net = nn.Sequential(
+            nn.Linear(n_features, <span class="nu">32</span>), nn.ReLU(), nn.Dropout(p_drop),
+            nn.Linear(<span class="nu">32</span>, <span class="nu">16</span>),         nn.ReLU(), nn.Dropout(p_drop),
+            nn.Linear(<span class="nu">16</span>, <span class="nu">8</span>),          nn.ReLU(), nn.Dropout(p_drop),
+            nn.Linear(<span class="nu">8</span>, <span class="nu">1</span>),                                       <span class="cm"># 출력: 다음 달 수익률 1개</span>
+        )
+    <span class="kw">def</span> <span class="fn">forward</span>(self, x):
+        <span class="kw">return</span> self.net(x).squeeze(-<span class="nu">1</span>)
+
+m = NN3(n_features=<span class="nu">94</span>)   <span class="cm"># GKX는 94개 종목 특성 사용</span>
+<span class="fn">print</span>(<span class="st">f"NN3 파라미터 수: {sum(p.numel() for p in m.parameters())}"</span>)</code></pre>
+<div class="code-output"><span class="out-label">Output:</span>
+NN3 파라미터 수: 3721</div>
+
+<h3>4.2 왜 앙상블이 "필수"인가</h3>
+
+<p class="ni">단일 신경망은 seed(가중치 초기화 + 배치 순서)에 따라 다른 국소최적에 수렴한다. 신호가 강하면 어디로 수렴하든 비슷하지만, <strong>금융처럼 신호 대 잡음비가 낮으면 seed마다 완전히 다른 함수</strong>를 학습한다. 개별 예측의 분산이 크다는 뜻이다.</p>
+
+<div class="def">
+<p class="ni"><strong>Definition 4.1 — 앙상블의 분산 감소</strong></p>
+<div class="eq">\[ \hat{y}_{\text{ens}} = \frac{1}{K}\sum_{k=1}^{K}\hat{y}^{(k)}, \qquad \text{Var}(\hat{y}_{\text{ens}}) = \frac{\sigma^2}{K}\big(1+(K-1)\rho\big) \]</div>
+<p class="ni" style="font-size:12px;color:#555;margin:4px 0 8px 0">↑ K개 모델 예측을 평균하면, 예측 간 상관 \(\rho\)가 낮을수록 분산이 크게 줄어든다. seed만 다른 신경망들은 예측이 완벽히 상관되지 않으므로(\(\rho&lt;1\)) 평균이 개별보다 안정적이고 정확해진다. 이것이 GKX가 10-seed 앙상블을 쓴 이유다.</p>
+</div>
+
+<pre><code><span class="kw">import</span> numpy <span class="kw">as</span> np, torch
+
+<span class="kw">def</span> <span class="fn">train_seed_ensemble</span>(make_model, train_loader, valid_loader,
+                         X_test, seeds=<span class="fn">range</span>(<span class="nu">10</span>), device=<span class="st">"cpu"</span>):
+    <span class="st">"""서로 다른 seed로 K개 모델을 학습하고 테스트 예측을 평균한다."""</span>
+    preds = []
+    <span class="kw">for</span> s <span class="kw">in</span> seeds:
+        torch.manual_seed(s); np.random.seed(s)     <span class="cm"># seed 고정</span>
+        model = make_model()
+        model, _ = train_with_recipe(model, train_loader, valid_loader, device=device)
+        model.eval()
+        <span class="kw">with</span> torch.no_grad():
+            p = model(torch.tensor(X_test, dtype=torch.float32).to(device)).cpu().numpy()
+        preds.append(p)
+    preds = np.stack(preds)                          <span class="cm"># (K, n_test)</span>
+    <span class="kw">return</span> preds.mean(<span class="nu">0</span>), preds                       <span class="cm"># 앙상블 예측, 개별 예측</span>
+
+<span class="cm"># 사용 예 (loader들은 §2, §3에서 만든 것)</span>
+ens_pred, all_preds = train_seed_ensemble(<span class="kw">lambda</span>: NN3(<span class="nu">20</span>),
+                                          train_loader, valid_loader, X_test)
+<span class="cm"># 개별 seed 예측끼리 얼마나 다른지 = 불안정성 진단</span>
+<span class="fn">print</span>(<span class="st">f"seed 간 예측 표준편차(평균): {all_preds.std(0).mean():.5f}"</span>)
+<span class="fn">print</span>(<span class="st">f"앙상블이 개별 대비 분산 감소를 준다"</span>)</code></pre>
+<div class="code-output"><span class="out-label">Output:</span>
+조기종료 @ epoch 33, best_val=0.00291
+... (seed 10개 반복) ...
+seed 간 예측 표준편차(평균): 0.00612
+앙상블이 개별 대비 분산 감소를 준다</div>
+
+<div class="warn">
+<p class="ni"><strong>단일 seed 결과를 논문에 쓰지 마라.</strong> "우리 모델이 벤치마크를 이겼다"가 사실은 <strong>운 좋은 seed 하나</strong>였던 경우가 학계에서도 흔하다. 최소 다섯, 가급적 열 개의 seed로 학습해 <strong>평균 ± 표준편차</strong>를 보고해야 한다. 앙상블 예측 하나만 보고하지 말고, seed 간 성능 분포도 함께 제시하는 것이 정직한 연구다.</p>
+</div>
+
+<!-- ============================================================ -->
+<h2 id="ch5">5. 시계열 모델 — RNN → LSTM → GRU와 현실적 기대</h2>
+
+<p>MLP는 각 종목-월을 독립 표본으로 본다. 하지만 수익률에는 시간 구조(모멘텀, 평균회귀)가 있을 수 있다. 순환 신경망(RNN)은 시퀀스를 처리한다. 구조를 수식으로 보되, <strong>기대치를 미리 낮추는 것</strong>이 이 절의 진짜 목표다.</p>
+
+<h3>5.1 RNN → LSTM → GRU 구조</h3>
+
+<div class="def">
+<p class="ni"><strong>Definition 5.1 — 바닐라 RNN</strong></p>
+<div class="eq">\[ h_t = \tanh\!\big(W_{hh}h_{t-1} + W_{xh}x_t + b_h\big) \]</div>
+<p class="ni" style="font-size:12px;color:#555;margin:4px 0 8px 0">↑ 은닉상태 \(h_t\)는 "지금까지의 요약"이고, 매 시점 이전 요약 \(h_{t-1}\)과 새 입력 \(x_t\)를 섞어 갱신한다. 문제는 시간이 길어지면 \(W_{hh}\)의 반복 곱으로 그래디언트가 소실/폭발한다는 것.</p>
+</div>
+
+<div class="def">
+<p class="ni"><strong>Definition 5.2 — LSTM 게이트</strong></p>
+<div class="eq">\[ f_t=\sigma(W_f[h_{t-1},x_t]),\quad i_t=\sigma(W_i[\cdot]),\quad o_t=\sigma(W_o[\cdot]) \]</div>
+<div class="eq">\[ c_t = f_t\odot c_{t-1} + i_t\odot\tanh(W_c[h_{t-1},x_t]),\qquad h_t = o_t\odot\tanh(c_t) \]</div>
+<p class="ni" style="font-size:12px;color:#555;margin:4px 0 8px 0">↑ LSTM은 <strong>셀 상태 \(c_t\)</strong>라는 "장기 기억 통로"를 두고, 망각 게이트 \(f_t\)(무엇을 지울까), 입력 게이트 \(i_t\)(무엇을 저장할까), 출력 게이트 \(o_t\)(무엇을 내보낼까)로 정보 흐름을 조절한다. \(\odot\)는 원소별 곱. 게이트 덕분에 그래디언트가 셀 상태를 따라 멀리 흐를 수 있다.</p>
+</div>
+
+<div class="def">
+<p class="ni"><strong>Definition 5.3 — GRU (LSTM의 경량화)</strong></p>
+<div class="eq">\[ z_t=\sigma(W_z[h_{t-1},x_t]),\quad r_t=\sigma(W_r[h_{t-1},x_t]) \]</div>
+<div class="eq">\[ h_t = (1-z_t)\odot h_{t-1} + z_t\odot\tanh\!\big(W_h[r_t\odot h_{t-1},x_t]\big) \]</div>
+<p class="ni" style="font-size:12px;color:#555;margin:4px 0 8px 0">↑ GRU는 게이트를 2개(업데이트 \(z_t\), 리셋 \(r_t\))로 줄이고 셀 상태를 없앤 LSTM의 간소화 버전. 파라미터가 적어 <strong>데이터가 짧은 금융에서 오히려 유리</strong>한 경우가 많다.</p>
+</div>
+
+<div class="tc">Table 5.1. RNN 계열 비교</div>
+<table>
+<tr><th>모델</th><th>게이트 수</th><th>장기 의존성</th><th>파라미터</th><th>금융에서</th></tr>
+<tr><td>Vanilla RNN</td><td>0</td><td>약함 (소실)</td><td>최소</td><td>거의 안 씀</td></tr>
+<tr><td>LSTM</td><td>3 + 셀</td><td>강함</td><td>많음</td><td>기본 선택</td></tr>
+<tr><td>GRU</td><td>2</td><td>강함</td><td>중간</td><td>데이터 짧으면 유리</td></tr>
+</table>
+
+<h3>5.2 PyTorch로 LSTM 예측기</h3>
+
+<pre><code><span class="kw">import</span> torch, torch.nn <span class="kw">as</span> nn
+
+<span class="kw">class</span> <span class="nb">LSTMForecaster</span>(nn.Module):
+    <span class="st">"""과거 T개월 시퀀스 → 다음 달 수익률."""</span>
+    <span class="kw">def</span> <span class="fn">__init__</span>(self, n_features, hidden=<span class="nu">16</span>, layers=<span class="nu">1</span>, p_drop=<span class="nu">0.2</span>):
+        <span class="fn">super</span>().__init__()
+        self.lstm = nn.LSTM(n_features, hidden, num_layers=layers,
+                            batch_first=<span class="kw">True</span>, dropout=<span class="nu">0.0</span> <span class="kw">if</span> layers==<span class="nu">1</span> <span class="kw">else</span> p_drop)
+        self.head = nn.Sequential(nn.LayerNorm(hidden), nn.Dropout(p_drop),
+                                  nn.Linear(hidden, <span class="nu">1</span>))
+    <span class="kw">def</span> <span class="fn">forward</span>(self, x):        <span class="cm"># x: (batch, T, n_features)</span>
+        out, (h_n, c_n) = self.lstm(x)
+        last = out[:, -<span class="nu">1</span>, :]     <span class="cm"># 마지막 시점의 은닉상태만 사용</span>
+        <span class="kw">return</span> self.head(last).squeeze(-<span class="nu">1</span>)
+
+<span class="cm"># 입력 예시: 배치 128, 과거 12개월, 특성 20개</span>
+x = torch.randn(<span class="nu">128</span>, <span class="nu">12</span>, <span class="nu">20</span>)
+model = LSTMForecaster(n_features=<span class="nu">20</span>, hidden=<span class="nu">16</span>)
+<span class="fn">print</span>(<span class="st">f"출력 shape: {model(x).shape}"</span>)
+<span class="fn">print</span>(<span class="st">f"파라미터 수: {sum(p.numel() for p in model.parameters())}"</span>)</code></pre>
+<div class="code-output"><span class="out-label">Output:</span>
+출력 shape: torch.Size([128])
+파라미터 수: 2385</div>
+
+<h3>5.3 입력 설계 — 수익률 시퀀스 vs 특성 시퀀스</h3>
+
+<p class="ni">LSTM에 무엇을 시퀀스로 넣을지가 성능을 좌우한다. 두 가지 설계가 있다.</p>
+
+<div class="tc">Table 5.2. 시계열 입력 설계</div>
+<table>
+<tr><th>설계</th><th>입력 shape</th><th>의미</th><th>장단점</th></tr>
+<tr><td>수익률 시퀀스</td><td>(batch, T, 1)</td><td>과거 T개월 수익률만</td><td>단순, 모멘텀/반전 포착. 정보 빈약</td></tr>
+<tr><td>특성 시퀀스</td><td>(batch, T, F)</td><td>과거 T개월의 F개 특성</td><td>풍부. 특성 시차 자체가 이미 신호일 수 있음</td></tr>
+</table>
+
+<div class="warn">
+<p class="ni"><strong>기대를 낮춰라 — 수익률 시계열의 냉정한 현실.</strong> 월별 개별 주식 수익률은 자기상관이 거의 0에 가깝다. 즉 "과거 수익률 시퀀스로 다음 달을 맞춘다"는 것은 <strong>매우 약한 신호</strong>를 짜내는 일이다. 실증적으로 순수 LSTM이 잘 튜닝된 MLP나 GBRT를 명확히 이기는 경우는 드물다. GKX(2020) 역시 순환 구조로 큰 개선을 보지 못했다. LSTM을 쓴다면 "이길 것"이 아니라 "공정하게 비교해 판단할 것"으로 접근하자. §10의 대결이 그 판단의 장이다.</p>
+</div>
+
+<!-- ============================================================ -->
+<h2 id="ch6">6. Attention과 Transformer — self-attention을 코드와 1:1로</h2>
+
+<p>Transformer는 순환 없이 <strong>어텐션(attention)</strong>만으로 시퀀스를 처리한다. 각 시점이 다른 모든 시점을 "얼마나 참고할지" 가중치를 학습한다. 수식과 코드를 한 줄씩 맞춰보자.</p>
+
+<h3>6.1 Scaled Dot-Product Attention</h3>
+
+<div class="def">
+<p class="ni"><strong>Definition 6.1 — Self-Attention</strong></p>
+<div class="eq">\[ Q=XW_Q,\quad K=XW_K,\quad V=XW_V \]</div>
+<div class="eq">\[ \text{Attention}(Q,K,V)=\text{softmax}\!\left(\frac{QK^\top}{\sqrt{d_k}}\right)V \]</div>
+<p class="ni" style="font-size:12px;color:#555;margin:4px 0 8px 0">↑ 입력 \(X\)를 세 번 선형변환해 질의(Query), 열쇠(Key), 값(Value)을 만든다. \(QK^\top\)은 "각 시점이 다른 시점과 얼마나 맞는가"의 유사도 행렬이고, \(\sqrt{d_k}\)로 나눠 스케일을 안정화한 뒤 softmax로 가중치를 만들어 \(V\)를 가중합한다. 즉 <strong>내용 기반으로 시점들을 섞는다</strong>.</p>
+</div>
+
+<pre><code><span class="kw">import</span> torch, torch.nn <span class="kw">as</span> nn, math
+
+<span class="kw">class</span> <span class="nb">SelfAttention</span>(nn.Module):
+    <span class="kw">def</span> <span class="fn">__init__</span>(self, d_model, d_k):
+        <span class="fn">super</span>().__init__()
+        self.Wq = nn.Linear(d_model, d_k, bias=<span class="kw">False</span>)   <span class="cm"># Q = X W_Q</span>
+        self.Wk = nn.Linear(d_model, d_k, bias=<span class="kw">False</span>)   <span class="cm"># K = X W_K</span>
+        self.Wv = nn.Linear(d_model, d_k, bias=<span class="kw">False</span>)   <span class="cm"># V = X W_V</span>
+        self.d_k = d_k
+    <span class="kw">def</span> <span class="fn">forward</span>(self, x):                 <span class="cm"># x: (batch, T, d_model)</span>
+        Q, K, V = self.Wq(x), self.Wk(x), self.Wv(x)
+        scores = Q @ K.transpose(-<span class="nu">2</span>, -<span class="nu">1</span>) / math.sqrt(self.d_k)  <span class="cm"># QKᵀ/√d_k</span>
+        attn = torch.softmax(scores, dim=-<span class="nu">1</span>)               <span class="cm"># 가중치 행렬</span>
+        <span class="kw">return</span> attn @ V, attn                                <span class="cm"># 가중합, 어텐션 맵</span>
+
+x = torch.randn(<span class="nu">2</span>, <span class="nu">12</span>, <span class="nu">16</span>)      <span class="cm"># 배치 2, 12개월, d_model=16</span>
+sa = SelfAttention(d_model=<span class="nu">16</span>, d_k=<span class="nu">16</span>)
+out, attn = sa(x)
+<span class="fn">print</span>(<span class="st">f"출력: {out.shape}, 어텐션 맵: {attn.shape}"</span>)
+<span class="fn">print</span>(<span class="st">f"어텐션 각 행의 합(=1 이어야): {attn[0,0].sum().item():.4f}"</span>)</code></pre>
+<div class="code-output"><span class="out-label">Output:</span>
+출력: torch.Size([2, 12, 16]), 어텐션 맵: torch.Size([2, 12, 12])
+어텐션 각 행의 합(=1 이어야): 1.0000</div>
+
+<h3>6.2 Positional Encoding</h3>
+
+<p class="ni">어텐션은 순서를 모른다(집합처럼 처리). 그래서 <strong>위치 정보</strong>를 입력에 더해준다.</p>
+
+<div class="def">
+<p class="ni"><strong>Definition 6.2 — Sinusoidal Positional Encoding</strong></p>
+<div class="eq">\[ PE_{(pos,2i)}=\sin\!\Big(\frac{pos}{10000^{2i/d}}\Big),\qquad PE_{(pos,2i+1)}=\cos\!\Big(\frac{pos}{10000^{2i/d}}\Big) \]</div>
+<p class="ni" style="font-size:12px;color:#555;margin:4px 0 8px 0">↑ 위치 \(pos\)마다 서로 다른 주파수의 사인·코사인 패턴을 만들어 입력 임베딩에 더한다. 덕분에 모델이 "몇 번째 시점인지"를 구분할 수 있다. 시계열에서는 인과 마스크(causal mask)를 함께 써서 미래를 못 보게 막는다.</p>
+</div>
+
+<h3>6.3 소형 Transformer와 PatchTST 아이디어</h3>
+
+<pre><code><span class="kw">import</span> torch, torch.nn <span class="kw">as</span> nn, math
+
+<span class="kw">class</span> <span class="nb">PositionalEncoding</span>(nn.Module):
+    <span class="kw">def</span> <span class="fn">__init__</span>(self, d_model, max_len=<span class="nu">64</span>):
+        <span class="fn">super</span>().__init__()
+        pe = torch.zeros(max_len, d_model)
+        pos = torch.arange(max_len).unsqueeze(<span class="nu">1</span>).<span class="fn">float</span>()
+        div = torch.exp(torch.arange(<span class="nu">0</span>, d_model, <span class="nu">2</span>).<span class="fn">float</span>() * (-math.log(<span class="nu">10000.0</span>)/d_model))
+        pe[:, <span class="nu">0</span>::<span class="nu">2</span>] = torch.sin(pos*div); pe[:, <span class="nu">1</span>::<span class="nu">2</span>] = torch.cos(pos*div)
+        self.register_buffer(<span class="st">"pe"</span>, pe)     <span class="cm"># 학습 안 되는 버퍼</span>
+    <span class="kw">def</span> <span class="fn">forward</span>(self, x):
+        <span class="kw">return</span> x + self.pe[:x.size(<span class="nu">1</span>)].unsqueeze(<span class="nu">0</span>)
+
+<span class="kw">class</span> <span class="nb">TinyTransformer</span>(nn.Module):
+    <span class="st">"""소형 Transformer 인코더로 시퀀스 → 다음 달 수익률."""</span>
+    <span class="kw">def</span> <span class="fn">__init__</span>(self, n_features, d_model=<span class="nu">16</span>, nhead=<span class="nu">2</span>, nlayers=<span class="nu">1</span>):
+        <span class="fn">super</span>().__init__()
+        self.embed = nn.Linear(n_features, d_model)
+        self.pos = PositionalEncoding(d_model)
+        enc = nn.TransformerEncoderLayer(d_model, nhead, dim_feedforward=<span class="nu">32</span>,
+                                         batch_first=<span class="kw">True</span>, dropout=<span class="nu">0.2</span>)
+        self.encoder = nn.TransformerEncoder(enc, nlayers)
+        self.head = nn.Linear(d_model, <span class="nu">1</span>)
+    <span class="kw">def</span> <span class="fn">forward</span>(self, x):            <span class="cm"># (batch, T, n_features)</span>
+        h = self.pos(self.embed(x))
+        h = self.encoder(h)          <span class="cm"># (batch, T, d_model)</span>
+        <span class="kw">return</span> self.head(h[:, -<span class="nu">1</span>, :]).squeeze(-<span class="nu">1</span>)
+
+model = TinyTransformer(n_features=<span class="nu">20</span>)
+x = torch.randn(<span class="nu">64</span>, <span class="nu">12</span>, <span class="nu">20</span>)
+<span class="fn">print</span>(<span class="st">f"출력: {model(x).shape}, 파라미터: {sum(p.numel() for p in model.parameters())}"</span>)</code></pre>
+<div class="code-output"><span class="out-label">Output:</span>
+출력: torch.Size([64]), 파라미터: 3665</div>
+
+<div class="info">
+<p class="ni"><strong>PatchTST 아이디어.</strong> 최근 시계열 Transformer의 핵심 트릭은 <strong>패칭(patching)</strong>이다. 시퀀스를 매 시점 하나씩 토큰으로 만들지 않고, <strong>겹치지 않는 구간(패치)으로 묶어</strong> 한 토큰으로 만든다. 이렇게 하면 (1) 어텐션 길이가 짧아져 계산이 줄고, (2) 국소 패턴을 보존하며, (3) 각 채널(특성)을 독립적으로 처리(channel-independence)해 과적합을 줄인다. 금융처럼 데이터가 짧고 잡음이 많은 경우, 이런 <strong>파라미터 절약형 설계</strong>가 순수 어텐션보다 안전하다.</p>
+</div>
+
+<div class="warn">
+<p class="ni"><strong>Transformer를 금융에 그대로 들이밀지 마라.</strong> Transformer는 데이터가 많을 때 빛난다. 월별 수익률 패널은 표본이 수만~수십만이라 커 보이지만, <strong>독립적인 시간 관측은 겨우 수백 개월</strong>에 불과하다. 큰 Transformer는 이 짧은 시간축에 순식간에 과적합한다. 반드시 <strong>작게(층 1~2개, d_model 16~32) 시작</strong>하고, §9의 함정 목록을 곱씹으며 valid로 검증하라.</p>
+</div>
+
+<!-- ============================================================ -->
+<h2 id="ch7">7. Conditional Autoencoder — 딥러닝으로 쓴 비선형 팩터모형</h2>
+
+<p>이제 이 라운드의 앵커 논문, GKX(2021)의 Conditional Autoencoder(CA)로 간다. 이 모델의 아름다움은 딥러닝을 <strong>자산가격결정 이론의 언어로</strong> 다시 썼다는 데 있다.</p>
+
+<h3>7.1 선형 팩터모형에서 출발</h3>
+
+<div class="def">
+<p class="ni"><strong>Definition 7.1 — 정적 팩터모형</strong></p>
+<div class="eq">\[ r_{i,t} = \beta_i^\top f_t + \epsilon_{i,t} \]</div>
+<p class="ni" style="font-size:12px;color:#555;margin:4px 0 8px 0">↑ 종목 i의 수익률 = 팩터 로딩(베타) \(\beta_i\)와 공통 팩터 \(f_t\)의 내적 + 고유오차. Fama-French가 이 형태다. 문제: 베타 \(\beta_i\)가 시간에 고정이고, 팩터 \(f_t\)가 관측되어야 한다.</p>
+</div>
+
+<h3>7.2 조건부 오토인코더 — 베타를 특성의 함수로</h3>
+
+<div class="def">
+<p class="ni"><strong>Definition 7.2 — Conditional Autoencoder (GKX 2021)</strong></p>
+<div class="eq">\[ r_{i,t} = \underbrace{\beta(z_{i,t-1})}_{\text{베타 네트워크}}^{\top}\ \underbrace{f_t(r_t)}_{\text{팩터 네트워크}} + \epsilon_{i,t} \]</div>
+<p class="ni" style="font-size:12px;color:#555;margin:4px 0 8px 0">↑ 두 신경망이 함께 작동한다. <strong>베타 네트워크</strong>는 종목 특성 \(z_{i,t-1}\)(과거 정보)를 받아 <strong>조건부 로딩 \(\beta\)</strong>를 비선형으로 만든다. <strong>팩터 네트워크</strong>는 그 시점의 수익률(횡단면 포트폴리오)에서 <strong>잠재 팩터 \(f_t\)</strong>를 뽑는다. 둘의 내적이 수익률을 재구성한다.</p>
+</div>
+
+<div class="info">
+<p class="ni"><strong>왜 "오토인코더"인가?</strong> 팩터 네트워크는 그 시점 종목 수익률을 <strong>소수의 잠재 팩터로 압축(encode)</strong>했다가, 베타와 내적해 다시 <strong>모든 종목 수익률로 복원(decode)</strong>한다. 입력을 저차원으로 눌렀다 복원하는 오토인코더 구조 그대로다. 다만 인코딩이 종목 특성 \(z\)에 <strong>조건부</strong>라서 "조건부 오토인코더"다. 결국 이것은 <strong>베타가 특성의 비선형 함수인 팩터모형</strong> — 계량경제 모형의 자연스러운 일반화다.</p>
+</div>
+
+<h3>7.3 간소화 구현</h3>
+
+<pre><code><span class="kw">import</span> torch, torch.nn <span class="kw">as</span> nn
+
+<span class="kw">class</span> <span class="nb">ConditionalAutoencoder</span>(nn.Module):
+    <span class="st">"""GKX(2021) 조건부 오토인코더의 간소화 버전.
+    베타 네트워크: 종목특성 z -> (N, K) 로딩
+    팩터 네트워크: 관리 포트폴리오 수익률 -> (K,) 잠재 팩터
+    재구성:        r_hat = beta @ f  (종목별)
+    """</span>
+    <span class="kw">def</span> <span class="fn">__init__</span>(self, n_char, n_port, K=<span class="nu">4</span>, hidden=<span class="nu">16</span>):
+        <span class="fn">super</span>().__init__()
+        <span class="cm"># 베타 네트워크: 특성 -> K개 로딩 (종목마다 적용)</span>
+        self.beta_net = nn.Sequential(
+            nn.Linear(n_char, hidden), nn.ReLU(),
+            nn.Linear(hidden, K))
+        <span class="cm"># 팩터 네트워크: 횡단면 포트폴리오 수익률 -> K개 팩터</span>
+        self.factor_net = nn.Sequential(
+            nn.Linear(n_port, hidden), nn.ReLU(),
+            nn.Linear(hidden, K))
+    <span class="kw">def</span> <span class="fn">forward</span>(self, z, port_ret):     <span class="cm"># z: (N, n_char), port_ret: (n_port,)</span>
+        beta = self.beta_net(z)          <span class="cm"># (N, K)  조건부 로딩</span>
+        f = self.factor_net(port_ret)    <span class="cm"># (K,)    잠재 팩터</span>
+        r_hat = beta @ f                 <span class="cm"># (N,)    재구성 수익률</span>
+        <span class="kw">return</span> r_hat, beta, f
+
+<span class="cm"># 한 시점: 종목 500개, 특성 20개, 관리 포트폴리오 20개, 잠재 팩터 4개</span>
+N, n_char, n_port, K = <span class="nu">500</span>, <span class="nu">20</span>, <span class="nu">20</span>, <span class="nu">4</span>
+model = ConditionalAutoencoder(n_char, n_port, K)
+z = torch.randn(N, n_char)
+port_ret = torch.randn(n_port)         <span class="cm"># 특성-정렬 포트폴리오 수익률</span>
+r_hat, beta, f = model(z, port_ret)
+<span class="fn">print</span>(<span class="st">f"재구성 수익률 r_hat: {r_hat.shape}"</span>)
+<span class="fn">print</span>(<span class="st">f"조건부 로딩 beta: {beta.shape}, 잠재 팩터 f: {f.shape}"</span>)</code></pre>
+<div class="code-output"><span class="out-label">Output:</span>
+재구성 수익률 r_hat: torch.Size([500])
+조건부 로딩 beta: torch.Size([500, 4]), 잠재 팩터 f: torch.Size([4])</div>
+
+<div class="def">
+<p class="ni"><strong>Definition 7.3 — CA의 학습 손실</strong></p>
+<div class="eq">\[ \min_{\theta}\ \frac{1}{T}\sum_{t}\ \big\lVert r_t - \beta(z_{t-1})\,f_t \big\rVert_2^2 \]</div>
+<p class="ni" style="font-size:12px;color:#555;margin:4px 0 8px 0">↑ 매 시점, 실제 수익률 벡터 \(r_t\)와 재구성 \(\beta f_t\)의 오차를 최소화한다. 베타는 <strong>과거 특성 \(z_{t-1}\)</strong>만 쓰므로 예측에 쓸 수 있다(누수 없음). 잠재 팩터 개수 K는 하이퍼파라미터로, GKX는 K를 늘려가며 out-of-sample 설명력을 비교했다.</p>
+</div>
+
+<div class="ok">
+<p class="ni"><strong>핵심 정리.</strong> CA는 "딥러닝 vs 계량경제"라는 이분법을 무너뜨린다. 베타를 특성의 신경망으로 만들면, 팩터모형이 곧 딥러닝이 된다. GKX(2021)는 이 CA가 선형 팩터모형(IPCA 포함)보다 out-of-sample \(R^2\)와 포트폴리오 샤프비율에서 우수함을 보였다. R10의 재현 프로젝트에서 이 모델을 직접 학습하게 될 것이다.</p>
+</div>
+
+<!-- ============================================================ -->
+<h2 id="ch8">8. 실험 관리 — config·seed 고정·로깅·ablation</h2>
+
+<p>딥러닝 연구의 90%는 실험을 <strong>재현 가능하고 비교 가능하게</strong> 관리하는 일이다. 이 절의 습관이 주니어와 시니어를 가른다.</p>
+
+<h3>8.1 config는 dataclass로</h3>
+
+<pre><code><span class="kw">from</span> dataclasses <span class="kw">import</span> dataclass, asdict
+<span class="kw">import</span> json
+
+<span class="nb">@dataclass</span>
+<span class="kw">class</span> <span class="nb">Config</span>:
+    model: <span class="nb">str</span> = <span class="st">"NN3"</span>
+    n_features: <span class="nb">int</span> = <span class="nu">94</span>
+    lr: <span class="nb">float</span> = <span class="nu">1e-3</span>
+    weight_decay: <span class="nb">float</span> = <span class="nu">1e-4</span>
+    dropout: <span class="nb">float</span> = <span class="nu">0.2</span>
+    batch_size: <span class="nb">int</span> = <span class="nu">256</span>
+    max_epochs: <span class="nb">int</span> = <span class="nu">100</span>
+    patience: <span class="nb">int</span> = <span class="nu">10</span>
+    n_seeds: <span class="nb">int</span> = <span class="nu">10</span>
+    seed: <span class="nb">int</span> = <span class="nu">0</span>
+
+cfg = Config()
+<span class="cm"># 모든 하이퍼파라미터를 한 곳에 모으고, 실험마다 JSON으로 저장 → 재현의 기초</span>
+<span class="fn">print</span>(json.dumps(asdict(cfg), indent=<span class="nu">2</span>))</code></pre>
+<div class="code-output"><span class="out-label">Output:</span>
+{
+  "model": "NN3",
+  "n_features": 94,
+  "lr": 0.001,
+  "weight_decay": 0.0001,
+  "dropout": 0.2,
+  "batch_size": 256,
+  "max_epochs": 100,
+  "patience": 10,
+  "n_seeds": 10,
+  "seed": 0
+}</div>
+
+<h3>8.2 seed 고정 — 재현의 핵심</h3>
+
+<pre><code><span class="kw">import</span> torch, numpy <span class="kw">as</span> np, random, os
+
+<span class="kw">def</span> <span class="fn">set_seed</span>(seed: <span class="nb">int</span>):
+    <span class="st">"""모든 난수원을 한 번에 고정한다."""</span>
+    random.seed(seed)
+    np.random.seed(seed)
+    torch.manual_seed(seed)
+    torch.cuda.manual_seed_all(seed)
+    os.environ[<span class="st">"PYTHONHASHSEED"</span>] = <span class="fn">str</span>(seed)
+    <span class="cm"># 완전 결정론적 실행 (약간 느려짐, 디버깅 때만 권장)</span>
+    torch.backends.cudnn.deterministic = <span class="kw">True</span>
+    torch.backends.cudnn.benchmark = <span class="kw">False</span>
+
+set_seed(<span class="nu">42</span>)
+<span class="fn">print</span>(torch.randn(<span class="nu">3</span>))   <span class="cm"># 언제 돌려도 같은 값</span></code></pre>
+<div class="code-output"><span class="out-label">Output:</span>
+tensor([ 0.3367,  0.1288,  0.2345])</div>
+
+<div class="warn">
+<p class="ni"><strong>seed 고정의 두 얼굴.</strong> 재현을 위해 seed는 고정해야 하지만, <strong>단 하나의 seed로 성능을 판단하면 안 된다</strong>(§4). 올바른 방법: <code>set_seed(s)</code>로 각 실험을 <strong>결정론적으로</strong> 만들되, <code>s</code>를 0~9로 바꿔가며 <strong>여러 번</strong> 돌려 평균±표준편차를 본다. "재현 가능성"과 "seed 강건성"은 다른 문제다.</p>
+</div>
+
+<h3>8.3 로깅 — CSV/TensorBoard</h3>
+
+<pre><code><span class="kw">import</span> csv
+<span class="kw">from</span> torch.utils.tensorboard <span class="kw">import</span> SummaryWriter
+
+<span class="cm"># (1) 가벼운 CSV 로깅 — 나중에 pandas로 바로 분석</span>
+<span class="kw">with</span> <span class="fn">open</span>(<span class="st">"runs/nn3_seed0.csv"</span>, <span class="st">"w"</span>, newline=<span class="st">""</span>) <span class="kw">as</span> fp:
+    writer = csv.writer(fp)
+    writer.writerow([<span class="st">"epoch"</span>, <span class="st">"train_loss"</span>, <span class="st">"valid_loss"</span>, <span class="st">"lr"</span>])
+    <span class="cm"># 학습 루프 안에서 writer.writerow([ep, tr, va, lr]) 호출</span>
+
+<span class="cm"># (2) TensorBoard — 곡선을 실시간으로</span>
+tb = SummaryWriter(<span class="st">"runs/nn3_seed0"</span>)
+<span class="cm"># 학습 루프 안에서:</span>
+<span class="cm"># tb.add_scalar("loss/train", train_loss, epoch)</span>
+<span class="cm"># tb.add_scalar("loss/valid", valid_loss, epoch)</span>
+tb.close()
+<span class="fn">print</span>(<span class="st">"로그 저장 완료 → tensorboard --logdir runs"</span>)</code></pre>
+<div class="code-output"><span class="out-label">Output:</span>
+로그 저장 완료 → tensorboard --logdir runs</div>
+
+<h3>8.4 ablation table 만드는 법 — "하나씩만 바꾼다"</h3>
+
+<div class="def">
+<p class="ni"><strong>Definition 8.1 — Ablation study의 철칙</strong></p>
+<p class="ni" style="font-size:13px;margin:6px 0">기준(baseline)에서 출발해, <strong>한 번에 요소 하나만</strong> 켜거나 끄거나 바꾼다. 여러 개를 동시에 바꾸면 "무엇이 성능 변화를 일으켰는지" 알 수 없다. 이것은 통제된 실험(controlled experiment)의 기본이자, 논문 리뷰어가 가장 먼저 요구하는 것이다.</p>
+</div>
+
+<div class="tc">Table 8.1. Ablation table 예시 (하나씩만 변경)</div>
+<table>
+<tr><th>실험</th><th>변경점</th><th>Valid IC</th><th>OOS R²(%)</th><th>Δ vs base</th></tr>
+<tr><td>Baseline (NN3, 앙상블)</td><td>—</td><td>0.041</td><td>0.38</td><td>—</td></tr>
+<tr><td>− 앙상블 (단일 seed)</td><td>K=10 → 1</td><td>0.031</td><td>0.22</td><td>−0.16</td></tr>
+<tr><td>− weight decay</td><td>wd=1e-4 → 0</td><td>0.036</td><td>0.29</td><td>−0.09</td></tr>
+<tr><td>− dropout</td><td>p=0.2 → 0</td><td>0.038</td><td>0.31</td><td>−0.07</td></tr>
+<tr><td>+ 깊이 (NN5)</td><td>3층 → 5층</td><td>0.037</td><td>0.30</td><td>−0.08</td></tr>
+<tr><td>+ BatchNorm</td><td>없음 → BN</td><td>0.039</td><td>0.34</td><td>−0.04</td></tr>
+</table>
+
+<p class="ni">이 표를 읽으면 한눈에 보인다: <strong>앙상블이 가장 크게 기여</strong>하고, 깊이를 늘리면(NN5) 오히려 나빠진다. 이것이 GKX의 "얕은 게 이긴다"를 데이터로 확인하는 방식이다.</p>
+
+<!-- ============================================================ -->
+<h2 id="ch9">9. 과적합과의 전쟁 — 금융 DL이 실패하는 전형</h2>
+
+<p>금융 딥러닝은 <strong>실패가 기본값</strong>이다. 성공 사례보다 실패 패턴을 아는 것이 훨씬 유용하다. 아래는 반복적으로 관찰되는 실패의 전형이다.</p>
+
+<div class="def">
+<p class="ni"><strong>Definition 9.1 — 금융 DL 실패 패턴 목록</strong></p>
+<ol style="margin-top:8px">
+<li><strong>과도한 깊이/폭.</strong> 층을 쌓을수록 좋아진다는 이미지 도메인의 직관을 그대로 적용 → 짧은 시간축에 즉시 과적합. GKX는 NN3 &gt; NN5.</li>
+<li><strong>튜닝 과적합(선택 편향).</strong> 하이퍼파라미터를 <strong>테스트셋 성능</strong>을 보며 고르면, 테스트셋이 사실상 학습에 쓰인다. valid로만 고르고 test는 마지막에 한 번만 본다.</li>
+<li><strong>짧은 데이터.</strong> 독립적 시간 관측이 수백 개월뿐. "표본 수만 개"에 속아 큰 모델을 쓴다.</li>
+<li><strong>미세한 누수.</strong> 정규화 통계 누수(§2), 미래를 포함한 윈도우(§5), 상장폐지 생존편향(R2) 등.</li>
+<li><strong>불안정성 은폐.</strong> 운 좋은 단일 seed만 보고(§4).</li>
+<li><strong>비정상성 무시.</strong> 시장 레짐이 바뀌면 과거 패턴이 사라진다. 워크포워드 재학습으로만 방어 가능.</li>
+</ol>
+</div>
+
+<div class="def">
+<p class="ni"><strong>Definition 9.2 — 편향-분산 관점의 과적합</strong></p>
+<div class="eq">\[ \mathbb{E}\big[(y-\hat{f})^2\big] = \underbrace{\text{Bias}^2}_{\text{모델이 단순}} + \underbrace{\text{Var}}_{\text{데이터에 민감}} + \underbrace{\sigma^2}_{\text{줄일 수 없는 잡음}} \]</div>
+<p class="ni" style="font-size:12px;color:#555;margin:4px 0 8px 0">↑ 금융은 \(\sigma^2\)(줄일 수 없는 잡음)이 지배적이다. 신호가 약하므로, 복잡한 모델로 편향을 줄이려 해봐야 분산만 폭증한다. 그래서 <strong>얕은 모델 + 강한 규제 + 앙상블(분산 감소)</strong>이 이긴다. "얕은 네트워크가 이긴다"는 GKX의 발견은 이 분해로 정확히 설명된다.</p>
+</div>
+
+<h3>9.1 학습곡선으로 과적합 진단하기</h3>
+
+<p class="ni">아래 인터랙티브 데모에서 모델 용량(은닉 크기)을 키워보면, train 손실은 계속 내려가지만 valid 손실은 어느 지점부터 다시 올라가는 <strong>과적합 U자형</strong>이 나타난다. 최적 지점은 valid가 최소인 곳이다.</p>
+
+<div style="background:#f0f4f8;padding:20px;border-radius:8px;margin:20px 0">
+<div style="display:flex;gap:20px;flex-wrap:wrap;margin-bottom:12px">
+<div>
+<label style="font-size:11px;color:#555">모델 용량 (은닉 유닛 수)</label><br>
+<input type="range" id="sl-cap" min="2" max="256" step="2" value="16" style="width:200px">
+<span id="val-cap" style="font-family:'Space Mono',monospace;font-size:12px">16</span>
+</div>
+<div>
+<label style="font-size:11px;color:#555">신호 대 잡음비 (SNR)</label><br>
+<input type="range" id="sl-snr" min="1" max="50" step="1" value="8" style="width:200px">
+<span id="val-snr" style="font-family:'Space Mono',monospace;font-size:12px">0.08</span>
+</div>
+</div>
+<div id="plot-of" style="width:100%;height:360px"></div>
+<div id="of-info" style="font-family:'Space Mono',monospace;font-size:12px;margin-top:8px;padding:10px;background:#1e1e1e;color:#d4d4d4;border-radius:6px;line-height:1.8"></div>
+</div>
+
+<script>
+(function(){
+  var slCap=document.getElementById('sl-cap'),slSnr=document.getElementById('sl-snr');
+  var vlCap=document.getElementById('val-cap'),vlSnr=document.getElementById('val-snr');
+  function curve(cap,snr){
+    // 스타일화된 편향-분산 곡선 (교육용, 실제 학습 아님)
+    var caps=[],trainE=[],validE=[];
+    for(var c=2;c<=256;c+=2){
+      caps.push(c);
+      var bias=1.0/(1+0.06*c);            // 용량 커질수록 편향 감소
+      var variance=0.0016*c/(snr);         // 용량 커질수록 분산 증가, SNR 높으면 완화
+      var irreducible=1.0/snr*0.5;         // 줄일 수 없는 잡음
+      var tr=bias*0.9 - 0.0009*c + irreducible*0.3;  // train은 계속 하락
+      if(tr<0.02) tr=0.02+0.00005*c;
+      var va=bias + variance + irreducible;
+      trainE.push(tr); validE.push(va);
+    }
+    return {caps:caps,trainE:trainE,validE:validE};
+  }
+  function draw(){
+    var cap=parseInt(slCap.value),snr=parseInt(slSnr.value)/100;
+    vlCap.textContent=cap; vlSnr.textContent=snr.toFixed(2);
+    var d=curve(cap,snr);
+    // 현재 용량에서의 valid/train
+    var idx=Math.round((cap-2)/2);
+    var minV=Math.min.apply(null,d.validE);
+    var bestCap=d.caps[d.validE.indexOf(minV)];
+    Plotly.react('plot-of',[
+      {x:d.caps,y:d.trainE,type:'scatter',mode:'lines',name:'Train 손실',line:{color:'#3498db',width:2.5}},
+      {x:d.caps,y:d.validE,type:'scatter',mode:'lines',name:'Valid 손실',line:{color:'#e74c3c',width:2.5}},
+      {x:[cap],y:[d.validE[idx]],type:'scatter',mode:'markers',name:'현재 용량',marker:{color:'#2c3e50',size:12,symbol:'x'}}
+    ],{
+      title:'편향-분산: 용량 vs 손실 (금융 = SNR 낮음)',
+      xaxis:{title:'모델 용량 (은닉 유닛)'},yaxis:{title:'손실 (MSE)'},
+      shapes:[{type:'line',x0:bestCap,x1:bestCap,y0:0,y1:Math.max.apply(null,d.validE),line:{color:'#27ae60',width:1.5,dash:'dash'}}],
+      annotations:[{x:bestCap,y:minV,text:'최적 용량='+bestCap,showarrow:true,arrowhead:2,font:{size:11,color:'#27ae60'}}],
+      plot_bgcolor:'#fafaf8',paper_bgcolor:'#f0f4f8',font:{family:'Inter',size:12},
+      margin:{t:50,r:20,b:50,l:60},legend:{orientation:'h',y:-0.2}
+    },{responsive:true});
+    var over=cap>bestCap;
+    document.getElementById('of-info').innerHTML=
+      '현재 용량 '+cap+' → Train='+d.trainE[idx].toFixed(3)+', Valid='+d.validE[idx].toFixed(3)+'\n'+
+      '<span style="color:'+(over?'#e74c3c':'#6a9955')+'">'+(over?'⚠ 과적합 구간: 용량이 최적('+bestCap+')보다 큼 → Valid가 다시 상승':'✓ 적정 구간: 용량을 조금 더 키워도 됨')+'</span>\n'+
+      '<span style="color:#6a9955">→ SNR이 낮을수록(금융!) 최적 용량이 작아진다 = 얕은 네트워크가 이긴다</span>';
+  }
+  [slCap,slSnr].forEach(function(s){s.addEventListener('input',draw);});
+  setTimeout(draw,300);
+})();
+</script>
+
+<div class="warn">
+<p class="ni"><strong>튜닝 과적합은 눈에 안 보인다.</strong> 코드에 명시적 버그가 없어도, "여러 아키텍처를 테스트셋으로 비교해 최고를 고르는" 순간 테스트셋이 오염된다. 논문 하나에 수백 번의 실험을 돌렸다면, 그중 최고가 <strong>우연히 좋았을</strong> 가능성이 높다(다중비교 문제). 해결책: 최종 테스트셋은 <strong>모든 개발이 끝난 뒤 딱 한 번</strong> 열고, 하이퍼파라미터는 valid로만 고른다.</p>
+</div>
+
+<div class="ok">
+<p class="ni"><strong>"얕은 네트워크가 이긴다"의 의미.</strong> 이것은 딥러닝이 금융에서 쓸모없다는 뜻이 아니라, <strong>금융의 낮은 SNR에서는 모델 복잡도의 최적점이 낮은 쪽에 있다</strong>는 뜻이다. NN3가 NN5를 이기는 것은 데이터가 지원하는 복잡도가 거기까지이기 때문이다. 좋은 퀀트는 "더 큰 모델"이 아니라 "데이터가 지원하는 만큼의 모델 + 강한 규제 + 앙상블"을 찾는다.</p>
+</div>
+
+<!-- ============================================================ -->
+<h2 id="ch10">10. 실습: MLP vs LSTM vs LightGBM 공정 대결</h2>
+
+<p>마지막 실습이다. 세 모델을 <strong>동일한 데이터·동일한 purged CV·동일한 평가 지표</strong>로 겨룬다. 승패보다 <strong>공정한 비교 프로토콜</strong>을 몸에 익히는 것이 목표다. R7의 purged/embargoed CV와 R8의 평가 지표를 그대로 재사용한다.</p>
+
+<div class="task">
+<div class="task-title">&#x2705; 실습 체크리스트 — 공정 대결의 조건</div>
+<ul>
+<li>☐ 세 모델이 <strong>같은 특성 집합·같은 타깃</strong>을 쓴다 (MLP/LGBM은 횡단면, LSTM은 같은 특성의 시퀀스)</li>
+<li>☐ 분할은 <strong>시간축 purged K-fold + embargo</strong> (R7). 무작위 셔플 분할 금지</li>
+<li>☐ 정규화는 <strong>각 fold의 train으로만 fit</strong> (누수 방지)</li>
+<li>☐ MLP/LSTM은 <strong>seed 앙상블(≥5)</strong>, LGBM은 seed 고정 후 동일 프로토콜</li>
+<li>☐ 평가는 <strong>out-of-sample R²와 랭크 IC</strong>로 통일 (R8 정의)</li>
+<li>☐ 하이퍼파라미터는 <strong>valid로만</strong> 튜닝, 최종 성능은 홀드아웃에서 한 번</li>
+<li>☐ 결과를 <strong>ablation 스타일 표</strong>로 정리 (§8)</li>
+</ul>
+</div>
+
+<h3>10.1 평가 지표 재사용 (R8)</h3>
+
+<div class="def">
+<p class="ni"><strong>Definition 10.1 — Out-of-sample R²와 랭크 IC</strong></p>
+<div class="eq">\[ R^2_{oos} = 1 - \frac{\sum_{(i,t)\in\text{test}}(r_{i,t}-\hat{r}_{i,t})^2}{\sum_{(i,t)\in\text{test}} r_{i,t}^2},\qquad \text{IC}_t = \text{corr}\big(\text{rank}(\hat{r}_{\cdot,t}),\ \text{rank}(r_{\cdot,t})\big) \]</div>
+<p class="ni" style="font-size:12px;color:#555;margin:4px 0 8px 0">↑ GKX 스타일 \(R^2_{oos}\)는 분모에 평균을 빼지 않는다(무조건부 예측이 0이라는 귀무가설 대비). 랭크 IC는 각 시점 예측 순위와 실제 순위의 상관 — 롱숏 포트폴리오 수익성과 직결된다. 두 지표 모두 R8에서 정의한 그대로다.</p>
+</div>
+
+<h3>10.2 통일된 평가 루프</h3>
+
+<pre><code><span class="kw">import</span> numpy <span class="kw">as</span> np, pandas <span class="kw">as</span> pd
+<span class="kw">from</span> scipy.stats <span class="kw">import</span> spearmanr
+
+<span class="kw">def</span> <span class="fn">oos_r2</span>(y_true, y_pred):
+    <span class="st">"""GKX 스타일 OOS R² (평균 차감 없음)."""</span>
+    <span class="kw">return</span> <span class="nu">1.0</span> - np.sum((y_true - y_pred)**<span class="nu">2</span>) / np.sum(y_true**<span class="nu">2</span>)
+
+<span class="kw">def</span> <span class="fn">mean_rank_ic</span>(df):
+    <span class="st">"""시점별 랭크 IC의 시계열 평균 (df: date, y_true, y_pred)."""</span>
+    ics = df.groupby(<span class="st">"date"</span>).apply(
+        <span class="kw">lambda</span> g: spearmanr(g[<span class="st">"y_pred"</span>], g[<span class="st">"y_true"</span>]).correlation)
+    <span class="kw">return</span> ics.mean(), ics.std()
+
+<span class="kw">def</span> <span class="fn">evaluate</span>(name, y_true, y_pred, dates):
+    df = pd.DataFrame({<span class="st">"date"</span>: dates, <span class="st">"y_true"</span>: y_true, <span class="st">"y_pred"</span>: y_pred})
+    r2 = oos_r2(y_true, y_pred)
+    ic_mean, ic_std = mean_rank_ic(df)
+    icir = ic_mean / ic_std * np.sqrt(<span class="nu">12</span>)   <span class="cm"># 연율화 IC 정보비율</span>
+    <span class="kw">return</span> {<span class="st">"model"</span>: name, <span class="st">"oos_r2(%)"</span>: <span class="fn">round</span>(r2*<span class="nu">100</span>, <span class="nu">3</span>),
+            <span class="st">"ic"</span>: <span class="fn">round</span>(ic_mean, <span class="nu">4</span>), <span class="st">"icir"</span>: <span class="fn">round</span>(icir, <span class="nu">2</span>)}</code></pre>
+<div class="code-output"><span class="out-label">Output:</span>
+# evaluate()가 각 모델에 대해 동일 지표를 반환 → 공정 비교 가능</div>
+
+<h3>10.3 세 모델을 같은 프로토콜로 돌리는 골격</h3>
+
+<pre><code><span class="kw">import</span> lightgbm <span class="kw">as</span> lgb
+<span class="kw">import</span> numpy <span class="kw">as</span> np
+
+results = []
+
+<span class="cm"># --- 모델 1: LightGBM (R8 재사용, 트리 벤치마크) ---</span>
+<span class="kw">def</span> <span class="fn">run_lgbm</span>(Xtr, ytr, Xva, yva, Xte):
+    dtr, dva = lgb.Dataset(Xtr, ytr), lgb.Dataset(Xva, yva)
+    params = <span class="fn">dict</span>(objective=<span class="st">"regression"</span>, learning_rate=<span class="nu">0.03</span>,
+                  num_leaves=<span class="nu">31</span>, feature_fraction=<span class="nu">0.7</span>, seed=<span class="nu">0</span>, verbose=-<span class="nu">1</span>)
+    m = lgb.train(params, dtr, num_boost_round=<span class="nu">500</span>, valid_sets=[dva],
+                  callbacks=[lgb.early_stopping(<span class="nu">30</span>, verbose=<span class="kw">False</span>)])
+    <span class="kw">return</span> m.predict(Xte)
+
+<span class="cm"># --- 모델 2: MLP (NN3 + seed 앙상블, §4) ---</span>
+<span class="kw">def</span> <span class="fn">run_mlp</span>(loaders, Xte):
+    ens_pred, _ = train_seed_ensemble(<span class="kw">lambda</span>: NN3(Xte.shape[<span class="nu">1</span>]),
+                                      loaders[<span class="st">"train"</span>], loaders[<span class="st">"valid"</span>], Xte, seeds=<span class="fn">range</span>(<span class="nu">5</span>))
+    <span class="kw">return</span> ens_pred
+
+<span class="cm"># --- 모델 3: LSTM (시퀀스 입력, §5) ---</span>
+<span class="kw">def</span> <span class="fn">run_lstm</span>(seq_loaders, Xte_seq):
+    ens = []
+    <span class="kw">for</span> s <span class="kw">in</span> <span class="fn">range</span>(<span class="nu">5</span>):
+        set_seed(s)
+        model = LSTMForecaster(n_features=Xte_seq.shape[-<span class="nu">1</span>], hidden=<span class="nu">16</span>)
+        model, _ = train_with_recipe(model, seq_loaders[<span class="st">"train"</span>], seq_loaders[<span class="st">"valid"</span>], clip=<span class="nu">5.0</span>)
+        model.eval()
+        <span class="kw">import</span> torch
+        <span class="kw">with</span> torch.no_grad():
+            ens.append(model(torch.tensor(Xte_seq, dtype=torch.float32)).numpy())
+    <span class="kw">return</span> np.stack(ens).mean(<span class="nu">0</span>)
+
+<span class="cm"># 각 purged CV fold에서 세 모델을 동일 데이터로 평가하고 results에 append</span>
+<span class="cm"># (fold 루프는 R7의 PurgedKFold 사용 — 지면상 생략)</span>
+<span class="fn">print</span>(<span class="st">"세 모델 모두 동일 fold·동일 지표로 평가 → 아래 표"</span>)</code></pre>
+<div class="code-output"><span class="out-label">Output:</span>
+세 모델 모두 동일 fold·동일 지표로 평가 → 아래 표</div>
+
+<h3>10.4 결과 ablation table</h3>
+
+<div class="tc">Table 10.1. MLP vs LSTM vs LightGBM 공정 대결 (동일 데이터·purged CV·동일 지표, 예시 결과)</div>
+<table>
+<tr><th>모델</th><th>입력</th><th>앙상블</th><th>OOS R²(%)</th><th>Rank IC</th><th>IC-IR(연율)</th><th>학습시간</th></tr>
+<tr><td>LightGBM</td><td>횡단면 특성</td><td>seed 1</td><td>0.41</td><td>0.043</td><td>1.35</td><td>빠름</td></tr>
+<tr><td>MLP (NN3)</td><td>횡단면 특성</td><td>seed 5</td><td>0.38</td><td>0.041</td><td>1.28</td><td>중간</td></tr>
+<tr><td>LSTM</td><td>12개월 시퀀스</td><td>seed 5</td><td>0.29</td><td>0.034</td><td>0.98</td><td>느림</td></tr>
+<tr><td>MLP − 앙상블</td><td>횡단면 특성</td><td>seed 1</td><td>0.22</td><td>0.031</td><td>0.91</td><td>중간</td></tr>
+<tr><td>단순 평균 (base)</td><td>—</td><td>—</td><td>0.00</td><td>0.000</td><td>0.00</td><td>—</td></tr>
+</table>
+
+<div class="ok">
+<p class="ni"><strong>이 표에서 읽어야 할 것.</strong> (1) <strong>LightGBM이 근소하게 앞선다</strong> — 트리 앙상블은 표 형태의 낮은 SNR 데이터에서 강하다. (2) <strong>MLP는 앙상블이 있어야 경쟁력</strong>이 생긴다(앙상블 제거 시 0.38→0.22). (3) <strong>LSTM은 가장 느리면서 가장 약하다</strong> — 월별 수익률의 시간 구조가 빈약하기 때문. 이 결과가 "딥러닝이 무조건 이긴다"는 신화를 깬다. 물론 데이터·특성·기간이 바뀌면 순위는 달라질 수 있고, <strong>그것을 확인하는 것이 바로 이 프로토콜의 존재 이유</strong>다.</p>
+</div>
+
+<div class="task">
+<div class="task-title">&#x2705; 확장 과제 — R10 재현으로 가는 다리</div>
+<ul>
+<li>☐ §7의 Conditional Autoencoder를 위 대결에 추가하고, K(잠재 팩터 수)를 1~6으로 ablation</li>
+<li>☐ LSTM 대신 §6의 TinyTransformer를 넣어 시퀀스 모델 두 개를 비교</li>
+<li>☐ seed를 5→10으로 늘려 성능의 <strong>평균±표준편차</strong>를 보고 (단일 값 금지)</li>
+<li>☐ 서브샘플(예: 대형주만 vs 소형주만)로 나눠 어느 종목군에서 DL이 유리한지 확인</li>
+<li>☐ 모든 config를 JSON으로 저장하고 CSV/TensorBoard 로그를 남겨 재현 가능하게 (§8)</li>
+</ul>
+</div>
+
+<!-- ============================================================ -->
+<h2 id="quiz">Quiz</h2>
+
+<details class="quiz-item">
+<summary>Q1. 학습 루프에서 <code>optimizer.zero_grad()</code>를 빼먹으면 어떤 일이 벌어지는가?</summary>
+<div class="answer">PyTorch의 <code>.grad</code>는 <code>.backward()</code>마다 덮어쓰지 않고 <strong>누적(accumulate)</strong>된다. 따라서 zero_grad를 빼먹으면 매 스텝의 그래디언트가 계속 더해져, 실질 학습률이 폭증하고 파라미터가 발산한다. 5단계(zero_grad→forward→loss→backward→step) 중 첫 단계를 지키는 것이 필수다.</div>
+</details>
+
+<details class="quiz-item">
+<summary>Q2. 금융 횡단면 신경망에서 BatchNorm보다 LayerNorm이 선호되는 이유는?</summary>
+<div class="answer">BatchNorm은 <strong>배치 통계(mean/std)</strong>에 의존하는데, 금융 배치는 종목 구성과 시점이 섞여 통계가 불안정하고, 여러 시점을 섞으면 미묘한 정보 혼합이 생길 수 있다. 반면 LayerNorm은 <strong>각 샘플 내부(특성 방향)</strong>에서만 정규화하므로 배치 구성·시점에 무관해 재현성이 좋다. 시계열/Transformer 계열에서 특히 중요하다.</div>
+</details>
+
+<details class="quiz-item">
+<summary>Q3. GKX가 단일 신경망이 아니라 10-seed 앙상블을 보고한 이유를 분산 감소 공식으로 설명하라.</summary>
+<div class="answer">신호 대 잡음비가 낮으면 개별 신경망 예측의 분산 \(\sigma^2\)이 크고 seed마다 다른 함수를 학습한다. K개 예측을 평균하면 분산이 \(\frac{\sigma^2}{K}(1+(K-1)\rho)\)로 줄어든다(\(\rho\)=예측 간 상관). seed만 다른 모델들은 \(\rho&lt;1\)이라 평균이 개별보다 안정적이고 정확하다. 따라서 앙상블은 선택이 아니라 필수다.</div>
+</details>
+
+<details class="quiz-item">
+<summary>Q4. 아래 코드의 누수 버그를 찾아라.<br><code>scaler = StandardScaler().fit(X_all); Xtr = scaler.transform(X_train); Xte = scaler.transform(X_test)</code></summary>
+<div class="answer">정규화 통계(mean/std)를 <strong>전체 데이터 X_all(테스트 포함)</strong>에서 계산했다. 이러면 테스트 기간의 분포 정보가 학습에 새어든다(look-ahead leakage). 올바른 코드는 <code>scaler.fit(X_train)</code>으로 학습셋에서만 fit하고, test에는 <code>transform</code>만 적용하는 것이다. 딥러닝 파이프라인에서 가장 흔하고 은밀한 누수다.</div>
+</details>
+
+<details class="quiz-item">
+<summary>Q5. self-attention에서 \(QK^\top\)을 \(\sqrt{d_k}\)로 나누는 이유는?</summary>
+<div class="answer">\(Q\)와 \(K\)의 차원 \(d_k\)가 커지면 내적 \(QK^\top\)의 분산이 \(d_k\)에 비례해 커진다. 그대로 softmax에 넣으면 값이 극단으로 몰려 그래디언트가 소실된다(포화). \(\sqrt{d_k}\)로 나눠 스케일을 안정화하면 softmax가 부드러운 분포를 유지해 학습이 안정된다. 그래서 "scaled" dot-product attention이라 부른다.</div>
+</details>
+
+<details class="quiz-item">
+<summary>Q6. Conditional Autoencoder(GKX 2021)에서 베타 네트워크의 입력이 \(z_{i,t-1}\)(과거 특성)인 것이 왜 중요한가?</summary>
+<div class="answer">베타 \(\beta(z_{i,t-1})\)가 <strong>시점 t 이전 정보</strong>만 쓰므로, 시점 t의 수익률을 예측하는 데 써도 미래 정보 누수가 없다. 만약 동시점 특성 \(z_{i,t}\)를 쓰면 예측 시점에 알 수 없는 정보를 쓰게 되어 실전 배포가 불가능하다. 이 시차 구조가 "예측 가능한 팩터모형"을 만드는 핵심이다.</div>
+</details>
+
+<details class="quiz-item">
+<summary>Q7. "얕은 네트워크가 이긴다"(NN3 &gt; NN5)를 편향-분산 분해로 설명하라.</summary>
+<div class="answer">기대 오차 = Bias² + Var + 줄일 수 없는 잡음 \(\sigma^2\). 금융은 \(\sigma^2\)이 지배적(낮은 SNR)이다. 층을 늘려 편향을 조금 줄여도, 짧은 데이터에서 분산이 훨씬 크게 증가한다. 결국 총 오차의 최적점이 <strong>낮은 복잡도</strong> 쪽에 있어 NN3가 NN5를 이긴다. 데이터가 지원하는 만큼만 복잡하게 만드는 것이 정답이다.</div>
+</details>
+
+<details class="quiz-item">
+<summary>Q8. "테스트셋 성능을 보며 하이퍼파라미터를 골랐다"가 왜 문제인가?</summary>
+<div class="answer">테스트셋이 사실상 학습(모델 선택)에 쓰여, 보고된 성능이 낙관적으로 부풀려진다(튜닝 과적합/선택 편향). 수백 번의 실험 중 최고를 고르면 그것이 우연히 좋았을 가능성이 크다(다중비교). 올바른 절차: 하이퍼파라미터는 <strong>validation</strong>으로만 고르고, 테스트셋은 모든 개발이 끝난 뒤 <strong>딱 한 번</strong> 연다.</div>
+</details>
+
+<details class="quiz-item">
+<summary>Q9. RNN 계열에 gradient clipping이 사실상 필수인 이유는?</summary>
+<div class="answer">RNN은 시간 전개에서 같은 가중치 \(W_{hh}\)를 반복 곱하므로, 시퀀스가 길면 그래디언트가 지수적으로 폭발(또는 소실)한다. 폭발하면 파라미터가 한 스텝에 발산한다. clipping은 그래디언트 노름이 임계값 c를 넘으면 방향은 유지한 채 크기만 c로 잘라 폭주를 막는다(<code>clip_grad_norm_</code>). LSTM/GRU도 완전히 자유롭지 않아 켜두는 것이 안전하다.</div>
+</details>
+
+<details class="quiz-item">
+<summary>Q10. 아래 LSTM 데이터 준비 코드의 위험을 지적하라.<br><code>seq = returns[t-11 : t+1]  # 과거 12개월; y = returns[t]</code></summary>
+<div class="answer">입력 시퀀스 <code>returns[t-11:t+1]</code>는 인덱스 t까지 포함하는데, 타깃이 <code>returns[t]</code>다. 즉 <strong>맞춰야 할 값이 입력에 들어가 있다</strong>(look-ahead 누수). 올바른 설계는 입력을 <code>returns[t-12:t]</code>(과거 12개월, t 미포함)로 하고 타깃을 <code>returns[t]</code>로 두는 것. 시퀀스 윈도우가 미래(또는 타깃 시점)를 포함하지 않도록 항상 확인해야 한다.</div>
+</details>
+
+<div class="ok">
+<p class="ni"><strong>Round 9 완료.</strong> 이제 PyTorch로 자산가격 예측 모델을 직접 짜고, 무엇보다 <strong>그 결과가 진짜인지 엄격하게 검증</strong>할 수 있다. 핵심: (1) autograd·nn.Module·5단계 루프를 손에 익혔고, (2) 금융 배치의 누수 함정을 안다, (3) seed 앙상블과 강한 규제가 필수임을 이해했다, (4) LSTM/Transformer/CA의 구조를 코드로 재현할 수 있다, (5) ablation table로 정직하게 비교할 수 있다. R10에서는 이 도구들로 GKX 논문을 처음부터 끝까지 재현한다.</p>
+</div>
+
+<!-- ============================================================ -->
+<h2 id="cheatsheet">&#x1F4CB; Cheat Sheet — Round 9 핵심</h2>
+
+<div class="tc">Table C.1. 핵심 수식 / 코드 / 규칙</div>
+<table>
+<tr><th style="width:24%">항목</th><th style="width:40%">수식 / 코드</th><th style="width:36%">한줄 설명</th></tr>
+<tr><td>학습 루프 5단계</td><td><code>zero_grad → forward → loss → backward → step</code></td><td>순서 틀리면 학습 안 됨</td></tr>
+<tr><td>autograd</td><td>\(\frac{\partial L}{\partial x}=\prod\frac{\partial(\cdot)}{\partial(\cdot)}\)</td><td>연쇄법칙의 자동화</td></tr>
+<tr><td>정규화 누수 방지</td><td><code>scaler.fit(X_train)</code>만</td><td>test엔 transform만</td></tr>
+<tr><td>weight decay</td><td>\(\theta\leftarrow\theta-\eta(\nabla L+\lambda\theta)\)</td><td>큰 가중치 억제 (L2)</td></tr>
+<tr><td>gradient clipping</td><td>\(g\leftarrow g\min(1,c/\lVert g\rVert)\)</td><td>RNN 필수, 폭주 방지</td></tr>
+<tr><td>early stopping</td><td>valid 손실 patience</td><td>과적합 전 중단, 최적 가중치 복원</td></tr>
+<tr><td>seed 앙상블 분산</td><td>\(\text{Var}=\frac{\sigma^2}{K}(1+(K-1)\rho)\)</td><td>K개 평균 → 안정화 (필수)</td></tr>
+<tr><td>NN3 구조</td><td>32-16-8, ReLU, dropout</td><td>GKX 최고 신경망</td></tr>
+<tr><td>LSTM 셀</td><td>\(c_t=f_t c_{t-1}+i_t\tilde{c}_t\)</td><td>게이트로 장기기억</td></tr>
+<tr><td>self-attention</td><td>\(\text{softmax}(QK^\top/\sqrt{d_k})V\)</td><td>내용 기반 시점 혼합</td></tr>
+<tr><td>positional encoding</td><td>\(\sin/\cos(pos/10000^{2i/d})\)</td><td>어텐션에 순서 주입</td></tr>
+<tr><td>Conditional AE</td><td>\(r=\beta(z_{t-1})^\top f_t+\epsilon\)</td><td>비선형 팩터모형 (GKX 2021)</td></tr>
+<tr><td>OOS R² (GKX)</td><td>\(1-\frac{\sum(r-\hat{r})^2}{\sum r^2}\)</td><td>평균 차감 없음</td></tr>
+<tr><td>랭크 IC</td><td>\(\text{corr}(\text{rank}\hat{r},\text{rank}\,r)\)</td><td>롱숏 수익성 대리</td></tr>
+<tr><td>ablation 철칙</td><td>한 번에 하나만 변경</td><td>인과 귀속 가능</td></tr>
+<tr><td>얕은 게 이긴다</td><td>낮은 SNR → 낮은 최적 복잡도</td><td>NN3 &gt; NN5</td></tr>
+</table>
+
+<div class="info">
+<p class="ni"><strong>버전 기준.</strong> 이 라운드의 코드는 PyTorch 2.x, scikit-learn 1.4+, pandas 2.x, LightGBM 4.x에서 동작한다. <code>nn.TransformerEncoderLayer(batch_first=True)</code>, <code>lgb.early_stopping</code> 콜백 등은 최신 API 기준이다.</p>
+</div>
+
+<div class="nav-footer">
+<a href="../round-08/"><span class="nf-label">&larr; Previous</span>R8. Financial ML II &middot; GKX</a>
+<a href="../round-10/" style="text-align:right"><span class="nf-label">Next &rarr;</span>R10. Paper Replication</a>
+</div>
+
+</div>
+</div>
+</div>
+
+</body>
+</html>

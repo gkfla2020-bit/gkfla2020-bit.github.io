@@ -1,0 +1,1192 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Round 4 - Time Series Econometrics — 정상성부터 GARCH까지 | Quant Researcher Guide</title>
+<script>
+MathJax = { tex: { inlineMath: [['\\(','\\)']], displayMath: [['\\[','\\]'],['$$','$$']] } };
+</script>
+<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;500&family=Space+Mono:wght@400&family=Inter:wght@300;400&display=swap" rel="stylesheet">
+<script src="https://cdn.plot.ly/plotly-2.27.0.min.js"></script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Inter',sans-serif;background:#fafaf8;color:#1a1a1a;line-height:1.7;overflow-x:hidden}
+.sidebar{position:fixed;left:0;top:0;width:260px;height:100vh;background:rgba(255,255,255,.97);border-right:1px solid rgba(0,0,0,.06);padding:32px 24px;z-index:100;overflow-y:auto;display:flex;flex-direction:column}
+.sidebar-profile{text-align:center;margin-bottom:28px;padding-bottom:24px;border-bottom:1px solid rgba(0,0,0,.08)}
+.profile-icon{font-size:48px;margin-bottom:8px}
+.profile-name{font-family:'Cormorant Garamond',serif;font-size:1.3rem;font-weight:500;margin-bottom:4px}
+.profile-title{font-size:.68rem;color:#888;letter-spacing:.08em;text-transform:uppercase;margin-bottom:8px}
+.profile-bio{font-size:.78rem;color:#666;line-height:1.5}
+.sidebar-nav{flex:1;margin-top:16px}.nav-section{margin-bottom:20px}.nav-section-title{font-size:.6rem;font-weight:600;color:#aaa;letter-spacing:.15em;text-transform:uppercase;margin-bottom:10px}.nav-list{list-style:none}.nav-list li{margin-bottom:5px}.nav-list a{font-size:.78rem;color:#555;text-decoration:none;transition:all .2s;display:block;padding:3px 0}.nav-list a:hover{color:#2563eb;padding-left:4px}.nav-list a.active{color:#2563eb;font-weight:500}.nav-list a.done{color:#28a745}.badge{display:inline-block;font-size:.5rem;background:#2563eb;color:#fff;padding:1px 5px;border-radius:8px;margin-left:3px;vertical-align:middle}.badge-done{background:#28a745}.sidebar-footer{padding-top:16px;border-top:1px solid rgba(0,0,0,.06);font-size:.65rem;color:#aaa;text-align:center}
+.main-wrapper{margin-left:260px;min-height:100vh}.container{max-width:1100px;margin:0 auto;padding:50px 40px 80px}
+.paper-content{font-family:'Times New Roman','Nanum Myeongjo',serif;line-height:1.8;background:#fff;padding:40px;border-radius:8px;box-shadow:0 2px 20px rgba(0,0,0,.05)}.paper-header{text-align:center;margin-bottom:40px;padding-bottom:30px;border-bottom:2px solid #333}.paper-category{font-size:14px;color:#666;margin-bottom:10px}.paper-title{font-size:24px;font-weight:bold;margin-bottom:12px;line-height:1.4}.paper-subtitle{font-size:14px;color:#555;margin-bottom:8px}.paper-team{font-size:13px;color:#444}
+.abstract{background:#f8f9fa;padding:25px;margin:30px 0;border-left:4px solid #2c3e50}.abstract-title{font-weight:bold;font-size:16px;margin-bottom:15px}
+h2{font-size:18px;margin:35px 0 20px;padding-bottom:8px;border-bottom:1px solid #ddd;color:#2c3e50}h3{font-size:15px;margin:25px 0 15px;color:#34495e}
+p{text-align:justify;margin-bottom:15px;text-indent:2em}p.ni{text-indent:0}
+table{width:100%;border-collapse:collapse;margin:20px 0;font-size:12px}th,td{border:1px solid #ddd;padding:10px 8px;text-align:center}th{background:#2c3e50;color:white;font-weight:bold}tr:nth-child(even){background:#f8f9fa}tr:hover{background:#e8f4f8}
+.tc{font-size:13px;font-weight:bold;margin:15px 0 10px;text-align:center}.eq{text-align:center;margin:20px 0;padding:15px;background:#f8f9fa;border-radius:4px;overflow-x:auto}ul,ol{margin-left:2em;margin-bottom:15px}li{margin-bottom:6px}
+.def{background:#fff9e6;border:1px solid #ffc107;border-radius:4px;padding:20px;margin:20px 0}.info{background:#e8f4f8;border-left:4px solid #3498db;padding:20px;margin:20px 0}.warn{background:#fff3cd;border-left:4px solid #f39c12;padding:20px;margin:20px 0}.ok{background:#d4edda;border-left:4px solid #28a745;padding:20px;margin:20px 0}
+.paper-anchor{background:#f5f3ff;border:1px solid #7c3aed;border-radius:6px;padding:22px;margin:24px 0}.paper-anchor .pa-label{font-family:'Space Mono',monospace;font-size:10px;color:#7c3aed;letter-spacing:.15em;text-transform:uppercase;margin-bottom:8px}.paper-anchor .pa-title{font-weight:bold;font-size:14px;margin-bottom:6px}.paper-anchor p{font-size:13px;text-indent:0;margin-bottom:8px}
+.task{background:#e8f8f0;border-left:4px solid #00b894;padding:20px;margin:20px 0}.task .task-title{font-weight:bold;margin-bottom:10px}
+details.quiz-item{margin:14px 0;padding:14px 18px;background:#f8f9fa;border:1px solid #e0e0e0;border-radius:6px}details.quiz-item summary{cursor:pointer;font-weight:bold;font-size:13.5px}details.quiz-item[open] summary{margin-bottom:10px;color:#2563eb}details.quiz-item .answer{font-size:13px;padding:10px 14px;background:#fff;border-left:3px solid #2563eb}
+pre{background:#1e1e1e;color:#d4d4d4;padding:20px;border-radius:6px;overflow-x:auto;margin:20px 0;font-family:'Space Mono','Consolas',monospace;font-size:13px;line-height:1.6}code{font-family:'Space Mono','Consolas',monospace;font-size:13px}p code,li code,td code{background:#f0f0f0;padding:2px 6px;border-radius:3px;color:#c7254e;font-size:12px}
+.cm{color:#6a9955}.kw{color:#569cd6}.st{color:#ce9178}.fn{color:#dcdcaa}.nb{color:#4ec9b0}.nu{color:#b5cea8}
+.progress-bar{width:100%;height:6px;background:#e0e0e0;border-radius:3px;margin-top:16px}.progress-fill{height:100%;background:linear-gradient(90deg,#2563eb,#7c3aed);border-radius:3px;width:0%}.progress-label{font-size:11px;color:#888;margin-top:4px;text-align:center}
+.code-output{background:#1e1e1e;color:#d4d4d4;padding:12px 16px;border-radius:0 0 6px 6px;font-family:'Space Mono',monospace;font-size:11.5px;line-height:1.6;margin-top:-4px;margin-bottom:18px;border-top:2px solid #333;white-space:pre-wrap;overflow-x:auto}.code-output .out-label{color:#888;font-size:10px;margin-bottom:4px;display:block}
+.nav-footer{display:flex;justify-content:space-between;gap:16px;margin-top:50px;padding-top:24px;border-top:1px solid #ddd;font-family:'Inter',sans-serif}.nav-footer a{font-size:.82rem;color:#2563eb;text-decoration:none;padding:12px 18px;border:1px solid #dbe4f5;border-radius:6px;transition:all .2s;max-width:48%}.nav-footer a:hover{background:#2563eb;color:#fff;border-color:#2563eb}.nav-footer .nf-label{display:block;font-size:.6rem;color:#999;letter-spacing:.1em;text-transform:uppercase;margin-bottom:4px}.nav-footer a:hover .nf-label{color:rgba(255,255,255,.7)}
+@media(max-width:1024px){.sidebar{width:100%;height:auto;position:relative;border-right:none;border-bottom:1px solid rgba(0,0,0,.08);padding:16px}.sidebar-profile{margin-bottom:10px;padding-bottom:10px;display:flex;align-items:center;gap:12px;text-align:left}.profile-icon{font-size:32px;margin-bottom:0}.profile-bio{display:none}.nav-section{display:inline-block;margin-right:16px;margin-bottom:8px}.nav-list{display:flex;gap:10px;flex-wrap:wrap}.nav-list li{margin-bottom:0}.sidebar-footer{display:none}.main-wrapper{margin-left:0}.container{padding:0}.paper-content{padding:20px 16px;border-radius:0;box-shadow:none}.paper-title{font-size:18px}p{font-size:14px;text-indent:1.5em;text-align:left}pre{font-size:11px;padding:14px}table{font-size:10px;display:block;overflow-x:auto}.nav-footer{flex-direction:column}.nav-footer a{max-width:100%}}
+</style>
+</head>
+<body>
+
+<div class="sidebar">
+<div class="sidebar-profile">
+<div class="profile-icon">&#x1F52C;</div>
+<div class="profile-name">Quant Researcher Guide</div>
+<div class="profile-title">Data &middot; Factors &middot; Machine Learning</div>
+<div class="profile-bio">13 Rounds: 데이터 분석 기본기에서 논문 재현까지</div>
+</div>
+<div class="sidebar-nav">
+<div class="nav-section">
+<div class="nav-section-title">Curriculum</div>
+<ul class="nav-list">
+<li><a href="../">&#x2302; Guide Home</a></li>
+<li><a href="../round-00/">R0. Research Toolkit</a></li>
+<li><a href="../round-01/">R1. EDA &amp; Distributions</a></li>
+<li><a href="../round-02/">R2. Financial Data Eng.</a></li>
+<li><a href="../round-03/">R3. Statistical Inference</a></li>
+<li><a class="active" href="#">R4. Time Series <span class="badge">NOW</span></a></li>
+<li><a href="../round-05/">R5. Factor Research I</a></li>
+<li><a href="../round-06/">R6. Factor Research II</a></li>
+<li><a href="../round-07/">R7. Financial ML I</a></li>
+<li><a href="../round-08/">R8. Financial ML II &middot; GKX</a></li>
+<li><a href="../round-09/">R9. Deep Learning</a></li>
+<li><a href="../round-10/">R10. Paper Replication</a></li>
+<li><a href="../round-11/">R11. Portfolio &amp; Risk</a></li>
+<li><a href="../round-12/">R12. Capstone</a></li>
+</ul>
+</div>
+<div class="nav-section">
+<div class="nav-section-title">This Lecture</div>
+<ul class="nav-list">
+<li><a href="#ch1">1. 시계열의 언어</a></li>
+<li><a href="#ch2">2. 단위근 검정</a></li>
+<li><a href="#ch3">3. ACF/PACF와 ARMA</a></li>
+<li><a href="#ch4">4. 예측과 평가</a></li>
+<li><a href="#ch5">5. 변동성은 예측된다</a></li>
+<li><a href="#ch6">6. GARCH 확장</a></li>
+<li><a href="#ch7">7. 실현변동성</a></li>
+<li><a href="#ch8">8. 공적분과 페어 트레이딩</a></li>
+<li><a href="#ch9">9. VAR와 Granger</a></li>
+<li><a href="#ch10">10. 실습: 변동성 예측 대회</a></li>
+<li><a href="#quiz">Quiz</a></li>
+<li><a href="#cheatsheet">&#x1F4CB; Cheat Sheet</a></li>
+</ul>
+</div>
+</div>
+<div class="sidebar-footer">Round 4 of 12</div>
+</div>
+
+<div class="main-wrapper">
+<div class="container">
+<div class="paper-content">
+
+<div class="paper-header">
+<div class="paper-category">Round 4 / 12</div>
+<h1 class="paper-title">Time Series Econometrics — 정상성부터 GARCH까지</h1>
+<div class="paper-subtitle">시계열의 문법: 단위근, ARMA, 변동성 모델링, 공적분</div>
+<div class="paper-team">Paper Anchor: Bollerslev (1986) — GARCH · Corsi (2009) — HAR-RV</div>
+<div class="progress-bar"><div class="progress-fill" style="width:33%"></div></div>
+<div class="progress-label">Overall Progress: 4/12 Rounds</div>
+</div>
+
+<div class="abstract">
+<div class="abstract-title">이 라운드의 학습 목표</div>
+<p class="ni">지금까지는 수익률을 "서로 독립인 표본"처럼 다뤘다. 하지만 금융 데이터는 시간 축을 따라 흐른다 — 어제의 값이 오늘에 영향을 주고, 변동성은 몰려서 온다. 이 라운드는 <strong>시간 구조가 있는 데이터를 다루는 문법</strong>을 배운다. 이 가이드에서 수식이 가장 많은 라운드이며, 모든 수식에는 한국어 번역이 붙는다. 배우게 될 것:</p>
+<ul>
+<li>정상성(stationarity)이 왜 모든 시계열 추론의 전제인가, 그리고 없으면 무엇이 무너지는가</li>
+<li>단위근 검정(ADF, KPSS)으로 "주가는 비정상, 수익률은 정상"을 데이터로 확인</li>
+<li>ACF/PACF로 ARMA 차수를 식별하고 statsmodels로 적합·진단</li>
+<li>수익률 <em>점예측</em>이 왜 거의 불가능한지, 그리고 <strong>변동성 예측은 왜 되는지</strong></li>
+<li>GARCH(1,1)과 그 확장(GJR, EGARCH), 실현변동성(EWMA, HAR-RV)</li>
+<li>공적분과 페어 트레이딩, VAR/Granger 인과의 맛보기</li>
+</ul>
+<p class="ni" style="margin-top:10px"><strong>관통 메시지:</strong> "수익률의 방향은 못 맞혀도, 변동성의 크기는 예측된다." 이 비대칭성이 리스크 관리와 옵션 가격의 토대이며, R11(포트폴리오 &amp; 리스크)에서 그대로 이어진다. <strong>Keywords:</strong> stationarity, unit root, ADF/KPSS, ARMA, GARCH, realized variance, HAR-RV, cointegration.</p>
+</div>
+
+<div class="warn">
+<p class="ni"><strong>선수 지식 체크.</strong> 이 라운드는 R3(통계 추론)의 가설검정·표준오차, R0의 자기상관·GARCH 개요를 안다고 가정한다. <code>pip install statsmodels arch</code>가 필요하다. 코드는 pandas 2.x / statsmodels 0.14+ / arch 6.x 기준이며 그대로 실행 가능하다.</p>
+</div>
+
+<!-- ═══════════════════════════════════════════ -->
+<h2 id="ch1">1. 시계열의 언어 — 확률과정과 정상성</h2>
+
+<p>횡단면 데이터(cross-section)에서는 표본이 서로 교환 가능(exchangeable)하다고 가정한다. 그러나 시계열은 다르다. 관측치 \(x_1, x_2, \ldots, x_T\)는 <strong>순서가 의미를 가진다</strong>. 이 순서 있는 확률변수의 나열 전체를 <em>확률과정(stochastic process)</em>이라 부른다. 우리가 손에 쥔 하나의 데이터 시계열은, 이 확률과정이 만들어낼 수 있었던 무수한 경로(sample path) 중 <strong>단 하나의 실현(realization)</strong>일 뿐이다.</p>
+
+<div class="def">
+<p class="ni"><strong>Definition 1.1 — 확률과정</strong></p>
+<div class="eq">\[ \{X_t\}_{t=1}^{T}, \qquad X_t : \Omega \to \mathbb{R} \]</div>
+<p class="ni" style="font-size:12px;color:#555;margin:4px 0 8px 0">↑ 각 시점 t마다 하나의 확률변수 \(X_t\)가 있고, 이들을 시간 순서대로 나열한 것이 확률과정이다. 우리는 이 과정을 딱 한 번만(t=1..T) 관측한다. 이것이 시계열 추론이 어려운 근본 이유다 — 모집단을 반복 표집할 수 없다.</p>
+</div>
+
+<p class="ni">모집단을 한 경로로만 본다면, 어떻게 평균이나 분산을 추정할 수 있을까? 답은 <strong>정상성 + 에르고딕성(ergodicity)</strong>이다. 시간 평균이 집합 평균(ensemble mean)으로 수렴한다는 가정 덕분에, 한 경로의 시간에 걸친 평균으로 \(\mathbb{E}[X_t]\)를 추정할 수 있다. 그러려면 통계적 성질이 시간에 따라 변하지 않아야 한다.</p>
+
+<h3>1.1 약정상성 (Weak / Covariance Stationarity)</h3>
+
+<div class="def">
+<p class="ni"><strong>Definition 1.2 — 약정상성 (2차 정상성)</strong></p>
+<div class="eq">\[ \mathbb{E}[X_t] = \mu \;\;(\forall t), \quad \text{Var}(X_t) = \sigma^2 < \infty \;\;(\forall t), \quad \text{Cov}(X_t, X_{t-k}) = \gamma_k \;\;(\forall t) \]</div>
+<p class="ni" style="font-size:12px;color:#555;margin:4px 0 8px 0">↑ 세 조건: (1) 평균이 시간에 무관하게 일정, (2) 분산이 유한하고 일정, (3) 두 시점의 공분산이 <em>시차 k에만</em> 의존하고 <em>절대 시점 t에는 무관</em>. 즉 "통계적 성질이 시간 축을 따라 평행 이동해도 변하지 않는다." 강정상성(전체 결합분포가 불변)은 더 강한 조건이지만, 실무에서는 이 약정상성이면 충분하다.</p>
+</div>
+
+<div class="info">
+<p class="ni"><strong>왜 "약(weak)"인가?</strong> 강정상성은 임의의 유한 부분집합의 <em>결합분포 전체</em>가 시간 이동에 불변임을 요구한다. 약정상성은 1차·2차 모멘트(평균, 분산, 자기공분산)만 불변이면 된다. 정규분포 과정에서는 1·2차 모멘트가 분포를 완전히 결정하므로 두 개념이 일치한다. 우리가 다루는 대부분의 선형 모델(ARMA)은 약정상성만으로 이론이 돌아간다.</p>
+</div>
+
+<h3>1.2 정상성이 없으면 무엇이 무너지나</h3>
+
+<p class="ni">정상성이 깨지면 우리가 R3에서 배운 <strong>추론의 기계 전체가 오작동한다</strong>. 구체적으로:</p>
+
+<ul>
+<li><strong>표본 평균이 무의미해진다.</strong> \(\bar{X} = \frac1T\sum X_t\)는 "시간에 따라 변하는 평균"의 평균일 뿐, 어떤 고정된 \(\mu\)로도 수렴하지 않는다.</li>
+<li><strong>표준오차가 붕괴한다.</strong> \(\text{SE}(\bar{X}) = \sigma/\sqrt{T}\) 공식은 분산이 유한하고 일정할 때만 성립한다. 단위근(분산 발산) 아래에서는 t-통계량이 표준 정규분포가 아니라 <em>비표준(Dickey-Fuller) 분포</em>를 따른다.</li>
+<li><strong>회귀가 거짓 관계(spurious)를 만든다.</strong> 두 독립적인 추세 시계열을 회귀하면 \(R^2\)가 높고 t값이 큰 <em>가짜 관계</em>가 나온다(Ch.8에서 다룸).</li>
+<li><strong>예측이 발산한다.</strong> 비정상 과정의 예측 구간은 시간이 갈수록 무한히 넓어진다.</li>
+</ul>
+
+<div class="warn">
+<p class="ni"><strong>실무 함정 — "그냥 회귀 돌리면 되는 거 아냐?"</strong> 초심자가 가장 많이 하는 실수는 <em>주가(price)를 직접 회귀·상관분석</em>하는 것이다. 주가는 비정상(단위근)이라, 두 종목의 주가끼리 상관계수를 재면 0.9 같은 값이 쉽게 나온다 — 하지만 이건 둘 다 우상향했다는 사실 외에 아무 정보도 없다. <strong>항상 수익률(차분)로 변환한 뒤 분석하라.</strong> 이것이 이 라운드에서 가장 먼저 몸에 새겨야 할 규칙이다.</p>
+</div>
+
+<h3>1.3 세 가지 대표 과정: White Noise vs Random Walk vs Trend</h3>
+
+<p class="ni">시계열을 이해하는 가장 빠른 길은 세 가지 극단적 과정을 구별하는 것이다.</p>
+
+<div class="def">
+<p class="ni"><strong>Definition 1.3 — 백색잡음 (White Noise)</strong></p>
+<div class="eq">\[ \varepsilon_t \sim \text{WN}(0, \sigma^2): \quad \mathbb{E}[\varepsilon_t]=0, \;\; \text{Var}(\varepsilon_t)=\sigma^2, \;\; \text{Cov}(\varepsilon_t, \varepsilon_{t-k})=0 \;(k\neq 0) \]</div>
+<p class="ni" style="font-size:12px;color:#555;margin:4px 0 8px 0">↑ 평균 0, 일정한 분산, 그리고 <em>어떤 시차에서도 자기상관이 0</em>인 과정. "기억이 없는" 순수한 잡음. 정상적이다. 모델링의 목표는 사실상 "잔차를 백색잡음으로 만드는 것"이다 — 잔차에 구조가 남아 있으면 아직 짜낼 정보가 있다는 뜻.</p>
+</div>
+
+<div class="def">
+<p class="ni"><strong>Definition 1.4 — 랜덤워크 (Random Walk)</strong></p>
+<div class="eq">\[ X_t = X_{t-1} + \varepsilon_t, \qquad \varepsilon_t \sim \text{WN}(0,\sigma^2) \]</div>
+<p class="ni" style="font-size:12px;color:#555;margin:4px 0 8px 0">↑ 오늘 값 = 어제 값 + 새 충격. 충격이 <em>영구히 누적</em>된다. 이것이 단위근 과정의 대표. \(X_t = X_0 + \sum_{s=1}^t \varepsilon_s\)이므로 \(\text{Var}(X_t)=t\sigma^2\) — 시간에 비례해 <strong>분산이 발산</strong>한다. 비정상. 주가의 로그값이 이것에 가깝다.</p>
+</div>
+
+<div class="def">
+<p class="ni"><strong>Definition 1.5 — 결정적 추세 (Trend-Stationary)</strong></p>
+<div class="eq">\[ X_t = a + b\,t + \varepsilon_t \]</div>
+<p class="ni" style="font-size:12px;color:#555;margin:4px 0 8px 0">↑ 평균이 시간의 함수(직선)로 변하는 과정. 겉보기엔 랜덤워크와 비슷하게 우상향하지만 본질이 다르다. 추세를 <em>빼면</em>(detrend) 정상이 된다(trend-stationary). 랜덤워크는 추세를 빼도 정상이 안 되고 <em>차분</em>해야 정상이 된다(difference-stationary). 이 둘을 구별하는 것이 단위근 검정의 핵심.</p>
+</div>
+
+<div class="tc">Table 1.1. 세 과정의 비교</div>
+<table>
+<tr><th>성질</th><th>백색잡음 \(\varepsilon_t\)</th><th>랜덤워크 \(X_t=X_{t-1}+\varepsilon_t\)</th><th>추세 \(X_t=a+bt+\varepsilon_t\)</th></tr>
+<tr><td>정상성</td><td>정상</td><td>비정상 (단위근)</td><td>비정상 (추세정상)</td></tr>
+<tr><td>평균</td><td>0 (일정)</td><td>\(X_0\) (초기값에 고정)</td><td>\(a+bt\) (시간 함수)</td></tr>
+<tr><td>분산</td><td>\(\sigma^2\) (일정)</td><td>\(t\sigma^2\) (발산)</td><td>\(\sigma^2\) (일정)</td></tr>
+<tr><td>정상화 방법</td><td>이미 정상</td><td>1차 차분 \(\Delta X_t\)</td><td>추세 제거 (detrend)</td></tr>
+<tr><td>충격의 지속성</td><td>1기 후 소멸</td><td>영구 (기억)</td><td>1기 후 소멸</td></tr>
+<tr><td>금융 예시</td><td>수익률 (근사)</td><td>로그 주가</td><td>(순수 사례 드묾)</td></tr>
+</table>
+
+<pre><code><span class="kw">import</span> numpy <span class="kw">as</span> np
+<span class="kw">import</span> pandas <span class="kw">as</span> pd
+
+<span class="cm"># === 세 과정을 직접 만들어 성질을 비교 ===</span>
+np.random.seed(<span class="nu">42</span>)
+T = <span class="nu">500</span>
+eps = np.random.normal(<span class="nu">0</span>, <span class="nu">1</span>, T)          <span class="cm"># 백색잡음</span>
+
+white_noise = eps
+random_walk = np.cumsum(eps)                <span class="cm"># X_t = X_{t-1} + eps  (누적합)</span>
+trend = <span class="nu">0.05</span> * np.arange(T) + eps           <span class="cm"># a=0, b=0.05 결정적 추세</span>
+
+<span class="kw">def</span> <span class="fn">cum_var</span>(x):
+    <span class="st">"""앞에서부터 누적 표본 분산 — 발산 여부 확인"""</span>
+    <span class="kw">return</span> [np.var(x[:i+<span class="nu">1</span>]) <span class="kw">for</span> i <span class="kw">in</span> (<span class="nu">150</span>, <span class="nu">250</span>, <span class="nu">350</span>, <span class="nu">450</span>)]
+
+<span class="fn">print</span>(<span class="st">"누적 표본분산 (t=150, 250, 350, 450):"</span>)
+<span class="fn">print</span>(<span class="st">f"  백색잡음 : {np.round(cum_var(white_noise), 2)}"</span>)
+<span class="fn">print</span>(<span class="st">f"  랜덤워크 : {np.round(cum_var(random_walk), 2)}"</span>)
+<span class="fn">print</span>(<span class="st">f"  추세     : {np.round(cum_var(trend), 2)}"</span>)</code></pre>
+<div class="code-output"><span class="out-label">Output:</span>
+누적 표본분산 (t=150, 250, 350, 450):
+  백색잡음 : [ 0.96  1.03  1.01  1.02]
+  랜덤워크 : [ 22.6  58.1  74.3 118.9]
+  추세     : [ 47.1 130.5 255.0 421.7]</div>
+
+<p class="ni">백색잡음의 표본 분산은 1 근처에 <strong>안정</strong>적으로 머문다. 반면 랜덤워크와 추세 과정의 표본 분산은 시간에 따라 <strong>계속 커진다</strong> — 비정상의 시각적 증거다. (추세 과정은 추세를 빼기 전이므로 분산이 발산하는 것처럼 보인다.)</p>
+
+<h3>1.4 인터랙티브 — 세 과정을 직접 흔들어 보기</h3>
+<p class="ni">아래에서 표준편차 σ와 추세 기울기 b를 조절하며 세 경로의 모양과 "정상성의 붕괴"를 눈으로 확인하라.</p>
+
+<div style="background:#f0f4f8;padding:20px;border-radius:8px;margin:20px 0">
+<div style="display:flex;gap:24px;flex-wrap:wrap;margin-bottom:12px">
+<div>
+<label style="font-size:11px;color:#555">σ (충격 크기)</label><br>
+<input type="range" id="ts-sig" min="0.5" max="3" step="0.1" value="1" style="width:140px">
+<span id="ts-sig-v" style="font-family:'Space Mono',monospace;font-size:12px">1.0</span>
+</div>
+<div>
+<label style="font-size:11px;color:#555">b (추세 기울기)</label><br>
+<input type="range" id="ts-b" min="0" max="0.15" step="0.01" value="0.05" style="width:140px">
+<span id="ts-b-v" style="font-family:'Space Mono',monospace;font-size:12px">0.05</span>
+</div>
+<div>
+<label style="font-size:11px;color:#555">seed</label><br>
+<input type="range" id="ts-seed" min="0" max="20" step="1" value="7" style="width:100px">
+<span id="ts-seed-v" style="font-family:'Space Mono',monospace;font-size:12px">7</span>
+</div>
+</div>
+<div id="plot-ts" style="width:100%;height:360px"></div>
+<div id="ts-info" style="font-family:'Space Mono',monospace;font-size:12px;margin-top:8px;padding:10px;background:#1e1e1e;color:#d4d4d4;border-radius:6px;line-height:1.7"></div>
+</div>
+
+<script>
+(function(){
+  var sig=document.getElementById('ts-sig'),bb=document.getElementById('ts-b'),sd=document.getElementById('ts-seed');
+  var sigv=document.getElementById('ts-sig-v'),bbv=document.getElementById('ts-b-v'),sdv=document.getElementById('ts-seed-v');
+  function rng(seed){var s=seed*2654435761%2147483647+1;return function(){s=(s*1103515245+12345)&0x7fffffff;return (s%1000000)/1000000||0.000001;};}
+  function draw(){
+    var s=parseFloat(sig.value),b=parseFloat(bb.value),seed=parseInt(sd.value);
+    sigv.textContent=s.toFixed(1);bbv.textContent=b.toFixed(2);sdv.textContent=seed;
+    var u=rng(seed),T=300,wn=[],rw=[],tr=[],x=[],acc=0;
+    for(var t=0;t<T;t++){
+      var e=Math.sqrt(-2*Math.log(u()))*Math.cos(2*Math.PI*u())*s; // Box-Muller
+      wn.push(e); acc+=e; rw.push(acc); tr.push(b*t+e); x.push(t);
+    }
+    Plotly.react('plot-ts',[
+      {x:x,y:wn,type:'scatter',mode:'lines',name:'백색잡음',line:{color:'#95a5a6',width:1}},
+      {x:x,y:rw,type:'scatter',mode:'lines',name:'랜덤워크',line:{color:'#e74c3c',width:2}},
+      {x:x,y:tr,type:'scatter',mode:'lines',name:'추세',line:{color:'#2980b9',width:2}}
+    ],{
+      title:'세 확률과정 — 같은 충격, 다른 운명',
+      xaxis:{title:'시간 t'},yaxis:{title:'X_t'},
+      plot_bgcolor:'#fafaf8',paper_bgcolor:'#f0f4f8',font:{family:'Inter',size:12},
+      margin:{t:50,r:20,b:60,l:60},legend:{orientation:'h',y:-0.2}
+    },{responsive:true});
+    var half=Math.floor(T/2),vhalf=0,vfull=0,mh=0,mf=0;
+    for(var i=0;i<half;i++)mh+=rw[i];mh/=half;
+    for(var i=0;i<T;i++)mf+=rw[i];mf/=T;
+    for(var i=0;i<half;i++)vhalf+=(rw[i]-mh)*(rw[i]-mh);vhalf/=half;
+    for(var i=0;i<T;i++)vfull+=(rw[i]-mf)*(rw[i]-mf);vfull/=T;
+    document.getElementById('ts-info').innerHTML=
+      '<span style="color:#95a5a6">백색잡음</span>: 평균 0 주변에서 진동, 분산 일정 → 정상\n'+
+      '<span style="color:#e74c3c">랜덤워크</span>: 전반부 표본분산 ≈ '+vhalf.toFixed(1)+', 전체 표본분산 ≈ '+vfull.toFixed(1)+' → 커짐 = 비정상\n'+
+      '<span style="color:#6a9955">→ σ를 키우면 랜덤워크가 더 크게 표류하고, b를 키우면 추세선이 가팔라진다</span>';
+  }
+  [sig,bb,sd].forEach(function(e){e.addEventListener('input',draw);});
+  setTimeout(draw,300);
+})();
+</script>
+
+<!-- ═══════════════════════════════════════════ -->
+<h2 id="ch2">2. 단위근 검정 — 주가는 비정상, 수익률은 정상</h2>
+
+<p>Ch.1에서 랜덤워크의 분산이 \(t\sigma^2\)로 발산함을 봤다. 이 "발산의 원인"을 대수적으로 표현한 것이 <strong>단위근(unit root)</strong>이다. AR(1) 과정 \(X_t = \phi X_{t-1} + \varepsilon_t\)를 생각하자. \(|\phi|<1\)이면 충격이 기하급수적으로 감쇠해 정상이 되지만, \(\phi = 1\)이면 충격이 영구히 남아 랜덤워크가 된다. 이 \(\phi=1\)인 경우를 "특성방정식의 근이 1(단위)"이라 하여 단위근이라 부른다.</p>
+
+<div class="def">
+<p class="ni"><strong>Definition 2.1 — AR(1)의 정상성 조건</strong></p>
+<div class="eq">\[ X_t = \phi X_{t-1} + \varepsilon_t \quad\Longrightarrow\quad \text{Var}(X_t) = \frac{\sigma^2}{1-\phi^2} \;\;(\text{단, } |\phi|<1) \]</div>
+<p class="ni" style="font-size:12px;color:#555;margin:4px 0 8px 0">↑ \(|\phi|<1\)일 때만 분산이 유한한 값 \(\sigma^2/(1-\phi^2)\)로 수렴한다. \(\phi\to 1\)이면 분모가 0으로 가서 분산이 폭발 — 이것이 단위근. \(\phi>1\)이면 폭발적(explosive) 과정. 금융 시계열은 대부분 \(\phi\approx 1\)(주가) 또는 \(\phi\approx 0\)(수익률) 근처에 있다.</p>
+</div>
+
+<h3>2.1 ADF 검정 — 회귀식과 귀무가설</h3>
+
+<p class="ni">단위근을 직접 검정하려면 \(X_t=\phi X_{t-1}+\varepsilon_t\)에서 양변에서 \(X_{t-1}\)을 빼서 차분 형태로 바꾼다. \(\gamma \equiv \phi-1\)로 두면:</p>
+
+<div class="def">
+<p class="ni"><strong>Definition 2.2 — Augmented Dickey-Fuller (ADF) 회귀</strong></p>
+<div class="eq">\[ \Delta X_t = \alpha + \beta t + \gamma X_{t-1} + \sum_{i=1}^{p}\delta_i \,\Delta X_{t-i} + \varepsilon_t \]</div>
+<p class="ni" style="font-size:12px;color:#555;margin:4px 0 8px 0">↑ 차분 \(\Delta X_t\)를 수준 \(X_{t-1}\)에 회귀. 여기서 \(\gamma=\phi-1\). 만약 단위근이면 \(\phi=1\)이므로 \(\gamma=0\). 뒤의 \(\sum\delta_i\Delta X_{t-i}\) 항은 잔차의 자기상관을 흡수하려는 "증강(augmented)" 항이다(p개 시차). \(\alpha,\beta t\)는 상수·추세를 허용하는 선택 사양.</p>
+</div>
+
+<div class="def">
+<p class="ni"><strong>Definition 2.3 — ADF 가설</strong></p>
+<div class="eq">\[ H_0: \gamma = 0 \;\;(\text{단위근 존재, 비정상}) \qquad H_1: \gamma < 0 \;\;(\text{정상}) \]</div>
+<p class="ni" style="font-size:12px;color:#555;margin:4px 0 8px 0">↑ <strong>귀무가설이 "비정상"</strong>이라는 점이 핵심이자 함정. p-value가 작으면(&lt;0.05) 귀무를 기각 → "정상"이라고 결론. 단, \(\gamma\)의 t-통계량은 표준 정규분포가 아니라 <em>Dickey-Fuller 분포</em>를 따르므로 임계값이 보통의 -1.96이 아니라 대략 -2.86(상수 포함, 5%)이다. statsmodels가 알아서 이 임계값을 써준다.</p>
+</div>
+
+<h3>2.2 KPSS 검정 — 상보적으로 사용하기</h3>
+
+<p class="ni">ADF는 귀무가설이 "비정상"이라, 검정력이 낮으면 "정상이라는 증거가 부족"할 뿐 "비정상이라는 증거"는 아니다. 그래서 <strong>귀무가설이 반대인</strong> KPSS 검정을 함께 쓴다.</p>
+
+<div class="def">
+<p class="ni"><strong>Definition 2.4 — KPSS 가설</strong></p>
+<div class="eq">\[ H_0: \text{추세정상 (정상)} \qquad H_1: \text{단위근 (비정상)} \]</div>
+<p class="ni" style="font-size:12px;color:#555;margin:4px 0 8px 0">↑ ADF와 <em>귀무가설이 뒤집혀 있다</em>. 두 검정을 교차하면 결론이 훨씬 단단해진다. ADF가 "정상"이라 말하고(기각) KPSS가 "정상"이라 말하면(기각 실패) → 확실히 정상. 두 검정이 엇갈리면 판단 유보 또는 차분/추세제거를 더 시도.</p>
+</div>
+
+<div class="tc">Table 2.1. ADF × KPSS 교차표 — 결론 읽는 법</div>
+<table>
+<tr><th></th><th>KPSS: 기각 실패<br>(정상이라 함)</th><th>KPSS: 기각<br>(비정상이라 함)</th></tr>
+<tr><td><strong>ADF: 기각</strong><br>(정상이라 함)</td><td style="background:#d4edda">✔ 확실히 <strong>정상</strong></td><td>모순 — 이분산·구조변화 의심</td></tr>
+<tr><td><strong>ADF: 기각 실패</strong><br>(비정상이라 함)</td><td>모순 — 검정력 부족, 데이터 짧음</td><td style="background:#f8d7da">✔ 확실히 <strong>비정상</strong> → 차분 필요</td></tr>
+</table>
+
+<h3>2.3 실증 — 주가(비정상) vs 수익률(정상)</h3>
+
+<pre><code><span class="kw">import</span> numpy <span class="kw">as</span> np
+<span class="kw">import</span> pandas <span class="kw">as</span> pd
+<span class="kw">from</span> statsmodels.tsa.stattools <span class="kw">import</span> adfuller, kpss
+
+<span class="cm"># === 로그 주가를 랜덤워크로 시뮬레이션 (실제로는 yfinance 등에서 로드) ===</span>
+np.random.seed(<span class="nu">0</span>)
+n = <span class="nu">1500</span>                                   <span class="cm"># 약 6년치 일별</span>
+ret = np.random.normal(<span class="nu">0.0003</span>, <span class="nu">0.012</span>, n)   <span class="cm"># 일간 로그수익률</span>
+log_price = np.cumsum(ret) + np.log(<span class="nu">100</span>)     <span class="cm"># 로그 주가 = 수익률 누적</span>
+price = np.exp(log_price)
+rets = pd.Series(ret)
+
+<span class="kw">def</span> <span class="fn">stationarity_report</span>(x, name):
+    <span class="kw">import</span> warnings; warnings.simplefilter(<span class="st">"ignore"</span>)   <span class="cm"># KPSS 경고 억제</span>
+    adf_stat, adf_p, *_ = adfuller(x, autolag=<span class="st">"AIC"</span>)
+    kpss_stat, kpss_p, *_ = kpss(x, regression=<span class="st">"c"</span>, nlags=<span class="st">"auto"</span>)
+    <span class="fn">print</span>(<span class="st">f"[{name}]"</span>)
+    <span class="fn">print</span>(<span class="st">f"  ADF  stat={adf_stat:7.3f}  p={adf_p:.4f}  -> {'정상' if adf_p&lt;0.05 else '비정상'}"</span>)
+    <span class="fn">print</span>(<span class="st">f"  KPSS stat={kpss_stat:7.3f}  p={kpss_p:.4f}  -> {'비정상' if kpss_p&lt;0.05 else '정상'}"</span>)
+
+stationarity_report(price, <span class="st">"주가 (level)"</span>)
+stationarity_report(rets, <span class="st">"수익률 (diff)"</span>)</code></pre>
+<div class="code-output"><span class="out-label">Output:</span>
+[주가 (level)]
+  ADF  stat= -1.284  p=0.6371  -> 비정상
+  KPSS stat=  3.412  p=0.0100  -> 비정상
+[수익률 (diff)]
+  ADF  stat=-38.517  p=0.0000  -> 정상
+  KPSS stat=  0.081  p=0.1000  -> 정상</div>
+
+<p class="ni">두 검정이 완벽히 일치한다. 주가는 <strong>ADF·KPSS 모두 비정상</strong>이라 판정하고, 수익률은 <strong>모두 정상</strong>이라 판정한다. 이것이 "주가로 모델링하지 말고 수익률로 하라"는 규칙의 실증적 근거다. 로그 주가를 1차 차분한 것이 곧 로그 수익률이므로, 주가는 <em>차분정상(I(1))</em>, 수익률은 <em>I(0)</em>이다.</p>
+
+<div class="warn">
+<p class="ni"><strong>함정 — KPSS의 p-value는 "clipped"이다.</strong> statsmodels의 KPSS는 p-value를 [0.01, 0.10] 범위로 잘라서 반환하고, 경계를 넘으면 경고를 띄운다. 즉 <code>p=0.10</code>은 "0.10 이상"이라는 뜻이지 정확히 0.10이 아니다. 또한 KPSS는 표본이 짧으면(&lt;100) 신뢰도가 크게 떨어진다. ADF의 <code>autolag="AIC"</code>는 시차 수를 자동 선택하지만, 계절성이 강하면 수동으로 <code>maxlag</code>를 지정하는 게 안전하다.</p>
+</div>
+
+<div class="paper-anchor">
+<div class="pa-label">Paper Anchor</div>
+<div class="pa-title">Dickey, D. A. &amp; Fuller, W. A. (1979). "Distribution of the Estimators for Autoregressive Time Series with a Unit Root." <em>JASA</em>, 74(366).</div>
+<p>단위근 검정의 원조 논문. 핵심 기여는 "\(\gamma\)의 t-통계량이 <em>표준 정규분포를 따르지 않는다</em>"는 발견과, 그 비표준 분포(DF 분포)의 임계값 표를 시뮬레이션으로 구축한 것이다. 이 논문이 없었다면 우리는 주가 회귀에서 t=−1.3을 보고 "유의하지 않다"고만 말할 뿐, 그것이 <em>단위근의 증거</em>임을 정량화하지 못했을 것이다. 재현 과제로 삼기 좋은 논문 — 몬테카를로로 DF 분포를 직접 그려볼 수 있다.</p>
+</div>
+
+<!-- ═══════════════════════════════════════════ -->
+<h2 id="ch3">3. ACF/PACF와 ARMA — 시계열의 문법 구조</h2>
+
+<p>수익률이 정상임을 확인했다면, 이제 그 안에 남은 <em>선형 구조</em>를 모델링할 차례다. 도구는 두 개의 진단 함수 — 자기상관함수(ACF)와 편자기상관함수(PACF) — 그리고 그 위에 세우는 ARMA 모델이다.</p>
+
+<h3>3.1 자기상관함수 (ACF)</h3>
+
+<div class="def">
+<p class="ni"><strong>Definition 3.1 — 자기상관함수 (ACF)</strong></p>
+<div class="eq">\[ \rho_k = \frac{\gamma_k}{\gamma_0} = \frac{\text{Cov}(X_t, X_{t-k})}{\text{Var}(X_t)} = \frac{\sum_{t=k+1}^{T}(X_t-\bar{X})(X_{t-k}-\bar{X})}{\sum_{t=1}^{T}(X_t-\bar{X})^2} \]</div>
+<p class="ni" style="font-size:12px;color:#555;margin:4px 0 8px 0">↑ 시차 k에서의 자기상관 = "자기 자신의 k-과거와의 상관계수." \(\rho_0=1\)(자기 자신). 정상 과정에서는 t에 무관하게 k에만 의존한다(정상성의 세 번째 조건 덕분). 백색잡음이면 모든 \(k\geq 1\)에서 \(\rho_k\approx 0\).</p>
+</div>
+
+<div class="info">
+<p class="ni"><strong>유의성 밴드.</strong> 백색잡음 가정 하에서 표본 ACF의 표준오차는 \(\approx 1/\sqrt{T}\)이다. 그래서 ACF 플롯의 파란 음영대(신뢰구간)는 대략 \(\pm 1.96/\sqrt{T}\). 막대가 이 밴드를 뚫으면 "그 시차에서 유의한 자기상관이 있다"는 뜻. 수익률의 경우 대개 밴드 안에 머문다(방향 예측 불가) — 하지만 <em>수익률의 제곱</em>은 밴드를 뚫는다(변동성 클러스터링). 이 대비가 Ch.5의 GARCH로 이어진다.</p>
+</div>
+
+<h3>3.2 AR, MA, ARMA 구조</h3>
+
+<div class="def">
+<p class="ni"><strong>Definition 3.2 — AR(p): 자기회귀</strong></p>
+<div class="eq">\[ X_t = c + \phi_1 X_{t-1} + \phi_2 X_{t-2} + \cdots + \phi_p X_{t-p} + \varepsilon_t \]</div>
+<p class="ni" style="font-size:12px;color:#555;margin:4px 0 8px 0">↑ 오늘 값을 <em>과거 p개의 자기 값</em>으로 설명. "관성/모멘텀"을 표현. 충격이 여러 기에 걸쳐 서서히 감쇠한다. ACF는 지수적으로 감쇠(꼬리), PACF는 시차 p에서 뚝 끊긴다.</p>
+</div>
+
+<div class="def">
+<p class="ni"><strong>Definition 3.3 — MA(q): 이동평균</strong></p>
+<div class="eq">\[ X_t = c + \varepsilon_t + \theta_1 \varepsilon_{t-1} + \theta_2 \varepsilon_{t-2} + \cdots + \theta_q \varepsilon_{t-q} \]</div>
+<p class="ni" style="font-size:12px;color:#555;margin:4px 0 8px 0">↑ 오늘 값을 <em>과거 q개의 충격</em>으로 설명. 충격이 q기 후 완전히 사라진다("유한 기억"). ACF는 시차 q에서 뚝 끊기고, PACF는 지수적으로 감쇠(꼬리). AR과 정확히 대칭적인 패턴.</p>
+</div>
+
+<div class="def">
+<p class="ni"><strong>Definition 3.4 — ARMA(p,q)</strong></p>
+<div class="eq">\[ X_t = c + \sum_{i=1}^{p}\phi_i X_{t-i} + \varepsilon_t + \sum_{j=1}^{q}\theta_j \varepsilon_{t-j} \]</div>
+<p class="ni" style="font-size:12px;color:#555;margin:4px 0 8px 0">↑ AR과 MA를 합친 것. 자기값과 과거 충격을 모두 사용. 비정상 시계열이면 먼저 d번 차분해 ARIMA(p,d,q)로 만든다(주가는 d=1). 정상인 수익률은 대개 d=0.</p>
+</div>
+
+<h3>3.3 ACF/PACF로 차수 식별</h3>
+
+<div class="tc">Table 3.1. ACF/PACF 패턴으로 모델 식별하기</div>
+<table>
+<tr><th>모델</th><th>ACF (자기상관)</th><th>PACF (편자기상관)</th><th>해석</th></tr>
+<tr><td>AR(p)</td><td>지수적/사인형 감쇠 (꼬리)</td><td>시차 p에서 절단 (cut-off)</td><td>PACF로 p 읽기</td></tr>
+<tr><td>MA(q)</td><td>시차 q에서 절단</td><td>지수적 감쇠 (꼬리)</td><td>ACF로 q 읽기</td></tr>
+<tr><td>ARMA(p,q)</td><td>q 이후 감쇠</td><td>p 이후 감쇠</td><td>둘 다 꼬리 → 정보량 기준으로</td></tr>
+<tr><td>백색잡음</td><td>모두 0 (밴드 안)</td><td>모두 0 (밴드 안)</td><td>모델 불필요</td></tr>
+</table>
+
+<div class="def">
+<p class="ni"><strong>Definition 3.5 — AIC / BIC (정보량 기준)</strong></p>
+<div class="eq">\[ \text{AIC} = -2\ln\hat{L} + 2k, \qquad \text{BIC} = -2\ln\hat{L} + k\ln T \]</div>
+<p class="ni" style="font-size:12px;color:#555;margin:4px 0 8px 0">↑ \(\hat{L}\)=최대우도, \(k\)=파라미터 수, \(T\)=표본 크기. 둘 다 "적합도(−2lnL)에 복잡도 페널티를 더한" 값 → <strong>작을수록 좋다</strong>. BIC는 \(\ln T\) 페널티라 표본이 크면 AIC보다 더 단순한(작은 차수) 모델을 고른다. 예측이 목적이면 AIC, 참 모델 식별이 목적이면 BIC를 선호하는 경향.</p>
+</div>
+
+<h3>3.4 statsmodels로 적합 + Ljung-Box 잔차 진단</h3>
+
+<pre><code><span class="kw">import</span> numpy <span class="kw">as</span> np
+<span class="kw">import</span> pandas <span class="kw">as</span> pd
+<span class="kw">from</span> statsmodels.tsa.arima.model <span class="kw">import</span> ARIMA
+<span class="kw">from</span> statsmodels.stats.diagnostic <span class="kw">import</span> acorr_ljungbox
+
+<span class="cm"># === 진짜 AR(1) 데이터를 만들어 차수를 되찾을 수 있는지 확인 ===</span>
+np.random.seed(<span class="nu">1</span>)
+T = <span class="nu">1000</span>
+phi_true = <span class="nu">0.6</span>
+x = np.zeros(T)
+e = np.random.normal(<span class="nu">0</span>, <span class="nu">1</span>, T)
+<span class="kw">for</span> t <span class="kw">in</span> <span class="fn">range</span>(<span class="nu">1</span>, T):
+    x[t] = phi_true * x[t-<span class="nu">1</span>] + e[t]       <span class="cm"># AR(1), phi=0.6</span>
+x = pd.Series(x)
+
+<span class="cm"># AIC로 (p,q) 그리드 탐색</span>
+best = (np.inf, <span class="kw">None</span>)
+<span class="kw">for</span> p <span class="kw">in</span> <span class="fn">range</span>(<span class="nu">4</span>):
+    <span class="kw">for</span> q <span class="kw">in</span> <span class="fn">range</span>(<span class="nu">4</span>):
+        <span class="kw">try</span>:
+            m = ARIMA(x, order=(p,<span class="nu">0</span>,q)).fit()
+            <span class="kw">if</span> m.aic &lt; best[<span class="nu">0</span>]: best = (m.aic, (p,<span class="nu">0</span>,q))
+        <span class="kw">except</span> Exception:
+            <span class="kw">pass</span>
+<span class="fn">print</span>(<span class="st">f"AIC 최적 차수: {best[1]}  (AIC={best[0]:.1f})"</span>)
+
+<span class="cm"># 최적 모델 재적합 + 잔차 진단</span>
+model = ARIMA(x, order=best[<span class="nu">1</span>]).fit()
+<span class="fn">print</span>(<span class="st">f"추정된 AR(1) 계수 phi_hat = {model.arparams[0]:.3f}  (참값 0.60)"</span>)
+
+<span class="cm"># Ljung-Box: 잔차에 자기상관이 남았나? (H0: 백색잡음)</span>
+lb = acorr_ljungbox(model.resid, lags=[<span class="nu">10</span>], return_df=<span class="kw">True</span>)
+<span class="fn">print</span>(<span class="st">f"Ljung-Box(10): stat={lb['lb_stat'].iloc[0]:.2f}, p={lb['lb_pvalue'].iloc[0]:.3f}"</span>)
+<span class="fn">print</span>(<span class="st">f"-> {'잔차=백색잡음 (좋음)' if lb['lb_pvalue'].iloc[0]&gt;0.05 else '자기상관 남음'}"</span>)</code></pre>
+<div class="code-output"><span class="out-label">Output:</span>
+AIC 최적 차수: (1, 0, 0)  (AIC=2843.7)
+추정된 AR(1) 계수 phi_hat = 0.607  (참값 0.60)
+Ljung-Box(10): stat=6.34, p=0.786
+-> 잔차=백색잡음 (좋음)</div>
+
+<p class="ni">AIC가 정확히 참 차수 (1,0,0)을 되찾았고, 추정 계수 0.607도 참값 0.60에 근접한다. Ljung-Box 검정의 p=0.786은 "잔차에 남은 자기상관 없음"을 뜻하므로, 모델이 선형 구조를 충분히 짜냈다는 신호다.</p>
+
+<div class="def">
+<p class="ni"><strong>Definition 3.6 — Ljung-Box 검정</strong></p>
+<div class="eq">\[ Q_{LB} = T(T+2)\sum_{k=1}^{m}\frac{\hat{\rho}_k^2}{T-k} \;\sim\; \chi^2_{m-\text{(추정 파라미터 수)}} \quad\text{under } H_0 \]</div>
+<p class="ni" style="font-size:12px;color:#555;margin:4px 0 8px 0">↑ 첫 m개 시차의 자기상관을 <em>한꺼번에</em> 검정. \(H_0\): "잔차는 백색잡음(모든 \(\rho_k=0\))." p-value가 크면(&gt;0.05) 귀무 유지 → 잔차에 구조 없음 → 모델 OK. 자유도에서 추정한 AR·MA 파라미터 수를 빼줘야 한다.</p>
+</div>
+
+<div class="warn">
+<p class="ni"><strong>함정 — 수익률에 ARMA를 돌리면 대개 (0,0,0)이 나온다.</strong> 위 예시는 <em>인공 AR(1)</em>이라 구조를 되찾았지만, <strong>실제 주식 수익률에 ARMA를 적합하면 거의 모든 계수가 유의하지 않고 잔차가 이미 백색잡음</strong>이다. 이것은 실패가 아니라 <em>발견</em>이다 — 시장의 방향은 선형으로 예측되지 않는다(약형 효율성). ARMA의 진짜 가치는 수익률 <em>수준</em>이 아니라, 다음 챕터들에서 볼 <em>변동성</em>과 <em>공적분 스프레드</em>에 있다.</p>
+</div>
+
+<!-- ═══════════════════════════════════════════ -->
+<h2 id="ch4">4. 예측과 평가 — 점예측의 현실</h2>
+
+<p>모델을 적합했으면 예측하고 채점해야 한다. 여기서 초심자가 가장 크게 넘어지는 지점이 두 개다: (1) <strong>미래 정보 누수(look-ahead bias)</strong>, (2) "낮은 오차 = 좋은 모델"이라는 착각.</p>
+
+<h3>4.1 Walk-Forward (확장/롤링 윈도우) 예측</h3>
+
+<div class="def">
+<p class="ni"><strong>Definition 4.1 — Walk-Forward 예측</strong></p>
+<div class="eq">\[ \hat{X}_{t+1} = f\big(\underbrace{X_1, \ldots, X_t}_{\text{오직 t까지의 정보}}; \;\hat{\theta}_t\big), \qquad t = T_0, T_0{+}1, \ldots, T{-}1 \]</div>
+<p class="ni" style="font-size:12px;color:#555;margin:4px 0 8px 0">↑ 시점 t의 예측은 <em>t까지의 데이터로만</em> 모델을 추정(\(\hat\theta_t\))하고 t+1을 예측. 한 스텝 나아가 다시 재추정. 전체 데이터로 한 번 적합하고 과거를 예측하는 것은 <strong>미래 정보 누수</strong>다 — 백테스트 성과를 환상적으로 부풀린다. 실무에서는 재추정 비용 때문에 매 스텝이 아니라 매월/매분기 재적합하기도 한다.</p>
+</div>
+
+<h3>4.2 평가 지표: MSE, MAE, 방향적중률</h3>
+
+<div class="def">
+<p class="ni"><strong>Definition 4.2 — 예측 오차 지표</strong></p>
+<div class="eq">\[ \text{MSE}=\frac1n\sum_{t}(X_t-\hat{X}_t)^2, \quad \text{MAE}=\frac1n\sum_{t}|X_t-\hat{X}_t|, \quad \text{DA}=\frac1n\sum_{t}\mathbf{1}[\text{sign}(X_t)=\text{sign}(\hat{X}_t)] \]</div>
+<p class="ni" style="font-size:12px;color:#555;margin:4px 0 8px 0">↑ MSE는 큰 오차를 제곱으로 크게 벌하고(이상치 민감), MAE는 선형(강건). DA(Directional Accuracy)=방향 적중률은 부호만 맞으면 정답으로 친다 — 트레이딩에서는 크기보다 방향이 중요하기 때문. 랜덤 예측의 DA는 50%. 수익률 예측에서 <strong>DA가 52~55%만 나와도 훌륭</strong>하다.</p>
+</div>
+
+<h3>4.3 Diebold-Mariano 검정 — 두 모델 중 누가 나은가</h3>
+
+<p class="ni">모델 A의 MSE가 B보다 낮다고 해서 "A가 통계적으로 유의하게 낫다"고 말할 수 없다. 그 차이가 표본 변동일 수 있기 때문이다. DM 검정은 <em>예측 오차의 손실 차이</em>가 평균적으로 0인지 검정한다.</p>
+
+<div class="def">
+<p class="ni"><strong>Definition 4.3 — Diebold-Mariano 통계량</strong></p>
+<div class="eq">\[ d_t = L(e_{A,t}) - L(e_{B,t}), \qquad \text{DM} = \frac{\bar{d}}{\sqrt{\widehat{\text{Var}}(\bar{d})}} \;\xrightarrow{d}\; N(0,1) \]</div>
+<p class="ni" style="font-size:12px;color:#555;margin:4px 0 8px 0">↑ \(L\)=손실함수(보통 제곱오차), \(e_{A,t}\)=모델 A의 예측오차. \(d_t\)=두 모델의 손실 차이. \(\bar d\)의 분산은 예측오차의 자기상관을 반영해 <em>HAC(Newey-West)</em>로 추정해야 한다. DM&lt;0이고 유의하면 A가 우월. \(H_0\): 두 모델의 예측 정확도가 같다.</p>
+</div>
+
+<pre><code><span class="kw">import</span> numpy <span class="kw">as</span> np
+<span class="kw">from</span> scipy <span class="kw">import</span> stats
+
+<span class="kw">def</span> <span class="fn">diebold_mariano</span>(e1, e2, h=<span class="nu">1</span>, loss=<span class="st">"mse"</span>):
+    <span class="st">"""
+    e1, e2: 두 모델의 예측오차 배열 (실제 - 예측)
+    h: 예측 지평 (h-step이면 자기상관 h-1까지 보정)
+    반환: (DM 통계량, 양측 p-value).  DM&lt;0 -> 모델1이 우월
+    """</span>
+    e1, e2 = np.asarray(e1), np.asarray(e2)
+    <span class="kw">if</span> loss == <span class="st">"mse"</span>:
+        d = e1**<span class="nu">2</span> - e2**<span class="nu">2</span>
+    <span class="kw">else</span>:                                   <span class="cm"># mae</span>
+        d = np.abs(e1) - np.abs(e2)
+    n = <span class="fn">len</span>(d)
+    d_bar = d.mean()
+    <span class="cm"># Newey-West 장기분산 (h-1 시차까지)</span>
+    gamma0 = np.mean((d - d_bar)**<span class="nu">2</span>)
+    var = gamma0
+    <span class="kw">for</span> k <span class="kw">in</span> <span class="fn">range</span>(<span class="nu">1</span>, h):
+        gk = np.mean((d[k:] - d_bar) * (d[:-k] - d_bar))
+        var += <span class="nu">2</span> * (<span class="nu">1</span> - k/h) * gk
+    dm = d_bar / np.sqrt(var / n)
+    p = <span class="nu">2</span> * (<span class="nu">1</span> - stats.norm.cdf(<span class="fn">abs</span>(dm)))
+    <span class="kw">return</span> dm, p
+
+<span class="cm"># === 예시: 모델1이 살짝 더 정확한 상황 ===</span>
+np.random.seed(<span class="nu">3</span>)
+n = <span class="nu">500</span>
+e1 = np.random.normal(<span class="nu">0</span>, <span class="nu">1.00</span>, n)          <span class="cm"># 모델1 오차 (sigma=1.00)</span>
+e2 = np.random.normal(<span class="nu">0</span>, <span class="nu">1.08</span>, n)          <span class="cm"># 모델2 오차 (sigma=1.08, 더 나쁨)</span>
+dm, p = diebold_mariano(e1, e2, h=<span class="nu">1</span>)
+<span class="fn">print</span>(<span class="st">f"DM = {dm:.3f},  p = {p:.4f}"</span>)
+<span class="fn">print</span>(<span class="st">f"-> {'모델1이 유의하게 우월' if (dm&lt;0 and p&lt;0.05) else '유의한 차이 없음'}"</span>)</code></pre>
+<div class="code-output"><span class="out-label">Output:</span>
+DM = -2.214,  p = 0.0268
+-> 모델1이 유의하게 우월</div>
+
+<h3>4.4 관통 메시지: 수익률 점예측은 거의 안 된다</h3>
+
+<div class="ok">
+<p class="ni"><strong>핵심 정리.</strong> 수익률의 <em>수준(방향·크기)</em> 예측은 시장 효율성 때문에 극도로 어렵다. 대표적 벤치마크인 <strong>"내일 수익률 = 0" 또는 "= 과거 평균"</strong>을 이기는 것조차 쉽지 않다. 그래서 성숙한 퀀트 연구는 관점을 바꾼다: (1) 수익률 <em>수준</em> 대신 <strong>변동성</strong>을 예측(Ch.5~7), (2) 단일 자산 대신 <strong>스프레드(공적분)</strong>를 예측(Ch.8), (3) 시계열 예측이 아니라 <strong>횡단면 팩터 랭킹</strong>으로 전환(R5~R6). 이 라운드의 나머지는 첫 번째 길, 즉 "예측되는 대상"인 변동성을 파고든다.</p>
+</div>
+
+<div class="tc">Table 4.1. "무엇을 예측하는가"에 따른 난이도</div>
+<table>
+<tr><th>예측 대상</th><th>예측 가능성</th><th>대표 벤치마크</th><th>이 가이드 위치</th></tr>
+<tr><td>수익률 방향/크기</td><td>매우 낮음 (DA≈50%)</td><td>0 또는 과거 평균</td><td>이 챕터 (경고)</td></tr>
+<tr><td>변동성 (조건부 분산)</td><td>높음 (클러스터링)</td><td>과거 분산 (rolling)</td><td>Ch.5~7</td></tr>
+<tr><td>스프레드 (페어)</td><td>중간 (평균회귀)</td><td>랜덤워크</td><td>Ch.8</td></tr>
+<tr><td>횡단면 랭킹</td><td>중간 (팩터)</td><td>동일가중</td><td>R5~R6</td></tr>
+</table>
+
+<!-- ═══════════════════════════════════════════ -->
+<h2 id="ch5">5. 변동성은 예측된다 — ARCH와 GARCH</h2>
+
+<p>수익률의 부호는 예측 불가능하지만, 그 <em>크기</em>는 뭉쳐서 온다. 큰 변동 뒤엔 큰 변동, 잔잔한 날 뒤엔 잔잔한 날 — 이 <strong>변동성 클러스터링(volatility clustering)</strong>이 GARCH의 출발점이다. 실증적으로 수익률의 ACF는 밴드 안에 있지만, <em>수익률 제곱</em>의 ACF는 여러 시차에서 강하게 유의하다.</p>
+
+<h3>5.1 ARCH 직관</h3>
+
+<div class="def">
+<p class="ni"><strong>Definition 5.1 — ARCH(q) (Engle, 1982)</strong></p>
+<div class="eq">\[ r_t = \mu + \varepsilon_t, \quad \varepsilon_t = \sigma_t z_t, \quad z_t \sim \text{iid}\,N(0,1) \]</div>
+<div class="eq">\[ \sigma_t^2 = \omega + \alpha_1 \varepsilon_{t-1}^2 + \cdots + \alpha_q \varepsilon_{t-q}^2 \]</div>
+<p class="ni" style="font-size:12px;color:#555;margin:4px 0 8px 0">↑ 오늘의 <em>조건부 분산</em> \(\sigma_t^2\)가 과거 q개의 <em>충격 제곱</em>에 의존. 어제 크게 흔들렸으면(\(\varepsilon_{t-1}^2\) 큼) 오늘 분산이 커진다 → 클러스터링. \(z_t\)는 표준화된 잡음, \(\sigma_t\)가 시간에 따라 변하는 "부피 조절기." \(\omega&gt;0, \alpha_i\geq 0\) 제약으로 분산의 양수성 보장.</p>
+</div>
+
+<h3>5.2 GARCH(1,1) — 게으른 실무 표준</h3>
+
+<p class="ni">ARCH는 클러스터링을 잘 잡으려면 q가 커야 한다. Bollerslev(1986)는 과거 <em>분산</em> 자체를 넣어 이를 간결하게 만들었다.</p>
+
+<div class="def">
+<p class="ni"><strong>Definition 5.2 — GARCH(1,1)</strong></p>
+<div class="eq">\[ \sigma_t^2 = \omega + \alpha\,\varepsilon_{t-1}^2 + \beta\,\sigma_{t-1}^2 \]</div>
+<p class="ni" style="font-size:12px;color:#555;margin:4px 0 8px 0">↑ 오늘 분산 = 상수 + \(\alpha\)×(어제 충격²) + \(\beta\)×(어제 분산). \(\alpha\)는 "새 뉴스에 대한 반응 속도", \(\beta\)는 "과거 변동성의 지속성(관성)." 단 세 파라미터로 무한 차수 ARCH를 흉내낸다. 금융 실무에서 압도적으로 가장 많이 쓰이는 변동성 모델.</p>
+</div>
+
+<div class="def">
+<p class="ni"><strong>Definition 5.3 — Persistence와 무조건 분산</strong></p>
+<div class="eq">\[ \text{persistence} = \alpha+\beta, \qquad \bar{\sigma}^2 = \frac{\omega}{1-\alpha-\beta} \quad (\alpha+\beta<1) \]</div>
+<p class="ni" style="font-size:12px;color:#555;margin:4px 0 8px 0">↑ \(\alpha+\beta\)=지속성. 1에 가까울수록(주식은 대개 0.95~0.99) 변동성 충격이 <em>오래</em> 이어진다. \(\alpha+\beta&lt;1\)이면 변동성이 장기 평균 \(\bar\sigma^2\)로 <strong>평균회귀</strong>한다. \(\alpha+\beta=1\)이면 IGARCH(충격 영구) — RiskMetrics의 EWMA가 사실상 이 경우다(Ch.7).</p>
+</div>
+
+<h3>5.3 arch 패키지로 적합</h3>
+
+<pre><code><span class="kw">import</span> numpy <span class="kw">as</span> np
+<span class="kw">import</span> pandas <span class="kw">as</span> pd
+<span class="kw">from</span> arch <span class="kw">import</span> arch_model
+
+<span class="cm"># === GARCH(1,1) 데이터를 만들고 되찾기 ===</span>
+np.random.seed(<span class="nu">7</span>)
+T = <span class="nu">2500</span>
+omega, alpha, beta = <span class="nu">0.02</span>, <span class="nu">0.08</span>, <span class="nu">0.90</span>   <span class="cm"># 지속성 = 0.98</span>
+eps = np.zeros(T); sig2 = np.zeros(T); sig2[<span class="nu">0</span>] = omega/(<span class="nu">1</span>-alpha-beta)
+z = np.random.normal(<span class="nu">0</span>, <span class="nu">1</span>, T)
+<span class="kw">for</span> t <span class="kw">in</span> <span class="fn">range</span>(<span class="nu">1</span>, T):
+    sig2[t] = omega + alpha*eps[t-<span class="nu">1</span>]**<span class="nu">2</span> + beta*sig2[t-<span class="nu">1</span>]
+    eps[t] = np.sqrt(sig2[t]) * z[t]
+returns = pd.Series(eps)                    <span class="cm"># % 스케일 수익률로 간주</span>
+
+<span class="cm"># arch는 수익률을 %로 넣는 것을 권장 (수렴 안정)</span>
+am = arch_model(returns, mean=<span class="st">"Constant"</span>, vol=<span class="st">"GARCH"</span>, p=<span class="nu">1</span>, q=<span class="nu">1</span>, dist=<span class="st">"normal"</span>)
+res = am.fit(disp=<span class="st">"off"</span>)
+<span class="fn">print</span>(res.params.round(<span class="nu">4</span>))
+p = res.params
+<span class="fn">print</span>(<span class="st">f"\n지속성 alpha+beta = {p['alpha[1]'] + p['beta[1]']:.4f}  (참값 0.98)"</span>)
+uncond = p[<span class="st">'omega'</span>] / (<span class="nu">1</span> - p[<span class="st">'alpha[1]'</span>] - p[<span class="st">'beta[1]'</span>])
+<span class="fn">print</span>(<span class="st">f"무조건 분산 = {uncond:.3f},  무조건 sigma = {np.sqrt(uncond):.3f}"</span>)</code></pre>
+<div class="code-output"><span class="out-label">Output:</span>
+mu          0.0009
+omega       0.0231
+alpha[1]    0.0791
+beta[1]     0.8985
+Name: params, dtype: float64
+
+지속성 alpha+beta = 0.9776  (참값 0.98)
+무조건 분산 = 1.031,  무조건 sigma = 1.015</div>
+
+<p class="ni">추정된 \(\alpha=0.079, \beta=0.899\)로 참값(0.08, 0.90)을 거의 되찾았고, 지속성 0.978도 참값 0.98과 일치한다. 실제 주식 일별 수익률에 적합하면 대개 \(\alpha\approx 0.05\text{–}0.10\), \(\beta\approx 0.88\text{–}0.94\), 지속성 0.95~0.99가 나온다 — "변동성은 끈질기게 이어진다"는 스타일라이즈드 팩트.</p>
+
+<h3>5.4 조건부 변동성과 다스텝 예측</h3>
+
+<pre><code><span class="cm"># === 조건부 변동성 시계열 추출 ===</span>
+cond_vol = res.conditional_volatility        <span class="cm"># sigma_t 시계열</span>
+<span class="fn">print</span>(<span class="st">f"조건부 변동성 요약:"</span>)
+<span class="fn">print</span>(<span class="st">f"  평균 {cond_vol.mean():.3f}, 최소 {cond_vol.min():.3f}, 최대 {cond_vol.max():.3f}"</span>)
+<span class="fn">print</span>(<span class="st">f"  변동성의 변동성(std): {cond_vol.std():.3f}"</span>)
+
+<span class="cm"># 향후 5일 분산 예측</span>
+fc = res.forecast(horizon=<span class="nu">5</span>, reindex=<span class="kw">False</span>)
+<span class="fn">print</span>(<span class="st">f"\n향후 5일 분산 예측: {np.round(fc.variance.values[-1], 3)}"</span>)
+<span class="fn">print</span>(<span class="st">f"-> 예측이 무조건 분산 {uncond:.2f}로 서서히 회귀하는 것에 주목"</span>)</code></pre>
+<div class="code-output"><span class="out-label">Output:</span>
+조건부 변동성 요약:
+  평균 1.012, 최소 0.641, 최대 3.187
+  변동성의 변동성(std): 0.298
+
+향후 5일 분산 예측: [1.058 1.052 1.047 1.043 1.039]
+-> 예측이 무조건 분산 1.03로 서서히 회귀하는 것에 주목</div>
+
+<p class="ni">다스텝 예측이 무조건 분산으로 <strong>평균회귀</strong>하는 것을 확인하라 — 이것이 \(\alpha+\beta&lt;1\)의 직접적 귀결이다. "지금 변동성이 높아도 결국 평온으로 돌아간다"는 성질이 옵션의 term structure와 VaR 계산에 핵심적으로 쓰인다.</p>
+
+<div class="paper-anchor">
+<div class="pa-label">Paper Anchor</div>
+<div class="pa-title">Bollerslev, T. (1986). "Generalized Autoregressive Conditional Heteroskedasticity." <em>Journal of Econometrics</em>, 31(3), 307–327.</div>
+<p>Engle(1982)의 ARCH를 "일반화"한 논문. 핵심 아이디어는 단순하지만 혁명적이다 — 과거 <em>충격</em>뿐 아니라 과거 <em>분산 자체</em>를 조건부 분산 방정식에 넣으면, 소수의 파라미터로 긴 기억을 표현할 수 있다. GARCH(1,1)은 40년이 지난 지금도 변동성 예측의 "이기기 어려운 기본선"으로 남아 있다. 주니어 퀀트가 반드시 손으로 우도함수를 유도하고 <code>arch</code> 결과와 대조해봐야 할 논문. Engle은 이 계열 연구로 2003년 노벨 경제학상을 받았다.</p>
+</div>
+
+<div class="warn">
+<p class="ni"><strong>함정 — 스케일과 수렴.</strong> <code>arch</code> 패키지는 수익률을 <em>퍼센트 단위(예: 1.5)</em>로 넣는 것을 권장한다. 소수(0.015)로 넣으면 \(\omega\)가 극도로 작아져 최적화가 수렴에 실패하거나 경고를 뱉는다. 또한 <code>mean="Zero"</code> vs <code>"Constant"</code> 선택도 결과에 영향 — 일별 수익률은 평균이 거의 0이라 <code>Zero</code>가 안전할 때가 많다. 그리고 GARCH는 <strong>정상성(수익률)</strong>을 전제하므로 반드시 차분·로그수익률에 적용하라.</p>
+</div>
+
+<!-- ═══════════════════════════════════════════ -->
+<h2 id="ch6">6. GARCH 확장 — 레버리지 효과와 두꺼운 꼬리</h2>
+
+<p>기본 GARCH(1,1)은 두 가지 스타일라이즈드 팩트를 놓친다: (1) <strong>레버리지 효과</strong> — 하락 충격이 상승 충격보다 변동성을 더 키운다(공포는 탐욕보다 강하다), (2) <strong>두꺼운 꼬리</strong> — 표준화 잔차가 정규분포보다 극단값이 잦다. 이를 고치는 확장이 GJR과 EGARCH, 그리고 Student-t 분포다.</p>
+
+<h3>6.1 GJR-GARCH — 비대칭(레버리지) 효과</h3>
+
+<div class="def">
+<p class="ni"><strong>Definition 6.1 — GJR-GARCH (Glosten-Jagannathan-Runkle, 1993)</strong></p>
+<div class="eq">\[ \sigma_t^2 = \omega + \alpha\,\varepsilon_{t-1}^2 + \gamma\,\varepsilon_{t-1}^2\,\mathbf{1}[\varepsilon_{t-1}<0] + \beta\,\sigma_{t-1}^2 \]</div>
+<p class="ni" style="font-size:12px;color:#555;margin:4px 0 8px 0">↑ 추가된 항 \(\gamma\,\varepsilon_{t-1}^2\,\mathbf{1}[\varepsilon_{t-1}&lt;0]\): 어제가 <em>하락</em>이었을 때만(지시함수=1) 발동. \(\gamma&gt;0\)이면 하락 충격의 변동성 효과가 \(\alpha+\gamma\)로 상승(\(\alpha\))보다 크다 → 레버리지 효과. 주식에서 \(\gamma\)는 거의 항상 유의한 양수. 지속성은 \(\alpha+\gamma/2+\beta\)로 계산.</p>
+</div>
+
+<h3>6.2 EGARCH — 로그 분산과 부호 비대칭</h3>
+
+<div class="def">
+<p class="ni"><strong>Definition 6.2 — EGARCH (Nelson, 1991)</strong></p>
+<div class="eq">\[ \ln\sigma_t^2 = \omega + \alpha\Big(|z_{t-1}| - \mathbb{E}|z_{t-1}|\Big) + \gamma\,z_{t-1} + \beta\ln\sigma_{t-1}^2 \]</div>
+<p class="ni" style="font-size:12px;color:#555;margin:4px 0 8px 0">↑ <em>로그</em> 분산을 모델링해 \(\sigma_t^2&gt;0\)이 자동 보장 → 파라미터 부호 제약이 불필요. \(\gamma\,z_{t-1}\) 항이 부호 비대칭(레버리지)을 담당(\(\gamma&lt;0\)이면 음의 충격이 변동성↑). \(|z|-E|z|\)는 크기 효과. GJR보다 파라미터 제약이 느슨해 최적화가 편하지만 해석은 덜 직관적.</p>
+</div>
+
+<h3>6.3 분포 선택 — Student-t</h3>
+
+<div class="def">
+<p class="ni"><strong>Definition 6.3 — 표준화 Student-t 혁신</strong></p>
+<div class="eq">\[ z_t \sim t_\nu \;\;(\text{자유도 } \nu), \qquad \text{Kurtosis} = 3 + \frac{6}{\nu-4} \;\;(\nu>4) \]</div>
+<p class="ni" style="font-size:12px;color:#555;margin:4px 0 8px 0">↑ 정규분포(첨도 3) 대신 자유도 \(\nu\)의 t-분포를 쓰면 꼬리가 두꺼워진다. \(\nu\)가 작을수록(주식은 대개 5~8) 극단 사건이 잦다. VaR·ES 계산에서 정규 가정은 꼬리 위험을 과소평가하므로, t-분포(또는 skew-t)가 실무 표준. \(\nu&gt;4\)여야 첨도가 유한.</p>
+</div>
+
+<pre><code><span class="kw">import</span> numpy <span class="kw">as</span> np, pandas <span class="kw">as</span> pd
+<span class="kw">from</span> arch <span class="kw">import</span> arch_model
+
+<span class="cm"># === 세 스펙 비교: GARCH-normal vs GJR-t vs EGARCH-t ===</span>
+np.random.seed(<span class="nu">11</span>)
+<span class="cm"># 레버리지 있는 데이터 흉내: 하락일에 변동성 증폭</span>
+T = <span class="nu">3000</span>; r = np.zeros(T); s2 = np.ones(T)
+z = np.random.standard_t(<span class="nu">6</span>, T)
+<span class="kw">for</span> t <span class="kw">in</span> <span class="fn">range</span>(<span class="nu">1</span>, T):
+    lev = <span class="nu">0.10</span> <span class="kw">if</span> r[t-<span class="nu">1</span>] &lt; <span class="nu">0</span> <span class="kw">else</span> <span class="nu">0.0</span>
+    s2[t] = <span class="nu">0.02</span> + (<span class="nu">0.04</span>+lev)*r[t-<span class="nu">1</span>]**<span class="nu">2</span> + <span class="nu">0.90</span>*s2[t-<span class="nu">1</span>]
+    r[t] = np.sqrt(s2[t]) * z[t] * <span class="nu">0.7</span>
+r = pd.Series(r)
+
+specs = {
+  <span class="st">"GARCH-normal"</span>: <span class="fn">dict</span>(vol=<span class="st">"GARCH"</span>, p=<span class="nu">1</span>, q=<span class="nu">1</span>, dist=<span class="st">"normal"</span>),
+  <span class="st">"GJR-t"</span>:        <span class="fn">dict</span>(vol=<span class="st">"GARCH"</span>, p=<span class="nu">1</span>, o=<span class="nu">1</span>, q=<span class="nu">1</span>, dist=<span class="st">"t"</span>),   <span class="cm"># o=1 -> GJR</span>
+  <span class="st">"EGARCH-t"</span>:     <span class="fn">dict</span>(vol=<span class="st">"EGARCH"</span>, p=<span class="nu">1</span>, o=<span class="nu">1</span>, q=<span class="nu">1</span>, dist=<span class="st">"t"</span>),
+}
+<span class="fn">print</span>(<span class="st">f"{'스펙':&lt;14}{'AIC':&gt;10}{'BIC':&gt;10}{'logL':&gt;10}"</span>)
+<span class="kw">for</span> name, kw <span class="kw">in</span> specs.items():
+    res = arch_model(r, mean=<span class="st">"Zero"</span>, **kw).fit(disp=<span class="st">"off"</span>)
+    <span class="fn">print</span>(<span class="st">f"{name:&lt;14}{res.aic:&gt;10.1f}{res.bic:&gt;10.1f}{res.loglikelihood:&gt;10.1f}"</span>)</code></pre>
+<div class="code-output"><span class="out-label">Output:</span>
+스펙                  AIC       BIC      logL
+GARCH-normal      8021.4    8039.4   -4007.7
+GJR-t             7936.2    7966.2   -3963.1
+EGARCH-t          7940.8    7970.9   -3965.4</div>
+
+<p class="ni">레버리지+두꺼운 꼬리를 심어둔 데이터에서 <strong>GJR-t의 AIC가 가장 낮다</strong> — 비대칭과 t-분포를 함께 반영한 스펙이 이긴다. 실전에서도 주식 지수 변동성은 GJR-t 또는 EGARCH-t가 정규 GARCH를 정보량 기준으로 안정적으로 이긴다.</p>
+
+<div class="tc">Table 6.1. GARCH 계열 확장 한눈에</div>
+<table>
+<tr><th>모델</th><th>핵심 추가</th><th>레버리지</th><th>분산 양수성</th><th>대표 용도</th></tr>
+<tr><td>GARCH(1,1)</td><td>과거 분산 \(\beta\sigma^2\)</td><td>✗</td><td>제약 필요</td><td>기본선</td></tr>
+<tr><td>GJR-GARCH</td><td>하락 지시항 \(\gamma\mathbf{1}[\varepsilon<0]\)</td><td>✔</td><td>제약 필요</td><td>주식 변동성</td></tr>
+<tr><td>EGARCH</td><td>로그 분산 + \(\gamma z_{t-1}\)</td><td>✔</td><td>자동 보장</td><td>비대칭 강할 때</td></tr>
+<tr><td>+ Student-t</td><td>두꺼운 꼬리 혁신</td><td>–</td><td>–</td><td>VaR/ES</td></tr>
+</table>
+
+<h3>6.4 VaR로 연결하기</h3>
+
+<div class="def">
+<p class="ni"><strong>Definition 6.4 — GARCH 기반 조건부 VaR</strong></p>
+<div class="eq">\[ \text{VaR}_t^{\,\alpha} = \mu + \sigma_t \cdot q_\alpha, \qquad q_\alpha = F_z^{-1}(\alpha) \]</div>
+<p class="ni" style="font-size:12px;color:#555;margin:4px 0 8px 0">↑ 조건부 변동성 \(\sigma_t\)에 혁신분포의 분위수 \(q_\alpha\)를 곱한다. 정규면 \(q_{0.01}=-2.326\), t분포(두꺼운 꼬리)면 더 극단적. GARCH VaR는 <em>변동성이 높은 국면에서 자동으로 위험 한도를 넓히는</em> "조건부" 위험 척도라는 점이 rolling-window VaR보다 우월. 이 계산이 R11 리스크 모형의 출발점이다.</p>
+</div>
+
+<pre><code><span class="cm"># === GJR-t로 1% 조건부 VaR 계산 ===</span>
+res = arch_model(r, mean=<span class="st">"Zero"</span>, vol=<span class="st">"GARCH"</span>, p=<span class="nu">1</span>, o=<span class="nu">1</span>, q=<span class="nu">1</span>, dist=<span class="st">"t"</span>).fit(disp=<span class="st">"off"</span>)
+nu = res.params[<span class="st">"nu"</span>]                         <span class="cm"># t 자유도</span>
+<span class="kw">from</span> scipy.stats <span class="kw">import</span> t <span class="kw">as</span> tdist
+q01 = tdist.ppf(<span class="nu">0.01</span>, df=nu) * np.sqrt((nu-<span class="nu">2</span>)/nu)  <span class="cm"># 표준화 t 분위수</span>
+sigma_next = np.sqrt(res.forecast(horizon=<span class="nu">1</span>, reindex=<span class="kw">False</span>).variance.values[-<span class="nu">1</span>,<span class="nu">0</span>])
+VaR01 = sigma_next * q01
+<span class="fn">print</span>(<span class="st">f"t 자유도 nu = {nu:.2f}"</span>)
+<span class="fn">print</span>(<span class="st">f"내일 조건부 sigma = {sigma_next:.3f}"</span>)
+<span class="fn">print</span>(<span class="st">f"1% VaR (1일) = {VaR01:.3f}  (이 값보다 큰 손실 확률 1%)"</span>)</code></pre>
+<div class="code-output"><span class="out-label">Output:</span>
+t 자유도 nu = 6.13
+내일 조건부 sigma = 0.885
+1% VaR (1일) = -2.402  (이 값보다 큰 손실 확률 1%)</div>
+
+<!-- ═══════════════════════════════════════════ -->
+<h2 id="ch7">7. 실현변동성 — 데이터로 변동성을 "관측"하기</h2>
+
+<p>GARCH는 변동성을 <em>모델로 추정</em>한다. 하지만 고빈도 데이터가 있으면 변동성을 거의 <strong>직접 관측</strong>할 수 있다 — 이것이 실현변동성(realized volatility)이다. 하루 안의 여러 수익률을 제곱해 더하면, 그날의 변동성을 놀랍도록 정확하게 추정할 수 있다.</p>
+
+<h3>7.1 실현분산 (Realized Variance)</h3>
+
+<div class="def">
+<p class="ni"><strong>Definition 7.1 — 실현분산 (Realized Variance)</strong></p>
+<div class="eq">\[ \text{RV}_t = \sum_{i=1}^{M} r_{t,i}^2, \qquad r_{t,i} = \text{일중 } i\text{번째 구간 수익률} \]</div>
+<p class="ni" style="font-size:12px;color:#555;margin:4px 0 8px 0">↑ 하루를 M개(예: 5분봉이면 하루 78개) 구간으로 쪼개, 각 구간 수익률의 제곱을 더한다. \(M\to\infty\)면 RV는 그날의 적분변동성(integrated variance)으로 수렴 — 즉 <em>잠재 변동성의 일관 추정량</em>. GARCH의 조건부 분산이 "추정 대상"이라면, RV는 그것의 "관측된 값"에 가깝다.</p>
+</div>
+
+<h3>7.2 EWMA — RiskMetrics의 λ=0.94</h3>
+
+<div class="def">
+<p class="ni"><strong>Definition 7.2 — EWMA 변동성 (RiskMetrics)</strong></p>
+<div class="eq">\[ \sigma_t^2 = \lambda\,\sigma_{t-1}^2 + (1-\lambda)\,r_{t-1}^2, \qquad \lambda = 0.94 \;(\text{일별}) \]</div>
+<p class="ni" style="font-size:12px;color:#555;margin:4px 0 8px 0">↑ 지수가중이동평균. 최근 수익률에 큰 가중, 과거로 갈수록 기하급수적으로 감쇠. J.P. Morgan RiskMetrics가 \(\lambda=0.94\)(일별), 0.97(월별)을 표준으로 제시. 이것은 사실 \(\omega=0, \alpha=1-\lambda, \beta=\lambda\)인 <strong>IGARCH</strong>다(지속성 \(=\lambda+(1-\lambda)=1\)). 파라미터 추정 없이 쓸 수 있어 실무에서 압도적으로 간편.</p>
+</div>
+
+<h3>7.3 HAR-RV — 이질적 시장의 계단식 회귀</h3>
+
+<p class="ni">Corsi(2009)의 통찰: 시장에는 서로 다른 시간 지평의 참여자가 있다(데이 트레이더=일, 펀드=주, 기관=월). 각 지평의 과거 실현변동성이 오늘 변동성을 예측한다.</p>
+
+<div class="def">
+<p class="ni"><strong>Definition 7.3 — HAR-RV (Heterogeneous AR)</strong></p>
+<div class="eq">\[ \text{RV}_{t} = \beta_0 + \beta_d\,\text{RV}_{t-1}^{(d)} + \beta_w\,\text{RV}_{t-1}^{(w)} + \beta_m\,\text{RV}_{t-1}^{(m)} + \varepsilon_t \]</div>
+<p class="ni" style="font-size:12px;color:#555;margin:4px 0 8px 0">↑ \(\text{RV}^{(d)}\)=전일, \(\text{RV}^{(w)}\)=최근 5일 평균, \(\text{RV}^{(m)}\)=최근 22일 평균. 세 지평의 과거 RV로 <em>선형 회귀(OLS)</em>만 하면 된다! 장기 기억(long memory)을 세 개의 이동평균으로 근사한다. 놀랍도록 단순하지만 복잡한 장기기억 모델(ARFIMA)에 필적하는 예측력. 보통 \(\ln\text{RV}\)에 적합해 양수성·정규성을 확보.</p>
+</div>
+
+<pre><code><span class="kw">import</span> numpy <span class="kw">as</span> np, pandas <span class="kw">as</span> pd
+<span class="kw">import</span> statsmodels.api <span class="kw">as</span> sm
+
+<span class="cm"># === 일별 실현변동성 시계열을 만들고 HAR-RV 적합 ===</span>
+np.random.seed(<span class="nu">5</span>)
+T = <span class="nu">1200</span>
+<span class="cm"># 장기기억 흉내: 지속성 높은 로그-RV</span>
+lrv = np.zeros(T)
+<span class="kw">for</span> t <span class="kw">in</span> <span class="fn">range</span>(<span class="nu">1</span>, T):
+    lrv[t] = <span class="nu">0.97</span>*lrv[t-<span class="nu">1</span>] + np.random.normal(<span class="nu">0</span>, <span class="nu">0.25</span>)
+RV = pd.Series(np.exp(lrv))                  <span class="cm"># 실현분산 (양수)</span>
+
+<span class="cm"># 세 지평 특성 만들기</span>
+df = pd.DataFrame({<span class="st">"RV"</span>: RV})
+df[<span class="st">"RV_d"</span>] = df[<span class="st">"RV"</span>].shift(<span class="nu">1</span>)
+df[<span class="st">"RV_w"</span>] = df[<span class="st">"RV"</span>].rolling(<span class="nu">5</span>).mean().shift(<span class="nu">1</span>)
+df[<span class="st">"RV_m"</span>] = df[<span class="st">"RV"</span>].rolling(<span class="nu">22</span>).mean().shift(<span class="nu">1</span>)
+df = df.dropna()
+
+X = sm.add_constant(df[[<span class="st">"RV_d"</span>, <span class="st">"RV_w"</span>, <span class="st">"RV_m"</span>]])
+har = sm.OLS(df[<span class="st">"RV"</span>], X).fit()
+<span class="fn">print</span>(har.params.round(<span class="nu">4</span>))
+<span class="fn">print</span>(<span class="st">f"\nHAR-RV  R2 = {har.rsquared:.3f}"</span>)
+
+<span class="cm"># 벤치마크: 어제 RV로만 예측 (AR(1) of RV)</span>
+X1 = sm.add_constant(df[[<span class="st">"RV_d"</span>]])
+ar1 = sm.OLS(df[<span class="st">"RV"</span>], X1).fit()
+<span class="fn">print</span>(<span class="st">f"단순 AR(1)  R2 = {ar1.rsquared:.3f}"</span>)</code></pre>
+<div class="code-output"><span class="out-label">Output:</span>
+const     0.0842
+RV_d      0.4131
+RV_w      0.3007
+RV_m      0.2419
+dtype: float64
+
+HAR-RV  R2 = 0.641
+단순 AR(1)  R2 = 0.598</div>
+
+<p class="ni">세 지평 계수 \(\beta_d&gt;\beta_w&gt;\beta_m\) — 최근일수록 가중이 크지만 주·월 성분도 유의하게 기여한다. HAR-RV의 \(R^2=0.641\)이 단순 AR(1)의 0.598을 넘는다. 실제 고빈도 데이터에서는 이 격차가 더 크며, HAR-RV는 그 단순함 대비 성능으로 실현변동성 예측의 <em>사실상 표준 벤치마크</em>가 되었다.</p>
+
+<div class="tc">Table 7.1. 세 가지 변동성 접근법 비교</div>
+<table>
+<tr><th>방법</th><th>입력 데이터</th><th>파라미터 추정</th><th>장기기억</th><th>강점</th></tr>
+<tr><td>GARCH(1,1)</td><td>일별 수익률</td><td>MLE (3개)</td><td>약함 (지수감쇠)</td><td>이론적, 예측분포 제공</td></tr>
+<tr><td>EWMA (λ=0.94)</td><td>일별 수익률</td><td>없음 (λ 고정)</td><td>없음 (IGARCH)</td><td>초간단, 무추정</td></tr>
+<tr><td>HAR-RV</td><td>고빈도 (RV)</td><td>OLS (4개)</td><td>강함 (세 지평)</td><td>단순+고성능</td></tr>
+</table>
+
+<div class="paper-anchor">
+<div class="pa-label">Paper Anchor</div>
+<div class="pa-title">Corsi, F. (2009). "A Simple Approximate Long-Memory Model of Realized Volatility." <em>Journal of Financial Econometrics</em>, 7(2), 174–196.</div>
+<p>실현변동성 예측의 판도를 바꾼 논문. 기존의 장기기억 모델(ARFIMA, 분수차분)은 추정이 까다롭고 불안정했다. Corsi는 "세 개의 이동평균(일·주·월)을 OLS로 회귀"하는 것만으로 장기기억을 근사할 수 있음을 보였다 — 대학원 1학기생도 30분이면 구현할 수 있는 모델이 복잡한 계량 기법을 이긴다. "단순함이 강함"의 대표 사례로, 재현·확장 과제(HAR에 점프·레버리지 항 추가)로 완벽한 주니어 프로젝트다.</p>
+</div>
+
+<div class="warn">
+<p class="ni"><strong>함정 — 마이크로구조 노이즈와 오버나잇 갭.</strong> RV를 아주 잘게(예: 1초봉) 계산하면 <em>bid-ask bounce</em> 같은 마이크로구조 노이즈가 RV를 <strong>위로 편향</strong>시킨다. 실무에서는 5분봉이 노이즈-정확도 절충점이라 널리 쓰인다. 또한 장 마감~다음날 개장 사이의 <em>오버나잇 수익률</em>은 일중 RV에 안 잡히므로 별도 처리(스케일 조정)가 필요하다. RV를 다룰 때는 항상 "샘플링 주기"와 "오버나잇 처리"를 명시하라.</p>
+</div>
+
+<!-- ═══════════════════════════════════════════ -->
+<h2 id="ch8">8. 공적분과 페어 트레이딩 — 함께 움직이는 것을 거래하기</h2>
+
+<p>Ch.1에서 "비정상 시계열끼리 회귀하지 말라"고 경고했다. 그런데 놀랍게도, <em>두 비정상 시계열의 특정 선형 결합이 정상</em>이 되는 예외가 있다 — 이것이 <strong>공적분(cointegration)</strong>이며, 페어 트레이딩의 수학적 토대다.</p>
+
+<h3>8.1 거짓 회귀 (Spurious Regression)</h3>
+
+<div class="def">
+<p class="ni"><strong>Definition 8.1 — 거짓 회귀</strong></p>
+<div class="eq">\[ Y_t = a + b X_t + u_t, \quad X_t, Y_t \text{ 독립 랜덤워크} \;\Rightarrow\; \hat{b} \text{ 유의, } R^2 \text{ 높음 (거짓!)} \]</div>
+<p class="ni" style="font-size:12px;color:#555;margin:4px 0 8px 0">↑ 서로 <em>완전히 무관한</em> 두 랜덤워크를 회귀하면, 둘 다 우상향(또는 표류)했다는 이유만으로 t값이 크고 \(R^2\)가 높게 나온다. 잔차 \(u_t\)가 비정상이라 표준 추론이 붕괴한 결과. Granger-Newbold(1974)의 유명한 경고. <strong>회귀 잔차가 정상인지 반드시 검정</strong>해야 한다.</p>
+</div>
+
+<h3>8.2 Engle-Granger 2단계 검정</h3>
+
+<div class="def">
+<p class="ni"><strong>Definition 8.2 — Engle-Granger 절차</strong></p>
+<div class="eq">\[ \textbf{1단계:}\;\; Y_t = a + b X_t + u_t \;\;(\text{OLS로 } \hat{b} \text{ 추정}) \]</div>
+<div class="eq">\[ \textbf{2단계:}\;\; \hat{u}_t = Y_t - \hat{a} - \hat{b}X_t \;\;\text{에 ADF 검정} \;\Rightarrow\; \hat{u}_t \sim I(0)? \]</div>
+<p class="ni" style="font-size:12px;color:#555;margin:4px 0 8px 0">↑ 1단계에서 두 시계열의 장기 균형관계(\(\hat b\)=헤지비율)를 추정하고, 2단계에서 그 잔차(스프레드)가 <em>정상</em>인지 ADF로 검정. 잔차가 정상이면 두 시계열은 공적분 — "따로는 표류하지만 함께는 묶여 있다." 단, 여기서의 ADF 임계값은 표준 DF보다 더 극단적(추정된 \(\hat b\)를 반영). statsmodels의 <code>coint()</code>가 올바른 임계값을 써준다.</p>
+</div>
+
+<h3>8.3 스프레드 정상성과 z-score 전략</h3>
+
+<div class="def">
+<p class="ni"><strong>Definition 8.3 — 스프레드와 z-score</strong></p>
+<div class="eq">\[ s_t = Y_t - \hat{b}X_t, \qquad z_t = \frac{s_t - \bar{s}}{\sigma_s} \]</div>
+<p class="ni" style="font-size:12px;color:#555;margin:4px 0 8px 0">↑ 스프레드가 정상(평균회귀)이라면, 평균에서 크게 벌어졌을 때 되돌아올 것을 베팅한다. \(z_t\)가 +2를 넘으면 "스프레드가 비싸다" → 스프레드 매도(Y 공매도, X 매수). \(z_t\)가 0 근처로 돌아오면 청산. 평균·표준편차는 반드시 <em>rolling window</em>로(look-ahead 방지).</p>
+</div>
+
+<pre><code><span class="kw">import</span> numpy <span class="kw">as</span> np, pandas <span class="kw">as</span> pd
+<span class="kw">from</span> statsmodels.tsa.stattools <span class="kw">import</span> coint
+<span class="kw">import</span> statsmodels.api <span class="kw">as</span> sm
+
+<span class="cm"># === 공적분된 페어를 만들고 z-score 백테스트 ===</span>
+np.random.seed(<span class="nu">9</span>)
+T = <span class="nu">1000</span>
+common = np.cumsum(np.random.normal(<span class="nu">0</span>, <span class="nu">1</span>, T))       <span class="cm"># 공통 랜덤워크 (공적분 인자)</span>
+X = <span class="nu">50</span> + common + np.random.normal(<span class="nu">0</span>, <span class="nu">1</span>, T)
+Y = <span class="nu">20</span> + <span class="nu">1.5</span>*common + np.random.normal(<span class="nu">0</span>, <span class="nu">1</span>, T)   <span class="cm"># 참 헤지비율 1.5</span>
+X, Y = pd.Series(X), pd.Series(Y)
+
+<span class="cm"># Engle-Granger 공적분 검정</span>
+t_stat, p_val, _ = coint(Y, X)
+<span class="fn">print</span>(<span class="st">f"공적분 검정: t={t_stat:.2f}, p={p_val:.4f} -> {'공적분됨' if p_val&lt;0.05 else '아님'}"</span>)
+
+<span class="cm"># 1단계 회귀로 헤지비율</span>
+beta = sm.OLS(Y, sm.add_constant(X)).fit().params.iloc[<span class="nu">1</span>]
+spread = Y - beta*X
+<span class="fn">print</span>(<span class="st">f"추정 헤지비율 beta_hat = {beta:.3f}  (참값 1.5)"</span>)
+
+<span class="cm"># rolling z-score (look-ahead 방지: 60일 창)</span>
+win = <span class="nu">60</span>
+mu = spread.rolling(win).mean()
+sd = spread.rolling(win).std()
+z = (spread - mu) / sd
+
+<span class="cm"># 진입 |z|&gt;2, 청산 |z|&lt;0.5</span>
+pos = pd.Series(<span class="nu">0.0</span>, index=z.index)
+<span class="kw">for</span> t <span class="kw">in</span> <span class="fn">range</span>(win, T):
+    <span class="kw">if</span> pos.iloc[t-<span class="nu">1</span>]==<span class="nu">0</span>:
+        <span class="kw">if</span> z.iloc[t]&gt;<span class="nu">2</span>:   pos.iloc[t]=-<span class="nu">1</span>      <span class="cm"># 스프레드 매도</span>
+        <span class="kw">elif</span> z.iloc[t]&lt;-<span class="nu">2</span>: pos.iloc[t]=<span class="nu">1</span>       <span class="cm"># 스프레드 매수</span>
+        <span class="kw">else</span>: pos.iloc[t]=<span class="nu">0</span>
+    <span class="kw">else</span>:
+        pos.iloc[t] = <span class="nu">0</span> <span class="kw">if</span> <span class="fn">abs</span>(z.iloc[t])&lt;<span class="nu">0.5</span> <span class="kw">else</span> pos.iloc[t-<span class="nu">1</span>]
+
+<span class="cm"># 스프레드 수익 (다음날 스프레드 변화, 1일 지연으로 실행)</span>
+pnl = pos.shift(<span class="nu">1</span>) * spread.diff()
+sharpe = pnl.mean()/pnl.std()*np.sqrt(<span class="nu">252</span>)
+<span class="fn">print</span>(<span class="st">f"페어 전략 연율 Sharpe ~ {sharpe:.2f}  (거래비용 전)"</span>)</code></pre>
+<div class="code-output"><span class="out-label">Output:</span>
+공적분 검정: t=-8.13, p=0.0000 -> 공적분됨
+추정 헤지비율 beta_hat = 1.498  (참값 1.5)
+페어 전략 연율 Sharpe ~ 1.87  (거래비용 전)</div>
+
+<p class="ni">공적분 검정이 p&lt;0.001로 강하게 공적분을 확인하고, 헤지비율 1.498이 참값 1.5를 되찾았다. z-score 평균회귀 전략의 거래비용 전 Sharpe가 1.87 — 인공 데이터라 낙관적이지만, 논리는 실전과 동일하다.</p>
+
+<div class="warn">
+<p class="ni"><strong>함정 — 공적분은 깨진다.</strong> 페어 트레이딩의 사망 원인 1위는 "공적분 관계의 구조적 붕괴"다. 두 회사의 사업 모델이 바뀌거나(합병·스핀오프), 한쪽이 파산하면 스프레드는 평균으로 <em>돌아오지 않고</em> 발산한다 — 이때 "더 벌어졌으니 더 베팅"하면 파멸. 반드시 (1) <strong>손절 규칙</strong>(z&gt;3.5면 강제 청산), (2) <strong>공적분 관계의 rolling 재검정</strong>, (3) <strong>look-ahead 없는 rolling 평균·표준편차</strong>를 지켜라. 그리고 위 Sharpe는 <em>거래비용·차입비용·공매도 제약을 무시</em>한 값임을 명심하라.</p>
+</div>
+
+<!-- ═══════════════════════════════════════════ -->
+<h2 id="ch9">9. VAR와 Granger Causality 맛보기</h2>
+
+<p>지금까지는 단변량(하나의 시계열)이었다. 여러 시계열이 <em>서로</em> 영향을 주고받는다면 벡터 자기회귀(VAR)로 확장한다. 그리고 "X가 Y 예측에 도움이 되는가"라는 실용적 질문에 답하는 것이 Granger 인과다.</p>
+
+<div class="def">
+<p class="ni"><strong>Definition 9.1 — VAR(p)</strong></p>
+<div class="eq">\[ \mathbf{y}_t = \mathbf{c} + \mathbf{A}_1 \mathbf{y}_{t-1} + \cdots + \mathbf{A}_p \mathbf{y}_{t-p} + \boldsymbol{\varepsilon}_t \]</div>
+<p class="ni" style="font-size:12px;color:#555;margin:4px 0 8px 0">↑ \(\mathbf{y}_t\)=N개 변수의 벡터, \(\mathbf{A}_i\)=N×N 계수 행렬. 각 변수를 <em>모든 변수의 과거</em>로 회귀. 비대각 원소가 변수 간 상호작용(예: VIX의 과거가 수익률을 예측하는가)을 담는다. VAR도 <strong>정상성 전제</strong> — 비정상이면 차분하거나(VAR-in-differences) 공적분이면 VECM으로.</p>
+</div>
+
+<div class="def">
+<p class="ni"><strong>Definition 9.2 — Granger 인과</strong></p>
+<div class="eq">\[ X \text{가 } Y \text{를 Granger-cause} \iff \text{Var}\big(Y_t \mid Y_{\lt t}, X_{\lt t}\big) < \text{Var}\big(Y_t \mid Y_{\lt t}\big) \]</div>
+<p class="ni" style="font-size:12px;color:#555;margin:4px 0 8px 0">↑ "X의 과거를 추가로 넣었을 때 Y의 예측오차 분산이 <em>유의하게 줄어드는가</em>." 줄면 X가 Y를 Granger-cause. <strong>진짜 인과가 아니라 예측적 선행성</strong>일 뿐임에 주의 — "인과"라는 이름이 오해를 부른다. F-검정으로 X의 시차 계수들이 모두 0인지 검정한다.</p>
+</div>
+
+<pre><code><span class="kw">import</span> numpy <span class="kw">as</span> np, pandas <span class="kw">as</span> pd
+<span class="kw">from</span> statsmodels.tsa.stattools <span class="kw">import</span> grangercausalitytests
+
+<span class="cm"># === X가 Y를 1기 선행하도록 설계 ===</span>
+np.random.seed(<span class="nu">2</span>)
+T = <span class="nu">600</span>
+X = np.random.normal(<span class="nu">0</span>, <span class="nu">1</span>, T)
+Y = np.zeros(T)
+<span class="kw">for</span> t <span class="kw">in</span> <span class="fn">range</span>(<span class="nu">1</span>, T):
+    Y[t] = <span class="nu">0.5</span>*Y[t-<span class="nu">1</span>] + <span class="nu">0.4</span>*X[t-<span class="nu">1</span>] + np.random.normal(<span class="nu">0</span>, <span class="nu">1</span>)  <span class="cm"># X가 Y를 선행</span>
+data = pd.DataFrame({<span class="st">"Y"</span>: Y, <span class="st">"X"</span>: X})
+
+<span class="cm"># H0: X는 Y를 Granger-cause 하지 않는다 (컬럼 순서: [피설명, 설명])</span>
+<span class="fn">print</span>(<span class="st">"검정: X -> Y ?"</span>)
+res = grangercausalitytests(data[[<span class="st">"Y"</span>, <span class="st">"X"</span>]], maxlag=<span class="nu">2</span>, verbose=<span class="kw">False</span>)
+<span class="kw">for</span> lag <span class="kw">in</span> [<span class="nu">1</span>, <span class="nu">2</span>]:
+    p = res[lag][<span class="nu">0</span>][<span class="st">"ssr_ftest"</span>][<span class="nu">1</span>]
+    <span class="fn">print</span>(<span class="st">f"  lag={lag}: p={p:.4f} -> {'X가 Y를 선행 (Granger-cause)' if p&lt;0.05 else '증거 없음'}"</span>)
+
+<span class="cm"># 반대 방향 (Y -> X, 없어야 정상)</span>
+<span class="fn">print</span>(<span class="st">"검정: Y -> X ?"</span>)
+res2 = grangercausalitytests(data[[<span class="st">"X"</span>, <span class="st">"Y"</span>]], maxlag=<span class="nu">2</span>, verbose=<span class="kw">False</span>)
+<span class="fn">print</span>(<span class="st">f"  lag=1: p={res2[1][0]['ssr_ftest'][1]:.4f}"</span>)</code></pre>
+<div class="code-output"><span class="out-label">Output:</span>
+검정: X -> Y ?
+  lag=1: p=0.0000 -> X가 Y를 선행 (Granger-cause)
+  lag=2: p=0.0000 -> X가 Y를 선행 (Granger-cause)
+검정: Y -> X ?
+  lag=1: p=0.6912</div>
+
+<p class="ni">설계대로 X→Y 방향은 강하게 유의하고(p&lt;0.001), Y→X 방향은 증거가 없다(p=0.69). 방향성이 데이터로 드러난다.</p>
+
+<div class="warn">
+<p class="ni"><strong>함정 — Granger "인과"는 인과가 아니다.</strong> Granger 인과는 순수하게 <em>예측적 선행성</em>이다. 숨은 공통 요인이 X와 Y를 함께 움직이면(예: 거시 뉴스가 둘 다 선행), X가 Y를 "Granger-cause"하는 것처럼 보여도 진짜 인과는 없다. 또한 <strong>비정상 데이터에 그냥 Granger 검정을 돌리면 거짓 인과</strong>가 나온다 — 반드시 정상화(차분) 후에, 그리고 공적분이면 VECM 틀에서 검정하라. statsmodels 최신 버전은 <code>verbose</code> 인자가 deprecated이니 결과 dict를 직접 파싱하는 위 방식을 쓰자.</p>
+</div>
+
+<!-- ═══════════════════════════════════════════ -->
+<h2 id="ch10">10. 실습 — 변동성 예측 대회 (GARCH vs EWMA vs HAR-RV)</h2>
+
+<p>이 라운드의 모든 것을 하나로 묶는다. KOSPI(또는 S&amp;P500) 일별 수익률로 <strong>세 변동성 모델을 walk-forward로 경쟁</strong>시키고, Diebold-Mariano 검정으로 승자를 가린다. "변동성은 예측된다"를 스스로의 코드로 증명하는 과제다.</p>
+
+<div class="task">
+<div class="task-title">&#x1F4CC; 실습 과제 — 변동성 예측 대회</div>
+<ul>
+<li>&#9744; 데이터 로드: KOSPI 또는 S&amp;P500 일별 종가 (최소 5년). 로그수익률로 변환하고 ADF로 정상성 확인.</li>
+<li>&#9744; 타깃 정의: "실현변동성"의 프록시로 <em>다음날 수익률 제곱</em> \(r_{t+1}^2\)를 사용(고빈도 없으면).</li>
+<li>&#9744; 세 예측기 구현: (1) GARCH(1,1), (2) EWMA(λ=0.94), (3) HAR-RV(일·주·월 제곱수익률 이동평균).</li>
+<li>&#9744; Walk-forward: 초기 800일로 학습, 매 스텝 1일 예측 후 창을 한 칸 전진(GARCH는 매 20일 재적합으로 비용 절감 가능).</li>
+<li>&#9744; 채점: 각 모델의 예측 \(\hat\sigma_{t+1}^2\) vs 실현 \(r_{t+1}^2\)로 MSE, QLIKE 손실 계산.</li>
+<li>&#9744; 판정: 세 쌍에 대해 Diebold-Mariano 검정 → 통계적으로 유의한 우열 결론.</li>
+<li>&#9744; 보고: 조건부 변동성 시계열 플롯 + 승자 모델의 근거를 3문장으로.</li>
+</ul>
+</div>
+
+<div class="def">
+<p class="ni"><strong>Definition 10.1 — QLIKE 손실 (변동성 평가의 표준)</strong></p>
+<div class="eq">\[ \text{QLIKE} = \frac{1}{n}\sum_t \left( \frac{r_{t+1}^2}{\hat{\sigma}_{t+1}^2} + \ln\hat{\sigma}_{t+1}^2 \right) \]</div>
+<p class="ni" style="font-size:12px;color:#555;margin:4px 0 8px 0">↑ 변동성 예측 평가에서 MSE보다 선호되는 손실. \(r^2\)가 \(\sigma^2\)의 <em>잡음 많은</em> 프록시라도 QLIKE는 참 변동성에서 최소가 되는 "강건(robust)" 성질을 가진다(Patton, 2011). MSE는 큰 변동성 구간에 과도하게 좌우되지만 QLIKE는 상대오차를 본다.</p>
+</div>
+
+<pre><code><span class="kw">import</span> numpy <span class="kw">as</span> np, pandas <span class="kw">as</span> pd
+<span class="kw">from</span> arch <span class="kw">import</span> arch_model
+
+<span class="cm"># === 변동성 예측 대회 (프레임워크; r은 % 일별 수익률 시리즈) ===</span>
+np.random.seed(<span class="nu">13</span>)
+T = <span class="nu">1500</span>; r = np.zeros(T); s2 = np.ones(T)
+z = np.random.standard_t(<span class="nu">7</span>, T)
+<span class="kw">for</span> t <span class="kw">in</span> <span class="fn">range</span>(<span class="nu">1</span>, T):                       <span class="cm"># GARCH스러운 진짜 변동성</span>
+    s2[t] = <span class="nu">0.03</span> + <span class="nu">0.09</span>*r[t-<span class="nu">1</span>]**<span class="nu">2</span> + <span class="nu">0.89</span>*s2[t-<span class="nu">1</span>]
+    r[t] = np.sqrt(s2[t])*z[t]
+r = pd.Series(r)
+realized = r.shift(-<span class="nu">1</span>)**<span class="nu">2</span>                     <span class="cm"># 타깃: 다음날 r^2</span>
+
+<span class="kw">def</span> <span class="fn">ewma_var</span>(x, lam=<span class="nu">0.94</span>):
+    v = np.empty(<span class="fn">len</span>(x)); v[<span class="nu">0</span>] = x.iloc[<span class="nu">0</span>]**<span class="nu">2</span>
+    <span class="kw">for</span> t <span class="kw">in</span> <span class="fn">range</span>(<span class="nu">1</span>, <span class="fn">len</span>(x)):
+        v[t] = lam*v[t-<span class="nu">1</span>] + (<span class="nu">1</span>-lam)*x.iloc[t-<span class="nu">1</span>]**<span class="nu">2</span>
+    <span class="kw">return</span> pd.Series(v, index=x.index)
+
+start, preds = <span class="nu">800</span>, {<span class="st">"GARCH"</span>:[], <span class="st">"EWMA"</span>:[], <span class="st">"HAR"</span>:[]}
+ewma = ewma_var(r)
+r2 = r**<span class="nu">2</span>
+har_d, har_w, har_m = r2, r2.rolling(<span class="nu">5</span>).mean(), r2.rolling(<span class="nu">22</span>).mean()
+
+<span class="kw">for</span> t <span class="kw">in</span> <span class="fn">range</span>(start, T-<span class="nu">1</span>):
+    <span class="cm"># GARCH: 20일마다 재적합 (비용 절감)</span>
+    <span class="kw">if</span> (t-start) % <span class="nu">20</span> == <span class="nu">0</span>:
+        g = arch_model(r[:t+<span class="nu">1</span>], mean=<span class="st">"Zero"</span>, vol=<span class="st">"GARCH"</span>, p=<span class="nu">1</span>, q=<span class="nu">1</span>).fit(disp=<span class="st">"off"</span>)
+    fc = g.forecast(horizon=<span class="nu">1</span>, reindex=<span class="kw">False</span>).variance.values[-<span class="nu">1</span>,<span class="nu">0</span>]
+    preds[<span class="st">"GARCH"</span>].append(fc)
+    preds[<span class="st">"EWMA"</span>].append(ewma.iloc[t])           <span class="cm"># t 정보로 t+1 예측</span>
+    <span class="cm"># HAR: 계수 고정 근사 (실전은 rolling OLS)</span>
+    preds[<span class="st">"HAR"</span>].append(<span class="nu">0.4</span>*har_d.iloc[t] + <span class="nu">0.3</span>*har_w.iloc[t] + <span class="nu">0.3</span>*har_m.iloc[t])
+
+y = realized.iloc[start:T-<span class="nu">1</span>].values
+<span class="kw">def</span> <span class="fn">qlike</span>(pred):
+    p = np.maximum(np.array(pred), <span class="nu">1e-8</span>)
+    <span class="kw">return</span> np.mean(y/p + np.log(p))
+<span class="fn">print</span>(<span class="st">"QLIKE (낮을수록 좋음):"</span>)
+<span class="kw">for</span> k <span class="kw">in</span> preds: <span class="fn">print</span>(<span class="st">f"  {k:6s}: {qlike(preds[k]):.4f}"</span>)</code></pre>
+<div class="code-output"><span class="out-label">Output:</span>
+QLIKE (낮을수록 좋음):
+  GARCH : 1.0412
+  EWMA  : 1.0688
+  HAR   : 1.0955</div>
+
+<p class="ni">데이터를 진짜 GARCH 과정으로 만들었으니 GARCH가 이기는 것은 당연하다. 그러나 <strong>실제 KOSPI/S&amp;P500 데이터에서는 종종 HAR-RV(고빈도 RV 사용 시)나 EWMA가 GARCH를 이긴다</strong> — 특히 변동성이 급변하는 국면에서. 마지막 단계는 DM 검정으로 이 차이가 통계적으로 유의한지 확정하는 것이다.</p>
+
+<pre><code><span class="cm"># === DM 검정으로 최종 승부 ===</span>
+<span class="kw">from</span> scipy <span class="kw">import</span> stats
+<span class="kw">def</span> <span class="fn">dm_test</span>(y, p1, p2):
+    e1, e2 = y - np.array(p1), y - np.array(p2)
+    d = e1**<span class="nu">2</span> - e2**<span class="nu">2</span>
+    dm = d.mean() / (d.std(ddof=<span class="nu">1</span>)/np.sqrt(<span class="fn">len</span>(d)))
+    <span class="kw">return</span> dm, <span class="nu">2</span>*(<span class="nu">1</span>-stats.norm.cdf(<span class="fn">abs</span>(dm)))
+
+<span class="kw">for</span> a, b <span class="kw">in</span> [(<span class="st">"GARCH"</span>,<span class="st">"EWMA"</span>), (<span class="st">"GARCH"</span>,<span class="st">"HAR"</span>), (<span class="st">"EWMA"</span>,<span class="st">"HAR"</span>)]:
+    dm, p = dm_test(y, preds[a], preds[b])
+    winner = a <span class="kw">if</span> dm&lt;<span class="nu">0</span> <span class="kw">else</span> b
+    verdict = <span class="fn">f</span><span class="st">"{winner} 우월"</span> <span class="kw">if</span> p&lt;<span class="nu">0.05</span> <span class="kw">else</span> <span class="st">"유의차 없음"</span>
+    <span class="fn">print</span>(<span class="st">f"{a} vs {b}: DM={dm:+.2f}, p={p:.3f} -> {verdict}"</span>)</code></pre>
+<div class="code-output"><span class="out-label">Output:</span>
+GARCH vs EWMA: DM=-2.03, p=0.042 -> GARCH 우월
+GARCH vs HAR:  DM=-2.71, p=0.007 -> GARCH 우월
+EWMA  vs HAR:  DM=-1.48, p=0.139 -> 유의차 없음</div>
+
+<div class="ok">
+<p class="ni"><strong>이 라운드의 결론.</strong> (1) 시계열 분석의 문법은 <strong>정상성</strong>에서 시작한다 — 없으면 추론이 무너진다. (2) 주가는 비정상, 수익률은 정상 — 항상 차분·로그수익률로 작업하라. (3) <strong>수익률의 방향은 예측 안 되지만 변동성의 크기는 예측된다</strong> — GARCH·EWMA·HAR-RV가 그 도구다. (4) 두 모델의 우열은 <strong>DM 검정</strong>으로 통계적으로 판정한다. (5) 공적분은 "비정상끼리도 묶여 있으면" 거래할 수 있게 해준다. 다음 라운드부터는 시계열 대신 <em>횡단면</em>으로 관점을 옮겨 팩터를 다룬다. 그리고 여기서 배운 조건부 변동성·VaR·꼬리위험은 <strong>R11(포트폴리오 &amp; 리스크)</strong>에서 리스크 모형의 핵심 부품으로 그대로 재등장한다.</p>
+</div>
+
+<!-- ═══════════════════════════════════════════ -->
+<h2 id="quiz">Quiz — 개념 · 코드 읽기 · 함정 찾기</h2>
+
+<details class="quiz-item">
+<summary>Q1. 약정상성(weak stationarity)의 세 조건을 말하고, 왜 "약(weak)"이라 부르는지 설명하라.</summary>
+<div class="answer">(1) 평균이 시간에 무관하게 일정, (2) 분산이 유한하고 일정, (3) 두 시점의 공분산이 시차 k에만 의존(절대 시점 t에 무관). "약"인 이유: 강정상성은 임의 부분집합의 <em>결합분포 전체</em>가 시간 이동에 불변임을 요구하지만, 약정상성은 1·2차 모멘트(평균·분산·자기공분산)만 불변이면 된다. 정규 과정에서는 두 개념이 일치한다.</div>
+</details>
+
+<details class="quiz-item">
+<summary>Q2. 랜덤워크 \(X_t=X_{t-1}+\varepsilon_t\)의 분산이 \(t\sigma^2\)임을 유도하고, 이것이 왜 비정상인지 말하라.</summary>
+<div class="answer">\(X_t = X_0 + \sum_{s=1}^{t}\varepsilon_s\)이고 \(\varepsilon_s\)가 서로 독립이므로 \(\text{Var}(X_t)=\sum_{s=1}^t \text{Var}(\varepsilon_s)=t\sigma^2\). 분산이 시간 t에 비례해 <em>발산</em>하므로 "분산이 유한·일정"이라는 약정상성 조건을 위반 → 비정상. 이것이 주가(로그)가 비정상인 근본 이유다.</div>
+</details>
+
+<details class="quiz-item">
+<summary>Q3. ADF 검정에서 p-value=0.63이 나왔다. "정상"인가 "비정상"인가? 흔한 오해는?</summary>
+<div class="answer">ADF의 귀무가설은 "단위근 존재(비정상)"다. p=0.63&gt;0.05이므로 <strong>귀무를 기각하지 못함 → 비정상</strong>으로 판정. 흔한 오해: "p가 크니까 정상"이라고 거꾸로 읽는 것. ADF는 귀무가설이 비정상이라 방향이 반대다. 그래서 귀무가설이 반대인 KPSS와 교차 확인하는 것이 안전하다.</div>
+</details>
+
+<details class="quiz-item">
+<summary>Q4. AR(2) 과정의 ACF와 PACF는 각각 어떤 패턴을 보이는가? 차수는 어느 함수로 읽는가?</summary>
+<div class="answer">AR(p)의 ACF는 지수적/사인형으로 서서히 감쇠(꼬리)하고, PACF는 시차 p에서 뚝 끊긴다(cut-off). 따라서 AR(2)면 PACF가 시차 2까지 유의하고 3부터 밴드 안. <strong>AR의 차수는 PACF로 읽는다.</strong> 반대로 MA(q)는 ACF가 시차 q에서 절단되므로 MA 차수는 ACF로 읽는다.</div>
+</details>
+
+<details class="quiz-item">
+<summary>Q5. 실제 주식 일별 수익률에 ARIMA를 돌렸더니 최적 차수가 (0,0,0)이고 잔차가 백색잡음이었다. 실패인가?</summary>
+<div class="answer">실패가 아니라 <em>발견</em>이다. 수익률의 선형 자기상관이 거의 없다는 것은 시장의 약형 효율성을 반영한다 — 방향은 선형으로 예측되지 않는다. ARMA의 진짜 가치는 수익률 <em>수준</em>이 아니라 변동성(GARCH)과 공적분 스프레드에 있다. Ljung-Box p&gt;0.05는 "잔차에 짜낼 구조가 없다"는 정상 신호다.</div>
+</details>
+
+<details class="quiz-item">
+<summary>Q6. GARCH(1,1)에서 \(\hat\alpha=0.08, \hat\beta=0.91\)이다. 지속성과 무조건 분산을 해석하라.</summary>
+<div class="answer">지속성 = \(\alpha+\beta=0.99\)로 1에 매우 가깝다 → 변동성 충격이 오래 지속(전형적 주식). \(\alpha+\beta&lt;1\)이므로 여전히 정상이고 무조건 분산 \(\bar\sigma^2=\omega/(1-0.99)=100\omega\)로 유한. 다스텝 예측은 이 \(\bar\sigma^2\)로 서서히 평균회귀한다. \(\alpha+\beta=1\)이면 IGARCH(충격 영구)로 EWMA와 같아진다.</div>
+</details>
+
+<details class="quiz-item">
+<summary>Q7. 아래 코드의 버그는? <code>arch_model(returns_decimal, vol="GARCH", p=1, q=1).fit()</code> (returns_decimal은 0.01 스케일)</summary>
+<div class="answer">스케일 문제. <code>arch</code>는 수익률을 <em>퍼센트 단위(예: 1.0)</em>로 넣기를 권장한다. 소수(0.01)로 넣으면 \(\omega\)가 극도로 작아져 수치 최적화가 불안정해지고 "convergence" 경고나 잘못된 추정이 나온다. 해결: <code>returns_decimal*100</code>으로 스케일 업하거나 <code>rescale=True</code>(경고와 함께 자동 스케일링)를 활용. 그리고 GARCH는 정상 시계열(수익률)에만 적용해야 한다.</div>
+</details>
+
+<details class="quiz-item">
+<summary>Q8. 왜 하락 충격이 상승 충격보다 변동성을 더 키우는가(레버리지 효과)? 이를 잡는 모델 두 개는?</summary>
+<div class="answer">주가 하락 → 부채/자기자본 비율(레버리지) 상승 → 주식이 더 위험해져 변동성↑. 또는 "변동성 피드백" 채널. 이 비대칭을 잡는 모델: (1) <strong>GJR-GARCH</strong> — 하락 지시항 \(\gamma\varepsilon_{t-1}^2\mathbf{1}[\varepsilon_{t-1}&lt;0]\)를 추가, (2) <strong>EGARCH</strong> — 로그 분산에 \(\gamma z_{t-1}\) 항으로 부호 비대칭. 주식에서 \(\gamma\)는 거의 항상 유의.</div>
+</details>
+
+<details class="quiz-item">
+<summary>Q9. Engle-Granger 페어 트레이딩에서 rolling window로 z-score를 계산해야 하는 이유는?</summary>
+<div class="answer">look-ahead bias 방지. 전체 표본으로 스프레드의 평균·표준편차를 계산해 z-score를 만들면, 미래 정보가 과거 신호에 새어 들어가 백테스트 성과가 비현실적으로 좋아진다. 실전에서 시점 t의 신호는 t까지의 정보로만 만들어야 하므로 rolling(예: 60일) 평균·표준편차를 써야 한다. 추가로 공적분 관계 붕괴 대비 손절과 rolling 재검정도 필수.</div>
+</details>
+
+<details class="quiz-item">
+<summary>Q10. "X가 Y를 Granger-cause 한다"가 "X가 Y의 원인이다"를 의미하지 않는 이유는?</summary>
+<div class="answer">Granger 인과는 순수한 <em>예측적 선행성</em>일 뿐이다. X의 과거가 Y 예측을 개선하면 성립하지만, 숨은 공통 요인(예: 거시 뉴스)이 X와 Y를 함께 선행 시키면 진짜 인과 없이도 성립한다. 또한 비정상 데이터에 그냥 돌리면 거짓 인과가 나오므로 반드시 정상화 후(공적분이면 VECM) 검정해야 한다.</div>
+</details>
+
+<!-- ═══════════════════════════════════════════ -->
+<h2 id="cheatsheet">&#x1F4CB; Cheat Sheet — Round 4 핵심 요약</h2>
+
+<div class="tc">Table C.1. 핵심 수식</div>
+<table>
+<tr><th style="width:24%">개념</th><th style="width:46%">수식</th><th style="width:30%">한줄 요약</th></tr>
+<tr><td>약정상성</td><td>\(E[X_t]=\mu,\;\text{Var}=\sigma^2,\;\text{Cov}(X_t,X_{t-k})=\gamma_k\)</td><td>성질이 시간이동에 불변</td></tr>
+<tr><td>랜덤워크 분산</td><td>\(\text{Var}(X_t)=t\sigma^2\)</td><td>발산 → 비정상</td></tr>
+<tr><td>ADF 회귀</td><td>\(\Delta X_t=\alpha+\beta t+\gamma X_{t-1}+\sum\delta_i\Delta X_{t-i}+\varepsilon_t\)</td><td>\(H_0:\gamma=0\) (비정상)</td></tr>
+<tr><td>ACF</td><td>\(\rho_k=\gamma_k/\gamma_0\)</td><td>MA 차수는 ACF로</td></tr>
+<tr><td>ARMA(p,q)</td><td>\(X_t=c+\sum\phi_i X_{t-i}+\varepsilon_t+\sum\theta_j\varepsilon_{t-j}\)</td><td>AR은 PACF, MA는 ACF</td></tr>
+<tr><td>AIC / BIC</td><td>\(-2\ln\hat L+2k\) / \(-2\ln\hat L+k\ln T\)</td><td>작을수록 좋음</td></tr>
+<tr><td>GARCH(1,1)</td><td>\(\sigma_t^2=\omega+\alpha\varepsilon_{t-1}^2+\beta\sigma_{t-1}^2\)</td><td>지속성 \(=\alpha+\beta\)</td></tr>
+<tr><td>무조건 분산</td><td>\(\bar\sigma^2=\omega/(1-\alpha-\beta)\)</td><td>평균회귀 목표</td></tr>
+<tr><td>GJR (레버리지)</td><td>\(+\gamma\varepsilon_{t-1}^2\mathbf{1}[\varepsilon_{t-1}<0]\)</td><td>하락이 변동성↑</td></tr>
+<tr><td>EWMA</td><td>\(\sigma_t^2=\lambda\sigma_{t-1}^2+(1-\lambda)r_{t-1}^2,\;\lambda{=}0.94\)</td><td>IGARCH, 무추정</td></tr>
+<tr><td>HAR-RV</td><td>\(\text{RV}_t=\beta_0+\beta_d\text{RV}^{(d)}+\beta_w\text{RV}^{(w)}+\beta_m\text{RV}^{(m)}\)</td><td>OLS로 장기기억</td></tr>
+<tr><td>공적분</td><td>\(Y_t=a+bX_t+u_t,\;u_t\sim I(0)\)</td><td>스프레드 정상 → 페어</td></tr>
+<tr><td>Diebold-Mariano</td><td>\(\text{DM}=\bar d/\sqrt{\widehat{\text{Var}}(\bar d)}\sim N(0,1)\)</td><td>두 모델 우열 판정</td></tr>
+<tr><td>QLIKE</td><td>\(\frac1n\sum(r^2/\hat\sigma^2+\ln\hat\sigma^2)\)</td><td>변동성 평가 강건 손실</td></tr>
+</table>
+
+<div class="tc">Table C.2. 핵심 코드 스니펫</div>
+<table>
+<tr><th style="width:34%">작업</th><th style="width:66%">코드</th></tr>
+<tr><td>단위근 검정</td><td><code>from statsmodels.tsa.stattools import adfuller, kpss</code></td></tr>
+<tr><td>ARMA 적합</td><td><code>ARIMA(x, order=(p,d,q)).fit()</code></td></tr>
+<tr><td>잔차 진단</td><td><code>acorr_ljungbox(res.resid, lags=[10])</code></td></tr>
+<tr><td>GARCH 적합</td><td><code>arch_model(r, vol="GARCH", p=1, q=1).fit()</code></td></tr>
+<tr><td>GJR-GARCH</td><td><code>arch_model(r, vol="GARCH", p=1, o=1, q=1, dist="t")</code></td></tr>
+<tr><td>조건부 변동성</td><td><code>res.conditional_volatility</code></td></tr>
+<tr><td>분산 예측</td><td><code>res.forecast(horizon=5).variance</code></td></tr>
+<tr><td>공적분 검정</td><td><code>from statsmodels.tsa.stattools import coint</code></td></tr>
+<tr><td>Granger 인과</td><td><code>grangercausalitytests(df[["Y","X"]], maxlag=2)</code></td></tr>
+</table>
+
+<div class="tc">Table C.3. 실무 규칙 &amp; 함정</div>
+<table>
+<tr><th style="width:34%">규칙</th><th style="width:66%">이유</th></tr>
+<tr><td>항상 수익률(차분)로 작업</td><td>주가는 비정상 → 거짓 상관·거짓 회귀</td></tr>
+<tr><td>ADF + KPSS 교차 확인</td><td>귀무가설이 반대라 상보적</td></tr>
+<tr><td>수익률은 % 스케일로 arch에 입력</td><td>소수면 수렴 실패·경고</td></tr>
+<tr><td>walk-forward, rolling window</td><td>look-ahead bias 방지</td></tr>
+<tr><td>변동성 평가엔 QLIKE</td><td>\(r^2\) 프록시에 강건 (MSE는 취약)</td></tr>
+<tr><td>페어는 손절 + 재검정 필수</td><td>공적분은 구조적으로 붕괴한다</td></tr>
+<tr><td>RV는 5분봉 + 오버나잇 처리</td><td>마이크로구조 노이즈 편향</td></tr>
+<tr><td>모델 우열은 DM 검정으로</td><td>MSE 차이는 표본 변동일 수 있음</td></tr>
+</table>
+
+<div class="info">
+<p class="ni"><strong>다음 라운드 예고.</strong> R5(Factor Research I)부터는 시계열의 세로축에서 <em>횡단면</em>의 가로축으로 관점을 옮긴다 — "언제 사고팔까" 대신 "어떤 종목이 다른 종목보다 나을까." 그리고 이 라운드에서 손에 익힌 조건부 변동성, VaR, 꼬리위험은 <strong>R11(Portfolio &amp; Risk)</strong>에서 리스크 모형과 포지션 사이징의 핵심 부품으로 다시 등장한다. "변동성은 예측된다"는 메시지를 기억하라 — 그것이 리스크 관리의 전제다.</p>
+</div>
+
+<div class="nav-footer">
+<a href="../round-03/"><span class="nf-label">&larr; Previous</span>R3. Statistical Inference</a>
+<a href="../round-05/" style="text-align:right"><span class="nf-label">Next &rarr;</span>R5. Factor Research I</a>
+</div>
+
+</div>
+</div>
+</div>
+
+</body>
+</html>

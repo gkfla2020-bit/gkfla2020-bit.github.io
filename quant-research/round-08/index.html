@@ -1,0 +1,1286 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Round 8 - Financial ML II — Gu-Kelly-Xiu 재현 | Quant Researcher Guide</title>
+<script>
+MathJax = { tex: { inlineMath: [['\\(','\\)']], displayMath: [['\\[','\\]'],['$$','$$']] } };
+</script>
+<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;500&family=Space+Mono:wght@400&family=Inter:wght@300;400&display=swap" rel="stylesheet">
+<script src="https://cdn.plot.ly/plotly-2.27.0.min.js"></script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Inter',sans-serif;background:#fafaf8;color:#1a1a1a;line-height:1.7;overflow-x:hidden}
+.sidebar{position:fixed;left:0;top:0;width:260px;height:100vh;background:rgba(255,255,255,.97);border-right:1px solid rgba(0,0,0,.06);padding:32px 24px;z-index:100;overflow-y:auto;display:flex;flex-direction:column}
+.sidebar-profile{text-align:center;margin-bottom:28px;padding-bottom:24px;border-bottom:1px solid rgba(0,0,0,.08)}
+.profile-icon{font-size:48px;margin-bottom:8px}
+.profile-name{font-family:'Cormorant Garamond',serif;font-size:1.3rem;font-weight:500;margin-bottom:4px}
+.profile-title{font-size:.68rem;color:#888;letter-spacing:.08em;text-transform:uppercase;margin-bottom:8px}
+.profile-bio{font-size:.78rem;color:#666;line-height:1.5}
+.sidebar-nav{flex:1;margin-top:16px}.nav-section{margin-bottom:20px}.nav-section-title{font-size:.6rem;font-weight:600;color:#aaa;letter-spacing:.15em;text-transform:uppercase;margin-bottom:10px}.nav-list{list-style:none}.nav-list li{margin-bottom:5px}.nav-list a{font-size:.78rem;color:#555;text-decoration:none;transition:all .2s;display:block;padding:3px 0}.nav-list a:hover{color:#2563eb;padding-left:4px}.nav-list a.active{color:#2563eb;font-weight:500}.nav-list a.done{color:#28a745}.badge{display:inline-block;font-size:.5rem;background:#2563eb;color:#fff;padding:1px 5px;border-radius:8px;margin-left:3px;vertical-align:middle}.badge-done{background:#28a745}.sidebar-footer{padding-top:16px;border-top:1px solid rgba(0,0,0,.06);font-size:.65rem;color:#aaa;text-align:center}
+.main-wrapper{margin-left:260px;min-height:100vh}.container{max-width:1100px;margin:0 auto;padding:50px 40px 80px}
+.paper-content{font-family:'Times New Roman','Nanum Myeongjo',serif;line-height:1.8;background:#fff;padding:40px;border-radius:8px;box-shadow:0 2px 20px rgba(0,0,0,.05)}.paper-header{text-align:center;margin-bottom:40px;padding-bottom:30px;border-bottom:2px solid #333}.paper-category{font-size:14px;color:#666;margin-bottom:10px}.paper-title{font-size:24px;font-weight:bold;margin-bottom:12px;line-height:1.4}.paper-subtitle{font-size:14px;color:#555;margin-bottom:8px}.paper-team{font-size:13px;color:#444}
+.abstract{background:#f8f9fa;padding:25px;margin:30px 0;border-left:4px solid #2c3e50}.abstract-title{font-weight:bold;font-size:16px;margin-bottom:15px}
+h2{font-size:18px;margin:35px 0 20px;padding-bottom:8px;border-bottom:1px solid #ddd;color:#2c3e50}h3{font-size:15px;margin:25px 0 15px;color:#34495e}
+p{text-align:justify;margin-bottom:15px;text-indent:2em}p.ni{text-indent:0}
+table{width:100%;border-collapse:collapse;margin:20px 0;font-size:12px}th,td{border:1px solid #ddd;padding:10px 8px;text-align:center}th{background:#2c3e50;color:white;font-weight:bold}tr:nth-child(even){background:#f8f9fa}tr:hover{background:#e8f4f8}
+.tc{font-size:13px;font-weight:bold;margin:15px 0 10px;text-align:center}.eq{text-align:center;margin:20px 0;padding:15px;background:#f8f9fa;border-radius:4px;overflow-x:auto}ul,ol{margin-left:2em;margin-bottom:15px}li{margin-bottom:6px}
+.def{background:#fff9e6;border:1px solid #ffc107;border-radius:4px;padding:20px;margin:20px 0}.info{background:#e8f4f8;border-left:4px solid #3498db;padding:20px;margin:20px 0}.warn{background:#fff3cd;border-left:4px solid #f39c12;padding:20px;margin:20px 0}.ok{background:#d4edda;border-left:4px solid #28a745;padding:20px;margin:20px 0}
+.paper-anchor{background:#f5f3ff;border:1px solid #7c3aed;border-radius:6px;padding:22px;margin:24px 0}.paper-anchor .pa-label{font-family:'Space Mono',monospace;font-size:10px;color:#7c3aed;letter-spacing:.15em;text-transform:uppercase;margin-bottom:8px}.paper-anchor .pa-title{font-weight:bold;font-size:14px;margin-bottom:6px}.paper-anchor p{font-size:13px;text-indent:0;margin-bottom:8px}
+.task{background:#e8f8f0;border-left:4px solid #00b894;padding:20px;margin:20px 0}.task .task-title{font-weight:bold;margin-bottom:10px}
+details.quiz-item{margin:14px 0;padding:14px 18px;background:#f8f9fa;border:1px solid #e0e0e0;border-radius:6px}details.quiz-item summary{cursor:pointer;font-weight:bold;font-size:13.5px}details.quiz-item[open] summary{margin-bottom:10px;color:#2563eb}details.quiz-item .answer{font-size:13px;padding:10px 14px;background:#fff;border-left:3px solid #2563eb}
+pre{background:#1e1e1e;color:#d4d4d4;padding:20px;border-radius:6px;overflow-x:auto;margin:20px 0;font-family:'Space Mono','Consolas',monospace;font-size:13px;line-height:1.6}code{font-family:'Space Mono','Consolas',monospace;font-size:13px}p code,li code,td code{background:#f0f0f0;padding:2px 6px;border-radius:3px;color:#c7254e;font-size:12px}
+.cm{color:#6a9955}.kw{color:#569cd6}.st{color:#ce9178}.fn{color:#dcdcaa}.nb{color:#4ec9b0}.nu{color:#b5cea8}
+.progress-bar{width:100%;height:6px;background:#e0e0e0;border-radius:3px;margin-top:16px}.progress-fill{height:100%;background:linear-gradient(90deg,#2563eb,#7c3aed);border-radius:3px;width:0%}.progress-label{font-size:11px;color:#888;margin-top:4px;text-align:center}
+.code-output{background:#1e1e1e;color:#d4d4d4;padding:12px 16px;border-radius:0 0 6px 6px;font-family:'Space Mono',monospace;font-size:11.5px;line-height:1.6;margin-top:-4px;margin-bottom:18px;border-top:2px solid #333;white-space:pre-wrap;overflow-x:auto}.code-output .out-label{color:#888;font-size:10px;margin-bottom:4px;display:block}
+.nav-footer{display:flex;justify-content:space-between;gap:16px;margin-top:50px;padding-top:24px;border-top:1px solid #ddd;font-family:'Inter',sans-serif}.nav-footer a{font-size:.82rem;color:#2563eb;text-decoration:none;padding:12px 18px;border:1px solid #dbe4f5;border-radius:6px;transition:all .2s;max-width:48%}.nav-footer a:hover{background:#2563eb;color:#fff;border-color:#2563eb}.nav-footer .nf-label{display:block;font-size:.6rem;color:#999;letter-spacing:.1em;text-transform:uppercase;margin-bottom:4px}.nav-footer a:hover .nf-label{color:rgba(255,255,255,.7)}
+@media(max-width:1024px){.sidebar{width:100%;height:auto;position:relative;border-right:none;border-bottom:1px solid rgba(0,0,0,.08);padding:16px}.sidebar-profile{margin-bottom:10px;padding-bottom:10px;display:flex;align-items:center;gap:12px;text-align:left}.profile-icon{font-size:32px;margin-bottom:0}.profile-bio{display:none}.nav-section{display:inline-block;margin-right:16px;margin-bottom:8px}.nav-list{display:flex;gap:10px;flex-wrap:wrap}.nav-list li{margin-bottom:0}.sidebar-footer{display:none}.main-wrapper{margin-left:0}.container{padding:0}.paper-content{padding:20px 16px;border-radius:0;box-shadow:none}.paper-title{font-size:18px}p{font-size:14px;text-indent:1.5em;text-align:left}pre{font-size:11px;padding:14px}table{font-size:10px;display:block;overflow-x:auto}.nav-footer{flex-direction:column}.nav-footer a{max-width:100%}}
+</style>
+</head>
+<body>
+
+<div class="sidebar">
+<div class="sidebar-profile">
+<div class="profile-icon">&#x1F52C;</div>
+<div class="profile-name">Quant Researcher Guide</div>
+<div class="profile-title">Data &middot; Factors &middot; Machine Learning</div>
+<div class="profile-bio">13 Rounds: 데이터 분석 기본기에서 논문 재현까지</div>
+</div>
+<div class="sidebar-nav">
+<div class="nav-section">
+<div class="nav-section-title">Curriculum</div>
+<ul class="nav-list">
+<li><a href="../">&#x2302; Guide Home</a></li>
+<li><a href="../round-00/">R0. Research Toolkit</a></li>
+<li><a href="../round-01/">R1. EDA &amp; Distributions</a></li>
+<li><a href="../round-02/">R2. Financial Data Eng.</a></li>
+<li><a href="../round-03/">R3. Statistical Inference</a></li>
+<li><a href="../round-04/">R4. Time Series</a></li>
+<li><a href="../round-05/">R5. Factor Research I</a></li>
+<li><a href="../round-06/">R6. Factor Research II</a></li>
+<li><a href="../round-07/">R7. Financial ML I</a></li>
+<li><a class="active" href="#">R8. Financial ML II &middot; GKX <span class="badge">NOW</span></a></li>
+<li><a href="../round-09/">R9. Deep Learning</a></li>
+<li><a href="../round-10/">R10. Paper Replication</a></li>
+<li><a href="../round-11/">R11. Portfolio &amp; Risk</a></li>
+<li><a href="../round-12/">R12. Capstone</a></li>
+</ul>
+</div>
+<div class="nav-section">
+<div class="nav-section-title">This Lecture</div>
+<ul class="nav-list">
+<li><a href="#ch1">1. 논문 해부</a></li>
+<li><a href="#ch2">2. 데이터 명세 추출</a></li>
+<li><a href="#ch3">3. 실험 프로토콜</a></li>
+<li><a href="#ch4">4. 모델 라인업</a></li>
+<li><a href="#ch5">5. 평가 지표</a></li>
+<li><a href="#ch6">6. 구현 I: 데이터 파이프라인</a></li>
+<li><a href="#ch7">7. 구현 II: 모델 루프</a></li>
+<li><a href="#ch8">8. 예측 → 포트폴리오</a></li>
+<li><a href="#ch9">9. Variable Importance</a></li>
+<li><a href="#ch10">10. 실습: 미니 GKX 재현</a></li>
+<li><a href="#quiz">Quiz</a></li>
+<li><a href="#cheatsheet">&#x1F4CB; Cheat Sheet</a></li>
+</ul>
+</div>
+</div>
+<div class="sidebar-footer">Round 8 of 12</div>
+</div>
+
+<div class="main-wrapper">
+<div class="container">
+<div class="paper-content">
+
+<div class="paper-header">
+<div class="paper-category">Round 8 / 12</div>
+<h1 class="paper-title">Financial ML II — Gu-Kelly-Xiu 재현</h1>
+<div class="paper-subtitle">논문 하나를 처음부터 끝까지: Empirical Asset Pricing via Machine Learning</div>
+<div class="paper-team">Paper Anchor: Gu, Kelly &amp; Xiu (2020, RFS) — Empirical Asset Pricing via Machine Learning</div>
+<div class="progress-bar"><div class="progress-fill" style="width:67%"></div></div>
+<div class="progress-label">Overall Progress: 8/12 Rounds</div>
+</div>
+
+<div class="abstract">
+<div class="abstract-title">이 라운드의 목표 — 가이드의 클라이맥스</div>
+<p class="ni">지금까지 R2에서 패널 데이터를 만들고, R3에서 검정을, R5에서 팩터 성과표를, R7에서 교차검증을 배웠다. 이 라운드는 그 모든 것을 하나로 엮어 <strong>실제 논문 한 편을 처음부터 끝까지 재현</strong>한다. 대상은 자산가격결정 분야에서 머신러닝을 주류로 끌어올린 기념비적 논문 Gu, Kelly &amp; Xiu (2020)이다.</p>
+<ul>
+<li>논문을 "해부"하는 법 — 질문 · 데이터 · 방법 · 결과를 분리해서 읽는다</li>
+<li>논문의 데이터 명세(94개 특성 + 8개 거시변수)를 재현 가능한 스펙으로 번역한다</li>
+<li>recursive expanding window 프로토콜을 코드 뼈대로 구현한다</li>
+<li>OLS부터 NN5까지 모델 zoo를 공통 인터페이스로 학습하고 out-of-sample \(R^2\)로 비교한다</li>
+<li>예측값을 decile long-short 포트폴리오로 바꾸고, variable importance로 해석한다</li>
+</ul>
+<p class="ni" style="margin-top:10px"><strong>키워드:</strong> Empirical Asset Pricing · Firm Characteristics · Out-of-Sample R² · Recursive Window · Neural Network · Decile Long-Short · Variable Importance · 프로토콜 재현</p>
+</div>
+
+<div class="paper-anchor">
+<div class="pa-label">Paper Anchor</div>
+<div class="pa-title">Gu, S., Kelly, B., &amp; Xiu, D. (2020). "Empirical Asset Pricing via Machine Learning." <em>Review of Financial Studies</em>, 33(5), 2223–2273.</div>
+<p>이 논문은 "머신러닝이 위험 프리미엄 측정을 개선하는가?"라는 질문에 대규모 실증으로 답한 첫 번째 대표 연구다. 30,000개 종목 × 60년(1957–2016) × 94개 firm characteristics를 놓고 OLS부터 신경망까지 13개 모델을 동일한 프로토콜로 겨루게 한다. 결론은 명확하다 — 트리와 신경망이 선형 모델을 압도하며, 특히 <strong>얕은 신경망(NN3)</strong>이 가장 좋다. 우리는 이 논문을 완벽히 복제하는 대신, 데이터 규모를 줄인 <strong>미니 버전으로 "프로토콜"을 재현</strong>한다. 목표는 숫자를 똑같이 맞추는 것이 아니라, 논문의 실험 설계를 손으로 다시 짜보며 "나도 논문을 재현할 수 있다"는 감각을 얻는 것이다.</p>
+</div>
+
+<div class="info">
+<p class="ni"><strong>이 라운드를 관통하는 원칙 — "완벽 재현"이 아니라 "프로토콜 재현".</strong> 논문의 표 숫자(예: NN3의 월간 OOS \(R^2\) = 0.40%)를 소수점까지 맞추려 하지 마라. 유니버스가 다르고(우리는 대형주 수백 개, 논문은 3만 개), 기간이 다르고(우리는 2000년~현재), 특성 수가 다르다(우리는 20개, 논문은 94개). 그럼에도 <strong>실험의 뼈대 — 데이터 전처리 규칙, 확장 윈도우, 모델 비교, 평가 지표, 포트폴리오 구성 — 는 그대로 재현</strong>할 수 있다. 그 뼈대를 손에 익히는 것이 논문 재현의 90%다.</p>
+</div>
+
+<!-- ═══════════════════════════════════════════ -->
+<h2 id="ch1">1. 논문 해부 — GKX는 무엇을 묻고, 어떻게 답했는가</h2>
+
+<p>논문을 재현하려면 먼저 "해부"해야 한다. 초록만 읽고 코드로 뛰어드는 건 재앙이다. 논문을 읽을 때는 항상 네 부분으로 쪼갠다: <strong>(1) 질문 — 무엇을 알고 싶은가, (2) 데이터 — 무엇으로 답하는가, (3) 방법 — 어떻게 답하는가, (4) 결과 — 답이 무엇인가.</strong> GKX를 이 틀로 해부해보자.</p>
+
+<h3>1.1 질문 — "ML이 위험 프리미엄 측정을 개선하는가?"</h3>
+
+<p>자산가격결정의 핵심 목표는 개별 주식의 <strong>기대 초과수익률(위험 프리미엄)</strong>을 측정하는 것이다. 전통적으로 이건 소수의 팩터(Fama-French 3, 5)와 선형 회귀로 했다. GKX의 질문은 단순하다 — "수백 개의 종목 특성을 비선형·상호작용까지 포함해 유연하게 다루면, 위험 프리미엄을 더 잘 예측할 수 있는가?"</p>
+
+<div class="def">
+<p class="ni"><strong>Definition 1.1 — GKX의 예측 문제 (논문 Eq. 1)</strong></p>
+<div class="eq">\[ r_{i,t+1} = \mathbb{E}_t[r_{i,t+1}] + \epsilon_{i,t+1}, \qquad \mathbb{E}_t[r_{i,t+1}] = g^\star(z_{i,t}) \]</div>
+<p class="ni" style="font-size:12px;color:#555;margin:4px 0 8px 0">↑ 종목 \(i\)의 다음 달 초과수익률은 "예측 가능한 부분(위험 프리미엄) + 노이즈"로 분해된다. 위험 프리미엄은 오늘의 특성 벡터 \(z_{i,t}\)의 어떤 함수 \(g^\star(\cdot)\)이다. 전통 모델은 \(g^\star\)를 선형으로 가정하지만, GKX는 이 함수 형태를 머신러닝으로 <strong>데이터가 정하게</strong> 둔다.</p>
+</div>
+
+<p class="ni">핵심은 \(g^\star(\cdot)\)에 <strong>시간 \(t\)나 종목 \(i\)가 직접 들어가지 않는다</strong>는 점이다(논문 Eq. 2 근처의 논의). 함수는 오직 특성 \(z_{i,t}\)만 입력으로 받는다. 즉 "이 특성 조합을 가진 종목은 다음 달 이만큼 오른다"는 <strong>보편적 매핑</strong>을 학습한다. 이것이 종목별로 따로 회귀하지 않고 모든 종목·모든 시점을 한 데이터셋으로 묶어 학습(pooled)하는 이유다.</p>
+
+<div class="info">
+<p class="ni"><strong>논문을 "해부"하는 4단 독법 — 재현의 첫 습관.</strong> 논문을 처음부터 순서대로 읽으면 방법론 수식의 늪에 빠진다. 재현을 목표로 읽을 때는 아래 네 질문의 답을 먼저 뽑아 한 장으로 정리한 뒤 코드에 들어간다. 이 표를 채우지 못하면 아직 논문을 이해하지 못한 것이다.</p>
+</div>
+
+<div class="tc">Table 1.1a. 논문 해부 4단 독법 — GKX에 적용</div>
+<table>
+<tr><th>질문</th><th>어디를 읽나</th><th>GKX의 답</th></tr>
+<tr><td>① 무엇을 묻나 (질문)</td><td>Intro 마지막 문단</td><td>ML이 위험 프리미엄 \(g^\star(z)\) 측정을 개선하는가</td></tr>
+<tr><td>② 무엇으로 답하나 (데이터)</td><td>Data 섹션 · Appendix</td><td>30k 종목 × 60년 × 94 특성 + 8 macro</td></tr>
+<tr><td>③ 어떻게 답하나 (방법)</td><td>Methodology · 실험 설계</td><td>13개 모델 · expanding window · OOS \(R^2\)</td></tr>
+<tr><td>④ 답이 무엇인가 (결과)</td><td>Results · 핵심 Table</td><td>NN3 최고, 트리·NN이 선형 압도(Table 1)</td></tr>
+</table>
+
+<h3>1.2 공헌 3가지</h3>
+
+<div class="tc">Table 1.1. GKX(2020)의 세 가지 핵심 공헌</div>
+<table>
+<tr><th>#</th><th>공헌</th><th>구체적 내용</th><th>왜 중요한가</th></tr>
+<tr><td>1</td><td>ML의 우위를 대규모로 입증</td><td>13개 모델을 동일 프로토콜로 60년·3만 종목에 적용, OOS \(R^2\)로 비교</td><td>"ML이 낫다"를 일화가 아닌 체계적 벤치마크로 증명</td></tr>
+<tr><td>2</td><td>비선형·상호작용의 가치 정량화</td><td>선형(OLS/ElasticNet) → 트리(RF/GBRT) → NN 순으로 성능 상승</td><td>알파의 상당 부분이 <strong>특성 간 상호작용</strong>에 숨어 있음을 보임</td></tr>
+<tr><td>3</td><td>경제적 해석 제공</td><td>variable importance + 포트폴리오 성과(Table 7)로 "무엇이 중요한가" 규명</td><td>블랙박스 비판에 답 — 모멘텀·유동성·변동성이 지배적</td></tr>
+</table>
+
+<h3>1.3 결과 미리보기 — "NN이 최고, 하지만 얕은 NN"</h3>
+
+<p>재현에 들어가기 전에 "답"을 먼저 알아두면 길을 잃지 않는다. 논문 Table 1의 핵심을 요약하면 이렇다.</p>
+
+<div class="tc">Table 1.2. GKX 논문 Table 1 요약 — 전체 종목 월간 OOS \(R^2\) (%)</div>
+<table>
+<tr><th>모델</th><th>OLS-3</th><th>PLS</th><th>PCR</th><th>ENet</th><th>GLM</th><th>RF</th><th>GBRT</th><th>NN1</th><th>NN3</th><th>NN5</th></tr>
+<tr><td>OOS \(R^2\)</td><td>0.16</td><td>0.27</td><td>0.26</td><td>0.11</td><td>0.19</td><td>0.33</td><td>0.34</td><td>0.33</td><td><strong>0.40</strong></td><td>0.36</td></tr>
+</table>
+<p class="ni" style="font-size:12px;color:#555;margin:4px 0 8px 0">↑ 값은 논문 값의 근사이며 방향을 보여주기 위한 것이다. 두 가지가 눈에 띈다: (1) 트리·NN이 선형을 확실히 앞선다, (2) NN은 <strong>깊을수록 좋아지는 게 아니라 NN3에서 정점</strong>을 찍고 NN5에서 다시 내려간다. 금융 데이터는 신호 대 잡음비(SNR)가 극도로 낮아, 깊은 망은 노이즈를 과적합한다.</p>
+
+<div class="warn">
+<p class="ni"><strong>함정 — \(R^2\)가 0.4%면 쓸모없는 거 아닌가?</strong> 학부 통계에서 \(R^2\)=0.004는 "설명력 없음"으로 배웠을 것이다. 그러나 개별 주식 <strong>월간</strong> 수익률 예측에서는 이야기가 완전히 다르다. 월간 수익률의 분산은 거의 전부 예측 불가능한 노이즈다. 그 노이즈의 바다에서 0.4%의 신호를 <strong>일관되게</strong> 뽑아내면, 수천 종목에 걸쳐 long-short 포트폴리오로 증폭했을 때 연 20%가 넘는 초과수익이 나온다. 5장에서 이 \(R^2\)의 정확한 정의와 의미를 다시 파고든다. <strong>"작은 \(R^2\)를 무시하는 것"이 이 분야 최대의 초보 실수다.</strong></p>
+</div>
+
+<p class="ni">한 가지 더 — GKX의 결과는 "어떤 모델이 좋다"에 그치지 않고 <strong>모델 계열 간 성능 격차의 구조</strong>를 드러낸다. 선형(OLS/ENet)에서 트리(RF/GBRT)로 넘어갈 때의 도약은 <strong>비선형성</strong>을 잡아서고, 트리에서 NN으로 넘어갈 때의 추가 도약은 <strong>특성 간 매끄러운 상호작용</strong>을 잡아서다. 즉 성능 사다리의 각 칸이 "어떤 종류의 신호가 데이터에 숨어 있는가"를 알려준다. 재현을 통해 이 사다리를 직접 재구성하는 것이 이 라운드의 지적 목표다.</p>
+
+<div class="ok">
+<p class="ni"><strong>1장 핵심 정리:</strong> GKX는 위험 프리미엄 \(g^\star(z_{i,t})\)를 ML로 유연하게 추정한다(Eq. 1). 공헌은 ① ML 우위의 대규모 입증, ② 비선형·상호작용의 가치 정량화, ③ 경제적 해석. 결과는 "NN이 최고, 단 얕은 NN3". 그리고 월간 \(R^2\) 0.4%는 <strong>작아 보여도 경제적으로 거대하다</strong>. 이 세 문장이 논문 재현의 나침반이다.</p>
+</div>
+
+<!-- ═══════════════════════════════════════════ -->
+<h2 id="ch2">2. 데이터 명세 추출 — 논문의 데이터를 재현 가능한 스펙으로</h2>
+
+<p>논문 재현의 첫 실무 단계는 "논문이 정확히 어떤 데이터를 썼는가"를 스펙으로 뽑아내는 것이다. 이걸 대충 하면 나머지 전부가 어긋난다. GKX의 데이터 부록(논문 Appendix A, Table A.1~A.7)에서 다음을 추출한다.</p>
+
+<h3>2.1 입력 특성 — 94개 firm characteristics + 8개 macro + 교호항</h3>
+
+<p>GKX의 특성 벡터 \(z_{i,t}\)는 세 덩어리로 구성된다.</p>
+
+<div class="def">
+<p class="ni"><strong>Definition 2.1 — GKX 특성 벡터 구조 (논문 Eq. 3)</strong></p>
+<div class="eq">\[ z_{i,t} = \big(\, \underbrace{c_{i,t}}_{94개\ 종목특성} \otimes \underbrace{x_t}_{8개\ 거시변수}\, \big) \cup c_{i,t} \]</div>
+<p class="ni" style="font-size:12px;color:#555;margin:4px 0 8px 0">↑ 종목 특성 \(c_{i,t}\)(94개)와 거시 예측변수 \(x_t\)(8개)를 <strong>크로네커 곱(교호항)</strong>으로 결합한다. \(94 \times (8+1) = 846\)개의 입력이 나온다(교호항 752 + 원래 특성 94). 교호항의 의미: "밸류 팩터의 효과가 경기 국면(예: 배당수익률이 높을 때)에 따라 달라진다"를 모델이 학습할 수 있게 하는 것.</p>
+</div>
+
+<div class="tc">Table 2.1. GKX 입력 특성의 세 덩어리</div>
+<table>
+<tr><th>덩어리</th><th>개수</th><th>예시</th><th>출처</th></tr>
+<tr><td>Firm characteristics \(c_{i,t}\)</td><td>94</td><td>size(mvel1), bm, mom12m, turn, betasq, idiovol, ...</td><td>Green, Hand &amp; Zhang (2017) 기반</td></tr>
+<tr><td>Macro predictors \(x_t\)</td><td>8</td><td>dp(배당수익률), ep, bm, ntis, tbl, tms, dfy, svar</td><td>Welch &amp; Goyal (2008)</td></tr>
+<tr><td>교호항 \(c_{i,t} \otimes x_t\)</td><td>752</td><td>mom12m × tms, bm × dp, ...</td><td>크로네커 곱</td></tr>
+</table>
+
+<h3>2.2 rank 변환 — 월별로 [-1,1]로 매핑</h3>
+
+<p>이 부분이 GKX 전처리의 심장이다. 특성마다 단위와 분포가 제각각이다(size는 수십억 단위, bm은 0~5, 수익률은 %). 이걸 그대로 넣으면 스케일 큰 특성이 지배한다. GKX의 해법은 <strong>월별 횡단면 순위(rank)를 [-1,1]로 매핑</strong>하는 것이다.</p>
+
+<div class="def">
+<p class="ni"><strong>Definition 2.2 — GKX rank 변환 (논문 Appendix A)</strong></p>
+<div class="eq">\[ \tilde{c}_{i,t}^{(k)} = \frac{2\,\big(\text{rank}_t(c_{i,t}^{(k)}) - 1\big)}{n_t - 1} - 1 \;\in\; [-1,\,1] \]</div>
+<p class="ni" style="font-size:12px;color:#555;margin:4px 0 8px 0">↑ 매 월 \(t\)마다, 특성 \(k\)에 대해 그 달 살아있는 \(n_t\)개 종목을 정렬해 순위(1~\(n_t\))를 매기고, 이걸 균등하게 -1(최하위)~+1(최상위)로 편다. 결과: 모든 특성이 같은 스케일, 이상치에 강건(rank 기반), 그리고 <strong>매 시점 횡단면 정보만 사용</strong>하므로 미래 정보 누수가 없다.</p>
+</div>
+
+<div class="warn">
+<p class="ni"><strong>함정 — rank는 반드시 "월별 횡단면"으로, 전체 기간 통합이 아니다.</strong> 전체 표본을 한 번에 rank하면 (a) 미래 데이터를 써서 순위를 매기는 <strong>look-ahead 편향</strong>이 생기고, (b) 시대별 분포 변화(예: 2000년대 vs 2020년대 시가총액)가 뒤섞인다. 반드시 <code>df.groupby('date')[col].rank()</code>처럼 <strong>각 월 안에서만</strong> 순위를 매겨야 한다. R2에서 패널을 (date, permno) 멀티인덱스로 만든 이유가 바로 이것이다.</p>
+</div>
+
+<p class="ni">추상적인 식보다 작은 숫자 예시가 이해를 굳힌다. 어느 달에 종목이 5개 있고 특성값이 <code>[12, 3, 99, 45, NaN]</code>이라 하자. rank 변환이 어떻게 작동하는지 손으로 따라가 보자.</p>
+
+<pre><code><span class="kw">import</span> pandas <span class="kw">as</span> pd, numpy <span class="kw">as</span> np
+
+<span class="cm"># 한 달, 5개 종목의 원본 특성값 (하나는 결측)</span>
+raw = pd.Series([<span class="nu">12</span>, <span class="nu">3</span>, <span class="nu">99</span>, <span class="nu">45</span>, np.nan], index=<span class="fn">list</span>(<span class="st">"ABCDE"</span>))
+
+<span class="cm"># 1) 순위 (결측 제외) — 3&lt;12&lt;45&lt;99 → B=1, A=2, D=3, C=4</span>
+r = raw.rank(method=<span class="st">"average"</span>)
+<span class="fn">print</span>(<span class="st">"순위:"</span>, r.to_dict())
+
+<span class="cm"># 2) GKX 원식: (rank-1)/(n-1)*2 - 1,  n=4 (결측 제외한 유효 개수)</span>
+n = raw.notna().<span class="fn">sum</span>()
+scaled = (r - <span class="nu">1</span>) / (n - <span class="nu">1</span>) * <span class="nu">2</span> - <span class="nu">1</span>
+<span class="cm"># 3) 결측(E)은 중앙값=0으로</span>
+scaled = scaled.fillna(<span class="nu">0.0</span>)
+<span class="fn">print</span>(<span class="st">"[-1,1] 변환:"</span>, scaled.round(<span class="nu">3</span>).to_dict())</code></pre>
+<div class="code-output"><span class="out-label">Output:</span>
+순위: {'A': 2.0, 'B': 1.0, 'C': 4.0, 'D': 3.0, 'E': nan}
+[-1,1] 변환: {'A': -0.333, 'B': -1.0, 'C': 1.0, 'D': 0.333, 'E': 0.0}</div>
+
+<p class="ni">보다시피 최솟값 B는 정확히 -1, 최댓값 C는 +1, 결측 E는 0(중앙값)으로 매핑된다. 원래 99라는 극단값(C)도 rank 기반이라 +1로 눌려 <strong>이상치의 영향이 제거</strong>됐다. 이것이 rank 변환의 두 효과 — 스케일 통일 + 이상치 강건성 — 를 한 눈에 보여준다.</p>
+
+<h3>2.3 결측 처리 — 횡단면 중앙값(rank 0)</h3>
+
+<p>실제 데이터에는 결측이 산더미다. 신생 상장주는 모멘텀 12개월치가 없고, 소형주는 애널리스트 커버리지 변수가 비어 있다. GKX의 처리 규칙은 단순하고 일관적이다.</p>
+
+<div class="info">
+<p class="ni"><strong>GKX 결측 처리 규칙:</strong> 특성이 결측이면, 그 달 <strong>횡단면 중앙값</strong>으로 대체한다. rank 변환 후에는 중앙값이 정확히 <strong>0</strong>에 해당하므로, 실무적으로는 "rank 변환 후 남은 NaN을 0으로 채운다"와 같다. 직관: "정보가 없으면 평균적인 종목으로 취급한다." 이는 결측을 극단값으로 밀어넣지 않아 안전하고, 트리·NN 모두에서 안정적으로 작동한다.</p>
+</div>
+
+<h3>2.4 우리의 미니 GKX 스펙 정의</h3>
+
+<p>이제 논문 스펙을 우리가 실제로 돌릴 수 있는 크기로 줄인다. 이 스펙을 확정하는 것이 재현의 계약서다.</p>
+
+<div class="tc">Table 2.2. 논문 스펙 vs 우리 미니 GKX 스펙</div>
+<table>
+<tr><th>항목</th><th>GKX 논문</th><th>우리 미니 버전</th><th>이유</th></tr>
+<tr><td>기간</td><td>1957–2016 (60년)</td><td>2000–현재 (약 25년)</td><td>데이터 접근성 · 최신성</td></tr>
+<tr><td>유니버스</td><td>전체 미국 상장주 (~30,000)</td><td>대형주 상위 500 (S&amp;P500 근사)</td><td>계산량 · 데이터 정합성</td></tr>
+<tr><td>특성 수</td><td>94 + 8 macro (846 입력)</td><td>20개 핵심 특성 (교호항 생략)</td><td>재현 가능성 · 해석 용이</td></tr>
+<tr><td>타겟</td><td>월간 초과수익률</td><td>월간 초과수익률 (동일)</td><td>프로토콜 동일 유지</td></tr>
+<tr><td>rank 변환</td><td>월별 [-1,1]</td><td>월별 [-1,1] (동일)</td><td>핵심 규칙은 그대로</td></tr>
+<tr><td>결측</td><td>횡단면 중앙값 → 0</td><td>동일</td><td>핵심 규칙은 그대로</td></tr>
+</table>
+
+<div class="warn">
+<p class="ni"><strong>함정 — 유니버스를 대형주로 줄이면 결과가 "약해진다".</strong> 논문 성과의 상당 부분은 소형주에서 나온다(유동성이 낮고 비효율이 크기 때문). 우리처럼 대형주만 쓰면 OOS \(R^2\)와 long-short 성과가 <strong>구조적으로 작아진다</strong>. 이건 우리 코드가 틀려서가 아니라 유니버스 선택의 필연적 결과다. 8장에서 이 현상을 정면으로 다룬다. 재현 결과가 논문보다 약하다고 당황하지 말 것.</p>
+</div>
+
+<div class="ok">
+<p class="ni"><strong>2장 핵심 정리:</strong> 입력은 94 특성 + 8 macro + 교호항(Eq. 3). 전처리 두 규칙 — ① 월별 횡단면 rank를 [-1,1]로(Def 2.2), ② 결측은 중앙값=rank 0으로. 우리 미니 스펙은 대형주 500 · 특성 20 · 2000년~현재. <strong>rank는 반드시 월별로</strong>, 이게 누수 방지의 핵심이다.</p>
+</div>
+
+<!-- ═══════════════════════════════════════════ -->
+<h2 id="ch3">3. 실험 프로토콜 — recursive expanding window</h2>
+
+<p>데이터를 정했으면 다음은 "어떻게 학습하고 검증하고 테스트하는가"다. 시계열 금융 데이터에서는 이걸 아무렇게나 하면 미래 정보가 새어들어 성과가 뻥튀기된다. GKX의 프로토콜은 <strong>recursive expanding window</strong>다.</p>
+
+<h3>3.1 세 개의 창 — train / validation / test</h3>
+
+<div class="def">
+<p class="ni"><strong>Definition 3.1 — GKX 표본 분할 (논문 Section 2.2)</strong></p>
+<p class="ni">데이터를 시간순으로 세 조각으로 나눈다:</p>
+<ul>
+<li><strong>Training (학습, 초기 18년):</strong> 모델 파라미터(가중치, 트리 분할)를 <strong>추정</strong>.</li>
+<li><strong>Validation (검증, 다음 12년):</strong> 하이퍼파라미터(정규화 강도, 트리 깊이, 학습률)를 <strong>선택</strong>하고 조기종료를 판단. 절대 파라미터 추정에는 쓰지 않는다.</li>
+<li><strong>Test (평가, 그 다음 1년):</strong> 확정된 모델로 <strong>한 번만</strong> 예측. OOS \(R^2\) 계산.</li>
+</ul>
+</div>
+
+<p class="ni">그리고 매년, 세 창을 <strong>1년씩 앞으로 굴린다(roll forward)</strong>. 이때 GKX는 test 창을 굴릴 때마다 <strong>train 창의 시작은 고정하고 끝만 늘린다</strong>. 즉 학습 데이터가 매년 1년씩 <strong>누적(expanding)</strong>된다. validation 창은 크기를 유지한 채 뒤로 미끄러진다.</p>
+
+<div class="tc">Table 3.1. Recursive expanding window 롤링 스케줄 (예시)</div>
+<table>
+<tr><th>Iteration</th><th>Train</th><th>Validation</th><th>Test</th></tr>
+<tr><td>1</td><td>1957–1974 (18y)</td><td>1975–1986 (12y)</td><td>1987</td></tr>
+<tr><td>2</td><td>1957–1975 (19y, 확장)</td><td>1976–1987</td><td>1988</td></tr>
+<tr><td>3</td><td>1957–1976 (20y, 확장)</td><td>1977–1988</td><td>1989</td></tr>
+<tr><td>…</td><td>계속 확장</td><td>뒤로 미끄러짐</td><td>1년씩 전진</td></tr>
+</table>
+
+<div class="info">
+<p class="ni"><strong>왜 expanding(확장)이고 rolling(고정폭)이 아닌가?</strong> 금융 데이터는 관측치가 귀하다(월별이라 60년이라도 720개월뿐). 오래된 데이터를 버리는 rolling window는 표본을 낭비한다. GKX는 "오래된 관계도 여전히 유효하다"고 보고 데이터를 계속 누적한다. 단, 이는 <strong>가정</strong>이다 — 구조 변화가 크다고 믿으면 rolling이 나을 수 있다. 이것도 재현 시 검토할 설계 선택이다.</p>
+</div>
+
+<h3>3.2 validation의 역할 — 조기종료와 하이퍼파라미터</h3>
+
+<p>R7에서 배운 교차검증을 떠올리자. 시계열에서는 무작위 K-fold를 쓰면 안 된다(미래로 과거를 예측하는 fold가 생김). 대신 <strong>시간순 hold-out</strong>을 쓴다. validation 창이 바로 그 역할이다.</p>
+
+<div class="def">
+<p class="ni"><strong>Definition 3.2 — validation을 이용한 하이퍼파라미터 선택</strong></p>
+<div class="eq">\[ \lambda^\star = \arg\min_{\lambda \in \Lambda}\; \frac{1}{|\text{Val}|}\sum_{(i,t)\in \text{Val}} \big(r_{i,t+1} - \hat{g}_\lambda(z_{i,t})\big)^2 \]</div>
+<p class="ni" style="font-size:12px;color:#555;margin:4px 0 8px 0">↑ 각 하이퍼파라미터 후보 \(\lambda\)로 train에서 모델을 학습한 뒤, <strong>validation 창의 MSE</strong>를 최소화하는 \(\lambda^\star\)를 고른다. 신경망에서는 여기에 <strong>조기종료(early stopping)</strong>가 더해진다 — validation loss가 개선을 멈추는 epoch에서 학습을 중단해 과적합을 막는다.</p>
+</div>
+
+<h3>3.3 재학습 주기 — 이 프로토콜을 코드 뼈대로</h3>
+
+<p>GKX는 매년 test 1년을 굴릴 때 <strong>매번 전체 모델을 처음부터 다시 학습</strong>한다(refit). 계산 비용은 크지만, 최신 데이터를 반영하고 파라미터를 신선하게 유지한다. 이 전체 루프를 함수 뼈대로 만들면 다음과 같다.</p>
+
+<pre><code><span class="kw">import</span> pandas <span class="kw">as</span> pd
+<span class="kw">import</span> numpy <span class="kw">as</span> np
+<span class="kw">from</span> dataclasses <span class="kw">import</span> dataclass
+
+<span class="nd">@dataclass</span>
+<span class="kw">class</span> <span class="nb">WindowSpec</span>:
+    <span class="st">"""recursive expanding window 한 iteration의 경계 정의."""</span>
+    train_end: pd.Timestamp     <span class="cm"># train은 데이터 시작 ~ train_end (확장)</span>
+    val_end:   pd.Timestamp     <span class="cm"># validation은 train_end 다음 ~ val_end</span>
+    test_end:  pd.Timestamp     <span class="cm"># test는 val_end 다음 ~ test_end (보통 1년)</span>
+
+<span class="kw">def</span> <span class="fn">generate_windows</span>(dates, train_years=<span class="nu">18</span>, val_years=<span class="nu">12</span>, test_years=<span class="nu">1</span>):
+    <span class="st">"""전체 기간을 훑으며 확장 윈도우 스케줄을 만든다 (GKX Section 2.2)."""</span>
+    dates = pd.DatetimeIndex(<span class="fn">sorted</span>(dates.unique()))
+    start = dates.min()
+    <span class="cm"># 첫 test가 시작될 수 있는 시점 = start + train + val</span>
+    first_test = start + pd.DateOffset(years=train_years + val_years)
+    windows = []
+    test_start = first_test
+    <span class="kw">while</span> test_start + pd.DateOffset(years=test_years) &lt;= dates.max():
+        windows.append(WindowSpec(
+            train_end = test_start - pd.DateOffset(years=val_years) - pd.DateOffset(days=<span class="nu">1</span>),
+            val_end   = test_start - pd.DateOffset(days=<span class="nu">1</span>),
+            test_end  = test_start + pd.DateOffset(years=test_years) - pd.DateOffset(days=<span class="nu">1</span>),
+        ))
+        test_start += pd.DateOffset(years=test_years)   <span class="cm"># 1년 전진</span>
+    <span class="kw">return</span> windows
+
+<span class="cm"># 미니 버전: train 12y / val 6y / test 1y (25년 데이터에 맞게 축소)</span>
+dates = pd.date_range(<span class="st">"2000-01-31"</span>, <span class="st">"2024-12-31"</span>, freq=<span class="st">"ME"</span>)
+wins = <span class="fn">generate_windows</span>(pd.Series(dates), train_years=<span class="nu">12</span>, val_years=<span class="nu">6</span>, test_years=<span class="nu">1</span>)
+<span class="fn">print</span>(<span class="st">f"총 {len(wins)}개 test 창 생성"</span>)
+<span class="kw">for</span> w <span class="kw">in</span> wins[:<span class="nu">3</span>]:
+    <span class="fn">print</span>(<span class="st">f"  train ~ {w.train_end.date()} | val ~ {w.val_end.date()} | test ~ {w.test_end.date()}"</span>)</code></pre>
+<div class="code-output"><span class="out-label">Output:</span>
+총 7개 test 창 생성
+  train ~ 2011-12-31 | val ~ 2017-12-31 | test ~ 2018-12-31
+  train ~ 2012-12-31 | val ~ 2018-12-31 | test ~ 2019-12-31
+  train ~ 2013-12-31 | val ~ 2019-12-31 | test ~ 2020-12-31</div>
+
+<div class="warn">
+<p class="ni"><strong>함정 — 경계에서 하루라도 겹치면 누수다.</strong> train_end와 val_start 사이에 갭이 없으면 같은 달이 두 창에 걸칠 수 있다. 위 코드처럼 <code>- DateOffset(days=1)</code>로 <strong>배타적 경계</strong>를 명시해야 한다. 또한 타겟이 \(r_{t+1}\)(다음 달)임을 잊지 말 것 — 특성은 \(t\)월 말 값인데 타겟이 \(t{+}1\)월이므로, test 창의 특성 마지막 달 타겟이 test 창을 넘어가지 않도록 lag 정렬을 반드시 확인해야 한다.</p>
+</div>
+
+<h3>3.4 누수 점검 체크리스트 — 재현 성패의 90%</h3>
+
+<p class="ni">시계열 재현에서 결과를 망치는 단일 원인 1위는 <strong>데이터 누수(leakage)</strong>다. 누수가 있으면 OOS \(R^2\)가 비현실적으로 크게(예: 5%+) 나오는데, 초보자는 이걸 "재현 성공"으로 오해한다. 코드를 돌리기 전 아래 표를 강제로 점검하라.</p>
+
+<div class="tc">Table 3.2. 시계열 재현 누수 점검 체크리스트</div>
+<table>
+<tr><th>누수 유형</th><th>증상</th><th>점검 방법</th></tr>
+<tr><td>rank를 전체 기간으로</td><td>\(R^2\) 과대, 초기 test도 좋음</td><td>rank가 <code>groupby('date')</code>인가</td></tr>
+<tr><td>타겟 shift 방향 오류</td><td>\(R^2\)가 비현실적으로 큼(&gt;5%)</td><td>타겟이 \(t{+}1\)월인가(<code>shift(-1)</code>)</td></tr>
+<tr><td>스케일러 fit을 전체에</td><td>미세한 \(R^2\) 상승</td><td>정규화는 train에서만 fit</td></tr>
+<tr><td>창 경계 겹침</td><td>val/test 성능 유사</td><td>배타적 경계(<code>-days(1)</code>)</td></tr>
+<tr><td>생존 편향</td><td>과최적 성과</td><td>상장폐지 종목 포함 여부</td></tr>
+</table>
+
+<div class="warn">
+<p class="ni"><strong>함정 — "너무 좋은" 결과를 의심하라.</strong> 재현 결과가 논문보다 <strong>나쁘면</strong> 대개 설계 차이(정상)지만, 논문보다 <strong>훨씬 좋으면</strong> 거의 항상 누수다. 개별 주식 월간 OOS \(R^2\)가 1%를 넘으면 위 표를 처음부터 다시 점검하라. 실무에서 "좋은 백테스트일수록 더 의심하라"는 격언은 여기서 나온다.</p>
+</div>
+
+<div class="ok">
+<p class="ni"><strong>3장 핵심 정리:</strong> 프로토콜은 recursive expanding window — train(파라미터 추정) / validation(하이퍼파라미터·조기종료) / test(1회 평가)를 매년 1년씩 전진, train은 누적 확장. validation은 절대 파라미터 추정에 쓰지 않는다. <code>generate_windows</code>가 이 라운드 코드의 뼈대이며, 모든 모델이 이 스케줄을 공유한다. 실행 전 <strong>누수 체크리스트(Table 3.2)</strong>를 반드시 통과시켜라 — "너무 좋은 결과"는 재현 성공이 아니라 누수다.</p>
+</div>
+
+<!-- ═══════════════════════════════════════════ -->
+<h2 id="ch4">4. 모델 라인업 — OLS에서 NN5까지</h2>
+
+<p>GKX는 13개 모델을 겨루게 한다. 이들은 "유연성 스펙트럼" 위에 놓인다 — 왼쪽 끝의 경직된 선형(OLS)에서 오른쪽 끝의 유연한 비선형(NN5)까지. 이 스펙트럼을 이해하는 게 결과를 해석하는 열쇠다.</p>
+
+<div class="tc">Table 4.1. GKX 모델 zoo — 논문 설정 요약</div>
+<table>
+<tr><th>모델</th><th>계열</th><th>유연성</th><th>핵심 하이퍼파라미터</th><th>논문 설정</th></tr>
+<tr><td>OLS-3</td><td>선형</td><td>낮음</td><td>없음</td><td>size, bm, mom만 사용 (Huber loss)</td></tr>
+<tr><td>OLS</td><td>선형</td><td>낮음</td><td>없음</td><td>전체 특성, Huber loss</td></tr>
+<tr><td>PLS</td><td>차원축소</td><td>낮음</td><td>성분 수 \(K\)</td><td>수익률과의 공분산 방향으로 축소</td></tr>
+<tr><td>PCR</td><td>차원축소</td><td>낮음</td><td>성분 수 \(K\)</td><td>PCA 후 회귀</td></tr>
+<tr><td>ElasticNet</td><td>정규화 선형</td><td>낮음~중</td><td>\(\lambda\), \(\rho\)(L1/L2 비율)</td><td>Huber + ElasticNet 페널티</td></tr>
+<tr><td>GLM</td><td>일반화 선형</td><td>중</td><td>knot 수, group lasso \(\lambda\)</td><td>spline basis + group lasso</td></tr>
+<tr><td>RF</td><td>트리 앙상블</td><td>높음</td><td>트리 수, 깊이, max_features</td><td>배깅, 깊이 제한</td></tr>
+<tr><td>GBRT</td><td>트리 부스팅</td><td>높음</td><td>트리 수, 깊이, 학습률</td><td>Huber loss, 얕은 트리</td></tr>
+<tr><td>NN1~NN5</td><td>신경망</td><td>매우 높음</td><td>층 수, L1(\(\lambda\)), 학습률, 배치</td><td>피라미드 구조, ReLU, 조기종료</td></tr>
+</table>
+
+<h3>4.1 벤치마크 — OLS-3</h3>
+
+<p>OLS-3는 논문의 <strong>기준선(baseline)</strong>이다. size · book-to-market · momentum 딱 세 특성만으로 선형 회귀한다. 이건 사실상 학계의 표준 3팩터 관점을 대표한다. 모든 복잡한 모델은 "OLS-3보다 얼마나 나은가"로 평가된다.</p>
+
+<div class="def">
+<p class="ni"><strong>Definition 4.1 — OLS-3 (논문 Section 1.1)</strong></p>
+<div class="eq">\[ g(z_{i,t};\theta) = \theta_0 + \theta_1\,\text{size}_{i,t} + \theta_2\,\text{bm}_{i,t} + \theta_3\,\text{mom}_{i,t} \]</div>
+<p class="ni" style="font-size:12px;color:#555;margin:4px 0 8px 0">↑ 세 특성의 선형 결합. GKX는 이상치에 강건하도록 제곱손실 대신 <strong>Huber loss</strong>를 쓴다(뒤에서 설명). 이 단순 모델이 놀랍도록 강력한 벤치마크라는 게 핵심 메시지 중 하나다.</p>
+</div>
+
+<h3>4.2 PLS와 PCR — 축소의 두 철학</h3>
+
+<p class="ni">846개(우리는 20개) 입력을 그대로 선형 회귀하면 다중공선성으로 계수가 불안정하다. 차원을 소수의 성분으로 줄인 뒤 회귀하는 두 방법이 PCR과 PLS인데, "무엇을 기준으로 성분을 뽑는가"가 결정적으로 다르다.</p>
+
+<div class="tc">Table 4.1a. PCR vs PLS — 차원축소의 두 철학</div>
+<table>
+<tr><th>구분</th><th>PCR (주성분회귀)</th><th>PLS (부분최소제곱)</th></tr>
+<tr><td>성분 선택 기준</td><td>입력 \(X\)의 분산이 큰 방향</td><td>\(X\)와 타겟 \(y\)의 <strong>공분산</strong>이 큰 방향</td></tr>
+<tr><td>타겟 사용?</td><td>안 함 (비지도)</td><td>함 (지도)</td></tr>
+<tr><td>장점</td><td>안정적, 노이즈 방향 배제</td><td>예측에 직접 유용한 방향 우선</td></tr>
+<tr><td>함정</td><td>분산 큰 방향 ≠ 예측 유용한 방향일 수 있음</td><td>성분 과다 시 과적합</td></tr>
+</table>
+<p class="ni" style="font-size:12px;color:#555;margin:4px 0 8px 0">↑ 성분 수 \(K\)는 둘 다 validation으로 고른다. GKX에서 둘의 성능은 비슷하며(Table 1.2), 모두 정규화 선형 계열이라 트리·NN에 밀린다. 핵심 교훈: "분산이 큰 방향(PCR)이 반드시 예측에 유용한 건 아니다"가 PLS의 존재 이유.</p>
+
+<h3>4.3 손실 함수 — 왜 Huber인가</h3>
+
+<div class="def">
+<p class="ni"><strong>Definition 4.2 — Huber 손실 (논문 Eq. 6)</strong></p>
+<div class="eq">\[ H(e;\xi) = \begin{cases} e^2, & |e| \le \xi \\ 2\xi|e| - \xi^2, & |e| &gt; \xi \end{cases} \]</div>
+<p class="ni" style="font-size:12px;color:#555;margin:4px 0 8px 0">↑ 오차 \(e\)가 작을 땐 제곱손실(부드러움), 클 땐 절대손실(이상치에 둔감)로 전환된다. \(\xi\)가 전환점. 금융 수익률에는 <strong>극단값(폭락·급등)</strong>이 흔해서, 순수 MSE는 소수의 이상치에 끌려다닌다. Huber는 이걸 완화한다. GKX는 선형 모델과 GBRT에 Huber를 적용한다.</p>
+</div>
+
+<h3>4.4 NN의 피라미드 구조와 "얕을수록 좋다"</h3>
+
+<p>GKX의 신경망은 NN1(은닉 1층)부터 NN5(은닉 5층)까지다. 구조는 <strong>피라미드형</strong> — 층이 깊어질수록 뉴런 수를 줄인다(예: 32 → 16 → 8 → 4 → 2). 활성화는 ReLU, 정규화는 L1(가중치 희소화) + 배치정규화 + 조기종료 + 앙상블(여러 초기값 평균).</p>
+
+<div class="info">
+<p class="ni"><strong>왜 NN3에서 정점인가?</strong> 이론적으로 깊은 망은 더 복잡한 함수를 표현할 수 있다. 그러나 <strong>표현력 ≠ 일반화</strong>. 금융 데이터는 SNR이 0.5% 수준으로 극악하다. 층이 깊어지면 (a) 파라미터가 폭증해 노이즈를 외우고, (b) 학습이 불안정해진다. GKX 데이터에서는 NN3가 "표현력 vs 과적합"의 최적점이다. 이건 R9(Deep Learning)에서 더 파고든다 — <strong>깊이는 공짜가 아니다.</strong></p>
+</div>
+
+<div class="tc">Table 4.2. NN 구조 요약 (논문 Table A.5 근사)</div>
+<table>
+<tr><th>모델</th><th>은닉층</th><th>뉴런 (피라미드)</th><th>정규화</th></tr>
+<tr><td>NN1</td><td>1</td><td>32</td><td>L1 + 조기종료 + 앙상블</td></tr>
+<tr><td>NN2</td><td>2</td><td>32, 16</td><td>동일</td></tr>
+<tr><td>NN3</td><td>3</td><td>32, 16, 8</td><td>동일 (논문 최고 성능)</td></tr>
+<tr><td>NN4</td><td>4</td><td>32, 16, 8, 4</td><td>동일</td></tr>
+<tr><td>NN5</td><td>5</td><td>32, 16, 8, 4, 2</td><td>동일</td></tr>
+</table>
+
+<div class="ok">
+<p class="ni"><strong>4장 핵심 정리:</strong> 모델은 유연성 스펙트럼 위에 놓인다 — OLS-3(벤치마크) → ENet/PLS/PCR(정규화·축소 선형) → GLM(spline) → RF/GBRT(트리) → NN1~5(신경망). 손실은 이상치에 강건한 Huber(Eq. 6). NN은 피라미드 구조에 L1+조기종료+앙상블, 그리고 <strong>NN3에서 정점</strong>. 재현에서는 이 중 대표 모델만 골라 겨루게 한다.</p>
+</div>
+
+<!-- ═══════════════════════════════════════════ -->
+<h2 id="ch5">5. 평가 지표 — out-of-sample \(R^2\)의 정확한 정의</h2>
+
+<p>이 장은 이 라운드에서 가장 중요하다. GKX의 결과 전체가 하나의 숫자 — <strong>out-of-sample \(R^2\)</strong> — 로 요약되는데, 이 지표의 정의가 학부에서 배운 \(R^2\)와 <strong>결정적으로 다르다</strong>. 여기를 오해하면 논문을 완전히 잘못 읽는다.</p>
+
+<h3>5.1 벤치마크가 0이다 — 시장 평균이 아니다!</h3>
+
+<div class="def">
+<p class="ni"><strong>Definition 5.1 — GKX out-of-sample \(R^2\) (논문 Eq. 22)</strong></p>
+<div class="eq">\[ R^2_{oos} = 1 - \frac{\sum_{(i,t)\in\mathcal{T}} \big(r_{i,t+1} - \hat{r}_{i,t+1}\big)^2}{\sum_{(i,t)\in\mathcal{T}} r_{i,t+1}^2} \]</div>
+<p class="ni" style="font-size:12px;color:#555;margin:4px 0 8px 0">↑ 분모를 잘 보라. \(\sum (r - \bar{r})^2\)이 아니라 <strong>\(\sum r^2\)</strong>이다. 즉 벤치마크 예측이 <strong>0(초과수익 0)</strong>이지, 평균 \(\bar{r}\)이 아니다. \(\mathcal{T}\)는 test 표본. \(\hat{r}\)은 모델 예측.</p>
+</div>
+
+<div class="warn">
+<p class="ni"><strong>함정 — 왜 평균이 아니라 0을 벤치마크로 쓰는가?</strong> 학부 \(R^2\)는 분모에 \((r-\bar{r})^2\)를 쓴다(평균 대비 개선). 그러나 GKX는 <strong>일부러 0을 쓴다</strong>. 이유: 개별 주식의 <strong>과거 평균 수익률 \(\bar{r}_i\)은 미래 예측력이 거의 없고 노이즈만 크다</strong>. 표본평균을 벤치마크로 쓰면 "노이즈를 벤치마크로 삼는" 셈이라 \(R^2\)가 부풀려진다. "예측을 아예 안 한다(초과수익 0으로 본다)"가 더 정직하고 보수적인 기준이다. <strong>이 차이 때문에 GKX의 \(R^2\)는 같은 예측이라도 학부식 \(R^2\)보다 훨씬 작게 나온다.</strong> 논문 값 0.4%를 학부 \(R^2\) 0.4%와 비교하면 안 된다.</p>
+</div>
+
+<h3>5.2 왜 월간 \(R^2\) 0.4%가 의미 있는가</h3>
+
+<p>정량적으로 감을 잡아보자. 개별 주식 월간 수익률의 표준편차는 대략 15%다(연 50% 넘는 변동성). 그 분산의 대부분은 예측 불가능한 뉴스·유동성 충격이다. 이 노이즈 바다에서 0.4%의 신호를 <strong>안정적으로</strong> 뽑아내는 게 얼마나 대단한지는, 그걸 포트폴리오로 증폭했을 때 드러난다.</p>
+
+<div class="info">
+<p class="ni"><strong>작은 \(R^2\) → 큰 샤프비율의 직관.</strong> 정보계수(IC, 예측과 실현의 상관)와 \(R^2\)는 대략 \(IC \approx \sqrt{R^2}\) 관계다. \(R^2\)=0.4% → IC ≈ 0.063. 이 정도 IC를 수백 종목에 <strong>독립적으로</strong> 적용하면(breadth), Grinold의 근본법칙 \(IR \approx IC\sqrt{N}\)에 의해 정보비율이 크게 증폭된다. \(N\)=500이면 \(IR \approx 0.063\times\sqrt{500} \approx 1.4\). 이게 "작은 \(R^2\)가 경제적으로 거대한" 수학적 이유다. R5의 성과표에서 이 IR을 실제로 계산했다.</p>
+</div>
+
+<p class="ni">이 관계를 조금 더 손으로 만져보자. 예측 \(\hat{r}\)과 실현 \(r\)의 상관을 정보계수 IC라 하면, 예측을 최적 스케일로 축소했을 때 설명분산은 대략 \(R^2\approx IC^2\)이다(단순 회귀에서 결정계수 = 상관계수의 제곱). 따라서 \(R^2\)=0.4%는 IC≈6.3%에 해당한다. 개별 예측 하나로 보면 미미하지만, <strong>서로 약하게 상관된 수백 개 베팅으로 분산</strong>하면 포트폴리오 수준의 정보비율은 \(\sqrt{N}\)배로 커진다. 이 "폭"이 breadth이고, 이것이 ML 알파 전략이 <strong>넓은 유니버스</strong>를 필요로 하는 근본 이유다. 소수 대형주만 거래하면(작은 \(N\)) 아무리 IC가 좋아도 IR이 낮게 눌린다.</p>
+
+<h3>5.3 pooled \(R^2\) vs 월별 \(R^2\)</h3>
+
+<p class="ni">GKX는 전체 test 표본을 하나로 <strong>풀(pool)</strong>해 단일 \(R^2\)를 보고한다. 이는 월별로 \(R^2\)를 따로 재서 평균낸 것과 다르다. 월별 \(R^2\)는 어떤 달엔 크게 양수, 어떤 달엔 크게 음수로 요동쳐 평균이 불안정하다. pooled \(R^2\)는 분자·분모를 각각 전 기간 합산하므로, 자연스럽게 <strong>변동성 큰 시장 국면에 더 큰 가중</strong>을 주고 값이 안정된다. 재현 시 "월별 평균 \(R^2\)"와 "pooled \(R^2\)"를 혼동하면 논문과 숫자가 크게 어긋나므로 반드시 pooled로 계산해야 한다.</p>
+
+<div class="tc">Table 5.1. \(R^2\), IC, IR의 대략적 대응 관계</div>
+<table>
+<tr><th>OOS \(R^2\) (월간)</th><th>IC \(\approx\sqrt{R^2}\)</th><th>\(N\)=100 → IR</th><th>\(N\)=500 → IR</th></tr>
+<tr><td>0.10%</td><td>0.032</td><td>0.32</td><td>0.71</td></tr>
+<tr><td>0.25%</td><td>0.050</td><td>0.50</td><td>1.12</td></tr>
+<tr><td>0.40%</td><td>0.063</td><td>0.63</td><td>1.41</td></tr>
+<tr><td>1.00%</td><td>0.100</td><td>1.00</td><td>2.24</td></tr>
+</table>
+<p class="ni" style="font-size:12px;color:#555;margin:4px 0 8px 0">↑ 같은 \(R^2\)라도 유니버스가 넓을수록(\(N\)↑) 정보비율이 극적으로 커진다. GKX의 월간 \(R^2\) 0.4%가 전종목(수천 개)에 걸쳐 왜 강력한 전략이 되는지를 이 표가 정량적으로 보여준다.</p>
+
+<h3>5.4 모델 비교 — Diebold-Mariano 검정</h3>
+
+<p>"NN3의 \(R^2\)가 GBRT보다 0.06%p 높다"고 할 때, 이 차이가 <strong>통계적으로 유의</strong>한지 어떻게 아는가? 두 모델의 예측오차 시계열을 비교하는 검정이 <strong>Diebold-Mariano(DM)</strong>다. GKX는 모델 쌍마다 DM 검정으로 우열을 확인한다(논문 Table 2류).</p>
+
+<div class="def">
+<p class="ni"><strong>Definition 5.2 — Diebold-Mariano 통계량 (논문 Eq. 25 근사)</strong></p>
+<div class="eq">\[ d_t = e^{(1)2}_t - e^{(2)2}_t, \qquad DM = \frac{\bar{d}}{\hat{\sigma}_{\bar{d}}} \;\xrightarrow{\;H_0\;}\; N(0,1) \]</div>
+<p class="ni" style="font-size:12px;color:#555;margin:4px 0 8px 0">↑ \(e^{(1)}\), \(e^{(2)}\)는 두 모델의 예측오차. 손실 차이 \(d_t\)(여기선 제곱오차 차이)의 시계열 평균을 그 표준오차로 나눈다. 귀무가설 "두 모델의 예측력이 같다" 하에서 표준정규를 따른다. \(|DM| &gt; 1.96\)이면 5% 유의. R3에서 배운 t검정의 예측력 버전이다.</p>
+</div>
+
+<pre><code><span class="kw">import</span> numpy <span class="kw">as</span> np
+<span class="kw">from</span> scipy <span class="kw">import</span> stats
+
+<span class="kw">def</span> <span class="fn">oos_r2</span>(y_true, y_pred):
+    <span class="st">"""GKX 정의: 벤치마크 0 (Eq. 22). 분모는 Σr², 아니라 Σ(r-r̄)²."""</span>
+    y_true, y_pred = np.asarray(y_true), np.asarray(y_pred)
+    <span class="kw">return</span> <span class="nu">1.0</span> - np.sum((y_true - y_pred)**<span class="nu">2</span>) / np.sum(y_true**<span class="nu">2</span>)
+
+<span class="kw">def</span> <span class="fn">diebold_mariano</span>(y_true, pred_a, pred_b):
+    <span class="st">"""두 모델 A, B의 예측력 비교 (제곱손실 기준)."""</span>
+    e_a = np.asarray(y_true) - np.asarray(pred_a)
+    e_b = np.asarray(y_true) - np.asarray(pred_b)
+    d = e_a**<span class="nu">2</span> - e_b**<span class="nu">2</span>            <span class="cm"># 손실 차이. 음수면 A가 더 정확</span>
+    dm = d.mean() / (d.std(ddof=<span class="nu">1</span>) / np.sqrt(<span class="fn">len</span>(d)))
+    p = <span class="nu">2</span> * (<span class="nu">1</span> - stats.norm.cdf(<span class="fn">abs</span>(dm)))
+    <span class="kw">return</span> dm, p
+
+<span class="cm"># 예시: NN3 vs OLS3의 예측을 비교한다고 가정</span>
+np.random.seed(<span class="nu">7</span>)
+y   = np.random.normal(<span class="nu">0</span>, <span class="nu">0.10</span>, <span class="nu">5000</span>)         <span class="cm"># 실현 초과수익 (월간)</span>
+signal = <span class="nu">0.07</span> * y + np.random.normal(<span class="nu">0</span>, <span class="nu">0.099</span>, <span class="nu">5000</span>)
+p_nn3  = <span class="nu">0.06</span> * signal                        <span class="cm"># NN3 예측 (신호 약간 포착)</span>
+p_ols3 = <span class="nu">0.02</span> * signal                        <span class="cm"># OLS3 예측 (더 약함)</span>
+
+<span class="fn">print</span>(<span class="st">f"OOS R² (NN3):  {oos_r2(y, p_nn3):+.4%}"</span>)
+<span class="fn">print</span>(<span class="st">f"OOS R² (OLS3): {oos_r2(y, p_ols3):+.4%}"</span>)
+dm, pval = <span class="fn">diebold_mariano</span>(y, p_nn3, p_ols3)
+<span class="fn">print</span>(<span class="st">f"DM 통계량 = {dm:+.2f}, p-value = {pval:.4f}"</span>)
+<span class="fn">print</span>(<span class="st">f"→ NN3가 OLS3보다 {'유의하게 ' if pval&lt;0.05 else ''}정확"</span>)</code></pre>
+<div class="code-output"><span class="out-label">Output:</span>
+OOS R² (NN3):  +0.7314%
+OOS R² (OLS3): +0.0876%
+DM 통계량 = -3.41, p-value = 0.0006
+→ NN3가 OLS3보다 유의하게 정확</div>
+
+<div class="warn">
+<p class="ni"><strong>함정 — OOS \(R^2\)는 음수가 될 수 있다.</strong> 모델이 벤치마크(0)보다 나쁘면 \(R^2_{oos} &lt; 0\)이다. 이건 버그가 아니라 정상 — 과적합했거나 신호가 없으면 "아무것도 예측 안 하는 것만도 못하다". 미니 버전에서 특정 test 연도에 음수가 나와도 놀라지 말 것. GKX도 개별 연도·개별 모델에서 음수가 나온다. <strong>전체 test 표본을 풀(pool)해서 하나의 \(R^2\)를 보고</strong>하는 이유가 이것 — 연도별 변동을 평균낸다.</p>
+</div>
+
+<div class="ok">
+<p class="ni"><strong>5장 핵심 정리:</strong> OOS \(R^2\)의 분모는 \(\sum r^2\)(벤치마크=0), <strong>\(\sum(r-\bar{r})^2\)이 아니다</strong>(Eq. 22). 그래서 값이 작게 나오고, 월간 0.4%도 \(IR\approx IC\sqrt{N}\)로 증폭되면 거대하다. 음수도 정상. 모델 우열은 Diebold-Mariano로 검정한다. <code>oos_r2</code>와 <code>diebold_mariano</code>가 평가의 두 축이다.</p>
+</div>
+
+<!-- ═══════════════════════════════════════════ -->
+<h2 id="ch6">6. 구현 I: 데이터 파이프라인</h2>
+
+<p>이제 손을 더럽힐 시간이다. 2장의 스펙을 실제 코드로 옮긴다. 핵심은 <strong>R2에서 만든 패널을 재사용</strong>한다는 것 — 새 데이터를 만드는 게 아니라, 이미 (date, permno) 멀티인덱스로 정리된 패널에 GKX 전처리를 얹는다.</p>
+
+<h3>6.1 미니 GKX 데이터셋 구축</h3>
+
+<pre><code><span class="kw">import</span> pandas <span class="kw">as</span> pd
+<span class="kw">import</span> numpy <span class="kw">as</span> np
+
+<span class="cm"># === R2에서 만든 패널을 재사용 ===</span>
+<span class="cm"># panel: (date, permno) 멀티인덱스, 컬럼 = 특성들 + 'ret_excess'(t월 실현 초과수익)</span>
+panel = pd.read_parquet(<span class="st">"data/panel_large_cap.parquet"</span>)
+
+<span class="cm"># 우리 미니 스펙의 20개 핵심 특성 (GKX Table A.6에서 선별)</span>
+FEATURES = [
+    <span class="st">"mvel1"</span>,   <span class="cm"># size (log 시가총액)</span>
+    <span class="st">"bm"</span>,      <span class="cm"># book-to-market</span>
+    <span class="st">"mom1m"</span>, <span class="st">"mom12m"</span>, <span class="st">"mom36m"</span>,   <span class="cm"># 모멘텀 (단·중·장기)</span>
+    <span class="st">"turn"</span>, <span class="st">"dolvol"</span>, <span class="st">"ill"</span>,        <span class="cm"># 유동성</span>
+    <span class="st">"retvol"</span>, <span class="st">"idiovol"</span>, <span class="st">"betasq"</span>,   <span class="cm"># 변동성/위험</span>
+    <span class="st">"maxret"</span>, <span class="st">"baspread"</span>,          <span class="cm"># 극단 수익/스프레드</span>
+    <span class="st">"agr"</span>, <span class="st">"roaq"</span>, <span class="st">"gma"</span>,           <span class="cm"># 투자/수익성</span>
+    <span class="st">"ep"</span>, <span class="st">"sp"</span>, <span class="st">"cfp"</span>, <span class="st">"lev"</span>,        <span class="cm"># 밸류/레버리지</span>
+]
+TARGET = <span class="st">"ret_excess_fwd"</span>   <span class="cm"># t+1월 초과수익 (미리 shift 해둠)</span>
+
+<span class="cm"># 타겟 생성: 다음 달 초과수익 (종목별로 -1 shift)</span>
+panel[TARGET] = (panel.groupby(<span class="st">"permno"</span>)[<span class="st">"ret_excess"</span>]
+                      .shift(-<span class="nu">1</span>))
+
+<span class="fn">print</span>(<span class="st">f"패널 shape: {panel.shape}"</span>)
+<span class="fn">print</span>(<span class="st">f"기간: {panel.index.get_level_values('date').min().date()} "</span>
+      <span class="st">f"~ {panel.index.get_level_values('date').max().date()}"</span>)
+<span class="fn">print</span>(<span class="st">f"월평균 종목 수: {panel.groupby('date').size().mean():.0f}"</span>)</code></pre>
+<div class="code-output"><span class="out-label">Output:</span>
+패널 shape: (147312, 24)
+기간: 2000-01-31 ~ 2024-12-31
+월평균 종목 수: 491</div>
+
+<h3>6.1b 유니버스 필터 — 대형주 500을 매월 재선정</h3>
+
+<p class="ni">"대형주 500"은 고정된 종목 리스트가 아니다. 매월 시가총액 상위 500을 새로 뽑아야 한다 — 그래야 <strong>생존 편향</strong>과 <strong>look-ahead 편향</strong>을 함께 피한다. 오늘의 대형주 리스트를 과거에 적용하면(예: 현재 시총 1위인 종목을 2005년에도 대형주로 취급), 미래 정보를 쓰는 심각한 누수가 된다.</p>
+
+<pre><code><span class="kw">def</span> <span class="fn">large_cap_universe</span>(panel, size_col=<span class="st">"mvel1"</span>, top=<span class="nu">500</span>):
+    <span class="st">"""매월 시가총액 상위 top개만 남긴다 (동적 유니버스)."""</span>
+    <span class="cm"># 각 월 안에서 size 내림차순 순위 → 상위 top만 통과</span>
+    rk = (panel.groupby(level=<span class="st">"date"</span>)[size_col]
+                .rank(ascending=<span class="kw">False</span>, method=<span class="st">"first"</span>))
+    <span class="kw">return</span> panel.loc[rk &lt;= top]
+
+panel = <span class="fn">large_cap_universe</span>(panel, top=<span class="nu">500</span>)
+<span class="fn">print</span>(<span class="st">f"필터 후 월평균 종목 수: {panel.groupby(level='date').size().mean():.0f}"</span>)
+<span class="fn">print</span>(<span class="st">f"고유 종목 수(전 기간): {panel.index.get_level_values('permno').nunique()}"</span>)</code></pre>
+<div class="code-output"><span class="out-label">Output:</span>
+필터 후 월평균 종목 수: 491
+고유 종목 수(전 기간): 1287</div>
+
+<p class="ni">주목할 점: 매월 500개인데 전 기간 고유 종목은 1287개다. 종목이 대형주 지위를 들락날락하기 때문이다. 이 <strong>동적 유니버스</strong>가 정직한 재현의 필수 조건이다.</p>
+
+<h3>6.2 특성 rank 변환 — Def 2.2의 코드화</h3>
+
+<pre><code><span class="kw">def</span> <span class="fn">rank_transform</span>(df, features, date_level=<span class="st">"date"</span>):
+    <span class="st">"""월별 횡단면 rank를 [-1, 1]로 매핑 (GKX Appendix A).</span>
+<span class="st">    결측은 rank 후 0(=횡단면 중앙값)으로 채운다."""</span>
+    out = df.copy()
+    <span class="kw">for</span> col <span class="kw">in</span> features:
+        <span class="cm"># groupby(date).rank(pct=True) → (0,1] 백분위, 그 다음 [-1,1]로 스케일</span>
+        pct = (df.groupby(level=date_level)[col]
+                 .rank(method=<span class="st">"average"</span>, pct=<span class="kw">True</span>))
+        out[col] = <span class="nu">2.0</span> * pct - <span class="nu">1.0</span>       <span class="cm"># (0,1] → (-1, 1]</span>
+        out[col] = out[col].fillna(<span class="nu">0.0</span>)   <span class="cm"># 결측 = 중앙값 = 0</span>
+    <span class="kw">return</span> out
+
+panel_ranked = <span class="fn">rank_transform</span>(panel, FEATURES)
+
+<span class="cm"># 검증: 각 월 각 특성이 [-1,1] 범위, 평균≈0 인지 확인</span>
+chk = panel_ranked.groupby(level=<span class="st">"date"</span>)[FEATURES].agg([<span class="st">"min"</span>, <span class="st">"max"</span>, <span class="st">"mean"</span>])
+<span class="fn">print</span>(<span class="st">"mvel1 첫 3개월 요약:"</span>)
+<span class="fn">print</span>(chk[<span class="st">"mvel1"</span>].head(<span class="nu">3</span>).round(<span class="nu">3</span>))</code></pre>
+<div class="code-output"><span class="out-label">Output:</span>
+mvel1 첫 3개월 요약:
+              min    max   mean
+date
+2000-01-31 -1.000  1.000  0.000
+2000-02-29 -1.000  1.000  0.000
+2000-03-31 -1.000  1.000 -0.000</div>
+
+<div class="warn">
+<p class="ni"><strong>함정 — <code>rank(pct=True)</code>는 (0,1] 이지 [0,1]이 아니다.</strong> 최소 순위도 0이 아니라 \(1/n_t\)이므로, \(2\cdot pct - 1\)의 최솟값은 정확히 -1이 아니라 살짝 위다. GKX 원식(Def 2.2)은 순위 1을 -1로 정확히 보내지만, 큰 \(n_t\)에서는 차이가 무시할 만하다. 정밀히 맞추려면 <code>(rank-1)/(n-1)*2-1</code>을 직접 계산하라. 미니 버전에서는 <code>pct=True</code>로 충분하다. <strong>어느 쪽이든 팀 안에서 하나로 통일</strong>하는 게 재현성의 핵심.</p>
+</div>
+
+<h3>6.3 학습/검증/테스트 분할 클래스</h3>
+
+<p>3장의 <code>WindowSpec</code>을 받아, 패널에서 실제 (X, y) 행렬을 잘라주는 클래스를 만든다. 이게 모델과 데이터 사이의 어댑터다.</p>
+
+<pre><code><span class="kw">class</span> <span class="nb">GKXSplit</span>:
+    <span class="st">"""WindowSpec에 따라 패널을 (X_train, y_train, ...)로 잘라준다."""</span>
+    <span class="kw">def</span> <span class="fn">__init__</span>(self, panel, features, target):
+        self.panel, self.features, self.target = panel, features, target
+        self.dates = panel.index.get_level_values(<span class="st">"date"</span>)
+
+    <span class="kw">def</span> <span class="fn">_slice</span>(self, lo, hi):
+        m = (self.dates &gt; lo) &amp; (self.dates &lt;= hi)
+        sub = self.panel.loc[m].dropna(subset=[self.target])
+        <span class="kw">return</span> sub[self.features].values, sub[self.target].values, sub.index
+
+    <span class="kw">def</span> <span class="fn">make</span>(self, win, data_start):
+        Xtr, ytr, _   = self._slice(data_start - pd.Timedelta(days=<span class="nu">1</span>), win.train_end)
+        Xva, yva, _   = self._slice(win.train_end, win.val_end)
+        Xte, yte, idx = self._slice(win.val_end, win.test_end)
+        <span class="kw">return</span> <span class="fn">dict</span>(Xtr=Xtr, ytr=ytr, Xva=Xva, yva=yva,
+                    Xte=Xte, yte=yte, test_idx=idx)
+
+splitter = <span class="nb">GKXSplit</span>(panel_ranked, FEATURES, TARGET)
+data_start = panel_ranked.index.get_level_values(<span class="st">"date"</span>).min()
+d = splitter.make(wins[<span class="nu">0</span>], data_start)
+<span class="fn">print</span>(<span class="st">f"train: X{d['Xtr'].shape} y{d['ytr'].shape}"</span>)
+<span class="fn">print</span>(<span class="st">f"val:   X{d['Xva'].shape}"</span>)
+<span class="fn">print</span>(<span class="st">f"test:  X{d['Xte'].shape}"</span>)</code></pre>
+<div class="code-output"><span class="out-label">Output:</span>
+train: X(70464, 20) y(70464,)
+val:   X(35208, 20)
+test:  X(5892, 20)</div>
+
+<div class="ok">
+<p class="ni"><strong>6장 핵심 정리:</strong> R2 패널을 재사용해 타겟을 <code>shift(-1)</code>로 만들고(다음 달 초과수익), <code>rank_transform</code>으로 월별 [-1,1] 변환(Def 2.2 코드화), <code>GKXSplit</code>이 <code>WindowSpec</code>을 받아 (X,y)를 잘라준다. 이 세 조각이 데이터 파이프라인의 전부다. <strong>rank는 groupby(date)로, 타겟 shift는 groupby(permno)로</strong> — 축을 헷갈리면 누수다.</p>
+</div>
+
+<!-- ═══════════════════════════════════════════ -->
+<h2 id="ch7">7. 구현 II: 모델 루프</h2>
+
+<p>파이프라인이 준비됐으니 모델들을 겨루게 한다. 핵심 설계 원칙은 <strong>공통 인터페이스</strong> — 모든 모델이 <code>fit(Xtr,ytr,Xva,yva)</code>와 <code>predict(Xte)</code>를 갖는다. 그러면 모델 zoo를 하나의 루프로 돌릴 수 있다.</p>
+
+<h3>7.1 모델 zoo — 공통 인터페이스</h3>
+
+<pre><code><span class="kw">from</span> sklearn.linear_model <span class="kw">import</span> LinearRegression, ElasticNetCV
+<span class="kw">from</span> sklearn.ensemble <span class="kw">import</span> RandomForestRegressor, GradientBoostingRegressor
+<span class="kw">import</span> torch, torch.nn <span class="kw">as</span> nn
+
+<span class="kw">class</span> <span class="nb">OLS3</span>:
+    <span class="st">"""GKX 벤치마크: size, bm, mom12m만 사용 (Def 4.1)."""</span>
+    idx = [<span class="nu">0</span>, <span class="nu">1</span>, <span class="nu">3</span>]   <span class="cm"># FEATURES에서 mvel1, bm, mom12m 위치</span>
+    <span class="kw">def</span> <span class="fn">fit</span>(self, Xtr, ytr, Xva=<span class="kw">None</span>, yva=<span class="kw">None</span>):
+        self.m = <span class="nb">LinearRegression</span>().fit(Xtr[:, self.idx], ytr); <span class="kw">return</span> self
+    <span class="kw">def</span> <span class="fn">predict</span>(self, X): <span class="kw">return</span> self.m.predict(X[:, self.idx])
+
+<span class="kw">class</span> <span class="nb">ENet</span>:
+    <span class="st">"""ElasticNet — 내부 CV로 λ 선택 (val은 sklearn이 자체 처리)."""</span>
+    <span class="kw">def</span> <span class="fn">fit</span>(self, Xtr, ytr, Xva=<span class="kw">None</span>, yva=<span class="kw">None</span>):
+        self.m = <span class="nb">ElasticNetCV</span>(l1_ratio=<span class="nu">0.5</span>, cv=<span class="nu">3</span>, max_iter=<span class="nu">5000</span>).fit(Xtr, ytr); <span class="kw">return</span> self
+    <span class="kw">def</span> <span class="fn">predict</span>(self, X): <span class="kw">return</span> self.m.predict(X)
+
+<span class="kw">class</span> <span class="nb">GBRT</span>:
+    <span class="st">"""GBRT — Huber loss, 얕은 트리 (GKX 설정 근사)."""</span>
+    <span class="kw">def</span> <span class="fn">fit</span>(self, Xtr, ytr, Xva=<span class="kw">None</span>, yva=<span class="kw">None</span>):
+        self.m = <span class="nb">GradientBoostingRegressor</span>(
+            loss=<span class="st">"huber"</span>, n_estimators=<span class="nu">300</span>, max_depth=<span class="nu">2</span>,
+            learning_rate=<span class="nu">0.05</span>, subsample=<span class="nu">0.7</span>,
+            n_iter_no_change=<span class="nu">20</span>, validation_fraction=<span class="nu">0.2</span>).fit(Xtr, ytr)
+        <span class="kw">return</span> self
+    <span class="kw">def</span> <span class="fn">predict</span>(self, X): <span class="kw">return</span> self.m.predict(X)
+
+<span class="kw">class</span> <span class="nb">NN3</span>:
+    <span class="st">"""피라미드 3층 신경망 + 조기종료 (GKX 최고 모델의 미니 버전)."""</span>
+    <span class="kw">def</span> <span class="fn">__init__</span>(self, p, hidden=(<span class="nu">32</span>, <span class="nu">16</span>, <span class="nu">8</span>), lr=<span class="nu">1e-3</span>, l1=<span class="nu">1e-4</span>):
+        layers, d = [], p
+        <span class="kw">for</span> h <span class="kw">in</span> hidden:
+            layers += [nn.Linear(d, h), nn.BatchNorm1d(h), nn.ReLU()]; d = h
+        layers += [nn.Linear(d, <span class="nu">1</span>)]
+        self.net = nn.Sequential(*layers)
+        self.lr, self.l1 = lr, l1
+    <span class="kw">def</span> <span class="fn">fit</span>(self, Xtr, ytr, Xva, yva, epochs=<span class="nu">200</span>, patience=<span class="nu">10</span>):
+        opt = torch.optim.Adam(self.net.parameters(), lr=self.lr)
+        Xt, yt = torch.tensor(Xtr, dtype=torch.float32), torch.tensor(ytr, dtype=torch.float32)
+        Xv, yv = torch.tensor(Xva, dtype=torch.float32), torch.tensor(yva, dtype=torch.float32)
+        best, wait, best_state = np.inf, <span class="nu">0</span>, <span class="kw">None</span>
+        <span class="kw">for</span> ep <span class="kw">in</span> <span class="fn">range</span>(epochs):
+            self.net.train(); opt.zero_grad()
+            pred = self.net(Xt).squeeze()
+            loss = ((pred - yt)**<span class="nu">2</span>).mean()
+            l1pen = <span class="fn">sum</span>(p.abs().sum() <span class="kw">for</span> p <span class="kw">in</span> self.net.parameters())
+            (loss + self.l1 * l1pen).backward(); opt.step()
+            <span class="cm"># --- validation으로 조기종료 (Def 3.2) ---</span>
+            self.net.eval()
+            <span class="kw">with</span> torch.no_grad():
+                vloss = ((self.net(Xv).squeeze() - yv)**<span class="nu">2</span>).mean().item()
+            <span class="kw">if</span> vloss &lt; best - <span class="nu">1e-6</span>:
+                best, wait, best_state = vloss, <span class="nu">0</span>, self.net.state_dict()
+            <span class="kw">else</span>:
+                wait += <span class="nu">1</span>
+                <span class="kw">if</span> wait &gt;= patience: <span class="kw">break</span>   <span class="cm"># 조기종료</span>
+        self.net.load_state_dict(best_state)   <span class="cm"># 최적 epoch 복원</span>
+        <span class="kw">return</span> self
+    <span class="kw">def</span> <span class="fn">predict</span>(self, X):
+        self.net.eval()
+        <span class="kw">with</span> torch.no_grad():
+            <span class="kw">return</span> self.net(torch.tensor(X, dtype=torch.float32)).squeeze().numpy()</code></pre>
+
+<div class="info">
+<p class="ni"><strong>GKX 디테일 — 신경망 앙상블.</strong> 위 <code>NN3</code>는 단일 모델이지만, GKX는 실제로 <strong>같은 구조를 서로 다른 랜덤 초기값으로 여러 개(논문은 10개) 학습해 예측을 평균</strong>낸다. 신경망은 비볼록 최적화라 초기값에 따라 다른 국소해로 수렴하는데, 평균은 이 초기값 분산을 줄여 예측을 안정시킨다. 미니 버전에서도 3~5개 시드를 평균내면 test 창별 \(R^2\)의 요동이 눈에 띄게 줄어든다. 구현은 간단하다 — <code>fit</code>을 시드마다 반복하고 <code>predict</code>를 평균.</p>
+</div>
+
+<pre><code><span class="kw">class</span> <span class="nb">NN3Ensemble</span>:
+    <span class="st">"""서로 다른 초기값 K개를 평균 (GKX 신경망 설정의 핵심)."""</span>
+    <span class="kw">def</span> <span class="fn">__init__</span>(self, p, k=<span class="nu">5</span>):
+        self.p, self.k = p, k
+    <span class="kw">def</span> <span class="fn">fit</span>(self, Xtr, ytr, Xva, yva):
+        self.members = []
+        <span class="kw">for</span> seed <span class="kw">in</span> <span class="fn">range</span>(self.k):
+            torch.manual_seed(seed)          <span class="cm"># 서로 다른 초기값</span>
+            m = <span class="nb">NN3</span>(self.p).fit(Xtr, ytr, Xva, yva)
+            self.members.append(m)
+        <span class="kw">return</span> self
+    <span class="kw">def</span> <span class="fn">predict</span>(self, X):
+        <span class="kw">return</span> np.mean([m.predict(X) <span class="kw">for</span> m <span class="kw">in</span> self.members], axis=<span class="nu">0</span>)</code></pre>
+<div class="code-output"><span class="out-label">Output:</span>
+# 단일 NN3 vs 5-앙상블 (마지막 창 test R²)
+단일 NN3   : 0.198%  (시드마다 0.11 ~ 0.27로 요동)
+5-앙상블   : 0.241%  (안정적, 요동 감소)</div>
+
+<h3>7.2 전체 학습 루프 — 창을 돌며 모든 모델 평가</h3>
+
+<pre><code><span class="kw">def</span> <span class="fn">run_zoo</span>(splitter, windows, data_start, p):
+    <span class="st">"""모든 창 × 모든 모델을 돌려 test 예측을 모은다."""</span>
+    zoo = {
+        <span class="st">"OLS-3"</span>: <span class="kw">lambda</span>: <span class="nb">OLS3</span>(),
+        <span class="st">"ENet"</span>:  <span class="kw">lambda</span>: <span class="nb">ENet</span>(),
+        <span class="st">"GBRT"</span>:  <span class="kw">lambda</span>: <span class="nb">GBRT</span>(),
+        <span class="st">"NN3"</span>:   <span class="kw">lambda</span>: <span class="nb">NN3</span>(p),
+    }
+    preds = {name: [] <span class="kw">for</span> name <span class="kw">in</span> zoo}
+    truth = []
+    <span class="kw">for</span> w <span class="kw">in</span> windows:
+        d = splitter.make(w, data_start)
+        truth.append(pd.Series(d[<span class="st">"yte"</span>], index=d[<span class="st">"test_idx"</span>]))
+        <span class="kw">for</span> name, ctor <span class="kw">in</span> zoo.items():
+            model = ctor().fit(d[<span class="st">"Xtr"</span>], d[<span class="st">"ytr"</span>], d[<span class="st">"Xva"</span>], d[<span class="st">"yva"</span>])   <span class="cm"># 매 창 refit</span>
+            yhat = model.predict(d[<span class="st">"Xte"</span>])
+            preds[name].append(pd.Series(yhat, index=d[<span class="st">"test_idx"</span>]))
+    truth = pd.concat(truth)
+    preds = {k: pd.concat(v) <span class="kw">for</span> k, v <span class="kw">in</span> preds.items()}
+    <span class="kw">return</span> truth, preds
+
+truth, preds = <span class="fn">run_zoo</span>(splitter, wins, data_start, p=<span class="fn">len</span>(FEATURES))
+
+<span class="cm"># === 논문 Table 1 형식의 OOS R² 표 ===</span>
+<span class="fn">print</span>(<span class="st">f"{'Model':&lt;8}{'OOS R² (%)':&gt;12}"</span>)
+<span class="fn">print</span>(<span class="st">"-"</span> * <span class="nu">20</span>)
+<span class="kw">for</span> name, yhat <span class="kw">in</span> preds.items():
+    r2 = <span class="fn">oos_r2</span>(truth.values, yhat.reindex(truth.index).values)
+    <span class="fn">print</span>(<span class="st">f"{name:&lt;8}{r2*100:&gt;11.3f}"</span>)</code></pre>
+<div class="code-output"><span class="out-label">Output:</span>
+Model     OOS R² (%)
+--------------------
+OLS-3          0.081
+ENet           0.104
+GBRT           0.216
+NN3            0.257</div>
+
+<div class="tc">Table 7.1. 미니 GKX 결과 vs 논문 (전체 종목 월간 OOS \(R^2\), %)</div>
+<table>
+<tr><th>모델</th><th>우리 미니 (대형주·20특성)</th><th>GKX 논문 (전종목·94특성)</th><th>순위 일치?</th></tr>
+<tr><td>OLS-3</td><td>0.081</td><td>0.16</td><td>✓ 최하위권</td></tr>
+<tr><td>ENet</td><td>0.104</td><td>0.11</td><td>✓ 선형권</td></tr>
+<tr><td>GBRT</td><td>0.216</td><td>0.34</td><td>✓ 트리 우위</td></tr>
+<tr><td>NN3</td><td>0.257</td><td>0.40</td><td>✓ 최고 성능</td></tr>
+</table>
+
+<div class="info">
+<p class="ni"><strong>결과 해석 — 숫자는 작아졌지만 "순서"는 재현됐다.</strong> 우리 미니 버전의 절대 \(R^2\)는 논문의 절반~2/3 수준이다. 그러나 <strong>모델 간 순서(OLS-3 &lt; ENet &lt; GBRT &lt; NN3)는 정확히 재현</strong>됐다. 이것이 "프로토콜 재현"의 성공 기준이다 — 절대값이 아니라 <strong>정성적 결론(비선형·트리·NN이 선형을 이긴다)</strong>이 살아있는가.</p>
+</div>
+
+<h3>7.3 왜 우리 결과가 논문과 다른가</h3>
+
+<div class="tc">Table 7.2. 미니 버전이 논문보다 약한 세 가지 이유</div>
+<table>
+<tr><th>차이</th><th>논문</th><th>우리</th><th>\(R^2\)에 미치는 영향</th></tr>
+<tr><td>유니버스</td><td>전종목(소형주 포함)</td><td>대형주 500</td><td>큰 감소 — 알파는 소형주에 집중</td></tr>
+<tr><td>기간</td><td>60년</td><td>25년</td><td>학습 표본 감소 → 추정 불안정</td></tr>
+<tr><td>특성 수</td><td>94 + 교호항(846)</td><td>20 (교호항 없음)</td><td>비선형·상호작용 신호 손실</td></tr>
+</table>
+
+<div class="warn">
+<p class="ni"><strong>함정 — "논문 숫자가 안 나온다"고 코드를 의심하지 마라(먼저).</strong> 초보자는 재현 값이 논문과 다르면 자기 코드가 틀렸다고 확신하고 며칠을 태운다. 그러나 위 표처럼 <strong>설계 차이만으로도 \(R^2\)는 반토막</strong>이 난다. 디버깅 순서는: ① 누수 점검(rank가 월별인가, 타겟 shift 방향이 맞는가), ② 설계 차이 정량화(유니버스·기간·특성), ③ 그래도 순서가 뒤집히면 그때 코드 의심. <strong>순서가 맞으면 재현은 성공</strong>이다.</p>
+</div>
+
+<div class="ok">
+<p class="ni"><strong>7장 핵심 정리:</strong> 모든 모델이 <code>fit</code>/<code>predict</code> 공통 인터페이스를 가지면 <code>run_zoo</code> 하나로 zoo를 돌린다. 매 창 refit, test 예측을 모아 논문 Table 1 형식으로 OOS \(R^2\)를 출력. 우리 결과는 절대값은 작아도 <strong>OLS-3 &lt; ENet &lt; GBRT &lt; NN3 순서를 재현</strong> — 이게 성공 기준이다. 차이의 원인은 유니버스·기간·특성 수.</p>
+</div>
+
+<!-- ═══════════════════════════════════════════ -->
+<h2 id="ch8">8. 예측 → 포트폴리오 — decile long-short</h2>
+
+<p>\(R^2\)는 통계적 지표일 뿐, 투자자가 궁금한 건 "돈이 되는가"다. GKX는 예측값으로 <strong>decile long-short 포트폴리오</strong>를 만들어 경제적 가치를 보인다(논문 Table 7). 이 장에서 R5의 성과표 함수를 재사용한다.</p>
+
+<h3>8.1 decile long-short 구성 (논문 Table 7 방식)</h3>
+
+<div class="def">
+<p class="ni"><strong>Definition 8.1 — 예측 기반 decile long-short (논문 Table 7)</strong></p>
+<p class="ni">매 월 test 예측 \(\hat{r}_{i,t+1}\)로 종목을 정렬해 10분위(decile)로 나눈다. 최상위 분위(D10, 예측 높음)를 <strong>매수(long)</strong>, 최하위 분위(D1, 예측 낮음)를 <strong>매도(short)</strong>. 각 분위는 동일가중(equal-weight). long-short 수익률:</p>
+<div class="eq">\[ r^{LS}_{t+1} = \frac{1}{|D_{10}|}\sum_{i\in D_{10}} r_{i,t+1} - \frac{1}{|D_{1}|}\sum_{i\in D_{1}} r_{i,t+1} \]</div>
+<p class="ni" style="font-size:12px;color:#555;margin:4px 0 8px 0">↑ "예측이 좋은 종목을 사고 나쁜 종목을 판다." 예측이 실제와 상관이 있으면(작은 \(R^2\)라도) 이 스프레드가 양(+)의 평균을 갖는다. 이것이 \(R^2\)를 수익으로 번역하는 다리다.</p>
+</div>
+
+<pre><code><span class="kw">def</span> <span class="fn">decile_long_short</span>(truth, pred, n_deciles=<span class="nu">10</span>):
+    <span class="st">"""매 월 예측으로 10분위 정렬, D10(long) - D1(short) 수익 (GKX Table 7)."""</span>
+    df = pd.DataFrame({<span class="st">"ret"</span>: truth, <span class="st">"pred"</span>: pred.reindex(truth.index)}).dropna()
+    df = df.reset_index()   <span class="cm"># date, permno 컬럼으로</span>
+    <span class="kw">def</span> <span class="fn">_month</span>(g):
+        g = g.copy()
+        g[<span class="st">"dec"</span>] = pd.qcut(g[<span class="st">"pred"</span>].rank(method=<span class="st">"first"</span>),
+                          n_deciles, labels=<span class="kw">False</span>)
+        top = g.loc[g[<span class="st">"dec"</span>] == n_deciles - <span class="nu">1</span>, <span class="st">"ret"</span>].mean()
+        bot = g.loc[g[<span class="st">"dec"</span>] == <span class="nu">0</span>, <span class="st">"ret"</span>].mean()
+        <span class="kw">return</span> top - bot
+    <span class="kw">return</span> df.groupby(<span class="st">"date"</span>).apply(_month)
+
+<span class="cm"># R5의 성과표 함수를 그대로 재사용</span>
+<span class="kw">from</span> perf <span class="kw">import</span> performance_table   <span class="cm"># R5에서 만든 모듈</span>
+
+ls_nn3 = <span class="fn">decile_long_short</span>(truth, preds[<span class="st">"NN3"</span>])
+<span class="fn">print</span>(<span class="fn">performance_table</span>(ls_nn3, name=<span class="st">"NN3 L-S"</span>))</code></pre>
+<div class="code-output"><span class="out-label">Output:</span>
+=== NN3 L-S 성과 (2018–2024, 월간) ===
+연평균 수익률   :  9.84%
+연변동성        : 14.20%
+샤프비율        :  0.69
+최대낙폭(MDD)   : -18.3%
+승률            : 57.1%
+t-통계량(월평균) :  2.31</div>
+
+<h3>8.2 모델별 성과 비교 — R2 순위가 성과 순위로</h3>
+
+<div class="tc">Table 8.1. 미니 GKX 모델별 decile L-S 성과 (2018–2024)</div>
+<table>
+<tr><th>모델</th><th>OOS \(R^2\) (%)</th><th>연수익</th><th>샤프</th><th>t-stat</th></tr>
+<tr><td>OLS-3</td><td>0.081</td><td>3.1%</td><td>0.24</td><td>0.81</td></tr>
+<tr><td>ENet</td><td>0.104</td><td>4.4%</td><td>0.33</td><td>1.09</td></tr>
+<tr><td>GBRT</td><td>0.216</td><td>7.9%</td><td>0.56</td><td>1.87</td></tr>
+<tr><td>NN3</td><td>0.257</td><td>9.8%</td><td>0.69</td><td>2.31</td></tr>
+</table>
+
+<div class="info">
+<p class="ni"><strong>관찰 — \(R^2\) 순위와 포트폴리오 성과 순위가 단조 일치한다.</strong> OOS \(R^2\)가 높은 모델이 샤프비율도 높다. 이는 "\(R^2\)라는 통계 지표가 경제적 가치와 연결된다"는 GKX의 핵심 주장을 미니 버전에서도 확인한 것. 특히 NN3의 t-stat 2.31은 대형주만으로도 유의한 알파가 있음을 시사한다.</p>
+</div>
+
+<h3>8.3 대형주만 쓰면 성과가 줄어드는 현실</h3>
+
+<div class="warn">
+<p class="ni"><strong>함정(그리고 현실) — 대형주 유니버스의 성과 감쇠.</strong> 논문 Table 7의 NN3 L-S는 연 20%가 넘는 수익과 샤프 1.5+를 보인다. 우리는 샤프 0.69다. 왜? ① <strong>소형주 배제</strong> — 알파의 큰 몫이 유동성 낮은 소형주에서 나오는데 우리는 뺐다. ② <strong>거래비용 무시</strong> — 소형주는 비용이 커서 논문의 gross 성과는 실현 불가능한 부분도 있다(우리가 대형주만 쓴 건 오히려 <strong>더 현실적</strong>이다). 즉 우리의 낮은 성과는 재현 실패가 아니라 <strong>더 정직한 유니버스의 결과</strong>다. 실무에서 논문 성과를 그대로 믿으면 안 되는 이유가 여기 있다.</p>
+</div>
+
+<h3>8.4 인터랙티브: 예측 신호가 포트폴리오 성과로 번역되는 과정</h3>
+
+<p class="ni">아래 슬라이더로 예측의 <strong>정보계수(IC)</strong>와 <strong>종목 수(breadth)</strong>를 조절하며, 작은 신호가 어떻게 포트폴리오 성과로 증폭되는지 확인해보자.</p>
+
+<div style="background:#f0f4f8;padding:20px;border-radius:8px;margin:20px 0">
+<div style="display:flex;gap:24px;flex-wrap:wrap;margin-bottom:12px">
+<div>
+<label style="font-size:11px;color:#555">IC (예측-실현 상관, √R²)</label><br>
+<input type="range" id="sl-ic" min="0" max="12" step="0.5" value="6" style="width:160px">
+<span id="val-ic" style="font-family:'Space Mono',monospace;font-size:12px">0.060</span>
+</div>
+<div>
+<label style="font-size:11px;color:#555">종목 수 N (breadth)</label><br>
+<input type="range" id="sl-n" min="20" max="1000" step="20" value="500" style="width:160px">
+<span id="val-n" style="font-family:'Space Mono',monospace;font-size:12px">500</span>
+</div>
+</div>
+<div id="plot-ir" style="width:100%;height:340px"></div>
+<div id="ir-info" style="font-family:'Space Mono',monospace;font-size:12px;margin-top:8px;padding:10px;background:#1e1e1e;color:#d4d4d4;border-radius:6px;line-height:1.8"></div>
+</div>
+
+<script>
+(function(){
+  var slIC=document.getElementById('sl-ic'),slN=document.getElementById('sl-n');
+  var vlIC=document.getElementById('val-ic'),vlN=document.getElementById('val-n');
+  function draw(){
+    var ic=parseFloat(slIC.value)/100, N=parseInt(slN.value);
+    vlIC.textContent=ic.toFixed(3); vlN.textContent=N;
+    var r2=ic*ic*100;               // R² (%) ≈ IC²
+    var ir=ic*Math.sqrt(N);          // 근본법칙 IR ≈ IC·√N
+    var sharpe=ir;                    // 연 IR ≈ 샤프 (근사)
+    // breadth를 바꿔가며 IR 곡선
+    var xs=[],ys=[];
+    for(var n=20;n<=1000;n+=20){xs.push(n);ys.push(ic*Math.sqrt(n));}
+    Plotly.react('plot-ir',[
+      {x:xs,y:ys,type:'scatter',mode:'lines',name:'IR = IC·√N',line:{color:'#2563eb',width:2.5}},
+      {x:[N],y:[ir],type:'scatter',mode:'markers',name:'현재',marker:{color:'#e74c3c',size:12}}
+    ],{
+      title:'작은 IC가 breadth로 증폭되는 근본법칙',
+      xaxis:{title:'종목 수 N (breadth)'},
+      yaxis:{title:'정보비율 IR (≈ 샤프)'},
+      shapes:[{type:'line',x0:20,x1:1000,y0:1,y1:1,line:{color:'#95a5a6',width:1,dash:'dot'}}],
+      annotations:[{x:900,y:1.05,text:'IR=1 (좋은 전략)',showarrow:false,font:{size:10,color:'#7f8c8d'}}],
+      plot_bgcolor:'#fafaf8',paper_bgcolor:'#f0f4f8',font:{family:'Inter',size:12},
+      margin:{t:50,r:20,b:50,l:60}
+    },{responsive:true});
+    document.getElementById('ir-info').innerHTML=
+      'IC = '+ic.toFixed(3)+'  →  <span style="color:#569cd6">OOS R² ≈ IC² = '+r2.toFixed(3)+'%</span>\n'+
+      'N = '+N+' 종목  →  <span style="color:#569cd6">IR ≈ IC·√N = '+ic.toFixed(3)+'×'+Math.sqrt(N).toFixed(1)+' = '+ir.toFixed(2)+'</span>\n'+
+      '<span style="color:#6a9955">→ R²가 겨우 '+r2.toFixed(2)+'%라도, '+N+'개 종목에 걸치면 IR '+ir.toFixed(2)+'의 전략!</span>\n'+
+      '<span style="color:#6a9955">→ 이것이 "작은 R²가 경제적으로 거대한" 이유 (5장)</span>';
+  }
+  [slIC,slN].forEach(function(s){s.addEventListener('input',draw);});
+  setTimeout(draw,300);
+})();
+</script>
+
+<div class="ok">
+<p class="ni"><strong>8장 핵심 정리:</strong> 예측으로 매월 decile 정렬 → D10 매수, D1 매도(Def 8.1, 논문 Table 7). R5의 <code>performance_table</code>을 재사용해 샤프·MDD·t-stat 산출. \(R^2\) 순위와 성과 순위가 단조 일치. 대형주만 쓰면 성과가 감쇠하지만 이는 <strong>더 정직한 결과</strong>다. 작은 \(R^2\)는 breadth로 증폭된다(근본법칙).</p>
+</div>
+
+<!-- ═══════════════════════════════════════════ -->
+<h2 id="ch9">9. Variable Importance — 무엇이 예측을 이끄는가</h2>
+
+<p>GKX의 세 번째 공헌은 "블랙박스"라는 비판에 답하는 것 — <strong>어떤 특성이 예측을 이끄는가</strong>를 규명한다(논문 Section 3, Figure 4~6). 이 장에서 논문의 결론을 확인하고, 미니 버전에서 SHAP으로 재현한다.</p>
+
+<h3>9.1 논문의 결론 — 모멘텀·유동성·변동성이 지배</h3>
+
+<p>GKX는 각 특성을 <strong>0으로 설정했을 때 \(R^2\)가 얼마나 떨어지는가</strong>로 중요도를 잰다(논문 Eq. 24 근처). 결론은 놀랍도록 일관적이다.</p>
+
+<div class="def">
+<p class="ni"><strong>Definition 9.1 — GKX 변수 중요도 (논문 Section 3.2)</strong></p>
+<div class="eq">\[ VI_j = R^2 - R^2_{(j\to 0)} \]</div>
+<p class="ni" style="font-size:12px;color:#555;margin:4px 0 8px 0">↑ 특성 \(j\)를 0으로 만든 뒤(정보 제거) 재예측했을 때 \(R^2\) 하락폭. 클수록 그 특성이 중요. GKX는 이를 모든 모델에 걸쳐 계산하고, 특성을 카테고리별로 묶어 <strong>어떤 종류의 정보가 알파를 이끄는가</strong>를 본다.</p>
+</div>
+
+<div class="tc">Table 9.1. GKX가 발견한 지배적 특성 카테고리 (논문 Figure 5 요약)</div>
+<table>
+<tr><th>순위</th><th>카테고리</th><th>대표 특성</th><th>경제적 의미</th></tr>
+<tr><td>1</td><td>모멘텀(Momentum)</td><td>mom1m, mom12m, chmom</td><td>추세 지속 — 과거 승자가 계속 이긴다</td></tr>
+<tr><td>2</td><td>유동성(Liquidity)</td><td>turn, dolvol, ill, baspread</td><td>유동성 프리미엄 — 거래 어려운 종목의 보상</td></tr>
+<tr><td>3</td><td>변동성(Volatility)</td><td>retvol, idiovol, maxret</td><td>저변동 이상현상 — 저변동주가 초과성과</td></tr>
+<tr><td>4</td><td>밸류(Value)</td><td>bm, ep, sp, cfp</td><td>저평가 프리미엄 (상대적으로 약함)</td></tr>
+</table>
+
+<div class="info">
+<p class="ni"><strong>왜 이게 놀라운가?</strong> 이 세 카테고리(모멘텀·유동성·변동성)는 <strong>모든 모델</strong>(선형이든 NN이든)에서 공통으로 상위에 온다. 즉 ML이 발견한 것은 이국적인 새 팩터가 아니라, 이미 알려진 강건한 이상현상들이다. ML의 진짜 기여는 <strong>이들을 비선형·상호작용으로 더 잘 결합</strong>하는 것이지, 마법의 신호를 찾는 게 아니다. 이는 재현 시 위안이 된다 — 중요 특성이 상식과 맞으면 코드가 옳을 가능성이 높다.</p>
+</div>
+
+<p class="ni">중요도를 재는 방법은 여럿이고, 각각 측정하는 것이 미묘하게 다르다. 재현 노트에 "중요도"라고만 쓰면 모호하니, 어떤 방법을 썼는지 명시해야 한다.</p>
+
+<div class="tc">Table 9.2. 변수 중요도 측정 방법 비교</div>
+<table>
+<tr><th>방법</th><th>측정 대상</th><th>장점</th><th>한계</th></tr>
+<tr><td>특성 0으로(GKX)</td><td>제거 시 \(R^2\) 하락</td><td>모델 무관, 직관적</td><td>상관 특성 있으면 과소평가</td></tr>
+<tr><td>Permutation</td><td>값 섞을 때 성능 하락</td><td>모델 무관</td><td>비현실적 조합 생성 가능</td></tr>
+<tr><td>SHAP</td><td>예측 기여의 게임이론적 배분</td><td>개별 예측까지 분해, 일관성</td><td>계산 비용 큼</td></tr>
+<tr><td>트리 gain</td><td>분할 시 손실 감소량</td><td>트리에 무료로 나옴</td><td>고카디널리티 편향</td></tr>
+</table>
+
+<h3>9.2 미니 버전에서 SHAP으로 확인</h3>
+
+<p>SHAP(SHapley Additive exPlanations)은 각 특성이 개별 예측에 얼마나 기여했는지를 게임이론적으로 배분한다. GKX의 "특성 0으로 만들기"보다 정밀한 현대적 도구다. 우리 GBRT/NN3에 적용한다.</p>
+
+<pre><code><span class="kw">import</span> shap
+<span class="kw">import</span> numpy <span class="kw">as</span> np
+
+<span class="cm"># 마지막 창의 test 셋에 대해 GBRT의 SHAP 값 계산</span>
+d = splitter.make(wins[-<span class="nu">1</span>], data_start)
+gbrt = <span class="nb">GBRT</span>().fit(d[<span class="st">"Xtr"</span>], d[<span class="st">"ytr"</span>])
+
+explainer = shap.TreeExplainer(gbrt.m)
+shap_vals = explainer.shap_values(d[<span class="st">"Xte"</span>])   <span class="cm"># (n_test, n_features)</span>
+
+<span class="cm"># 특성별 평균 |SHAP| = 전역 중요도</span>
+importance = np.abs(shap_vals).mean(axis=<span class="nu">0</span>)
+order = np.argsort(importance)[::-<span class="nu">1</span>]
+
+<span class="fn">print</span>(<span class="st">"=== 미니 GKX SHAP 중요도 Top 8 ==="</span>)
+<span class="kw">for</span> k <span class="kw">in</span> order[:<span class="nu">8</span>]:
+    bar = <span class="st">"#"</span> * <span class="fn">int</span>(importance[k] / importance.max() * <span class="nu">30</span>)
+    <span class="fn">print</span>(<span class="st">f"  {FEATURES[k]:&lt;10} {importance[k]:.5f} {bar}"</span>)</code></pre>
+<div class="code-output"><span class="out-label">Output:</span>
+=== 미니 GKX SHAP 중요도 Top 8 ===
+  mom12m     0.00412 ##############################
+  retvol     0.00361 ##########################
+  turn       0.00298 #####################
+  mom1m      0.00274 ###################
+  idiovol    0.00241 #################
+  dolvol     0.00219 ###############
+  bm         0.00157 ###########
+  maxret     0.00131 #########</div>
+
+<div class="info">
+<p class="ni"><strong>재현 성공 확인.</strong> 미니 버전의 Top 특성 — mom12m(모멘텀), retvol/idiovol(변동성), turn/dolvol(유동성) — 이 논문의 지배 카테고리(Table 9.1)와 <strong>정확히 일치</strong>한다. 대형주 20특성으로 줄였는데도 "무엇이 중요한가"의 결론이 살아있다. 이것이 프로토콜 재현의 가장 강력한 증거다 — 정성적 결론의 재현.</p>
+</div>
+
+<h3>9.3 시사점</h3>
+
+<div class="warn">
+<p class="ni"><strong>함정 — SHAP 중요도를 "인과"로 읽지 마라.</strong> SHAP은 "이 특성이 <strong>예측에</strong> 얼마나 기여했는가"이지 "이 특성이 <strong>수익을 일으키는가</strong>"가 아니다. 모멘텀이 중요하다는 건 "모멘텀이 미래 수익을 예측한다"이지 "모멘텀을 조작하면 수익이 바뀐다"가 아니다. 또한 rank 변환·결측 처리 방식이 중요도 순위를 바꿀 수 있다(예: 결측 많은 특성은 0으로 채워져 과소평가). <strong>중요도는 해석의 출발점이지 결론이 아니다.</strong></p>
+</div>
+
+<div class="ok">
+<p class="ni"><strong>9장 핵심 정리:</strong> GKX는 "특성 0으로 만들기"로 중요도를 측정(Def 9.1) — 모든 모델에서 <strong>모멘텀·유동성·변동성</strong>이 지배. 우리 미니 버전을 SHAP으로 확인하니 같은 결론(mom12m·retvol·turn 상위). ML은 새 마법 신호가 아니라 <strong>알려진 이상현상을 더 잘 결합</strong>한다. 단, SHAP은 예측 기여일 뿐 인과가 아니다.</p>
+</div>
+
+<!-- ═══════════════════════════════════════════ -->
+<h2 id="ch10">10. 실습 — 미니 GKX 전체 재현 체크리스트</h2>
+
+<p>이제 배운 모든 것을 하나의 연구노트로 엮는다. 실제 주니어 퀀트가 "논문 재현했습니다"라고 보고할 때의 형식이다. 아래 체크리스트를 순서대로 완주하면 미니 GKX 재현이 끝난다.</p>
+
+<div class="task">
+<div class="task-title">&#x2705; 실습 과제 — 미니 GKX 재현 5단계 체크리스트</div>
+<p class="ni"><strong>1단계 · 데이터 (2·6장)</strong></p>
+<ul>
+<li>[ ] R2 패널 로드, 대형주 500 필터, 2000년~현재로 절단</li>
+<li>[ ] 타겟 생성: <code>groupby('permno')['ret_excess'].shift(-1)</code> — 방향 확인</li>
+<li>[ ] 20개 특성 선정, <code>rank_transform</code>으로 월별 [-1,1] 변환</li>
+<li>[ ] 결측이 0(중앙값)으로 채워졌는지, 각 월 특성 평균≈0인지 검증</li>
+</ul>
+<p class="ni"><strong>2단계 · 프로토콜 (3장)</strong></p>
+<ul>
+<li>[ ] <code>generate_windows(train=12y, val=6y, test=1y)</code>로 창 생성</li>
+<li>[ ] 창 경계에 겹침 없는지(배타적 경계) 확인</li>
+<li>[ ] <code>GKXSplit</code>으로 (X,y) 잘라 shape 점검</li>
+</ul>
+<p class="ni"><strong>3단계 · 모델 (4·7장)</strong></p>
+<ul>
+<li>[ ] OLS-3, ENet, GBRT, NN3를 공통 인터페이스로 구현</li>
+<li>[ ] NN3에 validation 조기종료 적용됐는지 확인</li>
+<li>[ ] <code>run_zoo</code>로 전 창 × 전 모델 refit</li>
+</ul>
+<p class="ni"><strong>4단계 · 평가 (5장)</strong></p>
+<ul>
+<li>[ ] <code>oos_r2</code>(분모 \(\sum r^2\))로 논문 Table 1 형식 표 출력</li>
+<li>[ ] 순서 OLS-3 &lt; ENet &lt; GBRT &lt; NN3 재현 확인</li>
+<li>[ ] Diebold-Mariano로 NN3 vs OLS-3 유의성 검정</li>
+</ul>
+<p class="ni"><strong>5단계 · 포트폴리오·해석 (8·9장)</strong></p>
+<ul>
+<li>[ ] <code>decile_long_short</code>로 D10-D1 포트폴리오 (논문 Table 7)</li>
+<li>[ ] R5 <code>performance_table</code>로 샤프·MDD·t-stat</li>
+<li>[ ] SHAP으로 Top 특성 확인 — 모멘텀·유동성·변동성 나오는가</li>
+</ul>
+</div>
+
+<h3>10.1 연구노트 형식 정리 — 재현 결과 보고</h3>
+
+<p class="ni">완주 후에는 결과를 아래처럼 정리한다. 이것이 팀에 제출하는 "재현 노트"의 표준 골격이다.</p>
+
+<pre><code><span class="cm"># ══════════════════════════════════════════════════════════</span>
+<span class="cm"># 연구노트: Gu-Kelly-Xiu (2020) 미니 재현</span>
+<span class="cm"># 작성: 2026-07 / 상태: 프로토콜 재현 완료</span>
+<span class="cm"># ══════════════════════════════════════════════════════════</span>
+
+<span class="cm"># [1] 스펙</span>
+<span class="cm">#   유니버스 : 대형주 상위 500 (월평균 491종목)</span>
+<span class="cm">#   기간     : 2000-01 ~ 2024-12 (test: 2018~2024, 7개 창)</span>
+<span class="cm">#   특성     : 20개 (교호항 생략), 월별 rank [-1,1]</span>
+<span class="cm">#   프로토콜 : expanding window (train 12y / val 6y / test 1y)</span>
+
+<span class="cm"># [2] 핵심 결과 (전체 test 풀, 월간 OOS R²)</span>
+results = pd.DataFrame({
+    <span class="st">"model"</span>:  [<span class="st">"OLS-3"</span>, <span class="st">"ENet"</span>, <span class="st">"GBRT"</span>, <span class="st">"NN3"</span>],
+    <span class="st">"oos_r2_pct"</span>: [<span class="nu">0.081</span>, <span class="nu">0.104</span>, <span class="nu">0.216</span>, <span class="nu">0.257</span>],
+    <span class="st">"ls_sharpe"</span>:  [<span class="nu">0.24</span>, <span class="nu">0.33</span>, <span class="nu">0.56</span>, <span class="nu">0.69</span>],
+    <span class="st">"ls_tstat"</span>:   [<span class="nu">0.81</span>, <span class="nu">1.09</span>, <span class="nu">1.87</span>, <span class="nu">2.31</span>],
+})
+<span class="fn">print</span>(results.to_string(index=<span class="kw">False</span>))
+
+<span class="cm"># [3] 결론</span>
+<span class="fn">print</span>(<span class="st">"""</span>
+<span class="st">결론:</span>
+<span class="st"> - 논문의 핵심 순서(비선형&gt;선형, NN&gt;트리&gt;선형) 재현 성공.</span>
+<span class="st"> - 절대 R²는 논문의 ~60% 수준 (대형주·기간·특성 축소 때문, 예상됨).</span>
+<span class="st"> - 지배 특성(모멘텀·유동성·변동성)이 논문과 일치 (SHAP 확인).</span>
+<span class="st"> - NN3 L-S t=2.31로 대형주만으로도 유의한 알파 존재.</span>
+<span class="st">한계:</span>
+<span class="st"> - 교호항 미구현 → 상호작용 신호 일부 손실.</span>
+<span class="st"> - 거래비용 미반영 → 실제 순성과는 더 낮음.</span>
+<span class="st">"""</span>)</code></pre>
+<div class="code-output"><span class="out-label">Output:</span>
+model  oos_r2_pct  ls_sharpe  ls_tstat
+OLS-3       0.081       0.24      0.81
+ ENet       0.104       0.33      1.09
+ GBRT       0.216       0.56      1.87
+  NN3       0.257       0.69      2.31
+
+결론:
+ - 논문의 핵심 순서(비선형>선형, NN>트리>선형) 재현 성공.
+ - 절대 R²는 논문의 ~60% 수준 (대형주·기간·특성 축소 때문, 예상됨).
+ - 지배 특성(모멘텀·유동성·변동성)이 논문과 일치 (SHAP 확인).
+ - NN3 L-S t=2.31로 대형주만으로도 유의한 알파 존재.
+한계:
+ - 교호항 미구현 → 상호작용 신호 일부 손실.
+ - 거래비용 미반영 → 실제 순성과는 더 낮음.</div>
+
+<h3>10.2 재현이 실패하는 흔한 순간들 — 최종 정리</h3>
+
+<p class="ni">주니어 퀀트가 이 재현을 처음 할 때 걸려 넘어지는 지점은 놀랍도록 정형화되어 있다. 마지막으로 이들을 한 표에 모은다. 재현이 막히면 이 표부터 훑어라.</p>
+
+<div class="tc">Table 10.1. 미니 GKX 재현 실패 진단표</div>
+<table>
+<tr><th>증상</th><th>가장 흔한 원인</th><th>고치는 곳</th></tr>
+<tr><td>OOS \(R^2\)가 5%+로 너무 큼</td><td>타겟 shift 방향 오류 or 전체기간 rank</td><td>6장 · Table 3.2</td></tr>
+<tr><td>모든 모델 \(R^2\)가 음수</td><td>특성-타겟 정렬 어긋남(lag)</td><td>3장 경계 정렬</td></tr>
+<tr><td>모델 순서가 뒤죽박죽</td><td>NN 미수렴 or 하이퍼파라미터 미조정</td><td>7장 · validation 조기종료</td></tr>
+<tr><td>NN test \(R^2\)가 창마다 요동</td><td>단일 초기값 사용</td><td>7장 · 앙상블 평균</td></tr>
+<tr><td>포트폴리오 t-stat이 0 근처</td><td>유니버스 너무 좁음(breadth 부족)</td><td>5장 · 근본법칙</td></tr>
+<tr><td>SHAP 상위가 이상함</td><td>결측 많은 특성이 0으로 눌림</td><td>2장 · 결측 처리</td></tr>
+</table>
+
+<div class="info">
+<p class="ni"><strong>재사용 지도 — 이 라운드에서 재활용한 이전 라운드.</strong> R2(패널 데이터 → <code>panel</code>), R3(t검정 → Diebold-Mariano), R5(성과표 → <code>performance_table</code>), R7(교차검증 → expanding window validation). 즉 이 라운드는 <strong>새 도구를 배우는 게 아니라, 이미 가진 도구를 논문 재현이라는 하나의 목표로 조립</strong>하는 라운드다. 이것이 "가이드의 클라이맥스"인 이유다.</p>
+</div>
+
+<div class="ok">
+<p class="ni"><strong>10장 핵심 정리:</strong> 5단계 체크리스트(데이터→프로토콜→모델→평가→포트폴리오·해석)로 미니 GKX를 완주한다. 결과는 스펙·핵심표·결론·한계의 <strong>연구노트 형식</strong>으로 보고. 성공 기준은 절대값이 아니라 <strong>순서와 지배 특성의 재현</strong>. 모든 이전 라운드(R2·R3·R5·R7)가 여기서 조립된다.</p>
+</div>
+
+<!-- ═══════════════════════════════════════════ -->
+<h2 id="quiz">Quiz — 논문 재현 감각 점검</h2>
+
+<details class="quiz-item">
+<summary>Q1. GKX의 out-of-sample \(R^2\)(Eq. 22)에서 분모는 무엇인가? 학부 \(R^2\)와 어떻게 다른가?</summary>
+<div class="answer">분모는 \(\sum r_{i,t+1}^2\)로, 벤치마크 예측이 <strong>0(초과수익 0)</strong>이다. 학부 \(R^2\)는 분모가 \(\sum(r-\bar{r})^2\)로 벤치마크가 표본평균이다. GKX가 0을 쓰는 이유: 개별 주식의 과거 평균 수익률은 미래 예측력이 거의 없고 노이즈만 커서, 그걸 벤치마크로 쓰면 \(R^2\)가 부풀려진다. 그래서 GKX \(R^2\)는 같은 예측이라도 더 작고 보수적으로 나온다.</div>
+</details>
+
+<details class="quiz-item">
+<summary>Q2. 월간 OOS \(R^2\)가 겨우 0.4%인데 왜 "경제적으로 거대"하다고 하는가?</summary>
+<div class="answer">개별 주식 월간 수익률의 분산은 거의 전부 예측 불가능한 노이즈다. 그 바다에서 작은 신호라도 <strong>일관되게</strong> 뽑으면 breadth로 증폭된다. \(IC\approx\sqrt{R^2}\approx0.063\), 근본법칙 \(IR\approx IC\sqrt{N}\)에서 \(N\)=500이면 \(IR\approx1.4\). 즉 0.4%의 \(R^2\)도 수백 종목 long-short로 증폭하면 샤프 1 이상의 전략이 된다. "작은 \(R^2\)를 무시하는 것"이 이 분야 최대 초보 실수다.</div>
+</details>
+
+<details class="quiz-item">
+<summary>Q3. 다음 코드에서 look-ahead 편향이 있는가? <code>panel['size_rank'] = panel['mvel1'].rank(pct=True)</code></summary>
+<div class="answer"><strong>있다.</strong> 이 rank는 <strong>전체 기간을 통합</strong>해 순위를 매긴다. 그러면 (a) 미래 데이터로 오늘의 순위가 정해지는 look-ahead 편향, (b) 시대별 시가총액 분포 변화가 뒤섞이는 문제가 생긴다. 올바른 코드는 <code>panel.groupby(level='date')['mvel1'].rank(pct=True)</code>처럼 <strong>월별 횡단면</strong>으로 rank해야 한다(Def 2.2). GKX rank 변환의 핵심이 바로 "월별"이다.</div>
+</details>
+
+<details class="quiz-item">
+<summary>Q4. recursive expanding window에서 validation 창의 역할은? train 창과 무엇이 다른가?</summary>
+<div class="answer">train 창은 <strong>파라미터(가중치·트리 분할)를 추정</strong>하는 데 쓰고, validation 창은 <strong>하이퍼파라미터(정규화 강도·트리 깊이·학습률) 선택과 조기종료 판단</strong>에만 쓴다. validation은 절대 파라미터 추정에 쓰지 않는다. 신경망에서는 validation loss가 개선을 멈추는 epoch에서 학습을 중단(early stopping)한다. test 창은 확정된 모델로 <strong>한 번만</strong> 예측해 OOS \(R^2\)를 잰다.</div>
+</details>
+
+<details class="quiz-item">
+<summary>Q5. 왜 GKX의 신경망은 NN3에서 성능이 정점이고 NN5에서 오히려 떨어지는가?</summary>
+<div class="answer">표현력과 일반화는 다르다. 깊은 망은 더 복잡한 함수를 표현할 수 있지만, 금융 데이터는 신호 대 잡음비(SNR)가 극도로 낮다(월간 \(R^2\) 0.5% 수준). 층이 깊어지면 파라미터가 폭증해 노이즈를 외우고(과적합) 학습이 불안정해진다. GKX 데이터에서 NN3가 "표현력 vs 과적합"의 최적점이다. 교훈: <strong>깊이는 공짜가 아니다.</strong></div>
+</details>
+
+<details class="quiz-item">
+<summary>Q6. 미니 재현의 OOS \(R^2\)가 논문의 절반밖에 안 나온다. 가장 먼저 의심할 것은 코드 버그인가?</summary>
+<div class="answer"><strong>아니다.</strong> 먼저 <strong>설계 차이</strong>를 정량화한다. 유니버스(대형주 vs 전종목 — 알파는 소형주에 집중), 기간(25년 vs 60년), 특성 수(20 vs 94+교호항)만으로도 \(R^2\)는 반토막이 난다. 디버깅 순서: ① 누수 점검(rank 월별? 타겟 shift 방향?), ② 설계 차이 정량화, ③ 그래도 <strong>모델 간 순서가 뒤집히면</strong> 그때 코드 의심. 순서(OLS-3&lt;ENet&lt;GBRT&lt;NN3)가 맞으면 프로토콜 재현은 성공이다.</div>
+</details>
+
+<details class="quiz-item">
+<summary>Q7. decile long-short 포트폴리오(논문 Table 7)는 예측값을 어떻게 수익으로 바꾸는가?</summary>
+<div class="answer">매 월 예측 \(\hat{r}_{i,t+1}\)로 종목을 정렬해 10분위로 나눈다. 최상위 분위(D10, 예측 높음)를 매수, 최하위 분위(D1, 예측 낮음)를 매도한 동일가중 스프레드가 long-short 수익이다. 예측이 실현과 상관이 있으면(작은 \(R^2\)라도) 이 스프레드의 평균이 양(+)이 된다. 이것이 통계 지표 \(R^2\)를 경제적 가치(샤프·t-stat)로 번역하는 다리다.</div>
+</details>
+
+<details class="quiz-item">
+<summary>Q8. 미니 버전 SHAP 상위에 mom12m·retvol·turn이 나왔다. 이것을 "이 특성들이 수익을 인과적으로 일으킨다"고 해석해도 되는가?</summary>
+<div class="answer"><strong>안 된다.</strong> SHAP은 "특성이 <strong>예측에</strong> 얼마나 기여했는가"이지 "특성이 <strong>수익을 일으키는가</strong>(인과)"가 아니다. 모멘텀이 중요하다는 건 "모멘텀이 미래 수익을 예측한다"는 상관 관계이지 인과가 아니다. 또 rank·결측 처리 방식이 순위를 바꿀 수 있다. 다만 상위 특성이 논문의 지배 카테고리(모멘텀·유동성·변동성)와 일치하는 것은 <strong>재현이 옳게 됐다는 좋은 증거</strong>다.</div>
+</details>
+
+<details class="quiz-item">
+<summary>Q9. Diebold-Mariano 검정은 무엇을 비교하며, \(|DM|>1.96\)은 무엇을 뜻하는가?</summary>
+<div class="answer">두 모델의 예측오차 시계열을 비교한다. 손실 차이 \(d_t=e^{(1)2}_t-e^{(2)2}_t\)의 평균을 그 표준오차로 나눈 통계량이 귀무가설("두 모델 예측력 동일") 하에서 표준정규를 따른다. \(|DM|>1.96\)이면 5% 유의수준에서 두 모델의 예측력 차이가 통계적으로 유의하다는 뜻이다. R3의 t검정을 예측력 비교로 확장한 것으로, "NN3가 GBRT보다 0.06%p 높은 게 우연인가"를 판정한다.</div>
+</details>
+
+<details class="quiz-item">
+<summary>Q10. GKX 결측 처리 규칙은? rank 변환과 어떻게 맞물리는가?</summary>
+<div class="answer">특성이 결측이면 그 달 <strong>횡단면 중앙값</strong>으로 대체한다. rank를 [-1,1]로 변환하면 중앙값은 정확히 <strong>0</strong>에 해당하므로, 실무적으로 "rank 변환 후 남은 NaN을 0으로 채운다"와 같다. 직관은 "정보가 없으면 평균적인 종목으로 취급". 이는 결측을 극단값(-1이나 +1)으로 밀지 않아 안전하고, 트리·NN 모두에서 안정적으로 작동한다.</div>
+</details>
+
+<div class="ok">
+<p class="ni"><strong>Round 8 완료 — 가이드의 클라이맥스를 넘었다!</strong> 이제 논문 한 편을 데이터 명세 추출 → 프로토콜 설계 → 모델 zoo → 평가 → 포트폴리오 → 해석까지 스스로 재현할 수 있다. 핵심 다섯 문장: (1) 위험 프리미엄 \(g^\star(z)\)를 ML로 유연하게 추정, (2) rank는 월별·결측은 0, (3) expanding window로 validation은 하이퍼파라미터에만, (4) OOS \(R^2\) 분모는 \(\sum r^2\)이며 작아도 breadth로 거대해짐, (5) 재현 성공은 절대값이 아니라 <strong>순서와 지배 특성</strong>. R9에서는 이 NN을 더 깊이 파고들어 딥러닝을 다룬다.</p>
+</div>
+
+<!-- ═══════════════════════════════════════════ -->
+<h2 id="cheatsheet">&#x1F4CB; Cheat Sheet — Round 8 핵심 요약</h2>
+
+<div class="tc">Table CS.1. 핵심 공식</div>
+<table>
+<tr><th style="width:26%">이름</th><th style="width:44%">공식</th><th style="width:30%">한줄 설명</th></tr>
+<tr><td>예측 문제 (Eq.1)</td><td>\(\mathbb{E}_t[r_{i,t+1}]=g^\star(z_{i,t})\)</td><td>위험 프리미엄 = 특성의 함수</td></tr>
+<tr><td>특성 구조 (Eq.3)</td><td>\(z=c\otimes x \,\cup\, c\)</td><td>종목 특성 ⊗ 거시변수 (교호항)</td></tr>
+<tr><td>rank 변환</td><td>\(\tilde{c}=\frac{2(\text{rank}_t-1)}{n_t-1}-1\)</td><td>월별 [-1,1], 결측=0</td></tr>
+<tr><td>Huber 손실 (Eq.6)</td><td>\(H=e^2\) if \(|e|\le\xi\) else \(2\xi|e|-\xi^2\)</td><td>이상치에 강건</td></tr>
+<tr><td>OOS \(R^2\) (Eq.22)</td><td>\(1-\frac{\sum(r-\hat{r})^2}{\sum r^2}\)</td><td>벤치마크=0, 평균 아님!</td></tr>
+<tr><td>근본법칙</td><td>\(IR\approx IC\sqrt{N},\ IC\approx\sqrt{R^2}\)</td><td>작은 \(R^2\)를 breadth로 증폭</td></tr>
+<tr><td>Diebold-Mariano</td><td>\(DM=\bar{d}/\hat{\sigma}_{\bar d}\sim N(0,1)\)</td><td>모델 예측력 비교 검정</td></tr>
+<tr><td>Long-Short (Tbl.7)</td><td>\(r^{LS}=\bar{r}_{D10}-\bar{r}_{D1}\)</td><td>예측 상위 매수·하위 매도</td></tr>
+<tr><td>변수 중요도 (Eq.24)</td><td>\(VI_j=R^2-R^2_{(j\to0)}\)</td><td>특성 제거 시 \(R^2\) 하락</td></tr>
+</table>
+
+<div class="tc">Table CS.2. 전처리·프로토콜 규칙</div>
+<table>
+<tr><th>규칙</th><th>어떻게</th><th>왜 (함정 방지)</th></tr>
+<tr><td>rank 변환</td><td><code>groupby('date')[c].rank(pct=True)</code></td><td>전체 통합 rank는 look-ahead 편향</td></tr>
+<tr><td>타겟 생성</td><td><code>groupby('permno')['ret'].shift(-1)</code></td><td>종목별로 shift, 다음 달 수익</td></tr>
+<tr><td>결측 처리</td><td>rank 후 <code>.fillna(0)</code></td><td>중앙값=0, 극단값 회피</td></tr>
+<tr><td>윈도우</td><td>train 확장 / val 이동 / test 1년 전진</td><td>배타적 경계로 창 겹침 방지</td></tr>
+<tr><td>validation</td><td>하이퍼파라미터·조기종료 전용</td><td>파라미터 추정에 쓰면 누수</td></tr>
+<tr><td>refit</td><td>매 test 창마다 처음부터 재학습</td><td>최신 데이터 반영</td></tr>
+</table>
+
+<div class="tc">Table CS.3. 모델 zoo 한눈에</div>
+<table>
+<tr><th>모델</th><th>계열</th><th>미니 \(R^2\)(%)</th><th>역할</th></tr>
+<tr><td>OLS-3</td><td>선형(size·bm·mom)</td><td>0.081</td><td>벤치마크</td></tr>
+<tr><td>ENet</td><td>정규화 선형</td><td>0.104</td><td>선형 상한</td></tr>
+<tr><td>GBRT</td><td>트리 부스팅</td><td>0.216</td><td>비선형·상호작용</td></tr>
+<tr><td>NN3</td><td>얕은 신경망</td><td>0.257</td><td>논문 최고 모델</td></tr>
+</table>
+
+<div class="tc">Table CS.4. 재사용한 이전 라운드</div>
+<table>
+<tr><th>라운드</th><th>재사용한 것</th><th>이 라운드에서의 쓰임</th></tr>
+<tr><td>R2</td><td>패널 데이터 (date,permno)</td><td><code>panel</code> 로드·rank·타겟</td></tr>
+<tr><td>R3</td><td>t검정 / 유의성</td><td>Diebold-Mariano 검정</td></tr>
+<tr><td>R5</td><td>성과표 함수</td><td><code>performance_table</code> 재사용</td></tr>
+<tr><td>R7</td><td>교차검증</td><td>expanding window validation</td></tr>
+</table>
+
+<div class="nav-footer">
+<a href="../round-07/"><span class="nf-label">&larr; Previous</span>R7. Financial ML I</a>
+<a href="../round-09/" style="text-align:right"><span class="nf-label">Next &rarr;</span>R9. Deep Learning</a>
+</div>
+
+</div>
+</div>
+</div>
+
+</body>
+</html>

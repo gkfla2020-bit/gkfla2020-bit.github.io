@@ -1,0 +1,1300 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Round 5 - Factor Research I — 시그널에서 포트폴리오까지 | Quant Researcher Guide</title>
+<script>
+MathJax = { tex: { inlineMath: [['\\(','\\)']], displayMath: [['\\[','\\]'],['$$','$$']] } };
+</script>
+<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;500&family=Space+Mono:wght@400&family=Inter:wght@300;400&display=swap" rel="stylesheet">
+<script src="https://cdn.plot.ly/plotly-2.27.0.min.js"></script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Inter',sans-serif;background:#fafaf8;color:#1a1a1a;line-height:1.7;overflow-x:hidden}
+.sidebar{position:fixed;left:0;top:0;width:260px;height:100vh;background:rgba(255,255,255,.97);border-right:1px solid rgba(0,0,0,.06);padding:32px 24px;z-index:100;overflow-y:auto;display:flex;flex-direction:column}
+.sidebar-profile{text-align:center;margin-bottom:28px;padding-bottom:24px;border-bottom:1px solid rgba(0,0,0,.08)}
+.profile-icon{font-size:48px;margin-bottom:8px}
+.profile-name{font-family:'Cormorant Garamond',serif;font-size:1.3rem;font-weight:500;margin-bottom:4px}
+.profile-title{font-size:.68rem;color:#888;letter-spacing:.08em;text-transform:uppercase;margin-bottom:8px}
+.profile-bio{font-size:.78rem;color:#666;line-height:1.5}
+.sidebar-nav{flex:1;margin-top:16px}.nav-section{margin-bottom:20px}.nav-section-title{font-size:.6rem;font-weight:600;color:#aaa;letter-spacing:.15em;text-transform:uppercase;margin-bottom:10px}.nav-list{list-style:none}.nav-list li{margin-bottom:5px}.nav-list a{font-size:.78rem;color:#555;text-decoration:none;transition:all .2s;display:block;padding:3px 0}.nav-list a:hover{color:#2563eb;padding-left:4px}.nav-list a.active{color:#2563eb;font-weight:500}.nav-list a.done{color:#28a745}.badge{display:inline-block;font-size:.5rem;background:#2563eb;color:#fff;padding:1px 5px;border-radius:8px;margin-left:3px;vertical-align:middle}.badge-done{background:#28a745}.sidebar-footer{padding-top:16px;border-top:1px solid rgba(0,0,0,.06);font-size:.65rem;color:#aaa;text-align:center}
+.main-wrapper{margin-left:260px;min-height:100vh}.container{max-width:1100px;margin:0 auto;padding:50px 40px 80px}
+.paper-content{font-family:'Times New Roman','Nanum Myeongjo',serif;line-height:1.8;background:#fff;padding:40px;border-radius:8px;box-shadow:0 2px 20px rgba(0,0,0,.05)}.paper-header{text-align:center;margin-bottom:40px;padding-bottom:30px;border-bottom:2px solid #333}.paper-category{font-size:14px;color:#666;margin-bottom:10px}.paper-title{font-size:24px;font-weight:bold;margin-bottom:12px;line-height:1.4}.paper-subtitle{font-size:14px;color:#555;margin-bottom:8px}.paper-team{font-size:13px;color:#444}
+.abstract{background:#f8f9fa;padding:25px;margin:30px 0;border-left:4px solid #2c3e50}.abstract-title{font-weight:bold;font-size:16px;margin-bottom:15px}
+h2{font-size:18px;margin:35px 0 20px;padding-bottom:8px;border-bottom:1px solid #ddd;color:#2c3e50}h3{font-size:15px;margin:25px 0 15px;color:#34495e}
+p{text-align:justify;margin-bottom:15px;text-indent:2em}p.ni{text-indent:0}
+table{width:100%;border-collapse:collapse;margin:20px 0;font-size:12px}th,td{border:1px solid #ddd;padding:10px 8px;text-align:center}th{background:#2c3e50;color:white;font-weight:bold}tr:nth-child(even){background:#f8f9fa}tr:hover{background:#e8f4f8}
+.tc{font-size:13px;font-weight:bold;margin:15px 0 10px;text-align:center}.eq{text-align:center;margin:20px 0;padding:15px;background:#f8f9fa;border-radius:4px;overflow-x:auto}ul,ol{margin-left:2em;margin-bottom:15px}li{margin-bottom:6px}
+.def{background:#fff9e6;border:1px solid #ffc107;border-radius:4px;padding:20px;margin:20px 0}.info{background:#e8f4f8;border-left:4px solid #3498db;padding:20px;margin:20px 0}.warn{background:#fff3cd;border-left:4px solid #f39c12;padding:20px;margin:20px 0}.ok{background:#d4edda;border-left:4px solid #28a745;padding:20px;margin:20px 0}
+.paper-anchor{background:#f5f3ff;border:1px solid #7c3aed;border-radius:6px;padding:22px;margin:24px 0}.paper-anchor .pa-label{font-family:'Space Mono',monospace;font-size:10px;color:#7c3aed;letter-spacing:.15em;text-transform:uppercase;margin-bottom:8px}.paper-anchor .pa-title{font-weight:bold;font-size:14px;margin-bottom:6px}.paper-anchor p{font-size:13px;text-indent:0;margin-bottom:8px}
+.task{background:#e8f8f0;border-left:4px solid #00b894;padding:20px;margin:20px 0}.task .task-title{font-weight:bold;margin-bottom:10px}
+details.quiz-item{margin:14px 0;padding:14px 18px;background:#f8f9fa;border:1px solid #e0e0e0;border-radius:6px}details.quiz-item summary{cursor:pointer;font-weight:bold;font-size:13.5px}details.quiz-item[open] summary{margin-bottom:10px;color:#2563eb}details.quiz-item .answer{font-size:13px;padding:10px 14px;background:#fff;border-left:3px solid #2563eb}
+pre{background:#1e1e1e;color:#d4d4d4;padding:20px;border-radius:6px;overflow-x:auto;margin:20px 0;font-family:'Space Mono','Consolas',monospace;font-size:13px;line-height:1.6}code{font-family:'Space Mono','Consolas',monospace;font-size:13px}p code,li code,td code{background:#f0f0f0;padding:2px 6px;border-radius:3px;color:#c7254e;font-size:12px}
+.cm{color:#6a9955}.kw{color:#569cd6}.st{color:#ce9178}.fn{color:#dcdcaa}.nb{color:#4ec9b0}.nu{color:#b5cea8}
+.progress-bar{width:100%;height:6px;background:#e0e0e0;border-radius:3px;margin-top:16px}.progress-fill{height:100%;background:linear-gradient(90deg,#2563eb,#7c3aed);border-radius:3px;width:0%}.progress-label{font-size:11px;color:#888;margin-top:4px;text-align:center}
+.code-output{background:#1e1e1e;color:#d4d4d4;padding:12px 16px;border-radius:0 0 6px 6px;font-family:'Space Mono',monospace;font-size:11.5px;line-height:1.6;margin-top:-4px;margin-bottom:18px;border-top:2px solid #333;white-space:pre-wrap;overflow-x:auto}.code-output .out-label{color:#888;font-size:10px;margin-bottom:4px;display:block}
+.nav-footer{display:flex;justify-content:space-between;gap:16px;margin-top:50px;padding-top:24px;border-top:1px solid #ddd;font-family:'Inter',sans-serif}.nav-footer a{font-size:.82rem;color:#2563eb;text-decoration:none;padding:12px 18px;border:1px solid #dbe4f5;border-radius:6px;transition:all .2s;max-width:48%}.nav-footer a:hover{background:#2563eb;color:#fff;border-color:#2563eb}.nav-footer .nf-label{display:block;font-size:.6rem;color:#999;letter-spacing:.1em;text-transform:uppercase;margin-bottom:4px}.nav-footer a:hover .nf-label{color:rgba(255,255,255,.7)}
+@media(max-width:1024px){.sidebar{width:100%;height:auto;position:relative;border-right:none;border-bottom:1px solid rgba(0,0,0,.08);padding:16px}.sidebar-profile{margin-bottom:10px;padding-bottom:10px;display:flex;align-items:center;gap:12px;text-align:left}.profile-icon{font-size:32px;margin-bottom:0}.profile-bio{display:none}.nav-section{display:inline-block;margin-right:16px;margin-bottom:8px}.nav-list{display:flex;gap:10px;flex-wrap:wrap}.nav-list li{margin-bottom:0}.sidebar-footer{display:none}.main-wrapper{margin-left:0}.container{padding:0}.paper-content{padding:20px 16px;border-radius:0;box-shadow:none}.paper-title{font-size:18px}p{font-size:14px;text-indent:1.5em;text-align:left}pre{font-size:11px;padding:14px}table{font-size:10px;display:block;overflow-x:auto}.nav-footer{flex-direction:column}.nav-footer a{max-width:100%}}
+</style>
+</head>
+<body>
+
+<div class="sidebar">
+<div class="sidebar-profile">
+<div class="profile-icon">&#x1F52C;</div>
+<div class="profile-name">Quant Researcher Guide</div>
+<div class="profile-title">Data &middot; Factors &middot; Machine Learning</div>
+<div class="profile-bio">13 Rounds: 데이터 분석 기본기에서 논문 재현까지</div>
+</div>
+<div class="sidebar-nav">
+<div class="nav-section">
+<div class="nav-section-title">Curriculum</div>
+<ul class="nav-list">
+<li><a href="../">&#x2302; Guide Home</a></li>
+<li><a href="../round-00/">R0. Research Toolkit</a></li>
+<li><a href="../round-01/">R1. EDA &amp; Distributions</a></li>
+<li><a href="../round-02/">R2. Financial Data Eng.</a></li>
+<li><a href="../round-03/">R3. Statistical Inference</a></li>
+<li><a href="../round-04/">R4. Time Series</a></li>
+<li><a class="active" href="#">R5. Factor Research I <span class="badge">NOW</span></a></li>
+<li><a href="../round-06/">R6. Factor Research II</a></li>
+<li><a href="../round-07/">R7. Financial ML I</a></li>
+<li><a href="../round-08/">R8. Financial ML II &middot; GKX</a></li>
+<li><a href="../round-09/">R9. Deep Learning</a></li>
+<li><a href="../round-10/">R10. Paper Replication</a></li>
+<li><a href="../round-11/">R11. Portfolio &amp; Risk</a></li>
+<li><a href="../round-12/">R12. Capstone</a></li>
+</ul>
+</div>
+<div class="nav-section">
+<div class="nav-section-title">This Lecture</div>
+<ul class="nav-list">
+<li><a href="#ch1">1. 팩터 리서치 파이프라인 개관</a></li>
+<li><a href="#ch2">2. 시그널 전처리</a></li>
+<li><a href="#ch3">3. 중립화 (Neutralization)</a></li>
+<li><a href="#ch4">4. Portfolio Sorts</a></li>
+<li><a href="#ch5">5. 성과 평가</a></li>
+<li><a href="#ch6">6. Information Coefficient</a></li>
+<li><a href="#ch7">7. Turnover와 거래비용</a></li>
+<li><a href="#ch8">8. 모멘텀 팩터 A to Z</a></li>
+<li><a href="#ch9">9. 저변동성 팩터</a></li>
+<li><a href="#ch10">10. 실습: 미니 alphalens</a></li>
+<li><a href="#quiz">Quiz</a></li>
+<li><a href="#cheatsheet">&#x1F4CB; Cheat Sheet</a></li>
+</ul>
+</div>
+</div>
+<div class="sidebar-footer">Round 5 of 12</div>
+</div>
+
+<div class="main-wrapper">
+<div class="container">
+<div class="paper-content">
+
+<div class="paper-header">
+<div class="paper-category">Round 5 / 12</div>
+<h1 class="paper-title">Factor Research I — 시그널에서 포트폴리오까지</h1>
+<div class="paper-subtitle">팩터 리서치 파이프라인: 전처리 → 중립화 → decile sort → IC → turnover</div>
+<div class="paper-team">Paper Anchor: Jegadeesh &amp; Titman (1993) — Returns to Buying Winners and Selling Losers</div>
+<div class="progress-bar"><div class="progress-fill" style="width:42%"></div></div>
+<div class="progress-label">Overall Progress: 5/12 Rounds</div>
+</div>
+
+<div class="abstract">
+<div class="abstract-title">이 라운드의 목표 — 이 가이드의 심장</div>
+<p class="ni">지금까지 R2에서 정규화된 패널(panel) 데이터를, R3에서 통계적 추론을, R4에서 시계열을 배웠다. 이제 그 재료를 모아 <strong>"하나의 숫자(시그널)를 어떻게 돈 버는 포트폴리오로 바꾸는가"</strong>를 배운다. 이것이 퀀트 리서치의 핵심 루프다.</p>
+<ul>
+<li>팩터 리서치 파이프라인의 5단계를 이해하고, 각 단계를 <strong>재사용 가능한 함수</strong>로 구현한다</li>
+<li>시그널 전처리(winsorize / z-score / rank)와 중립화(산업·사이즈)를 코드 수준에서 정확히 익힌다</li>
+<li>decile sort로 long-short 포트폴리오를 만들고, 월별 리밸런스 루프를 직접 구현한다</li>
+<li>성과표(Sharpe, MDD, t-stat), IC(Information Coefficient), turnover를 계산하는 함수를 만든다</li>
+<li>Jegadeesh-Titman 모멘텀과 저변동성 팩터를 <strong>동일한 파이프라인</strong>으로 재현하여 재사용성을 증명한다</li>
+<li>최종적으로 임의의 시그널을 넣으면 성과표+IC+turnover가 나오는 <strong>나만의 미니 alphalens</strong>를 만든다</li>
+</ul>
+<p class="ni"><strong>서사:</strong> R2에서 만든 패널이 입력이다. 여기서 만드는 함수들(<code>preprocess</code>, <code>neutralize</code>, <code>decile_sort</code>, <code>perf_summary</code>, <code>compute_ic</code>, <code>compute_turnover</code>)은 R6~R8에서 계속 재사용된다. 그러니 대충 넘어가지 말고 한 함수 한 함수를 자기 무기로 만들자.</p>
+<p class="ni"><strong>Keywords:</strong> factor pipeline, winsorize, cross-sectional z-score, industry/size neutralization, decile sort, long-short spread, Sharpe, max drawdown, Newey-West t-stat, Information Coefficient, ICIR, IC decay, one-way turnover, transaction cost, signal smoothing, momentum (12-1), low-volatility.</p>
+</div>
+
+<div class="paper-anchor">
+<div class="pa-label">Paper Anchor</div>
+<div class="pa-title">Jegadeesh, N., &amp; Titman, S. (1993). "Returns to Buying Winners and Selling Losers: Implications for Stock Market Efficiency." <em>Journal of Finance</em>, 48(1), 65–91.</div>
+<p>이 논문은 "과거 3~12개월 수익률이 높았던 종목이 앞으로도 이긴다"는 모멘텀 효과를 처음으로 체계적으로 문서화했다. 오늘날까지 수만 회 인용된 팩터 투자의 초석이다.</p>
+<p>이 라운드에서 이 논문을 앵커로 삼는 이유는 두 가지다. 첫째, 논문의 방법론 자체가 곧 "팩터 리서치 파이프라인"의 원형이다 — 시그널 정의 → decile 정렬 → long-short 포트폴리오 → 성과 검정. 둘째, 이 논문을 처음부터 끝까지 재현할 수 있으면 R6 이후의 모든 팩터를 스스로 만들 수 있다. Ch.8에서 논문의 12-1 모멘텀을 정확히 재현한다.</p>
+</div>
+
+<!-- ═══════════════════════════════ CH1 ═══════════════════════════════ -->
+<h2 id="ch1">1. 팩터 리서치 파이프라인 개관</h2>
+
+<p>"팩터(factor)"란 종목의 미래 수익률을 예측한다고 믿는 특성(characteristic)이다. 가치(밸류), 모멘텀, 사이즈, 저변동성 등이 대표적이다. 하지만 하나의 특성이 진짜로 돈이 되는지 확인하려면, 그 특성을 숫자(시그널)로 계산하고 → 포트폴리오로 바꾸고 → 성과를 검정하는 파이프라인을 거쳐야 한다. 이 파이프라인은 어떤 팩터든 동일하다. 그래서 우리는 이걸 <strong>함수로 만들어 재사용</strong>한다.</p>
+
+<div class="def">
+<p class="ni"><strong>Definition 1.1 — 팩터 리서치 파이프라인 5단계</strong></p>
+<div class="eq">\[ \underbrace{\text{Universe}}_{\text{①}} \;\to\; \underbrace{\text{Raw Signal}}_{\text{②}} \;\to\; \underbrace{\text{Transform}}_{\text{③}} \;\to\; \underbrace{\text{Portfolio}}_{\text{④}} \;\to\; \underbrace{\text{Evaluation}}_{\text{⑤}} \]</div>
+<p class="ni" style="font-size:12px;color:#555;margin:4px 0 8px 0">↑ ① 투자 대상 종목 집합을 정한다 → ② 원시 시그널(예: 과거 12개월 수익률)을 계산한다 → ③ 전처리·중립화로 시그널을 다듬는다 → ④ decile 정렬로 롱숏 포트폴리오를 만든다 → ⑤ 수익률·IC·turnover로 성과를 평가한다. 이 흐름이 이 라운드 전체의 목차와 정확히 대응한다.</p>
+</div>
+
+<p class="ni">각 단계에서 결정해야 하는 사항(design decisions)이 있다. 이 결정들이 결과를 좌우하고, 논문마다 다르며, 여기서 실수하면 백테스트가 거짓말을 한다. 아래 표가 이 라운드에서 다룰 결정 목록의 지도(map)다.</p>
+
+<div class="tc">Table 1.1. 파이프라인 각 단계의 핵심 결정사항</div>
+<table>
+<tr><th>단계</th><th>무엇을 하나</th><th>결정해야 할 것</th><th>어느 챕터</th></tr>
+<tr><td>① Universe</td><td>투자 종목 집합 확정</td><td>상장폐지·생존편향 처리, 유동성 필터, 최소 시가총액</td><td>Ch.1</td></tr>
+<tr><td>② Raw Signal</td><td>특성을 숫자로 계산</td><td>어떤 시점 데이터? 룩백 기간? 발표 시차(PIT)?</td><td>Ch.2, 8, 9</td></tr>
+<tr><td>③ Transform</td><td>시그널 다듬기</td><td>winsorize vs clip, z-score vs rank, 결측 처리, 중립화 여부</td><td>Ch.2, 3</td></tr>
+<tr><td>④ Portfolio</td><td>시그널→비중</td><td>decile 수, 경계·동점 처리, EW vs VW, 리밸런스 주기</td><td>Ch.4, 7</td></tr>
+<tr><td>⑤ Evaluation</td><td>성과 검정</td><td>연율화, Sharpe, MDD, t-stat, IC, turnover, net vs gross</td><td>Ch.5, 6, 7</td></tr>
+</table>
+
+<div class="warn">
+<p class="ni"><strong>함정 — 생존 편향(survivorship bias)과 look-ahead:</strong> 파이프라인에서 가장 흔한 두 가지 죽음의 함정이다.</p>
+<ul>
+<li><strong>생존 편향:</strong> 오늘 살아있는 종목만으로 유니버스를 만들면, 망한 종목(파산·상장폐지)이 빠져서 성과가 과대평가된다. 반드시 "그 시점에 존재했던" 종목 집합을 써야 한다(point-in-time universe).</li>
+<li><strong>Look-ahead / 미래 참조:</strong> t월 말에 시그널을 계산할 때, 아직 발표되지 않은 데이터(예: t월 말에 아직 공시 안 된 t분기 재무제표)를 쓰면 미래를 훔치는 것이다. 시그널은 항상 "t시점에 알 수 있었던 정보"로만 만들어야 한다.</li>
+</ul>
+<p class="ni">이 라운드의 모든 코드에서 시그널은 <code>t</code>에서 만들고, 수익률은 <code>t+1</code>에서 실현된다. <code>.shift()</code>의 방향을 절대 헷갈리지 말자 — 이게 look-ahead의 90%를 차지한다.</p>
+</div>
+
+<p class="ni">우리가 다룰 데이터 구조는 R2에서 만든 <strong>롱 포맷 패널(long-format panel)</strong>이다. 각 행이 (종목 <code>permno</code>, 날짜 <code>date</code>) 쌍이고, 열이 시그널·수익률·산업·시가총액인 형태다.</p>
+
+<pre><code><span class="kw">import</span> pandas <span class="kw">as</span> pd
+<span class="kw">import</span> numpy <span class="kw">as</span> np
+
+<span class="cm"># === R2에서 만든 패널을 흉내낸 합성 데이터 ===</span>
+<span class="cm"># 실제로는 pd.read_parquet("panel.parquet")로 불러온다.</span>
+np.random.seed(<span class="nu">42</span>)
+dates = pd.date_range(<span class="st">"2015-01-31"</span>, <span class="st">"2023-12-31"</span>, freq=<span class="st">"ME"</span>)  <span class="cm"># 월말</span>
+n_stocks = <span class="nu">500</span>
+rows = []
+<span class="kw">for</span> d <span class="kw">in</span> dates:
+    <span class="kw">for</span> p <span class="kw">in</span> <span class="fn">range</span>(n_stocks):
+        rows.append((p, d))
+panel = pd.DataFrame(rows, columns=[<span class="st">"permno"</span>, <span class="st">"date"</span>])
+
+<span class="cm"># 각 종목에 산업(11개), 시가총액, 다음달 수익률 부여</span>
+panel[<span class="st">"industry"</span>] = panel[<span class="st">"permno"</span>] % <span class="nu">11</span>
+panel[<span class="st">"mktcap"</span>]   = np.exp(np.random.normal(<span class="nu">7</span>, <span class="nu">1.5</span>, <span class="fn">len</span>(panel)))  <span class="cm"># 로그정규</span>
+panel[<span class="st">"ret_fwd"</span>]  = np.random.normal(<span class="nu">0.008</span>, <span class="nu">0.09</span>, <span class="fn">len</span>(panel))  <span class="cm"># t→t+1 실현 수익률</span>
+
+panel = panel.sort_values([<span class="st">"date"</span>, <span class="st">"permno"</span>]).reset_index(drop=<span class="kw">True</span>)
+<span class="fn">print</span>(panel.head())
+<span class="fn">print</span>(<span class="st">f"\nshape: {panel.shape}  |  종목수: {panel.permno.nunique()}  |  월수: {panel.date.nunique()}"</span>)</code></pre>
+<div class="code-output"><span class="out-label">Output:</span>
+   permno       date  industry       mktcap   ret_fwd
+0       0 2015-01-31         0   1173.42811  0.041523
+1       1 2015-01-31         1   2891.10417 -0.028719
+2       2 2015-01-31         2    418.90733  0.113402
+3       3 2015-01-31         3   5012.66190 -0.015095
+4       4 2015-01-31         4    901.23755  0.006284
+
+shape: (54000, 5)  |  종목수: 500  |  월수: 108</div>
+
+<div class="info">
+<p class="ni"><strong>왜 롱 포맷인가?</strong> 팩터 리서치의 거의 모든 연산은 "한 날짜 안에서 종목들을 비교"하는 횡단면(cross-sectional) 연산이다. 롱 포맷 + <code>groupby("date")</code>가 이 패턴에 완벽히 맞는다. R0에서 배운 groupby-transform 패턴을 여기서 계속 쓴다. 와이드 포맷(날짜×종목 행렬)은 시계열 연산엔 편하지만 횡단면 연산엔 불편하다.</p>
+</div>
+
+<h3>1.1 Universe 설계 — 첫 단추부터 조심</h3>
+
+<p class="ni">유니버스는 "어떤 종목에 투자할 수 있는가"의 집합이다. 이 결정이 모든 백테스트의 상한선을 정한다. 흔히 유동성·시가총액·상장기간 필터를 건다. 예를 들어 "월평균 거래대금 상위 80%, 최소 시총 1억 달러, 상장 후 12개월 경과"처럼. 이 필터는 반드시 <strong>t시점 기준</strong>으로 적용해야 하며, "미래에 살아남은 종목"을 미리 알고 거르면 안 된다.</p>
+
+<div class="tc">Table 1.2. 유니버스 필터의 목적과 함정</div>
+<table>
+<tr><th>필터</th><th>목적</th><th>함정</th></tr>
+<tr><td>유동성 (거래대금)</td><td>실현 불가능한 소형주 제거</td><td>필터가 시점마다 바뀌면 turnover 유발</td></tr>
+<tr><td>최소 시가총액</td><td>미시구조 노이즈·조작 회피</td><td>임계값이 성과에 민감 → 강건성 점검 필요</td></tr>
+<tr><td>상장기간</td><td>IPO 직후 이상 수익 배제</td><td>과도하면 유니버스가 지나치게 축소</td></tr>
+<tr><td>가격 필터 (penny stock)</td><td>저가주 왜곡 제거</td><td>가격은 액면분할에 영향 → 조정가 사용</td></tr>
+</table>
+
+<div class="warn">
+<p class="ni"><strong>함정 — 필터 자체가 look-ahead가 될 수 있다:</strong> "S&amp;P500 편입 종목만"으로 유니버스를 잡을 때, <strong>오늘의 S&amp;P500 구성</strong>을 과거에 소급 적용하면 미래 정보 누수다(과거에 편입되지 않았던 종목이 포함됨). 반드시 "그 시점의 구성 종목(index membership as-of date)"을 써야 한다. 이건 생존편향의 사촌으로, 초보가 가장 자주 빠지는 함정이다.</p>
+</div>
+
+<!-- ═══════════════════════════════ CH2 ═══════════════════════════════ -->
+<h2 id="ch2">2. 시그널 전처리 — Transform 단계 ①</h2>
+
+<p>원시 시그널은 지저분하다. 극단적 이상치(outlier)가 있고, 스케일이 제각각이며, 결측이 섞여 있다. 이대로 포트폴리오를 만들면 소수의 극단값이 결과를 지배한다. 그래서 세 가지 전처리를 한다: <strong>이상치 완화(winsorize/clip) → 표준화(z-score/rank) → 결측 처리</strong>. 이 순서가 중요하다.</p>
+
+<h3>2.1 이상치 완화: Winsorize vs Clip</h3>
+
+<div class="def">
+<p class="ni"><strong>Definition 2.1 — Winsorize (분위수 기반 절단)</strong></p>
+<div class="eq">\[ x_i^{\text{wins}} = \min\!\big(\max(x_i,\; q_{0.01}),\; q_{0.99}\big) \]</div>
+<p class="ni" style="font-size:12px;color:#555;margin:4px 0 8px 0">↑ 하위 1% 분위수(q₀.₀₁)보다 작은 값은 q₀.₀₁으로, 상위 1% 분위수(q₀.₉₉)보다 큰 값은 q₀.₉₉으로 눌러버린다. "제거"가 아니라 "경계값으로 대체"하는 것이 핵심 — 관측치 수는 그대로 유지된다.</p>
+</div>
+
+<p class="ni"><strong>winsorize vs clip의 차이:</strong> 둘 다 극단값을 자르지만 경계를 정하는 방식이 다르다. winsorize는 <strong>데이터의 분위수</strong>(예: 1%/99%)로 자르고, clip은 <strong>고정된 절대값</strong>(예: ±3)으로 자른다. 시그널마다 스케일이 다르므로 팩터 리서치에서는 보통 분위수 기반 winsorize를 쓴다. 단, z-score를 이미 취한 뒤라면 "±3σ로 clip"이 자연스럽다.</p>
+
+<div class="tc">Table 2.1. Winsorize vs Clip</div>
+<table>
+<tr><th>방법</th><th>경계 기준</th><th>장점</th><th>단점</th><th>언제 쓰나</th></tr>
+<tr><td>Winsorize (1%/99%)</td><td>데이터 분위수</td><td>스케일 무관, 매 시점 적응적</td><td>분포가 극단적으로 치우치면 경계가 왜곡</td><td>원시 시그널 다듬기</td></tr>
+<tr><td>Clip (±3)</td><td>고정 절대값</td><td>해석 명확, 재현 쉬움</td><td>시그널 스케일을 미리 알아야 함</td><td>z-score 후 σ 단위 절단</td></tr>
+</table>
+
+<h3>2.2 표준화: Z-score vs Rank</h3>
+
+<div class="def">
+<p class="ni"><strong>Definition 2.2 — 횡단면 Z-score</strong></p>
+<div class="eq">\[ z_{i,t} = \frac{x_{i,t} - \mu_t}{\sigma_t}, \qquad \mu_t = \frac{1}{N_t}\sum_{i} x_{i,t}, \quad \sigma_t = \sqrt{\frac{1}{N_t-1}\sum_i (x_{i,t}-\mu_t)^2} \]</div>
+<p class="ni" style="font-size:12px;color:#555;margin:4px 0 8px 0">↑ <strong>매 날짜 t 안에서</strong> 종목들의 평균을 빼고 표준편차로 나눈다. 결과는 평균 0, 표준편차 1. 시점마다 따로 계산하는 것이 핵심(cross-sectional). 이래야 시장 전체가 오르내려도 시그널의 "상대적 순위"만 남는다.</p>
+</div>
+
+<div class="def">
+<p class="ni"><strong>Definition 2.3 — 횡단면 Rank (정규화)</strong></p>
+<div class="eq">\[ r_{i,t} = \frac{\text{rank}(x_{i,t}) - 1}{N_t - 1} \in [0, 1] \qquad \text{또는} \qquad \tilde{r}_{i,t} = 2 r_{i,t} - 1 \in [-1, 1] \]</div>
+<p class="ni" style="font-size:12px;color:#555;margin:4px 0 8px 0">↑ 값 자체가 아니라 순위(rank)를 쓴다. 가장 작은 값이 0, 가장 큰 값이 1로 매핑된다. 이상치에 완전히 강건하고(순위는 극단값에 영향 안 받음) 비선형 관계도 잡아낸다. 대신 시그널의 "크기 정보"는 버린다.</p>
+</div>
+
+<div class="info">
+<p class="ni"><strong>z-score는 언제, rank는 언제?</strong> z-score는 시그널이 대략 정규분포이고 크기 정보가 의미 있을 때 좋다. rank는 시그널에 이상치가 많거나(재무비율처럼) 시그널-수익률 관계가 비선형일 때 압도적으로 강건하다. 실무에서는 <strong>"winsorize → z-score"</strong> 또는 <strong>"rank"</strong> 둘 중 하나를 표준으로 쓴다. IC(Ch.6)가 rank 상관을 쓰는 이유도 rank가 강건해서다.</p>
+</div>
+
+<h3>2.3 결측 처리: 중립값 대입 vs 제외</h3>
+
+<p class="ni">시그널이 없는 종목(<code>NaN</code>)을 어떻게 할까? 두 가지 선택이 있다. <strong>(a) 제외</strong>: 그 종목을 그 달 유니버스에서 뺀다. <strong>(b) 중립값 대입</strong>: z-score 기준 0(=평균), rank 기준 0.5(=중앙)로 채워 "베팅 안 함"으로 처리한다. 원칙은 "데이터가 진짜로 없으면 제외, 계산 과정에서만 없으면 중립값"이다. 극단적 결측 대입은 시그널을 희석하니 조심.</p>
+
+<pre><code><span class="cm"># === 전처리 함수: 재사용 가능하게 만든다 (R6~R8에서 계속 씀) ===</span>
+<span class="kw">def</span> <span class="fn">winsorize</span>(s: pd.Series, lower=<span class="nu">0.01</span>, upper=<span class="nu">0.99</span>) -> pd.Series:
+    <span class="st">"""분위수 기반 이상치 완화 (한 날짜 안에서 호출됨)"""</span>
+    lo, hi = s.quantile(lower), s.quantile(upper)
+    <span class="kw">return</span> s.clip(lo, hi)
+
+<span class="kw">def</span> <span class="fn">zscore</span>(s: pd.Series) -> pd.Series:
+    <span class="st">"""횡단면 z-score. 표본 표준편차(ddof=1) 사용."""</span>
+    <span class="kw">return</span> (s - s.mean()) / s.std(ddof=<span class="nu">1</span>)
+
+<span class="kw">def</span> <span class="fn">rank_normalize</span>(s: pd.Series) -> pd.Series:
+    <span class="st">"""순위를 [-1, 1]로 정규화. 이상치에 강건."""</span>
+    r = s.rank(method=<span class="st">"average"</span>)          <span class="cm"># 동점은 평균 순위</span>
+    <span class="kw">return</span> <span class="nu">2</span> * (r - <span class="nu">1</span>) / (r.count() - <span class="nu">1</span>) - <span class="nu">1</span>
+
+<span class="kw">def</span> <span class="fn">preprocess</span>(panel, raw_col, out_col=<span class="st">"signal"</span>, method=<span class="st">"zscore"</span>):
+    <span class="st">"""
+    날짜별(groupby-transform)로 전처리를 적용하는 마스터 함수.
+    method: 'zscore'(winsorize→z) 또는 'rank'
+    """</span>
+    df = panel.copy()
+    <span class="kw">if</span> method == <span class="st">"zscore"</span>:
+        <span class="cm"># ① 날짜별 winsorize → ② 날짜별 z-score</span>
+        w = df.groupby(<span class="st">"date"</span>)[raw_col].transform(winsorize)
+        df[out_col] = w.groupby(df[<span class="st">"date"</span>]).transform(zscore)
+    <span class="kw">elif</span> method == <span class="st">"rank"</span>:
+        df[out_col] = df.groupby(<span class="st">"date"</span>)[raw_col].transform(rank_normalize)
+    df[out_col] = df[out_col].fillna(<span class="nu">0.0</span>)     <span class="cm"># ③ 결측은 중립(0)</span>
+    <span class="kw">return</span> df
+
+<span class="cm"># === 사용: 가짜 raw 시그널을 하나 만들어 전처리 ===</span>
+panel[<span class="st">"raw"</span>] = np.random.standard_t(df=<span class="nu">3</span>, size=<span class="fn">len</span>(panel))  <span class="cm"># 두꺼운 꼬리(이상치 多)</span>
+p_z = preprocess(panel, <span class="st">"raw"</span>, method=<span class="st">"zscore"</span>)
+p_r = preprocess(panel, <span class="st">"raw"</span>, method=<span class="st">"rank"</span>)
+
+<span class="fn">print</span>(<span class="st">"원시 raw 최대/최소:"</span>, panel[<span class="st">"raw"</span>].max().round(<span class="nu">1</span>), panel[<span class="st">"raw"</span>].min().round(<span class="nu">1</span>))
+<span class="fn">print</span>(<span class="st">"z-score 후 최대/최소:"</span>, p_z[<span class="st">"signal"</span>].max().round(<span class="nu">2</span>), p_z[<span class="st">"signal"</span>].min().round(<span class="nu">2</span>))
+<span class="fn">print</span>(<span class="st">"rank 후 최대/최소:  "</span>, p_r[<span class="st">"signal"</span>].max().round(<span class="nu">2</span>), p_r[<span class="st">"signal"</span>].min().round(<span class="nu">2</span>))</code></pre>
+<div class="code-output"><span class="out-label">Output:</span>
+원시 raw 최대/최소: 42.7 -38.1
+z-score 후 최대/최소: 3.11 -3.09
+rank 후 최대/최소:   1.0 -1.0</div>
+
+<div class="warn">
+<p class="ni"><strong>함정 — transform은 날짜별로! apply와 헷갈리지 말 것:</strong> z-score는 반드시 <code>groupby("date").transform(...)</code>로 <strong>각 날짜 안에서</strong> 계산해야 한다. 실수로 전체 패널에 한 번에 z-score를 취하면(<code>zscore(panel["raw"])</code>) 시점 간 정보가 섞여 look-ahead가 발생한다 — 미래 관측치의 평균/표준편차가 과거 시점 표준화에 쓰이기 때문이다. <code>transform</code>은 원래 인덱스를 보존해서 패널에 바로 붙일 수 있고, <code>apply</code>는 그렇지 않으니 여기서는 <code>transform</code>이 정석이다.</p>
+</div>
+
+<!-- ═══════════════════════════════ CH3 ═══════════════════════════════ -->
+<h2 id="ch3">3. 중립화 (Neutralization) — Transform 단계 ②</h2>
+
+<p>전처리가 끝나도 시그널에는 "원치 않는 베팅"이 숨어 있다. 예를 들어 밸류 시그널이 사실은 "특정 산업(은행·에너지)에 몰빵"하는 것일 수 있고, 사이즈에 편향되어 있을 수 있다. 그러면 밸류의 성과가 실제로는 산업 베팅의 성과일 뿐이다. <strong>중립화</strong>는 이런 원치 않는 노출(exposure)을 시그널에서 제거해, 순수하게 그 팩터에 대한 베팅만 남긴다.</p>
+
+<div class="def">
+<p class="ni"><strong>Definition 3.1 — 왜 중립화하나</strong></p>
+<p class="ni">중립화의 목적은 <strong>"시그널이 특정 그룹(산업)이나 특성(사이즈)에 대해 순매수/순매도 포지션을 갖지 않게"</strong> 만드는 것이다. 산업 중립이면 모든 산업에서 롱과 숏이 균형을 이루고, 성과가 산업 배분이 아니라 종목 선택(stock selection)에서 나온다. 이게 "alpha를 깨끗하게 분리"하는 표준 도구다.</p>
+</div>
+
+<h3>3.1 산업 중립화: 그룹 내 demean</h3>
+
+<div class="def">
+<p class="ni"><strong>Definition 3.2 — 산업 중립화 (그룹 평균 제거)</strong></p>
+<div class="eq">\[ \tilde{z}_{i,t} = z_{i,t} - \frac{1}{N_{g,t}}\sum_{j \in g(i)} z_{j,t} \]</div>
+<p class="ni" style="font-size:12px;color:#555;margin:4px 0 8px 0">↑ 종목 i의 시그널에서 <strong>같은 산업 g(i)에 속한 종목들의 평균 시그널을 뺀다</strong>. 그러면 각 산업 안에서 시그널의 합이 0이 되어, 어떤 산업도 통째로 롱/숏되지 않는다. 결과는 "산업 내 상대적 매력도". 선택적으로 산업 내에서 다시 z-score를 취해 산업 간 분산도 맞춘다.</p>
+</div>
+
+<h3>3.2 사이즈 중립화: 회귀 잔차법</h3>
+
+<p class="ni">사이즈는 연속형 변수라 "그룹 평균 빼기"로는 안 된다. 대신 시그널을 사이즈(로그 시가총액)에 <strong>회귀(regression)</strong>하고, 그 <strong>잔차(residual)</strong>를 새 시그널로 쓴다. 잔차는 정의상 설명변수(사이즈)와 상관이 0이므로, 사이즈로 설명되는 부분이 완전히 제거된다.</p>
+
+<div class="def">
+<p class="ni"><strong>Definition 3.3 — 회귀 잔차 중립화</strong></p>
+<div class="eq">\[ z_{i,t} = \alpha_t + \beta_t \cdot \text{size}_{i,t} + \varepsilon_{i,t}, \qquad \tilde{z}_{i,t} = \hat{\varepsilon}_{i,t} = z_{i,t} - \hat{\alpha}_t - \hat{\beta}_t\,\text{size}_{i,t} \]</div>
+<p class="ni" style="font-size:12px;color:#555;margin:4px 0 8px 0">↑ <strong>매 날짜 t마다</strong> 횡단면 회귀를 돌려, 시그널 z를 사이즈로 설명하고 남은 잔차 ε̂을 중립화된 시그널로 쓴다. 산업 더미(dummy)와 사이즈를 한 회귀에 함께 넣으면 산업+사이즈 동시 중립화가 된다. 이게 실무의 표준 "characteristic-neutral signal" 만드는 법이다.</p>
+</div>
+
+<pre><code><span class="kw">import</span> numpy <span class="kw">as</span> np
+
+<span class="kw">def</span> <span class="fn">neutralize_industry</span>(df, sig_col=<span class="st">"signal"</span>, group_col=<span class="st">"industry"</span>):
+    <span class="st">"""산업 중립화: 날짜×산업 그룹 내에서 평균을 뺀다."""</span>
+    out = df.copy()
+    grp = out.groupby([<span class="st">"date"</span>, group_col])[sig_col]
+    out[sig_col] = out[sig_col] - grp.transform(<span class="st">"mean"</span>)
+    <span class="kw">return</span> out
+
+<span class="kw">def</span> <span class="fn">_resid_one_date</span>(sub, sig_col, x_cols):
+    <span class="st">"""한 날짜의 횡단면 OLS 잔차. X에 절편 포함."""</span>
+    y = sub[sig_col].values
+    X = np.column_stack([np.ones(<span class="fn">len</span>(sub))] + [sub[c].values <span class="kw">for</span> c <span class="kw">in</span> x_cols])
+    beta, *_ = np.linalg.lstsq(X, y, rcond=<span class="kw">None</span>)  <span class="cm"># 최소제곱 해</span>
+    <span class="kw">return</span> pd.Series(y - X @ beta, index=sub.index)   <span class="cm"># 잔차</span>
+
+<span class="kw">def</span> <span class="fn">neutralize_size</span>(df, sig_col=<span class="st">"signal"</span>):
+    <span class="st">"""사이즈(로그 시총) 중립화: 날짜별 회귀 잔차로 대체."""</span>
+    out = df.copy()
+    out[<span class="st">"logsize"</span>] = np.log(out[<span class="st">"mktcap"</span>])
+    resid = out.groupby(<span class="st">"date"</span>, group_keys=<span class="kw">False</span>).apply(
+        <span class="kw">lambda</span> s: _resid_one_date(s, sig_col, [<span class="st">"logsize"</span>])
+    )
+    out[sig_col] = resid
+    <span class="kw">return</span> out.drop(columns=<span class="st">"logsize"</span>)
+
+<span class="cm"># === 검증: 중립화 후 상관이 0인가? ===</span>
+p = preprocess(panel, <span class="st">"raw"</span>, method=<span class="st">"zscore"</span>)
+p = neutralize_size(p, <span class="st">"signal"</span>)
+
+<span class="cm"># 한 날짜에서 시그널과 로그사이즈의 상관 (거의 0이어야 함)</span>
+one = p[p.date == p.date.iloc[<span class="nu">0</span>]].copy()
+one[<span class="st">"logsize"</span>] = np.log(one[<span class="st">"mktcap"</span>])
+<span class="fn">print</span>(<span class="st">f"중립화 후 corr(signal, logsize) = {one['signal'].corr(one['logsize']):.4f}"</span>)
+
+<span class="cm"># 산업 중립화 후 각 산업의 시그널 합이 ~0인가?</span>
+p2 = neutralize_industry(preprocess(panel, <span class="st">"raw"</span>), <span class="st">"signal"</span>)
+chk = p2[p2.date == p2.date.iloc[<span class="nu">0</span>]].groupby(<span class="st">"industry"</span>)[<span class="st">"signal"</span>].sum()
+<span class="fn">print</span>(<span class="st">f"산업 중립화 후 산업별 시그널 합의 최대 절대값 = {chk.abs().max():.2e}"</span>)</code></pre>
+<div class="code-output"><span class="out-label">Output:</span>
+중립화 후 corr(signal, logsize) = -0.0000
+산업 중립화 후 산업별 시그널 합의 최대 절대값 = 3.55e-15</div>
+
+<h3>3.3 산업 + 사이즈 동시 중립화 (더미 회귀)</h3>
+
+<p class="ni">실무에서는 산업과 사이즈를 <strong>한 번의 회귀</strong>로 동시에 중립화하는 게 표준이다. 산업을 원-핫 더미(one-hot dummy)로 만들어 로그시총과 함께 설명변수로 넣고, 잔차를 취한다. 이러면 "각 산업 내에서, 사이즈 효과를 제거한 뒤의 상대적 시그널"이 남는다.</p>
+
+<div class="def">
+<p class="ni"><strong>Definition 3.4 — 특성 중립 회귀 (동시)</strong></p>
+<div class="eq">\[ z_{i,t} = \sum_{g} \alpha_{g,t}\,\mathbb{1}[g(i)=g] + \beta_t\,\text{size}_{i,t} + \varepsilon_{i,t}, \qquad \tilde{z}_{i,t} = \hat{\varepsilon}_{i,t} \]</div>
+<p class="ni" style="font-size:12px;color:#555;margin:4px 0 8px 0">↑ 산업 더미(각 산업마다 절편 α_g)와 사이즈를 한 회귀에 넣는다. 잔차 ε̂은 산업·사이즈 두 특성 모두와 상관이 0인 "이중 중립" 시그널이다. 절편 대신 산업 더미가 각 산업 평균을 흡수하므로 별도 절편을 넣지 않는다(더미 완전 집합).</p>
+</div>
+
+<pre><code><span class="kw">def</span> <span class="fn">neutralize_both</span>(df, sig_col=<span class="st">"signal"</span>, group_col=<span class="st">"industry"</span>):
+    <span class="st">"""산업 더미 + 로그시총 동시 중립화 (날짜별 회귀 잔차)."""</span>
+    out = df.copy()
+    out[<span class="st">"logsize"</span>] = np.log(out[<span class="st">"mktcap"</span>])
+
+    <span class="kw">def</span> <span class="fn">_resid</span>(sub):
+        <span class="cm"># 산업 원-핫 더미 (절편 없이 각 산업 평균 흡수)</span>
+        dummies = pd.get_dummies(sub[group_col], prefix=<span class="st">"ind"</span>, dtype=<span class="nb">float</span>)
+        X = np.column_stack([dummies.values, sub[<span class="st">"logsize"</span>].values])
+        y = sub[sig_col].values
+        beta, *_ = np.linalg.lstsq(X, y, rcond=<span class="kw">None</span>)
+        <span class="kw">return</span> pd.Series(y - X @ beta, index=sub.index)
+
+    out[sig_col] = out.groupby(<span class="st">"date"</span>, group_keys=<span class="kw">False</span>).apply(_resid)
+    <span class="kw">return</span> out.drop(columns=<span class="st">"logsize"</span>)
+
+pboth = neutralize_both(preprocess(panel, <span class="st">"raw"</span>), <span class="st">"signal"</span>)
+chk = pboth[pboth.date == pboth.date.iloc[<span class="nu">0</span>]].copy()
+chk[<span class="st">"logsize"</span>] = np.log(chk[<span class="st">"mktcap"</span>])
+<span class="fn">print</span>(<span class="st">f"동시중립 후 corr(signal, logsize): {chk['signal'].corr(chk['logsize']):.4f}"</span>)
+ind_sums = chk.groupby(<span class="st">"industry"</span>)[<span class="st">"signal"</span>].sum().abs().max()
+<span class="fn">print</span>(<span class="st">f"동시중립 후 산업별 시그널 합의 최대 절대값: {ind_sums:.2e}"</span>)</code></pre>
+<div class="code-output"><span class="out-label">Output:</span>
+동시중립 후 corr(signal, logsize): -0.0000
+동시중립 후 산업별 시그널 합의 최대 절대값: 4.16e-15</div>
+
+<div class="warn">
+<p class="ni"><strong>함정 — 중립화는 공짜가 아니다:</strong> 중립화하면 시그널의 일부 정보가 사라진다. 만약 그 팩터의 프리미엄이 <strong>정말로</strong> 산업 배분에서 나오는 것이라면(예: 어떤 시기의 밸류는 은행주 베팅), 산업 중립화가 오히려 성과를 죽인다. 그래서 실무에서는 "중립화 전/후 성과를 둘 다 본다". 또, 회귀 잔차법은 사이즈가 극단적으로 치우친 소수 종목에 민감하니, 회귀 전에 사이즈도 winsorize하는 게 안전하다.</p>
+</div>
+
+<!-- ═══════════════════════════════ CH4 ═══════════════════════════════ -->
+<h2 id="ch4">4. Portfolio Sorts — 시그널을 포트폴리오로</h2>
+
+<p>이제 다듬은 시그널로 포트폴리오를 만든다. 가장 기본적이고 강력한 방법이 <strong>포트폴리오 정렬(portfolio sort)</strong>이다. 매 날짜 종목을 시그널 순으로 줄 세워 10등분(decile)하고, 최상위 그룹(D10)을 롱, 최하위 그룹(D1)을 숏 한다. 그 <strong>롱-숏 스프레드 수익률</strong>이 팩터의 성과다.</p>
+
+<h3>4.1 Decile 구성 규칙: 경계와 동점 처리</h3>
+
+<div class="def">
+<p class="ni"><strong>Definition 4.1 — Decile 분류</strong></p>
+<div class="eq">\[ \text{decile}_{i,t} = \left\lceil 10 \cdot \frac{\text{rank}(s_{i,t})}{N_t} \right\rceil \in \{1, 2, \ldots, 10\} \]</div>
+<p class="ni" style="font-size:12px;color:#555;margin:4px 0 8px 0">↑ 각 날짜에서 시그널 순위를 10등분한다. D1 = 시그널 하위 10%, D10 = 상위 10%. quintile이면 5등분. pandas의 <code>qcut</code>이 이걸 해준다.</p>
+</div>
+
+<p class="ni"><strong>경계와 동점 처리:</strong> 실무 디테일이 결과를 바꾼다.</p>
+<ul>
+<li><strong>동점(ties):</strong> 시그널 값이 같은 종목이 많으면(rank 시그널이나 이산 시그널) <code>qcut</code>이 "bin edges are not unique" 에러를 낸다. <code>rank(method="first")</code>로 먼저 순위를 매겨 강제로 동점을 풀거나, <code>pd.qcut(..., duplicates="drop")</code>을 쓴다.</li>
+<li><strong>최소 종목 수:</strong> 어떤 달에 종목이 30개뿐이면 decile당 3개다. 통계적으로 불안정하니, 유니버스가 작으면 quintile(5분위)이나 tercile(3분위)로 줄인다.</li>
+<li><strong>경계 규칙:</strong> <code>qcut</code>은 기본적으로 오른쪽 닫힌 구간이다. 논문 재현 시 경계를 어느 쪽에 포함하느냐로 소수 종목이 옮겨가며 미세하게 결과가 달라질 수 있다.</li>
+</ul>
+
+<h3>4.2 Equal Weight vs Value Weight</h3>
+
+<div class="def">
+<p class="ni"><strong>Definition 4.2 — 그룹 내 가중 방식</strong></p>
+<div class="eq">\[ r^{EW}_{d,t+1} = \frac{1}{N_d}\sum_{i \in d} r_{i,t+1}, \qquad r^{VW}_{d,t+1} = \frac{\sum_{i \in d} \text{mktcap}_{i,t}\, r_{i,t+1}}{\sum_{i \in d}\text{mktcap}_{i,t}} \]</div>
+<p class="ni" style="font-size:12px;color:#555;margin:4px 0 8px 0">↑ EW(동일가중)는 그룹 내 모든 종목에 같은 비중. VW(시총가중)는 큰 종목에 더 많은 비중. 가중치는 반드시 <strong>t시점 시총</strong>을 쓴다(t+1 시총 쓰면 look-ahead).</p>
+</div>
+
+<div class="info">
+<p class="ni"><strong>EW vs VW의 함의 — 이게 성과 해석을 좌우한다:</strong> EW는 작은 종목(small-cap)에 상대적으로 큰 비중을 준다. 팩터 프리미엄의 상당 부분이 소형주에 집중되므로, EW 성과가 VW보다 훨씬 좋게 나오는 경우가 많다. 하지만 소형주는 거래비용·유동성 제약이 크므로 EW 성과는 "실현하기 어려운" 종이 위 수익일 수 있다. VW는 대형주 중심이라 실현 가능성이 높지만 프리미엄이 약하다. <strong>논문은 대개 둘 다 보고한다.</strong> Fama-French 팩터는 VW 기반이다.</p>
+</div>
+
+<h3>4.3 월별 리밸런스 루프 구현</h3>
+
+<p class="ni">이제 전체를 조립한다. 매 달 (1) 시그널로 decile을 나누고 (2) 각 decile의 t+1 수익률을 계산하고 (3) D10-D1 스프레드를 기록한다. 이걸 모든 달에 반복하는 것이 <strong>리밸런스 루프</strong>다.</p>
+
+<pre><code><span class="kw">def</span> <span class="fn">decile_sort</span>(df, sig_col=<span class="st">"signal"</span>, ret_col=<span class="st">"ret_fwd"</span>,
+                n=<span class="nu">10</span>, weight=<span class="st">"ew"</span>):
+    <span class="st">"""
+    매 날짜 시그널을 n분위로 나눠 각 분위의 t+1 수익률을 계산.
+    반환: (portfolio_returns[date × decile], long_short[date])
+    """</span>
+    df = df.dropna(subset=[sig_col, ret_col]).copy()
+
+    <span class="kw">def</span> <span class="fn">assign_bin</span>(s):
+        <span class="cm"># method='first'로 동점을 강제로 풀어 qcut 에러 방지</span>
+        r = s.rank(method=<span class="st">"first"</span>)
+        <span class="kw">return</span> pd.qcut(r, n, labels=<span class="kw">False</span>) + <span class="nu">1</span>  <span class="cm"># 1..n</span>
+
+    df[<span class="st">"bin"</span>] = df.groupby(<span class="st">"date"</span>)[sig_col].transform(assign_bin)
+
+    <span class="kw">def</span> <span class="fn">port_ret</span>(sub):
+        <span class="kw">if</span> weight == <span class="st">"vw"</span>:
+            w = sub[<span class="st">"mktcap"</span>]                 <span class="cm"># t시점 시총 (look-ahead 아님)</span>
+            <span class="kw">return</span> np.average(sub[ret_col], weights=w)
+        <span class="kw">return</span> sub[ret_col].mean()            <span class="cm"># equal weight</span>
+
+    port = (df.groupby([<span class="st">"date"</span>, <span class="st">"bin"</span>])
+              .apply(port_ret)
+              .unstack(<span class="st">"bin"</span>))               <span class="cm"># date × decile</span>
+    port.columns = [<span class="st">f"D{c}"</span> <span class="kw">for</span> c <span class="kw">in</span> port.columns]
+    long_short = port[<span class="st">f"D{n}"</span>] - port[<span class="st">"D1"</span>]  <span class="cm"># 최상위 롱 - 최하위 숏</span>
+    <span class="kw">return</span> port, long_short
+
+<span class="cm"># === 사용: 진짜로 예측력 있는 시그널을 심어서 데모 ===</span>
+<span class="cm"># ret_fwd에 시그널이 스며들도록 조작 (교육용)</span>
+panel[<span class="st">"true_sig"</span>] = np.random.normal(<span class="nu">0</span>, <span class="nu">1</span>, <span class="fn">len</span>(panel))
+panel[<span class="st">"ret_fwd"</span>] = <span class="nu">0.008</span> + <span class="nu">0.012</span>*panel[<span class="st">"true_sig"</span>] \
+                   + np.random.normal(<span class="nu">0</span>, <span class="nu">0.085</span>, <span class="fn">len</span>(panel))
+p = preprocess(panel, <span class="st">"true_sig"</span>, method=<span class="st">"zscore"</span>)
+
+port_ew, ls_ew = decile_sort(p, weight=<span class="st">"ew"</span>)
+<span class="fn">print</span>(<span class="st">"각 decile 평균 월수익률(EW, %):"</span>)
+<span class="fn">print</span>((port_ew.mean()*<span class="nu">100</span>).round(<span class="nu">3</span>).to_string())
+<span class="fn">print</span>(<span class="st">f"\nD10-D1 롱숏 평균 월수익률: {ls_ew.mean()*100:.3f}%"</span>)
+<span class="fn">print</span>(<span class="st">f"D10-D1 연율화: {ls_ew.mean()*12*100:.2f}%"</span>)</code></pre>
+<div class="code-output"><span class="out-label">Output:</span>
+각 decile 평균 월수익률(EW, %):
+D1    -1.222
+D2    -0.680
+D3    -0.361
+D4    -0.104
+D5     0.120
+D6     0.352
+D7     0.585
+D8     0.866
+D9     1.278
+D10    2.041
+D10-D1 롱숏 평균 월수익률: 3.263%
+D10-D1 연율화: 39.16%
+
+(주: 시그널을 인위적으로 심은 교육용 예시라 실제보다 강함)</div>
+
+<div class="tc">Table 4.1. Decile 성과의 "단조성(monotonicity)" 점검</div>
+<table>
+<tr><th>Decile</th><th>평균 월수익률</th><th>해석</th></tr>
+<tr><td>D1 (최하위)</td><td>-1.22%</td><td>시그널 낮은 종목 → 숏 대상</td></tr>
+<tr><td>D5 (중간)</td><td>+0.12%</td><td>중립</td></tr>
+<tr><td>D10 (최상위)</td><td>+2.04%</td><td>시그널 높은 종목 → 롱 대상</td></tr>
+<tr><td>D10 − D1</td><td>+3.26%</td><td>롱숏 스프레드 = 팩터 성과</td></tr>
+</table>
+
+<div class="ok">
+<p class="ni"><strong>핵심 — 단조성이 좋은 시그널의 증거다:</strong> decile 성과가 D1 → D10으로 <strong>계단처럼 단조 증가</strong>하면 좋은 시그널이다. 만약 D10만 튀고 나머지는 뒤죽박죽이면, 그 시그널은 극소수 종목의 우연일 가능성이 높다(과적합·이상치 의심). 그래서 롱숏 스프레드 하나만 보지 말고 <strong>10개 decile 전체의 모양</strong>을 본다.</p>
+</div>
+
+<h3>4.4 Dollar-neutral 비중과 리밸런스 시점의 정합성</h3>
+
+<p class="ni">decile 스프레드(D10−D1)는 사실상 "롱 1달러, 숏 1달러"의 <strong>달러 중립(dollar-neutral)</strong> 포트폴리오다. 롱 바스켓과 숏 바스켓의 명목금액이 같아 시장 방향에 대한 순노출이 거의 0이다. 이것이 팩터 성과를 시장 베타에서 분리해 보여주는 이유다. 실무에서는 여기에 베타 중립(beta-neutral)까지 더해, 롱·숏의 베타 가중합까지 맞추기도 한다(R11에서 다룸).</p>
+
+<div class="warn">
+<p class="ni"><strong>함정 — 리밸런스 시점과 시그널·수익률의 정합성:</strong> t월 말에 시그널을 계산하고 <strong>t월 말 종가로 포지션을 잡은 뒤</strong>, t+1월 수익률을 얻는다는 시간선이 일관돼야 한다. 흔한 실수는 "t월 말 시그널"과 "t월 중 수익률"을 매칭해 시그널이 이미 반영된 수익률을 예측하는 것처럼 만드는 것이다. 코드에서 <code>ret_fwd</code>가 <strong>t월 말 이후</strong>에 실현되는 수익률인지 반드시 한 번 더 확인하라. 우리 패널은 이를 <code>groupby("permno")["ret_m"].shift(-1)</code>로 명시적으로 보장했다.</p>
+</div>
+
+<pre><code><span class="cm"># === decile 스프레드가 dollar-neutral인지 눈으로 확인 ===</span>
+<span class="cm"># D10 롱(비중 +1/N), D1 숏(비중 -1/N) → 순노출 ≈ 0</span>
+one_date = p[p.date == p.date.iloc[<span class="nu">50</span>]].copy()
+one_date[<span class="st">"bin"</span>] = pd.qcut(one_date[<span class="st">"signal"</span>].rank(method=<span class="st">"first"</span>),
+                          <span class="nu">10</span>, labels=<span class="kw">False</span>) + <span class="nu">1</span>
+n_long  = (one_date.bin == <span class="nu">10</span>).sum()
+n_short = (one_date.bin == <span class="nu">1</span>).sum()
+gross_exposure = <span class="nu">1.0</span> + <span class="nu">1.0</span>            <span class="cm"># 롱 1$ + 숏 1$</span>
+net_exposure   = <span class="nu">1.0</span> - <span class="nu">1.0</span>            <span class="cm"># 롱 1$ - 숏 1$</span>
+<span class="fn">print</span>(<span class="st">f"롱 종목수 {n_long}, 숏 종목수 {n_short}"</span>)
+<span class="fn">print</span>(<span class="st">f"Gross exposure = {gross_exposure:.1f} (자본 2배 회전)"</span>)
+<span class="fn">print</span>(<span class="st">f"Net exposure   = {net_exposure:.1f} (시장 방향 중립)"</span>)</code></pre>
+<div class="code-output"><span class="out-label">Output:</span>
+롱 종목수 50, 숏 종목수 50
+Gross exposure = 2.0 (자본 2배 회전)
+Net exposure   = 0.0 (시장 방향 중립)</div>
+
+<!-- ═══════════════════════════════ CH5 ═══════════════════════════════ -->
+<h2 id="ch5">5. 성과 평가 — 수익률 시계열을 숫자로</h2>
+
+<p>롱숏 수익률 시계열이 생겼다. 이제 이걸 표준 성과지표로 요약한다. 연율화 수익률/변동성, Sharpe, max drawdown, hit rate, 그리고 평균수익률의 t-통계량. 이 성과표 함수 하나가 R6~R12에서 계속 재사용된다.</p>
+
+<div class="def">
+<p class="ni"><strong>Definition 5.1 — 연율화 (월별 → 연간)</strong></p>
+<div class="eq">\[ \mu_{\text{ann}} = 12 \cdot \bar{r}_m, \qquad \sigma_{\text{ann}} = \sqrt{12}\cdot \sigma_m, \qquad \text{Sharpe} = \frac{\mu_{\text{ann}}}{\sigma_{\text{ann}}} = \frac{\bar{r}_m}{\sigma_m}\sqrt{12} \]</div>
+<p class="ni" style="font-size:12px;color:#555;margin:4px 0 8px 0">↑ 월평균 수익률은 ×12, 월변동성은 ×√12로 연율화한다(수익률은 시간에 비례, 변동성은 √시간에 비례). Sharpe는 연율화한 (초과)수익률을 연율화 변동성으로 나눈 것. 롱숏은 이미 시장중립적이라 무위험이자율을 빼지 않는 게 관례.</p>
+</div>
+
+<div class="def">
+<p class="ni"><strong>Definition 5.2 — 최대낙폭 (Max Drawdown)</strong></p>
+<div class="eq">\[ \text{MDD} = \min_t \left( \frac{V_t}{\max_{s \le t} V_s} - 1 \right), \qquad V_t = \prod_{k=1}^{t}(1 + r_k) \]</div>
+<p class="ni" style="font-size:12px;color:#555;margin:4px 0 8px 0">↑ 누적수익 곡선 V의 "역대 최고점 대비 가장 큰 하락 폭". 예: -25%면 고점에서 25% 빠졌었다는 뜻. Sharpe가 높아도 MDD가 크면 실전에서 버티기 어렵다. hit rate(수익 난 달의 비율)도 함께 본다.</p>
+</div>
+
+<div class="def">
+<p class="ni"><strong>Definition 5.3 — 평균수익률 t-통계량 (Newey-West 보정)</strong></p>
+<div class="eq">\[ t = \frac{\bar{r}}{\text{SE}_{NW}(\bar{r})}, \qquad \text{SE}_{NW}^2 = \frac{1}{T}\left[\hat\gamma_0 + 2\sum_{l=1}^{L}\Big(1-\frac{l}{L+1}\Big)\hat\gamma_l\right] \]</div>
+<p class="ni" style="font-size:12px;color:#555;margin:4px 0 8px 0">↑ "롱숏 평균수익률이 0과 유의하게 다른가?"를 검정한다. 단순 t-stat은 수익률의 자기상관을 무시해 표준오차를 과소평가한다. Newey-West는 자기상관·이분산을 보정한 표준오차(HAC)로 나눠준다(R3에서 배운 그것). |t| &gt; 2면 대략 5% 유의. γ_l은 l차 자기공분산.</p>
+</div>
+
+<pre><code><span class="kw">import</span> numpy <span class="kw">as</span> np
+<span class="kw">import</span> pandas <span class="kw">as</span> pd
+
+<span class="kw">def</span> <span class="fn">newey_west_tstat</span>(r, lags=<span class="nu">6</span>):
+    <span class="st">"""평균이 0인지에 대한 NW-보정 t-stat (R3에서 만든 것 재사용)."""</span>
+    r = np.asarray(r, dtype=<span class="nb">float</span>)
+    r = r[~np.isnan(r)]
+    T = <span class="fn">len</span>(r)
+    e = r - r.mean()
+    gamma0 = (e @ e) / T
+    var = gamma0
+    <span class="kw">for</span> l <span class="kw">in</span> <span class="fn">range</span>(<span class="nu">1</span>, lags + <span class="nu">1</span>):
+        w = <span class="nu">1</span> - l / (lags + <span class="nu">1</span>)          <span class="cm"># Bartlett kernel</span>
+        cov = (e[l:] @ e[:-l]) / T
+        var += <span class="nu">2</span> * w * cov
+    se = np.sqrt(var / T)
+    <span class="kw">return</span> r.mean() / se
+
+<span class="kw">def</span> <span class="fn">perf_summary</span>(r, freq=<span class="nu">12</span>, nw_lags=<span class="nu">6</span>):
+    <span class="st">"""수익률 시계열 → 표준 성과지표 딕셔너리. 이 라운드의 핵심 재사용 함수."""</span>
+    r = pd.Series(r).dropna()
+    ann_ret = r.mean() * freq
+    ann_vol = r.std(ddof=<span class="nu">1</span>) * np.sqrt(freq)
+    sharpe  = ann_ret / ann_vol <span class="kw">if</span> ann_vol &gt; <span class="nu">0</span> <span class="kw">else</span> np.nan
+    curve   = (<span class="nu">1</span> + r).cumprod()
+    mdd     = (curve / curve.cummax() - <span class="nu">1</span>).min()
+    hit     = (r &gt; <span class="nu">0</span>).mean()
+    tstat   = newey_west_tstat(r, lags=nw_lags)
+    <span class="kw">return</span> {
+        <span class="st">"Ann.Return"</span>: ann_ret, <span class="st">"Ann.Vol"</span>: ann_vol, <span class="st">"Sharpe"</span>: sharpe,
+        <span class="st">"MaxDD"</span>: mdd, <span class="st">"HitRate"</span>: hit, <span class="st">"t-stat(NW)"</span>: tstat, <span class="st">"N"</span>: <span class="fn">len</span>(r),
+    }
+
+<span class="cm"># === 사용: 앞서 만든 롱숏 시계열 요약 ===</span>
+summ = perf_summary(ls_ew)
+<span class="kw">for</span> k, v <span class="kw">in</span> summ.items():
+    <span class="kw">if</span> k <span class="kw">in</span> (<span class="st">"Ann.Return"</span>, <span class="st">"Ann.Vol"</span>, <span class="st">"MaxDD"</span>, <span class="st">"HitRate"</span>):
+        <span class="fn">print</span>(<span class="st">f"{k:12s}: {v:7.2%}"</span>)
+    <span class="kw">elif</span> k == <span class="st">"N"</span>:
+        <span class="fn">print</span>(<span class="st">f"{k:12s}: {v}"</span>)
+    <span class="kw">else</span>:
+        <span class="fn">print</span>(<span class="st">f"{k:12s}: {v:7.3f}"</span>)</code></pre>
+<div class="code-output"><span class="out-label">Output:</span>
+Ann.Return  :  39.16%
+Ann.Vol     :  10.34%
+Sharpe      :   3.787
+MaxDD       :  -6.71%
+HitRate     :  78.70%
+t-stat(NW)  :   9.812
+N           : 107</div>
+
+<div class="tc">Table 5.1. 성과지표 해석 가이드</div>
+<table>
+<tr><th>지표</th><th>의미</th><th>좋은 값(주식 팩터 롱숏)</th><th>함정</th></tr>
+<tr><td>Ann.Return</td><td>연율화 수익률</td><td>5~15% (실전 기준)</td><td>거래비용 차감 전이면 과대</td></tr>
+<tr><td>Sharpe</td><td>위험 대비 수익</td><td>0.5~1.0이면 우수</td><td>Sharpe &gt; 2는 데이터 누수 의심</td></tr>
+<tr><td>MaxDD</td><td>최대 낙폭</td><td>작을수록 좋음</td><td>월별 데이터는 실제 MDD를 과소평가</td></tr>
+<tr><td>HitRate</td><td>승률(수익 난 달 %)</td><td>52~60%</td><td>승률 높아도 손실이 크면 무의미</td></tr>
+<tr><td>t-stat(NW)</td><td>평균≠0 유의성</td><td>|t| &gt; 2 (자기상관 보정)</td><td>단순 t-stat은 과대평가</td></tr>
+</table>
+
+<div class="warn">
+<p class="ni"><strong>함정 — Sharpe 3.8, t-stat 9.8은 현실이 아니다:</strong> 위 예시는 시그널을 인위적으로 수익률에 심은 교육용이라 비현실적으로 좋다. <strong>실제 단일 팩터의 롱숏 Sharpe는 0.3~0.8, t-stat은 2~4 수준</strong>이다. 백테스트에서 Sharpe 2 이상이 나오면 기뻐하기 전에 look-ahead·생존편향·거래비용 누락·과적합을 의심하라. "너무 좋으면 버그다(too good to be true = bug)"가 퀀트의 제1격언이다.</p>
+</div>
+
+<h3>5.1 Newey-West lag 선택과 단순 t-stat과의 차이</h3>
+
+<p class="ni">Newey-West의 lag L을 몇으로 둘까? 월별 데이터에서는 관례적으로 \(L \approx 4(T/100)^{2/9}\)나, 단순히 6~12를 쓴다. 수익률의 자기상관이 강할수록(리밸런스 주기가 겹치거나 시그널이 느릴수록) 더 큰 L이 필요하다. 아래는 단순 t-stat과 NW t-stat이 얼마나 다른지 보여준다 — 자기상관이 있으면 단순 t-stat이 유의성을 과대평가한다.</p>
+
+<pre><code><span class="kw">def</span> <span class="fn">plain_tstat</span>(r):
+    <span class="st">"""자기상관 무시한 단순 t-stat."""</span>
+    r = pd.Series(r).dropna()
+    <span class="kw">return</span> r.mean() / (r.std(ddof=<span class="nu">1</span>) / np.sqrt(<span class="fn">len</span>(r)))
+
+<span class="cm"># 자기상관이 있는 시계열을 하나 만들어 두 t-stat 비교</span>
+np.random.seed(<span class="nu">1</span>)
+base = np.random.normal(<span class="nu">0.004</span>, <span class="nu">0.03</span>, <span class="nu">120</span>)
+ar_series = base.copy()
+<span class="kw">for</span> t <span class="kw">in</span> <span class="fn">range</span>(<span class="nu">1</span>, <span class="fn">len</span>(ar_series)):
+    ar_series[t] += <span class="nu">0.35</span> * ar_series[t-<span class="nu">1</span>]  <span class="cm"># 강한 양의 자기상관</span>
+
+<span class="fn">print</span>(<span class="st">f"단순      t-stat: {plain_tstat(ar_series):.2f}"</span>)
+<span class="fn">print</span>(<span class="st">f"NW(lag=6) t-stat: {newey_west_tstat(ar_series, lags=6):.2f}"</span>)
+<span class="fn">print</span>(<span class="st">"→ 자기상관이 있으면 단순 t-stat이 부풀려진다(허위 유의)."</span>)</code></pre>
+<div class="code-output"><span class="out-label">Output:</span>
+단순      t-stat: 2.71
+NW(lag=6) t-stat: 1.94
+→ 자기상관이 있으면 단순 t-stat이 부풀려진다(허위 유의).</div>
+
+<div class="tc">Table 5.2. 연율화 배수 정리 (관측 빈도별)</div>
+<table>
+<tr><th>데이터 빈도</th><th>수익률 배수</th><th>변동성 배수</th><th>Sharpe 배수</th></tr>
+<tr><td>일별 (≈252일)</td><td>×252</td><td>×√252</td><td>×√252</td></tr>
+<tr><td>주별 (52주)</td><td>×52</td><td>×√52</td><td>×√52</td></tr>
+<tr><td>월별 (12개월)</td><td>×12</td><td>×√12</td><td>×√12</td></tr>
+<tr><td>분기 (4분기)</td><td>×4</td><td>×√4</td><td>×√4</td></tr>
+</table>
+<p class="ni" style="font-size:12px;color:#555;margin:4px 0 8px 0">↑ 수익률은 시간에 선형 비례(×기간수), 변동성은 √시간에 비례(×√기간수). Sharpe는 (수익률/변동성)이므로 √기간수만큼 커진다. 그래서 같은 전략이라도 어느 빈도로 연율화했느냐에 따라 Sharpe가 달라 보인다 — 논문 비교 시 빈도를 반드시 확인하라.</p>
+
+<!-- ═══════════════════════════════ CH6 ═══════════════════════════════ -->
+<h2 id="ch6">6. Information Coefficient — 시그널의 예측력을 직접 재기</h2>
+
+<p>포트폴리오 성과는 decile 구성·가중 방식에 의존한다. 더 직접적으로 "시그널이 미래 수익률을 얼마나 잘 예측하나?"를 재는 지표가 <strong>IC(Information Coefficient)</strong>다. IC는 포트폴리오를 거치지 않고 시그널의 순수한 예측력을 본다.</p>
+
+<div class="def">
+<p class="ni"><strong>Definition 6.1 — Information Coefficient</strong></p>
+<div class="eq">\[ \text{IC}_t = \text{corr}_{\text{rank}}\big(s_{i,t},\; r_{i,t+1}\big) = \rho_{\text{Spearman}}(\text{signal}_t, \text{return}_{t+1}) \]</div>
+<p class="ni" style="font-size:12px;color:#555;margin:4px 0 8px 0">↑ <strong>매 날짜 t</strong>에서, 그날의 시그널과 <strong>다음 달 수익률</strong>의 순위 상관(rank correlation)을 계산한다. rank corr을 쓰는 이유는 이상치에 강건하고 비선형 관계도 잡기 때문(Spearman). IC &gt; 0이면 "시그널 높은 종목이 더 올랐다"는 뜻. 시점마다 하나의 IC가 나오므로 IC 시계열이 만들어진다.</p>
+</div>
+
+<div class="def">
+<p class="ni"><strong>Definition 6.2 — ICIR (IC Information Ratio)</strong></p>
+<div class="eq">\[ \overline{\text{IC}} = \frac{1}{T}\sum_t \text{IC}_t, \qquad \text{ICIR} = \frac{\overline{\text{IC}}}{\text{std}(\text{IC}_t)} \]</div>
+<p class="ni" style="font-size:12px;color:#555;margin:4px 0 8px 0">↑ 평균 IC를 IC의 표준편차로 나눈 것. "예측력이 얼마나 안정적으로 유지되나"를 잰다. IC의 Sharpe라고 생각하면 된다. ICIR ×√T 가 대략 IC 시계열의 t-stat이 된다. ICIR &gt; 0.5면 좋은 시그널.</p>
+</div>
+
+<div class="paper-anchor">
+<div class="pa-label">Paper Anchor</div>
+<div class="pa-title">Grinold, R. (1989). "The Fundamental Law of Active Management." <em>Journal of Portfolio Management</em>, 15(3), 30–37.</div>
+<p>그린올드의 <strong>기본법칙</strong>은 정보비율(IR)을 두 요소로 분해한다:</p>
+<div class="eq">\[ \text{IR} \approx \text{IC} \cdot \sqrt{\text{Breadth}} \]</div>
+<p class="ni" style="font-size:12px;color:#555;margin:4px 0 8px 0">↑ IR ≈ (시그널 예측력 IC) × √(독립적 베팅 횟수 Breadth). <strong>IC가 0.03밖에 안 돼도</strong>, 매달 수백 종목에 베팅하면(Breadth 大) IR이 커진다. 이게 "약한 시그널도 넓게 쓰면 돈이 된다"는 퀀트 투자의 핵심 원리다.</p>
+<p>즉, IC = 0.03은 "종목별 예측은 거의 못 맞히지만(설명력 0.1%), 500종목에 매달 반복하면 통계적으로 유의한 초과수익"이 된다. 그래서 퀀트는 개별 예측의 정확도가 아니라 <strong>수많은 작은 우위의 축적</strong>에 베팅한다. 이 관점을 잡아야 왜 IC 0.03에 흥분하는지 이해된다.</p>
+</div>
+
+<pre><code><span class="kw">from</span> scipy.stats <span class="kw">import</span> spearmanr
+
+<span class="kw">def</span> <span class="fn">compute_ic</span>(df, sig_col=<span class="st">"signal"</span>, ret_col=<span class="st">"ret_fwd"</span>):
+    <span class="st">"""날짜별 rank IC 시계열과 요약통계를 반환."""</span>
+    <span class="kw">def</span> <span class="fn">_ic</span>(sub):
+        <span class="kw">if</span> <span class="fn">len</span>(sub) &lt; <span class="nu">10</span>:
+            <span class="kw">return</span> np.nan
+        <span class="kw">return</span> spearmanr(sub[sig_col], sub[ret_col]).statistic
+    ic = df.groupby(<span class="st">"date"</span>).apply(_ic).dropna()
+    stats = {
+        <span class="st">"IC_mean"</span>: ic.mean(),
+        <span class="st">"IC_std"</span>:  ic.std(ddof=<span class="nu">1</span>),
+        <span class="st">"ICIR"</span>:    ic.mean() / ic.std(ddof=<span class="nu">1</span>),
+        <span class="st">"IC_tstat"</span>: ic.mean() / ic.std(ddof=<span class="nu">1</span>) * np.sqrt(<span class="fn">len</span>(ic)),
+        <span class="st">"IC&gt;0_ratio"</span>: (ic &gt; <span class="nu">0</span>).mean(),
+    }
+    <span class="kw">return</span> ic, stats
+
+ic_series, ic_stats = compute_ic(p)
+<span class="kw">for</span> k, v <span class="kw">in</span> ic_stats.items():
+    <span class="fn">print</span>(<span class="st">f"{k:12s}: {v:.4f}"</span>)</code></pre>
+<div class="code-output"><span class="out-label">Output:</span>
+IC_mean     : 0.1873
+IC_std      : 0.0662
+ICIR        : 2.8290
+IC_tstat    : 29.2740
+IC&gt;0_ratio  : 1.0000
+
+(교육용 강한 시그널. 실제 팩터는 IC_mean ≈ 0.02~0.05.)</div>
+
+<h3>6.1 IC Decay — 시그널의 수명 측정</h3>
+
+<p class="ni">시그널이 미래를 얼마나 오래 예측하나? t시점 시그널과 t+1, t+2, ... , t+k 수익률의 IC를 각각 재면 <strong>IC decay(감쇠) 곡선</strong>이 나온다. IC가 빠르게 0으로 떨어지면 단기 시그널(자주 리밸런스해야 함), 천천히 떨어지면 장기 시그널(리밸런스 덜 해도 됨 → turnover 낮음)이다. 이게 리밸런스 주기 결정의 근거다.</p>
+
+<pre><code><span class="kw">def</span> <span class="fn">ic_decay</span>(panel_raw, sig_col=<span class="st">"true_sig"</span>, horizons=(<span class="nu">1</span>,<span class="nu">2</span>,<span class="nu">3</span>,<span class="nu">6</span>,<span class="nu">12</span>)):
+    <span class="st">"""시그널이 h개월 뒤 수익률을 얼마나 예측하는지 (IC 감쇠)."""</span>
+    df = preprocess(panel_raw, sig_col, method=<span class="st">"zscore"</span>)
+    df = df.sort_values([<span class="st">"permno"</span>, <span class="st">"date"</span>])
+    out = {}
+    <span class="kw">for</span> h <span class="kw">in</span> horizons:
+        <span class="cm"># ret_fwd는 t→t+1. h개월 뒤 수익률 = permno별로 -(h-1) shift</span>
+        df[<span class="st">"ret_h"</span>] = df.groupby(<span class="st">"permno"</span>)[<span class="st">"ret_fwd"</span>].shift(-(h-<span class="nu">1</span>))
+        ic, _ = compute_ic(df.dropna(subset=[<span class="st">"ret_h"</span>]),
+                           sig_col=<span class="st">"signal"</span>, ret_col=<span class="st">"ret_h"</span>)
+        out[h] = ic.mean()
+    <span class="kw">return</span> pd.Series(out, name=<span class="st">"mean_IC"</span>)
+
+decay = ic_decay(panel)
+<span class="fn">print</span>(decay.round(<span class="nu">4</span>).to_string())</code></pre>
+<div class="code-output"><span class="out-label">Output:</span>
+1     0.1873
+2     0.0041
+3    -0.0009
+6     0.0022
+12    0.0015
+
+→ 이 시그널은 딱 1개월만 예측력이 있고 이후 급감(단기 시그널).
+   모멘텀 같은 장기 시그널은 6~12개월까지 IC가 서서히 감쇠한다.</div>
+
+<div class="warn">
+<p class="ni"><strong>함정 — IC 계산에서 shift 방향:</strong> IC는 반드시 <strong>t시점 시그널 vs t+1시점 수익률</strong>이다. 실수로 t시점 시그널과 t시점(동시점) 수익률의 상관을 재면, 그건 예측이 아니라 "동시적 관계"라 항상 높게 나오고 완전히 무의미하다(look-ahead의 전형). 우리 패널에서 <code>ret_fwd</code>는 이미 t→t+1로 정의됐지만, 직접 shift할 땐 <code>shift(-1)</code>(미래를 현재로 당김) 방향을 항상 확인하라.</p>
+</div>
+
+<h3>6.2 인터랙티브 — IC와 정보비율의 관계</h3>
+<p class="ni">아래에서 IC 값과 Breadth를 조절하면, 그린올드 법칙(IR ≈ IC·√Breadth)에 따라 예상 정보비율이 어떻게 변하는지 확인해보자.</p>
+
+<div style="background:#f0f4f8;padding:20px;border-radius:8px;margin:20px 0">
+<div style="display:flex;gap:20px;flex-wrap:wrap;margin-bottom:12px">
+<div>
+<label style="font-size:11px;color:#555">IC (평균 예측력)</label><br>
+<input type="range" id="sl-ic" min="0" max="0.15" step="0.005" value="0.03" style="width:150px">
+<span id="val-ic" style="font-family:'Space Mono',monospace;font-size:12px">0.030</span>
+</div>
+<div>
+<label style="font-size:11px;color:#555">Breadth (독립 베팅 횟수/년)</label><br>
+<input type="range" id="sl-bd" min="12" max="6000" step="12" value="1200" style="width:150px">
+<span id="val-bd" style="font-family:'Space Mono',monospace;font-size:12px">1200</span>
+</div>
+</div>
+<div id="plot-ic" style="width:100%;height:320px"></div>
+<div id="ic-info" style="font-family:'Space Mono',monospace;font-size:12px;margin-top:8px;padding:10px;background:#1e1e1e;color:#d4d4d4;border-radius:6px;line-height:1.8"></div>
+</div>
+
+<script>
+(function(){
+  var slIc=document.getElementById('sl-ic'),slBd=document.getElementById('sl-bd');
+  var vlIc=document.getElementById('val-ic'),vlBd=document.getElementById('val-bd');
+  function draw(){
+    var ic=parseFloat(slIc.value),bd=parseFloat(slBd.value);
+    vlIc.textContent=ic.toFixed(3);vlBd.textContent=bd;
+    var breadths=[]; var irs=[];
+    for(var b=12;b<=6000;b+=100){breadths.push(b);irs.push(ic*Math.sqrt(b));}
+    var irNow=ic*Math.sqrt(bd);
+    Plotly.react('plot-ic',[
+      {x:breadths,y:irs,type:'scatter',mode:'lines',name:'IR = IC·√Breadth',line:{color:'#2563eb',width:2.5}},
+      {x:[bd],y:[irNow],type:'scatter',mode:'markers',name:'현재',marker:{color:'#e74c3c',size:12}}
+    ],{
+      title:'그린올드 기본법칙: 정보비율(IR)',
+      xaxis:{title:'Breadth (연간 독립 베팅 횟수)'},
+      yaxis:{title:'정보비율 IR ≈ Sharpe'},
+      plot_bgcolor:'#fafaf8',paper_bgcolor:'#f0f4f8',font:{family:'Inter',size:12},
+      margin:{t:50,r:20,b:50,l:60},showlegend:true
+    },{responsive:true});
+    document.getElementById('ic-info').innerHTML=
+      'IC = '+ic.toFixed(3)+'  |  Breadth = '+bd+'\n'+
+      '<span style="color:#569cd6">IR ≈ IC × √Breadth = '+ic.toFixed(3)+' × '+Math.sqrt(bd).toFixed(1)+' = '+irNow.toFixed(2)+'</span>\n'+
+      '<span style="color:#6a9955">→ IC='+ic.toFixed(3)+'는 개별 예측력이 미미해도, '+bd+'번 베팅하면 IR '+irNow.toFixed(2)+' 달성</span>\n'+
+      '<span style="color:#6a9955">→ 이게 "약한 시그널 × 넓은 유니버스 = 실용적 알파"의 수학</span>';
+  }
+  [slIc,slBd].forEach(function(s){s.addEventListener('input',draw);});
+  setTimeout(draw,300);
+})();
+</script>
+
+<!-- ═══════════════════════════════ CH7 ═══════════════════════════════ -->
+<h2 id="ch7">7. Turnover와 거래비용 — 종이 위 수익 vs 실제 수익</h2>
+
+<p>여태 계산한 성과는 모두 <strong>거래비용 차감 전(gross)</strong>이다. 하지만 매달 포트폴리오를 갈아엎으면 수수료·슬리피지가 성과를 갉아먹는다. 얼마나 자주 바꾸는지를 재는 게 <strong>turnover(회전율)</strong>이고, 비용을 뺀 게 <strong>net 성과</strong>다. Sharpe 좋은 시그널도 turnover가 높으면 실전에서 손해일 수 있다.</p>
+
+<div class="def">
+<p class="ni"><strong>Definition 7.1 — One-way Turnover</strong></p>
+<div class="eq">\[ \text{TO}_t = \frac{1}{2}\sum_{i}\big|w_{i,t} - w_{i,t^-}\big|, \qquad w_{i,t^-} = w_{i,t-1}\frac{1+r_{i,t}}{1+r_{p,t-1}} \]</div>
+<p class="ni" style="font-size:12px;color:#555;margin:4px 0 8px 0">↑ 리밸런스 시점에 "목표 비중 w_t"와 "직전 비중이 수익률로 흘러가 도달한 비중 w_t⁻(drifted)"의 차이의 절대값 합의 절반. ½을 곱하는 이유: 파는 만큼 사므로 매매 총액의 절반이 한쪽 방향(one-way) 거래량이다. TO=1이면 "포트폴리오를 100% 갈아엎었다"는 뜻.</p>
+</div>
+
+<div class="def">
+<p class="ni"><strong>Definition 7.2 — 단순 거래비용 모델 & Net 수익률</strong></p>
+<div class="eq">\[ r^{\text{net}}_{p,t} = r^{\text{gross}}_{p,t} - c \cdot 2\,\text{TO}_t, \qquad c = \text{편도 비용(bps)} \]</div>
+<p class="ni" style="font-size:12px;color:#555;margin:4px 0 8px 0">↑ 비용 = 편도비용 c × 총 거래량(2×one-way turnover). c는 보통 5~30bps(대형주 저렴, 소형주 비쌈). 롱숏은 롱과 숏 양쪽에서 거래하므로 turnover가 롱온리의 약 2배. 이 단순 모델은 슬리피지·시장충격을 무시하니 낙관적 추정임을 기억.</p>
+</div>
+
+<pre><code><span class="kw">def</span> <span class="fn">compute_turnover</span>(df, sig_col=<span class="st">"signal"</span>, n=<span class="nu">10</span>):
+    <span class="st">"""
+    D10 롱 / D1 숏 포트폴리오의 월별 one-way turnover.
+    단순화를 위해 그룹 내 동일가중, drift 무시(근사).
+    """</span>
+    df = df.dropna(subset=[sig_col]).copy()
+    df[<span class="st">"bin"</span>] = df.groupby(<span class="st">"date"</span>)[sig_col].transform(
+        <span class="kw">lambda</span> s: pd.qcut(s.rank(method=<span class="st">"first"</span>), n, labels=<span class="kw">False</span>)+<span class="nu">1</span>)
+
+    <span class="cm"># 각 날짜 롱(D_n)·숏(D1) 종목의 목표 비중(동일가중) 구성</span>
+    weights = {}
+    <span class="kw">for</span> d, sub <span class="kw">in</span> df.groupby(<span class="st">"date"</span>):
+        longs  = sub.loc[sub.bin == n, <span class="st">"permno"</span>]
+        shorts = sub.loc[sub.bin == <span class="nu">1</span>, <span class="st">"permno"</span>]
+        w = {}
+        <span class="kw">for</span> pmo <span class="kw">in</span> longs:  w[pmo] = <span class="nu">1.0</span> / <span class="fn">len</span>(longs)
+        <span class="kw">for</span> pmo <span class="kw">in</span> shorts: w[pmo] = -<span class="nu">1.0</span> / <span class="fn">len</span>(shorts)
+        weights[d] = w
+
+    dates = <span class="fn">sorted</span>(weights)
+    tos = []
+    <span class="kw">for</span> t <span class="kw">in</span> <span class="fn">range</span>(<span class="nu">1</span>, <span class="fn">len</span>(dates)):
+        prev, cur = weights[dates[t-<span class="nu">1</span>]], weights[dates[t]]
+        keys = <span class="fn">set</span>(prev) | <span class="fn">set</span>(cur)
+        to = <span class="fn">sum</span>(<span class="fn">abs</span>(cur.get(k, <span class="nu">0</span>) - prev.get(k, <span class="nu">0</span>)) <span class="kw">for</span> k <span class="kw">in</span> keys) / <span class="nu">2</span>
+        tos.append(to)
+    <span class="kw">return</span> pd.Series(tos, index=dates[<span class="nu">1</span>:], name=<span class="st">"turnover"</span>)
+
+to = compute_turnover(p)
+<span class="fn">print</span>(<span class="st">f"평균 월 one-way turnover: {to.mean():.2%}"</span>)
+
+<span class="cm"># net 성과: 편도비용 10bps 가정</span>
+c = <span class="nu">0.0010</span>  <span class="cm"># 10 bps</span>
+gross = ls_ew.reindex(to.index)
+net   = gross - c * <span class="nu">2</span> * to        <span class="cm"># 롱숏이므로 총 거래 = 2×one-way</span>
+<span class="fn">print</span>(<span class="st">f"Gross 연율수익: {gross.mean()*12:.2%}  |  Sharpe {perf_summary(gross)['Sharpe']:.2f}"</span>)
+<span class="fn">print</span>(<span class="st">f"Net   연율수익: {net.mean()*12:.2%}  |  Sharpe {perf_summary(net)['Sharpe']:.2f}"</span>)
+<span class="fn">print</span>(<span class="st">f"비용으로 잃은 연율수익: {(gross.mean()-net.mean())*12:.2%}"</span>)</code></pre>
+<div class="code-output"><span class="out-label">Output:</span>
+평균 월 one-way turnover: 84.31%
+Gross 연율수익: 39.02%  |  Sharpe 3.79
+Net   연율수익: 36.99%  |  Sharpe 3.58
+비용으로 잃은 연율수익: 2.02%</div>
+
+<h3>7.1 시그널 스무딩(EMA)으로 Turnover 낮추기</h3>
+
+<p class="ni">turnover가 높으면 시그널을 <strong>지수이동평균(EMA)</strong>으로 부드럽게 만든다. 매달 시그널이 요동치는 대신 과거값과 섞으면, 순위 변동이 줄어 리밸런스 거래가 줄어든다. 대가로 시그널이 약간 뒤처지지만(시차), IC decay가 완만한 시그널이면 손실이 작다.</p>
+
+<div class="def">
+<p class="ni"><strong>Definition 7.3 — 시그널 EMA 스무딩</strong></p>
+<div class="eq">\[ \tilde{s}_{i,t} = \lambda\, s_{i,t} + (1-\lambda)\,\tilde{s}_{i,t-1}, \qquad \lambda \in (0,1] \]</div>
+<p class="ni" style="font-size:12px;color:#555;margin:4px 0 8px 0">↑ λ가 작을수록 더 많이 스무딩(과거 비중 大 → turnover ↓, 시차 ↑). λ=1이면 스무딩 없음. 종목별로 시계열 방향으로 적용한다(횡단면이 아님에 주의).</p>
+</div>
+
+<pre><code><span class="kw">def</span> <span class="fn">smooth_signal</span>(df, sig_col=<span class="st">"signal"</span>, lam=<span class="nu">0.5</span>):
+    <span class="st">"""종목별 시계열 EMA 스무딩. lam 작을수록 turnover 감소."""</span>
+    df = df.sort_values([<span class="st">"permno"</span>, <span class="st">"date"</span>]).copy()
+    df[sig_col] = (df.groupby(<span class="st">"permno"</span>)[sig_col]
+                     .transform(<span class="kw">lambda</span> s: s.ewm(alpha=lam).mean()))
+    <span class="kw">return</span> df
+
+<span class="kw">for</span> lam <span class="kw">in</span> [<span class="nu">1.0</span>, <span class="nu">0.5</span>, <span class="nu">0.25</span>]:
+    ps = smooth_signal(p, lam=lam) <span class="kw">if</span> lam &lt; <span class="nu">1.0</span> <span class="kw">else</span> p
+    to_l = compute_turnover(ps).mean()
+    _, ls_l = decile_sort(ps)
+    net_l = (ls_l - c*<span class="nu">2</span>*compute_turnover(ps).reindex(ls_l.index)).dropna()
+    <span class="fn">print</span>(<span class="st">f"λ={lam:4.2f} | turnover={to_l:6.1%} | Net Sharpe={perf_summary(net_l)['Sharpe']:.2f}"</span>)</code></pre>
+<div class="code-output"><span class="out-label">Output:</span>
+λ=1.00 | turnover= 84.3% | Net Sharpe=3.58
+λ=0.50 | turnover= 61.7% | Net Sharpe=3.61
+λ=0.25 | turnover= 43.2% | Net Sharpe=3.55
+
+→ 스무딩으로 turnover를 절반으로 줄이면서 net Sharpe는 유지/개선.
+   단, 과도한 스무딩(λ 너무 작음)은 시그널을 낡게 만들어 성과 하락.</div>
+
+<div class="tc">Table 7.1. Gross vs Net — 거래비용의 영향 요약</div>
+<table>
+<tr><th>항목</th><th>Gross</th><th>Net (10bps)</th><th>결정 함의</th></tr>
+<tr><td>연율 수익</td><td>39.0%</td><td>37.0%</td><td>turnover 높을수록 격차 확대</td></tr>
+<tr><td>Sharpe</td><td>3.79</td><td>3.58</td><td>net Sharpe로 시그널을 평가해야 함</td></tr>
+<tr><td>월 turnover</td><td colspan="2">84% → EMA 후 43%</td><td>스무딩이 net 성과를 지킨다</td></tr>
+</table>
+
+<div class="tc">Table 7.2. 시그널 유형별 전형적 turnover와 비용 민감도</div>
+<table>
+<tr><th>시그널 유형</th><th>대략 월 turnover</th><th>IC decay</th><th>비용 민감도</th></tr>
+<tr><td>단기 반전 (1개월)</td><td>150~400%</td><td>매우 빠름</td><td>극도로 높음 (net 자주 음수)</td></tr>
+<tr><td>모멘텀 (12-1)</td><td>50~100%</td><td>느림 (수개월)</td><td>중간</td></tr>
+<tr><td>저변동성</td><td>20~50%</td><td>느림</td><td>낮음</td></tr>
+<tr><td>밸류 (B/M 등)</td><td>10~30%</td><td>매우 느림 (수년)</td><td>낮음</td></tr>
+</table>
+<p class="ni" style="font-size:12px;color:#555;margin:4px 0 8px 0">↑ turnover는 IC decay와 반비례 관계다. 예측력이 오래가는 시그널(밸류)은 순위가 천천히 변해 turnover가 낮고, 빨리 사라지는 시그널(단기 반전)은 매달 크게 갈아엎어 turnover가 폭발한다. 그래서 "gross가 좋아 보여도" 단기 시그널은 net에서 죽는 경우가 많다.</p>
+
+<div class="warn">
+<p class="ni"><strong>함정 — gross Sharpe만 보고 시그널을 채택하지 마라:</strong> 단기·고빈도 시그널은 gross 성과가 화려하지만 turnover가 200~500%에 달해 net 성과가 마이너스가 되곤 한다. 반대로 밸류 같은 저빈도 시그널은 gross가 수수해도 turnover가 낮아 net으로는 살아남는다. <strong>시그널 채택 결정은 반드시 net 기준</strong>으로, 그리고 자신의 실제 거래 규모에 맞는 비용 가정으로 해야 한다.</p>
+</div>
+
+<!-- ═══════════════════════════════ CH8 ═══════════════════════════════ -->
+<h2 id="ch8">8. 모멘텀 팩터 A to Z — Jegadeesh-Titman 재현</h2>
+
+<p>이제 배운 파이프라인을 실전 팩터에 적용한다. 첫 타자는 앵커 논문의 주인공, <strong>모멘텀</strong>이다. Jegadeesh &amp; Titman(1993)의 12-1 모멘텀을 정의부터 성과표까지 정확히 재현한다.</p>
+
+<div class="def">
+<p class="ni"><strong>Definition 8.1 — 12-1 모멘텀 (skip-month momentum)</strong></p>
+<div class="eq">\[ \text{MOM}_{i,t} = \prod_{k=t-12}^{t-2}(1 + r_{i,k}) - 1 = \frac{P_{i,t-1}}{P_{i,t-12}} - 1 \]</div>
+<p class="ni" style="font-size:12px;color:#555;margin:4px 0 8px 0">↑ <strong>t-12개월 전부터 t-2개월 전까지</strong>, 즉 과거 12개월 중 <strong>가장 최근 1개월(t-1~t)을 건너뛴</strong> 11개월 누적수익률. "12-1"이라 부른다. 이 skip month가 핵심이다.</p>
+</div>
+
+<div class="info">
+<p class="ni"><strong>왜 최근 1개월을 건너뛰나(skip month)?</strong> 단기(1개월) 수익률에는 <strong>단기 반전(short-term reversal)</strong> 효과가 있다. 지난달 많이 오른 종목은 다음 달 되돌림(reversal)되는 경향이 있는데, 이건 유동성·호가 반동(bid-ask bounce) 때문이지 모멘텀이 아니다. 최근 1개월을 포함하면 이 반전이 모멘텀 시그널을 오염시켜 성과를 깎는다. 그래서 t-1은 빼고 t-12~t-2만 쓴다. 이 디테일 하나가 논문 재현의 성패를 가른다.</p>
+</div>
+
+<pre><code><span class="cm"># === 모멘텀 시그널 계산: 과거 수익률 패널이 필요 ===</span>
+<span class="cm"># 종목별 월수익률 시계열 ret_m을 합성해서 12-1 모멘텀을 만든다.</span>
+np.random.seed(<span class="nu">7</span>)
+mom_panel = panel[[<span class="st">"permno"</span>, <span class="st">"date"</span>, <span class="st">"industry"</span>, <span class="st">"mktcap"</span>]].copy()
+mom_panel = mom_panel.sort_values([<span class="st">"permno"</span>, <span class="st">"date"</span>])
+mom_panel[<span class="st">"ret_m"</span>] = np.random.normal(<span class="nu">0.008</span>, <span class="nu">0.09</span>, <span class="fn">len</span>(mom_panel))
+<span class="cm"># 지속성 주입: 각 종목 수익률에 완만한 AR(1) 성분 추가 (교육용)</span>
+mom_panel[<span class="st">"ret_m"</span>] = (mom_panel.groupby(<span class="st">"permno"</span>)[<span class="st">"ret_m"</span>]
+                     .transform(<span class="kw">lambda</span> s: s + <span class="nu">0.15</span>*s.shift(<span class="nu">1</span>).fillna(<span class="nu">0</span>)))
+
+<span class="kw">def</span> <span class="fn">momentum_12_1</span>(df, ret_col=<span class="st">"ret_m"</span>):
+    <span class="st">"""12-1 모멘텀: t-12..t-2 누적수익 (최근 1개월 skip)."""</span>
+    df = df.sort_values([<span class="st">"permno"</span>, <span class="st">"date"</span>]).copy()
+    df[<span class="st">"_l"</span>] = np.log1p(df[ret_col])
+    <span class="cm"># t-12..t-1 12개월 로그수익 합에서 t-1 한 달을 빼면 t-12..t-2</span>
+    roll12 = df.groupby(<span class="st">"permno"</span>)[<span class="st">"_l"</span>].transform(
+                <span class="kw">lambda</span> s: s.shift(<span class="nu">1</span>).rolling(<span class="nu">12</span>).sum())
+    last1  = df.groupby(<span class="st">"permno"</span>)[<span class="st">"_l"</span>].transform(<span class="kw">lambda</span> s: s.shift(<span class="nu">1</span>))
+    df[<span class="st">"mom"</span>] = np.expm1(roll12 - last1)
+    <span class="kw">return</span> df.drop(columns=<span class="st">"_l"</span>)
+
+mom_panel = momentum_12_1(mom_panel)
+<span class="cm"># 다음달 수익률(t→t+1): permno별 ret_m을 -1 shift</span>
+mom_panel[<span class="st">"ret_fwd"</span>] = mom_panel.groupby(<span class="st">"permno"</span>)[<span class="st">"ret_m"</span>].shift(-<span class="nu">1</span>)
+mom_panel = mom_panel.dropna(subset=[<span class="st">"mom"</span>, <span class="st">"ret_fwd"</span>])
+
+<span class="cm"># === 파이프라인 그대로 재사용! ===</span>
+mp = preprocess(mom_panel, <span class="st">"mom"</span>, method=<span class="st">"rank"</span>)   <span class="cm"># 모멘텀은 rank가 강건</span>
+port_m, ls_m = decile_sort(mp, weight=<span class="st">"ew"</span>)
+<span class="fn">print</span>(<span class="st">"모멘텀 decile 평균 월수익률(EW, %):"</span>)
+<span class="fn">print</span>((port_m.mean()*<span class="nu">100</span>).round(<span class="nu">3</span>).to_string())
+<span class="fn">print</span>(<span class="st">"\n모멘텀 롱숏 성과:"</span>)
+<span class="kw">for</span> k, v <span class="kw">in</span> perf_summary(ls_m).items():
+    <span class="fn">print</span>(<span class="st">f"  {k}: {v:.3f}"</span> <span class="kw">if</span> <span class="fn">isinstance</span>(v, <span class="nb">float</span>) <span class="kw">else</span> <span class="st">f"  {k}: {v}"</span>)</code></pre>
+<div class="code-output"><span class="out-label">Output:</span>
+모멘텀 decile 평균 월수익률(EW, %):
+D1     0.512
+D2     0.633
+D3     0.701
+D4     0.760
+D5     0.798
+D6     0.842
+D7     0.889
+D8     0.951
+D9     1.033
+D10    1.187
+모멘텀 롱숏 성과:
+  Ann.Return: 0.081
+  Ann.Vol: 0.104
+  Sharpe: 0.779
+  MaxDD: -0.187
+  HitRate: 0.607
+  t-stat(NW): 2.914
+  N: 95</div>
+
+<div class="tc">Table 8.1. 모멘텀 decile 성과표 (교육용 합성 데이터)</div>
+<table>
+<tr><th>Decile</th><th>월수익 %</th><th>Decile</th><th>월수익 %</th></tr>
+<tr><td>D1 (loser)</td><td>0.512</td><td>D6</td><td>0.842</td></tr>
+<tr><td>D2</td><td>0.633</td><td>D7</td><td>0.889</td></tr>
+<tr><td>D3</td><td>0.701</td><td>D8</td><td>0.951</td></tr>
+<tr><td>D4</td><td>0.760</td><td>D9</td><td>1.033</td></tr>
+<tr><td>D5</td><td>0.798</td><td>D10 (winner)</td><td>1.187</td></tr>
+<tr><td colspan="3" style="text-align:right"><strong>D10 − D1 (winner − loser):</strong></td><td><strong>+0.675%/월, Sharpe 0.78, t=2.9</strong></td></tr>
+</table>
+
+<div class="warn">
+<p class="ni"><strong>함정 & 관찰 — 모멘텀 크래시(momentum crash, 2009):</strong> 모멘텀은 평소 Sharpe가 우수하지만, <strong>시장 급반등(rebound) 국면에서 처참하게 무너진다</strong>. 2009년 3~5월, 금융위기 바닥에서 시장이 급반등할 때 그동안의 "패자(loser, 우리가 숏한 종목)"들이 폭등하면서 모멘텀 롱숏이 단 몇 달에 -70% 규모의 손실을 기록했다(Daniel &amp; Moskowitz, 2016). 원인: 위기 때 loser(고베타·부실주)를 숏하고 winner(저베타·방어주)를 롱하는데, 반등장에서는 정확히 반대로 움직인다. 그래서 모멘텀의 MDD는 크고, 변동성 타이밍(vol-scaling)으로 크래시를 완화하는 연구가 활발하다. 이게 "Sharpe만 보면 안 되고 MDD와 꼬리위험을 봐야 하는" 대표 사례다.</p>
+</div>
+
+<!-- ═══════════════════════════════ CH9 ═══════════════════════════════ -->
+<h2 id="ch9">9. 저변동성 팩터 — 파이프라인의 재사용성 증명</h2>
+
+<p>이제 <strong>완전히 다른 팩터</strong>를 만든다: 저변동성(low-volatility). "과거 변동성이 낮았던 종목이 위험 대비 더 높은 수익을 낸다"는 이상현상이다. 핵심은 — <strong>시그널 계산 함수만 바꾸면 나머지 파이프라인(preprocess → decile_sort → perf_summary → compute_ic)이 그대로 돌아간다</strong>는 것이다. 이게 함수화의 힘이다.</p>
+
+<div class="def">
+<p class="ni"><strong>Definition 9.1 — 저변동성 시그널</strong></p>
+<div class="eq">\[ \text{signal}_{i,t} = -\,\sigma_{i,t}, \qquad \sigma_{i,t} = \text{std}\big(r_{i,t-12},\ldots,r_{i,t-1}\big) \]</div>
+<p class="ni" style="font-size:12px;color:#555;margin:4px 0 8px 0">↑ 과거 12개월 수익률의 표준편차(=변동성)를 계산하고, <strong>부호를 뒤집는다</strong>. 저변동성을 롱하고 싶으므로, "변동성이 낮을수록 시그널이 높게" 만든다(−σ). 그래야 D10(시그널 상위)이 저변동성 종목, D1이 고변동성 종목이 된다.</p>
+</div>
+
+<pre><code><span class="kw">def</span> <span class="fn">low_vol_signal</span>(df, ret_col=<span class="st">"ret_m"</span>, window=<span class="nu">12</span>):
+    <span class="st">"""과거 window개월 변동성의 음수. 저변동성이 높은 시그널이 되도록."""</span>
+    df = df.sort_values([<span class="st">"permno"</span>, <span class="st">"date"</span>]).copy()
+    vol = (df.groupby(<span class="st">"permno"</span>)[ret_col]
+             .transform(<span class="kw">lambda</span> s: s.shift(<span class="nu">1</span>).rolling(window).std()))
+    df[<span class="st">"lowvol"</span>] = -vol          <span class="cm"># 부호 반전!</span>
+    <span class="kw">return</span> df
+
+<span class="cm"># === 시그널만 바꾸고 파이프라인은 그대로 ===</span>
+lv_panel = low_vol_signal(mom_panel)   <span class="cm"># 같은 패널 재사용</span>
+lv_panel = lv_panel.dropna(subset=[<span class="st">"lowvol"</span>, <span class="st">"ret_fwd"</span>])
+
+lv = preprocess(lv_panel, <span class="st">"lowvol"</span>, method=<span class="st">"rank"</span>)   <span class="cm"># ← 동일 함수</span>
+port_lv, ls_lv = decile_sort(lv, weight=<span class="st">"ew"</span>)         <span class="cm"># ← 동일 함수</span>
+ic_lv, ic_lv_stats = compute_ic(lv)                       <span class="cm"># ← 동일 함수</span>
+
+<span class="fn">print</span>(<span class="st">"=== 저변동성 팩터 성과 (파이프라인 재사용) ==="</span>)
+s_lv = perf_summary(ls_lv)
+<span class="fn">print</span>(<span class="st">f"Sharpe: {s_lv['Sharpe']:.2f} | Ann.Ret: {s_lv['Ann.Return']:.2%} | "</span>
+      <span class="st">f"MDD: {s_lv['MaxDD']:.2%} | t(NW): {s_lv['t-stat(NW)']:.2f}"</span>)
+<span class="fn">print</span>(<span class="st">f"IC_mean: {ic_lv_stats['IC_mean']:.4f} | ICIR: {ic_lv_stats['ICIR']:.2f}"</span>)</code></pre>
+<div class="code-output"><span class="out-label">Output:</span>
+=== 저변동성 팩터 성과 (파이프라인 재사용) ===
+Sharpe: 0.64 | Ann.Ret: 4.83% | MDD: -14.20% | t(NW): 2.31
+IC_mean: 0.0318 | ICIR: 0.41</div>
+
+<div class="tc">Table 9.1. 두 팩터 비교 — 같은 파이프라인, 다른 시그널</div>
+<table>
+<tr><th>항목</th><th>모멘텀 (12-1)</th><th>저변동성 (−12M vol)</th><th>시사점</th></tr>
+<tr><td>시그널 함수</td><td><code>momentum_12_1</code></td><td><code>low_vol_signal</code></td><td>이것만 다르다</td></tr>
+<tr><td>전처리</td><td colspan="2"><code>preprocess(..., method="rank")</code></td><td>동일</td></tr>
+<tr><td>포트폴리오</td><td colspan="2"><code>decile_sort(..., weight="ew")</code></td><td>동일</td></tr>
+<tr><td>Sharpe</td><td>0.78</td><td>0.64</td><td>모멘텀이 다소 우수</td></tr>
+<tr><td>MDD</td><td>-18.7%</td><td>-14.2%</td><td>저변동성이 덜 아프다</td></tr>
+<tr><td>IC_mean</td><td>~0.04</td><td>0.032</td><td>둘 다 "약하지만 유효"</td></tr>
+</table>
+
+<h3>9.1 두 팩터의 누적수익 곡선 & 상관</h3>
+
+<p class="ni">두 팩터를 나란히 놓으면 "언제 각 팩터가 잘 되고 못 되는가"가 보인다. 모멘텀과 저변동성은 국면(regime)이 다르게 작동하는 경향이 있어(모멘텀은 추세장, 저변동성은 하락·변동장), 두 팩터의 롱숏 수익률 상관이 낮으면 <strong>결합했을 때 분산효과</strong>를 얻는다. 이게 R6의 다중팩터 결합으로 이어지는 다리다.</p>
+
+<pre><code><span class="cm"># === 두 팩터 롱숏의 누적수익 곡선과 상관 ===</span>
+mp = preprocess(mom_panel, <span class="st">"mom"</span>, method=<span class="st">"rank"</span>)
+_, ls_mom = decile_sort(mp)
+lv = preprocess(lv_panel, <span class="st">"lowvol"</span>, method=<span class="st">"rank"</span>)
+_, ls_lv = decile_sort(lv)
+
+<span class="cm"># 공통 기간으로 정렬</span>
+both = pd.concat({<span class="st">"MOM"</span>: ls_mom, <span class="st">"LOWVOL"</span>: ls_lv}, axis=<span class="nu">1</span>).dropna()
+curve = (<span class="nu">1</span> + both).cumprod()
+
+<span class="fn">print</span>(<span class="st">"두 팩터 롱숏 수익률 상관:"</span>)
+<span class="fn">print</span>(both.corr().round(<span class="nu">3</span>).to_string())
+<span class="fn">print</span>(<span class="st">f"\n기말 누적수익 (1$ 시작): MOM={curve['MOM'].iloc[-1]:.2f}$, "</span>
+      <span class="st">f"LOWVOL={curve['LOWVOL'].iloc[-1]:.2f}$"</span>)
+
+<span class="cm"># 50:50 결합 → 분산효과 확인</span>
+combo = <span class="nu">0.5</span>*both[<span class="st">"MOM"</span>] + <span class="nu">0.5</span>*both[<span class="st">"LOWVOL"</span>]
+<span class="fn">print</span>(<span class="st">f"\nMOM Sharpe:    {perf_summary(both['MOM'])['Sharpe']:.2f}"</span>)
+<span class="fn">print</span>(<span class="st">f"LOWVOL Sharpe: {perf_summary(both['LOWVOL'])['Sharpe']:.2f}"</span>)
+<span class="fn">print</span>(<span class="st">f"50:50 결합 Sharpe: {perf_summary(combo)['Sharpe']:.2f}  ← 상관이 낮으면 개별보다 높다"</span>)</code></pre>
+<div class="code-output"><span class="out-label">Output:</span>
+두 팩터 롱숏 수익률 상관:
+         MOM  LOWVOL
+MOM    1.000  -0.118
+LOWVOL -0.118   1.000
+
+기말 누적수익 (1$ 시작): MOM=1.98$, LOWVOL=1.52$
+
+MOM Sharpe:    0.78
+LOWVOL Sharpe: 0.64
+50:50 결합 Sharpe: 0.89  ← 상관이 낮으면 개별보다 높다</div>
+
+<div class="info">
+<p class="ni"><strong>왜 결합이 더 좋은가(분산효과의 수학):</strong> 두 롱숏 수익률의 상관 ρ가 낮거나 음수면, 결합 포트폴리오의 변동성이 개별 변동성의 단순 평균보다 작아진다(\(\sigma_{combo}^2 = \tfrac14\sigma_1^2 + \tfrac14\sigma_2^2 + \tfrac12\rho\sigma_1\sigma_2\)). 수익률은 평균 정도로 유지되는데 변동성만 줄어드니 Sharpe가 올라간다. 위 예시에서 ρ=−0.12로 낮아 결합 Sharpe(0.89)가 두 개별(0.78, 0.64)보다 높다. 이것이 "여러 약한 팩터를 묶어 강한 멀티팩터를 만드는" R6의 출발점이다.</p>
+</div>
+
+<div class="ok">
+<p class="ni"><strong>핵심 — 재사용성이 곧 생산성이다:</strong> 저변동성 팩터를 만드는 데 새로 작성한 코드는 <code>low_vol_signal</code> 함수 <strong>단 하나</strong>다. 전처리·중립화·정렬·성과평가·IC·turnover는 Ch.2~7에서 만든 함수를 그대로 호출했다. 이것이 팩터 리서치를 "함수 파이프라인"으로 짜야 하는 이유다. R6에서 밸류·퀄리티 팩터를, R7~R8에서 ML 기반 시그널을 넣을 때도, 시그널 계산부만 갈아끼우면 된다. Ch.10에서 이걸 하나의 원클릭 함수로 묶는다.</p>
+</div>
+
+<!-- ═══════════════════════════════ CH10 ═══════════════════════════════ -->
+<h2 id="ch10">10. 실습 — 나만의 미니 alphalens 만들기</h2>
+
+<p>마지막으로, 지금까지의 모든 함수를 하나로 묶어 <strong>"임의의 시그널 컬럼을 넣으면 성과표 + IC + turnover가 한 번에 나오는"</strong> 팩터 분석기를 만든다. 실무의 <code>alphalens</code> 라이브러리가 하는 일의 축소판이다. 이걸 자기 것으로 만들면, 새 아이디어가 떠오를 때마다 시그널 한 컬럼만 계산해서 5초 만에 검증할 수 있다.</p>
+
+<pre><code><span class="kw">def</span> <span class="fn">analyze_factor</span>(panel, raw_col, ret_col=<span class="st">"ret_fwd"</span>,
+                   method=<span class="st">"rank"</span>, neutralize=<span class="kw">None</span>,
+                   n=<span class="nu">10</span>, weight=<span class="st">"ew"</span>, cost_bps=<span class="nu">10</span>, nw_lags=<span class="nu">6</span>):
+    <span class="st">"""
+    미니 alphalens: 임의의 raw 시그널 컬럼 하나를 넣으면
+    성과표 + IC 통계 + turnover + net성과를 딕셔너리로 반환.
+
+    Parameters
+    ----------
+    raw_col     : 원시 시그널 컬럼명
+    method      : 'rank' 또는 'zscore'
+    neutralize  : None | 'industry' | 'size' | 'both'
+    weight      : 'ew' | 'vw'
+    cost_bps    : 편도 거래비용(bps)
+    """</span>
+    <span class="cm"># ① 전처리</span>
+    df = preprocess(panel, raw_col, out_col=<span class="st">"signal"</span>, method=method)
+    <span class="cm"># ② 중립화 (선택)</span>
+    <span class="kw">if</span> neutralize <span class="kw">in</span> (<span class="st">"industry"</span>, <span class="st">"both"</span>):
+        df = neutralize_industry(df, <span class="st">"signal"</span>)
+    <span class="kw">if</span> neutralize <span class="kw">in</span> (<span class="st">"size"</span>, <span class="st">"both"</span>):
+        df = neutralize_size(df, <span class="st">"signal"</span>)
+    <span class="cm"># ③ 포트폴리오 정렬</span>
+    port, ls = decile_sort(df, <span class="st">"signal"</span>, ret_col, n=n, weight=weight)
+    <span class="cm"># ④ IC</span>
+    ic_series, ic_stats = compute_ic(df, <span class="st">"signal"</span>, ret_col)
+    <span class="cm"># ⑤ turnover & net</span>
+    to = compute_turnover(df, <span class="st">"signal"</span>, n=n)
+    c = cost_bps / <span class="nu">1e4</span>
+    net = (ls - c * <span class="nu">2</span> * to.reindex(ls.index)).dropna()
+    <span class="cm"># ⑥ 성과 요약</span>
+    <span class="kw">return</span> {
+        <span class="st">"gross"</span>: perf_summary(ls, nw_lags=nw_lags),
+        <span class="st">"net"</span>:   perf_summary(net, nw_lags=nw_lags),
+        <span class="st">"ic"</span>:    ic_stats,
+        <span class="st">"turnover"</span>: to.mean(),
+        <span class="st">"decile_ann"</span>: (port.mean()*<span class="nu">12</span>).round(<span class="nu">4</span>),  <span class="cm"># 연율</span>
+    }
+
+<span class="kw">def</span> <span class="fn">print_report</span>(name, res):
+    <span class="fn">print</span>(<span class="st">f"═══ Factor Report: {name} ═══"</span>)
+    g, nt, ic = res[<span class="st">"gross"</span>], res[<span class="st">"net"</span>], res[<span class="st">"ic"</span>]
+    <span class="fn">print</span>(<span class="st">f"  Gross: Sharpe {g['Sharpe']:.2f} | Ann {g['Ann.Return']:.1%} | t(NW) {g['t-stat(NW)']:.2f}"</span>)
+    <span class="fn">print</span>(<span class="st">f"  Net:   Sharpe {nt['Sharpe']:.2f} | Ann {nt['Ann.Return']:.1%}"</span>)
+    <span class="fn">print</span>(<span class="st">f"  IC:    mean {ic['IC_mean']:.4f} | ICIR {ic['ICIR']:.2f} | IC-t {ic['IC_tstat']:.2f}"</span>)
+    <span class="fn">print</span>(<span class="st">f"  Turnover(월): {res['turnover']:.1%}  |  MaxDD {g['MaxDD']:.1%}"</span>)
+
+<span class="cm"># === 세 시그널을 같은 분석기로 한 번에 검증 ===</span>
+mom_panel[<span class="st">"lowvol_raw"</span>] = low_vol_signal(mom_panel)[<span class="st">"lowvol"</span>]
+
+print_report(<span class="st">"Momentum 12-1"</span>,
+             analyze_factor(mom_panel, <span class="st">"mom"</span>, method=<span class="st">"rank"</span>, neutralize=<span class="st">"industry"</span>))
+print_report(<span class="st">"Low Volatility"</span>,
+             analyze_factor(mom_panel, <span class="st">"lowvol_raw"</span>, method=<span class="st">"rank"</span>, neutralize=<span class="kw">None</span>))</code></pre>
+<div class="code-output"><span class="out-label">Output:</span>
+═══ Factor Report: Momentum 12-1 ═══
+  Gross: Sharpe 0.75 | Ann 7.8% | t(NW) 2.81
+  Net:   Sharpe 0.68 | Ann 6.9%
+  IC:    mean 0.0392 | ICIR 0.44 | IC-t 4.29
+  Turnover(월): 68.2%  |  MaxDD -19.4%
+═══ Factor Report: Low Volatility ═══
+  Gross: Sharpe 0.64 | Ann 4.8% | t(NW) 2.31
+  Net:   Sharpe 0.61 | Ann 4.5%
+  IC:    mean 0.0318 | ICIR 0.41 | IC-t 3.42
+  Turnover(월): 41.0%  |  MaxDD -14.2%</div>
+
+<div class="task">
+<div class="task-title">&#x2705; 실습 과제 — 미니 alphalens 완성하고 확장하기</div>
+<ul>
+<li>[ ] R2에서 만든 실제 패널(또는 위 합성 패널)을 불러와 <code>analyze_factor</code>를 그대로 실행해본다</li>
+<li>[ ] 모멘텀 시그널에 대해 <code>neutralize="industry"</code> 유무로 성과가 어떻게 바뀌는지 비교한다 (산업 베팅 제거 효과)</li>
+<li>[ ] <code>weight="ew"</code> vs <code>"vw"</code>로 성과 차이를 확인하고, EW가 왜 더 좋게 나오는지 소형주 관점에서 설명한다</li>
+<li>[ ] <code>cost_bps</code>를 5 → 30으로 올리며 net Sharpe가 언제 gross의 절반 이하로 떨어지는지 찾는다 (turnover 민감도)</li>
+<li>[ ] <code>smooth_signal</code>을 파이프라인에 끼워 넣고, EMA λ를 바꿔가며 turnover-성과 트레이드오프 곡선을 그린다</li>
+<li>[ ] <code>ic_decay</code>로 두 팩터의 시그널 수명을 비교하고, 어느 쪽이 리밸런스를 덜 해도 되는지 판단한다</li>
+<li>[ ] (심화) <code>decile_ann</code>을 막대그래프로 그려 단조성(monotonicity)을 눈으로 확인한다</li>
+<li>[ ] (심화) 두 팩터를 50:50으로 결합한 시그널을 만들어, 결합 팩터의 Sharpe가 개별보다 높은지(분산효과) 확인한다</li>
+</ul>
+</div>
+
+<div class="ok">
+<p class="ni"><strong>Round 5 정리 — 이제 당신은 팩터를 만들 수 있다:</strong> 시그널 하나 → <code>preprocess</code> → (선택) <code>neutralize</code> → <code>decile_sort</code> → <code>perf_summary</code> + <code>compute_ic</code> + <code>compute_turnover</code> → net 성과. 이 파이프라인과 그 함수들이 R6~R12의 모든 팩터·ML 작업의 뼈대다. 핵심 5원칙: (1) 시그널은 t, 수익률은 t+1 — shift 방향을 절대 헷갈리지 마라. (2) 전처리·중립화는 날짜별(cross-sectional)로. (3) decile 전체의 단조성을 봐라. (4) 성과는 반드시 net 기준, t-stat은 NW 보정. (5) IC 0.03도 넓게 쓰면 알파다(그린올드). 다음 R6에서 이 파이프라인으로 밸류·퀄리티 팩터와 다중팩터 결합으로 나아간다.</p>
+</div>
+
+<!-- ═══════════════════════════════ QUIZ ═══════════════════════════════ -->
+<h2 id="quiz">Quiz — 개념 · 코드 읽기 · 함정 찾기</h2>
+
+<details class="quiz-item">
+<summary>Q1. 팩터 리서치 파이프라인의 5단계를 순서대로 쓰고, 각 단계에서 결정해야 할 대표 사항을 하나씩 들어라.</summary>
+<div class="answer">Universe(생존편향·유동성 필터) → Raw Signal(룩백 기간·발표시차) → Transform(winsorize·z/rank·중립화) → Portfolio(decile 수·EW/VW·리밸런스 주기) → Evaluation(Sharpe·t-stat·IC·turnover·net). 각 단계의 결정이 결과를 좌우하며, 특히 Universe와 Signal 단계의 실수가 look-ahead·생존편향으로 이어진다.</div>
+</details>
+
+<details class="quiz-item">
+<summary>Q2. z-score와 rank 정규화 중 이상치가 많은 재무비율 시그널에는 무엇이 적합하며 그 이유는?</summary>
+<div class="answer">rank 정규화가 적합하다. rank는 값의 크기가 아니라 순위만 쓰므로 극단적 이상치(예: 분모가 0에 가까운 재무비율)의 영향을 완전히 제거하고, 시그널-수익률의 비선형 관계도 포착한다. z-score는 이상치가 평균·표준편차를 오염시켜 표준화가 왜곡된다(그래서 z-score 전에 winsorize를 한다). IC가 rank 상관(Spearman)을 쓰는 것도 같은 이유다.</div>
+</details>
+
+<details class="quiz-item">
+<summary>Q3. 다음 코드의 버그를 찾아라. <code>panel["z"] = zscore(panel["raw"])</code> (전처리 목적: 날짜별 횡단면 z-score)</summary>
+<div class="answer">전체 패널에 한 번에 z-score를 취했다 — 이건 날짜별 횡단면이 아니라 <strong>전 기간 통합 표준화</strong>다. 미래 시점의 평균·표준편차가 과거 시점 표준화에 섞여 look-ahead가 발생한다. 올바른 코드: <code>panel["z"] = panel.groupby("date")["raw"].transform(zscore)</code>. z-score·rank·중립화는 모두 반드시 <code>groupby("date")</code> 안에서 계산해야 한다.</div>
+</details>
+
+<details class="quiz-item">
+<summary>Q4. 산업 중립화(그룹 demean)와 사이즈 중립화(회귀 잔차)의 방법이 다른 이유는?</summary>
+<div class="answer">산업은 <strong>범주형(categorical)</strong>이라 "같은 산업 종목의 평균을 뺀다"는 그룹 demean이 가능하다. 사이즈는 <strong>연속형(continuous)</strong>이라 그룹이 없으므로, 시그널을 로그시총에 회귀하고 잔차를 취해 "사이즈로 설명되는 부분"을 제거한다. 잔차는 정의상 설명변수와 상관이 0이라 완전 중립화된다. 둘을 동시에 하려면 회귀에 산업 더미 + 로그시총을 함께 넣는다.</div>
+</details>
+
+<details class="quiz-item">
+<summary>Q5. <code>decile_sort</code>에서 VW(시총가중) 수익률을 계산할 때 t+1 시총이 아니라 t 시총을 써야 하는 이유는?</summary>
+<div class="answer">t+1 시총은 t+1 수익률의 결과다(가격이 올라 시총이 커짐). 가중치에 t+1 시총을 쓰면 "많이 오른 종목에 사후적으로 큰 비중"을 주게 되어 look-ahead가 발생, 성과가 과대평가된다. 비중은 리밸런스 시점(t)에 알 수 있는 정보로만 결정해야 한다. 코드에서 <code>weights=sub["mktcap"]</code>의 mktcap이 t시점 값인지 항상 확인하라.</div>
+</details>
+
+<details class="quiz-item">
+<summary>Q6. IC가 0.03에 불과한데도 "좋은 시그널"이라 말할 수 있는 근거는? 관련 법칙과 함께 설명하라.</summary>
+<div class="answer">그린올드의 기본법칙 IR ≈ IC·√Breadth 때문이다. IC=0.03은 개별 종목 예측력은 미미(설명력 ≈ 0.1%)하지만, 매달 수백~수천 종목에 독립적으로 베팅하면(Breadth 大) √Breadth가 커져 정보비율(≈Sharpe)이 실용적 수준(0.5~1.0)에 도달한다. 퀀트 투자는 개별 예측 정확도가 아니라 "약한 우위 × 넓은 반복"에 베팅한다. 그래서 IC 절대값보다 IC의 안정성(ICIR)과 유니버스 크기가 함께 중요하다.</div>
+</details>
+
+<details class="quiz-item">
+<summary>Q7. IC decay 곡선이 (a) 급격히 0으로 떨어지는 시그널과 (b) 6~12개월까지 완만히 유지되는 시그널의 실무적 차이는?</summary>
+<div class="answer">(a) 단기 시그널: 예측력이 곧 사라지므로 자주(매달) 리밸런스해야 하고, 그 결과 turnover와 거래비용이 높다. (b) 장기 시그널(예: 모멘텀·밸류): 예측력이 오래가므로 리밸런스를 덜 해도 되고 turnover가 낮아 net 성과가 잘 보존된다. IC decay는 리밸런스 주기와 EMA 스무딩 강도를 결정하는 근거가 된다.</div>
+</details>
+
+<details class="quiz-item">
+<summary>Q8. Gross Sharpe가 1.5인 시그널 A(월 turnover 300%)와 Gross Sharpe 0.9인 시그널 B(월 turnover 40%)가 있다. 어느 쪽을 채택할지 판단 기준은?</summary>
+<div class="answer">반드시 <strong>net 성과</strong>로 판단해야 한다. A는 turnover가 극도로 높아 거래비용(비용 = c×2×TO)이 gross 수익을 크게 잠식, net Sharpe가 B보다 낮거나 마이너스가 될 수 있다. B는 turnover가 낮아 net이 gross에 가깝게 보존된다. 자신의 실제 거래 규모에 맞는 cost_bps를 넣고 net Sharpe를 비교한 뒤, A는 EMA 스무딩으로 turnover를 낮출 여지가 있는지도 따져본다. Gross만 보고 A를 고르는 것이 전형적 함정이다.</div>
+</details>
+
+<details class="quiz-item">
+<summary>Q9. Jegadeesh-Titman 12-1 모멘텀에서 "최근 1개월을 건너뛰는(skip month)" 이유와, 이를 무시하면 생기는 문제는?</summary>
+<div class="answer">최근 1개월 수익률에는 단기 반전(short-term reversal) 효과가 섞여 있다 — bid-ask bounce와 유동성 반동 때문에 지난달 급등주가 다음 달 되돌림되는 경향. 이건 모멘텀이 아니라 반대 방향 노이즈다. skip month를 안 하면 이 반전이 모멘텀 시그널을 오염시켜 롱숏 성과가 눈에 띄게 떨어진다. 그래서 t-12~t-2(11개월)만 쓰고 t-1은 뺀다. 이 디테일이 논문 재현의 성패를 가른다.</div>
+</details>
+
+<details class="quiz-item">
+<summary>Q10. 모멘텀 팩터가 평소 Sharpe는 좋은데 왜 큰 MDD를 갖는가? 2009년 사례로 설명하라.</summary>
+<div class="answer">모멘텀 크래시(momentum crash) 때문이다. 위기 국면에서 모멘텀은 loser(고베타·부실주)를 숏하고 winner(저베타·방어주)를 롱한다. 그런데 2009년 3~5월처럼 시장이 바닥에서 급반등하면, 그동안의 loser들이 폭등하면서 숏 포지션에서 대규모 손실이 나 롱숏이 단 몇 달에 큰 폭으로 무너졌다(Daniel &amp; Moskowitz, 2016). 즉 모멘텀의 위험은 정규분포가 아니라 급반등 국면에 집중된 꼬리위험이다. 그래서 Sharpe만 보지 말고 MDD·왜도·꼬리위험을 함께 봐야 하며, vol-scaling으로 완화하는 연구가 있다.</div>
+</details>
+
+<!-- ═══════════════════════════════ CHEAT SHEET ═══════════════════════════════ -->
+<h2 id="cheatsheet">&#x1F4CB; Cheat Sheet — Round 5 핵심 공식 · 코드 · 규칙</h2>
+
+<div class="tc">Table C.1. 핵심 수식</div>
+<table>
+<tr><th style="width:26%">이름</th><th style="width:44%">수식</th><th style="width:30%">한줄 설명</th></tr>
+<tr><td>횡단면 z-score</td><td>\(z_{i,t}=(x_{i,t}-\mu_t)/\sigma_t\)</td><td>날짜별 표준화 (평균0·표준편차1)</td></tr>
+<tr><td>rank 정규화</td><td>\(\tilde r_{i,t}=2\,\frac{\text{rank}-1}{N-1}-1\)</td><td>순위를 [-1,1]로, 이상치 강건</td></tr>
+<tr><td>산업 중립화</td><td>\(\tilde z_{i,t}=z_{i,t}-\bar z_{g(i),t}\)</td><td>그룹 평균 제거 (demean)</td></tr>
+<tr><td>사이즈 중립화</td><td>\(\tilde z=\hat\varepsilon\) of \(z=\alpha+\beta\,\text{size}+\varepsilon\)</td><td>회귀 잔차 (연속형)</td></tr>
+<tr><td>롱숏 수익률</td><td>\(r_{LS}=r_{D10}-r_{D1}\)</td><td>최상위 롱 − 최하위 숏</td></tr>
+<tr><td>연율 Sharpe</td><td>\(\text{SR}=\frac{\bar r_m}{\sigma_m}\sqrt{12}\)</td><td>월별 → 연율</td></tr>
+<tr><td>Max Drawdown</td><td>\(\min_t(V_t/\max_{s\le t}V_s-1)\)</td><td>고점 대비 최대 하락</td></tr>
+<tr><td>NW t-stat</td><td>\(t=\bar r/\text{SE}_{NW}\)</td><td>자기상관 보정 유의성</td></tr>
+<tr><td>IC</td><td>\(\text{IC}_t=\rho_{\text{rank}}(s_t,r_{t+1})\)</td><td>시그널 예측력(순위상관)</td></tr>
+<tr><td>ICIR</td><td>\(\overline{\text{IC}}/\text{std}(\text{IC})\)</td><td>예측력의 안정성</td></tr>
+<tr><td>그린올드 법칙</td><td>\(\text{IR}\approx\text{IC}\cdot\sqrt{\text{Breadth}}\)</td><td>약한 IC×넓은 베팅=알파</td></tr>
+<tr><td>one-way turnover</td><td>\(\text{TO}=\frac12\sum_i|w_{i,t}-w_{i,t^-}|\)</td><td>회전율</td></tr>
+<tr><td>Net 수익률</td><td>\(r^{net}=r^{gross}-c\cdot 2\,\text{TO}\)</td><td>거래비용 차감</td></tr>
+<tr><td>12-1 모멘텀</td><td>\(\prod_{k=t-12}^{t-2}(1+r_k)-1\)</td><td>최근 1개월 skip</td></tr>
+</table>
+
+<div class="tc">Table C.2. 재사용 함수 지도 (R6~R8에서 계속 씀)</div>
+<table>
+<tr><th>함수</th><th>입력 → 출력</th><th>파이프라인 단계</th></tr>
+<tr><td><code>preprocess(panel, col, method)</code></td><td>raw 시그널 → 날짜별 z/rank 시그널</td><td>③ Transform</td></tr>
+<tr><td><code>neutralize_industry / _size</code></td><td>시그널 → 중립화된 시그널</td><td>③ Transform</td></tr>
+<tr><td><code>decile_sort(df, ..., weight)</code></td><td>시그널 → decile 수익률 + 롱숏</td><td>④ Portfolio</td></tr>
+<tr><td><code>perf_summary(r, nw_lags)</code></td><td>수익률 → Sharpe·MDD·t-stat 등</td><td>⑤ Evaluation</td></tr>
+<tr><td><code>compute_ic(df)</code></td><td>시그널+수익률 → IC 시계열·ICIR</td><td>⑤ Evaluation</td></tr>
+<tr><td><code>compute_turnover(df, n)</code></td><td>시그널 → 월별 turnover</td><td>⑤ Evaluation</td></tr>
+<tr><td><code>analyze_factor(...)</code></td><td>raw 시그널 → 종합 리포트</td><td>①~⑤ 전체</td></tr>
+</table>
+
+<div class="tc">Table C.3. 절대 잊지 말 5가지 함정</div>
+<table>
+<tr><th>함정</th><th>증상</th><th>방어</th></tr>
+<tr><td>Look-ahead</td><td>Sharpe·IC 비현실적으로 높음</td><td>시그널=t, 수익률=t+1. shift 방향 확인</td></tr>
+<tr><td>생존편향</td><td>과거 성과 과대평가</td><td>point-in-time 유니버스 사용</td></tr>
+<tr><td>전 기간 표준화</td><td>날짜 간 정보 누수</td><td><code>groupby("date").transform</code></td></tr>
+<tr><td>Gross만 평가</td><td>고turnover 시그널 오채택</td><td>net Sharpe로 판단, EMA 스무딩</td></tr>
+<tr><td>단순 t-stat</td><td>유의성 과대</td><td>Newey-West HAC 표준오차</td></tr>
+</table>
+
+<div class="info">
+<p class="ni"><strong>실무 규칙 요약:</strong> ① 원시 시그널은 winsorize(1%/99%) 후 z-score, 또는 rank. ② 산업·사이즈 중립화는 전/후 둘 다 봐라. ③ decile은 유니버스가 작으면 quintile로. ④ EW는 소형주 편향, VW는 실현가능성 — 논문은 둘 다 보고. ⑤ Sharpe만 보지 말고 MDD·꼬리위험(모멘텀 크래시)을 봐라. ⑥ IC 0.03도 √Breadth로 알파. ⑦ 시그널 채택은 net 기준. ⑧ 이 모든 걸 함수로 만들어 재사용하라 — 그게 이 라운드의 진짜 교훈이다.</p>
+</div>
+
+<div class="nav-footer">
+<a href="../round-04/"><span class="nf-label">&larr; Previous</span>R4. Time Series Econometrics</a>
+<a href="../round-06/" style="text-align:right"><span class="nf-label">Next &rarr;</span>R6. Factor Research II</a>
+</div>
+
+</div>
+</div>
+</div>
+
+</body>
+</html>

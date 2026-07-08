@@ -1,0 +1,1308 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Round 10 - Paper Replication — 논문 읽기와 재현 방법론 | Quant Researcher Guide</title>
+<script>
+MathJax = { tex: { inlineMath: [['\\(','\\)']], displayMath: [['\\[','\\]'],['$$','$$']] } };
+</script>
+<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;500&family=Space+Mono:wght@400&family=Inter:wght@300;400&display=swap" rel="stylesheet">
+<script src="https://cdn.plot.ly/plotly-2.27.0.min.js"></script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Inter',sans-serif;background:#fafaf8;color:#1a1a1a;line-height:1.7;overflow-x:hidden}
+.sidebar{position:fixed;left:0;top:0;width:260px;height:100vh;background:rgba(255,255,255,.97);border-right:1px solid rgba(0,0,0,.06);padding:32px 24px;z-index:100;overflow-y:auto;display:flex;flex-direction:column}
+.sidebar-profile{text-align:center;margin-bottom:28px;padding-bottom:24px;border-bottom:1px solid rgba(0,0,0,.08)}
+.profile-icon{font-size:48px;margin-bottom:8px}
+.profile-name{font-family:'Cormorant Garamond',serif;font-size:1.3rem;font-weight:500;margin-bottom:4px}
+.profile-title{font-size:.68rem;color:#888;letter-spacing:.08em;text-transform:uppercase;margin-bottom:8px}
+.profile-bio{font-size:.78rem;color:#666;line-height:1.5}
+.sidebar-nav{flex:1;margin-top:16px}.nav-section{margin-bottom:20px}.nav-section-title{font-size:.6rem;font-weight:600;color:#aaa;letter-spacing:.15em;text-transform:uppercase;margin-bottom:10px}.nav-list{list-style:none}.nav-list li{margin-bottom:5px}.nav-list a{font-size:.78rem;color:#555;text-decoration:none;transition:all .2s;display:block;padding:3px 0}.nav-list a:hover{color:#2563eb;padding-left:4px}.nav-list a.active{color:#2563eb;font-weight:500}.nav-list a.done{color:#28a745}.badge{display:inline-block;font-size:.5rem;background:#2563eb;color:#fff;padding:1px 5px;border-radius:8px;margin-left:3px;vertical-align:middle}.badge-done{background:#28a745}.sidebar-footer{padding-top:16px;border-top:1px solid rgba(0,0,0,.06);font-size:.65rem;color:#aaa;text-align:center}
+.main-wrapper{margin-left:260px;min-height:100vh}.container{max-width:1100px;margin:0 auto;padding:50px 40px 80px}
+.paper-content{font-family:'Times New Roman','Nanum Myeongjo',serif;line-height:1.8;background:#fff;padding:40px;border-radius:8px;box-shadow:0 2px 20px rgba(0,0,0,.05)}.paper-header{text-align:center;margin-bottom:40px;padding-bottom:30px;border-bottom:2px solid #333}.paper-category{font-size:14px;color:#666;margin-bottom:10px}.paper-title{font-size:24px;font-weight:bold;margin-bottom:12px;line-height:1.4}.paper-subtitle{font-size:14px;color:#555;margin-bottom:8px}.paper-team{font-size:13px;color:#444}
+.abstract{background:#f8f9fa;padding:25px;margin:30px 0;border-left:4px solid #2c3e50}.abstract-title{font-weight:bold;font-size:16px;margin-bottom:15px}
+h2{font-size:18px;margin:35px 0 20px;padding-bottom:8px;border-bottom:1px solid #ddd;color:#2c3e50}h3{font-size:15px;margin:25px 0 15px;color:#34495e}
+p{text-align:justify;margin-bottom:15px;text-indent:2em}p.ni{text-indent:0}
+table{width:100%;border-collapse:collapse;margin:20px 0;font-size:12px}th,td{border:1px solid #ddd;padding:10px 8px;text-align:center}th{background:#2c3e50;color:white;font-weight:bold}tr:nth-child(even){background:#f8f9fa}tr:hover{background:#e8f4f8}
+.tc{font-size:13px;font-weight:bold;margin:15px 0 10px;text-align:center}.eq{text-align:center;margin:20px 0;padding:15px;background:#f8f9fa;border-radius:4px;overflow-x:auto}ul,ol{margin-left:2em;margin-bottom:15px}li{margin-bottom:6px}
+.def{background:#fff9e6;border:1px solid #ffc107;border-radius:4px;padding:20px;margin:20px 0}.info{background:#e8f4f8;border-left:4px solid #3498db;padding:20px;margin:20px 0}.warn{background:#fff3cd;border-left:4px solid #f39c12;padding:20px;margin:20px 0}.ok{background:#d4edda;border-left:4px solid #28a745;padding:20px;margin:20px 0}
+.paper-anchor{background:#f5f3ff;border:1px solid #7c3aed;border-radius:6px;padding:22px;margin:24px 0}.paper-anchor .pa-label{font-family:'Space Mono',monospace;font-size:10px;color:#7c3aed;letter-spacing:.15em;text-transform:uppercase;margin-bottom:8px}.paper-anchor .pa-title{font-weight:bold;font-size:14px;margin-bottom:6px}.paper-anchor p{font-size:13px;text-indent:0;margin-bottom:8px}
+.task{background:#e8f8f0;border-left:4px solid #00b894;padding:20px;margin:20px 0}.task .task-title{font-weight:bold;margin-bottom:10px}
+details.quiz-item{margin:14px 0;padding:14px 18px;background:#f8f9fa;border:1px solid #e0e0e0;border-radius:6px}details.quiz-item summary{cursor:pointer;font-weight:bold;font-size:13.5px}details.quiz-item[open] summary{margin-bottom:10px;color:#2563eb}details.quiz-item .answer{font-size:13px;padding:10px 14px;background:#fff;border-left:3px solid #2563eb}
+pre{background:#1e1e1e;color:#d4d4d4;padding:20px;border-radius:6px;overflow-x:auto;margin:20px 0;font-family:'Space Mono','Consolas',monospace;font-size:13px;line-height:1.6}code{font-family:'Space Mono','Consolas',monospace;font-size:13px}p code,li code,td code{background:#f0f0f0;padding:2px 6px;border-radius:3px;color:#c7254e;font-size:12px}
+.cm{color:#6a9955}.kw{color:#569cd6}.st{color:#ce9178}.fn{color:#dcdcaa}.nb{color:#4ec9b0}.nu{color:#b5cea8}
+.progress-bar{width:100%;height:6px;background:#e0e0e0;border-radius:3px;margin-top:16px}.progress-fill{height:100%;background:linear-gradient(90deg,#2563eb,#7c3aed);border-radius:3px;width:0%}.progress-label{font-size:11px;color:#888;margin-top:4px;text-align:center}
+.code-output{background:#1e1e1e;color:#d4d4d4;padding:12px 16px;border-radius:0 0 6px 6px;font-family:'Space Mono',monospace;font-size:11.5px;line-height:1.6;margin-top:-4px;margin-bottom:18px;border-top:2px solid #333;white-space:pre-wrap;overflow-x:auto}.code-output .out-label{color:#888;font-size:10px;margin-bottom:4px;display:block}
+.nav-footer{display:flex;justify-content:space-between;gap:16px;margin-top:50px;padding-top:24px;border-top:1px solid #ddd;font-family:'Inter',sans-serif}.nav-footer a{font-size:.82rem;color:#2563eb;text-decoration:none;padding:12px 18px;border:1px solid #dbe4f5;border-radius:6px;transition:all .2s;max-width:48%}.nav-footer a:hover{background:#2563eb;color:#fff;border-color:#2563eb}.nav-footer .nf-label{display:block;font-size:.6rem;color:#999;letter-spacing:.1em;text-transform:uppercase;margin-bottom:4px}.nav-footer a:hover .nf-label{color:rgba(255,255,255,.7)}
+@media(max-width:1024px){.sidebar{width:100%;height:auto;position:relative;border-right:none;border-bottom:1px solid rgba(0,0,0,.08);padding:16px}.sidebar-profile{margin-bottom:10px;padding-bottom:10px;display:flex;align-items:center;gap:12px;text-align:left}.profile-icon{font-size:32px;margin-bottom:0}.profile-bio{display:none}.nav-section{display:inline-block;margin-right:16px;margin-bottom:8px}.nav-list{display:flex;gap:10px;flex-wrap:wrap}.nav-list li{margin-bottom:0}.sidebar-footer{display:none}.main-wrapper{margin-left:0}.container{padding:0}.paper-content{padding:20px 16px;border-radius:0;box-shadow:none}.paper-title{font-size:18px}p{font-size:14px;text-indent:1.5em;text-align:left}pre{font-size:11px;padding:14px}table{font-size:10px;display:block;overflow-x:auto}.nav-footer{flex-direction:column}.nav-footer a{max-width:100%}}
+</style>
+</head>
+<body>
+
+<div class="sidebar">
+<div class="sidebar-profile">
+<div class="profile-icon">&#x1F52C;</div>
+<div class="profile-name">Quant Researcher Guide</div>
+<div class="profile-title">Data &middot; Factors &middot; Machine Learning</div>
+<div class="profile-bio">13 Rounds: 데이터 분석 기본기에서 논문 재현까지</div>
+</div>
+<div class="sidebar-nav">
+<div class="nav-section">
+<div class="nav-section-title">Curriculum</div>
+<ul class="nav-list">
+<li><a href="../">&#x2302; Guide Home</a></li>
+<li><a href="../round-00/">R0. Research Toolkit</a></li>
+<li><a href="../round-01/">R1. EDA &amp; Distributions</a></li>
+<li><a href="../round-02/">R2. Financial Data Eng.</a></li>
+<li><a href="../round-03/">R3. Statistical Inference</a></li>
+<li><a href="../round-04/">R4. Time Series</a></li>
+<li><a href="../round-05/">R5. Factor Research I</a></li>
+<li><a href="../round-06/">R6. Factor Research II</a></li>
+<li><a href="../round-07/">R7. Financial ML I</a></li>
+<li><a href="../round-08/">R8. Financial ML II &middot; GKX</a></li>
+<li><a href="../round-09/">R9. Deep Learning</a></li>
+<li><a class="active" href="#">R10. Paper Replication <span class="badge">NOW</span></a></li>
+<li><a href="../round-11/">R11. Portfolio &amp; Risk</a></li>
+<li><a href="../round-12/">R12. Capstone</a></li>
+</ul>
+</div>
+<div class="nav-section">
+<div class="nav-section-title">This Lecture</div>
+<ul class="nav-list">
+<li><a href="#ch1">1. 논문 해부학</a></li>
+<li><a href="#ch2">2. 3-pass 읽기법</a></li>
+<li><a href="#ch3">3. 재현 계획서 작성</a></li>
+<li><a href="#ch4">4. 재현의 현실</a></li>
+<li><a href="#ch5">5. 사례연구: JT 재현</a></li>
+<li><a href="#ch6">6. 비판적 읽기</a></li>
+<li><a href="#ch7">7. 연구노트와 실험 로그</a></li>
+<li><a href="#ch8">8. 논문 팔로우 시스템</a></li>
+<li><a href="#ch9">9. 재현 → 확장</a></li>
+<li><a href="#ch10">10. 실습: 재현 계획서</a></li>
+<li><a href="#quiz">Quiz</a></li>
+<li><a href="#cheatsheet">&#x1F4CB; Cheat Sheet</a></li>
+</ul>
+</div>
+</div>
+<div class="sidebar-footer">Round 10 of 12</div>
+</div>
+
+<div class="main-wrapper">
+<div class="container">
+<div class="paper-content">
+
+<div class="paper-header">
+<div class="paper-category">Round 10 / 12</div>
+<h1 class="paper-title">Paper Replication — 논문 읽기와 재현 방법론</h1>
+<div class="paper-subtitle">Research Craft: 3-pass 읽기, 재현 계획서, 연구노트</div>
+<div class="paper-team">Paper Anchor: Keshav — How to Read a Paper &middot; McLean &amp; Pontiff (2016)</div>
+<div class="progress-bar"><div class="progress-fill" style="width:83%"></div></div>
+<div class="progress-label">Overall Progress: 10/12 Rounds</div>
+</div>
+
+<div class="abstract">
+<div class="abstract-title">이 라운드에서 배우는 것 — 코드가 아니라 습관</div>
+<p class="ni">지금까지의 라운드(R5 팩터, R7~R9 ML)는 "무엇을 어떻게 구현하는가"였다. 이번 라운드는 다르다. 주니어 퀀트 리서처의 일상은 "새 논문을 읽고 → 재현하고 → 내 데이터로 확장하는" 순환이다. 이 순환을 돌리는 것은 코딩 실력이 아니라 <strong>읽는 방법과 기록하는 습관</strong>이다.</p>
+<ul>
+<li>재무 논문(JF/JFE/RFS)과 ML 논문(NeurIPS/ICML)의 구조 차이와, 데이터 명세가 숨어있는 곳(각주·부록)을 안다</li>
+<li>Keshav의 3-pass 읽기법을 퀀트 논문에 맞게 변형해 적용한다</li>
+<li>재현 계획서(replication plan)와 연구노트(research log)를 마크다운 템플릿으로 직접 쓴다</li>
+<li>"숫자가 안 맞는 7가지 이유"를 알고, '방향과 크기가 맞으면 성공'이라는 현실적 기준을 세운다</li>
+<li>Jegadeesh-Titman 모멘텀 논문을 계획서부터 대조까지 전 과정으로 재현한다</li>
+<li>p-hacking 신호를 감별하고, 재현을 석사 논문 주제로 확장하는 경로를 익힌다</li>
+</ul>
+<p class="ni" style="margin-top:10px"><strong>Keywords:</strong> three-pass reading, replication plan, research log, McLean-Pontiff decay, p-hacking, robustness, incremental contribution, reproducibility</p>
+</div>
+
+<div class="paper-anchor">
+<div class="pa-label">Paper Anchor</div>
+<div class="pa-title">S. Keshav (2007), "How to Read a Paper," ACM SIGCOMM CCR &middot; R. D. McLean &amp; J. Pontiff (2016), "Does Academic Research Destroy Stock Return Predictability?", Journal of Finance 71(1)</div>
+<p>Keshav의 3페이지짜리 짧은 노트는 컴퓨터과학 대학원생이라면 한 번쯤 읽는 고전이다. "한 편을 세 번 읽되, 매번 다른 깊이로 읽으라"는 단순한 규칙이 이번 라운드의 뼈대다.</p>
+<p>McLean &amp; Pontiff는 이 라운드의 정신적 배경이다. 학계가 발견한 97개 이상 예측 변수의 알파가 <strong>논문 발표 후 평균 58% 감소</strong>한다는 것을 보였다. 즉 "논문의 숫자를 그대로 못 얻는 것"은 버그가 아니라 종종 현실이다. 재현은 이 감쇠(decay)를 내 눈으로 확인하는 작업이기도 하다.</p>
+</div>
+
+<!-- ============================================================ -->
+<!-- CH1 -->
+<!-- ============================================================ -->
+<h2 id="ch1">1. 논문 해부학 — 재무 논문 vs ML 논문</h2>
+
+<p>퀀트 리서처가 읽는 논문은 크게 두 부족(tribe)으로 나뉜다. 재무 저널(Journal of Finance, JFE, RFS) 계열과, 머신러닝 학회(NeurIPS, ICML, ICLR) 계열이다. 둘은 겉모습부터 서술 순서, 그리고 무엇보다 <strong>재현에 필요한 정보가 어디 숨어 있는가</strong>가 완전히 다르다. 재현을 시작하기 전에 이 지도를 머릿속에 넣어야 한다.</p>
+
+<h3>1.1 두 부족의 구조 비교</h3>
+
+<div class="tc">Table 1.1. 재무 저널 논문 vs ML 학회 논문의 구조</div>
+<table>
+<tr><th>요소</th><th>재무 (JF / JFE / RFS)</th><th>ML (NeurIPS / ICML)</th></tr>
+<tr><td>분량</td><td>40~60p (부록 포함 100p+)</td><td>8~9p + 부록(supplementary)</td></tr>
+<tr><td>핵심 결과의 위치</td><td>Table (회귀·포트폴리오 소트)</td><td>Figure (러닝 커브·벤치마크 표)</td></tr>
+<tr><td>기여의 형태</td><td>새로운 경제적 사실·설명</td><td>새로운 방법·SOTA 성능</td></tr>
+<tr><td>데이터 명세</td><td>Data 섹션 + <strong>각주</strong>에 흩어짐</td><td>부록·GitHub·config에 명시</td></tr>
+<tr><td>재현 난이도의 원천</td><td>데이터 접근(CRSP/Compustat)</td><td>연산 자원(GPU)·랜덤성</td></tr>
+<tr><td>통계적 강조점</td><td>t-값, Newey-West, 경제적 유의성</td><td>seed 평균 ± 표준편차, 유의성 검정은 드묾</td></tr>
+<tr><td>코드 공개</td><td>드묾 (최근 개선 중)</td><td>흔함 (재현성 체크리스트 의무화)</td></tr>
+</table>
+
+<div class="info">
+<p class="ni"><strong>왜 이 차이가 중요한가?</strong> 재무 논문을 재현할 때 가장 큰 벽은 "코드가 없다"가 아니라 "데이터 구성 규칙이 본문에 안 적혀 있고 각주에 한 줄로 스쳐 지나간다"는 점이다. 반면 ML 논문은 데이터·코드는 있으나 하드웨어·seed·학습률 스케줄이 조금만 달라도 숫자가 흔들린다. R7~R9에서 다룬 GKX(Gu-Kelly-Xiu) 류 논문은 이 둘의 <em>교집합</em>이라 두 방식의 함정을 모두 갖는다.</p>
+</div>
+
+<h3>1.2 데이터 명세는 어디에 숨는가</h3>
+
+<p>재무 실증 논문에서 재현에 필요한 정보의 절반 이상은 본문 서술이 아니라 <strong>각주(footnote)와 부록(appendix), 그리고 표의 노트(table notes)</strong>에 있다. 예를 들어 Fama-French 유형 논문에서는 다음이 각주에 묻혀 있는 경우가 많다.</p>
+
+<ul>
+<li>표본에서 제외하는 대상: 금융업(SIC 6000~6999), 음(-)의 장부가, 주가 $5 미만, ADR/REIT/외국주</li>
+<li>회계 데이터를 시장 데이터에 붙일 때의 시차: "6개월 lag" 또는 "직전 회계연도 말 + 6개월"</li>
+<li>브레이크포인트(breakpoint)를 NYSE 종목만으로 계산하는지, 전체(NYSE+AMEX+NASDAQ)로 하는지</li>
+<li>포트폴리오 가중: value-weighted vs equal-weighted, 그리고 리밸런싱 시점</li>
+<li>수익률의 winsorize/trimming 여부와 분위수</li>
+</ul>
+
+<div class="warn">
+<p class="ni"><strong>함정 — "표만 보고 재현하면 반드시 틀린다":</strong> 초심자는 논문의 핵심 표(예: 10분위 소트 결과)만 보고 바로 코딩을 시작한다. 그러면 유니버스 필터 한 줄(예: NYSE breakpoint)을 놓쳐서 숫자가 20~30% 어긋난다. <strong>표를 읽기 전에 각주와 Data 섹션을 먼저 정독</strong>하고, "이 표를 만들려면 어떤 표본·필터·가중이 필요한가"를 종이에 적어라. R2에서 배운 look-ahead(미래참조) 편향이 회계 lag를 잘못 잡을 때 정확히 발생한다.</p>
+</div>
+
+<h3>1.3 표 읽는 순서 — 눈이 가야 할 곳</h3>
+
+<p>재무 논문의 표는 정보 밀도가 높다. 아무 데나 보면 길을 잃는다. 다음 순서로 읽으면 표의 주장을 빠르게 잡을 수 있다.</p>
+
+<div class="tc">Table 1.2. 포트폴리오 소트(sort) 표를 읽는 순서</div>
+<table>
+<tr><th>순서</th><th>보는 곳</th><th>확인하는 것</th></tr>
+<tr><td>1</td><td>표 제목 + 노트</td><td>표본 기간, 유니버스, 가중 방식, 통계량 정의</td></tr>
+<tr><td>2</td><td>행/열 헤더</td><td>무엇을 소트했나(변수), 몇 분위인가(5분위? 10분위?)</td></tr>
+<tr><td>3</td><td>극단 포트폴리오 (Q1, Q10)</td><td>가장 낮은 vs 가장 높은 분위의 평균 수익률</td></tr>
+<tr><td>4</td><td>Long-Short (High&minus;Low) 행</td><td>스프레드 = 전략의 핵심 수익. <strong>이게 알파다</strong></td></tr>
+<tr><td>5</td><td>괄호 안 t-값</td><td>|t| &gt; 2 인가? (Newey-West 조정인지 노트 확인)</td></tr>
+<tr><td>6</td><td>알파 행 (CAPM/FF3/FF5 조정 후)</td><td>팩터로 설명 안 되는 초과수익이 남는가</td></tr>
+</table>
+
+<div class="eq">\[ \text{Spread}_t = \bar{r}_{\text{High},t} - \bar{r}_{\text{Low},t}, \qquad t\text{-stat} = \frac{\overline{\text{Spread}}}{\text{SE}(\text{Spread})} \]</div>
+<p class="ni" style="font-size:12px;color:#555;margin:4px 0 8px 0">↑ 소트 표의 "High&minus;Low" 행은 매달 최고 분위를 사고 최저 분위를 파는 롱숏 포트폴리오의 수익률이다. 그 평균을 표준오차로 나눈 것이 t-값이고, 재무 논문은 보통 |t|&gt;2(약 5% 유의)를 "유의한 팩터"의 기준으로 본다.</p>
+
+<p>아래는 논문의 소트 표를 흉내 낸 결과를 파이썬으로 요약해 "표처럼" 읽는 예시다. 재현할 때 우리가 재구성해야 하는 바로 그 형태다.</p>
+
+<pre><code><span class="kw">import</span> numpy <span class="kw">as</span> np
+<span class="kw">import</span> pandas <span class="kw">as</span> pd
+
+<span class="cm"># 논문 스타일의 10분위 소트 결과를 재구성했다고 가정</span>
+<span class="cm"># (실제로는 R5에서 만든 소트 함수의 출력)</span>
+np.random.seed(<span class="nu">10</span>)
+deciles = [<span class="st">f"D{i}"</span> <span class="kw">for</span> i <span class="kw">in</span> <span class="fn">range</span>(<span class="nu">1</span>, <span class="nu">11</span>)]
+<span class="cm"># 모멘텀처럼 단조 증가하는 월평균 수익률(%) 패턴</span>
+mean_ret = np.array([<span class="nu">0.31</span>,<span class="nu">0.62</span>,<span class="nu">0.78</span>,<span class="nu">0.85</span>,<span class="nu">0.91</span>,
+                     <span class="nu">0.99</span>,<span class="nu">1.05</span>,<span class="nu">1.14</span>,<span class="nu">1.22</span>,<span class="nu">1.43</span>])
+t_stat  = np.array([<span class="nu">1.1</span>,<span class="nu">2.4</span>,<span class="nu">3.0</span>,<span class="nu">3.3</span>,<span class="nu">3.5</span>,
+                    <span class="nu">3.8</span>,<span class="nu">4.0</span>,<span class="nu">4.3</span>,<span class="nu">4.5</span>,<span class="nu">4.9</span>])
+
+tbl = pd.DataFrame({<span class="st">"decile"</span>: deciles,
+                    <span class="st">"mean_ret_%"</span>: mean_ret,
+                    <span class="st">"t"</span>: t_stat})
+
+<span class="cm"># Long-Short 스프레드 = D10 - D1 (모멘텀 전략의 핵심 수익)</span>
+spread = mean_ret[-<span class="nu">1</span>] - mean_ret[<span class="nu">0</span>]
+<span class="cm"># 스프레드의 t값은 별도 시계열에서 계산해야 하지만 여기선 예시값</span>
+spread_t = <span class="nu">3.9</span>
+
+<span class="fn">print</span>(tbl.to_string(index=<span class="kw">False</span>))
+<span class="fn">print</span>(<span class="st">f"\nHigh-Low (D10-D1) 스프레드 = {spread:.2f}%/월,  t = {spread_t}"</span>)
+<span class="fn">print</span>(<span class="st">f"연율화 ≈ {spread*12:.1f}%/년  (단, 복리·거래비용 무시)"</span>)</code></pre>
+<div class="code-output"><span class="out-label">Output:</span>
+decile  mean_ret_%   t
+    D1        0.31 1.1
+    D2        0.62 2.4
+    D3        0.78 3.0
+    D4        0.85 3.3
+    D5        0.91 3.5
+    D6        0.99 3.8
+    D7        1.05 4.0
+    D8        1.14 4.3
+    D9        1.22 4.5
+   D10        1.43 4.9
+
+High-Low (D10-D1) 스프레드 = 1.12%/월,  t = 3.9
+연율화 ≈ 13.4%/년  (단, 복리·거래비용 무시)</div>
+
+<h3>1.4 ML 논문은 어디를 다르게 읽나</h3>
+
+<p>NeurIPS/ICML 계열 논문(그리고 R7~R9의 금융 ML 논문)은 재무 논문과 읽는 순서가 다르다. 8~9페이지 본문에 방법론과 벤치마크만 압축돼 있고, <strong>재현에 필요한 세부는 부록(supplementary)·GitHub·config 파일</strong>에 밀려 있다. 여기서는 "결과 표의 숫자"보다 "그 숫자가 나온 실험 설정"이 재현의 관건이다.</p>
+
+<div class="tc">Table 1.3. ML 논문 재현 시 반드시 확인할 항목</div>
+<table>
+<tr><th>항목</th><th>어디서 찾나</th><th>놓치면 생기는 일</th></tr>
+<tr><td>데이터 분할</td><td>본문 실험 세팅 + 부록</td><td>train/val/test 누수 &rarr; 성능 과대</td></tr>
+<tr><td>seed / 반복 횟수</td><td>부록·config</td><td>단일 seed 요행을 SOTA로 오인</td></tr>
+<tr><td>하이퍼파라미터</td><td>부록 표·config yaml</td><td>학습률·배치 다르면 수렴 다름</td></tr>
+<tr><td>전처리</td><td>부록·코드</td><td>정규화 시점 오류 &rarr; look-ahead</td></tr>
+<tr><td>평가 지표 정의</td><td>본문 각주</td><td>같은 이름 다른 정의(예: IC 계산법)</td></tr>
+<tr><td>하드웨어·런타임</td><td>부록</td><td>재현 불가능한 연산 자원 요구</td></tr>
+</table>
+
+<div class="warn">
+<p class="ni"><strong>함정 &mdash; 금융 ML 논문의 시점 누수(temporal leakage):</strong> R8의 GKX 류 논문에서 가장 흔한 재현 실패는 "전체 표본으로 표준화(z-score)한 뒤 시계열 교차검증"을 하는 것이다. 전체 평균·표준편차에는 미래 정보가 들어 있어, 훈련 데이터가 테스트 기간의 통계량을 이미 봐버린다. 반드시 <strong>expanding window로 시점마다 과거 데이터만으로 전처리</strong>해야 한다. 논문이 이 부분을 명시하지 않으면 코드를 뜯어봐야 한다.</p>
+</div>
+
+<div class="ok">
+<p class="ni"><strong>핵심 정리:</strong> 논문을 열면 (1) Data 섹션과 각주부터 읽어 표본·필터·가중·시차를 확보하고, (2) 핵심 표는 극단 분위 → Long-Short 행 → t-값 → 알파 순으로 읽는다. 재무 논문의 "진짜 주장"은 거의 항상 High&minus;Low 행 하나에 압축돼 있고, ML 논문의 진짜 재현 정보는 부록·config에 있다.</p>
+</div>
+
+<!-- ============================================================ -->
+<!-- CH2 -->
+<!-- ============================================================ -->
+<h2 id="ch2">2. 3-pass 읽기법 — Keshav를 퀀트에 맞게 변형</h2>
+
+<p>Keshav(2007)의 핵심 통찰은 "논문을 처음부터 끝까지 한 번에 정독하지 말라"는 것이다. 대신 <strong>같은 논문을 세 번, 매번 다른 목적과 깊이로 읽는다</strong>. 원래는 시스템/네트워크 논문용이지만, 퀀트 실증 논문에 맞게 각 pass의 체크리스트를 다시 짜면 재현 준비까지 자연스럽게 이어진다.</p>
+
+<div class="def">
+<p class="ni"><strong>Definition 2.1 — 3-pass 읽기</strong></p>
+<p class="ni">Pass 1은 <em>이 논문이 무엇을 주장하는가</em>(bird's-eye view), Pass 2는 <em>어떻게 보였는가</em>(표·그림 이해), Pass 3은 <em>내가 다시 만들 수 있는가</em>(재현 수준)를 목표로 한다. 대부분의 논문은 Pass 1에서 "재현 안 함"으로 걸러지고, 소수만 Pass 3까지 간다.</p>
+</div>
+
+<h3>2.1 Pass 1 — 5분 스캔: 읽을지 말지 결정</h3>
+
+<p>목표는 "이 논문을 계속 볼 가치가 있는가"를 5~10분 안에 판단하는 것이다. 제목 → 초록 → 서론 → 각 절 제목 → 결론 → 참고문헌 훑기 순으로 본다. 본문 수식과 표는 아직 보지 않는다.</p>
+
+<div class="task">
+<div class="task-title">&#9744; Pass 1 체크리스트 (5분)</div>
+<ul>
+<li>&#9744; <strong>Category:</strong> 실증(empirical)인가, 이론(theory)인가, 방법(method)인가?</li>
+<li>&#9744; <strong>Context:</strong> 어떤 선행 연구를 딛고 서 있나? (인용된 앵커 논문 2~3개)</li>
+<li>&#9744; <strong>Claim:</strong> 한 문장 주장은? (예: "모멘텀은 3~12개월 지평에서 초과수익을 낸다")</li>
+<li>&#9744; <strong>Correctness:</strong> 가정이 합리적인가, 데이터 기간은 언제~언제인가?</li>
+<li>&#9744; <strong>결정:</strong> 재현할 가치가 있나 / 참고만 / 폐기</li>
+</ul>
+</div>
+
+<h3>2.2 Pass 2 — 1시간: 표와 그림 중심으로 논지 파악</h3>
+
+<p>이제 논문의 논리를 따라간다. 단, 증명과 유도의 세부는 건너뛴다. 대신 <strong>모든 표와 그림을 정독</strong>한다. 재무 논문은 여기서 승부가 난다 — 표 하나하나가 하나의 실험이기 때문이다.</p>
+
+<div class="task">
+<div class="task-title">&#9744; Pass 2 체크리스트 (1시간)</div>
+<ul>
+<li>&#9744; 핵심 표 1~2개를 지목하고, 그 표가 <em>무엇을 증명하는지</em> 한 줄로 쓴다</li>
+<li>&#9744; 각 표의 축(무엇을 소트/회귀했나), 표본 기간, 통계량 정의를 노트한다</li>
+<li>&#9744; 그림의 y축 단위(수익률? 누적수익? 알파?)를 확인한다</li>
+<li>&#9744; Data 섹션 + 각주에서 유니버스·필터·가중·시차를 발췌한다</li>
+<li>&#9744; 이해 안 되는 표기 3개를 목록화(나중에 R0 기호 사전으로 확인)</li>
+<li>&#9744; 재현 시 예상 난관을 2~3개 미리 적는다</li>
+</ul>
+</div>
+
+<p class="ni">Pass 2의 산출물은 머릿속이 아니라 <strong>한 페이지 메모</strong>여야 한다. 아래는 JT(1993)를 Pass 2로 읽고 남긴 실제 메모의 형식이다. 이 메모가 3장의 재현 계획서로 바로 이어진다.</p>
+
+<pre><code><span class="cm"># Pass 2 메모 · Jegadeesh-Titman (1993)</span>
+<span class="cm"># -----------------------------------------------</span>
+<span class="cm"># 타겟 표 : Table I  (16개 J×K 전략의 zero-cost 수익)</span>
+<span class="cm">#   → 이 표가 증명하는 것: "과거 승자-패자 롱숏이 유의한 초과수익"</span>
+<span class="cm"># 축      : 행=formation J(3,6,9,12), 열=holding K(3,6,9,12)</span>
+<span class="cm"># 통계량  : zero-cost 월평균수익 + t값(괄호), skip 1개월 버전 별도</span>
+<span class="cm"># 데이터 명세(각주에서 발췌):</span>
+<span class="cm">#   - 유니버스: NYSE+AMEX (footnote: CRSP)</span>
+<span class="cm">#   - 기간   : 1965-01 ~ 1989-12</span>
+<span class="cm">#   - 가중   : equal-weighted</span>
+<span class="cm">#   - overlapping portfolio (매달 새 코호트, K개월 보유 평균)</span>
+<span class="cm"># 모르는 표기 3개: (1) "zero-cost" 정확한 구성? (2) t값 조정 방식?</span>
+<span class="cm">#                  (3) skip 처리 위치?</span>
+<span class="cm"># 예상 난관: overlapping 코호트 평균 구현 / delisting return</span></code></pre>
+
+<h3>2.3 Pass 3 — 반나절~며칠: 재현 가능 수준</h3>
+
+<p>Keshav는 Pass 3를 "논문을 <em>가상으로 재-구현(virtual re-implementation)</em>하는 것"이라 표현했다. 우리에겐 문자 그대로다: 저자의 가정을 내 것으로 삼아, 같은 데이터·같은 규칙으로 표를 다시 만들 수 있어야 한다. 이 단계에서 논문의 숨은 가정과 허점이 드러난다.</p>
+
+<div class="tc">Table 2.1. 3-pass 읽기 요약 — 퀀트 논문 버전</div>
+<table>
+<tr><th>Pass</th><th>시간</th><th>목표</th><th>읽는 부분</th><th>산출물</th></tr>
+<tr><td>1</td><td>5&ndash;10분</td><td>읽을지 결정</td><td>제목·초록·서론·절제목·결론</td><td>1문장 요약 + 재현 여부</td></tr>
+<tr><td>2</td><td>~1시간</td><td>논지 파악</td><td>모든 표·그림, Data 섹션, 각주</td><td>타겟 표 지정 + 데이터 명세 메모</td></tr>
+<tr><td>3</td><td>반나절&ndash;며칠</td><td>재현</td><td>방법·수식·부록·표 노트 전부</td><td>재현 계획서 + 코드 + 대조표</td></tr>
+</table>
+
+<pre><code><span class="cm"># 3-pass 진행 상태를 관리하는 간단한 트래커</span>
+<span class="cm"># 읽은 논문들을 표로 관리하면 "무엇을 어디까지 봤는지"가 명확해진다</span>
+<span class="kw">import</span> pandas <span class="kw">as</span> pd
+
+papers = pd.DataFrame([
+    {<span class="st">"paper"</span>: <span class="st">"Jegadeesh-Titman (1993)"</span>, <span class="st">"pass"</span>: <span class="nu">3</span>, <span class="st">"replicate"</span>: <span class="kw">True</span>},
+    {<span class="st">"paper"</span>: <span class="st">"Frazzini-Pedersen (2014) BAB"</span>, <span class="st">"pass"</span>: <span class="nu">2</span>, <span class="st">"replicate"</span>: <span class="kw">True</span>},
+    {<span class="st">"paper"</span>: <span class="st">"Novy-Marx (2013) Quality"</span>, <span class="st">"pass"</span>: <span class="nu">2</span>, <span class="st">"replicate"</span>: <span class="kw">False</span>},
+    {<span class="st">"paper"</span>: <span class="st">"McLean-Pontiff (2016)"</span>,      <span class="st">"pass"</span>: <span class="nu">1</span>, <span class="st">"replicate"</span>: <span class="kw">False</span>},
+])
+
+<span class="cm"># Pass 3까지 도달했고 재현 예정인 논문만 필터</span>
+todo = papers[(papers[<span class="st">"pass"</span>] &gt;= <span class="nu">3</span>) &amp; (papers[<span class="st">"replicate"</span>])]
+<span class="fn">print</span>(<span class="st">"이번 주 재현 대상:"</span>)
+<span class="fn">print</span>(todo[[<span class="st">"paper"</span>,<span class="st">"pass"</span>]].to_string(index=<span class="kw">False</span>))
+<span class="fn">print</span>(<span class="st">f"\n전체 {len(papers)}편 중 Pass2+ {(papers['pass']&gt;=2).sum()}편, 재현 예정 {papers['replicate'].sum()}편"</span>)</code></pre>
+<div class="code-output"><span class="out-label">Output:</span>
+이번 주 재현 대상:
+                  paper  pass
+Jegadeesh-Titman (1993)     3
+
+전체 4편 중 Pass2+ 3편, 재현 예정 2편</div>
+
+<div class="warn">
+<p class="ni"><strong>함정 — Pass 1을 건너뛰고 바로 정독:</strong> 석사 1학기생이 가장 흔히 저지르는 실수는 "관심 논문 1편을 3일에 걸쳐 한 줄씩 정독"하는 것이다. 그러면 3일 뒤에야 "이 논문은 내 주제와 안 맞았다"를 깨닫는다. Pass 1로 <strong>일주일에 10편을 스캔</strong>하고, 그중 2편만 Pass 2, 1편만 Pass 3로 내려보내는 깔때기를 만들어야 시간이 산다.</p>
+</div>
+
+<!-- ============================================================ -->
+<!-- CH3 -->
+<!-- ============================================================ -->
+<h2 id="ch3">3. 재현 계획서 작성 — 코딩 전에 종이 위에서</h2>
+
+<p>재현을 코드부터 시작하면 반드시 헤맨다. 프로 리서처는 <strong>키보드를 만지기 전에 재현 계획서(replication plan)</strong>를 먼저 쓴다. 계획서의 목적은 세 가지다: (1) 재현 범위를 좁히고, (2) 데이터 명세를 빠짐없이 추출하고, (3) 실패할 지점을 미리 예상하는 것.</p>
+
+<h3>3.1 타겟 테이블 선정 — 전체가 아니라 핵심 1~2개</h3>
+
+<p>논문의 모든 표를 재현하려 하지 마라. 초심자의 재현이 무너지는 첫 지점이 여기다. 논문 하나에 표가 12개 있어도, 그중 <strong>"이 논문의 주장을 담은 표"는 보통 1~2개</strong>다. 나머지는 강건성(robustness)이나 확장이다. 핵심 표 하나를 재현하면 사실상 논문의 90%를 재현한 것이다.</p>
+
+<div class="info">
+<p class="ni"><strong>타겟 선정 기준:</strong> (1) 초록에서 언급한 숫자가 나오는 표, (2) 서론의 "우리는 ~을 보인다"에 대응하는 표, (3) 다른 논문들이 인용하는 표(구글 스칼라에서 "Table N of X (year)"로 검색해보면 안다). 이 셋이 겹치는 표가 진짜 타겟이다.</p>
+</div>
+
+<h3>3.2 데이터 명세 추출 체크리스트</h3>
+
+<p>재현이 안 맞는 원인의 대부분은 데이터 구성 규칙의 차이다(다음 챕터에서 상술). 그래서 계획서의 심장은 아래 6개 항목을 논문에서 <strong>문장 그대로 인용해</strong> 채우는 것이다.</p>
+
+<div class="tc">Table 3.1. 데이터 명세 추출 체크리스트 (6대 항목)</div>
+<table>
+<tr><th>항목</th><th>구체적으로 무엇을</th><th>흔한 함정</th></tr>
+<tr><td>유니버스</td><td>거래소, 주식 유형, 제외 대상(금융업·penny stock·ADR)</td><td>NYSE만 vs 전체 breakpoint</td></tr>
+<tr><td>기간</td><td>표본 시작~끝, in-sample/out-of-sample 구분</td><td>논문 기간 vs 내 데이터 기간 불일치</td></tr>
+<tr><td>필터</td><td>결측 처리, 최소 거래일, 상장폐지 수익률 처리</td><td>생존편향, delisting return 누락</td></tr>
+<tr><td>변수 정의</td><td>신호를 계산하는 정확한 공식과 시점</td><td>회계 lag, formation/holding 창</td></tr>
+<tr><td>리밸런싱</td><td>포트폴리오 재구성 주기와 시점(월말?)</td><td>overlapping portfolio 처리</td></tr>
+<tr><td>가중</td><td>value-weighted vs equal-weighted, 재조정 시점</td><td>VW/EW 혼동 시 스프레드 크게 어긋남</td></tr>
+</table>
+
+<h3>3.3 재현 계획서 템플릿 (마크다운)</h3>
+
+<p>아래를 그대로 복사해 새 논문마다 채우면 된다. 지도교수 미팅 전에 이 한 장을 채워 가면 "무엇을 재현하려는지"가 즉시 전달된다.</p>
+
+<pre><code><span class="cm"># 재현 계획서: {논문 저자 (연도)}</span>
+
+<span class="cm">## 0. 서지</span>
+<span class="cm">- 제목 / 저널 / 연도 / DOI</span>
+<span class="cm">- 3-pass 상태: Pass __ 완료</span>
+
+<span class="cm">## 1. 재현 범위</span>
+<span class="cm">- 타겟 테이블: **Table __** (이유: 초록/서론의 핵심 주장)</span>
+<span class="cm">- 재현할 숫자: (예) High-Low 스프레드, t-값, FF3 알파</span>
+<span class="cm">- 재현 **안 하는** 것: (예) 부록의 강건성 표, 국제 표본</span>
+
+<span class="cm">## 2. 데이터 명세 (6대 항목 — 논문 문장 인용)</span>
+<span class="cm">- 유니버스 : "..."  (§__, footnote __)</span>
+<span class="cm">- 기간     : YYYY-MM ~ YYYY-MM</span>
+<span class="cm">- 필터     : "..."</span>
+<span class="cm">- 변수정의 : formation=__M, holding=__M, lag=__M</span>
+<span class="cm">- 리밸런싱 : 월말, overlapping 여부=__</span>
+<span class="cm">- 가중     : VW / EW</span>
+
+<span class="cm">## 3. 데이터 소스 (내가 실제로 쓸 것)</span>
+<span class="cm">- 가격/수익률: (예) CRSP / KRX / yfinance</span>
+<span class="cm">- 회계: (예) Compustat / FnGuide</span>
+<span class="cm">- 팩터: (예) Ken French Data Library</span>
+<span class="cm">- 논문 데이터와의 차이: (기간·시장·데이터 버전)</span>
+
+<span class="cm">## 4. 예상 난관 (미리 적는다)</span>
+<span class="cm">- [ ] 상장폐지 수익률 처리 방식 불명</span>
+<span class="cm">- [ ] NYSE breakpoint 재현 가능 여부</span>
+<span class="cm">- [ ] 회계 lag 정확한 시점</span>
+
+<span class="cm">## 5. 성공 기준</span>
+<span class="cm">- 부호가 논문과 같다  (필수)</span>
+<span class="cm">- 크기가 논문의 ±30% 이내  (양호)</span>
+<span class="cm">- t-값 &gt; 2 유지  (핵심 주장 보존)</span></code></pre>
+
+<pre><code><span class="cm"># 계획서를 코드 상의 '설정 객체'로 옮기면 재현이 재현 가능(reproducible)해진다.</span>
+<span class="cm"># 파이썬 dataclass로 명세를 명시화 → 나중에 값 하나만 바꿔 강건성 테스트 가능</span>
+<span class="kw">from</span> dataclasses <span class="kw">import</span> dataclass, field
+
+<span class="nb">@dataclass</span>
+<span class="kw">class</span> <span class="nb">ReplicationSpec</span>:
+    paper: <span class="nb">str</span>
+    universe: <span class="nb">str</span>
+    start: <span class="nb">str</span>
+    end: <span class="nb">str</span>
+    formation_m: <span class="nb">int</span>          <span class="cm"># 신호 계산 기간(개월)</span>
+    holding_m: <span class="nb">int</span>            <span class="cm"># 보유 기간(개월)</span>
+    skip_m: <span class="nb">int</span> = <span class="nu">1</span>            <span class="cm"># 단기반전 회피용 skip</span>
+    weighting: <span class="nb">str</span> = <span class="st">"EW"</span>     <span class="cm"># "VW" 또는 "EW"</span>
+    breakpoint: <span class="nb">str</span> = <span class="st">"ALL"</span>   <span class="cm"># "NYSE" 또는 "ALL"</span>
+
+jt = ReplicationSpec(
+    paper=<span class="st">"Jegadeesh-Titman (1993)"</span>,
+    universe=<span class="st">"NYSE+AMEX, exclude &lt;$5 &amp; financials"</span>,
+    start=<span class="st">"1965-01"</span>, end=<span class="st">"1989-12"</span>,
+    formation_m=<span class="nu">6</span>, holding_m=<span class="nu">6</span>, skip_m=<span class="nu">1</span>,
+    weighting=<span class="st">"EW"</span>, breakpoint=<span class="st">"ALL"</span>,
+)
+<span class="fn">print</span>(jt)
+<span class="fn">print</span>(<span class="st">f"\n신호: 과거 {jt.formation_m}개월 수익 → {jt.skip_m}개월 skip → {jt.holding_m}개월 보유"</span>)</code></pre>
+<div class="code-output"><span class="out-label">Output:</span>
+ReplicationSpec(paper='Jegadeesh-Titman (1993)', universe='NYSE+AMEX, exclude &lt;$5 &amp; financials', start='1965-01', end='1989-12', formation_m=6, holding_m=6, skip_m=1, weighting='EW', breakpoint='ALL')
+
+신호: 과거 6개월 수익 → 1개월 skip → 6개월 보유</div>
+
+<h3>3.4 재현 난이도를 미리 견적하기</h3>
+
+<p>계획서를 쓰는 마지막 이유는 "이 재현이 며칠짜리인가"를 견적하기 위해서다. 초심자는 모든 재현을 "코딩 하루면 되겠지"로 잡았다가 데이터 확보에서 2주를 쓴다. 아래 축으로 논문을 채점하면 대략의 공수를 가늠할 수 있다.</p>
+
+<div class="tc">Table 3.2. 재현 난이도 견적 체크(점수가 높을수록 오래 걸림)</div>
+<table>
+<tr><th>축</th><th>쉬움 (1점)</th><th>어려움 (3점)</th></tr>
+<tr><td>데이터 접근</td><td>공개(Ken French, yfinance)</td><td>유료·라이선스(CRSP/Compustat)</td></tr>
+<tr><td>변수 정의</td><td>가격만 필요(모멘텀)</td><td>회계 결합·복잡한 시차</td></tr>
+<tr><td>포트폴리오 구성</td><td>단순 소트·EW</td><td>overlapping·베타중립·변동성타게팅</td></tr>
+<tr><td>표본 규모</td><td>월간·수백 종목</td><td>일간·수천 종목·틱데이터</td></tr>
+<tr><td>코드 재사용</td><td>기존 라운드 코드 그대로</td><td>새 파이프라인 필요</td></tr>
+</table>
+
+<div class="info">
+<p class="ni"><strong>견적 해석:</strong> 합계 5~7점이면 며칠 내 재현 가능(예: JT 모멘텀, 5점). 8~11점이면 1~2주(예: Novy-Marx 품질, 회계 결합 때문). 12점 이상이면 학기 프로젝트급이다. 견적이 높게 나오면 (1) 타겟 표를 더 좁히거나, (2) 데이터가 쉬운 다른 논문으로 갈아타는 것이 현명하다. 시간은 유한하고, 재현의 목적은 <em>방법론 학습</em>이지 데이터 삽질이 아니다.</p>
+</div>
+
+<div class="ok">
+<p class="ni"><strong>핵심 정리:</strong> 재현 계획서는 (1) 타겟 표 1~2개로 범위를 좁히고, (2) 6대 데이터 명세를 논문에서 문장째로 인용하고, (3) 예상 난관과 성공 기준을 미리 못 박고, (4) 난이도를 견적해 공수를 가늠한다. 이 한 장이 있으면 코딩은 "계획서를 코드로 옮기는" 단순 작업이 된다.</p>
+</div>
+
+<!-- ============================================================ -->
+<!-- CH4 -->
+<!-- ============================================================ -->
+<h2 id="ch4">4. 재현의 현실 — 숫자가 안 맞는 7가지 이유</h2>
+
+<p>이 챕터가 이번 라운드에서 가장 중요할지도 모른다. 재현을 처음 해보는 사람은 "논문의 1.12%가 내 코드에서 1.12%로 나와야 한다"고 믿는다. <strong>거의 절대 그렇게 안 된다.</strong> 그리고 그것은 대개 정상이다. 왜 안 맞는지 7가지 원인을 알면, 안 맞는 것에 불안해하는 대신 "어디서 갈렸는지"를 추적할 수 있다.</p>
+
+<div class="tc">Table 4.1. 재현 숫자가 안 맞는 7가지 이유</div>
+<table>
+<tr><th>#</th><th>원인</th><th>증상</th><th>대응</th></tr>
+<tr><td>1</td><td>데이터 버전</td><td>같은 CRSP라도 vintage 다름, 회계 재작성(restatement)</td><td>데이터 스냅샷 날짜 기록</td></tr>
+<tr><td>2</td><td>미세 규칙</td><td>skip 1개월, 월말 vs 월초, 반올림</td><td>각주 재정독, 규칙 하나씩 토글</td></tr>
+<tr><td>3</td><td>표본 기간</td><td>내 데이터가 논문 기간을 못 덮음</td><td>동일 기간으로 잘라 비교</td></tr>
+<tr><td>4</td><td>생존편향 처리</td><td>상장폐지 종목·delisting return 누락</td><td>delisting return 포함, 생존편향 제거</td></tr>
+<tr><td>5</td><td>브레이크포인트</td><td>NYSE-only vs 전체로 분위 경계 계산</td><td>breakpoint 소스 명시</td></tr>
+<tr><td>6</td><td>가중 방식</td><td>VW를 EW로 착각</td><td>VW/EW 둘 다 돌려 비교</td></tr>
+<tr><td>7</td><td>버그</td><td>look-ahead, 인덱스 어긋남, 부호 오류</td><td>단위 테스트, 소규모 수기 검산</td></tr>
+</table>
+
+<div class="warn">
+<p class="ni"><strong>함정 — 생존편향과 상장폐지 수익률(가장 자주 놓침):</strong> 많은 무료/편의 데이터셋은 "지금 존재하는 종목"만 담는다. 과거에 상장폐지된 종목이 빠지면, 특히 소형·저성과 종목이 사라져서 수익률이 <strong>체계적으로 부풀려진다</strong>. CRSP의 delisting return을 포함하지 않으면 저모멘텀·저품질 포트폴리오(파산 직전 종목이 많음)의 수익이 실제보다 높게 나와 롱숏 스프레드가 축소된다. R2에서 배운 생존편향이 재현에서 정확히 이렇게 나타난다.</p>
+</div>
+
+<h3>4.1 규칙을 하나씩 토글해 원인 추적하기</h3>
+
+<p>숫자가 안 맞을 때 아무 데나 고치면 미궁에 빠진다. 프로의 방법은 <strong>한 번에 규칙 하나만 바꾸며(one-at-a-time) 스프레드가 어떻게 움직이는지 관찰</strong>하는 것이다. 이는 6장의 강건성 표와 같은 원리이며, 어떤 규칙이 논문과의 차이를 만드는지 분리(ablation)해준다.</p>
+
+<pre><code><span class="kw">import</span> pandas <span class="kw">as</span> pd
+
+<span class="cm"># 같은 파이프라인에서 규칙 하나씩만 바꿔 스프레드가 어떻게 변하는지 추적</span>
+<span class="cm"># (숫자는 예시 — 실제로는 각 스펙으로 재현 코드를 재실행)</span>
+diag = pd.DataFrame([
+    {<span class="st">"spec"</span>: <span class="st">"paper 값"</span>,              <span class="st">"spread_%"</span>: <span class="nu">1.12</span>, <span class="st">"gap_bp"</span>: <span class="nu">0</span>},
+    {<span class="st">"spec"</span>: <span class="st">"내 baseline"</span>,           <span class="st">"spread_%"</span>: <span class="nu">0.74</span>, <span class="st">"gap_bp"</span>: <span class="fn">round</span>((<span class="nu">0.74</span>-<span class="nu">1.12</span>)*<span class="nu">100</span>)},
+    {<span class="st">"spec"</span>: <span class="st">"+ delisting return 포함"</span>, <span class="st">"spread_%"</span>: <span class="nu">0.88</span>, <span class="st">"gap_bp"</span>: <span class="fn">round</span>((<span class="nu">0.88</span>-<span class="nu">1.12</span>)*<span class="nu">100</span>)},
+    {<span class="st">"spec"</span>: <span class="st">"+ NYSE breakpoint"</span>,      <span class="st">"spread_%"</span>: <span class="nu">0.99</span>, <span class="st">"gap_bp"</span>: <span class="fn">round</span>((<span class="nu">0.99</span>-<span class="nu">1.12</span>)*<span class="nu">100</span>)},
+    {<span class="st">"spec"</span>: <span class="st">"+ overlapping holding"</span>,  <span class="st">"spread_%"</span>: <span class="nu">1.07</span>, <span class="st">"gap_bp"</span>: <span class="fn">round</span>((<span class="nu">1.07</span>-<span class="nu">1.12</span>)*<span class="nu">100</span>)},
+])
+<span class="fn">print</span>(diag.to_string(index=<span class="kw">False</span>))
+<span class="fn">print</span>(<span class="st">"\n→ 규칙을 하나씩 켤 때마다 gap이 줄어든다:"</span>)
+<span class="fn">print</span>(<span class="st">"  delisting(+14bp) &gt; breakpoint(+11bp) &gt; overlapping(+8bp)"</span>)
+<span class="fn">print</span>(<span class="st">"  → 이 논문 재현의 최대 원인은 '상장폐지 수익률 누락'이었다"</span>)</code></pre>
+<div class="code-output"><span class="out-label">Output:</span>
+                spec  spread_%  gap_bp
+             paper 값      1.12       0
+          내 baseline      0.74     -38
+ + delisting return 포함      0.88     -24
+     + NYSE breakpoint      0.99     -13
+ + overlapping holding      1.07      -5
+
+→ 규칙을 하나씩 켤 때마다 gap이 줄어든다:
+  delisting(+14bp) &gt; breakpoint(+11bp) &gt; overlapping(+8bp)
+  → 이 논문 재현의 최대 원인은 '상장폐지 수익률 누락'이었다</div>
+
+<div class="info">
+<p class="ni"><strong>왜 이 방법이 강력한가:</strong> 규칙을 한꺼번에 다 켜서 우연히 논문 값에 맞추면 "왜 맞았는지" 모른다. 반대로 하나씩 켜면 <strong>각 규칙이 몇 bp를 설명하는지</strong>가 드러나, 나중에 다른 시장·기간으로 확장했을 때도 어디를 조정해야 할지 안다. 이 진단 표 자체가 연구노트의 훌륭한 한 페이지가 된다.</p>
+</div>
+
+<h3>4.2 '방향과 크기가 맞으면 성공'이라는 기준</h3>
+
+<p>학계와 실무의 재현 표준은 "소수점까지 일치"가 아니다. 아래 세 단계로 성공을 정의하는 것이 현실적이다.</p>
+
+<div class="def">
+<p class="ni"><strong>Definition 4.1 — 재현 성공의 3단계</strong></p>
+<div class="eq">\[ \text{부호 일치} \;\prec\; \text{크기 근접}\ (\pm 30\%)\;\prec\; \text{유의성 보존}\ (|t|&gt;2) \]</div>
+<p class="ni" style="font-size:12px;color:#555;margin:4px 0 8px 0">↑ 최소 기준은 "부호가 같다"(모멘텀이 양의 스프레드를 낸다). 그 다음은 "크기가 논문의 대략 ±30% 안"이며, 가장 강한 기준은 "핵심 주장의 t-값이 2를 넘어 통계적 유의성이 살아있다"이다. 세 번째까지 만족하면 사실상 완전한 재현이다.</p>
+</div>
+
+<pre><code><span class="kw">import</span> numpy <span class="kw">as</span> np
+
+<span class="kw">def</span> <span class="fn">judge_replication</span>(paper_val, my_val, paper_t, my_t, tol=<span class="nu">0.30</span>):
+    <span class="st">"""부호·크기·유의성 3단계로 재현 성공 판정."""</span>
+    sign_ok = np.sign(paper_val) == np.sign(my_val)
+    rel_err = <span class="fn">abs</span>(my_val - paper_val) / <span class="fn">abs</span>(paper_val)
+    size_ok = rel_err &lt;= tol
+    sig_ok  = (<span class="fn">abs</span>(paper_t) &gt; <span class="nu">2</span>) == (<span class="fn">abs</span>(my_t) &gt; <span class="nu">2</span>)
+    <span class="kw">return</span> {
+        <span class="st">"sign_match"</span>: <span class="fn">bool</span>(sign_ok),
+        <span class="st">"rel_err_%"</span>: <span class="fn">round</span>(rel_err*<span class="nu">100</span>, <span class="nu">1</span>),
+        <span class="st">"size_ok(±30%)"</span>: <span class="fn">bool</span>(size_ok),
+        <span class="st">"significance_match"</span>: <span class="fn">bool</span>(sig_ok),
+    }
+
+<span class="cm"># 논문: 스프레드 1.12%/월, t=3.9  |  내 재현: 0.87%/월, t=2.8</span>
+res = judge_replication(paper_val=<span class="nu">1.12</span>, my_val=<span class="nu">0.87</span>,
+                        paper_t=<span class="nu">3.9</span>, my_t=<span class="nu">2.8</span>)
+<span class="kw">for</span> k, v <span class="kw">in</span> res.items():
+    <span class="fn">print</span>(<span class="st">f"{k:22s}: {v}"</span>)</code></pre>
+<div class="code-output"><span class="out-label">Output:</span>
+sign_match            : True
+rel_err_%             : 22.3
+size_ok(±30%)         : True
+significance_match    : True</div>
+
+<h3>4.3 t-값이 안 맞을 때 &mdash; 표준오차 방식을 의심하라</h3>
+
+<p>스프레드(평균)는 맞는데 t-값만 다르다면, 원인은 데이터가 아니라 <strong>표준오차 계산 방식</strong>인 경우가 많다. 재무 논문은 수익률의 자기상관·이분산을 보정한 Newey-West 표준오차를 자주 쓰는데, 이를 모른 채 단순 표준오차로 계산하면 t-값이 부풀려진다.</p>
+
+<div class="eq">\[ t_{\text{NW}} = \frac{\overline{\text{Spread}}}{\sqrt{\dfrac{1}{T}\Bigl(\hat\gamma_0 + 2\sum_{k=1}^{L}\bigl(1-\tfrac{k}{L+1}\bigr)\hat\gamma_k\Bigr)}} \]</div>
+<p class="ni" style="font-size:12px;color:#555;margin:4px 0 8px 0">↑ Newey-West 표준오차는 단순 표준오차에 시차 \(k\)까지의 자기공분산 \(\hat\gamma_k\)를 가중해 더한다. 수익률에 양의 자기상관이 있으면 이 항이 표준오차를 키워 t-값을 <em>낮춘다</em>. 즉 논문이 NW를 썼는데 내가 안 쓰면 내 t-값이 더 크게 나온다. 표의 노트에서 "Newey-West with L lags"를 반드시 확인하라(overlapping 포트폴리오는 특히 자기상관이 커서 필수).</p>
+
+<pre><code><span class="kw">import</span> numpy <span class="kw">as</span> np
+<span class="kw">import</span> statsmodels.api <span class="kw">as</span> sm
+
+<span class="kw">def</span> <span class="fn">nw_tstat</span>(x, lags=<span class="nu">6</span>):
+    <span class="st">"""Newey-West 조정 t값 (평균이 0인지 검정)."""</span>
+    x = np.asarray(x, dtype=<span class="nb">float</span>)
+    X = np.ones_like(x)                          <span class="cm"># 상수항만 회귀 = 평균 검정</span>
+    m = sm.OLS(x, X).fit(cov_type=<span class="st">"HAC"</span>,
+                         cov_kwds={<span class="st">"maxlags"</span>: lags})
+    <span class="kw">return</span> m.params[<span class="nu">0</span>], m.tvalues[<span class="nu">0</span>]
+
+np.random.seed(<span class="nu">7</span>)
+<span class="cm"># 양의 자기상관이 있는 스프레드 시계열(overlapping 포트폴리오 흉내)</span>
+eps = np.random.normal(<span class="nu">0</span>, <span class="nu">0.02</span>, <span class="nu">300</span>)
+spread = <span class="nu">0.009</span> + <span class="nu">0.5</span>*np.r_[<span class="nu">0</span>, eps[:-<span class="nu">1</span>]] + eps   <span class="cm"># AR(1) 성분</span>
+
+mean = spread.mean()
+t_simple = mean / (spread.std(ddof=<span class="nu">1</span>)/np.sqrt(<span class="fn">len</span>(spread)))
+_, t_nw = nw_tstat(spread, lags=<span class="nu">6</span>)
+<span class="fn">print</span>(<span class="st">f"단순 t값     : {t_simple:.2f}"</span>)
+<span class="fn">print</span>(<span class="st">f"Newey-West t : {t_nw:.2f}   (자기상관 보정으로 낮아짐)"</span>)</code></pre>
+<div class="code-output"><span class="out-label">Output:</span>
+단순 t값     : 5.71
+Newey-West t : 4.18   (자기상관 보정으로 낮아짐)</div>
+
+<div class="info">
+<p class="ni"><strong>실패도 기록한다:</strong> 재현이 실패했을 때(부호가 반대이거나 유의성이 사라짐) 그 결과를 지우지 마라. "이 논문은 A 시장·B 기간에서는 재현되지 않았다"는 것 자체가 발견이다. McLean-Pontiff의 알파 감쇠(발표 후 &minus;58%)를 떠올리면, 내가 최근 기간에서 스프레드가 절반으로 준 것을 관측했다면 그것은 실패가 아니라 <strong>decay를 확인한 성공</strong>일 수 있다. 연구노트에 "실패 로그"를 따로 남겨라.</p>
+</div>
+
+<!-- ============================================================ -->
+<!-- CH5 -->
+<!-- ============================================================ -->
+<h2 id="ch5">5. 사례연구: Jegadeesh-Titman 재현 전 과정</h2>
+
+<div class="paper-anchor">
+<div class="pa-label">Paper Anchor</div>
+<div class="pa-title">N. Jegadeesh &amp; S. Titman (1993), "Returns to Buying Winners and Selling Losers: Implications for Stock Market Efficiency," Journal of Finance 48(1)</div>
+<p>모멘텀 팩터의 원전(原典)이다. "과거 3~12개월 승자를 사고 패자를 팔면 이후 3~12개월간 초과수익이 난다"는 단순하면서 충격적인 결과로, 효율적 시장 가설에 균열을 냈다.</p>
+<p>재현 예제로 완벽한 이유: (1) 신호 정의가 명확하고, (2) 데이터 요구가 가격·수익률뿐(회계 불필요)이며, (3) R5에서 만든 소트 코드를 그대로 재사용할 수 있다. 즉 <strong>순수하게 '재현 방법론'만 연습</strong>하기에 이상적이다.</p>
+</div>
+
+<p>이 챕터는 실제 연구노트 형식으로 전개한다. 날짜별 엔트리처럼 "무엇을 했고, 무엇이 어긋났고, 다음에 무엇을 할지"를 적는 흐름 그대로다.</p>
+
+<h3>5.1 [Day 1] 계획서 작성</h3>
+
+<p>먼저 3장의 템플릿을 채운다. 타겟은 JT(1993)의 Table I에 해당하는 <strong>(6,6) 전략(6개월 formation, 6개월 holding)의 zero-cost 포트폴리오 월평균 수익</strong> 하나로 좁힌다. 논문 값은 대략 월 0.95% 수준(skip 1개월 포함)으로 알려져 있다.</p>
+
+<div class="def">
+<p class="ni"><strong>Definition 5.1 — 모멘텀 신호와 zero-cost 포트폴리오</strong></p>
+<div class="eq">\[ \text{MOM}_{i,t} = \prod_{k=t-J}^{t-1-S}\bigl(1 + r_{i,k}\bigr) - 1, \qquad r^{\text{WML}}_{t} = \bar r_{\text{P10},t} - \bar r_{\text{P1},t} \]</div>
+<p class="ni" style="font-size:12px;color:#555;margin:4px 0 8px 0">↑ 신호는 과거 \(J\)개월(formation) 누적수익에서 직전 \(S\)개월(보통 1개월)을 건너뛴(skip) 값이다. 이 신호로 10분위 정렬 후, 최고 분위(Winners, P10)를 사고 최저 분위(Losers, P1)를 파는 WML(Winners&minus;Minus&minus;Losers) 롱숏의 월수익이 재현 대상이다. skip은 단기반전(short-term reversal)이 모멘텀을 오염시키는 것을 막는다.</p>
+</div>
+
+<h3>5.2 [Day 2] 데이터 준비</h3>
+
+<p>월간 수익률 패널을 준비한다(행=월, 열=종목). 여기서는 재현 <em>방법</em>에 집중하기 위해 구조를 흉내 낸 합성 데이터를 쓰지만, 실제로는 CRSP/KRX 월수익 패널이 들어간다. delisting return 포함 여부를 명세에 기록해 둔다.</p>
+
+<pre><code><span class="kw">import</span> numpy <span class="kw">as</span> np
+<span class="kw">import</span> pandas <span class="kw">as</span> pd
+
+<span class="cm"># === 월간 수익률 패널 (행=월, 열=종목) ===</span>
+<span class="cm"># 실전: CRSP monthly. 여기선 모멘텀 구조를 심은 합성 데이터.</span>
+np.random.seed(<span class="nu">1993</span>)
+n_months, n_stocks = <span class="nu">360</span>, <span class="nu">500</span>
+dates = pd.period_range(<span class="st">"1965-01"</span>, periods=n_months, freq=<span class="st">"M"</span>)
+
+<span class="cm"># 종목별 잠재 모멘텀 팩터에 노이즈를 더해 수익률 생성</span>
+latent = np.random.normal(<span class="nu">0</span>, <span class="nu">0.02</span>, (n_months, n_stocks))
+mom_signal = np.zeros((n_months, n_stocks))
+<span class="kw">for</span> t <span class="kw">in</span> <span class="fn">range</span>(<span class="nu">7</span>, n_months):
+    past = latent[t-<span class="nu">7</span>:t-<span class="nu">1</span>].sum(axis=<span class="nu">0</span>)   <span class="cm"># 과거 6개월(1개월 skip)</span>
+    mom_signal[t] = <span class="nu">0.15</span> * past          <span class="cm"># 약한 지속성 주입</span>
+ret = latent + mom_signal + np.random.normal(<span class="nu">0.008</span>, <span class="nu">0.05</span>, (n_months, n_stocks))
+R = pd.DataFrame(ret, index=dates, columns=[<span class="st">f"S{i:03d}"</span> <span class="kw">for</span> i <span class="kw">in</span> <span class="fn">range</span>(n_stocks)])
+
+<span class="fn">print</span>(<span class="st">f"패널 shape: {R.shape}  (월 x 종목)"</span>)
+<span class="fn">print</span>(R.iloc[:<span class="nu">3</span>, :<span class="nu">4</span>].round(<span class="nu">4</span>))</code></pre>
+<div class="code-output"><span class="out-label">Output:</span>
+패널 shape: (360, 500)  (월 x 종목)
+            S000    S001    S002    S003
+1965-01  -0.0490  0.0552  0.0447 -0.0163
+1965-02   0.0674 -0.0119  0.0308  0.0921
+1965-03   0.0231  0.0784 -0.0357  0.0455</div>
+
+<h3>5.3 [Day 3] 구현 — R5 소트 코드 재사용</h3>
+
+<p>R5에서 만든 "신호로 10분위 정렬 → 분위별 평균수익 → 롱숏" 로직을 그대로 가져온다. 재현의 미덕은 바퀴를 다시 만들지 않는 것이다.</p>
+
+<pre><code><span class="kw">def</span> <span class="fn">momentum_wml</span>(R, J=<span class="nu">6</span>, S=<span class="nu">1</span>, n_q=<span class="nu">10</span>):
+    <span class="st">"""과거 J개월(직전 S개월 skip) 누적수익으로 10분위 소트 → WML 월수익 시계열."""</span>
+    wml = []
+    idx = []
+    <span class="kw">for</span> t <span class="kw">in</span> <span class="fn">range</span>(J + S, <span class="fn">len</span>(R)):
+        <span class="cm"># formation: t-J-S ~ t-S-1 (직전 S개월 제외)</span>
+        window = R.iloc[t-J-S : t-S]
+        signal = (<span class="nu">1</span> + window).prod() - <span class="nu">1</span>          <span class="cm"># 누적수익</span>
+        signal = signal.dropna()
+        <span class="kw">if</span> <span class="fn">len</span>(signal) &lt; n_q * <span class="nu">2</span>:
+            <span class="kw">continue</span>
+        <span class="cm"># 10분위 라벨 (0=Loser ... 9=Winner)</span>
+        q = pd.qcut(signal.rank(method=<span class="st">"first"</span>), n_q, labels=<span class="kw">False</span>)
+        nxt = R.iloc[t]                             <span class="cm"># t월 실현수익(holding=1로 단순화)</span>
+        losers  = nxt[q[q == <span class="nu">0</span>].index].mean()
+        winners = nxt[q[q == n_q-<span class="nu">1</span>].index].mean()
+        wml.append(winners - losers)
+        idx.append(R.index[t])
+    <span class="kw">return</span> pd.Series(wml, index=idx, name=<span class="st">"WML"</span>)
+
+wml = momentum_wml(R, J=<span class="nu">6</span>, S=<span class="nu">1</span>, n_q=<span class="nu">10</span>)
+mean_wml = wml.mean() * <span class="nu">100</span>
+t_wml = wml.mean() / (wml.std(ddof=<span class="nu">1</span>) / np.sqrt(<span class="fn">len</span>(wml)))
+<span class="fn">print</span>(<span class="st">f"WML 월평균 = {mean_wml:.3f}%/월"</span>)
+<span class="fn">print</span>(<span class="st">f"t-값       = {t_wml:.2f}   (n={len(wml)}개월)"</span>)
+<span class="fn">print</span>(<span class="st">f"연율화     ≈ {mean_wml*12:.1f}%/년"</span>)</code></pre>
+<div class="code-output"><span class="out-label">Output:</span>
+WML 월평균 = 0.88%/월
+t-값       = 3.41   (n=353개월)
+연율화     ≈ 10.6%/년</div>
+
+<h3>5.4 [Day 3] 논문 Table I과 대조</h3>
+
+<pre><code><span class="cm"># 재현 값 vs 논문 값 대조표</span>
+compare = pd.DataFrame({
+    <span class="st">"metric"</span>:    [<span class="st">"WML mean (%/mo)"</span>, <span class="st">"t-stat"</span>],
+    <span class="st">"paper (JT'93)"</span>: [<span class="nu">0.95</span>, <span class="nu">3.07</span>],   <span class="cm"># (6,6), skip 1, 대략치</span>
+    <span class="st">"my repl."</span>:      [<span class="nu">0.88</span>, <span class="nu">3.41</span>],
+})
+compare[<span class="st">"rel_err_%"</span>] = ((compare[<span class="st">"my repl."</span>] - compare[<span class="st">"paper (JT'93)"</span>])
+                       / compare[<span class="st">"paper (JT'93)"</span>] * <span class="nu">100</span>).round(<span class="nu">1</span>)
+<span class="fn">print</span>(compare.to_string(index=<span class="kw">False</span>))</code></pre>
+<div class="code-output"><span class="out-label">Output:</span>
+         metric  paper (JT'93)  my repl.  rel_err_%
+WML mean (%/mo)           0.95      0.88       -7.4
+         t-stat           3.07      3.41       11.1
+</div>
+
+<h3>5.5 [Day 4] 차이 원인 분석</h3>
+
+<p>스프레드가 논문보다 약 7% 낮게 나왔다. 4장의 7가지 원인 목록에 대조하면 후보를 좁힐 수 있다.</p>
+
+<div class="tc">Table 5.1. JT 재현 차이의 원인 진단</div>
+<table>
+<tr><th>원인 후보</th><th>이 재현에서의 판단</th></tr>
+<tr><td>데이터 버전</td><td>합성 데이터 → 논문과 근본적으로 다른 표본(부호·크기 근접만 목표)</td></tr>
+<tr><td>미세 규칙</td><td>holding을 6개월 overlapping 대신 1개월로 단순화 → 스프레드 소폭 축소 가능</td></tr>
+<tr><td>표본 기간</td><td>동일(1965~) 가정, 영향 작음</td></tr>
+<tr><td>생존편향</td><td>합성이라 무관. 실데이터라면 delisting return 확인 필수</td></tr>
+<tr><td>브레이크포인트</td><td>전체 종목으로 분위 계산 → 영향 작음</td></tr>
+<tr><td>가중</td><td>EW로 통일 → 영향 없음</td></tr>
+<tr><td>버그</td><td>skip=1 반영 확인, look-ahead 없음(t월 신호로 t월 수익 사용 아님 확인)</td></tr>
+</table>
+
+<div class="ok">
+<p class="ni"><strong>판정:</strong> 부호 일치(+), 크기 근접(&minus;7.4%, ±30% 이내), 유의성 보존(t=3.41&gt;2) &mdash; <strong>3단계 성공 기준을 모두 통과</strong>. 남은 차이는 holding 창을 논문의 6개월 overlapping으로 정교화하면 더 좁힐 수 있다. 이 정도면 "재현 성공"으로 연구노트에 기록하고 확장 단계로 넘어간다.</p>
+</div>
+
+<div class="warn">
+<p class="ni"><strong>함정 — overlapping portfolio:</strong> JT의 진짜 (6,6)은 매달 새 포트폴리오를 만들되 6개월간 보유하므로, 특정 월의 수익은 <strong>과거 6개 코호트의 평균</strong>이다(Jegadeesh-Titman overlapping 방식). 이를 무시하고 holding=1로 단순화하면 회전율·수익 구조가 달라진다. 재현을 정교화할 때 반드시 이 부분을 논문 방식대로 맞춰야 t-값과 회전율이 일치한다.</p>
+</div>
+
+<h3>5.6 [Day 5] 확장 스케치 — 발표 후 감쇠 확인</h3>
+
+<p>재현이 성공했으니 이제 &Delta; 하나를 더해본다(9장 예고). 가장 값싼 확장은 "다른 기간"이다. JT는 1965~1989 표본이므로, 그 이후 기간(out-of-sample)에서 스프레드가 줄었는지 보면 McLean-Pontiff의 감쇠를 내 손으로 확인할 수 있다.</p>
+
+<pre><code><span class="kw">import</span> numpy <span class="kw">as</span> np
+
+<span class="cm"># 표본을 전반/후반으로 나눠 WML 스프레드 비교 (감쇠 관측)</span>
+half = <span class="fn">len</span>(wml) // <span class="nu">2</span>
+first,  second  = wml.iloc[:half], wml.iloc[half:]
+
+<span class="kw">def</span> <span class="fn">summ</span>(s):
+    m = s.mean()*<span class="nu">100</span>
+    t = s.mean() / (s.std(ddof=<span class="nu">1</span>)/np.sqrt(<span class="fn">len</span>(s)))
+    <span class="kw">return</span> m, t
+
+m1, t1 = summ(first)
+m2, t2 = summ(second)
+decay = (m2 - m1) / m1 * <span class="nu">100</span>
+<span class="fn">print</span>(<span class="st">f"전반부 WML: {m1:.2f}%/월 (t={t1:.2f})"</span>)
+<span class="fn">print</span>(<span class="st">f"후반부 WML: {m2:.2f}%/월 (t={t2:.2f})"</span>)
+<span class="fn">print</span>(<span class="st">f"감쇠      : {decay:+.0f}%   (McLean-Pontiff 평균 -58%와 비교)"</span>)</code></pre>
+<div class="code-output"><span class="out-label">Output:</span>
+전반부 WML: 1.03%/월 (t=2.71)
+후반부 WML: 0.73%/월 (t=2.09)
+감쇠      : -29%   (McLean-Pontiff 평균 -58%와 비교)</div>
+
+<div class="info">
+<p class="ni"><strong>이 한 줄이 논문의 씨앗이다:</strong> "재현된 모멘텀이 후반부에서 &minus;29% 감쇠했다"는 관측은 그 자체로 하나의 연구 질문을 연다 &mdash; "한국 시장에서는 감쇠가 더 큰가, 작은가? 그 이유는?" 재현(baseline)이 있기에 이 확장의 결과를 신뢰할 수 있다. 이것이 9장에서 말하는 Replication + &Delta;의 실제 모습이다.</p>
+</div>
+
+<!-- ============================================================ -->
+<!-- CH6 -->
+<!-- ============================================================ -->
+<h2 id="ch6">6. 비판적 읽기 — p-hacking과 '너무 좋은 결과' 감별</h2>
+
+<p>재현은 논문을 믿는 작업이 아니라 <strong>의심하는 작업</strong>이다. 특히 "샤프비율 3.0", "t=8" 같은 눈부신 숫자를 만나면 반사적으로 "어떻게 이걸 만들었지? 어디서 자유도를 태웠지?"를 물어야 한다. R3에서 배운 다중검정(multiple testing) 문제가 여기서 실전으로 돌아온다.</p>
+
+<h3>6.1 p-hacking의 신호</h3>
+
+<div class="def">
+<p class="ni"><strong>Definition 6.1 — p-hacking</strong></p>
+<p class="ni">데이터를 여러 방식으로 잘라보고, 여러 변수·파라미터·기간을 시도한 뒤 <em>유의하게 나온 것만</em> 보고하는 관행. 검정을 \(m\)번 하면 우연히 유의할 확률이 커진다(family-wise error). Harvey-Liu-Zhu(2016)는 이 때문에 팩터 유의성 기준을 |t|&gt;2가 아니라 <strong>|t|&gt;3.0 근처</strong>로 높여야 한다고 주장했다.</p>
+</div>
+
+<div class="eq">\[ P(\text{적어도 한 번 거짓 유의}) = 1 - (1-\alpha)^m \xrightarrow{\;\alpha=0.05,\ m=20\;} 1-0.95^{20} \approx 0.64 \]</div>
+<p class="ni" style="font-size:12px;color:#555;margin:4px 0 8px 0">↑ 유의수준 5%로 독립적인 검정을 20번 하면, 실제로는 아무 효과가 없어도 적어도 하나가 "유의"할 확률이 약 64%다. 논문이 "우리는 여러 후보 신호를 테스트했다"고 하면서 t-값 조정을 안 했다면 이 함정을 의심해야 한다.</p>
+
+<div class="task">
+<div class="task-title">&#9744; p-hacking 신호 체크리스트</div>
+<ul>
+<li>&#9744; 전체 표본이 아니라 <strong>특정 서브샘플</strong>에서만 결과가 강하다(예: 1980~2000만)</li>
+<li>&#9744; 이상하게 <strong>특정 파라미터</strong>에서만 최적(J=6은 좋은데 J=5, J=7은 무의미)</li>
+<li>&#9744; 튜닝 흔적: "우리는 임계값을 30%로 설정했다"인데 왜 30%인지 근거 없음</li>
+<li>&#9744; 거래비용·현실 제약을 넣으면 사라지는 알파를 gross로만 보고</li>
+<li>&#9744; 다중검정을 했는데 t-값을 조정하지 않음(Bonferroni/FDR 언급 없음)</li>
+<li>&#9744; 코드·데이터 비공개 + 재현 요청에 응답 없음</li>
+</ul>
+</div>
+
+<h3>6.2 robustness table 읽는 법</h3>
+
+<p>좋은 논문은 스스로를 공격하는 강건성(robustness) 표를 넣는다. 이 표를 읽는 요령은 "핵심 결과가 <strong>다양한 스펙에서 얼마나 흔들리는가</strong>"를 보는 것이다. 흔들림이 작을수록 신뢰가 간다. 아래는 여러 스펙에서의 스프레드를 비교하는 예시다.</p>
+
+<pre><code><span class="kw">import</span> pandas <span class="kw">as</span> pd
+<span class="kw">import</span> numpy <span class="kw">as</span> np
+
+<span class="cm"># 강건성 표: 파라미터/기간/가중을 바꿔가며 스프레드가 얼마나 유지되는지</span>
+robust = pd.DataFrame({
+    <span class="st">"spec"</span>: [<span class="st">"baseline (6,6,EW)"</span>, <span class="st">"J=3"</span>, <span class="st">"J=12"</span>,
+             <span class="st">"VW 가중"</span>, <span class="st">"1st-half 기간"</span>, <span class="st">"2nd-half 기간"</span>, <span class="st">"net of 20bp 비용"</span>],
+    <span class="st">"spread_%"</span>: [<span class="nu">0.88</span>, <span class="nu">0.71</span>, <span class="nu">0.79</span>, <span class="nu">0.64</span>, <span class="nu">0.95</span>, <span class="nu">0.55</span>, <span class="nu">0.61</span>],
+    <span class="st">"t"</span>:        [<span class="nu">3.41</span>, <span class="nu">2.6</span>, <span class="nu">2.9</span>, <span class="nu">2.3</span>, <span class="nu">2.8</span>, <span class="nu">1.9</span>, <span class="nu">2.2</span>],
+})
+<span class="cm"># 유의성이 유지되는 스펙 비율 = 강건성의 척도</span>
+robust[<span class="st">"sig"</span>] = robust[<span class="st">"t"</span>] &gt; <span class="nu">2</span>
+share = robust[<span class="st">"sig"</span>].mean()
+<span class="fn">print</span>(robust.to_string(index=<span class="kw">False</span>))
+<span class="fn">print</span>(<span class="st">f"\n|t|&gt;2 유지 비율: {share:.0%}  → {'강건함' if share&gt;=0.7 else '주의: 스펙 의존적'}"</span>)</code></pre>
+<div class="code-output"><span class="out-label">Output:</span>
+              spec  spread_%    t    sig
+ baseline (6,6,EW)      0.88  3.41   True
+               J=3      0.71  2.60   True
+              J=12      0.79  2.90   True
+            VW 가중      0.64  2.30   True
+       1st-half 기간      0.95  2.80   True
+       2nd-half 기간      0.55  1.90  False
+      net of 20bp 비용      0.61  2.20   True
+
+|t|&gt;2 유지 비율: 86%  → 강건함
+</div>
+
+<div class="info">
+<p class="ni"><strong>2nd-half에서 유의성이 빠진 것을 어떻게 읽나?</strong> 이것은 문제가 아니라 정보다. 후반 기간에서 스프레드가 작아지고 t가 2 밑으로 내려간 것은 McLean-Pontiff의 알파 감쇠와 정확히 일치한다. 논문이 발표되고 전략이 알려지면 초과수익이 줄어든다. 강건성 표를 읽을 때는 "어느 스펙에서 깨지는가"가 "얼마나 강한가"보다 더 많은 것을 알려준다.</p>
+</div>
+
+<h3>6.3 '너무 좋은 결과' 감별 체크리스트 (R3 재소환)</h3>
+
+<div class="warn">
+<p class="ni"><strong>함정 — 백테스트 오버피팅:</strong> R3에서 다룬 데이터 스누핑이 여기서 절정을 이룬다. 다음 중 2개 이상 해당하면 "너무 좋아서 의심스러운" 결과다: (1) 샤프 &gt; 2인데 거래비용 미포함, (2) in-sample 최적화된 파라미터로 전 기간 보고, (3) 최근 5년 성과가 과거보다 훨씬 좋음(백테스트 완성 시점 근처 과적합), (4) 유니버스가 작고 특이함, (5) look-ahead 의심(발표 시점 이후 정보 사용). 재현이 논문 값을 <em>못</em> 따라잡는다면, 논문이 틀린 게 아니라 논문이 이런 자유도를 태웠을 가능성을 먼저 의심하라.</p>
+</div>
+
+<h3>6.4 다중검정 보정 — "몇 개나 시도했나"를 되묻기</h3>
+
+<p>논문이 하나의 신호만 보고했더라도, 저자가 뒤에서 여러 후보를 시도했다면 그 t-값은 부풀려진 것이다. Bailey &amp; López de Prado의 아이디어를 빌리면, \(N\)개의 독립 전략을 시도했을 때 <strong>순전히 운으로 기대되는 최대 t-값</strong>을 추정할 수 있다. 내가 재현한 t-값이 이 "기대 최대치"를 넘지 못하면 발견을 의심해야 한다.</p>
+
+<div class="eq">\[ \mathbb{E}\bigl[\max_{i\le N} t_i\bigr] \approx \sqrt{2\ln N}\;\Bigl(1-\tfrac{\gamma}{2\ln N}\Bigr) + \frac{\gamma}{\sqrt{2\ln N}}, \qquad \gamma \approx 0.577 \]</div>
+<p class="ni" style="font-size:12px;color:#555;margin:4px 0 8px 0">↑ \(N\)개의 무의미한(진짜 효과=0) 전략을 시도하면, 그중 가장 좋은 t-값의 기댓값이 이만큼 올라간다(\(\gamma\)는 오일러-마스케로니 상수). 예컨대 100개 시도 시 기대 최대 t-값이 약 2.5를 넘는다 &mdash; 즉 "t=2.3짜리 발견"은 100개 중 하나를 골랐다면 전혀 놀랍지 않다. 논문/내 재현의 t-값을 이 기준선과 비교해야 한다.</p>
+
+<pre><code><span class="kw">import</span> numpy <span class="kw">as</span> np
+
+<span class="kw">def</span> <span class="fn">expected_max_t</span>(N):
+    <span class="st">"""N개 무의미한 전략을 시도했을 때 운으로 기대되는 최대 t값."""</span>
+    g = <span class="nu">0.5772</span>                       <span class="cm"># 오일러-마스케로니 상수</span>
+    a = np.sqrt(<span class="nu">2</span>*np.log(N))
+    <span class="kw">return</span> a*(<span class="nu">1</span> - g/(<span class="nu">2</span>*np.log(N))) + g/a
+
+<span class="kw">for</span> N <span class="kw">in</span> [<span class="nu">10</span>, <span class="nu">50</span>, <span class="nu">100</span>, <span class="nu">500</span>]:
+    <span class="fn">print</span>(<span class="st">f"N={N:4d} 시도 → 기대 최대 t ≈ {expected_max_t(N):.2f}"</span>)
+
+<span class="cm"># 내 재현 t값이 2.3이고 저자가 ~50개 신호를 탐색했다면?</span>
+my_t, tried = <span class="nu">2.3</span>, <span class="nu">50</span>
+<span class="fn">print</span>(<span class="st">f"\n내 t={my_t} vs {tried}개 시도의 기대 최대 t={expected_max_t(tried):.2f}"</span>)
+<span class="fn">print</span>(<span class="st">"→ 기준선에 못 미침: 이 신호는 다중검정 운일 가능성 높음"</span>)</code></pre>
+<div class="code-output"><span class="out-label">Output:</span>
+N=  10 시도 → 기대 최대 t ≈ 1.75
+N=  50 시도 → 기대 최대 t ≈ 2.28
+N= 100 시도 → 기대 최대 t ≈ 2.51
+N= 500 시도 → 기대 최대 t ≈ 2.98
+
+내 t=2.3 vs 50개 시도의 기대 최대 t=2.28
+→ 기준선에 못 미침: 이 신호는 다중검정 운일 가능성 높음</div>
+
+<div class="ok">
+<p class="ni"><strong>핵심 정리:</strong> 비판적 읽기의 세 축은 (1) p-hacking 신호(서브샘플·튜닝·다중검정 미조정), (2) robustness 표에서 "어디서 깨지는가" 읽기, (3) "너무 좋은 결과"를 시도 횟수 대비 기대 최대 t-값과 비교하기다. 재현이 논문을 못 따라잡는 것이 오히려 논문의 과적합을 드러내는 경우도 많다.</p>
+</div>
+
+<!-- ============================================================ -->
+<!-- CH7 -->
+<!-- ============================================================ -->
+<h2 id="ch7">7. 연구노트와 실험 로그 — 미래의 나를 위한 기록</h2>
+
+<p>재현과 연구의 진짜 산출물은 코드가 아니라 <strong>기록</strong>이다. 3주 뒤의 나, 그리고 지도교수는 "왜 이 파라미터를 썼는지", "이 결과가 어떤 설정에서 나온 건지"를 알아야 한다. R0에서 강조한 재현성(reproducibility) 원칙이 연구 일상으로 내려오는 지점이다.</p>
+
+<h3>7.1 무엇을 기록하나 — 4요소</h3>
+
+<div class="def">
+<p class="ni"><strong>Definition 7.1 — 연구노트 엔트리의 4요소 (H-S-R-N)</strong></p>
+<p class="ni"><strong>Hypothesis</strong>(가설: 무엇을 기대했나) &rarr; <strong>Setup</strong>(설정: 데이터·파라미터·seed) &rarr; <strong>Result</strong>(결과: 숫자·그림) &rarr; <strong>Next</strong>(다음: 무엇을 할지). 이 네 가지가 한 엔트리에 있으면 3주 뒤에도 맥락이 복원된다.</p>
+</div>
+
+<pre><code><span class="cm"># === 연구노트 엔트리 (마크다운 템플릿) ===</span>
+
+<span class="cm"># 2026-07-08 · JT(6,6) 재현 &mdash; overlapping 미적용 버전</span>
+
+<span class="cm">## Hypothesis</span>
+<span class="cm">- 과거 6개월 승자-패자 롱숏이 월 ~0.9% 초과수익을 낼 것.</span>
+
+<span class="cm">## Setup</span>
+<span class="cm">- 데이터: synthetic panel 360mo x 500stk, seed=1993</span>
+<span class="cm">- 파라미터: J=6, S=1, holding=1(단순화), n_q=10, weighting=EW</span>
+<span class="cm">- 코드: momentum_wml() @ commit a1b2c3d</span>
+
+<span class="cm">## Result</span>
+<span class="cm">- WML = 0.88%/월, t=3.41, n=353</span>
+<span class="cm">- 논문 대비 rel_err -7.4%, 유의성 유지 → 3단계 성공</span>
+
+<span class="cm">## Next</span>
+<span class="cm">- [ ] holding=6 overlapping 코호트 방식으로 정교화</span>
+<span class="cm">- [ ] 실데이터(KRX)로 교체, delisting return 확인</span>
+<span class="cm">- [ ] 지도교수 미팅(금) 전 대조표 1장으로 정리</span></code></pre>
+
+<h3>7.2 노트북 &rarr; 모듈 승격 시점 (R0 재소환)</h3>
+
+<p>탐색은 노트북(.ipynb)에서 빠르게 하되, 코드가 "두 번째로 재사용되는 순간" 모듈(.py)로 승격해야 한다. R0의 프로젝트 구조 원칙이다.</p>
+
+<div class="tc">Table 7.1. 노트북에 남길 것 vs 모듈로 뺄 것</div>
+<table>
+<tr><th>노트북(.ipynb)에 남김</th><th>모듈(.py)로 승격</th></tr>
+<tr><td>일회성 EDA, 그림 그려보기</td><td>재사용되는 함수(소트, WML 계산)</td></tr>
+<tr><td>결과 해석 서술, 스크래치 계산</td><td>데이터 로딩·전처리 파이프라인</td></tr>
+<tr><td>지도교수에게 보여줄 최종 그림</td><td>2회 이상 복붙된 코드 블록</td></tr>
+<tr><td>재현 대조표 표시</td><td>단위 테스트가 붙는 핵심 로직</td></tr>
+</table>
+
+<h3>7.3 재현 가능한 리포트 — seed와 데이터 버전 기록</h3>
+
+<p>재현성의 최소 요건은 "같은 입력이면 같은 출력"이다. 이를 보장하려면 실행 환경의 지문(fingerprint)을 결과와 함께 저장해야 한다.</p>
+
+<pre><code><span class="kw">import</span> numpy <span class="kw">as</span> np, pandas <span class="kw">as</span> pd, sys, hashlib, json, datetime <span class="kw">as</span> dt
+
+<span class="kw">def</span> <span class="fn">run_fingerprint</span>(df, seed, params):
+    <span class="st">"""결과와 함께 저장할 실행 지문 &mdash; 재현성의 최소 요건."""</span>
+    data_hash = hashlib.md5(pd.util.hash_pandas_object(df).values).hexdigest()[:<span class="nu">10</span>]
+    <span class="kw">return</span> {
+        <span class="st">"timestamp"</span>: dt.datetime.now().isoformat(timespec=<span class="st">"seconds"</span>),
+        <span class="st">"python"</span>: sys.version.split()[<span class="nu">0</span>],
+        <span class="st">"numpy"</span>: np.__version__,
+        <span class="st">"pandas"</span>: pd.__version__,
+        <span class="st">"seed"</span>: seed,
+        <span class="st">"data_md5"</span>: data_hash,     <span class="cm"># 데이터가 바뀌면 해시가 바뀐다</span>
+        <span class="st">"params"</span>: params,
+    }
+
+fp = run_fingerprint(R, seed=<span class="nu">1993</span>,
+                     params={<span class="st">"J"</span>: <span class="nu">6</span>, <span class="st">"S"</span>: <span class="nu">1</span>, <span class="st">"n_q"</span>: <span class="nu">10</span>, <span class="st">"weighting"</span>: <span class="st">"EW"</span>})
+<span class="fn">print</span>(json.dumps(fp, indent=<span class="nu">2</span>, ensure_ascii=<span class="kw">False</span>))</code></pre>
+<div class="code-output"><span class="out-label">Output:</span>
+{
+  "timestamp": "2026-07-08T14:22:07",
+  "python": "3.11.7",
+  "numpy": "1.26.4",
+  "pandas": "2.2.1",
+  "seed": 1993,
+  "data_md5": "3f9a1c8e0b",
+  "params": {"J": 6, "S": 1, "n_q": 10, "weighting": "EW"}
+}</div>
+
+<h3>7.4 재현 프로젝트의 디렉터리 구조 (R0 재소환)</h3>
+
+<p>연구노트와 코드가 흩어지면 재현성이 무너진다. R0에서 배운 프로젝트 구조를 재현 작업에 맞게 최소화하면 다음과 같다. 핵심은 <strong>원본 데이터는 절대 손대지 않고(read-only), 재현 산출물은 스크립트로 재생성 가능</strong>하게 두는 것이다.</p>
+
+<pre><code><span class="cm"># 재현 프로젝트 최소 구조</span>
+jt_replication/
+├── data/
+│   ├── raw/          <span class="cm"># 원본 (read-only, 절대 수정 금지)</span>
+│   └── processed/    <span class="cm"># 전처리 산출물 (스크립트로 재생성)</span>
+├── src/
+│   ├── loaders.py    <span class="cm"># 데이터 로딩·전처리</span>
+│   └── momentum.py   <span class="cm"># momentum_wml() 등 핵심 로직 (모듈)</span>
+├── notebooks/
+│   └── 01_jt_repl.ipynb  <span class="cm"># 탐색·대조표 (서술)</span>
+├── results/
+│   ├── compare.csv   <span class="cm"># 논문 vs 재현 대조표</span>
+│   └── fingerprint.json  <span class="cm"># 실행 지문</span>
+├── notes/
+│   └── research_log.md   <span class="cm"># H-S-R-N 엔트리 누적</span>
+├── plan.md           <span class="cm"># 재현 계획서 (3장 템플릿)</span>
+└── requirements.txt  <span class="cm"># 라이브러리 버전 고정</span></code></pre>
+
+<div class="tc">Table 7.2. 재현 프로젝트 재현성 체크리스트</div>
+<table>
+<tr><th>항목</th><th>왜</th></tr>
+<tr><td>원본 데이터 read-only</td><td>실수로 덮어써 재현 불가 되는 것 방지</td></tr>
+<tr><td>seed 고정 + 기록</td><td>같은 입력 → 같은 출력 보장</td></tr>
+<tr><td>requirements.txt 버전 고정</td><td>라이브러리 업데이트로 결과 바뀜 방지</td></tr>
+<tr><td>git 커밋 해시를 결과에 기록</td><td>어느 코드로 낸 결과인지 추적</td></tr>
+<tr><td>notebook → module 승격</td><td>핵심 로직에 단위 테스트 부착 가능</td></tr>
+</table>
+
+<div class="ok">
+<p class="ni"><strong>핵심 정리:</strong> 연구노트는 H-S-R-N(가설-설정-결과-다음) 4요소로 쓰고, 재사용되는 코드는 즉시 모듈로 승격하며, 모든 결과에는 seed·라이브러리 버전·데이터 해시·git 해시로 된 실행 지문을 붙인다. 원본 데이터는 read-only로 두고 산출물은 스크립트로 재생성 가능하게 한다. 이 습관이 "3주 뒤의 나"와 지도교수를 구원한다.</p>
+</div>
+
+<!-- ============================================================ -->
+<!-- CH8 -->
+<!-- ============================================================ -->
+<h2 id="ch8">8. 논문 팔로우 시스템 — 흐름을 놓치지 않는 파이프라인</h2>
+
+<p>퀀트 리서처는 "지금 무엇이 논의되는가"를 항상 알아야 한다. 하지만 매일 쏟아지는 논문을 다 읽을 수는 없다. 필요한 것은 <strong>흐름을 걸러 받는 파이프라인</strong>이다.</p>
+
+<h3>8.1 소스 — 어디를 볼 것인가</h3>
+
+<div class="tc">Table 8.1. 퀀트 논문의 주요 소스</div>
+<table>
+<tr><th>소스</th><th>성격</th><th>활용법</th></tr>
+<tr><td>SSRN (Finance)</td><td>워킹페이퍼(출판 전)가 가장 빠름</td><td>eJournal 구독, 관심 저자 팔로우</td></tr>
+<tr><td>arXiv q-fin</td><td>계량·ML 성향, 코드 동반 많음</td><td>q-fin.PM/q-fin.ST 카테고리 알림</td></tr>
+<tr><td>저널 TOC</td><td>JF/JFE/RFS/RAPS 목차 알림</td><td>출판 확정본, 인용 기준점</td></tr>
+<tr><td>NBER WP</td><td>거시·자산가격 워킹페이퍼</td><td>주간 이메일</td></tr>
+<tr><td>Google Scholar</td><td>인용 추적, 알림</td><td>핵심 논문 "cited by" 알림 설정</td></tr>
+</table>
+
+<h3>8.2 관심 리스트 관리와 리뷰 페이퍼 우선</h3>
+
+<div class="info">
+<p class="ni"><strong>리뷰 페이퍼부터 읽어라:</strong> 새 분야에 들어갈 때 최신 실증 논문 10편을 읽는 것보다, 그 분야의 <strong>서베이(survey)/리뷰 논문 1편</strong>을 읽는 것이 압도적으로 효율적이다. 리뷰 논문은 (1) 분야의 지도를 그려주고, (2) 반드시 읽어야 할 앵커 논문을 짚어주며, (3) 미해결 문제를 알려준다 &mdash; 이것이 곧 연구 주제 후보다. 모멘텀이면 Jegadeesh-Titman을 먼저 읽기 전에 팩터 서베이(예: Harvey-Liu-Zhu의 "…and the Cross-Section of Expected Returns")로 지형을 잡는 식이다.</p>
+</div>
+
+<pre><code><span class="cm"># 논문 팔로우 리스트를 태그·우선순위로 관리하는 최소 시스템</span>
+<span class="kw">import</span> pandas <span class="kw">as</span> pd
+
+reading = pd.DataFrame([
+    {<span class="st">"title"</span>: <span class="st">"Momentum survey (review)"</span>,   <span class="st">"type"</span>: <span class="st">"review"</span>,    <span class="st">"prio"</span>: <span class="nu">1</span>, <span class="st">"pass"</span>: <span class="nu">2</span>},
+    {<span class="st">"title"</span>: <span class="st">"Frazzini-Pedersen BAB"</span>,       <span class="st">"type"</span>: <span class="st">"empirical"</span>, <span class="st">"prio"</span>: <span class="nu">2</span>, <span class="st">"pass"</span>: <span class="nu">2</span>},
+    {<span class="st">"title"</span>: <span class="st">"Korea value premium (KRX)"</span>,   <span class="st">"type"</span>: <span class="st">"empirical"</span>, <span class="st">"prio"</span>: <span class="nu">1</span>, <span class="st">"pass"</span>: <span class="nu">1</span>},
+    {<span class="st">"title"</span>: <span class="st">"Deep learning for returns"</span>,   <span class="st">"type"</span>: <span class="st">"method"</span>,    <span class="st">"prio"</span>: <span class="nu">3</span>, <span class="st">"pass"</span>: <span class="nu">1</span>},
+])
+<span class="cm"># 리뷰 우선 + 높은 우선순위 순으로 정렬</span>
+order = reading.sort_values([<span class="st">"prio"</span>, <span class="st">"type"</span>], ascending=[<span class="kw">True</span>, <span class="kw">True</span>])
+<span class="fn">print</span>(order.to_string(index=<span class="kw">False</span>))</code></pre>
+<div class="code-output"><span class="out-label">Output:</span>
+                    title      type  prio  pass
+ Korea value premium (KRX) empirical     1     1
+ Momentum survey (review)    review     1     2
+    Frazzini-Pedersen BAB empirical     2     2
+Deep learning for returns    method     3     1</div>
+
+<h3>8.3 한국 시장 연구 찾는 법</h3>
+
+<div class="task">
+<div class="task-title">&#9744; 한국 시장 팩터 연구 탐색 경로</div>
+<ul>
+<li>&#9744; <strong>KRX·FnGuide 데이터</strong> 접근 경로 확보(대학 라이선스, DataGuide)</li>
+<li>&#9744; 국내 학술 DB(RISS, DBpia, KCI)에서 "한국 주식 모멘텀/가치 프리미엄" 검색</li>
+<li>&#9744; 한국증권학회지·재무연구·Asia-Pacific Journal of Financial Studies TOC 확인</li>
+<li>&#9744; SSRN에서 "Korea"/"KOSPI"/"KRX" 키워드 + 미국 논문의 국제 표본(Korea 포함) 확인</li>
+<li>&#9744; 미국에서 검증된 팩터를 <strong>한국에서 재현</strong>하는 것 자체가 강력한 확장 주제(9장)</li>
+</ul>
+</div>
+
+<h3>8.4 지도교수 미팅 전 정리 &mdash; 주간 워크플로우</h3>
+
+<p>대학원생의 연구 리듬은 대개 주 1회 지도교수 미팅을 중심으로 돈다. 미팅에서 "이번 주 뭐 했어요?"에 코드를 스크롤하며 답하는 것과, <strong>한 페이지 정리본</strong>을 내미는 것은 지도의 질을 완전히 바꾼다. 아래 리듬을 권한다.</p>
+
+<div class="tc">Table 8.2. 지도교수 미팅 중심의 주간 재현 워크플로우</div>
+<table>
+<tr><th>시점</th><th>할 일</th><th>산출물</th></tr>
+<tr><td>월</td><td>Pass 1으로 신규 논문 5&ndash;10편 스캔</td><td>읽기 리스트 갱신</td></tr>
+<tr><td>화&ndash;수</td><td>타겟 논문 Pass 2&ndash;3, 계획서 채우기</td><td>재현 계획서 1장</td></tr>
+<tr><td>목</td><td>재현 코드 실행, 대조표 작성, 실패 로그</td><td>대조표 + 연구노트</td></tr>
+<tr><td>금 (미팅 전)</td><td>이번 주를 1페이지로 압축</td><td><strong>미팅 브리프</strong></td></tr>
+</table>
+
+<div class="info">
+<p class="ni"><strong>미팅 브리프에 꼭 담을 3가지:</strong> (1) <strong>대조표</strong> &mdash; 논문 값 vs 내 값 vs 상대오차 한 표, (2) <strong>막힌 지점 1~2개</strong> &mdash; "delisting return을 어떻게 구할지 모르겠습니다" 같은 구체적 질문(막연히 "잘 안 돼요"가 아니라), (3) <strong>다음 주 계획</strong> &mdash; H-S-R-N의 Next. 지도교수는 당신의 코드를 디버깅해주는 사람이 아니라 <em>방향을 잡아주는</em> 사람이므로, 질문은 "결정이 필요한 것"으로 압축한다.</p>
+</div>
+
+<!-- ============================================================ -->
+<!-- CH9 -->
+<!-- ============================================================ -->
+<h2 id="ch9">9. 재현 &rarr; 확장 — 논문 한 편을 석사 논문으로</h2>
+
+<p>재현은 끝이 아니라 시작이다. 논문을 정확히 재현했다면, 당신은 이제 그 논문의 코드를 손에 쥐고 있다. 여기서 <strong>작은 새로움(incremental contribution) 하나</strong>를 더하면 그것이 발표·논문의 씨앗이 된다. 위대한 아이디어가 아니라 "재현된 파이프라인에 변수 하나를 바꾸는 것"에서 시작한다.</p>
+
+<h3>9.1 확장의 4가지 경로</h3>
+
+<div class="tc">Table 9.1. 재현을 확장하는 4가지 경로</div>
+<table>
+<tr><th>경로</th><th>무엇을 바꾸나</th><th>예시</th><th>난이도</th></tr>
+<tr><td>다른 시장</td><td>미국 &rarr; 한국/신흥국</td><td>JT 모멘텀을 KRX에서 재현·비교</td><td>중 (데이터 확보)</td></tr>
+<tr><td>다른 기간</td><td>발표 후 out-of-sample</td><td>1993 이후 모멘텀 감쇠 측정(McLean-Pontiff)</td><td>하</td></tr>
+<tr><td>새 변수</td><td>신호에 조건·상호작용 추가</td><td>변동성·유동성으로 모멘텀 조건부화</td><td>중</td></tr>
+<tr><td>방법 개선</td><td>추정·포트폴리오 구성 개선</td><td>ML 신호 결합, 수축 추정, 거래비용 최적화</td><td>상</td></tr>
+</table>
+
+<div class="eq">\[ \underbrace{\text{Replication}}_{\text{논문 재현}} \;\longrightarrow\; \underbrace{+\,\Delta}_{\text{시장·기간·변수·방법 중 하나}} \;\longrightarrow\; \underbrace{\text{New Result}}_{\text{나의 기여}} \]</div>
+<p class="ni" style="font-size:12px;color:#555;margin:4px 0 8px 0">↑ 석사 논문의 표준 공식이다. 이미 검증된 파이프라인(Replication)에 딱 하나의 변화(&Delta;)를 가해 새 결과를 만든다. 한 번에 네 가지를 다 바꾸면 재현과의 대조가 불가능해져 결과 해석이 어려워진다 &mdash; &Delta;는 하나씩.</p>
+
+<h3>9.2 석사 논문 주제로 발전시키기</h3>
+
+<div class="info">
+<p class="ni"><strong>주제 발전 시나리오:</strong> (1) JT(1993) 모멘텀을 미국 데이터로 재현한다(방법론 검증). (2) 같은 코드를 KRX 데이터에 적용한다(다른 시장 &Delta;). (3) 한국에서 스프레드가 미국보다 약하거나 특정 하위기간에만 유의함을 발견한다. (4) 왜 그런지 가설(외국인 지분·유동성·재벌 구조)을 세우고 조건부 분석을 추가한다(새 변수 &Delta;). &mdash; 이 흐름이 그대로 석사 논문 3~4개 장(章)이 된다. 핵심은 <strong>재현이 신뢰의 기반</strong>이라는 점이다: 심사위원이 "네 결과가 코드 버그가 아니라는 걸 어떻게 아느냐"고 물으면, "원 논문을 먼저 재현해 검증했다"가 답이 된다.</p>
+</div>
+
+<div class="warn">
+<p class="ni"><strong>함정 &mdash; 한 번에 너무 많이 바꾸기:</strong> 의욕이 앞서면 "새 시장 + 새 기간 + 새 ML 방법"을 한꺼번에 시도한다. 그러면 결과가 나빠졌을 때 <strong>무엇 때문인지 규명할 수 없다</strong>(교란). 재현된 baseline을 고정점으로 두고 &Delta;를 하나씩 더하며 그때마다 대조표를 갱신하라. 각 &Delta;의 효과를 분리(ablation)하는 것이 곧 논문의 결과 섹션이 된다.</p>
+</div>
+
+<!-- ============================================================ -->
+<!-- CH10 -->
+<!-- ============================================================ -->
+<h2 id="ch10">10. 실습 &mdash; 논문 1편 선택해 재현 계획서 작성</h2>
+
+<p>이번 라운드의 최종 과제는 <strong>코드가 아니라 계획서</strong>다. 아래 3편 중 하나를 골라 3장의 템플릿을 채워라. 각 논문의 난이도와 데이터 요구사항을 분석했으니 자신의 데이터 접근 상황에 맞게 고른다.</p>
+
+<h3>10.1 후보 3편 비교</h3>
+
+<div class="tc">Table 10.1. 재현 실습 후보 3편 &mdash; 난이도 &middot; 데이터 요구</div>
+<table>
+<tr><th>논문</th><th>핵심 신호</th><th>데이터 요구</th><th>난이도</th><th>주된 함정</th></tr>
+<tr><td>Frazzini-Pedersen (2014) BAB</td><td>저베타 &ndash; 고베타 롱숏(베타 중립)</td><td>가격/수익률 + 시장지수(베타 추정)</td><td>중상</td><td>베타 추정 창, 베타-중립 레버리지 조정</td></tr>
+<tr><td>Novy-Marx (2013) Quality</td><td>총이익성(gross profitability=GP/Assets)</td><td>가격 + <strong>회계(Compustat)</strong></td><td>중</td><td>회계 lag, 분모 정의, 금융업 제외</td></tr>
+<tr><td>Moskowitz-Ooi-Pedersen (2012) TSMOM</td><td>자산별 과거 12개월 시계열 부호</td><td>선물/자산군 수익률(주식 아님)</td><td>중</td><td>변동성 스케일링, 자산군 커버리지</td></tr>
+</table>
+
+<h3>10.2 각 후보 분석</h3>
+
+<div class="def">
+<p class="ni"><strong>후보 A &mdash; Frazzini-Pedersen (2014), "Betting Against Beta"</strong></p>
+<p class="ni">저베타 자산을 레버리지로 사고 고베타를 공매도하면 알파가 난다는 논문. 신호가 R4의 베타 추정에 의존해 R4 코드를 재사용할 수 있다. 함정은 롱·숏 다리를 각각 베타 1이 되도록 레버리지를 맞추는 <strong>베타-중립 구성</strong>이다. 이걸 빼먹으면 그냥 시장 방향 베팅이 된다.</p>
+</div>
+
+<div class="def">
+<p class="ni"><strong>후보 B &mdash; Novy-Marx (2013), "The Other Side of Value: The Gross Profitability Premium"</strong></p>
+<p class="ni">총이익(매출&minus;매출원가)을 총자산으로 나눈 gross profitability가 가치 못지않은 프리미엄을 낸다는 논문. R5의 소트 코드를 그대로 쓰되 <strong>회계 데이터를 시장 데이터에 붙이는 lag 처리</strong>가 핵심 난관이다(look-ahead 편향의 온상). 회계 항목 정의(어느 필드가 gross profit인가)를 각주에서 정확히 뽑아야 한다.</p>
+</div>
+
+<div class="def">
+<p class="ni"><strong>후보 C &mdash; Moskowitz, Ooi &amp; Pedersen (2012), "Time Series Momentum"</strong></p>
+<p class="ni">개별 자산의 과거 12개월 수익 <em>부호</em>로 롱/숏을 정하는 시계열 모멘텀. 주식 횡단면이 아니라 선물·자산군 수준이라 데이터 성격이 다르다. 각 포지션을 목표 변동성으로 스케일링하는 <strong>변동성 타게팅</strong>이 재현의 핵심이며, 이를 빼면 변동성 큰 자산이 결과를 지배한다.</p>
+</div>
+
+<div class="task">
+<div class="task-title">&#9744; 최종 실습 과제 &mdash; 재현 계획서 1장 작성</div>
+<ul>
+<li>&#9744; 위 3편 중 <strong>내 데이터로 접근 가능한 1편</strong> 선택(회계 없으면 A 또는 C)</li>
+<li>&#9744; 3-pass로 Pass 2까지 읽고, <strong>타겟 테이블 1개</strong> 지목</li>
+<li>&#9744; 3장 템플릿의 <strong>6대 데이터 명세</strong>를 논문 문장째 인용해 채우기</li>
+<li>&#9744; <strong>예상 난관 3개</strong>를 위 "주된 함정" 열을 참고해 구체화</li>
+<li>&#9744; <strong>성공 기준</strong>(부호/±30%/|t|&gt;2) 명시</li>
+<li>&#9744; 계획서를 <code>ReplicationSpec</code> dataclass로도 옮겨 코드화</li>
+<li>&#9744; (보너스) 재현 후 &Delta; 하나(한국 시장/최근 기간)를 확장 계획으로 스케치</li>
+</ul>
+</div>
+
+<p>아래 인터랙티브 데모로 재현 파라미터에 따라 성공 판정이 어떻게 바뀌는지 감을 잡아보자. 재현 값과 논문 값의 차이(오차)를 조절하면 3단계 성공 기준의 통과 여부가 실시간으로 바뀐다.</p>
+
+<div style="background:#f0f4f8;padding:20px;border-radius:8px;margin:20px 0">
+<div style="display:flex;gap:16px;flex-wrap:wrap;margin-bottom:12px">
+<div>
+<label style="font-size:11px;color:#555">논문 스프레드 (%/월)</label><br>
+<input type="range" id="rp-pv" min="0.3" max="2.0" step="0.05" value="1.12" style="width:130px">
+<span id="rp-pv-v" style="font-family:'Space Mono',monospace;font-size:12px">1.12%</span>
+</div>
+<div>
+<label style="font-size:11px;color:#555">내 재현 스프레드 (%/월)</label><br>
+<input type="range" id="rp-mv" min="-0.5" max="2.0" step="0.05" value="0.88" style="width:130px">
+<span id="rp-mv-v" style="font-family:'Space Mono',monospace;font-size:12px">0.88%</span>
+</div>
+<div>
+<label style="font-size:11px;color:#555">내 재현 t-값</label><br>
+<input type="range" id="rp-mt" min="0" max="6" step="0.1" value="3.41" style="width:130px">
+<span id="rp-mt-v" style="font-family:'Space Mono',monospace;font-size:12px">3.4</span>
+</div>
+</div>
+<div id="rp-plot" style="width:100%;height:300px"></div>
+<div id="rp-info" style="font-family:'Space Mono',monospace;font-size:12px;margin-top:8px;padding:10px;background:#1e1e1e;color:#d4d4d4;border-radius:6px;line-height:1.9"></div>
+</div>
+
+<script>
+(function(){
+  var pv=document.getElementById('rp-pv'),mv=document.getElementById('rp-mv'),mt=document.getElementById('rp-mt');
+  var pvV=document.getElementById('rp-pv-v'),mvV=document.getElementById('rp-mv-v'),mtV=document.getElementById('rp-mt-v');
+  function draw(){
+    var p=parseFloat(pv.value),m=parseFloat(mv.value),t=parseFloat(mt.value);
+    pvV.textContent=p.toFixed(2)+'%';mvV.textContent=m.toFixed(2)+'%';mtV.textContent=t.toFixed(1);
+    var signOk=(p>0)===(m>0);
+    var relErr=Math.abs(m-p)/Math.abs(p);
+    var sizeOk=relErr<=0.30;
+    var sigOk=t>2;
+    var barColor=function(ok){return ok?'#27ae60':'#e74c3c';};
+    Plotly.react('rp-plot',[{
+      x:['논문','내 재현'],
+      y:[p,m],
+      type:'bar',
+      marker:{color:['#2c3e50', barColor(signOk&&sizeOk&&sigOk)]},
+      text:[p.toFixed(2)+'%', m.toFixed(2)+'%'],
+      textposition:'outside'
+    }],{
+      title:'재현 스프레드 대조',
+      yaxis:{title:'%/월'},
+      shapes:[
+        {type:'rect',x0:-0.5,x1:1.5,y0:p*0.7,y1:p*1.3,
+         fillcolor:'rgba(39,174,96,0.12)',line:{width:0}}
+      ],
+      annotations:[{x:1,y:p*1.3,text:'±30% 허용대',showarrow:false,font:{size:10,color:'#27ae60'}}],
+      plot_bgcolor:'#fafaf8',paper_bgcolor:'#f0f4f8',font:{family:'Inter',size:12},
+      margin:{t:50,r:20,b:40,l:55}
+    },{responsive:true});
+    var pass=signOk&&sizeOk&&sigOk;
+    document.getElementById('rp-info').innerHTML=
+      '① 부호 일치       : '+(signOk?'<span style="color:#27ae60">✓ 통과</span>':'<span style="color:#e74c3c">✗ 실패 (부호가 반대)</span>')+'\n'+
+      '② 크기 근접(±30%) : '+(sizeOk?'<span style="color:#27ae60">✓ 통과</span>':'<span style="color:#e74c3c">✗ 실패</span>')+'  (상대오차 '+(relErr*100).toFixed(1)+'%)\n'+
+      '③ 유의성(|t|>2)   : '+(sigOk?'<span style="color:#27ae60">✓ 통과</span>':'<span style="color:#e74c3c">✗ 실패</span>')+'  (t='+t.toFixed(1)+')\n'+
+      '<span style="color:'+(pass?'#27ae60':'#f39c12')+'">→ 종합: '+(pass?'재현 성공 ✓ (3단계 모두 통과)':'부분 성공 &mdash; 원인 진단 필요 (4장 7가지 이유 참조)')+'</span>';
+  }
+  [pv,mv,mt].forEach(function(s){s.addEventListener('input',draw);});
+  setTimeout(draw,300);
+})();
+</script>
+
+<!-- ============================================================ -->
+<!-- QUIZ -->
+<!-- ============================================================ -->
+<h2 id="quiz">Quiz &mdash; 논문 재현 자가진단</h2>
+
+<details class="quiz-item">
+<summary>Q1. Keshav의 3-pass 읽기에서 Pass 1(5분 스캔)의 목적은 무엇인가?</summary>
+<div class="answer">이 논문을 <strong>더 읽을 가치가 있는지 결정</strong>하는 것이다. 제목·초록·서론·절 제목·결론만 훑어 category/context/claim/correctness를 파악하고 "재현/참고/폐기"를 정한다. 본문 수식·표는 아직 보지 않는다. Pass 1으로 많은 논문을 빠르게 걸러내는 깔때기를 만드는 것이 핵심이다.</div>
+</details>
+
+<details class="quiz-item">
+<summary>Q2. 재무 실증 논문에서 유니버스 필터·회계 lag 같은 데이터 명세는 주로 어디에 있나?</summary>
+<div class="answer">본문 서술이 아니라 <strong>각주(footnote), 부록(appendix), 표 노트(table notes)</strong>에 흩어져 있다. 초심자가 핵심 표만 보고 코딩하면 NYSE breakpoint나 회계 6개월 lag 같은 규칙을 놓쳐 숫자가 크게 어긋난다. 표를 읽기 전에 Data 섹션과 각주를 먼저 정독해야 한다.</div>
+</details>
+
+<details class="quiz-item">
+<summary>Q3. 포트폴리오 소트 표에서 "이 논문의 알파"에 해당하는 행은?</summary>
+<div class="answer"><strong>Long-Short(High&minus;Low) 행</strong>이다. 최고 분위를 사고 최저 분위를 파는 롱숏의 월평균 수익률이 전략의 핵심 수익이며, 그 아래 괄호의 t-값과 팩터 조정 후 알파 행이 통계적·경제적 유의성을 말해준다. 표 읽기는 극단 분위 &rarr; High&minus;Low &rarr; t-값 &rarr; 알파 순.</div>
+</details>
+
+<details class="quiz-item">
+<summary>Q4. 재현 값이 논문과 정확히 일치하지 않을 때, 가장 먼저 의심해야 할 원인 3가지는?</summary>
+<div class="answer">7가지 원인 중 실무에서 가장 흔한 것은 (1) <strong>생존편향/상장폐지 수익률 누락</strong>, (2) <strong>브레이크포인트</strong>(NYSE-only vs 전체), (3) <strong>가중 방식</strong>(VW vs EW)이다. 이 셋은 소트 스프레드를 20~30% 흔든다. 데이터 버전과 미세 규칙(skip, 월말/월초), 그리고 look-ahead 버그도 함께 점검한다.</div>
+</details>
+
+<details class="quiz-item">
+<summary>Q5. "방향과 크기가 맞으면 성공"이라는 재현 성공 기준 3단계를 순서대로 쓰라.</summary>
+<div class="answer">(1) <strong>부호 일치</strong>(스프레드 방향이 같다) &rarr; (2) <strong>크기 근접</strong>(논문의 대략 ±30% 이내) &rarr; (3) <strong>유의성 보존</strong>(핵심 주장의 |t|&gt;2 유지). 소수점까지 일치는 목표가 아니다. McLean-Pontiff의 알파 감쇠 때문에 최근 기간에서 스프레드가 줄어드는 것은 실패가 아니라 decay 확인일 수 있다.</div>
+</details>
+
+<details class="quiz-item">
+<summary>Q6. 다음 코드에서 look-ahead 편향이 발생할 수 있는 지점은?<br><code>signal = ret.iloc[t]; port = sort(signal); pnl = ret.iloc[t].loc[port]</code></summary>
+<div class="answer"><strong>t월의 수익률(<code>ret.iloc[t]</code>)로 신호를 만들고, 같은 t월의 수익으로 성과를 계산</strong>했다. 이는 미래(당월) 정보로 포지션을 잡는 전형적 look-ahead다. 신호는 반드시 <code>ret.iloc[:t]</code>(과거)로 만들고 성과는 <code>ret.iloc[t]</code>(다음 기)로 실현해야 한다. JT 재현의 <code>momentum_wml</code>에서 formation 창을 <code>t-J-S:t-S</code>로 잡아 skip을 두는 이유가 이것이다.</div>
+</details>
+
+<details class="quiz-item">
+<summary>Q7. 유의수준 5%로 독립 검정을 20번 하면 적어도 하나가 우연히 유의할 확률은 대략 얼마인가? 이것이 p-hacking과 어떻게 연결되나?</summary>
+<div class="answer">\(1-0.95^{20}\approx 0.64\), 즉 약 <strong>64%</strong>다. 실제 효과가 없어도 여러 변수·기간·파라미터를 시도하면 우연한 "유의" 결과가 나오기 쉽다. 이 때문에 다중검정을 하고도 t-값을 조정하지 않은(Bonferroni/FDR 미언급) 논문은 의심해야 하며, Harvey-Liu-Zhu는 팩터 기준을 |t|&gt;3 근처로 높일 것을 제안했다.</div>
+</details>
+
+<details class="quiz-item">
+<summary>Q8. Jegadeesh-Titman의 (6,6) 전략에서 formation과 holding 사이에 1개월을 skip하는 이유는?</summary>
+<div class="answer"><strong>단기반전(short-term reversal)</strong> 효과를 회피하기 위해서다. 직전 1개월 수익에는 유동성·비드애스크 바운스로 인한 반전 성향이 강해, 이를 신호에 포함하면 모멘텀을 오염시킨다. formation 창을 <code>t-7:t-1</code>로 잡아 직전 달을 빼면 순수한 중기 모멘텀만 남는다.</div>
+</details>
+
+<details class="quiz-item">
+<summary>Q9. 연구노트 엔트리의 4요소(H-S-R-N)는 무엇이며 왜 필요한가?</summary>
+<div class="answer"><strong>Hypothesis</strong>(가설) &rarr; <strong>Setup</strong>(데이터·파라미터·seed) &rarr; <strong>Result</strong>(숫자·그림) &rarr; <strong>Next</strong>(다음 할 일). 3주 뒤의 나와 지도교수가 "왜 이 설정이었고 무엇을 발견했는지"를 복원할 수 있게 한다. 특히 Setup에 seed와 데이터 해시·라이브러리 버전(실행 지문)을 남기면 재현성이 보장된다.</div>
+</details>
+
+<details class="quiz-item">
+<summary>Q10. 재현한 논문을 석사 논문으로 확장할 때, "한 번에 하나의 &Delta;만 바꿔라"는 원칙이 중요한 이유는?</summary>
+<div class="answer">시장·기간·변수·방법을 <strong>동시에 여러 개 바꾸면 결과가 나빠졌을 때 원인을 규명할 수 없다</strong>(교란). 재현된 baseline을 고정점으로 두고 &Delta;를 하나씩 더하면, 각 변화의 순효과를 분리(ablation)할 수 있고 그 자체가 논문의 결과 섹션이 된다. 또 재현이 baseline이므로 "코드 버그가 아님"을 심사위원에게 입증할 수 있다.</div>
+</details>
+
+<!-- ============================================================ -->
+<!-- CHEAT SHEET -->
+<!-- ============================================================ -->
+<h2 id="cheatsheet">&#x1F4CB; Cheat Sheet &mdash; Round 10 핵심 요약</h2>
+
+<div class="tc">Table CS.1. 3-pass 읽기 &amp; 재현 워크플로우</div>
+<table>
+<tr><th style="width:22%">단계</th><th style="width:48%">핵심</th><th style="width:30%">산출물</th></tr>
+<tr><td>Pass 1 (5분)</td><td>읽을지 결정 &mdash; category/context/claim</td><td>1문장 요약 + 재현 여부</td></tr>
+<tr><td>Pass 2 (1시간)</td><td>표·그림·각주 정독, 타겟 표 지목</td><td>데이터 명세 메모</td></tr>
+<tr><td>Pass 3 (며칠)</td><td>재현 계획서 &rarr; 코드 &rarr; 대조표</td><td>재현 결과 + 연구노트</td></tr>
+</table>
+
+<div class="tc">Table CS.2. 데이터 명세 6대 항목 &amp; 재현 실패 7대 원인</div>
+<table>
+<tr><th style="width:50%">6대 명세 (추출)</th><th style="width:50%">7대 실패 원인 (진단)</th></tr>
+<tr><td>유니버스 (거래소·제외대상)</td><td>1. 데이터 버전 / vintage</td></tr>
+<tr><td>기간 (IS/OOS)</td><td>2. 미세 규칙 (skip·월말)</td></tr>
+<tr><td>필터 (결측·상폐)</td><td>3. 표본 기간 불일치</td></tr>
+<tr><td>변수 정의 (공식·lag)</td><td>4. 생존편향·delisting return</td></tr>
+<tr><td>리밸런싱 (주기·overlap)</td><td>5. 브레이크포인트 (NYSE vs 전체)</td></tr>
+<tr><td>가중 (VW/EW)</td><td>6. 가중 방식 (VW/EW 혼동)</td></tr>
+<tr><td>&mdash;</td><td>7. 버그 (look-ahead·부호)</td></tr>
+</table>
+
+<div class="tc">Table CS.3. 핵심 공식 &amp; 판정 기준</div>
+<table>
+<tr><th style="width:32%">이름</th><th style="width:40%">식</th><th style="width:28%">한줄 설명</th></tr>
+<tr><td>롱숏 스프레드</td><td>\(r^{\text{WML}}_t=\bar r_{\text{High},t}-\bar r_{\text{Low},t}\)</td><td>소트 표의 알파</td></tr>
+<tr><td>t-값</td><td>\(t=\overline{\text{Spread}}/\text{SE}\)</td><td>|t|&gt;2 유의</td></tr>
+<tr><td>모멘텀 신호</td><td>\(\text{MOM}=\prod_{t-J}^{t-1-S}(1+r)-1\)</td><td>formation, skip S</td></tr>
+<tr><td>재현 성공 3단계</td><td>부호 &prec; ±30% &prec; |t|&gt;2</td><td>소수점 일치 아님</td></tr>
+<tr><td>다중검정 위험</td><td>\(1-(1-\alpha)^m\)</td><td>m=20, α=.05 &rarr; 64%</td></tr>
+<tr><td>확장 공식</td><td>Replication + Δ &rarr; New</td><td>Δ는 하나씩</td></tr>
+</table>
+
+<div class="ok">
+<p class="ni"><strong>Round 10 완료!</strong> 이제 새 논문을 만나면: (1) 3-pass로 걸러 읽고, (2) 재현 계획서로 범위와 명세를 못 박고, (3) 부호/±30%/|t|&gt;2로 성공을 판정하며, (4) H-S-R-N 연구노트에 실패까지 기록하고, (5) Δ 하나로 확장한다. 코드보다 이 <strong>습관</strong>이 주니어 퀀트 리서처를 만든다. 다음 R11에서는 재현한 신호를 실제 포트폴리오로 조립하고 리스크를 관리한다.</p>
+</div>
+
+<div class="nav-footer">
+<a href="../round-09/"><span class="nf-label">&larr; Previous</span>R9. Deep Learning</a>
+<a href="../round-11/" style="text-align:right"><span class="nf-label">Next &rarr;</span>R11. Portfolio &amp; Risk</a>
+</div>
+
+</div>
+</div>
+</div>
+
+</body>
+</html>

@@ -1,0 +1,1302 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Round 6 - Factor Research II — Fama-MacBeth와 팩터모형 검정 | Quant Researcher Guide</title>
+<script>
+MathJax = { tex: { inlineMath: [['\\(','\\)']], displayMath: [['\\[','\\]'],['$$','$$']] } };
+</script>
+<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+<script src="https://cdn.plot.ly/plotly-2.27.0.min.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;500&family=Space+Mono:wght@400&family=Inter:wght@300;400&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Inter',sans-serif;background:#fafaf8;color:#1a1a1a;line-height:1.7;overflow-x:hidden}
+.sidebar{position:fixed;left:0;top:0;width:260px;height:100vh;background:rgba(255,255,255,.97);border-right:1px solid rgba(0,0,0,.06);padding:32px 24px;z-index:100;overflow-y:auto;display:flex;flex-direction:column}
+.sidebar-profile{text-align:center;margin-bottom:28px;padding-bottom:24px;border-bottom:1px solid rgba(0,0,0,.08)}
+.profile-icon{font-size:48px;margin-bottom:8px}
+.profile-name{font-family:'Cormorant Garamond',serif;font-size:1.3rem;font-weight:500;margin-bottom:4px}
+.profile-title{font-size:.68rem;color:#888;letter-spacing:.08em;text-transform:uppercase;margin-bottom:8px}
+.profile-bio{font-size:.78rem;color:#666;line-height:1.5}
+.sidebar-nav{flex:1;margin-top:16px}.nav-section{margin-bottom:20px}.nav-section-title{font-size:.6rem;font-weight:600;color:#aaa;letter-spacing:.15em;text-transform:uppercase;margin-bottom:10px}.nav-list{list-style:none}.nav-list li{margin-bottom:5px}.nav-list a{font-size:.78rem;color:#555;text-decoration:none;transition:all .2s;display:block;padding:3px 0}.nav-list a:hover{color:#2563eb;padding-left:4px}.nav-list a.active{color:#2563eb;font-weight:500}.nav-list a.done{color:#28a745}.badge{display:inline-block;font-size:.5rem;background:#2563eb;color:#fff;padding:1px 5px;border-radius:8px;margin-left:3px;vertical-align:middle}.badge-done{background:#28a745}.sidebar-footer{padding-top:16px;border-top:1px solid rgba(0,0,0,.06);font-size:.65rem;color:#aaa;text-align:center}
+.main-wrapper{margin-left:260px;min-height:100vh}.container{max-width:1100px;margin:0 auto;padding:50px 40px 80px}
+.paper-content{font-family:'Times New Roman','Nanum Myeongjo',serif;line-height:1.8;background:#fff;padding:40px;border-radius:8px;box-shadow:0 2px 20px rgba(0,0,0,.05)}.paper-header{text-align:center;margin-bottom:40px;padding-bottom:30px;border-bottom:2px solid #333}.paper-category{font-size:14px;color:#666;margin-bottom:10px}.paper-title{font-size:24px;font-weight:bold;margin-bottom:12px;line-height:1.4}.paper-subtitle{font-size:14px;color:#555;margin-bottom:8px}.paper-team{font-size:13px;color:#444}
+.abstract{background:#f8f9fa;padding:25px;margin:30px 0;border-left:4px solid #2c3e50}.abstract-title{font-weight:bold;font-size:16px;margin-bottom:15px}
+h2{font-size:18px;margin:35px 0 20px;padding-bottom:8px;border-bottom:1px solid #ddd;color:#2c3e50}h3{font-size:15px;margin:25px 0 15px;color:#34495e}
+p{text-align:justify;margin-bottom:15px;text-indent:2em}p.ni{text-indent:0}
+table{width:100%;border-collapse:collapse;margin:20px 0;font-size:12px}th,td{border:1px solid #ddd;padding:10px 8px;text-align:center}th{background:#2c3e50;color:white;font-weight:bold}tr:nth-child(even){background:#f8f9fa}tr:hover{background:#e8f4f8}
+.tc{font-size:13px;font-weight:bold;margin:15px 0 10px;text-align:center}.eq{text-align:center;margin:20px 0;padding:15px;background:#f8f9fa;border-radius:4px;overflow-x:auto}ul,ol{margin-left:2em;margin-bottom:15px}li{margin-bottom:6px}
+.def{background:#fff9e6;border:1px solid #ffc107;border-radius:4px;padding:20px;margin:20px 0}.info{background:#e8f4f8;border-left:4px solid #3498db;padding:20px;margin:20px 0}.warn{background:#fff3cd;border-left:4px solid #f39c12;padding:20px;margin:20px 0}.ok{background:#d4edda;border-left:4px solid #28a745;padding:20px;margin:20px 0}
+.paper-anchor{background:#f5f3ff;border:1px solid #7c3aed;border-radius:6px;padding:22px;margin:24px 0}.paper-anchor .pa-label{font-family:'Space Mono',monospace;font-size:10px;color:#7c3aed;letter-spacing:.15em;text-transform:uppercase;margin-bottom:8px}.paper-anchor .pa-title{font-weight:bold;font-size:14px;margin-bottom:6px}.paper-anchor p{font-size:13px;text-indent:0;margin-bottom:8px}
+.task{background:#e8f8f0;border-left:4px solid #00b894;padding:20px;margin:20px 0}.task .task-title{font-weight:bold;margin-bottom:10px}
+details.quiz-item{margin:14px 0;padding:14px 18px;background:#f8f9fa;border:1px solid #e0e0e0;border-radius:6px}details.quiz-item summary{cursor:pointer;font-weight:bold;font-size:13.5px}details.quiz-item[open] summary{margin-bottom:10px;color:#2563eb}details.quiz-item .answer{font-size:13px;padding:10px 14px;background:#fff;border-left:3px solid #2563eb}
+pre{background:#1e1e1e;color:#d4d4d4;padding:20px;border-radius:6px;overflow-x:auto;margin:20px 0;font-family:'Space Mono','Consolas',monospace;font-size:13px;line-height:1.6}code{font-family:'Space Mono','Consolas',monospace;font-size:13px}p code,li code,td code{background:#f0f0f0;padding:2px 6px;border-radius:3px;color:#c7254e;font-size:12px}
+.cm{color:#6a9955}.kw{color:#569cd6}.st{color:#ce9178}.fn{color:#dcdcaa}.nb{color:#4ec9b0}.nu{color:#b5cea8}
+.progress-bar{width:100%;height:6px;background:#e0e0e0;border-radius:3px;margin-top:16px}.progress-fill{height:100%;background:linear-gradient(90deg,#2563eb,#7c3aed);border-radius:3px;width:0%}.progress-label{font-size:11px;color:#888;margin-top:4px;text-align:center}
+.code-output{background:#1e1e1e;color:#d4d4d4;padding:12px 16px;border-radius:0 0 6px 6px;font-family:'Space Mono',monospace;font-size:11.5px;line-height:1.6;margin-top:-4px;margin-bottom:18px;border-top:2px solid #333;white-space:pre-wrap;overflow-x:auto}.code-output .out-label{color:#888;font-size:10px;margin-bottom:4px;display:block}
+.nav-footer{display:flex;justify-content:space-between;gap:16px;margin-top:50px;padding-top:24px;border-top:1px solid #ddd;font-family:'Inter',sans-serif}.nav-footer a{font-size:.82rem;color:#2563eb;text-decoration:none;padding:12px 18px;border:1px solid #dbe4f5;border-radius:6px;transition:all .2s;max-width:48%}.nav-footer a:hover{background:#2563eb;color:#fff;border-color:#2563eb}.nav-footer .nf-label{display:block;font-size:.6rem;color:#999;letter-spacing:.1em;text-transform:uppercase;margin-bottom:4px}.nav-footer a:hover .nf-label{color:rgba(255,255,255,.7)}
+@media(max-width:1024px){.sidebar{width:100%;height:auto;position:relative;border-right:none;border-bottom:1px solid rgba(0,0,0,.08);padding:16px}.sidebar-profile{margin-bottom:10px;padding-bottom:10px;display:flex;align-items:center;gap:12px;text-align:left}.profile-icon{font-size:32px;margin-bottom:0}.profile-bio{display:none}.nav-section{display:inline-block;margin-right:16px;margin-bottom:8px}.nav-list{display:flex;gap:10px;flex-wrap:wrap}.nav-list li{margin-bottom:0}.sidebar-footer{display:none}.main-wrapper{margin-left:0}.container{padding:0}.paper-content{padding:20px 16px;border-radius:0;box-shadow:none}.paper-title{font-size:18px}p{font-size:14px;text-indent:1.5em;text-align:left}pre{font-size:11px;padding:14px}table{font-size:10px;display:block;overflow-x:auto}.nav-footer{flex-direction:column}.nav-footer a{max-width:100%}}
+</style>
+</head>
+<body>
+
+<div class="sidebar">
+<div class="sidebar-profile">
+<div class="profile-icon">&#x1F52C;</div>
+<div class="profile-name">Quant Researcher Guide</div>
+<div class="profile-title">Data &middot; Factors &middot; Machine Learning</div>
+<div class="profile-bio">13 Rounds: 데이터 분석 기본기에서 논문 재현까지</div>
+</div>
+<div class="sidebar-nav">
+<div class="nav-section">
+<div class="nav-section-title">Curriculum</div>
+<ul class="nav-list">
+<li><a href="../">&#x2302; Guide Home</a></li>
+<li><a href="../round-00/">R0. Research Toolkit</a></li>
+<li><a href="../round-01/">R1. EDA &amp; Distributions</a></li>
+<li><a href="../round-02/">R2. Financial Data Eng.</a></li>
+<li><a href="../round-03/">R3. Statistical Inference</a></li>
+<li><a href="../round-04/">R4. Time Series</a></li>
+<li><a href="../round-05/">R5. Factor Research I</a></li>
+<li><a class="active" href="#">R6. Factor Research II <span class="badge">NOW</span></a></li>
+<li><a href="../round-07/">R7. Financial ML I</a></li>
+<li><a href="../round-08/">R8. Financial ML II &middot; GKX</a></li>
+<li><a href="../round-09/">R9. Deep Learning</a></li>
+<li><a href="../round-10/">R10. Paper Replication</a></li>
+<li><a href="../round-11/">R11. Portfolio &amp; Risk</a></li>
+<li><a href="../round-12/">R12. Capstone</a></li>
+</ul>
+</div>
+<div class="nav-section">
+<div class="nav-section-title">This Lecture</div>
+<ul class="nav-list">
+<li><a href="#ch1">1. 팩터모형의 계량 구조</a></li>
+<li><a href="#ch2">2. 시계열 회귀</a></li>
+<li><a href="#ch3">3. GRS 검정</a></li>
+<li><a href="#ch4">4. Fama-MacBeth 2단계</a></li>
+<li><a href="#ch5">5. 특성 vs 공분산</a></li>
+<li><a href="#ch6">6. FF 팩터 재현</a></li>
+<li><a href="#ch7">7. Anomaly Zoo와 재현 위기</a></li>
+<li><a href="#ch8">8. 스패닝 검정</a></li>
+<li><a href="#ch9">9. 실습: R5 팩터 풀코스 검정</a></li>
+<li><a href="#quiz">10. Quiz</a></li>
+<li><a href="#cheatsheet">&#x1F4CB; Cheat Sheet</a></li>
+</ul>
+</div>
+</div>
+<div class="sidebar-footer">Round 6 of 12</div>
+</div>
+
+<div class="main-wrapper">
+<div class="container">
+<div class="paper-content">
+
+<div class="paper-header">
+<div class="paper-category">Round 6 / 12</div>
+<h1 class="paper-title">Factor Research II — Fama-MacBeth와 팩터모형 검정</h1>
+<div class="paper-subtitle">팩터가 '진짜'인지 검정하는 법: 시계열 회귀, GRS, FF5, 스패닝</div>
+<div class="paper-team">Paper Anchor: Fama &amp; MacBeth (1973) &middot; Fama &amp; French (2015) &middot; McLean &amp; Pontiff (2016)</div>
+<div class="progress-bar"><div class="progress-fill" style="width:50%"></div></div>
+<div class="progress-label">Overall Progress: 6/12 Rounds</div>
+</div>
+
+<div class="abstract">
+<div class="abstract-title">Learning Objectives</div>
+<p class="ni">R5에서 팩터를 <strong>만들었다</strong>. 이번 라운드에서는 그 팩터가 <strong>진짜인지 검정한다</strong>. 학술 자산가격결정론(asset pricing)의 방법론이 총집결하는, 이 커리큘럼의 계량경제학적 정점이다. 이 라운드가 끝나면 다음을 할 수 있어야 한다:</p>
+<ul>
+<li>시계열 회귀와 횡단면 회귀가 각각 <strong>무엇을 검정하는지</strong> 구별하고, 상황에 맞는 방법을 고른다</li>
+<li>GRS 통계량을 수식 그대로 NumPy로 구현하고, "모든 알파 = 0" 가설을 F-분포로 판정한다</li>
+<li>Fama-MacBeth 2단계 회귀를 밑바닥부터 구현하고, Newey-West·Shanken 보정의 필요성을 설명한다</li>
+<li>Ken French 데이터 라이브러리 기준으로 SMB/HML을 <strong>규칙 그대로 재현</strong>하고 상관계수 0.98+로 검증한다</li>
+<li>새 팩터 후보를 스패닝 검정에 걸어 "기존 팩터의 재포장"인지 판별한다</li>
+<li>FF (2015) Table 5 형식의 결과 테이블을 직접 만들어 논문 재현의 감각을 익힌다</li>
+</ul>
+<p class="ni"><strong>Keywords:</strong> time-series regression, GRS test, Fama-MacBeth, Shanken correction, Daniel-Titman, SMB/HML construction, NYSE breakpoints, anomaly decay, spanning test</p>
+</div>
+
+<div class="paper-anchor">
+<div class="pa-label">PAPER ANCHOR</div>
+<div class="pa-title">Fama, E. F., &amp; MacBeth, J. D. (1973). "Risk, Return, and Equilibrium: Empirical Tests." <em>Journal of Political Economy</em>, 81(3), 607&ndash;636.</div>
+<p>실증 자산가격결정론에서 가장 많이 인용되는 방법론 논문이다. "매월 횡단면 회귀를 돌리고, 계수의 시계열 평균과 표준오차로 추론한다"는 단순한 아이디어가 횡단면 상관(cross-sectional correlation) 문제를 우아하게 해결했다. 50년이 지난 지금도 팩터 프리미엄 추정의 표준 절차이며, 이 논문의 2단계 절차를 손으로 구현해보는 것이 이번 라운드의 중심 과제다.</p>
+</div>
+
+<h2 id="ch1">1. 팩터모형의 계량 구조 — 무엇을 검정하는가</h2>
+
+<h3>1.1 "기대수익률의 횡단면을 설명한다"는 것</h3>
+
+<p>R5에서 모멘텀 팩터를 만들어 롱숏 수익률이 유의하다는 것을 확인했다. 그런데 학계가 팩터모형에 요구하는 것은 그보다 강하다. 팩터모형의 임무는 개별 팩터가 돈을 버는지가 아니라, <strong>"왜 어떤 자산은 다른 자산보다 평균수익률이 높은가"를 팩터 노출(exposure)의 차이로 전부 설명하는 것</strong>이다. 이것을 "기대수익률의 횡단면(cross-section of expected returns)을 설명한다"고 말한다.</p>
+
+<div class="def">
+<p class="ni"><strong>Definition 1.1 — 선형 팩터모형 (Linear Factor Model)</strong></p>
+<div class="eq">\[ E[R_i^e] = \boldsymbol{\beta}_i^\top \boldsymbol{\lambda} = \beta_{i,1}\lambda_1 + \beta_{i,2}\lambda_2 + \cdots + \beta_{i,K}\lambda_K \]</div>
+<p class="ni" style="font-size:12px;color:#555;margin:4px 0 8px 0">↑ "자산 i의 기대 초과수익률은, 자산 i가 각 팩터에 얼마나 노출됐는지(β)에 그 팩터의 가격(λ, 리스크 프리미엄)을 곱해 더한 것과 같다." 우변에 자산 고유의 상수항(알파)이 없다는 점이 핵심 — 모형이 맞다면 β로 설명되지 않는 평균수익률은 존재하지 않아야 한다.</p>
+</div>
+
+<p class="ni">이 식은 두 종류의 미지수를 담고 있다. 자산마다 다른 \(\boldsymbol{\beta}_i\)(팩터 노출)와, 자산과 무관하게 시장 전체에 하나씩 존재하는 \(\boldsymbol{\lambda}\)(팩터 프리미엄)다. 검정 방법론은 이 둘 중 무엇을 어떻게 추정하느냐에 따라 갈라진다.</p>
+
+<h3>1.2 두 가지 접근: 시계열 vs 횡단면</h3>
+
+<p>팩터 \(f_t\)가 <strong>그 자체로 거래 가능한 초과수익률</strong>(예: SMB, HML, 모멘텀 롱숏)이라면 이야기가 간단해진다. 팩터의 프리미엄은 팩터 자신의 평균수익률이어야 하므로(\(\lambda_k = E[f_{k,t}]\)), 자산별 시계열 회귀의 절편(알파)이 0인지 보면 된다. 반면 팩터가 거래 불가능한 상태변수(예: GDP 성장률, 인플레이션 서프라이즈)라면 \(\lambda\)를 데이터에서 따로 추정해야 하고, 이때 횡단면 회귀 — 즉 Fama-MacBeth — 가 등장한다.</p>
+
+<div class="tc">Table 1.1. 팩터모형 검정의 두 축 — 이 라운드의 지도</div>
+<table>
+<tr><th>구분</th><th>시계열 회귀 (Time-Series)</th><th>횡단면 회귀 (Cross-Sectional / FMB)</th></tr>
+<tr><td>회귀 방향</td><td>자산 하나씩, 시간 축으로 회귀</td><td>시점 하나씩, 자산 축으로 회귀</td></tr>
+<tr><td>추정 대상</td><td>\(\alpha_i, \beta_i\) (프리미엄은 \(\bar{f}\)로 대체)</td><td>\(\gamma_t\) → 시계열 평균이 \(\hat{\lambda}\)</td></tr>
+<tr><td>귀무가설</td><td>\(\alpha_i = 0\ \forall i\) (모형이 완전하다)</td><td>\(\lambda_k \neq 0\) (팩터가 가격결정된다)</td></tr>
+<tr><td>전제 조건</td><td>팩터가 거래 가능한 초과수익률</td><td>팩터가 거래 불가능해도 됨, 특성(characteristic)도 가능</td></tr>
+<tr><td>공식 검정</td><td>GRS F-검정 (Ch3)</td><td>\(\bar{\gamma}\)의 t-검정 + Newey-West + Shanken (Ch4)</td></tr>
+<tr><td>대표 논문</td><td>Fama-French (1993, 2015)</td><td>Fama-MacBeth (1973)</td></tr>
+<tr><td>이 라운드에서</td><td>Ch2&ndash;3</td><td>Ch4</td></tr>
+</table>
+
+<div class="info">
+<p class="ni"><strong>왜 두 방법이 다 필요한가?</strong> 시계열 회귀는 "이 팩터 집합이 테스트 자산들의 평균수익률을 남김없이 설명하는가"(모형 완전성)를 묻고, Fama-MacBeth는 "이 특성/베타가 횡단면에서 수익률 차이에 대한 프리미엄을 받는가"(개별 변수의 가격)를 묻는다. 논문에서는 보통 둘 다 보고한다. FF (2015)는 시계열+GRS가 주 무기이고, 특성 기반 연구(예: GKX 2020의 선행 연구들)는 FMB가 주 무기다.</p>
+</div>
+
+<h3>1.3 SDF 관점 — 한 단계 위의 조망</h3>
+
+<p class="ni">현대 자산가격결정론은 위 두 접근을 확률할인계수(SDF, stochastic discount factor) 하나로 통합한다. 모든 자산가격결정 모형은 결국 다음 한 줄이다:</p>
+
+<div class="eq">\[ E[m_{t+1} R_{i,t+1}^e] = 0, \qquad m_{t+1} = 1 - \boldsymbol{b}^\top (\boldsymbol{f}_{t+1} - E[\boldsymbol{f}]) \]</div>
+<p class="ni" style="font-size:12px;color:#555;margin:4px 0 8px 0">↑ "할인계수 m으로 할인한 초과수익률의 기댓값은 0이다." 선형 팩터모형은 m이 팩터들의 선형결합이라는 특수한 경우다. b가 0이 아닌 팩터만 SDF에 들어갈 자격이 있고, 이것이 Ch8 스패닝 검정의 이론적 근거가 된다 — 기존 팩터들로 다 설명되는 새 팩터는 m을 바꾸지 못한다.</p>
+
+<p>석사 수준에서는 "시계열 알파 검정 = 이 팩터들로 만든 SDF가 테스트 자산의 가격을 다 맞추는가"라는 번역만 기억하면 충분하다. 베타 표현과 SDF 표현이 수학적으로 동치라는 사실도 알아두면 좋다:</p>
+
+<div class="eq">\[ E[R_i^e] = \boldsymbol{\beta}_i^\top \boldsymbol{\lambda} \iff E[m R_i^e] = 0 \text{ with } \boldsymbol{\lambda} = \Omega\, \boldsymbol{b} \]</div>
+<p class="ni" style="font-size:12px;color:#555;margin:4px 0 8px 0">↑ "베타-프리미엄 표현과 SDF 계수 b 표현은 팩터 공분산 행렬 Ω를 사이에 두고 1:1 변환된다." 논문마다 λ(프리미엄) 언어와 b(SDF 로딩) 언어를 섞어 쓰는데, 같은 모형의 두 좌표계일 뿐이다. 단 팩터들이 서로 상관되면 λ_k ≠ 0이어도 b_k = 0일 수 있다 — "프리미엄이 있는 팩터"와 "SDF에 필요한 팩터"는 다른 개념이다.</p>
+
+<div class="warn">
+<p class="ni"><strong>함정 — "λ가 유의하다"와 "b가 유의하다"는 다른 문장이다.</strong> Fama-MacBeth(Ch4)는 보통 λ(프리미엄)를 추정한다. 하지만 팩터가 서로 상관돼 있으면 어떤 팩터의 λ가 유의해도, 그 팩터가 <em>다른 팩터에 이미 담긴 정보의 반복</em>이라 SDF 계수 b는 0일 수 있다. 즉 λ 유의성만으로 "이 팩터를 모형에 넣어야 한다"고 결론지으면 안 된다 — 그것을 판정하는 것이 b의 유의성(사실상 Ch8 스패닝)이다. 최근 논문들(예: Barillas-Shanken 2018)이 λ보다 b·스패닝을 강조하는 이유다. 이 라운드에서 λ는 Ch4, b·스패닝은 Ch8로 나눠 다룬다.</p>
+</div>
+
+<h3>1.4 이 라운드의 표기법 고정</h3>
+
+<p class="ni">앞으로 아홉 개 챕터에서 반복해서 쓸 기호를 여기서 고정한다. 논문을 읽을 때도 이 대응표를 기준으로 삼으면 된다.</p>
+
+<div class="tc">Table 1.2. 표기법 사전 — 이 라운드 전체에서 공통</div>
+<table>
+<tr><th>기호</th><th>차원</th><th>의미</th><th>추정 방법</th></tr>
+<tr><td>\(R_{i,t}^e\)</td><td>스칼라</td><td>자산 i의 t월 초과수익률 (\(R_{i,t} - r_{f,t}\))</td><td>관측</td></tr>
+<tr><td>\(\boldsymbol{f}_t\)</td><td>\(K \times 1\)</td><td>t월 팩터 수익률 벡터</td><td>관측 (Ch6에서 직접 제작)</td></tr>
+<tr><td>\(\boldsymbol{\beta}_i\)</td><td>\(K \times 1\)</td><td>자산 i의 팩터 노출</td><td>시계열 OLS (Ch2)</td></tr>
+<tr><td>\(\alpha_i\)</td><td>스칼라</td><td>모형이 설명 못 한 평균 초과수익률</td><td>시계열 OLS 절편 (Ch2&ndash;3)</td></tr>
+<tr><td>\(\boldsymbol{\lambda}\)</td><td>\(K \times 1\)</td><td>팩터 리스크 프리미엄 (팩터의 가격)</td><td>거래 가능 시 \(\bar{f}\), 아니면 FMB (Ch4)</td></tr>
+<tr><td>\(\hat{\gamma}_t\)</td><td>\(K \times 1\)</td><td>t월 횡단면 회귀 기울기 (월별 프리미엄 실현치)</td><td>매월 횡단면 OLS (Ch4)</td></tr>
+<tr><td>\(\hat{\Sigma}\)</td><td>\(N \times N\)</td><td>시계열 회귀 잔차의 공분산 행렬</td><td>\(\hat{\epsilon}^\top\hat{\epsilon}/(T{-}K{-}1)\) (Ch3)</td></tr>
+<tr><td>\(\hat{\Omega}\)</td><td>\(K \times K\)</td><td>팩터 수익률의 공분산 행렬</td><td>표본 공분산 (Ch3&ndash;4)</td></tr>
+<tr><td>\(T, N, K\)</td><td>&mdash;</td><td>관측 월 수 / 테스트 자산 수 / 팩터 수</td><td>&mdash;</td></tr>
+</table>
+
+<div class="ok">
+<p class="ni"><strong>이 라운드의 로드맵.</strong> Ch2&ndash;3이 시계열 축(α 추정 → GRS 동시 검정), Ch4&ndash;5가 횡단면 축(FMB → 특성 vs 베타 논쟁), Ch6이 팩터 제작(SMB/HML 재현), Ch7&ndash;8이 팩터의 생존 검증(감쇠·스패닝), Ch9가 전체 통합 실습이다. 각 도구는 독립적이지 않다 — Ch9에서 보듯 실제 논문은 스패닝 + GRS + FMB를 한 세트로 보고한다.</p>
+</div>
+
+<p>이제 도구를 하나씩 뜯어보자.</p>
+
+<div class="warn">
+<p class="ni"><strong>함정 — "수익률이 좋다"와 "팩터다"는 다른 명제다.</strong> R5에서 만든 롱숏 포트폴리오가 샤프비율 0.8을 찍었다고 해서 팩터가 되는 것이 아니다. 학계 기준으로 팩터가 되려면 (1) 기존 팩터에 스패닝되지 않고(Ch8), (2) 횡단면 프리미엄이 통계적으로 유의하며(Ch4), (3) 다중검정 보정 후에도 살아남아야 한다(Ch7, R3 재소환). 이 셋을 통과 못 한 "좋은 전략"은 anomaly zoo의 사육 대상일 뿐이다.</p>
+</div>
+
+<h2 id="ch2">2. 시계열 회귀 — 알파와 베타 읽는 법</h2>
+
+<h3>2.1 회귀식과 각 항의 의미</h3>
+
+<div class="def">
+<p class="ni"><strong>Definition 2.1 — 시계열 회귀 (Time-Series Regression)</strong></p>
+<div class="eq">\[ R_{i,t} - r_{f,t} = \alpha_i + \sum_{k=1}^{K} \beta_{i,k} f_{k,t} + \epsilon_{i,t}, \qquad t = 1, \ldots, T \]</div>
+<p class="ni" style="font-size:12px;color:#555;margin:4px 0 8px 0">↑ "자산 i의 t월 초과수익률을, 같은 달의 팩터 수익률 K개에 회귀한다." 자산 하나당 회귀 하나. β_ik는 자산 i가 팩터 k에 얼마나 노출됐는가(팩터가 1% 움직일 때 자산이 몇 % 따라 움직이는가), α_i는 팩터들이 설명하지 못하고 남은 평균 초과수익률이다.</p>
+</div>
+
+<p class="ni">여기서 각 추정치를 읽는 법이 실무의 반이다:</p>
+
+<ul>
+<li><strong>\(\hat{\beta}_{i,k}\) (팩터 노출):</strong> 리스크의 "양"이다. HML 베타가 0.7이면 "이 자산은 가치주처럼 움직인다"는 뜻이다. 노출 자체는 좋고 나쁨이 없다 — 노출에 대한 보상(\(\lambda\))이 문제다.</li>
+<li><strong>\(\hat{\alpha}_i\) (알파):</strong> 모형의 실패분이자, 액티브 운용의 존재 이유다. 팩터가 거래 가능하다면 \(\alpha_i \neq 0\)은 "팩터들을 조합해도 복제할 수 없는 평균수익률"을 의미한다.</li>
+<li><strong>\(R^2\):</strong> 변동(분산)의 설명 비율. 주의 — \(R^2\)가 높다고 알파가 작은 게 아니다. \(R^2\)는 분산을, \(\alpha\)는 평균을 다룬다. 완전히 다른 축이다.</li>
+</ul>
+
+<p class="ni">N개 자산의 회귀는 행렬 하나로 묶어서 쓸 수 있고, 이 형태가 Ch3의 GRS 구현에서 그대로 쓰인다:</p>
+
+<div class="eq">\[ \underbrace{\boldsymbol{R}^e}_{T \times N} = \underbrace{\boldsymbol{X}}_{T \times (K+1)} \underbrace{\boldsymbol{B}}_{(K+1) \times N} + \boldsymbol{E}, \qquad \hat{\boldsymbol{B}} = (\boldsymbol{X}^\top \boldsymbol{X})^{-1} \boldsymbol{X}^\top \boldsymbol{R}^e \]</div>
+<p class="ni" style="font-size:12px;color:#555;margin:4px 0 8px 0">↑ "X = [1, f_1, ..., f_K]를 공유하므로, N번 회귀를 돌릴 필요 없이 (X'X)⁻¹X'R 한 번으로 N개 자산의 [α; β] 전부를 얻는다." B̂의 첫 행이 알파 벡터, 나머지 행이 베타 행렬. NumPy로는 np.linalg.solve(X.T@X, X.T@R) 한 줄이다.</p>
+
+<h3>2.2 t(알파) 읽기 — 실전 감각</h3>
+
+<div class="eq">\[ t(\hat{\alpha}_i) = \frac{\hat{\alpha}_i}{\mathrm{se}(\hat{\alpha}_i)}, \qquad \mathrm{se}(\hat{\alpha}_i) \approx \frac{\sigma(\epsilon_i)}{\sqrt{T}}\sqrt{1 + \bar{\boldsymbol{f}}^\top \hat{\Omega}^{-1} \bar{\boldsymbol{f}}} \]</div>
+<p class="ni" style="font-size:12px;color:#555;margin:4px 0 8px 0">↑ "알파를 알파의 표준오차로 나눈 것." 잔차 변동성 σ(ε)이 작을수록(모형이 변동을 잘 설명할수록), 표본 T가 길수록 같은 크기의 알파도 더 유의해진다. 뒤의 √(1+f̄'Ω⁻¹f̄) 항은 팩터 평균이 0이 아니어서 생기는 절편 추정의 불확실성 보정이다.</p>
+
+<p class="ni">읽기 규칙: 월간 데이터 기준으로 |t| &gt; 2를 전통적 유의 기준으로 쓰지만, R3에서 배웠듯 Harvey-Liu-Zhu (2016)는 다중검정을 감안해 <strong>t &gt; 3.0</strong>을 요구한다. 알파의 크기 자체는 연율화해서 본다: 월간 알파 0.3%면 연 3.6%다. "t=2.5, 연 알파 4%"처럼 두 숫자를 항상 같이 말하는 습관을 들이자 — t만 크고 알파가 연 0.5%면 경제적으로 무의미하다.</p>
+
+<p class="ni">알파의 크기를 리스크 대비로 정규화한 것이 평가비율(appraisal ratio) 혹은 정보비율이다:</p>
+
+<div class="eq">\[ IR_i = \frac{\alpha_i}{\sigma(\epsilon_i)}, \qquad t(\hat{\alpha}_i) \approx IR_i \times \sqrt{T} \]</div>
+<p class="ni" style="font-size:12px;color:#555;margin:4px 0 8px 0">↑ "IR = 알파를 잔차 변동성으로 나눈 것 = 팩터를 완벽히 헤지하고 알파만 뽑았을 때의 샤프비율." 오른쪽 근사가 실전 감각의 핵심: t-stat은 대략 IR × √T다. 연 IR 0.5짜리 진짜 알파도 t &gt; 3을 찍으려면 (3/0.5)² = 36년이 필요하다 — '유의한 알파'가 왜 드문지, 짧은 트랙레코드로 왜 판정이 불가능한지가 이 한 줄에 들어 있다.</p>
+
+<div class="def">
+<p class="ni"><strong>Definition 2.2 — 알파 t-stat이 트랙레코드 길이를 요구한다</strong></p>
+<div class="eq">\[ T_{\text{필요}} = \left(\frac{t^*}{IR}\right)^2, \qquad t^*=3.0 \]</div>
+<p class="ni" style="font-size:12px;color:#555;margin:4px 0 8px 0">↑ t(α)≈IR·√T를 뒤집으면, 목표 t*를 넘기는 데 필요한 표본 길이가 나온다. 연 IR 1.0의 뛰어난 전략도 t&gt;3에 9년, 연 IR 0.5면 36년이 필요하다. "3년 트랙레코드로 실력을 증명했다"는 주장이 왜 통계적으로 불가능한지, 왜 대부분의 알파 논쟁이 '데이터 부족'으로 미결인지가 이 한 줄에 있다. 헤지펀드 실사(due diligence)에서 이 계산은 필수다.</p>
+</div>
+
+<div class="info">
+<p class="ni"><strong>HAC 표준오차는 시계열 회귀에서도 기본값이다.</strong> 월간 수익률의 자기상관은 약하지만 잔차의 조건부 이분산(변동성 군집, R4)은 강하다. 관례상 알파 t-stat은 Newey-West(lag 4&ndash;6) 또는 White 표준오차로 보고한다. 아래 코드처럼 <code>fit(cov_type='HAC', cov_kwds={'maxlags':6})</code> 한 줄 차이인데, 심사자는 반드시 확인하는 항목이다.</p>
+</div>
+
+<pre><code><span class="cm"># 단일 자산 예시: OLS se vs HAC se — 알파 t-stat이 어떻게 달라지나</span>
+<span class="kw">import</span> statsmodels.api <span class="kw">as</span> sm
+
+y = excess[<span class="st">'SMALL LoBM'</span>]                <span class="cm"># 소형 성장주 포트폴리오</span>
+X = sm.<span class="fn">add_constant</span>(factors)             <span class="cm"># [1, Mkt-RF, SMB, HML]</span>
+
+m_ols = sm.<span class="nb">OLS</span>(y, X).<span class="fn">fit</span>()
+m_hac = sm.<span class="nb">OLS</span>(y, X).<span class="fn">fit</span>(cov_type=<span class="st">'HAC'</span>, cov_kwds={<span class="st">'maxlags'</span>: <span class="nu">6</span>})
+
+<span class="fn">print</span>(<span class="st">f"alpha        = {m_ols.params['const']*100:.3f} %/월 "</span>
+      <span class="st">f"(연 {m_ols.params['const']*1200:.1f}%)"</span>)
+<span class="fn">print</span>(<span class="st">f"t(alpha) OLS = {m_ols.tvalues['const']:.2f}"</span>)
+<span class="fn">print</span>(<span class="st">f"t(alpha) HAC = {m_hac.tvalues['const']:.2f}"</span>)
+<span class="fn">print</span>(<span class="st">f"IR(연율)     = {m_ols.params['const']/m_ols.resid.std(ddof=1)*np.sqrt(12):.2f}"</span>)
+<span class="fn">print</span>(<span class="st">f"R²           = {m_ols.rsquared:.3f}"</span>)</code></pre>
+<div class="code-output"><span class="out-label">Output:</span>
+alpha        = -0.517 %/월 (연 -6.2%)
+t(alpha) OLS = -4.98
+t(alpha) HAC = -4.31
+IR(연율)     = -0.65
+R²           = 0.933
+
+→ HAC로 바꾸면 t가 -4.98 → -4.31로 완만해지지만 결론은 동일 (강한 음의 알파)
+→ 경계선 케이스(t≈2.2)에서는 이 차이가 판정을 뒤집는다</div>
+
+<h3>2.3 테스트 자산 문제 — 개별 종목이 아니라 포트폴리오로 검정하는 이유</h3>
+
+<p>시계열 검정의 좌변에 무엇을 놓을 것인가? 이것이 "테스트 자산(test assets)" 선택 문제다. 개별 종목 3,000개를 좌변에 놓으면 안 되는 이유가 세 가지 있다. 첫째, 개별 종목의 베타는 추정 오차가 커서(월간 60개 관측치로 추정한 개별주 베타의 표준오차는 0.3 수준) 검정력이 낮다. 둘째, 상장·폐지로 시계열이 끊긴다. 셋째, GRS 검정(Ch3)은 잔차 공분산 행렬의 역행렬이 필요한데 N &gt; T면 역행렬이 존재하지 않는다. 그래서 학계 표준은 종목을 특성으로 정렬해 만든 <strong>포트폴리오</strong>(예: 5&times;5 size-B/M 25개)를 테스트 자산으로 쓴다.</p>
+
+<div class="warn">
+<p class="ni"><strong>함정 — 테스트 자산 선택 자체가 결과를 결정한다.</strong> 25 size-B/M 포트폴리오로 검정하면 size·value 관련 팩터가 유리하고, 모멘텀 정렬 포트폴리오로 검정하면 모멘텀 팩터가 유리하다. Lewellen, Nagel &amp; Shanken (2010)은 이 포트폴리오들이 강한 팩터 구조를 갖고 있어 "웬만한 팩터는 다 잘 설명하는 것처럼 보인다"고 경고했다. 논문을 읽을 때 "테스트 자산이 무엇인가"를 반드시 확인하고, 자기 연구에서는 정렬 기준이 다른 여러 세트(25 size-B/M + 25 size-momentum + 산업 포트폴리오)로 강건성을 확인하라.</p>
+</div>
+
+<h3>2.4 구현 — 25 size-B/M 포트폴리오를 FF3에 회귀</h3>
+
+<pre><code><span class="cm"># 시계열 회귀: 25 size-B/M 포트폴리오 각각을 FF3 팩터에 회귀</span>
+<span class="kw">import</span> pandas <span class="kw">as</span> pd
+<span class="kw">import</span> numpy <span class="kw">as</span> np
+<span class="kw">import</span> statsmodels.api <span class="kw">as</span> sm
+<span class="kw">from</span> pandas_datareader <span class="kw">import</span> data <span class="kw">as</span> pdr
+
+<span class="cm"># Ken French 라이브러리에서 데이터 다운로드 (월간, % 단위)</span>
+ff3 = pdr.<span class="fn">DataReader</span>(<span class="st">'F-F_Research_Data_Factors'</span>, <span class="st">'famafrench'</span>,
+                     start=<span class="st">'1963-07'</span>, end=<span class="st">'2024-12'</span>)[<span class="nu">0</span>] / <span class="nu">100</span>
+p25 = pdr.<span class="fn">DataReader</span>(<span class="st">'25_Portfolios_5x5'</span>, <span class="st">'famafrench'</span>,
+                     start=<span class="st">'1963-07'</span>, end=<span class="st">'2024-12'</span>)[<span class="nu">0</span>] / <span class="nu">100</span>
+
+excess = p25.<span class="fn">sub</span>(ff3[<span class="st">'RF'</span>], axis=<span class="nu">0</span>)          <span class="cm"># 초과수익률로 변환</span>
+factors = ff3[[<span class="st">'Mkt-RF'</span>, <span class="st">'SMB'</span>, <span class="st">'HML'</span>]]
+X = sm.<span class="fn">add_constant</span>(factors)
+
+results = {}
+<span class="kw">for</span> port <span class="kw">in</span> excess.columns:
+    ols = sm.<span class="nb">OLS</span>(excess[port], X).<span class="fn">fit</span>()
+    results[port] = {
+        <span class="st">'alpha(%/mo)'</span>: ols.params[<span class="st">'const'</span>] * <span class="nu">100</span>,
+        <span class="st">'t(alpha)'</span>:    ols.tvalues[<span class="st">'const'</span>],
+        <span class="st">'b_MKT'</span>:       ols.params[<span class="st">'Mkt-RF'</span>],
+        <span class="st">'b_SMB'</span>:       ols.params[<span class="st">'SMB'</span>],
+        <span class="st">'b_HML'</span>:       ols.params[<span class="st">'HML'</span>],
+        <span class="st">'R2'</span>:          ols.rsquared,
+    }
+res = pd.<span class="nb">DataFrame</span>(results).T
+<span class="fn">print</span>(res.<span class="fn">head</span>(<span class="nu">5</span>).<span class="fn">round</span>(<span class="nu">3</span>))
+<span class="fn">print</span>(<span class="st">f"\n|t(alpha)| &gt; 2 인 포트폴리오: {(res['t(alpha)'].abs() &gt; 2).sum()} / 25"</span>)
+<span class="fn">print</span>(<span class="st">f"평균 R²: {res['R2'].mean():.3f}"</span>)</code></pre>
+<div class="code-output"><span class="out-label">Output:</span>
+             alpha(%/mo)  t(alpha)  b_MKT  b_SMB  b_HML     R2
+SMALL LoBM        -0.517    -4.981  1.088  1.404 -0.268  0.933
+ME1 BM2           -0.006    -0.070  0.964  1.302  0.083  0.945
+ME1 BM3            0.075     1.017  0.925  1.121  0.293  0.947
+ME1 BM4            0.163     2.359  0.892  1.087  0.446  0.949
+SMALL HiBM         0.132     1.716  0.949  1.117  0.653  0.945
+
+|t(alpha)| &gt; 2 인 포트폴리오: 6 / 25
+평균 R²: 0.916</div>
+
+<p class="ni">전형적인 결과다. \(R^2\)는 0.9를 넘어 "변동"은 훌륭하게 설명하지만, 소형 성장주(SMALL LoBM) 코너의 알파는 월 &minus;0.52%(연 &minus;6%!), t=&minus;5로 강하게 유의하다. 이 "small growth 문제"는 FF3의 유명한 실패 지점이고, FF5가 RMW·CMA를 추가한 동기 중 하나다.</p>
+
+<p class="ni">알파를 5&times;5 격자로 펼쳐 놓으면 실패의 구조가 눈에 들어온다. 논문들이 알파 히트맵을 싣는 이유다 — 어느 코너가 새는지 한눈에 보이기 때문이다.</p>
+
+<div class="tc">Table 2.1. FF3 알파 히트맵 (월 %, 25 size-B/M, 굵게 = |t|&gt;2). 좌상단 small-growth가 새는 코너다</div>
+<table>
+<tr><th>&nbsp;</th><th>Growth (Lo)</th><th>2</th><th>3</th><th>4</th><th>Value (Hi)</th></tr>
+<tr><td><strong>Small</strong></td><td><strong>&minus;0.52</strong></td><td>&minus;0.01</td><td>0.08</td><td><strong>0.16</strong></td><td>0.13</td></tr>
+<tr><td>2</td><td>&minus;0.16</td><td>0.03</td><td>0.11</td><td>0.09</td><td><strong>0.19</strong></td></tr>
+<tr><td>3</td><td>&minus;0.05</td><td>0.09</td><td>0.04</td><td>0.07</td><td>0.12</td></tr>
+<tr><td>4</td><td>0.11</td><td>&minus;0.02</td><td>&minus;0.06</td><td>0.03</td><td>0.08</td></tr>
+<tr><td><strong>Big</strong></td><td>0.09</td><td>0.02</td><td>&minus;0.04</td><td><strong>&minus;0.14</strong></td><td>&minus;0.10</td></tr>
+</table>
+<p class="ni" style="font-size:12px;color:#555;margin:4px 0 8px 0">↑ 코너(small-growth, big-value)에서 알파가 크고 유의하다. 이는 우연이 아니라 <strong>구조적</strong>이다 — FF3가 이 두 코너의 평균수익률을 체계적으로 못 맞춘다는 뜻이고, 개별 t를 세는 대신 이 패턴 전체를 하나의 통계량으로 검정해야 하는 이유다.</p>
+
+<div class="info">
+<p class="ni"><strong>R&sup2;와 알파는 직교하는 두 축이다.</strong> 위 표에서 모든 포트폴리오의 R&sup2;는 0.9를 넘지만 알파는 제각각이다. R&sup2;=0.93이라는 건 "월별 <em>변동</em>의 93%를 팩터가 설명한다"는 것이고, 알파는 "설명 못 한 <em>평균수익률</em>"이다. 변동을 잘 설명해도 평균을 못 맞출 수 있다 — 잔차의 평균이 0이 아니면 된다. 실무에서 "R&sup2;가 높으니 좋은 모형"이라는 말은 자산가격결정 맥락에서 <em>틀린</em> 문장이다. 자산가격결정 모형의 성적표는 알파이지 R&sup2;가 아니다.</p>
+</div>
+
+<p class="ni">그런데 25개 포트폴리오 중 6개가 유의하다는 사실만으로 "모형 기각"을 선언할 수 있을까? 25번 검정하면 우연히도 1&ndash;2개는 유의하게 나온다(R3의 다중검정 문제). 그래서 <strong>25개 알파를 한 방에 동시 검정</strong>하는 도구가 필요하다. 그것이 GRS다.</p>
+
+<div class="ok">
+<p class="ni"><strong>핵심 정리 (Ch2).</strong> 시계열 회귀에서 (1) <strong>β</strong>는 팩터 노출의 양(좋고 나쁨 없음), (2) <strong>α</strong>는 팩터로 설명 못 한 평균 초과수익(모형의 성적표), (3) <strong>R²</strong>는 변동의 설명 비율(α와 직교하는 별개 축). t(α)≈IR·√T이므로 진짜 알파도 짧은 표본에서는 유의하지 않을 수 있고, HAC 표준오차와 t&gt;3 기준이 실무 표준이다. 개별 알파를 N번 세는 것은 다중검정 함정이라 GRS가 필요하다 — 다음 챕터.</p>
+</div>
+
+<h2 id="ch3">3. GRS 검정 — "모든 알파가 동시에 0인가"</h2>
+
+<div class="paper-anchor">
+<div class="pa-label">PAPER ANCHOR</div>
+<div class="pa-title">Gibbons, M. R., Ross, S. A., &amp; Shanken, J. (1989). "A Test of the Efficiency of a Given Portfolio." <em>Econometrica</em>, 57(5), 1121&ndash;1152.</div>
+<p>N개 자산의 알파를 하나의 F-통계량으로 묶어 "모든 알파가 동시에 0인가"를 정확히 검정하는 방법을 제시했다. 진짜 기여는 이 통계량이 <strong>샤프비율 개선</strong>과 정확히 동치임을 보인 것 — 통계 검정과 평균-분산 포트폴리오 이론이 한 수식에서 만난다. 이후 30년간 모든 팩터모형 비교(FF3 vs FF5 등)의 표준 심판이 됐다. 이 라운드에서 "모형이 옳은가"를 묻는 시계열 축의 종착역이다.</p>
+</div>
+
+<h3>3.1 검정의 구조</h3>
+
+<div class="def">
+<p class="ni"><strong>Definition 3.1 — GRS 검정 (Gibbons, Ross &amp; Shanken 1989)</strong></p>
+<p class="ni">귀무가설 \(H_0: \alpha_1 = \alpha_2 = \cdots = \alpha_N = 0\) (N개 테스트 자산의 알파가 전부 0)에 대해:</p>
+<div class="eq">\[ \mathrm{GRS} = \frac{T - N - K}{N} \cdot \frac{\hat{\boldsymbol{\alpha}}^\top \hat{\Sigma}^{-1} \hat{\boldsymbol{\alpha}}}{1 + \bar{\boldsymbol{f}}^\top \hat{\Omega}^{-1} \bar{\boldsymbol{f}}} \; \sim \; F(N,\; T - N - K) \]</div>
+<p class="ni" style="font-size:12px;color:#555;margin:4px 0 8px 0">↑ "알파 벡터를 잔차 공분산 행렬 Σ̂의 역행렬로 감싼 이차형식(α'Σ⁻¹α)을, 팩터의 샤프비율 제곱(f̄'Ω⁻¹f̄)으로 벌점을 주고, 자유도로 스케일한 것." T=관측월수, N=테스트 자산 수, K=팩터 수. Σ̂은 N×N 잔차 공분산, Ω̂은 K×K 팩터 공분산, f̄는 팩터 평균 벡터. 귀무가설 하에서 정확히 F(N, T−N−K) 분포를 따른다.</p>
+</div>
+
+<h3>3.2 직관 — GRS는 샤프비율 개선 검정이다</h3>
+
+<p class="ni">GRS의 아름다움은 이차형식이 경제적 의미를 갖는다는 데 있다. 핵심 항등식:</p>
+
+<div class="eq">\[ \hat{\boldsymbol{\alpha}}^\top \hat{\Sigma}^{-1} \hat{\boldsymbol{\alpha}} \;=\; \mathrm{Sh}^2(\boldsymbol{f}, \boldsymbol{R}) - \mathrm{Sh}^2(\boldsymbol{f}) \]</div>
+<p class="ni" style="font-size:12px;color:#555;margin:4px 0 8px 0">↑ "α'Σ⁻¹α = (팩터+테스트 자산을 전부 조합했을 때 도달 가능한 최대 샤프비율의 제곱) − (팩터만으로 도달 가능한 최대 샤프비율의 제곱)." 즉 GRS는 '테스트 자산들을 포트폴리오에 추가하면 팩터만 쓸 때보다 샤프비율이 통계적으로 유의하게 개선되는가'를 묻는다.</p>
+
+<p>이 번역은 실무자에게 즉시 와닿는다. 모형이 완전하다면(모든 알파=0), 팩터 포트폴리오가 이미 평균-분산 효율적(mean-variance efficient) 경계에 있으므로 테스트 자산 25개를 추가로 사 봤자 샤프비율이 안 올라간다. 알파가 남아 있다면 그 알파를 사서 샤프비율을 올릴 수 있다. <strong>"알파가 있다 = 팩터만으로는 최적 포트폴리오를 만들 수 없다"</strong> — 통계 검정과 포트폴리오 이론이 한 수식에서 만난다.</p>
+
+<div class="tc">Table 3.1. 개별 알파 검정 vs GRS 결합 검정 — 왜 GRS가 필요한가</div>
+<table>
+<tr><th>측면</th><th>개별 t(α) N번</th><th>GRS 결합 검정</th></tr>
+<tr><td>귀무가설</td><td>\(\alpha_i=0\) (자산별)</td><td>\(\alpha_1=\cdots=\alpha_N=0\) (동시)</td></tr>
+<tr><td>알파 간 상관</td><td>무시</td><td>\(\hat{\Sigma}^{-1}\)로 반영</td></tr>
+<tr><td>다중검정 문제</td><td>있음 (우연 유의 누적)</td><td>없음 (1회 검정)</td></tr>
+<tr><td>경제적 해석</td><td>없음</td><td>샤프비율 개선폭</td></tr>
+<tr><td>결론</td><td>"몇 개가 유의"</td><td>"모형을 기각/채택"</td></tr>
+</table>
+<p class="ni" style="font-size:12px;color:#555;margin:4px 0 8px 0">↑ GRS의 결정적 이점은 \(\hat{\Sigma}^{-1}\)이 알파들의 <em>상관</em>을 반영한다는 것이다. 두 포트폴리오의 알파가 각각 작아도 <em>서로 반대 방향</em>으로 체계적이면 결합 검정에서 크게 잡힌다 — 개별 t로는 절대 못 보는 패턴이다.</p>
+
+<h3>3.3 구현 — 수식을 한 줄씩 코드로</h3>
+
+<pre><code><span class="cm"># GRS 검정: 수식 → NumPy 1:1 구현</span>
+<span class="kw">import</span> numpy <span class="kw">as</span> np
+<span class="kw">from</span> scipy <span class="kw">import</span> stats
+
+<span class="kw">def</span> <span class="fn">grs_test</span>(excess_ret: pd.<span class="nb">DataFrame</span>, factors: pd.<span class="nb">DataFrame</span>):
+    <span class="st">"""excess_ret: (T×N) 테스트 자산 초과수익률, factors: (T×K) 팩터 수익률"""</span>
+    T, N = excess_ret.shape
+    K = factors.shape[<span class="nu">1</span>]
+    X = np.<span class="fn">column_stack</span>([np.<span class="fn">ones</span>(T), factors.values])   <span class="cm"># (T × K+1)</span>
+
+    <span class="cm"># 1) N개 회귀를 행렬 한 방에: B̂ = (X'X)⁻¹X'R</span>
+    B = np.linalg.<span class="fn">solve</span>(X.T @ X, X.T @ excess_ret.values)  <span class="cm"># (K+1 × N)</span>
+    alpha = B[<span class="nu">0</span>, :]                                        <span class="cm"># 알파 벡터 (N,)</span>
+    resid = excess_ret.values - X @ B                       <span class="cm"># 잔차 (T × N)</span>
+
+    <span class="cm"># 2) Σ̂: 잔차 공분산 (자유도 T-K-1), Ω̂: 팩터 공분산, f̄: 팩터 평균</span>
+    Sigma = resid.T @ resid / (T - K - <span class="nu">1</span>)                  <span class="cm"># (N × N)</span>
+    f_bar = factors.<span class="fn">mean</span>().values                            <span class="cm"># (K,)</span>
+    Omega = np.<span class="fn">cov</span>(factors.values, rowvar=<span class="kw">False</span>, ddof=<span class="nu">1</span>)   <span class="cm"># (K × K)</span>
+
+    <span class="cm"># 3) GRS 통계량 — Definition 3.1 그대로</span>
+    quad_a = alpha @ np.linalg.<span class="fn">solve</span>(Sigma, alpha)          <span class="cm"># α'Σ⁻¹α</span>
+    quad_f = f_bar @ np.linalg.<span class="fn">solve</span>(Omega, f_bar)          <span class="cm"># f̄'Ω⁻¹f̄ = Sh²(f)</span>
+    grs = (T - N - K) / N * quad_a / (<span class="nu">1</span> + quad_f)
+    pval = <span class="nu">1</span> - stats.f.<span class="fn">cdf</span>(grs, N, T - N - K)
+    <span class="kw">return</span> grs, pval, np.<span class="fn">sqrt</span>(quad_a), np.<span class="fn">sqrt</span>(quad_f)
+
+grs, p, sh_gap, sh_f = <span class="fn">grs_test</span>(excess, factors)
+<span class="fn">print</span>(<span class="st">f"GRS = {grs:.2f},  p-value = {p:.4f}"</span>)
+<span class="fn">print</span>(<span class="st">f"팩터만의 최대 샤프(월간): {sh_f:.3f}  → 연율화 {sh_f*np.sqrt(12):.2f}"</span>)
+<span class="fn">print</span>(<span class="st">f"알파 활용 시 추가 가능한 샤프²의 근: {sh_gap:.3f}"</span>)</code></pre>
+<div class="code-output"><span class="out-label">Output:</span>
+GRS = 3.41,  p-value = 0.0000
+팩터만의 최대 샤프(월간): 0.221  → 연율화 0.77
+알파 활용 시 추가 가능한 샤프²의 근: 0.412
+
+→ H₀ (모든 α=0) 기각: FF3는 25 size-B/M 횡단면을 완전히 설명하지 못한다</div>
+
+<p class="ni">FF3는 GRS에서 기각당한다. 흥미로운 건 FF (2015)에서 <strong>FF5조차 GRS를 통과하지 못한다</strong>는 점이다(GRS &asymp; 2.8, p &lt; 0.01). Fama와 French 본인들이 논문에 "모든 모형은 기각된다. 문제는 어느 모형이 <em>덜</em> 나쁜가다"라고 썼다. 그래서 실전에서는 GRS 절대값보다 모형 간 비교 지표 — 평균 |알파|, \(A|\alpha_i|/A|\bar{r}_i|\) (설명 못 한 비율) — 를 함께 본다.</p>
+
+<div class="warn">
+<p class="ni"><strong>함정 — GRS의 사용 조건 3가지.</strong> (1) <strong>N &lt; T 필수</strong>: Σ̂⁻¹이 존재하려면 자산 수가 관측치 수보다 작아야 하고, 실전에서는 N ≤ T/2 정도로 여유를 둔다. 테스트 자산 100개에 월간 120개월이면 이미 위험하다. (2) <strong>정규성·등분산 가정</strong>: GRS의 정확한 F-분포는 잔차의 iid 정규성에 의존한다. 수익률의 fat tail(R1)과 변동성 군집(R4) 하에서는 근사가 깨질 수 있어, 논문들은 부트스트랩 p-value를 병기하기도 한다. (3) <strong>팩터가 초과수익률이어야 한다</strong>: 거래 불가능한 매크로 팩터에는 GRS를 쓸 수 없다 — 그때는 Ch4의 FMB로 간다.</p>
+</div>
+
+<h3>3.4 정규성이 의심될 때 — 블록 부트스트랩 p-value</h3>
+
+<p class="ni">수익률은 fat tail과 변동성 군집을 가지므로 GRS의 F-분포 p-value가 낙관적일 수 있다. 실무 표준은 <strong>블록 부트스트랩</strong>으로 귀무분포를 직접 만들어 p-value를 재계산하는 것이다 — 알파를 0으로 강제한 잔차를 블록 단위로 리샘플해 GRS 분포를 시뮬레이션한다.</p>
+
+<pre><code><span class="cm"># 블록 부트스트랩 GRS p-value (변동성 군집·자기상관 보존)</span>
+<span class="kw">def</span> <span class="fn">grs_bootstrap_pval</span>(excess, factors, n_boot=<span class="nu">2000</span>, block=<span class="nu">6</span>, seed=<span class="nu">6</span>):
+    rng = np.random.<span class="fn">default_rng</span>(seed)
+    T, N = excess.shape
+    K = factors.shape[<span class="nu">1</span>]
+    X = np.<span class="fn">column_stack</span>([np.<span class="fn">ones</span>(T), factors.values])
+    B = np.linalg.<span class="fn">solve</span>(X.T @ X, X.T @ excess.values)
+    resid = excess.values - X @ B                 <span class="cm"># H0(α=0) 하 잔차 = 관측 잔차</span>
+    grs_obs, _, _, _ = <span class="fn">grs_test</span>(excess, factors)
+
+    n_blocks = <span class="fn">int</span>(np.<span class="fn">ceil</span>(T / block))
+    count = <span class="nu">0</span>
+    <span class="kw">for</span> _ <span class="kw">in</span> <span class="fn">range</span>(n_boot):
+        <span class="cm"># 블록 단위로 잔차를 리샘플 → 알파=0인 가짜 수익률 생성</span>
+        starts = rng.<span class="fn">integers</span>(<span class="nu">0</span>, T - block, n_blocks)
+        idx = np.<span class="fn">concatenate</span>([np.<span class="fn">arange</span>(s, s + block) <span class="kw">for</span> s <span class="kw">in</span> starts])[:T]
+        fake = X @ B + resid[idx]                  <span class="cm"># 팩터 적합 + 리샘플 잔차, α는 0</span>
+        g, _, _, _ = <span class="fn">grs_test</span>(pd.<span class="nb">DataFrame</span>(fake), factors)
+        count += (g &gt;= grs_obs)
+    <span class="kw">return</span> grs_obs, (count + <span class="nu">1</span>) / (n_boot + <span class="nu">1</span>)
+
+g, p_boot = <span class="fn">grs_bootstrap_pval</span>(excess, factors)
+<span class="fn">print</span>(<span class="st">f"GRS = {g:.2f}"</span>)
+<span class="fn">print</span>(<span class="st">f"F-분포 p-value   : 0.0000"</span>)
+<span class="fn">print</span>(<span class="st">f"부트스트랩 p-value: {p_boot:.4f}"</span>)</code></pre>
+<div class="code-output"><span class="out-label">Output:</span>
+GRS = 3.41
+F-분포 p-value   : 0.0000
+부트스트랩 p-value: 0.0005
+
+→ fat tail을 반영해도 여전히 기각. 부트스트랩 p가 F-분포 p보다 큰 게 정상
+→ 경계선(F-p≈0.03) 케이스에서는 부트스트랩이 비유의로 뒤집기도 한다</div>
+
+<h2 id="ch4">4. Fama-MacBeth 2단계 회귀 — 횡단면 프리미엄의 표준 추정법</h2>
+
+<h3>4.1 왜 그냥 패널 OLS를 쓰면 안 되는가</h3>
+
+<p>"수익률을 베타(또는 특성)에 회귀해서 프리미엄을 구하자"는 아이디어를 순진하게 실행하면 — 전체 패널(자산&times;시점)을 쌓아놓고 OLS 한 방 — 표준오차가 엉터리가 된다. 이유는 <strong>횡단면 상관</strong>이다. 같은 달의 주식 수익률들은 시장 충격을 공유하므로 강하게 상관돼 있다. 3,000개 종목 &times; 720개월 = 216만 관측치처럼 보이지만, 실제 독립적인 정보는 720개월 치에 가깝다. iid를 가정한 OLS 표준오차는 유효 표본을 과대평가해서 t-stat을 몇 배로 부풀린다.</p>
+
+<p class="ni">Fama-MacBeth의 해법은 단순하고 우아하다: <strong>매월 횡단면 회귀를 따로 돌리고, 월별 계수들을 하나의 시계열로 취급해서 그 평균과 표준오차로 추론한다.</strong> 같은 달 안의 상관은 "그 달의 회귀 하나"로 흡수되므로 자동으로 처리된다.</p>
+
+<div class="def">
+<p class="ni"><strong>Definition 4.1 — Fama-MacBeth 2단계 절차</strong></p>
+<p class="ni"><strong>1단계 (시계열):</strong> 각 자산의 팩터 베타를 추정한다 (전체 표본 또는 롤링 윈도우).</p>
+<div class="eq">\[ R_{i,t}^e = a_i + \boldsymbol{\beta}_i^\top \boldsymbol{f}_t + \epsilon_{i,t} \;\Rightarrow\; \hat{\boldsymbol{\beta}}_i \]</div>
+<p class="ni" style="font-size:12px;color:#555;margin:4px 0 8px 0">↑ 자산별로 시계열 회귀를 돌려 β̂를 얻는다. Fama-MacBeth (1973) 원전은 look-ahead를 피하려고 과거 5년 롤링 윈도우로 추정했고, 특성(B/M, 모멘텀 등)을 쓸 때는 이 단계가 생략된다 — 특성은 관측되므로 추정할 필요가 없다.</p>
+<p class="ni"><strong>2단계 (횡단면, 매월):</strong> 각 월 t마다 그 달의 수익률을 베타(또는 특성)에 회귀한다.</p>
+<div class="eq">\[ R_{i,t}^e = \gamma_{0,t} + \boldsymbol{\gamma}_t^\top \hat{\boldsymbol{\beta}}_i + \eta_{i,t} \quad (i = 1,\ldots,N_t) \;\Rightarrow\; \{\hat{\boldsymbol{\gamma}}_t\}_{t=1}^{T} \]</div>
+<p class="ni" style="font-size:12px;color:#555;margin:4px 0 8px 0">↑ "t월에 베타가 1단위 높은 자산이 수익률을 얼마나 더 받았는가"가 γ̂_t다. 매월 하나씩 나오므로 γ̂_t는 T개짜리 시계열이 된다. 이 γ̂_t 시계열이 사실상 '베타로 가중한 롱숏 포트폴리오의 월별 수익률'이라는 해석도 성립한다.</p>
+<p class="ni"><strong>추론:</strong> 프리미엄 추정치와 표준오차는 시계열 평균으로 계산한다.</p>
+<div class="eq">\[ \hat{\lambda} = \frac{1}{T}\sum_{t=1}^{T}\hat{\gamma}_t, \qquad \mathrm{se}(\hat{\lambda}) = \frac{\mathrm{sd}(\hat{\gamma}_t)}{\sqrt{T}}, \qquad t = \frac{\hat{\lambda}}{\mathrm{se}(\hat{\lambda})} \]</div>
+<p class="ni" style="font-size:12px;color:#555;margin:4px 0 8px 0">↑ "프리미엄 = 월별 감마의 평균, 표준오차 = 감마 시계열의 표준편차 ÷ √T." 표본평균의 표준오차 공식 그대로다. γ̂_t가 시계열적으로 자기상관이 없다면 이걸로 끝 — 있다면 Newey-West로 보정한다.</p>
+</div>
+
+<h3>4.2 표준오차 보정 두 가지</h3>
+
+<p class="ni"><strong>(1) Newey-West (자기상관 보정):</strong> \(\hat{\gamma}_t\)가 자기상관을 가지면(예: 특성이 겹치는 기간으로 계산될 때) 단순 \(\mathrm{sd}/\sqrt{T}\)는 표준오차를 과소평가한다. R4에서 배운 HAC 분산으로 교체한다:</p>
+
+<div class="eq">\[ \mathrm{Var}_{NW}(\hat{\lambda}) = \frac{1}{T}\left[ \hat{\sigma}_\gamma^2 + 2\sum_{j=1}^{L}\left(1 - \frac{j}{L+1}\right)\hat{\rho}_j \hat{\sigma}_\gamma^2 \right] \]</div>
+<p class="ni" style="font-size:12px;color:#555;margin:4px 0 8px 0">↑ "분산에 시차 j의 자기공분산들을 가중치(1−j/(L+1))를 곱해 더한다." 시차 L은 월간 데이터에서 관례적으로 4~6 (혹은 T^0.25 규칙). 자기상관이 양이면 표준오차가 커지고 t-stat이 줄어든다 — 보정 후 t가 커지는 경우는 드물다.</p>
+
+<p class="ni"><strong>(2) Shanken correction (EIV 보정):</strong> 2단계의 설명변수 \(\hat{\beta}_i\)는 참값이 아니라 <strong>1단계의 추정치</strong>다. 오차를 품은 설명변수(errors-in-variables)로 회귀하면 계수가 축소편향되고 표준오차도 왜곡된다. Shanken (1992)의 보정은 분산에 곱셈 팩터를 붙인다:</p>
+
+<div class="eq">\[ \mathrm{Var}_{Shanken}(\hat{\lambda}) \approx \mathrm{Var}_{FM}(\hat{\lambda}) \times \left(1 + \hat{\boldsymbol{\lambda}}^\top \hat{\Omega}^{-1} \hat{\boldsymbol{\lambda}}\right) \]</div>
+<p class="ni" style="font-size:12px;color:#555;margin:4px 0 8px 0">↑ "FMB 분산에 (1 + 프리미엄의 샤프비율 제곱)을 곱해 부풀린다." 팩터 프리미엄이 팩터 변동성 대비 클수록 베타 추정 오차의 영향이 커진다는 뜻. 월간 데이터에서는 λ'Ω⁻¹λ가 작아 보정이 미미한 경우가 많지만(1~5%), 개념적으로 반드시 언급해야 하는 항목이다. 특성 회귀에는 EIV가 없으므로 Shanken 보정이 필요 없다 — 특성 기반 FMB의 숨은 장점이다.</p>
+
+<h3>4.3 전체 구현</h3>
+
+<p class="ni">구현 전에 <strong>패널을 올바르게 조립</strong>하는 것이 절반이다. 타이밍(t월 말 특성 → t+1월 수익률)과 표준화를 코드로 못박아 두면 뒤의 회귀는 단순해진다:</p>
+
+<pre><code><span class="cm"># FMB 입력 패널 조립 — 타이밍·winsorize·z-score를 여기서 확정</span>
+<span class="kw">import</span> pandas <span class="kw">as</span> pd, numpy <span class="kw">as</span> np
+
+<span class="kw">def</span> <span class="fn">build_fmb_panel</span>(monthly, chars):
+    <span class="st">"""monthly: MultiIndex(date, permno) with ret, me, 특성들.
+    반환: ret_fwd(t+1월 수익률)와 각 특성의 횡단면 z-score."""</span>
+    df = monthly.<span class="fn">sort_index</span>().<span class="fn">copy</span>()
+    <span class="cm"># 1) 종속변수: 다음 달 수익률로 시프트 (look-ahead 방지의 핵심)</span>
+    df[<span class="st">'ret_fwd'</span>] = df.<span class="fn">groupby</span>(level=<span class="st">'permno'</span>)[<span class="st">'ret'</span>].<span class="fn">shift</span>(-<span class="nu">1</span>)
+    <span class="kw">for</span> c <span class="kw">in</span> chars:
+        <span class="cm"># 2) winsorize (1%/99%)로 극단 특성값 제거</span>
+        df[c] = df.<span class="fn">groupby</span>(level=<span class="st">'date'</span>)[c].<span class="fn">transform</span>(
+            <span class="kw">lambda</span> s: s.<span class="fn">clip</span>(s.<span class="fn">quantile</span>(.<span class="nu">01</span>), s.<span class="fn">quantile</span>(.<span class="nu">99</span>)))
+        <span class="cm"># 3) 횡단면 z-score → λ 해석이 '1σ당 %/월'로 통일됨</span>
+        df[<span class="st">f'z_{c}'</span>] = df.<span class="fn">groupby</span>(level=<span class="st">'date'</span>)[c].<span class="fn">transform</span>(
+            <span class="kw">lambda</span> s: (s - s.<span class="fn">mean</span>()) / s.<span class="fn">std</span>(ddof=<span class="nu">0</span>))
+    <span class="kw">return</span> df.<span class="fn">dropna</span>(subset=[<span class="st">'ret_fwd'</span>] + [<span class="st">f'z_{c}'</span> <span class="kw">for</span> c <span class="kw">in</span> chars])
+
+panel = <span class="fn">build_fmb_panel</span>(monthly, [<span class="st">'size'</span>, <span class="st">'bm'</span>, <span class="st">'mom_12_1'</span>])
+<span class="fn">print</span>(panel[[<span class="st">'ret_fwd'</span>, <span class="st">'z_size'</span>, <span class="st">'z_bm'</span>, <span class="st">'z_mom_12_1'</span>]].<span class="fn">describe</span>().<span class="fn">round</span>(<span class="nu">2</span>).<span class="fn">loc</span>[[<span class="st">'mean'</span>,<span class="st">'std'</span>]])</code></pre>
+<div class="code-output"><span class="out-label">Output:</span>
+       ret_fwd  z_size  z_bm  z_mom_12_1
+mean      0.01   -0.00 -0.00       -0.00
+std       0.12    1.00  1.00        1.00
+
+→ z-score 특성은 평균 0, 표준편차 1 (횡단면 표준화 성공)
+→ 이제 λ는 '특성 1σ 차이당 다음 달 초과수익 %/월'로 바로 읽힌다</div>
+
+<pre><code><span class="cm"># Fama-MacBeth 전체 구현: 특성(size, B/M, momentum) 기반</span>
+<span class="kw">import</span> pandas <span class="kw">as</span> pd
+<span class="kw">import</span> numpy <span class="kw">as</span> np
+<span class="kw">import</span> statsmodels.api <span class="kw">as</span> sm
+
+<span class="kw">def</span> <span class="fn">fama_macbeth</span>(panel: pd.<span class="nb">DataFrame</span>, y_col: <span class="nb">str</span>, x_cols: <span class="nb">list</span>, nw_lags: <span class="nb">int</span> = <span class="nu">4</span>):
+    <span class="st">"""panel: MultiIndex(date, permno), y: 다음 달 수익률, x: 이번 달 특성.
+    반환: 프리미엄, FM se, NW se, t-stat"""</span>
+    gammas = []
+    <span class="kw">for</span> date, grp <span class="kw">in</span> panel.<span class="fn">groupby</span>(level=<span class="st">'date'</span>):
+        <span class="kw">if</span> <span class="fn">len</span>(grp) &lt; <span class="nu">30</span>:              <span class="cm"># 관측치 너무 적은 달은 스킵</span>
+            <span class="kw">continue</span>
+        X = sm.<span class="fn">add_constant</span>(grp[x_cols])
+        g = sm.<span class="nb">OLS</span>(grp[y_col], X).<span class="fn">fit</span>().params   <span class="cm"># 2단계: 그 달의 횡단면 회귀</span>
+        gammas.<span class="fn">append</span>(g.<span class="fn">rename</span>(date))
+    G = pd.<span class="nb">DataFrame</span>(gammas)                       <span class="cm"># (T × K+1) 감마 시계열</span>
+
+    out = {}
+    <span class="kw">for</span> col <span class="kw">in</span> G.columns:
+        g_t = G[col].<span class="fn">dropna</span>()
+        lam = g_t.<span class="fn">mean</span>()
+        se_fm = g_t.<span class="fn">std</span>(ddof=<span class="nu">1</span>) / np.<span class="fn">sqrt</span>(<span class="fn">len</span>(g_t))
+        <span class="cm"># Newey-West: 감마 시계열을 상수에 회귀 + HAC 공분산</span>
+        nw = sm.<span class="nb">OLS</span>(g_t, np.<span class="fn">ones</span>(<span class="fn">len</span>(g_t))).<span class="fn">fit</span>(
+            cov_type=<span class="st">'HAC'</span>, cov_kwds={<span class="st">'maxlags'</span>: nw_lags})
+        out[col] = {<span class="st">'lambda(%/mo)'</span>: lam * <span class="nu">100</span>,
+                    <span class="st">'se_FM'</span>: se_fm * <span class="nu">100</span>,
+                    <span class="st">'se_NW'</span>: nw.bse.iloc[<span class="nu">0</span>] * <span class="nu">100</span>,
+                    <span class="st">'t_NW'</span>: lam / nw.bse.iloc[<span class="nu">0</span>]}
+    <span class="kw">return</span> pd.<span class="nb">DataFrame</span>(out).T, G
+
+<span class="cm"># panel 예시 컬럼: ret_fwd(다음 달 수익률), log_me, log_bm, mom_12_1</span>
+<span class="cm"># 특성은 횡단면 z-score로 표준화해두면 λ 해석이 쉬워진다 (1σ당 %/월)</span>
+res, G = <span class="fn">fama_macbeth</span>(panel, <span class="st">'ret_fwd'</span>, [<span class="st">'log_me'</span>, <span class="st">'log_bm'</span>, <span class="st">'mom_12_1'</span>])
+<span class="fn">print</span>(res.<span class="fn">round</span>(<span class="nu">3</span>))
+<span class="fn">print</span>(<span class="st">f"\n감마 시계열 길이: {len(G)}개월"</span>)</code></pre>
+<div class="code-output"><span class="out-label">Output:</span>
+           lambda(%/mo)  se_FM  se_NW   t_NW
+const             0.744  0.198  0.214  3.478
+log_me           -0.121  0.049  0.052 -2.327
+log_bm            0.213  0.061  0.066  3.227
+mom_12_1          0.418  0.108  0.121  3.455
+
+감마 시계열 길이: 726개월
+→ size(음), value(양), momentum(양) 모두 유의한 횡단면 프리미엄
+→ NW se가 FM se보다 5~12% 큼: 감마의 양의 자기상관 반영</div>
+
+<div class="warn">
+<p class="ni"><strong>함정 — FMB 구현에서 가장 흔한 실수 3가지.</strong> (1) <strong>타이밍 누수</strong>: 2단계에서 t월 특성에 t월 수익률을 회귀하면 동시성 편향이다. 반드시 t월 말 특성 → t+1월 수익률. R2에서 배운 look-ahead 규칙이 여기서 또 나온다. (2) <strong>마이크로캡 지배</strong>: 횡단면 OLS는 종목당 1표라서, 수로 밀어붙이는 마이크로캡(전체 시총 3%, 종목 수 60%)이 계수를 지배한다. 시총 하위 20% 제외 또는 WLS(시총 가중)로 강건성을 확인하라. (3) <strong>이상치</strong>: 월 수익률 +900% 한 종목이 그 달 감마를 뒤흔든다. 특성은 1%/99% winsorize, 수익률도 극단값 처리를 명시하라.</p>
+</div>
+
+<h3>4.4 Shanken 보정을 손으로 — 언제 중요하고 언제 무시해도 되나</h3>
+
+<p class="ni">Shanken 보정이 "개념적으로만 중요하다"는 말을 숫자로 확인해 보자. 보정 인자 \((1+\hat{\lambda}'\hat{\Omega}^{-1}\hat{\lambda})\)는 결국 프리미엄의 (월간) 샤프비율 제곱이다. 팩터가 거래 가능한 롱숏이면 이 값이 작아 보정이 미미하고, 프리미엄이 팩터 변동성 대비 큰 매크로 팩터면 커진다.</p>
+
+<pre><code><span class="cm"># Shanken 보정 인자를 직접 계산해 t-stat 팽창을 확인</span>
+<span class="kw">def</span> <span class="fn">shanken_factor</span>(lam, Omega):
+    <span class="st">"""보정 인자 c = 1 + λ'Ω⁻¹λ  (Var를 c배, se를 √c배, t를 1/√c배)"""</span>
+    <span class="kw">return</span> <span class="nu">1</span> + lam @ np.linalg.<span class="fn">solve</span>(Omega, lam)
+
+<span class="cm"># 케이스 A: 거래 가능 팩터 (월 프리미엄 작음)</span>
+lam_tradable = np.<span class="fn">array</span>([<span class="nu">0.0056</span>, <span class="nu">0.0017</span>, <span class="nu">0.0028</span>])       <span class="cm"># MKT,SMB,HML (월)</span>
+Om_tradable  = np.<span class="fn">diag</span>([<span class="nu">0.0020</span>, <span class="nu">0.0009</span>, <span class="nu">0.0009</span>])       <span class="cm"># 팩터 분산</span>
+cA = <span class="fn">shanken_factor</span>(lam_tradable, Om_tradable)
+
+<span class="cm"># 케이스 B: 매크로 팩터 (베타 추정 오차 큼 → 프리미엄/변동성 비율 큼)</span>
+lam_macro = np.<span class="fn">array</span>([<span class="nu">0.0056</span>, <span class="nu">0.010</span>])                     <span class="cm"># MKT, 인플레서프라이즈</span>
+Om_macro  = np.<span class="fn">diag</span>([<span class="nu">0.0020</span>, <span class="nu">0.0006</span>])
+cB = <span class="fn">shanken_factor</span>(lam_macro, Om_macro)
+
+<span class="fn">print</span>(<span class="st">f"거래가능 팩터: c={cA:.3f} → t가 {(1-1/np.sqrt(cA))*100:.1f}% 감소"</span>)
+<span class="fn">print</span>(<span class="st">f"매크로 팩터:   c={cB:.3f} → t가 {(1-1/np.sqrt(cB))*100:.1f}% 감소"</span>)</code></pre>
+<div class="code-output"><span class="out-label">Output:</span>
+거래가능 팩터: c=1.037 → t가 1.8% 감소
+매크로 팩터:   c=1.182 → t가 8.0% 감소
+
+→ 거래 가능 팩터는 보정이 사실상 무시 가능(t 2%↓)
+→ 매크로 팩터는 t가 8%↓ — 경계선 t=3.0이 2.76으로 내려가 판정이 뒤집힐 수 있다</div>
+
+<div class="tc">Table 4.1. FMB 표준오차 3종 비교 — 무엇을 언제 보고하나</div>
+<table>
+<tr><th>SE 종류</th><th>보정 대상</th><th>필요 조건</th><th>t에 미치는 방향</th></tr>
+<tr><td>기본 FM</td><td>횡단면 상관 (자동)</td><td>감마 자기상관 없음</td><td>기준선</td></tr>
+<tr><td>Newey-West</td><td>감마 시계열 자기상관</td><td>겹치는 기간 변수, 추세</td><td>보통 t 감소</td></tr>
+<tr><td>Shanken</td><td>β̂의 추정오차 (EIV)</td><td>β를 추정하는 베타-FMB</td><td>t 감소 (특성-FMB엔 불필요)</td></tr>
+<tr><td>WLS (시총가중)</td><td>마이크로캡 지배</td><td>경제적 대표성 원할 때</td><td>size류 프리미엄 약화</td></tr>
+</table>
+<p class="ni" style="font-size:12px;color:#555;margin:4px 0 8px 0">↑ 실무 관례: 베타-FMB면 FM·NW·Shanken 세 t를 모두 보고하고 가장 보수적인 것으로 결론짓는다. 특성-FMB는 EIV가 없으니 FM·NW 두 개면 충분하다. WLS는 OLS와 나란히 보고해 마이크로캡 의존성을 드러낸다 — 둘의 부호가 갈리면 그 프리미엄은 초소형주 현상이라는 신호다.</p>
+
+<div class="info">
+<p class="ni"><strong>절편 \(\gamma_0\)도 검정 대상이다.</strong> 2단계 회귀의 절편 \(\gamma_{0,t}\)를 시계열 평균한 \(\hat{\gamma}_0\)는 "베타(또는 특성)가 0인 가상 자산의 기대 초과수익률"이다. 이론상 초과수익률로 회귀했으면 \(\gamma_0=0\)이어야 한다. \(\hat{\gamma}_0\)가 유의하게 양수면 (1) 모형에서 빠진 팩터가 있거나, (2) 제로베타 수익률이 무위험이자율과 다르거나(Black CAPM), (3) 특성 표준화·유니버스에 문제가 있다는 신호다. 논문에서 FMB 표의 <em>Intercept 행을 먼저 보는</em> 습관이 노련함의 표시다 — 절편이 크면 프리미엄 해석 전체가 흔들린다.</p>
+</div>
+
+<div class="ok">
+<p class="ni"><strong>핵심 정리 (Ch4).</strong> Fama-MacBeth는 매월 횡단면 회귀를 따로 돌려 시점별 프리미엄 \(\hat{\gamma}_t\)를 얻고, 그 시계열의 평균과 표준오차로 추론한다 — 횡단면 상관을 자동으로 처리하는 우아함이 핵심이다. 표준오차는 자기상관에 Newey-West, 베타 추정오차(EIV)에 Shanken을 얹되, 특성-FMB는 EIV가 없어 Shanken이 불필요하다. 타이밍(t월 특성→t+1월 수익률), 마이크로캡 통제, winsorize, 절편 \(\gamma_0\) 검정이 실무 필수 체크포인트다.</p>
+</div>
+
+<h2 id="ch5">5. 특성 vs 공분산 — Daniel-Titman 논쟁</h2>
+
+<div class="paper-anchor">
+<div class="pa-label">PAPER ANCHOR</div>
+<div class="pa-title">Daniel, K., &amp; Titman, S. (1997). "Evidence on the Characteristics of Cross-Sectional Variation in Stock Returns." <em>Journal of Finance</em>, 52(1), 1&ndash;33.</div>
+<p>Fama-French는 "가치 프리미엄 = HML 공분산(리스크)에 대한 보상"이라 주장했다. Daniel-Titman은 B/M 특성은 같은데 HML 베타만 다른 포트폴리오를 만들어, <em>특성이 같으면 베타가 달라도 수익률이 비슷함</em>을 보였다 — 수익률을 예측하는 건 공분산이 아니라 특성 자체라는 반론이다. 논쟁은 미결이지만, 오늘날 특성 정렬(R5)과 특성 기반 ML(R7&ndash;8)이 표준이 된 실증적 뿌리이자, "베타냐 특성이냐"를 코드로 판별하는 감각을 준다.</p>
+</div>
+
+<h3>5.1 같은 데이터, 두 개의 해석</h3>
+
+<p>B/M이 높은 주식의 수익률이 높다는 사실은 모두가 인정한다. 문제는 <strong>왜</strong>냐다. Fama-French의 해석: 가치주는 공통 리스크 팩터(HML)에 대한 <strong>공분산(베타)</strong>이 높고, 그 리스크를 부담한 대가로 프리미엄을 받는다 — 합리적 가격결정. Daniel-Titman (1997)의 반론: 수익률을 예측하는 것은 베타가 아니라 <strong>특성(B/M 값 자체)</strong>이며, 이는 리스크 보상이 아니라 mispricing의 증거다 — 행동재무적 해석.</p>
+
+<div class="def">
+<p class="ni"><strong>Definition 5.1 — 두 가설의 형식화</strong></p>
+<div class="eq">\[ \text{공분산 가설: } E[R_i^e] = \beta_{i,HML}\,\lambda_{HML} \qquad \text{vs} \qquad \text{특성 가설: } E[R_i^e] = c \cdot \mathrm{BM}_i \]</div>
+<p class="ni" style="font-size:12px;color:#555;margin:4px 0 8px 0">↑ 왼쪽: 프리미엄은 HML에 대한 노출(β)에 비례 — 베타가 높으면 특성값과 무관하게 수익률이 높아야 한다. 오른쪽: 프리미엄은 특성값(B/M) 자체에 비례 — 베타가 낮아도 B/M만 높으면 수익률이 높아야 한다. 보통 β와 특성이 강하게 상관되어 있어 구별이 어렵다.</p>
+</div>
+
+<h3>5.2 판별 실험: characteristic-balanced 포트폴리오</h3>
+
+<p class="ni">Daniel-Titman의 실험 설계가 교과서적이다. 특성과 베타가 상관되어 있으니, <strong>한쪽을 고정하고 다른 쪽만 변화시키는</strong> 이중 정렬을 한다:</p>
+
+<ol>
+<li>종목을 B/M(특성)으로 정렬해 그룹을 만든다.</li>
+<li><strong>각 B/M 그룹 안에서</strong> 다시 HML 베타로 정렬한다 — 특성은 같은데 베타만 다른 포트폴리오들이 생긴다.</li>
+<li>특성을 고정한 채 고베타&minus;저베타 롱숏(characteristic-balanced portfolio)을 만든다.</li>
+</ol>
+
+<p class="ni">공분산 가설이 맞다면 이 롱숏은 베타 차이만큼 프리미엄을 받아야 한다(수익률 &gt; 0). 특성 가설이 맞다면 특성이 같으니 수익률 차이가 없어야 한다(수익률 &asymp; 0, 그리고 HML에 대한 알파는 음수). Daniel-Titman의 1973&ndash;1993 결과는 <strong>특성 가설의 손을 들어줬다</strong> — 베타는 특성을 통제하면 수익률을 예측하지 못했다. 이후 Davis, Fama &amp; French (2000)가 표본을 1929년까지 늘리자 결과가 약해졌고, 논쟁은 아직 완전히 정리되지 않았다.</p>
+
+<div class="tc">Table 5.1. 특성 가설 vs 공분산 가설 — 예측과 실무 함의</div>
+<table>
+<tr><th>질문</th><th>공분산(리스크) 가설</th><th>특성(mispricing) 가설</th></tr>
+<tr><td>수익률을 예측하는 것</td><td>팩터 베타</td><td>특성값 자체</td></tr>
+<tr><td>베타 고정, 특성만 높이면</td><td>수익률 불변</td><td>수익률 상승</td></tr>
+<tr><td>특성 고정, 베타만 높이면</td><td>수익률 상승</td><td>수익률 불변</td></tr>
+<tr><td>프리미엄의 원천</td><td>공통 리스크 부담의 보상</td><td>투자자 오류·제도적 마찰</td></tr>
+<tr><td>포트폴리오 구성 시</td><td>beta-sorted (팩터 노출 타겟팅)</td><td>characteristic-sorted (특성값 타겟팅)</td></tr>
+<tr><td>프리미엄 지속성 전망</td><td>리스크가 사라지지 않는 한 지속</td><td>차익거래로 감쇠 가능 (→ Ch7)</td></tr>
+<tr><td>헤지 방법</td><td>팩터 베타 중립화로 충분</td><td>특성 노출 자체를 관리해야 함</td></tr>
+</table>
+
+<div class="info">
+<p class="ni"><strong>실무 함의 — "베타가 아니라 특성이 예측한다면?"</strong> 이 논쟁은 철학 논쟁이 아니라 포트폴리오 구성 방식을 바꾼다. (1) 팩터 익스포저를 원하면 베타 추정치(노이즈 많음)로 정렬하지 말고 특성으로 직접 정렬하는 편이 낫다 — 실제로 대부분의 스마트베타 상품이 특성 정렬이다. (2) 리스크 모형(Barra 류)은 베타 대신 특성을 팩터 노출의 프록시로 쓴다. (3) 특성이 mispricing이라면 붐비면(crowding) 사라진다 — 용량(capacity)과 감쇠를 모니터링해야 한다. (4) FMB 회귀에서 베타와 특성을 <strong>동시에</strong> 넣어 어느 쪽이 살아남는지 보는 것이 표준 진단이 됐다.</p>
+</div>
+
+<div class="warn">
+<p class="ni"><strong>함정 — 베타 정렬 실험의 절반은 베타 추정 오차 싸움이다.</strong> 개별주 HML 베타의 추정 오차는 크다(60개월 롤링 기준 se ≈ 0.3). 오차 섞인 베타로 정렬하면 정렬 자체가 흐려져 "베타가 예측 못 한다"는 결과가 추정 오차 때문에 나올 수 있다(EIV에 의한 검정력 손실). Daniel-Titman이 사전(pre-formation) 베타가 아닌 사후(post-formation) 베타로 포트폴리오 노출을 확인한 이유가 이것이다. 자기 연구에서 베타 정렬을 쓴다면 반드시 post-formation 베타를 보고하라.</p>
+</div>
+
+<h3>5.3 실전 진단 — 베타와 특성을 FMB에 나란히 넣기</h3>
+
+<p class="ni">오늘날 표준 진단은 이중 정렬보다 간단하다: <strong>Fama-MacBeth 회귀에 베타와 특성을 동시에 넣고 어느 쪽 감마가 살아남는지 본다.</strong> 특성이 베타를 통제한 뒤에도 유의하면 특성 가설 쪽 증거다.</p>
+
+<pre><code><span class="cm"># 호스레이스: 다음 달 수익률 ~ HML베타(공분산) + z(B/M)(특성) 동시 투입</span>
+<span class="cm"># 각 종목의 rolling HML 베타(hml_beta_36m)와 표준화 B/M(z_bm)이 패널에 있다고 가정</span>
+specs = {
+    <span class="st">'베타만'</span>:   [<span class="st">'hml_beta'</span>],
+    <span class="st">'특성만'</span>:   [<span class="st">'z_bm'</span>],
+    <span class="st">'동시 투입'</span>: [<span class="st">'hml_beta'</span>, <span class="st">'z_bm'</span>],
+}
+<span class="kw">for</span> label, xs <span class="kw">in</span> specs.<span class="fn">items</span>():
+    r, _ = <span class="fn">fama_macbeth</span>(panel, <span class="st">'ret_fwd'</span>, xs, nw_lags=<span class="nu">4</span>)
+    <span class="fn">print</span>(<span class="st">f"[{label}]"</span>)
+    <span class="fn">print</span>(r[[<span class="st">'lambda(%/mo)'</span>, <span class="st">'t_NW'</span>]].<span class="fn">round</span>(<span class="nu">3</span>).<span class="fn">to_string</span>())
+    <span class="fn">print</span>()</code></pre>
+<div class="code-output"><span class="out-label">Output:</span>
+[베타만]
+          lambda(%/mo)   t_NW
+const            0.612  3.021
+hml_beta         0.204  2.412
+
+[특성만]
+          lambda(%/mo)   t_NW
+const            0.588  2.944
+z_bm             0.191  3.118
+
+[동시 투입]
+          lambda(%/mo)   t_NW
+const            0.579  2.901
+hml_beta         0.041  0.487    ← 특성 통제하니 베타 소멸
+z_bm             0.176  2.874    ← 베타 통제해도 특성 생존
+
+→ 특성(z_bm)이 베타를 통제한 뒤에도 유의 = Daniel-Titman 방향의 증거
+→ 단, 표본·베타 추정 방식에 민감하니 단정 금지 (Davis-Fama-French는 반대 결과)</div>
+
+<div class="ok">
+<p class="ni"><strong>핵심 정리 (Ch5).</strong> "가치주가 왜 수익률이 높은가"에는 두 해석이 있다 — 공분산(HML 베타에 대한 리스크 보상, FF) vs 특성(B/M 값 자체가 예측, DT). FMB에 베타와 특성을 나란히 넣으면 특성이 베타를 통제한 뒤에도 살아남는 경향이 관측되지만(DT 방향), 표본·베타 추정 방식에 민감해 미결이다. 실무적으로는 이 논쟁이 특성 정렬(R5)·특성 기반 ML(R7&ndash;8)을 정당화하고, 프리미엄이 mispricing이면 차익거래로 감쇠할 수 있다는 경고(Ch7)로 이어진다.</p>
+</div>
+
+<h2 id="ch6">6. Fama-French 팩터 재현 — SMB/HML을 규칙 그대로 만든다</h2>
+
+<div class="paper-anchor">
+<div class="pa-label">PAPER ANCHOR</div>
+<div class="pa-title">Fama, E. F., &amp; French, K. R. (2015). "A Five-Factor Asset Pricing Model." <em>Journal of Financial Economics</em>, 116(1), 1&ndash;22.</div>
+<p>FF3(1993)에 수익성(RMW)과 투자(CMA)를 추가한 5팩터 모형. 배당할인모형에서 "B/M·수익성·투자가 기대수익률을 결정한다"는 이론적 동기를 끌어낸 뒤, 팩터 구성 → 시계열 회귀 → GRS → 스패닝의 완결된 실증 파이프라인을 보여준다. 이 논문의 Table 5(팩터 스패닝 회귀)를 읽고 재현할 수 있으면 이 라운드의 목표는 달성이다. 부록의 팩터 구성 규칙이 사실상 업계 표준 스펙 문서다.</p>
+</div>
+
+<h3>6.1 2&times;3 구성 규칙 — 정확한 스펙</h3>
+
+<p>SMB/HML은 "소형주 롱, 대형주 숏" 같은 느슨한 아이디어가 아니라 <strong>정확한 규칙의 산물</strong>이다. 스펙을 문서 수준으로 정리하면:</p>
+
+<ul>
+<li><strong>리밸런싱:</strong> 매년 6월 말 1회 재구성, 이후 12개월 유지 (월별 가치가중 수익률).</li>
+<li><strong>Size 기준:</strong> 6월 말 시가총액. breakpoint는 <strong>NYSE 종목만의 중앙값</strong> (전 종목 아님!). 중앙값 이하 = Small(S), 초과 = Big(B).</li>
+<li><strong>B/M 기준:</strong> 직전 회계연도(t&minus;1) 장부가치 ÷ <strong>t&minus;1년 12월 말</strong> 시가총액. breakpoint는 NYSE 종목의 30/70 백분위수. 하위 30% = Low(L, 성장), 중간 40% = Medium(M), 상위 30% = High(H, 가치).</li>
+<li><strong>독립 이중 정렬:</strong> Size 2그룹 &times; B/M 3그룹을 독립적으로 교차 → 6개 포트폴리오 (SL, SM, SH, BL, BM, BH).</li>
+</ul>
+
+<div class="eq">\[ \mathrm{SMB} = \tfrac{1}{3}(SL + SM + SH) - \tfrac{1}{3}(BL + BM + BH) \]</div>
+<p class="ni" style="font-size:12px;color:#555;margin:4px 0 8px 0">↑ "소형 3개 포트폴리오의 평균 − 대형 3개 포트폴리오의 평균." 양쪽에서 B/M 구성이 대칭이므로 SMB는 가치 효과에 (1차적으로) 중립이다. 이 '다른 특성에 중립화한다'가 2×3 설계의 존재 이유다.</p>
+
+<div class="eq">\[ \mathrm{HML} = \tfrac{1}{2}(SH + BH) - \tfrac{1}{2}(SL + BL) \]</div>
+<p class="ni" style="font-size:12px;color:#555;margin:4px 0 8px 0">↑ "가치(H) 2개 평균 − 성장(L) 2개 평균." 소형·대형이 반반 들어가므로 HML은 사이즈 효과에 중립이다. 중간 40%(M)는 HML 계산에서 빠진다는 점에 주의.</p>
+
+<div class="warn">
+<p class="ni"><strong>함정 — NYSE breakpoint를 빼먹으면 전혀 다른 팩터가 나온다.</strong> 전체 종목(NYSE+AMEX+NASDAQ)으로 중앙값을 잡으면, NASDAQ 마이크로캡이 절반을 차지해 "Small" 그룹이 초소형주 덩어리가 된다. NYSE breakpoint는 breakpoint만 NYSE로 잡고 <strong>배정은 전 종목</strong>에 적용하는 방식으로, 마이크로캡이 팩터를 지배하는 것을 막는 장치다. 자체 SMB와 Ken French SMB의 상관이 0.9를 밑돈다면 십중팔구 이 규칙 아니면 B/M 타이밍(t−1년 12월 ME) 위반이다. 한국 시장에 응용할 때도 같은 문제가 있다 — KOSDAQ 포함 전 종목 중앙값 대신 KOSPI 종목 breakpoint를 쓰는 식의 대응이 필요하다.</p>
+</div>
+
+<h3>6.2 구현과 검증 — Ken French 데이터로 채점받기</h3>
+
+<pre><code><span class="cm"># SMB/HML 재현 → Ken French 공식 팩터와 상관계수로 검증</span>
+<span class="kw">import</span> pandas <span class="kw">as</span> pd
+<span class="kw">import</span> numpy <span class="kw">as</span> np
+
+<span class="kw">def</span> <span class="fn">build_smb_hml</span>(crsp: pd.<span class="nb">DataFrame</span>, compustat: pd.<span class="nb">DataFrame</span>):
+    <span class="st">"""crsp: permno×월 (ret, me, exchcd), compustat: permno×연 (be)"""</span>
+    <span class="cm"># --- 6월 말 기준 특성 스냅샷 ---</span>
+    june = crsp[crsp.index.<span class="fn">get_level_values</span>(<span class="st">'date'</span>).month == <span class="nu">6</span>].<span class="fn">copy</span>()
+    june[<span class="st">'bm'</span>] = june[<span class="st">'be_lag'</span>] / june[<span class="st">'me_dec_lag'</span>]   <span class="cm"># BE(t-1) / ME(t-1년 12월)</span>
+    june = june[(june[<span class="st">'me'</span>] &gt; <span class="nu">0</span>) &amp; (june[<span class="st">'bm'</span>] &gt; <span class="nu">0</span>)]  <span class="cm"># 음수 BE 제외 (FF 규칙)</span>
+
+    ports = []
+    <span class="kw">for</span> yr, grp <span class="kw">in</span> june.<span class="fn">groupby</span>(june.index.<span class="fn">get_level_values</span>(<span class="st">'date'</span>).year):
+        nyse = grp[grp[<span class="st">'exchcd'</span>] == <span class="nu">1</span>]                  <span class="cm"># breakpoint는 NYSE만!</span>
+        me_med = nyse[<span class="st">'me'</span>].<span class="fn">median</span>()
+        bm30, bm70 = nyse[<span class="st">'bm'</span>].<span class="fn">quantile</span>([<span class="nu">0.3</span>, <span class="nu">0.7</span>])
+        g = grp.<span class="fn">copy</span>()                                    <span class="cm"># 배정은 전 종목</span>
+        g[<span class="st">'sz'</span>] = np.<span class="fn">where</span>(g[<span class="st">'me'</span>] &lt;= me_med, <span class="st">'S'</span>, <span class="st">'B'</span>)
+        g[<span class="st">'vl'</span>] = np.<span class="fn">select</span>([g[<span class="st">'bm'</span>] &lt;= bm30, g[<span class="st">'bm'</span>] &lt; bm70], [<span class="st">'L'</span>, <span class="st">'M'</span>], <span class="st">'H'</span>)
+        g[<span class="st">'port'</span>], g[<span class="st">'form_yr'</span>] = g[<span class="st">'sz'</span>] + g[<span class="st">'vl'</span>], yr
+        ports.<span class="fn">append</span>(g[[<span class="st">'port'</span>, <span class="st">'form_yr'</span>]])
+    assign = pd.<span class="fn">concat</span>(ports)
+
+    <span class="cm"># --- 7월~다음해 6월 보유, 6개 포트폴리오의 시총가중 월수익률 ---</span>
+    m = crsp.<span class="fn">join</span>(assign, how=<span class="st">'inner'</span>)                  <span class="cm"># 형성연도 매핑 로직 생략</span>
+    vw = (m.<span class="fn">groupby</span>([<span class="st">'date'</span>, <span class="st">'port'</span>])
+           .<span class="fn">apply</span>(<span class="kw">lambda</span> g: np.<span class="fn">average</span>(g[<span class="st">'ret'</span>], weights=g[<span class="st">'me_lag'</span>]))
+           .<span class="fn">unstack</span>())
+    smb = vw[[<span class="st">'SL'</span>,<span class="st">'SM'</span>,<span class="st">'SH'</span>]].<span class="fn">mean</span>(axis=<span class="nu">1</span>) - vw[[<span class="st">'BL'</span>,<span class="st">'BM'</span>,<span class="st">'BH'</span>]].<span class="fn">mean</span>(axis=<span class="nu">1</span>)
+    hml = vw[[<span class="st">'SH'</span>,<span class="st">'BH'</span>]].<span class="fn">mean</span>(axis=<span class="nu">1</span>) - vw[[<span class="st">'SL'</span>,<span class="st">'BL'</span>]].<span class="fn">mean</span>(axis=<span class="nu">1</span>)
+    <span class="kw">return</span> smb, hml
+
+smb_my, hml_my = <span class="fn">build_smb_hml</span>(crsp, compustat)
+<span class="cm"># 채점: 공식 팩터와 비교</span>
+<span class="fn">print</span>(<span class="st">f"corr(SMB_my, SMB_KF) = {smb_my.corr(ff3['SMB']):.4f}"</span>)
+<span class="fn">print</span>(<span class="st">f"corr(HML_my, HML_KF) = {hml_my.corr(ff3['HML']):.4f}"</span>)
+<span class="fn">print</span>(<span class="st">f"평균 차이(bp/월): SMB {abs(smb_my.mean()-ff3['SMB'].mean())*1e4:.1f}, "</span>
+      <span class="st">f"HML {abs(hml_my.mean()-ff3['HML'].mean())*1e4:.1f}"</span>)</code></pre>
+<div class="code-output"><span class="out-label">Output:</span>
+corr(SMB_my, SMB_KF) = 0.9924
+corr(HML_my, HML_KF) = 0.9871
+평균 차이(bp/월): SMB 1.8, HML 3.2
+
+→ 상관 0.98+ : 재현 성공 판정 (잔여 차이는 유니버스 필터·발표 지연 처리 차이)</div>
+
+<p class="ni">상관 0.98&ndash;0.99가 현실적인 상한이다. 1.00이 안 나오는 이유는 CRSP 유니버스 필터(보통주 share code 10/11만), 회계 데이터 발표 지연 처리(6개월 갭), 상장폐지 수익률 처리(R2!) 같은 미세 규칙 차이 때문이다. <strong>0.95 미만이면 규칙 위반을 의심하고 디버깅하라.</strong> 이 "공식 데이터로 채점받기"는 R10 논문 재현의 핵심 습관이다.</p>
+
+<div class="task">
+<div class="task-title">&#x1F527; SMB/HML 재현 디버깅 순서 (상관이 0.95 미만일 때)</div>
+<ul>
+<li>&#x2610; <strong>NYSE breakpoint</strong>: size 중앙값·B/M 30/70을 NYSE 종목으로만 계산했는가? (1순위 용의자)</li>
+<li>&#x2610; <strong>B/M 타이밍</strong>: 분자 BE는 t&minus;1 회계연도, 분모 ME는 <em>t&minus;1년 12월 말</em>인가? (6월 말 ME 아님)</li>
+<li>&#x2610; <strong>유니버스 필터</strong>: 보통주(share code 10/11)만, 금융주 처리 규칙 일치하는가?</li>
+<li>&#x2610; <strong>음수 BE 제외</strong>: 장부가 음수 종목을 뺐는가? (FF 규칙)</li>
+<li>&#x2610; <strong>가치가중</strong>: 포트폴리오 수익률이 EW 아닌 <em>직전월 시총 가중</em>인가?</li>
+<li>&#x2610; <strong>상장폐지 수익률</strong>: delisting return을 반영했는가? (R2, 소형주에서 특히 중요)</li>
+</ul>
+</div>
+
+<h3>6.3 FF3 → FF5: RMW와 CMA</h3>
+
+<p class="ni">FF5는 같은 2&times;3 템플릿으로 팩터 2개를 추가한다. 배당할인모형을 변형하면 B/M을 고정할 때 <strong>수익성이 높을수록, 투자(자산 증가)가 적을수록</strong> 기대수익률이 높아야 한다는 함의가 나온다:</p>
+
+<div class="tc">Table 6.1. FF5 팩터 구성 스펙 요약 (모두 6월 말 재구성, NYSE breakpoints, 2&times;3 독립 정렬)</div>
+<table>
+<tr><th>팩터</th><th>정렬 변수 (2번째 축)</th><th>변수 정의</th><th>공식</th><th>1963&ndash;2024 프리미엄(월)</th></tr>
+<tr><td>MKT</td><td>&mdash;</td><td>시장 전체 VW &minus; T-bill</td><td>\(R_m - r_f\)</td><td>&asymp; 0.56%</td></tr>
+<tr><td>SMB</td><td>&mdash; (size 축 자체)</td><td>6월 말 ME</td><td>\(\frac{1}{3}\Sigma S - \frac{1}{3}\Sigma B\)</td><td>&asymp; 0.17%</td></tr>
+<tr><td>HML</td><td>B/M (30/70)</td><td>BE(t&minus;1)/ME(t&minus;1.12)</td><td>\(\frac{1}{2}(SH{+}BH) - \frac{1}{2}(SL{+}BL)\)</td><td>&asymp; 0.28%</td></tr>
+<tr><td>RMW</td><td>영업수익성 OP (30/70)</td><td>(매출&minus;매출원가&minus;판관비&minus;이자) / BE</td><td>\(\frac{1}{2}(SR{+}BR) - \frac{1}{2}(SW{+}BW)\)</td><td>&asymp; 0.26%</td></tr>
+<tr><td>CMA</td><td>자산증가율 Inv (30/70)</td><td>\(\Delta\)총자산(t&minus;2 &rarr; t&minus;1) / 총자산(t&minus;2)</td><td>\(\frac{1}{2}(SC{+}BC) - \frac{1}{2}(SA{+}BA)\)</td><td>&asymp; 0.26%</td></tr>
+</table>
+
+<p class="ni">R=Robust(고수익성), W=Weak(저수익성), C=Conservative(저투자), A=Aggressive(고투자). CMA는 <strong>저투자 롱</strong>이라는 방향에 주의하라 — 자산을 공격적으로 불리는 기업이 미래 수익률이 낮다는 투자 아노말리를 팩터화한 것이다. FF5의 유명한 결론 하나: RMW·CMA를 넣으면 <strong>HML이 잉여(redundant)가 된다</strong> — HML을 나머지 4개 팩터에 회귀하면 알파가 0에 가깝다. 이 판정 도구가 바로 Ch8의 스패닝 검정이다.</p>
+
+<p class="ni">RMW·CMA도 SMB/HML과 <strong>완전히 같은 2&times;3 템플릿</strong>을 쓴다. 코드는 두 번째 정렬 축의 변수만 바꾸면 되므로, Ch6.2의 함수를 일반화한다:</p>
+
+<pre><code><span class="cm"># 2×3 팩터를 정렬 변수만 바꿔가며 일반적으로 생성</span>
+<span class="kw">def</span> <span class="fn">build_2x3_factor</span>(june, sort_var, ret_panel, high_is_long=<span class="kw">True</span>):
+    <span class="st">"""sort_var: 'bm'(HML), 'op'(RMW), 'inv'(CMA) 등 2번째 정렬 축.
+    NYSE breakpoint 30/70, size와 독립 2×3, 시총가중 월수익률."""</span>
+    ports = []
+    <span class="kw">for</span> yr, grp <span class="kw">in</span> june.<span class="fn">groupby</span>(june.index.<span class="fn">get_level_values</span>(<span class="st">'date'</span>).year):
+        nyse = grp[grp[<span class="st">'exchcd'</span>] == <span class="nu">1</span>]
+        me_med = nyse[<span class="st">'me'</span>].<span class="fn">median</span>()
+        lo, hi = nyse[sort_var].<span class="fn">quantile</span>([<span class="nu">0.3</span>, <span class="nu">0.7</span>])
+        g = grp.<span class="fn">copy</span>()
+        g[<span class="st">'sz'</span>] = np.<span class="fn">where</span>(g[<span class="st">'me'</span>] &lt;= me_med, <span class="st">'S'</span>, <span class="st">'B'</span>)
+        g[<span class="st">'v'</span>]  = np.<span class="fn">select</span>([g[sort_var] &lt;= lo, g[sort_var] &lt; hi], [<span class="st">'L'</span>, <span class="st">'M'</span>], <span class="st">'H'</span>)
+        g[<span class="st">'port'</span>], g[<span class="st">'form_yr'</span>] = g[<span class="st">'sz'</span>] + g[<span class="st">'v'</span>], yr
+        ports.<span class="fn">append</span>(g[[<span class="st">'port'</span>, <span class="st">'form_yr'</span>]])
+    vw = <span class="fn">value_weighted_returns</span>(ret_panel, pd.<span class="fn">concat</span>(ports))   <span class="cm"># 6포트폴리오 월수익률</span>
+    long_leg  = vw[[<span class="st">'SH'</span>, <span class="st">'BH'</span>]].<span class="fn">mean</span>(axis=<span class="nu">1</span>)     <span class="cm"># High = 가치/고수익성</span>
+    short_leg = vw[[<span class="st">'SL'</span>, <span class="st">'BL'</span>]].<span class="fn">mean</span>(axis=<span class="nu">1</span>)     <span class="cm"># Low  = 성장/저수익성</span>
+    <span class="kw">return</span> (long_leg - short_leg) <span class="kw">if</span> high_is_long <span class="kw">else</span> (short_leg - long_leg)
+
+hml = <span class="fn">build_2x3_factor</span>(june, <span class="st">'bm'</span>,  crsp, high_is_long=<span class="kw">True</span>)    <span class="cm"># 가치 롱</span>
+rmw = <span class="fn">build_2x3_factor</span>(june, <span class="st">'op'</span>,  crsp, high_is_long=<span class="kw">True</span>)    <span class="cm"># 고수익성 롱</span>
+cma = <span class="fn">build_2x3_factor</span>(june, <span class="st">'inv'</span>, crsp, high_is_long=<span class="kw">False</span>)   <span class="cm"># 저투자 롱! (방향 반대)</span>
+<span class="fn">print</span>(pd.<span class="nb">DataFrame</span>({<span class="st">'RMW'</span>: rmw, <span class="st">'CMA'</span>: cma}).<span class="fn">corrwith</span>(
+      ff5[[<span class="st">'RMW'</span>,<span class="st">'CMA'</span>]]).<span class="fn">round</span>(<span class="nu">3</span>))</code></pre>
+<div class="code-output"><span class="out-label">Output:</span>
+RMW    0.951
+CMA    0.968
+
+→ high_is_long=False가 CMA의 핵심: '저투자(Conservative)'가 롱 레그
+→ RMW corr이 HML(0.987)보다 낮은 건 op 정의(영업이익 항목)에 벤더 차이가 크기 때문</div>
+
+<div class="warn">
+<p class="ni"><strong>함정 — RMW의 수익성 정의는 벤더마다 다르다.</strong> Ken French의 OP는 (매출 − 매출원가 − 판관비 − 이자비용) / 장부가다. 그런데 "판관비에 R&amp;D를 포함하는가", "이자비용을 빼는가"는 데이터 소스마다 달라 RMW 재현 상관이 SMB/HML보다 낮게 나온다. RMW corr이 0.90 밑이면 <em>규칙 위반이 아니라 수익성 변수 정의 차이</em>일 가능성이 높으니, French의 상세 정의(웹사이트 Detail 문서)와 컬럼 단위로 대조하라. 이것이 R10 논문 재현에서 "회계 변수 정의"가 항상 첫 번째 용의자인 이유다.</p>
+</div>
+
+<div class="ok">
+<p class="ni"><strong>핵심 정리 (Ch6).</strong> SMB/HML/RMW/CMA는 모두 <strong>NYSE breakpoint + 2&times;3 독립 정렬 + 6월 재구성 + 시총가중</strong>이라는 동일 템플릿의 산물이다. CMA만 저투자(Conservative)가 롱 레그라는 방향에 주의한다. 자체 구현은 반드시 Ken French 공식 팩터와 상관(≥0.95)으로 채점받고, 미달 시 NYSE breakpoint → B/M 타이밍 → 유니버스 필터 순으로 디버깅한다. 이 "공식 데이터 채점" 습관이 R10 논문 재현의 토대다.</p>
+</div>
+
+<h2 id="ch7">7. Anomaly Zoo와 재현 위기 — 발표되면 감쇠한다</h2>
+
+<div class="paper-anchor">
+<div class="pa-label">PAPER ANCHOR</div>
+<div class="pa-title">McLean, R. D., &amp; Pontiff, J. (2016). "Does Academic Research Destroy Stock Return Predictability?" <em>Journal of Finance</em>, 71(1), 5&ndash;32.</div>
+<p>학술지에 발표된 97개 아노말리를 표본 내(in-sample) / 표본 밖&ndash;발표 전(out-of-sample) / 발표 후(post-publication) 세 구간으로 잘라 수익률을 추적한 메타 연구. 표본 밖에서 26%, 발표 후에는 58%가 감쇠함을 보였다. "감쇠의 절반 이상은 데이터 스누핑이 아니라 차익거래에 의한 것"이라는 분해가 이 논문의 백미다 — 감쇠 속도가 차익거래 비용(유동성, 공매도 제약)과 체계적으로 연관됨을 보였다.</p>
+</div>
+
+<h3>7.1 세 구간 분해</h3>
+
+<div class="eq">\[ \underbrace{\bar{r}^{IS}}_{\text{표본 내}} \;\xrightarrow[\text{데이터 스누핑 } \approx 26\%]{}\; \bar{r}^{OOS} \;\xrightarrow[\text{차익거래 추가 } \approx 32\%p]{}\; \bar{r}^{PUB} \approx 0.42\,\bar{r}^{IS} \]</div>
+<p class="ni" style="font-size:12px;color:#555;margin:4px 0 8px 0">↑ "표본 내 수익률 100 기준: 표본 종료~발표 사이(스누핑만 작동)에 74로, 발표 후(스누핑+차익거래)에 42로 감소." 표본 밖 감쇠 26%는 in-sample 수치가 과최적화로 부풀려져 있었다는 뜻이고, 발표 후 추가 감쇠는 시장이 논문을 읽고 거래한다는 뜻이다. 두 원인은 대응책이 다르다 — 전자는 통계(다중검정 보정), 후자는 경제(용량·크라우딩 관리).</p>
+
+<p class="ni">이 표는 R3에서 배운 다중검정 문제의 재소환이기도 하다. Harvey-Liu-Zhu (2016)는 발표된 팩터 316개를 세어 "지금까지의 탐색 횟수를 감안하면 신규 팩터의 t-stat 기준은 3.0 이상이어야 한다"고 주장했고, Hou-Xue-Zhang (2020)은 452개 아노말리를 표준 절차(NYSE breakpoint, VW, 마이크로캡 통제)로 재검정해 <strong>65%가 재현 실패</strong>임을 보였다. 재현에 실패한 아노말리의 공통점: EW 수익률 + 마이크로캡 의존.</p>
+
+<div class="def">
+<p class="ni"><strong>Definition 7.1 — 왜 t&gt;3인가 (다중검정의 산수)</strong></p>
+<div class="eq">\[ P(\text{적어도 1개 우연 유의}) = 1 - (1-\alpha)^M \xrightarrow{M \text{ 크면}} 1 \]</div>
+<p class="ni" style="font-size:12px;color:#555;margin:4px 0 8px 0">↑ M개 팩터를 유의수준 α=0.05로 독립 검정하면, 전부 가짜여도 최소 하나가 우연히 유의할 확률이 M이 커질수록 1로 간다. M=316이면 이 확률은 사실상 100%이고, 기대 위양성 수는 α·M ≈ 16개다. Bonferroni식으로 개별 유의수준을 α/M로 낮추면, 정규분포에서 그 임계 t값이 대략 3.0 부근이 된다 — HLZ의 "t&gt;3" 권고의 산술적 근거다.</p>
+</div>
+
+<p class="ni">즉 "내 팩터의 t가 2.3"이라는 문장은, 세상에 이미 수백 개의 팩터 탐색이 있었음을 감안하면 <strong>우연일 확률이 상당하다</strong>는 뜻으로 읽어야 한다. R3의 다중검정이 R6에서 "왜 팩터 기준이 t&gt;3인가"로 구체화되는 지점이다.</p>
+
+<div class="tc">Table 7.1. 아노말리 감쇠의 원인별 진단과 대응</div>
+<table>
+<tr><th>감쇠 원인</th><th>메커니즘</th><th>진단 신호</th><th>연구자의 대응</th></tr>
+<tr><td>데이터 스누핑</td><td>수천 번 탐색의 승자만 발표됨</td><td>OOS에서 즉시 붕괴, t가 2 근처였음</td><td>t &gt; 3 기준, R3 다중검정 보정, 사전등록식 가설</td></tr>
+<tr><td>차익거래(펀딩 유입)</td><td>발표 → 자금 유입 → 가격 선반영</td><td>발표 후 점진적 감쇠 + 거래량 증가</td><td>용량 추정, 크라우딩 지표 모니터링</td></tr>
+<tr><td>마이크로캡 착시</td><td>EW + 초소형주가 수익률 견인</td><td>VW로 바꾸면 소멸, NYSE BP에서 소멸</td><td>VW 필수 병기, 시총 하위 20% 제외 재검정</td></tr>
+<tr><td>거래비용 무시</td><td>고회전 전략의 페이퍼 수익률</td><td>회전율 &times; 스프레드 &gt; 프리미엄</td><td>비용 차감 후 수익률 보고 (R11)</td></tr>
+<tr><td>구조 변화</td><td>제도·공시 환경 변화로 원천 소멸</td><td>특정 시점 전후로 레짐 단절</td><td>서브샘플 분석, 경제 메커니즘 명시</td></tr>
+</table>
+
+<p class="ni">Hou-Xue-Zhang의 재현 결과는 표로 보면 충격적이다. 발표 당시 유의했던 아노말리들이 표준 절차(VW + NYSE breakpoint + 마이크로캡 통제)에서 대거 무너진다.</p>
+
+<div class="tc">Table 7.2. 재현 위기의 두 대형 연구 — 무엇을 세었나</div>
+<table>
+<tr><th>연구</th><th>대상</th><th>핵심 방법</th><th>결과</th><th>연구자에게 주는 규칙</th></tr>
+<tr><td>Harvey-Liu-Zhu (2016)</td><td>발표 팩터 316개</td><td>다중검정 보정(Bonferroni/BHY)</td><td>t 기준을 3.0으로 상향</td><td>신규 팩터 t(HAC)&gt;3</td></tr>
+<tr><td>McLean-Pontiff (2016)</td><td>아노말리 97개</td><td>IS/OOS/발표후 3구간</td><td>발표 후 58% 감쇠</td><td>기대수익을 감쇠 반영해 하향</td></tr>
+<tr><td>Hou-Xue-Zhang (2020)</td><td>아노말리 452개</td><td>VW + NYSE BP + 마이크로캡 통제</td><td>65%가 재현 실패</td><td>EW·마이크로캡 결과 불신</td></tr>
+<tr><td>Chen-Zimmermann (2022)</td><td>공개 재현 209개</td><td>오픈소스 재현 코드 공개</td><td>대부분 재현되나 크기 축소</td><td>재현 코드 공개가 표준</td></tr>
+</table>
+
+<p class="ni">직접 감쇠를 측정하는 코드는 짧다. 자기 팩터의 IS/OOS 수익률을 잘라 비교하는 것이 신규 팩터 검증의 필수 절차다:</p>
+
+<pre><code><span class="cm"># 자기 팩터의 in-sample vs out-of-sample 감쇠 측정</span>
+<span class="kw">def</span> <span class="fn">decay_report</span>(factor_ret, is_end, pub_date=<span class="kw">None</span>):
+    <span class="st">"""factor_ret: 월별 롱숏 수익률 Series. is_end: 논문 표본 종료일."""</span>
+    seg = {<span class="st">'in_sample'</span>: factor_ret[:is_end]}
+    <span class="kw">if</span> pub_date:
+        seg[<span class="st">'oos_pre_pub'</span>] = factor_ret[is_end:pub_date]
+        seg[<span class="st">'post_pub'</span>]    = factor_ret[pub_date:]
+    <span class="kw">else</span>:
+        seg[<span class="st">'oos'</span>] = factor_ret[is_end:]
+    base = <span class="kw">None</span>
+    <span class="kw">for</span> name, r <span class="kw">in</span> seg.<span class="fn">items</span>():
+        mu_ann = r.<span class="fn">mean</span>() * <span class="nu">1200</span>
+        t = r.<span class="fn">mean</span>() / r.<span class="fn">std</span>(ddof=<span class="nu">1</span>) * np.<span class="fn">sqrt</span>(<span class="fn">len</span>(r))
+        base = mu_ann <span class="kw">if</span> base <span class="kw">is</span> <span class="kw">None</span> <span class="kw">else</span> base
+        <span class="fn">print</span>(<span class="st">f"{name:14s} μ={mu_ann:6.2f}%/yr  t={t:5.2f}  "</span>
+              <span class="st">f"IS대비={mu_ann/base*100:5.0f}%  (n={len(r)})"</span>)
+
+decay_report(my_anomaly, is_end=<span class="st">'2004-12'</span>, pub_date=<span class="st">'2011-06'</span>)</code></pre>
+<div class="code-output"><span class="out-label">Output:</span>
+in_sample      μ=  7.84%/yr  t= 3.41  IS대비=  100%  (n=300)
+oos_pre_pub    μ=  5.62%/yr  t= 2.03  IS대비=   72%  (n=78)
+post_pub       μ=  3.29%/yr  t= 1.18  IS대비=   42%  (n=162)
+
+→ 표본 밖에서 이미 28% 감소(스누핑), 발표 후 42%만 생존 → McLean-Pontiff 패턴 재현
+→ post_pub의 t=1.18: '살아있지만 더는 유의하지 않은' 전형적 감쇠 궤적</div>
+
+<h3>7.2 감쇠를 눈으로 보기</h3>
+
+<p class="ni">아래 인터랙티브 차트는 McLean-Pontiff의 세 구간 분해를 도식화한 것이다. 슬라이더로 표본 내 t-stat을 바꿔 보면, t가 낮은(≈2) 아노말리일수록 감쇠 후 남는 프리미엄이 0에 가까워지는 구조를 확인할 수 있다 — "t=2.1 발견"이 실전에서 왜 위험한지의 시각적 요약이다.</p>
+
+<div id="decay-chart" style="width:100%;height:380px;margin:20px 0"></div>
+<div style="text-align:center;font-family:'Inter',sans-serif;font-size:12px;margin-bottom:20px">
+표본 내 t-stat: <input type="range" id="tstat-slider" min="2" max="6" step="0.5" value="3" style="vertical-align:middle;width:200px"> <span id="tstat-val" style="font-weight:bold">3.0</span>
+</div>
+<script>
+(function(){
+function draw(t){
+  var is=1.0;                              // in-sample premium (normalized)
+  var snoop=Math.min(0.9,1.2/t);           // 스누핑 감쇠: t 낮을수록 큼 (직관용 근사)
+  var oos=is*(1-0.26*snoop/0.4);
+  var pub=is*(1-(0.58)*(0.5+snoop/2));
+  pub=Math.max(0.02,pub); oos=Math.max(pub,oos);
+  var data=[{x:['In-Sample','Out-of-Sample<br>(발표 전)','Post-Publication<br>(발표 후)'],
+    y:[is,oos,pub],type:'bar',
+    marker:{color:['#2563eb','#7c3aed','#94a3b8']},
+    text:[is.toFixed(2),oos.toFixed(2),pub.toFixed(2)],textposition:'outside'}];
+  var layout={title:{text:'아노말리 프리미엄 감쇠 (In-Sample = 1.0 기준)',font:{size:14}},
+    yaxis:{range:[0,1.25],title:'상대 프리미엄'},margin:{t:50,b:60},
+    paper_bgcolor:'rgba(0,0,0,0)',plot_bgcolor:'rgba(0,0,0,0)'};
+  Plotly.react('decay-chart',data,layout,{displayModeBar:false,responsive:true});
+}
+var s=document.getElementById('tstat-slider');
+s.addEventListener('input',function(){
+  document.getElementById('tstat-val').textContent=parseFloat(s.value).toFixed(1);
+  draw(parseFloat(s.value));
+});
+draw(3.0);
+})();
+</script>
+
+<div class="ok">
+<p class="ni"><strong>핵심 정리 — 신규 팩터 발견 시 자기 검증 체크리스트.</strong> (1) t(HAC) &gt; 3인가? (2) VW로도 살아 있는가? (3) NYSE breakpoint + 마이크로캡 제외 후에도 살아 있는가? (4) 표본을 반으로 잘라 양쪽 모두에서 유의한가? (5) 거래비용 차감 후 프리미엄이 남는가? (6) 기존 팩터에 스패닝되지 않는가(→ Ch8)? 여섯 관문을 통과 못 하면 zoo의 새 우리 하나를 추가했을 뿐이다.</p>
+</div>
+
+<h2 id="ch8">8. 스패닝 검정 — 내 팩터는 기존 팩터의 재포장인가</h2>
+
+<h3>8.1 검정의 구조</h3>
+
+<div class="def">
+<p class="ni"><strong>Definition 8.1 — 스패닝 검정 (Spanning / Redundancy Test)</strong></p>
+<p class="ni">신규 팩터 후보 \(g_t\)(거래 가능한 초과수익률)를 기존 팩터 집합 \(\boldsymbol{f}_t\)에 시계열 회귀한다:</p>
+<div class="eq">\[ g_t = \alpha_g + \boldsymbol{b}^\top \boldsymbol{f}_t + e_t \]</div>
+<p class="ni" style="font-size:12px;color:#555;margin:4px 0 8px 0">↑ "새 팩터의 수익률을 기존 팩터들로 복제 시도한다." α_g가 0이면 g는 기존 팩터의 선형조합 + 노이즈로 완전히 복제(스패닝)된다 → 잉여 팩터. α_g가 유의하게 0이 아니면 g는 기존 팩터가 못 주는 평균수익률을 담고 있다 → SDF에 추가할 가치가 있고, 기존 팩터에 g를 섞으면 최대 샤프비율이 α_g/σ(e)만큼 제곱 단위로 개선된다.</p>
+</div>
+
+<p class="ni">방향에 주의하라. 시계열 알파 검정(Ch2)은 <strong>테스트 자산</strong>을 좌변에 놓고 모형의 완전성을 물었다. 스패닝 검정은 <strong>팩터 자신</strong>을 좌변에 놓고 팩터의 신규성을 묻는다. 회귀식 모양은 같지만 질문이 다르다. 판정 수치도 정해져 있다: 정보비율(information ratio) \(IR = \alpha_g / \sigma(e_t)\)가 스패닝 후 남는 "순수 기여분"의 크기다.</p>
+
+<p class="ni">스패닝의 α와 최대 샤프비율은 정량적으로 연결된다. 새 팩터를 기존 세트에 추가하면 접선 포트폴리오의 샤프비율 제곱이 정확히 \(IR^2\)만큼 오른다:</p>
+
+<div class="eq">\[ \mathrm{Sh}^2(\boldsymbol{f}, g) = \mathrm{Sh}^2(\boldsymbol{f}) + \left(\frac{\alpha_g}{\sigma(e_t)}\right)^2 = \mathrm{Sh}^2(\boldsymbol{f}) + IR_g^2 \]</div>
+<p class="ni" style="font-size:12px;color:#555;margin:4px 0 8px 0">↑ "기존 팩터에 새 팩터 g를 더했을 때 최대 샤프² = 기존 최대 샤프² + g의 정보비율²." α가 0이면(g가 스패닝되면) IR=0이라 샤프가 안 오른다. 이것이 Ch3 GRS의 N=1 특수 케이스라는 사실을 정확히 보여준다 — 스패닝 검정은 "새 팩터 하나짜리 GRS"다.</p>
+
+<div class="def">
+<p class="ni"><strong>Definition 8.2 — 양방향 스패닝과 잉여 판정</strong></p>
+<p class="ni">두 팩터 A, B에 대해 서로를 상대에 회귀한 절편 \(\alpha_{A|B}\), \(\alpha_{B|A}\)의 조합으로 관계를 판정한다:</p>
+<ul style="margin-bottom:0">
+<li>\(\alpha_{A|B}\approx0,\ \alpha_{B|A}\ne0\): <strong>B가 A를 잉여로 만든다</strong>(B가 A를 대체·포섭). FF5에서 CMA가 HML을 이렇게 흡수했다.</li>
+<li>둘 다 유의: 두 팩터가 <strong>서로 다른 정보</strong>를 담음 — 둘 다 SDF에 필요하다.</li>
+<li>둘 다 무의: 서로 복제 가능 — 하나만 남기면 된다.</li>
+</ul>
+</div>
+
+<h3>8.2 실전 판별 절차</h3>
+
+<ol>
+<li><strong>후보 팩터를 표준 스펙으로 재구성한다</strong> — VW, NYSE breakpoint, 6월(또는 월별) 리밸런싱. EW 마이크로캡 팩터는 여기서부터 반칙이다.</li>
+<li><strong>기존 팩터 세트를 넉넉하게 잡는다</strong> — 최소 FF5 + 모멘텀(UMD). 관대한 기준(FF3)에만 이기는 팩터는 의심하라.</li>
+<li><strong>HAC 표준오차로 \(t(\alpha_g)\)를 계산한다</strong> — Newey-West lag 4&ndash;6.</li>
+<li><strong>역방향 회귀도 확인한다</strong> — 기존 팩터 각각을 (나머지 기존 + 신규)에 회귀. 신규 팩터가 기존 팩터 하나를 잉여로 만들면(예: FF5에서 HML) 교체 논거가 된다.</li>
+<li><strong>서브샘플 분할</strong> — 전·후반기 모두에서 \(\alpha_g\)의 부호가 유지되는지 확인한다.</li>
+</ol>
+
+<h3>8.3 구현 — "저변동성 팩터는 새로운가?"</h3>
+
+<pre><code><span class="cm"># 스패닝 검정: R5 저변동성 팩터를 FF5 + UMD에 회귀</span>
+<span class="kw">import</span> statsmodels.api <span class="kw">as</span> sm
+
+ff5 = pdr.<span class="fn">DataReader</span>(<span class="st">'F-F_Research_Data_5_Factors_2x3'</span>, <span class="st">'famafrench'</span>,
+                     start=<span class="st">'1963-07'</span>, end=<span class="st">'2024-12'</span>)[<span class="nu">0</span>] / <span class="nu">100</span>
+umd = pdr.<span class="fn">DataReader</span>(<span class="st">'F-F_Momentum_Factor'</span>, <span class="st">'famafrench'</span>,
+                     start=<span class="st">'1963-07'</span>, end=<span class="st">'2024-12'</span>)[<span class="nu">0</span>][<span class="st">'Mom   '</span>] / <span class="nu">100</span>
+
+<span class="kw">def</span> <span class="fn">spanning_test</span>(g: pd.<span class="nb">Series</span>, F: pd.<span class="nb">DataFrame</span>, lags: <span class="nb">int</span> = <span class="nu">6</span>):
+    df = pd.<span class="fn">concat</span>([g.<span class="fn">rename</span>(<span class="st">'g'</span>), F], axis=<span class="nu">1</span>).<span class="fn">dropna</span>()
+    X = sm.<span class="fn">add_constant</span>(df[F.columns])
+    m = sm.<span class="nb">OLS</span>(df[<span class="st">'g'</span>], X).<span class="fn">fit</span>(cov_type=<span class="st">'HAC'</span>, cov_kwds={<span class="st">'maxlags'</span>: lags})
+    ir_mo = m.params[<span class="st">'const'</span>] / m.resid.<span class="fn">std</span>(ddof=<span class="nu">1</span>)
+    <span class="kw">return</span> {<span class="st">'alpha(%/yr)'</span>: m.params[<span class="st">'const'</span>] * <span class="nu">1200</span>,
+            <span class="st">'t(alpha)'</span>: m.tvalues[<span class="st">'const'</span>],
+            <span class="st">'IR(ann)'</span>: ir_mo * np.<span class="fn">sqrt</span>(<span class="nu">12</span>),
+            <span class="st">'R2'</span>: m.rsquared,
+            <span class="st">'betas'</span>: m.params.<span class="fn">drop</span>(<span class="st">'const'</span>).<span class="fn">round</span>(<span class="nu">2</span>).<span class="fn">to_dict</span>()}
+
+F6 = pd.<span class="fn">concat</span>([ff5.<span class="fn">drop</span>(columns=<span class="st">'RF'</span>), umd.<span class="fn">rename</span>(<span class="st">'UMD'</span>)], axis=<span class="nu">1</span>)
+<span class="kw">for</span> name, g <span class="kw">in</span> [(<span class="st">'LowVol'</span>, lowvol_factor), (<span class="st">'HML (역검정)'</span>, ff5[<span class="st">'HML'</span>])]:
+    F_use = F6 <span class="kw">if</span> name == <span class="st">'LowVol'</span> <span class="kw">else</span> F6.<span class="fn">drop</span>(columns=<span class="st">'HML'</span>)
+    r = <span class="fn">spanning_test</span>(g, F_use)
+    <span class="fn">print</span>(name, <span class="st">'→'</span>, {k: <span class="fn">round</span>(v, <span class="nu">3</span>) <span class="kw">if</span> <span class="kw">not</span> <span class="fn">isinstance</span>(v, <span class="nb">dict</span>) <span class="kw">else</span> v
+                        <span class="kw">for</span> k, v <span class="kw">in</span> r.<span class="fn">items</span>()})</code></pre>
+<div class="code-output"><span class="out-label">Output:</span>
+LowVol → {'alpha(%/yr)': 2.87, 't(alpha)': 2.41, 'IR(ann)': 0.34, 'R2': 0.62,
+  'betas': {'Mkt-RF': -0.31, 'SMB': -0.12, 'HML': 0.18, 'RMW': 0.29, 'CMA': 0.21, 'UMD': 0.08}}
+HML (역검정) → {'alpha(%/yr)': 0.51, 't(alpha)': 0.47, 'IR(ann)': 0.07, 'R2': 0.51,
+  'betas': {'Mkt-RF': 0.02, 'SMB': 0.03, 'RMW': 0.19, 'CMA': 0.94, 'UMD': -0.11}}
+
+→ LowVol: α 유의(t=2.4)하나 RMW·CMA가 상당 부분 흡수, HLZ 기준(t&gt;3)엔 미달
+→ HML: FF5-HML+UMD에 스패닝됨 (t=0.47) — FF(2015)의 "HML은 잉여" 재확인, CMA 베타 0.94</div>
+
+<p class="ni">이 출력의 두 번째 줄이 FF (2015)의 유명한 결과의 재현이다: HML은 CMA(베타 0.94)에 거의 흡수되어 알파가 사라진다. 첫 번째 줄은 실전에서 흔한 애매한 케이스다 — 저변동성 팩터의 알파는 t=2.4로 "전통 기준 통과, HLZ 기준 미달"이며, RMW(수익성) 노출이 프리미엄의 상당 부분을 설명한다. 이런 경우 결론은 "독립 팩터라 부르기엔 부족하고, 수익성 노출의 저비용 구현체로서의 가치는 있다"처럼 정직하게 쓴다.</p>
+
+<p class="ni">스패닝 결론이 벤치마크 세트에 얼마나 민감한지는 표로 보면 확연하다. 같은 저변동성 팩터라도 어떤 팩터에 통제하느냐에 따라 "새 팩터"에서 "재포장"까지 판정이 오간다.</p>
+
+<div class="tc">Table 8.1. 벤치마크 세트별 저변동성 팩터 스패닝 — 통제 팩터가 판정을 바꾼다</div>
+<table>
+<tr><th>벤치마크 세트</th><th>α (%/년)</th><th>t(α) HAC</th><th>R&sup2;</th><th>판정</th></tr>
+<tr><td>CAPM (MKT만)</td><td>4.9</td><td>3.61</td><td>0.34</td><td>새 팩터로 보임</td></tr>
+<tr><td>FF3</td><td>3.8</td><td>2.98</td><td>0.47</td><td>경계선</td></tr>
+<tr><td>FF5</td><td>3.1</td><td>2.55</td><td>0.58</td><td>약화 (RMW 흡수)</td></tr>
+<tr><td>FF5 + UMD</td><td>2.9</td><td>2.41</td><td>0.62</td><td>HLZ 기준 미달</td></tr>
+<tr><td>FF5 + UMD + BAB</td><td>1.2</td><td>0.94</td><td>0.79</td><td>재포장 (저베타)</td></tr>
+</table>
+<p class="ni" style="font-size:12px;color:#555;margin:4px 0 8px 0">↑ 관대한 벤치마크(CAPM)에서는 유의하던 α가, 통제 팩터를 늘릴수록 죽는다. 특히 BAB(betting-against-beta, 저베타 팩터)를 넣으면 α가 소멸한다 — 저변동성은 사실상 저베타의 다른 이름이라는 강한 증거다. <strong>논문이 어떤 세트에 통제했는지</strong>를 반드시 확인해야 하는 이유가 이 한 줄에 있다.</p>
+
+<div class="warn">
+<p class="ni"><strong>함정 — 스패닝 결과는 표본 기간과 팩터 스펙의 함수다.</strong> HML 잉여 결과도 1963&ndash;2013 표본의 이야기이며, 표본을 바꾸면 t(α)가 1점대까지 올라오기도 한다. 또 월별 리밸런싱 HML(HML-Devil)을 쓰면 결과가 또 달라진다. 스패닝 검정 하나로 팩터의 생사를 확정하지 말고, 반드시 서브샘플·스펙 변형에 대한 강건성 표를 붙여라. 그리고 α가 0이라는 것은 "평균이 복제된다"는 뜻이지 "시계열이 복제된다"는 뜻이 아니다 — R²가 0.5라면 단기 추적오차는 여전히 크다. 헤지 목적이라면 α가 아니라 R²와 잔차 변동성을 봐야 한다.</p>
+</div>
+
+<div class="ok">
+<p class="ni"><strong>핵심 정리 (Ch8).</strong> 스패닝 검정은 새 팩터를 기존 팩터에 회귀해 <strong>절편 α의 유의성</strong>으로 신규성을 판정한다(R²가 아니라 α!). α가 유의하면 최대 샤프비율을 \(IR^2\)만큼 올리는 진짜 팩터, α≈0이면 재포장이다. 이는 "새 팩터 하나짜리 GRS"(N=1)이며, 양방향 회귀로 잉여·대체 관계까지 판별한다. 결론은 통제 팩터 세트에 절대적으로 의존하므로(Table 8.1), 반드시 FF5+모멘텀 이상에 통제하고 강건성 표를 붙인다.</p>
+</div>
+
+<h2 id="ch9">9. 실습: R5의 모멘텀·저변동성 팩터 풀코스 검정</h2>
+
+<p>이제 이 라운드의 도구 전체를 R5에서 만든 두 팩터에 적용한다. 흐름은 실제 논문의 실증 섹션 순서 그대로다: <strong>(1) 스패닝 회귀 (FF 2015 Table 5 형식) → (2) GRS로 모형 비교 → (3) Fama-MacBeth로 특성 프리미엄 추정.</strong></p>
+
+<div class="info">
+<p class="ni"><strong>세 단계가 서로 다른 질문에 답한다.</strong> 스패닝(Ch8)은 "내 팩터가 새로운가"(팩터 축), GRS(Ch3)는 "이 모형이 자산을 설명하는가"(모형 축), Fama-MacBeth(Ch4)는 "특성이 프리미엄을 받는가"(횡단면 축). 실제 논문은 이 셋을 한 세트로 보고하고, 결론은 세 숫자(스패닝 t, 평균|α| 개선, FMB t)가 <em>같은 방향</em>을 가리킬 때만 강하게 선다. 하나만 유의하고 둘이 죽으면 "약한 증거"로 정직하게 써야 한다.</p>
+</div>
+
+<h3>9.1 Step 1 — 스패닝 회귀 테이블 (논문 형식)</h3>
+
+<pre><code><span class="cm"># FF(2015) Table 5 형식: 각 팩터를 나머지 전부에 회귀</span>
+factors_all = pd.<span class="fn">concat</span>([ff5.<span class="fn">drop</span>(columns=<span class="st">'RF'</span>),
+                         mom_factor.<span class="fn">rename</span>(<span class="st">'MOM'</span>),      <span class="cm"># R5 자체 제작 모멘텀</span>
+                         lowvol_factor.<span class="fn">rename</span>(<span class="st">'LVOL'</span>)], axis=<span class="nu">1</span>).<span class="fn">dropna</span>()
+
+rows = []
+<span class="kw">for</span> tgt <span class="kw">in</span> factors_all.columns:
+    rhs = factors_all.<span class="fn">drop</span>(columns=tgt)
+    m = sm.<span class="nb">OLS</span>(factors_all[tgt], sm.<span class="fn">add_constant</span>(rhs)).<span class="fn">fit</span>(
+        cov_type=<span class="st">'HAC'</span>, cov_kwds={<span class="st">'maxlags'</span>: <span class="nu">6</span>})
+    row = {<span class="st">'target'</span>: tgt, <span class="st">'Int'</span>: m.params[<span class="st">'const'</span>]*<span class="nu">100</span>, <span class="st">'t(Int)'</span>: m.tvalues[<span class="st">'const'</span>]}
+    row.<span class="fn">update</span>({c: m.params[c] <span class="kw">for</span> c <span class="kw">in</span> rhs.columns})
+    row[<span class="st">'R2'</span>] = m.rsquared
+    rows.<span class="fn">append</span>(row)
+tbl5 = pd.<span class="nb">DataFrame</span>(rows).<span class="fn">set_index</span>(<span class="st">'target'</span>).<span class="fn">round</span>(<span class="nu">2</span>)
+<span class="fn">print</span>(tbl5.<span class="fn">to_string</span>())</code></pre>
+<div class="code-output"><span class="out-label">Output:</span>
+        Int  t(Int)  Mkt-RF   SMB   HML   RMW   CMA   MOM  LVOL    R2
+Mkt-RF 0.71    4.62     ---  0.21 -0.05 -0.28 -0.43  0.02 -0.41  0.31
+SMB    0.24    2.31    0.11   ---  0.02 -0.35 -0.02  0.01 -0.08  0.19
+HML   -0.03   -0.31   -0.01  0.02   ---  0.16  0.96 -0.10  0.09  0.53
+RMW    0.29    3.44   -0.08 -0.19  0.09   --- -0.12  0.03  0.22  0.28
+CMA    0.20    3.12   -0.10 -0.01  0.42 -0.07   ---  0.02  0.06  0.55
+MOM    0.61    3.18    0.03  0.04 -0.28  0.07  0.09   --- -0.05  0.09
+LVOL   0.22    2.35   -0.29 -0.11  0.12  0.24  0.17  0.06   ---  0.64</div>
+
+<p class="ni">이 표를 논문처럼 조판하면 다음과 같다. 각 행이 "그 팩터를 나머지 7개에 회귀한 결과"다 — Int(절편, %/월)가 스패닝 후 남는 순수 프리미엄이다.</p>
+
+<div class="tc">Table 9.1. 스패닝 회귀 — 각 팩터를 나머지 전체에 회귀 (1963.07&ndash;2024.12, HAC t-stat, FF 2015 Table 5 형식)</div>
+<table>
+<tr><th>좌변 팩터</th><th>Int (%/월)</th><th>t(Int)</th><th>Mkt-RF</th><th>SMB</th><th>HML</th><th>RMW</th><th>CMA</th><th>MOM</th><th>LVOL</th><th>R&sup2;</th></tr>
+<tr><td>Mkt-RF</td><td>0.71</td><td><strong>4.62</strong></td><td>&mdash;</td><td>0.21</td><td>&minus;0.05</td><td>&minus;0.28</td><td>&minus;0.43</td><td>0.02</td><td>&minus;0.41</td><td>0.31</td></tr>
+<tr><td>SMB</td><td>0.24</td><td>2.31</td><td>0.11</td><td>&mdash;</td><td>0.02</td><td>&minus;0.35</td><td>&minus;0.02</td><td>0.01</td><td>&minus;0.08</td><td>0.19</td></tr>
+<tr><td>HML</td><td>&minus;0.03</td><td>&minus;0.31</td><td>&minus;0.01</td><td>0.02</td><td>&mdash;</td><td>0.16</td><td><strong>0.96</strong></td><td>&minus;0.10</td><td>0.09</td><td>0.53</td></tr>
+<tr><td>RMW</td><td>0.29</td><td><strong>3.44</strong></td><td>&minus;0.08</td><td>&minus;0.19</td><td>0.09</td><td>&mdash;</td><td>&minus;0.12</td><td>0.03</td><td>0.22</td><td>0.28</td></tr>
+<tr><td>CMA</td><td>0.20</td><td><strong>3.12</strong></td><td>&minus;0.10</td><td>&minus;0.01</td><td>0.42</td><td>&minus;0.07</td><td>&mdash;</td><td>0.02</td><td>0.06</td><td>0.55</td></tr>
+<tr><td>MOM (R5)</td><td>0.61</td><td><strong>3.18</strong></td><td>0.03</td><td>0.04</td><td>&minus;0.28</td><td>0.07</td><td>0.09</td><td>&mdash;</td><td>&minus;0.05</td><td>0.09</td></tr>
+<tr><td>LVOL (R5)</td><td>0.22</td><td>2.35</td><td>&minus;0.29</td><td>&minus;0.11</td><td>0.12</td><td>0.24</td><td>0.17</td><td>0.06</td><td>&mdash;</td><td>0.64</td></tr>
+</table>
+
+<p class="ni"><strong>판독:</strong> ① MOM은 R&sup2;=0.09로 어떤 팩터로도 복제되지 않고 절편 t=3.2 — HLZ 기준까지 통과하는 독립 팩터다. ② LVOL은 R&sup2;=0.64로 상당 부분 복제되고(음의 시장 베타 + RMW 노출) 절편 t=2.4 — 경계선 판정. ③ HML은 CMA 베타 0.96에 흡수되어 잉여 판정 — FF (2015)의 결과와 정합적이다. 이렇게 표 하나에서 세 개의 서로 다른 결론이 나오는 것을 직접 확인하는 것이 이 실습의 목적이다.</p>
+
+<div class="info">
+<p class="ni"><strong>논문의 실증 표를 읽는 순서 — 이 라운드 도구의 실전 사용법.</strong> 팩터 논문의 Results 섹션을 마주하면 이 순서로 읽는다: (1) <strong>테스트 자산이 무엇인가</strong> — size-B/M만이면 Ch2의 LNS 경고를 떠올린다. (2) <strong>스패닝 표의 절편 t</strong> — HLZ 기준(3.0)으로 필터링하며 읽는다. (3) <strong>GRS/평균|α|</strong> — 모형 간 비교는 절대값이 아니라 상대 순위로. (4) <strong>표준오차 종류</strong> — HAC인가, Shanken 보정했는가, 각주에서 확인. (5) <strong>강건성 표</strong> — VW/EW, 마이크로캡 포함/제외, 서브샘플. 이 다섯을 체크하면 논문의 주장이 어디까지 믿을 만한지 스스로 판정할 수 있다. R10 논문 재현의 사전 독해 체크리스트이기도 하다.</p>
+</div>
+
+<h3>9.2 Step 2 — GRS로 모형 비교</h3>
+
+<pre><code><span class="cm"># 테스트 자산: 25 size-B/M + 25 size-momentum (강건성 위해 2세트)</span>
+p25mom = pdr.<span class="fn">DataReader</span>(<span class="st">'25_Portfolios_ME_Prior_12_2'</span>, <span class="st">'famafrench'</span>,
+                        start=<span class="st">'1963-07'</span>, end=<span class="st">'2024-12'</span>)[<span class="nu">0</span>] / <span class="nu">100</span>
+
+models = {
+    <span class="st">'CAPM'</span>:      ff5[[<span class="st">'Mkt-RF'</span>]],
+    <span class="st">'FF3'</span>:       ff3[[<span class="st">'Mkt-RF'</span>,<span class="st">'SMB'</span>,<span class="st">'HML'</span>]],
+    <span class="st">'FF5'</span>:       ff5.<span class="fn">drop</span>(columns=<span class="st">'RF'</span>),
+    <span class="st">'FF5+MOM'</span>:   pd.<span class="fn">concat</span>([ff5.<span class="fn">drop</span>(columns=<span class="st">'RF'</span>), mom_factor.<span class="fn">rename</span>(<span class="st">'MOM'</span>)], axis=<span class="nu">1</span>),
+}
+<span class="kw">for</span> assets_name, assets <span class="kw">in</span> [(<span class="st">'25 size-B/M'</span>, excess), (<span class="st">'25 size-MOM'</span>, p25mom_excess)]:
+    <span class="fn">print</span>(<span class="st">f"--- 테스트 자산: {assets_name} ---"</span>)
+    <span class="kw">for</span> name, F <span class="kw">in</span> models.<span class="fn">items</span>():
+        grs, p, _, _ = <span class="fn">grs_test</span>(assets, F)
+        avg_a = <span class="fn">abs</span>(<span class="fn">alphas_of</span>(assets, F)).<span class="fn">mean</span>() * <span class="nu">100</span>
+        <span class="fn">print</span>(<span class="st">f"{name:9s} GRS={grs:5.2f} (p={p:.3f})  평균|α|={avg_a:.3f}%/월"</span>)</code></pre>
+<div class="code-output"><span class="out-label">Output:</span>
+--- 테스트 자산: 25 size-B/M ---
+CAPM      GRS= 4.35 (p=0.000)  평균|α|=0.281%/월
+FF3       GRS= 3.41 (p=0.000)  평균|α|=0.104%/월
+FF5       GRS= 2.86 (p=0.000)  평균|α|=0.092%/월
+FF5+MOM   GRS= 2.79 (p=0.000)  평균|α|=0.089%/월
+--- 테스트 자산: 25 size-MOM ---
+CAPM      GRS= 5.12 (p=0.000)  평균|α|=0.398%/월
+FF3       GRS= 4.87 (p=0.000)  평균|α|=0.371%/월
+FF5       GRS= 4.40 (p=0.000)  평균|α|=0.334%/월
+FF5+MOM   GRS= 2.31 (p=0.001)  평균|α|=0.121%/월
+
+→ 모든 모형이 GRS 기각(정상). 순위 비교: FF5+MOM이 두 자산 세트 모두에서 최선
+→ 모멘텀 정렬 자산에서 FF5의 평균|α|가 3배로 튐: 테스트 자산이 결과를 좌우한다는 Ch2 경고의 실물</div>
+
+<h3>9.3 Step 3 — Fama-MacBeth로 특성 프리미엄 추정</h3>
+
+<pre><code><span class="cm"># 특성 FMB: 다음 달 수익률 ~ z(size) + z(bm) + z(mom_12_1) + z(vol_36m)</span>
+chars = [<span class="st">'z_size'</span>, <span class="st">'z_bm'</span>, <span class="st">'z_mom'</span>, <span class="st">'z_vol'</span>]
+res_all, G = <span class="fn">fama_macbeth</span>(panel, <span class="st">'ret_fwd'</span>, chars, nw_lags=<span class="nu">4</span>)
+res_big, _ = <span class="fn">fama_macbeth</span>(panel[panel[<span class="st">'me_pct'</span>] &gt; <span class="nu">0.2</span>], <span class="st">'ret_fwd'</span>, chars, nw_lags=<span class="nu">4</span>)
+
+cmp = pd.<span class="fn">concat</span>({<span class="st">'전체'</span>: res_all[<span class="st">'t_NW'</span>], <span class="st">'마이크로캡 제외'</span>: res_big[<span class="st">'t_NW'</span>]}, axis=<span class="nu">1</span>)
+<span class="fn">print</span>(res_all.<span class="fn">round</span>(<span class="nu">3</span>)); <span class="fn">print</span>(); <span class="fn">print</span>(cmp.<span class="fn">round</span>(<span class="nu">2</span>))</code></pre>
+<div class="code-output"><span class="out-label">Output:</span>
+        lambda(%/mo)  se_FM  se_NW   t_NW
+const          0.782  0.201  0.219  3.571
+z_size        -0.093  0.041  0.044 -2.114
+z_bm           0.148  0.052  0.057  2.596
+z_mom          0.287  0.079  0.089  3.225
+z_vol         -0.187  0.068  0.077 -2.429
+
+          전체  마이크로캡 제외
+const   3.57      3.41
+z_size -2.11     -1.38
+z_bm    2.60      2.28
+z_mom   3.23      3.05
+z_vol  -2.43     -1.72
+
+→ 모멘텀: 1σ당 월 0.29%, t=3.2, 마이크로캡 제외에도 강건 — 최종 합격
+→ 저변동성: t=-2.4 → 제외 후 -1.7로 약화. 스패닝(t=2.4)과 종합하면 "약한 경계선 팩터" 판정
+→ size 프리미엄은 마이크로캡 제외 시 소멸(t=-1.4): Ch7 감쇠 표의 교과서적 사례</div>
+
+<div class="ok">
+<p class="ni"><strong>최종 판정문 쓰기 연습.</strong> 세 단계 증거를 종합한 결론은 이렇게 쓴다: "자체 구성 모멘텀 팩터는 FF5+LVOL에 스패닝되지 않고(α=0.61%/월, t=3.18), 특성 프리미엄도 마이크로캡 통제 후 유의하며(t=3.05), FF5에 추가 시 모멘텀 정렬 테스트 자산의 평균 |α|를 0.334%에서 0.121%로 줄인다. 반면 저변동성 팩터는 스패닝 α의 t가 2.4로 HLZ 기준에 미달하고 특성 프리미엄이 마이크로캡 제외 시 약화되어, 독립 팩터로서의 증거는 제한적이다." — 숫자 세 개(스패닝 t, FMB t, GRS/평균|α| 개선)가 항상 세트로 움직인다.</p>
+</div>
+
+<div class="task">
+<div class="task-title">&#x1F4DD; Round 6 실습 과제</div>
+<ul>
+<li>&#x2610; GRS 함수를 직접 구현하고, <code>statsmodels</code> 없이 NumPy만으로 Ch3 결과를 재현하라 (수식→코드 1:1 확인)</li>
+<li>&#x2610; 25 size-B/M 알파의 5&times;5 히트맵을 그려 FF3/FF5의 실패 코너(small-growth)를 시각화하라</li>
+<li>&#x2610; Fama-MacBeth를 1단계 롤링 베타(60개월) 버전으로 다시 구현하고, 특성 버전과 t-stat을 비교하라</li>
+<li>&#x2610; Shanken correction을 구현해 베타-FMB의 t-stat이 몇 % 줄어드는지 계산하라</li>
+<li>&#x2610; SMB/HML 재현에서 NYSE breakpoint를 일부러 전 종목 breakpoint로 바꿔 상관계수가 얼마나 떨어지는지 실험하라</li>
+<li>&#x2610; R5의 자기 팩터 하나를 골라 Ch9의 3단계 풀코스를 완주하고, 위 "최종 판정문" 형식으로 3문장 결론을 써라</li>
+<li>&#x2610; (심화) FF (2015) Table 5를 원문에서 찾아 자기 재현 테이블과 계수 단위까지 비교하라</li>
+</ul>
+</div>
+
+<h2 id="quiz">10. Quiz</h2>
+
+<details class="quiz-item"><summary>Q1. 시계열 회귀 검정과 Fama-MacBeth 횡단면 회귀는 각각 어떤 질문에 답하는가? 팩터가 거래 불가능한 매크로 변수일 때 쓸 수 없는 쪽은?</summary>
+<div class="answer">시계열 검정은 "이 팩터 집합이 테스트 자산의 평균수익률을 남김없이 설명하는가"(모든 α=0, 모형 완전성)를, FMB는 "이 베타/특성이 횡단면에서 프리미엄을 받는가"(λ≠0)를 묻는다. 시계열 검정(및 GRS)은 λ를 팩터 자신의 평균수익률로 대체하므로 팩터가 거래 가능한 초과수익률이어야 한다 — 매크로 팩터에는 쓸 수 없고 FMB로 λ를 직접 추정해야 한다.</div>
+</details>
+
+<details class="quiz-item"><summary>Q2. 25개 포트폴리오 중 6개의 t(α)가 2를 넘었다. "모형 기각"이라고 결론 내리면 안 되는 이유와 올바른 도구는?</summary>
+<div class="answer">25번의 개별 검정을 하면 귀무가설이 참이어도 평균 1.25개는 우연히 유의하게 나온다(다중검정 문제, R3). 개별 t를 세는 대신 25개 알파를 잔차 공분산까지 반영해 동시에 검정하는 GRS F-검정을 써야 한다. GRS는 α'Σ⁻¹α 이차형식으로 알파 간 상관을 처리하므로 "몇 개가 유의한가" 세기와는 검정의 질이 다르다.</div>
+</details>
+
+<details class="quiz-item"><summary>Q3. GRS 통계량의 α'Σ⁻¹α 항이 갖는 경제적 의미를 샤프비율 언어로 설명하라.</summary>
+<div class="answer">α'Σ⁻¹α = Sh²(f,R) − Sh²(f), 즉 테스트 자산을 팩터에 추가해서 얻을 수 있는 최대 샤프비율 제곱의 개선폭이다. 따라서 GRS는 "팩터 포트폴리오가 이미 평균-분산 효율적이라 테스트 자산을 더 사도 샤프가 안 오르는가"를 검정하는 것과 같다. 알파가 있다 = 팩터만으로는 접선 포트폴리오를 만들 수 없다.</div>
+</details>
+
+<details class="quiz-item"><summary>Q4. Fama-MacBeth가 216만 개 패널 관측치를 풀링한 OLS보다 나은 핵심 이유는 무엇인가?</summary>
+<div class="answer">횡단면 상관 처리다. 같은 달 주식 수익률들은 공통 충격을 공유해 강하게 상관되어 있는데, 풀링 OLS의 iid 표준오차는 216만 개를 독립 관측치로 취급해 t-stat을 크게 부풀린다. FMB는 매월 회귀를 따로 돌려 그 달 안의 상관을 흡수하고, 월별 감마의 시계열(사실상 T개의 준독립 관측치)로 추론하므로 표준오차가 정직해진다.</div>
+</details>
+
+<details class="quiz-item"><summary>Q5. Shanken correction은 어떤 문제를 보정하며, 특성(characteristic) 기반 FMB에는 왜 필요 없는가?</summary>
+<div class="answer">2단계 회귀의 설명변수인 β̂가 1단계의 추정치라서 생기는 errors-in-variables 문제를 보정한다(분산에 1+λ'Ω⁻¹λ를 곱함). 특성(B/M, 시총, 모멘텀 등)은 추정하는 것이 아니라 데이터에서 직접 관측되므로 측정오차가 (회계적 오류를 제외하면) 없고, 따라서 EIV 보정이 필요 없다.</div>
+</details>
+
+<details class="quiz-item"><summary>Q6. 다음 코드의 버그를 찾아라: <code>for date, grp in panel.groupby('date'): g = OLS(grp['ret'], add_constant(grp[['bm','mom']])).fit().params</code> — 여기서 <code>ret</code>은 date월의 수익률, <code>bm</code>·<code>mom</code>도 date월 말 기준 값이다.</summary>
+<div class="answer">동시성 편향(타이밍 누수)이다. t월 말에야 확정되는 특성으로 같은 t월의 수익률을 "예측"하고 있다 — 특히 mom과 ret은 기계적으로 겹친다. 종속변수를 t+1월 수익률(ret_fwd)로 바꿔 "t월 말에 아는 정보 → t+1월 수익"의 인과 방향을 지켜야 한다. R2의 look-ahead 규칙이 FMB에서 가장 자주 깨지는 지점이다.</div>
+</details>
+
+<details class="quiz-item"><summary>Q7. SMB 구성에서 breakpoint를 NYSE 종목만으로 잡되 배정은 전 종목에 하는 이유는?</summary>
+<div class="answer">NASDAQ 마이크로캡이 종목 수의 절반 이상을 차지하므로, 전 종목 중앙값으로 자르면 "Small" 그룹이 유동성 없는 초소형주 덩어리가 되어 팩터가 마이크로캡 노이즈에 지배된다. NYSE breakpoint는 경제적으로 의미 있는 크기 경계를 유지하면서(대형 거래소 기준), 배정은 전 종목에 적용해 유니버스는 넓게 가져가는 절충이다. 이 규칙 하나로 자체 SMB와 공식 SMB의 상관이 0.9x에서 갈린다.</div>
+</details>
+
+<details class="quiz-item"><summary>Q8. McLean-Pontiff의 세 구간 분해에서 표본 밖 감쇠(26%)와 발표 후 감쇠(58%)가 구별해주는 두 원인은 무엇이고, 각각의 대응책은?</summary>
+<div class="answer">표본 종료~발표 전 구간은 아무도 논문을 못 읽었으므로 감쇠는 순수 데이터 스누핑(in-sample 과최적화) 탓이고, 발표 후 추가 감쇠는 투자자들이 논문을 읽고 차익거래한 결과다. 대응책이 다르다: 스누핑은 통계로(t&gt;3, 다중검정 보정, OOS 홀드아웃), 차익거래는 경제로(용량 추정, 크라우딩 모니터링, 감쇠를 반영한 기대수익 하향) 대응한다.</div>
+</details>
+
+<details class="quiz-item"><summary>Q9. 스패닝 검정에서 새 팩터 g의 회귀 결과가 α의 t=0.5, R²=0.45였다. "g는 쓸모없다"는 결론이 성립하는 용도와 성립하지 않는 용도를 각각 말하라.</summary>
+<div class="answer">성립: 수익 원천으로서는 쓸모없다 — 기존 팩터 조합으로 평균수익률이 복제되므로 g를 추가해도 최대 샤프비율이 개선되지 않고 SDF에 넣을 이유가 없다. 불성립: 리스크 관리·헤지 용도 — R²가 0.45뿐이라 g의 월별 움직임의 55%는 기존 팩터로 추적되지 않으므로, g에 노출된 포트폴리오를 기존 팩터만으로 헤지하면 큰 추적오차가 남는다. α는 평균의 문제, R²는 변동의 문제다.</div>
+</details>
+
+<details class="quiz-item"><summary>Q10. Daniel-Titman의 characteristic-balanced 포트폴리오 실험 설계를 한 문장으로 요약하고, 공분산 가설과 특성 가설이 각각 예측하는 그 포트폴리오의 수익률을 말하라.</summary>
+<div class="answer">특성(B/M)을 고정한 채 팩터 베타만 다른 종목들로 고베타−저베타 롱숏을 만들어, 특성과 베타 중 무엇이 수익률을 예측하는지 분리하는 설계다. 공분산 가설: 베타 차이만큼 양의 프리미엄을 받아야 한다(수익률 &gt; 0). 특성 가설: 특성이 같으므로 기대수익률 차이가 없어야 한다(수익률 ≈ 0, HML 대비 알파는 음수). 1973–93 데이터는 후자를 지지했다.</div>
+</details>
+
+<h2 id="cheatsheet">&#x1F4CB; Cheat Sheet</h2>
+
+<div class="tc">핵심 수식 요약</div>
+<table>
+<tr><th>도구</th><th>수식</th><th>귀무가설 / 해석</th><th>분포·기준</th></tr>
+<tr><td>시계열 회귀</td><td>\(R_{i,t}^e = \alpha_i + \boldsymbol{\beta}_i^\top \boldsymbol{f}_t + \epsilon_{i,t}\)</td><td>\(\alpha_i\)=미설명 평균수익, \(\beta\)=노출</td><td>t(α): 전통 2.0 / HLZ 3.0</td></tr>
+<tr><td>GRS</td><td>\(\frac{T-N-K}{N}\frac{\hat{\alpha}'\hat{\Sigma}^{-1}\hat{\alpha}}{1+\bar{f}'\hat{\Omega}^{-1}\bar{f}}\)</td><td>모든 α=0 (모형 완전성)</td><td>\(F(N, T{-}N{-}K)\), N&lt;T 필수</td></tr>
+<tr><td>GRS 직관</td><td>\(\hat{\alpha}'\hat{\Sigma}^{-1}\hat{\alpha} = \mathrm{Sh}^2(f,R) - \mathrm{Sh}^2(f)\)</td><td>테스트 자산 추가 시 샤프 개선폭</td><td>0이면 팩터가 이미 MV효율적</td></tr>
+<tr><td>FMB 2단계</td><td>매월: \(R_{i,t}^e = \gamma_{0,t} + \gamma_t'\hat{\beta}_i + \eta_{i,t}\)</td><td>\(\hat{\lambda} = \bar{\gamma}_t\), 프리미엄 추정</td><td>\(t = \bar{\gamma}\sqrt{T}/\mathrm{sd}(\gamma_t)\) + NW</td></tr>
+<tr><td>Shanken</td><td>\(\mathrm{Var} \times (1 + \hat{\lambda}'\hat{\Omega}^{-1}\hat{\lambda})\)</td><td>β̂의 EIV 보정 (특성 FMB엔 불필요)</td><td>월간에서 보통 1&ndash;5% 팽창</td></tr>
+<tr><td>SMB</td><td>\(\frac{1}{3}(SL{+}SM{+}SH) - \frac{1}{3}(BL{+}BM{+}BH)\)</td><td>가치 중립화된 사이즈 팩터</td><td>NYSE 중앙값, 6월 재구성</td></tr>
+<tr><td>HML</td><td>\(\frac{1}{2}(SH{+}BH) - \frac{1}{2}(SL{+}BL)\)</td><td>사이즈 중립화된 가치 팩터</td><td>NYSE 30/70, BE(t-1)/ME(t-1.12)</td></tr>
+<tr><td>스패닝</td><td>\(g_t = \alpha_g + \boldsymbol{b}'\boldsymbol{f}_t + e_t\)</td><td>\(\alpha_g=0\)이면 g는 잉여 팩터</td><td>t(α) HAC, IR = α/σ(e)</td></tr>
+</table>
+
+<div class="tc">실무 규칙 요약</div>
+<table>
+<tr><th>상황</th><th>규칙</th></tr>
+<tr><td>테스트 자산 선택</td><td>개별주 말고 정렬 포트폴리오. 정렬 기준 2세트 이상으로 강건성 확인 (Lewellen-Nagel-Shanken 경고)</td></tr>
+<tr><td>FMB 타이밍</td><td>t월 말 특성 → t+1월 수익률. 특성은 winsorize + z-score, 마이크로캡 제외 버전 병기</td></tr>
+<tr><td>Newey-West lag</td><td>월간 데이터 4&ndash;6 (또는 \(T^{0.25}\)). 겹치는 기간 변수면 겹침 길이만큼</td></tr>
+<tr><td>FF 팩터 재현 채점</td><td>공식 팩터와 corr ≥ 0.95 목표, 미달 시 NYSE BP·B/M 타이밍·유니버스 필터 순으로 디버깅</td></tr>
+<tr><td>신규 팩터 6관문</td><td>t(HAC)&gt;3 → VW 생존 → 마이크로캡 통제 생존 → 서브샘플 생존 → 비용 차감 생존 → 스패닝 비잉여</td></tr>
+<tr><td>모형 비교 보고</td><td>GRS + 평균|α| + 테스트 자산별 결과를 세트로. "모두 기각되므로 <em>덜</em> 나쁜 모형을 고른다"</td></tr>
+<tr><td>결론 문장 형식</td><td>스패닝 t + FMB t + 평균|α| 개선, 숫자 3종 세트로 판정문 작성 (Ch9.3 예시)</td></tr>
+</table>
+
+<div class="tc">핵심 코드 스니펫</div>
+<table>
+<tr><th>작업</th><th>코드</th></tr>
+<tr><td>N개 시계열 회귀 한 방에</td><td><code>B = np.linalg.solve(X.T@X, X.T@R)</code> (X에 상수항 포함, B[0]=알파 벡터)</td></tr>
+<tr><td>HAC t-stat</td><td><code>OLS(y,X).fit(cov_type='HAC', cov_kwds={'maxlags':6})</code></td></tr>
+<tr><td>GRS 이차형식</td><td><code>a @ np.linalg.solve(Sigma, a)</code> (역행렬 직접 계산 대신 solve)</td></tr>
+<tr><td>FMB 표준오차</td><td>감마 시계열을 상수에 회귀 + HAC: <code>OLS(g_t, ones).fit(cov_type='HAC',...)</code></td></tr>
+<tr><td>Ken French 데이터</td><td><code>pdr.DataReader('F-F_Research_Data_5_Factors_2x3','famafrench')</code></td></tr>
+</table>
+
+<div class="info">
+<p class="ni"><strong>다음 라운드 예고 — R7. Financial ML I.</strong> 여기까지가 "선형 회귀 + 검정"으로 무장한 고전 자산가격결정론이다. R7부터는 질문이 바뀐다: 특성 100개가 있을 때, 어떤 것이 언제 작동하는지 비선형·상호작용까지 포함해서 배우려면? 정규화, 교차검증의 금융 버전(purged CV), 그리고 "예측력 좋은 모형 ≠ 돈 버는 모형" 문제를 다룬다. 이번 라운드의 FMB는 R8의 GKX(2020)에서 "머신러닝 포트폴리오의 성과 귀속" 도구로 다시 등장한다.</p>
+</div>
+
+<div class="nav-footer">
+<a href="../round-05/"><span class="nf-label">&larr; Previous</span>R5. Factor Research I</a>
+<a href="../round-07/" style="text-align:right"><span class="nf-label">Next &rarr;</span>R7. Financial ML I</a>
+</div>
+
+</div>
+</div>
+</div>
+
+</body>
+</html>

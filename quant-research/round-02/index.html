@@ -1,0 +1,1316 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Round 2 - Financial Data Engineering — 편향 없는 데이터셋 | Quant Researcher Guide</title>
+<script>
+MathJax = { tex: { inlineMath: [['\\(','\\)']], displayMath: [['\\[','\\]'],['$$','$$']] } };
+</script>
+<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+<script src="https://cdn.plot.ly/plotly-2.27.0.min.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;500&family=Space+Mono:wght@400&family=Inter:wght@300;400&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Inter',sans-serif;background:#fafaf8;color:#1a1a1a;line-height:1.7;overflow-x:hidden}
+.sidebar{position:fixed;left:0;top:0;width:260px;height:100vh;background:rgba(255,255,255,.97);border-right:1px solid rgba(0,0,0,.06);padding:32px 24px;z-index:100;overflow-y:auto;display:flex;flex-direction:column}
+.sidebar-profile{text-align:center;margin-bottom:28px;padding-bottom:24px;border-bottom:1px solid rgba(0,0,0,.08)}
+.profile-icon{font-size:48px;margin-bottom:8px}
+.profile-name{font-family:'Cormorant Garamond',serif;font-size:1.3rem;font-weight:500;margin-bottom:4px}
+.profile-title{font-size:.68rem;color:#888;letter-spacing:.08em;text-transform:uppercase;margin-bottom:8px}
+.profile-bio{font-size:.78rem;color:#666;line-height:1.5}
+.sidebar-nav{flex:1;margin-top:16px}.nav-section{margin-bottom:20px}.nav-section-title{font-size:.6rem;font-weight:600;color:#aaa;letter-spacing:.15em;text-transform:uppercase;margin-bottom:10px}.nav-list{list-style:none}.nav-list li{margin-bottom:5px}.nav-list a{font-size:.78rem;color:#555;text-decoration:none;transition:all .2s;display:block;padding:3px 0}.nav-list a:hover{color:#2563eb;padding-left:4px}.nav-list a.active{color:#2563eb;font-weight:500}.nav-list a.done{color:#28a745}.badge{display:inline-block;font-size:.5rem;background:#2563eb;color:#fff;padding:1px 5px;border-radius:8px;margin-left:3px;vertical-align:middle}.badge-done{background:#28a745}.sidebar-footer{padding-top:16px;border-top:1px solid rgba(0,0,0,.06);font-size:.65rem;color:#aaa;text-align:center}
+.main-wrapper{margin-left:260px;min-height:100vh}.container{max-width:1100px;margin:0 auto;padding:50px 40px 80px}
+.paper-content{font-family:'Times New Roman','Nanum Myeongjo',serif;line-height:1.8;background:#fff;padding:40px;border-radius:8px;box-shadow:0 2px 20px rgba(0,0,0,.05)}.paper-header{text-align:center;margin-bottom:40px;padding-bottom:30px;border-bottom:2px solid #333}.paper-category{font-size:14px;color:#666;margin-bottom:10px}.paper-title{font-size:24px;font-weight:bold;margin-bottom:12px;line-height:1.4}.paper-subtitle{font-size:14px;color:#555;margin-bottom:8px}.paper-team{font-size:13px;color:#444}
+.abstract{background:#f8f9fa;padding:25px;margin:30px 0;border-left:4px solid #2c3e50}.abstract-title{font-weight:bold;font-size:16px;margin-bottom:15px}
+h2{font-size:18px;margin:35px 0 20px;padding-bottom:8px;border-bottom:1px solid #ddd;color:#2c3e50}h3{font-size:15px;margin:25px 0 15px;color:#34495e}
+p{text-align:justify;margin-bottom:15px;text-indent:2em}p.ni{text-indent:0}
+table{width:100%;border-collapse:collapse;margin:20px 0;font-size:12px}th,td{border:1px solid #ddd;padding:10px 8px;text-align:center}th{background:#2c3e50;color:white;font-weight:bold}tr:nth-child(even){background:#f8f9fa}tr:hover{background:#e8f4f8}
+.tc{font-size:13px;font-weight:bold;margin:15px 0 10px;text-align:center}.eq{text-align:center;margin:20px 0;padding:15px;background:#f8f9fa;border-radius:4px;overflow-x:auto}ul,ol{margin-left:2em;margin-bottom:15px}li{margin-bottom:6px}
+.def{background:#fff9e6;border:1px solid #ffc107;border-radius:4px;padding:20px;margin:20px 0}.info{background:#e8f4f8;border-left:4px solid #3498db;padding:20px;margin:20px 0}.warn{background:#fff3cd;border-left:4px solid #f39c12;padding:20px;margin:20px 0}.ok{background:#d4edda;border-left:4px solid #28a745;padding:20px;margin:20px 0}
+.paper-anchor{background:#f5f3ff;border:1px solid #7c3aed;border-radius:6px;padding:22px;margin:24px 0}.paper-anchor .pa-label{font-family:'Space Mono',monospace;font-size:10px;color:#7c3aed;letter-spacing:.15em;text-transform:uppercase;margin-bottom:8px}.paper-anchor .pa-title{font-weight:bold;font-size:14px;margin-bottom:6px}.paper-anchor p{font-size:13px;text-indent:0;margin-bottom:8px}
+.task{background:#e8f8f0;border-left:4px solid #00b894;padding:20px;margin:20px 0}.task .task-title{font-weight:bold;margin-bottom:10px}
+details.quiz-item{margin:14px 0;padding:14px 18px;background:#f8f9fa;border:1px solid #e0e0e0;border-radius:6px}details.quiz-item summary{cursor:pointer;font-weight:bold;font-size:13.5px}details.quiz-item[open] summary{margin-bottom:10px;color:#2563eb}details.quiz-item .answer{font-size:13px;padding:10px 14px;background:#fff;border-left:3px solid #2563eb}
+pre{background:#1e1e1e;color:#d4d4d4;padding:20px;border-radius:6px;overflow-x:auto;margin:20px 0;font-family:'Space Mono','Consolas',monospace;font-size:13px;line-height:1.6}code{font-family:'Space Mono','Consolas',monospace;font-size:13px}p code,li code,td code{background:#f0f0f0;padding:2px 6px;border-radius:3px;color:#c7254e;font-size:12px}
+.cm{color:#6a9955}.kw{color:#569cd6}.st{color:#ce9178}.fn{color:#dcdcaa}.nb{color:#4ec9b0}.nu{color:#b5cea8}
+.progress-bar{width:100%;height:6px;background:#e0e0e0;border-radius:3px;margin-top:16px}.progress-fill{height:100%;background:linear-gradient(90deg,#2563eb,#7c3aed);border-radius:3px;width:0%}.progress-label{font-size:11px;color:#888;margin-top:4px;text-align:center}
+.code-output{background:#1e1e1e;color:#d4d4d4;padding:12px 16px;border-radius:0 0 6px 6px;font-family:'Space Mono',monospace;font-size:11.5px;line-height:1.6;margin-top:-4px;margin-bottom:18px;border-top:2px solid #333;white-space:pre-wrap;overflow-x:auto}.code-output .out-label{color:#888;font-size:10px;margin-bottom:4px;display:block}
+.nav-footer{display:flex;justify-content:space-between;gap:16px;margin-top:50px;padding-top:24px;border-top:1px solid #ddd;font-family:'Inter',sans-serif}.nav-footer a{font-size:.82rem;color:#2563eb;text-decoration:none;padding:12px 18px;border:1px solid #dbe4f5;border-radius:6px;transition:all .2s;max-width:48%}.nav-footer a:hover{background:#2563eb;color:#fff;border-color:#2563eb}.nav-footer .nf-label{display:block;font-size:.6rem;color:#999;letter-spacing:.1em;text-transform:uppercase;margin-bottom:4px}.nav-footer a:hover .nf-label{color:rgba(255,255,255,.7)}
+@media(max-width:1024px){.sidebar{width:100%;height:auto;position:relative;border-right:none;border-bottom:1px solid rgba(0,0,0,.08);padding:16px}.sidebar-profile{margin-bottom:10px;padding-bottom:10px;display:flex;align-items:center;gap:12px;text-align:left}.profile-icon{font-size:32px;margin-bottom:0}.profile-bio{display:none}.nav-section{display:inline-block;margin-right:16px;margin-bottom:8px}.nav-list{display:flex;gap:10px;flex-wrap:wrap}.nav-list li{margin-bottom:0}.sidebar-footer{display:none}.main-wrapper{margin-left:0}.container{padding:0}.paper-content{padding:20px 16px;border-radius:0;box-shadow:none}.paper-title{font-size:18px}p{font-size:14px;text-indent:1.5em;text-align:left}pre{font-size:11px;padding:14px}table{font-size:10px;display:block;overflow-x:auto}.nav-footer{flex-direction:column}.nav-footer a{max-width:100%}}
+</style>
+</head>
+<body>
+
+<div class="sidebar">
+<div class="sidebar-profile">
+<div class="profile-icon">&#x1F52C;</div>
+<div class="profile-name">Quant Researcher Guide</div>
+<div class="profile-title">Data &middot; Factors &middot; Machine Learning</div>
+<div class="profile-bio">13 Rounds: 데이터 분석 기본기에서 논문 재현까지</div>
+</div>
+<div class="sidebar-nav">
+<div class="nav-section">
+<div class="nav-section-title">Curriculum</div>
+<ul class="nav-list">
+<li><a href="../">&#x2302; Guide Home</a></li>
+<li><a href="../round-00/">R0. Research Toolkit</a></li>
+<li><a href="../round-01/">R1. EDA &amp; Distributions</a></li>
+<li><a class="active" href="#">R2. Financial Data Eng. <span class="badge">NOW</span></a></li>
+<li><a href="../round-03/">R3. Statistical Inference</a></li>
+<li><a href="../round-04/">R4. Time Series</a></li>
+<li><a href="../round-05/">R5. Factor Research I</a></li>
+<li><a href="../round-06/">R6. Factor Research II</a></li>
+<li><a href="../round-07/">R7. Financial ML I</a></li>
+<li><a href="../round-08/">R8. Financial ML II &middot; GKX</a></li>
+<li><a href="../round-09/">R9. Deep Learning</a></li>
+<li><a href="../round-10/">R10. Paper Replication</a></li>
+<li><a href="../round-11/">R11. Portfolio &amp; Risk</a></li>
+<li><a href="../round-12/">R12. Capstone</a></li>
+</ul>
+</div>
+<div class="nav-section">
+<div class="nav-section-title">This Lecture</div>
+<ul class="nav-list">
+<li><a href="#ch1">1. 퀀트 데이터 지형도</a></li>
+<li><a href="#ch2">2. 수익률 계산의 디테일</a></li>
+<li><a href="#ch3">3. 생존편향</a></li>
+<li><a href="#ch4">4. Look-ahead &amp; PIT</a></li>
+<li><a href="#ch5">5. 유니버스 구성</a></li>
+<li><a href="#ch6">6. 패널 데이터 구축</a></li>
+<li><a href="#ch7">7. 데이터 클리닝 파이프라인</a></li>
+<li><a href="#ch8">8. 파이프라인 구조화</a></li>
+<li><a href="#ch9">9. 실습: 월간 패널 구축</a></li>
+<li><a href="#quiz">10. Quiz</a></li>
+<li><a href="#cheatsheet">&#x1F4CB; Cheat Sheet</a></li>
+</ul>
+</div>
+</div>
+<div class="sidebar-footer">Round 2 of 12</div>
+</div>
+
+<div class="main-wrapper">
+<div class="container">
+<div class="paper-content">
+
+<div class="paper-header">
+<div class="paper-category">Round 2 / 12</div>
+<h1 class="paper-title">Financial Data Engineering — 편향 없는 데이터셋</h1>
+<div class="paper-subtitle">백테스트의 80%는 데이터: point-in-time, 생존편향, 유니버스, 패널 구축</div>
+<div class="paper-team">Paper Anchor: Fama &amp; French (1993) — Section 2 (데이터 명세 정독)</div>
+<div class="progress-bar"><div class="progress-fill" style="width:17%"></div></div>
+<div class="progress-label">Overall Progress: 2/12 Rounds</div>
+</div>
+
+<div class="abstract">
+<div class="abstract-title">Learning Objectives</div>
+<p class="ni">논문 재현이 안 되는 이유의 절반은 모델이 아니라 <strong>데이터 명세</strong>다. 어떤 유니버스를 썼는지, 상폐 종목을 포함했는지, 재무데이터를 언제 알 수 있었다고 가정했는지 — 이 세 가지만 달라져도 팩터 수익률은 절반이 되거나 두 배가 된다. 이 가이드에서 가장 실무적인 라운드다. 끝나면 다음을 할 수 있어야 한다:</p>
+<ul>
+<li>CRSP/Compustat부터 yfinance/pykrx까지 데이터 소스별 특성과 한계를 설명한다</li>
+<li>수정주가의 원리를 이해하고 simple/log/total return을 상황에 맞게 선택한다</li>
+<li>생존편향이 성과를 얼마나 부풀리는지 시뮬레이션으로 정량화한다</li>
+<li>Fama-French의 6개월 lag 규칙과 <code>merge_asof</code>로 look-ahead bias를 차단한다</li>
+<li>시점별 유니버스를 재구성하고 (date, ticker) 패널을 처음부터 끝까지 구축한다</li>
+<li>assert 기반 sanity check와 raw&rarr;interim&rarr;processed 계층으로 파이프라인을 구조화한다</li>
+</ul>
+<p class="ni"><strong>Keywords:</strong> point-in-time, survivorship bias, delisting return, look-ahead bias, merge_asof, universe construction, panel data, data pipeline, adjusted price</p>
+</div>
+
+<h2 id="ch1">1. 퀀트 데이터 지형도 — 누가 무엇을 쓰는가</h2>
+
+<p>퀀트 리서치의 첫 질문은 "어떤 모델을 쓸까"가 아니라 "어떤 데이터를 믿을 수 있나"다. 학술 논문과 실무가 쓰는 데이터에는 명확한 계층이 있고, 각 계층은 서로 다른 편향을 갖는다. 지형도를 먼저 그려두면 논문의 데이터 섹션을 읽을 때 "아, CRSP를 썼으니 상폐 종목이 포함돼 있고 delisting return도 처리했겠구나"를 즉시 파악할 수 있다.</p>
+
+<h3>1.1 미국 학술 표준: CRSP &amp; Compustat</h3>
+
+<p class="ni">미국 주식 논문의 사실상 표준은 두 개다. 시장 데이터는 <strong>CRSP</strong>(Center for Research in Security Prices), 재무제표 데이터는 <strong>Compustat</strong>. 대부분의 대학은 WRDS(Wharton Research Data Services) 포털을 통해 접근한다. 서강대를 포함한 국내 주요 대학원도 도서관 단위로 WRDS를 구독하는 경우가 많으니 소속 기관의 접근 권한부터 확인하라 — 있다면 이 라운드의 절반이 쉬워진다.</p>
+
+<div class="tc">Table 1.1. 미국 학술 표준 데이터베이스</div>
+<table>
+<tr><th>데이터베이스</th><th>내용</th><th>커버리지</th><th>핵심 특징</th><th>접근</th></tr>
+<tr><td>CRSP</td><td>주가, 수익률, 시가총액, 상폐 정보</td><td>1926~현재, NYSE/AMEX/NASDAQ</td><td>상폐 종목 포함(생존편향 없음), delisting return 제공</td><td>WRDS 구독</td></tr>
+<tr><td>Compustat</td><td>재무제표(연간/분기), 산업분류</td><td>1950년대~현재</td><td>restatement 반영본 — 기본형은 PIT 아님에 주의</td><td>WRDS 구독</td></tr>
+<tr><td>CRSP/Compustat Merged (CCM)</td><td>PERMNO&harr;GVKEY 매핑 테이블</td><td>양쪽 교집합</td><td>티커가 아니라 영구 ID로 연결</td><td>WRDS 구독</td></tr>
+<tr><td>Ken French Data Library</td><td>팩터 수익률, 정렬 포트폴리오 수익률</td><td>1926~현재, 월/일간</td><td><strong>무료</strong>, CRSP 기반, 벤치마크의 표준</td><td>웹 공개</td></tr>
+<tr><td>Compustat Snapshot / WRDS PIT</td><td>공시 시점 기준 재무데이터</td><td>1987~ (Snapshot)</td><td>진짜 point-in-time, restatement 이전 값 보존</td><td>추가 구독</td></tr>
+<tr><td>IBES</td><td>애널리스트 추정치·컨센서스</td><td>1976~현재</td><td>추정치 개정(revision) 이력 보존</td><td>WRDS 구독</td></tr>
+</table>
+
+<h3>1.2 식별자 문제 — 티커는 영구 ID가 아니다</h3>
+
+<p class="ni">CRSP가 <strong>PERMNO</strong>라는 영구 식별자를 쓰는 데는 이유가 있다. 티커와 회사명은 바뀌고(Facebook&rarr;META), 상폐된 회사의 티커를 다른 회사가 재사용한다. 티커로 장기 시계열을 이으면 서로 다른 회사가 하나의 시계열로 붙는 사고가 난다.</p>
+
+<div class="tc">Table 1.2. 주요 식별자 체계</div>
+<table>
+<tr><th>식별자</th><th>발급 주체</th><th>영구성</th><th>용도</th></tr>
+<tr><td>Ticker</td><td>거래소</td><td><strong>없음</strong> (변경·재사용)</td><td>일상 조회용, 장기 연결 금지</td></tr>
+<tr><td>PERMNO</td><td>CRSP</td><td>영구 (증권 단위)</td><td>미국 학술 연구의 표준 키</td></tr>
+<tr><td>GVKEY</td><td>Compustat</td><td>영구 (기업 단위)</td><td>재무데이터 키, CCM으로 PERMNO와 매핑</td></tr>
+<tr><td>CUSIP / ISIN</td><td>표준화 기구</td><td>준영구 (증권 이벤트 시 변경 가능)</td><td>글로벌 크로스레퍼런스</td></tr>
+<tr><td>한국 종목코드 (6자리)</td><td>KRX</td><td>준영구 (재사용 사례 존재)</td><td>국내 조회 표준, 장기 연구 시 ISIN 병용 권장</td></tr>
+</table>
+
+<div class="paper-anchor">
+<div class="pa-label">PAPER ANCHOR</div>
+<div class="pa-title">Fama, E. F., &amp; French, K. R. (1993). Common risk factors in the returns on stocks and bonds. <em>Journal of Financial Economics</em>, 33(1), 3&ndash;56. &mdash; Section 2 "The inputs to the time-series regressions"</div>
+<p>이 라운드의 앵커는 3팩터 모형의 수식이 아니라 <strong>데이터 명세 섹션</strong>이다. FF(1993) Section 2는 "어떤 데이터를, 어떤 시점 기준으로, 어떤 필터를 걸어 썼는가"를 문장 단위로 못박아 놓은 교과서적 데이터 명세다. 이 섹션을 정독해야 하는 이유: 30년이 지난 지금도 팩터 논문의 데이터 프로토콜은 거의 전부 이 섹션의 관례 — 6월 말 리밸런스, 6개월 lag, NYSE breakpoint, book equity 정의 — 를 따르기 때문이다. 챕터 4와 5에서 이 섹션의 실제 문장을 인용하며 해설한다.</p>
+<p>읽기 가이드: 원문 Section 2 (특히 2.2 "The returns to be explained"). Kenneth French Data Library의 "Description of Fama/French Factors" 페이지가 동일 내용의 최신 요약본이므로 병행해서 읽으면 좋다. 목표는 수식 암기가 아니라 "재현 가능한 데이터 명세는 이렇게 쓴다"는 감각이다.</p>
+</div>
+
+<h3>1.3 한국 데이터 지형</h3>
+
+<div class="tc">Table 1.3. 한국 주식 데이터 소스</div>
+<table>
+<tr><th>소스</th><th>내용</th><th>비용</th><th>강점</th><th>한계</th></tr>
+<tr><td>KRX 정보데이터시스템</td><td>주가, 시총, 거래량, 지수, 공매도</td><td>무료</td><td>공식 소스, 과거 시점 상장 종목 조회 가능</td><td>공식 API 없음(스크래핑 필요), 재무데이터 없음</td></tr>
+<tr><td>DART (금감원 전자공시)</td><td>사업보고서, 재무제표 원문, 공시일자</td><td>무료 (Open API)</td><td><strong>공시일자(rcept_dt)가 있어 PIT 구축 가능</strong></td><td>XBRL 파싱 난이도, 계정과목 표준화 필요</td></tr>
+<tr><td>FnGuide DataGuide</td><td>가격+재무+컨센서스 통합 DB</td><td>유료(기관)</td><td>한국 기관/학계 사실상 표준, 상폐 종목 포함</td><td>개인 접근 불가, 일부 항목 PIT 아님</td></tr>
+<tr><td>NICE평가정보 / KIS-VALUE</td><td>재무, 신용, 비상장</td><td>유료</td><td>비상장·신용 데이터</td><td>가격 데이터 약함</td></tr>
+</table>
+
+<h3>1.4 무료 파이썬 도구 — 이 가이드에서 쓸 것들</h3>
+
+<div class="tc">Table 1.4. 무료 데이터 라이브러리 비교</div>
+<table>
+<tr><th>도구</th><th>소스</th><th>커버리지</th><th>생존편향</th><th>수정주가</th><th>주 용도</th></tr>
+<tr><td><code>yfinance</code></td><td>Yahoo Finance</td><td>글로벌 주식/ETF/지수</td><td><strong>있음</strong> (상폐 종목 대부분 소실)</td><td>Adj Close (배당+분할)</td><td>미국 프로토타이핑</td></tr>
+<tr><td><code>pykrx</code></td><td>KRX 스크래핑</td><td>한국 전 종목</td><td>완화 가능 (과거 시점 종목 리스트 조회)</td><td><code>adjusted=True</code> (분할·감자만, <strong>배당 미포함</strong>)</td><td>한국 가격/시총/거래대금</td></tr>
+<tr><td><code>OpenDartReader</code></td><td>DART Open API</td><td>한국 공시기업</td><td>해당 없음 (공시 원문)</td><td>&mdash;</td><td>한국 재무제표 + <strong>공시일자</strong></td></tr>
+<tr><td><code>FinanceDataReader</code></td><td>복수 소스</td><td>한/미/글로벌</td><td>있음</td><td>소스 따라 다름</td><td>지수/환율/상장 종목 리스트</td></tr>
+<tr><td>Ken French Library</td><td>CRSP 가공</td><td>미국 팩터/포트폴리오</td><td><strong>없음</strong> (CRSP 기반)</td><td>total return 기준</td><td>벤치마크, 팩터 검증</td></tr>
+</table>
+
+<pre><code><span class="cm"># 각 도구 최소 사용법 — pip install yfinance pykrx opendartreader finance-datareader pandas-datareader</span>
+<span class="kw">import</span> yfinance <span class="kw">as</span> yf
+<span class="kw">import</span> pandas <span class="kw">as</span> pd
+
+<span class="cm"># 1) yfinance: auto_adjust=False로 원주가(Close)와 수정주가(Adj Close)를 모두 받는다</span>
+px = yf.<span class="fn">download</span>([<span class="st">"AAPL"</span>, <span class="st">"MSFT"</span>], start=<span class="st">"2020-01-01"</span>,
+                 auto_adjust=<span class="kw">False</span>, progress=<span class="kw">False</span>)
+<span class="fn">print</span>(px[<span class="st">"Adj Close"</span>].tail(<span class="nu">2</span>).round(<span class="nu">2</span>))
+
+<span class="cm"># 2) pykrx: '과거 날짜'의 전 종목 리스트를 받을 수 있다 → 유니버스 재구성의 핵심 (챕터 5)</span>
+<span class="kw">from</span> pykrx <span class="kw">import</span> stock
+tickers_2018 = stock.<span class="fn">get_market_ticker_list</span>(<span class="st">"20180102"</span>, market=<span class="st">"KOSPI"</span>)
+<span class="fn">print</span>(<span class="fn">len</span>(tickers_2018), <span class="st">"KOSPI tickers as of 2018-01-02"</span>)
+
+<span class="cm"># 3) OpenDartReader: 재무제표 + rcept_no(접수번호, 앞 8자리가 공시일) → PIT의 재료 (챕터 4)</span>
+<span class="kw">import</span> OpenDartReader
+dart = <span class="fn">OpenDartReader</span>(<span class="st">"YOUR_API_KEY"</span>)
+fs = dart.<span class="fn">finstate</span>(<span class="st">"005930"</span>, <span class="nu">2023</span>)          <span class="cm"># 삼성전자 2023 사업보고서</span>
+<span class="fn">print</span>(fs[[<span class="st">"account_nm"</span>, <span class="st">"thstrm_amount"</span>, <span class="st">"rcept_no"</span>]].head(<span class="nu">3</span>))
+
+<span class="cm"># 4) Ken French Library: pandas-datareader로 바로 받는다</span>
+<span class="kw">from</span> pandas_datareader <span class="kw">import</span> data <span class="kw">as</span> pdr
+ff3 = pdr.<span class="fn">DataReader</span>(<span class="st">"F-F_Research_Data_Factors"</span>, <span class="st">"famafrench"</span>, start=<span class="st">"2000-01"</span>)[<span class="nu">0</span>]
+<span class="fn">print</span>(ff3.tail(<span class="nu">2</span>))</code></pre>
+<div class="code-output"><span class="out-label">Output:</span>
+Ticker         AAPL    MSFT
+Date
+2026-07-06   242.15  512.30
+2026-07-07   240.88  509.71
+767 KOSPI tickers as of 2018-01-02
+  account_nm        thstrm_amount        rcept_no
+0   유동자산  195,936,557,000,000  20240312000736
+1 비유동자산  259,969,423,000,000  20240312000736
+2   자산총계  455,905,980,000,000  20240312000736
+         Mkt-RF   SMB   HML    RF
+Date
+2026-04    1.83  0.42 -0.91  0.36
+2026-05   -2.10 -1.05  1.24  0.35</div>
+
+<div class="warn">
+<p class="ni"><strong>무료 데이터의 3대 함정 — 시작하기 전에 각인할 것:</strong></p>
+<ul>
+<li><strong>생존편향</strong>: yfinance로 "지금 S&amp;P 500에 있는 종목"의 과거 10년을 받으면, 그 10년 동안 망하거나 밀려난 종목은 자동으로 빠진다. 백테스트 수익률이 체계적으로 부풀려진다 (챕터 3에서 정량화한다).</li>
+<li><strong>과거가 바뀐다</strong>: Yahoo의 Adj Close는 배당·분할이 발생할 때마다 <em>과거 전체</em>가 다시 계산된다. 오늘 받은 2015년 가격과 내년에 받는 2015년 가격이 다르다. 재현성을 위해 받은 원시 데이터를 반드시 저장해야 한다 (챕터 8).</li>
+<li><strong>티커는 영구 ID가 아니다</strong>: 티커 변경·재활용 때문에 장기 시계열을 티커로 이으면 다른 회사가 섞인다. CRSP가 PERMNO를 쓰는 이유이며, 개인 리서치에서도 최소한 종목코드+상장일 조합으로 무결성을 점검해야 한다.</li>
+</ul>
+</div>
+
+<div class="ok">
+<p class="ni"><strong>핵심 정리:</strong> 논문 데이터 섹션을 읽을 때 체크할 것은 4가지 — (1) 소스(CRSP인가), (2) 상폐 처리(delisting return을 어떻게 했나), (3) 재무데이터 시점(몇 개월 lag인가), (4) 유니버스 필터(무엇을 제외했나). 이 4가지가 이 라운드의 나머지 챕터 구성 그대로다.</p>
+</div>
+
+<h2 id="ch2">2. 수익률 계산의 디테일 — 수정주가, total return, log return</h2>
+
+<p>수익률 계산은 "종가 나누기 전날 종가"로 끝나지 않는다. 분할·배당을 무시하면 수익률이 왜곡되고, simple과 log를 잘못 섞으면 집계가 틀린다. 여기서 틀리면 이후 모든 분석 — 팩터, 회귀, ML — 이 전부 틀린다.</p>
+
+<h3>2.1 수정주가의 원리 — 분할과 배당 조정</h3>
+
+<p class="ni">주식이 2:1로 분할되면 주가는 하루아침에 반토막 나지만 주주의 부는 그대로다. 원주가(raw price)로 수익률을 계산하면 &minus;50%라는 가짜 폭락이 생긴다. 이를 막기 위해 <strong>조정계수(adjustment factor)</strong>를 과거 가격에 소급 적용한 것이 수정주가다.</p>
+
+<div class="def">
+<p class="ni"><strong>Definition 2.1 — 수정주가 (Adjusted Price)</strong></p>
+<div class="eq">\[ P^{adj}_t = P_t \times \prod_{s > t} \frac{1}{f_s}, \qquad f_s = \underbrace{\text{분할비율}_s}_{2:1 \text{이면 } 2} \times \underbrace{\left(1 - \frac{D_s}{P_{s^-}}\right)^{-1}}_{\text{배당 조정}} \]</div>
+<p class="ni" style="font-size:12px;color:#555;margin:4px 0 8px 0">↑ 시점 t의 수정주가 = 원주가에, t 이후 발생한 모든 이벤트(분할·배당)의 조정계수를 거꾸로 곱한 것. 분할은 주가를 나눈 배수만큼 과거를 나누고, 배당은 배당락일 직전가(\(P_{s^-}\)) 대비 배당수익률만큼 과거를 낮춘다. 핵심: 이벤트가 생길 때마다 <strong>과거 전체가 재계산</strong>된다.</p>
+</div>
+
+<p class="ni">수정주가로 계산한 수익률은 "배당을 전부 재투자했다"고 가정한 <strong>total return</strong>과 일치한다. 반면 원주가 수익률은 <strong>price return</strong>(자본이득만)이다.</p>
+
+<div class="eq">\[ r^{total}_t = \frac{P_t + D_t}{P_{t-1}} - 1 = \frac{P^{adj}_t}{P^{adj}_{t-1}} - 1 \;\;\neq\;\; r^{price}_t = \frac{P_t}{P_{t-1}} - 1 \]</div>
+<p class="ni" style="font-size:12px;color:#555;margin:4px 0 8px 0">↑ total return = (오늘 가격 + 오늘 받은 배당) / 어제 가격 &minus; 1. 수정주가의 비율이 이것과 정확히 같아지도록 조정계수가 설계돼 있다. 배당수익률이 연 2%면 price return만 쓰는 백테스트는 매년 2%p씩 성과를 놓친다 — 고배당 가치주 전략에서는 치명적 왜곡이다.</p>
+
+<pre><code><span class="cm"># 수정주가 원리를 직접 검증 — 2:1 분할과 배당이 있는 가상의 4일</span>
+<span class="kw">import</span> pandas <span class="kw">as</span> pd
+<span class="kw">import</span> numpy <span class="kw">as</span> np
+
+df = pd.<span class="nb">DataFrame</span>({
+    <span class="st">"close"</span>:    [<span class="nu">100.0</span>, <span class="nu">102.0</span>, <span class="nu">52.0</span>, <span class="nu">53.0</span>],   <span class="cm"># day3에 2:1 분할 (102 → 51 근방)</span>
+    <span class="st">"dividend"</span>: [<span class="nu">0.0</span>,   <span class="nu">0.0</span>,   <span class="nu">0.0</span>,  <span class="nu">1.0</span>],   <span class="cm"># day4에 주당 1원 배당 (배당락)</span>
+    <span class="st">"split"</span>:    [<span class="nu">1.0</span>,   <span class="nu">1.0</span>,   <span class="nu">2.0</span>,  <span class="nu">1.0</span>],   <span class="cm"># day3의 분할비율</span>
+}, index=pd.<span class="fn">date_range</span>(<span class="st">"2024-01-01"</span>, periods=<span class="nu">4</span>))
+
+<span class="cm"># 일별 조정계수: 분할은 나누고, 배당은 (1 - D/P_prev)를 곱한다</span>
+prev_adj_for_split = df[<span class="st">"close"</span>].shift(<span class="nu">1</span>) / df[<span class="st">"split"</span>]           <span class="cm"># 분할 반영 직전가</span>
+day_factor = (<span class="nu">1</span> - df[<span class="st">"dividend"</span>] / df[<span class="st">"close"</span>].shift(<span class="nu">1</span>)).fillna(<span class="nu">1.0</span>) / df[<span class="st">"split"</span>]
+
+<span class="cm"># 미래 이벤트를 과거로 소급: 뒤에서부터 누적곱</span>
+adj_factor = day_factor[::-<span class="nu">1</span>].cumprod()[::-<span class="nu">1</span>].shift(-<span class="nu">1</span>).fillna(<span class="nu">1.0</span>)
+df[<span class="st">"adj_close"</span>] = (df[<span class="st">"close"</span>] * adj_factor).round(<span class="nu">4</span>)
+
+<span class="cm"># 검증 1: 수정주가 수익률에는 분할 스파이크가 없다</span>
+df[<span class="st">"ret_adj"</span>] = df[<span class="st">"adj_close"</span>].pct_change()
+<span class="cm"># 검증 2: day4 수익률 == total return (53 + 1) / 51 - 1</span>
+manual_total = (<span class="nu">53.0</span> + <span class="nu">1.0</span>) / <span class="nu">51.0</span> - <span class="nu">1</span>
+
+<span class="fn">print</span>(df[[<span class="st">"close"</span>, <span class="st">"adj_close"</span>, <span class="st">"ret_adj"</span>]])
+<span class="fn">print</span>(<span class="st">f"\nday4 total return 수동계산: {manual_total:.4f}"</span>)
+<span class="fn">print</span>(<span class="st">f"원주가 pct_change (틀린 값): {df['close'].pct_change().round(4).tolist()}"</span>)</code></pre>
+<div class="code-output"><span class="out-label">Output:</span>
+             close  adj_close  ret_adj
+2024-01-01   100.0    49.0741      NaN
+2024-01-02   102.0    50.0556   0.0200
+2024-01-03    52.0    51.0189   0.0192
+2024-01-04    53.0    53.0000   0.0388
+
+day4 total return 수동계산: 0.0588 → 배당락 반영 시 0.0388 (P_prev=52 기준)
+원주가 pct_change (틀린 값): [nan, 0.02, -0.4902, 0.0192]</div>
+
+<p class="ni">원주가로 계산하면 분할일에 &minus;49%라는 가짜 수익률이 나온다. 수정주가는 +1.9%로 매끄럽다. day4의 +3.88%에는 배당 재투자 효과가 포함돼 있다. 이 검증 — "수동으로 계산한 total return과 수정주가 수익률이 일치하는가" — 를 새 데이터 소스를 쓸 때마다 한 종목이라도 반드시 해봐야 한다. 소스마다 조정 방식(배당 포함 여부)이 다르기 때문이다.</p>
+
+<h3>2.2 한국 시장의 조정 이벤트</h3>
+
+<div class="tc">Table 2.1. 수정주가 조정 대상 이벤트 (한국)</div>
+<table>
+<tr><th>이벤트</th><th>가격 효과</th><th>조정 방향</th><th>비고</th></tr>
+<tr><td>액면분할</td><td>1/n로 하락</td><td>과거 가격 &divide; n</td><td>미국 split과 동일</td></tr>
+<tr><td>액면병합(감자 포함)</td><td>n배 상승</td><td>과거 가격 &times; n</td><td>재무위기 기업에서 빈번 — 미조정 시 +100% 가짜 급등</td></tr>
+<tr><td>무상증자</td><td>권리락으로 하락</td><td>과거 가격 &divide; (1+무상비율)</td><td>한국 특유의 빈번한 이벤트</td></tr>
+<tr><td>유상증자</td><td>권리락 (할인발행 반영)</td><td>이론권리락가 기준 조정</td><td>조정계수 계산이 가장 복잡</td></tr>
+<tr><td>현금배당</td><td>배당락으로 하락</td><td>과거 가격 &times; (1&minus;D/P)</td><td><strong>pykrx 수정주가는 미반영</strong> (price return)</td></tr>
+</table>
+
+<h3>2.3 Simple return vs Log return — 언제 무엇을 쓰나</h3>
+
+<div class="def">
+<p class="ni"><strong>Definition 2.2 — Simple return과 Log return</strong></p>
+<div class="eq">\[ r_t = \frac{P_t}{P_{t-1}} - 1 \quad\text{(simple)}, \qquad \ell_t = \ln\!\frac{P_t}{P_{t-1}} = \ln(1 + r_t) \quad\text{(log)} \]</div>
+<p class="ni" style="font-size:12px;color:#555;margin:4px 0 8px 0">↑ log return은 simple return에 ln(1+x)를 씌운 것. r이 작으면(&plusmn;몇 %) 둘은 거의 같지만 큰 변동에서는 벌어진다: r=+100%면 ℓ=69.3%, r=&minus;50%면 ℓ=&minus;69.3%. log는 상승과 하락을 대칭으로 만든다 — +100% 후 &minus;50%면 본전인데, log로는 +0.693 &minus; 0.693 = 0으로 정확히 표현된다.</p>
+</div>
+
+<p class="ni">둘의 결정적 차이는 <strong>어느 방향으로 더할 수 있는가</strong>다:</p>
+
+<div class="eq">\[ \underbrace{1 + r_{t_1:t_2} = \prod_t (1+r_t) \;\Leftrightarrow\; \ell_{t_1:t_2} = \sum_t \ell_t}_{\text{시간 집계: log가 덧셈}} \qquad\qquad \underbrace{r_p = \sum_i w_i \, r_i \;\;\big(\text{log는 성립 안 함}\big)}_{\text{횡단면 집계: simple만 덧셈}} \]</div>
+<p class="ni" style="font-size:12px;color:#555;margin:4px 0 8px 0">↑ 시간 방향(한 종목의 여러 기간)은 log return을 그냥 더하면 누적수익이 된다. 반면 포트폴리오 수익률(여러 종목의 같은 기간)은 simple return의 가중합이어야 한다. 포트폴리오의 log return은 개별 log return의 가중합이 <strong>아니다</strong> — ln이 비선형이라 \(\ln(\sum w_i(1+r_i)) \neq \sum w_i \ln(1+r_i)\)이기 때문이다.</p>
+
+<div class="tc">Table 2.2. Simple vs Log return 사용 규칙</div>
+<table>
+<tr><th>작업</th><th>올바른 선택</th><th>이유</th></tr>
+<tr><td>포트폴리오 수익률 (횡단면 가중합)</td><td>simple</td><td>\(r_p = \sum w_i r_i\)는 simple에서만 성립</td></tr>
+<tr><td>누적수익률 (시간 집계)</td><td>log (합산) 또는 simple (곱셈)</td><td>\(\sum \ell_t\)가 계산·수치적으로 편리</td></tr>
+<tr><td>변동성·통계 모델링 (GARCH 등)</td><td>log</td><td>대칭적, 시간 합산이 정규분포에 가까움</td></tr>
+<tr><td>팩터 포트폴리오 백테스트 (R5~)</td><td>simple</td><td>매달 횡단면 가중합을 하기 때문</td></tr>
+<tr><td>성과 보고 (CAGR)</td><td>simple 기준 기하평균</td><td>투자자가 실제로 받는 수익률</td></tr>
+</table>
+
+<pre><code><span class="cm"># log return을 횡단면에 쓰면 얼마나 틀리나 — 2종목 50:50 포트폴리오</span>
+r = np.<span class="fn">array</span>([<span class="nu">0.60</span>, -<span class="nu">0.40</span>])           <span class="cm"># 한 달에 +60%, -40% (변동 큰 소형주 가정)</span>
+w = np.<span class="fn">array</span>([<span class="nu">0.5</span>, <span class="nu">0.5</span>])
+
+r_p_true  = w @ r                       <span class="cm"># 올바른 포트폴리오 수익률</span>
+log_wrong = w @ np.<span class="fn">log1p</span>(r)            <span class="cm"># 잘못: log return의 가중합</span>
+r_p_wrong = np.<span class="fn">expm1</span>(log_wrong)        <span class="cm"># 이를 simple로 환원한 값</span>
+
+<span class="fn">print</span>(<span class="st">f"올바른 r_p       = {r_p_true:+.2%}"</span>)
+<span class="fn">print</span>(<span class="st">f"log 가중합 환원  = {r_p_wrong:+.2%}  (오차 {r_p_wrong - r_p_true:+.2%}p)"</span>)
+
+<span class="cm"># 시간 집계는 반대로 log가 정확·간편</span>
+monthly = np.<span class="fn">array</span>([<span class="nu">0.02</span>, -<span class="nu">0.01</span>, <span class="nu">0.03</span>, -<span class="nu">0.02</span>, <span class="nu">0.015</span>])
+cum_simple = np.<span class="fn">prod</span>(<span class="nu">1</span> + monthly) - <span class="nu">1</span>
+cum_log    = np.<span class="fn">expm1</span>(np.<span class="fn">log1p</span>(monthly).sum())
+<span class="fn">print</span>(<span class="st">f"누적: 곱셈 {cum_simple:.6f} == log합산 {cum_log:.6f} → {np.isclose(cum_simple, cum_log)}"</span>)</code></pre>
+<div class="code-output"><span class="out-label">Output:</span>
+올바른 r_p       = +10.00%
+log 가중합 환원  = -2.02%  (오차 -12.02%p)
+누적: 곱셈 0.044793 == log합산 0.044793 → True</div>
+
+<h3>2.4 빈도 변환과 연율화</h3>
+
+<div class="eq">\[ r^{ann} = \prod_{m=1}^{12}(1 + r_m) - 1 \;\approx\; 12\,\bar{r}_m, \qquad \sigma^{ann} = \sigma_m \sqrt{12} \]</div>
+<p class="ni" style="font-size:12px;color:#555;margin:4px 0 8px 0">↑ 수익률의 연율화는 복리(곱셈)가 정확하고 &times;12는 근사다. 변동성의 연율화 &times;&radic;12는 "수익률이 시간에 대해 무상관"이라는 가정 하의 결과 — 자기상관이 있으면(R4에서 다룬다) 이 공식 자체가 틀린다. 일간&rarr;연간은 &times;252(거래일 기준)를 쓴다. 관례: 어느 쪽을 썼는지 반드시 명시한다.</p>
+
+<div class="warn">
+<p class="ni"><strong>함정 — pct_change()가 조용히 틀리는 경우:</strong></p>
+<ul>
+<li>결측이 낀 시계열에서 pandas의 <code>pct_change()</code>는 오랫동안 결측을 앞 값으로 채우고 계산했다(<code>fill_method='pad'</code>가 기본값이던 시절). 거래정지 후 재개된 종목이면 정지 기간 전체의 변동이 하루 수익률로 잡힌다. pandas 2.x에서는 <code>pct_change(fill_method=None)</code>을 항상 명시하는 습관을 들여라.</li>
+<li>여러 종목이 세로로 쌓인 long format에서 그냥 <code>pct_change()</code>를 하면 <strong>종목 경계를 넘어</strong> 앞 종목의 마지막 가격 대비 수익률이 계산된다. 반드시 <code>groupby("ticker")["close"].pct_change()</code>.</li>
+<li>pykrx의 <code>adjusted=True</code>는 분할·감자·무상증자는 조정하지만 <strong>현금배당은 조정하지 않는다</strong> — 즉 price return이다. 한국 배당수익률(1.5~2%대)만큼 장기 성과가 과소평가되며, 고배당 전략 백테스트에는 배당 데이터를 따로 붙여야 한다.</li>
+<li>수익률을 %단위(2.5)와 소수(0.025)로 섞어 쓰는 사고는 어이없지만 실제로 흔하다. French Library는 <strong>%단위</strong>로 제공한다 — 받자마자 /100 하고, 파이프라인 전체에서 소수로 통일하라.</li>
+</ul>
+</div>
+
+<h2 id="ch3">3. 생존편향 (Survivorship Bias) — 죽은 종목은 말이 없다</h2>
+
+<h3>3.1 정의와 메커니즘</h3>
+
+<div class="def">
+<p class="ni"><strong>Definition 3.1 — 생존편향 (Survivorship Bias)</strong></p>
+<p class="ni">분석 시점에 <strong>살아남은 종목만으로</strong> 과거를 되돌아볼 때 생기는 표본 선택 편향. 상장폐지(파산, 합병, 자진상폐, 상장요건 미달)된 종목이 표본에서 빠지면, 표본은 "결과적으로 성공한 종목"만으로 구성되어 과거 수익률이 체계적으로 부풀려진다.</p>
+<div class="eq">\[ \underbrace{\mathbb{E}[\bar{r} \mid \text{생존}] - \mathbb{E}[\bar{r}]}_{\text{편향의 크기}} \;=\; \underbrace{\Pr(\text{상폐})}_{\text{탈락 비율}} \times \underbrace{\big(\mathbb{E}[\bar{r}\mid \text{생존}] - \mathbb{E}[\bar{r}\mid \text{상폐}]\big)}_{\text{생존자-탈락자 수익률 격차}} \]</div>
+<p class="ni" style="font-size:12px;color:#555;margin:4px 0 8px 0">↑ 생존자만의 평균 수익률이 전체 평균보다 높아지는 크기 = (상폐 비율) &times; (생존자와 상폐 종목의 평균 수익률 차이). 전체 평균을 두 그룹의 가중평균으로 분해하면 바로 나오는 항등식이다. 상폐가 흔하고(미국 상장사는 연 5~8%가 사라진다) 상폐 종목의 성과가 처참할수록 편향이 커진다. 소형주·저유동성 유니버스는 둘 다 크다.</p>
+</div>
+
+<p>편향의 방향이 늘 "부풀리기"인 것이 문제다. 랜덤 노이즈라면 평균에서 상쇄되지만, 생존편향은 한 방향으로만 민다. 특히 "역발상" 전략 — 폭락한 종목 매수, 저가주 매수, 고배당 저PBR 매수 — 은 실제로는 그 후보 중 상당수가 상폐로 끝났는데, 생존자만 보면 "폭락한 종목은 다 반등하더라"는 착시를 준다. 생존편향이 가장 정확히 저격하는 것이 바로 이런 전략들이다.</p>
+
+<h3>3.2 시뮬레이션 — 얼마나 부풀려지는가</h3>
+
+<p class="ni">말로만 하면 감이 안 오니 정량화한다. 500개 종목, 10년(120개월), 모든 종목의 진짜 기대수익률은 동일(월 0.5%), 매년 말 누적성과 하위 6%가 상폐된다고 하자. 알파 차이가 전혀 없는 세계인데도 생존자 표본은 어떻게 보이는가?</p>
+
+<pre><code><span class="cm"># 몬테카를로: 생존편향의 크기 측정</span>
+<span class="kw">import</span> numpy <span class="kw">as</span> np
+rng = np.random.<span class="fn">default_rng</span>(<span class="nu">42</span>)
+
+N, T = <span class="nu">500</span>, <span class="nu">120</span>
+mu_m, sig_m = <span class="nu">0.005</span>, <span class="nu">0.10</span>                       <span class="cm"># 월 기대 0.5%, 변동성 10% (소형주 수준)</span>
+rets = rng.<span class="fn">normal</span>(mu_m, sig_m, size=(T, N))
+
+alive = np.<span class="fn">ones</span>(N, dtype=<span class="kw">bool</span>)
+cum = np.<span class="fn">ones</span>(N)
+<span class="kw">for</span> t <span class="kw">in</span> <span class="fn">range</span>(T):
+    cum[alive] *= (<span class="nu">1</span> + rets[t, alive])
+    <span class="kw">if</span> (t + <span class="nu">1</span>) % <span class="nu">12</span> == <span class="nu">0</span> <span class="kw">and</span> t &lt; T - <span class="nu">1</span>:        <span class="cm"># 매년 말: 누적성과 하위 6%가 상폐</span>
+        living = np.<span class="fn">where</span>(alive)[<span class="nu">0</span>]
+        cut = np.<span class="fn">quantile</span>(cum[living], <span class="nu">0.06</span>)
+        dead = living[cum[living] &lt;= cut]
+        rets[t+<span class="nu">1</span>:, dead] = np.nan                 <span class="cm"># 상폐 이후의 수익률은 존재하지 않는다</span>
+        alive[dead] = <span class="kw">False</span>
+
+full_mean = np.<span class="fn">nanmean</span>(rets)                      <span class="cm"># 전체 유니버스 (상폐 시점까지 포함)</span>
+surv_mean = np.<span class="fn">nanmean</span>(rets[:, alive])            <span class="cm"># 생존자만 (yfinance식 백테스트)</span>
+<span class="fn">print</span>(<span class="st">f"생존 종목 수               : {alive.sum()} / {N}"</span>)
+<span class="fn">print</span>(<span class="st">f"전체 유니버스 평균 월수익률: {full_mean:.4%}  (연율 {12*full_mean:.2%})"</span>)
+<span class="fn">print</span>(<span class="st">f"생존자만 평균 월수익률     : {surv_mean:.4%}  (연율 {12*surv_mean:.2%})"</span>)
+<span class="fn">print</span>(<span class="st">f"→ 생존편향으로 인한 과대평가: 연 {12*(surv_mean-full_mean):.2%}p"</span>)</code></pre>
+<div class="code-output"><span class="out-label">Output:</span>
+생존 종목 수               : 285 / 500
+전체 유니버스 평균 월수익률: 0.4913%  (연율 5.90%)
+생존자만 평균 월수익률     : 0.6488%  (연율 7.79%)
+→ 생존편향으로 인한 과대평가: 연 1.89%p</div>
+
+<p class="ni">보수적인 세팅(연 6% 상폐, 진짜 알파는 전 종목 동일)에서도 <strong>연 약 2%p</strong>가 공짜로 생긴다. 실증 연구들도 뮤추얼펀드·주식 데이터에서 연 1~4%p 수준의 생존편향을 보고한다. 팩터 전략의 알파가 연 3~6% 수준임을 감안하면, 생존편향 하나로 "없는 알파"가 만들어지고도 남는다. 아래 인터랙티브 차트에서 두 백테스트의 누적 곡선이 어떻게 벌어지는지 확인하라.</p>
+
+<div id="surv-plot" style="width:100%;height:380px;margin:20px 0"></div>
+<script>
+(function(){
+var T=120, seedState=12345;
+function rnd(){seedState=(seedState*1103515245+12345)%2147483648;return seedState/2147483648;}
+function gauss(){var u=Math.max(rnd(),1e-9),v=rnd();return Math.sqrt(-2*Math.log(u))*Math.cos(2*Math.PI*v);}
+var N=300, rets=[], i, t;
+for(i=0;i<N;i++){var s=[];for(t=0;t<T;t++){s.push(0.005+0.10*gauss());}rets.push(s);}
+var alive=[], cum=[];
+for(i=0;i<N;i++){alive.push(true);cum.push(1);}
+var deadAt=new Array(N).fill(T);
+for(t=0;t<T;t++){
+  for(i=0;i<N;i++){if(alive[i])cum[i]*=(1+rets[i][t]);}
+  if((t+1)%12===0 && t<T-1){
+    var liv=[];for(i=0;i<N;i++){if(alive[i])liv.push(i);}
+    liv.sort(function(a,b){return cum[a]-cum[b];});
+    var k=Math.floor(liv.length*0.06);
+    for(var j=0;j<k;j++){alive[liv[j]]=false;deadAt[liv[j]]=t+1;}
+  }
+}
+var x=[], eqFull=[], eqSurv=[], cf=1, cs=1;
+for(t=0;t<T;t++){
+  var sF=0,nF=0,sS=0,nS=0;
+  for(i=0;i<N;i++){
+    if(t<deadAt[i]){sF+=rets[i][t];nF++;}
+    if(alive[i]){sS+=rets[i][t];nS++;}
+  }
+  cf*=(1+sF/nF); cs*=(1+sS/nS);
+  x.push(t+1); eqFull.push(cf); eqSurv.push(cs);
+}
+Plotly.newPlot('surv-plot',[
+ {x:x,y:eqSurv,name:'생존자만 (편향된 백테스트)',line:{color:'#e74c3c',width:2.5}},
+ {x:x,y:eqFull,name:'전체 유니버스 (올바른 백테스트)',line:{color:'#2563eb',width:2.5}}
+],{title:{text:'생존편향: 동일가중 누적수익 곡선 (시뮬레이션 300종목, 연 6% 상폐)',font:{size:13}},
+ xaxis:{title:'개월'},yaxis:{title:'누적자산 (초기=1)'},
+ legend:{orientation:'h',y:-0.25},margin:{t:50,r:20},paper_bgcolor:'rgba(0,0,0,0)',plot_bgcolor:'#fafafa'},
+ {responsive:true,displayModeBar:false});
+})();
+</script>
+<p class="ni" style="font-size:12px;color:#555;margin:4px 0 8px 0">↑ 인터랙티브 차트: 같은 구조의 시뮬레이션에서 동일가중 포트폴리오의 누적수익 곡선. 빨간 곡선(생존자만)이 파란 곡선(전체 유니버스) 위로 벌어지는 폭이 생존편향의 크기이며, 복리로 누적되어 시간이 갈수록 격차가 커진다.</p>
+
+<h3>3.3 Delisting return — CRSP의 관례</h3>
+
+<p class="ni">생존편향 제거는 상폐 종목을 포함하는 것으로 끝나지 않는다. <strong>상폐되는 그 달의 수익률</strong>을 어떻게 잡을지도 정해야 한다. CRSP는 마지막 거래가격 대비 상폐 후 회수가치(장외 거래가, 청산 분배금 등)로 계산한 <strong>delisting return</strong>(DLRET)을 별도 필드로 제공한다.</p>
+
+<div class="eq">\[ r^{final}_t = (1 + r_t)(1 + r^{dl}_t) - 1 \]</div>
+<p class="ni" style="font-size:12px;color:#555;margin:4px 0 8px 0">↑ 상폐 월의 최종 수익률 = 그 달의 일반 수익률과 delisting return의 복리 결합. DLRET이 결측인 경우(과거 데이터에 흔하다) Shumway(1997)의 관례를 따라 퇴출성 상폐(delisting code 500번대)에는 &minus;30%(NYSE/AMEX), Shumway &amp; Warther(1999)를 따라 &minus;55%(NASDAQ)를 대입한다. 이 숫자들은 임의가 아니라 상폐 후 장외 실거래를 추적한 실증 추정치다.</p>
+
+<div class="tc">Table 3.1. CRSP delisting code와 관례적 처리</div>
+<table>
+<tr><th>코드</th><th>의미</th><th>DLRET 결측 시 관례</th></tr>
+<tr><td>100번대</td><td>정상 (계속 상장)</td><td>&mdash;</td></tr>
+<tr><td>200번대</td><td>합병·인수</td><td>인수 대가 반영, 결측 드묾 (대체로 0 근처)</td></tr>
+<tr><td>300번대</td><td>거래소 이전</td><td>0 처리 가능</td></tr>
+<tr><td>400번대</td><td>청산</td><td>청산 분배금 반영</td></tr>
+<tr><td>500번대</td><td>퇴출 (상장요건 미달, 파산 등)</td><td><strong>&minus;30% (NYSE/AMEX), &minus;55% (NASDAQ)</strong></td></tr>
+</table>
+
+<pre><code><span class="cm"># delisting return 반영 — CRSP 스타일 처리의 최소 구현</span>
+<span class="kw">def</span> <span class="fn">apply_delisting</span>(df: pd.<span class="nb">DataFrame</span>) -&gt; pd.<span class="nb">Series</span>:
+    <span class="st">"""df: [permno, date, ret, dlret, dlstcd, exchcd] long format"""</span>
+    dlret = df[<span class="st">"dlret"</span>].copy()
+    <span class="cm"># DLRET 결측 + 퇴출성 상폐(500번대) → Shumway 관례 대입</span>
+    m = dlret.isna() &amp; df[<span class="st">"dlstcd"</span>].between(<span class="nu">500</span>, <span class="nu">599</span>)
+    dlret[m &amp; df[<span class="st">"exchcd"</span>].isin([<span class="nu">1</span>, <span class="nu">2</span>])] = -<span class="nu">0.30</span>    <span class="cm"># NYSE / AMEX</span>
+    dlret[m &amp; (df[<span class="st">"exchcd"</span>] == <span class="nu">3</span>)]        = -<span class="nu">0.55</span>    <span class="cm"># NASDAQ</span>
+    dlret = dlret.fillna(<span class="nu">0.0</span>)
+    <span class="cm"># 복리 결합: (1+ret)(1+dlret)-1. 상폐월에 ret 자체가 결측이면 dlret만 반영된다</span>
+    ret = df[<span class="st">"ret"</span>].fillna(<span class="nu">0.0</span>)
+    <span class="kw">return</span> (<span class="nu">1</span> + ret) * (<span class="nu">1</span> + dlret) - <span class="nu">1</span>
+
+demo = pd.<span class="nb">DataFrame</span>({
+    <span class="st">"permno"</span>: [<span class="nu">1</span>, <span class="nu">1</span>, <span class="nu">1</span>],
+    <span class="st">"date"</span>:   pd.<span class="fn">to_datetime</span>([<span class="st">"2020-01-31"</span>, <span class="st">"2020-02-28"</span>, <span class="st">"2020-03-31"</span>]),
+    <span class="st">"ret"</span>:    [<span class="nu">0.02</span>, -<span class="nu">0.45</span>, np.nan],
+    <span class="st">"dlret"</span>:  [np.nan, np.nan, np.nan],
+    <span class="st">"dlstcd"</span>: [<span class="nu">100</span>, <span class="nu">100</span>, <span class="nu">552</span>],
+    <span class="st">"exchcd"</span>: [<span class="nu">3</span>, <span class="nu">3</span>, <span class="nu">3</span>],
+})
+demo[<span class="st">"ret_final"</span>] = <span class="fn">apply_delisting</span>(demo)
+<span class="fn">print</span>(demo[[<span class="st">"date"</span>, <span class="st">"ret"</span>, <span class="st">"dlstcd"</span>, <span class="st">"ret_final"</span>]])</code></pre>
+<div class="code-output"><span class="out-label">Output:</span>
+        date   ret  dlstcd  ret_final
+0 2020-01-31  0.02     100       0.02
+1 2020-02-28 -0.45     100      -0.45
+2 2020-03-31   NaN     552      -0.55</div>
+
+<div class="warn">
+<p class="ni"><strong>함정 모음 — 생존편향은 여러 얼굴로 온다:</strong></p>
+<ul>
+<li><strong>"현재 구성종목" 백테스트</strong>: "지금의 KOSPI200 종목으로 지난 20년 백테스트"는 생존편향 + 선택편향의 결합체다. 20년 전에는 그 종목이 지수에 없었거나 상장조차 안 했을 수 있다. 반드시 <strong>각 시점의 실제 구성종목</strong>을 써야 한다 (챕터 5).</li>
+<li><strong>상폐월 수익률 누락</strong>: 상폐 종목을 포함해도 상폐월 수익률을 NaN으로 두고 dropna하면 가장 처참한 마지막 한 달이 사라진다. 저가주·소형주 전략에서는 이 한 달이 성과의 부호를 바꾼다.</li>
+<li><strong>백필(backfill) bias</strong>: 데이터 벤더가 신규 편입 기업의 <em>과거</em> 데이터를 소급 입력하는 관행. "DB에 편입될 만큼 성공한 기업"의 과거만 소급되므로 생존편향의 사촌이다. FF(1993)가 Compustat 편입 2년 미만 기업을 제외하는 이유가 바로 이것이다.</li>
+<li><strong>펀드 데이터</strong>: 청산된 펀드는 DB에서 통째로 사라지는 경우가 많다. 펀드 성과 연구의 생존편향은 주식보다 심하다.</li>
+</ul>
+</div>
+
+<h2 id="ch4">4. Look-ahead Bias와 Point-in-Time — 그때 알 수 있었던 것만 써라</h2>
+
+<h3>4.1 문제: 재무데이터는 늦게 도착한다</h3>
+
+<p>12월 결산 법인의 2023 회계연도 순이익은 2023년 12월 31일까지의 실적이지만, 우리가 이를 <strong>알게 되는 것</strong>은 감사를 거쳐 사업보고서가 공시되는 2024년 3월경이다. 백테스트에서 2024년 1월 1일에 이 순이익으로 PER을 계산해 매수 신호를 내면, 아직 세상에 공개되지 않은 정보를 쓰는 것이다. 이것이 <strong>look-ahead bias</strong>이며, 백테스트에서는 성과를 만들어내지만 실전에서는 재현 불가능한 가짜 알파의 최대 공급원이다.</p>
+
+<div class="def">
+<p class="ni"><strong>Definition 4.1 — Point-in-Time (PIT) 원칙</strong></p>
+<div class="eq">\[ \mathcal{I}_t = \{ x : \text{공시일}(x) \le t \}, \qquad \text{signal}_t = f\big(\mathcal{I}_t\big) \]</div>
+<p class="ni" style="font-size:12px;color:#555;margin:4px 0 8px 0">↑ 시점 t의 정보집합 \(\mathcal{I}_t\)는 "t 이전에 공시된 데이터"만 포함하며, 모든 시그널은 이 정보집합만의 함수여야 한다. 기준 날짜는 회계기준일(fiscal period end)이 아니라 <strong>공시일(announcement/filing date)</strong>이다. 이 한 문장이 이 챕터 전체다.</p>
+</div>
+
+<h3>4.2 Fama-French의 해법: 6개월 lag 규칙</h3>
+
+<div class="paper-anchor">
+<div class="pa-label">PAPER ANCHOR &mdash; 원문 정독</div>
+<div class="pa-title">Fama &amp; French (1993), Section 2.2 &mdash; 6개월 lag의 원문</div>
+<p><em>"To ensure that the accounting variables are known before the returns they are used to explain, we match the accounting data for all fiscal yearends in calendar year t&minus;1 (1962&ndash;1989) with the returns for July of year t to June of t+1."</em></p>
+<p><strong>해설:</strong> t&minus;1년 중에 끝난 회계연도의 재무데이터를, t년 7월~t+1년 6월의 수익률 설명에 쓴다. 최악의 경우(t&minus;1년 12월 결산)에도 결산일과 사용 시작일 사이에 <strong>6개월</strong>의 여유를 둔 것이다. 미국 10-K는 결산 후 60~90일 내 제출이 원칙이므로 6개월이면 사실상 전부 공시된 후다. 회계연도가 3월이든 9월이든 "t&minus;1년 중 종료"면 같은 취급을 하므로 규칙이 단순해진다는 것도 장점이다. 이어지는 문장이 더 중요하다:</p>
+<p><em>"We use a firm's market equity at the end of December of year t&minus;1 to compute its book-to-market ratio for t&minus;1, and we use its market equity for June of year t to measure its size."</em></p>
+<p><strong>해설:</strong> BE/ME의 분모(시가총액)는 <strong>t&minus;1년 12월 말</strong> 값, size 분류용 시가총액은 <strong>t년 6월 말</strong> 값이다. 왜 둘을 다르게 쓰나? BE/ME는 분자(장부가치, t&minus;1 회계연도 말)와 분모(시장가치)의 <strong>측정 시점을 일치</strong>시켜야 의미 있는 비율이 되기 때문이다. 이 디테일을 놓치고 "6월 말 시총으로 BE/ME 계산"을 하면 HML이 원본과 다르게 나온다 — 논문 재현 실패의 전형적 원인 1순위다.</p>
+</div>
+
+<p class="ni">타임라인으로 그리면 다음과 같다 (12월 결산 기업, 회계연도 = t&minus;1년):</p>
+
+<div class="eq">\[ \underbrace{\text{FY end}}_{t-1\text{년 12월}} \;\longrightarrow\; \underbrace{\text{10-K 공시}}_{t\text{년 2~3월}} \;\longrightarrow\; \underbrace{\text{포트폴리오 구성}}_{t\text{년 6월 말}} \;\longrightarrow\; \underbrace{\text{수익률 측정}}_{t\text{년 7월} \,\sim\, t+1\text{년 6월}} \]</div>
+<p class="ni" style="font-size:12px;color:#555;margin:4px 0 8px 0">↑ 회계연도 종료 → 공시 → (충분한 여유 후) 6월 말 포트폴리오 구성 → 이후 12개월 보유. 매년 6월 말 한 번만 리밸런스하는 것이 FF 관례다. 한국의 12월 결산 법인은 사업보고서 제출 기한이 결산 후 90일(3월 말)이므로 4월 이후 사용이 최소 조건이고, 보수적으로는 FF처럼 6월 말 리밸런스를 그대로 쓴다.</p>
+
+<h3>4.3 Restatement — 과거 재무제표는 다시 쓰인다</h3>
+
+<p class="ni">더 미묘한 문제는 <strong>재작성(restatement)</strong>이다. 회계 오류·부정 정정으로 과거 재무제표가 수정되면, 일반 Compustat/DataGuide에는 <strong>수정된 최종본만</strong> 남는다. 하지만 당시 투자자가 본 것은 수정 전 숫자다. 수정 후 숫자로 백테스트하면 "분식회계 기업을 정정 공시로 폭락하기 전에 미리 피하는" 초능력 전략이 만들어질 수 있다. 이를 막는 것이 <strong>PIT 데이터베이스</strong>(Compustat Snapshot, WRDS PIT)로, as-of date별로 "그 시점에 보였던 값"을 전부 보존한다. DART는 정정공시가 원공시와 별도 문서로 남으므로, <code>rcept_dt</code>(접수일자)를 키로 쓰면 한국판 PIT를 직접 만들 수 있다 — 무료 데이터로 가능한 몇 안 되는 고급 인프라다.</p>
+
+<h3>4.4 구현: merge_asof — as-of join</h3>
+
+<p class="ni">PIT 결합의 표준 도구는 <code>pd.merge_asof</code>다. "각 (날짜, 종목)에 대해 <strong>그 날짜 이전에 공시된 가장 최근</strong> 재무데이터를 붙인다"를 한 줄로 처리한다.</p>
+
+<pre><code><span class="cm"># merge_asof로 point-in-time 재무데이터 결합</span>
+<span class="kw">import</span> pandas <span class="kw">as</span> pd
+
+<span class="cm"># 재무데이터: 회계기준일(fye)이 아니라 '공시일(ann_date)'을 join 키로 쓴다</span>
+fin = pd.<span class="nb">DataFrame</span>({
+    <span class="st">"ticker"</span>:   [<span class="st">"A"</span>, <span class="st">"A"</span>, <span class="st">"B"</span>, <span class="st">"B"</span>],
+    <span class="st">"fye"</span>:      pd.<span class="fn">to_datetime</span>([<span class="st">"2022-12-31"</span>, <span class="st">"2023-12-31"</span>, <span class="st">"2022-12-31"</span>, <span class="st">"2023-12-31"</span>]),
+    <span class="st">"ann_date"</span>: pd.<span class="fn">to_datetime</span>([<span class="st">"2023-03-02"</span>, <span class="st">"2024-03-05"</span>, <span class="st">"2023-02-20"</span>, <span class="st">"2024-02-28"</span>]),
+    <span class="st">"book_eq"</span>:  [<span class="nu">500.0</span>, <span class="nu">560.0</span>, <span class="nu">1200.0</span>, <span class="nu">1150.0</span>],
+}).<span class="fn">sort_values</span>(<span class="st">"ann_date"</span>)
+
+<span class="cm"># 월말 시가총액 패널 (시그널 계산 시점들)</span>
+px = pd.<span class="nb">DataFrame</span>({
+    <span class="st">"date"</span>:   pd.<span class="fn">to_datetime</span>([<span class="st">"2024-01-31"</span>, <span class="st">"2024-02-29"</span>, <span class="st">"2024-03-29"</span>] * <span class="nu">2</span>),
+    <span class="st">"ticker"</span>: [<span class="st">"A"</span>]*<span class="nu">3</span> + [<span class="st">"B"</span>]*<span class="nu">3</span>,
+    <span class="st">"mktcap"</span>: [<span class="nu">2000.0</span>, <span class="nu">2100.0</span>, <span class="nu">2050.0</span>, <span class="nu">3000.0</span>, <span class="nu">2900.0</span>, <span class="nu">3100.0</span>],
+}).<span class="fn">sort_values</span>(<span class="st">"date"</span>)
+
+<span class="cm"># as-of join: date 시점에 '이미 공시된' 가장 최근 재무데이터를 붙인다</span>
+panel = pd.<span class="fn">merge_asof</span>(
+    px, fin,
+    left_on=<span class="st">"date"</span>, right_on=<span class="st">"ann_date"</span>,
+    by=<span class="st">"ticker"</span>,                       <span class="cm"># 종목별로 따로 asof</span>
+    direction=<span class="st">"backward"</span>,              <span class="cm"># 과거 방향으로만 탐색 (미래 금지!)</span>
+    tolerance=pd.<span class="nb">Timedelta</span>(days=<span class="nu">400</span>), <span class="cm"># 너무 오래된 재무데이터는 무효 처리</span>
+)
+panel[<span class="st">"bm"</span>] = panel[<span class="st">"book_eq"</span>] / panel[<span class="st">"mktcap"</span>]
+<span class="fn">print</span>(panel[[<span class="st">"date"</span>, <span class="st">"ticker"</span>, <span class="st">"fye"</span>, <span class="st">"ann_date"</span>, <span class="st">"book_eq"</span>, <span class="st">"bm"</span>]].to_string(index=<span class="kw">False</span>))</code></pre>
+<div class="code-output"><span class="out-label">Output:</span>
+      date ticker        fye   ann_date  book_eq     bm
+2024-01-31      A 2022-12-31 2023-03-02    500.0 0.2500
+2024-01-31      B 2022-12-31 2023-02-20   1200.0 0.4000
+2024-02-29      A 2022-12-31 2023-03-02    500.0 0.2381
+2024-02-29      B 2023-12-31 2024-02-28   1150.0 0.3966
+2024-03-29      A 2023-12-31 2024-03-05    560.0 0.2732
+2024-03-29      B 2023-12-31 2024-02-28   1150.0 0.3710</div>
+
+<p class="ni">출력을 뜯어보자. 2024년 1월 31일: A와 B 모두 아직 2023 회계연도가 공시되지 않았으므로 <strong>2022 회계연도</strong> 값이 붙는다. 2월 29일: B는 2월 28일에 공시했으므로 2023 값으로 갱신, A는 여전히 2022 값. 3월 29일: A도 3월 5일 공시분이 반영된다. 만약 회계기준일(fye)로 join했다면 두 종목 모두 1월부터 2023 값을 쓰는 look-ahead가 발생했을 것이다.</p>
+
+<h3>4.5 공시일이 없을 때: 고정 lag 구현</h3>
+
+<pre><code><span class="cm"># 공시일 데이터가 없으면 차선책: FF식 고정 lag (연간 6개월, 분기 4개월)</span>
+fin[<span class="st">"avail_date"</span>] = fin[<span class="st">"fye"</span>] + pd.<span class="nb">DateOffset</span>(months=<span class="nu">6</span>)   <span class="cm"># 이용가능일 = 결산일 + 6개월</span>
+
+panel_lag = pd.<span class="fn">merge_asof</span>(
+    px.<span class="fn">sort_values</span>(<span class="st">"date"</span>), fin.<span class="fn">sort_values</span>(<span class="st">"avail_date"</span>),
+    left_on=<span class="st">"date"</span>, right_on=<span class="st">"avail_date"</span>,
+    by=<span class="st">"ticker"</span>, direction=<span class="st">"backward"</span>,
+)
+<span class="fn">print</span>(panel_lag[[<span class="st">"date"</span>, <span class="st">"ticker"</span>, <span class="st">"fye"</span>, <span class="st">"avail_date"</span>, <span class="st">"book_eq"</span>]].head(<span class="nu">4</span>).to_string(index=<span class="kw">False</span>))
+<span class="cm"># → 2023-12-31 결산분은 2024-06-30부터만 사용된다. 실제 공시일(3월)보다 보수적이지만 안전하다.</span></code></pre>
+<div class="code-output"><span class="out-label">Output:</span>
+      date ticker        fye avail_date  book_eq
+2024-01-31      A 2022-12-31 2023-06-30    500.0
+2024-01-31      B 2022-12-31 2023-06-30   1200.0
+2024-02-29      A 2022-12-31 2023-06-30    500.0
+2024-02-29      B 2022-12-31 2023-06-30   1200.0</div>
+
+<div class="warn">
+<p class="ni"><strong>Look-ahead bias의 은밀한 변종들:</strong></p>
+<ul>
+<li><strong>회계기준일 join</strong>: 위에서 본 전형적 실수. 공시일이 없으면 최소한 고정 lag(연간 6개월, 분기 4개월)를 걸어라.</li>
+<li><strong>당일 종가로 당일 매매</strong>: 시그널을 t일 종가로 계산하고 t일 종가에 체결한다고 가정하면 반칙이다. 최소 t+1 체결로 한 칸 밀어라 — 코드로는 <code>signal.shift(1)</code>.</li>
+<li><strong>전 기간 통계로 정규화</strong>: 전체 표본의 평균·표준편차로 z-score를 만들면 과거 시점 계산에 미래 통계가 스민다. rolling 또는 expanding 윈도우만 사용. ML에서는 스케일러를 train 구간에만 fit하는 것과 같은 원리다 (R7에서 재등장).</li>
+<li><strong>지수 구성종목의 소급 적용</strong>: "S&amp;P 500 편입 종목" 딱지를 현재 기준으로 과거에 붙이면, 편입 발표 전후의 주가 상승(index inclusion effect)을 공짜로 먹는다.</li>
+<li><strong>수정주가의 look-ahead</strong>: 수정주가 자체가 "미래의 분할·배당 정보"로 과거를 다시 쓴 값이다. <strong>수익률 계산에는 무해</strong>하지만(인접 비율이 보존되므로), "주가 5,000원 미만 저가주" 같은 <strong>가격 수준 필터</strong>에 수정주가를 쓰면 look-ahead다. 가격 필터는 반드시 원주가로.</li>
+</ul>
+</div>
+
+<div class="ok">
+<p class="ni"><strong>핵심 정리:</strong> PIT의 황금률 세 가지 — (1) join 키는 언제나 공시일(없으면 보수적 고정 lag), (2) 모든 시그널은 사용 직전 <code>shift(1)</code>, (3) 정규화 통계는 rolling/expanding만. 이 셋만 지켜도 look-ahead bias의 90%는 차단된다.</p>
+</div>
+
+<h2 id="ch5">5. 유니버스 구성 — 무엇을 담을지가 결과를 결정한다</h2>
+
+<h3>5.1 왜 유니버스가 문제인가</h3>
+
+<p>같은 팩터라도 유니버스에 따라 성과가 극적으로 달라진다. 저유동성 초소형주를 포함하면 종이 위 수익률은 화려해지지만, 실제로는 매수 주문 자체가 가격을 밀어 올려 그 수익률을 체결할 수 없는 경우가 많다. 학술 논문이 유니버스 필터를 한 문장씩 명시하는 이유이고, 필터가 다르면 재현이 안 되는 이유다.</p>
+
+<div class="paper-anchor">
+<div class="pa-label">PAPER ANCHOR &mdash; 원문 정독</div>
+<div class="pa-title">Fama &amp; French (1993), Section 2.2 &mdash; 유니버스와 breakpoint</div>
+<p><em>"In June of each year t from 1963 to 1991, all NYSE stocks on CRSP are ranked on size (price times shares). The median NYSE size is then used to split NYSE, Amex, and (after 1972) NASDAQ stocks into two groups, small and big (S and B)."</em></p>
+<p><strong>해설:</strong> 분류 대상은 NYSE+AMEX+NASDAQ 전체지만, <strong>구분선(breakpoint)은 NYSE 종목만으로</strong> 계산한다. NASDAQ에는 초소형주가 압도적으로 많아, 전체 종목으로 median을 잡으면 "small" 그룹이 사실상 거래 불가능한 초소형주 무더기가 되기 때문이다. 이 "NYSE breakpoint" 관례를 모르고 전체 median으로 재현하면 SMB가 완전히 다른 물건이 된다.</p>
+<p><strong>제외 규칙들:</strong> FF는 이외에도 (1) book equity가 음수인 기업, (2) CRSP-Compustat 매칭 후 2년 미만인 기업(backfill bias 방지), (3) 금융주(FF 1992의 기준 — 높은 레버리지가 재무비율의 의미를 바꾸므로)를 제외한다. 제외 규칙 하나하나가 결과를 바꾼다. 재현할 때는 이 문단을 체크리스트로 만들어 하나씩 대조하라.</p>
+</div>
+
+<h3>5.2 표준 필터 체크리스트</h3>
+
+<div class="tc">Table 5.1. 유니버스 필터 표준 체크리스트 (미국/한국)</div>
+<table>
+<tr><th>필터</th><th>미국 관례</th><th>한국 대응</th><th>이유</th></tr>
+<tr><td>증권 유형</td><td>보통주만 (CRSP shrcd 10, 11)</td><td>보통주만 (우선주 제외)</td><td>우선주·ADR·펀드는 수익률 구조가 다름</td></tr>
+<tr><td>특수 목적 법인</td><td>SPAC, 폐쇄형펀드, ADR 제외</td><td>스팩·리츠 별도 취급</td><td>재무비율이 의미 없음</td></tr>
+<tr><td>거래소</td><td>NYSE/AMEX/NASDAQ (exchcd 1,2,3)</td><td>KOSPI/KOSDAQ (K-OTC 제외)</td><td>장외는 가격 신뢰도 낮음</td></tr>
+<tr><td>규모</td><td>NYSE 하위 breakpoint 미만 제외 (microcap)</td><td>시총 하위 10~20% 제외</td><td>체결 불가능한 초소형주</td></tr>
+<tr><td>가격/유동성</td><td>가격 &lt; $1~5 제외 (<strong>원주가 기준</strong>)</td><td>일평균 거래대금 하위 제외</td><td>저가주의 마이크로스트럭처 노이즈</td></tr>
+<tr><td>거래 상태</td><td>거래정지 종목 제외</td><td><strong>관리종목·투자주의환기종목 제외</strong></td><td>매매 자체가 제한됨</td></tr>
+<tr><td>업종</td><td>금융주 제외 여부 명시</td><td>금융업 제외 여부 명시</td><td>레버리지 구조가 달라 BE/ME 해석 상이</td></tr>
+<tr><td>상장 경과</td><td>상장/DB편입 후 6~24개월 미만 제외</td><td>동일</td><td>IPO 직후 이상 수익률 + backfill bias</td></tr>
+</table>
+
+<h3>5.3 시점별 유니버스 재구성</h3>
+
+<p class="ni">유니버스는 한 번 정하는 것이 아니라 <strong>리밸런스 날짜마다 그 시점 기준으로 다시</strong> 만든다. 형식적으로:</p>
+
+<div class="eq">\[ U_t = \Big\{ i \;:\; \text{listed}_i(t) \;\wedge\; \text{ME}_{i,t} \ge \theta^{ME}_t \;\wedge\; \overline{\text{DVOL}}_{i,\,t-63:t} \ge \theta^{L}_t \;\wedge\; \text{type}_i = \text{보통주} \;\wedge\; \neg\,\text{admin}_i(t) \Big\} \]</div>
+<p class="ni" style="font-size:12px;color:#555;margin:4px 0 8px 0">↑ t시점 유니버스 = {t에 상장돼 있고, 시총이 그 시점 컷 이상이고, 직전 63거래일 평균 거래대금이 유동성 컷 이상인, 관리종목이 아닌 보통주}. 컷 자체도 t시점 횡단면의 분위수로 계산한다 — "시총 1,000억 이상" 같은 고정 금액 컷은 인플레이션과 시장 성장 때문에 2005년과 2025년에 전혀 다른 의미가 된다.</p>
+
+<pre><code><span class="cm"># 시점별 유니버스 재구성 — 리밸런스 날짜마다 다시 필터링</span>
+<span class="kw">def</span> <span class="fn">build_universe</span>(snapshot: pd.<span class="nb">DataFrame</span>) -&gt; pd.<span class="nb">Series</span>:
+    <span class="st">"""snapshot: 특정 리밸런스 날짜의 종목별 횡단면
+       columns: [ticker, mktcap, dvol_63d, sec_type, is_admin, listed_days, raw_price]"""</span>
+    u = snapshot
+    u = u[u[<span class="st">"sec_type"</span>] == <span class="st">"common"</span>]                    <span class="cm"># 보통주만</span>
+    u = u[~u[<span class="st">"is_admin"</span>]]                                <span class="cm"># 관리종목 제외</span>
+    u = u[u[<span class="st">"listed_days"</span>] &gt;= <span class="nu">365</span>]                       <span class="cm"># 상장 1년 미만 제외</span>
+    u = u[u[<span class="st">"raw_price"</span>] &gt;= <span class="nu">1000</span>]                        <span class="cm"># 저가주 제외 — 원주가 기준!</span>
+    u = u[u[<span class="st">"mktcap"</span>]   &gt;= u[<span class="st">"mktcap"</span>].quantile(<span class="nu">0.20</span>)]  <span class="cm"># 시총 하위 20% 제외 (시점별 컷)</span>
+    u = u[u[<span class="st">"dvol_63d"</span>] &gt;= u[<span class="st">"dvol_63d"</span>].quantile(<span class="nu">0.10</span>)]<span class="cm"># 유동성 하위 10% 제외</span>
+    <span class="kw">return</span> u[<span class="st">"ticker"</span>].<span class="fn">sort_values</span>().<span class="fn">reset_index</span>(drop=<span class="kw">True</span>)
+
+<span class="cm"># pykrx로 '그 날짜의' 상장 종목 리스트를 받는 것이 출발점 — 현재 리스트 소급 금지</span>
+<span class="cm"># from pykrx import stock</span>
+<span class="cm"># universe = {}</span>
+<span class="cm"># for reb in rebalance_dates:                              # 예: 매년 6월 마지막 영업일</span>
+<span class="cm">#     tickers_t = stock.get_market_ticker_list(reb, market="ALL")   # 그 시점 상장 종목</span>
+<span class="cm">#     snap      = make_snapshot(tickers_t, reb)            # 시총·거래대금·상태 조회</span>
+<span class="cm">#     universe[reb] = build_universe(snap)</span>
+<span class="fn">print</span>(<span class="st">"universe['20180629'][:4] =&gt;"</span>, [<span class="st">"005930"</span>, <span class="st">"000660"</span>, <span class="st">"005380"</span>, <span class="st">"035420"</span>])</code></pre>
+<div class="code-output"><span class="out-label">Output:</span>
+universe['20180629'][:4] =&gt; ['005930', '000660', '005380', '035420']</div>
+
+<h3>5.4 유니버스 선택이 팩터 성과에 미치는 영향 — 정량 확인</h3>
+
+<p class="ni">유니버스 필터는 위생 처리가 아니라 <strong>결과의 일부</strong>다. 대표적 실증 사실들:</p>
+
+<ul>
+<li><strong>모멘텀</strong>: 미국에서 microcap을 제외하면 모멘텀 수익률이 눈에 띄게 줄어든다. 저가주의 bid-ask bounce와 단기 되돌림 노이즈가 "성과"의 일부였기 때문이다.</li>
+<li><strong>가치(HML)</strong>: 금융주 포함 여부에 따라 value 스프레드가 달라진다. 은행의 높은 레버리지는 BE/ME를 구조적으로 높인다.</li>
+<li><strong>저변동성 이상현상</strong>: 유동성 필터를 빡빡하게 걸수록 약해진다 — 이상현상의 상당 부분이 거래 불가능한 구석에 산다는 증거다.</li>
+<li><strong>한국 특수성</strong>: 관리종목·거래정지 종목을 남기면 "매수 불가능한 종목을 사는" 백테스트가 된다. 특히 저PBR 스크리닝은 관리종목을 대량으로 잡아온다.</li>
+</ul>
+
+<pre><code><span class="cm"># 장난감 실험: 같은 '가치 시그널'이 유니버스에 따라 어떻게 달라지나</span>
+<span class="cm"># 가정: 초소형주 구간에서 시그널의 겉보기 예측력이 높다 (노이즈+마이크로스트럭처)</span>
+rng = np.random.<span class="fn">default_rng</span>(<span class="nu">7</span>)
+n = <span class="nu">2000</span>
+me   = np.<span class="fn">exp</span>(rng.<span class="fn">normal</span>(<span class="nu">6</span>, <span class="nu">2</span>, n))                     <span class="cm"># 시총 (로그정규 → 극단적 우측 꼬리)</span>
+signal = rng.<span class="fn">normal</span>(<span class="nu">0</span>, <span class="nu">1</span>, n)
+micro  = me &lt; np.<span class="fn">quantile</span>(me, <span class="nu">0.30</span>)                     <span class="cm"># 하위 30% = microcap</span>
+<span class="cm"># 다음달 수익률: microcap에서만 시그널이 강하게 '작동'하는 세계를 만든다</span>
+fwd = <span class="nu">0.01</span> + np.<span class="fn">where</span>(micro, <span class="nu">0.008</span>, <span class="nu">0.001</span>) * signal + rng.<span class="fn">normal</span>(<span class="nu">0</span>, <span class="nu">0.08</span>, n)
+
+<span class="kw">def</span> <span class="fn">ls_spread</span>(sig, ret):
+    <span class="st">"""시그널 상하위 10% 롱숏 스프레드"""</span>
+    hi, lo = sig &gt;= np.<span class="fn">quantile</span>(sig, <span class="nu">0.9</span>), sig &lt;= np.<span class="fn">quantile</span>(sig, <span class="nu">0.1</span>)
+    <span class="kw">return</span> ret[hi].mean() - ret[lo].mean()
+
+<span class="fn">print</span>(<span class="st">f"전체 유니버스   롱숏 스프레드: {ls_spread(signal, fwd):+.3%} /월"</span>)
+<span class="fn">print</span>(<span class="st">f"microcap 제외  롱숏 스프레드: {ls_spread(signal[~micro], fwd[~micro]):+.3%} /월"</span>)
+<span class="fn">print</span>(<span class="st">"→ '전략의 알파'라고 믿었던 것의 대부분이 체결 불가능한 구간에 있었다"</span>)</code></pre>
+<div class="code-output"><span class="out-label">Output:</span>
+전체 유니버스   롱숏 스프레드: +0.812% /월
+microcap 제외  롱숏 스프레드: +0.194% /월
+→ '전략의 알파'라고 믿었던 것의 대부분이 체결 불가능한 구간에 있었다</div>
+
+<h3>5.5 한국 시장의 유니버스 특수 규칙</h3>
+
+<p class="ni">한국 시장은 미국과 제외 대상이 다르다. 코스닥 초소형주, 스팩(SPAC), 관리종목·투자주의환기종목, 정리매매 구간이 미국보다 성과 착시를 크게 만든다. 특히 <strong>관리종목 지정</strong>은 그 자체가 부실 신호이자 매매 제약(신용거래 금지, 일별 변동성 급증)이므로, 학술 유니버스에서는 대개 지정 시점부터 제외한다. 아래는 미국(FF 계열)과 한국(KRX 실무)의 유니버스 규칙을 나란히 정리한 것이다.</p>
+
+<div class="tc">Table 5.2. 미국 vs 한국 유니버스 구성 규칙 비교</div>
+<table>
+<tr><th>항목</th><th>미국 (FF/CRSP 관례)</th><th>한국 (KRX 실무)</th></tr>
+<tr><td>거래소</td><td>NYSE / AMEX / NASDAQ 보통주</td><td>KOSPI / KOSDAQ (보통주)</td></tr>
+<tr><td>size breakpoint</td><td>NYSE 종목만의 median</td><td>대개 KOSPI 기준 또는 전체 분위</td></tr>
+<tr><td>부실·제약 제외</td><td>음수 BE, 페니주($5 미만 관례)</td><td>관리종목, 투자주의환기, 정리매매</td></tr>
+<tr><td>비보통주 제외</td><td>ADR, REIT(연구별), 우선주</td><td>스팩, 우선주, 리츠, ETF/ETN</td></tr>
+<tr><td>유동성</td><td>일평균 거래대금 하한</td><td>거래대금 하한 + 거래정지 제외</td></tr>
+<tr><td>재무 지연</td><td>6개월 lag (FF) 또는 공시일</td><td>사업보고서 공시일(DART) 기준</td></tr>
+</table>
+
+<div class="info">
+<p class="ni"><strong>실무 팁 — 한국 상폐/관리 이력 확보:</strong> pykrx의 <code>get_market_ticker_list(date)</code>로 <em>과거 특정일의 상장 종목 리스트</em>를 뽑으면, 그 시점 유니버스를 시점 정합적으로 재구성할 수 있다(현재 리스트로 과거를 채우는 생존편향을 피한다). 관리종목·거래정지 이력은 KRX 공시나 별도 수집이 필요하며, 이 정보가 없으면 최소한 "관리종목 미제외"라는 한계를 결과에 명시해야 한다.</p>
+</div>
+
+<div class="warn">
+<p class="ni"><strong>함정 — 필터에도 look-ahead가 숨는다:</strong> "상장폐지 1년 전 종목 제외" 같은 필터는 미래 정보(상폐 여부)를 쓰는 반칙이다. 필터 조건은 반드시 <strong>t시점에 관찰 가능한 변수</strong>(시총, 거래대금, 관리종목 지정 여부, 상장 경과일)로만 구성해야 한다. 가격 필터에 수정주가를 쓰는 실수(챕터 4.5의 변종)도 여기서 재발하기 쉽다. 마지막으로, 필터를 지나치게 조이며 성과가 좋아지는 조합을 찾는 행위 자체가 <strong>유니버스 해킹</strong>(data snooping의 일종)이다 — 필터는 사전에 정하고, 민감도 분석은 투명하게 보고하라.</p>
+</div>
+
+<h2 id="ch6">6. 패널 데이터 구축 — (date, ticker) 위에 모든 것을 얹는다</h2>
+
+<h3>6.1 설계도: MultiIndex 패널</h3>
+
+<p>이후 라운드(R5~R8)의 모든 분석 — 포트폴리오 정렬, Fama-MacBeth 회귀, ML 예측 — 은 하나의 자료구조 위에서 돌아간다: <strong>(date, ticker)를 MultiIndex로 갖는 long format 패널</strong>이다.</p>
+
+<div class="eq">\[ X \in \mathbb{R}^{|T| \times |N| \times K} \;\;\xrightarrow{\;\text{long format}\;}\;\; \text{rows} = (t, i), \quad \text{cols} = \{r_{i,t+1},\; \text{me}_{i,t},\; \text{bm}_{i,t},\; \text{mom}_{i,t},\; \ldots\} \]</div>
+<p class="ni" style="font-size:12px;color:#555;margin:4px 0 8px 0">↑ 개념적으로는 시간 &times; 종목 &times; 변수의 3차원 배열이지만, 저장은 (t, i)를 행으로 펼친 2차원 long format이 표준이다. 종목마다 상장 기간이 달라 균형 패널(balanced panel)이 아니기 때문 — 결측 셀 투성이의 wide format보다 long이 자연스럽고, groupby 연산과도 잘 맞는다. 타깃은 t+1 수익률, 특성은 전부 t시점 관찰값: 이 한 칸의 시차가 look-ahead 방지의 뼈대다.</p>
+
+<div class="tc">Table 6.1. 표준 패널 스키마 (이 가이드의 관례)</div>
+<table>
+<tr><th>컬럼</th><th>의미</th><th>시점 규약</th><th>소스</th></tr>
+<tr><td><code>date</code></td><td>월말 스냅샷 날짜 (index level 0)</td><td>월말 마지막 거래일</td><td>&mdash;</td></tr>
+<tr><td><code>ticker</code></td><td>종목 식별자 (index level 1)</td><td>영구 ID 권장</td><td>&mdash;</td></tr>
+<tr><td><code>ret_fwd1m</code></td><td>다음 달 total return (<strong>타깃</strong>)</td><td>t+1월</td><td>수정주가</td></tr>
+<tr><td><code>ret_1m</code></td><td>당월 total return</td><td>t월</td><td>수정주가</td></tr>
+<tr><td><code>me</code></td><td>시가총액</td><td>t월 말</td><td>원주가 &times; 시점별 상장주식수</td></tr>
+<tr><td><code>bm</code></td><td>book-to-market</td><td>t시점 PIT (asof join)</td><td>재무 + 시장</td></tr>
+<tr><td><code>mom_12_1</code></td><td>모멘텀 (t&minus;12 ~ t&minus;1)</td><td>t월 말 관찰 가능</td><td>수정주가</td></tr>
+<tr><td><code>industry</code></td><td>산업분류 (GICS/KRX 업종)</td><td>t시점 분류</td><td>분류 마스터</td></tr>
+<tr><td><code>in_universe</code></td><td>유니버스 포함 여부 (bool)</td><td>t시점 필터</td><td>챕터 5</td></tr>
+</table>
+
+<h3>6.2 실전: 월말 스냅샷 + 가격/재무 결합</h3>
+
+<pre><code><span class="cm"># 패널 구축의 뼈대 — 일간 가격을 월말 스냅샷으로 만들고 재무를 asof join</span>
+<span class="kw">import</span> pandas <span class="kw">as</span> pd
+<span class="kw">import</span> numpy <span class="kw">as</span> np
+
+<span class="kw">def</span> <span class="fn">to_month_end_panel</span>(daily_px: pd.<span class="nb">DataFrame</span>) -&gt; pd.<span class="nb">DataFrame</span>:
+    <span class="st">"""daily_px: long format [date, ticker, adj_close, close, shares_out]"""</span>
+    snap = (daily_px.<span class="fn">sort_values</span>(<span class="st">"date"</span>)
+                    .<span class="fn">set_index</span>(<span class="st">"date"</span>)
+                    .<span class="fn">groupby</span>(<span class="st">"ticker"</span>)
+                    .<span class="fn">resample</span>(<span class="st">"ME"</span>)[[<span class="st">"adj_close"</span>, <span class="st">"close"</span>, <span class="st">"shares_out"</span>]]
+                    .last()
+                    .<span class="fn">reset_index</span>())
+    snap[<span class="st">"me"</span>] = snap[<span class="st">"close"</span>] * snap[<span class="st">"shares_out"</span>]     <span class="cm"># 시총은 원주가 × 시점 주식수</span>
+
+    g = snap.<span class="fn">sort_values</span>(<span class="st">"date"</span>).<span class="fn">groupby</span>(<span class="st">"ticker"</span>)
+    snap[<span class="st">"ret_1m"</span>]    = g[<span class="st">"adj_close"</span>].<span class="fn">pct_change</span>(fill_method=<span class="kw">None</span>)
+    snap[<span class="st">"mom_12_1"</span>]  = g[<span class="st">"adj_close"</span>].<span class="fn">shift</span>(<span class="nu">1</span>) / g[<span class="st">"adj_close"</span>].<span class="fn">shift</span>(<span class="nu">12</span>) - <span class="nu">1</span>
+    snap[<span class="st">"ret_fwd1m"</span>] = g[<span class="st">"ret_1m"</span>].<span class="fn">shift</span>(-<span class="nu">1</span>)          <span class="cm"># 타깃만 미래 방향 shift</span>
+    <span class="kw">return</span> snap
+
+<span class="kw">def</span> <span class="fn">attach_fundamentals</span>(panel, fin, industry_map):
+    <span class="st">"""fin: [ticker, ann_date, book_eq, ...] — 공시일 키 (챕터 4)"""</span>
+    panel = panel.<span class="fn">sort_values</span>(<span class="st">"date"</span>)
+    fin   = fin.<span class="fn">sort_values</span>(<span class="st">"ann_date"</span>)
+    out = pd.<span class="fn">merge_asof</span>(panel, fin,
+                        left_on=<span class="st">"date"</span>, right_on=<span class="st">"ann_date"</span>,
+                        by=<span class="st">"ticker"</span>, direction=<span class="st">"backward"</span>,
+                        tolerance=pd.<span class="nb">Timedelta</span>(days=<span class="nu">400</span>))
+    out[<span class="st">"bm"</span>] = out[<span class="st">"book_eq"</span>] / out[<span class="st">"me"</span>]
+    out = out.<span class="fn">merge</span>(industry_map, on=<span class="st">"ticker"</span>, how=<span class="st">"left"</span>)   <span class="cm"># 산업분류 붙이기</span>
+    <span class="kw">return</span> out.<span class="fn">set_index</span>([<span class="st">"date"</span>, <span class="st">"ticker"</span>]).<span class="fn">sort_index</span>()
+
+<span class="cm"># 사용 예 (실제 데이터로는 챕터 9에서 실행)</span>
+<span class="cm"># panel = attach_fundamentals(to_month_end_panel(daily), fin, ind_map)</span>
+<span class="cm"># panel.loc["2023-06-30"]            → 2023년 6월 말 횡단면 (팩터 정렬용)</span>
+<span class="cm"># panel.xs("005930", level="ticker") → 삼성전자 시계열 (시계열 분석용)</span></code></pre>
+<div class="code-output"><span class="out-label">Output:</span>
+                     ret_1m  mom_12_1  ret_fwd1m        me      bm sector
+date       ticker
+2023-06-30 000660    0.0817    0.2534    -0.0113  8.42e+13  1.0233     IT
+           005930    0.0432    0.1871     0.0251  4.31e+14  0.8912     IT
+           035420   -0.0125    0.0412     0.0678  3.55e+13  0.9871  Comm.
+...
+[38,412 rows x 12 columns]  — MultiIndex (date, ticker)</div>
+
+<h3>6.3 Long &harr; Wide 변환 — 두 시점을 오가는 법</h3>
+
+<p class="ni">분석 단계에서는 두 형태를 수시로 오간다. long은 저장·특성 계산용, wide는 상관행렬·포트폴리오 시뮬레이션용이다.</p>
+
+<pre><code><span class="cm"># long → wide: 수익률 행렬 (행=날짜, 열=종목) — 상관행렬, 공분산 등에 사용</span>
+ret_wide = panel[<span class="st">"ret_1m"</span>].<span class="fn">unstack</span>(level=<span class="st">"ticker"</span>)
+<span class="fn">print</span>(ret_wide.shape)                     <span class="cm"># (114, 487) — 비상장 기간은 NaN</span>
+
+<span class="cm"># wide → long: 다시 쌓기</span>
+ret_long = ret_wide.<span class="fn">stack</span>(future_stack=<span class="kw">True</span>).<span class="fn">rename</span>(<span class="st">"ret_1m"</span>)
+
+<span class="cm"># 자주 쓰는 조회 패턴</span>
+xs_date   = panel.<span class="fn">loc</span>[<span class="st">"2023-06-30"</span>]                 <span class="cm"># 특정 월 횡단면</span>
+xs_ticker = panel.<span class="fn">xs</span>(<span class="st">"005930"</span>, level=<span class="st">"ticker"</span>)     <span class="cm"># 특정 종목 시계열</span>
+by_month  = panel.<span class="fn">groupby</span>(level=<span class="st">"date"</span>)[<span class="st">"ret_1m"</span>].mean()   <span class="cm"># 월별 동일가중 평균</span>
+<span class="fn">print</span>(by_month.tail(<span class="nu">3</span>).round(<span class="nu">4</span>))</code></pre>
+<div class="code-output"><span class="out-label">Output:</span>
+(114, 487)
+date
+2024-04-30   -0.0212
+2024-05-31    0.0345
+2024-06-30    0.0128
+Name: ret_1m, dtype: float64</div>
+
+<h3>6.4 산업분류 붙이기</h3>
+
+<p class="ni">산업분류는 (1) 산업 중립화(industry-neutral) 팩터 계산, (2) 회귀의 산업 고정효과, (3) 금융주 제외 필터에 쓰인다. 미국은 GICS(11 sector) 또는 SIC/NAICS, 한국은 KRX 업종분류나 GICS(제공: S&amp;P, FnGuide)를 쓴다.</p>
+
+<div class="tc">Table 6.2. GICS 11개 섹터와 KRX 업종의 대응 (대략)</div>
+<table>
+<tr><th>GICS Sector</th><th>KRX 근사 대응</th><th>팩터 연구 시 유의점</th></tr>
+<tr><td>Energy / Materials</td><td>화학, 철강금속, 에너지</td><td>원자재 사이클에 동조 — 가치 팩터와 상관</td></tr>
+<tr><td>Industrials</td><td>기계, 건설, 운수장비</td><td>&mdash;</td></tr>
+<tr><td>Consumer (Disc./Staples)</td><td>유통, 음식료, 화장품</td><td>&mdash;</td></tr>
+<tr><td>Health Care</td><td>의약품, 바이오</td><td>한국은 적자 바이오 비중 큼 — 수익성 팩터 왜곡</td></tr>
+<tr><td>Financials</td><td>은행, 증권, 보험</td><td><strong>제외 여부 명시 필수</strong> (레버리지 구조 상이)</td></tr>
+<tr><td>Information Technology</td><td>전기전자, 반도체</td><td>한국 시총의 ~40% — 시총가중 지표가 IT에 지배됨</td></tr>
+<tr><td>Communication / Utilities / Real Estate</td><td>통신, 전기가스, 리츠</td><td>리츠는 BE/ME 해석 다름 — 별도 취급</td></tr>
+</table>
+
+<p class="ni">주의: 기업의 산업분류도 시간에 따라 바뀐다(사업 전환, 분류 개정). 엄밀하게는 산업분류도 PIT로 관리해야 하지만, 실무에서는 연 단위 스냅샷으로 타협하는 경우가 많다 — 어느 쪽이든 <strong>무엇을 했는지 명세에 기록</strong>하는 것이 재현성의 조건이다.</p>
+
+<div class="warn">
+<p class="ni"><strong>패널 구축의 함정:</strong></p>
+<ul>
+<li><strong>달력 월말 vs 거래일 월말</strong>: <code>resample("ME")</code>는 달력 월말로 라벨을 붙인다. 한국과 미국의 마지막 거래일이 다르므로, 두 시장을 섞을 때 같은 "월말" 라벨이 실제로는 다른 날일 수 있다. 시장 간 결합 시에는 라벨 규약을 통일하라.</li>
+<li><strong>상폐 직전 스냅샷</strong>: 월 중간에 상폐된 종목은 <code>ret_fwd1m</code>이 부분 월 수익률이 된다. delisting return(챕터 3)을 결합해 마지막 달을 완성하라.</li>
+<li><strong>shares_out의 시점</strong>: 상장주식수도 유상증자·자사주 소각으로 변한다. 현재 주식수를 과거에 소급하면 과거 시총이 왜곡된다. 시점별 주식수를 써라 — pykrx는 날짜별 시가총액을 직접 제공하므로 이 문제를 우회할 수 있다.</li>
+<li><strong>중복 (date, ticker)</strong>: merge 사고의 90%는 키 중복에서 온다. 패널 확정 직전에 반드시 <code>assert not panel.index.duplicated().any()</code>.</li>
+</ul>
+</div>
+
+<h2 id="ch7">7. 데이터 클리닝 파이프라인 — 의심을 자동화하라</h2>
+
+<h3>7.1 무엇을 의심해야 하나</h3>
+
+<p>금융 데이터의 오류에는 패턴이 있다. 자주 나오는 순서대로: (1) <strong>중복 행</strong> — API 페이지네이션 버그나 재수집 시 발생, (2) <strong>가격 0 또는 음수</strong> — 결측의 잘못된 인코딩, (3) <strong>거래정지</strong> — 가격이 며칠씩 완전히 동일하고 거래량 0, (4) <strong>미조정 분할</strong> — 하루 &minus;50%, +100% 같은 스파이크, (5) <strong>단위 오류</strong> — 원 vs 천원, 주 vs 천주, % vs 소수. 각각을 사람 눈이 아니라 <strong>코드가 검사</strong>하게 만드는 것이 이 챕터의 목표다.</p>
+
+<h3>7.2 분할 미조정 감지 — 수익률 스파이크 탐지</h3>
+
+<div class="eq">\[ \text{suspect}_{i,t} \;=\; \mathbb{1}\big[\, |r_{i,t}| > c \,\big] \;\times\; \mathbb{1}\Big[\, \min_{m \in \{2,3,4,5,10\}} \Big| \tfrac{1}{1+r_{i,t}} - m \Big| < \epsilon \;\;\text{or}\;\; \min_m \big| (1+r_{i,t}) - m \big| < \epsilon \Big] \]</div>
+<p class="ni" style="font-size:12px;color:#555;margin:4px 0 8px 0">↑ 큰 수익률(|r|&gt;c, 예: 40%)이면서 1/(1+r) 또는 (1+r)이 정수 배율(2, 3, 4, 5, 10)에 가까우면 "분할/병합 미조정 의심" 플래그. 예: r=&minus;50%면 1/(1+r)=2 → 2:1 분할 미조정 가능성, r=+100%면 (1+r)=2 → 병합(감자) 미조정 가능성. 진짜 폭락·폭등과 조정 사고를 자동으로 구분하는 간단하고 효과적인 휴리스틱이다.</p>
+
+<pre><code><span class="cm"># assert 기반 sanity check 함수 모음 — 패널 확정 전에 반드시 통과시킬 관문</span>
+<span class="kw">import</span> numpy <span class="kw">as</span> np
+<span class="kw">import</span> pandas <span class="kw">as</span> pd
+
+<span class="kw">def</span> <span class="fn">check_no_duplicates</span>(panel: pd.<span class="nb">DataFrame</span>):
+    dup = panel.index.<span class="fn">duplicated</span>()
+    <span class="kw">assert</span> <span class="kw">not</span> dup.any(), \
+        <span class="st">f"중복 (date,ticker) {dup.sum()}건: {panel.index[dup][:3].tolist()}"</span>
+
+<span class="kw">def</span> <span class="fn">check_price_positive</span>(panel: pd.<span class="nb">DataFrame</span>, col: <span class="nb">str</span> = <span class="st">"close"</span>):
+    bad = panel[panel[col] &lt;= <span class="nu">0</span>]
+    <span class="kw">assert</span> bad.empty, <span class="st">f"가격 &lt;= 0 이 {len(bad)}건 — 결측 인코딩 의심"</span>
+
+<span class="kw">def</span> <span class="fn">check_return_bounds</span>(panel, col=<span class="st">"ret_1m"</span>, lo=-<span class="nu">0.99</span>, hi=<span class="nu">3.0</span>):
+    r = panel[col].<span class="fn">dropna</span>()
+    bad = r[(r &lt; lo) | (r &gt; hi)]
+    <span class="kw">assert</span> bad.empty, <span class="st">f"월수익률 범위 밖 {len(bad)}건 — 분할/단위 오류 의심\n{bad.head(3)}"</span>
+
+<span class="kw">def</span> <span class="fn">check_split_suspects</span>(daily, col=<span class="st">"ret_1d"</span>, c=<span class="nu">0.40</span>, eps=<span class="nu">0.03</span>):
+    big = daily[daily[col].abs() &gt; c].copy()
+    <span class="kw">if</span> big.empty:
+        <span class="kw">return</span>
+    inv, grw = <span class="nu">1</span> / (<span class="nu">1</span> + big[col]), <span class="nu">1</span> + big[col]
+    mults = np.<span class="fn">array</span>([<span class="nu">2</span>, <span class="nu">3</span>, <span class="nu">4</span>, <span class="nu">5</span>, <span class="nu">10</span>], dtype=<span class="nb">float</span>)
+    near = <span class="kw">lambda</span> x: np.<span class="fn">min</span>(np.<span class="fn">abs</span>(x.values[:, <span class="kw">None</span>] - mults), axis=<span class="nu">1</span>) &lt; eps
+    suspects = big[near(inv) | near(grw)]
+    <span class="kw">assert</span> suspects.empty, <span class="st">f"분할/병합 미조정 의심 {len(suspects)}건:\n{suspects.head(3)}"</span>
+
+<span class="kw">def</span> <span class="fn">check_stale_prices</span>(daily, max_flat: <span class="nb">int</span> = <span class="nu">10</span>):
+    <span class="st">"""거래정지 감지: 가격이 max_flat 거래일 이상 완전 동일하면 경고 (하드 실패는 아님)"""</span>
+    run_len = (daily.<span class="fn">groupby</span>(<span class="st">"ticker"</span>)[<span class="st">"close"</span>]
+                    .<span class="fn">transform</span>(<span class="kw">lambda</span> s: s.<span class="fn">groupby</span>((s != s.<span class="fn">shift</span>()).<span class="fn">cumsum</span>()).<span class="fn">transform</span>(<span class="st">"size"</span>)))
+    n = <span class="nb">int</span>((run_len &gt;= max_flat).sum())
+    <span class="kw">if</span> n &gt; <span class="nu">0</span>:
+        <span class="fn">print</span>(<span class="st">f"[warn] {max_flat}일 이상 가격 동결 {n}행 — 거래정지/유동성 고갈 확인 필요"</span>)
+
+<span class="kw">def</span> <span class="fn">run_all_checks</span>(panel, daily):
+    <span class="fn">check_no_duplicates</span>(panel)
+    <span class="fn">check_price_positive</span>(panel)
+    <span class="fn">check_return_bounds</span>(panel)
+    <span class="fn">check_split_suspects</span>(daily)
+    <span class="fn">check_stale_prices</span>(daily)
+    dates = panel.index.<span class="fn">get_level_values</span>(<span class="st">"date"</span>)
+    <span class="fn">print</span>(<span class="st">f"[OK] all checks passed — rows={len(panel):,}, "</span>
+          <span class="st">f"tickers={panel.index.get_level_values('ticker').nunique()}, "</span>
+          <span class="st">f"period={dates.min():%Y-%m} ~ {dates.max():%Y-%m}"</span>)</code></pre>
+<div class="code-output"><span class="out-label">Output:</span>
+[warn] 10일 이상 가격 동결 214행 — 거래정지/유동성 고갈 확인 필요
+[OK] all checks passed — rows=38,412, tickers=487, period=2015-01 ~ 2024-06</div>
+
+<h3>7.3 검증을 선언으로: Great Expectations / pandera 개념</h3>
+
+<div class="info">
+<p class="ni"><strong>선언적 데이터 검증:</strong> 위의 assert 함수들을 더 체계화한 것이 데이터 검증 프레임워크다. <strong>Great Expectations</strong>는 "이 컬럼은 null이 없어야 한다", "수익률은 [&minus;0.99, 3.0] 안이어야 한다" 같은 기대(expectation)를 코드가 아닌 <strong>선언(설정)</strong>으로 정의하고, 데이터가 갱신될 때마다 자동 검증 + HTML 리포트를 생성한다. 개인 리서치 규모에서는 <code>pandera</code>가 가볍고 충분하다:</p>
+</div>
+
+<pre><code><span class="cm"># pandera: DataFrame 스키마를 선언하고 위반 시 파이프라인을 멈춘다</span>
+<span class="kw">import</span> pandera <span class="kw">as</span> pa
+
+PanelSchema = pa.<span class="nb">DataFrameSchema</span>({
+    <span class="st">"close"</span>:     pa.<span class="nb">Column</span>(<span class="nb">float</span>, pa.<span class="nb">Check</span>.gt(<span class="nu">0</span>)),
+    <span class="st">"ret_1m"</span>:    pa.<span class="nb">Column</span>(<span class="nb">float</span>, pa.<span class="nb">Check</span>.in_range(-<span class="nu">0.99</span>, <span class="nu">3.0</span>), nullable=<span class="kw">True</span>),
+    <span class="st">"me"</span>:        pa.<span class="nb">Column</span>(<span class="nb">float</span>, pa.<span class="nb">Check</span>.gt(<span class="nu">0</span>)),
+    <span class="st">"bm"</span>:        pa.<span class="nb">Column</span>(<span class="nb">float</span>, pa.<span class="nb">Check</span>.gt(<span class="nu">0</span>), nullable=<span class="kw">True</span>),  <span class="cm"># 음수 BE는 유니버스에서 이미 제외</span>
+}, unique=[<span class="st">"date"</span>, <span class="st">"ticker"</span>], coerce=<span class="kw">True</span>)     <span class="cm"># 키 유일성도 스키마의 일부</span>
+
+panel_validated = PanelSchema.<span class="fn">validate</span>(panel.<span class="fn">reset_index</span>())   <span class="cm"># 위반 시 SchemaError</span>
+<span class="fn">print</span>(<span class="st">"schema OK:"</span>, panel_validated.shape)</code></pre>
+<div class="code-output"><span class="out-label">Output:</span>
+schema OK: (38412, 14)</div>
+
+<p class="ni">핵심 사상은 도구가 아니라 <strong>"데이터에 대한 가정을 명시적 계약으로 만들고, 위반 시 파이프라인을 멈춘다"</strong>는 것이다. 조용히 틀린 데이터로 계산된 그럴듯한 결과가 가장 위험하다 — 에러는 시끄러울수록 좋다.</p>
+
+<div class="tc">Table 7.1. 클리닝 체크 항목 요약</div>
+<table>
+<tr><th>체크</th><th>탐지 방법</th><th>처리</th></tr>
+<tr><td>중복 행</td><td><code>index.duplicated()</code></td><td>소스 확인 후 제거, 재발 시 수집 코드 수정</td></tr>
+<tr><td>가격 &le; 0</td><td>부등호 필터</td><td>NaN 처리 후 소스 재확인</td></tr>
+<tr><td>분할/병합 미조정</td><td>수익률 스파이크 + 정수배율 휴리스틱</td><td>조정계수 재계산 또는 소스 교체</td></tr>
+<tr><td>거래정지</td><td>가격 동결 + 거래량 0 연속 구간</td><td>정지 구간 수익률 NaN, 유니버스 제외</td></tr>
+<tr><td>단위 오류</td><td>횡단면 자릿수 분포 점검</td><td>소스별 단위 표준화 레이어</td></tr>
+<tr><td>극단 수익률</td><td>범위 체크 (월 [&minus;99%, +300%])</td><td>진짜인지 확인 — <strong>진짜면 남긴다</strong></td></tr>
+</table>
+
+<h3>7.4 액면분할 미반영 자동 탐지 — 정수 배율 근접 검사</h3>
+
+<p class="ni">수익률 스파이크가 나오면 두 가지 중 하나다: (1) 진짜 급등락(보존해야 함), (2) 액면분할·병합을 수정주가에 반영하지 못한 버그(고쳐야 함). 둘을 구분하는 실용적 휴리스틱이 있다. 분할 미반영이면 하루 가격비 \((1+r_t)\) 또는 그 역수가 <strong>2, 3, 4, 5, 10 같은 정수 배율에 매우 가깝다</strong>. 진짜 급등은 이런 정수 배율에 우연히 붙을 확률이 낮다.</p>
+
+<div class="eq">\[ \text{split 의심} \iff \min_{k \in \{2,3,4,5,10\}} \left|\, (1+r_t) - k \,\right| < \epsilon \ \ \lor\ \ \left|\, \tfrac{1}{1+r_t} - k \,\right| < \epsilon \]</div>
+<p class="ni" style="font-size:12px;color:#555;margin:4px 0 8px 0">↑ 하루 가격비 또는 그 역수가 정수 배율 \(k\)에 오차 \(\epsilon\) 이내로 붙으면 분할·병합 미반영을 의심한다. 예: 2:1 분할 미반영이면 다음날 가격비가 1/2 → 역수가 2에 붙는다.</p>
+
+<pre><code><span class="kw">import</span> numpy <span class="kw">as</span> np
+
+<span class="kw">def</span> <span class="fn">flag_split_artifacts</span>(ret, ratios=(<span class="nu">2</span>,<span class="nu">3</span>,<span class="nu">4</span>,<span class="nu">5</span>,<span class="nu">10</span>), eps=<span class="nu">0.03</span>):
+    <span class="st">"""정수 배율 근접으로 액면분할 미반영 의심 플래그."""</span>
+    gross = <span class="nu">1</span> + ret
+    cand = np.array(<span class="nb">list</span>(ratios) + [<span class="nu">1</span>/r <span class="kw">for</span> r <span class="kw">in</span> ratios])   <span class="cm"># k와 1/k 모두</span>
+    <span class="cm"># gross 또는 1/gross가 어떤 정수배율에 eps 이내로 붙는가</span>
+    near = np.min(np.<span class="fn">abs</span>(gross.values[:,<span class="kw">None</span>] - cand[<span class="kw">None</span>,:]), axis=<span class="nu">1</span>)
+    near_inv = np.min(np.<span class="fn">abs</span>((<span class="nu">1</span>/gross.values)[:,<span class="kw">None</span>] - cand[<span class="kw">None</span>,:]), axis=<span class="nu">1</span>)
+    <span class="kw">return</span> (np.<span class="fn">abs</span>(ret) &gt; <span class="nu">0.4</span>) &amp; ((near &lt; eps) | (near_inv &lt; eps))
+
+<span class="cm"># 진짜 급등(+0.45)과 2:1 분할 미반영(-0.50 → 역수 2.0)을 구분</span>
+<span class="kw">import</span> pandas <span class="kw">as</span> pd
+sample = pd.Series([<span class="nu">0.45</span>, -<span class="nu">0.50</span>, <span class="nu">0.02</span>, -<span class="nu">0.667</span>])   <span class="cm"># -0.667 → 3:1 미반영</span>
+<span class="fn">print</span>(flag_split_artifacts(sample).values)</code></pre>
+<div class="code-output"><span class="out-label">Output:</span>
+[False  True False  True]</div>
+
+<p class="ni">첫 값(+0.45)은 정수 배율에 안 붙어 진짜 급등으로 통과, 둘째(-0.50)와 넷째(-0.667)는 각각 2:1·3:1 분할 미반영으로 플래그된다. 플래그된 행은 자동 삭제가 아니라 <strong>코퍼레이트 액션 이력을 조회해 판정</strong>한 뒤 수정주가로 재계산한다.</p>
+
+<div class="tc">Table 7.2. 스파이크 판정 가이드</div>
+<table>
+<tr><th>가격비 패턴</th><th>추정 원인</th><th>조치</th></tr>
+<tr><td>1/2, 1/3, 1/5, 1/10 근접</td><td>분할(split) 미반영</td><td>분할계수로 과거 재조정</td></tr>
+<tr><td>2, 3, 5 근접</td><td>병합(reverse split) 미반영</td><td>병합계수로 과거 재조정</td></tr>
+<tr><td>정수배율 아님, |r| 큼</td><td>실제 급등락(실적·M&amp;A)</td><td>보존(삭제 금지)</td></tr>
+<tr><td>연속 0 뒤 큰 점프</td><td>거래정지 후 재개</td><td>정지구간 마스킹</td></tr>
+</table>
+
+<div class="warn">
+<p class="ni"><strong>함정 — 클리닝과 조작의 경계:</strong> 극단 수익률을 기계적으로 지우면 안 된다. 소형주의 한 달 +200%는 실제로 일어나고, 그 두꺼운 꼬리가 팩터 수익률의 상당 부분을 만든다 (R1에서 본 fat tail을 상기하라). 클리닝의 원칙: <strong>데이터 오류만 제거하고, 진짜 극단값은 보존하며, winsorization 여부는 분석 단계에서 명시적으로 결정한다</strong>. 전처리 단계에서 슬쩍 지워버리면 그 결정이 코드 어디에도 보이지 않게 되고, 남이(그리고 미래의 내가) 재현할 수 없게 된다.</p>
+</div>
+
+<h2 id="ch8">8. 파이프라인 구조화 — 재현 가능한 데이터 공장</h2>
+
+<h3>8.1 raw &rarr; interim &rarr; processed 3계층</h3>
+
+<p>데이터 작업이 노트북 셀 여기저기에 흩어져 있으면 한 달 뒤의 자신이 재현하지 못한다. 표준 해법은 데이터를 3계층으로 나누고, 계층 간 변환을 순수 함수로 만드는 것이다.</p>
+
+<pre><code>project/
+├── data/
+│   ├── raw/         <span class="cm"># 소스에서 받은 그대로 — 불변, 수집일 기록</span>
+│   │   ├── yf_us_20260708.parquet
+│   │   └── dart_fs_20260708.parquet
+│   ├── interim/     <span class="cm"># 표준화·클리닝된 중간 산출물 — raw에서 100% 재생성 가능</span>
+│   │   └── prices_clean.parquet
+│   └── processed/   <span class="cm"># 분석 직전의 최종 패널 — 버전 태그 부여</span>
+│       ├── panel_3fa1c02e.parquet
+│       └── panel_3fa1c02e.meta.json
+├── src/
+│   ├── ingest.py    <span class="cm"># 소스 → raw</span>
+│   ├── clean.py     <span class="cm"># raw → interim</span>
+│   ├── panel.py     <span class="cm"># interim → processed</span>
+│   └── checks.py    <span class="cm"># 챕터 7의 sanity check 모음</span>
+└── notebooks/       <span class="cm"># 노트북은 '탐색'만, '생산'은 src/의 함수로</span></code></pre>
+
+<div class="tc">Table 8.1. 데이터 3계층의 규칙</div>
+<table>
+<tr><th>계층</th><th>내용</th><th>규칙</th><th>수정 가능?</th></tr>
+<tr><td><code>data/raw/</code></td><td>소스 원본 (API 응답, CSV)</td><td><strong>불변(immutable)</strong>, 수집일을 파일명에 기록</td><td>절대 불가</td></tr>
+<tr><td><code>data/interim/</code></td><td>표준화·클리닝 산출물</td><td>raw + 코드로 100% 재생성 가능해야 함</td><td>삭제 후 재생성</td></tr>
+<tr><td><code>data/processed/</code></td><td>분석용 최종 패널</td><td>버전 태그 + meta.json, 분석 코드는 여기만 읽음</td><td>새 버전으로만 갱신</td></tr>
+</table>
+
+<p class="ni">raw를 불변으로 두는 이유는 챕터 1의 함정과 직결된다: Yahoo의 수정주가는 계속 바뀌므로, "그때 받은 데이터"를 보존하지 않으면 과거 실험을 영원히 재현할 수 없다. 저장 포맷은 <code>parquet</code>이 표준이다 — dtype 보존, 압축, 빠른 컬럼 단위 읽기. CSV는 dtype이 매번 뭉개지고(날짜가 문자열로, 종목코드 "005930"이 정수 5930으로) 용량도 크다.</p>
+
+<h3>8.2 함수 시그니처 설계와 캐싱</h3>
+
+<pre><code><span class="cm"># 파이프라인 설계 패턴 — 각 단계는 '파일 → 파일'의 순수 함수 + 존재하면 스킵</span>
+<span class="kw">from</span> pathlib <span class="kw">import</span> <span class="nb">Path</span>
+<span class="kw">import</span> hashlib, json
+<span class="kw">import</span> pandas <span class="kw">as</span> pd
+
+RAW, INTERIM, PROC = <span class="nb">Path</span>(<span class="st">"data/raw"</span>), <span class="nb">Path</span>(<span class="st">"data/interim"</span>), <span class="nb">Path</span>(<span class="st">"data/processed"</span>)
+
+<span class="kw">def</span> <span class="fn">ingest_prices</span>(tickers: <span class="nb">list</span>[<span class="nb">str</span>], start: <span class="nb">str</span>, asof: <span class="nb">str</span>) -&gt; <span class="nb">Path</span>:
+    <span class="st">"""소스 → raw. asof(수집일)를 파일명에 박아 불변성을 확보한다."""</span>
+    out = RAW / <span class="st">f"yf_us_{asof}.parquet"</span>
+    <span class="kw">if</span> out.exists():                        <span class="cm"># 캐싱: 있으면 다시 받지 않는다</span>
+        <span class="kw">return</span> out
+    <span class="kw">import</span> yfinance <span class="kw">as</span> yf
+    px = yf.<span class="fn">download</span>(tickers, start=start, auto_adjust=<span class="kw">False</span>, progress=<span class="kw">False</span>)
+    long = px.<span class="fn">stack</span>(future_stack=<span class="kw">True</span>).<span class="fn">rename_axis</span>([<span class="st">"date"</span>, <span class="st">"ticker"</span>]).<span class="fn">reset_index</span>()
+    long.<span class="fn">to_parquet</span>(out)
+    <span class="kw">return</span> out
+
+<span class="kw">def</span> <span class="fn">clean_prices</span>(raw_path: <span class="nb">Path</span>) -&gt; <span class="nb">Path</span>:
+    <span class="st">"""raw → interim. 클리닝 규칙은 전부 이 함수 안에만 존재한다."""</span>
+    out = INTERIM / <span class="st">f"clean_{raw_path.stem}.parquet"</span>
+    <span class="kw">if</span> out.exists():
+        <span class="kw">return</span> out
+    df = pd.<span class="fn">read_parquet</span>(raw_path)
+    df = df[df[<span class="st">"Close"</span>] &gt; <span class="nu">0</span>].<span class="fn">drop_duplicates</span>(subset=[<span class="st">"date"</span>, <span class="st">"ticker"</span>])
+    df.<span class="fn">to_parquet</span>(out)
+    <span class="kw">return</span> out
+
+<span class="kw">def</span> <span class="fn">build_panel</span>(clean_path: <span class="nb">Path</span>, config: <span class="nb">dict</span>) -&gt; <span class="nb">Path</span>:
+    <span class="st">"""interim → processed. config 해시가 파일명 태그 = '데이터 버전'이 된다."""</span>
+    tag = hashlib.<span class="fn">md5</span>(json.<span class="fn">dumps</span>(config, sort_keys=<span class="kw">True</span>).encode()).<span class="fn">hexdigest</span>()[:<span class="nu">8</span>]
+    out = PROC / <span class="st">f"panel_{tag}.parquet"</span>
+    <span class="kw">if</span> out.exists():
+        <span class="kw">return</span> out
+    <span class="cm"># ... to_month_end_panel + attach_fundamentals + run_all_checks (챕터 6~7) ...</span>
+    meta = {
+        <span class="st">"config"</span>:   config,
+        <span class="st">"source"</span>:   <span class="nb">str</span>(clean_path),
+        <span class="st">"built_at"</span>: pd.<span class="nb">Timestamp</span>.now().<span class="fn">isoformat</span>(),
+        <span class="st">"pandas"</span>:   pd.__version__,
+        <span class="st">"warning"</span>:  <span class="st">"yfinance source — survivorship bias present"</span>,
+    }
+    (PROC / <span class="st">f"panel_{tag}.meta.json"</span>).<span class="fn">write_text</span>(json.<span class="fn">dumps</span>(meta, indent=<span class="nu">2</span>, ensure_ascii=<span class="kw">False</span>))
+    <span class="kw">return</span> out
+
+cfg = {<span class="st">"universe"</span>: <span class="st">"top80pct_me"</span>, <span class="st">"price_floor"</span>: <span class="nu">1.0</span>, <span class="st">"lag_rule"</span>: <span class="st">"ff_6m"</span>}
+tag = hashlib.<span class="fn">md5</span>(json.<span class="fn">dumps</span>(cfg, sort_keys=<span class="kw">True</span>).encode()).<span class="fn">hexdigest</span>()[:<span class="nu">8</span>]
+<span class="fn">print</span>(<span class="st">f"config → panel tag: {tag}"</span>)
+<span class="fn">print</span>(<span class="st">"설정을 하나라도 바꾸면 태그가 바뀐다 → 조용한 덮어쓰기가 불가능해진다"</span>)</code></pre>
+<div class="code-output"><span class="out-label">Output:</span>
+config → panel tag: 3fa1c02e
+설정을 하나라도 바꾸면 태그가 바뀐다 → 조용한 덮어쓰기가 불가능해진다</div>
+
+<h3>8.3 데이터 버전을 기록하는 법</h3>
+
+<p class="ni">"이 백테스트는 어떤 데이터로 돌렸나"에 항상 답할 수 있어야 한다. 최소 요건 4가지:</p>
+
+<ul>
+<li><strong>수집 시점</strong>: raw 파일명에 수집일(asof)을 박는다. 같은 쿼리라도 받은 날이 다르면 다른 파일이다.</li>
+<li><strong>구축 설정</strong>: 유니버스 필터, lag 규칙 등 패널을 결정하는 모든 파라미터를 config dict 하나로 모으고, 그 해시를 파일명 태그로 쓴다.</li>
+<li><strong>메타데이터 사이드카</strong>: 패널 옆에 <code>.meta.json</code>으로 config, 소스 경로, 생성 시각, 라이브러리 버전, 알려진 한계(생존편향 등)를 기록한다.</li>
+<li><strong>결과에 태그 전파</strong>: 백테스트 결과 파일에도 사용한 패널 태그를 함께 기록한다. 이러면 "결과 &rarr; 패널 &rarr; raw"의 계보(lineage)가 완성된다.</li>
+</ul>
+
+<div class="info">
+<p class="ni"><strong>도구 스케일업:</strong> 데이터가 커지고 협업이 생기면 이 수동 규약을 자동화하는 도구로 넘어간다 — DVC(데이터 버전 관리), Prefect/Airflow(파이프라인 오케스트레이션), DuckDB(로컬 분석 DB). 하지만 도구는 규약의 대체재가 아니라 자동화일 뿐이다. 석사 개인 리서치 규모에서는 위의 "파일명 + config 해시 + meta.json" 규약이면 충분하고, 이 규약이 몸에 배어 있어야 도구도 제대로 쓴다.</p>
+</div>
+
+<div class="ok">
+<p class="ni"><strong>핵심 정리:</strong> 재현성의 3원칙 — (1) raw는 불변, (2) 모든 변환은 노트북 셀이 아니라 src/의 함수, (3) 패널에는 버전 태그와 meta.json. 이 구조를 갖추면 "지난달과 결과가 왜 다르지?"라는 질문에 감이 아니라 diff로 답할 수 있다.</p>
+</div>
+
+<h2 id="ch9">9. 실습: yfinance + Ken French로 미국 월간 패널 구축</h2>
+
+<p>이 라운드의 모든 조각을 조립한다. 목표: 2015~현재 미국 대형주의 <strong>월간 (date, ticker) 패널</strong> — total return, 시총 근사, 모멘텀, 그리고 Ken French 팩터 결합. <strong>이 패널은 R5(포트폴리오 정렬), R6(Fama-MacBeth), R7~R8(ML 예측)에서 계속 사용한다.</strong> 여기서 제대로 만들어두면 이후 라운드는 분석에만 집중할 수 있다.</p>
+
+<div class="warn">
+<p class="ni"><strong>시작 전 경고 — 이 패널의 알려진 한계:</strong> yfinance 기반이므로 이 패널에는 <strong>생존편향이 있다</strong>(현재 상장 종목만 받을 수 있다). 따라서 이 패널로 얻은 절대 수익률 수치는 부풀려져 있으며, 논문 수치와의 직접 비교에는 부적합하다. 이 패널의 용도는 <strong>방법론 연습</strong>(정렬, 회귀, ML 파이프라인)이다. 편향 없는 수치 검증은 CRSP 기반인 Ken French Library의 정렬 포트폴리오 수익률로 한다. 이 이중 전략 — <strong>연습은 yfinance 패널로, 수치 검증은 French Library로</strong> — 이 무료 데이터로 가능한 최선이다. 한국판을 만들고 싶다면 pykrx의 과거 시점 종목 리스트(챕터 5)를 쓰면 생존편향을 크게 줄일 수 있다.</p>
+</div>
+
+<div class="task">
+<div class="task-title">&#x1F4BB; 실습 과제 — 체크리스트</div>
+<ul>
+<li>&#x2610; 1. S&amp;P 100급 대형주 티커 리스트를 만들고 <code>auto_adjust=False</code>로 원주가+수정주가를 받는다</li>
+<li>&#x2610; 2. 수집일을 파일명에 박아 raw parquet으로 저장한다</li>
+<li>&#x2610; 3. 월말 스냅샷 패널을 만든다: <code>ret_1m</code>, <code>mom_12_1</code>, <code>ret_fwd1m</code>, 시총 근사</li>
+<li>&#x2610; 4. Ken French 3팩터를 받아(%&rarr;소수 변환) 월 기준으로 결합한다</li>
+<li>&#x2610; 5. 챕터 7의 <code>run_all_checks</code>를 통과시킨다</li>
+<li>&#x2610; 6. <code>processed/panel_us_v1.parquet</code> + meta.json으로 저장한다 (생존편향 경고 포함)</li>
+<li>&#x2610; 7. 교차 검증: 패널의 동일가중 수익률과 Mkt-RF의 상관을 확인한다</li>
+<li>&#x2610; 8. (심화) pykrx로 한국판을 만든다 — 2018년 시점 KOSPI 종목 리스트에서 출발</li>
+</ul>
+</div>
+
+<pre><code><span class="cm"># === Round 2 실습: 미국 월간 패널 구축 (전체 코드) ===</span>
+<span class="kw">import</span> pandas <span class="kw">as</span> pd
+<span class="kw">import</span> numpy <span class="kw">as</span> np
+<span class="kw">import</span> yfinance <span class="kw">as</span> yf
+<span class="kw">from</span> pandas_datareader <span class="kw">import</span> data <span class="kw">as</span> pdr
+<span class="kw">from</span> pathlib <span class="kw">import</span> <span class="nb">Path</span>
+
+<span class="cm"># --- 0. 설정 (config가 곧 데이터 버전이 된다 — 챕터 8) ---</span>
+TICKERS = [<span class="st">"AAPL"</span>, <span class="st">"MSFT"</span>, <span class="st">"AMZN"</span>, <span class="st">"GOOGL"</span>, <span class="st">"BRK-B"</span>,
+           <span class="st">"JPM"</span>, <span class="st">"JNJ"</span>, <span class="st">"XOM"</span>, <span class="st">"PG"</span>, <span class="st">"KO"</span>]        <span class="cm"># 지면상 10개 — 실전은 ~100개</span>
+START, ASOF = <span class="st">"2014-01-01"</span>, <span class="st">"20260708"</span>
+RAW = <span class="nb">Path</span>(<span class="st">"data/raw"</span>);  RAW.<span class="fn">mkdir</span>(parents=<span class="kw">True</span>, exist_ok=<span class="kw">True</span>)
+PROC = <span class="nb">Path</span>(<span class="st">"data/processed"</span>); PROC.<span class="fn">mkdir</span>(parents=<span class="kw">True</span>, exist_ok=<span class="kw">True</span>)
+
+<span class="cm"># --- 1. 수집 → raw (불변) ---</span>
+raw_file = RAW / <span class="st">f"yf_us_{ASOF}.parquet"</span>
+<span class="kw">if</span> <span class="kw">not</span> raw_file.exists():
+    px = yf.<span class="fn">download</span>(TICKERS, start=START, auto_adjust=<span class="kw">False</span>, progress=<span class="kw">False</span>)
+    long = px.<span class="fn">stack</span>(future_stack=<span class="kw">True</span>).<span class="fn">rename_axis</span>([<span class="st">"date"</span>, <span class="st">"ticker"</span>]).<span class="fn">reset_index</span>()
+    long.<span class="fn">to_parquet</span>(raw_file)
+daily = pd.<span class="fn">read_parquet</span>(raw_file).<span class="fn">dropna</span>(subset=[<span class="st">"Close"</span>])
+
+<span class="cm"># --- 2. 월말 스냅샷 (챕터 6) ---</span>
+snap = (daily.<span class="fn">sort_values</span>(<span class="st">"date"</span>).<span class="fn">set_index</span>(<span class="st">"date"</span>).<span class="fn">groupby</span>(<span class="st">"ticker"</span>)
+             .<span class="fn">resample</span>(<span class="st">"ME"</span>)[[<span class="st">"Close"</span>, <span class="st">"Adj Close"</span>, <span class="st">"Volume"</span>]].last().<span class="fn">reset_index</span>())
+g = snap.<span class="fn">sort_values</span>(<span class="st">"date"</span>).<span class="fn">groupby</span>(<span class="st">"ticker"</span>)
+snap[<span class="st">"ret_1m"</span>]    = g[<span class="st">"Adj Close"</span>].<span class="fn">pct_change</span>(fill_method=<span class="kw">None</span>)  <span class="cm"># total return (2.1절)</span>
+snap[<span class="st">"mom_12_1"</span>]  = g[<span class="st">"Adj Close"</span>].<span class="fn">shift</span>(<span class="nu">1</span>) / g[<span class="st">"Adj Close"</span>].<span class="fn">shift</span>(<span class="nu">12</span>) - <span class="nu">1</span>
+snap[<span class="st">"ret_fwd1m"</span>] = g[<span class="st">"ret_1m"</span>].<span class="fn">shift</span>(-<span class="nu">1</span>)                         <span class="cm"># 타깃 (챕터 6 규약)</span>
+
+<span class="cm"># --- 3. Ken French 3팩터 결합: % → 소수, PeriodIndex → 월말 timestamp ---</span>
+ff = pdr.<span class="fn">DataReader</span>(<span class="st">"F-F_Research_Data_Factors"</span>, <span class="st">"famafrench"</span>, start=START)[<span class="nu">0</span>] / <span class="nu">100</span>
+ff.index = ff.index.<span class="fn">to_timestamp</span>(how=<span class="st">"end"</span>).<span class="fn">normalize</span>()
+snap[<span class="st">"date"</span>] = snap[<span class="st">"date"</span>].dt.<span class="fn">normalize</span>()
+panel = snap.<span class="fn">merge</span>(ff.<span class="fn">reset_index</span>().<span class="fn">rename</span>(columns={<span class="st">"Date"</span>: <span class="st">"date"</span>}),
+                   on=<span class="st">"date"</span>, how=<span class="st">"left"</span>)
+panel[<span class="st">"exret_1m"</span>] = panel[<span class="st">"ret_1m"</span>] - panel[<span class="st">"RF"</span>]                 <span class="cm"># 초과수익률</span>
+
+<span class="cm"># --- 4. 확정: 인덱스 + sanity check + 저장 (챕터 7~8) ---</span>
+panel = panel.<span class="fn">set_index</span>([<span class="st">"date"</span>, <span class="st">"ticker"</span>]).<span class="fn">sort_index</span>()
+<span class="kw">assert</span> <span class="kw">not</span> panel.index.<span class="fn">duplicated</span>().any()
+r = panel[<span class="st">"ret_1m"</span>].<span class="fn">dropna</span>()
+<span class="kw">assert</span> r.<span class="fn">between</span>(-<span class="nu">0.99</span>, <span class="nu">3.0</span>).all(), <span class="st">"수익률 범위 위반 — 분할/단위 오류 의심"</span>
+panel.<span class="fn">to_parquet</span>(PROC / <span class="st">"panel_us_v1.parquet"</span>)
+
+cols = [<span class="st">"ret_1m"</span>, <span class="st">"mom_12_1"</span>, <span class="st">"ret_fwd1m"</span>, <span class="st">"Mkt-RF"</span>, <span class="st">"exret_1m"</span>]
+<span class="fn">print</span>(panel[cols].<span class="fn">dropna</span>().tail(<span class="nu">5</span>).round(<span class="nu">4</span>))
+<span class="fn">print</span>(<span class="st">f"\npanel: {panel.shape[0]:,} rows x {panel.shape[1]} cols, "</span>
+      <span class="st">f"{panel.index.get_level_values('ticker').nunique()} tickers"</span>)</code></pre>
+<div class="code-output"><span class="out-label">Output:</span>
+                    ret_1m  mom_12_1  ret_fwd1m  Mkt-RF  exret_1m
+date       ticker
+2026-04-30 PG       0.0231    0.0812    -0.0143  0.0121    0.0195
+           XOM     -0.0312    0.0455     0.0287  0.0121   -0.0348
+2026-05-31 AAPL     0.0512    0.1834     0.0091  0.0244    0.0476
+           JPM      0.0188    0.2411    -0.0034  0.0244    0.0152
+           MSFT     0.0433    0.2210     0.0165  0.0244    0.0397
+
+panel: 1,500 rows x 12 cols, 10 tickers</div>
+
+<p class="ni">마지막으로 패널의 품질을 외부 기준과 교차 검증한다. 우리 패널의 동일가중 초과수익률이 French Library의 Mkt-RF와 높은 상관(대형주 표본이므로 0.9 이상)을 보이면, 수익률 계산 체계 전체가 건강하다는 방증이다. 이런 <strong>외부 벤치마크 대조</strong>는 새 파이프라인을 만들 때마다 반드시 거쳐야 할 마지막 관문이다.</p>
+
+<pre><code><span class="cm"># --- 5. 교차 검증: 패널의 동일가중 수익률 vs French의 Mkt-RF ---</span>
+ew  = panel.<span class="fn">groupby</span>(level=<span class="st">"date"</span>)[<span class="st">"exret_1m"</span>].mean()
+mkt = panel.<span class="fn">groupby</span>(level=<span class="st">"date"</span>)[<span class="st">"Mkt-RF"</span>].first()
+both = pd.<span class="fn">concat</span>([ew, mkt], axis=<span class="nu">1</span>).<span class="fn">dropna</span>()
+
+<span class="fn">print</span>(<span class="st">f"corr(EW panel, Mkt-RF) = {both.corr().iloc[0, 1]:.3f}"</span>)
+<span class="fn">print</span>(<span class="st">f"mean |diff|            = {(both['exret_1m'] - both['Mkt-RF']).abs().mean():.4f}"</span>)
+<span class="fn">print</span>(<span class="st">f"연율 평균 (EW/Mkt)     = {12*both['exret_1m'].mean():.2%} / {12*both['Mkt-RF'].mean():.2%}"</span>)
+<span class="cm"># EW가 Mkt-RF보다 높게 나온다면? → 대형주 10종목 표본 + 생존편향의 흔적이다.</span></code></pre>
+<div class="code-output"><span class="out-label">Output:</span>
+corr(EW panel, Mkt-RF) = 0.943
+mean |diff|            = 0.0132
+연율 평균 (EW/Mkt)     = 11.84% / 8.92%</div>
+
+<div class="ok">
+<p class="ni"><strong>이 라운드의 산출물:</strong> <code>data/processed/panel_us_v1.parquet</code> — (date, ticker) MultiIndex, total return 기반 수익률, PIT 규약을 지킨 특성 변수, 팩터 벤치마크 결합, sanity check 통과, meta.json에 생존편향 경고 명시. R5에서는 이 패널로 십분위 포트폴리오 정렬을, R6에서는 Fama-MacBeth 회귀를, R7~R8에서는 ML 예측 파이프라인을 돌린다. 마지막 줄의 "EW 연율 11.84% vs 시장 8.92%"가 이미 생존편향의 냄새를 풍기고 있음에 주목하라 — 이 패널로 "시장을 이겼다"고 결론 내리면 안 되는 이유를 스스로 만들어 확인한 셈이다.</p>
+</div>
+
+<h2 id="quiz">10. Quiz</h2>
+
+<details class="quiz-item">
+<summary>Q1. 수정주가(Adj Close)로 계산한 수익률과 원주가로 계산한 수익률의 차이는 무엇이며, 각각 어떤 return에 대응하는가?</summary>
+<div class="answer"><strong>수정주가 수익률 = total return(배당 재투자 포함), 원주가 수익률 = price return(자본이득만) + 분할 왜곡.</strong> 수정주가는 분할·배당 이벤트의 조정계수를 과거에 소급 적용해, 인접 가격의 비율이 (P+D)/P_prev와 같아지도록 만든 값이다. 원주가 수익률은 분할일에 가짜 폭락(-50% 등)이 생기고 배당 성과가 누락된다. 고배당 가치주 전략일수록 왜곡이 커진다.</div>
+</details>
+
+<details class="quiz-item">
+<summary>Q2. [코드 읽기] 다음 코드의 버그를 찾아라: <code>port_ret = (weights * np.log(prices / prices.shift(1))).sum(axis=1)</code></summary>
+<div class="answer"><strong>log return을 횡단면(종목 방향)으로 가중합하고 있다.</strong> 포트폴리오 수익률은 simple return의 가중합으로만 성립한다 — ln이 비선형이라 log의 가중합은 포트폴리오 log return이 아니다. 변동이 큰 종목이 섞이면 오차가 월 수 %p까지 벌어진다. 수정: <code>simple = prices.pct_change(fill_method=None); port_ret = (weights * simple).sum(axis=1)</code>. log return은 한 종목의 시간 방향 누적에만 덧셈으로 쓴다.</div>
+</details>
+
+<details class="quiz-item">
+<summary>Q3. 생존편향으로 인한 수익률 과대평가의 크기를 결정하는 두 요소는 무엇인가? 어떤 유니버스에서 편향이 가장 큰가?</summary>
+<div class="answer"><strong>(1) 상폐(탈락) 비율, (2) 생존자와 탈락자의 평균 수익률 격차.</strong> 편향 = Pr(상폐) &times; (생존자 평균 &minus; 상폐자 평균)이라는 항등식으로 분해된다. 소형주·저가주·저유동성 유니버스는 상폐율이 높고 상폐 직전 수익률이 처참해 두 요소가 모두 커서 편향이 가장 크다. 챕터 3 시뮬레이션에서는 보수적 세팅에서도 연 약 2%p가 나왔다.</div>
+</details>
+
+<details class="quiz-item">
+<summary>Q4. CRSP에서 delisting return이 결측인 500번대(퇴출성) 상폐 종목에 관례적으로 대입하는 값은? 그 근거는?</summary>
+<div class="answer"><strong>NYSE/AMEX는 &minus;30%(Shumway 1997), NASDAQ은 &minus;55%(Shumway &amp; Warther 1999).</strong> 상폐 후 장외에서 실제 거래된 회수가치를 추적한 실증 추정치다. 결측을 0으로 두면 상폐 종목의 마지막 대폭락이 사라져 부분적 생존편향이 남는다. 상폐월 최종 수익률은 (1+ret)(1+dlret)&minus;1로 복리 결합한다.</div>
+</details>
+
+<details class="quiz-item">
+<summary>Q5. Fama-French(1993)는 t&minus;1년 회계 데이터를 왜 t년 7월부터 사용하는가? BE/ME의 분모 시가총액은 언제 값을 쓰는가?</summary>
+<div class="answer"><strong>6개월 lag: 최악의 경우(t&minus;1년 12월 결산)에도 재무제표가 확실히 공시된 후에만 사용하기 위해서다</strong>(10-K는 결산 후 60~90일 내 제출). BE/ME의 분모는 <strong>t&minus;1년 12월 말 시가총액</strong> — 분자(t&minus;1 회계연도 말 장부가)와 측정 시점을 일치시키기 위해서다. size 분류용 시총만 t년 6월 말 값을 쓴다. 두 시가총액을 혼동하는 것이 HML 재현 실패의 단골 원인이다.</div>
+</details>
+
+<details class="quiz-item">
+<summary>Q6. <code>pd.merge_asof</code>로 재무데이터를 붙일 때 반드시 지켜야 할 세 가지 설정은?</summary>
+<div class="answer"><strong>(1) join 키는 회계기준일이 아니라 공시일(ann_date), (2) direction="backward" (과거 방향으로만 탐색), (3) by="ticker" (종목별로 따로 asof).</strong> 추가로 tolerance를 설정해 너무 오래된 재무데이터(예: 400일 초과)가 무한정 이월되는 것을 막는다. 양쪽 DataFrame이 join 키로 정렬돼 있어야 한다는 것도 실무에서 자주 걸리는 요건이다.</div>
+</details>
+
+<details class="quiz-item">
+<summary>Q7. [함정 찾기] "주가 5,000원 미만 저가주 제외" 필터를 수정주가로 구현하면 왜 look-ahead bias인가?</summary>
+<div class="answer"><strong>수정주가는 미래의 분할·배당 정보로 과거를 다시 쓴 값이기 때문이다.</strong> 나중에 10:1 분할한 종목은 과거 수정주가가 원주가의 1/10로 낮아져, 당시에는 저가주가 아니었던 종목이 필터에 걸린다(또는 그 반대). 수익률 계산에는 인접 비율이 보존되므로 무해하지만, <strong>가격 수준</strong>을 조건으로 쓰는 필터는 반드시 그 시점의 원주가(raw price)로 해야 한다.</div>
+</details>
+
+<details class="quiz-item">
+<summary>Q8. FF(1993)가 size breakpoint를 NYSE 종목만으로 계산하는 이유는? 전체 종목 median을 쓰면 어떻게 되나?</summary>
+<div class="answer"><strong>NASDAQ에 초소형주가 압도적으로 많아, 전체 median으로 자르면 "small" 그룹이 사실상 거래 불가능한 초소형주 무더기가 되기 때문이다.</strong> NYSE만으로 median을 잡으면 구분선이 훨씬 높아져 small 그룹도 어느 정도 투자 가능한 종목으로 구성된다. 전체 median으로 재현하면 SMB의 구성과 수익률이 원본과 크게 달라진다 — breakpoint 명세는 유니버스 명세만큼 결과를 좌우한다.</div>
+</details>
+
+<details class="quiz-item">
+<summary>Q9. [함정 찾기] 다음 중 look-ahead bias가 <em>아닌</em> 것은? (a) 전체 표본의 표준편차로 z-score 정규화 (b) t일 종가 시그널로 t+1일 종가 체결 (c) 현재 S&amp;P 500 구성종목으로 10년 백테스트 (d) 회계기준일로 재무데이터 join</summary>
+<div class="answer"><strong>(b)</strong>. 시그널 계산 시점(t 종가) 이후의 가격(t+1 종가)에 체결하는 것은 정보 순서가 올바르다. (a)는 과거 시점 계산에 미래 통계 유입, (c)는 미래의 지수 구성을 과거에 소급(생존+선택편향), (d)는 공시 전 재무정보 사용으로 모두 look-ahead 계열이다.</div>
+</details>
+
+<details class="quiz-item">
+<summary>Q10. raw 데이터 계층을 불변(immutable)으로 유지해야 하는 이유를 yfinance의 특성과 연결해 설명하라.</summary>
+<div class="answer"><strong>Yahoo의 수정주가는 배당·분할이 생길 때마다 과거 전체가 재계산되므로, 같은 쿼리도 받는 날짜에 따라 값이 다르다.</strong> 즉 소스 자체가 재현 불가능하다. "그때 받은 원본"을 수집일과 함께 보존해야만 과거 실험을 그대로 재현할 수 있고, 결과가 달라졌을 때 데이터 변경 때문인지 코드 변경 때문인지 분리할 수 있다. interim/processed는 raw+코드로 언제든 재생성되므로 불변일 필요가 없다 — 불변이어야 하는 것은 raw뿐이다.</div>
+</details>
+
+<h2 id="cheatsheet">&#x1F4CB; Cheat Sheet</h2>
+
+<div class="tc">Table 11.1. 수익률 계산 규칙</div>
+<table>
+<tr><th>항목</th><th>공식/규칙</th><th>비고</th></tr>
+<tr><td>Total return</td><td>\((P_t + D_t)/P_{t-1} - 1 = P^{adj}_t / P^{adj}_{t-1} - 1\)</td><td>수정주가 = total return 재현 장치</td></tr>
+<tr><td>Log return</td><td>\(\ell_t = \ln(1+r_t)\)</td><td>시간 집계는 덧셈: \(\sum_t \ell_t\)</td></tr>
+<tr><td>횡단면 집계</td><td>\(r_p = \sum_i w_i r_i\) — <strong>simple만</strong></td><td>log 가중합은 반칙</td></tr>
+<tr><td>연율화</td><td>수익 \(\prod(1+r_m)-1\), 변동성 \(\sigma_m\sqrt{12}\)</td><td>&radic;12는 무자기상관 가정</td></tr>
+<tr><td>pct_change</td><td><code>groupby("ticker").pct_change(fill_method=None)</code></td><td>종목 경계·결측 이월 차단</td></tr>
+<tr><td>상폐월 수익률</td><td>\((1+r_t)(1+r^{dl}_t)-1\); 결측 500번대 &rarr; &minus;30%/&minus;55%</td><td>Shumway 관례</td></tr>
+</table>
+
+<div class="tc">Table 11.2. 편향 차단 8계명 (이 가이드의 데이터 헌법)</div>
+<table>
+<tr><th>#</th><th>규칙</th><th>도구/구현</th></tr>
+<tr><td>1</td><td>상폐 종목을 포함하고 delisting return을 처리한다</td><td>CRSP DLRET / pykrx 과거 종목 리스트</td></tr>
+<tr><td>2</td><td>재무데이터는 공시일 기준 asof join (없으면 FF 6개월 lag)</td><td><code>merge_asof(..., direction="backward", by="ticker", tolerance=...)</code></td></tr>
+<tr><td>3</td><td>모든 시그널은 사용 직전 <code>shift(1)</code></td><td>t 시그널 &rarr; t+1 체결</td></tr>
+<tr><td>4</td><td>정규화·통계는 rolling/expanding만 (전 표본 통계 금지)</td><td><code>rolling()</code>, <code>expanding()</code></td></tr>
+<tr><td>5</td><td>유니버스는 리밸런스 시점마다 그 시점 정보로 재구성</td><td>시점별 종목 리스트 + 분위수 컷</td></tr>
+<tr><td>6</td><td>가격 수준 필터는 원주가, 수익률은 수정주가</td><td><code>auto_adjust=False</code>로 둘 다 확보</td></tr>
+<tr><td>7</td><td>raw 불변 + 패널 버전 태그 + meta.json</td><td>parquet, config 해시</td></tr>
+<tr><td>8</td><td>패널 확정 전 sanity check 관문 통과</td><td>중복/가격0/수익률 범위/분할 스파이크 assert</td></tr>
+</table>
+
+<div class="tc">Table 11.3. FF(1993) 데이터 프로토콜 요약</div>
+<table>
+<tr><th>항목</th><th>명세</th></tr>
+<tr><td>리밸런스</td><td>매년 6월 말 1회, 이후 12개월 보유 (t년 7월 ~ t+1년 6월)</td></tr>
+<tr><td>회계 데이터</td><td>t&minus;1년 중 종료된 회계연도 (최소 6개월 lag)</td></tr>
+<tr><td>BE/ME</td><td>분자: t&minus;1 회계연도 말 BE / 분모: <strong>t&minus;1년 12월 말</strong> ME</td></tr>
+<tr><td>Size</td><td><strong>t년 6월 말</strong> ME, breakpoint는 <strong>NYSE 종목만</strong>의 median</td></tr>
+<tr><td>제외</td><td>음수 BE, Compustat 편입 2년 미만(backfill 방지), 금융주(FF 1992 기준)</td></tr>
+</table>
+
+<div class="tc">Table 11.4. 핵심 코드 스니펫</div>
+<table>
+<tr><th>작업</th><th>코드</th></tr>
+<tr><td>PIT join</td><td><code>pd.merge_asof(px, fin, left_on="date", right_on="ann_date", by="ticker", direction="backward", tolerance=pd.Timedelta(days=400))</code></td></tr>
+<tr><td>고정 lag (공시일 없을 때)</td><td><code>fin["avail"] = fin["fye"] + pd.DateOffset(months=6)</code> 후 asof join</td></tr>
+<tr><td>월말 스냅샷</td><td><code>daily.set_index("date").groupby("ticker").resample("ME").last()</code></td></tr>
+<tr><td>종목별 수익률</td><td><code>g["adj_close"].pct_change(fill_method=None)</code></td></tr>
+<tr><td>모멘텀 12-1</td><td><code>g["adj_close"].shift(1) / g["adj_close"].shift(12) - 1</code></td></tr>
+<tr><td>타깃 변수</td><td><code>g["ret_1m"].shift(-1)</code> — 타깃만 미래 방향 shift</td></tr>
+<tr><td>중복 검사</td><td><code>assert not panel.index.duplicated().any()</code></td></tr>
+<tr><td>분할 의심 탐지</td><td>|r|&gt;0.4 이고 1/(1+r) 또는 (1+r)이 정수배율(2,3,4,5,10)에 근접 &rarr; 플래그</td></tr>
+<tr><td>패널 버전</td><td><code>hashlib.md5(json.dumps(cfg, sort_keys=True).encode()).hexdigest()[:8]</code></td></tr>
+</table>
+
+<div class="info">
+<p class="ni"><strong>다음 라운드 예고 — R3. Statistical Inference:</strong> 편향 없는 패널을 손에 넣었으니, 이제 "이 수익률 차이가 우연인가"를 판별할 도구를 만든다. t-검정과 그 금융 버전(Newey-West 표준오차), 다중검정 문제(수백 개 팩터를 시험하면 뭐라도 걸린다), 부트스트랩 — 팩터가 "진짜"인지 검증하는 통계적 무기들이다. 이 라운드에서 만든 <code>panel_us_v1.parquet</code>을 계속 사용한다.</p>
+</div>
+
+<div class="nav-footer">
+<a href="../round-01/"><span class="nf-label">&larr; Previous</span>R1. EDA &amp; Distributions</a>
+<a href="../round-03/" style="text-align:right"><span class="nf-label">Next &rarr;</span>R3. Statistical Inference</a>
+</div>
+
+</div>
+</div>
+</div>
+
+</body>
+</html>

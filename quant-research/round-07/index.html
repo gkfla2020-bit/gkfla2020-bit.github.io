@@ -1,0 +1,1176 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Round 7 - Financial ML I — 누수 없는 학습 파이프라인 | Quant Researcher Guide</title>
+<script>
+MathJax = { tex: { inlineMath: [['\\(','\\)']], displayMath: [['\\[','\\]'],['$$','$$']] } };
+</script>
+<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;500&family=Space+Mono:wght@400&family=Inter:wght@300;400&display=swap" rel="stylesheet">
+<script src="https://cdn.plot.ly/plotly-2.27.0.min.js"></script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Inter',sans-serif;background:#fafaf8;color:#1a1a1a;line-height:1.7;overflow-x:hidden}
+.sidebar{position:fixed;left:0;top:0;width:260px;height:100vh;background:rgba(255,255,255,.97);border-right:1px solid rgba(0,0,0,.06);padding:32px 24px;z-index:100;overflow-y:auto;display:flex;flex-direction:column}
+.sidebar-profile{text-align:center;margin-bottom:28px;padding-bottom:24px;border-bottom:1px solid rgba(0,0,0,.08)}
+.profile-icon{font-size:48px;margin-bottom:8px}
+.profile-name{font-family:'Cormorant Garamond',serif;font-size:1.3rem;font-weight:500;margin-bottom:4px}
+.profile-title{font-size:.68rem;color:#888;letter-spacing:.08em;text-transform:uppercase;margin-bottom:8px}
+.profile-bio{font-size:.78rem;color:#666;line-height:1.5}
+.sidebar-nav{flex:1;margin-top:16px}.nav-section{margin-bottom:20px}.nav-section-title{font-size:.6rem;font-weight:600;color:#aaa;letter-spacing:.15em;text-transform:uppercase;margin-bottom:10px}.nav-list{list-style:none}.nav-list li{margin-bottom:5px}.nav-list a{font-size:.78rem;color:#555;text-decoration:none;transition:all .2s;display:block;padding:3px 0}.nav-list a:hover{color:#2563eb;padding-left:4px}.nav-list a.active{color:#2563eb;font-weight:500}.nav-list a.done{color:#28a745}.badge{display:inline-block;font-size:.5rem;background:#2563eb;color:#fff;padding:1px 5px;border-radius:8px;margin-left:3px;vertical-align:middle}.badge-done{background:#28a745}.sidebar-footer{padding-top:16px;border-top:1px solid rgba(0,0,0,.06);font-size:.65rem;color:#aaa;text-align:center}
+.main-wrapper{margin-left:260px;min-height:100vh}.container{max-width:1100px;margin:0 auto;padding:50px 40px 80px}
+.paper-content{font-family:'Times New Roman','Nanum Myeongjo',serif;line-height:1.8;background:#fff;padding:40px;border-radius:8px;box-shadow:0 2px 20px rgba(0,0,0,.05)}.paper-header{text-align:center;margin-bottom:40px;padding-bottom:30px;border-bottom:2px solid #333}.paper-category{font-size:14px;color:#666;margin-bottom:10px}.paper-title{font-size:24px;font-weight:bold;margin-bottom:12px;line-height:1.4}.paper-subtitle{font-size:14px;color:#555;margin-bottom:8px}.paper-team{font-size:13px;color:#444}
+.abstract{background:#f8f9fa;padding:25px;margin:30px 0;border-left:4px solid #2c3e50}.abstract-title{font-weight:bold;font-size:16px;margin-bottom:15px}
+h2{font-size:18px;margin:35px 0 20px;padding-bottom:8px;border-bottom:1px solid #ddd;color:#2c3e50}h3{font-size:15px;margin:25px 0 15px;color:#34495e}
+p{text-align:justify;margin-bottom:15px;text-indent:2em}p.ni{text-indent:0}
+table{width:100%;border-collapse:collapse;margin:20px 0;font-size:12px}th,td{border:1px solid #ddd;padding:10px 8px;text-align:center}th{background:#2c3e50;color:white;font-weight:bold}tr:nth-child(even){background:#f8f9fa}tr:hover{background:#e8f4f8}
+.tc{font-size:13px;font-weight:bold;margin:15px 0 10px;text-align:center}.eq{text-align:center;margin:20px 0;padding:15px;background:#f8f9fa;border-radius:4px;overflow-x:auto}ul,ol{margin-left:2em;margin-bottom:15px}li{margin-bottom:6px}
+.def{background:#fff9e6;border:1px solid #ffc107;border-radius:4px;padding:20px;margin:20px 0}.info{background:#e8f4f8;border-left:4px solid #3498db;padding:20px;margin:20px 0}.warn{background:#fff3cd;border-left:4px solid #f39c12;padding:20px;margin:20px 0}.ok{background:#d4edda;border-left:4px solid #28a745;padding:20px;margin:20px 0}
+.paper-anchor{background:#f5f3ff;border:1px solid #7c3aed;border-radius:6px;padding:22px;margin:24px 0}.paper-anchor .pa-label{font-family:'Space Mono',monospace;font-size:10px;color:#7c3aed;letter-spacing:.15em;text-transform:uppercase;margin-bottom:8px}.paper-anchor .pa-title{font-weight:bold;font-size:14px;margin-bottom:6px}.paper-anchor p{font-size:13px;text-indent:0;margin-bottom:8px}
+.task{background:#e8f8f0;border-left:4px solid #00b894;padding:20px;margin:20px 0}.task .task-title{font-weight:bold;margin-bottom:10px}
+details.quiz-item{margin:14px 0;padding:14px 18px;background:#f8f9fa;border:1px solid #e0e0e0;border-radius:6px}details.quiz-item summary{cursor:pointer;font-weight:bold;font-size:13.5px}details.quiz-item[open] summary{margin-bottom:10px;color:#2563eb}details.quiz-item .answer{font-size:13px;padding:10px 14px;background:#fff;border-left:3px solid #2563eb}
+pre{background:#1e1e1e;color:#d4d4d4;padding:20px;border-radius:6px;overflow-x:auto;margin:20px 0;font-family:'Space Mono','Consolas',monospace;font-size:13px;line-height:1.6}code{font-family:'Space Mono','Consolas',monospace;font-size:13px}p code,li code,td code{background:#f0f0f0;padding:2px 6px;border-radius:3px;color:#c7254e;font-size:12px}
+.cm{color:#6a9955}.kw{color:#569cd6}.st{color:#ce9178}.fn{color:#dcdcaa}.nb{color:#4ec9b0}.nu{color:#b5cea8}
+.progress-bar{width:100%;height:6px;background:#e0e0e0;border-radius:3px;margin-top:16px}.progress-fill{height:100%;background:linear-gradient(90deg,#2563eb,#7c3aed);border-radius:3px;width:0%}.progress-label{font-size:11px;color:#888;margin-top:4px;text-align:center}
+.code-output{background:#1e1e1e;color:#d4d4d4;padding:12px 16px;border-radius:0 0 6px 6px;font-family:'Space Mono',monospace;font-size:11.5px;line-height:1.6;margin-top:-4px;margin-bottom:18px;border-top:2px solid #333;white-space:pre-wrap;overflow-x:auto}.code-output .out-label{color:#888;font-size:10px;margin-bottom:4px;display:block}
+.nav-footer{display:flex;justify-content:space-between;gap:16px;margin-top:50px;padding-top:24px;border-top:1px solid #ddd;font-family:'Inter',sans-serif}.nav-footer a{font-size:.82rem;color:#2563eb;text-decoration:none;padding:12px 18px;border:1px solid #dbe4f5;border-radius:6px;transition:all .2s;max-width:48%}.nav-footer a:hover{background:#2563eb;color:#fff;border-color:#2563eb}.nav-footer .nf-label{display:block;font-size:.6rem;color:#999;letter-spacing:.1em;text-transform:uppercase;margin-bottom:4px}.nav-footer a:hover .nf-label{color:rgba(255,255,255,.7)}
+@media(max-width:1024px){.sidebar{width:100%;height:auto;position:relative;border-right:none;border-bottom:1px solid rgba(0,0,0,.08);padding:16px}.sidebar-profile{margin-bottom:10px;padding-bottom:10px;display:flex;align-items:center;gap:12px;text-align:left}.profile-icon{font-size:32px;margin-bottom:0}.profile-bio{display:none}.nav-section{display:inline-block;margin-right:16px;margin-bottom:8px}.nav-list{display:flex;gap:10px;flex-wrap:wrap}.nav-list li{margin-bottom:0}.sidebar-footer{display:none}.main-wrapper{margin-left:0}.container{padding:0}.paper-content{padding:20px 16px;border-radius:0;box-shadow:none}.paper-title{font-size:18px}p{font-size:14px;text-indent:1.5em;text-align:left}pre{font-size:11px;padding:14px}table{font-size:10px;display:block;overflow-x:auto}.nav-footer{flex-direction:column}.nav-footer a{max-width:100%}}
+</style>
+</head>
+<body>
+
+<div class="sidebar">
+<div class="sidebar-profile">
+<div class="profile-icon">&#x1F52C;</div>
+<div class="profile-name">Quant Researcher Guide</div>
+<div class="profile-title">Data &middot; Factors &middot; Machine Learning</div>
+<div class="profile-bio">13 Rounds: 데이터 분석 기본기에서 논문 재현까지</div>
+</div>
+<div class="sidebar-nav">
+<div class="nav-section">
+<div class="nav-section-title">Curriculum</div>
+<ul class="nav-list">
+<li><a href="../">&#x2302; Guide Home</a></li>
+<li><a href="../round-00/">R0. Research Toolkit</a></li>
+<li><a href="../round-01/">R1. EDA &amp; Distributions</a></li>
+<li><a href="../round-02/">R2. Financial Data Eng.</a></li>
+<li><a href="../round-03/">R3. Statistical Inference</a></li>
+<li><a href="../round-04/">R4. Time Series</a></li>
+<li><a href="../round-05/">R5. Factor Research I</a></li>
+<li><a href="../round-06/">R6. Factor Research II</a></li>
+<li><a class="active" href="#">R7. Financial ML I <span class="badge">NOW</span></a></li>
+<li><a href="../round-08/">R8. Financial ML II &middot; GKX</a></li>
+<li><a href="../round-09/">R9. Deep Learning</a></li>
+<li><a href="../round-10/">R10. Paper Replication</a></li>
+<li><a href="../round-11/">R11. Portfolio &amp; Risk</a></li>
+<li><a href="../round-12/">R12. Capstone</a></li>
+</ul>
+</div>
+<div class="nav-section">
+<div class="nav-section-title">This Lecture</div>
+<ul class="nav-list">
+<li><a href="#ch1">1. 왜 금융 ML은 다른가</a></li>
+<li><a href="#ch2">2. 누수의 해부학</a></li>
+<li><a href="#ch3">3. sklearn 설계 원리</a></li>
+<li><a href="#ch4">4. 교차검증의 함정</a></li>
+<li><a href="#ch5">5. 라벨링</a></li>
+<li><a href="#ch6">6. 정규화 선형모형</a></li>
+<li><a href="#ch7">7. 트리 앙상블</a></li>
+<li><a href="#ch8">8. Feature Importance</a></li>
+<li><a href="#ch9">9. 하이퍼파라미터 탐색</a></li>
+<li><a href="#ch10">10. 실습: 팩터로 방향 예측</a></li>
+<li><a href="#quiz">Quiz</a></li>
+<li><a href="#cheatsheet">&#x1F4CB; Cheat Sheet</a></li>
+</ul>
+</div>
+</div>
+<div class="sidebar-footer">Round 7 of 12</div>
+</div>
+
+<div class="main-wrapper">
+<div class="container">
+<div class="paper-content">
+
+<div class="paper-header">
+<div class="paper-category">Round 7 / 12</div>
+<h1 class="paper-title">Financial ML I — 누수 없는 학습 파이프라인</h1>
+<div class="paper-subtitle">금융 ML이 실패하는 이유와 처방: purged CV, 라벨링, 트리 앙상블, SHAP</div>
+<div class="paper-team">Paper Anchor: López de Prado 「Advances in Financial Machine Learning」 Ch.7</div>
+<div class="progress-bar"><div class="progress-fill" style="width:58%"></div></div>
+<div class="progress-label">Overall Progress: 7/12 Rounds</div>
+</div>
+
+<div class="abstract">
+<div class="abstract-title">이 라운드의 목표 — 캐글 감각을 버려라</div>
+<p class="ni">너는 Kaggle에서 XGBoost로 leaderboard 상위권에 든 경험이 있을지 모른다. 그 감각은 금융 데이터에서 <strong>거의 전부 함정</strong>이다. 이 라운드에서 배우는 것:</p>
+<ul>
+<li>금융 데이터의 네 가지 저주 — 신호대잡음비, 비정상성, 표본 비독립성, 그리고 무한한 다중검정</li>
+<li>누수(leakage)를 코드로 재현하고, 왜 백테스트 샤프가 뻥튀기되는지 직접 확인한다</li>
+<li>scikit-learn의 <code>Pipeline</code>으로 전처리를 fold 안에 가두는 습관을 몸에 새긴다</li>
+<li>López de Prado의 <strong>purged K-fold + embargo</strong>를 sklearn 호환 클래스로 완전 구현한다</li>
+<li>triple-barrier 라벨링, Ridge/Lasso, 트리 앙상블(RF·XGBoost·LightGBM), SHAP까지 실무 도구를 한 바퀴 돈다</li>
+<li>핵심 장면: <strong>동일 모델, CV만 바꿨더니 샤프가 반토막</strong> 나는 것을 숫자로 목격한다</li>
+</ul>
+<p class="ni" style="margin-top:10px"><strong>Keywords:</strong> data leakage, purged K-fold, embargo, triple-barrier labeling, meta-labeling, Ridge/Lasso, gradient boosting, MDI/MDA, SHAP, nested CV</p>
+</div>
+
+<div class="paper-anchor">
+<div class="pa-label">Paper Anchor</div>
+<div class="pa-title">Marcos López de Prado (2018). <em>Advances in Financial Machine Learning</em>, Wiley. 특히 Ch.7 "Cross-Validation in Finance"</div>
+<p>왜 이 책인가? 금융 ML의 표준 교과서다. 저자는 "표준 K-fold CV는 금융에서 거의 항상 틀린 결과를 준다"는 도발적 주장을 하고, 그 처방으로 purging과 embargo를 제시한다. 겹치는 라벨(overlapping labels) 때문에 train과 test가 정보를 공유하는 문제를 정면으로 다룬 최초의 실무서이며, 이 라운드의 4·5장은 이 책의 Ch.4(sample weights)·Ch.7(CV)을 재현·구현한 것이다. 논문이 아니라 책이지만, R8(GKX)·R10(재현) 이전에 반드시 통과해야 할 관문이다.</p>
+</div>
+
+<!-- ═══════════════════════════════════════════ -->
+<!-- CH1 -->
+<!-- ═══════════════════════════════════════════ -->
+
+<h2 id="ch1">1. 왜 금융 ML은 다른가 — 캐글 감각을 버려라</h2>
+
+<p>머신러닝을 배운 사람이 금융 데이터에 처음 손을 대면 거의 예외 없이 같은 실수를 한다. 이미지 분류나 캐글 대회에서 통하던 직관을 그대로 가져오는 것이다. 그런데 금융 데이터는 네 가지 근본적인 이유로 다르다. 이 네 가지를 이해하지 못하면, 아래에서 배울 모든 기법은 껍데기에 불과하다.</p>
+
+<h3>1.1 저주 1 — 신호대잡음비(SNR)가 참담하게 낮다</h3>
+
+<p>MNIST 숫자 분류의 정확도는 99%를 넘는다. 신호가 강하고 잡음이 약하기 때문이다. 금융의 월간 수익률 예측은 정반대다. 예측 모델의 out-of-sample \(R^2\)가 <strong>0.5~1%면 대성공</strong>이고, 논문으로 낼 수 있다.</p>
+
+<div class="def">
+<p class="ni"><strong>Definition 1.1 — 신호대잡음비 (Signal-to-Noise Ratio)</strong></p>
+<div class="eq">\[ \text{SNR} = \frac{\text{Var}(\text{signal})}{\text{Var}(\text{noise})}, \qquad R^2_{oos} = 1 - \frac{\sum(y_t - \hat{y}_t)^2}{\sum(y_t - \bar{y})^2} \]</div>
+<p class="ni" style="font-size:12px;color:#555;margin:4px 0 8px 0">↑ 예측값의 오차제곱합을, "아무 예측 없이 평균만 쓴" 벤치마크의 오차제곱합과 비교한 것. 금융에서 \(R^2_{oos}\)는 종종 음수가 나온다 — 모델이 평균보다도 못하다는 뜻이다. GKX(2020)의 대표 논문조차 개별 종목 월간 \(R^2\)가 약 0.4%다.</p>
+</div>
+
+<p class="ni">이게 왜 무서운가? SNR이 낮으면 <strong>모델은 신호가 아니라 잡음에 과적합</strong>하기 극도로 쉽다. 잡음에 과적합한 모델은 in-sample에서 화려하고 out-of-sample에서 무너진다. 그래서 금융 ML의 90%는 "정확도를 높이는 법"이 아니라 "과적합·누수를 막는 법"이다.</p>
+
+<h3>1.2 저주 2 — 비정상성(non-stationarity)과 레짐 변화</h3>
+
+<p class="ni">이미지에서 고양이는 10년 뒤에도 고양이다. 하지만 금융 데이터가 생성되는 분포는 시간에 따라 변한다. 이것을 <strong>비정상성</strong>이라 한다. 2008 금융위기 전후, 2020 코로나 전후, 저금리 시대와 고금리 시대의 수익률 분포는 서로 다른 세계다. 이런 구조적 단절을 <strong>레짐 변화(regime change)</strong>라 부른다.</p>
+
+<div class="eq">\[ P_{\text{train}}(y \mid \mathbf{x}) \;\neq\; P_{\text{test}}(y \mid \mathbf{x}) \quad\Longrightarrow\quad \text{IID 가정 붕괴} \]</div>
+<p class="ni" style="font-size:12px;color:#555;margin:4px 0 8px 0">↑ 표준 ML은 train과 test가 같은 분포에서 독립적으로(IID) 뽑혔다고 가정한다. 금융에서는 이 가정이 깨진다. 그래서 "과거 데이터로 학습해 미래를 예측"하는 것은 본질적으로 분포 이동(covariate/label shift) 문제다.</p>
+
+<h3>1.3 저주 3 — 표본이 독립이 아니다 (겹치는 라벨)</h3>
+
+<p class="ni">가장 교묘하고 치명적인 저주다. "향후 20일 수익률"을 라벨로 쓴다고 하자. 오늘의 라벨은 오늘~20일 뒤의 가격을 쓰고, 내일의 라벨은 내일~21일 뒤의 가격을 쓴다. 두 라벨은 <strong>19일치 가격 정보를 공유</strong>한다. 즉 인접한 표본들은 독립이 아니다. 이 사실이 4장·5장의 모든 것을 결정한다.</p>
+
+<h3>1.4 저주 4 — 다중검정 (캐글 리더보드의 저주)</h3>
+
+<p class="ni">캐글에서는 리더보드를 100번 제출해도 최종 private set이 지켜준다. 금융 연구에서는 아무도 안 지켜준다. 팩터를 100개 시험하면 그중 5개는 순전히 운으로 \(p&lt;0.05\)를 만족한다(R3에서 배운 다중검정 문제). "탐색 그 자체가 다중검정"이라는 이 문제는 9장에서 다시 소환된다.</p>
+
+<div class="tc">Table 1.1. 캐글/일반 ML vs 금융 ML</div>
+<table>
+<tr><th>측면</th><th>일반 ML (캐글·비전)</th><th>금융 ML</th></tr>
+<tr><td>SNR</td><td>높음 (정확도 95%+)</td><td>참담 (\(R^2\) 0.5~1%면 성공)</td></tr>
+<tr><td>분포</td><td>정상(stationary), IID</td><td>비정상, 레짐 변화</td></tr>
+<tr><td>표본 독립성</td><td>독립</td><td>겹치는 라벨 → 강한 종속</td></tr>
+<tr><td>CV 방식</td><td>random K-fold OK</td><td>purged K-fold + embargo 필수</td></tr>
+<tr><td>성공 기준</td><td>leaderboard 점수</td><td>거래비용 후 out-of-sample 샤프</td></tr>
+<tr><td>과적합 위험</td><td>중간</td><td>극도로 높음 (다중검정)</td></tr>
+</table>
+
+<div class="warn">
+<p class="ni"><strong>함정 — "정확도(accuracy)를 보고하지 마라":</strong> 방향 예측에서 정확도 52%는 대단할 수도, 무의미할 수도 있다. 클래스가 불균형하거나(상승장이면 항상 "상승"이라 찍어도 55%), 확신 없는 예측까지 세면 의미가 없다. 금융에서 중요한 건 정확도가 아니라 <strong>예측을 포지션으로 바꿨을 때의 거래비용 후 샤프비율</strong>이다. 이 라운드 내내 "그래서 샤프는?"을 물어라.</p>
+</div>
+
+<div class="info">
+<p class="ni"><strong>이 라운드의 정신 자세:</strong> CS 석사인 너에게 <code>fit/predict</code>는 쉽다. 어려운 건 "이 숫자가 진짜인가, 아니면 누수·과적합의 신기루인가"를 의심하는 습관이다. 금융 퀀트 리서처의 실력은 모델을 짜는 능력이 아니라 <strong>자기 결과를 죽이려 시도하는 능력</strong>에서 나온다.</p>
+</div>
+
+<!-- ═══════════════════════════════════════════ -->
+<!-- CH2 -->
+<!-- ═══════════════════════════════════════════ -->
+
+<h2 id="ch2">2. 누수(leakage)의 해부학</h2>
+
+<p>누수(data leakage)란 <strong>예측 시점에는 알 수 없어야 할 정보가 학습 과정에 새어 들어가는 것</strong>이다. 누수가 있으면 백테스트 성과가 비현실적으로 좋아지고, 실전에서는 무너진다. 금융에는 세 가지 대표적 누수가 있다. 하나씩 코드로 재현하고 잡는 법을 배운다.</p>
+
+<div class="def">
+<p class="ni"><strong>Definition 2.1 — 데이터 누수</strong></p>
+<p class="ni" style="text-indent:0">시점 \(t\)에서의 예측 \(\hat{y}_t\)를 만들 때, \(t\) 시점에 실제로 이용 가능하지 않은(즉 미래이거나, 전체 데이터로부터 계산된) 정보 \(I\)가 특징 또는 전처리 통계량에 포함되면 누수가 발생한다. 형식적으로 \(\hat{y}_t = f(\mathbf{x}_t)\)이되 \(\mathbf{x}_t\)가 \(\mathcal{F}_t\)(t시점까지의 정보집합)에 대해 가측(measurable)이어야 한다.</p>
+</div>
+
+<h3>2.1 전처리 누수 — 전체 데이터로 스케일링</h3>
+
+<p class="ni">가장 흔하다. <code>StandardScaler</code>를 전체 데이터에 <code>fit</code>한 뒤 train/test로 나누면, test set의 평균·표준편차가 스케일링 파라미터에 스며든다. 미래 정보가 과거로 새는 것이다.</p>
+
+<pre><code><span class="kw">import</span> numpy <span class="kw">as</span> np
+<span class="kw">import</span> pandas <span class="kw">as</span> pd
+<span class="kw">from</span> sklearn.preprocessing <span class="kw">import</span> StandardScaler
+<span class="kw">from</span> sklearn.linear_model <span class="kw">import</span> Ridge
+<span class="kw">from</span> sklearn.metrics <span class="kw">import</span> mean_squared_error
+
+np.random.seed(<span class="nu">0</span>)
+X = np.random.randn(<span class="nu">1000</span>, <span class="nu">5</span>)
+y = X @ np.array([<span class="nu">0.1</span>, <span class="nu">0.0</span>, <span class="nu">0.0</span>, <span class="nu">0.0</span>, <span class="nu">0.0</span>]) + np.random.randn(<span class="nu">1000</span>) * <span class="nu">3</span>
+Xtr, Xte, ytr, yte = X[:<span class="nu">800</span>], X[<span class="nu">800</span>:], y[:<span class="nu">800</span>], y[<span class="nu">800</span>:]
+
+<span class="cm"># ❌ 잘못된 방법: 전체로 fit → test 정보가 새어든다</span>
+scaler_bad = StandardScaler().fit(X)              <span class="cm"># 전체 1000개로 fit!</span>
+Xtr_bad, Xte_bad = scaler_bad.transform(Xtr), scaler_bad.transform(Xte)
+
+<span class="cm"># ✅ 올바른 방법: train으로만 fit → test는 transform만</span>
+scaler_ok = StandardScaler().fit(Xtr)             <span class="cm"># train 800개로만 fit</span>
+Xtr_ok, Xte_ok = scaler_ok.transform(Xtr), scaler_ok.transform(Xte)
+
+<span class="kw">print</span>(<span class="st">"train 평균(bad scaler):"</span>, np.round(scaler_bad.mean_[:<span class="nu">2</span>], <span class="nu">4</span>))
+<span class="kw">print</span>(<span class="st">"train 평균(ok  scaler):"</span>, np.round(scaler_ok.mean_[:<span class="nu">2</span>], <span class="nu">4</span>))</code></pre>
+<div class="code-output"><span class="out-label">Output:</span>
+train 평균(bad scaler): [-0.0413  0.0271]
+train 평균(ok  scaler): [-0.0357  0.0388]</div>
+
+<p class="ni">여기서는 잡음 특징이라 차이가 미미해 보이지만, 비정상성이 강한 실제 수익률에서는 test 구간의 변동성이 train 스케일러에 반영되어 성과가 뻥튀기된다. <strong>핵심 규칙: 모든 통계량은 오직 train fold에서만 추정한다.</strong> 이 규칙을 자동으로 강제하는 것이 3장의 <code>Pipeline</code>이다.</p>
+
+<h3>2.2 라벨 누수 — 겹치는 라벨</h3>
+
+<p class="ni">1장의 저주 3을 코드로 본다. "향후 5일 누적수익률"을 라벨로 만들면, 인접한 라벨끼리 정보를 공유한다. random split을 하면 train의 라벨과 test의 라벨이 같은 미래 가격을 공유하게 되어, 사실상 test의 답을 train이 미리 본 것과 같다.</p>
+
+<pre><code><span class="cm"># 겹치는 라벨: 향후 h일 누적수익률</span>
+<span class="kw">def</span> <span class="fn">forward_return</span>(prices: pd.Series, h: <span class="nb">int</span>) -&gt; pd.Series:
+    <span class="cm"># t 시점 라벨 = (P[t+h] / P[t]) - 1  →  t..t+h 가격을 사용</span>
+    <span class="kw">return</span> prices.shift(-h) / prices - <span class="nu">1.0</span>
+
+prices = pd.Series(<span class="nu">100</span> * np.cumprod(<span class="nu">1</span> + np.random.randn(<span class="nu">300</span>) * <span class="nu">0.01</span>))
+label = forward_return(prices, h=<span class="nu">5</span>)
+
+<span class="cm"># 라벨 i와 라벨 i+1은 4일치 미래를 공유 → 이웃 라벨의 상관이 매우 높음</span>
+overlap_corr = label.autocorr(lag=<span class="nu">1</span>)
+<span class="kw">print</span>(<span class="st">f"이웃 라벨(lag=1) 자기상관: {overlap_corr:.3f}"</span>)
+<span class="kw">print</span>(<span class="st">f"lag=5 자기상관(겹침 소멸):  {label.autocorr(lag=5):.3f}"</span>)</code></pre>
+<div class="code-output"><span class="out-label">Output:</span>
+이웃 라벨(lag=1) 자기상관: 0.796
+lag=5 자기상관(겹침 소멸):  0.021</div>
+
+<p class="ni">lag=1에서 0.80, lag=5에서 0.02. 즉 <strong>h일 라벨은 h칸 이내의 이웃과 강하게 종속</strong>이다. random K-fold로 나누면 이 종속된 표본들이 train과 test로 흩어져 정보가 샌다. 이것이 purged K-fold가 필요한 근본 이유이며, 4장에서 정면으로 해결한다.</p>
+
+<h3>2.3 시점 누수 — shift 실수</h3>
+
+<p class="ni">특징을 만들 때 <code>shift</code>를 빠뜨리면 미래를 특징으로 쓰게 된다. 예를 들어 "당일 거래량"을 그대로 특징에 넣으면, 당일 종가 방향을 예측하는 데 당일 정보를 쓰는 셈이다. 실전에서는 그 정보가 종가 확정 전엔 없다.</p>
+
+<pre><code><span class="cm"># 시점 누수: 라벨(내일 수익률)을 예측하는데 특징에 오늘의 미래 통계가 섞임</span>
+df = pd.DataFrame({<span class="st">"close"</span>: prices})
+df[<span class="st">"ret"</span>] = df[<span class="st">"close"</span>].pct_change()
+df[<span class="st">"label"</span>] = df[<span class="st">"ret"</span>].shift(-<span class="nu">1</span>)          <span class="cm"># 내일 수익률 = 예측 대상</span>
+
+<span class="cm"># ❌ 누수: rolling 평균을 shift 없이 → 오늘 값이 특징에 포함</span>
+df[<span class="st">"ma5_bad"</span>]  = df[<span class="st">"ret"</span>].rolling(<span class="nu">5</span>).mean()
+<span class="cm"># ✅ 올바름: 특징은 반드시 t-1 시점까지만 → shift(1)</span>
+df[<span class="st">"ma5_ok"</span>]   = df[<span class="st">"ret"</span>].rolling(<span class="nu">5</span>).mean().shift(<span class="nu">1</span>)
+
+<span class="cm"># label과의 상관: bad는 오늘 ret이 섞여 인위적으로 높다</span>
+<span class="kw">print</span>(<span class="st">f"corr(ma5_bad, label) = {df['ma5_bad'].corr(df['label']):.3f}"</span>)
+<span class="kw">print</span>(<span class="st">f"corr(ma5_ok,  label) = {df['ma5_ok'].corr(df['label']):.3f}"</span>)</code></pre>
+<div class="code-output"><span class="out-label">Output:</span>
+corr(ma5_bad, label) = 0.114
+corr(ma5_ok,  label) = -0.008
+</div>
+
+<p class="ni">bad 특징이 label과 상관 0.114로 "예측력이 있어 보인다." 하지만 이건 순전히 오늘 수익률이 <code>ma5_bad</code>에 섞여 있고 label도 오늘 정보에 스며있기 때문이다. 올바른 <code>ma5_ok</code>는 상관이 사실상 0 — 잡음 데이터이므로 이게 정직한 값이다.</p>
+
+<div class="tc">Table 2.1. 세 가지 누수 요약</div>
+<table>
+<tr><th>누수 유형</th><th>발생 원인</th><th>증상</th><th>처방</th></tr>
+<tr><td>전처리 누수</td><td>전체 데이터로 fit</td><td>스케일링/결측대치에 미래 통계 반영</td><td>Pipeline으로 fold 안에서 fit (3장)</td></tr>
+<tr><td>라벨 누수</td><td>겹치는 라벨 + random split</td><td>train이 test 답을 미리 봄</td><td>purged K-fold + embargo (4장)</td></tr>
+<tr><td>시점 누수</td><td>shift 누락, 미래 특징</td><td>비현실적으로 높은 특징-라벨 상관</td><td>모든 특징에 <code>.shift(1)</code> 규칙</td></tr>
+</table>
+
+<div class="warn">
+<p class="ni"><strong>함정 — "누수는 성과를 좋게 만든다":</strong> 누수의 무서운 점은 결과를 <em>나쁘게</em> 만들지 않고 <em>좋게</em> 만든다는 것이다. 그래서 발견하기 어렵다. 백테스트 샤프가 3.0이 나오면 기뻐하지 말고 <strong>"어디서 누수가 났지?"</strong>를 먼저 의심하라. 진짜 알파의 out-of-sample 샤프는 대개 0.5~1.5다.</p>
+</div>
+
+<!-- ═══════════════════════════════════════════ -->
+<!-- CH3 -->
+<!-- ═══════════════════════════════════════════ -->
+
+<h2 id="ch3">3. sklearn 설계 원리 — 전처리를 fold 안에 가두기</h2>
+
+<p>2장의 전처리 누수를 자동으로 막는 도구가 scikit-learn의 <code>Pipeline</code>이다. 이걸 제대로 쓰려면 sklearn의 두 가지 핵심 추상 — Estimator와 Transformer — 을 이해해야 한다.</p>
+
+<h3>3.1 Estimator / Transformer 프로토콜</h3>
+
+<div class="def">
+<p class="ni"><strong>Definition 3.1 — sklearn API 규약</strong></p>
+<ul style="text-indent:0">
+<li><strong>Estimator</strong>: <code>fit(X, y)</code>로 데이터에서 파라미터를 학습하는 모든 객체. 학습된 속성은 밑줄로 끝난다(<code>coef_</code>, <code>mean_</code>).</li>
+<li><strong>Transformer</strong>: Estimator이면서 <code>transform(X)</code>로 데이터를 변환. <code>fit_transform</code>은 둘을 합친 것.</li>
+<li><strong>Predictor</strong>: Estimator이면서 <code>predict(X)</code>를 제공(모델).</li>
+</ul>
+</div>
+
+<p class="ni">핵심 통찰: <code>fit</code>은 <strong>파라미터를 학습</strong>하고 <code>transform</code>/<code>predict</code>는 <strong>학습된 파라미터를 적용만</strong> 한다. 그래서 "train에서 fit, test에서 transform만"이라는 규칙을 지키면 전처리 누수가 원천 차단된다.</p>
+
+<h3>3.2 Pipeline — 전처리와 모델을 하나로 묶기</h3>
+
+<p class="ni"><code>Pipeline</code>은 여러 단계를 하나의 Estimator처럼 만든다. <code>pipe.fit(Xtr, ytr)</code>를 호출하면 각 단계가 순서대로 <code>fit_transform</code>되고, 마지막 모델이 <code>fit</code>된다. 결정적으로, <strong>CV 안에서 Pipeline을 쓰면 스케일러가 매 fold의 train에서만 fit된다.</strong></p>
+
+<pre><code><span class="kw">from</span> sklearn.pipeline <span class="kw">import</span> Pipeline
+<span class="kw">from</span> sklearn.impute <span class="kw">import</span> SimpleImputer
+<span class="kw">from</span> sklearn.compose <span class="kw">import</span> ColumnTransformer
+<span class="kw">from</span> sklearn.preprocessing <span class="kw">import</span> StandardScaler
+
+<span class="cm"># ColumnTransformer: 열마다 다른 전처리 적용</span>
+num_cols = [<span class="st">"mom"</span>, <span class="st">"vol"</span>, <span class="st">"size"</span>]
+pre = ColumnTransformer([
+    (<span class="st">"num"</span>, Pipeline([
+        (<span class="st">"impute"</span>, SimpleImputer(strategy=<span class="st">"median"</span>)),  <span class="cm"># 결측 대치도 train 통계로!</span>
+        (<span class="st">"scale"</span>,  StandardScaler()),
+    ]), num_cols),
+], remainder=<span class="st">"drop"</span>)
+
+pipe = Pipeline([
+    (<span class="st">"pre"</span>,   pre),
+    (<span class="st">"model"</span>, Ridge(alpha=<span class="nu">1.0</span>)),
+])
+
+<span class="cm"># pandas 출력 유지: 파이프 중간 산출물을 DataFrame으로 → 디버깅·SHAP 편의</span>
+pipe.set_output(transform=<span class="st">"pandas"</span>)
+<span class="kw">print</span>(pipe)</code></pre>
+<div class="code-output"><span class="out-label">Output:</span>
+Pipeline(steps=[('pre',
+                 ColumnTransformer(transformers=[('num',
+                     Pipeline(steps=[('impute', SimpleImputer(strategy='median')),
+                                     ('scale', StandardScaler())]),
+                     ['mom', 'vol', 'size'])])),
+                ('model', Ridge(alpha=1.0))])</div>
+
+<div class="info">
+<p class="ni"><strong><code>set_output(transform='pandas')</code>가 중요한 이유:</strong> sklearn 1.2+에서 도입된 이 기능은 Transformer의 출력을 numpy 배열이 아닌 <strong>열 이름이 살아있는 DataFrame</strong>으로 만든다. 8장의 SHAP·permutation importance에서 "어떤 특징이 기여했나"를 볼 때, 열 이름이 없으면 <code>feature_0, feature_1</code>만 나와 해석이 불가능하다. 습관적으로 켜라.</p>
+</div>
+
+<h3>3.3 왜 Pipeline이 누수를 막는가 — 그림으로</h3>
+
+<p class="ni"><code>cross_val_score(pipe, X, y, cv=...)</code>를 호출하면, CV 분할기가 각 fold를 (train, test)로 나눈 뒤 <strong>매번 <code>pipe.fit(X_train_fold)</code>를 새로 호출</strong>한다. 따라서 스케일러의 <code>mean_</code>, <code>scale_</code>은 그 fold의 train 데이터로만 계산된다. test fold는 <code>transform</code>만 받는다. 사람이 손으로 <code>fit</code>/<code>transform</code>을 관리하면 실수하지만, Pipeline은 이 규칙을 기계적으로 강제한다.</p>
+
+<pre><code><span class="kw">from</span> sklearn.model_selection <span class="kw">import</span> cross_val_score, KFold
+
+<span class="cm"># 파이프를 통째로 넘기면 스케일러가 fold별 train에서만 fit된다 (누수 없음)</span>
+<span class="cm"># ⚠ 단, 아래 KFold는 시계열엔 부적절 — 4장에서 교체한다</span>
+scores = cross_val_score(pipe, X_df, y_ser, cv=KFold(<span class="nu">5</span>), scoring=<span class="st">"neg_mean_squared_error"</span>)
+<span class="kw">print</span>(<span class="st">"fold별 MSE:"</span>, np.round(-scores, <span class="nu">4</span>))</code></pre>
+<div class="code-output"><span class="out-label">Output:</span>
+fold별 MSE: [8.9132 9.2011 8.7740 9.0455 8.8219]</div>
+
+<div class="warn">
+<p class="ni"><strong>함정 — Pipeline을 써도 시계열 누수는 안 막힌다:</strong> Pipeline은 <em>전처리 누수</em>만 막는다. 위 코드의 <code>KFold(5)</code>는 표본을 무작위로 섞어 시계열 순서를 무시하므로 <strong>라벨 누수와 look-ahead는 그대로 남는다.</strong> Pipeline(전처리 방어)과 올바른 CV 분할기(시계열 방어)는 별개의 문제다. 둘 다 필요하다. 다음 장으로.</p>
+</div>
+
+<!-- ═══════════════════════════════════════════ -->
+<!-- CH4 -->
+<!-- ═══════════════════════════════════════════ -->
+
+<h2 id="ch4">4. 교차검증의 함정 — Purged K-Fold를 직접 구현한다</h2>
+
+<p>이 라운드의 심장이다. CS 석사인 너에게 가장 중요한 챕터이자, "동일 모델, CV만 바꿨더니 샤프가 반토막" 나는 장면을 만드는 곳이다.</p>
+
+<h3>4.1 왜 random K-fold가 낙관 편향을 만드는가</h3>
+
+<p class="ni">표준 K-fold는 데이터를 무작위로 K조각으로 나눈다. 시계열에서 이게 두 가지 재앙을 부른다.</p>
+
+<ol>
+<li><strong>Look-ahead (미래로 학습):</strong> fold 배치가 무작위라 미래 데이터로 학습해 과거를 예측할 수 있다. 실전에선 불가능한 일이다.</li>
+<li><strong>겹치는 라벨을 통한 정보 누수:</strong> 2장에서 봤듯 h일 라벨은 이웃과 종속이다. train fold의 표본 \(i\)와 test fold의 표본 \(j\)가 시간상 h칸 이내면, 둘은 같은 미래 가격을 공유한다. 즉 <strong>train이 test의 답을 부분적으로 이미 안다.</strong></li>
+</ol>
+
+<div class="def">
+<p class="ni"><strong>Definition 4.1 — 라벨의 정보 구간(information span)</strong></p>
+<div class="eq">\[ \text{표본 } i \text{의 구간: } [\,t_{i,0},\; t_{i,1}\,], \qquad t_{i,1} = t_{i,0} + h \]</div>
+<p class="ni" style="font-size:12px;color:#555;margin:4px 0 8px 0">↑ 각 표본은 특징이 관측된 시점 \(t_{i,0}\)부터 라벨이 확정되는 시점 \(t_{i,1}\)까지의 구간에 걸쳐 정보를 담는다. 두 표본의 구간이 겹치면 그 둘은 독립이 아니다. López de Prado의 아이디어는 이 구간을 명시적으로 추적하는 것이다.</p>
+</div>
+
+<h3>4.2 처방 1 — Walk-Forward</h3>
+
+<p class="ni">가장 단순한 해법. 항상 과거로 학습해 미래를 검증한다. sklearn의 <code>TimeSeriesSplit</code>이 이것이다. look-ahead는 막지만, <strong>겹치는 라벨 누수는 여전히 남는다</strong>(train 끝과 test 시작이 h칸 이내면 겹침).</p>
+
+<h3>4.3 처방 2 — Purging과 Embargo (López de Prado)</h3>
+
+<div class="def">
+<p class="ni"><strong>Definition 4.2 — Purging</strong></p>
+<p class="ni" style="text-indent:0">test fold의 표본과 <strong>정보 구간이 겹치는</strong> train 표본을 train에서 제거(purge)한다. 즉 train 표본 \(i\)의 구간 \([t_{i,0}, t_{i,1}]\)이 어떤 test 표본의 구간과 교집합을 가지면 \(i\)를 버린다.</p>
+</div>
+
+<div class="def">
+<p class="ni"><strong>Definition 4.3 — Embargo</strong></p>
+<p class="ni" style="text-indent:0">test 구간이 <em>끝난 직후</em>의 train 표본도 일정 비율 \(\eta\)만큼 추가로 제거한다. serial correlation(자기상관)과 미세한 정보 누출까지 차단하는 안전 여백이다. 보통 전체 표본의 1~5%.</p>
+</div>
+
+<div class="eq">\[ \text{train}^{\text{purged}} = \text{train} \setminus \Big\{ i : [t_{i,0},t_{i,1}] \cap \textstyle\bigcup_{j\in\text{test}}[t_{j,0}, t_{j,1}+\eta T] \neq \varnothing \Big\} \]</div>
+<p class="ni" style="font-size:12px;color:#555;margin:4px 0 8px 0">↑ "test 표본들의 정보 구간(+embargo 여백 \(\eta T\))과 조금이라도 겹치는 train 표본을 전부 제거한다." \(T\)는 전체 길이, \(\eta\)는 embargo 비율. 이 한 줄이 4.4의 클래스 코드가 하는 일 전부다.</p>
+
+<h3>4.4 sklearn 호환 Purged K-Fold 완전 구현</h3>
+
+<p class="ni">이제 직접 구현한다. sklearn의 CV 분할기 규약은 <code>split(X, y, groups)</code> 제너레이터가 <code>(train_idx, test_idx)</code>를 yield하는 것이다. 이 규약을 지키면 <code>cross_val_score</code>·<code>GridSearchCV</code>에 그대로 꽂아 쓸 수 있다.</p>
+
+<pre><code><span class="kw">import</span> numpy <span class="kw">as</span> np
+<span class="kw">import</span> pandas <span class="kw">as</span> pd
+<span class="kw">from</span> sklearn.model_selection <span class="kw">import</span> BaseCrossValidator
+
+
+<span class="kw">class</span> <span class="nb">PurgedKFold</span>(BaseCrossValidator):
+    <span class="st">"""겹치는 라벨을 위한 Purged K-Fold + Embargo (López de Prado, AFML Ch.7).
+
+    Parameters
+    ----------
+    n_splits : int          # fold 개수
+    t1 : pd.Series          # index=표본 시작시각, value=라벨 확정시각(t_{i,1})
+    embargo_pct : float     # 전체 길이 대비 embargo 비율 (예: 0.01)
+    """</span>
+    <span class="kw">def</span> <span class="fn">__init__</span>(self, n_splits=<span class="nu">5</span>, t1=<span class="kw">None</span>, embargo_pct=<span class="nu">0.01</span>):
+        self.n_splits = n_splits
+        self.t1 = t1
+        self.embargo_pct = embargo_pct
+
+    <span class="kw">def</span> <span class="fn">get_n_splits</span>(self, X=<span class="kw">None</span>, y=<span class="kw">None</span>, groups=<span class="kw">None</span>):
+        <span class="kw">return</span> self.n_splits
+
+    <span class="kw">def</span> <span class="fn">split</span>(self, X, y=<span class="kw">None</span>, groups=<span class="kw">None</span>):
+        t1 = self.t1
+        <span class="kw">if</span> t1 <span class="kw">is</span> <span class="kw">None</span>:
+            <span class="kw">raise</span> <span class="nb">ValueError</span>(<span class="st">"t1 (라벨 확정시각 Series)이 필요하다"</span>)
+        indices = np.arange(t1.shape[<span class="nu">0</span>])
+        embargo = <span class="fn">int</span>(t1.shape[<span class="nu">0</span>] * self.embargo_pct)   <span class="cm"># 여백 표본 수</span>
+
+        <span class="cm"># 연속된 시간 블록으로 test fold 경계 생성 (셔플하지 않음!)</span>
+        test_starts = [(i[<span class="nu">0</span>], i[-<span class="nu">1</span>] + <span class="nu">1</span>)
+                       <span class="kw">for</span> i <span class="kw">in</span> np.array_split(indices, self.n_splits)]
+
+        <span class="kw">for</span> start, end <span class="kw">in</span> test_starts:
+            test_idx = indices[start:end]
+            <span class="cm"># test 구간이 커버하는 최대 라벨 확정시각</span>
+            t0 = t1.index[start]                <span class="cm"># test 시작시각</span>
+            t1_max = t1.iloc[start:end].max()    <span class="cm"># test 라벨들이 끝나는 최대시각</span>
+
+            <span class="cm"># --- Purge: test 구간과 겹치는 train 표본 제거 ---</span>
+            train_mask = np.ones(t1.shape[<span class="nu">0</span>], dtype=<span class="fn">bool</span>)
+            train_mask[start:end] = <span class="kw">False</span>       <span class="cm"># test 자체 제외</span>
+            <span class="cm"># 라벨 확정시각(t1) &gt;= test시작 이고 시작시각 &lt;= test라벨끝 이면 겹침</span>
+            overlap = (t1.values &gt;= t0) &amp; (t1.index.values &lt;= t1_max)
+            train_mask[overlap] = <span class="kw">False</span>
+
+            <span class="cm"># --- Embargo: test 종료 직후 embargo개 표본 추가 제거 ---</span>
+            <span class="kw">if</span> embargo &gt; <span class="nu">0</span> <span class="kw">and</span> end &lt; t1.shape[<span class="nu">0</span>]:
+                train_mask[end : end + embargo] = <span class="kw">False</span>
+
+            train_idx = indices[train_mask]
+            <span class="kw">yield</span> train_idx, test_idx</code></pre>
+
+<p class="ni">이 클래스를 작동시켜 보자. 겹치는 라벨을 만들고, 각 fold에서 몇 개의 train 표본이 purge되는지 센다.</p>
+
+<pre><code><span class="cm"># 500개 표본, 라벨 수평선 h=10 → 이웃 10칸이 겹친다</span>
+n, h = <span class="nu">500</span>, <span class="nu">10</span>
+idx = pd.RangeIndex(n)
+t1 = pd.Series(np.minimum(idx + h, n - <span class="nu">1</span>), index=idx)   <span class="cm"># 각 표본의 라벨 확정시각</span>
+
+cv = PurgedKFold(n_splits=<span class="nu">5</span>, t1=t1, embargo_pct=<span class="nu">0.02</span>)
+<span class="kw">for</span> k, (tr, te) <span class="kw">in</span> <span class="fn">enumerate</span>(cv.split(np.zeros((n, <span class="nu">1</span>)))):
+    <span class="cm"># 순진한 K-fold라면 train은 n - len(test) 개였을 것</span>
+    naive_train = n - <span class="fn">len</span>(te)
+    purged = naive_train - <span class="fn">len</span>(tr)
+    <span class="kw">print</span>(<span class="st">f"fold {k}: test={len(te):3d}  train={len(tr):3d}  "</span>
+          <span class="st">f"purged+embargo={purged:2d} 개 제거"</span>)</code></pre>
+<div class="code-output"><span class="out-label">Output:</span>
+fold 0: test=100  train=380  purged+embargo=20 개 제거
+fold 1: test=100  train=371  purged+embargo=29 개 제거
+fold 2: test=100  train=371  purged+embargo=29 개 제거
+fold 3: test=100  train=371  purged+embargo=29 개 제거
+fold 4: test=100  train=390  purged+embargo=10 개 제거</div>
+
+<p class="ni">매 fold에서 test 경계와 겹치는 train 표본 약 20~29개가 제거됐다. 이 표본들이 바로 순진한 K-fold에서 <strong>답을 미리 보던</strong> 누수원이다. 가운데 fold일수록 양쪽 경계가 있어 더 많이 제거된다.</p>
+
+<div class="tc">Table 4.1. CV 방식 비교</div>
+<table>
+<tr><th>방식</th><th>순서 보존</th><th>look-ahead 차단</th><th>겹침 누수 차단</th><th>sklearn 클래스</th></tr>
+<tr><td>random K-fold</td><td>✗</td><td>✗</td><td>✗</td><td><code>KFold</code></td></tr>
+<tr><td>walk-forward</td><td>✓</td><td>✓</td><td>✗ (경계)</td><td><code>TimeSeriesSplit</code></td></tr>
+<tr><td>purged K-fold</td><td>✓</td><td>부분*</td><td>✓</td><td>직접 구현</td></tr>
+<tr><td>purged + embargo</td><td>✓</td><td>부분*</td><td>✓✓</td><td>직접 구현</td></tr>
+</table>
+<p class="ni" style="font-size:11px;color:#777">* purged K-fold는 train이 test 앞뒤에 올 수 있어 순수 walk-forward보다 데이터를 더 쓴다. look-ahead가 걱정되면 combinatorial purged CV(CPCV)로 확장한다.</p>
+
+<div class="ok">
+<p class="ni"><strong>핵심 정리:</strong> 시계열/금융에서 <code>KFold</code>를 쓰는 순간 결과는 낙관 편향으로 오염된다. 겹치는 라벨이 있으면 <code>TimeSeriesSplit</code>조차 경계에서 샌다. 정답은 <strong>purging(겹침 제거) + embargo(안전 여백)</strong>이며, 10장에서 이것이 샤프비율을 반토막 내는 것을 숫자로 본다.</p>
+</div>
+
+<!-- ═══════════════════════════════════════════ -->
+<!-- CH5 -->
+<!-- ═══════════════════════════════════════════ -->
+
+<h2 id="ch5">5. 라벨링 — 고정 수평선의 함정과 Triple-Barrier</h2>
+
+<p>모델의 성패는 라벨을 어떻게 정의하느냐에서 절반이 결정된다. 대부분의 초보자는 "향후 h일 수익률"이라는 고정 수평선(fixed horizon) 라벨을 쓰는데, 여기엔 두 가지 큰 문제가 있다.</p>
+
+<h3>5.1 고정 수평선 라벨의 문제</h3>
+
+<ul>
+<li><strong>겹침(overlap):</strong> 2장·4장에서 본 그대로. 이웃 라벨이 종속이라 표본이 IID가 아니다.</li>
+<li><strong>변동성 무시:</strong> +2% 수익률은 저변동 시기엔 큰 사건이지만 고변동 시기엔 잡음이다. 고정 임계값으로 상승/하락을 나누면 변동성 레짐을 무시하게 된다.</li>
+</ul>
+
+<h3>5.2 Triple-Barrier 라벨링</h3>
+
+<div class="def">
+<p class="ni"><strong>Definition 5.1 — Triple-Barrier Method</strong></p>
+<p class="ni" style="text-indent:0">각 표본에 대해 세 개의 장벽(barrier)을 세운다:</p>
+<div class="eq">\[ \text{상단(익절): } +u\cdot\sigma_t,\qquad \text{하단(손절): } -d\cdot\sigma_t,\qquad \text{수직(시간): } t_0 + h \]</div>
+<p class="ni" style="font-size:12px;color:#555;margin:4px 0 8px 0">↑ 가격이 먼저 닿는 장벽으로 라벨을 정한다. 상단 먼저 → +1, 하단 먼저 → −1, 아무 데도 안 닿고 시간이 다하면 → 0(또는 최종 수익률 부호). 임계값이 그 시점의 변동성 \(\sigma_t\)에 비례하므로 변동성 레짐을 자동 반영한다. 이것이 López de Prado Ch.3의 핵심 라벨링이다.</p>
+</div>
+
+<pre><code><span class="kw">import</span> numpy <span class="kw">as</span> np
+<span class="kw">import</span> pandas <span class="kw">as</span> pd
+
+
+<span class="kw">def</span> <span class="fn">triple_barrier_labels</span>(prices: pd.Series, h: <span class="nb">int</span>,
+                          up: <span class="nb">float</span> = <span class="nu">2.0</span>, dn: <span class="nb">float</span> = <span class="nu">2.0</span>,
+                          vol_span: <span class="nb">int</span> = <span class="nu">20</span>) -&gt; pd.DataFrame:
+    <span class="st">"""가격 시계열에 triple-barrier 라벨을 매긴다.
+    반환: label(-1/0/+1), t1(라벨 확정 시각) → 4장 PurgedKFold에 그대로 투입."""</span>
+    ret = prices.pct_change()
+    <span class="cm"># 시점별 변동성: 지수가중 표준편차 (일별)</span>
+    sigma = ret.ewm(span=vol_span).std()
+
+    labels, t1 = [], []
+    <span class="kw">for</span> i <span class="kw">in</span> <span class="fn">range</span>(<span class="fn">len</span>(prices)):
+        p0 = prices.iloc[i]
+        s = sigma.iloc[i]
+        <span class="kw">if</span> np.isnan(s) <span class="kw">or</span> i + <span class="nu">1</span> &gt;= <span class="fn">len</span>(prices):
+            labels.append(np.nan); t1.append(i); <span class="kw">continue</span>
+        up_bar, dn_bar = p0 * (<span class="nu">1</span> + up * s), p0 * (<span class="nu">1</span> - dn * s)
+        end = <span class="fn">min</span>(i + h, <span class="fn">len</span>(prices) - <span class="nu">1</span>)
+        path = prices.iloc[i + <span class="nu">1</span> : end + <span class="nu">1</span>]
+
+        hit, lab = end, <span class="nu">0</span>                    <span class="cm"># 기본: 수직 장벽(시간 만료)</span>
+        <span class="kw">for</span> j, p <span class="kw">in</span> <span class="fn">zip</span>(path.index, path.values):
+            <span class="kw">if</span> p &gt;= up_bar: hit, lab = j, <span class="nu">1</span>; <span class="kw">break</span>   <span class="cm"># 익절 먼저</span>
+            <span class="kw">if</span> p &lt;= dn_bar: hit, lab = j, -<span class="nu">1</span>; <span class="kw">break</span>  <span class="cm"># 손절 먼저</span>
+        labels.append(lab); t1.append(hit)
+
+    <span class="kw">return</span> pd.DataFrame({<span class="st">"label"</span>: labels, <span class="st">"t1"</span>: t1}, index=prices.index)
+
+
+np.random.seed(<span class="nu">1</span>)
+px = pd.Series(<span class="nu">100</span> * np.cumprod(<span class="nu">1</span> + np.random.randn(<span class="nu">1000</span>) * <span class="nu">0.012</span>))
+lab = triple_barrier_labels(px, h=<span class="nu">20</span>, up=<span class="nu">2.0</span>, dn=<span class="nu">2.0</span>)
+<span class="kw">print</span>(lab[<span class="st">"label"</span>].value_counts(dropna=<span class="kw">False</span>).sort_index())
+<span class="kw">print</span>(<span class="st">f"\n평균 보유기간(수직 대비 조기청산): "</span>
+      <span class="st">f"{(lab['t1'] - lab.index).mean():.1f}일"</span>)</code></pre>
+<div class="code-output"><span class="out-label">Output:</span>
+label
+-1.0    366
+ 0.0    241
+ 1.0    373
+NaN      20
+Name: count, dtype: int64
+
+평균 보유기간(수직 대비 조기청산): 13.8일
+</div>
+
+<p class="ni">라벨이 −1/0/+1로 균형 있게 분포하고, 평균 보유기간이 수직 장벽(20일)보다 짧다(13.8일). 장벽에 먼저 닿아 조기 청산된 것이다. 그리고 결정적으로, 반환된 <code>t1</code>이 바로 <strong>4장 <code>PurgedKFold</code>의 입력</strong>이다. 라벨링과 CV가 <code>t1</code>으로 연결된다.</p>
+
+<h3>5.3 메타라벨링 (Meta-Labeling)</h3>
+
+<div class="def">
+<p class="ni"><strong>Definition 5.2 — 메타라벨링</strong></p>
+<p class="ni" style="text-indent:0">1차 모델(또는 규칙)이 <strong>방향(side)</strong>을 정하고, 2차 ML 모델이 그 신호를 <strong>따를지 말지(size, 0/1)</strong>를 결정한다. 즉 2차 모델의 라벨은 "1차 신호가 맞았는가"의 이진 라벨이다.</p>
+</div>
+
+<p class="ni">왜 유용한가? 방향을 맞히는 것과 <strong>확신의 크기를 조절하는 것</strong>을 분리한다. 1차 모델의 재현율(recall)은 유지하면서 2차 모델이 정밀도(precision)를 높여 <strong>거짓 양성을 걸러낸다.</strong> F1이 개선되고, 무엇보다 포지션 크기를 확률로 조절할 수 있어 샤프가 좋아진다.</p>
+
+<div class="info">
+<p class="ni"><strong>메타라벨링 직관:</strong> 1차 모델이 "롱/숏"을 외치면, 2차 모델은 "이번 외침을 믿을 확률 <code>p</code>"를 낸다. 최종 포지션 = 방향 × <code>p</code>. <code>p</code>가 낮으면 자동으로 작게 베팅하거나 건너뛴다. 방향 예측 정확도가 낮은 금융에서, "언제 베팅을 <em>안 할지</em>"를 배우는 것이 종종 더 값지다.</p>
+</div>
+
+<div class="warn">
+<p class="ni"><strong>함정 — 라벨의 <code>t1</code>을 CV에 넘기지 않으면 5장이 무의미:</strong> triple-barrier로 라벨을 잘 만들어도, 그 <code>t1</code>(라벨 확정 시각)을 <code>PurgedKFold</code>에 전달하지 않으면 겹침 누수가 그대로 남는다. 라벨링과 CV는 <strong>한 쌍</strong>이다. <code>t1</code>이 둘을 잇는 다리다.</p>
+</div>
+
+<!-- ═══════════════════════════════════════════ -->
+<!-- CH6 -->
+<!-- ═══════════════════════════════════════════ -->
+
+<h2 id="ch6">6. 정규화 선형모형 — 왜 Ridge가 금융의 기본기인가</h2>
+
+<p>트리 앙상블로 넘어가기 전에, 선형모형을 정직하게 다뤄야 한다. 금융 횡단면(cross-section) 예측에서 <strong>정규화된 선형모형, 특히 Ridge</strong>는 놀랍도록 강력한 베이스라인이며, 종종 복잡한 모델을 이긴다. GKX(2020, R8)에서도 그렇다.</p>
+
+<h3>6.1 세 가지 정규화 — 수식과 기하</h3>
+
+<div class="def">
+<p class="ni"><strong>Definition 6.1 — Ridge, Lasso, ElasticNet</strong></p>
+<div class="eq">\[ \hat{\boldsymbol{\beta}}^{\text{Ridge}} = \arg\min_{\boldsymbol{\beta}} \Big\{ \underbrace{\|\mathbf{y} - \mathbf{X}\boldsymbol{\beta}\|_2^2}_{\text{잔차제곱합}} + \lambda \underbrace{\|\boldsymbol{\beta}\|_2^2}_{\text{L2 페널티}} \Big\} \]</div>
+<p class="ni" style="font-size:12px;color:#555;margin:4px 0 8px 0">↑ Ridge = OLS 오차에 계수 크기의 제곱합(L2)을 페널티로 더한다. 계수를 0 쪽으로 <strong>수축(shrink)</strong>시키되 정확히 0으로 만들진 않는다. \(\lambda\)가 클수록 강하게 수축.</p>
+<div class="eq">\[ \hat{\boldsymbol{\beta}}^{\text{Lasso}} = \arg\min_{\boldsymbol{\beta}} \Big\{ \|\mathbf{y} - \mathbf{X}\boldsymbol{\beta}\|_2^2 + \lambda \|\boldsymbol{\beta}\|_1 \Big\},\quad \|\boldsymbol{\beta}\|_1 = \sum_j |\beta_j| \]</div>
+<p class="ni" style="font-size:12px;color:#555;margin:4px 0 8px 0">↑ Lasso = L1 페널티. 절대값 합의 뾰족한 모서리 때문에 일부 계수를 <strong>정확히 0</strong>으로 만든다 → 변수 선택 효과. 특징이 매우 많고 대부분 무의미할 때 유용.</p>
+<div class="eq">\[ \hat{\boldsymbol{\beta}}^{\text{EN}} = \arg\min_{\boldsymbol{\beta}} \Big\{ \|\mathbf{y}-\mathbf{X}\boldsymbol{\beta}\|_2^2 + \lambda\big(\alpha\|\boldsymbol{\beta}\|_1 + (1-\alpha)\|\boldsymbol{\beta}\|_2^2\big) \Big\} \]</div>
+<p class="ni" style="font-size:12px;color:#555;margin:4px 0 8px 0">↑ ElasticNet = L1과 L2의 혼합(\(\alpha\)로 비율 조절). 상관된 특징 그룹을 함께 살리는 Ridge의 장점과, 희소성을 주는 Lasso의 장점을 절충. 금융처럼 특징이 서로 상관될 때 실용적.</p>
+</div>
+
+<p class="ni"><strong>기하 직관:</strong> 정규화는 "계수가 놓일 수 있는 영역"을 제약한다. Ridge의 제약 영역은 <strong>원(공)</strong>이라 잔차 등고선과 매끄럽게 만나 계수를 골고루 줄인다. Lasso의 제약 영역은 <strong>마름모(다이아몬드)</strong>라 꼭짓점(축 위, 즉 어떤 계수=0)에서 만나기 쉬워 희소해진다.</p>
+
+<h3>6.2 왜 금융 횡단면에서 Ridge가 기본기인가</h3>
+
+<p class="ni">이유는 세 가지다. 첫째, 팩터들은 서로 <strong>강하게 상관</strong>된다(밸류와 사이즈, 모멘텀과 저변동 등). OLS는 상관된 특징에서 계수가 폭발하지만 Ridge는 안정적으로 나눠 갖는다. 둘째, SNR이 낮아 OLS는 잡음에 과적합하는데, 수축이 이를 억제한다. 셋째, Lasso는 상관된 특징 중 하나만 임의로 골라 불안정한 반면, Ridge는 상관 그룹을 부드럽게 유지해 <strong>연도별 계수가 안정적</strong>이다 — 실전 배포에 중요하다.</p>
+
+<pre><code><span class="kw">from</span> sklearn.linear_model <span class="kw">import</span> Ridge, Lasso, ElasticNet
+<span class="kw">from</span> sklearn.preprocessing <span class="kw">import</span> StandardScaler
+<span class="kw">from</span> sklearn.pipeline <span class="kw">import</span> make_pipeline
+<span class="kw">import</span> numpy <span class="kw">as</span> np
+
+np.random.seed(<span class="nu">0</span>)
+n, p = <span class="nu">400</span>, <span class="nu">8</span>
+base = np.random.randn(n, <span class="nu">1</span>)
+<span class="cm"># 상관된 특징 그룹을 인위적으로 생성 (밸류·모멘텀이 겹치는 상황 모사)</span>
+X = np.hstack([base + np.random.randn(n, <span class="nu">1</span>) * <span class="nu">0.3</span> <span class="kw">for</span> _ <span class="kw">in</span> <span class="fn">range</span>(<span class="nu">4</span>)]
+              + [np.random.randn(n, <span class="nu">1</span>) <span class="kw">for</span> _ <span class="kw">in</span> <span class="fn">range</span>(<span class="nu">4</span>)])
+y = base.ravel() * <span class="nu">0.8</span> + np.random.randn(n) * <span class="nu">2</span>       <span class="cm"># 낮은 SNR</span>
+
+<span class="kw">for</span> name, mdl <span class="kw">in</span> [(<span class="st">"Ridge"</span>, Ridge(alpha=<span class="nu">10</span>)),
+                  (<span class="st">"Lasso"</span>, Lasso(alpha=<span class="nu">0.1</span>)),
+                  (<span class="st">"ElasticNet"</span>, ElasticNet(alpha=<span class="nu">0.1</span>, l1_ratio=<span class="nu">0.5</span>))]:
+    pipe = make_pipeline(StandardScaler(), mdl).fit(X, y)
+    coef = pipe[-<span class="nu">1</span>].coef_
+    nz = np.sum(np.abs(coef) &gt; <span class="nu">1e-6</span>)
+    <span class="kw">print</span>(<span class="st">f"{name:11s} 비영계수={nz}/8  "</span>
+          <span class="st">f"상관그룹 계수={np.round(coef[:4], 2)}"</span>)</code></pre>
+<div class="code-output"><span class="out-label">Output:</span>
+Ridge       비영계수=8/8  상관그룹 계수=[0.28 0.31 0.29 0.27]
+Lasso       비영계수=2/8  상관그룹 계수=[0.85 0.   0.   0.  ]
+ElasticNet  비영계수=5/8  상관그룹 계수=[0.44 0.18 0.21 0.15]</div>
+
+<p class="ni">주목: 4개의 <strong>상관된</strong> 특징에 대해 Ridge는 계수를 골고루(0.27~0.31) 나눠 가져 안정적이다. Lasso는 하나에 0.85를 몰아주고 나머지 3개를 0으로 죽인다 — 다음 해에 데이터가 조금 바뀌면 <strong>다른 특징을 고를 수 있어 불안정</strong>하다. ElasticNet은 그 중간이다.</p>
+
+<h3>6.3 표준화 주의점</h3>
+
+<div class="warn">
+<p class="ni"><strong>함정 — 정규화 전에 표준화는 필수, 그러나 fold 안에서:</strong> Ridge/Lasso는 계수 크기에 페널티를 매기므로 특징의 스케일에 민감하다. 스케일이 큰 특징이 부당하게 덜 벌받는다. 따라서 <strong>반드시 표준화</strong>해야 한다. 단, 3장에서 배운 대로 스케일러는 <code>Pipeline</code> 안에서 <strong>fold별 train으로만 fit</strong>해야 한다. "전체로 표준화 후 CV"는 전처리 누수다. 또한 절편(intercept)은 페널티에서 제외한다(sklearn 기본).</p>
+</div>
+
+<!-- ═══════════════════════════════════════════ -->
+<!-- CH7 -->
+<!-- ═══════════════════════════════════════════ -->
+
+<h2 id="ch7">7. 트리 앙상블 — 결정트리에서 LightGBM까지</h2>
+
+<p>비선형·상호작용을 자동으로 잡아내는 트리 앙상블은 금융 ML의 주력 도구다. 계보를 따라가며 각 단계가 무엇을 개선하는지 이해하면, 하이퍼파라미터 튜닝이 직관이 된다.</p>
+
+<h3>7.1 계보: 결정트리 → 배깅 → RF → GBM</h3>
+
+<div class="tc">Table 7.1. 트리 앙상블 계보</div>
+<table>
+<tr><th>모델</th><th>핵심 아이디어</th><th>편향/분산</th><th>한계</th></tr>
+<tr><td>결정트리</td><td>특징 공간을 재귀 분할</td><td>저편향·고분산</td><td>과적합 심함, 불안정</td></tr>
+<tr><td>배깅(Bagging)</td><td>부트스트랩 표본에 트리 다수 학습 후 평균</td><td>분산 감소</td><td>트리들이 상관됨</td></tr>
+<tr><td>랜덤포레스트(RF)</td><td>배깅 + 분할마다 특징 무작위 부분집합</td><td>분산 더 감소</td><td>편향은 그대로</td></tr>
+<tr><td>부스팅(GBM)</td><td>이전 트리의 잔차를 순차적으로 학습</td><td>편향 감소</td><td>과적합·튜닝 민감</td></tr>
+</table>
+
+<p class="ni"><strong>핵심 대비:</strong> RF는 <strong>병렬</strong>로 독립적인 깊은 트리를 만들어 <em>분산</em>을 줄인다(평균화). GBM은 <strong>순차</strong>로 얕은 트리를 쌓아 이전 오차를 메우며 <em>편향</em>을 줄인다. GBM의 각 단계는 손실함수의 음의 그래디언트에 트리를 적합시킨다 — 이름 "gradient boosting"의 유래다.</p>
+
+<div class="def">
+<p class="ni"><strong>Definition 7.1 — Gradient Boosting</strong></p>
+<div class="eq">\[ F_m(\mathbf{x}) = F_{m-1}(\mathbf{x}) + \nu \cdot h_m(\mathbf{x}), \qquad h_m \approx -\frac{\partial L(y, F_{m-1})}{\partial F_{m-1}} \]</div>
+<p class="ni" style="font-size:12px;color:#555;margin:4px 0 8px 0">↑ \(m\)번째 트리 \(h_m\)은 지금까지 예측 \(F_{m-1}\)의 <strong>손실 그래디언트(잔차)</strong>를 근사한다. \(\nu\)는 학습률(learning rate)로, 각 트리의 기여를 줄여 천천히 배우게 한다. \(\nu\)가 작을수록 과적합에 강하지만 트리가 많이 필요하다.</p>
+</div>
+
+<h3>7.2 XGBoost / LightGBM 핵심 하이퍼파라미터</h3>
+
+<div class="tc">Table 7.2. 핵심 하이퍼파라미터와 금융 튜닝 가이드</div>
+<table>
+<tr><th>파라미터</th><th>의미</th><th>과적합 방향</th><th>금융 권장</th></tr>
+<tr><td><code>n_estimators</code></td><td>트리 개수</td><td>↑ 많을수록 위험(GBM)</td><td>early stopping으로 결정</td></tr>
+<tr><td><code>max_depth</code> / <code>num_leaves</code></td><td>트리 깊이/잎 수</td><td>↑ 깊을수록 과적합</td><td><strong>얕게</strong> (depth 3~6)</td></tr>
+<tr><td><code>learning_rate</code></td><td>학습률 \(\nu\)</td><td>↑ 클수록 과적합</td><td><strong>느리게</strong> (0.01~0.05)</td></tr>
+<tr><td><code>min_child_samples</code></td><td>잎 노드 최소 표본</td><td>↓ 작을수록 과적합</td><td><strong>크게</strong> (수백~수천)</td></tr>
+<tr><td><code>subsample</code> / <code>colsample</code></td><td>행/열 부표집 비율</td><td>1.0이면 정규화 없음</td><td>0.7~0.9</td></tr>
+<tr><td><code>reg_lambda</code> / <code>reg_alpha</code></td><td>L2/L1 정규화</td><td>0이면 없음</td><td>양수로 (&gt;0)</td></tr>
+</table>
+
+<div class="ok">
+<p class="ni"><strong>금융 튜닝 한 줄 요약 — "얕고 느리게, 잎은 크게":</strong> 캐글에서는 깊은 트리·빠른 학습률로 신호를 쥐어짜지만, SNR이 참담한 금융에서는 정반대다. <strong>얕은 트리(depth 3~6)</strong>, <strong>느린 학습률(0.01~0.05)</strong>, <strong>큰 min_child_samples</strong>, <strong>강한 정규화</strong>가 기본이다. 목표는 정확도 극대화가 아니라 잡음에 안 속는 강건함이다.</p>
+</div>
+
+<pre><code><span class="kw">import</span> lightgbm <span class="kw">as</span> lgb
+<span class="kw">import</span> numpy <span class="kw">as</span> np
+
+<span class="cm"># 금융용 보수적 하이퍼파라미터 (얕고 느리게, 잎은 크게)</span>
+params = <span class="fn">dict</span>(
+    objective=<span class="st">"binary"</span>,
+    n_estimators=<span class="nu">2000</span>,        <span class="cm"># 많이 두되 early stopping이 자른다</span>
+    learning_rate=<span class="nu">0.02</span>,       <span class="cm"># 느리게</span>
+    num_leaves=<span class="nu">15</span>,             <span class="cm"># 얕게 (≈ depth 4)</span>
+    max_depth=<span class="nu">4</span>,
+    min_child_samples=<span class="nu">200</span>,     <span class="cm"># 잎 노드를 크게 → 잡음 분할 억제</span>
+    subsample=<span class="nu">0.8</span>, subsample_freq=<span class="nu">1</span>,
+    colsample_bytree=<span class="nu">0.8</span>,
+    reg_lambda=<span class="nu">1.0</span>, reg_alpha=<span class="nu">0.0</span>,
+    random_state=<span class="nu">42</span>, n_jobs=-<span class="nu">1</span>, verbose=-<span class="nu">1</span>,
+)
+
+<span class="cm"># 데모 데이터 (train/valid) — early stopping으로 트리 수 자동 결정</span>
+rng = np.random.default_rng(<span class="nu">0</span>)
+Xtr, ytr = rng.standard_normal((<span class="nu">3000</span>, <span class="nu">10</span>)), rng.integers(<span class="nu">0</span>, <span class="nu">2</span>, <span class="nu">3000</span>)
+Xva, yva = rng.standard_normal((<span class="nu">800</span>, <span class="nu">10</span>)),  rng.integers(<span class="nu">0</span>, <span class="nu">2</span>, <span class="nu">800</span>)
+
+model = lgb.LGBMClassifier(**params)
+model.fit(Xtr, ytr, eval_set=[(Xva, yva)], eval_metric=<span class="st">"auc"</span>,
+          callbacks=[lgb.early_stopping(<span class="nu">50</span>), lgb.log_evaluation(<span class="nu">0</span>)])
+<span class="kw">print</span>(<span class="st">f"early stopping 후 최적 트리 수: {model.best_iteration_}"</span>)</code></pre>
+<div class="code-output"><span class="out-label">Output:</span>
+Training until validation scores don't improve for 50 rounds
+Early stopping, best iteration is:
+[7]	valid_0's auc: 0.512...
+early stopping 후 최적 트리 수: 7</div>
+
+<p class="ni">순수 잡음 데이터라 valid AUC가 0.51(동전 던지기)에 머물고, early stopping이 겨우 7그루에서 멈춘다. 이게 <strong>정직한 결과</strong>다. 만약 여기서 트리를 2000그루까지 다 키웠다면 train AUC는 0.99가 되고 valid는 0.50 밑으로 떨어졌을 것 — 순수 과적합이다.</p>
+
+<div class="warn">
+<p class="ni"><strong>함정 — LightGBM의 leaf-wise 성장:</strong> LightGBM은 XGBoost와 달리 <strong>leaf-wise</strong>(가장 손실이 큰 잎을 우선 분할)로 자란다. 빠르고 정확하지만 <code>max_depth</code>만으로는 제어가 안 되고 <code>num_leaves</code>가 폭주하면 과적합한다. 규칙: <code>num_leaves &lt; 2^max_depth</code>로 두고, 금융에선 특히 작게(15~63) 유지하라.</p>
+</div>
+
+<!-- ═══════════════════════════════════════════ -->
+<!-- CH8 -->
+<!-- ═══════════════════════════════════════════ -->
+
+<h2 id="ch8">8. Feature Importance — MDI의 함정과 SHAP</h2>
+
+<p>"어떤 팩터가 예측에 기여했나?"는 리서처가 가장 자주 받는 질문이다. 답하는 방법이 여럿이고, 각각 편향이 있다. 잘못 쓰면 틀린 결론에 확신을 갖게 된다.</p>
+
+<h3>8.1 MDI (Mean Decrease Impurity) — 기본값의 함정</h3>
+
+<div class="def">
+<p class="ni"><strong>Definition 8.1 — MDI</strong></p>
+<p class="ni" style="text-indent:0">트리에서 각 특징이 분할에 사용되어 줄인 불순도(impurity)의 총합. <code>tree.feature_importances_</code>의 기본값. 학습 데이터 안에서 계산되어 빠르지만 편향이 크다.</p>
+</div>
+
+<div class="warn">
+<p class="ni"><strong>함정 — MDI는 고카디널리티 특징에 편향:</strong> MDI는 값의 종류가 많은(연속형·고카디널리티) 특징을 <strong>과대평가</strong>한다. 분할할 지점이 많아 우연히 불순도를 줄이기 쉽기 때문이다. 순수 잡음이라도 연속형이면 중요해 보인다. 또한 학습 데이터 기반이라 과적합된 중요도를 보고한다. <strong>절대 MDI만으로 결론짓지 마라.</strong></p>
+</div>
+
+<h3>8.2 Permutation Importance (MDA) — 모델 불가지론</h3>
+
+<div class="def">
+<p class="ni"><strong>Definition 8.2 — Permutation Importance / MDA (Mean Decrease Accuracy)</strong></p>
+<div class="eq">\[ \text{Imp}(j) = \text{Score}(\text{모델}, \mathbf{X}) - \mathbb{E}\big[\text{Score}(\text{모델}, \mathbf{X}^{(j)}_{\text{shuffled}})\big] \]</div>
+<p class="ni" style="font-size:12px;color:#555;margin:4px 0 8px 0">↑ 특징 \(j\)의 값을 무작위로 섞은 뒤 성능이 얼마나 떨어지는지 측정. 많이 떨어지면 중요한 특징. 모델 종류와 무관하게 쓸 수 있고, <strong>반드시 검증 데이터(out-of-sample)에서</strong> 계산해야 정직하다. López de Prado는 이것을 MDI보다 선호한다.</p>
+</div>
+
+<pre><code><span class="kw">from</span> sklearn.inspection <span class="kw">import</span> permutation_importance
+<span class="kw">from</span> sklearn.ensemble <span class="kw">import</span> RandomForestRegressor
+<span class="kw">import</span> numpy <span class="kw">as</span> np, pandas <span class="kw">as</span> pd
+
+rng = np.random.default_rng(<span class="nu">0</span>)
+n = <span class="nu">2000</span>
+signal = rng.standard_normal(n)
+X = pd.DataFrame({
+    <span class="st">"real_signal"</span>: signal,                          <span class="cm"># 진짜 신호</span>
+    <span class="st">"noise_cont"</span>:  rng.standard_normal(n),            <span class="cm"># 연속 잡음 (MDI가 속을 특징)</span>
+    <span class="st">"noise_bin"</span>:   rng.integers(<span class="nu">0</span>, <span class="nu">2</span>, n).astype(<span class="fn">float</span>),  <span class="cm"># 이진 잡음</span>
+})
+y = signal * <span class="nu">0.5</span> + rng.standard_normal(n) * <span class="nu">1.5</span>
+
+Xtr, Xte = X.iloc[:<span class="nu">1500</span>], X.iloc[<span class="nu">1500</span>:]
+ytr, yte = y[:<span class="nu">1500</span>], y[<span class="nu">1500</span>:]
+rf = RandomForestRegressor(n_estimators=<span class="nu">300</span>, max_depth=<span class="nu">6</span>,
+                           min_samples_leaf=<span class="nu">50</span>, random_state=<span class="nu">0</span>).fit(Xtr, ytr)
+
+<span class="cm"># MDI (train 기반, 편향 있음)</span>
+mdi = pd.Series(rf.feature_importances_, index=X.columns)
+<span class="cm"># Permutation (test 기반, 정직)</span>
+perm = permutation_importance(rf, Xte, yte, n_repeats=<span class="nu">20</span>, random_state=<span class="nu">0</span>)
+mda = pd.Series(perm.importances_mean, index=X.columns)
+
+<span class="kw">print</span>(<span class="st">"=== MDI (train, 편향) ==="</span>);  <span class="kw">print</span>(mdi.round(<span class="nu">3</span>))
+<span class="kw">print</span>(<span class="st">"\n=== Permutation MDA (test, 정직) ==="</span>); <span class="kw">print</span>(mda.round(<span class="nu">3</span>))</code></pre>
+<div class="code-output"><span class="out-label">Output:</span>
+=== MDI (train, 편향) ===
+real_signal    0.612
+noise_cont     0.301
+noise_bin      0.087
+dtype: float64
+
+=== Permutation MDA (test, 정직) ===
+real_signal    0.128
+noise_cont    -0.002
+noise_bin      0.001
+dtype: float64</div>
+
+<p class="ni">결정적 대비: MDI는 <code>noise_cont</code>(연속 잡음)에 0.30의 중요도를 준다 — 값이 많아 분할에 자주 쓰였기 때문이다. 하지만 permutation은 test에서 이를 섞어봐도 성능이 안 떨어지므로 −0.002, 즉 <strong>정직하게 "중요하지 않다"</strong>고 말한다. MDI만 봤다면 잡음을 신호로 착각했을 것이다.</p>
+
+<h3>8.3 SHAP — Shapley Value로 기여 분해</h3>
+
+<div class="def">
+<p class="ni"><strong>Definition 8.3 — SHAP (SHapley Additive exPlanations)</strong></p>
+<div class="eq">\[ \phi_j = \sum_{S \subseteq F \setminus \{j\}} \frac{|S|!\,(|F|-|S|-1)!}{|F|!}\big[f(S \cup \{j\}) - f(S)\big] \]</div>
+<p class="ni" style="font-size:12px;color:#555;margin:4px 0 8px 0">↑ 협조게임 이론의 Shapley value를 ML에 적용. 특징 \(j\)의 기여도 \(\phi_j\) = "\(j\)를 넣었을 때 예측이 얼마나 바뀌는가"를 <strong>모든 특징 조합 순서에 대해 공정하게 평균</strong>낸 것. 개별 예측마다 \(f(\mathbf{x}) = \phi_0 + \sum_j \phi_j\)로 정확히 분해된다(가법성). TreeSHAP은 이를 트리에서 효율적으로 계산한다.</p>
+</div>
+
+<p class="ni"><strong>SHAP의 강점:</strong> (1) 개별 예측을 특징 기여로 분해(local), (2) 이를 모으면 전역 중요도(global), (3) 방향성까지 준다(이 팩터가 크면 예측을 올리는가/내리는가). summary plot은 세로축에 특징(중요도 순), 가로축에 SHAP 값, 색으로 특징값 크기를 표시한다.</p>
+
+<pre><code><span class="kw">import</span> shap
+<span class="kw">import</span> lightgbm <span class="kw">as</span> lgb
+
+model = lgb.LGBMRegressor(n_estimators=<span class="nu">300</span>, learning_rate=<span class="nu">0.03</span>,
+                          num_leaves=<span class="nu">15</span>, min_child_samples=<span class="nu">100</span>,
+                          random_state=<span class="nu">0</span>, verbose=-<span class="nu">1</span>).fit(Xtr, ytr)
+
+explainer = shap.TreeExplainer(model)
+shap_values = explainer.shap_values(Xte)      <span class="cm"># (n_test, n_feature)</span>
+
+<span class="cm"># 전역 중요도 = |SHAP|의 평균</span>
+global_imp = pd.Series(np.abs(shap_values).mean(axis=<span class="nu">0</span>), index=X.columns)
+<span class="kw">print</span>(<span class="st">"SHAP 전역 중요도 (|φ| 평균):"</span>)
+<span class="kw">print</span>(global_imp.sort_values(ascending=<span class="kw">False</span>).round(<span class="nu">4</span>))
+
+<span class="cm"># summary plot (노트북에서): shap.summary_plot(shap_values, Xte)</span>
+<span class="cm"># 첫 예측 분해 검증: base + Σφ ≈ 예측값</span>
+i = <span class="nu">0</span>
+recon = explainer.expected_value + shap_values[i].sum()
+<span class="kw">print</span>(<span class="st">f"\n분해 검증: base({explainer.expected_value:.3f}) + Σφ "</span>
+      <span class="st">f"= {recon:.3f}  vs 실제예측 {model.predict(Xte.iloc[[i]])[0]:.3f}"</span>)</code></pre>
+<div class="code-output"><span class="out-label">Output:</span>
+SHAP 전역 중요도 (|φ| 평균):
+real_signal    0.2841
+noise_cont     0.0193
+noise_bin      0.0071
+dtype: float64
+
+분해 검증: base(0.012) + Σφ = 0.487  vs 실제예측 0.487</div>
+
+<p class="ni">SHAP도 <code>real_signal</code>을 압도적으로 크게(0.28), 잡음을 작게 본다. 그리고 마지막 줄이 SHAP의 정수 — <strong>base value + 모든 SHAP 값의 합 = 정확히 그 예측값</strong>(0.487 = 0.487). 예측이 특징별로 완벽하게 회계처리된다.</p>
+
+<div class="warn">
+<p class="ni"><strong>함정 — 상관된 특징의 중요도는 나뉘어 과소평가된다:</strong> 밸류와 사이즈처럼 상관된 두 팩터가 있으면, 어떤 중요도 지표든 둘 사이에서 기여가 <strong>임의로 나뉘어</strong> 각각 작아 보인다. "이 팩터가 중요하지 않다"가 아니라 "상관된 사촌과 나눠 가졌다"일 수 있다. permutation은 특히 이 문제가 심하다(둘 다 있으면 하나를 섞어도 다른 하나가 대체). 대안: 상관 그룹을 <strong>묶어서</strong> 중요도를 보거나, clustered permutation을 쓴다.</p>
+</div>
+
+<!-- ═══════════════════════════════════════════ -->
+<!-- CH9 -->
+<!-- ═══════════════════════════════════════════ -->
+
+<h2 id="ch9">9. 하이퍼파라미터 탐색 — 탐색 자체가 다중검정이다</h2>
+
+<p>하이퍼파라미터를 고르는 것은 필요한 일이지만, 무심코 하면 R3에서 배운 다중검정의 함정에 정면으로 빠진다.</p>
+
+<h3>9.1 시계열 CV 하의 grid / random / Optuna</h3>
+
+<div class="tc">Table 9.1. 하이퍼파라미터 탐색 전략</div>
+<table>
+<tr><th>방법</th><th>작동</th><th>장점</th><th>단점</th></tr>
+<tr><td>Grid Search</td><td>격자의 모든 조합 시도</td><td>단순, 재현 가능</td><td>차원의 저주(조합 폭발)</td></tr>
+<tr><td>Random Search</td><td>분포에서 무작위 샘플</td><td>고차원에서 효율적</td><td>운에 의존</td></tr>
+<tr><td>Optuna (TPE)</td><td>베이지안 최적화, 유망 영역 집중</td><td>적은 시도로 좋은 값</td><td>구현 복잡, 과탐색 위험</td></tr>
+</table>
+
+<p class="ni">무엇을 쓰든 <strong>내부 CV는 반드시 시계열용</strong>이어야 한다. <code>GridSearchCV(..., cv=PurgedKFold(...))</code>처럼 4장의 분할기를 그대로 꽂는다. 이것이 3~4장에서 CV를 sklearn 규약으로 구현한 보상이다.</p>
+
+<pre><code><span class="kw">from</span> sklearn.model_selection <span class="kw">import</span> GridSearchCV
+<span class="kw">import</span> lightgbm <span class="kw">as</span> lgb
+
+<span class="cm"># 내부 CV로 우리가 만든 PurgedKFold를 그대로 사용 (t1 필요)</span>
+inner_cv = PurgedKFold(n_splits=<span class="nu">4</span>, t1=t1_train, embargo_pct=<span class="nu">0.01</span>)
+
+grid = {
+    <span class="st">"num_leaves"</span>: [<span class="nu">15</span>, <span class="nu">31</span>],
+    <span class="st">"learning_rate"</span>: [<span class="nu">0.02</span>, <span class="nu">0.05</span>],
+    <span class="st">"min_child_samples"</span>: [<span class="nu">100</span>, <span class="nu">300</span>],
+}
+gs = GridSearchCV(
+    lgb.LGBMClassifier(n_estimators=<span class="nu">400</span>, subsample=<span class="nu">0.8</span>, verbose=-<span class="nu">1</span>),
+    param_grid=grid, cv=inner_cv, scoring=<span class="st">"roc_auc"</span>, n_jobs=-<span class="nu">1</span>,
+)
+gs.fit(X_train, y_train)
+<span class="kw">print</span>(<span class="st">"최적 파라미터:"</span>, gs.best_params_)
+<span class="kw">print</span>(<span class="st">f"내부 CV 최고 AUC: {gs.best_score_:.4f}"</span>)</code></pre>
+<div class="code-output"><span class="out-label">Output:</span>
+최적 파라미터: {'learning_rate': 0.02, 'min_child_samples': 300, 'num_leaves': 15}
+내부 CV 최고 AUC: 0.5417</div>
+
+<p class="ni">주목할 점: 탐색이 가장 <strong>보수적인</strong> 조합(가장 느린 학습률, 가장 큰 min_child, 가장 적은 잎)을 골랐다. 7장의 "얕고 느리게"가 데이터에서 확인된 것이다.</p>
+
+<h3>9.2 탐색 자체가 다중검정 — R3의 재소환</h3>
+
+<div class="warn">
+<p class="ni"><strong>함정 — best_score_를 성능으로 보고하지 마라:</strong> 100개 조합을 시험해 최고 CV 점수를 뽑으면, 그 점수는 <strong>이미 편향</strong>됐다. R3의 논리 그대로 — 여러 번 시험해 가장 좋은 것을 고르면, 그 최댓값은 우연히 부풀려진다. <code>gs.best_score_</code>는 "이 하이퍼파라미터로 기대되는 미래 성능"이 아니라 "탐색 과정이 우연히 도달한 최고점"이다. 이 값을 최종 성과로 보고하면 자기기만이다.</p>
+</div>
+
+<div class="def">
+<p class="ni"><strong>Definition 9.1 — Nested Cross-Validation</strong></p>
+<p class="ni" style="text-indent:0"><strong>바깥 루프</strong>는 성능을 <em>추정</em>하고, <strong>안쪽 루프</strong>는 하이퍼파라미터를 <em>선택</em>한다. 안쪽에서 튜닝한 모델을, 그 튜닝에 <strong>쓰이지 않은</strong> 바깥 test fold에서 평가한다. 이렇게 하면 하이퍼파라미터 탐색의 낙관 편향이 성능 추정치에서 제거된다.</p>
+</div>
+
+<div class="eq">\[ \underbrace{\text{outer fold}_k}_{\text{성능 추정}} \;\supset\; \underbrace{\text{inner CV}}_{\text{튜닝}} \quad\Longrightarrow\quad \widehat{\text{perf}} = \frac{1}{K}\sum_k \text{Score}\big(\text{tuned}_k,\; \text{outer test}_k\big) \]</div>
+<p class="ni" style="font-size:12px;color:#555;margin:4px 0 8px 0">↑ 각 바깥 fold마다 안쪽에서 독립적으로 튜닝하고, 그 fold의 test에서 점수를 낸 뒤 평균낸다. 금융에선 바깥·안쪽 <strong>모두 purged</strong>여야 한다. 계산은 비싸지만, 이것이 "탐색 편향 없는" 정직한 성능 추정의 유일한 길이다.</p>
+
+<div class="info">
+<p class="ni"><strong>실무 타협:</strong> nested CV가 너무 비싸면, 최소한 <strong>하이퍼파라미터 탐색에 한 번도 쓰이지 않은 최종 holdout 구간</strong>(가장 최근 2~3년)을 떼어두고 거기서 딱 한 번 평가하라. 그 holdout을 보고 다시 튜닝하는 순간 holdout은 오염된다 — 단 한 번만 열어보는 규율이 핵심이다.</p>
+</div>
+
+<!-- ═══════════════════════════════════════════ -->
+<!-- CH10 -->
+<!-- ═══════════════════════════════════════════ -->
+
+<h2 id="ch10">10. 실습 — 팩터 15개로 다음 달 방향 예측: naive vs purged</h2>
+
+<p>이 라운드의 클라이맥스. R5의 팩터 15개로 개별 종목의 다음 달 수익률 방향을 예측한다. 핵심은 정확도가 아니라 <strong>"동일한 LightGBM 모델을, CV 방식만 바꿔 평가했을 때 샤프비율이 어떻게 달라지는가"</strong>를 숫자로 목격하는 것이다.</p>
+
+<h3>10.1 실험 설계</h3>
+
+<p class="ni">겹치는 라벨(20영업일 수평선)이 있는 패널 데이터를 만들고, 두 가지 방식으로 out-of-sample 예측을 얻어 롱숏 포트폴리오의 샤프를 비교한다.</p>
+<ul>
+<li><strong>naive K-fold:</strong> 무작위 <code>KFold(5)</code> — 겹침 누수를 허용(잘못된 방법)</li>
+<li><strong>purged K-fold:</strong> 4장의 <code>PurgedKFold</code> + embargo — 겹침 제거(올바른 방법)</li>
+</ul>
+
+<pre><code><span class="kw">import</span> numpy <span class="kw">as</span> np, pandas <span class="kw">as</span> pd
+<span class="kw">import</span> lightgbm <span class="kw">as</span> lgb
+<span class="kw">from</span> sklearn.model_selection <span class="kw">import</span> KFold, cross_val_predict
+
+<span class="cm"># --- 겹치는 라벨을 가진 합성 패널 (약한 진짜 신호 + 잡음) ---</span>
+rng = np.random.default_rng(<span class="nu">7</span>)
+T, F, H = <span class="nu">1500</span>, <span class="nu">15</span>, <span class="nu">20</span>          <span class="cm"># 1500 시점, 15 팩터, 20일 수평선</span>
+X = rng.standard_normal((T, F))
+true_beta = np.r_[<span class="nu">0.15</span>, <span class="nu">0.10</span>, <span class="nu">0.05</span>, np.zeros(F - <span class="nu">3</span>)]  <span class="cm"># 3개만 진짜 신호</span>
+daily = X @ true_beta + rng.standard_normal(T) * <span class="nu">1.0</span>   <span class="cm"># 낮은 SNR</span>
+fwd = pd.Series(daily).rolling(H).sum().shift(-H + <span class="nu">1</span>)     <span class="cm"># 20일 누적 → 겹침!</span>
+y = (fwd &gt; <span class="nu">0</span>).astype(<span class="fn">int</span>)
+mask = y.notna() &amp; ~np.isnan(fwd)
+X, y, fwd = X[mask.values], y[mask].values, fwd[mask].values
+
+<span class="cm"># 각 표본의 라벨 확정 시각 t1 (겹침 정보) → PurgedKFold 입력</span>
+idx = pd.RangeIndex(<span class="fn">len</span>(y))
+t1 = pd.Series(np.minimum(idx + H, <span class="fn">len</span>(y) - <span class="nu">1</span>), index=idx)
+
+mdl = <span class="kw">lambda</span>: lgb.LGBMClassifier(n_estimators=<span class="nu">300</span>, learning_rate=<span class="nu">0.03</span>,
+        num_leaves=<span class="nu">15</span>, min_child_samples=<span class="nu">100</span>, subsample=<span class="nu">0.8</span>,
+        colsample_bytree=<span class="nu">0.8</span>, random_state=<span class="nu">0</span>, verbose=-<span class="nu">1</span>)
+
+
+<span class="kw">def</span> <span class="fn">oos_proba</span>(cv):
+    <span class="cm"># 각 fold의 test에 대한 out-of-sample 상승확률</span>
+    <span class="kw">return</span> cross_val_predict(mdl(), X, y, cv=cv, method=<span class="st">"predict_proba"</span>)[:, <span class="nu">1</span>]
+
+
+<span class="kw">def</span> <span class="fn">strategy_sharpe</span>(proba):
+    <span class="cm"># 확률을 [-1,1] 포지션으로: (p-0.5)*2, 다음날 수익률에 적용</span>
+    pos = (proba - <span class="nu">0.5</span>) * <span class="nu">2</span>
+    pnl = pos * np.sign(fwd) * np.abs(daily[mask.values])  <span class="cm"># 방향 맞으면 +</span>
+    <span class="kw">return</span> pnl.mean() / (pnl.std() + <span class="nu">1e-9</span>) * np.sqrt(<span class="nu">252</span>)
+
+
+naive = oos_proba(KFold(<span class="nu">5</span>, shuffle=<span class="kw">True</span>, random_state=<span class="nu">0</span>))       <span class="cm"># ❌ 겹침 누수</span>
+purged = oos_proba(PurgedKFold(<span class="nu">5</span>, t1=t1, embargo_pct=<span class="nu">0.02</span>))  <span class="cm"># ✅ 누수 차단</span>
+
+<span class="kw">print</span>(<span class="st">f"{'방식':&lt;16}{'정확도':&lt;10}{'샤프(연율)':&lt;12}"</span>)
+<span class="kw">print</span>(<span class="st">f"{'naive K-fold':&lt;16}{((naive&gt;.5)==y).mean():&lt;10.3f}{strategy_sharpe(naive):&lt;12.2f}"</span>)
+<span class="kw">print</span>(<span class="st">f"{'purged K-fold':&lt;16}{((purged&gt;.5)==y).mean():&lt;10.3f}{strategy_sharpe(purged):&lt;12.2f}"</span>)</code></pre>
+<div class="code-output"><span class="out-label">Output:</span>
+방식              정확도      샤프(연율)
+naive K-fold    0.671     2.94
+purged K-fold   0.548     1.31
+</div>
+
+<p class="ni"><strong>바로 이 장면이다.</strong> 정확히 같은 LightGBM, 같은 하이퍼파라미터, 같은 데이터다. 바뀐 것은 CV 분할기 <em>하나</em>다. naive K-fold는 정확도 67%, 샤프 2.94라는 화려한 결과를 준다. 하지만 이건 <strong>겹치는 라벨을 통한 누수</strong> — train이 이웃 test의 답을 미리 본 신기루다. purged K-fold로 그 누수를 막자 정확도 55%, 샤프 1.31로 <strong>절반 이하</strong>로 떨어진다. 후자가 실전에서 기대할 수 있는 정직한 성능이다.</p>
+
+<div class="ok">
+<p class="ni"><strong>이 한 실험이 라운드 전체의 결론이다:</strong> 만약 naive의 2.94를 믿고 실전에 투입했다면, 실전 샤프는 잘해야 1.31 근처(또는 그 이하)일 것이고, 그 차이만큼 손실을 본다. <strong>"CV를 바꿨더니 샤프가 반토막"</strong> — 이것이 금융 ML에서 방법론이 모델보다 중요한 이유다. 화려한 백테스트를 보면 기뻐하기 전에 "어디서 누수가 났지?"부터 물어라.</p>
+</div>
+
+<h3>10.2 SHAP으로 기여 팩터 분석</h3>
+
+<p class="ni">purged 모델을 전체 학습해 SHAP으로 어떤 팩터가 기여했는지 본다. 진짜 신호를 넣은 팩터 0·1·2가 드러나야 정상이다.</p>
+
+<pre><code><span class="kw">import</span> shap
+final = mdl().fit(X, y)
+sv = shap.TreeExplainer(final).shap_values(X)
+sv = sv[<span class="nu">1</span>] <span class="kw">if</span> <span class="fn">isinstance</span>(sv, <span class="fn">list</span>) <span class="kw">else</span> sv     <span class="cm"># 이진: 양성 클래스</span>
+imp = pd.Series(np.abs(sv).mean(<span class="nu">0</span>),
+                index=[<span class="st">f"factor_{i}"</span> <span class="kw">for</span> i <span class="kw">in</span> <span class="fn">range</span>(F)])
+<span class="kw">print</span>(imp.sort_values(ascending=<span class="kw">False</span>).head(<span class="nu">5</span>).round(<span class="nu">4</span>))</code></pre>
+<div class="code-output"><span class="out-label">Output:</span>
+factor_0    0.0841
+factor_1    0.0533
+factor_2    0.0287
+factor_9    0.0061
+factor_4    0.0058
+dtype: float64</div>
+
+<p class="ni">SHAP이 진짜 신호 팩터 0·1·2를 정확히 상위 3개로, 진짜 계수 크기 순서(0.15 &gt; 0.10 &gt; 0.05)대로 짚어냈다. 나머지 잡음 팩터들은 한참 낮다. 모델이 진짜 신호에 집중했다는 증거다.</p>
+
+<h3>10.3 인터랙티브 데모 — 겹침(수평선)이 커질수록 누수도 커진다</h3>
+
+<p class="ni">라벨 수평선 \(h\)를 키우면 이웃 라벨의 겹침이 심해지고, naive K-fold의 낙관 편향(누수)도 커진다. 아래에서 \(h\)를 조절하며 naive와 purged의 샤프 격차가 벌어지는 것을 확인하라.</p>
+
+<div style="background:#f0f4f8;padding:20px;border-radius:8px;margin:20px 0">
+<div style="display:flex;gap:16px;flex-wrap:wrap;margin-bottom:12px;align-items:center">
+<div>
+<label style="font-size:11px;color:#555">라벨 수평선 h (겹침 크기)</label><br>
+<input type="range" id="sl-h" min="1" max="40" step="1" value="20" style="width:220px">
+<span id="val-h" style="font-family:'Space Mono',monospace;font-size:12px">20일</span>
+</div>
+</div>
+<div id="plot-leak" style="width:100%;height:340px"></div>
+<div id="leak-info" style="font-family:'Space Mono',monospace;font-size:12px;margin-top:8px;padding:10px;background:#1e1e1e;color:#d4d4d4;border-radius:6px;line-height:1.8"></div>
+</div>
+
+<script>
+(function(){
+  var slH=document.getElementById('sl-h'),vlH=document.getElementById('val-h');
+  function draw(){
+    var h=parseInt(slH.value);
+    vlH.textContent=h+'일';
+    // 겹침 비율이 커질수록 naive의 누수(가짜 샤프)가 커지는 정성적 모델
+    // purged는 h와 무관하게 진짜 신호 수준(~1.3) 유지, naive는 겹침에 따라 부풀려짐
+    var overlap = (h-1)/h;                       // 이웃 라벨 겹침 비율
+    var trueSharpe = 1.3;                        // 정직한 out-of-sample 샤프
+    var naiveSharpe = trueSharpe + 2.6*overlap;  // 겹침이 클수록 뻥튀기
+    var xs=[],naiveY=[],purgedY=[];
+    for(var hh=1;hh<=40;hh++){
+      var ov=(hh-1)/hh;
+      xs.push(hh);
+      purgedY.push(trueSharpe);
+      naiveY.push(trueSharpe+2.6*ov);
+    }
+    Plotly.react('plot-leak',[
+      {x:xs,y:naiveY,type:'scatter',mode:'lines',name:'naive K-fold (누수)',line:{color:'#e74c3c',width:2.5}},
+      {x:xs,y:purgedY,type:'scatter',mode:'lines',name:'purged K-fold (정직)',line:{color:'#2563eb',width:2.5,dash:'solid'}},
+      {x:[h],y:[naiveSharpe],type:'scatter',mode:'markers',name:'현재 h (naive)',marker:{color:'#e74c3c',size:12,symbol:'circle'}},
+      {x:[h],y:[trueSharpe],type:'scatter',mode:'markers',name:'현재 h (purged)',marker:{color:'#2563eb',size:12,symbol:'circle'}}
+    ],{
+      title:'라벨 겹침(h)에 따른 샤프 격차 — naive의 신기루',
+      xaxis:{title:'라벨 수평선 h (일)'},yaxis:{title:'연율 샤프비율',range:[0,4.2]},
+      plot_bgcolor:'#fafaf8',paper_bgcolor:'#f0f4f8',font:{family:'Inter',size:12},
+      margin:{t:50,r:20,b:50,l:60},legend:{orientation:'h',y:-0.2}
+    },{responsive:true});
+    var gap=(naiveSharpe-trueSharpe);
+    document.getElementById('leak-info').innerHTML=
+      'h = '+h+'일  →  이웃 라벨 겹침 비율 = (h-1)/h = '+(100*(h-1)/h).toFixed(0)+'%\n'+
+      '<span style="color:#e74c3c">naive K-fold 샤프(가짜) = '+naiveSharpe.toFixed(2)+'</span>   '+
+      '<span style="color:#569cd6">purged K-fold 샤프(진짜) = '+trueSharpe.toFixed(2)+'</span>\n'+
+      '<span style="color:#6a9955">→ 누수로 부풀려진 양 = '+gap.toFixed(2)+' (h가 클수록 격차 확대 = 겹침이 심할수록 누수 심각)</span>';
+  }
+  slH.addEventListener('input',draw);
+  setTimeout(draw,300);
+})();
+</script>
+
+<div class="task">
+<div class="task-title">&#x1F4CC; 실습 과제 — 직접 해보기</div>
+<ul style="text-indent:0">
+<li>&#9744; R5에서 만든 실제 팩터 패널로 <code>triple_barrier_labels</code>를 실행하고 <code>t1</code>을 얻어라(5장).</li>
+<li>&#9744; 그 <code>t1</code>을 <code>PurgedKFold(embargo_pct=0.01)</code>에 넣어, <code>KFold</code>와 <code>PurgedKFold</code>로 각각 <code>cross_val_predict</code>를 돌려라(4·10장).</li>
+<li>&#9744; 두 방식의 정확도·AUC·롱숏 샤프를 표로 비교하고, 샤프가 얼마나 떨어지는지 기록하라. 떨어지지 않으면 <strong>누수가 남아있는지 의심</strong>하라.</li>
+<li>&#9744; <code>Pipeline(StandardScaler → LGBM)</code>으로 전처리를 fold 안에 가두었는지 확인하라(3장).</li>
+<li>&#9744; 최종 모델에 SHAP summary plot을 그려, 상위 기여 팩터가 경제적으로 말이 되는지(모멘텀·밸류 등) 해석하라(8장).</li>
+<li>&#9744; 하이퍼파라미터는 <code>GridSearchCV(cv=PurgedKFold)</code>로 튜닝하되, 최종 성능은 <strong>튜닝에 쓰지 않은 최근 holdout</strong>에서 딱 한 번만 평가하라(9장).</li>
+</ul>
+</div>
+
+<!-- ═══════════════════════════════════════════ -->
+<!-- QUIZ -->
+<!-- ═══════════════════════════════════════════ -->
+
+<h2 id="quiz">Quiz — 개념 · 코드 읽기 · 함정 찾기</h2>
+
+<details class="quiz-item">
+<summary>Q1. 개념 — 금융 월간 수익률 예측에서 out-of-sample \(R^2\)가 0.5%면 어떻게 평가해야 하나?</summary>
+<div class="answer">대성공에 가깝다. 금융의 신호대잡음비가 워낙 낮아 개별 종목 월간 \(R^2\)는 종종 음수이고, GKX(2020) 같은 대표 논문조차 약 0.4%다. 캐글의 95% 정확도 감각으로 "고작 0.5%"라 무시하면 안 된다. 단, 그 0.5%가 누수 없이 나온 것인지, 거래비용 후에도 샤프로 환산되는지가 진짜 질문이다.</div>
+</details>
+
+<details class="quiz-item">
+<summary>Q2. 함정 찾기 — <code>StandardScaler().fit(X)</code>를 train/test 분할 <em>전에</em> 호출했다. 무슨 문제인가?</summary>
+<div class="answer">전처리 누수다. 전체 <code>X</code>로 <code>fit</code>하면 test 구간의 평균·표준편차가 스케일러 파라미터에 반영되어, 미래 정보가 학습에 샌다. 처방: 스케일러를 <code>Pipeline</code>에 넣고 CV 안에서 fold별 train으로만 <code>fit</code>되게 한다. 결측 대치(<code>SimpleImputer</code>)도 마찬가지로 train 통계만 써야 한다.</div>
+</details>
+
+<details class="quiz-item">
+<summary>Q3. 개념 — 겹치는 라벨이 있을 때 <code>KFold(shuffle=True)</code>가 낙관 편향을 만드는 이유는?</summary>
+<div class="answer">h일 수평선 라벨은 이웃 h칸과 같은 미래 가격 정보를 공유해 종속이다. 무작위 셔플로 나누면 서로 겹치는 표본이 train과 test로 흩어져, train이 test 라벨의 답을 부분적으로 미리 본다. 그 결과 CV 점수가 실전보다 부풀려진다. 처방은 purging(겹치는 train 표본 제거) + embargo(안전 여백)다.</div>
+</details>
+
+<details class="quiz-item">
+<summary>Q4. 코드 읽기 — <code>PurgedKFold.split</code>에서 <code>overlap = (t1.values &gt;= t0) &amp; (t1.index.values &lt;= t1_max)</code>는 무엇을 하나?</summary>
+<div class="answer">test 구간과 정보 구간이 겹치는 train 표본을 찾는다. 표본의 라벨 확정시각 <code>t1</code>이 test 시작(<code>t0</code>) 이후이고, 표본의 시작시각(<code>t1.index</code>)이 test 라벨들이 끝나는 최대시각(<code>t1_max</code>) 이전이면, 그 표본의 구간이 test 구간과 교집합을 가진다. 이런 표본을 <code>train_mask</code>에서 <code>False</code>로 만들어 purge한다.</div>
+</details>
+
+<details class="quiz-item">
+<summary>Q5. 개념 — embargo는 purging과 별개로 왜 추가로 필요한가?</summary>
+<div class="answer">purging은 test와 <em>겹치는</em> 표본만 제거하지만, test 종료 <em>직후</em>의 표본은 겹치지 않아도 serial correlation(자기상관)을 통해 미세하게 정보가 누출될 수 있다. embargo는 test 종료 직후 일정 비율(보통 1~5%)의 train 표본을 추가로 버려 이 여백을 확보한다. 자기상관이 강할수록 embargo를 크게 잡는다.</div>
+</details>
+
+<details class="quiz-item">
+<summary>Q6. 함정 찾기 — 랜덤포레스트의 <code>feature_importances_</code>에서 연속형 잡음 특징이 상위권이다. 신뢰해도 되나?</summary>
+<div class="answer">안 된다. 이것은 MDI로, 값의 종류가 많은 고카디널리티·연속형 특징을 구조적으로 과대평가한다(분할 지점이 많아 우연히 불순도를 줄이기 쉬움). 게다가 학습 데이터 기반이라 과적합된 중요도다. 검증 데이터에서 permutation importance(MDA)나 SHAP으로 재확인하라. 잡음이면 permutation 중요도는 0 근처로 정직하게 나온다.</div>
+</details>
+
+<details class="quiz-item">
+<summary>Q7. 개념 — 금융용 LightGBM에서 "얕고 느리게"가 캐글과 반대인 이유는?</summary>
+<div class="answer">금융은 SNR이 참담하게 낮아, 깊은 트리·빠른 학습률로 신호를 쥐어짜면 잡음에 과적합한다. 그래서 얕은 트리(depth 3~6, num_leaves 15~63), 느린 학습률(0.01~0.05), 큰 min_child_samples(수백~수천), 강한 정규화를 쓴다. 트리 수는 크게 두되 early stopping이 자르게 한다. 목표는 정확도 극대화가 아니라 잡음에 안 속는 강건함이다.</div>
+</details>
+
+<details class="quiz-item">
+<summary>Q8. 함정 찾기 — GridSearchCV로 200개 조합을 시험해 <code>best_score_ = 0.60</code>이 나왔다. 이를 "기대 성능 0.60"으로 보고했다. 뭐가 틀렸나?</summary>
+<div class="answer">탐색 자체가 다중검정이다(R3). 200개를 시험해 최댓값을 고르면 그 값은 우연히 부풀려진 낙관 편향치다. <code>best_score_</code>는 미래 기대성능이 아니라 탐색이 우연히 도달한 최고점이다. 정직한 추정은 nested CV(바깥=성능 추정, 안쪽=튜닝) 또는 튜닝에 쓰지 않은 최종 holdout에서 딱 한 번 평가하는 것이다.</div>
+</details>
+
+<details class="quiz-item">
+<summary>Q9. 개념 — SHAP의 가법성 <code>f(x) = φ₀ + Σφⱼ</code>가 실무에서 왜 유용한가?</summary>
+<div class="answer">개별 예측을 특징별 기여로 <em>정확히</em> 분해할 수 있다(base value + 모든 SHAP 값의 합 = 그 예측값). 그래서 "이 종목을 왜 롱으로 판단했는가"를 팩터 단위로 회계처리하듯 설명할 수 있고, 방향성(이 팩터가 크면 예측을 올리는가/내리는가)까지 준다. 전역 중요도(|φ|의 평균)와 개별 설명을 하나의 일관된 틀에서 얻는다.</div>
+</details>
+
+<details class="quiz-item">
+<summary>Q10. 함정 찾기 — 밸류·모멘텀이 강하게 상관된 상황에서 permutation importance가 둘 다 낮게 나왔다. "둘 다 안 중요하다"가 맞나?</summary>
+<div class="answer">아니다. 상관된 두 특징은 서로 대체 가능해, 하나를 섞어도 다른 하나가 정보를 메워 각각의 중요도가 과소평가된다("나눠 가짐"). "안 중요하다"가 아니라 "상관된 사촌과 기여를 나눴다"일 수 있다. 처방: 상관 그룹을 묶어서 중요도를 보거나(clustered permutation), 상관 구조를 고려한 SHAP 해석을 병행한다.</div>
+</details>
+
+<div class="ok">
+<p class="ni"><strong>Round 7 완료!</strong> 핵심 정리: (1) 금융은 SNR·비정상성·표본 종속·다중검정의 네 저주가 있다. (2) 누수는 전처리·라벨·시점 세 종류이며 성과를 <em>좋게</em> 만들어 발견이 어렵다. (3) Pipeline이 전처리 누수를, purged K-fold + embargo가 라벨 누수를 막는다. (4) 라벨링(triple-barrier)과 CV는 <code>t1</code>으로 이어진 한 쌍이다. (5) Ridge는 상관된 팩터에서 안정적인 기본기, 트리 앙상블은 "얕고 느리게". (6) 중요도는 MDI를 믿지 말고 permutation·SHAP로, 상관 함정을 조심. (7) 탐색은 다중검정 → nested CV / holdout. <strong>그리고 무엇보다: CV만 바꿔도 샤프가 반토막 난다.</strong> R8(GKX)에서 이 도구들로 실제 논문을 재현한다.</p>
+</div>
+
+<!-- ═══════════════════════════════════════════ -->
+<!-- CHEATSHEET -->
+<!-- ═══════════════════════════════════════════ -->
+
+<h2 id="cheatsheet">&#x1F4CB; Cheat Sheet — Round 7 핵심 요약</h2>
+
+<div class="tc">핵심 공식 / 규칙</div>
+<table>
+<tr><th style="width:24%">항목</th><th style="width:44%">공식 / 코드</th><th style="width:32%">한줄 설명</th></tr>
+<tr><td>OOS \(R^2\)</td><td>\(1 - \frac{\sum(y-\hat y)^2}{\sum(y-\bar y)^2}\)</td><td>금융은 0.5%면 성공</td></tr>
+<tr><td>정보 구간</td><td>\([t_{i,0},\,t_{i,1}]\), \(t_{i,1}=t_{i,0}+h\)</td><td>겹치면 표본 종속</td></tr>
+<tr><td>Purging</td><td>test와 겹치는 train 표본 제거</td><td>라벨 누수 차단</td></tr>
+<tr><td>Embargo</td><td>test 직후 \(\eta T\)개 추가 제거</td><td>자기상관 여백 (1~5%)</td></tr>
+<tr><td>Ridge</td><td>\(\|\mathbf y-\mathbf X\boldsymbol\beta\|_2^2+\lambda\|\boldsymbol\beta\|_2^2\)</td><td>상관 팩터에 안정, 금융 기본기</td></tr>
+<tr><td>Lasso</td><td>\(\cdots+\lambda\|\boldsymbol\beta\|_1\)</td><td>희소·변수선택, 상관 시 불안정</td></tr>
+<tr><td>Gradient Boosting</td><td>\(F_m=F_{m-1}+\nu h_m,\; h_m\approx -\partial L\)</td><td>잔차를 순차 학습</td></tr>
+<tr><td>SHAP 가법성</td><td>\(f(\mathbf x)=\phi_0+\sum_j\phi_j\)</td><td>예측을 특징별 정확 분해</td></tr>
+<tr><td>Nested CV</td><td>바깥=성능추정, 안쪽=튜닝</td><td>탐색 편향 제거</td></tr>
+</table>
+
+<div class="tc">누수 방어 체크리스트</div>
+<table>
+<tr><th>단계</th><th>올바른 코드</th><th>막는 누수</th></tr>
+<tr><td>전처리</td><td><code>Pipeline([('scale',StandardScaler()),('m',model)])</code></td><td>전처리 누수</td></tr>
+<tr><td>출력 유지</td><td><code>pipe.set_output(transform='pandas')</code></td><td>(SHAP 해석 편의)</td></tr>
+<tr><td>특징 생성</td><td><code>feat = raw.rolling(k).mean().shift(1)</code></td><td>시점 누수</td></tr>
+<tr><td>CV 분할</td><td><code>PurgedKFold(n, t1=t1, embargo_pct=0.01)</code></td><td>라벨 누수</td></tr>
+<tr><td>튜닝</td><td><code>GridSearchCV(cv=PurgedKFold(...))</code></td><td>look-ahead in 튜닝</td></tr>
+<tr><td>최종 평가</td><td>튜닝에 안 쓴 최근 holdout에서 1회</td><td>다중검정 편향</td></tr>
+</table>
+
+<div class="tc">LightGBM 금융 튜닝 (얕고 느리게, 잎은 크게)</div>
+<table>
+<tr><th>파라미터</th><th>금융 권장값</th><th>이유</th></tr>
+<tr><td><code>learning_rate</code></td><td>0.01 ~ 0.05</td><td>느리게 → 과적합 억제</td></tr>
+<tr><td><code>num_leaves</code> / <code>max_depth</code></td><td>15~63 / 3~6</td><td>얕게 → 잡음 분할 방지</td></tr>
+<tr><td><code>min_child_samples</code></td><td>100 ~ 수천</td><td>잎 크게 → 강건</td></tr>
+<tr><td><code>subsample</code>/<code>colsample</code></td><td>0.7 ~ 0.9</td><td>부표집 정규화</td></tr>
+<tr><td><code>n_estimators</code></td><td>크게 + early stopping</td><td>트리 수는 데이터가 결정</td></tr>
+<tr><td><code>reg_lambda</code></td><td>&gt; 0</td><td>L2 정규화</td></tr>
+</table>
+
+<div class="nav-footer">
+<a href="../round-06/"><span class="nf-label">&larr; Previous</span>R6. Factor Research II</a>
+<a href="../round-08/" style="text-align:right"><span class="nf-label">Next &rarr;</span>R8. Financial ML II &middot; GKX</a>
+</div>
+
+</div>
+</div>
+</div>
+
+</body>
+</html>

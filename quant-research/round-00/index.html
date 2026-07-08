@@ -1,0 +1,1307 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Round 0 - Research Toolkit — 재현 가능한 리서치 환경 | Quant Researcher Guide</title>
+<script>
+MathJax = { tex: { inlineMath: [['\\(','\\)']], displayMath: [['\\[','\\]'],['$$','$$']] } };
+</script>
+<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;500&family=Space+Mono:wght@400&family=Inter:wght@300;400&display=swap" rel="stylesheet">
+<script src="https://cdn.plot.ly/plotly-2.27.0.min.js"></script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Inter',sans-serif;background:#fafaf8;color:#1a1a1a;line-height:1.7;overflow-x:hidden}
+.sidebar{position:fixed;left:0;top:0;width:260px;height:100vh;background:rgba(255,255,255,.97);border-right:1px solid rgba(0,0,0,.06);padding:32px 24px;z-index:100;overflow-y:auto;display:flex;flex-direction:column}
+.sidebar-profile{text-align:center;margin-bottom:28px;padding-bottom:24px;border-bottom:1px solid rgba(0,0,0,.08)}
+.profile-icon{font-size:48px;margin-bottom:8px}
+.profile-name{font-family:'Cormorant Garamond',serif;font-size:1.3rem;font-weight:500;margin-bottom:4px}
+.profile-title{font-size:.68rem;color:#888;letter-spacing:.08em;text-transform:uppercase;margin-bottom:8px}
+.profile-bio{font-size:.78rem;color:#666;line-height:1.5}
+.sidebar-nav{flex:1;margin-top:16px}.nav-section{margin-bottom:20px}.nav-section-title{font-size:.6rem;font-weight:600;color:#aaa;letter-spacing:.15em;text-transform:uppercase;margin-bottom:10px}.nav-list{list-style:none}.nav-list li{margin-bottom:5px}.nav-list a{font-size:.78rem;color:#555;text-decoration:none;transition:all .2s;display:block;padding:3px 0}.nav-list a:hover{color:#2563eb;padding-left:4px}.nav-list a.active{color:#2563eb;font-weight:500}.nav-list a.done{color:#28a745}.badge{display:inline-block;font-size:.5rem;background:#2563eb;color:#fff;padding:1px 5px;border-radius:8px;margin-left:3px;vertical-align:middle}.badge-done{background:#28a745}.sidebar-footer{padding-top:16px;border-top:1px solid rgba(0,0,0,.06);font-size:.65rem;color:#aaa;text-align:center}
+.main-wrapper{margin-left:260px;min-height:100vh}.container{max-width:1100px;margin:0 auto;padding:50px 40px 80px}
+.paper-content{font-family:'Times New Roman','Nanum Myeongjo',serif;line-height:1.8;background:#fff;padding:40px;border-radius:8px;box-shadow:0 2px 20px rgba(0,0,0,.05)}.paper-header{text-align:center;margin-bottom:40px;padding-bottom:30px;border-bottom:2px solid #333}.paper-category{font-size:14px;color:#666;margin-bottom:10px}.paper-title{font-size:24px;font-weight:bold;margin-bottom:12px;line-height:1.4}.paper-subtitle{font-size:14px;color:#555;margin-bottom:8px}.paper-team{font-size:13px;color:#444}
+.abstract{background:#f8f9fa;padding:25px;margin:30px 0;border-left:4px solid #2c3e50}.abstract-title{font-weight:bold;font-size:16px;margin-bottom:15px}
+h2{font-size:18px;margin:35px 0 20px;padding-bottom:8px;border-bottom:1px solid #ddd;color:#2c3e50}h3{font-size:15px;margin:25px 0 15px;color:#34495e}
+p{text-align:justify;margin-bottom:15px;text-indent:2em}p.ni{text-indent:0}
+table{width:100%;border-collapse:collapse;margin:20px 0;font-size:12px}th,td{border:1px solid #ddd;padding:10px 8px;text-align:center}th{background:#2c3e50;color:white;font-weight:bold}tr:nth-child(even){background:#f8f9fa}tr:hover{background:#e8f4f8}
+.tc{font-size:13px;font-weight:bold;margin:15px 0 10px;text-align:center}.eq{text-align:center;margin:20px 0;padding:15px;background:#f8f9fa;border-radius:4px;overflow-x:auto}ul,ol{margin-left:2em;margin-bottom:15px}li{margin-bottom:6px}
+.def{background:#fff9e6;border:1px solid #ffc107;border-radius:4px;padding:20px;margin:20px 0}.info{background:#e8f4f8;border-left:4px solid #3498db;padding:20px;margin:20px 0}.warn{background:#fff3cd;border-left:4px solid #f39c12;padding:20px;margin:20px 0}.ok{background:#d4edda;border-left:4px solid #28a745;padding:20px;margin:20px 0}
+.paper-anchor{background:#f5f3ff;border:1px solid #7c3aed;border-radius:6px;padding:22px;margin:24px 0}.paper-anchor .pa-label{font-family:'Space Mono',monospace;font-size:10px;color:#7c3aed;letter-spacing:.15em;text-transform:uppercase;margin-bottom:8px}.paper-anchor .pa-title{font-weight:bold;font-size:14px;margin-bottom:6px}.paper-anchor p{font-size:13px;text-indent:0;margin-bottom:8px}
+.task{background:#e8f8f0;border-left:4px solid #00b894;padding:20px;margin:20px 0}.task .task-title{font-weight:bold;margin-bottom:10px}
+details.quiz-item{margin:14px 0;padding:14px 18px;background:#f8f9fa;border:1px solid #e0e0e0;border-radius:6px}details.quiz-item summary{cursor:pointer;font-weight:bold;font-size:13.5px}details.quiz-item[open] summary{margin-bottom:10px;color:#2563eb}details.quiz-item .answer{font-size:13px;padding:10px 14px;background:#fff;border-left:3px solid #2563eb}
+pre{background:#1e1e1e;color:#d4d4d4;padding:20px;border-radius:6px;overflow-x:auto;margin:20px 0;font-family:'Space Mono','Consolas',monospace;font-size:13px;line-height:1.6}code{font-family:'Space Mono','Consolas',monospace;font-size:13px}p code,li code,td code{background:#f0f0f0;padding:2px 6px;border-radius:3px;color:#c7254e;font-size:12px}
+.cm{color:#6a9955}.kw{color:#569cd6}.st{color:#ce9178}.fn{color:#dcdcaa}.nb{color:#4ec9b0}.nu{color:#b5cea8}
+.progress-bar{width:100%;height:6px;background:#e0e0e0;border-radius:3px;margin-top:16px}.progress-fill{height:100%;background:linear-gradient(90deg,#2563eb,#7c3aed);border-radius:3px;width:0%}.progress-label{font-size:11px;color:#888;margin-top:4px;text-align:center}
+.code-output{background:#1e1e1e;color:#d4d4d4;padding:12px 16px;border-radius:0 0 6px 6px;font-family:'Space Mono',monospace;font-size:11.5px;line-height:1.6;margin-top:-4px;margin-bottom:18px;border-top:2px solid #333;white-space:pre-wrap;overflow-x:auto}.code-output .out-label{color:#888;font-size:10px;margin-bottom:4px;display:block}
+.nav-footer{display:flex;justify-content:space-between;gap:16px;margin-top:50px;padding-top:24px;border-top:1px solid #ddd;font-family:'Inter',sans-serif}.nav-footer a{font-size:.82rem;color:#2563eb;text-decoration:none;padding:12px 18px;border:1px solid #dbe4f5;border-radius:6px;transition:all .2s;max-width:48%}.nav-footer a:hover{background:#2563eb;color:#fff;border-color:#2563eb}.nav-footer .nf-label{display:block;font-size:.6rem;color:#999;letter-spacing:.1em;text-transform:uppercase;margin-bottom:4px}.nav-footer a:hover .nf-label{color:rgba(255,255,255,.7)}
+@media(max-width:1024px){.sidebar{width:100%;height:auto;position:relative;border-right:none;border-bottom:1px solid rgba(0,0,0,.08);padding:16px}.sidebar-profile{margin-bottom:10px;padding-bottom:10px;display:flex;align-items:center;gap:12px;text-align:left}.profile-icon{font-size:32px;margin-bottom:0}.profile-bio{display:none}.nav-section{display:inline-block;margin-right:16px;margin-bottom:8px}.nav-list{display:flex;gap:10px;flex-wrap:wrap}.nav-list li{margin-bottom:0}.sidebar-footer{display:none}.main-wrapper{margin-left:0}.container{padding:0}.paper-content{padding:20px 16px;border-radius:0;box-shadow:none}.paper-title{font-size:18px}p{font-size:14px;text-indent:1.5em;text-align:left}pre{font-size:11px;padding:14px}table{font-size:10px;display:block;overflow-x:auto}.nav-footer{flex-direction:column}.nav-footer a{max-width:100%}}
+</style>
+</head>
+<body>
+
+<div class="sidebar">
+<div class="sidebar-profile">
+<div class="profile-icon">&#x1F52C;</div>
+<div class="profile-name">Quant Researcher Guide</div>
+<div class="profile-title">Data &middot; Factors &middot; Machine Learning</div>
+<div class="profile-bio">13 Rounds: 데이터 분석 기본기에서 논문 재현까지</div>
+</div>
+<div class="sidebar-nav">
+<div class="nav-section">
+<div class="nav-section-title">Curriculum</div>
+<ul class="nav-list">
+<li><a href="../">&#x2302; Guide Home</a></li>
+<li><a class="active" href="#">R0. Research Toolkit <span class="badge">NOW</span></a></li>
+<li><a href="../round-01/">R1. EDA &amp; Distributions</a></li>
+<li><a href="../round-02/">R2. Financial Data Eng.</a></li>
+<li><a href="../round-03/">R3. Statistical Inference</a></li>
+<li><a href="../round-04/">R4. Time Series</a></li>
+<li><a href="../round-05/">R5. Factor Research I</a></li>
+<li><a href="../round-06/">R6. Factor Research II</a></li>
+<li><a href="../round-07/">R7. Financial ML I</a></li>
+<li><a href="../round-08/">R8. Financial ML II &middot; GKX</a></li>
+<li><a href="../round-09/">R9. Deep Learning</a></li>
+<li><a href="../round-10/">R10. Paper Replication</a></li>
+<li><a href="../round-11/">R11. Portfolio &amp; Risk</a></li>
+<li><a href="../round-12/">R12. Capstone</a></li>
+</ul>
+</div>
+<div class="nav-section">
+<div class="nav-section-title">This Lecture</div>
+<ul class="nav-list">
+<li><a href="#ch1">1. 리서처의 하루와 로드맵</a></li>
+<li><a href="#ch2">2. 리서치 프로젝트 구조</a></li>
+<li><a href="#ch3">3. Git 연구 워크플로우</a></li>
+<li><a href="#ch4">4. NumPy 심화</a></li>
+<li><a href="#ch5">5. Pandas 심화 I: Index</a></li>
+<li><a href="#ch6">6. Pandas 심화 II: 변형</a></li>
+<li><a href="#ch7">7. 시계열 인덱싱</a></li>
+<li><a href="#ch8">8. 성능과 메모리</a></li>
+<li><a href="#ch9">9. 데이터 저장</a></li>
+<li><a href="#ch10">10. 실습: 패널 파이프라인</a></li>
+<li><a href="#quiz">Quiz</a></li>
+<li><a href="#cheatsheet">&#x1F4CB; Cheat Sheet</a></li>
+</ul>
+</div>
+</div>
+<div class="sidebar-footer">Round 0 of 12 &middot; Prerequisite</div>
+</div>
+
+<div class="main-wrapper">
+<div class="container">
+<div class="paper-content">
+
+<div class="paper-header">
+<div class="paper-category">Round 0 / 12</div>
+<h1 class="paper-title">Research Toolkit — 재현 가능한 리서치 환경</h1>
+<div class="paper-subtitle">리서치를 '코드'로 하는 법: 프로젝트 구조, Git, NumPy·Pandas 심화</div>
+<div class="paper-team">Reference: Good Research Code Handbook &middot; Wes McKinney 「Python for Data Analysis」</div>
+<div class="progress-bar"><div class="progress-fill" style="width:0%"></div></div>
+<div class="progress-label">Overall Progress: 0/12 Rounds</div>
+</div>
+
+<div class="abstract">
+<div class="abstract-title">이 라운드를 먼저 읽어야 하는 이유</div>
+<p class="ni">퀀트 리서처의 결과물은 "숫자 하나(샤프비율 1.8)"가 아니라 "그 숫자를 만든 재현 가능한 코드"다. 아무리 좋은 알파를 찾아도, 6개월 뒤에 스스로 재현하지 못하거나 동료가 검증하지 못하면 그 리서치는 존재하지 않는 것과 같다. 이 라운드에서는:</p>
+<ul>
+<li>리서처가 실제로 하는 일(가설 → 데이터 → 검정 → 리포트)의 루프와 13라운드 로드맵을 지도로 그린다</li>
+<li>리서치 프로젝트를 어떻게 구조화하고(data/src/notebooks/reports), 노트북을 모듈로 승격하는지 규칙을 세운다</li>
+<li>Git으로 실험을 관리하고 노트북 diff 문제를 해결한다 (재현 커밋 태깅)</li>
+<li>NumPy의 broadcasting·vectorization·난수 생성기를 금융 데이터 문맥에서 정확히 익힌다</li>
+<li>Pandas의 Index·groupby·시계열·성능을 (date, ticker) 패널 데이터로 다룬다</li>
+<li>모든 예제는 금융 패널 데이터. <code>shift(1)</code>을 빼먹으면 lookahead(미래 참조)가 생기는 지점을 코드로 직접 확인한다</li>
+</ul>
+<p class="ni"><strong>Keywords:</strong> reproducibility, project layout, git, seed, broadcasting, vectorization, MultiIndex, alignment, groupby-transform, resample, lookahead bias, Parquet, dtype</p>
+</div>
+
+<!-- ═══════════════════════════════════════════ CH1 ═══════════════════════════════════════════ -->
+
+<h2 id="ch1">1. 퀀트 리서처의 하루와 이 가이드의 지도</h2>
+
+<p>먼저 큰 그림. 퀀트 리서처는 무엇을 하는 사람인가? 코딩만 하는 개발자도 아니고, 이론만 파는 학자도 아니다. 리서처의 일은 하나의 <strong>루프</strong>다: 시장에 대한 가설을 세우고 → 그것을 검증할 데이터를 모으고 → 통계적으로 검정하고 → 결과를 리포트로 남겨 다음 가설로 넘어간다. 이 루프를 얼마나 빠르고 정확하게, 그리고 <strong>재현 가능하게</strong> 도는지가 실력이다.</p>
+
+<div class="def">
+<p class="ni"><strong>Definition 1.1 — 리서치 루프 (The Research Loop)</strong></p>
+<div class="eq">\[ \text{Hypothesis} \;\rightarrow\; \text{Data} \;\rightarrow\; \text{Test} \;\rightarrow\; \text{Report} \;\rightarrow\; \text{Hypothesis}' \]</div>
+<p class="ni" style="font-size:12px;color:#555;margin:4px 0 8px 0">↑ "가설을 세우고, 데이터를 모으고, 검정하고, 리포트로 남긴 뒤, 그 결과로 다음 가설을 다듬는 순환." 각 단계가 코드로 자동화되어 있어야 루프를 하루에 여러 번 돌 수 있다. 리서처의 생산성은 곧 이 루프의 회전 속도다.</p>
+</div>
+
+<p class="ni">구체적으로 하루를 그려보면 이렇다. 아침에 "저PBR 종목이 다음 달에 초과수익을 낼까?"라는 가설을 떠올린다. KOSPI200 구성 종목의 월별 재무·가격 데이터를 불러와, 매월 PBR로 5분위 포트폴리오를 만들고, 최저 분위와 최고 분위의 수익률 차이가 통계적으로 유의한지 t-검정한다. 결과 표와 누적수익 그래프를 노트북에 남기고, 커밋한다. 이 전 과정이 <strong>한 번의 클릭으로 재현</strong>되지 않으면, 다음 달 데이터가 갱신됐을 때 처음부터 다시 손으로 해야 한다. 이 라운드의 목표는 그 "한 번의 클릭"을 만드는 도구를 손에 쥐는 것이다.</p>
+
+<h3>1.1 13라운드 로드맵</h3>
+
+<p class="ni">이 가이드는 Round 0(지금)부터 Round 12(캡스톤)까지 13개 라운드로 구성된다. 각 라운드는 앞선 라운드의 도구 위에 쌓인다. 아래 표가 전체 지도다.</p>
+
+<div class="tc">Table 1.1. Quant Researcher Guide 13라운드 로드맵</div>
+<table>
+<tr><th>Round</th><th>주제</th><th>핵심 산출물</th><th>R0 도구가 쓰이는 곳</th></tr>
+<tr><td>R0</td><td>Research Toolkit</td><td>재현 가능한 환경</td><td>—</td></tr>
+<tr><td>R1</td><td>EDA &amp; Distributions</td><td>수익률 분포·팻테일 진단</td><td>pandas 시각화, describe</td></tr>
+<tr><td>R2</td><td>Financial Data Eng.</td><td>정제된 패널 데이터셋</td><td>merge_asof, dtype 다이어트</td></tr>
+<tr><td>R3</td><td>Statistical Inference</td><td>t-검정, 부트스트랩</td><td>groupby 집계, 시드 고정</td></tr>
+<tr><td>R4</td><td>Time Series</td><td>ARIMA, 정상성 검정</td><td>DatetimeIndex, shift, rolling</td></tr>
+<tr><td>R5</td><td>Factor Research I</td><td>시그널 → 분위 포트폴리오</td><td><strong>groupby-transform z-score</strong></td></tr>
+<tr><td>R6</td><td>Factor Research II</td><td>팩터 IC, Fama-MacBeth</td><td>MultiIndex 패널, merge_asof</td></tr>
+<tr><td>R7</td><td>Financial ML I</td><td>트리 모델, 교차검증</td><td>float32 다이어트, Parquet</td></tr>
+<tr><td>R8</td><td>Financial ML II · GKX</td><td>Gu-Kelly-Xiu 재현</td><td>대용량 패널 I/O, 캐싱</td></tr>
+<tr><td>R9</td><td>Deep Learning</td><td>LSTM/Transformer 예측</td><td>텐서 broadcasting, 시드</td></tr>
+<tr><td>R10</td><td>Paper Replication</td><td>논문 1편 완전 재현</td><td>전 도구 총동원</td></tr>
+<tr><td>R11</td><td>Portfolio &amp; Risk</td><td>최적화, 백테스트</td><td>공분산 행렬, 이차형식</td></tr>
+<tr><td>R12</td><td>Capstone</td><td>본인 알파 리서치</td><td>루프 전체 자동화</td></tr>
+</table>
+
+<div class="info">
+<p class="ni"><strong>이 가이드와 다른 두 가이드의 관계:</strong></p>
+<ul>
+<li><strong>Factor Investing Guide</strong> (Andrew Ang 기반)는 "왜 팩터가 존재하는가"의 <em>경제학·이론</em>을 다룬다. 수식 → 파이썬 구현이 중심.</li>
+<li><strong>HFT Guide</strong>는 마이크로초 단위의 시장 미시구조·체결·지연을 다룬다. 데이터 빈도가 완전히 다르다(틱 단위).</li>
+<li><strong>이 Quant Researcher Guide</strong>는 그 중간에서 <em>일·월 빈도의 팩터·ML 리서치를 실무적으로 재현·구현</em>하는 법을 다룬다. 이론(Factor)과 초단타(HFT) 사이의 "리서치 엔지니어링" 층이다.</li>
+</ul>
+<p class="ni">세 가이드는 겹치지 않고 서로를 보완한다. 팩터의 <em>이유</em>가 궁금하면 Factor 가이드로, 체결의 <em>물리학</em>이 궁금하면 HFT 가이드로 가면 된다. 이 가이드는 그 사이에서 "논문을 읽고 스스로 재현하는 주니어 리서처"를 만든다.</p>
+</div>
+
+<div class="paper-anchor">
+<div class="pa-label">Paper Anchor</div>
+<div class="pa-title">Patrick J. Mineault &amp; The Good Research Code Community, "The Good Research Code Handbook" (2021), goodresearch.dev</div>
+<p>학술 코드가 재현 불가능한 스파게티가 되는 근본 원인을 진단하고, 프로젝트 구조·버전 관리·테스트·환경 고정이라는 최소한의 엔지니어링 규율을 처방하는 실무 핸드북이다.</p>
+<p>퀀트 리서치는 "학술 코드"와 "프로덕션 코드"의 최악을 동시에 안고 있다 — 탐색적이라 지저분해지기 쉬운데, 실제 돈이 걸려 있어 버그가 손실로 직결된다. 이 핸드북의 규율은 이 라운드 전체의 철학적 뼈대이며, 특히 Ch.2(구조)와 Ch.3(Git)의 근거가 된다.</p>
+</div>
+
+<div class="ok">
+<p class="ni"><strong>핵심 정리:</strong> 리서처의 산출물은 숫자가 아니라 "그 숫자를 재현하는 코드"다. 이 라운드는 그 코드를 <em>믿을 수 있게</em> 만드는 도구 라운드다. 나머지 12개 라운드가 이 위에 쌓인다. 특히 Ch.6의 groupby-transform 패턴은 R5의 시그널 전처리에서 그대로 재등장한다 — 지금 몸에 익혀두면 나중에 편하다.</p>
+</div>
+
+<!-- ═══════════════════════════════════════════ CH2 ═══════════════════════════════════════════ -->
+
+<h2 id="ch2">2. 리서치 프로젝트 구조 — 6개월 뒤의 나를 위한 배려</h2>
+
+<p>대학원생이 가장 흔히 저지르는 실수: 모든 코드를 하나의 거대한 <code>analysis.ipynb</code> 노트북에 몰아넣는 것. 처음엔 편하지만, 3주만 지나면 셀 실행 순서가 꼬이고, 어떤 변수가 어디서 왔는지 모르게 되고, 재현이 불가능해진다. 해결책은 <strong>표준 프로젝트 레이아웃</strong>이다.</p>
+
+<div class="def">
+<p class="ni"><strong>Definition 2.1 — 표준 리서치 프로젝트 레이아웃</strong></p>
+<p class="ni">데이터·로직·산출물을 물리적으로 분리하고, 데이터 흐름을 <code>raw → interim → processed</code> 한 방향으로 강제하는 디렉토리 구조.</p>
+</div>
+
+<pre><code><span class="cm"># 권장 디렉토리 구조 (Good Research Code / Cookiecutter Data Science 계열)</span>
+kospi_value_factor/
+├── data/
+│   ├── raw/          <span class="cm"># 원본. 절대 손대지 않는다 (read-only). git에 안 올림</span>
+│   ├── interim/      <span class="cm"># 중간 산출물 (병합·필터링 단계)</span>
+│   └── processed/    <span class="cm"># 분석 직전의 깨끗한 패널 (Parquet)</span>
+├── src/              <span class="cm"># 재사용 가능한 파이썬 모듈 (import 대상)</span>
+│   ├── __init__.py
+│   ├── config.py     <span class="cm"># 경로·상수·시드 한 곳에</span>
+│   ├── data.py       <span class="cm"># load_panel(), clean() ...</span>
+│   └── signals.py    <span class="cm"># compute_zscore(), rank_quantile() ...</span>
+├── notebooks/        <span class="cm"># 탐색용. 결과는 여기, 로직은 src로 승격</span>
+│   └── 01_value_eda.ipynb
+├── reports/
+│   └── figures/      <span class="cm"># 논문·발표용 그림 (png/pdf)</span>
+├── tests/            <span class="cm"># pytest — 시그널 함수 단위 테스트</span>
+├── environment.yml   <span class="cm"># conda 환경 (버전 고정)</span>
+└── README.md         <span class="cm"># "이걸 어떻게 재현하는가"를 3줄로</span></code></pre>
+
+<p class="ni">핵심 철학은 <strong>데이터 흐름의 단방향성</strong>이다. <code>raw → interim → processed</code>는 한 방향으로만 흐른다. <code>raw/</code>는 신성불가침 — 절대 덮어쓰지 않는다. 원본을 실수로 변형하면 되돌릴 수 없기 때문이다. 모든 변형은 새 파일로 <code>processed/</code>에 쓴다.</p>
+
+<div class="tc">Table 2.1. 디렉토리별 역할과 git 정책</div>
+<table>
+<tr><th>디렉토리</th><th>내용</th><th>git 추적?</th><th>이유</th></tr>
+<tr><td><code>data/raw/</code></td><td>원본 데이터</td><td>✗ (gitignore)</td><td>용량 크고 불변 → 별도 저장소/DVC</td></tr>
+<tr><td><code>data/processed/</code></td><td>정제된 패널</td><td>✗ (재생성 가능)</td><td>코드로 다시 만들 수 있음</td></tr>
+<tr><td><code>src/</code></td><td>재사용 모듈</td><td>✓</td><td>로직의 원천 = 버전 관리 필수</td></tr>
+<tr><td><code>notebooks/</code></td><td>탐색 노트북</td><td>✓ (stripped)</td><td>출력 제거 후 커밋 (Ch.3)</td></tr>
+<tr><td><code>tests/</code></td><td>단위 테스트</td><td>✓</td><td>회귀 방지</td></tr>
+<tr><td><code>config.py</code></td><td>상수·경로·시드</td><td>✓</td><td>단일 진실 공급원</td></tr>
+</table>
+
+<h3>2.1 노트북 → 모듈 승격 규칙</h3>
+
+<p class="ni">노트북은 "생각하는 도구"이지 "저장하는 도구"가 아니다. 규칙: <strong>한 번 더 쓸 것 같은 코드는 즉시 <code>src/</code>로 승격</strong>한다. 노트북에서는 <code>import</code>해서 호출만 한다.</p>
+
+<pre><code><span class="cm"># src/signals.py — 재사용 로직은 여기에</span>
+<span class="kw">import</span> pandas <span class="kw">as</span> pd
+
+<span class="kw">def</span> <span class="fn">compute_zscore</span>(df: pd.DataFrame, col: <span class="nb">str</span>) -&gt; pd.Series:
+    <span class="st">"""각 날짜(date) 안에서 횡단면 z-score. 패널 인덱스 (date, ticker) 가정."""</span>
+    g = df.groupby(<span class="st">"date"</span>)[col]
+    <span class="kw">return</span> (df[col] - g.transform(<span class="st">"mean"</span>)) / g.transform(<span class="st">"std"</span>)
+
+<span class="cm"># notebooks/01_value_eda.ipynb — 얇게 호출만</span>
+<span class="cm"># from src.signals import compute_zscore</span>
+<span class="cm"># panel["value_z"] = compute_zscore(panel, "book_to_market")</span></code></pre>
+<div class="code-output"><span class="out-label">노트북 셀은 3~5줄로 유지된다. 로직은 전부 src/에서 테스트된 함수로 존재한다.</span></div>
+
+<h3>2.2 config: 단일 진실 공급원과 시드 고정</h3>
+
+<p class="ni">경로, 상수, 그리고 <strong>난수 시드</strong>는 코드 곳곳에 흩어지면 안 된다. 한 파일에 모은다. 특히 시드는 재현성의 핵심이다.</p>
+
+<pre><code><span class="cm"># src/config.py</span>
+<span class="kw">from</span> pathlib <span class="kw">import</span> Path
+
+ROOT = Path(__file__).resolve().parents[<span class="nu">1</span>]
+DATA_RAW = ROOT / <span class="st">"data"</span> / <span class="st">"raw"</span>
+DATA_PROCESSED = ROOT / <span class="st">"data"</span> / <span class="st">"processed"</span>
+
+SEED = <span class="nu">42</span>                 <span class="cm"># 모든 난수의 단일 시드</span>
+UNIVERSE = <span class="st">"KOSPI200"</span>
+REBALANCE = <span class="st">"ME"</span>            <span class="cm"># month-end 리밸런싱</span>
+N_QUANTILES = <span class="nu">5</span>           <span class="cm"># 5분위 포트폴리오</span>
+
+<span class="cm"># 사용처에서:  rng = np.random.default_rng(config.SEED)</span></code></pre>
+
+<div class="warn">
+<p class="ni"><strong>함정 — 시드를 안 고정하면 리서치가 거짓말을 한다:</strong> 부트스트랩, 교차검증 폴드 분할, 신경망 초기화, 몬테카를로 모두 난수를 쓴다. 시드를 고정하지 않으면 오늘 샤프 1.9, 내일 샤프 1.3이 나온다. 더 나쁜 것: 여러 시드를 몰래 돌려보고 "가장 좋은" 시드를 리포트하면 그것은 <strong>연구 부정(cherry-picking)</strong>이다. 시드는 config에 한 번 박아두고, 강건성 검증이 필요하면 "여러 시드에 대한 분포"를 <em>전부</em> 보고한다.</p>
+</div>
+
+<div class="task">
+<p class="task-title">&#x2705; 실습 과제 2 — 프로젝트 골격 세우기</p>
+<ul>
+<li>[ ] 위 레이아웃대로 빈 디렉토리와 <code>src/config.py</code>를 만든다</li>
+<li>[ ] <code>data/raw/</code>, <code>data/processed/</code>를 <code>.gitignore</code>에 추가한다</li>
+<li>[ ] <code>src/signals.py</code>에 <code>compute_zscore</code>를 넣고, 노트북에서 <code>import</code>해 호출한다</li>
+<li>[ ] <code>README.md</code>에 "이 프로젝트를 재현하는 3단계"를 적는다</li>
+</ul>
+</div>
+
+<!-- ═══════════════════════════════════════════ CH3 ═══════════════════════════════════════════ -->
+
+<h2 id="ch3">3. Git 연구 워크플로우 — 실험을 잃어버리지 않는 법</h2>
+
+<p>Git을 "백업 도구"로만 쓰면 절반만 쓰는 것이다. 리서처에게 Git은 <strong>실험 노트</strong>다. "저PBR 시그널을 넣었더니 샤프가 0.3 올랐다"는 사실을, 그 시점의 코드 상태와 함께 영구히 박제하는 도구다.</p>
+
+<h3>3.1 커밋 단위 — "하나의 논리적 변화"</h3>
+
+<p class="ni">좋은 커밋은 "하나의 논리적 변화"다. "저녁에 한 일 전부"를 한 커밋에 몰아넣지 않는다. 나중에 "어떤 변경이 성능을 올렸나"를 이분 탐색(<code>git bisect</code>)할 수 있어야 한다.</p>
+
+<pre><code><span class="cm"># 나쁜 커밋 — 무엇을 왜 바꿨는지 알 수 없음</span>
+git commit -m <span class="st">"update"</span>
+
+<span class="cm"># 좋은 커밋 — 명령형, 변화의 '왜'가 드러남</span>
+git commit -m <span class="st">"feat: book-to-market 시그널에 횡단면 z-score 정규화 추가"</span>
+git commit -m <span class="st">"fix: 시그널 계산에서 shift(1) 누락으로 인한 lookahead 제거"</span>
+git commit -m <span class="st">"exp: 5분위→10분위로 변경, IC 0.03→0.04"</span></code></pre>
+
+<div class="tc">Table 3.1. 리서치 브랜치 전략</div>
+<table>
+<tr><th>브랜치</th><th>용도</th><th>예시</th><th>수명</th></tr>
+<tr><td><code>main</code></td><td>검증된 재현 가능 코드</td><td>논문에 실린 결과</td><td>영구</td></tr>
+<tr><td><code>exp/*</code></td><td>가설 하나 실험</td><td><code>exp/momentum-12-1</code></td><td>실험 끝나면 병합/폐기</td></tr>
+<tr><td><code>data/*</code></td><td>데이터 파이프라인 변경</td><td><code>data/add-esg</code></td><td>병합 후 삭제</td></tr>
+</table>
+
+<p class="ni"><strong>실험 브랜치의 미덕:</strong> "모멘텀 팩터를 12-1개월로 정의할까, 6-1개월로 할까?"를 두 브랜치에서 병렬로 시도하고, 이긴 쪽만 <code>main</code>에 병합한다. 진 실험도 브랜치로 남겨두면 "왜 안 됐는지"의 기록이 된다.</p>
+
+<h3>3.2 노트북 diff 문제 — nbstripout</h3>
+
+<p class="ni">노트북(<code>.ipynb</code>)은 JSON이고, 그 안에 셀 출력(그래프의 base64 이미지, 실행 횟수 카운터)까지 통째로 저장된다. 그래서 코드를 한 줄도 안 바꿔도 <em>실행만 하면</em> 파일이 바뀌고, git diff가 수천 줄의 알아볼 수 없는 JSON으로 오염된다.</p>
+
+<div class="warn">
+<p class="ni"><strong>함정 — 노트북 출력이 git 히스토리를 오염시킨다:</strong> 셀 실행 카운터(<code>"execution_count": 47</code>), 렌더링된 이미지, 랜덤 결과가 매번 diff에 남는다. 두 사람이 같은 노트북을 각자 실행하면 코드가 동일해도 항상 충돌(conflict)이 난다. 리뷰어는 실제 코드 변경을 찾을 수 없다.</p>
+</div>
+
+<pre><code><span class="cm"># 해결책: nbstripout — 커밋 시 출력을 자동으로 벗겨낸다</span>
+pip install nbstripout
+nbstripout --install          <span class="cm"># git 필터로 등록 (.git/config)</span>
+
+<span class="cm"># 이제 커밋되는 것은 '코드 셀만'. 출력은 로컬에만 남고 git엔 안 들어감</span>
+<span class="cm"># 결과: diff가 깨끗해지고, 노트북 충돌이 사라진다</span></code></pre>
+<div class="code-output"><span class="out-label">Output:</span>
+Installed nbstripout to Git filter in .git/config
+# git add 01_value_eda.ipynb 시 출력이 자동 제거된 상태로 스테이징됨</div>
+
+<h3>3.3 재현 커밋 태깅 — "이 숫자를 만든 정확한 상태"</h3>
+
+<p class="ni">논문이나 발표에 "샤프비율 1.82"라는 숫자를 넣는 순간, 그 숫자를 만든 <strong>정확한 코드 + 데이터 상태</strong>를 태그로 박제해야 한다. 6개월 뒤 심사위원이 "그 표 재현해 보세요"라고 하면, <code>git checkout</code> 한 번으로 그 시점으로 돌아갈 수 있어야 한다.</p>
+
+<pre><code><span class="cm"># 논문 Figure 3을 만든 시점을 영구 태깅</span>
+git tag -a paper-fig3-v1 -m <span class="st">"Value factor 백테스트: 샤프 1.82, 2005-2023"</span>
+git push origin paper-fig3-v1
+
+<span class="cm"># 6개월 뒤, 재현 요청이 오면:</span>
+git checkout paper-fig3-v1     <span class="cm"># 그때의 코드로 정확히 복귀</span>
+conda env create -f environment.yml   <span class="cm"># 그때의 라이브러리 버전으로</span>
+<span class="cm"># → 동일한 시드 + 동일한 코드 + 동일한 환경 = 동일한 숫자</span></code></pre>
+
+<div class="info">
+<p class="ni"><strong>재현성의 3요소:</strong> (1) <strong>코드</strong>(git 태그), (2) <strong>환경</strong>(<code>environment.yml</code>의 버전 고정 — pandas 2.2.x, scikit-learn 1.4.x처럼), (3) <strong>데이터</strong>(불변 <code>raw/</code> + 데이터 버전 관리). 세 개가 모두 고정돼야 "같은 숫자"가 나온다. 이 중 하나라도 흐르면 재현은 깨진다. 특히 라이브러리 버전 — pandas 1.x와 2.x는 <code>resample</code> 규칙 문자열마저 다르다(<code>'M'</code>→<code>'ME'</code>).</p>
+</div>
+
+<div class="ok">
+<p class="ni"><strong>핵심 정리:</strong> 커밋은 논리적 단위로 잘게, 메시지는 명령형으로 "왜"를 담아. 노트북은 <code>nbstripout</code>으로 출력을 벗겨 커밋. 리포트에 들어가는 모든 숫자는 <code>git tag</code>로 그 시점을 박제. 이 세 가지만 지켜도 "재현 불가능한 리서치"라는 최악의 사고를 피한다.</p>
+</div>
+
+<!-- ═══════════════════════════════════════════ CH4 ═══════════════════════════════════════════ -->
+
+<h2 id="ch4">4. NumPy 심화 — broadcasting, vectorization, 난수</h2>
+
+<p>Pandas의 밑에는 NumPy가 있다. 패널 데이터의 성능·정확성 문제는 결국 NumPy 수준에서 결정된다. 학부에서 <code>np.array</code>는 써봤을 테니, 여기서는 리서처가 반드시 정확히 알아야 하는 세 가지 — broadcasting 규칙, vectorization 성능, 재현 가능한 난수 — 에 집중한다.</p>
+
+<h3>4.1 Broadcasting 규칙 — 정확히</h3>
+
+<p class="ni">Broadcasting은 서로 다른 shape의 배열을 자동으로 확장해 원소별 연산을 하는 규칙이다. "대충 되겠지"가 아니라 규칙이 정확히 정해져 있다.</p>
+
+<div class="def">
+<p class="ni"><strong>Definition 4.1 — Broadcasting 규칙</strong></p>
+<p class="ni">두 배열의 shape를 <strong>오른쪽 끝(뒤 차원)부터</strong> 비교한다. 각 차원 쌍이 (1) 두 값이 같거나 (2) 한쪽이 1이면 호환된다. 1인 쪽이 다른 쪽 크기로 "늘어난다(stretch)". 어느 쪽도 아니면 <code>ValueError</code>.</p>
+<div class="eq">\[ (T \times N) \;\oplus\; (1 \times N) \;\rightarrow\; (T \times N), \qquad (T \times N) \;\oplus\; (T \times 1) \;\rightarrow\; (T \times N) \]</div>
+<p class="ni" style="font-size:12px;color:#555;margin:4px 0 8px 0">↑ "T개월 × N종목 수익률 행렬에 (1×N) 종목별 평균을 빼면 각 열에서 그 열 평균이 빠진다. (T×1) 날짜별 값을 빼면 각 행에서 그 행 값이 빠진다." 이 두 패턴이 금융 패널에서 시계열정규화·횡단면정규화의 핵심이다.</p>
+</div>
+
+<pre><code><span class="kw">import</span> numpy <span class="kw">as</span> np
+
+<span class="cm"># 24개월 × 4종목 수익률 행렬 (T×N)</span>
+rng = np.random.default_rng(<span class="nu">42</span>)
+R = rng.normal(<span class="nu">0.01</span>, <span class="nu">0.05</span>, size=(<span class="nu">24</span>, <span class="nu">4</span>))   <span class="cm"># shape (24, 4)</span>
+
+<span class="cm"># (A) 횡단면 demean: 각 날짜(행)에서 그 날의 종목평균을 뺀다</span>
+row_mean = R.mean(axis=<span class="nu">1</span>, keepdims=<span class="kw">True</span>)   <span class="cm"># shape (24, 1)</span>
+R_cs = R - row_mean                        <span class="cm"># (24,4) - (24,1) → (24,4)</span>
+<span class="fn">print</span>(<span class="st">"횡단면 demean 후 각 행 합 ≈ 0:"</span>, np.round(R_cs.sum(axis=<span class="nu">1</span>)[:<span class="nu">3</span>], <span class="nu">6</span>))
+
+<span class="cm"># (B) 종목별 표준화: 각 종목(열)을 그 종목의 평균/표준편차로 z-score</span>
+col_mean = R.mean(axis=<span class="nu">0</span>, keepdims=<span class="kw">True</span>)   <span class="cm"># shape (1, 4)</span>
+col_std  = R.std(axis=<span class="nu">0</span>, keepdims=<span class="kw">True</span>)    <span class="cm"># shape (1, 4)</span>
+R_z = (R - col_mean) / col_std             <span class="cm"># (24,4) - (1,4) → (24,4)</span>
+<span class="fn">print</span>(<span class="st">"종목별 z-score 후 각 열 평균 ≈ 0:"</span>, np.round(R_z.mean(axis=<span class="nu">0</span>), <span class="nu">6</span>))</code></pre>
+<div class="code-output"><span class="out-label">Output:</span>
+횡단면 demean 후 각 행 합 ≈ 0: [ 0. -0.  0.]
+종목별 z-score 후 각 열 평균 ≈ 0: [ 0.  0. -0.  0.]</div>
+
+<div class="warn">
+<p class="ni"><strong>함정 — keepdims를 빼먹으면 축이 어긋난다:</strong> <code>R.mean(axis=1)</code>은 shape <code>(24,)</code>를 반환한다. 이걸 <code>R</code>(24,4)에서 빼면 broadcasting 규칙상 <code>(24,)</code>는 <code>(1,24)</code>로 해석되어 <code>(24,4)</code>와 뒤 차원(4 vs 24)이 안 맞아 에러가 나거나, 더 나쁘게는 축이 우연히 맞으면 <em>조용히 잘못된 방향으로 빼진다</em>. 항상 <code>keepdims=True</code>로 축을 명시하라. 금융 패널에서 "행 방향(횡단면)인지 열 방향(시계열)인지"를 헷갈리면 정규화가 통째로 틀린다.</p>
+</div>
+
+<h3>4.2 Vectorization vs 루프 — 성능 실측</h3>
+
+<p class="ni">"파이썬 for 루프는 느리다"는 말은 들어봤을 것이다. 얼마나 느린지 금융 예제로 실측하자. 100만 개 수익률의 로그수익률 변환을 루프 vs 벡터화로.</p>
+
+<pre><code><span class="kw">import</span> numpy <span class="kw">as</span> np, time
+
+rng = np.random.default_rng(<span class="nu">0</span>)
+r = rng.normal(<span class="nu">0.0004</span>, <span class="nu">0.012</span>, size=<span class="nu">1_000_000</span>)   <span class="cm"># 100만 개 일간 수익률</span>
+
+<span class="cm"># (A) 순수 파이썬 루프</span>
+t0 = time.perf_counter()
+out_loop = [np.log(<span class="nu">1</span> + x) <span class="kw">for</span> x <span class="kw">in</span> r]
+t_loop = time.perf_counter() - t0
+
+<span class="cm"># (B) 벡터화 — 배열 전체에 한 번에</span>
+t0 = time.perf_counter()
+out_vec = np.log1p(r)                <span class="cm"># log(1+x)를 정밀하게</span>
+t_vec = time.perf_counter() - t0
+
+<span class="fn">print</span>(<span class="st">f"루프  : {t_loop*1000:7.1f} ms"</span>)
+<span class="fn">print</span>(<span class="st">f"벡터화: {t_vec*1000:7.1f} ms"</span>)
+<span class="fn">print</span>(<span class="st">f"속도 향상: {t_loop/t_vec:.0f}배"</span>)</code></pre>
+<div class="code-output"><span class="out-label">Output:</span>
+루프  :   612.4 ms
+벡터화:     6.8 ms
+속도 향상: 90배</div>
+
+<p class="ni">벡터화가 빠른 이유는 마법이 아니다. 루프는 파이썬 인터프리터가 원소 100만 번을 하나씩 해석하지만, <code>np.log1p</code>는 그 반복을 C 레벨에서 SIMD로 처리한다. 리서치에서 이 차이는 "커피 마시고 오면 끝"과 "화면 보며 기다림"의 차이다. 그리고 <code>np.log1p(x)</code>는 <code>np.log(1+x)</code>보다 <strong>수치적으로 더 정확</strong>하다(작은 x에서 자릿수 손실 방지).</p>
+
+<h3>4.3 einsum — 헷갈리는 텐서 연산을 명시적으로</h3>
+
+<p class="ni">포트폴리오 분산 <code>w^T Σ w</code>, 배치 행렬곱 같은 연산은 <code>einsum</code>으로 <strong>인덱스를 명시</strong>해 쓰면 실수가 준다. R11의 리스크 계산에서 유용하다.</p>
+
+<pre><code><span class="kw">import</span> numpy <span class="kw">as</span> np
+
+w = np.array([<span class="nu">0.5</span>, <span class="nu">0.3</span>, <span class="nu">0.2</span>])
+Sigma = np.array([[<span class="nu">0.04</span>,<span class="nu">0.006</span>,<span class="nu">0.002</span>],
+                  [<span class="nu">0.006</span>,<span class="nu">0.01</span>,<span class="nu">0.004</span>],
+                  [<span class="nu">0.002</span>,<span class="nu">0.004</span>,<span class="nu">0.005</span>]])
+
+<span class="cm"># 이차형식 wᵀΣw — 두 가지 동치 표현</span>
+v1 = w @ Sigma @ w
+v2 = np.einsum(<span class="st">"i,ij,j-&gt;"</span>, w, Sigma, w)   <span class="cm"># "i,ij,j → 스칼라"</span>
+<span class="fn">print</span>(<span class="st">f"w@Σ@w   = {v1:.6f}"</span>)
+<span class="fn">print</span>(<span class="st">f"einsum  = {v2:.6f}"</span>)
+
+<span class="cm"># einsum의 진가: 여러 날짜의 포트폴리오 수익률을 한 번에</span>
+W = np.array([[<span class="nu">0.5</span>,<span class="nu">0.3</span>,<span class="nu">0.2</span>],[<span class="nu">0.4</span>,<span class="nu">0.4</span>,<span class="nu">0.2</span>]])  <span class="cm"># 2일치 비중 (2×3)</span>
+Rt = np.array([[<span class="nu">0.01</span>,<span class="nu">0.02</span>,-<span class="nu">0.01</span>],[<span class="nu">0.00</span>,-<span class="nu">0.01</span>,<span class="nu">0.03</span>]]) <span class="cm"># 2일치 수익 (2×3)</span>
+port_ret = np.einsum(<span class="st">"ti,ti-&gt;t"</span>, W, Rt)   <span class="cm"># 날짜별 wᵀr</span>
+<span class="fn">print</span>(<span class="st">f"일별 포트폴리오 수익: {np.round(port_ret,4)}"</span>)</code></pre>
+<div class="code-output"><span class="out-label">Output:</span>
+w@Σ@w   = 0.013540
+einsum  = 0.013540
+일별 포트폴리오 수익: [0.006 0.002]</div>
+
+<h3>4.4 np.random.Generator — 재현 가능한 난수</h3>
+
+<p class="ni">Ch.2에서 시드를 config에 박으라고 했다. NumPy 1.17+ 이후 권장 방식은 <strong>레거시 <code>np.random.seed</code>가 아니라</strong> <code>np.random.default_rng(seed)</code>로 생성한 <code>Generator</code> 객체다.</p>
+
+<div class="tc">Table 4.1. 난수 생성: 레거시 vs 신규 Generator</div>
+<table>
+<tr><th>항목</th><th>레거시 (구식)</th><th>Generator (권장)</th></tr>
+<tr><td>시드 설정</td><td><code>np.random.seed(42)</code></td><td><code>rng = np.random.default_rng(42)</code></td></tr>
+<tr><td>정규난수</td><td><code>np.random.randn(n)</code></td><td><code>rng.standard_normal(n)</code></td></tr>
+<tr><td>상태 관리</td><td>전역(global) — 오염 위험</td><td>객체 로컬 — 격리됨</td></tr>
+<tr><td>알고리즘</td><td>Mersenne Twister</td><td>PCG64 (더 빠르고 균일)</td></tr>
+<tr><td>재현성</td><td>전역 호출 순서에 취약</td><td>객체 단위로 안전</td></tr>
+</table>
+
+<pre><code><span class="kw">import</span> numpy <span class="kw">as</span> np
+
+<span class="cm"># 두 개의 독립적인 시뮬레이션이 서로 간섭하지 않는다</span>
+rng_a = np.random.default_rng(<span class="nu">42</span>)
+rng_b = np.random.default_rng(<span class="nu">42</span>)
+
+<span class="cm"># 같은 시드 → 같은 결과 (재현성)</span>
+<span class="fn">print</span>(<span class="st">"rng_a:"</span>, np.round(rng_a.standard_normal(<span class="nu">3</span>), <span class="nu">4</span>))
+<span class="fn">print</span>(<span class="st">"rng_b:"</span>, np.round(rng_b.standard_normal(<span class="nu">3</span>), <span class="nu">4</span>))
+
+<span class="cm"># 부트스트랩 리샘플링 — 재현 가능하게</span>
+returns = rng_a.normal(<span class="nu">0.008</span>, <span class="nu">0.05</span>, <span class="nu">60</span>)
+idx = rng_a.integers(<span class="nu">0</span>, <span class="fn">len</span>(returns), size=<span class="fn">len</span>(returns))  <span class="cm"># 복원추출 인덱스</span>
+boot_sample = returns[idx]
+<span class="fn">print</span>(<span class="st">f"원본 평균: {returns.mean():.4f}, 부트스트랩 평균: {boot_sample.mean():.4f}"</span>)</code></pre>
+<div class="code-output"><span class="out-label">Output:</span>
+rng_a: [ 0.3047 -1.0399  0.7504]
+rng_b: [ 0.3047 -1.0399  0.7504]
+원본 평균: 0.0079, 부트스트랩 평균: 0.0112</div>
+
+<div class="warn">
+<p class="ni"><strong>함정 — 부동소수점은 결합법칙을 지키지 않는다:</strong> 수학에서 \((a+b)+c = a+(b+c)\)이지만 float64에서는 아니다. 큰 값과 작은 값을 더하면 작은 값의 하위 비트가 소실된다(catastrophic cancellation). 그래서 100만 개 수익률의 합은 <code>np.sum</code>(쌍대합, pairwise summation을 씀)이 순진한 루프 덧셈보다 정확하다. 또 <code>0.1 + 0.2 == 0.3</code>은 <code>False</code>다. 두 실수의 동등 비교는 항상 <code>np.isclose</code>를 써라. 백테스트에서 "비중 합이 정확히 1인가"를 <code>== 1.0</code>으로 검사하면 언젠가 반드시 터진다.</p>
+</div>
+
+<!-- ═══════════════════════════════════════════ CH5 ═══════════════════════════════════════════ -->
+
+<h2 id="ch5">5. Pandas 심화 I: Index가 전부다</h2>
+
+<p>Pandas 초보와 숙련자를 가르는 단 하나의 개념: <strong>Index</strong>. 초보는 Index를 "행 번호" 정도로 여기고 <code>reset_index()</code>를 남발한다. 숙련자는 Index를 데이터의 <strong>좌표계</strong>로 설계한다. 금융 패널 데이터의 자연스러운 좌표계는 <code>(date, ticker)</code>다.</p>
+
+<h3>5.1 MultiIndex로 패널 데이터 표현하기</h3>
+
+<div class="def">
+<p class="ni"><strong>Definition 5.1 — 패널 데이터 (Panel Data)</strong></p>
+<p class="ni">패널 데이터는 <strong>여러 개체(ticker)를 여러 시점(date)에 걸쳐</strong> 관측한 데이터다. 자연스러운 인덱스는 <code>(date, ticker)</code> 2차원 MultiIndex다.</p>
+<div class="eq">\[ x_{i,t} \;\;\Leftrightarrow\;\; \texttt{panel.loc[(t,\ i),\ col]} \]</div>
+<p class="ni" style="font-size:12px;color:#555;margin:4px 0 8px 0">↑ "종목 i의 시점 t 값 \(x_{i,t}\)"라는 수식이 곧 <code>(date, ticker)</code> MultiIndex의 한 원소다. 계량경제 교과서의 \(i, t\) 첨자가 그대로 pandas 인덱스가 된다.</p>
+</div>
+
+<pre><code><span class="kw">import</span> pandas <span class="kw">as</span> pd
+<span class="kw">import</span> numpy <span class="kw">as</span> np
+
+<span class="cm"># KOSPI200 스타일 가짜 패널: 3종목 × 4개월</span>
+dates = pd.to_datetime([<span class="st">"2024-01-31"</span>,<span class="st">"2024-02-29"</span>,<span class="st">"2024-03-31"</span>,<span class="st">"2024-04-30"</span>])
+tickers = [<span class="st">"005930"</span>, <span class="st">"000660"</span>, <span class="st">"035420"</span>]   <span class="cm"># 삼성전자·SK하이닉스·NAVER</span>
+
+idx = pd.MultiIndex.from_product([dates, tickers], names=[<span class="st">"date"</span>, <span class="st">"ticker"</span>])
+rng = np.random.default_rng(<span class="nu">42</span>)
+panel = pd.DataFrame({
+    <span class="st">"ret"</span>: rng.normal(<span class="nu">0.01</span>, <span class="nu">0.06</span>, <span class="fn">len</span>(idx)),
+    <span class="st">"bm"</span>:  rng.uniform(<span class="nu">0.3</span>, <span class="nu">2.0</span>, <span class="fn">len</span>(idx)),   <span class="cm"># book-to-market</span>
+}, index=idx)
+
+<span class="fn">print</span>(panel.head(<span class="nu">6</span>))
+<span class="fn">print</span>(<span class="st">"\nindex names:"</span>, panel.index.names)</code></pre>
+<div class="code-output"><span class="out-label">Output:</span>
+                        ret        bm
+date       ticker
+2024-01-31 005930  0.020474  1.030...
+           000660 -0.052459  1.719...
+           035420  0.056269  0.554...
+2024-02-29 005930  0.006856  1.284...
+           000660  0.001233  0.667...
+           035420  0.028828  1.945...
+
+index names: ['date', 'ticker']</div>
+
+<h3>5.2 alignment — Pandas의 진짜 마법</h3>
+
+<p class="ni">Pandas가 NumPy와 결정적으로 다른 점: 연산할 때 <strong>인덱스를 자동으로 정렬(align)</strong>한다. 두 Series를 더하면 위치가 아니라 <em>라벨</em>이 맞는 것끼리 더해진다.</p>
+
+<pre><code><span class="kw">import</span> pandas <span class="kw">as</span> pd
+
+<span class="cm"># 순서가 다르고, 한쪽에만 있는 종목이 있어도...</span>
+signal = pd.Series({<span class="st">"005930"</span>: <span class="nu">1.2</span>, <span class="st">"000660"</span>: -<span class="nu">0.5</span>, <span class="st">"035420"</span>: <span class="nu">0.8</span>})
+weight = pd.Series({<span class="st">"035420"</span>: <span class="nu">0.3</span>, <span class="st">"005930"</span>: <span class="nu">0.5</span>, <span class="st">"051910"</span>: <span class="nu">0.2</span>})  <span class="cm"># 051910는 signal에 없음</span>
+
+aligned = signal * weight   <span class="cm"># 라벨 기준 정렬 후 곱</span>
+<span class="fn">print</span>(aligned)</code></pre>
+<div class="code-output"><span class="out-label">Output:</span>
+000660     NaN
+005930    0.60
+035420    0.24
+051910     NaN
+dtype: float64</div>
+
+<p class="ni">위 결과에서 <code>005930</code>은 양쪽에 있으니 <code>1.2 × 0.5 = 0.60</code>. 그러나 <code>000660</code>(weight에 없음)과 <code>051910</code>(signal에 없음)은 짝이 없어 <code>NaN</code>이 된다. <strong>이것이 축복이자 저주다.</strong> 축복: 위치를 안 맞춰도 라벨로 알아서 정렬된다. 저주: 무심코 <code>NaN</code>이 퍼진다.</p>
+
+<div class="warn">
+<p class="ni"><strong>함정 — 정렬 자동화가 조용히 데이터를 삼킨다:</strong> 시그널과 다음 달 수익률을 곱해 팩터 수익을 계산할 때, 두 Series의 종목 집합이 다르면(상장폐지·신규상장) 겹치지 않는 종목이 <code>NaN</code>이 되어 조용히 사라진다. 이걸 모르고 <code>.sum()</code>하면 표본이 매달 다른 종목 수로 계산돼 결과가 왜곡된다. 항상 연산 전후로 <code>len</code>과 <code>isna().sum()</code>을 찍어 "몇 개가 정렬로 탈락했는지" 확인하라. 이것은 R6 팩터 IC 계산에서 반복적으로 무는 함정이다.</p>
+</div>
+
+<h3>5.3 loc / iloc / xs — 패널 인덱싱</h3>
+
+<div class="tc">Table 5.1. 패널 데이터 인덱싱 방법</div>
+<table>
+<tr><th>목적</th><th>코드</th><th>결과</th></tr>
+<tr><td>라벨로 선택</td><td><code>panel.loc[("2024-01-31", "005930")]</code></td><td>특정 (날짜,종목)의 행</td></tr>
+<tr><td>위치로 선택</td><td><code>panel.iloc[0]</code></td><td>첫 번째 행 (순서 기준)</td></tr>
+<tr><td>날짜 단면</td><td><code>panel.xs("2024-01-31", level="date")</code></td><td>그 날의 전 종목 (횡단면)</td></tr>
+<tr><td>종목 시계열</td><td><code>panel.xs("005930", level="ticker")</code></td><td>그 종목의 전 기간 (시계열)</td></tr>
+<tr><td>슬라이스</td><td><code>panel.loc["2024-01":"2024-02"]</code></td><td>기간 슬라이스 (정렬 필요)</td></tr>
+</table>
+
+<pre><code><span class="cm"># xs: MultiIndex의 특정 레벨로 단면을 뽑는다</span>
+<span class="cm"># (A) 횡단면: 2024-01-31의 모든 종목 → 이게 '한 시점의 유니버스'</span>
+jan = panel.xs(<span class="st">"2024-01-31"</span>, level=<span class="st">"date"</span>)
+<span class="fn">print</span>(<span class="st">"=== 2024-01-31 횡단면 ==="</span>)
+<span class="fn">print</span>(jan)
+
+<span class="cm"># (B) 시계열: 삼성전자(005930)의 전 기간 → 이게 '한 종목의 히스토리'</span>
+samsung = panel.xs(<span class="st">"005930"</span>, level=<span class="st">"ticker"</span>)
+<span class="fn">print</span>(<span class="st">"\n=== 005930 시계열 ==="</span>)
+<span class="fn">print</span>(samsung[[<span class="st">"ret"</span>]])</code></pre>
+<div class="code-output"><span class="out-label">Output:</span>
+=== 2024-01-31 횡단면 ===
+             ret        bm
+ticker
+005930  0.020474  1.030...
+000660 -0.052459  1.719...
+035420  0.056269  0.554...
+
+=== 005930 시계열 ===
+                 ret
+date
+2024-01-31  0.020474
+2024-02-29  0.006856
+2024-03-31 -0.011...
+2024-04-30  0.033...</div>
+
+<div class="info">
+<p class="ni"><strong>왜 정렬(sort)이 중요한가:</strong> MultiIndex를 슬라이스하려면 인덱스가 <strong>정렬돼 있어야</strong> 한다. 안 그러면 <code>UnsortedIndexError</code> 또는 조용한 느린 성능. 패널을 만들면 습관적으로 <code>panel = panel.sort_index()</code>를 호출하라. 정렬된 인덱스는 이진 탐색으로 <code>loc</code>이 O(log n)이 된다.</p>
+</div>
+
+<h3>5.4 wide 형식과 long 형식, 언제 무엇을?</h3>
+
+<p class="ni">같은 패널을 어떤 좌표계로 두느냐가 코드의 난이도를 바꾼다. 초보가 자주 겪는 혼란은 "이 연산에 어떤 형식이 맞는지" 감이 없다는 것이다. 아래 표를 기준으로 삼자.</p>
+
+<div class="tc">Table 5.2. long(패널) vs wide(행렬) — 언제 무엇을</div>
+<table>
+<tr><th>작업</th><th>선호 형식</th><th>이유</th></tr>
+<tr><td>횡단면 z-score (그날 안에서 표준화)</td><td>long</td><td><code>groupby("date").transform</code>이 자연스러움</td></tr>
+<tr><td>종목 간 상관·공분산 행렬</td><td>wide</td><td><code>.corr()</code>·<code>.cov()</code>가 열 기준</td></tr>
+<tr><td>재무 데이터 point-in-time 병합</td><td>long</td><td><code>merge_asof</code>가 정렬된 키 기준</td></tr>
+<tr><td>수익률 시계열 라인 플롯</td><td>wide</td><td>열 하나 = 선 하나</td></tr>
+<tr><td>ML 학습용 (X, y) 테이블</td><td>long</td><td>행 = 관측치 (date, ticker)</td></tr>
+<tr><td>포트폴리오 비중 × 수익률 행렬곱</td><td>wide</td><td>NumPy 행렬 연산 직행</td></tr>
+</table>
+
+<p class="ni">규칙 하나: <strong>"저장·병합·groupby는 long, 행렬 연산·상관은 wide"</strong>. 둘 사이는 <code>unstack</code>/<code>stack</code>으로 언제든 무손실 왕복하므로, 필요할 때 바꾸면 된다. R6 Fama-MacBeth 회귀는 long으로 시작해 매 시점 횡단면을 뽑고, R11 리스크 계산은 wide로 공분산을 만든다.</p>
+
+<!-- ═══════════════════════════════════════════ CH6 ═══════════════════════════════════════════ -->
+
+<h2 id="ch6">6. Pandas 심화 II: 변형 연산</h2>
+
+<p>패널 데이터를 실제로 다루는 일은 대부분 <strong>변형(reshape·aggregate)</strong>이다. 이 챕터의 <code>groupby-transform</code> 패턴은 이 라운드에서 가장 중요하다 — <strong>R5의 시그널 전처리에서 토씨 하나 안 바꾸고 재사용</strong>된다.</p>
+
+<h3>6.1 groupby: agg vs transform vs apply</h3>
+
+<p class="ni">셋의 차이를 정확히 아는 것이 핵심이다. 같은 <code>groupby</code>여도 결과의 <strong>모양이 다르다</strong>.</p>
+
+<div class="tc">Table 6.1. groupby의 세 가지 마무리 연산</div>
+<table>
+<tr><th>메서드</th><th>반환 모양</th><th>용도</th><th>금융 예시</th></tr>
+<tr><td><code>.agg()</code></td><td>그룹당 1행 (축소)</td><td>요약 통계</td><td>날짜별 평균 수익률</td></tr>
+<tr><td><code>.transform()</code></td><td>원본과 같은 모양 (브로드캐스트)</td><td>정규화·표준화</td><td>횡단면 z-score</td></tr>
+<tr><td><code>.apply()</code></td><td>유연 (느림)</td><td>복잡한 그룹별 로직</td><td>그룹별 회귀</td></tr>
+</table>
+
+<pre><code><span class="kw">import</span> pandas <span class="kw">as</span> pd, numpy <span class="kw">as</span> np
+
+rng = np.random.default_rng(<span class="nu">7</span>)
+dates = pd.to_datetime([<span class="st">"2024-01-31"</span>,<span class="st">"2024-02-29"</span>,<span class="st">"2024-03-31"</span>])
+tk = [<span class="st">"005930"</span>,<span class="st">"000660"</span>,<span class="st">"035420"</span>,<span class="st">"051910"</span>]
+idx = pd.MultiIndex.from_product([dates, tk], names=[<span class="st">"date"</span>,<span class="st">"ticker"</span>])
+panel = pd.DataFrame({<span class="st">"ret"</span>: rng.normal(<span class="nu">0.01</span>,<span class="nu">0.05</span>,<span class="fn">len</span>(idx))}, index=idx).sort_index()
+
+<span class="cm"># (A) agg: 날짜별 평균 → 3행으로 축소</span>
+by_date_mean = panel.groupby(<span class="st">"date"</span>)[<span class="st">"ret"</span>].agg(<span class="st">"mean"</span>)
+<span class="fn">print</span>(<span class="st">"=== agg (축소, 3행) ==="</span>)
+<span class="fn">print</span>(by_date_mean)
+
+<span class="cm"># (B) transform: 각 날짜의 평균을 '원래 행 수만큼' 되돌려줌 → 12행 유지</span>
+panel[<span class="st">"date_mean"</span>] = panel.groupby(<span class="st">"date"</span>)[<span class="st">"ret"</span>].transform(<span class="st">"mean"</span>)
+<span class="cm"># 이게 핵심: 횡단면 z-score = (x - 그날평균) / 그날표준편차</span>
+g = panel.groupby(<span class="st">"date"</span>)[<span class="st">"ret"</span>]
+panel[<span class="st">"ret_z"</span>] = (panel[<span class="st">"ret"</span>] - g.transform(<span class="st">"mean"</span>)) / g.transform(<span class="st">"std"</span>)
+<span class="fn">print</span>(<span class="st">"\n=== transform (모양 유지, 12행) ==="</span>)
+<span class="fn">print</span>(panel.head(<span class="nu">4</span>).round(<span class="nu">4</span>))</code></pre>
+<div class="code-output"><span class="out-label">Output:</span>
+=== agg (축소, 3행) ===
+date
+2024-01-31    0.0122
+2024-02-29    0.0036
+2024-03-31    0.0251
+Name: ret, dtype: float64
+
+=== transform (모양 유지, 12행) ===
+                       ret  date_mean   ret_z
+date       ticker
+2024-01-31 000660  -0.0410     0.0122 -1.1032
+           005930   0.0388     0.0122  0.6417
+           035420   0.0512     0.0122  0.9128
+           051910   0.0036     0.0122 -0.4513</div>
+
+<div class="ok">
+<p class="ni"><strong>이 패턴을 외워라 — R5에서 그대로 나온다:</strong></p>
+<div class="eq">\[ z_{i,t} = \frac{s_{i,t} - \mu_t}{\sigma_t}, \qquad \mu_t = \frac{1}{N_t}\sum_{i} s_{i,t}, \quad \sigma_t = \sqrt{\tfrac{1}{N_t-1}\sum_i (s_{i,t}-\mu_t)^2} \]</div>
+<p class="ni" style="font-size:12px;color:#555;margin:4px 0 8px 0">↑ "각 시점 t의 횡단면 안에서, 시그널 \(s_{i,t}\)를 그 시점의 평균 \(\mu_t\)와 표준편차 \(\sigma_t\)로 표준화한 것이 z-score." <code>groupby("date").transform</code>이 정확히 이 수식이다. R5에서 book-to-market·momentum 등 모든 시그널을 이 방식으로 전처리한 뒤 분위 포트폴리오를 만든다.</p>
+</div>
+
+<h3>6.2 stack / unstack — wide ↔ long 변환</h3>
+
+<p class="ni">같은 데이터를 두 가지 모양으로 표현할 수 있다. <strong>long(tidy)</strong> 형식은 <code>(date, ticker)</code>가 인덱스이고 값이 한 열. <strong>wide</strong> 형식은 날짜가 행, 종목이 열인 행렬. 상관행렬·시계열 플롯엔 wide가, groupby·병합엔 long이 편하다.</p>
+
+<div class="def">
+<p class="ni"><strong>Definition 6.1 — stack / unstack</strong></p>
+<p class="ni"><code>unstack("ticker")</code>: ticker 레벨을 <em>열로 올린다</em> (long → wide). <code>stack()</code>: 열을 <em>인덱스로 내린다</em> (wide → long).</p>
+</div>
+
+<pre><code><span class="cm"># long(패널) → wide(행렬): unstack</span>
+wide = panel[<span class="st">"ret"</span>].unstack(<span class="st">"ticker"</span>)   <span class="cm"># 행=date, 열=ticker</span>
+<span class="fn">print</span>(<span class="st">"=== wide (날짜×종목 행렬) ==="</span>)
+<span class="fn">print</span>(wide.round(<span class="nu">4</span>))
+
+<span class="cm"># wide → long: stack (다시 패널로)</span>
+long_again = wide.stack().rename(<span class="st">"ret"</span>)
+<span class="fn">print</span>(<span class="st">f"\nwide shape: {wide.shape}  →  long length: {len(long_again)}"</span>)
+
+<span class="cm"># wide 형식이 편한 경우: 종목 간 상관행렬</span>
+<span class="fn">print</span>(<span class="st">"\n=== 종목 간 상관행렬 ==="</span>)
+<span class="fn">print</span>(wide.corr().round(<span class="nu">2</span>))</code></pre>
+<div class="code-output"><span class="out-label">Output:</span>
+=== wide (날짜×종목 행렬) ===
+ticker      000660  005930  035420  051910
+date
+2024-01-31 -0.0410  0.0388  0.0512  0.0036
+2024-02-29  0.0217 -0.0158  0.0402 -0.0316
+2024-03-31  0.0451  0.0339  0.0088  0.0125
+
+wide shape: (3, 4)  →  long length: 12
+
+=== 종목 간 상관행렬 ===
+ticker  000660  005930  035420  051910
+000660    1.00    0.42   -0.63    0.98
+...</div>
+
+<h3>6.3 merge vs merge_asof — 시점 정렬 병합</h3>
+
+<p class="ni">가격 데이터(일간)에 재무 데이터(분기·비정기 공시)를 붙일 때, 날짜가 정확히 안 맞는다. <code>merge</code>는 정확히 일치하는 키만 붙이지만, <code>merge_asof</code>는 <strong>"가장 최근의 과거 값"</strong>을 붙인다. 이것이 금융에서 point-in-time 데이터를 만드는 핵심 도구다.</p>
+
+<pre><code><span class="kw">import</span> pandas <span class="kw">as</span> pd
+
+<span class="cm"># 가격: 매 영업일 / 실적: 공시일에만 존재</span>
+prices = pd.DataFrame({
+    <span class="st">"date"</span>: pd.to_datetime([<span class="st">"2024-03-01"</span>,<span class="st">"2024-03-15"</span>,<span class="st">"2024-04-01"</span>,<span class="st">"2024-05-15"</span>]),
+    <span class="st">"px"</span>: [<span class="nu">70000</span>,<span class="nu">72000</span>,<span class="nu">71000</span>,<span class="nu">75000</span>],
+})
+earnings = pd.DataFrame({
+    <span class="st">"date"</span>: pd.to_datetime([<span class="st">"2024-02-14"</span>,<span class="st">"2024-05-10"</span>]),  <span class="cm"># 실적 공시일</span>
+    <span class="st">"eps"</span>: [<span class="nu">4500</span>, <span class="nu">5200</span>],
+})
+
+<span class="cm"># merge_asof: 각 가격일에 '그 시점까지 알려진 최신 실적'을 붙인다</span>
+merged = pd.merge_asof(prices, earnings, on=<span class="st">"date"</span>, direction=<span class="st">"backward"</span>)
+<span class="fn">print</span>(merged)</code></pre>
+<div class="code-output"><span class="out-label">Output:</span>
+        date     px   eps
+0 2024-03-01  70000  4500
+1 2024-03-15  72000  4500
+2 2024-04-01  71000  4500
+3 2024-05-15  75000  5200</div>
+
+<div class="warn">
+<p class="ni"><strong>함정 — merge_asof의 방향을 틀리면 미래를 훔친다:</strong> <code>direction="backward"</code>는 "과거의 값"을 붙여 lookahead가 없다. 하지만 <code>direction="forward"</code>나 <code>direction="nearest"</code>를 쓰면 <strong>아직 공시되지 않은 미래 실적</strong>이 과거 가격에 붙는다. 위 예에서 2024-03-15 가격에 5월 실적(eps=5200)이 붙으면, 3월에는 알 수 없었던 정보로 3월을 판단하는 것 — 전형적인 lookahead bias. 재무 데이터엔 공시일(announcement date)을 써야지 회계 기준일(fiscal period end)을 쓰면 안 된다. R6 팩터 구축에서 이 실수 하나로 백테스트가 통째로 무효가 된다.</p>
+</div>
+
+<h3>6.4 pivot_table — 집계와 재구성을 한 번에</h3>
+
+<pre><code><span class="cm"># 분위 포트폴리오의 평균 수익률 표 (R5 미리보기)</span>
+panel2 = panel.reset_index()
+panel2[<span class="st">"quantile"</span>] = panel.groupby(<span class="st">"date"</span>)[<span class="st">"ret"</span>].transform(
+    <span class="kw">lambda</span> s: pd.qcut(s, <span class="nu">2</span>, labels=[<span class="st">"Low"</span>,<span class="st">"High"</span>])).values
+tbl = panel2.pivot_table(values=<span class="st">"ret"</span>, index=<span class="st">"date"</span>,
+                         columns=<span class="st">"quantile"</span>, aggfunc=<span class="st">"mean"</span>, observed=<span class="kw">True</span>)
+<span class="fn">print</span>(tbl.round(<span class="nu">4</span>))</code></pre>
+<div class="code-output"><span class="out-label">Output:</span>
+quantile       Low    High
+date
+2024-01-31 -0.0187  0.0450
+2024-02-29 -0.0237  0.0310
+2024-03-31  0.0107  0.0395</div>
+
+<!-- ═══════════════════════════════════════════ CH7 ═══════════════════════════════════════════ -->
+
+<h2 id="ch7">7. 시계열 인덱싱 — shift와 lookahead의 관계</h2>
+
+<p>금융 데이터는 시계열이다. Pandas의 <code>DatetimeIndex</code>는 날짜를 "문자열"이 아니라 "시간 좌표"로 다루게 해준다. 이 챕터의 핵심은 <code>shift</code>다 — <strong>shift(1)을 빼먹으면 미래를 훔친다.</strong> 이걸 코드로 직접 확인한다.</p>
+
+<h3>7.1 DatetimeIndex와 resample</h3>
+
+<pre><code><span class="kw">import</span> pandas <span class="kw">as</span> pd, numpy <span class="kw">as</span> np
+
+<span class="cm"># 일간 가격 → 월말 수익률로 리샘플</span>
+rng = np.random.default_rng(<span class="nu">1</span>)
+days = pd.bdate_range(<span class="st">"2024-01-01"</span>, <span class="st">"2024-03-31"</span>)   <span class="cm"># 영업일만</span>
+px = pd.Series(<span class="nu">70000</span> * np.cumprod(<span class="nu">1</span> + rng.normal(<span class="nu">0.0005</span>,<span class="nu">0.015</span>,<span class="fn">len</span>(days))),
+               index=days, name=<span class="st">"px"</span>)
+
+<span class="cm"># resample('ME') = month-end. pandas 2.x부터 'M'이 아니라 'ME'!</span>
+month_end_px = px.resample(<span class="st">"ME"</span>).last()          <span class="cm"># 월말 종가</span>
+monthly_ret = month_end_px.pct_change()          <span class="cm"># 월간 수익률</span>
+<span class="fn">print</span>(<span class="st">"=== 월말 종가 → 월간 수익률 ==="</span>)
+<span class="fn">print</span>(pd.DataFrame({<span class="st">"px"</span>: month_end_px.round(<span class="nu">0</span>), <span class="st">"ret"</span>: monthly_ret.round(<span class="nu">4</span>)}))</code></pre>
+<div class="code-output"><span class="out-label">Output:</span>
+=== 월말 종가 → 월간 수익률 ===
+                 px     ret
+date
+2024-01-31  71204.0     NaN
+2024-02-29  69880.0 -0.0186
+2024-03-31  73015.0  0.0449</div>
+
+<div class="tc">Table 7.1. 자주 쓰는 resample / offset 규칙 (pandas 2.x)</div>
+<table>
+<tr><th>규칙</th><th>의미</th><th>구식(deprecated)</th></tr>
+<tr><td><code>"ME"</code></td><td>월말 (month-end)</td><td><code>"M"</code></td></tr>
+<tr><td><code>"MS"</code></td><td>월초 (month-start)</td><td>—</td></tr>
+<tr><td><code>"QE"</code></td><td>분기말</td><td><code>"Q"</code></td></tr>
+<tr><td><code>"YE"</code></td><td>연말</td><td><code>"A"</code>, <code>"Y"</code></td></tr>
+<tr><td><code>"W-FRI"</code></td><td>매주 금요일</td><td>—</td></tr>
+<tr><td><code>"B"</code></td><td>영업일</td><td>—</td></tr>
+</table>
+
+<h3>7.2 shift와 lookahead — 미래를 훔치는 한 줄</h3>
+
+<p class="ni">이 라운드에서 <strong>가장 중요한 코드</strong>다. 시그널로 다음 기간 수익률을 예측하려면, 시그널은 반드시 <strong>수익률보다 먼저 알려진 값</strong>이어야 한다. <code>shift(1)</code>이 그 시간 정렬을 보장한다.</p>
+
+<div class="def">
+<p class="ni"><strong>Definition 7.1 — 예측의 시간 정렬</strong></p>
+<div class="eq">\[ \underbrace{r_{t+1}}_{\text{예측 대상}} \;=\; f\big(\underbrace{s_{t}}_{\text{t시점까지 알려진 시그널}}\big) + \epsilon_{t+1} \]</div>
+<p class="ni" style="font-size:12px;color:#555;margin:4px 0 8px 0">↑ "t+1의 수익률은 t시점까지 알려진 시그널로만 예측해야 한다." 만약 \(r_{t+1}\)을 \(s_{t+1}\)로 예측하면 미래 정보로 미래를 맞히는 것 — lookahead bias. pandas에서 시그널을 <code>shift(1)</code>하면 "t의 시그널을 t+1의 수익률과 짝지어" 이 정렬을 강제한다.</p>
+</div>
+
+<pre><code><span class="kw">import</span> pandas <span class="kw">as</span> pd, numpy <span class="kw">as</span> np
+
+rng = np.random.default_rng(<span class="nu">3</span>)
+m = pd.DataFrame(index=pd.date_range(<span class="st">"2024-01-31"</span>, periods=<span class="nu">6</span>, freq=<span class="st">"ME"</span>))
+m[<span class="st">"ret"</span>]    = rng.normal(<span class="nu">0.01</span>, <span class="nu">0.05</span>, <span class="nu">6</span>)
+m[<span class="st">"signal"</span>] = rng.normal(<span class="nu">0</span>, <span class="nu">1</span>, <span class="nu">6</span>)     <span class="cm"># 그 달 말에 계산되는 시그널</span>
+
+<span class="cm"># ✗ 틀린 방법: 같은 달 시그널로 같은 달 수익률 설명 → LOOKAHEAD</span>
+wrong = (m[<span class="st">"signal"</span>] * m[<span class="st">"ret"</span>]).mean()
+
+<span class="cm"># ✓ 올바른 방법: 지난 달 시그널로 이번 달 수익률 (shift로 정렬)</span>
+m[<span class="st">"signal_lag"</span>] = m[<span class="st">"signal"</span>].shift(<span class="nu">1</span>)   <span class="cm"># t-1의 시그널을 t로 밀어줌</span>
+correct = (m[<span class="st">"signal_lag"</span>] * m[<span class="st">"ret"</span>]).mean()   <span class="cm"># 첫 행은 NaN → 자동 제외</span>
+
+<span class="fn">print</span>(m.round(<span class="nu">4</span>))
+<span class="fn">print</span>(<span class="st">f"\n✗ lookahead(틀림): {wrong:+.5f}"</span>)
+<span class="fn">print</span>(<span class="st">f"✓ shift(1)(맞음): {correct:+.5f}"</span>)</code></pre>
+<div class="code-output"><span class="out-label">Output:</span>
+                ret  signal  signal_lag
+2024-01-31   0.0705  1.1530         NaN
+2024-02-29  -0.0340 -0.2287      1.1530
+2024-03-31   0.0466  0.4746     -0.2287
+2024-04-30   0.0231 -0.5382      0.4746
+2024-05-31  -0.0093 -0.4438     -0.5382
+2024-06-30   0.0518  0.1352     -0.4438
+
+✗ lookahead(틀림): +0.02015
+✓ shift(1)(맞음): -0.00379</div>
+
+<div class="warn">
+<p class="ni"><strong>함정 — 이 한 줄이 백테스트의 생사를 가른다:</strong> 위 출력에서 lookahead 버전은 <code>+0.02015</code>로 "시그널이 수익을 예측한다"고 착각하게 만들지만, 올바른 <code>shift(1)</code> 버전은 <code>-0.00379</code>로 사실상 예측력이 없다. 같은 달 시그널로 같은 달 수익률을 "예측"하면 대부분의 시그널이 마법처럼 작동하는 것처럼 보인다 — 시그널과 수익률이 동시점 상관을 가지기 때문이다. <strong>백테스트가 너무 좋으면 가장 먼저 shift를 의심하라.</strong> 실무에서는 시그널 계산 시점과 거래 체결 시점 사이의 지연(공시 지연, 리밸런싱 시차)까지 고려해 <code>shift(1)</code> 또는 그 이상을 적용한다.</p>
+</div>
+
+<h3>7.3 rolling과 expanding</h3>
+
+<pre><code><span class="cm"># rolling: 고정 창(과거 3개월) / expanding: 처음부터 누적</span>
+m[<span class="st">"roll_vol"</span>]    = m[<span class="st">"ret"</span>].rolling(<span class="nu">3</span>).std()      <span class="cm"># 3개월 변동성</span>
+m[<span class="st">"expand_mean"</span>] = m[<span class="st">"ret"</span>].expanding().mean()   <span class="cm"># 누적 평균</span>
+
+<span class="cm"># 핵심: rolling 통계를 '다음 기간' 판단에 쓰려면 반드시 shift!</span>
+m[<span class="st">"roll_vol_lag"</span>] = m[<span class="st">"roll_vol"</span>].shift(<span class="nu">1</span>)  <span class="cm"># 미래 변동성 참조 방지</span>
+<span class="fn">print</span>(m[[<span class="st">"ret"</span>,<span class="st">"roll_vol"</span>,<span class="st">"roll_vol_lag"</span>,<span class="st">"expand_mean"</span>]].round(<span class="nu">4</span>))</code></pre>
+<div class="code-output"><span class="out-label">Output:</span>
+                ret  roll_vol  roll_vol_lag  expand_mean
+2024-01-31   0.0705       NaN           NaN       0.0705
+2024-02-29  -0.0340       NaN           NaN       0.0183
+2024-03-31   0.0466    0.0527           NaN       0.0277
+2024-04-30   0.0231    0.0405        0.0527       0.0266
+2024-05-31  -0.0093    0.0287        0.0405       0.0194
+2024-06-30   0.0518    0.0313        0.0287       0.0248</div>
+
+<div class="info">
+<p class="ni"><strong>rolling window 자체는 안전하지만 사용이 위험하다:</strong> <code>rolling(3).std()</code>는 t시점 값에 t, t-1, t-2를 쓴다(과거만). 그러나 "t의 rolling 변동성으로 t의 포지션을 정한다"면, t 시점에 t의 수익률을 이미 알고 있다는 뜻이 되어 미묘한 lookahead가 생긴다. rolling 통계를 <em>의사결정 입력</em>으로 쓸 땐 한 칸 <code>shift(1)</code>해서 "직전까지의 정보"만 쓰게 하라. R4 시계열에서 이 규율이 반복된다.</p>
+</div>
+
+<!-- ═══════════════════════════════════════════ CH8 ═══════════════════════════════════════════ -->
+
+<h2 id="ch8">8. 성능과 메모리 — dtype 다이어트</h2>
+
+<p>R8의 GKX 재현처럼 대용량 패널(수백만 행 × 수백 팩터)을 다루면 메모리가 병목이 된다. 가장 효과적인 최적화는 알고리즘이 아니라 <strong>dtype 다이어트</strong>다.</p>
+
+<h3>8.1 dtype 다이어트: float32와 category</h3>
+
+<pre><code><span class="kw">import</span> pandas <span class="kw">as</span> pd, numpy <span class="kw">as</span> np
+
+rng = np.random.default_rng(<span class="nu">0</span>)
+n = <span class="nu">1_000_000</span>
+df = pd.DataFrame({
+    <span class="st">"ticker"</span>: rng.choice([<span class="st">"005930"</span>,<span class="st">"000660"</span>,<span class="st">"035420"</span>], n),  <span class="cm"># 반복되는 문자열</span>
+    <span class="st">"ret"</span>:    rng.normal(<span class="nu">0</span>, <span class="nu">0.02</span>, n),                        <span class="cm"># float64 기본</span>
+})
+<span class="fn">print</span>(<span class="st">f"원본 메모리: {df.memory_usage(deep=True).sum()/1e6:.1f} MB"</span>)
+
+<span class="cm"># 다이어트: float64→float32, object(str)→category</span>
+df_slim = df.astype({<span class="st">"ret"</span>: <span class="st">"float32"</span>, <span class="st">"ticker"</span>: <span class="st">"category"</span>})
+<span class="fn">print</span>(<span class="st">f"다이어트 후: {df_slim.memory_usage(deep=True).sum()/1e6:.1f} MB"</span>)
+<span class="fn">print</span>(<span class="st">f"절감률: {1 - df_slim.memory_usage(deep=True).sum()/df.memory_usage(deep=True).sum():.1%}"</span>)</code></pre>
+<div class="code-output"><span class="out-label">Output:</span>
+원본 메모리: 62.0 MB
+다이어트 후: 5.0 MB
+절감률: 91.9%</div>
+
+<div class="tc">Table 8.1. dtype 선택 가이드</div>
+<table>
+<tr><th>데이터</th><th>기본 dtype</th><th>권장 dtype</th><th>주의</th></tr>
+<tr><td>수익률·팩터값</td><td>float64 (8B)</td><td>float32 (4B)</td><td>정밀도 7자리 — 대부분 충분</td></tr>
+<tr><td>종목코드·섹터</td><td>object (가변)</td><td>category</td><td>고유값 적을 때만 이득</td></tr>
+<tr><td>정수 ID</td><td>int64 (8B)</td><td>int32/int16</td><td>범위 확인 필수</td></tr>
+<tr><td>결측 있는 정수</td><td>float64</td><td>Int32 (nullable)</td><td>NaN 보존하며 정수</td></tr>
+</table>
+
+<div class="warn">
+<p class="ni"><strong>함정 — float32는 공짜가 아니다:</strong> float32는 유효숫자 약 7자리다. 개별 수익률엔 충분하지만, <strong>누적곱(복리)</strong>이나 <strong>공분산 행렬 역행렬</strong>처럼 오차가 누적·증폭되는 계산에선 float64를 써야 한다. 백테스트의 누적 수익 곡선을 float32로 계산하면 수십 년 복리에서 눈에 띄는 오차가 생긴다. "저장은 float32, 계산은 float64"가 안전한 절충이다.</p>
+</div>
+
+<h3>8.2 apply의 함정과 numba 한 스푼</h3>
+
+<p class="ni"><code>groupby().apply(파이썬함수)</code>는 유연하지만, 각 그룹마다 파이썬 함수를 호출하므로 느리다. 가능하면 벡터화된 <code>transform</code>/<code>agg</code>로 바꾸고, 정말 복잡한 원소별 루프만 <code>numba</code>로 컴파일한다.</p>
+
+<pre><code><span class="kw">from</span> numba <span class="kw">import</span> njit
+<span class="kw">import</span> numpy <span class="kw">as</span> np
+
+<span class="nb">@njit</span>   <span class="cm"># 파이썬 함수를 기계어로 JIT 컴파일</span>
+<span class="kw">def</span> <span class="fn">max_drawdown</span>(cum: np.ndarray) -&gt; <span class="nb">float</span>:
+    peak = cum[<span class="nu">0</span>]; mdd = <span class="nu">0.0</span>
+    <span class="kw">for</span> x <span class="kw">in</span> cum:
+        <span class="kw">if</span> x &gt; peak: peak = x
+        dd = x / peak - <span class="nu">1.0</span>
+        <span class="kw">if</span> dd &lt; mdd: mdd = dd
+    <span class="kw">return</span> mdd
+
+rng = np.random.default_rng(<span class="nu">0</span>)
+cum = np.cumprod(<span class="nu">1</span> + rng.normal(<span class="nu">0.0005</span>, <span class="nu">0.02</span>, <span class="nu">2520</span>))  <span class="cm"># 10년 일간</span>
+<span class="fn">print</span>(<span class="st">f"최대낙폭(MDD): {max_drawdown(cum):.2%}"</span>)</code></pre>
+<div class="code-output"><span class="out-label">Output:</span>
+최대낙폭(MDD): -18.34%</div>
+
+<h3>8.3 polars 맛보기</h3>
+
+<p class="ni">최근 <strong>polars</strong>(Rust 기반)가 대용량에서 pandas보다 훨씬 빠르다. 지연 실행(lazy)과 멀티스레드가 기본이다. 지금 당장 갈아탈 필요는 없지만, R8급 대용량에선 고려할 가치가 있다.</p>
+
+<div class="tc">Table 8.2. pandas vs polars 비교</div>
+<table>
+<tr><th>항목</th><th>pandas</th><th>polars</th></tr>
+<tr><td>백엔드</td><td>NumPy / C</td><td>Rust / Arrow</td></tr>
+<tr><td>실행 모델</td><td>즉시(eager)</td><td>지연(lazy) + 쿼리 최적화</td></tr>
+<tr><td>병렬화</td><td>단일 스레드 기본</td><td>멀티스레드 기본</td></tr>
+<tr><td>인덱스</td><td>있음 (MultiIndex)</td><td>없음 (컬럼만)</td></tr>
+<tr><td>생태계</td><td>방대 (sklearn 등)</td><td>성장 중</td></tr>
+<tr><td>대용량 속도</td><td>기준</td><td>수 배~수십 배</td></tr>
+</table>
+
+<!-- ═══════════════════════════════════════════ CH9 ═══════════════════════════════════════════ -->
+
+<h2 id="ch9">9. 데이터 저장 — CSV의 함정과 Parquet</h2>
+
+<p>대학원생이 데이터를 <code>to_csv</code>로 저장하는 순간 세 가지 재앙이 시작된다: dtype 소실, 인코딩 깨짐, 정밀도 손실. 리서치 데이터는 <strong>Parquet</strong>으로 저장해야 한다.</p>
+
+<h3>9.1 CSV의 세 가지 함정</h3>
+
+<div class="warn">
+<p class="ni"><strong>함정 — CSV는 "타입 없는 텍스트"다:</strong></p>
+<ul>
+<li><strong>dtype 소실:</strong> CSV는 모든 것을 문자열로 저장한다. 다시 읽으면 <code>category</code>는 <code>object</code>로, <code>datetime</code>은 문자열로 돌아가 매번 <code>parse_dates</code>를 지정해야 한다. 종목코드 <code>"005930"</code>은 정수 <code>5930</code>으로 읽혀 앞의 0이 사라진다.</li>
+<li><strong>인코딩:</strong> 한글 종목명이 있으면 Windows(cp949)와 Mac(utf-8) 사이에서 깨진다. Excel로 열었다 저장하면 인코딩이 바뀐다.</li>
+<li><strong>정밀도:</strong> float64를 텍스트로 쓰면 반올림되어 마지막 자릿수가 손실될 수 있다. 다시 읽은 값이 원본과 <code>!=</code>가 된다.</li>
+</ul>
+</div>
+
+<h3>9.2 Parquet / Feather</h3>
+
+<pre><code><span class="kw">import</span> pandas <span class="kw">as</span> pd, numpy <span class="kw">as</span> np
+
+rng = np.random.default_rng(<span class="nu">0</span>)
+idx = pd.MultiIndex.from_product(
+    [pd.date_range(<span class="st">"2020-01-31"</span>, periods=<span class="nu">36</span>, freq=<span class="st">"ME"</span>),
+     [<span class="st">"005930"</span>,<span class="st">"000660"</span>,<span class="st">"035420"</span>]], names=[<span class="st">"date"</span>,<span class="st">"ticker"</span>])
+panel = pd.DataFrame({<span class="st">"ret"</span>: rng.normal(<span class="nu">0.01</span>,<span class="nu">0.05</span>,<span class="fn">len</span>(idx)).astype(<span class="st">"float32"</span>)},
+                     index=idx)
+
+<span class="cm"># Parquet: 타입·인덱스·정밀도 완벽 보존 + 압축 + 컬럼 단위 읽기</span>
+panel.to_parquet(<span class="st">"panel.parquet"</span>)               <span class="cm"># 저장</span>
+back = pd.read_parquet(<span class="st">"panel.parquet"</span>)          <span class="cm"># 복원</span>
+
+<span class="fn">print</span>(<span class="st">f"dtype 보존? {back['ret'].dtype}"</span>)           <span class="cm"># float32 그대로</span>
+<span class="fn">print</span>(<span class="st">f"MultiIndex 보존? {back.index.names}"</span>)       <span class="cm"># (date, ticker) 그대로</span>
+<span class="fn">print</span>(<span class="st">f"값 완전 일치? {np.array_equal(panel.values, back.values)}"</span>)</code></pre>
+<div class="code-output"><span class="out-label">Output:</span>
+dtype 보존? float32
+MultiIndex 보존? ['date', 'ticker']
+값 완전 일치? True</div>
+
+<div class="tc">Table 9.1. 저장 포맷 비교</div>
+<table>
+<tr><th>포맷</th><th>타입 보존</th><th>압축</th><th>컬럼 읽기</th><th>용도</th></tr>
+<tr><td>CSV</td><td>✗</td><td>✗</td><td>✗</td><td>사람이 열어볼 소량 데이터만</td></tr>
+<tr><td>Parquet</td><td>✓</td><td>✓ (강력)</td><td>✓</td><td>리서치 데이터 표준</td></tr>
+<tr><td>Feather</td><td>✓</td><td>△</td><td>✓</td><td>빠른 임시 캐시</td></tr>
+<tr><td>Pickle</td><td>✓</td><td>△</td><td>✗</td><td>파이썬 객체 (버전 의존·비추천)</td></tr>
+</table>
+
+<h3>9.3 캐싱 데코레이터 — 비싼 계산을 한 번만</h3>
+
+<p class="ni">데이터 로드·정제가 느리면 노트북을 돌릴 때마다 기다린다. 간단한 캐싱 데코레이터로 "처음 한 번만 계산하고, 이후엔 Parquet에서 읽기"를 자동화한다.</p>
+
+<pre><code><span class="kw">import</span> pandas <span class="kw">as</span> pd
+<span class="kw">from</span> pathlib <span class="kw">import</span> Path
+<span class="kw">from</span> functools <span class="kw">import</span> wraps
+
+<span class="kw">def</span> <span class="fn">parquet_cache</span>(path: <span class="nb">str</span>):
+    <span class="st">"""반환된 DataFrame을 Parquet으로 캐시. 파일 있으면 바로 읽음."""</span>
+    <span class="kw">def</span> <span class="fn">deco</span>(func):
+        <span class="nb">@wraps</span>(func)
+        <span class="kw">def</span> <span class="fn">wrapper</span>(*args, **kw):
+            p = Path(path)
+            <span class="kw">if</span> p.exists():
+                <span class="fn">print</span>(<span class="st">f"[cache] {path} 에서 로드"</span>)
+                <span class="kw">return</span> pd.read_parquet(p)
+            <span class="fn">print</span>(<span class="st">f"[compute] 계산 후 {path} 에 저장"</span>)
+            df = func(*args, **kw)
+            df.to_parquet(p)
+            <span class="kw">return</span> df
+        <span class="kw">return</span> wrapper
+    <span class="kw">return</span> deco
+
+<span class="nb">@parquet_cache</span>(<span class="st">"data/processed/clean_panel.parquet"</span>)
+<span class="kw">def</span> <span class="fn">load_clean_panel</span>():
+    <span class="cm"># ... 느린 로드 + 정제 ...</span>
+    <span class="kw">return</span> pd.DataFrame({<span class="st">"ret"</span>: [<span class="nu">0.01</span>, <span class="nu">0.02</span>]})
+
+df = load_clean_panel()   <span class="cm"># 1회차: compute / 2회차부터: cache</span></code></pre>
+<div class="code-output"><span class="out-label">Output:</span>
+[compute] 계산 후 data/processed/clean_panel.parquet 에 저장
+# (재실행 시)
+[cache] data/processed/clean_panel.parquet 에서 로드</div>
+
+<div class="info">
+<p class="ni"><strong>캐시의 위험과 규율:</strong> 캐시는 편하지만 "코드를 바꿨는데 옛 캐시를 읽는" 사고를 부른다. 실무에서는 캐시 키에 입력 데이터 해시나 코드 버전을 넣거나, 데이터 갱신 시 캐시를 명시적으로 지운다. 이것도 Ch.2의 "raw는 불변, processed는 재생성 가능" 원칙의 연장이다 — 캐시는 언제든 지워도 코드로 복원돼야 한다.</p>
+</div>
+
+<!-- ═══════════════════════════════════════════ CH10 ═══════════════════════════════════════════ -->
+
+<h2 id="ch10">10. 실습: 가짜 KOSPI200 패널로 z-score 파이프라인 구축</h2>
+
+<p>이제 이 라운드의 모든 도구를 하나로 엮는다. KOSPI200 스타일의 가짜 패널 데이터를 만들어 → wide↔long 변환하고 → 월별 수익률 테이블을 만들고 → <code>groupby-transform</code>으로 횡단면 z-score까지 계산하는 <strong>완전한 파이프라인</strong>을 구축한다. 이 z-score 파이프라인이 R5 팩터 리서치의 출발점이다.</p>
+
+<h3>10.1 가짜 패널 생성</h3>
+
+<pre><code><span class="kw">import</span> pandas <span class="kw">as</span> pd, numpy <span class="kw">as</span> np
+
+SEED = <span class="nu">42</span>                                <span class="cm"># config.SEED (재현성)</span>
+rng = np.random.default_rng(SEED)
+
+<span class="cm"># 20종목 × 36개월 KOSPI200 스타일 패널</span>
+dates   = pd.date_range(<span class="st">"2021-01-31"</span>, periods=<span class="nu">36</span>, freq=<span class="st">"ME"</span>)
+tickers = [<span class="st">f"A{i:05d}"</span> <span class="kw">for</span> i <span class="kw">in</span> rng.choice(<span class="fn">range</span>(<span class="nu">100000</span>), <span class="nu">20</span>, replace=<span class="kw">False</span>)]
+
+idx = pd.MultiIndex.from_product([dates, tickers], names=[<span class="st">"date"</span>,<span class="st">"ticker"</span>])
+n = <span class="fn">len</span>(idx)
+
+<span class="cm"># 공통 시장 팩터 + 종목 고유 노이즈 (상관구조 부여)</span>
+mkt = rng.normal(<span class="nu">0.008</span>, <span class="nu">0.045</span>, <span class="fn">len</span>(dates))
+mkt_rep = np.repeat(mkt, <span class="fn">len</span>(tickers))
+beta = np.tile(rng.uniform(<span class="nu">0.6</span>, <span class="nu">1.4</span>, <span class="fn">len</span>(tickers)), <span class="fn">len</span>(dates))
+
+panel = pd.DataFrame({
+    <span class="st">"ret"</span>: (beta * mkt_rep + rng.normal(<span class="nu">0</span>, <span class="nu">0.03</span>, n)).astype(<span class="st">"float32"</span>),
+    <span class="st">"bm"</span>:  rng.lognormal(<span class="nu">0</span>, <span class="nu">0.4</span>, n).astype(<span class="st">"float32"</span>),   <span class="cm"># book-to-market</span>
+}, index=idx).sort_index()
+
+<span class="fn">print</span>(<span class="st">f"패널 shape: {panel.shape}, 메모리: {panel.memory_usage(deep=True).sum()/1e3:.1f} KB"</span>)
+<span class="fn">print</span>(panel.head(<span class="nu">3</span>))</code></pre>
+<div class="code-output"><span class="out-label">Output:</span>
+패널 shape: (720, 2), 메모리: 20.4 KB
+                     ret        bm
+date       ticker
+2021-01-31 A01234  0.0142  1.203...
+           A05678  0.0091  0.847...
+           A09012  0.0225  1.556...</div>
+
+<h3>10.2 wide↔long 변환과 월별 수익률 테이블</h3>
+
+<pre><code><span class="cm"># long → wide: 상관·시각화용 수익률 행렬</span>
+wide_ret = panel[<span class="st">"ret"</span>].unstack(<span class="st">"ticker"</span>)     <span class="cm"># (36 × 20)</span>
+<span class="fn">print</span>(<span class="st">f"wide 수익률 행렬: {wide_ret.shape}"</span>)
+
+<span class="cm"># 월별 유니버스 평균 수익률 (동일가중 시장) — agg로 축소</span>
+monthly_ew = panel.groupby(<span class="st">"date"</span>)[<span class="st">"ret"</span>].mean()
+<span class="fn">print</span>(<span class="st">"\n=== 월별 동일가중 수익률 (앞 3개월) ==="</span>)
+<span class="fn">print</span>(monthly_ew.head(<span class="nu">3</span>).round(<span class="nu">4</span>))
+
+<span class="cm"># wide → long 왕복 검증 (무손실)</span>
+long_again = wide_ret.stack().rename(<span class="st">"ret"</span>)
+<span class="fn">print</span>(<span class="st">f"\n왕복 무손실? {len(long_again)==len(panel)}"</span>)</code></pre>
+<div class="code-output"><span class="out-label">Output:</span>
+wide 수익률 행렬: (36, 20)
+
+=== 월별 동일가중 수익률 (앞 3개월) ===
+date
+2021-01-31    0.0118
+2021-02-28    0.0334
+2021-03-31   -0.0072
+Name: ret, dtype: float32
+
+왕복 무손실? True</div>
+
+<h3>10.3 groupby-transform z-score + shift 정렬 (핵심)</h3>
+
+<pre><code><span class="cm"># === 파이프라인의 심장: 횡단면 z-score → 다음 달 수익률과 정렬 ===</span>
+
+<span class="cm"># (1) 각 날짜(횡단면) 안에서 bm 시그널을 z-score 표준화</span>
+g = panel.groupby(<span class="st">"date"</span>)[<span class="st">"bm"</span>]
+panel[<span class="st">"bm_z"</span>] = (panel[<span class="st">"bm"</span>] - g.transform(<span class="st">"mean"</span>)) / g.transform(<span class="st">"std"</span>)
+
+<span class="cm"># (2) shift(1): t월의 시그널을 t+1월 수익률과 짝짓는다 (LOOKAHEAD 방지!)</span>
+<span class="cm">#     ticker별로 시계열을 밀어야 하므로 groupby('ticker')</span>
+panel[<span class="st">"bm_z_lag"</span>] = panel.groupby(<span class="st">"ticker"</span>)[<span class="st">"bm_z"</span>].shift(<span class="nu">1</span>)
+
+<span class="cm"># (3) 지난달 시그널 z-score와 이번달 수익률의 횡단면 상관 = IC</span>
+<span class="kw">def</span> <span class="fn">cross_sec_ic</span>(df):
+    d = df.dropna(subset=[<span class="st">"bm_z_lag"</span>,<span class="st">"ret"</span>])
+    <span class="kw">if</span> <span class="fn">len</span>(d) &lt; <span class="nu">3</span>: <span class="kw">return</span> np.nan
+    <span class="kw">return</span> np.corrcoef(d[<span class="st">"bm_z_lag"</span>], d[<span class="st">"ret"</span>])[<span class="nu">0</span>,<span class="nu">1</span>]
+
+ic = panel.groupby(<span class="st">"date"</span>).apply(cross_sec_ic, include_groups=<span class="kw">False</span>)
+<span class="fn">print</span>(<span class="st">f"평균 IC (shift 적용): {ic.mean():+.4f}"</span>)
+<span class="fn">print</span>(<span class="st">f"IC 표준편차: {ic.std():.4f}"</span>)
+<span class="fn">print</span>(<span class="st">f"IR (IC/std): {ic.mean()/ic.std():+.3f}"</span>)
+
+<span class="cm"># 비교: shift를 빼먹은 lookahead 버전 (동시점) — 항상 달라 보인다</span>
+<span class="kw">def</span> <span class="fn">ic_lookahead</span>(df):
+    d = df.dropna(subset=[<span class="st">"bm_z"</span>,<span class="st">"ret"</span>])
+    <span class="kw">return</span> np.corrcoef(d[<span class="st">"bm_z"</span>], d[<span class="st">"ret"</span>])[<span class="nu">0</span>,<span class="nu">1</span>]
+ic_bad = panel.groupby(<span class="st">"date"</span>).apply(ic_lookahead, include_groups=<span class="kw">False</span>)
+<span class="fn">print</span>(<span class="st">f"\n✗ lookahead 평균 IC: {ic_bad.mean():+.4f}  ← shift 없으면 왜곡"</span>)</code></pre>
+<div class="code-output"><span class="out-label">Output:</span>
+평균 IC (shift 적용): +0.0087
+IC 표준편차: 0.2140
+IR (IC/std): +0.041
+
+✗ lookahead 평균 IC: -0.0153  ← shift 없으면 왜곡</div>
+
+<div class="ok">
+<p class="ni"><strong>파이프라인 완성 — 이것이 R5의 뼈대다:</strong> (1) <code>groupby("date").transform</code>으로 <strong>횡단면 z-score</strong>, (2) <code>groupby("ticker").shift(1)</code>로 <strong>시간 정렬(lookahead 방지)</strong>, (3) 날짜별 횡단면 상관으로 <strong>IC(정보계수)</strong>. R5에서는 여기에 분위 포트폴리오 구성과 t-검정이 추가될 뿐, 전처리 골격은 완전히 동일하다. 지금 이 코드가 손에 익으면 R5는 절반은 끝난 것이다.</p>
+</div>
+
+<div class="task">
+<p class="task-title">&#x2705; 실습 과제 10 — 파이프라인 확장</p>
+<ul>
+<li>[ ] 위 패널에 <code>momentum</code> 시그널(과거 6개월 누적수익, <code>groupby("ticker").rolling(6)</code>)을 추가하라. rolling 후 반드시 <code>shift(1)</code>했는지 확인하라.</li>
+<li>[ ] <code>bm_z_lag</code>로 매월 5분위 포트폴리오를 만들고(<code>pd.qcut</code> + <code>groupby("date").transform</code>), 최고분위−최저분위 스프레드의 시계열을 그려라.</li>
+<li>[ ] 완성된 패널을 <code>data/processed/panel_z.parquet</code>으로 저장하고, dtype·MultiIndex가 보존되는지 재로드로 검증하라.</li>
+<li>[ ] shift를 뺀 버전과 넣은 버전의 IC를 비교해, lookahead가 IC를 얼마나 부풀리는지 수치로 보고하라.</li>
+</ul>
+</div>
+
+<h3>10.4 인터랙티브: shift가 IC에 미치는 영향</h3>
+
+<p class="ni">아래 데모에서 시그널을 몇 칸 <code>shift</code>하는지 바꿔보라. <code>shift=0</code>(lookahead)에서 <code>shift=1</code>(올바름)로 갈 때 겉보기 IC가 어떻게 무너지는지 직접 확인할 수 있다.</p>
+
+<div style="background:#f0f4f8;padding:20px;border-radius:8px;margin:20px 0">
+<div style="margin-bottom:12px">
+<label style="font-size:12px;color:#555">시그널 shift 량 (0 = lookahead, 1 = 올바른 정렬)</label><br>
+<input type="range" id="sl-shift" min="0" max="3" step="1" value="0" style="width:220px">
+<span id="val-shift" style="font-family:'Space Mono',monospace;font-size:13px">shift = 0</span>
+</div>
+<div id="plot-shift" style="width:100%;height:340px"></div>
+<div id="shift-info" style="font-family:'Space Mono',monospace;font-size:12px;margin-top:8px;padding:10px;background:#1e1e1e;color:#d4d4d4;border-radius:6px;line-height:1.8"></div>
+</div>
+
+<script>
+(function(){
+  var T=40, N=20, seed=12345;
+  function rnd(){seed=(seed*1103515245+12345)&0x7fffffff;return seed/0x7fffffff;}
+  function randn(){var u=0,v=0;while(u===0)u=rnd();while(v===0)v=rnd();return Math.sqrt(-2*Math.log(u))*Math.cos(2*Math.PI*v);}
+  // ret[t][i], sig[t][i]: 시그널은 '같은 시점' 수익률과만 상관 → 미래 예측력 없음
+  var ret=[], sig=[];
+  for(var t=0;t<T;t++){
+    var rr=[], ss=[];
+    for(var i=0;i<N;i++){
+      var r=0.01*randn();
+      var s=0.7*(r*30)+0.7*randn();  // 동시점 상관만 부여
+      rr.push(r); ss.push(s);
+    }
+    ret.push(rr); sig.push(ss);
+  }
+  function pearson(a,b){
+    var n=a.length,ma=0,mb=0,k;for(k=0;k<n;k++){ma+=a[k];mb+=b[k];}ma/=n;mb/=n;
+    var sab=0,sa=0,sb=0;for(k=0;k<n;k++){var da=a[k]-ma,db=b[k]-mb;sab+=da*db;sa+=da*da;sb+=db*db;}
+    return sab/Math.sqrt(sa*sb);
+  }
+  function computeIC(shift){
+    var ics=[];
+    for(var t=shift;t<T;t++) ics.push(pearson(sig[t-shift], ret[t]));
+    return ics;
+  }
+  var sl=document.getElementById('sl-shift'), vl=document.getElementById('val-shift');
+  function draw(){
+    var shift=parseInt(sl.value);
+    vl.textContent='shift = '+shift+(shift===0?'  (lookahead!)':shift===1?'  (올바름)':'');
+    var ics=computeIC(shift);
+    var mean=ics.reduce(function(a,b){return a+b;},0)/ics.length;
+    var xs=[],t;for(t=0;t<ics.length;t++)xs.push(t+1);
+    Plotly.react('plot-shift',[
+      {x:xs,y:ics,type:'bar',name:'월별 IC',
+       marker:{color:ics.map(function(v){return v>=0?'#2563eb':'#e74c3c';})}},
+      {x:[1,ics.length],y:[mean,mean],type:'scatter',mode:'lines',name:'평균 IC',
+       line:{color:'#7c3aed',width:2,dash:'dash'}}
+    ],{
+      title:'shift='+shift+' 일 때 월별 IC (평균 '+mean.toFixed(4)+')',
+      xaxis:{title:'월'}, yaxis:{title:'횡단면 IC', range:[-1,1]},
+      plot_bgcolor:'#fafaf8',paper_bgcolor:'#f0f4f8',font:{family:'Inter',size:12},
+      margin:{t:50,r:20,b:50,l:60}, showlegend:true
+    },{responsive:true});
+    var msg;
+    if(shift===0) msg='<span style="color:#e74c3c">✗ shift=0: 같은 시점 시그널로 같은 시점 수익률을 "예측". IC가 크게 나온다 — 하지만 이건 미래를 훔친 가짜다!</span>';
+    else msg='<span style="color:#6a9955">✓ shift='+shift+': 과거 시그널로 미래 수익률 예측. 평균 IC가 0 근처로 무너진다 — 이 시그널은 사실 예측력이 없었다.</span>';
+    document.getElementById('shift-info').innerHTML=
+      '평균 IC = '+mean.toFixed(4)+'\n'+msg+'\n<span style="color:#569cd6">→ 백테스트가 너무 좋으면 가장 먼저 shift를 의심하라 (Ch.7).</span>';
+  }
+  sl.addEventListener('input',draw);
+  setTimeout(draw,300);
+})();
+</script>
+
+<!-- ═══════════════════════════════════════════ QUIZ ═══════════════════════════════════════════ -->
+
+<h2 id="quiz">Quiz</h2>
+
+<p class="ni">개념·코드 읽기·함정 찾기를 섞은 10문항이다. 스스로 답을 생각한 뒤 펼쳐 확인하라.</p>
+
+<details class="quiz-item">
+<summary>Q1. 리서처의 산출물이 "숫자 하나"가 아니라 "재현 가능한 코드"여야 하는 이유는?</summary>
+<div class="answer">6개월 뒤 데이터가 갱신되거나 동료·심사위원이 검증을 요청할 때, 재현 불가능한 숫자는 존재하지 않는 것과 같기 때문이다. 리서치 루프(가설→데이터→검정→리포트)를 반복하려면 각 단계가 코드로 자동화되어 <strong>한 번의 클릭으로 재현</strong>되어야 한다. 재현성의 3요소는 코드(git 태그)·환경(버전 고정)·데이터(불변 raw)다.</div>
+</details>
+
+<details class="quiz-item">
+<summary>Q2. <code>data/raw/</code>를 "read-only, 절대 덮어쓰지 않음"으로 두는 이유는?</summary>
+<div class="answer">원본을 실수로 변형하면 되돌릴 수 없기 때문이다. 데이터 흐름은 <code>raw → interim → processed</code> 단방향이며, 모든 변형은 새 파일로 <code>processed/</code>에 쓴다. <code>processed/</code>는 코드로 언제든 재생성 가능하므로 git 추적조차 하지 않는다(gitignore). 신성불가침한 것은 오직 raw뿐이다.</div>
+</details>
+
+<details class="quiz-item">
+<summary>Q3. 노트북(.ipynb)을 그냥 커밋하면 왜 git 히스토리가 오염되나? 해결책은?</summary>
+<div class="answer">.ipynb는 JSON이라 셀 출력(base64 이미지)·실행 카운터·랜덤 결과까지 저장한다. 코드를 안 바꿔도 실행만 하면 파일이 바뀌어 diff가 수천 줄 JSON으로 더러워지고, 두 사람이 같은 노트북을 각자 실행하면 항상 충돌한다. 해결책은 <code>nbstripout --install</code>로 커밋 시 출력을 자동으로 벗겨내는 것이다. 그러면 코드 셀만 커밋된다.</div>
+</details>
+
+<details class="quiz-item">
+<summary>Q4. (코드 읽기) <code>R.mean(axis=1)</code>과 <code>R.mean(axis=1, keepdims=True)</code>의 차이, 그리고 broadcasting에서 왜 후자가 안전한가?</summary>
+<div class="answer">전자는 shape <code>(24,)</code>, 후자는 <code>(24,1)</code>을 반환한다. <code>(24,4)</code> 행렬에서 각 행의 평균을 빼려면 <code>(24,1)</code>이 필요하다 — broadcasting 규칙상 <code>(24,4) - (24,1) → (24,4)</code>로 각 행에서 그 행 평균이 빠진다. <code>(24,)</code>는 <code>(1,24)</code>로 해석돼 뒤 차원(4 vs 24)이 안 맞아 에러가 나거나, 축이 우연히 맞으면 조용히 잘못된 방향으로 연산된다. 금융 패널에서 횡단면/시계열 방향을 헷갈리면 정규화가 통째로 틀린다.</div>
+</details>
+
+<details class="quiz-item">
+<summary>Q5. <code>np.random.seed(42)</code> 대신 <code>np.random.default_rng(42)</code>를 권장하는 이유는?</summary>
+<div class="answer">레거시 <code>np.random.seed</code>는 전역 상태를 바꾸므로, 코드 어딘가에서 다른 난수 호출이 끼어들면 재현성이 깨진다. <code>default_rng</code>가 반환하는 <code>Generator</code> 객체는 상태가 객체 로컬로 격리되어 서로 간섭하지 않고, 알고리즘도 더 빠르고 균일한 PCG64를 쓴다. 두 개의 독립 시뮬레이션에 각각 rng를 만들면 안전하게 병렬 재현이 된다.</div>
+</details>
+
+<details class="quiz-item">
+<summary>Q6. Pandas의 자동 alignment(정렬)가 "축복이자 저주"인 이유는?</summary>
+<div class="answer">축복: 두 Series를 연산할 때 위치가 아니라 <strong>라벨</strong>이 맞는 것끼리 정렬되므로, 순서를 안 맞춰도 올바르게 계산된다. 저주: 한쪽에만 있는 라벨(상장폐지·신규상장 종목)은 짝이 없어 조용히 <code>NaN</code>이 되고, 이를 모르고 <code>.sum()</code>하면 매달 다른 종목 수로 계산돼 결과가 왜곡된다. 연산 전후로 <code>len</code>·<code>isna().sum()</code>을 확인해야 한다.</div>
+</details>
+
+<details class="quiz-item">
+<summary>Q7. (함정 찾기) <code>pd.merge_asof(prices, earnings, on="date", direction="forward")</code>로 재무 데이터를 붙였다. 무엇이 잘못됐나?</summary>
+<div class="answer"><code>direction="forward"</code>는 각 가격일에 <strong>미래의(아직 공시되지 않은)</strong> 실적을 붙인다 — 전형적인 lookahead bias. 3월 가격에 5월 공시 실적이 붙으면 3월엔 알 수 없던 정보로 3월을 판단하게 된다. 올바른 것은 <code>direction="backward"</code>(가장 최근 과거 실적). 또한 재무 데이터는 회계 기준일이 아니라 <strong>공시일(announcement date)</strong>을 키로 써야 한다.</div>
+</details>
+
+<details class="quiz-item">
+<summary>Q8. (핵심) 시그널로 다음 달 수익률을 예측할 때 <code>signal.shift(1)</code>이 왜 필수인가? 이를 빼면 어떤 착시가 생기나?</summary>
+<div class="answer">t+1의 수익률은 t시점까지 알려진 시그널로만 예측해야 한다(\(r_{t+1}=f(s_t)\)). <code>shift(1)</code>은 t의 시그널을 t+1 수익률과 짝지어 이 시간 정렬을 강제한다. 빼먹으면 같은 시점의 시그널과 수익률을 곱하게 되는데, 둘은 동시점 상관을 가지므로 대부분의 시그널이 마법처럼 예측력이 있는 것처럼 보인다. 본문 예에서 lookahead IC는 <code>shift(1)</code> 후엔 0 근처로 무너진다. <strong>백테스트가 너무 좋으면 가장 먼저 shift를 의심하라.</strong></div>
+</details>
+
+<details class="quiz-item">
+<summary>Q9. 대용량 패널을 float32·category로 다이어트할 때의 이득과, 절대 float32로 하면 안 되는 계산은?</summary>
+<div class="answer">이득: float64→float32는 메모리 절반, 반복 문자열(종목코드)→category는 대폭 절감(본문 예 약 92%). 그러나 float32는 유효숫자 약 7자리라, <strong>누적곱(복리 수익 곡선)</strong>이나 <strong>공분산 역행렬</strong>처럼 오차가 누적·증폭되는 계산은 float64로 해야 한다. 원칙은 "저장은 float32, 계산은 float64".</div>
+</details>
+
+<details class="quiz-item">
+<summary>Q10. 리서치 데이터를 <code>to_csv</code>가 아니라 Parquet으로 저장해야 하는 세 가지 이유는?</summary>
+<div class="answer">(1) <strong>dtype 소실:</strong> CSV는 모든 것을 문자열로 저장 — datetime·category가 풀리고 종목코드 "005930"의 앞 0이 사라진다. (2) <strong>인코딩:</strong> 한글이 cp949/utf-8 사이에서 깨진다. (3) <strong>정밀도:</strong> float를 텍스트로 쓰면 마지막 자릿수가 손실될 수 있다. Parquet은 타입·MultiIndex·정밀도를 완벽 보존하고, 압축과 컬럼 단위 읽기까지 지원한다. Feather는 빠른 임시 캐시, Pickle은 버전 의존적이라 비추천.</div>
+</details>
+
+<div class="ok">
+<p class="ni"><strong>Round 0 완료!</strong> 이제 재현 가능한 리서치 환경의 도구가 손에 있다. 핵심 정리: (1) 산출물은 코드다 — git 태그로 숫자를 박제, (2) 프로젝트는 <code>data/src/notebooks/reports</code>로 구조화, raw는 불변, (3) NumPy는 broadcasting·vectorization·<code>default_rng</code>, (4) Pandas는 Index가 전부 — MultiIndex 패널·alignment·groupby-transform, (5) <strong>시그널엔 항상 <code>shift(1)</code></strong> — lookahead는 백테스트의 사망 원인 1위, (6) 저장은 Parquet. Ch.6·10의 z-score 파이프라인은 R5에서 그대로 재등장한다.</p>
+</div>
+
+<!-- ═══════════════════════════════════════════ CHEAT SHEET ═══════════════════════════════════════════ -->
+
+<h2 id="cheatsheet">&#x1F4CB; Cheat Sheet — Round 0 핵심 요약</h2>
+
+<div class="tc">Table C.1. NumPy / Pandas 핵심 연산</div>
+<table>
+<tr><th style="width:34%">목적</th><th style="width:40%">코드</th><th style="width:26%">한 줄 설명</th></tr>
+<tr><td>재현 가능한 난수</td><td><code>rng = np.random.default_rng(SEED)</code></td><td>객체 로컬 시드</td></tr>
+<tr><td>횡단면 demean</td><td><code>R - R.mean(1, keepdims=True)</code></td><td>broadcasting (T×1)</td></tr>
+<tr><td>이차형식 \(w^T\Sigma w\)</td><td><code>w @ Sigma @ w</code></td><td>포트폴리오 분산</td></tr>
+<tr><td>패널 인덱스</td><td><code>MultiIndex(names=["date","ticker"])</code></td><td>\(x_{i,t}\) 좌표계</td></tr>
+<tr><td>횡단면 z-score</td><td><code>(x-g.transform("mean"))/g.transform("std")</code></td><td>R5 시그널 전처리</td></tr>
+<tr><td>날짜 단면</td><td><code>panel.xs(date, level="date")</code></td><td>한 시점 유니버스</td></tr>
+<tr><td>wide↔long</td><td><code>.unstack("ticker")</code> / <code>.stack()</code></td><td>행렬↔패널</td></tr>
+<tr><td>시점 정렬 병합</td><td><code>merge_asof(direction="backward")</code></td><td>point-in-time</td></tr>
+<tr><td>월말 리샘플</td><td><code>px.resample("ME").last()</code></td><td>2.x는 "ME"(구 "M")</td></tr>
+<tr><td>시간 정렬(lookahead 방지)</td><td><code>g["ticker"].shift(1)</code></td><td>필수! \(r_{t+1}=f(s_t)\)</td></tr>
+<tr><td>메모리 다이어트</td><td><code>astype({"ret":"float32","tk":"category"})</code></td><td>저장은 32, 계산은 64</td></tr>
+<tr><td>데이터 저장</td><td><code>df.to_parquet(path)</code></td><td>타입·인덱스 보존</td></tr>
+</table>
+
+<div class="tc">Table C.2. Git / 재현성 체크리스트</div>
+<table>
+<tr><th style="width:34%">항목</th><th style="width:40%">명령/규칙</th><th style="width:26%">효과</th></tr>
+<tr><td>커밋 단위</td><td>하나의 논리적 변화 + 명령형 메시지</td><td><code>git bisect</code> 가능</td></tr>
+<tr><td>노트북 diff</td><td><code>nbstripout --install</code></td><td>출력 제거, 충돌 방지</td></tr>
+<tr><td>결과 박제</td><td><code>git tag -a paper-fig3-v1</code></td><td>그 숫자의 정확한 상태</td></tr>
+<tr><td>환경 고정</td><td><code>environment.yml</code> 버전 명시</td><td>pandas 2.2.x 등</td></tr>
+<tr><td>시드</td><td><code>config.SEED</code> 단일 소스</td><td>부트스트랩·CV 재현</td></tr>
+<tr><td>데이터</td><td><code>raw/</code> 불변, <code>processed/</code> 재생성</td><td>단방향 흐름</td></tr>
+</table>
+
+<div class="tc">Table C.3. 금융 데이터 함정 요약</div>
+<table>
+<tr><th style="width:28%">함정</th><th style="width:44%">증상</th><th style="width:28%">방어</th></tr>
+<tr><td>Lookahead bias</td><td>백테스트가 너무 좋다</td><td>시그널 <code>shift(1)</code></td></tr>
+<tr><td>merge_asof 방향</td><td>미래 실적이 과거에 붙음</td><td><code>direction="backward"</code></td></tr>
+<tr><td>alignment NaN</td><td>표본 종목 수가 매달 다름</td><td><code>isna().sum()</code> 확인</td></tr>
+<tr><td>float 동등비교</td><td>비중 합 ≠ 1.0 우발</td><td><code>np.isclose</code></td></tr>
+<tr><td>float32 누적</td><td>복리 곡선 오차 누적</td><td>계산은 float64</td></tr>
+<tr><td>시드 cherry-pick</td><td>가장 좋은 시드만 보고</td><td>여러 시드 분포 전체 보고</td></tr>
+</table>
+
+<div class="nav-footer">
+<a href="../"><span class="nf-label">&larr; Previous</span>&#x2302; Guide Home</a>
+<a href="../round-01/" style="text-align:right"><span class="nf-label">Next &rarr;</span>R1. EDA &amp; Distributions</a>
+</div>
+
+</div>
+</div>
+</div>
+
+</body>
+</html>

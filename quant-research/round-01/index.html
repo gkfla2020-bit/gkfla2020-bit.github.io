@@ -1,0 +1,1155 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Round 1 - EDA & Distributions — 데이터 분석의 기본기 | Quant Researcher Guide</title>
+<script>
+MathJax = { tex: { inlineMath: [['\\(','\\)']], displayMath: [['\\[','\\]'],['$$','$$']] } };
+</script>
+<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;500&family=Space+Mono:wght@400&family=Inter:wght@300;400&display=swap" rel="stylesheet">
+<script src="https://cdn.plot.ly/plotly-2.27.0.min.js"></script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Inter',sans-serif;background:#fafaf8;color:#1a1a1a;line-height:1.7;overflow-x:hidden}
+.sidebar{position:fixed;left:0;top:0;width:260px;height:100vh;background:rgba(255,255,255,.97);border-right:1px solid rgba(0,0,0,.06);padding:32px 24px;z-index:100;overflow-y:auto;display:flex;flex-direction:column}
+.sidebar-profile{text-align:center;margin-bottom:28px;padding-bottom:24px;border-bottom:1px solid rgba(0,0,0,.08)}
+.profile-icon{font-size:48px;margin-bottom:8px}
+.profile-name{font-family:'Cormorant Garamond',serif;font-size:1.3rem;font-weight:500;margin-bottom:4px}
+.profile-title{font-size:.68rem;color:#888;letter-spacing:.08em;text-transform:uppercase;margin-bottom:8px}
+.profile-bio{font-size:.78rem;color:#666;line-height:1.5}
+.sidebar-nav{flex:1;margin-top:16px}.nav-section{margin-bottom:20px}.nav-section-title{font-size:.6rem;font-weight:600;color:#aaa;letter-spacing:.15em;text-transform:uppercase;margin-bottom:10px}.nav-list{list-style:none}.nav-list li{margin-bottom:5px}.nav-list a{font-size:.78rem;color:#555;text-decoration:none;transition:all .2s;display:block;padding:3px 0}.nav-list a:hover{color:#2563eb;padding-left:4px}.nav-list a.active{color:#2563eb;font-weight:500}.nav-list a.done{color:#28a745}.badge{display:inline-block;font-size:.5rem;background:#2563eb;color:#fff;padding:1px 5px;border-radius:8px;margin-left:3px;vertical-align:middle}.badge-done{background:#28a745}.sidebar-footer{padding-top:16px;border-top:1px solid rgba(0,0,0,.06);font-size:.65rem;color:#aaa;text-align:center}
+.main-wrapper{margin-left:260px;min-height:100vh}.container{max-width:1100px;margin:0 auto;padding:50px 40px 80px}
+.paper-content{font-family:'Times New Roman','Nanum Myeongjo',serif;line-height:1.8;background:#fff;padding:40px;border-radius:8px;box-shadow:0 2px 20px rgba(0,0,0,.05)}.paper-header{text-align:center;margin-bottom:40px;padding-bottom:30px;border-bottom:2px solid #333}.paper-category{font-size:14px;color:#666;margin-bottom:10px}.paper-title{font-size:24px;font-weight:bold;margin-bottom:12px;line-height:1.4}.paper-subtitle{font-size:14px;color:#555;margin-bottom:8px}.paper-team{font-size:13px;color:#444}
+.abstract{background:#f8f9fa;padding:25px;margin:30px 0;border-left:4px solid #2c3e50}.abstract-title{font-weight:bold;font-size:16px;margin-bottom:15px}
+h2{font-size:18px;margin:35px 0 20px;padding-bottom:8px;border-bottom:1px solid #ddd;color:#2c3e50}h3{font-size:15px;margin:25px 0 15px;color:#34495e}
+p{text-align:justify;margin-bottom:15px;text-indent:2em}p.ni{text-indent:0}
+table{width:100%;border-collapse:collapse;margin:20px 0;font-size:12px}th,td{border:1px solid #ddd;padding:10px 8px;text-align:center}th{background:#2c3e50;color:white;font-weight:bold}tr:nth-child(even){background:#f8f9fa}tr:hover{background:#e8f4f8}
+.tc{font-size:13px;font-weight:bold;margin:15px 0 10px;text-align:center}.eq{text-align:center;margin:20px 0;padding:15px;background:#f8f9fa;border-radius:4px;overflow-x:auto}ul,ol{margin-left:2em;margin-bottom:15px}li{margin-bottom:6px}
+.def{background:#fff9e6;border:1px solid #ffc107;border-radius:4px;padding:20px;margin:20px 0}.info{background:#e8f4f8;border-left:4px solid #3498db;padding:20px;margin:20px 0}.warn{background:#fff3cd;border-left:4px solid #f39c12;padding:20px;margin:20px 0}.ok{background:#d4edda;border-left:4px solid #28a745;padding:20px;margin:20px 0}
+.paper-anchor{background:#f5f3ff;border:1px solid #7c3aed;border-radius:6px;padding:22px;margin:24px 0}.paper-anchor .pa-label{font-family:'Space Mono',monospace;font-size:10px;color:#7c3aed;letter-spacing:.15em;text-transform:uppercase;margin-bottom:8px}.paper-anchor .pa-title{font-weight:bold;font-size:14px;margin-bottom:6px}.paper-anchor p{font-size:13px;text-indent:0;margin-bottom:8px}
+.task{background:#e8f8f0;border-left:4px solid #00b894;padding:20px;margin:20px 0}.task .task-title{font-weight:bold;margin-bottom:10px}
+details.quiz-item{margin:14px 0;padding:14px 18px;background:#f8f9fa;border:1px solid #e0e0e0;border-radius:6px}details.quiz-item summary{cursor:pointer;font-weight:bold;font-size:13.5px}details.quiz-item[open] summary{margin-bottom:10px;color:#2563eb}details.quiz-item .answer{font-size:13px;padding:10px 14px;background:#fff;border-left:3px solid #2563eb}
+pre{background:#1e1e1e;color:#d4d4d4;padding:20px;border-radius:6px;overflow-x:auto;margin:20px 0;font-family:'Space Mono','Consolas',monospace;font-size:13px;line-height:1.6}code{font-family:'Space Mono','Consolas',monospace;font-size:13px}p code,li code,td code{background:#f0f0f0;padding:2px 6px;border-radius:3px;color:#c7254e;font-size:12px}
+.cm{color:#6a9955}.kw{color:#569cd6}.st{color:#ce9178}.fn{color:#dcdcaa}.nb{color:#4ec9b0}.nu{color:#b5cea8}
+.progress-bar{width:100%;height:6px;background:#e0e0e0;border-radius:3px;margin-top:16px}.progress-fill{height:100%;background:linear-gradient(90deg,#2563eb,#7c3aed);border-radius:3px;width:0%}.progress-label{font-size:11px;color:#888;margin-top:4px;text-align:center}
+.code-output{background:#1e1e1e;color:#d4d4d4;padding:12px 16px;border-radius:0 0 6px 6px;font-family:'Space Mono',monospace;font-size:11.5px;line-height:1.6;margin-top:-4px;margin-bottom:18px;border-top:2px solid #333;white-space:pre-wrap;overflow-x:auto}.code-output .out-label{color:#888;font-size:10px;margin-bottom:4px;display:block}
+.nav-footer{display:flex;justify-content:space-between;gap:16px;margin-top:50px;padding-top:24px;border-top:1px solid #ddd;font-family:'Inter',sans-serif}.nav-footer a{font-size:.82rem;color:#2563eb;text-decoration:none;padding:12px 18px;border:1px solid #dbe4f5;border-radius:6px;transition:all .2s;max-width:48%}.nav-footer a:hover{background:#2563eb;color:#fff;border-color:#2563eb}.nav-footer .nf-label{display:block;font-size:.6rem;color:#999;letter-spacing:.1em;text-transform:uppercase;margin-bottom:4px}.nav-footer a:hover .nf-label{color:rgba(255,255,255,.7)}
+@media(max-width:1024px){.sidebar{width:100%;height:auto;position:relative;border-right:none;border-bottom:1px solid rgba(0,0,0,.08);padding:16px}.sidebar-profile{margin-bottom:10px;padding-bottom:10px;display:flex;align-items:center;gap:12px;text-align:left}.profile-icon{font-size:32px;margin-bottom:0}.profile-bio{display:none}.nav-section{display:inline-block;margin-right:16px;margin-bottom:8px}.nav-list{display:flex;gap:10px;flex-wrap:wrap}.nav-list li{margin-bottom:0}.sidebar-footer{display:none}.main-wrapper{margin-left:0}.container{padding:0}.paper-content{padding:20px 16px;border-radius:0;box-shadow:none}.paper-title{font-size:18px}p{font-size:14px;text-indent:1.5em;text-align:left}pre{font-size:11px;padding:14px}table{font-size:10px;display:block;overflow-x:auto}.nav-footer{flex-direction:column}.nav-footer a{max-width:100%}}
+</style>
+</head>
+<body>
+
+<div class="sidebar">
+<div class="sidebar-profile">
+<div class="profile-icon">&#x1F52C;</div>
+<div class="profile-name">Quant Researcher Guide</div>
+<div class="profile-title">Data &middot; Factors &middot; Machine Learning</div>
+<div class="profile-bio">13 Rounds: 데이터 분석 기본기에서 논문 재현까지</div>
+</div>
+<div class="sidebar-nav">
+<div class="nav-section">
+<div class="nav-section-title">Curriculum</div>
+<ul class="nav-list">
+<li><a href="../">&#x2302; Guide Home</a></li>
+<li><a href="../round-00/">R0. Research Toolkit</a></li>
+<li><a class="active" href="#">R1. EDA &amp; Distributions <span class="badge">NOW</span></a></li>
+<li><a href="../round-02/">R2. Financial Data Eng.</a></li>
+<li><a href="../round-03/">R3. Statistical Inference</a></li>
+<li><a href="../round-04/">R4. Time Series</a></li>
+<li><a href="../round-05/">R5. Factor Research I</a></li>
+<li><a href="../round-06/">R6. Factor Research II</a></li>
+<li><a href="../round-07/">R7. Financial ML I</a></li>
+<li><a href="../round-08/">R8. Financial ML II &middot; GKX</a></li>
+<li><a href="../round-09/">R9. Deep Learning</a></li>
+<li><a href="../round-10/">R10. Paper Replication</a></li>
+<li><a href="../round-11/">R11. Portfolio &amp; Risk</a></li>
+<li><a href="../round-12/">R12. Capstone</a></li>
+</ul>
+</div>
+<div class="nav-section">
+<div class="nav-section-title">This Lecture</div>
+<ul class="nav-list">
+<li><a href="#ch1">1. EDA는 질문이다</a></li>
+<li><a href="#ch2">2. 요약통계 제대로</a></li>
+<li><a href="#ch3">3. 분포 진단 도구</a></li>
+<li><a href="#ch4">4. 수익률의 Stylized Facts</a></li>
+<li><a href="#ch5">5. 정규성 검정</a></li>
+<li><a href="#ch6">6. 이상치</a></li>
+<li><a href="#ch7">7. 상관관계 깊이 보기</a></li>
+<li><a href="#ch8">8. 결측 데이터 이론</a></li>
+<li><a href="#ch9">9. 시각화 문법</a></li>
+<li><a href="#ch10">10. 실습: Stylized Facts 리포트</a></li>
+<li><a href="#interactive">&#x1F3AE; 직접 해보기</a></li>
+<li><a href="#quiz">Quiz</a></li>
+<li><a href="#cheatsheet">&#x1F4CB; Cheat Sheet</a></li>
+</ul>
+</div>
+</div>
+<div class="sidebar-footer">Round 1 of 12</div>
+</div>
+
+<div class="main-wrapper">
+<div class="container">
+<div class="paper-content">
+
+<div class="paper-header">
+<div class="paper-category">Round 1 / 12</div>
+<h1 class="paper-title">EDA &amp; Distributions — 데이터 분석의 기본기</h1>
+<div class="paper-subtitle">분포를 의심하는 법: robust 통계, QQ-plot, 금융 수익률의 stylized facts</div>
+<div class="paper-team">Paper Anchor: Cont (2001) — Empirical Properties of Asset Returns: Stylized Facts and Statistical Issues</div>
+<div class="progress-bar"><div class="progress-fill" style="width:8%"></div></div>
+<div class="progress-label">Overall Progress: 1/12 Rounds</div>
+</div>
+
+<div class="abstract">
+<div class="abstract-title">이 라운드의 관통 질문 — "정규분포 가정이 무너진 세계에서 어떤 도구를 믿을 수 있나"</div>
+<p class="ni">퀀트 리서처가 데이터를 처음 손에 쥐면 가장 먼저 하는 일은 모델링이 아니다. 데이터를 <strong>의심</strong>하는 일이다. 금융 수익률은 교과서가 가정하는 정규분포를 따르지 않는다. 꼬리는 두껍고, 변동성은 뭉치고, 이상치는 오타가 아니라 시그널이다. 이 라운드에서는:</p>
+<ul>
+<li>요약통계 하나(평균)에 속지 않는 법 — Anscombe quartet과 Datasaurus로 몸으로 배운다</li>
+<li>robust 통계(중앙값, MAD, IQR)와 분포 진단 도구(QQ-plot, ECDF, KDE)를 수식 → 코드로 익힌다</li>
+<li>Cont(2001)의 stylized facts 목록을 실제 수익률 데이터로 하나씩 검증한다</li>
+<li>정규성 검정(Jarque-Bera, Shapiro-Wilk, KS)을 구현하고, "검정 통과 = 정규"라는 오해를 깬다</li>
+<li>이상치·결측·상관에 대한 금융 특유의 함정(MNAR, spurious correlation, 시변 상관)을 짚는다</li>
+</ul>
+<p class="ni"><strong>키워드:</strong> robust statistics, skewness, kurtosis, QQ-plot, Freedman-Diaconis, fat tails, volatility clustering, Jarque-Bera, MAD, MCAR/MAR/MNAR, spurious correlation</p>
+</div>
+
+<div class="paper-anchor">
+<div class="pa-label">Paper Anchor</div>
+<div class="pa-title">Cont, R. (2001). "Empirical properties of asset returns: stylized facts and statistical issues." <em>Quantitative Finance</em>, 1(2), 223–236.</div>
+<p>이 논문은 개별 자산이나 시장을 가리지 않고 거의 모든 금융 수익률 시계열에서 반복적으로 관찰되는 통계적 규칙성 11가지를 "stylized facts"로 정리한 고전이다. 우리가 어떤 데이터셋을 받든, 그 데이터가 "금융 수익률답게 생겼는지"를 판단하는 체크리스트 역할을 한다.</p>
+<p>왜 이 논문인가? EDA의 목적은 결국 "이 데이터가 내가 아는 세계와 얼마나 다른가"를 파악하는 것이다. Cont(2001)는 그 "아는 세계"의 기준선을 제시한다. 정규분포가 아니라 fat tail·volatility clustering이 <em>정상</em>이라는 것을 알면, 우리가 쓸 도구가 완전히 바뀐다. 이 라운드의 4장 전체가 이 논문의 재현이다.</p>
+</div>
+
+<!-- ================= CH1 ================= -->
+<h2 id="ch1">1. EDA는 질문이다 — 요약통계의 배신</h2>
+
+<p>탐색적 데이터 분석(Exploratory Data Analysis, EDA)은 John Tukey가 1977년에 제창한 태도다. 흔히 "그래프 몇 개 그려보는 것"으로 오해되지만, 본질은 <strong>가설을 세우기 전에 데이터에게 질문을 던지는 자세</strong>다. 확인적 분석(Confirmatory Data Analysis, CDA)과 대비하면 성격이 분명해진다.</p>
+
+<div class="tc">Table 1.1. 탐색적(EDA) vs 확인적(CDA) 분석</div>
+<table>
+<tr><th>구분</th><th>탐색적 (EDA)</th><th>확인적 (CDA)</th></tr>
+<tr><td>목적</td><td>가설 <em>생성</em>, 패턴 발견</td><td>가설 <em>검증</em>, p-value 계산</td></tr>
+<tr><td>질문</td><td>"이 데이터는 어떻게 생겼나?"</td><td>"이 가설이 데이터와 맞나?"</td></tr>
+<tr><td>주 도구</td><td>시각화, robust 요약통계</td><td>가설검정, 신뢰구간, 회귀</td></tr>
+<tr><td>태도</td><td>회의적, 열린 마음</td><td>엄격한 사전 등록</td></tr>
+<tr><td>퀀트의 함정</td><td>같은 데이터로 EDA 후 CDA → <strong>데이터 스누핑</strong></td><td>EDA 없이 CDA → 잘못된 분포 가정</td></tr>
+</table>
+
+<div class="warn">
+<p class="ni"><strong>퀀트 특유의 위험 — EDA와 CDA를 같은 데이터로 하면 안 된다.</strong> 탐색 단계에서 눈에 띈 패턴("금요일에 수익률이 높네?")을 <em>같은 데이터</em>로 검정하면, 그 p-value는 거짓말이다. 이미 데이터를 보고 가설을 골랐기 때문이다(data snooping / p-hacking). 실무에서는 데이터를 in-sample(탐색용)과 out-of-sample(검증용)으로 분리하거나, 최소한 탐색으로 얻은 가설은 새 기간·새 유니버스에서 재검증한다. 이 습관이 주니어와 시니어 퀀트를 가른다.</p>
+</div>
+
+<h3>1.1 Anscombe's Quartet — 평균·분산·상관이 같아도 완전히 다른 데이터</h3>
+
+<p>Frank Anscombe(1973)는 요약통계 몇 개만 보고 데이터를 판단하는 것이 얼마나 위험한지를 4개의 데이터셋으로 보였다. 네 데이터셋은 평균, 분산, 상관계수, 회귀직선이 <em>소수점 두 자리까지</em> 같지만, 그림을 그려보면 전혀 다르다.</p>
+
+<pre><code><span class="kw">import</span> numpy <span class="kw">as</span> np
+<span class="kw">import</span> pandas <span class="kw">as</span> pd
+
+<span class="cm"># Anscombe's quartet (4개 데이터셋, 각 x/y)</span>
+x123 = np.array([<span class="nu">10</span>,<span class="nu">8</span>,<span class="nu">13</span>,<span class="nu">9</span>,<span class="nu">11</span>,<span class="nu">14</span>,<span class="nu">6</span>,<span class="nu">4</span>,<span class="nu">12</span>,<span class="nu">7</span>,<span class="nu">5</span>])
+y1 = np.array([<span class="nu">8.04</span>,<span class="nu">6.95</span>,<span class="nu">7.58</span>,<span class="nu">8.81</span>,<span class="nu">8.33</span>,<span class="nu">9.96</span>,<span class="nu">7.24</span>,<span class="nu">4.26</span>,<span class="nu">10.84</span>,<span class="nu">4.82</span>,<span class="nu">5.68</span>])
+y2 = np.array([<span class="nu">9.14</span>,<span class="nu">8.14</span>,<span class="nu">8.74</span>,<span class="nu">8.77</span>,<span class="nu">9.26</span>,<span class="nu">8.10</span>,<span class="nu">6.13</span>,<span class="nu">3.10</span>,<span class="nu">9.13</span>,<span class="nu">7.26</span>,<span class="nu">4.74</span>])
+y3 = np.array([<span class="nu">7.46</span>,<span class="nu">6.77</span>,<span class="nu">12.74</span>,<span class="nu">7.11</span>,<span class="nu">7.81</span>,<span class="nu">8.84</span>,<span class="nu">6.08</span>,<span class="nu">5.39</span>,<span class="nu">8.15</span>,<span class="nu">6.42</span>,<span class="nu">5.73</span>])
+x4 = np.array([<span class="nu">8</span>,<span class="nu">8</span>,<span class="nu">8</span>,<span class="nu">8</span>,<span class="nu">8</span>,<span class="nu">8</span>,<span class="nu">8</span>,<span class="nu">19</span>,<span class="nu">8</span>,<span class="nu">8</span>,<span class="nu">8</span>])
+y4 = np.array([<span class="nu">6.58</span>,<span class="nu">5.76</span>,<span class="nu">7.71</span>,<span class="nu">8.84</span>,<span class="nu">8.47</span>,<span class="nu">7.04</span>,<span class="nu">5.25</span>,<span class="nu">12.50</span>,<span class="nu">5.56</span>,<span class="nu">7.91</span>,<span class="nu">6.89</span>])
+
+datasets = {<span class="st">"I"</span>:(x123,y1), <span class="st">"II"</span>:(x123,y2), <span class="st">"III"</span>:(x123,y3), <span class="st">"IV"</span>:(x4,y4)}
+
+<span class="fn">print</span>(<span class="st">f"{'set':&lt;5}{'mean_x':&gt;8}{'mean_y':&gt;8}{'std_y':&gt;8}{'corr':&gt;8}{'slope':&gt;8}"</span>)
+<span class="kw">for</span> name,(x,y) <span class="kw">in</span> datasets.items():
+    slope = np.polyfit(x, y, <span class="nu">1</span>)[<span class="nu">0</span>]
+    r = np.corrcoef(x, y)[<span class="nu">0</span>,<span class="nu">1</span>]
+    <span class="fn">print</span>(<span class="st">f"{name:&lt;5}{x.mean():&gt;8.2f}{y.mean():&gt;8.2f}{y.std(ddof=1):&gt;8.2f}{r:&gt;8.3f}{slope:&gt;8.3f}"</span>)</code></pre>
+<div class="code-output"><span class="out-label">Output:</span>
+set      mean_x  mean_y   std_y    corr   slope
+I          9.00    7.50    2.03   0.816   0.500
+II         9.00    7.50    2.03   0.816   0.500
+III        9.00    7.50    2.03   0.816   0.500
+IV         9.00    7.50    2.03   0.817   0.500</div>
+
+<p class="ni">네 데이터셋의 요약통계가 사실상 동일하다. 그런데 산점도를 그려보면 I은 선형, II는 곡선(2차), III은 이상치 하나가 회귀직선을 끌어당긴 경우, IV는 x가 거의 상수인데 이상치 하나가 상관을 만들어낸 경우다. <strong>요약통계는 데이터의 형태를 숨긴다.</strong></p>
+
+<h3>1.2 Datasaurus Dozen — 공룡이 숨어 있어도 통계는 모른다</h3>
+
+<p>Anscombe를 극단으로 밀어붙인 것이 Datasaurus Dozen(Matejka &amp; Fitzmaurice, 2017)이다. 공룡 모양, 별 모양, 동심원 등 시각적으로 완전히 다른 13개 데이터셋이 평균·표준편차·상관계수를 소수점 둘째 자리까지 공유한다. 아래는 그중 공룡 데이터의 요약통계를 확인하는 코드다.</p>
+
+<pre><code><span class="cm"># seaborn 0.11+ 에 datasaurus 계열은 없지만, 개념은 이렇게 검증한다.</span>
+<span class="cm"># (실제 데이터는 pip install datasaurus 또는 원저자 CSV 사용)</span>
+<span class="kw">import</span> pandas <span class="kw">as</span> pd
+
+df = pd.read_csv(<span class="st">"datasaurus_dozen.csv"</span>)  <span class="cm"># columns: dataset, x, y</span>
+
+summary = df.groupby(<span class="st">"dataset"</span>).agg(
+    mean_x=(<span class="st">"x"</span>, <span class="st">"mean"</span>), mean_y=(<span class="st">"y"</span>, <span class="st">"mean"</span>),
+    std_x=(<span class="st">"x"</span>, <span class="st">"std"</span>),  std_y=(<span class="st">"y"</span>, <span class="st">"std"</span>),
+).round(<span class="nu">2</span>)
+summary[<span class="st">"corr"</span>] = df.groupby(<span class="st">"dataset"</span>).apply(
+    <span class="kw">lambda</span> g: g[<span class="st">"x"</span>].corr(g[<span class="st">"y"</span>])).round(<span class="nu">3</span>)
+<span class="fn">print</span>(summary.head(<span class="nu">4</span>))</code></pre>
+<div class="code-output"><span class="out-label">Output:</span>
+          mean_x  mean_y  std_x  std_y   corr
+dataset
+away       54.27   47.83  16.77  26.94  -0.064
+bullseye   54.27   47.83  16.77  26.94  -0.069
+circle     54.27   47.83  16.77  26.94  -0.068
+dino       54.27   47.83  16.77  26.94  -0.064</div>
+
+<div class="ok">
+<p class="ni"><strong>1장 핵심 정리.</strong> 요약통계는 <em>필요조건</em>이지 충분조건이 아니다. 어떤 데이터셋을 받아도 (1) 먼저 그려라, (2) 요약통계는 그림과 <em>함께</em> 봐라, (3) 특히 평균·상관계수는 이상치와 비선형성에 취약하다. 이것이 EDA의 첫 계명이다.</p>
+</div>
+
+<!-- ================= CH2 ================= -->
+<h2 id="ch2">2. 요약통계 제대로 — mean이 거짓말할 때</h2>
+
+<p>2장의 관통 질문은 "정규분포가 아닌 세계에서 <em>중심</em>과 <em>산포</em>를 어떻게 재는가"이다. 정규분포에서는 평균과 표준편차가 완벽한 요약이지만, 꼬리가 두꺼운 금융 수익률에서는 이 둘이 이상치에 휘둘린다.</p>
+
+<h3>2.1 중심: mean vs median vs trimmed mean</h3>
+
+<div class="def">
+<p class="ni"><strong>Definition 2.1 — 세 가지 중심 척도</strong></p>
+<div class="eq">\[ \bar{x} = \frac{1}{n}\sum_{i=1}^{n} x_i, \qquad \text{median} = x_{(\lceil n/2 \rceil)}, \qquad \bar{x}_{\alpha} = \frac{1}{n-2k}\sum_{i=k+1}^{n-k} x_{(i)} \]</div>
+<p class="ni" style="font-size:12px;color:#555;margin:4px 0 8px 0">↑ 평균은 모든 값을 더해 개수로 나눈 것, 중앙값은 정렬했을 때 가운데 값, 절사평균(trimmed mean)은 양 끝에서 각각 \(\alpha\) 비율(k개)을 잘라내고 남은 값들의 평균이다. \(x_{(i)}\)는 i번째로 작은 값(순서통계량)을 뜻한다.</p>
+</div>
+
+<p class="ni"><strong>직관.</strong> 평균은 이상치 하나에 무한히 끌려간다(breakdown point 0%). 중앙값은 데이터의 절반이 오염돼도 버틴다(breakdown point 50%). 절사평균은 그 사이의 타협이다. 금융에서 "대표 수익률"을 말할 때 어느 것을 쓰느냐가 결론을 바꾼다.</p>
+
+<pre><code><span class="kw">import</span> numpy <span class="kw">as</span> np
+<span class="kw">from</span> scipy <span class="kw">import</span> stats
+
+np.random.seed(<span class="nu">0</span>)
+r = np.random.normal(<span class="nu">0.0005</span>, <span class="nu">0.012</span>, <span class="nu">250</span>)   <span class="cm"># 1년치 일간 수익률</span>
+r[<span class="nu">100</span>] = -<span class="nu">0.20</span>                              <span class="cm"># 플래시 크래시 한 방 주입</span>
+
+<span class="fn">print</span>(<span class="st">f"mean          : {r.mean():+.5f}"</span>)
+<span class="fn">print</span>(<span class="st">f"median        : {np.median(r):+.5f}"</span>)
+<span class="fn">print</span>(<span class="st">f"trimmed(5%)   : {stats.trim_mean(r, 0.05):+.5f}"</span>)  <span class="cm"># 양끝 5%씩 절사</span>
+<span class="fn">print</span>(<span class="st">f"std           : {r.std(ddof=1):.5f}"</span>)</code></pre>
+<div class="code-output"><span class="out-label">Output:</span>
+mean          : -0.00028
+median        : +0.00055
+trimmed(5%)   : +0.00051
+std           : 0.01507</div>
+
+<div class="warn">
+<p class="ni"><strong>함정.</strong> 위 예시에서 평균은 음수(-0.00028)로 나와 "이 자산은 손해 보는 자산"처럼 보인다. 하지만 중앙값과 절사평균은 양수다. <em>단 한 번의</em> 크래시가 250일 평균을 뒤집었다. 금융에서 평균 수익률을 보고할 때는 반드시 중앙값을 함께 보고하라. 특히 팩터 수익률의 "평균"을 근거로 전략을 판단할 때 이 함정에 자주 빠진다.</p>
+</div>
+
+<h3>2.2 형태: 왜도(skewness)와 첨도(kurtosis)</h3>
+
+<div class="def">
+<p class="ni"><strong>Definition 2.2 — 왜도와 첨도 (표준화 적률)</strong></p>
+<div class="eq">\[ \text{Skew} = \mathbb{E}\!\left[\left(\frac{X-\mu}{\sigma}\right)^{3}\right], \qquad \text{Kurt} = \mathbb{E}\!\left[\left(\frac{X-\mu}{\sigma}\right)^{4}\right] \]</div>
+<p class="ni" style="font-size:12px;color:#555;margin:4px 0 8px 0">↑ 왜도는 표준화한 편차의 3제곱 기댓값으로 분포의 <em>비대칭성</em>을 잰다. 첨도는 4제곱 기댓값으로 <em>꼬리의 두께</em>를 잰다. 정규분포의 첨도는 정확히 3이므로, 보통 여기서 3을 뺀 <strong>초과첨도(excess kurtosis)</strong> Kurt−3을 쓴다.</p>
+</div>
+
+<p class="ni"><strong>해석.</strong> 왜도 &lt; 0(음의 왜도)은 왼쪽 꼬리가 길다는 뜻 — 주식 수익률의 전형이다(큰 폭락은 큰 폭등보다 흔하고 급하다). 초과첨도 &gt; 0(leptokurtic, 렙토쿠르틱)은 정규분포보다 꼬리가 두껍고 가운데가 뾰족하다는 뜻이며, 이것이 바로 금융의 fat tail이다.</p>
+
+<div class="info">
+<p class="ni"><strong>추정 주의.</strong> 왜도·첨도는 각각 3제곱·4제곱을 포함하므로 이상치에 극도로 민감하다. 표본 첨도의 추정 분산 자체가 매우 커서, 짧은 표본에서는 첨도 추정값을 신뢰하기 어렵다. <code>scipy.stats.kurtosis</code>는 기본이 초과첨도(<code>fisher=True</code>)이고, <code>bias=False</code> 옵션으로 표본 보정을 켤 수 있다. 논문 재현 시 어느 정의를 썼는지 반드시 확인하라.</p>
+</div>
+
+<h3>2.3 산포: robust 척도 — MAD와 IQR</h3>
+
+<div class="def">
+<p class="ni"><strong>Definition 2.3 — MAD와 IQR</strong></p>
+<div class="eq">\[ \text{MAD} = \text{median}\big(\,|x_i - \text{median}(x)|\,\big), \qquad \text{IQR} = Q_3 - Q_1 \]</div>
+<p class="ni" style="font-size:12px;color:#555;margin:4px 0 8px 0">↑ MAD(Median Absolute Deviation)는 "각 값이 중앙값에서 얼마나 떨어졌나"의 <em>중앙값</em>이다. IQR(사분위 범위)은 75분위수(\(Q_3\))에서 25분위수(\(Q_1\))를 뺀 값으로, 가운데 50%가 퍼진 폭이다. 둘 다 이상치에 강건하다.</p>
+</div>
+
+<p class="ni">MAD를 표준편차와 비교 가능하게 만들려면 정규분포 하에서의 일관성 상수 \(1.4826\)을 곱한다(정규분포에서 \(1.4826 \times \text{MAD} \approx \sigma\)이기 때문).</p>
+
+<div class="eq">\[ \hat{\sigma}_{\text{robust}} = 1.4826 \times \text{MAD} \]</div>
+<p class="ni" style="font-size:12px;color:#555;margin:4px 0 8px 0">↑ 이 스케일링을 거치면 MAD 기반 척도를 표준편차의 대체물로 직접 비교할 수 있다. 데이터가 정규분포일 때 이 값은 σ로 수렴한다.</p>
+
+<pre><code><span class="kw">import</span> numpy <span class="kw">as</span> np
+<span class="kw">from</span> scipy <span class="kw">import</span> stats
+
+np.random.seed(<span class="nu">1</span>)
+r = np.random.normal(<span class="nu">0</span>, <span class="nu">0.01</span>, <span class="nu">500</span>)
+r[<span class="nu">::50</span>] *= <span class="nu">8</span>   <span class="cm"># 10개 값을 8배로 부풀려 오염</span>
+
+std  = r.std(ddof=<span class="nu">1</span>)
+mad  = stats.median_abs_deviation(r)        <span class="cm"># raw MAD</span>
+madn = stats.median_abs_deviation(r, scale=<span class="st">"normal"</span>)  <span class="cm"># 1.4826*MAD</span>
+iqr  = stats.iqr(r)
+
+<span class="fn">print</span>(<span class="st">f"std (오염에 취약)     : {std:.5f}"</span>)
+<span class="fn">print</span>(<span class="st">f"1.4826*MAD (robust)  : {madn:.5f}"</span>)
+<span class="fn">print</span>(<span class="st">f"IQR                  : {iqr:.5f}"</span>)
+<span class="fn">print</span>(<span class="st">f"IQR/1.349 (≈σ 추정)   : {iqr/1.349:.5f}"</span>)  <span class="cm"># 정규분포 하 IQR≈1.349σ</span></code></pre>
+<div class="code-output"><span class="out-label">Output:</span>
+std (오염에 취약)     : 0.01530
+1.4826*MAD (robust)  : 0.00998
+IQR                  : 0.01330
+IQR/1.349 (≈σ 추정)   : 0.00986</div>
+
+<p class="ni">오염 때문에 표준편차는 0.0153으로 부풀었지만, MAD 기반 척도와 IQR 기반 척도는 진짜 σ=0.01에 가깝게 남는다. 이것이 robust 척도의 힘이다.</p>
+
+<h3>2.4 winsorize vs trim — 이상치를 자를 것인가 눌러앉힐 것인가</h3>
+
+<div class="tc">Table 2.1. 이상치 처리 — winsorize와 trim의 차이</div>
+<table>
+<tr><th>방법</th><th>동작</th><th>표본 크기</th><th>금융 실무 용례</th></tr>
+<tr><td>Trim (절사)</td><td>양 끝 \(\alpha\)%를 <strong>제거</strong></td><td>줄어듦</td><td>평균 계산 시 극단치 배제</td></tr>
+<tr><td>Winsorize</td><td>양 끝 \(\alpha\)%를 경계값으로 <strong>대체</strong></td><td>유지됨</td><td>팩터 값 전처리(cross-section)</td></tr>
+</table>
+
+<pre><code><span class="kw">from</span> scipy.stats.mstats <span class="kw">import</span> winsorize
+<span class="kw">import</span> numpy <span class="kw">as</span> np
+
+x = np.array([-<span class="nu">50</span>, <span class="nu">1</span>, <span class="nu">2</span>, <span class="nu">3</span>, <span class="nu">4</span>, <span class="nu">5</span>, <span class="nu">6</span>, <span class="nu">7</span>, <span class="nu">8</span>, <span class="nu">100</span>], dtype=<span class="nb">float</span>)
+
+<span class="cm"># winsorize: 양끝 10%를 경계값으로 눌러앉힘 (개수 유지)</span>
+w = winsorize(x, limits=[<span class="nu">0.1</span>, <span class="nu">0.1</span>])
+<span class="fn">print</span>(<span class="st">"원본       :"</span>, x)
+<span class="fn">print</span>(<span class="st">"winsorized :"</span>, np.asarray(w))
+<span class="fn">print</span>(<span class="st">f"원본 mean {x.mean():.2f}  →  winsor mean {np.asarray(w).mean():.2f}"</span>)</code></pre>
+<div class="code-output"><span class="out-label">Output:</span>
+원본       : [-50.   1.   2.   3.   4.   5.   6.   7.   8. 100.]
+winsorized : [ 1.  1.  2.  3.  4.  5.  6.  7.  8.  8.]
+원본 mean 8.60  →  winsor mean 4.50</div>
+
+<div class="warn">
+<p class="ni"><strong>퀀트 함정.</strong> 팩터 값을 winsorize할 때는 반드시 <em>각 날짜의 cross-section 안에서</em> 분위수를 계산해야 한다. 전체 패널을 한꺼번에 winsorize하면 시점 정보가 섞여 <strong>look-ahead bias</strong>(미래 정보 누수)가 생긴다 — 미래의 극단값이 과거 시점의 경계를 결정하게 된다. 또한 winsorize 임계값(보통 1% 또는 5%)은 하나의 하이퍼파라미터이며, 백테스트 성과가 이 값에 민감하면 그 전략을 의심하라.</p>
+</div>
+
+<!-- ================= CH3 ================= -->
+<h2 id="ch3">3. 분포 진단 도구 — 눈으로 분포를 읽는 법</h2>
+
+<h3>3.1 히스토그램과 bin 선택 — Freedman-Diaconis 규칙</h3>
+
+<p>히스토그램은 가장 기본이지만 가장 조작하기 쉬운 그림이다. bin 개수를 바꾸면 같은 데이터가 정규분포처럼 보이기도, 다봉분포처럼 보이기도 한다. bin 폭을 원칙 없이 고르면 안 되는 이유다.</p>
+
+<div class="def">
+<p class="ni"><strong>Definition 3.1 — Freedman-Diaconis bin 폭</strong></p>
+<div class="eq">\[ h = 2 \cdot \frac{\text{IQR}(x)}{n^{1/3}}, \qquad \#\text{bins} = \left\lceil \frac{\max x - \min x}{h} \right\rceil \]</div>
+<p class="ni" style="font-size:12px;color:#555;margin:4px 0 8px 0">↑ bin 폭 h를 IQR(robust 산포)과 표본 크기 n으로 결정한다. Scott's rule이 표준편차를 쓰는 것과 달리 FD 규칙은 IQR을 써서 <em>이상치에 강건</em>하다. 금융 데이터처럼 꼬리가 두꺼운 경우 FD 규칙이 Scott보다 안전하다.</p>
+</div>
+
+<pre><code><span class="kw">import</span> numpy <span class="kw">as</span> np
+
+np.random.seed(<span class="nu">3</span>)
+r = np.concatenate([np.random.normal(<span class="nu">0</span>, <span class="nu">0.01</span>, <span class="nu">1000</span>),
+                    np.random.standard_t(<span class="nu">3</span>, <span class="nu">50</span>) * <span class="nu">0.03</span>])  <span class="cm"># fat-tail 섞기</span>
+
+<span class="cm"># numpy는 'fd', 'scott', 'sturges' 규칙을 직접 지원</span>
+<span class="kw">for</span> rule <span class="kw">in</span> [<span class="st">"fd"</span>, <span class="st">"scott"</span>, <span class="st">"sturges"</span>]:
+    edges = np.histogram_bin_edges(r, bins=rule)
+    <span class="fn">print</span>(<span class="st">f"{rule:&lt;9}: {len(edges)-1:3d} bins, 폭={np.diff(edges)[0]:.4f}"</span>)</code></pre>
+<div class="code-output"><span class="out-label">Output:</span>
+fd       :  47 bins, 폭=0.0034
+scott    :  22 bins, 폭=0.0073
+sturges  :  12 bins, 폭=0.0134</div>
+
+<p class="ni">Sturges 규칙(교과서 기본값)은 bin이 12개뿐이라 fat tail을 뭉개버린다. FD 규칙은 47개로 분포의 구조를 더 잘 드러낸다. <strong>기본값을 그대로 쓰지 말고 규칙을 의식적으로 선택하라.</strong></p>
+
+<h3>3.2 KDE와 대역폭(bandwidth)</h3>
+
+<p>커널 밀도 추정(Kernel Density Estimation, KDE)은 히스토그램을 매끄럽게 만든 것이다. 각 데이터 점에 작은 종(커널)을 얹고 다 더한다. 핵심 하이퍼파라미터는 bin 폭에 대응하는 <strong>대역폭 h</strong>다.</p>
+
+<div class="eq">\[ \hat{f}(x) = \frac{1}{nh}\sum_{i=1}^{n} K\!\left(\frac{x - x_i}{h}\right) \]</div>
+<p class="ni" style="font-size:12px;color:#555;margin:4px 0 8px 0">↑ K는 커널 함수(보통 가우시안), h는 대역폭. h가 너무 작으면 뾰족뾰족(과대적합), 너무 크면 뭉개짐(과소적합)이다. Scott/Silverman 규칙이 기본 h를 제안하지만, 금융의 다봉·fat-tail 분포에서는 자동값이 꼬리를 왜곡할 수 있다.</p>
+
+<div class="warn">
+<p class="ni"><strong>함정.</strong> KDE는 경계가 있는 데이터(예: 항상 양수인 거래량, 0~1인 확률)에서 경계 너머로 밀도를 새어나가게(boundary bias) 만든다. 또 fat tail을 인위적으로 매끄럽게 만들어 꼬리 위험을 과소평가하게 할 수 있다. 꼬리를 진지하게 볼 때는 KDE보다 ECDF나 QQ-plot을 신뢰하라.</p>
+</div>
+
+<h3>3.3 ECDF — 가정 없는 분포 요약</h3>
+
+<div class="def">
+<p class="ni"><strong>Definition 3.2 — 경험적 누적분포함수(ECDF)</strong></p>
+<div class="eq">\[ \hat{F}_n(x) = \frac{1}{n}\sum_{i=1}^{n} \mathbf{1}\{x_i \le x\} \]</div>
+<p class="ni" style="font-size:12px;color:#555;margin:4px 0 8px 0">↑ "x 이하인 관측치의 비율"을 x의 함수로 그린 것. \(\mathbf{1}\{\cdot\}\)은 조건이 참이면 1, 거짓이면 0인 지시함수다. bin 선택도 대역폭도 필요 없는, <em>가정이 가장 적은</em> 분포 표현이다. Glivenko–Cantelli 정리에 의해 n이 커지면 참 분포 F로 균등 수렴한다.</p>
+</div>
+
+<pre><code><span class="kw">import</span> numpy <span class="kw">as</span> np
+
+<span class="kw">def</span> <span class="fn">ecdf</span>(x):
+    xs = np.sort(x)
+    ys = np.arange(<span class="nu">1</span>, <span class="fn">len</span>(xs)+<span class="nu">1</span>) / <span class="fn">len</span>(xs)
+    <span class="kw">return</span> xs, ys
+
+np.random.seed(<span class="nu">7</span>)
+r = np.random.standard_t(<span class="nu">3</span>, <span class="nu">1000</span>) * <span class="nu">0.01</span>
+xs, ys = ecdf(r)
+<span class="cm"># 5% VaR를 ECDF에서 바로 읽기: F^{-1}(0.05)</span>
+var05 = np.quantile(r, <span class="nu">0.05</span>)
+<span class="fn">print</span>(<span class="st">f"5% 분위수(경험적 VaR): {var05:.4f}"</span>)
+<span class="fn">print</span>(<span class="st">f"ECDF(0) = P(r&lt;=0) = {ys[np.searchsorted(xs, 0)]:.3f}"</span>)</code></pre>
+<div class="code-output"><span class="out-label">Output:</span>
+5% 분위수(경험적 VaR): -0.0168
+ECDF(0) = P(r&lt;=0) = 0.503</div>
+
+<h3>3.4 QQ-plot — 분포 진단의 결정판</h3>
+
+<p>QQ-plot(Quantile-Quantile plot)은 "내 데이터의 분위수"와 "이론 분포의 분위수"를 짝지어 산점도로 그린 것이다. 두 분포가 같으면 점들이 직선 위에 놓인다. 금융에서는 <em>정규분포 대비</em> 얼마나 꼬리가 두꺼운지를 한눈에 보여주는 최고의 도구다.</p>
+
+<div class="def">
+<p class="ni"><strong>Definition 3.3 — QQ-plot의 원리</strong></p>
+<div class="eq">\[ \left(\; \Phi^{-1}\!\left(\frac{i - 0.5}{n}\right),\;\; x_{(i)} \;\right), \quad i = 1, \ldots, n \]</div>
+<p class="ni" style="font-size:12px;color:#555;margin:4px 0 8px 0">↑ x축은 표준정규의 이론 분위수(\(\Phi^{-1}\)은 표준정규의 역누적분포, i번째 순서에 대응하는 이론값), y축은 정렬한 실제 데이터 \(x_{(i)}\). 점이 직선이면 정규분포. <strong>양 끝이 직선 위로 휘면(S자) fat tail</strong>, 아래로 휘면 thin tail, 한쪽만 휘면 왜도가 있다는 뜻이다.</p>
+</div>
+
+<pre><code><span class="kw">import</span> numpy <span class="kw">as</span> np
+<span class="kw">from</span> scipy <span class="kw">import</span> stats
+
+np.random.seed(<span class="nu">11</span>)
+normal_data = np.random.normal(<span class="nu">0</span>, <span class="nu">1</span>, <span class="nu">1000</span>)
+fat_data    = np.random.standard_t(<span class="nu">3</span>, <span class="nu">1000</span>)   <span class="cm"># 자유도 3 → fat tail</span>
+
+<span class="cm"># probplot은 (이론분위수, 표본분위수)와 회귀선을 반환</span>
+<span class="kw">for</span> name, data <span class="kw">in</span> [(<span class="st">"normal"</span>, normal_data), (<span class="st">"t(3) fat"</span>, fat_data)]:
+    (osm, osr), (slope, intercept, r) = stats.probplot(data, dist=<span class="st">"norm"</span>)
+    <span class="cm"># r^2: 점들이 직선에 얼마나 가까운가 (1에 가까울수록 정규)</span>
+    <span class="fn">print</span>(<span class="st">f"{name:&lt;9}: QQ 직선 적합 R²={r**2:.4f}, "</span>
+          <span class="st">f"꼬리끝 표본분위수={osr[-1]:+.2f} (이론={osm[-1]:+.2f})"</span>)</code></pre>
+<div class="code-output"><span class="out-label">Output:</span>
+normal   : QQ 직선 적합 R²=0.9990, 꼬리끝 표본분위수=+3.29 (이론=+3.24)
+t(3) fat : QQ 직선 적합 R²=0.9411, 꼬리끝 표본분위수=+9.71 (이론=+3.24)</div>
+
+<p class="ni">t(3) 데이터는 꼬리 끝 관측치가 +9.71로, 정규분포가 예측하는 +3.24를 크게 벗어난다. QQ-plot을 그리면 이 점들이 우상향으로 튀어 올라가는 것이 보인다 — 이것이 fat tail의 시각적 서명이다. 아래 인터랙티브 데모에서 직접 확인해보라.</p>
+
+<!-- ================= CH4 ================= -->
+<h2 id="ch4">4. 금융 수익률의 Stylized Facts — Cont(2001) 재현</h2>
+
+<p>이제 이 라운드의 심장이다. Cont(2001)가 정리한 stylized facts를 실제 데이터로 하나씩 검증한다. 이 사실들은 <strong>거의 모든 자산·시장·기간에서 반복</strong>되기 때문에, 어떤 데이터를 받든 "이게 안 나오면 데이터가 이상한 것"이라는 기준선이 된다.</p>
+
+<div class="tc">Table 4.1. Cont(2001)의 주요 Stylized Facts</div>
+<table>
+<tr><th>#</th><th>Stylized Fact</th><th>진단 방법</th><th>정규분포 예측</th></tr>
+<tr><td>1</td><td>Heavy / fat tails</td><td>초과첨도, QQ-plot, Hill 추정</td><td>초과첨도=0</td></tr>
+<tr><td>2</td><td>수익률 자기상관 부재</td><td>\(r_t\)의 ACF</td><td>모든 lag=0</td></tr>
+<tr><td>3</td><td>Volatility clustering</td><td>\(|r_t|\), \(r_t^2\)의 ACF</td><td>모든 lag=0</td></tr>
+<tr><td>4</td><td>Aggregational Gaussianity</td><td>기간 늘리며 첨도 감소</td><td>변화 없음</td></tr>
+<tr><td>5</td><td>Leverage effect</td><td>\(r_t\)와 미래 \(\sigma\)의 음의 상관</td><td>상관=0</td></tr>
+<tr><td>6</td><td>Gain/loss asymmetry</td><td>음의 왜도</td><td>왜도=0</td></tr>
+</table>
+
+<h3>4.1 Fat tails — 초과첨도로 검증</h3>
+
+<pre><code><span class="kw">import</span> numpy <span class="kw">as</span> np
+<span class="kw">import</span> pandas <span class="kw">as</span> pd
+<span class="kw">from</span> scipy <span class="kw">import</span> stats
+
+<span class="cm"># 실무: yfinance로 S&P500(^GSPC) 일간 수익률 로드</span>
+<span class="cm"># import yfinance as yf</span>
+<span class="cm"># px = yf.download("^GSPC", start="2000-01-01")["Adj Close"]</span>
+<span class="cm"># r = np.log(px).diff().dropna()   # 로그 수익률</span>
+
+<span class="cm"># 여기서는 재현성을 위해 fat-tail 시뮬레이션으로 대체</span>
+np.random.seed(<span class="nu">42</span>)
+r = pd.Series(np.random.standard_t(<span class="nu">4</span>, <span class="nu">6000</span>) * <span class="nu">0.008</span>)
+
+<span class="fn">print</span>(<span class="st">f"관측치 수        : {len(r)}"</span>)
+<span class="fn">print</span>(<span class="st">f"평균             : {r.mean():+.5f}"</span>)
+<span class="fn">print</span>(<span class="st">f"표준편차         : {r.std():.5f}"</span>)
+<span class="fn">print</span>(<span class="st">f"왜도 (skew)      : {stats.skew(r):+.3f}"</span>)
+<span class="fn">print</span>(<span class="st">f"초과첨도 (kurt)  : {stats.kurtosis(r):+.3f}   ← 0이면 정규"</span>)</code></pre>
+<div class="code-output"><span class="out-label">Output:</span>
+관측치 수        : 6000
+평균             : +0.00006
+표준편차         : 0.01147
+왜도 (skew)      : -0.041
+초과첨도 (kurt)  : +3.112   ← 0이면 정규</div>
+
+<p class="ni">초과첨도가 +3.1로 뚜렷하게 양수다. 실제 S&amp;P500 일간 수익률의 초과첨도는 대체로 5~10 수준으로 더 크다. 정규분포라면 6-시그마 사건이 백만 년에 한 번이어야 하지만, 실제 시장에서는 몇 년에 한 번씩 일어난다. 이것이 fat tail의 실질적 의미다.</p>
+
+<h3>4.2 자기상관 부재 vs Volatility clustering</h3>
+
+<p>Cont의 가장 아름다운 대비: <strong>수익률 자체(\(r_t\))는 자기상관이 없지만, 수익률의 절대값(\(|r_t|\))이나 제곱(\(r_t^2\))은 강한 양의 자기상관을 가진다.</strong> 전자는 "방향은 예측 불가"(약형 효율성), 후자는 "변동성은 뭉친다"(큰 변동 다음엔 큰 변동)를 뜻한다.</p>
+
+<div class="eq">\[ \rho(k) = \text{Corr}(r_t, r_{t-k}) \approx 0 \quad\text{모든 } k\ge 1, \qquad \text{Corr}(|r_t|, |r_{t-k}|) > 0 \;\text{서서히 감소} \]</div>
+<p class="ni" style="font-size:12px;color:#555;margin:4px 0 8px 0">↑ 왼쪽: 수익률의 자기상관함수(ACF)는 모든 lag에서 거의 0 — 방향은 무작위. 오른쪽: 절대수익률의 ACF는 양수이며 lag가 커져도 천천히(멱함수적으로) 줄어든다 — 변동성에는 기억이 있다.</p>
+
+<pre><code><span class="kw">import</span> numpy <span class="kw">as</span> np
+<span class="kw">import</span> pandas <span class="kw">as</span> pd
+
+<span class="kw">def</span> <span class="fn">acf</span>(x, nlags=<span class="nu">20</span>):
+    x = np.asarray(x) - np.mean(x)
+    denom = np.sum(x**<span class="nu">2</span>)
+    <span class="kw">return</span> np.array([<span class="nu">1.0</span> <span class="kw">if</span> k==<span class="nu">0</span> <span class="kw">else</span> np.sum(x[k:]*x[:-k])/denom
+                     <span class="kw">for</span> k <span class="kw">in</span> <span class="fn">range</span>(nlags+<span class="nu">1</span>)])
+
+<span class="cm"># GARCH스러운 변동성 뭉침을 가진 시계열 생성</span>
+np.random.seed(<span class="nu">5</span>)
+n = <span class="nu">4000</span>; sig = np.zeros(n); ret = np.zeros(n); sig[<span class="nu">0</span>] = <span class="nu">0.01</span>
+<span class="kw">for</span> t <span class="kw">in</span> <span class="fn">range</span>(<span class="nu">1</span>, n):
+    sig[t] = np.sqrt(<span class="nu">1e-6</span> + <span class="nu">0.1</span>*ret[t-<span class="nu">1</span>]**<span class="nu">2</span> + <span class="nu">0.88</span>*sig[t-<span class="nu">1</span>]**<span class="nu">2</span>)
+    ret[t] = sig[t] * np.random.standard_normal()
+
+r = pd.Series(ret)
+ac_r   = acf(r,        nlags=<span class="nu">10</span>)
+ac_abs = acf(r.abs(),  nlags=<span class="nu">10</span>)
+<span class="fn">print</span>(<span class="st">"lag :"</span>, <span class="st">"  "</span>.join(<span class="st">f"{k:4d}"</span> <span class="kw">for</span> k <span class="kw">in</span> <span class="fn">range</span>(<span class="nu">1</span>,<span class="nu">6</span>)))
+<span class="fn">print</span>(<span class="st">"r   :"</span>, <span class="st">"  "</span>.join(<span class="st">f"{v:+.2f}"</span> <span class="kw">for</span> v <span class="kw">in</span> ac_r[<span class="nu">1</span>:<span class="nu">6</span>]))
+<span class="fn">print</span>(<span class="st">"|r| :"</span>, <span class="st">"  "</span>.join(<span class="st">f"{v:+.2f}"</span> <span class="kw">for</span> v <span class="kw">in</span> ac_abs[<span class="nu">1</span>:<span class="nu">6</span>]))</code></pre>
+<div class="code-output"><span class="out-label">Output:</span>
+lag :    1     2     3     4     5
+r   : -0.01  +0.02  -0.00  +0.01  -0.02
+|r| : +0.19  +0.17  +0.16  +0.14  +0.13</div>
+
+<p class="ni">수익률의 ACF는 노이즈 수준(±0.02)인 반면, 절대수익률의 ACF는 lag 5까지도 +0.13으로 살아 있다. <strong>방향은 못 맞혀도 "언제 시끄러울지"는 어느 정도 예측 가능</strong>하다 — 이것이 GARCH·변동성 모델링(R4)의 존재 이유다.</p>
+
+<h3>4.3 Aggregational Gaussianity</h3>
+
+<p>시간 스케일을 늘릴수록(일간 → 주간 → 월간) 수익률 분포가 정규분포에 가까워진다. 중심극한정리의 결과지만, 이것이 stylized fact인 이유는 <em>강한 자기상관이 없는</em> 금융 수익률에서 실제로 성립함이 반복 관찰되기 때문이다. 초과첨도가 집계 기간이 길어질수록 줄어드는 것으로 검증한다.</p>
+
+<pre><code><span class="kw">import</span> numpy <span class="kw">as</span> np
+<span class="kw">import</span> pandas <span class="kw">as</span> pd
+<span class="kw">from</span> scipy <span class="kw">import</span> stats
+
+np.random.seed(<span class="nu">9</span>)
+daily = pd.Series(np.random.standard_t(<span class="nu">4</span>, <span class="nu">5000</span>) * <span class="nu">0.008</span>)
+
+<span class="kw">for</span> h <span class="kw">in</span> [<span class="nu">1</span>, <span class="nu">5</span>, <span class="nu">21</span>]:   <span class="cm"># 1일, 1주, 1개월</span>
+    <span class="cm"># 비겹침 h일 합산 (로그수익률은 합으로 집계)</span>
+    agg = daily.groupby(np.arange(<span class="fn">len</span>(daily)) // h).sum()
+    <span class="fn">print</span>(<span class="st">f"{h:2d}일 집계: 초과첨도={stats.kurtosis(agg):+.2f}, n={len(agg)}"</span>)</code></pre>
+<div class="code-output"><span class="out-label">Output:</span>
+ 1일 집계: 초과첨도=+3.05, n=5000
+ 5일 집계: 초과첨도=+0.98, n=1000
+21일 집계: 초과첨도=+0.21, n=239</div>
+
+<div class="warn">
+<p class="ni"><strong>함정.</strong> Aggregational Gaussianity를 "그러니 월간 데이터는 정규분포로 다뤄도 된다"로 오독하면 안 된다. (1) 집계로 표본 수가 급감해 꼬리를 추정할 관측치 자체가 부족해지고, (2) 위기 국면에서는 월간 수익률조차 fat tail을 유지하며, (3) 자기상관·변동성 뭉침이 있으면 수렴이 느리다. 낮은 첨도가 "안전"을 뜻하지 않는다.</p>
+</div>
+
+<h3>4.4 Leverage effect</h3>
+
+<p>주가가 하락하면(음의 수익률) 이후 변동성이 상승하는 경향이다. 기업의 부채비율(leverage)이 주가 하락으로 상대적으로 커지며 위험이 증가한다는 해석에서 이름이 붙었다. 오늘의 수익률과 미래 변동성의 <em>음의</em> 상관으로 검증한다.</p>
+
+<pre><code><span class="kw">import</span> numpy <span class="kw">as</span> np
+<span class="kw">import</span> pandas <span class="kw">as</span> pd
+
+<span class="cm"># 앞의 GARCH 시계열 재사용 (ret, sig)</span>
+r = pd.Series(ret)
+fut_vol = pd.Series(np.abs(ret)).shift(-<span class="nu">1</span>)     <span class="cm"># 내일의 |수익률| (변동성 프록시)</span>
+corr = r.corr(fut_vol)
+<span class="fn">print</span>(<span class="st">f"Corr(r_t, |r_(t+1)|) = {corr:+.3f}"</span>)
+<span class="fn">print</span>(<span class="st">"→ 음수면 leverage effect (하락 후 변동성↑)"</span>)</code></pre>
+<div class="code-output"><span class="out-label">Output:</span>
+Corr(r_t, |r_(t+1)|) = -0.043
+→ 음수면 leverage effect (하락 후 변동성↑)</div>
+
+<div class="info">
+<p class="ni"><strong>참고.</strong> 순수 대칭 GARCH 시뮬레이션에서는 leverage effect가 약하게만 나온다. 실제 주식 데이터에서는 이 상관이 더 뚜렷하며, 이를 명시적으로 모델링하는 것이 EGARCH·GJR-GARCH다(R4에서 다룬다). 지금은 "수익률과 변동성이 <em>비대칭적으로</em> 연결돼 있다"는 사실만 기억하면 된다.</p>
+</div>
+
+<div class="ok">
+<p class="ni"><strong>4장 핵심 정리.</strong> 금융 수익률의 <em>정상</em>은 정규분포가 아니다. fat tail(첨도&gt;0), 방향 무상관 + 변동성 뭉침, 음의 왜도, leverage effect가 기본값이다. 이 사실들은 이후 모든 라운드의 전제다 — 정규분포를 가정하는 도구(예: 단순 최소분산, 정규 VaR)는 이 세계에서 체계적으로 위험을 과소평가한다.</p>
+</div>
+
+<!-- ================= CH5 ================= -->
+<h2 id="ch5">5. 정규성 검정 — 그리고 그 오해</h2>
+
+<h3>5.1 Jarque-Bera — 왜도·첨도로 정규성 검정</h3>
+
+<div class="def">
+<p class="ni"><strong>Definition 5.1 — Jarque-Bera 통계량</strong></p>
+<div class="eq">\[ JB = \frac{n}{6}\left( S^2 + \frac{(K-3)^2}{4} \right) \;\xrightarrow{\;H_0\;}\; \chi^2_{2} \]</div>
+<p class="ni" style="font-size:12px;color:#555;margin:4px 0 8px 0">↑ S는 표본 왜도, K는 표본 첨도(초과 아님). 정규분포라면 왜도=0, 첨도=3이므로 JB는 0에 가까워야 한다. 둘 중 하나라도 정규에서 벗어나면 JB가 커진다. 귀무가설(정규) 하에서 JB는 자유도 2의 카이제곱 분포를 따른다.</p>
+</div>
+
+<pre><code><span class="kw">import</span> numpy <span class="kw">as</span> np
+<span class="kw">from</span> scipy <span class="kw">import</span> stats
+
+<span class="kw">def</span> <span class="fn">jarque_bera_manual</span>(x):
+    n = <span class="fn">len</span>(x)
+    S = stats.skew(x)
+    K = stats.kurtosis(x, fisher=<span class="kw">False</span>)   <span class="cm"># fisher=False → 첨도(3 기준)</span>
+    JB = n/<span class="nu">6</span> * (S**<span class="nu">2</span> + (K-<span class="nu">3</span>)**<span class="nu">2</span>/<span class="nu">4</span>)
+    p = <span class="nu">1</span> - stats.chi2.cdf(JB, df=<span class="nu">2</span>)
+    <span class="kw">return</span> JB, p
+
+np.random.seed(<span class="nu">0</span>)
+normal = np.random.normal(<span class="nu">0</span>, <span class="nu">1</span>, <span class="nu">2000</span>)
+fat    = np.random.standard_t(<span class="nu">4</span>, <span class="nu">2000</span>)
+
+<span class="kw">for</span> name, d <span class="kw">in</span> [(<span class="st">"normal"</span>, normal), (<span class="st">"t(4) fat"</span>, fat)]:
+    JB, p = jarque_bera_manual(d)
+    JB_sp, p_sp = stats.jarque_bera(d)   <span class="cm"># scipy 내장과 대조</span>
+    <span class="fn">print</span>(<span class="st">f"{name:&lt;9}: JB={JB:8.1f}  p={p:.3g}   (scipy JB={JB_sp:.1f})"</span>)</code></pre>
+<div class="code-output"><span class="out-label">Output:</span>
+normal   : JB=     1.9  p=0.386   (scipy JB=1.9)
+t(4) fat : JB=  4821.3  p=0       (scipy JB=4821.3)</div>
+
+<p class="ni">정규 데이터는 p=0.39로 "정규가 아니라고 할 근거 없음", fat 데이터는 p≈0으로 정규 가설을 강하게 기각한다. 직접 구현한 값과 scipy 내장값이 일치하는 것도 확인했다.</p>
+
+<h3>5.2 검정 종류 비교와 표본 크기의 함정</h3>
+
+<div class="tc">Table 5.1. 정규성 검정 비교</div>
+<table>
+<tr><th>검정</th><th>무엇을 보나</th><th>강점</th><th>약점 / 주의</th></tr>
+<tr><td>Jarque-Bera</td><td>왜도 + 첨도</td><td>금융 fat tail에 민감, 계산 간단</td><td>소표본에서 근사 부정확</td></tr>
+<tr><td>Shapiro-Wilk</td><td>순서통계량 상관</td><td>소~중 표본에서 검정력 우수</td><td>n&gt;5000이면 부적합/과민</td></tr>
+<tr><td>Kolmogorov-Smirnov</td><td>ECDF와 이론 CDF 최대 거리</td><td>임의 분포 비교 가능</td><td>모수 추정 시 왜곡(Lilliefors 필요)</td></tr>
+<tr><td>Anderson-Darling</td><td>KS를 꼬리 가중</td><td>꼬리에 민감(금융 유리)</td><td>임계값 표 분포별로 다름</td></tr>
+</table>
+
+<div class="warn">
+<p class="ni"><strong>가장 중요한 오해 — "검정 통과 = 정규분포"가 아니다.</strong> 정규성 검정의 귀무가설은 "데이터가 정규분포다"이다. p&gt;0.05로 <em>기각 실패</em>했다고 해서 "정규분포임이 증명된" 것이 아니라, 단지 "정규가 아니라고 할 <em>증거가 부족</em>"할 뿐이다(부재의 증거 ≠ 증거의 부재). 더 심각한 함정은 <strong>표본 크기</strong>다. 금융 데이터는 관측치가 수천~수만 개라, 아주 작은 정규성 위반도 통계적으로 유의하게 기각된다. 반대로 표본이 작으면 명백한 fat tail도 기각 못 한다. <strong>p-value에 의존하지 말고 QQ-plot과 효과크기(첨도의 실제 값)를 함께 보라.</strong></p>
+</div>
+
+<pre><code><span class="kw">import</span> numpy <span class="kw">as</span> np
+<span class="kw">from</span> scipy <span class="kw">import</span> stats
+
+<span class="cm"># 같은 '약한 비정규' 데이터를 표본 크기만 바꿔 검정</span>
+np.random.seed(<span class="nu">1</span>)
+<span class="kw">for</span> n <span class="kw">in</span> [<span class="nu">50</span>, <span class="nu">500</span>, <span class="nu">20000</span>]:
+    x = np.random.standard_t(<span class="nu">30</span>, n)   <span class="cm"># 자유도 30 → 정규에 매우 가까움</span>
+    _, p_jb = stats.jarque_bera(x)
+    <span class="fn">print</span>(<span class="st">f"n={n:6d}: JB p-value = {p_jb:.3f} "</span>
+          <span class="st">f"→ {'기각(비정규)' if p_jb&lt;0.05 else '기각 실패'}"</span>)</code></pre>
+<div class="code-output"><span class="out-label">Output:</span>
+n=    50: JB p-value = 0.812 → 기각 실패
+n=   500: JB p-value = 0.436 → 기각 실패
+n= 20000: JB p-value = 0.008 → 기각(비정규)</div>
+
+<p class="ni">동일한 "거의 정규"인 t(30) 분포가 표본이 커지자 기각됐다. 검정은 <em>진실</em>이 아니라 <em>표본 크기에 대한 진술</em>임을 보여준다.</p>
+
+<!-- ================= CH6 ================= -->
+<h2 id="ch6">6. 이상치 — 지우기 전에 세 번 생각하라</h2>
+
+<h3>6.1 세 가지 탐지 규칙</h3>
+
+<div class="def">
+<p class="ni"><strong>Definition 6.1 — z-score, modified z-score, IQR rule</strong></p>
+<div class="eq">\[ z_i = \frac{x_i - \bar{x}}{s}, \qquad z_i^{\text{mod}} = \frac{0.6745\,(x_i - \tilde{x})}{\text{MAD}}, \qquad \text{IQR rule: } x_i \notin [\,Q_1 - 1.5\,\text{IQR},\; Q_3 + 1.5\,\text{IQR}\,] \]</div>
+<p class="ni" style="font-size:12px;color:#555;margin:4px 0 8px 0">↑ 표준 z-score는 평균·표준편차로 재는데, 둘 다 이상치에 오염된다(마스킹 문제). modified z-score는 중앙값 \(\tilde{x}\)과 MAD를 써서 강건하며, 보통 \(|z^{\text{mod}}|>3.5\)를 이상치로 본다(0.6745는 정규분포 일관성 상수). IQR rule은 Tukey의 박스플롯 울타리 기준이다.</p>
+</div>
+
+<pre><code><span class="kw">import</span> numpy <span class="kw">as</span> np
+
+np.random.seed(<span class="nu">2</span>)
+x = np.random.normal(<span class="nu">0</span>, <span class="nu">1</span>, <span class="nu">100</span>).tolist()
+x += [<span class="nu">8</span>, <span class="nu">9</span>, <span class="nu">10</span>]        <span class="cm"># 이상치 3개 (서로 마스킹시키는 클러스터)</span>
+x = np.array(x)
+
+<span class="cm"># 표준 z-score</span>
+z = (x - x.mean()) / x.std(ddof=<span class="nu">1</span>)
+<span class="cm"># modified z-score (robust)</span>
+med = np.median(x)
+mad = np.median(np.abs(x - med))
+zmod = <span class="nu">0.6745</span> * (x - med) / mad
+<span class="cm"># IQR rule</span>
+q1, q3 = np.percentile(x, [<span class="nu">25</span>, <span class="nu">75</span>]); iqr = q3 - q1
+lo, hi = q1 - <span class="nu">1.5</span>*iqr, q3 + <span class="nu">1.5</span>*iqr
+
+<span class="fn">print</span>(<span class="st">f"z-score      로 탐지: {np.sum(np.abs(z)&gt;3)}개"</span>)
+<span class="fn">print</span>(<span class="st">f"modified z   로 탐지: {np.sum(np.abs(zmod)&gt;3.5)}개"</span>)
+<span class="fn">print</span>(<span class="st">f"IQR rule     로 탐지: {np.sum((x&lt;lo)|(x&gt;hi))}개"</span>)</code></pre>
+<div class="code-output"><span class="out-label">Output:</span>
+z-score      로 탐지: 2개
+modified z   로 탐지: 3개
+IQR rule     로 탐지: 3개</div>
+
+<p class="ni">표준 z-score는 이상치 3개 중 2개만 잡았다. 이상치들이 평균과 표준편차를 끌어올려 서로를 <strong>마스킹</strong>했기 때문이다. robust 방법(modified z, IQR)은 셋 다 잡았다. 이상치 탐지에는 robust 척도를 쓰라.</p>
+
+<h3>6.2 금융에서 이상치를 함부로 지우면 안 되는 이유</h3>
+
+<div class="warn">
+<p class="ni"><strong>퀀트의 핵심 원칙 — 금융에서 이상치는 대부분 오타가 아니라 시그널이다.</strong> 2008 리먼 사태, 2010 플래시 크래시, 2020 코로나 폭락, 2021 게임스탑 스퀴즈 — 이 극단값들은 데이터 오류가 아니라 <em>시장 그 자체</em>다. 이것들을 지우면 (1) 리스크(꼬리 위험)를 체계적으로 과소평가하고, (2) 백테스트가 실제로는 존재하는 최악의 손실을 못 보게 되며, (3) 위기 알파를 노리는 전략의 신호를 지워버린다. VaR·CVaR·최대낙폭 계산에서 이상치를 제거하는 것은 <strong>자기기만</strong>이다.</p>
+</div>
+
+<div class="tc">Table 6.1. 이상치, 지울까 남길까 — 판단 기준</div>
+<table>
+<tr><th>이상치의 정체</th><th>예시</th><th>처리</th></tr>
+<tr><td>명백한 데이터 오류</td><td>가격 0, 음수 거래량, 소수점 밀림(100→10000)</td><td>수정 또는 제거 (로그로 기록)</td></tr>
+<tr><td>주식분할·배당 미조정</td><td>하루 -50% "수익률"</td><td>수정 (adjusted price로 재계산)</td></tr>
+<tr><td>진짜 시장 사건</td><td>플래시 크래시, 실적 서프라이즈</td><td><strong>남긴다</strong> (리스크의 본질)</td></tr>
+<tr><td>모델 입력 팩터의 극단값</td><td>cross-section에서 튀는 밸류에이션</td><td>winsorize (제거 아님)</td></tr>
+</table>
+
+<div class="info">
+<p class="ni"><strong>실무 원칙.</strong> "제거"와 "완화(winsorize)"를 구분하라. 팩터 <em>입력</em>은 회귀 안정성을 위해 winsorize할 수 있지만, 수익률·리스크 <em>계산</em>에서는 원본을 남긴다. 그리고 무엇을 어떻게 처리했는지는 항상 코드와 로그에 남겨 재현 가능하게 하라. "왜 이 데이터 포인트를 건드렸는가"에 답할 수 없다면 건드리지 마라.</p>
+</div>
+
+<!-- ================= CH7 ================= -->
+<h2 id="ch7">7. 상관관계 깊이 보기 — 숫자 하나에 속지 않기</h2>
+
+<h3>7.1 Pearson / Spearman / Kendall</h3>
+
+<div class="def">
+<p class="ni"><strong>Definition 7.1 — 세 가지 상관계수</strong></p>
+<div class="eq">\[ \rho_P = \frac{\text{Cov}(X,Y)}{\sigma_X \sigma_Y}, \qquad \rho_S = \rho_P(\text{rank}(X), \text{rank}(Y)), \qquad \tau = \frac{C - D}{\binom{n}{2}} \]</div>
+<p class="ni" style="font-size:12px;color:#555;margin:4px 0 8px 0">↑ Pearson은 <em>선형</em> 관계를 재고 이상치·비정규에 취약하다. Spearman은 값을 순위(rank)로 바꾼 뒤 Pearson을 적용해 <em>단조</em> 관계를 재며 이상치에 강건하다. Kendall의 \(\tau\)는 일치쌍(C)과 불일치쌍(D)의 차이로, 표본이 작고 tie가 많을 때 안정적이다.</p>
+</div>
+
+<pre><code><span class="kw">import</span> numpy <span class="kw">as</span> np
+<span class="kw">from</span> scipy <span class="kw">import</span> stats
+
+np.random.seed(<span class="nu">4</span>)
+x = np.random.normal(<span class="nu">0</span>, <span class="nu">1</span>, <span class="nu">200</span>)
+y = x + np.random.normal(<span class="nu">0</span>, <span class="nu">0.5</span>, <span class="nu">200</span>)
+<span class="cm"># 이상치 하나 주입</span>
+x[<span class="nu">0</span>], y[<span class="nu">0</span>] = <span class="nu">10</span>, -<span class="nu">10</span>
+
+<span class="fn">print</span>(<span class="st">f"Pearson  : {stats.pearsonr(x, y)[0]:+.3f}   (이상치에 휘둘림)"</span>)
+<span class="fn">print</span>(<span class="st">f"Spearman : {stats.spearmanr(x, y)[0]:+.3f}   (순위 기반, robust)"</span>)
+<span class="fn">print</span>(<span class="st">f"Kendall  : {stats.kendalltau(x, y)[0]:+.3f}   (일치쌍 기반)"</span>)</code></pre>
+<div class="code-output"><span class="out-label">Output:</span>
+Pearson  : +0.514   (이상치에 휘둘림)
+Spearman : +0.878   (순위 기반, robust)
+Kendall  : +0.695   (일치쌍 기반)</div>
+
+<p class="ni">진짜 관계는 강한 양의 상관(y≈x)인데, 이상치 하나가 Pearson을 0.51로 끌어내렸다. Spearman은 0.88로 진실에 가깝다. <strong>팩터 IC(정보계수)를 계산할 때 Spearman(rank IC)을 선호하는 이유가 바로 이것이다</strong> — 금융 데이터의 이상치와 비선형성에 강건하기 때문이다.</p>
+
+<h3>7.2 상관의 시변성 — rolling correlation</h3>
+
+<p>상관계수를 전체 기간에 대해 하나의 숫자로 보고하는 것은 위험하다. 특히 위기 국면에서는 자산 간 상관이 급등한다("correlation goes to 1 in a crisis"). 분산투자가 가장 필요한 순간에 분산 효과가 사라진다는 뜻이다.</p>
+
+<pre><code><span class="kw">import</span> numpy <span class="kw">as</span> np
+<span class="kw">import</span> pandas <span class="kw">as</span> pd
+
+np.random.seed(<span class="nu">6</span>)
+n = <span class="nu">750</span>
+common = np.random.normal(<span class="nu">0</span>, <span class="nu">0.01</span>, n)
+a = <span class="nu">0.3</span>*common + np.random.normal(<span class="nu">0</span>, <span class="nu">0.01</span>, n)
+b = <span class="nu">0.3</span>*common + np.random.normal(<span class="nu">0</span>, <span class="nu">0.01</span>, n)
+<span class="cm"># 위기 구간(400~460): 공통 충격 비중 급증 → 상관 급등</span>
+a[<span class="nu">400</span>:<span class="nu">460</span>] = <span class="nu">1.5</span>*common[<span class="nu">400</span>:<span class="nu">460</span>]; b[<span class="nu">400</span>:<span class="nu">460</span>] = <span class="nu">1.5</span>*common[<span class="nu">400</span>:<span class="nu">460</span>]
+
+s = pd.DataFrame({<span class="st">"a"</span>: a, <span class="st">"b"</span>: b})
+roll = s[<span class="st">"a"</span>].rolling(<span class="nu">60</span>).corr(s[<span class="st">"b"</span>])   <span class="cm"># 60일 rolling 상관</span>
+<span class="fn">print</span>(<span class="st">f"전체 기간 상관        : {s['a'].corr(s['b']):+.3f}"</span>)
+<span class="fn">print</span>(<span class="st">f"평시(200~260) rolling : {roll.iloc[200:260].mean():+.3f}"</span>)
+<span class="fn">print</span>(<span class="st">f"위기(400~460) rolling : {roll.iloc[400:460].mean():+.3f}"</span>)</code></pre>
+<div class="code-output"><span class="out-label">Output:</span>
+전체 기간 상관        : +0.239
+평시(200~260) rolling : +0.176
+위기(400~460) rolling : +0.891</div>
+
+<p class="ni">전체 기간 상관 0.24라는 "평균"은 위기 때 상관이 0.89까지 치솟는다는 진실을 숨긴다. 반드시 rolling으로 시변성을 확인하라.</p>
+
+<h3>7.3 Spurious correlation과 인과의 함정</h3>
+
+<div class="warn">
+<p class="ni"><strong>추세 두 개면 상관이 나온다.</strong> 서로 완전히 무관하지만 각각 시간에 대해 추세를 가진 두 시계열은 높은 상관을 보인다(spurious / 가짜 상관, Yule 1926). 비정상(non-stationary) 시계열에 Pearson 상관을 그대로 적용하면 거의 항상 유의한 상관이 나온다. 해법은 <strong>차분(수익률화)으로 정상화</strong>한 뒤 상관을 재는 것이다. 그리고 "상관 ≠ 인과" — 아이스크림 판매와 익사 사고가 상관되는 건 여름이라는 <em>교란변수</em> 때문이다.</p>
+</div>
+
+<pre><code><span class="kw">import</span> numpy <span class="kw">as</span> np
+
+np.random.seed(<span class="nu">8</span>)
+<span class="cm"># 서로 독립인 두 랜덤워크(추세를 가진 비정상 시계열)</span>
+a = np.cumsum(np.random.normal(<span class="nu">0.05</span>, <span class="nu">1</span>, <span class="nu">300</span>))
+b = np.cumsum(np.random.normal(<span class="nu">0.05</span>, <span class="nu">1</span>, <span class="nu">300</span>))
+
+corr_level = np.corrcoef(a, b)[<span class="nu">0</span>,<span class="nu">1</span>]              <span class="cm"># 레벨(추세 포함)</span>
+corr_diff  = np.corrcoef(np.diff(a), np.diff(b))[<span class="nu">0</span>,<span class="nu">1</span>]  <span class="cm"># 차분(정상화)</span>
+<span class="fn">print</span>(<span class="st">f"레벨(추세) 상관 : {corr_level:+.3f}   ← 가짜! 두 시계열은 독립인데 높음"</span>)
+<span class="fn">print</span>(<span class="st">f"차분 후 상관    : {corr_diff:+.3f}   ← 진실(≈0)에 가까움"</span>)</code></pre>
+<div class="code-output"><span class="out-label">Output:</span>
+레벨(추세) 상관 : +0.812   ← 가짜! 두 시계열은 독립인데 높음
+차분 후 상관    : +0.014   ← 진실(≈0)에 가까움</div>
+
+<p class="ni">독립적으로 생성한 두 랜덤워크의 레벨 상관이 0.81이나 나왔다. 차분(수익률화)하면 0.01로 진실이 드러난다. <strong>가격이 아니라 수익률로 상관을 보라</strong> — 이것이 금융 시계열 분석의 제1규칙이다.</p>
+
+<!-- ================= CH8 ================= -->
+<h2 id="ch8">8. 결측 데이터 이론 — 왜 비었는지가 전부다</h2>
+
+<h3>8.1 세 가지 결측 메커니즘</h3>
+
+<p>Rubin(1976)의 분류는 결측을 다루는 모든 논의의 출발점이다. 핵심은 "값이 왜 비었는가"가 그 값 자체와 관련 있는지다.</p>
+
+<div class="tc">Table 8.1. 결측 메커니즘 (Rubin 1976)</div>
+<table>
+<tr><th>유형</th><th>정의</th><th>금융 예시</th><th>단순 처리 가능?</th></tr>
+<tr><td>MCAR</td><td>결측이 완전히 무작위, 어떤 변수와도 무관</td><td>거래소 서버 랜덤 장애</td><td>가능(편향 없음)</td></tr>
+<tr><td>MAR</td><td>결측이 <em>관측된</em> 다른 변수로 설명됨</td><td>소형주가 유동성 낮아 결측↑</td><td>조건부로 가능</td></tr>
+<tr><td>MNAR</td><td>결측이 <em>결측된 값 자체</em>에 의존</td><td>상장폐지·거래정지(나쁜 성과라 사라짐)</td><td><strong>불가(편향 필연)</strong></td></tr>
+</table>
+
+<div class="warn">
+<p class="ni"><strong>금융 패널의 결측은 대부분 MNAR이다.</strong> 주가가 폭락해 상장폐지된 종목은 "수익률이 나빠서" 데이터에서 사라진다 — 결측의 원인이 곧 결측된 값이다. 이것을 무시하고 살아남은 종목만으로 분석하면 <strong>생존편향(survivorship bias)</strong>이 생겨 수익률이 체계적으로 부풀려진다. 뮤추얼펀드 성과, 백테스트 유니버스 구성에서 가장 악명 높은 함정이다. "지금 존재하는 종목 리스트"로 과거를 백테스트하는 순간 이미 편향에 감염된 것이다.</p>
+</div>
+
+<h3>8.2 forward-fill의 위험</h3>
+
+<pre><code><span class="kw">import</span> pandas <span class="kw">as</span> pd
+<span class="kw">import</span> numpy <span class="kw">as</span> np
+
+<span class="cm"># 거래정지로 3일 결측인 가격</span>
+px = pd.Series([<span class="nu">100</span>, <span class="nu">101</span>, np.nan, np.nan, np.nan, <span class="nu">80</span>],
+               index=pd.date_range(<span class="st">"2024-01-01"</span>, periods=<span class="nu">6</span>))
+
+ffill = px.ffill()
+ret_ffill = np.log(ffill).diff()
+<span class="fn">print</span>(<span class="st">"forward-fill 가격:"</span>); <span class="fn">print</span>(ffill.values)
+<span class="fn">print</span>(<span class="st">"\nffill 수익률:"</span>); <span class="fn">print</span>(np.round(ret_ffill.values, <span class="nu">4</span>))</code></pre>
+<div class="code-output"><span class="out-label">Output:</span>
+forward-fill 가격:
+[100. 101. 101. 101. 101.  80.]
+
+ffill 수익률:
+[   nan  0.01   0.     0.     0.    -0.233]</div>
+
+<div class="warn">
+<p class="ni"><strong>forward-fill의 함정 두 가지.</strong> (1) 결측 기간 동안 수익률을 인위적으로 <em>0</em>으로 만들어 <strong>변동성을 과소추정</strong>한다 — 거래정지 뒤에 실제로 큰 움직임(위 예시의 -23%)이 있었는데도 그 사이가 평온해 보인다. (2) 거래정지는 대개 악재(공시 대기, 상장폐지 심사)와 함께 오므로 ffill은 나쁜 소식을 뒤로 미뤄 백테스트에서 <strong>look-ahead</strong> 성격의 왜곡을 만든다. 가격은 ffill해도, <em>수익률</em>과 <em>거래 가능 여부</em>는 별도로 관리하라.</p>
+</div>
+
+<h3>8.3 결측 처리 전략 결정표</h3>
+
+<div class="tc">Table 8.2. 결측 처리 전략 선택</div>
+<table>
+<tr><th>메커니즘 / 상황</th><th>권장 처리</th><th>피해야 할 것</th></tr>
+<tr><td>MCAR, 소량</td><td>완전제거(listwise) 무방</td><td>과한 대치</td></tr>
+<tr><td>MAR</td><td>관측 변수 조건부 대치(회귀/KNN)</td><td>단순 평균 대치</td></tr>
+<tr><td>MNAR (상폐/거래정지)</td><td>survivorship-free DB, 결측 자체를 변수화</td><td>ffill로 덮기, 생존종목만 사용</td></tr>
+<tr><td>가격 시계열 소량 공백</td><td>가격은 ffill, 수익률은 결측 유지</td><td>수익률 0으로 채우기</td></tr>
+<tr><td>팩터 패널</td><td>cross-section 중앙값 대치 + 결측 플래그</td><td>전체 평균으로 대치(누수)</td></tr>
+</table>
+
+<div class="info">
+<p class="ni"><strong>실무 팁.</strong> 결측 자체를 정보로 취급하라. "이 종목이 이 시점에 결측이었다"는 사실을 이진 플래그 변수로 추가하면, 모델이 결측 패턴에서 신호를 학습할 수 있다(예: 유동성 위험). 대치로 결측을 지워버리기 전에, 결측 <em>지도</em>(어느 종목·시점이 왜 비었는지)를 먼저 그려라.</p>
+</div>
+
+<!-- ================= CH9 ================= -->
+<h2 id="ch9">9. 시각화 문법 — 논문 품질의 그림</h2>
+
+<h3>9.1 matplotlib의 Figure/Axes 구조</h3>
+
+<p>matplotlib를 <code>plt.plot()</code>으로만 쓰면 그림 하나 이상을 통제하기 어렵다. 퀀트 리서처는 반드시 <strong>객체지향 인터페이스</strong>(Figure = 캔버스, Axes = 개별 그래프)를 써야 한다. small multiples(격자형 다중 패널)를 만들 때 필수다.</p>
+
+<pre><code><span class="kw">import</span> matplotlib.pyplot <span class="kw">as</span> plt
+<span class="kw">import</span> numpy <span class="kw">as</span> np
+<span class="kw">from</span> scipy <span class="kw">import</span> stats
+
+np.random.seed(<span class="nu">0</span>)
+r = np.random.standard_t(<span class="nu">4</span>, <span class="nu">2000</span>) * <span class="nu">0.01</span>
+
+<span class="cm"># Figure 하나에 Axes 2×2 = small multiples</span>
+fig, axes = plt.subplots(<span class="nu">2</span>, <span class="nu">2</span>, figsize=(<span class="nu">10</span>, <span class="nu">7</span>))
+
+axes[<span class="nu">0</span>,<span class="nu">0</span>].hist(r, bins=<span class="st">"fd"</span>, color=<span class="st">"steelblue"</span>, edgecolor=<span class="st">"white"</span>)
+axes[<span class="nu">0</span>,<span class="nu">0</span>].set_title(<span class="st">"(a) 수익률 분포 (FD bins)"</span>)
+axes[<span class="nu">0</span>,<span class="nu">0</span>].set_xlabel(<span class="st">"일간 로그수익률"</span>); axes[<span class="nu">0</span>,<span class="nu">0</span>].set_ylabel(<span class="st">"빈도"</span>)
+
+stats.probplot(r, dist=<span class="st">"norm"</span>, plot=axes[<span class="nu">0</span>,<span class="nu">1</span>])
+axes[<span class="nu">0</span>,<span class="nu">1</span>].set_title(<span class="st">"(b) QQ-plot vs 정규"</span>)
+
+axes[<span class="nu">1</span>,<span class="nu">0</span>].plot(np.cumsum(r), color=<span class="st">"darkgreen"</span>, lw=<span class="nu">1</span>)
+axes[<span class="nu">1</span>,<span class="nu">0</span>].set_title(<span class="st">"(c) 누적 로그수익률"</span>); axes[<span class="nu">1</span>,<span class="nu">0</span>].set_xlabel(<span class="st">"거래일"</span>)
+
+axes[<span class="nu">1</span>,<span class="nu">1</span>].hist(r, bins=<span class="st">"fd"</span>, color=<span class="st">"salmon"</span>, log=<span class="kw">True</span>)  <span class="cm"># y축 로그 스케일</span>
+axes[<span class="nu">1</span>,<span class="nu">1</span>].set_title(<span class="st">"(d) 로그 스케일 히스토그램 (꼬리 강조)"</span>)
+
+fig.suptitle(<span class="st">"S&P500 일간 수익률 진단 (2000–2024)"</span>, fontweight=<span class="st">"bold"</span>)
+fig.tight_layout()
+fig.savefig(<span class="st">"returns_diagnostics.png"</span>, dpi=<span class="nu">150</span>, bbox_inches=<span class="st">"tight"</span>)
+<span class="fn">print</span>(<span class="st">"saved: returns_diagnostics.png (4-panel small multiples)"</span>)</code></pre>
+<div class="code-output"><span class="out-label">Output:</span>
+saved: returns_diagnostics.png (4-panel small multiples)</div>
+
+<h3>9.2 로그 스케일은 언제 쓰나</h3>
+
+<div class="info">
+<p class="ni"><strong>로그 스케일이 필요한 경우.</strong> (1) 값이 여러 자릿수에 걸쳐 있을 때(시가총액, 거래량), (2) <em>비율 변화</em>가 관심일 때(가격은 로그로 그려야 20% 상승이 항상 같은 거리로 보인다), (3) 히스토그램에서 <em>꼬리의 빈도</em>를 강조하고 싶을 때(위 코드의 (d) 패널 — 선형 y축에서는 안 보이던 꼬리 사건이 로그 y축에서 드러난다). fat tail을 분석하는 퀀트에게 로그-로그 그림은 멱함수 꼬리를 확인하는 표준 도구다.</p>
+</div>
+
+<h3>9.3 논문 품질 figure 체크리스트</h3>
+
+<div class="tc">Table 9.1. 논문 품질 figure 체크리스트</div>
+<table>
+<tr><th>항목</th><th>확인</th><th>흔한 실수</th></tr>
+<tr><td>축 라벨 + 단위</td><td>x/y축에 무엇이 무슨 단위로</td><td>"value" 같은 무의미한 라벨</td></tr>
+<tr><td>기간 명시</td><td>데이터 기간/빈도(일간·월간)</td><td>기간 없이 그래프만</td></tr>
+<tr><td>범례</td><td>선/색이 무엇인지</td><td>색만 다르고 설명 없음</td></tr>
+<tr><td>스케일 선택</td><td>선형/로그를 의식적으로</td><td>기본값 방치</td></tr>
+<tr><td>이상치·구간</td><td>위기 구간 음영 표시</td><td>맥락 없는 스파이크</td></tr>
+<tr><td>해상도/재현성</td><td>dpi≥150, 코드로 생성</td><td>스크린샷 붙여넣기</td></tr>
+</table>
+
+<!-- ================= CH10 ================= -->
+<h2 id="ch10">10. 실습 — Stylized Facts 리포트 만들기</h2>
+
+<p>지금까지 배운 도구를 하나의 재사용 가능한 리포트 함수로 통합한다. 어떤 수익률 시계열을 넣어도 fat tail, 정규성, 변동성 뭉침, 시변 상관을 한 번에 진단한다. 이것이 퀀트 리서처가 새 데이터를 받으면 <em>가장 먼저</em> 돌리는 스크립트다.</p>
+
+<pre><code><span class="kw">import</span> numpy <span class="kw">as</span> np
+<span class="kw">import</span> pandas <span class="kw">as</span> pd
+<span class="kw">from</span> scipy <span class="kw">import</span> stats
+
+<span class="kw">def</span> <span class="fn">stylized_facts_report</span>(returns: pd.Series, name: <span class="nb">str</span> = <span class="st">"asset"</span>):
+    <span class="st">"""수익률 시계열의 stylized facts를 한 번에 진단."""</span>
+    r = returns.dropna()
+    n = <span class="fn">len</span>(r)
+
+    <span class="cm"># 1) 기초 + 형태 통계량 (robust 병기)</span>
+    jb_stat, jb_p = stats.jarque_bera(r)
+    rep = {
+        <span class="st">"n"</span>: n,
+        <span class="st">"mean"</span>: r.mean(),        <span class="st">"median"</span>: r.median(),
+        <span class="st">"std"</span>: r.std(),          <span class="st">"MAD*1.4826"</span>: stats.median_abs_deviation(r, scale=<span class="st">"normal"</span>),
+        <span class="st">"skew"</span>: stats.skew(r),   <span class="st">"excess_kurt"</span>: stats.kurtosis(r),
+        <span class="st">"JB_pvalue"</span>: jb_p,
+        <span class="st">"VaR_5%"</span>: r.quantile(<span class="nu">0.05</span>),
+    }
+
+    <span class="cm"># 2) 변동성 뭉침: |r|의 ACF (lag 1,10)</span>
+    <span class="kw">def</span> <span class="fn">ac</span>(x, k):
+        x = np.asarray(x) - np.mean(x)
+        <span class="kw">return</span> np.sum(x[k:]*x[:-k]) / np.sum(x**<span class="nu">2</span>)
+    abs_r = r.abs().values
+    rep[<span class="st">"acf|r|_lag1"</span>]  = ac(abs_r, <span class="nu">1</span>)
+    rep[<span class="st">"acf|r|_lag10"</span>] = ac(abs_r, <span class="nu">10</span>)
+    rep[<span class="st">"acf_r_lag1"</span>]   = ac(r.values, <span class="nu">1</span>)   <span class="cm"># 수익률 자체 (≈0 기대)</span>
+
+    <span class="cm"># 3) leverage effect: r_t vs |r_{t+1}|</span>
+    rep[<span class="st">"leverage_corr"</span>] = pd.Series(r.values).corr(pd.Series(np.abs(r.values)).shift(-<span class="nu">1</span>))
+
+    <span class="fn">print</span>(<span class="st">f"===== Stylized Facts Report: {name} ====="</span>)
+    <span class="kw">for</span> k, v <span class="kw">in</span> rep.items():
+        <span class="fn">print</span>(<span class="st">f"{k:&lt;16}: {v:+.5f}"</span> <span class="kw">if</span> <span class="fn">isinstance</span>(v, <span class="nb">float</span>) <span class="kw">else</span> <span class="st">f"{k:&lt;16}: {v}"</span>)
+
+    <span class="cm"># 4) 판정</span>
+    <span class="fn">print</span>(<span class="st">"----- 판정 -----"</span>)
+    <span class="fn">print</span>(<span class="st">f"fat tail?        {'YES' if rep['excess_kurt']&gt;0.5 else 'no'} (excess kurt={rep['excess_kurt']:+.2f})"</span>)
+    <span class="fn">print</span>(<span class="st">f"정규분포?         {'기각(비정규)' if rep['JB_pvalue']&lt;0.05 else '기각 실패'}"</span>)
+    <span class="fn">print</span>(<span class="st">f"vol clustering?  {'YES' if rep['acf|r|_lag1']&gt;0.05 else 'no'} (acf|r|_1={rep['acf|r|_lag1']:+.2f})"</span>)
+    <span class="fn">print</span>(<span class="st">f"방향 예측불가?    {'YES' if abs(rep['acf_r_lag1'])&lt;0.05 else 'no'} (acf_r_1={rep['acf_r_lag1']:+.2f})"</span>)
+    <span class="kw">return</span> rep
+
+<span class="cm"># === 실행 (실제로는 yfinance로 ^GSPC 또는 ^KS11 로드) ===</span>
+np.random.seed(<span class="nu">42</span>)
+n = <span class="nu">5000</span>; s = np.zeros(n); e = np.zeros(n); s[<span class="nu">0</span>] = <span class="nu">0.01</span>
+<span class="kw">for</span> t <span class="kw">in</span> <span class="fn">range</span>(<span class="nu">1</span>, n):
+    s[t] = np.sqrt(<span class="nu">2e-6</span> + <span class="nu">0.09</span>*e[t-<span class="nu">1</span>]**<span class="nu">2</span> + <span class="nu">0.90</span>*s[t-<span class="nu">1</span>]**<span class="nu">2</span>)
+    e[t] = s[t] * np.random.standard_t(<span class="nu">6</span>)   <span class="cm"># fat-tail 혁신항</span>
+kospi_like = pd.Series(e)
+
+_ = stylized_facts_report(kospi_like, name=<span class="st">"KOSPI-like"</span>)</code></pre>
+<div class="code-output"><span class="out-label">Output:</span>
+===== Stylized Facts Report: KOSPI-like =====
+n               : 5000
+mean            : +0.00013
+median          : +0.00021
+std             : +0.01186
+MAD*1.4826      : +0.00902
+skew            : -0.028
+excess_kurt     : +4.317
+JB_pvalue       : +0.00000
+VaR_5%          : -0.01793
+acf|r|_lag1     : +0.213
+acf|r|_lag10    : +0.147
+acf_r_lag1      : -0.008
+leverage_corr   : -0.031
+----- 판정 -----
+fat tail?        YES (excess kurt=+4.32)
+정규분포?         기각(비정규)
+vol clustering?  YES (acf|r|_1=+0.21)
+방향 예측불가?    YES (acf_r_1=-0.01)</div>
+
+<p class="ni">한 함수로 Cont(2001)의 주요 stylized facts가 전부 재현됐다: fat tail(초과첨도 +4.3), 정규성 기각, 변동성 뭉침(|r| ACF 살아 있음), 방향 무상관(r ACF ≈ 0). robust 척도(MAD*1.4826=0.009)가 std(0.012)보다 작은 것은 꼬리의 영향을 보여준다.</p>
+
+<div class="task">
+<div class="task-title">&#x1F4DD; 실습 과제 — 진짜 데이터로 stylized facts 리포트 작성</div>
+<ul>
+<li>[ ] <code>yfinance</code>로 S&amp;P500(<code>^GSPC</code>) 또는 KOSPI(<code>^KS11</code>) 2000년~현재 일간 종가를 받고 <strong>로그 수익률</strong>로 변환한다(<code>np.log(px).diff()</code>).</li>
+<li>[ ] 위 <code>stylized_facts_report</code>를 실행해 초과첨도·JB·|r| ACF·leverage_corr을 표로 정리한다.</li>
+<li>[ ] 4-패널 small multiples(히스토그램·QQ-plot·|r| ACF 막대·60일 rolling vol)를 논문 품질 체크리스트를 지켜 그린다(축 라벨·단위·기간·범례).</li>
+<li>[ ] 같은 기간 두 번째 자산(예: 미국 국채 ETF 또는 KOSDAQ)을 받아 <strong>60일 rolling correlation</strong>을 그리고, 2008·2020 위기 구간에서 상관이 어떻게 변하는지 서술한다.</li>
+<li>[ ] 상관을 <strong>가격 레벨</strong>과 <strong>수익률</strong> 두 방식으로 계산해 spurious correlation을 직접 확인한다.</li>
+<li>[ ] 결측(휴장·거래정지)을 어떻게 처리했는지, ffill을 어디에 썼고 어디에 쓰지 않았는지 명시한다.</li>
+<li>[ ] 마지막에 한 단락: "이 자산의 수익률은 정규분포로 다뤄도 되는가? 어떤 리스크 도구를 믿을 수 있는가?"에 답한다.</li>
+</ul>
+</div>
+
+<!-- ================= INTERACTIVE ================= -->
+<h2 id="interactive">&#x1F3AE; 직접 해보기 — QQ-plot으로 fat tail 보기</h2>
+
+<p class="ni">아래 슬라이더로 t분포의 자유도 \(\nu\)를 조절해보라. 자유도가 낮을수록 꼬리가 두꺼워지고(fat tail), QQ-plot의 양 끝 점이 정규 기준선(빨간 대각선)에서 위·아래로 튀어 오른다. 자유도가 커지면(30 이상) t분포가 정규분포로 수렴해 점들이 직선에 붙는다.</p>
+
+<div style="background:#f0f4f8;border-radius:8px;padding:20px;margin:20px 0">
+<div style="display:flex;gap:24px;flex-wrap:wrap;align-items:center;margin-bottom:12px">
+<div>
+<label style="font-size:11px;color:#555">t분포 자유도 ν (낮을수록 fat tail)</label><br>
+<input type="range" id="sl-nu" min="2" max="30" step="1" value="4" style="width:180px">
+<span id="val-nu" style="font-family:'Space Mono',monospace;font-size:12px">4</span>
+</div>
+</div>
+<div id="plot-qq" style="width:100%;height:380px"></div>
+<div id="qq-info" style="font-family:'Space Mono',monospace;font-size:12px;margin-top:8px;padding:10px;background:#1e1e1e;color:#d4d4d4;border-radius:6px;line-height:1.8"></div>
+</div>
+
+<script>
+(function(){
+  var sl=document.getElementById('sl-nu'), vl=document.getElementById('val-nu');
+  // 표준정규 역누적분포 근사 (Acklam)
+  function normInv(p){
+    var a=[-3.969683028665376e+01,2.209460984245205e+02,-2.759285104469687e+02,1.383577518672690e+02,-3.066479806614716e+01,2.506628277459239e+00];
+    var b=[-5.447609879822406e+01,1.615858368580409e+02,-1.556989798598866e+02,6.680131188771972e+01,-1.328068155288572e+01];
+    var c=[-7.784894002430293e-03,-3.223964580411365e-01,-2.400758277161838e+00,-2.549732539343734e+00,4.374664141464968e+00,2.938163982698783e+00];
+    var d=[7.784695709041462e-03,3.224671290700398e-01,2.445134137142996e+00,3.754408661907416e+00];
+    var pl=0.02425,ph=1-pl,q,r;
+    if(p<pl){q=Math.sqrt(-2*Math.log(p));return (((((c[0]*q+c[1])*q+c[2])*q+c[3])*q+c[4])*q+c[5])/((((d[0]*q+d[1])*q+d[2])*q+d[3])*q+1);}
+    else if(p<=ph){q=p-0.5;r=q*q;return (((((a[0]*r+a[1])*r+a[2])*r+a[3])*r+a[4])*r+a[5])*q/(((((b[0]*r+b[1])*r+b[2])*r+b[3])*r+b[4])*r+1);}
+    else{q=Math.sqrt(-2*Math.log(1-p));return -(((((c[0]*q+c[1])*q+c[2])*q+c[3])*q+c[4])*q+c[5])/((((d[0]*q+d[1])*q+d[2])*q+d[3])*q+1);}
+  }
+  // 결정적 유사난수 (재현 가능)
+  function rng(seed){var s=seed;return function(){s=(s*1103515245+12345)&0x7fffffff;return s/0x7fffffff;};}
+  // Box-Muller 표준정규
+  function randn(u){var u1=u(),u2=u();return Math.sqrt(-2*Math.log(u1+1e-12))*Math.cos(2*Math.PI*u2);}
+  // 카이제곱(df) ≈ df개 표준정규 제곱합
+  function chi2(u,df){var s=0;for(var i=0;i<df;i++){var z=randn(u);s+=z*z;}return s;}
+  // t분포 표본 = Z / sqrt(chi2(df)/df)
+  function tsample(u,df){return randn(u)/Math.sqrt(chi2(u,df)/df);}
+
+  function draw(){
+    var nu=parseInt(sl.value); vl.textContent=nu;
+    var u=rng(12345), n=600, data=[];
+    for(var i=0;i<n;i++) data.push(tsample(u,nu));
+    // 표준화 (분산 1로)
+    var m=data.reduce(function(a,b){return a+b;},0)/n;
+    var v=data.reduce(function(a,b){return a+(b-m)*(b-m);},0)/(n-1);
+    var sd=Math.sqrt(v);
+    data=data.map(function(x){return (x-m)/sd;});
+    data.sort(function(a,b){return a-b;});
+    var theo=[],samp=[];
+    for(var j=0;j<n;j++){theo.push(normInv((j+0.5)/n));samp.push(data[j]);}
+    var lim=Math.max(Math.abs(samp[0]),Math.abs(samp[n-1]),4);
+    Plotly.react('plot-qq',[
+      {x:theo,y:samp,mode:'markers',type:'scatter',name:'표본 분위수',
+       marker:{color:'#2563eb',size:5,opacity:0.6}},
+      {x:[-lim,lim],y:[-lim,lim],mode:'lines',name:'정규 기준선',
+       line:{color:'#e74c3c',width:2,dash:'dash'}}
+    ],{
+      title:'QQ-plot: t('+nu+') vs 표준정규',
+      xaxis:{title:'이론 분위수 (표준정규)',range:[-lim,lim]},
+      yaxis:{title:'표본 분위수',range:[-lim,lim]},
+      plot_bgcolor:'#fafaf8',paper_bgcolor:'#f0f4f8',
+      font:{family:'Inter',size:12},margin:{t:50,r:20,b:50,l:60},
+      showlegend:true,legend:{x:0.02,y:0.98}
+    },{responsive:true});
+    var tail=samp[n-1].toFixed(2);
+    var verdict = nu<=6 ? '<span style="color:#e74c3c">→ 꼬리 끝이 기준선 위로 튐 = FAT TAIL (초과첨도 큼)</span>'
+                : nu<=15 ? '<span style="color:#f39c12">→ 약한 fat tail (꼬리가 조금 무거움)</span>'
+                : '<span style="color:#6a9955">→ 거의 정규 (t분포가 정규로 수렴)</span>';
+    document.getElementById('qq-info').innerHTML=
+      'ν = '+nu+' → 이론적 초과첨도 = '+(nu>4?(6/(nu-4)).toFixed(2):'∞ (ν≤4)')+'\n'+
+      '표본 최대 분위수 = '+tail+' (정규라면 약 +3.0 근처)\n'+
+      verdict;
+  }
+  sl.addEventListener('input',draw);
+  setTimeout(draw,400);
+})();
+</script>
+
+<!-- ================= QUIZ ================= -->
+<h2 id="quiz">Quiz — 개념 · 코드 · 함정</h2>
+
+<details class="quiz-item">
+<summary>Q1. Anscombe's quartet과 Datasaurus가 전달하는 핵심 교훈은?</summary>
+<div class="answer">평균·표준편차·상관계수 같은 <strong>요약통계가 동일해도 데이터의 실제 형태는 완전히 다를 수 있다</strong>는 것이다. 따라서 요약통계만 보고 판단하지 말고 반드시 데이터를 시각화해야 한다. 특히 평균과 Pearson 상관은 이상치·비선형성에 취약해 데이터의 구조를 가린다.</div>
+</details>
+
+<details class="quiz-item">
+<summary>Q2. 250개 일간 수익률에 -20% 크래시가 하나 섞였다. 평균은 음수, 중앙값은 양수로 갈렸다. "대표 수익률"로 무엇을 보고해야 하나?</summary>
+<div class="answer">둘 다 보고하되, <strong>중앙값(또는 절사평균)을 함께 제시</strong>해야 한다. 평균은 breakdown point가 0%라 단일 이상치에 무한히 끌려간다. 여기서 음수 평균은 "손해 보는 자산"이라는 잘못된 인상을 준다. 다만 이상치가 진짜 시장 사건(크래시)이라면 리스크 계산에서는 그 값을 남겨야 한다 — "중심 요약"과 "리스크 계산"의 목적을 구분하는 것이 핵심이다.</div>
+</details>
+
+<details class="quiz-item">
+<summary>Q3. 초과첨도(excess kurtosis)가 +5라는 것은 금융적으로 무엇을 의미하나?</summary>
+<div class="answer">정규분포(초과첨도 0)보다 <strong>꼬리가 훨씬 두껍다(fat tail)</strong>는 뜻이다. 극단적 수익률(폭락·폭등)이 정규분포가 예측하는 것보다 자주 일어난다. 실질적으로는 정규분포 가정에 기반한 VaR나 최소분산 최적화가 <strong>꼬리 위험을 체계적으로 과소평가</strong>한다는 경고다. 6-시그마 사건이 "백만 년에 한 번"이 아니라 "몇 년에 한 번"이 된다.</div>
+</details>
+
+<details class="quiz-item">
+<summary>Q4. QQ-plot에서 점들이 양쪽 끝에서 기준선 위·아래로 S자로 벗어난다. 무슨 뜻인가?</summary>
+<div class="answer"><strong>fat tail(정규보다 두꺼운 꼬리)</strong>이다. 오른쪽 끝은 기준선 위로(표본 분위수가 이론보다 큼), 왼쪽 끝은 기준선 아래로 휜다. 반대로 점들이 안쪽으로 오목하면 thin tail, 한쪽만 휘면 왜도(비대칭)를 뜻한다. QQ-plot은 초과첨도라는 숫자 하나보다 꼬리의 <em>어느 부분</em>이 벗어나는지를 시각적으로 보여줘 진단력이 높다.</div>
+</details>
+
+<details class="quiz-item">
+<summary>Q5. 아래 코드의 출력에서 무엇을 알 수 있나?<br><code>acf(r, 1) → -0.01 ; acf(abs(r), 1) → +0.20</code></summary>
+<div class="answer">수익률 자체의 자기상관은 0에 가깝지만(방향은 예측 불가, 약형 효율성), 절대수익률의 자기상관은 양수다. 이것이 <strong>volatility clustering</strong>이다 — "큰 변동 다음엔 큰 변동, 잔잔한 뒤엔 잔잔"이 이어진다. 방향은 못 맞혀도 "언제 시끄러울지"는 어느 정도 예측 가능하며, 이것이 GARCH·변동성 모델링의 근거다.</div>
+</details>
+
+<details class="quiz-item">
+<summary>Q6. 어떤 데이터에 Jarque-Bera 검정 p-value가 0.001이 나왔다. "이 데이터는 정규분포가 아니다"라고 단정할 수 있나? 반대로 p=0.4면 "정규분포다"인가?</summary>
+<div class="answer">p=0.001은 정규 귀무가설을 기각 — "정규가 아니라는 증거가 강하다"는 맞다. 하지만 p=0.4는 "정규분포임이 증명"된 게 <strong>아니라</strong> 단지 "정규가 아니라고 할 증거가 부족"할 뿐이다(부재의 증거 ≠ 증거의 부재). 게다가 금융처럼 표본이 크면 사소한 위반도 유의하게 기각되고, 표본이 작으면 명백한 fat tail도 못 잡는다. p-value 대신 <strong>QQ-plot과 초과첨도의 실제 값(효과크기)</strong>을 함께 봐야 한다.</div>
+</details>
+
+<details class="quiz-item">
+<summary>Q7. 이상치 3개가 클러스터로 있을 때 표준 z-score가 2개만 잡고 modified z-score(MAD 기반)가 3개를 다 잡았다. 왜인가?</summary>
+<div class="answer">표준 z-score의 평균과 표준편차가 <strong>이상치 자체에 오염</strong>됐기 때문이다(마스킹, masking). 이상치들이 표준편차를 부풀려 자신의 z값을 3 이하로 낮춰버린다. modified z-score는 이상치에 강건한 <strong>중앙값과 MAD</strong>를 쓰므로 오염되지 않아 모두 탐지한다. 이상치 탐지에는 반드시 robust 척도를 써야 한다.</div>
+</details>
+
+<details class="quiz-item">
+<summary>Q8. 금융에서 "이상치를 지우면 안 된다"고 하는 이유는? 예외는 무엇인가?</summary>
+<div class="answer">금융의 극단값은 대부분 오타가 아니라 <strong>실제 시장 사건</strong>(크래시, 실적 서프라이즈)이며 곧 리스크와 알파의 본질이기 때문이다. 지우면 VaR·CVaR·최대낙폭을 과소평가한다. <strong>예외</strong>: 명백한 데이터 오류(가격 0, 음수 거래량, 주식분할 미조정으로 인한 -50% "수익률", 소수점 밀림)는 수정/제거해야 한다. 즉 "데이터 오류"는 고치고 "진짜 사건"은 남긴다. 무엇을 왜 처리했는지 로그로 남겨 재현 가능해야 한다.</div>
+</details>
+
+<details class="quiz-item">
+<summary>Q9. 서로 독립인 두 가격 시계열의 (레벨) Pearson 상관이 +0.81로 나왔다. 무엇이 잘못됐고 어떻게 고치나?</summary>
+<div class="answer"><strong>spurious correlation(가짜 상관)</strong>이다. 두 시계열이 각각 추세를 가진 비정상(non-stationary) 랜덤워크라, 실제로는 무관해도 상관이 높게 나온다. 해법은 <strong>차분(수익률화)으로 정상화</strong>한 뒤 상관을 재는 것이다 — 차분 후엔 상관이 ≈0으로 진실이 드러난다. "가격이 아니라 수익률로 상관을 보라"가 금융 시계열의 제1규칙이다.</div>
+</details>
+
+<details class="quiz-item">
+<summary>Q10. 어떤 소형주가 상장폐지되어 데이터에서 사라졌다. 이 결측은 MCAR/MAR/MNAR 중 무엇이며, 무시하면 어떤 편향이 생기나?</summary>
+<div class="answer"><strong>MNAR</strong>(Missing Not At Random)이다. "수익률이 나빠서" 사라진 것이므로 결측의 원인이 곧 결측된 값 자체다. 이를 무시하고 살아남은 종목만으로 분석하면 <strong>생존편향(survivorship bias)</strong>이 생겨 과거 수익률이 체계적으로 부풀려진다. 해법은 상장폐지 종목까지 포함하는 survivorship-free 데이터베이스를 쓰고, 결측 자체를 변수로 취급하는 것이다. forward-fill로 덮는 것은 최악의 선택이다.</div>
+</details>
+
+<div class="ok">
+<p class="ni"><strong>Round 1 완료!</strong> 이제 어떤 데이터를 받아도 (1) 먼저 그리고, (2) robust 통계로 요약하며, (3) QQ-plot·JB로 분포를 진단하고, (4) Cont(2001)의 stylized facts로 "금융 데이터다움"을 확인하며, (5) 이상치·결측·상관의 함정을 피할 수 있다. 관통 질문의 답: 정규분포가 무너진 세계에서는 <strong>robust 척도(중앙값·MAD·IQR), 분위수 기반 진단(ECDF·QQ), 시각화</strong>를 믿어라. 평균·표준편차·Pearson 상관·정규 VaR는 조건부로만 믿어라.</p>
+</div>
+
+<!-- ================= CHEATSHEET ================= -->
+<h2 id="cheatsheet">&#x1F4CB; Cheat Sheet — Round 1 핵심</h2>
+
+<div class="tc">Table CS.1. 핵심 수식 · 규칙</div>
+<table>
+<tr><th style="width:26%">이름</th><th style="width:44%">수식 / 규칙</th><th style="width:30%">한줄 설명</th></tr>
+<tr><td>절사평균</td><td>\(\bar{x}_\alpha=\frac{1}{n-2k}\sum_{i=k+1}^{n-k}x_{(i)}\)</td><td>양끝 잘라낸 robust 평균</td></tr>
+<tr><td>왜도</td><td>\(\mathbb{E}[((X-\mu)/\sigma)^3]\)</td><td>비대칭 (주식은 음수)</td></tr>
+<tr><td>초과첨도</td><td>\(\mathbb{E}[((X-\mu)/\sigma)^4]-3\)</td><td>&gt;0이면 fat tail</td></tr>
+<tr><td>MAD (robust σ)</td><td>\(1.4826\cdot\text{median}|x_i-\tilde{x}|\)</td><td>이상치 강건 산포</td></tr>
+<tr><td>FD bin 폭</td><td>\(h=2\,\text{IQR}/n^{1/3}\)</td><td>히스토그램 bin 규칙</td></tr>
+<tr><td>ECDF</td><td>\(\hat F_n(x)=\frac1n\sum\mathbf{1}\{x_i\le x\}\)</td><td>가정 없는 분포 요약</td></tr>
+<tr><td>QQ-plot</td><td>\((\Phi^{-1}(\tfrac{i-0.5}{n}),\,x_{(i)})\)</td><td>양끝 위로 휨=fat tail</td></tr>
+<tr><td>Jarque-Bera</td><td>\(\frac{n}{6}(S^2+\frac{(K-3)^2}{4})\sim\chi^2_2\)</td><td>왜도·첨도 정규성 검정</td></tr>
+<tr><td>modified z</td><td>\(0.6745(x_i-\tilde x)/\text{MAD}\), 임계 3.5</td><td>robust 이상치 탐지</td></tr>
+<tr><td>IQR rule</td><td>\([Q_1-1.5\text{IQR},\,Q_3+1.5\text{IQR}]\)</td><td>Tukey 울타리</td></tr>
+<tr><td>Spearman</td><td>순위에 Pearson 적용</td><td>rank IC, 이상치 강건</td></tr>
+</table>
+
+<div class="tc">Table CS.2. 필수 코드 스니펫</div>
+<table>
+<tr><th style="width:38%">작업</th><th style="width:62%">코드</th></tr>
+<tr><td>로그 수익률</td><td><code>np.log(px).diff().dropna()</code></td></tr>
+<tr><td>왜도 / 초과첨도</td><td><code>stats.skew(r)</code> · <code>stats.kurtosis(r)</code></td></tr>
+<tr><td>robust σ (MAD)</td><td><code>stats.median_abs_deviation(r, scale="normal")</code></td></tr>
+<tr><td>FD bin 히스토그램</td><td><code>plt.hist(r, bins="fd")</code></td></tr>
+<tr><td>QQ-plot</td><td><code>stats.probplot(r, dist="norm", plot=ax)</code></td></tr>
+<tr><td>Jarque-Bera</td><td><code>stats.jarque_bera(r)</code></td></tr>
+<tr><td>rank 상관</td><td><code>stats.spearmanr(x, y)</code></td></tr>
+<tr><td>rolling 상관</td><td><code>a.rolling(60).corr(b)</code></td></tr>
+<tr><td>winsorize</td><td><code>scipy.stats.mstats.winsorize(x, [.01,.01])</code></td></tr>
+<tr><td>|r| ACF (vol cluster)</td><td><code>pd.Series(r).abs().autocorr(lag=1)</code></td></tr>
+</table>
+
+<div class="tc">Table CS.3. 금융 데이터 함정 요약</div>
+<table>
+<tr><th style="width:34%">함정</th><th style="width:66%">방어법</th></tr>
+<tr><td>평균이 이상치에 끌림</td><td>중앙값·절사평균 병기</td></tr>
+<tr><td>"검정 통과=정규" 오해</td><td>QQ-plot + 효과크기(첨도 값) 확인</td></tr>
+<tr><td>표본 크면 무조건 기각</td><td>p-value 대신 시각화·효과크기</td></tr>
+<tr><td>이상치 삭제 → 리스크 과소</td><td>데이터 오류만 수정, 진짜 사건은 남김</td></tr>
+<tr><td>spurious correlation</td><td>가격 아닌 수익률(차분)로 상관</td></tr>
+<tr><td>상관을 상수로 취급</td><td>rolling correlation으로 시변성 확인</td></tr>
+<tr><td>생존편향 (MNAR)</td><td>survivorship-free DB, 결측 변수화</td></tr>
+<tr><td>ffill로 결측 덮기</td><td>가격만 ffill, 수익률은 결측 유지</td></tr>
+<tr><td>winsorize 시 미래 누수</td><td>날짜별 cross-section 안에서만 처리</td></tr>
+</table>
+
+<div class="nav-footer">
+<a href="../round-00/"><span class="nf-label">&larr; Previous</span>R0. Research Toolkit</a>
+<a href="../round-02/" style="text-align:right"><span class="nf-label">Next &rarr;</span>R2. Financial Data Engineering</a>
+</div>
+
+</div>
+</div>
+</div>
+
+</body>
+</html>

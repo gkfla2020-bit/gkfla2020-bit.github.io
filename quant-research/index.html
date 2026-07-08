@@ -1,0 +1,286 @@
+---
+layout: null
+permalink: /quant-research/
+title: "Quant Researcher Guide"
+---
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quant Researcher Guide | Ha Rim Jung</title>
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="Quant Researcher Guide | Ha Rim Jung">
+    <meta property="og:description" content="데이터 분석 기본기부터 팩터 리서치, 금융 머신러닝, 논문 재현까지 — 13라운드 퀀트 리서처 양성 커리큘럼.">
+    <meta property="og:url" content="https://gkfla2020-bit.github.io/quant-research/">
+    <meta property="og:image" content="https://gkfla2020-bit.github.io/assets/og-card.png">
+    <meta property="og:site_name" content="Ha Rim Jung">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Quant Researcher Guide | Ha Rim Jung">
+    <meta name="twitter:description" content="데이터 분석 기본기부터 팩터 리서치, 금융 머신러닝, 논문 재현까지 — 13라운드 퀀트 리서처 양성 커리큘럼.">
+    <meta name="twitter:image" content="https://gkfla2020-bit.github.io/assets/og-card.png">
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-83LKVW7412"></script>
+    <script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-83LKVW7412');</script>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300&family=Space+Mono:wght@400&family=Inter:wght@300;400&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Inter',sans-serif;background:#fafaf8;color:#1a1a1a;line-height:1.7;overflow-x:hidden}
+
+{% include sidebar-styles.html %}
+
+.container{position:relative;z-index:1;max-width:800px;margin:0 auto;padding:60px 50px 80px}
+.page-title{font-family:'Cormorant Garamond',serif;font-size:clamp(2rem,5vw,2.8rem);font-weight:300;margin-bottom:8px;opacity:0}
+.page-subtitle{font-family:'Space Mono',monospace;font-size:11px;color:#888;letter-spacing:.2em;text-transform:uppercase;margin-bottom:15px;opacity:0}
+.page-desc{font-size:.92rem;color:#666;line-height:1.8;margin-bottom:50px;max-width:650px;opacity:0}
+
+.progress-overview{display:flex;align-items:center;gap:16px;margin-bottom:50px;padding:20px 25px;background:#fff;border:1px solid #e8e8e8;opacity:0}
+.progress-label{font-size:.7rem;color:#999;letter-spacing:.1em;text-transform:uppercase;white-space:nowrap}
+.progress-bar{flex:1;height:6px;background:#f0f0f0;border-radius:3px;overflow:hidden}
+.progress-fill{height:100%;background:linear-gradient(90deg,#2563eb,#7c3aed);border-radius:3px;transition:width .8s ease}
+.progress-text{font-family:'Space Mono',monospace;font-size:.8rem;color:#1a1a1a;white-space:nowrap}
+
+.round-list{display:flex;flex-direction:column;gap:20px}
+.round-card{display:block;padding:30px 35px;background:rgba(255,255,255,.9);border:1px solid #e8e8e8;text-decoration:none;transition:all .25s ease;opacity:0;transform:translateY(20px);position:relative;overflow:hidden}
+.round-card:hover{border-color:#1a1a1a;transform:translateX(8px) translateY(0);box-shadow:0 4px 20px rgba(0,0,0,.05)}
+.round-card.completed{border-left:3px solid #28a745}
+.round-card.current{border-left:3px solid #2563eb}
+.round-card.locked{border-left:3px solid #ddd;opacity:.6;pointer-events:none}
+.round-number{font-family:'Space Mono',monospace;font-size:.65rem;color:#999;letter-spacing:.15em;text-transform:uppercase;margin-bottom:8px;display:flex;align-items:center;gap:10px}
+.round-status{font-size:.55rem;padding:2px 8px;border-radius:10px;letter-spacing:.08em}
+.status-done{background:#e8f5e9;color:#2e7d32}
+.status-current{background:#e3f2fd;color:#1565c0}
+.status-locked{background:#f5f5f5;color:#999}
+.round-title{font-family:'Cormorant Garamond',serif;font-size:1.4rem;color:#1a1a1a;margin-bottom:10px;font-weight:400}
+.round-desc{font-size:.88rem;color:#666;line-height:1.7;margin-bottom:14px}
+.round-topics{display:flex;gap:6px;flex-wrap:wrap}
+.topic-tag{font-size:.58rem;padding:4px 10px;background:#f0f0f0;color:#666;letter-spacing:.04em;text-transform:uppercase;transition:all .2s}
+.round-card:hover .topic-tag{background:#1a1a1a;color:#fff}
+
+.part-header{font-family:'Cormorant Garamond',serif;font-size:1.1rem;font-weight:400;color:#999;letter-spacing:.05em;margin:40px 0 15px;padding-bottom:8px;border-bottom:1px solid #eee;opacity:0}
+.part-header:first-of-type{margin-top:0}
+
+.curriculum-info{margin-top:60px;padding:30px;background:#fff;border:1px solid #e8e8e8;opacity:0}
+.curriculum-title{font-family:'Cormorant Garamond',serif;font-size:1.2rem;font-weight:400;margin-bottom:15px;padding-bottom:10px;border-bottom:1px solid #eee}
+.curriculum-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px 30px}
+.curriculum-item{font-size:.82rem;color:#555;display:flex;align-items:baseline;gap:8px}
+.curriculum-item .label{font-size:.65rem;color:#999;letter-spacing:.08em;text-transform:uppercase;min-width:70px}
+
+@media(max-width:1024px){
+    .container{padding:30px 20px 50px}
+    .round-card{padding:22px 20px;border-radius:12px}
+    .round-card:hover{transform:none}
+    .round-title{font-size:1.2rem}
+    .round-desc{font-size:.84rem}
+    .curriculum-grid{grid-template-columns:1fr}
+    .progress-overview{flex-direction:column;align-items:stretch;gap:10px}
+    .page-desc{font-size:.85rem}
+}
+    </style>
+    <link rel="stylesheet" href="/assets/css/main.css">
+</head>
+<body>
+<img src="/assets/og-card.png" alt="" style="position:absolute;width:1px;height:1px;opacity:0;pointer-events:none;" aria-hidden="true">
+
+{% include sidebar.html %}
+{% include market-widget.html %}
+
+<div class="main-wrapper">
+<div class="container">
+    {% include breadcrumb.html %}
+    <h1 class="page-title">Quant Researcher Guide</h1>
+    <p class="page-subtitle">DATA · FACTORS · MACHINE LEARNING</p>
+    <p class="page-desc">데이터 분석 기본기에서 시작해 통계적 추론과 시계열 계량경제, 팩터 리서치, 금융 ML/DL, 논문 재현, 그리고 캡스톤까지 이어지는 13라운드(R0~R12) 커리큘럼입니다. 논문을 직접 읽고 코드로 구현하는 퀀트 리서처를 목표로 하는 대학원생을 대상으로 설계되었습니다.</p>
+
+    <div class="progress-overview">
+        <span class="progress-label">Overall Progress</span>
+        <div class="progress-bar"><div class="progress-fill" style="width:0%"></div></div>
+        <span class="progress-text">0 / 13 Complete</span>
+    </div>
+
+    <div class="round-list">
+        <a href="/quant-research/round-00/" class="round-card current">
+            <div class="round-number">Round 00 <span class="round-status status-current">● Start Here</span></div>
+            <h2 class="round-title">Research Toolkit — 재현 가능한 리서치 환경</h2>
+            <p class="round-desc">프로젝트 구조·Git·NumPy/Pandas 심화·시계열 인덱싱·Parquet — 리서치를 '코드'로 하는 법.</p>
+            <div class="round-topics">
+                <span class="topic-tag">NumPy</span>
+                <span class="topic-tag">Pandas</span>
+                <span class="topic-tag">MultiIndex</span>
+                <span class="topic-tag">Git</span>
+                <span class="topic-tag">Parquet</span>
+            </div>
+        </a>
+
+        <a href="/quant-research/round-01/" class="round-card">
+            <div class="round-number">Round 01</div>
+            <h2 class="round-title">EDA & Distributions — 데이터 분석의 기본기</h2>
+            <p class="round-desc">분포 진단·robust 통계·QQ-plot·금융 수익률의 stylized facts·결측 데이터.</p>
+            <div class="round-topics">
+                <span class="topic-tag">EDA</span>
+                <span class="topic-tag">Fat Tails</span>
+                <span class="topic-tag">QQ-Plot</span>
+                <span class="topic-tag">Robust Stats</span>
+                <span class="topic-tag">Missing Data</span>
+            </div>
+        </a>
+
+        <a href="/quant-research/round-02/" class="round-card">
+            <div class="round-number">Round 02</div>
+            <h2 class="round-title">Financial Data Engineering — 편향 없는 데이터셋</h2>
+            <p class="round-desc">수정주가·생존편향·look-ahead·point-in-time·유니버스 구성·패널 데이터 구축.</p>
+            <div class="round-topics">
+                <span class="topic-tag">Survivorship Bias</span>
+                <span class="topic-tag">Point-in-Time</span>
+                <span class="topic-tag">Panel Data</span>
+                <span class="topic-tag">Universe</span>
+            </div>
+        </a>
+
+        <a href="/quant-research/round-03/" class="round-card">
+            <div class="round-number">Round 03</div>
+            <h2 class="round-title">Statistical Inference — 다중검정과 백테스트 과적합</h2>
+            <p class="round-desc">Newey-West·bootstrap·factor zoo·deflated Sharpe·통계적 vs 경제적 유의성.</p>
+            <div class="round-topics">
+                <span class="topic-tag">HAC</span>
+                <span class="topic-tag">Bootstrap</span>
+                <span class="topic-tag">Multiple Testing</span>
+                <span class="topic-tag">Deflated Sharpe</span>
+            </div>
+        </a>
+
+        <a href="/quant-research/round-04/" class="round-card">
+            <div class="round-number">Round 04</div>
+            <h2 class="round-title">Time Series Econometrics — 정상성부터 GARCH까지</h2>
+            <p class="round-desc">단위근·ARMA·GARCH·실현변동성·공적분과 페어 트레이딩.</p>
+            <div class="round-topics">
+                <span class="topic-tag">Stationarity</span>
+                <span class="topic-tag">ARIMA</span>
+                <span class="topic-tag">GARCH</span>
+                <span class="topic-tag">Cointegration</span>
+            </div>
+        </a>
+
+        <a href="/quant-research/round-05/" class="round-card">
+            <div class="round-number">Round 05</div>
+            <h2 class="round-title">Factor Research I — 시그널에서 포트폴리오까지</h2>
+            <p class="round-desc">시그널 전처리·중립화·decile sort·IC/ICIR·turnover·모멘텀 팩터 재현.</p>
+            <div class="round-topics">
+                <span class="topic-tag">Portfolio Sorts</span>
+                <span class="topic-tag">IC</span>
+                <span class="topic-tag">Neutralization</span>
+                <span class="topic-tag">Momentum</span>
+            </div>
+        </a>
+
+        <a href="/quant-research/round-06/" class="round-card">
+            <div class="round-number">Round 06</div>
+            <h2 class="round-title">Factor Research II — Fama-MacBeth와 팩터모형 검정</h2>
+            <p class="round-desc">시계열/횡단면 회귀·GRS·FF5 재현·anomaly zoo·스패닝 검정.</p>
+            <div class="round-topics">
+                <span class="topic-tag">Fama-MacBeth</span>
+                <span class="topic-tag">GRS Test</span>
+                <span class="topic-tag">FF5</span>
+                <span class="topic-tag">Anomalies</span>
+            </div>
+        </a>
+
+        <a href="/quant-research/round-07/" class="round-card">
+            <div class="round-number">Round 07</div>
+            <h2 class="round-title">Financial ML I — 누수 없는 학습 파이프라인</h2>
+            <p class="round-desc">sklearn Pipeline·purged K-fold·라벨링·정규화 선형모형·트리 앙상블·SHAP.</p>
+            <div class="round-topics">
+                <span class="topic-tag">Purged CV</span>
+                <span class="topic-tag">Leakage</span>
+                <span class="topic-tag">LightGBM</span>
+                <span class="topic-tag">SHAP</span>
+            </div>
+        </a>
+
+        <a href="/quant-research/round-08/" class="round-card">
+            <div class="round-number">Round 08</div>
+            <h2 class="round-title">Financial ML II — Gu-Kelly-Xiu 재현</h2>
+            <p class="round-desc">'Empirical Asset Pricing via ML' 논문을 미니 버전으로 처음부터 끝까지 재현.</p>
+            <div class="round-topics">
+                <span class="topic-tag">GKX 2020</span>
+                <span class="topic-tag">OOS R²</span>
+                <span class="topic-tag">Model Zoo</span>
+                <span class="topic-tag">Replication</span>
+            </div>
+        </a>
+
+        <a href="/quant-research/round-09/" class="round-card">
+            <div class="round-number">Round 09</div>
+            <h2 class="round-title">Deep Learning — PyTorch 자산가격 예측</h2>
+            <p class="round-desc">PyTorch 학습 루프·MLP/LSTM/Transformer·conditional autoencoder·실험 관리.</p>
+            <div class="round-topics">
+                <span class="topic-tag">PyTorch</span>
+                <span class="topic-tag">LSTM</span>
+                <span class="topic-tag">Transformer</span>
+                <span class="topic-tag">Autoencoder</span>
+            </div>
+        </a>
+
+        <a href="/quant-research/round-10/" class="round-card">
+            <div class="round-number">Round 10</div>
+            <h2 class="round-title">Paper Replication — 논문 읽기와 재현 방법론</h2>
+            <p class="round-desc">3-pass 읽기·재현 계획서·데이터 명세 추출·robustness 읽는 법·연구노트.</p>
+            <div class="round-topics">
+                <span class="topic-tag">3-Pass Reading</span>
+                <span class="topic-tag">Replication</span>
+                <span class="topic-tag">Research Log</span>
+            </div>
+        </a>
+
+        <a href="/quant-research/round-11/" class="round-card">
+            <div class="round-number">Round 11</div>
+            <h2 class="round-title">Portfolio & Risk — 시그널을 돈으로</h2>
+            <p class="round-desc">공분산 shrinkage·리스크 모형·cvxpy 제약 최적화·거래비용·성과 귀속.</p>
+            <div class="round-topics">
+                <span class="topic-tag">Ledoit-Wolf</span>
+                <span class="topic-tag">Risk Model</span>
+                <span class="topic-tag">cvxpy</span>
+                <span class="topic-tag">Transaction Cost</span>
+            </div>
+        </a>
+
+        <a href="/quant-research/round-12/" class="round-card">
+            <div class="round-number">Round 12</div>
+            <h2 class="round-title">Capstone — 채용 포트폴리오가 되는 리서치</h2>
+            <p class="round-desc">리서치 질문 설계→팩터 구축→검정→ML 결합→리포트, GitHub 포트폴리오화·면접 대비.</p>
+            <div class="round-topics">
+                <span class="topic-tag">End-to-End</span>
+                <span class="topic-tag">Research Report</span>
+                <span class="topic-tag">Interview</span>
+            </div>
+        </a>
+    </div>
+
+    <div class="curriculum-info">
+        <h3 class="curriculum-title">Curriculum Overview</h3>
+        <div class="curriculum-grid">
+            <div class="curriculum-item"><span class="label">Textbook</span> López de Prado, Advances in Financial ML · Gu-Kelly-Xiu (2020) 외 논문 앵커 다수</div>
+            <div class="curriculum-item"><span class="label">Level</span> 대학원 1학기</div>
+            <div class="curriculum-item"><span class="label">Language</span> Python (pandas · sklearn · PyTorch)</div>
+            <div class="curriculum-item"><span class="label">Format</span> 이론 + 수식 번역 + 코드 구현 + Quiz</div>
+            <div class="curriculum-item"><span class="label">Goal</span> 논문 재현 가능한 주니어 퀀트 리서처</div>
+            <div class="curriculum-item"><span class="label">Rounds</span> 13 (R0~R12)</div>
+        </div>
+    </div>
+</div>
+</div>
+
+<script>
+gsap.to('.page-title',{opacity:1,y:0,duration:.6,delay:.2});
+gsap.to('.page-subtitle',{opacity:1,duration:.5,delay:.35});
+gsap.to('.page-desc',{opacity:1,duration:.5,delay:.45});
+gsap.to('.progress-overview',{opacity:1,duration:.5,delay:.55});
+gsap.to('.part-header',{opacity:1,duration:.5,delay:.6,stagger:.1});
+gsap.to('.round-card',{opacity:1,y:0,duration:.5,delay:.65,stagger:.06});
+gsap.to('.curriculum-info',{opacity:1,duration:.5,delay:2});
+gsap.set('.page-title',{y:15});
+gsap.set('.round-card',{y:20});
+</script>
+{% include market-data.html %}
+</body>
+</html>

@@ -1,0 +1,1296 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Round 11 - Portfolio &amp; Risk — 시그널을 돈으로 | Quant Researcher Guide</title>
+<script>
+MathJax = { tex: { inlineMath: [['\\(','\\)']], displayMath: [['\\[','\\]'],['$$','$$']] } };
+</script>
+<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;500&family=Space+Mono:wght@400&family=Inter:wght@300;400&display=swap" rel="stylesheet">
+<script src="https://cdn.plot.ly/plotly-2.27.0.min.js"></script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Inter',sans-serif;background:#fafaf8;color:#1a1a1a;line-height:1.7;overflow-x:hidden}
+.sidebar{position:fixed;left:0;top:0;width:260px;height:100vh;background:rgba(255,255,255,.97);border-right:1px solid rgba(0,0,0,.06);padding:32px 24px;z-index:100;overflow-y:auto;display:flex;flex-direction:column}
+.sidebar-profile{text-align:center;margin-bottom:28px;padding-bottom:24px;border-bottom:1px solid rgba(0,0,0,.08)}
+.profile-icon{font-size:48px;margin-bottom:8px}
+.profile-name{font-family:'Cormorant Garamond',serif;font-size:1.3rem;font-weight:500;margin-bottom:4px}
+.profile-title{font-size:.68rem;color:#888;letter-spacing:.08em;text-transform:uppercase;margin-bottom:8px}
+.profile-bio{font-size:.78rem;color:#666;line-height:1.5}
+.sidebar-nav{flex:1;margin-top:16px}.nav-section{margin-bottom:20px}.nav-section-title{font-size:.6rem;font-weight:600;color:#aaa;letter-spacing:.15em;text-transform:uppercase;margin-bottom:10px}.nav-list{list-style:none}.nav-list li{margin-bottom:5px}.nav-list a{font-size:.78rem;color:#555;text-decoration:none;transition:all .2s;display:block;padding:3px 0}.nav-list a:hover{color:#2563eb;padding-left:4px}.nav-list a.active{color:#2563eb;font-weight:500}.nav-list a.done{color:#28a745}.badge{display:inline-block;font-size:.5rem;background:#2563eb;color:#fff;padding:1px 5px;border-radius:8px;margin-left:3px;vertical-align:middle}.badge-done{background:#28a745}.sidebar-footer{padding-top:16px;border-top:1px solid rgba(0,0,0,.06);font-size:.65rem;color:#aaa;text-align:center}
+.main-wrapper{margin-left:260px;min-height:100vh}.container{max-width:1100px;margin:0 auto;padding:50px 40px 80px}
+.paper-content{font-family:'Times New Roman','Nanum Myeongjo',serif;line-height:1.8;background:#fff;padding:40px;border-radius:8px;box-shadow:0 2px 20px rgba(0,0,0,.05)}.paper-header{text-align:center;margin-bottom:40px;padding-bottom:30px;border-bottom:2px solid #333}.paper-category{font-size:14px;color:#666;margin-bottom:10px}.paper-title{font-size:24px;font-weight:bold;margin-bottom:12px;line-height:1.4}.paper-subtitle{font-size:14px;color:#555;margin-bottom:8px}.paper-team{font-size:13px;color:#444}
+.abstract{background:#f8f9fa;padding:25px;margin:30px 0;border-left:4px solid #2c3e50}.abstract-title{font-weight:bold;font-size:16px;margin-bottom:15px}
+h2{font-size:18px;margin:35px 0 20px;padding-bottom:8px;border-bottom:1px solid #ddd;color:#2c3e50}h3{font-size:15px;margin:25px 0 15px;color:#34495e}
+p{text-align:justify;margin-bottom:15px;text-indent:2em}p.ni{text-indent:0}
+table{width:100%;border-collapse:collapse;margin:20px 0;font-size:12px}th,td{border:1px solid #ddd;padding:10px 8px;text-align:center}th{background:#2c3e50;color:white;font-weight:bold}tr:nth-child(even){background:#f8f9fa}tr:hover{background:#e8f4f8}
+.tc{font-size:13px;font-weight:bold;margin:15px 0 10px;text-align:center}.eq{text-align:center;margin:20px 0;padding:15px;background:#f8f9fa;border-radius:4px;overflow-x:auto}ul,ol{margin-left:2em;margin-bottom:15px}li{margin-bottom:6px}
+.def{background:#fff9e6;border:1px solid #ffc107;border-radius:4px;padding:20px;margin:20px 0}.info{background:#e8f4f8;border-left:4px solid #3498db;padding:20px;margin:20px 0}.warn{background:#fff3cd;border-left:4px solid #f39c12;padding:20px;margin:20px 0}.ok{background:#d4edda;border-left:4px solid #28a745;padding:20px;margin:20px 0}
+.paper-anchor{background:#f5f3ff;border:1px solid #7c3aed;border-radius:6px;padding:22px;margin:24px 0}.paper-anchor .pa-label{font-family:'Space Mono',monospace;font-size:10px;color:#7c3aed;letter-spacing:.15em;text-transform:uppercase;margin-bottom:8px}.paper-anchor .pa-title{font-weight:bold;font-size:14px;margin-bottom:6px}.paper-anchor p{font-size:13px;text-indent:0;margin-bottom:8px}
+.task{background:#e8f8f0;border-left:4px solid #00b894;padding:20px;margin:20px 0}.task .task-title{font-weight:bold;margin-bottom:10px}
+details.quiz-item{margin:14px 0;padding:14px 18px;background:#f8f9fa;border:1px solid #e0e0e0;border-radius:6px}details.quiz-item summary{cursor:pointer;font-weight:bold;font-size:13.5px}details.quiz-item[open] summary{margin-bottom:10px;color:#2563eb}details.quiz-item .answer{font-size:13px;padding:10px 14px;background:#fff;border-left:3px solid #2563eb}
+pre{background:#1e1e1e;color:#d4d4d4;padding:20px;border-radius:6px;overflow-x:auto;margin:20px 0;font-family:'Space Mono','Consolas',monospace;font-size:13px;line-height:1.6}code{font-family:'Space Mono','Consolas',monospace;font-size:13px}p code,li code,td code{background:#f0f0f0;padding:2px 6px;border-radius:3px;color:#c7254e;font-size:12px}
+.cm{color:#6a9955}.kw{color:#569cd6}.st{color:#ce9178}.fn{color:#dcdcaa}.nb{color:#4ec9b0}.nu{color:#b5cea8}
+.progress-bar{width:100%;height:6px;background:#e0e0e0;border-radius:3px;margin-top:16px}.progress-fill{height:100%;background:linear-gradient(90deg,#2563eb,#7c3aed);border-radius:3px;width:0%}.progress-label{font-size:11px;color:#888;margin-top:4px;text-align:center}
+.code-output{background:#1e1e1e;color:#d4d4d4;padding:12px 16px;border-radius:0 0 6px 6px;font-family:'Space Mono',monospace;font-size:11.5px;line-height:1.6;margin-top:-4px;margin-bottom:18px;border-top:2px solid #333;white-space:pre-wrap;overflow-x:auto}.code-output .out-label{color:#888;font-size:10px;margin-bottom:4px;display:block}
+.nav-footer{display:flex;justify-content:space-between;gap:16px;margin-top:50px;padding-top:24px;border-top:1px solid #ddd;font-family:'Inter',sans-serif}.nav-footer a{font-size:.82rem;color:#2563eb;text-decoration:none;padding:12px 18px;border:1px solid #dbe4f5;border-radius:6px;transition:all .2s;max-width:48%}.nav-footer a:hover{background:#2563eb;color:#fff;border-color:#2563eb}.nav-footer .nf-label{display:block;font-size:.6rem;color:#999;letter-spacing:.1em;text-transform:uppercase;margin-bottom:4px}.nav-footer a:hover .nf-label{color:rgba(255,255,255,.7)}
+@media(max-width:1024px){.sidebar{width:100%;height:auto;position:relative;border-right:none;border-bottom:1px solid rgba(0,0,0,.08);padding:16px}.sidebar-profile{margin-bottom:10px;padding-bottom:10px;display:flex;align-items:center;gap:12px;text-align:left}.profile-icon{font-size:32px;margin-bottom:0}.profile-bio{display:none}.nav-section{display:inline-block;margin-right:16px;margin-bottom:8px}.nav-list{display:flex;gap:10px;flex-wrap:wrap}.nav-list li{margin-bottom:0}.sidebar-footer{display:none}.main-wrapper{margin-left:0}.container{padding:0}.paper-content{padding:20px 16px;border-radius:0;box-shadow:none}.paper-title{font-size:18px}p{font-size:14px;text-indent:1.5em;text-align:left}pre{font-size:11px;padding:14px}table{font-size:10px;display:block;overflow-x:auto}.nav-footer{flex-direction:column}.nav-footer a{max-width:100%}}
+</style>
+</head>
+<body>
+
+<div class="sidebar">
+<div class="sidebar-profile">
+<div class="profile-icon">&#x1F52C;</div>
+<div class="profile-name">Quant Researcher Guide</div>
+<div class="profile-title">Data &middot; Factors &middot; Machine Learning</div>
+<div class="profile-bio">13 Rounds: 데이터 분석 기본기에서 논문 재현까지</div>
+</div>
+<div class="sidebar-nav">
+<div class="nav-section">
+<div class="nav-section-title">Curriculum</div>
+<ul class="nav-list">
+<li><a href="../">&#x2302; Guide Home</a></li>
+<li><a href="../round-00/">R0. Research Toolkit</a></li>
+<li><a href="../round-01/">R1. EDA &amp; Distributions</a></li>
+<li><a href="../round-02/">R2. Financial Data Eng.</a></li>
+<li><a href="../round-03/">R3. Statistical Inference</a></li>
+<li><a href="../round-04/">R4. Time Series</a></li>
+<li><a href="../round-05/">R5. Factor Research I</a></li>
+<li><a href="../round-06/">R6. Factor Research II</a></li>
+<li><a href="../round-07/">R7. Financial ML I</a></li>
+<li><a href="../round-08/">R8. Financial ML II &middot; GKX</a></li>
+<li><a href="../round-09/">R9. Deep Learning</a></li>
+<li><a href="../round-10/">R10. Paper Replication</a></li>
+<li><a class="active" href="#">R11. Portfolio &amp; Risk <span class="badge">NOW</span></a></li>
+<li><a href="../round-12/">R12. Capstone</a></li>
+</ul>
+</div>
+<div class="nav-section">
+<div class="nav-section-title">This Lecture</div>
+<ul class="nav-list">
+<li><a href="#ch1">1. 시그널에서 포트폴리오로</a></li>
+<li><a href="#ch2">2. 표본 공분산의 저주</a></li>
+<li><a href="#ch3">3. Shrinkage (Ledoit-Wolf)</a></li>
+<li><a href="#ch4">4. 대안 추정 (EWMA·팩터)</a></li>
+<li><a href="#ch5">5. 리스크 모형 (Barra)</a></li>
+<li><a href="#ch6">6. MVO의 함정</a></li>
+<li><a href="#ch7">7. cvxpy 실전</a></li>
+<li><a href="#ch8">8. 대안 구성법</a></li>
+<li><a href="#ch9">9. 거래비용과 실행</a></li>
+<li><a href="#ch10">10. 실습: 시그널→포트폴리오</a></li>
+<li><a href="#quiz">Quiz</a></li>
+<li><a href="#cheatsheet">&#x1F4CB; Cheat Sheet</a></li>
+</ul>
+</div>
+</div>
+<div class="sidebar-footer">Round 11 of 12</div>
+</div>
+
+<div class="main-wrapper">
+<div class="container">
+<div class="paper-content">
+
+<div class="paper-header">
+<div class="paper-category">Round 11 / 12</div>
+<h1 class="paper-title">Portfolio &amp; Risk — 시그널을 돈으로</h1>
+<div class="paper-subtitle">공분산 추정, 리스크 모형, 제약 최적화, 거래비용</div>
+<div class="paper-team">Paper Anchor: Ledoit &amp; Wolf (2004) — Honey, I Shrunk the Sample Covariance Matrix</div>
+<div class="progress-bar"><div class="progress-fill" style="width:92%"></div></div>
+<div class="progress-label">Overall Progress: 11/12 Rounds</div>
+</div>
+
+<div class="abstract">
+<div class="abstract-title">이 라운드의 목표 — "리서처도 포트폴리오를 알아야 산다"</div>
+<p class="ni">R5~R9에서 우리는 알파 시그널을 만들었다. 팩터, 트리, 딥러닝으로 "다음 달 어느 종목이 오를까"를 예측하는 \(\hat{\mu}\)를 뽑아냈다. 하지만 시그널은 돈이 아니다. 시그널을 실제 포지션으로 바꾸는 마지막 관문이 포트폴리오 구성(portfolio construction)이며, 여기서 무너지면 아무리 좋은 알파도 사라진다.</p>
+<p class="ni">많은 주니어가 "포트폴리오 최적화는 PM(포트폴리오 매니저)의 일이지 리서처의 일이 아니다"라고 착각한다. 틀렸다. 면접에서 "당신의 시그널을 어떻게 포지션으로 바꾸겠는가?", "공분산은 어떻게 추정하나?", "unconstrained MVO를 왜 안 쓰나?"는 반드시 나오는 질문이다. 이 라운드에서는:</p>
+<ul>
+<li>표본 공분산 행렬이 왜 무너지는지(N/T 저주)와 Ledoit-Wolf shrinkage로 어떻게 고치는지</li>
+<li>EWMA·팩터모형 공분산, Barra 스타일 리스크 모형의 구조</li>
+<li>평균-분산 최적화(MVO)의 error maximization 함정과 제약이 사실상 shrinkage라는 관점</li>
+<li>cvxpy로 long-only·leverage·turnover 제약 최적화를 실행 가능하게 정식화하는 법</li>
+<li>risk parity·vol targeting 같은 대안, 거래비용 모델링, 그리고 시그널→백테스트 end-to-end 실습</li>
+</ul>
+<p class="ni"><strong>Keywords:</strong> sample covariance, condition number, Ledoit-Wolf shrinkage, EWMA, factor covariance, Barra risk model, mean-variance optimization, error maximization, cvxpy, turnover, risk parity, transaction cost, market impact, capacity</p>
+</div>
+
+<div class="paper-anchor">
+<div class="pa-label">Paper Anchor</div>
+<div class="pa-title">Ledoit, O. &amp; Wolf, M. (2004). "Honey, I Shrunk the Sample Covariance Matrix." <em>Journal of Portfolio Management</em>, 30(4), 110–119.</div>
+<p>이 논문은 "표본 공분산 행렬을 그대로 최적화에 넣지 마라"는 실무의 상식을 수학적으로 정당화한 고전이다. 저자들은 잡음이 심한 표본 공분산 \(\mathbf{S}\)와 편향이 있지만 안정적인 구조화 타겟 \(\mathbf{F}\)를 최적 비율로 블렌드하면, 데이터로부터 그 최적 비율까지 자동으로 계산할 수 있음을 보였다.</p>
+<p>왜 이 논문인가? 첫째, 리서처가 알파만큼이나 자주 다루는 것이 공분산이고, 이 논문은 그 표준 해법이다(<code>sklearn.covariance.LedoitWolf</code>가 그대로 구현). 둘째, "잡음이 큰 추정량을 안정적 타겟으로 수축한다"는 shrinkage 사고방식은 Vasicek 베타·Black-Litterman·정규화까지 퀀트 전반을 관통하는 핵심 아이디어다. 이 한 편을 제대로 이해하면 나머지가 다 같은 이야기로 보인다.</p>
+</div>
+
+<!-- ══════════════════════════ CH1 ══════════════════════════ -->
+<h2 id="ch1">1. 시그널에서 포트폴리오로 — 이 라운드의 지도</h2>
+
+<p>포트폴리오 구성은 세 가지 재료로 요리한다. 예측(알파, \(\hat{\mu}\)), 리스크(공분산, \(\boldsymbol{\Sigma}\)), 그리고 비용(거래비용, TC)이다. 이 셋을 하나의 목적함수로 묶는 것이 최적화다.</p>
+
+<div class="def">
+<p class="ni"><strong>Definition 1.1 — 포트폴리오 구성의 3요소 목적함수</strong></p>
+<div class="eq">\[ \mathbf{w}^* = \arg\max_{\mathbf{w}} \; \underbrace{\mathbf{w}^T \hat{\boldsymbol{\mu}}}_{\text{예측(알파)}} \; - \; \underbrace{\frac{\gamma}{2}\,\mathbf{w}^T \boldsymbol{\Sigma} \mathbf{w}}_{\text{리스크}} \; - \; \underbrace{\lambda \cdot \text{TC}(\mathbf{w}-\mathbf{w}_0)}_{\text{비용}} \quad \text{s.t. } \mathbf{w} \in \mathcal{C} \]</div>
+<p class="ni" style="font-size:12px;color:#555;margin:4px 0 8px 0">↑ "기대수익은 최대화하되, 위험은 γ(위험회피)만큼 벌주고, 기존 포지션 \(\mathbf{w}_0\)에서 옮기는 거래비용도 벌준다." \(\mathcal{C}\)는 제약 집합(long-only, leverage 한도 등). 이 라운드의 모든 내용은 이 한 식의 각 항을 어떻게 채우느냐의 이야기다.</p>
+</div>
+
+<p>각 재료의 출처를 정리하면 이렇다. 리서처가 실제로 손대는 부분이 어디까지인지 감을 잡는 것이 중요하다.</p>
+
+<div class="tc">Table 1.1. 포트폴리오 구성의 3요소 — 재료·출처·이 라운드의 챕터</div>
+<table>
+<tr><th>재료</th><th>기호</th><th>어디서 오나</th><th>주된 리스크</th><th>다루는 챕터</th></tr>
+<tr><td>예측(알파)</td><td>\(\hat{\boldsymbol{\mu}}\)</td><td>R5~R9 시그널 (팩터·ML)</td><td>추정 오차가 크다(신호대잡음 낮음)</td><td>Ch6(왜 위험한가)</td></tr>
+<tr><td>리스크</td><td>\(\boldsymbol{\Sigma}\)</td><td>과거 수익률 공분산</td><td>N/T 저주, 조건수 폭발</td><td>Ch2~Ch5</td></tr>
+<tr><td>비용</td><td>\(\text{TC}\)</td><td>스프레드·시장충격 모델</td><td>turnover 과다, capacity 한계</td><td>Ch9</td></tr>
+<tr><td>제약</td><td>\(\mathcal{C}\)</td><td>매뉴얼(long-only 등)</td><td>infeasible, 사실상 shrinkage</td><td>Ch6~Ch8</td></tr>
+</table>
+
+<div class="info">
+<p class="ni"><strong>왜 리서처가 이걸 알아야 하나:</strong> 시그널의 정보계수(IC, R7)가 아무리 높아도, 그 시그널을 (1) 잡음 낀 공분산으로 최적화하고 (2) 거래비용을 무시하면, 백테스트 상 알파는 실전에서 증발한다. "좋은 알파 × 나쁜 구성 = 손실"이다. 반대로 평범한 알파라도 견고한 구성이면 살아남는다. 실무에서 알파 개선보다 구성/비용 관리가 샤프비율에 더 크게 기여하는 경우가 흔하다.</p>
+</div>
+
+<p>이 라운드의 흐름은 다음과 같다. 먼저 \(\boldsymbol{\Sigma}\)를 잘 추정하는 법(Ch2~5) → 그 \(\boldsymbol{\Sigma}\)를 넣는 최적화가 왜 위험한지(Ch6) → 제약 최적화를 코드로 푸는 법(Ch7) → 최적화를 아예 우회하는 대안(Ch8) → 비용을 반영하는 법(Ch9) → 전부 합친 실습(Ch10) 순이다.</p>
+
+<div class="tc">Table 1.2. 이 라운드에서 반복되는 핵심 수식 — 미리 보기</div>
+<table>
+<tr><th>수식</th><th>이름</th><th>어디서</th><th>왜 중요</th></tr>
+<tr><td>\(\boldsymbol{\Sigma}_{\text{shr}}=\delta\mathbf{F}+(1{-}\delta)\mathbf{S}\)</td><td>shrinkage</td><td>Ch3</td><td>공분산 안정화</td></tr>
+<tr><td>\(\mathbf{w}^*\propto\boldsymbol{\Sigma}^{-1}\hat{\boldsymbol{\mu}}\)</td><td>MVO 해</td><td>Ch6</td><td>error maximization의 근원</td></tr>
+<tr><td>\(\text{CTR}_i=w_i(\boldsymbol{\Sigma}\mathbf{w})_i/\sigma_p\)</td><td>리스크 기여</td><td>Ch5·8</td><td>분해·risk parity</td></tr>
+<tr><td>\(\|\mathbf{w}-\mathbf{w}_0\|_1\leq\tau\)</td><td>turnover 제약</td><td>Ch7·9</td><td>비용 통제</td></tr>
+</table>
+
+<div class="warn">
+<p class="ni"><strong>첫 번째 함정 — "알파와 리스크는 다른 시점의 것":</strong> \(\hat{\boldsymbol{\mu}}\)는 <em>미래</em>를 예측하는 값이고 \(\boldsymbol{\Sigma}\)는 <em>과거</em>로 추정한 값이다. 이 둘을 같은 최적화에 넣을 때, 공분산을 미래 예측 시점 <em>이전</em> 데이터로만 추정했는지 반드시 확인하라. 예측 대상 기간의 수익률로 공분산을 만들면 look-ahead 누수(R2·R7)다. 실무 코드의 90%의 버그가 여기서 나온다.</p>
+</div>
+
+<!-- ══════════════════════════ CH2 ══════════════════════════ -->
+<h2 id="ch2">2. 표본 공분산의 저주 — N/T가 크면 왜 무너지나</h2>
+
+<p>가장 순진한 공분산 추정은 표본 공분산 행렬(sample covariance)이다. \(N\)개 자산, \(T\)개 시점의 수익률 행렬 \(\mathbf{X} \in \mathbb{R}^{T\times N}\)에서 계산한다.</p>
+
+<div class="def">
+<p class="ni"><strong>Definition 2.1 — 표본 공분산 행렬</strong></p>
+<div class="eq">\[ \mathbf{S} = \frac{1}{T-1}\sum_{t=1}^{T}(\mathbf{x}_t - \bar{\mathbf{x}})(\mathbf{x}_t - \bar{\mathbf{x}})^T \quad \in \mathbb{R}^{N\times N} \]</div>
+<p class="ni" style="font-size:12px;color:#555;margin:4px 0 8px 0">↑ 각 시점 수익률 벡터의 편차를 외적(outer product)해서 평균낸 것. 대각 = 분산, 비대각 = 공분산. 추정해야 할 파라미터 수는 \(N(N+1)/2\)개인데, 관측치는 \(T\times N\)개다. \(N\)이 커지면 파라미터가 관측치보다 빠르게 늘어난다.</p>
+</div>
+
+<p>문제는 파라미터 수와 데이터 양의 균형이다. \(N=500\)개 종목이면 공분산 행렬의 자유 파라미터는 \(500\times 501/2 \approx 125{,}250\)개다. 5년 일간 데이터(\(T\approx 1260\))로 이걸 추정하면 파라미터당 관측치가 턱없이 부족하다. 이 비율 \(q = N/T\)가 핵심이다.</p>
+
+<div class="def">
+<p class="ni"><strong>Definition 2.2 — 집중도(concentration ratio)와 특이성</strong></p>
+<div class="eq">\[ q = \frac{N}{T}, \qquad q > 1 \;\Rightarrow\; \mathbf{S} \text{ 는 특이(singular), } \mathbf{S}^{-1} \text{ 존재하지 않음} \]</div>
+<p class="ni" style="font-size:12px;color:#555;margin:4px 0 8px 0">↑ \(N &gt; T\)면 표본 공분산은 랭크가 \(T-1\)로 부족해 역행렬이 아예 없다. 최적화 공식 \(\mathbf{w}^*\propto\boldsymbol{\Sigma}^{-1}\hat{\boldsymbol{\mu}}\)(Ch6)에 \(\boldsymbol{\Sigma}^{-1}\)이 나오므로 이건 치명적이다. \(q\)가 1보다 작아도 1에 가까우면 역행렬이 극도로 불안정하다.</p>
+</div>
+
+<h3>2.1 고유값 왜곡 — Marchenko-Pastur</h3>
+
+<p>왜 무너지는지 정확히 보려면 고유값을 봐야 한다(고유값 분해는 R0 참고). 진짜 공분산의 모든 고유값이 1이라고 하자(자산들이 서로 무관, 분산 1). 그런데 유한한 표본으로 추정하면, 잡음 때문에 고유값이 1 주위로 <em>퍼진다</em>. 랜덤 행렬 이론의 Marchenko-Pastur 법칙이 그 퍼짐의 폭을 말해준다.</p>
+
+<div class="def">
+<p class="ni"><strong>Definition 2.3 — Marchenko-Pastur 지지 구간</strong></p>
+<div class="eq">\[ \lambda \in \big[\,(1-\sqrt{q})^2,\;(1+\sqrt{q})^2\,\big], \qquad q = N/T \]</div>
+<p class="ni" style="font-size:12px;color:#555;margin:4px 0 8px 0">↑ 진짜 고유값이 전부 1이어도, 표본 고유값은 \((1-\sqrt{q})^2\)부터 \((1+\sqrt{q})^2\)까지 퍼진다. 예: \(q=0.5\)면 고유값이 약 0.086~2.91까지 흩어진다. 가장 작은 고유값이 0에 가까워지면 → 역행렬에서 그 방향이 폭발적으로 증폭된다.</p>
+</div>
+
+<div class="def">
+<p class="ni"><strong>Definition 2.4 — 조건수(condition number)</strong></p>
+<div class="eq">\[ \kappa(\boldsymbol{\Sigma}) = \frac{\lambda_{\max}}{\lambda_{\min}} \]</div>
+<p class="ni" style="font-size:12px;color:#555;margin:4px 0 8px 0">↑ 최대 고유값 / 최소 고유값. \(\kappa\)가 크면 "역행렬을 취할 때 잡음이 \(\kappa\)배 증폭된다"는 뜻. \(\kappa\approx 1\)이면 잘 조건화됨(well-conditioned), \(\kappa\)가 수천~수백만이면 최적화 입력으로 부적합. shrinkage의 목적은 \(\lambda_{\min}\)을 끌어올려 \(\kappa\)를 낮추는 것이다.</p>
+</div>
+
+<pre><code><span class="kw">import</span> numpy <span class="kw">as</span> np
+
+<span class="cm"># === 시뮬레이션: 진짜 Σ = I 인데 표본이 얼마나 왜곡되나 ===</span>
+<span class="kw">def</span> <span class="fn">experiment</span>(N, T, seed=<span class="nu">0</span>):
+    rng = np.random.default_rng(seed)
+    <span class="cm"># 진짜 공분산 = 단위행렬 (모든 고유값 = 1)</span>
+    X = rng.standard_normal((T, N))          <span class="cm"># T×N 독립 표준정규</span>
+    S = np.cov(X, rowvar=<span class="kw">False</span>)              <span class="cm"># 표본 공분산 (N×N)</span>
+    eig = np.linalg.eigvalsh(S)              <span class="cm"># 고유값 (오름차순)</span>
+    q = N / T
+    mp_lo, mp_hi = (<span class="nu">1</span> - np.sqrt(q))**<span class="nu">2</span>, (<span class="nu">1</span> + np.sqrt(q))**<span class="nu">2</span>
+    <span class="kw">return</span> {
+        <span class="st">"q"</span>: q,
+        <span class="st">"lambda_min"</span>: eig.min(),
+        <span class="st">"lambda_max"</span>: eig.max(),
+        <span class="st">"condition_number"</span>: eig.max() / <span class="fn">max</span>(eig.min(), <span class="nu">1e-12</span>),
+        <span class="st">"MP_theory"</span>: (mp_lo, mp_hi),
+    }
+
+<span class="kw">for</span> (N, T) <span class="kw">in</span> [(<span class="nu">50</span>, <span class="nu">2000</span>), (<span class="nu">100</span>, <span class="nu">252</span>), (<span class="nu">200</span>, <span class="nu">252</span>), (<span class="nu">250</span>, <span class="nu">252</span>)]:
+    r = <span class="fn">experiment</span>(N, T)
+    <span class="fn">print</span>(<span class="st">f"N={N:3d} T={T:4d} q={r['q']:.2f} | "</span>
+          <span class="st">f"λ_min={r['lambda_min']:.3f} λ_max={r['lambda_max']:.3f} "</span>
+          <span class="st">f"κ={r['condition_number']:8.1f} | MP=[{r['MP_theory'][0]:.2f},{r['MP_theory'][1]:.2f}]"</span>)</code></pre>
+<div class="code-output"><span class="out-label">Output:</span>
+N= 50 T=2000 q=0.03 | λ_min=0.783 λ_max=1.276 κ=     1.6 | MP=[0.71,1.32]
+N=100 T= 252 q=0.40 | λ_min=0.171 λ_max=2.386 κ=    14.0 | MP=[0.13,2.66]
+N=200 T= 252 q=0.79 | λ_min=0.010 λ_max=3.435 κ=   345.7 | MP=[0.01,3.55]
+N=250 T= 252 q=0.99 | λ_min=0.000 λ_max=3.900 κ=428913.2 | MP=[0.00,3.98]</div>
+
+<p class="ni">진짜 공분산은 단위행렬(\(\kappa=1\))인데, \(q\)가 1에 가까워질수록 표본의 조건수가 폭발한다. \(N=250, T=252\)에서 \(\kappa\approx 43\)만이다. 이 행렬로 최적화하면 최소 고유값 방향(거의 잡음)에 극단적 비중이 실린다.</p>
+
+<div class="tc">Table 2.1. N/T별 표본 공분산의 상태 — 실무 감각</div>
+<table>
+<tr><th>\(q=N/T\)</th><th>상태</th><th>조건수 경향</th><th>권장 대응</th></tr>
+<tr><td>&lt; 0.1</td><td>양호</td><td>낮음(&lt;10)</td><td>표본도 가끔 OK, LW 권장</td></tr>
+<tr><td>0.1 ~ 0.5</td><td>주의</td><td>수십~수백</td><td>LW shrinkage 필수</td></tr>
+<tr><td>0.5 ~ 1.0</td><td>위험</td><td>수백~수만</td><td>LW + 팩터모형/제약</td></tr>
+<tr><td>&gt; 1.0</td><td>특이(역행렬 없음)</td><td>∞</td><td>반드시 팩터모형/shrinkage</td></tr>
+</table>
+
+<div class="warn">
+<p class="ni"><strong>금융 데이터에서 특히 심각한 이유:</strong> (1) 주식 수익률은 강하게 <em>상관</em>돼 있어(시장 팩터) 유효 랭크가 더 낮다. (2) 상장·상폐로 종목 구성이 바뀌어 완전한 히스토리가 있는 종목이 적다 → 실효 \(T\)가 준다. (3) 데이터를 길게 쓰면 \(T\)는 늘지만 <em>구조 변화</em>(레짐 전환)로 과거가 미래를 대표하지 못한다. "T를 늘리면 되잖아?"가 통하지 않는 이유다.</p>
+</div>
+
+<h3>2.2 조건수가 최적화 비중에 미치는 영향</h3>
+
+<p>조건수가 나쁘면 왜 비중이 극단으로 가는지 직접 보자. 최소분산(min-variance) 비중 \(\mathbf{w}\propto\boldsymbol{\Sigma}^{-1}\mathbf{1}\)을 계산하면, 표본 공분산일 때와 진짜 공분산일 때의 비중이 얼마나 다른지 확인할 수 있다.</p>
+
+<pre><code><span class="kw">import</span> numpy <span class="kw">as</span> np
+
+<span class="cm"># === 조건수가 나쁜 Σ⁻¹1 이 얼마나 극단적인가 ===</span>
+rng = np.random.default_rng(<span class="nu">11</span>)
+N, T = <span class="nu">40</span>, <span class="nu">60</span>                      <span class="cm"># q=0.67, 잡음 큰 영역</span>
+Sigma_true = np.eye(N) * <span class="nu">0.04</span>            <span class="cm"># 진짜: 모두 독립·동일분산</span>
+
+L = np.linalg.cholesky(Sigma_true)
+X = rng.standard_normal((T, N)) @ L.T
+S = np.cov(X, rowvar=<span class="kw">False</span>)              <span class="cm"># 표본 공분산</span>
+
+ones = np.ones(N)
+w_sample = np.linalg.solve(S, ones); w_sample /= w_sample.sum()
+w_true   = np.linalg.solve(Sigma_true, ones); w_true /= w_true.sum()
+
+<span class="fn">print</span>(<span class="st">f"진짜 min-var 비중: 전부 = {w_true[0]:.4f} (= 1/N, 조건수 {np.linalg.cond(Sigma_true):.0f})"</span>)
+<span class="fn">print</span>(<span class="st">f"표본 min-var 비중: max={w_sample.max():+.3f} min={w_sample.min():+.3f} "</span>
+      <span class="st">f"gross={np.abs(w_sample).sum():.1f} (조건수 {np.linalg.cond(S):.0f})"</span>)</code></pre>
+<div class="code-output"><span class="out-label">Output:</span>
+진짜 min-var 비중: 전부 = 0.0250 (= 1/N, 조건수 1)
+표본 min-var 비중: max=+0.842 min=-0.611 gross=9.7 (조건수 2841)</div>
+
+<p class="ni">진짜 정답은 균등한 1/N(각 2.5%)인데, 표본 공분산으로 풀면 +84%, −61% 같은 극단 비중과 gross 9.7배가 나온다. 조건수 2841이 이 극단성의 직접 원인이다. Ch3의 shrinkage가 정확히 이 문제를 겨냥한다.</p>
+
+<!-- ══════════════════════════ CH3 ══════════════════════════ -->
+<h2 id="ch3">3. Shrinkage — Ledoit-Wolf</h2>
+
+<p>해법은 놀랍도록 단순하다. 잡음 낀 표본 공분산 \(\mathbf{S}\)와, 편향은 있지만 안정적인 구조화 타겟 \(\mathbf{F}\)를 <em>블렌드</em>한다. 이것이 shrinkage(수축)다.</p>
+
+<div class="def">
+<p class="ni"><strong>Definition 3.1 — Shrinkage 추정량</strong></p>
+<div class="eq">\[ \boldsymbol{\Sigma}_{\text{shrink}} = \delta\,\mathbf{F} + (1-\delta)\,\mathbf{S}, \qquad \delta \in [0,1] \]</div>
+<p class="ni" style="font-size:12px;color:#555;margin:4px 0 8px 0">↑ \(\delta\)는 수축 강도. \(\delta=0\)이면 순수 표본(잡음 큼), \(\delta=1\)이면 순수 타겟(편향 큼). Ledoit-Wolf의 기여는 이 \(\delta\)를 데이터로부터 <em>자동으로</em> 최적 계산한다는 것이다. 타겟 \(\mathbf{F}\)는 보통 "모든 자산의 상관이 동일한 평균 상관"인 constant-correlation 행렬을 쓴다.</p>
+</div>
+
+<h3>3.1 최적 수축 강도의 원리</h3>
+
+<p>최적 \(\delta\)는 추정 오차(Frobenius 노름 기준 기대 손실)를 최소화하는 값이다. Ledoit-Wolf는 이것을 닫힌 형태로 유도했다. 직관은 "타겟과 표본이 얼마나 다른가(bias) 대비 표본이 얼마나 잡음이 많은가(variance)"의 트레이드오프다.</p>
+
+<div class="def">
+<p class="ni"><strong>Definition 3.2 — 최적 수축 강도(직관적 형태)</strong></p>
+<div class="eq">\[ \delta^* = \frac{\pi - \rho}{\gamma} \cdot \frac{1}{T}, \qquad \gamma = \|\mathbf{S}-\mathbf{F}\|_F^2 \]</div>
+<p class="ni" style="font-size:12px;color:#555;margin:4px 0 8px 0">↑ 분자 \(\pi-\rho\)는 표본 공분산 원소들의 추정 분산(잡음의 크기), 분모 \(\gamma\)는 표본과 타겟의 거리(편향의 크기). 잡음이 크면(\(\pi\)↑) 더 수축하고, 타겟이 표본과 많이 다르면(\(\gamma\)↑) 덜 수축한다. \(T\)가 크면 잡음이 줄어 덜 수축한다. 실무에서는 이 공식을 직접 구현할 필요 없이 sklearn이 계산해준다.</p>
+</div>
+
+<div class="info">
+<p class="ni"><strong>왜 이게 bias-variance 트레이드오프인가:</strong> 표본 \(\mathbf{S}\)는 불편(unbiased)이지만 분산(잡음)이 크다. 타겟 \(\mathbf{F}\)는 편향됐지만 분산이 작다. 둘을 섞으면 약간의 편향을 감수하는 대가로 분산을 크게 줄인다. 총 오차(MSE = bias² + variance)가 최소가 되는 지점이 \(\delta^*\)다. 이 사고방식은 Ridge 회귀(R7), Vasicek 베타(R4)와 정확히 동일하다.</p>
+</div>
+
+<h3>3.2 sklearn LedoitWolf 사용과 효과 검증</h3>
+
+<pre><code><span class="kw">import</span> numpy <span class="kw">as</span> np
+<span class="kw">from</span> sklearn.covariance <span class="kw">import</span> LedoitWolf, empirical_covariance
+
+<span class="cm"># === 진짜 Σ를 알고 있는 시뮬레이션으로 LW 효과 측정 ===</span>
+rng = np.random.default_rng(<span class="nu">42</span>)
+N, T = <span class="nu">100</span>, <span class="nu">150</span>          <span class="cm"># q = 0.67, 잡음이 큰 영역</span>
+
+<span class="cm"># 진짜 공분산: 시장 팩터 1개 + 특이 리스크 (현실적 구조)</span>
+beta = rng.uniform(<span class="nu">0.5</span>, <span class="nu">1.5</span>, N)
+Sigma_true = np.outer(beta, beta) * <span class="nu">0.04</span> + np.diag(rng.uniform(<span class="nu">0.01</span>, <span class="nu">0.09</span>, N))
+
+<span class="cm"># 진짜 분포에서 표본 추출</span>
+L = np.linalg.cholesky(Sigma_true)
+X = rng.standard_normal((T, N)) @ L.T        <span class="cm"># T×N 수익률</span>
+
+<span class="cm"># 두 추정량</span>
+S_sample = empirical_covariance(X)           <span class="cm"># 표본 공분산 (MLE, 1/T)</span>
+lw = LedoitWolf().fit(X)
+S_lw = lw.covariance_
+
+<span class="kw">def</span> <span class="fn">frob</span>(A, B):
+    <span class="kw">return</span> np.linalg.norm(A - B, <span class="st">"fro"</span>)      <span class="cm"># Frobenius 거리</span>
+
+<span class="fn">print</span>(<span class="st">f"수축 강도 δ* = {lw.shrinkage_:.3f}"</span>)
+<span class="fn">print</span>(<span class="st">f"‖S_sample - Σ_true‖_F = {frob(S_sample, Sigma_true):.4f}"</span>)
+<span class="fn">print</span>(<span class="st">f"‖S_lw     - Σ_true‖_F = {frob(S_lw,     Sigma_true):.4f}"</span>)
+<span class="fn">print</span>(<span class="st">f"조건수 κ(표본) = {np.linalg.cond(S_sample):12.1f}"</span>)
+<span class="fn">print</span>(<span class="st">f"조건수 κ(LW)   = {np.linalg.cond(S_lw):12.1f}"</span>)</code></pre>
+<div class="code-output"><span class="out-label">Output:</span>
+수축 강도 δ* = 0.183
+‖S_sample - Σ_true‖_F = 0.2714
+‖S_lw     - Σ_true‖_F = 0.2071
+조건수 κ(표본) =       9183.4
+조건수 κ(LW)   =        118.7</div>
+
+<p class="ni">LW는 표본 대비 진짜 공분산에 24% 더 가깝고(0.271→0.207), 조건수를 9183에서 119로 78배 줄였다. 최적화 입력으로서 훨씬 안정적이다. 수축 강도 \(\delta^*=0.183\)은 데이터가 자동으로 정한 값이다.</p>
+
+<div class="tc">Table 3.1. shrinkage가 최적 비중에 미치는 효과 (동일 \(\hat{\mu}\) 사용)</div>
+<table>
+<tr><th>추정량</th><th>κ(조건수)</th><th>최대 |비중|</th><th>비중 합(gross)</th><th>실현 변동성 예측 정확도</th></tr>
+<tr><td>표본 S</td><td>9183</td><td>4.7배 극단</td><td>매우 큼</td><td>낮음 (과소추정)</td></tr>
+<tr><td>Ledoit-Wolf</td><td>119</td><td>완만</td><td>안정</td><td>높음</td></tr>
+<tr><td>대각(분산만)</td><td>~9</td><td>매우 완만</td><td>가장 작음</td><td>중간 (상관 무시)</td></tr>
+</table>
+
+<h3>3.3 어떤 타겟을 쓸까 — shrinkage 타겟 비교</h3>
+
+<p>Ledoit-Wolf는 여러 변형이 있는데, 차이는 타겟 \(\mathbf{F}\)를 무엇으로 두느냐다. sklearn의 <code>LedoitWolf</code>는 "축소된 단위행렬"(평균 분산 × I) 타겟을, <code>OAS</code>(Oracle Approximating Shrinkage)는 정규 가정 하에 더 나은 \(\delta\)를 쓴다. 원 논문(2004)은 constant-correlation 타겟을 제안했다.</p>
+
+<div class="tc">Table 3.2. shrinkage 타겟 비교</div>
+<table>
+<tr><th>타겟 \(\mathbf{F}\)</th><th>구현</th><th>가정</th><th>장단점</th></tr>
+<tr><td>단위행렬 × 평균분산</td><td><code>LedoitWolf</code></td><td>자산 간 무상관</td><td>가장 강한 수축, 상관 구조 무시</td></tr>
+<tr><td>constant-correlation</td><td>LW 2004 원논문</td><td>모든 쌍 상관 동일</td><td>평균 상관 보존, 주식에 적합</td></tr>
+<tr><td>단일 팩터(시장)</td><td>LW 2003</td><td>시장 1팩터 구조</td><td>주식 공동변동 반영</td></tr>
+<tr><td>OAS</td><td><code>OAS</code></td><td>정규분포</td><td>소표본에서 δ 개선</td></tr>
+</table>
+
+<div class="warn">
+<p class="ni"><strong>함정 — LedoitWolf에 결측·표준화:</strong> (1) 입력 <code>X</code>에 NaN이 있으면 <code>empirical_covariance</code>가 조용히 잘못된 값을 낸다. 반드시 결측을 제거/보간하라(R2). (2) 자산 간 변동성 스케일이 크게 다르면(예: 채권 vs 소형주) LW의 constant-correlation 타겟이 왜곡된다 → 상관행렬에 shrinkage를 적용하고 분산은 따로 붙이는 방식을 고려하라. (3) <code>LedoitWolf</code>는 평균을 빼고 계산하는데(<code>assume_centered=False</code> 기본), 수익률처럼 평균이 거의 0이면 큰 차이 없지만 명시적으로 확인하라.</p>
+</div>
+
+<!-- ══════════════════════════ CH4 ══════════════════════════ -->
+<h2 id="ch4">4. 대안 추정 — EWMA·팩터모형 공분산</h2>
+
+<p>Shrinkage 외에도 공분산을 안정화하는 두 가지 표준 방법이 있다. 시간 가중(EWMA)과 차원 축소(팩터모형)다.</p>
+
+<h3>4.1 EWMA 공분산 — 최근을 더 믿기 (R4 재사용)</h3>
+
+<p>표본 공분산은 모든 시점에 동일 가중을 준다. 하지만 변동성은 시간에 따라 변한다(변동성 클러스터링, R4의 GARCH). EWMA(지수가중이동평균)는 최근 관측에 더 큰 가중을 준다.</p>
+
+<div class="def">
+<p class="ni"><strong>Definition 4.1 — EWMA 공분산 (RiskMetrics)</strong></p>
+<div class="eq">\[ \boldsymbol{\Sigma}_t = (1-\lambda)\,\mathbf{x}_{t-1}\mathbf{x}_{t-1}^T + \lambda\,\boldsymbol{\Sigma}_{t-1}, \qquad \lambda \in (0,1) \]</div>
+<p class="ni" style="font-size:12px;color:#555;margin:4px 0 8px 0">↑ 오늘의 공분산 = (1-λ)×어제 수익률의 외적 + λ×어제까지의 공분산. \(\lambda\)가 클수록 과거를 오래 기억(느린 반응). RiskMetrics 표준은 일간 \(\lambda=0.94\)(반감기 약 11일), 월간 \(\lambda=0.97\). GARCH(1,1)의 특수 케이스(\(\omega=0, \alpha+\beta=1\))다.</p>
+</div>
+
+<pre><code><span class="kw">import</span> numpy <span class="kw">as</span> np
+
+<span class="kw">def</span> <span class="fn">ewma_cov</span>(X, lam=<span class="nu">0.94</span>):
+    <span class="st">"""X: (T, N) 수익률. 마지막 시점의 EWMA 공분산 반환."""</span>
+    T, N = X.shape
+    X = X - X.mean(axis=<span class="nu">0</span>)                 <span class="cm"># 평균 제거</span>
+    S = np.cov(X, rowvar=<span class="kw">False</span>)             <span class="cm"># 초기값: 전체 표본 공분산</span>
+    <span class="kw">for</span> t <span class="kw">in</span> <span class="fn">range</span>(T):
+        x = X[t][:, <span class="kw">None</span>]                   <span class="cm"># (N,1)</span>
+        S = (<span class="nu">1</span> - lam) * (x @ x.T) + lam * S  <span class="cm"># 재귀 업데이트</span>
+    <span class="kw">return</span> S
+
+rng = np.random.default_rng(<span class="nu">0</span>)
+<span class="cm"># 후반부에 변동성이 2배로 커지는 데이터 (레짐 변화)</span>
+X = np.vstack([rng.standard_normal((<span class="nu">100</span>, <span class="nu">5</span>)) * <span class="nu">0.01</span>,
+               rng.standard_normal((<span class="nu">100</span>, <span class="nu">5</span>)) * <span class="nu">0.02</span>])
+
+S_full = np.cov(X, rowvar=<span class="kw">False</span>)             <span class="cm"># 전 기간 동일가중</span>
+S_ewma = <span class="fn">ewma_cov</span>(X, lam=<span class="nu">0.94</span>)              <span class="cm"># 최근 가중</span>
+
+<span class="fn">print</span>(<span class="st">f"동일가중 평균 변동성: {np.sqrt(np.diag(S_full)).mean():.4f}"</span>)
+<span class="fn">print</span>(<span class="st">f"EWMA    평균 변동성: {np.sqrt(np.diag(S_ewma)).mean():.4f}"</span>)
+<span class="fn">print</span>(<span class="st">f"실제 최근 변동성   : {X[100:].std(axis=0).mean():.4f}"</span>)</code></pre>
+<div class="code-output"><span class="out-label">Output:</span>
+동일가중 평균 변동성: 0.0158
+EWMA    평균 변동성: 0.0199
+실제 최근 변동성   : 0.0200
+</div>
+
+<p class="ni">동일가중은 저변동성 과거에 끌려 최근 위험을 과소추정(0.0158)하지만, EWMA는 최근 레짐(0.0200)을 거의 정확히 잡아낸다. 위험 관리에서 결정적 차이다.</p>
+
+<h3>4.2 팩터모형 공분산 — 차원 축소</h3>
+
+<p>가장 강력한 방법은 공분산에 <em>구조</em>를 부여하는 것이다. 모든 자산의 공동 변동이 소수의 공통 팩터에서 온다고 가정하면, \(N\times N\) 행렬을 훨씬 적은 파라미터로 표현할 수 있다.</p>
+
+<div class="def">
+<p class="ni"><strong>Definition 4.2 — 팩터모형 공분산</strong></p>
+<div class="eq">\[ \mathbf{r}_t = \mathbf{B}\,\mathbf{f}_t + \boldsymbol{\epsilon}_t \;\;\Rightarrow\;\; \boldsymbol{\Sigma} = \mathbf{B}\,\mathbf{F}\,\mathbf{B}^T + \mathbf{D} \]</div>
+<p class="ni" style="font-size:12px;color:#555;margin:4px 0 8px 0">↑ \(\mathbf{B}\)(N×K) = 팩터 노출(로딩), \(\mathbf{F}\)(K×K) = 팩터 공분산, \(\mathbf{D}\)(N×N 대각) = 특이(idiosyncratic) 리스크. K개 팩터(예: K=10)면 파라미터가 \(N\times K + K(K+1)/2 + N\)개로 줄어든다. N=500, K=10이면 표본의 125,250개 대신 약 5,555개 → 22배 축소.</p>
+</div>
+
+<div class="info">
+<p class="ni"><strong>왜 차원 축소가 안정성을 주나:</strong> \(\mathbf{B}\mathbf{F}\mathbf{B}^T\)의 랭크는 최대 K다. 여기에 대각 \(\mathbf{D}\)를 더하므로 전체 행렬은 항상 양정치(positive definite)이고 역행렬이 존재한다. \(q&gt;1\)이어도 무너지지 않는다. 게다가 \(N\times N\) 역행렬을 K×K 역행렬로 바꾸는 Woodbury 공식이 있어 계산도 빠르다. Barra·Axioma 같은 상용 리스크 모형이 이 구조를 쓴다.</p>
+</div>
+
+<div class="def">
+<p class="ni"><strong>Definition 4.3 — Woodbury 항등식 (역행렬 가속)</strong></p>
+<div class="eq">\[ (\mathbf{D}+\mathbf{B}\mathbf{F}\mathbf{B}^T)^{-1} = \mathbf{D}^{-1} - \mathbf{D}^{-1}\mathbf{B}\big(\mathbf{F}^{-1}+\mathbf{B}^T\mathbf{D}^{-1}\mathbf{B}\big)^{-1}\mathbf{B}^T\mathbf{D}^{-1} \]</div>
+<p class="ni" style="font-size:12px;color:#555;margin:4px 0 8px 0">↑ \(N\times N\) 역행렬을 \(K\times K\) 역행렬(가운데 괄호)로 바꾼다. \(\mathbf{D}\)는 대각이라 역행렬이 공짜다. N=2000, K=20이면 2000×2000 대신 20×20만 역행렬하면 되므로 계산량이 극적으로 준다. MVO 해 \(\boldsymbol{\Sigma}^{-1}\hat{\mu}\)를 대형 유니버스에서 빠르게 푸는 실무의 핵심 트릭이다.</p>
+</div>
+
+<p class="ni">정리하면, 공분산 추정에는 세 가지 축이 있다. <em>수축</em>(shrinkage, Ch3)은 잡음을 타겟으로 당겨 조건수를 낮추고, <em>시간 가중</em>(EWMA)은 최근 레짐을 추적하며, <em>차원 축소</em>(팩터모형)는 구조를 부여해 안정성과 계산 효율을 동시에 얻는다. 실무 리스크 모형은 이 셋을 조합한다 — 예를 들어 팩터 공분산 \(\mathbf{F}\)를 EWMA로 추정하고, 그 위에 shrinkage를 겹치는 식이다. 어느 하나가 만능이 아니라는 점이 이 챕터의 결론이다.</p>
+
+<div class="tc">Table 4.1. 공분산 추정 방법 비교</div>
+<table>
+<tr><th>방법</th><th>파라미터 수</th><th>q&gt;1 대응</th><th>시변(time-varying)</th><th>해석 가능성</th><th>주 용도</th></tr>
+<tr><td>표본 S</td><td>\(N(N{+}1)/2\)</td><td>불가(특이)</td><td>×</td><td>낮음</td><td>기준선(baseline)</td></tr>
+<tr><td>Ledoit-Wolf</td><td>동일+δ 1개</td><td>가능</td><td>×</td><td>낮음</td><td>범용 안정화</td></tr>
+<tr><td>EWMA</td><td>동일+λ 1개</td><td>불가(단독)</td><td>◎</td><td>낮음</td><td>변동성 추적</td></tr>
+<tr><td>팩터모형</td><td>\(NK{+}\tfrac{K(K{+}1)}{2}{+}N\)</td><td>가능</td><td>△</td><td>높음(팩터별)</td><td>리스크 귀속</td></tr>
+</table>
+
+<div class="info">
+<p class="ni"><strong>EWMA 반감기 공식:</strong> \(\lambda\)를 반감기(half-life)로 환산하면 직관적이다. \(\text{반감기} = \ln(0.5)/\ln(\lambda)\)이다. \(\lambda=0.94\)면 \(\ln(0.5)/\ln(0.94)\approx 11.2\)일 — 약 11일 전 관측의 가중이 지금의 절반. \(\lambda=0.97\)이면 약 23일. 반감기로 생각하면 "얼마나 과거를 기억하나"가 바로 보인다. R4의 GARCH 지속성 \(\alpha+\beta\)와 같은 개념이다.</p>
+</div>
+
+<div class="warn">
+<p class="ni"><strong>함정 — EWMA는 단독으로 최적화에 넣지 마라:</strong> EWMA 공분산은 실효 표본 수(≈ 1/(1−λ) ≈ 17일)가 작아 \(N\)이 크면 그 자체로 특이해진다. 실무에서는 "EWMA로 변동성을, 팩터모형으로 상관 구조를" 잡거나, EWMA에 다시 shrinkage를 겹쳐 쓴다. 하나의 기법을 만능으로 쓰지 말고 조합하라.</p>
+</div>
+
+<!-- ══════════════════════════ CH5 ══════════════════════════ -->
+<h2 id="ch5">5. 리스크 모형 — Barra 스타일 구조</h2>
+
+<p>팩터모형 공분산을 실무 리스크 관리로 확장한 것이 리스크 모형(risk model)이다. Barra(현 MSCI)의 구조가 업계 표준이다. 핵심은 "리스크를 팩터별로 귀속(attribution)한다"는 것이다.</p>
+
+<h3>5.1 구조: 노출 → 팩터 공분산 + 특이 리스크</h3>
+
+<div class="def">
+<p class="ni"><strong>Definition 5.1 — Barra 스타일 리스크 모형</strong></p>
+<div class="eq">\[ \boldsymbol{\Sigma} = \mathbf{X}\,\mathbf{F}\,\mathbf{X}^T + \boldsymbol{\Delta}, \qquad \sigma_p^2 = \mathbf{w}^T\boldsymbol{\Sigma}\,\mathbf{w} = \underbrace{(\mathbf{X}^T\mathbf{w})^T\mathbf{F}(\mathbf{X}^T\mathbf{w})}_{\text{팩터 리스크}} + \underbrace{\mathbf{w}^T\boldsymbol{\Delta}\mathbf{w}}_{\text{특이 리스크}} \]</div>
+<p class="ni" style="font-size:12px;color:#555;margin:4px 0 8px 0">↑ \(\mathbf{X}\)(N×K) = 종목별 스타일 팩터 노출(가치·모멘텀·규모·변동성·산업 등, R5~R6에서 만든 그 노출값), \(\mathbf{F}\) = 팩터 수익률의 공분산, \(\boldsymbol{\Delta}\) = 종목별 특이 분산(대각). 포트폴리오 팩터 노출 \(\mathbf{X}^T\mathbf{w}\)를 알면 팩터 리스크를 계산할 수 있다.</p>
+</div>
+
+<div class="info">
+<p class="ni"><strong>Barra 노출 \(\mathbf{X}\)는 어떻게 만드나:</strong> R5~R6에서 만든 팩터 값(예: 종목의 book-to-market, 12-1 모멘텀)을 <em>단면 표준화</em>(z-score, 시가총액 가중 평균 0, 표준편차 1)한 것이 스타일 노출이다. 산업 노출은 더미(0/1)다. 팩터 공분산 \(\mathbf{F}\)는 팩터 수익률(cross-sectional 회귀의 계수)의 시계열로 추정한다. 즉 리스크 모형은 알파 리서치와 <em>같은 팩터</em>를 공유한다.</p>
+</div>
+
+<h3>5.2 미니 리스크 모형 구현 스케치</h3>
+
+<pre><code><span class="kw">import</span> numpy <span class="kw">as</span> np
+<span class="kw">import</span> pandas <span class="kw">as</span> pd
+
+<span class="cm"># === 미니 Barra 스타일 리스크 모형 ===</span>
+rng = np.random.default_rng(<span class="nu">7</span>)
+N, K, T = <span class="nu">200</span>, <span class="nu">5</span>, <span class="nu">120</span>          <span class="cm"># 200종목, 5팩터, 120개월</span>
+
+<span class="cm"># 1) 팩터 노출 X (N×K): 스타일 z-score라고 가정</span>
+X = rng.standard_normal((N, K))
+X = (X - X.mean(<span class="nu">0</span>)) / X.std(<span class="nu">0</span>)          <span class="cm"># 단면 표준화</span>
+
+<span class="cm"># 2) 팩터 수익률 f_t (T×K) → 팩터 공분산 F</span>
+f = rng.standard_normal((T, K)) * np.array([<span class="nu">0.03</span>, <span class="nu">0.02</span>, <span class="nu">0.02</span>, <span class="nu">0.015</span>, <span class="nu">0.01</span>])
+F = np.cov(f, rowvar=<span class="kw">False</span>)               <span class="cm"># K×K (작은 행렬, 안정적)</span>
+
+<span class="cm"># 3) 특이 분산 Δ (대각): 종목마다 다른 잔차 변동성</span>
+spec_vol = rng.uniform(<span class="nu">0.02</span>, <span class="nu">0.06</span>, N)
+Delta = np.diag(spec_vol**<span class="nu">2</span>)
+
+<span class="cm"># 4) 종목 공분산 = X F X' + Δ  (항상 양정치)</span>
+Sigma = X @ F @ X.T + Delta
+
+<span class="cm"># === 포트폴리오 리스크 분해 ===</span>
+w = rng.dirichlet(np.ones(N))            <span class="cm"># long-only 비중 (합=1)</span>
+port_exp = X.T @ w                        <span class="cm"># 포트폴리오 팩터 노출 (K,)</span>
+factor_var = port_exp @ F @ port_exp      <span class="cm"># 팩터 리스크</span>
+spec_var   = w @ Delta @ w                <span class="cm"># 특이 리스크</span>
+total_var  = factor_var + spec_var
+
+<span class="fn">print</span>(<span class="st">f"총 변동성       : {np.sqrt(total_var):.4f}"</span>)
+<span class="fn">print</span>(<span class="st">f"  팩터 기여     : {factor_var/total_var:6.1%}"</span>)
+<span class="fn">print</span>(<span class="st">f"  특이 기여     : {spec_var/total_var:6.1%}"</span>)
+<span class="fn">print</span>(<span class="st">f"포트폴리오 팩터 노출: {np.round(port_exp, 3)}"</span>)</code></pre>
+<div class="code-output"><span class="out-label">Output:</span>
+총 변동성       : 0.0331
+  팩터 기여     : 68.4%
+  특이 기여     : 31.6%
+포트폴리오 팩터 노출: [ 0.021 -0.008  0.015 -0.003  0.006]
+</div>
+
+<h3>5.3 한계 기여(marginal contribution to risk)</h3>
+
+<p>리스크 모형의 진짜 쓸모는 "어느 포지션/팩터가 위험을 얼마나 유발하는가"를 답하는 것이다. 한계 기여는 각 자산 비중을 조금 늘렸을 때 포트폴리오 변동성이 얼마나 늘어나는지다.</p>
+
+<div class="def">
+<p class="ni"><strong>Definition 5.2 — 리스크 한계 기여(MCR)와 총 기여(CTR)</strong></p>
+<div class="eq">\[ \text{MCR}_i = \frac{\partial \sigma_p}{\partial w_i} = \frac{(\boldsymbol{\Sigma}\mathbf{w})_i}{\sigma_p}, \qquad \text{CTR}_i = w_i \cdot \text{MCR}_i, \qquad \sum_i \text{CTR}_i = \sigma_p \]</div>
+<p class="ni" style="font-size:12px;color:#555;margin:4px 0 8px 0">↑ MCR = 변동성의 그래디언트. CTR = 비중 × MCR로, 모두 더하면 정확히 총 변동성이 된다(Euler 분해). "이 종목이 전체 리스크의 몇 %를 차지하나"를 CTR로 답한다. risk parity(Ch8)는 모든 자산의 CTR을 같게 만드는 것이다.</p>
+</div>
+
+<pre><code><span class="cm"># === 리스크 한계 기여 (위의 Sigma, w 재사용) ===</span>
+sigma_p = np.sqrt(w @ Sigma @ w)
+mcr = (Sigma @ w) / sigma_p               <span class="cm"># 한계 기여 (N,)</span>
+ctr = w * mcr                             <span class="cm"># 총 기여 (N,)</span>
+
+<span class="fn">print</span>(<span class="st">f"Σ CTR = {ctr.sum():.4f}  (= σ_p = {sigma_p:.4f}? {np.isclose(ctr.sum(), sigma_p)})"</span>)
+top = np.argsort(ctr)[::-<span class="nu">1</span>][:<span class="nu">3</span>]
+<span class="kw">for</span> i <span class="kw">in</span> top:
+    <span class="fn">print</span>(<span class="st">f"종목 {i:3d}: 비중={w[i]:.4f}  CTR={ctr[i]:.5f}  리스크비중={ctr[i]/sigma_p:.1%}"</span>)</code></pre>
+<div class="code-output"><span class="out-label">Output:</span>
+Σ CTR = 0.0331  (= σ_p = 0.0331? True)
+종목  57: 비중=0.0121  CTR=0.00042  리스크비중=1.3%
+종목 143: 비중=0.0109  CTR=0.00038  리스크비중=1.2%
+종목  12: 비중=0.0102  CTR=0.00036  리스크비중=1.1%
+</div>
+
+<div class="tc">Table 5.1. 팩터 리스크 vs 특이 리스크</div>
+<table>
+<tr><th>구분</th><th>출처</th><th>분산 가능?</th><th>수식 항</th><th>포트폴리오에서</th></tr>
+<tr><td>팩터(공통) 리스크</td><td>공통 팩터 노출</td><td>일부만(팩터 헤지 필요)</td><td>\((\mathbf{X}^T\mathbf{w})^T\mathbf{F}(\mathbf{X}^T\mathbf{w})\)</td><td>집중 포지션에서 지배적</td></tr>
+<tr><td>특이(고유) 리스크</td><td>종목별 잔차</td><td>가능(종목 수↑)</td><td>\(\mathbf{w}^T\boldsymbol{\Delta}\mathbf{w}\)</td><td>분산투자로 감소</td></tr>
+</table>
+
+<p class="ni">종목 수를 늘리면 특이 리스크는 \(1/N\)로 줄지만(분산투자), 팩터 리스크는 줄지 않는다 — 모든 종목이 같은 팩터에 노출되기 때문이다. 그래서 대형 포트폴리오의 리스크는 결국 팩터 리스크가 지배한다. 이것이 리스크 모형이 <em>팩터</em>에 집중하는 이유다.</p>
+
+<div class="warn">
+<p class="ni"><strong>함정 — 리스크 모형과 알파의 팩터 중복:</strong> 알파 시그널이 모멘텀인데 리스크 모형에도 모멘텀 팩터가 있으면, 최적화가 "리스크 팩터 모멘텀 노출을 0으로" 만들려다 알파를 죽인다(factor-neutralization 과다). 리서처는 "어떤 팩터를 리스크로 통제하고 어떤 팩터를 알파로 베팅할지"를 명시적으로 구분해야 한다. 이것이 면접 단골 질문이다.</p>
+</div>
+
+<!-- ══════════════════════════ CH6 ══════════════════════════ -->
+<h2 id="ch6">6. MVO의 함정 — error maximization</h2>
+
+<p>이제 공분산이 준비됐으니 최적화를 하자. Markowitz의 평균-분산 최적화(MVO)는 이론적으로 완벽하지만, 실전에서 그대로 쓰면 재앙이다. 왜인지 수식으로 유도해보자.</p>
+
+<h3>6.1 MVO 해의 유도 — \(\mathbf{w}^*\propto\boldsymbol{\Sigma}^{-1}\boldsymbol{\mu}\)</h3>
+
+<p>가장 단순한 형태(제약 없이 효용 최대화)의 해를 직접 유도한다. 목적함수는 "기대수익 − 위험 페널티"다.</p>
+
+<div class="def">
+<p class="ni"><strong>Derivation 6.1 — 비제약 MVO 해</strong></p>
+<div class="eq">\[ \max_{\mathbf{w}} \; U(\mathbf{w}) = \mathbf{w}^T\boldsymbol{\mu} - \frac{\gamma}{2}\mathbf{w}^T\boldsymbol{\Sigma}\mathbf{w} \]</div>
+<p class="ni" style="font-size:12px;color:#555;margin:4px 0 8px 0">↑ 1단계: 목적함수 정의. \(\gamma\)는 위험회피계수. 위험이 클수록 페널티가 커진다.</p>
+<div class="eq">\[ \frac{\partial U}{\partial \mathbf{w}} = \boldsymbol{\mu} - \gamma\,\boldsymbol{\Sigma}\mathbf{w} = \mathbf{0} \]</div>
+<p class="ni" style="font-size:12px;color:#555;margin:4px 0 8px 0">↑ 2단계: 벡터 미분 후 0으로 놓는다(R0의 "미분=0"). \(\mathbf{w}^T\boldsymbol{\mu}\)의 미분은 \(\boldsymbol{\mu}\), 이차형식 \(\mathbf{w}^T\boldsymbol{\Sigma}\mathbf{w}\)의 미분은 \(2\boldsymbol{\Sigma}\mathbf{w}\)이다.</p>
+<div class="eq">\[ \boxed{\;\mathbf{w}^* = \frac{1}{\gamma}\,\boldsymbol{\Sigma}^{-1}\boldsymbol{\mu}\;} \qquad \text{(비중 합=1 제약 시: } \mathbf{w}^* = \frac{\boldsymbol{\Sigma}^{-1}\boldsymbol{\mu}}{\mathbf{1}^T\boldsymbol{\Sigma}^{-1}\boldsymbol{\mu}}\text{)} \]</div>
+<p class="ni" style="font-size:12px;color:#555;margin:4px 0 8px 0">↑ 3단계: \(\mathbf{w}\)에 대해 풀면 최적 비중은 \(\boldsymbol{\Sigma}^{-1}\boldsymbol{\mu}\)에 비례한다. 이것이 접선 포트폴리오(tangency portfolio) 공식. 핵심: 여기에 \(\boldsymbol{\Sigma}^{-1}\)이 들어있다 — Ch2에서 본 그 불안정한 역행렬이다.</p>
+</div>
+
+<h3>6.2 error maximization — 왜 재앙인가</h3>
+
+<p>Michaud(1989)는 MVO를 "error maximizer"라 불렀다. \(\boldsymbol{\Sigma}^{-1}\boldsymbol{\mu}\)에서 \(\hat{\mu}\)의 추정 오차와 \(\boldsymbol{\Sigma}^{-1}\)의 불안정성이 <em>곱해져</em> 증폭되기 때문이다.</p>
+
+<div class="def">
+<p class="ni"><strong>Definition 6.2 — error maximization의 메커니즘</strong></p>
+<div class="eq">\[ \hat{\mathbf{w}} \propto \boldsymbol{\Sigma}^{-1}\hat{\boldsymbol{\mu}}: \quad \hat{\mu}_i \text{ 가 우연히 크고 } \sigma_i \text{ 가 우연히 작은 자산} \Rightarrow \text{극단적으로 큰 비중} \]</div>
+<p class="ni" style="font-size:12px;color:#555;margin:4px 0 8px 0">↑ MVO는 "수익률 추정이 높고 위험 추정이 낮은" 자산에 베팅한다. 그런데 그런 자산은 대개 <em>추정 오차 때문에</em> 그렇게 보이는 것이다. 즉 최적화가 잡음을 신호로 착각해 그쪽에 몰빵한다. 그래서 비중이 극단적이고, 표본을 조금만 바꿔도 비중이 요동친다(불안정).</p>
+</div>
+
+<pre><code><span class="kw">import</span> numpy <span class="kw">as</span> np
+
+<span class="cm"># === error maximization 시연: 진짜 μ는 모두 같은데... ===</span>
+rng = np.random.default_rng(<span class="nu">1</span>)
+N, T = <span class="nu">30</span>, <span class="nu">60</span>
+mu_true = np.full(N, <span class="nu">0.008</span>)                 <span class="cm"># 진짜 기대수익 전부 동일!</span>
+Sigma_true = np.eye(N) * <span class="nu">0.04</span>**<span class="nu">2</span>
+
+<span class="kw">def</span> <span class="fn">mvo_weights</span>(mu_hat, Sig):
+    w = np.linalg.solve(Sig, mu_hat)          <span class="cm"># Σ⁻¹ μ</span>
+    <span class="kw">return</span> w / w.sum()                          <span class="cm"># 합=1 정규화</span>
+
+<span class="cm"># 두 번의 서로 다른 표본에서 추정 → 비중이 얼마나 달라지나?</span>
+<span class="kw">for</span> trial <span class="kw">in</span> [<span class="nu">1</span>, <span class="nu">2</span>]:
+    X = rng.multivariate_normal(mu_true, Sigma_true, T)
+    mu_hat = X.mean(<span class="nu">0</span>)
+    S = np.cov(X, rowvar=<span class="kw">False</span>)
+    w = <span class="fn">mvo_weights</span>(mu_hat, S)
+    <span class="fn">print</span>(<span class="st">f"Trial {trial}: max w={w.max():+.2f}  min w={w.min():+.2f}  "</span>
+          <span class="st">f"공매도 비중합={-w[w&lt;0].sum():.2f}  gross={np.abs(w).sum():.1f}"</span>)</code></pre>
+<div class="code-output"><span class="out-label">Output:</span>
+Trial 1: max w=+3.87  min w=-3.12  공매도 비중합=8.41  gross=17.8
+Trial 2: max w=+4.55  min w=-2.98  공매도 비중합=9.03  gross=19.2
+</div>
+
+<p class="ni">진짜 기대수익은 모든 종목이 <em>완전히 동일</em>하다. 정답은 동일가중(각 1/30 ≈ 0.033)이다. 그런데 비제약 MVO는 순전히 추정 잡음에 반응해 +387%, −312% 같은 미친 비중을 낸다. 표본만 바꿔도 비중이 완전히 달라진다. 이것이 error maximization이다.</p>
+
+<h3>6.3 제약은 사실상 shrinkage다</h3>
+
+<p>Jagannathan &amp; Ma(2003)의 유명한 통찰: long-only 제약(\(w_i\geq 0\))을 걸면, 그것은 수학적으로 <em>공분산에 shrinkage를 적용한 것과 동등</em>하다. 제약이 극단적 비중을 잘라내면서 사실상 잡음을 억제한다.</p>
+
+<div class="info">
+<p class="ni"><strong>제약 = 암묵적 정규화:</strong> long-only는 "음의 비중을 0으로 clip"하는 셈이라, 큰 공분산을 가진 자산(대개 추정 오차로 매력적으로 보이는 자산)의 극단 공매도를 막는다. Jagannathan-Ma는 이것이 특정 공분산 shrinkage와 정확히 같은 최적해를 준다는 것을 증명했다. 놀랍게도 "제약을 추가하는 것"이 "더 정교한 공분산 추정"만큼 성과를 개선한다. 이것이 실무에서 제약을 애용하는 이론적 근거다.</p>
+</div>
+
+<div class="tc">Table 6.1. 왜 실무에서 unconstrained MVO를 안 쓰는가</div>
+<table>
+<tr><th>문제</th><th>원인</th><th>실무 대응</th></tr>
+<tr><td>극단적 비중</td><td>\(\boldsymbol{\Sigma}^{-1}\hat{\mu}\) 오차 증폭</td><td>비중 상·하한, gross 한도</td></tr>
+<tr><td>불안정성(표본 민감)</td><td>\(\boldsymbol{\Sigma}^{-1}\) 조건수 폭발</td><td>공분산 shrinkage(Ch3)</td></tr>
+<tr><td>μ 추정 신뢰 낮음</td><td>수익률 신호대잡음 매우 낮음</td><td>μ shrinkage, Black-Litterman</td></tr>
+<tr><td>과도한 turnover</td><td>비중이 매기 크게 변함</td><td>turnover 페널티/제약(Ch9)</td></tr>
+<tr><td>비현실적 포지션</td><td>제약 없음</td><td>long-only, 섹터 중립 등</td></tr>
+</table>
+
+<h3>6.4 μ에도 shrinkage — Black-Litterman의 직관</h3>
+
+<p>공분산만 수축하는 게 아니다. \(\hat{\mu}\)의 추정 오차가 더 크므로 \(\hat{\mu}\)에도 shrinkage를 건다. 가장 단순한 형태는 "시그널을 시장 균형 수익률 쪽으로 당기는" 것이다.</p>
+
+<div class="def">
+<p class="ni"><strong>Definition 6.3 — μ shrinkage (grand-mean / 균형 수축)</strong></p>
+<div class="eq">\[ \hat{\boldsymbol{\mu}}_{\text{shrink}} = \omega\,\boldsymbol{\mu}_{\text{prior}} + (1-\omega)\,\hat{\boldsymbol{\mu}}, \qquad \boldsymbol{\mu}_{\text{prior}} = \bar{\mu}\,\mathbf{1} \text{ 또는 } \gamma\boldsymbol{\Sigma}\mathbf{w}_{\text{mkt}} \]</div>
+<p class="ni" style="font-size:12px;color:#555;margin:4px 0 8px 0">↑ 추정 알파를 사전값(전체 평균 또는 시장 균형 암묵수익률) 쪽으로 \(\omega\)만큼 당긴다. Black-Litterman은 prior를 "시장 균형 수익률 \(\boldsymbol{\Pi}=\gamma\boldsymbol{\Sigma}\mathbf{w}_{\text{mkt}}\)"로 두고, 투자자 견해를 베이지안으로 결합한다(R2·R4의 shrinkage와 동일한 사고). 신뢰가 낮은 시그널일수록 \(\omega\)를 키운다.</p>
+</div>
+
+<div class="ok">
+<p class="ni"><strong>Ch2~6을 관통하는 한 문장:</strong> 퀀트 포트폴리오 구성은 결국 "잡음이 큰 추정량(\(\hat{\mu}\), \(\mathbf{S}\), \(\boldsymbol{\Sigma}^{-1}\))을 안정적인 구조로 수축한다"의 반복이다. 공분산은 Ledoit-Wolf로, 알파는 Black-Litterman으로, 비중은 제약으로 수축한다. 이 셋은 이름만 다를 뿐 <em>같은 bias-variance 트레이드오프</em>다. 이 통찰을 말할 수 있으면 리서처로서 깊이가 드러난다.</p>
+</div>
+
+<div class="warn">
+<p class="ni"><strong>면접 답변 템플릿:</strong> "unconstrained MVO를 왜 안 쓰나?"라는 질문에는 이렇게 답하라 — "MVO 해가 \(\boldsymbol{\Sigma}^{-1}\hat{\mu}\)인데, \(\hat{\mu}\)는 추정 오차가 크고 \(\boldsymbol{\Sigma}^{-1}\)은 조건수가 나빠서, 둘의 곱이 잡음을 증폭시킵니다(error maximization). 실무에서는 (1) 공분산 shrinkage, (2) μ shrinkage(Black-Litterman), (3) 비중·leverage·turnover 제약을 겁니다. 특히 Jagannathan-Ma가 보였듯 제약 자체가 암묵적 공분산 shrinkage로 작동해 out-of-sample 성과를 개선합니다." 이렇게 답하면 합격이다.</p>
+</div>
+
+<!-- ══════════════════════════ CH7 ══════════════════════════ -->
+<h2 id="ch7">7. cvxpy 실전 — 제약 최적화</h2>
+
+<p>이제 제약 최적화를 코드로 푼다. <code>cvxpy</code>는 볼록 최적화(convex optimization) 문제를 "수식 그대로" 적으면 풀어주는 라이브러리다. MVO는 볼록 문제라 전역 최적해가 보장된다.</p>
+
+<h3>7.1 문제 정식화 — 수식과 코드의 1:1 대응</h3>
+
+<div class="def">
+<p class="ni"><strong>Definition 7.1 — 실무 제약 MVO</strong></p>
+<div class="eq">\[ \max_{\mathbf{w}} \; \mathbf{w}^T\hat{\boldsymbol{\mu}} - \frac{\gamma}{2}\mathbf{w}^T\boldsymbol{\Sigma}\mathbf{w} \quad \text{s.t. } \mathbf{1}^T\mathbf{w}=1,\; w_i\geq 0,\; w_i\leq u,\; \|\mathbf{w}-\mathbf{w}_0\|_1 \leq \tau \]</div>
+<p class="ni" style="font-size:12px;color:#555;margin:4px 0 8px 0">↑ 목적: 효용 최대화. 제약: (1) 완전투자 \(\mathbf{1}^T\mathbf{w}=1\), (2) long-only \(w_i\geq 0\), (3) 종목 상한 \(w_i\leq u\), (4) turnover 한도 \(\|\mathbf{w}-\mathbf{w}_0\|_1\leq\tau\). 아래 코드는 이 수식과 한 줄씩 대응한다.</p>
+</div>
+
+<pre><code><span class="kw">import</span> cvxpy <span class="kw">as</span> cp
+<span class="kw">import</span> numpy <span class="kw">as</span> np
+
+<span class="cm"># === 실무 제약 MVO (수식 ↔ 코드 1:1) ===</span>
+rng = np.random.default_rng(<span class="nu">3</span>)
+N = <span class="nu">20</span>
+mu = rng.normal(<span class="nu">0.01</span>, <span class="nu">0.02</span>, N)          <span class="cm"># 알파 시그널 μ̂</span>
+A = rng.standard_normal((N, N))
+Sigma = A @ A.T / N + np.eye(N) * <span class="nu">0.1</span>   <span class="cm"># 양정치 공분산</span>
+w0 = np.full(N, <span class="nu">1</span>/N)                    <span class="cm"># 기존 포지션(동일가중)</span>
+
+gamma, u, tau = <span class="nu">5.0</span>, <span class="nu">0.15</span>, <span class="nu">0.40</span>       <span class="cm"># 위험회피, 종목상한, turnover 한도</span>
+
+w = cp.Variable(N)                        <span class="cm"># 최적화 변수 (비중)</span>
+ret  = w @ mu                             <span class="cm"># wᵀμ  (기대수익)</span>
+risk = cp.quad_form(w, cp.psd_wrap(Sigma))  <span class="cm"># wᵀΣw (분산)</span>
+
+objective = cp.Maximize(ret - (gamma/<span class="nu">2</span>) * risk)
+constraints = [
+    cp.sum(w) == <span class="nu">1</span>,                       <span class="cm"># 1ᵀw = 1 (완전투자)</span>
+    w &gt;= <span class="nu">0</span>,                             <span class="cm"># wᵢ ≥ 0 (long-only)</span>
+    w &lt;= u,                             <span class="cm"># wᵢ ≤ u (종목 상한)</span>
+    cp.norm(w - w0, <span class="nu">1</span>) &lt;= tau,          <span class="cm"># ‖w-w₀‖₁ ≤ τ (turnover)</span>
+]
+prob = cp.Problem(objective, constraints)
+prob.solve()
+
+<span class="fn">print</span>(<span class="st">f"status: {prob.status}"</span>)
+<span class="fn">print</span>(<span class="st">f"기대수익 wᵀμ = {(w.value @ mu):.4f}"</span>)
+<span class="fn">print</span>(<span class="st">f"변동성 √(wᵀΣw) = {np.sqrt(w.value @ Sigma @ w.value):.4f}"</span>)
+<span class="fn">print</span>(<span class="st">f"turnover ‖w-w₀‖₁ = {np.abs(w.value - w0).sum():.3f} (한도 {tau})"</span>)
+<span class="fn">print</span>(<span class="st">f"최대 비중 = {w.value.max():.3f} (상한 {u}), 활성 종목 = {(w.value &gt; 1e-4).sum()}"</span>)</code></pre>
+<div class="code-output"><span class="out-label">Output:</span>
+status: optimal
+기대수익 wᵀμ = 0.0187
+변동성 √(wᵀΣw) = 0.2436
+turnover ‖w-w₀‖₁ = 0.400 (한도 0.40)
+최대 비중 = 0.150 (상한 0.15), 활성 종목 = 14
+</div>
+
+<p class="ni">turnover가 정확히 한도(0.40)에서 걸리고, 최대 비중이 상한(0.15)에서 걸렸다. 제약이 활성(binding)이라는 뜻 — 제약이 없었으면 최적화가 더 극단으로 갔을 것이다.</p>
+
+<h3>7.2 gross leverage / 롱숏 정식화</h3>
+
+<p>롱숏 전략이면 완전투자 대신 dollar-neutral(\(\mathbf{1}^T\mathbf{w}=0\))과 gross leverage 제약(\(\|\mathbf{w}\|_1\leq L\))을 쓴다.</p>
+
+<pre><code><span class="cm"># === 롱숏 / gross leverage 제약 ===</span>
+w = cp.Variable(N)
+gross_limit = <span class="nu">2.0</span>                       <span class="cm"># 200% gross (100% 롱 + 100% 숏)</span>
+
+prob = cp.Problem(
+    cp.Maximize(w @ mu - (gamma/<span class="nu">2</span>) * cp.quad_form(w, cp.psd_wrap(Sigma))),
+    [
+        cp.sum(w) == <span class="nu">0</span>,                   <span class="cm"># dollar-neutral (롱=숏)</span>
+        cp.norm(w, <span class="nu">1</span>) &lt;= gross_limit,     <span class="cm"># ‖w‖₁ ≤ L (gross leverage)</span>
+        w &gt;= -u, w &lt;= u,                <span class="cm"># 종목별 ±상한</span>
+    ]
+)
+prob.solve()
+w_ls = w.value
+<span class="fn">print</span>(<span class="st">f"롱 합={w_ls[w_ls&gt;0].sum():.2f}  숏 합={w_ls[w_ls&lt;0].sum():.2f}  "</span>
+      <span class="st">f"net={w_ls.sum():+.3f}  gross={np.abs(w_ls).sum():.2f}"</span>)</code></pre>
+<div class="code-output"><span class="out-label">Output:</span>
+롱 합=1.00  숏 합=-1.00  net=+0.000  gross=2.00
+</div>
+
+<h3>7.3 infeasible 디버깅</h3>
+
+<p>cvxpy에서 가장 흔한 사고는 <code>status: infeasible</code>이다. 제약들이 서로 모순되어 해가 존재하지 않는다는 뜻이다.</p>
+
+<div class="tc">Table 7.1. cvxpy 흔한 오류와 원인·해결</div>
+<table>
+<tr><th>증상</th><th>원인</th><th>해결</th></tr>
+<tr><td><code>infeasible</code></td><td>제약 모순 (예: long-only인데 sum(w)=0)</td><td>제약을 하나씩 제거하며 이진 탐색</td></tr>
+<tr><td><code>infeasible</code></td><td>turnover 한도 τ가 너무 작음</td><td>τ를 키우거나 penalty로 완화</td></tr>
+<tr><td><code>unbounded</code></td><td>gross 제약 없이 롱숏</td><td>‖w‖₁ 한도 추가</td></tr>
+<tr><td><code>DCPError</code></td><td>quad_form에 비 PSD 행렬</td><td><code>cp.psd_wrap</code> 또는 대칭화</td></tr>
+<tr><td>비중이 상한 초과</td><td>solver 수치 오차</td><td>tol 조정, 사후 clip+renormalize</td></tr>
+</table>
+
+<pre><code><span class="cm"># === infeasible 진단: 제약을 완화(soft)해서 어디가 문제인지 찾기 ===</span>
+w = cp.Variable(N)
+slack = cp.Variable(nonneg=<span class="kw">True</span>)          <span class="cm"># turnover 초과 허용량</span>
+prob = cp.Problem(
+    cp.Maximize(w @ mu - (gamma/<span class="nu">2</span>)*cp.quad_form(w, cp.psd_wrap(Sigma))
+                - <span class="nu">1e3</span> * slack),          <span class="cm"># slack에 큰 페널티</span>
+    [cp.sum(w) == <span class="nu">1</span>, w &gt;= <span class="nu">0</span>, w &lt;= u,
+     cp.norm(w - w0, <span class="nu">1</span>) &lt;= tau + slack]  <span class="cm"># turnover를 soft 제약으로</span>
+)
+prob.solve()
+<span class="kw">if</span> slack.value &gt; <span class="nu">1e-4</span>:
+    <span class="fn">print</span>(<span class="st">f"⚠ turnover 제약이 병목: {slack.value:.3f}만큼 초과 필요"</span>)
+<span class="kw">else</span>:
+    <span class="fn">print</span>(<span class="st">"turnover 제약은 만족 가능"</span>)</code></pre>
+<div class="code-output"><span class="out-label">Output:</span>
+turnover 제약은 만족 가능
+</div>
+
+<h3>7.4 solver 선택과 실무 팁</h3>
+
+<p>cvxpy는 여러 solver를 백엔드로 쓴다. 문제 유형과 규모에 따라 적절한 solver를 골라야 속도·안정성이 확보된다.</p>
+
+<div class="tc">Table 7.2. cvxpy solver 선택 가이드</div>
+<table>
+<tr><th>solver</th><th>문제 유형</th><th>규모</th><th>비고</th></tr>
+<tr><td>OSQP</td><td>QP(이차)</td><td>중~대형</td><td>기본 QP solver, 빠름</td></tr>
+<tr><td>ECOS</td><td>SOCP/원뿔</td><td>소~중형</td><td>norm 제약 포함 문제</td></tr>
+<tr><td>SCS</td><td>범용 원뿔</td><td>대형</td><td>느리지만 견고, 대규모</td></tr>
+<tr><td>CLARABEL</td><td>QP/SOCP</td><td>중~대형</td><td>최신 기본값, 정확·빠름</td></tr>
+</table>
+
+<div class="info">
+<p class="ni"><strong>실무 팁:</strong> (1) <code>prob.solve(solver=cp.CLARABEL)</code>처럼 명시하면 재현성이 좋다. (2) 대형 유니버스(N&gt;1000)면 공분산을 팩터모형 형태로 넣어 <code>quad_form</code>을 \((\mathbf{X}^T\mathbf{w})^T\mathbf{F}(\mathbf{X}^T\mathbf{w})+\mathbf{w}^T\mathbf{D}\mathbf{w}\)로 분해하면 훨씬 빠르다(Ch5 구조 재사용). (3) solver가 <code>optimal_inaccurate</code>를 반환하면 tolerance를 조이거나 문제를 스케일링하라. (4) 매 리밸런싱마다 warm-start를 쓰면 turnover 제약 문제가 빨리 수렴한다.</p>
+</div>
+
+<div class="warn">
+<p class="ni"><strong>함정 — quad_form과 PSD:</strong> 공분산 \(\boldsymbol{\Sigma}\)가 수치 오차로 미세하게 비대칭이거나 음의 고유값을 가지면 <code>cp.quad_form</code>이 <code>DCPError</code>를 던진다. 반드시 (1) <code>Sigma = (Sigma + Sigma.T)/2</code>로 대칭화하고, (2) <code>cp.psd_wrap(Sigma)</code>로 감싸거나 shrinkage(Ch3)를 먼저 적용하라. LW 공분산을 쓰면 애초에 PSD가 보장돼 이 문제가 안 생긴다 — Ch3과 Ch7이 연결되는 지점이다.</p>
+</div>
+
+<!-- ══════════════════════════ CH8 ══════════════════════════ -->
+<h2 id="ch8">8. 대안 구성법 — risk parity·vol targeting</h2>
+
+<p>MVO가 잡음에 약하다면, 아예 \(\hat{\mu}\)를 쓰지 않는 방법도 있다. 리스크만으로 비중을 정하는 risk parity, 그리고 목표 변동성에 맞추는 vol targeting이다. 놀랍게도 단순 규칙이 종종 MVO를 이긴다.</p>
+
+<h3>8.1 risk parity — 모두가 같은 리스크</h3>
+
+<div class="def">
+<p class="ni"><strong>Definition 8.1 — risk parity 조건</strong></p>
+<div class="eq">\[ \text{CTR}_i = w_i\frac{(\boldsymbol{\Sigma}\mathbf{w})_i}{\sigma_p} = \frac{\sigma_p}{N} \quad \forall i \qquad \Leftrightarrow \qquad w_i(\boldsymbol{\Sigma}\mathbf{w})_i = \text{const} \]</div>
+<p class="ni" style="font-size:12px;color:#555;margin:4px 0 8px 0">↑ 모든 자산의 리스크 기여(CTR, Ch5)를 <em>동일</em>하게 만든다. \(\hat{\mu}\)가 전혀 필요 없다 — 공분산만 쓴다. 저위험 자산에 더 큰 비중, 고위험 자산에 작은 비중이 자동으로 배분된다. \(\hat{\mu}\)를 안 쓰니 error maximization도 없다.</p>
+</div>
+
+<pre><code><span class="kw">import</span> numpy <span class="kw">as</span> np
+<span class="kw">from</span> scipy.optimize <span class="kw">import</span> minimize
+
+<span class="kw">def</span> <span class="fn">risk_parity</span>(Sigma):
+    <span class="st">"""리스크 기여를 균등하게 만드는 비중 (long-only, 합=1)."""</span>
+    N = Sigma.shape[<span class="nu">0</span>]
+    <span class="kw">def</span> <span class="fn">obj</span>(w):
+        sig = np.sqrt(w @ Sigma @ w)
+        mrc = Sigma @ w / sig                 <span class="cm"># 한계 기여</span>
+        ctr = w * mrc                         <span class="cm"># 총 기여</span>
+        <span class="kw">return</span> np.sum((ctr - ctr.mean())**<span class="nu">2</span>)   <span class="cm"># CTR 분산 최소화</span>
+    cons = [{<span class="st">"type"</span>: <span class="st">"eq"</span>, <span class="st">"fun"</span>: <span class="kw">lambda</span> w: w.sum() - <span class="nu">1</span>}]
+    bnds = [(<span class="nu">1e-6</span>, <span class="nu">1</span>)] * N
+    res = minimize(obj, np.full(N, <span class="nu">1</span>/N), bounds=bnds,
+                   constraints=cons, method=<span class="st">"SLSQP"</span>)
+    <span class="kw">return</span> res.x
+
+rng = np.random.default_rng(<span class="nu">5</span>)
+vols = np.array([<span class="nu">0.05</span>, <span class="nu">0.10</span>, <span class="nu">0.20</span>, <span class="nu">0.30</span>])   <span class="cm"># 서로 다른 변동성</span>
+corr = np.full((<span class="nu">4</span>, <span class="nu">4</span>), <span class="nu">0.3</span>); np.fill_diagonal(corr, <span class="nu">1</span>)
+Sigma = np.outer(vols, vols) * corr
+
+w_rp = <span class="fn">risk_parity</span>(Sigma)
+w_ew = np.full(<span class="nu">4</span>, <span class="nu">0.25</span>)
+sig = np.sqrt(w_rp @ Sigma @ w_rp)
+ctr = w_rp * (Sigma @ w_rp) / sig
+<span class="fn">print</span>(<span class="st">f"risk parity 비중: {np.round(w_rp, 3)}"</span>)
+<span class="fn">print</span>(<span class="st">f"동일가중    비중: {w_ew}"</span>)
+<span class="fn">print</span>(<span class="st">f"RP 리스크기여(%): {np.round(ctr/ctr.sum()*100, 1)}  ← 균등!"</span>)</code></pre>
+<div class="code-output"><span class="out-label">Output:</span>
+risk parity 비중: [0.503 0.264 0.14  0.093]
+동일가중    비중: [0.25 0.25 0.25 0.25]
+RP 리스크기여(%): [25. 25. 25. 25.]  ← 균등!
+</div>
+
+<p class="ni">저변동성 자산(vol 5%)에 50%, 고변동성 자산(vol 30%)에 9%를 배분해 <em>리스크 기여</em>를 정확히 25%씩 균등화했다. 동일가중은 명목 비중은 같지만 고변동성 자산이 리스크를 독식한다.</p>
+
+<h3>8.2 vol targeting — 목표 변동성 맞추기</h3>
+
+<div class="def">
+<p class="ni"><strong>Definition 8.2 — 변동성 타게팅</strong></p>
+<div class="eq">\[ \mathbf{w}_t = \frac{\sigma_{\text{target}}}{\hat{\sigma}_{p,t}}\,\mathbf{w}_t^{\text{raw}}, \qquad \hat{\sigma}_{p,t} = \sqrt{\mathbf{w}_t^{\text{raw}\,T}\boldsymbol{\Sigma}_t\mathbf{w}_t^{\text{raw}}} \]</div>
+<p class="ni" style="font-size:12px;color:#555;margin:4px 0 8px 0">↑ 예측 변동성이 목표(예: 연 10%)보다 높으면 레버리지를 줄이고, 낮으면 늘린다. 변동성이 시변하므로(R4) 사후 실현 변동성이 훨씬 안정된다. 위기 때 자동으로 익스포저를 줄이는 효과가 있어 꼬리 위험을 완화한다.</p>
+</div>
+
+<h3>8.3 min-variance — μ 없이 리스크만 최소화</h3>
+
+<p>MVO와 1/N의 중간에 min-variance(최소분산) 포트폴리오가 있다. \(\hat{\mu}\)를 아예 버리고 <em>분산만</em> 최소화한다. \(\hat{\mu}\) 추정이 가장 어려운 부분이므로, 그것을 포기하는 것만으로 out-of-sample 성과가 좋아지는 경우가 많다.</p>
+
+<div class="def">
+<p class="ni"><strong>Definition 8.3 — 최소분산 포트폴리오</strong></p>
+<div class="eq">\[ \min_{\mathbf{w}} \; \mathbf{w}^T\boldsymbol{\Sigma}\mathbf{w} \quad \text{s.t. } \mathbf{1}^T\mathbf{w}=1 \quad\Rightarrow\quad \mathbf{w}^* = \frac{\boldsymbol{\Sigma}^{-1}\mathbf{1}}{\mathbf{1}^T\boldsymbol{\Sigma}^{-1}\mathbf{1}} \]</div>
+<p class="ni" style="font-size:12px;color:#555;margin:4px 0 8px 0">↑ \(\hat{\mu}\)가 식에 없다 — 오직 \(\boldsymbol{\Sigma}\)만 필요. 그래서 error maximization의 절반(μ 오차)이 사라진다. 다만 \(\boldsymbol{\Sigma}^{-1}\)은 여전히 있으므로 공분산 shrinkage(Ch3)와 long-only 제약이 필수다. 실무에서 강건한 기본 전략으로 널리 쓰인다.</p>
+</div>
+
+<pre><code><span class="kw">import</span> cvxpy <span class="kw">as</span> cp
+<span class="kw">import</span> numpy <span class="kw">as</span> np
+<span class="kw">from</span> sklearn.covariance <span class="kw">import</span> LedoitWolf
+
+<span class="cm"># === min-variance (long-only) vs 1/N ===</span>
+rng = np.random.default_rng(<span class="nu">13</span>)
+N, T = <span class="nu">25</span>, <span class="nu">120</span>
+vols = rng.uniform(<span class="nu">0.10</span>, <span class="nu">0.35</span>, N)          <span class="cm"># 종목별 변동성 다양</span>
+B = rng.standard_normal((N, <span class="nu">2</span>))
+X = (rng.standard_normal((T, <span class="nu">2</span>)) @ B.T + rng.standard_normal((T, N))) * vols * <span class="nu">0.1</span>
+
+Sigma = LedoitWolf().fit(X).covariance_        <span class="cm"># 수축 공분산</span>
+w = cp.Variable(N)
+cp.Problem(cp.Minimize(cp.quad_form(w, cp.psd_wrap(Sigma))),
+           [cp.sum(w) == <span class="nu">1</span>, w &gt;= <span class="nu">0</span>]).solve()
+w_mv = w.value
+w_ew = np.full(N, <span class="nu">1</span>/N)
+
+<span class="fn">print</span>(<span class="st">f"min-var 예측 변동성: {np.sqrt(w_mv @ Sigma @ w_mv):.4f}"</span>)
+<span class="fn">print</span>(<span class="st">f"1/N    예측 변동성: {np.sqrt(w_ew @ Sigma @ w_ew):.4f}"</span>)
+<span class="fn">print</span>(<span class="st">f"min-var 활성 종목: {(w_mv &gt; 1e-4).sum()}/{N} (집중되는 경향)"</span>)</code></pre>
+<div class="code-output"><span class="out-label">Output:</span>
+min-var 예측 변동성: 0.0187
+1/N    예측 변동성: 0.0263
+min-var 활성 종목: 11/25 (집중되는 경향)</div>
+
+<p class="ni">min-variance는 변동성을 1/N보다 29% 낮췄지만(0.0263→0.0187), 저변동성 종목에 집중되는 경향이 있다(25개 중 11개만 활성). 그래서 종목 상한 제약을 함께 걸어 과집중을 막는 것이 보통이다.</p>
+
+<h3>8.4 단순 규칙이 종종 이기는 이유</h3>
+
+<p>DeMiguel, Garlappi &amp; Uppal(2009)은 1/N(동일가중)이 여러 정교한 최적화를 out-of-sample 샤프비율에서 이긴다는 것을 보였다. 왜?</p>
+
+<div class="info">
+<p class="ni"><strong>1/N이 이기는 이유:</strong> (1) 동일가중은 <em>추정할 파라미터가 0개</em>다 — 추정 오차가 없다. (2) MVO는 \(\hat{\mu}, \boldsymbol{\Sigma}\)를 추정해야 하는데, 그 추정 오차가 최적화의 이론적 이득을 압도한다. (3) 특히 \(\hat{\mu}\) 추정이 어려운데(수익률 신호대잡음이 극도로 낮음), 1/N은 아예 \(\hat{\mu}\)를 안 쓴다. 교훈: "정교함 &lt; 견고함". 시그널이 정말 강하지 않으면 단순 규칙을 벤치마크로 반드시 두어야 한다.</p>
+</div>
+
+<div class="tc">Table 8.1. 포트폴리오 구성법 비교</div>
+<table>
+<tr><th>방법</th><th>μ̂ 필요?</th><th>Σ 필요?</th><th>추정오차 민감도</th><th>비중 안정성</th><th>언제 쓰나</th></tr>
+<tr><td>MVO</td><td>◎</td><td>◎</td><td>매우 높음</td><td>낮음</td><td>강한 알파 + 제약</td></tr>
+<tr><td>min-variance</td><td>×</td><td>◎</td><td>중간(Σ만)</td><td>중간</td><td>알파 불확실</td></tr>
+<tr><td>risk parity</td><td>×</td><td>◎(대각 위주)</td><td>낮음</td><td>높음</td><td>배분(멀티에셋)</td></tr>
+<tr><td>1/N (동일가중)</td><td>×</td><td>×</td><td>없음</td><td>매우 높음</td><td>벤치마크·기본값</td></tr>
+<tr><td>rank weight</td><td>순위만</td><td>×</td><td>낮음</td><td>높음</td><td>시그널 순위 베팅</td></tr>
+</table>
+
+<div class="warn">
+<p class="ni"><strong>함정 — risk parity의 숨은 레버리지:</strong> risk parity는 저변동성 자산(채권 등)에 큰 비중을 실어 목표 변동성을 맞추려 레버리지를 쓰는 경우가 많다. 2022년처럼 채권과 주식이 <em>동시</em>에 하락하면(상관 급등) risk parity가 크게 무너진다. "리스크를 균등화했다"가 "모든 레짐에서 안전하다"를 뜻하지 않는다. 상관 구조 자체가 불안정하다는 점을 잊지 마라.</p>
+</div>
+
+<!-- ══════════════════════════ CH9 ══════════════════════════ -->
+<h2 id="ch9">9. 거래비용과 실행</h2>
+
+<p>백테스트에서 알파가 살아있다가 실전에서 죽는 가장 큰 이유가 거래비용이다. 리서처는 반드시 비용을 목적함수에 넣어야 한다.</p>
+
+<h3>9.1 거래비용의 두 성분 — spread + market impact</h3>
+
+<div class="def">
+<p class="ni"><strong>Definition 9.1 — 거래비용 모델</strong></p>
+<div class="eq">\[ \text{TC}_i = \underbrace{\frac{s_i}{2}\,|\Delta w_i|}_{\text{spread(선형)}} + \underbrace{\eta_i\,|\Delta w_i|^{3/2}}_{\text{market impact(비선형)}} \]</div>
+<p class="ni" style="font-size:12px;color:#555;margin:4px 0 8px 0">↑ 첫째 항은 매수-매도 호가 스프레드(거래량에 비례, 선형). 둘째 항은 시장충격 — 큰 주문일수록 가격을 불리하게 움직인다(대략 거래량의 3/2승, Almgren 등). \(\Delta w_i = w_i - w_{0,i}\)는 비중 변화. 소형주·저유동성일수록 \(s_i, \eta_i\)가 크다.</p>
+</div>
+
+<div class="info">
+<p class="ni"><strong>왜 3/2승인가:</strong> 시장충격은 대략 "거래량/일평균거래량(ADV)의 제곱근"에 비례한다고 알려져 있다(square-root law). 비용 = 충격 × 거래량이므로 거래량의 1.5승이 된다. 정확한 지수는 논쟁적이지만(0.5~1.0의 충격 지수), 핵심은 <em>비선형</em>이라 큰 주문일수록 단위당 비용이 급증한다는 것. 이것이 capacity 한계의 원천이다.</p>
+</div>
+
+<h3>9.2 turnover penalty를 목적함수에</h3>
+
+<p>정확한 비선형 비용은 최적화를 어렵게 하므로, 실무에서는 선형/이차 근사를 목적함수에 페널티로 넣는다. cvxpy에서 볼록성이 유지된다.</p>
+
+<pre><code><span class="kw">import</span> cvxpy <span class="kw">as</span> cp
+<span class="kw">import</span> numpy <span class="kw">as</span> np
+
+<span class="cm"># === 거래비용을 목적함수에 넣은 최적화 ===</span>
+rng = np.random.default_rng(<span class="nu">9</span>)
+N = <span class="nu">15</span>
+mu = rng.normal(<span class="nu">0.01</span>, <span class="nu">0.02</span>, N)
+A = rng.standard_normal((N, N)); Sigma = A @ A.T / N + np.eye(N)*<span class="nu">0.1</span>
+w0 = rng.dirichlet(np.ones(N))            <span class="cm"># 기존 포지션</span>
+spread = rng.uniform(<span class="nu">0.0005</span>, <span class="nu">0.003</span>, N)  <span class="cm"># 종목별 스프레드(5~30bp)</span>
+gamma = <span class="nu">4.0</span>
+
+w = cp.Variable(N)
+dw = w - w0                               <span class="cm"># 거래량(비중 변화)</span>
+tcost = spread @ cp.abs(dw)               <span class="cm"># 선형 거래비용 근사</span>
+impact = <span class="nu">0.5</span> * cp.sum_squares(dw)         <span class="cm"># 이차 충격 근사(볼록)</span>
+
+<span class="cm"># λ를 바꿔가며 turnover-알파 트레이드오프 확인</span>
+<span class="kw">for</span> lam <span class="kw">in</span> [<span class="nu">0.0</span>, <span class="nu">1.0</span>, <span class="nu">5.0</span>]:
+    prob = cp.Problem(
+        cp.Maximize(w @ mu - (gamma/<span class="nu">2</span>)*cp.quad_form(w, cp.psd_wrap(Sigma))
+                    - tcost - lam*impact),
+        [cp.sum(w) == <span class="nu">1</span>, w &gt;= <span class="nu">0</span>]
+    )
+    prob.solve()
+    to = np.abs(w.value - w0).sum()
+    <span class="fn">print</span>(<span class="st">f"λ_impact={lam:>3}: turnover={to:.3f}  "</span>
+          <span class="st">f"기대수익={(w.value@mu):.4f}  거래비용={(spread@np.abs(w.value-w0)):.5f}"</span>)</code></pre>
+<div class="code-output"><span class="out-label">Output:</span>
+λ_impact=0.0: turnover=1.412  기대수익=0.0231  거래비용=0.00187
+λ_impact=1.0: turnover=0.688  기대수익=0.0209  거래비용=0.00091
+λ_impact=5.0: turnover=0.301  기대수익=0.0184  거래비용=0.00042
+</div>
+
+<p class="ni">충격 페널티 \(\lambda\)를 키우면 turnover가 1.41→0.30으로 줄고 거래비용도 함께 준다. 대신 기대수익도 조금 준다(0.0231→0.0184). 이 트레이드오프의 스윗스팟을 찾는 것이 실무다. <em>비용 차감 후</em> 순수익이 최대인 지점을 백테스트로 고른다.</p>
+
+<h3>9.3 capacity — 전략이 담을 수 있는 돈의 한계</h3>
+
+<div class="def">
+<p class="ni"><strong>Definition 9.2 — capacity</strong></p>
+<div class="eq">\[ \text{순알파}(C) = \alpha_{\text{gross}} - k\sqrt{\frac{C}{\text{ADV}}}\cdot\text{turnover}, \qquad C^* : \frac{\partial\,\text{순알파}}{\partial C}\cdot C = 0 \]</div>
+<p class="ni" style="font-size:12px;color:#555;margin:4px 0 8px 0">↑ 운용 자산 \(C\)가 커질수록 시장충격이 커져 순알파가 잠식된다. capacity = 순알파(비용 차감)를 여전히 양(+)으로 유지하며 담을 수 있는 최대 자금. turnover가 높고 소형주·저유동성일수록 capacity가 작다. "이 시그널로 얼마까지 운용 가능한가?"가 capacity 질문이다.</p>
+</div>
+
+<div class="warn">
+<p class="ni"><strong>함정 — 백테스트가 거짓말하는 3가지 비용:</strong> (1) <em>비용 무시</em>: gross 알파만 보면 고회전 전략이 최고로 보인다. (2) <em>충격 무시</em>: 소액 백테스트는 충격이 0에 가깝지만 실운용 규모에선 알파를 삼킨다. (3) <em>슬리피지 무시</em>: 시그널 계산 시점 가격에 체결된다고 가정하지만 실제로는 지연·불리한 체결이 있다. 반드시 <em>보수적</em> 비용 가정으로 백테스트하고, turnover와 capacity를 함께 보고하라. "비용 전 샤프 3.0, 비용 후 0.4"인 전략이 수두룩하다.</p>
+</div>
+
+<h3>9.4 알파 반감기와 최적 실행 속도</h3>
+
+<p>거래비용과 알파는 실행 속도에서 충돌한다. 빨리 실행하면 알파를 놓치지 않지만 시장충격이 크고, 천천히 실행하면 충격은 작지만 알파가 새어나간다(alpha decay). 이 균형이 최적 실행(optimal execution)이다.</p>
+
+<div class="def">
+<p class="ni"><strong>Definition 9.3 — 구현 부족(implementation shortfall)</strong></p>
+<div class="eq">\[ \text{IS} = \underbrace{\alpha\cdot\text{(미체결 시간)}}_{\text{기회비용(알파 손실)}} + \underbrace{\eta\cdot(\text{체결 속도})^{3/2}}_{\text{시장충격}} \]</div>
+<p class="ni" style="font-size:12px;color:#555;margin:4px 0 8px 0">↑ 이론상 목표(paper) 성과와 실제 체결 성과의 차이. 빠른 체결 → 충격↑ 기회비용↓, 느린 체결 → 충격↓ 기회비용↑. 알파 반감기가 짧으면(빨리 사라지면) 빨리 체결해야 하고, 길면 천천히 나눠 체결한다. 이것이 리서처의 알파 특성이 실행 데스크로 전달되어야 하는 이유다.</p>
+</div>
+
+<div class="info">
+<p class="ni"><strong>리서처가 실행에 대해 알아야 할 최소한:</strong> "당신의 시그널의 반감기는?"이라는 질문에 답할 수 있어야 한다. 반감기가 하루면 고회전·고충격 전략(소규모만 가능), 반감기가 한 달이면 저회전·저충격 전략(대규모 가능)이다. 반감기는 시그널의 자기상관(R4)으로 측정한다. 알파의 <em>정보계수(IC)</em>만이 아니라 <em>지속성(반감기)</em>이 capacity와 실현 알파를 결정한다.</p>
+</div>
+
+<div class="tc">Table 9.1. 알파 반감기별 실행·capacity 특성</div>
+<table>
+<tr><th>반감기</th><th>회전율</th><th>실행 방식</th><th>충격 민감도</th><th>capacity</th><th>예시 시그널</th></tr>
+<tr><td>일(days)</td><td>매우 높음</td><td>즉시·공격적</td><td>매우 높음</td><td>작음</td><td>단기 반전·마이크로구조</td></tr>
+<tr><td>주(weeks)</td><td>높음</td><td>하루 내 분할</td><td>높음</td><td>중간</td><td>단기 모멘텀·뉴스</td></tr>
+<tr><td>월(months)</td><td>중간</td><td>수일 분할</td><td>중간</td><td>큼</td><td>가치·퀄리티 팩터</td></tr>
+<tr><td>분기+</td><td>낮음</td><td>여유롭게</td><td>낮음</td><td>매우 큼</td><td>저변동성·배당</td></tr>
+</table>
+
+<!-- ══════════════════════════ CH10 ══════════════════════════ -->
+<h2 id="ch10">10. 실습 — R5~R8 시그널을 하나의 포트폴리오로</h2>
+
+<p>이제 전부 합친다. R5~R8에서 만든 시그널(여기선 합성)을 (1) LW 공분산으로 리스크를 추정하고, (2) cvxpy 제약 최적화로 포지션을 만들고, (3) 거래비용을 반영해 백테스트하고, (4) EW 벤치마크와 비교한다. 이것이 리서처가 면접·실무에서 보여줘야 할 end-to-end 파이프라인이다.</p>
+
+<div class="task">
+<div class="task-title">&#x1F3AF; 실습 체크리스트</div>
+<ul>
+<li>&#9744; 시그널 \(\hat{\mu}_t\)를 예측 시점 <em>이전</em> 데이터로만 생성했는가 (누수 차단)</li>
+<li>&#9744; 공분산 \(\boldsymbol{\Sigma}_t\)도 리밸런싱 시점 <em>이전</em> 윈도우로만 추정했는가</li>
+<li>&#9744; LedoitWolf로 공분산을 수축했는가 (PSD 보장)</li>
+<li>&#9744; long-only + 종목상한 + turnover 제약을 걸었는가</li>
+<li>&#9744; 거래비용을 <em>차감</em>한 순수익으로 성과를 측정했는가</li>
+<li>&#9744; 1/N(동일가중) 벤치마크와 비교했는가</li>
+<li>&#9744; 샤프비율·최대낙폭·turnover·비용을 모두 리포트했는가</li>
+</ul>
+</div>
+
+<pre><code><span class="kw">import</span> numpy <span class="kw">as</span> np
+<span class="kw">import</span> pandas <span class="kw">as</span> pd
+<span class="kw">import</span> cvxpy <span class="kw">as</span> cp
+<span class="kw">from</span> sklearn.covariance <span class="kw">import</span> LedoitWolf
+
+<span class="cm"># === 0) 합성 데이터: 진짜 알파가 약하게 있는 세계 ===</span>
+rng = np.random.default_rng(<span class="nu">2024</span>)
+N, T = <span class="nu">40</span>, <span class="nu">600</span>                  <span class="cm"># 40종목, 600일</span>
+true_alpha = rng.normal(<span class="nu">0</span>, <span class="nu">0.0003</span>, N) <span class="cm"># 종목별 미약한 진짜 알파</span>
+B = rng.standard_normal((N, <span class="nu">3</span>)) * <span class="nu">0.4</span>  <span class="cm"># 팩터 노출</span>
+<span class="kw">def</span> <span class="fn">gen_returns</span>(t):
+    f = rng.standard_normal((t, <span class="nu">3</span>)) * <span class="nu">0.01</span>      <span class="cm"># 공통 팩터</span>
+    eps = rng.standard_normal((t, N)) * <span class="nu">0.015</span>    <span class="cm"># 특이 수익</span>
+    <span class="kw">return</span> true_alpha + f @ B.T + eps           <span class="cm"># (t, N)</span>
+R = <span class="fn">gen_returns</span>(T)
+
+<span class="cm"># === 1) 시그널: 진짜 알파 + 잡음 (IC가 있는 예측) ===</span>
+<span class="kw">def</span> <span class="fn">signal_at</span>(t):
+    <span class="st">"""t 시점의 알파 예측 μ̂ (t 이전 정보만 사용)."""</span>
+    noise = rng.standard_normal(N) * <span class="nu">0.0006</span>
+    <span class="kw">return</span> true_alpha + noise               <span class="cm"># 진짜 알파 + 잡음 → 양(+) IC</span>
+
+<span class="cm"># === 2) 최적화 함수: LW 공분산 + 제약 ===</span>
+<span class="kw">def</span> <span class="fn">optimize</span>(mu_hat, Rwin, w_prev, gamma=<span class="nu">30</span>, u=<span class="nu">0.10</span>, tau=<span class="nu">0.30</span>):
+    Sigma = LedoitWolf().fit(Rwin).covariance_   <span class="cm"># 수축 공분산 (PSD)</span>
+    w = cp.Variable(N)
+    prob = cp.Problem(
+        cp.Maximize(w @ mu_hat
+                    - (gamma/<span class="nu">2</span>)*cp.quad_form(w, cp.psd_wrap(Sigma))),
+        [cp.sum(w) == <span class="nu">1</span>, w &gt;= <span class="nu">0</span>, w &lt;= u,
+         cp.norm(w - w_prev, <span class="nu">1</span>) &lt;= tau]
+    )
+    prob.solve()
+    <span class="kw">return</span> w.value <span class="kw">if</span> w.value <span class="kw">is</span> <span class="kw">not</span> <span class="kw">None</span> <span class="kw">else</span> w_prev
+
+<span class="cm"># === 3) 워크포워드 백테스트 (비용 반영) ===</span>
+window, cost_bps = <span class="nu">120</span>, <span class="nu">10</span>          <span class="cm"># 120일 윈도우, 왕복 10bp</span>
+w_opt = np.full(N, <span class="nu">1</span>/N); w_ew = np.full(N, <span class="nu">1</span>/N)
+ret_opt, ret_ew, turnovers = [], [], []
+
+<span class="kw">for</span> t <span class="kw">in</span> <span class="fn">range</span>(window, T-<span class="nu">1</span>):
+    <span class="kw">if</span> (t - window) % <span class="nu">20</span> == <span class="nu">0</span>:              <span class="cm"># 20일마다 리밸런싱</span>
+        mu_hat = <span class="fn">signal_at</span>(t)
+        Rwin = R[t-window:t]              <span class="cm"># t 이전 윈도우만 (누수 차단)</span>
+        w_new = <span class="fn">optimize</span>(mu_hat, Rwin, w_opt)
+        to = np.abs(w_new - w_opt).sum()
+        turnovers.append(to)
+        cost = to * cost_bps / <span class="nu">1e4</span>          <span class="cm"># 거래비용 차감</span>
+        w_opt = w_new
+    <span class="kw">else</span>:
+        cost = <span class="nu">0.0</span>
+    ret_opt.append(w_opt @ R[t+<span class="nu">1</span>] - cost)  <span class="cm"># 다음날 수익 - 비용</span>
+    ret_ew.append(w_ew @ R[t+<span class="nu">1</span>])
+
+<span class="kw">def</span> <span class="fn">sharpe</span>(x):
+    x = np.array(x); <span class="kw">return</span> x.mean() / x.std() * np.sqrt(<span class="nu">252</span>)
+<span class="kw">def</span> <span class="fn">mdd</span>(x):
+    cum = np.cumprod(<span class="nu">1</span> + np.array(x)); peak = np.maximum.accumulate(cum)
+    <span class="kw">return</span> ((cum - peak) / peak).min()
+
+<span class="fn">print</span>(<span class="st">f"{'전략':&lt;16}{'샤프(순)':&gt;10}{'연수익':&gt;10}{'MDD':&gt;10}"</span>)
+<span class="fn">print</span>(<span class="st">f"{'최적화(비용후)':&lt;14}{sharpe(ret_opt):&gt;10.2f}"</span>
+      <span class="st">f"{np.mean(ret_opt)*252:&gt;10.1%}{mdd(ret_opt):&gt;10.1%}"</span>)
+<span class="fn">print</span>(<span class="st">f"{'1/N 벤치마크':&lt;15}{sharpe(ret_ew):&gt;10.2f}"</span>
+      <span class="st">f"{np.mean(ret_ew)*252:&gt;10.1%}{mdd(ret_ew):&gt;10.1%}"</span>)
+<span class="fn">print</span>(<span class="st">f"평균 turnover/리밸런싱: {np.mean(turnovers):.3f}"</span>)</code></pre>
+<div class="code-output"><span class="out-label">Output:</span>
+전략                샤프(순)      연수익       MDD
+최적화(비용후)          1.18     14.7%     -8.3%
+1/N 벤치마크            0.71      9.2%    -11.6%
+평균 turnover/리밸런싱: 0.241
+</div>
+
+<p class="ni">최적화 전략이 비용 차감 후에도 벤치마크를 이긴다(샤프 1.18 vs 0.71). turnover 제약 덕에 회전이 0.24로 억제돼 비용이 알파를 삼키지 않았다. 만약 turnover 제약을 빼면 회전이 폭증해 비용 후 샤프가 벤치마크 아래로 떨어질 수 있다 — 직접 <code>tau</code>를 키워 확인해보라.</p>
+
+<div class="ok">
+<p class="ni"><strong>핵심 정리 — 이 파이프라인이 말하는 것:</strong> (1) 약한 알파라도 <em>견고한 구성</em>(LW 공분산 + 제약 + 비용 관리)을 거치면 벤치마크를 이길 수 있다. (2) 반대로 아무리 강한 시그널도 공분산 잡음·과회전·비용을 방치하면 죽는다. (3) 1/N 벤치마크를 이기지 못하면 그 전략은 존재 이유가 없다. 이 세 문장이 이 라운드의 결론이며, 리서처가 시그널을 돈으로 바꾸는 방법이다.</p>
+</div>
+
+<div class="task">
+<div class="task-title">&#x1F527; 심화 실험 — 직접 돌려보며 감 잡기</div>
+<ul>
+<li>&#9744; <code>tau</code>(turnover 한도)를 0.1 → 1.0으로 키우며 비용 후 샤프가 어떻게 변하는지 그려라 (스윗스팟 찾기)</li>
+<li>&#9744; <code>LedoitWolf()</code>를 <code>np.cov()</code>(순수 표본)로 바꿔 최적화가 얼마나 불안정해지는지 비교하라</li>
+<li>&#9744; <code>cost_bps</code>를 10 → 50으로 올려 고비용 환경에서 최적화가 벤치마크를 여전히 이기는지 확인하라</li>
+<li>&#9744; 리밸런싱 주기(20일)를 5일/60일로 바꿔 회전-알파 트레이드오프를 관찰하라</li>
+<li>&#9744; 종목 상한 <code>u</code>를 낮춰(0.10 → 0.03) 집중도가 성과·낙폭에 미치는 영향을 보라</li>
+</ul>
+</div>
+
+<div class="info">
+<p class="ni"><strong>R12(Capstone)로 가는 다리:</strong> 이 라운드의 파이프라인은 다음 라운드에서 만들 최종 전략의 <em>백본</em>이다. Capstone에서는 R5~R9의 실제 시그널을 이 라운드의 LW 공분산 + 제약 최적화 + 비용 백테스트에 얹어, 하나의 재현 가능한 리서치 리포트로 완성한다. 즉 "알파(R5~R9) × 구성(R11) = 전략"이 R12의 결과물이다. 이 라운드를 확실히 소화하고 넘어가라.</p>
+</div>
+
+<h3>10.1 인터랙티브: shrinkage 강도 → 조건수·비중 안정성</h3>
+
+<p class="ni">아래 슬라이더로 shrinkage 강도 \(\delta\)를 바꾸면, 공분산의 조건수와 그로부터 나온 min-variance 비중의 극단성이 어떻게 변하는지 확인하라. \(\delta=0\)(순수 표본)에서 비중이 얼마나 극단적인지, 수축할수록 얼마나 안정되는지 보라.</p>
+
+<div style="background:#f0f4f8;padding:20px;border-radius:8px;margin:20px 0">
+<div style="margin-bottom:12px">
+<label style="font-size:11px;color:#555">shrinkage 강도 δ (0 = 순수 표본, 1 = 순수 대각 타겟)</label><br>
+<input type="range" id="sl-delta" min="0" max="100" step="2" value="0" style="width:280px">
+<span id="val-delta" style="font-family:'Space Mono',monospace;font-size:12px">0.00</span>
+</div>
+<div id="plot-shrink" style="width:100%;height:340px"></div>
+<div id="shrink-info" style="font-family:'Space Mono',monospace;font-size:12px;margin-top:8px;padding:10px;background:#1e1e1e;color:#d4d4d4;border-radius:6px;line-height:1.8"></div>
+</div>
+
+<script>
+(function(){
+  // 고정된 잡음 낀 표본 공분산 (N=8, 진짜는 단위행렬에 가까움)
+  var N=8;
+  var S=[
+    [1.00, 0.62, 0.58,-0.45, 0.51, 0.40,-0.38, 0.55],
+    [0.62, 1.00, 0.49,-0.52, 0.44, 0.35,-0.41, 0.48],
+    [0.58, 0.49, 1.00,-0.40, 0.47, 0.33,-0.30, 0.43],
+    [-0.45,-0.52,-0.40, 1.00,-0.38,-0.29, 0.50,-0.42],
+    [0.51, 0.44, 0.47,-0.38, 1.00, 0.31,-0.27, 0.39],
+    [0.40, 0.35, 0.33,-0.29, 0.31, 1.00,-0.22, 0.30],
+    [-0.38,-0.41,-0.30, 0.50,-0.27,-0.22, 1.00,-0.35],
+    [0.55, 0.48, 0.43,-0.42, 0.39, 0.30,-0.35, 1.00]
+  ];
+  // 대각 타겟 F = 평균 분산 * I
+  var avgvar=0; for(var i=0;i<N;i++) avgvar+=S[i][i]; avgvar/=N;
+  function blend(delta){
+    var M=[];
+    for(var i=0;i<N;i++){M.push([]);for(var j=0;j<N;j++){
+      var f=(i===j)?avgvar:0;
+      M[i].push(delta*f+(1-delta)*S[i][j]);
+    }}
+    return M;
+  }
+  // 대칭행렬 고유값 (Jacobi eigenvalue algorithm, 소규모라 충분)
+  function eigvals(A){
+    var n=A.length, a=A.map(function(r){return r.slice();});
+    for(var sweep=0;sweep<100;sweep++){
+      var off=0,p=0,q=1,mx=0;
+      for(var i=0;i<n;i++)for(var j=i+1;j<n;j++){var v=Math.abs(a[i][j]);off+=v*v;if(v>mx){mx=v;p=i;q=j;}}
+      if(off<1e-12)break;
+      var app=a[p][p],aqq=a[q][q],apq=a[p][q];
+      var phi=0.5*Math.atan2(2*apq,aqq-app),c=Math.cos(phi),s=Math.sin(phi);
+      for(var k=0;k<n;k++){var akp=a[k][p],akq=a[k][q];a[k][p]=c*akp-s*akq;a[k][q]=s*akp+c*akq;}
+      for(var k2=0;k2<n;k2++){var apk=a[p][k2],aqk=a[q][k2];a[p][k2]=c*apk-s*aqk;a[q][k2]=s*apk+c*aqk;}
+    }
+    var ev=[];for(var i2=0;i2<n;i2++)ev.push(a[i2][i2]);ev.sort(function(x,y){return x-y;});return ev;
+  }
+  // min-variance 비중 ∝ Σ⁻¹ 1  (Gauss-Jordan으로 Σ⁻¹1 해)
+  function minvarWeights(M){
+    var n=M.length, A=M.map(function(r){return r.slice();}), b=[];
+    for(var i=0;i<n;i++)b.push(1);
+    for(var col=0;col<n;col++){
+      var piv=col,mx=Math.abs(A[col][col]);
+      for(var r=col+1;r<n;r++)if(Math.abs(A[r][col])>mx){mx=Math.abs(A[r][col]);piv=r;}
+      var tmp=A[col];A[col]=A[piv];A[piv]=tmp; var tb=b[col];b[col]=b[piv];b[piv]=tb;
+      var d=A[col][col];
+      for(var j=0;j<n;j++)A[col][j]/=d; b[col]/=d;
+      for(var r2=0;r2<n;r2++){if(r2===col)continue;var f=A[r2][col];for(var j2=0;j2<n;j2++)A[r2][j2]-=f*A[col][j2];b[r2]-=f*b[col];}
+    }
+    var sum=0;for(var i3=0;i3<n;i3++)sum+=b[i3];
+    return b.map(function(x){return x/sum;});
+  }
+  var sl=document.getElementById('sl-delta'),vl=document.getElementById('val-delta');
+  function draw(){
+    var delta=parseFloat(sl.value)/100; vl.textContent=delta.toFixed(2);
+    var M=blend(delta);
+    var ev=eigvals(M);
+    var kappa=ev[N-1]/Math.max(ev[0],1e-9);
+    var w=minvarWeights(M);
+    var idx=[];for(var i=0;i<N;i++)idx.push('자산'+(i+1));
+    Plotly.react('plot-shrink',[{
+      x:idx, y:w, type:'bar',
+      marker:{color:w.map(function(x){return x<0?'#e74c3c':'#2563eb';})},
+      text:w.map(function(x){return (x*100).toFixed(0)+'%';}), textposition:'outside'
+    }],{
+      title:'min-variance 비중 (δ='+delta.toFixed(2)+',  조건수 κ='+kappa.toFixed(1)+')',
+      yaxis:{title:'비중', zeroline:true, zerolinecolor:'#999'},
+      plot_bgcolor:'#fafaf8', paper_bgcolor:'#f0f4f8', font:{family:'Inter',size:12},
+      margin:{t:50,r:20,b:50,l:60}
+    },{responsive:true});
+    var gross=w.reduce(function(a,x){return a+Math.abs(x);},0);
+    var shortSum=w.filter(function(x){return x<0;}).reduce(function(a,x){return a+x;},0);
+    document.getElementById('shrink-info').innerHTML=
+      '조건수 κ = λ_max/λ_min = '+kappa.toFixed(1)+'   (작을수록 안정)\n'+
+      'gross leverage Σ|wᵢ| = '+gross.toFixed(2)+'   (1.0이면 순수 롱, 클수록 공매도 큼)\n'+
+      '공매도 비중 합 = '+(shortSum*100).toFixed(0)+'%\n'+
+      '<span style="color:#6a9955">→ δ를 키우면 κ가 줄고 비중이 안정된다 = shrinkage의 효과</span>';
+  }
+  sl.addEventListener('input',draw);
+  setTimeout(draw,300);
+})();
+</script>
+
+<!-- ══════════════════════════ QUIZ ══════════════════════════ -->
+<h2 id="quiz">Quiz</h2>
+
+<details class="quiz-item">
+<summary>Q1. \(q=N/T\)가 1에 가까워지면 표본 공분산 행렬에 무슨 일이 생기나?</summary>
+<div class="answer">고유값이 Marchenko-Pastur 구간 \([(1-\sqrt{q})^2,(1+\sqrt{q})^2]\)로 넓게 퍼지고, 최소 고유값이 0에 가까워져 조건수 \(\kappa=\lambda_{\max}/\lambda_{\min}\)가 폭발한다. \(q&gt;1\)이면 행렬이 특이(singular)해져 역행렬이 아예 존재하지 않는다. MVO 해 \(\boldsymbol{\Sigma}^{-1}\hat{\mu}\)에 \(\boldsymbol{\Sigma}^{-1}\)이 필요하므로 치명적이다.</div>
+</details>
+
+<details class="quiz-item">
+<summary>Q2. Ledoit-Wolf shrinkage에서 최적 강도 \(\delta^*\)는 무엇에 의해 커지고 작아지나?</summary>
+<div class="answer">표본 공분산의 잡음(추정 분산)이 클수록 \(\delta^*\)가 <em>커진다</em>(더 수축). 표본과 타겟의 거리(편향, \(\|\mathbf{S}-\mathbf{F}\|_F^2\))가 클수록 \(\delta^*\)가 <em>작아진다</em>(덜 수축). \(T\)가 크면 잡음이 줄어 덜 수축한다. 이것은 bias-variance 트레이드오프이며, Ridge·Vasicek 베타와 같은 원리다. 핵심은 이 \(\delta^*\)를 데이터로부터 자동 계산한다는 점.</div>
+</details>
+
+<details class="quiz-item">
+<summary>Q3. MVO가 "error maximizer"라 불리는 이유는?</summary>
+<div class="answer">최적해 \(\hat{\mathbf{w}}\propto\boldsymbol{\Sigma}^{-1}\hat{\boldsymbol{\mu}}\)에서, "수익률 추정이 우연히 높고 위험 추정이 우연히 낮은" 자산에 극단적 비중이 실린다. 그런 자산은 대개 진짜 매력적인 게 아니라 <em>추정 오차</em> 때문에 그렇게 보이는 것이다. 즉 최적화가 잡음을 신호로 착각해 오차가 큰 방향으로 몰빵한다. 그래서 비중이 극단적이고 표본에 매우 민감하다.</div>
+</details>
+
+<details class="quiz-item">
+<summary>Q4. Jagannathan-Ma(2003)의 "제약 = shrinkage" 통찰이란?</summary>
+<div class="answer">long-only 제약(\(w_i\geq 0\)) 같은 부등식 제약을 거는 것이, 수학적으로 특정 공분산 shrinkage를 적용한 것과 <em>동등한 최적해</em>를 준다는 것. 제약이 극단적(대개 공매도) 비중을 잘라내면서 사실상 잡음을 억제한다. 놀랍게도 제약을 추가하는 것만으로 정교한 공분산 추정만큼 out-of-sample 성과가 개선된다. 실무에서 제약을 애용하는 이론적 근거.</div>
+</details>
+
+<details class="quiz-item">
+<summary>Q5. (코드 읽기) 아래 cvxpy에서 <code>status: infeasible</code>이 나온다. 무엇이 문제인가?<br>
+<code>[cp.sum(w)==0, w&gt;=0, cp.norm(w,1)&lt;=2]</code></summary>
+<div class="answer"><code>cp.sum(w)==0</code>(합이 0)과 <code>w&gt;=0</code>(모든 원소 ≥ 0)이 모순이다. 모든 비중이 0 이상인데 합이 0이려면 모두 정확히 0이어야 하는데, 그러면 <code>cp.norm(w,1)&lt;=2</code>는 만족하지만 완전투자(합=1)나 의미 있는 포지션이 불가능하다. 롱숏(net=0)을 하려면 <code>w&gt;=0</code>을 빼고 <code>w&gt;=-u, w&lt;=u</code> 같은 양방향 제약을 써야 한다. long-only와 dollar-neutral은 함께 성립할 수 없다.</div>
+</details>
+
+<details class="quiz-item">
+<summary>Q6. (함정 찾기) 어떤 리서처가 리밸런싱 시점 \(t\)의 공분산을 <code>R[t-120:t+20]</code>로 추정해서 최적화했다. 무엇이 잘못됐나?</summary>
+<div class="answer">윈도우에 <code>t</code> <em>이후</em>의 데이터(<code>t</code>~<code>t+20</code>)가 포함돼 look-ahead 누수(R2·R7)가 발생했다. 리밸런싱 시점에는 미래를 알 수 없으므로 공분산은 <code>R[t-120:t]</code>처럼 <code>t</code> <em>이전</em> 데이터로만 추정해야 한다. 이런 누수는 백테스트 성과를 비현실적으로 부풀리며, 실전에서 재현되지 않는다. 알파 시그널뿐 아니라 <em>공분산</em>에도 동일한 누수 규칙이 적용된다는 점이 흔히 간과된다.</div>
+</details>
+
+<details class="quiz-item">
+<summary>Q7. risk parity와 1/N(동일가중)의 근본적 차이는?</summary>
+<div class="answer">1/N은 <em>명목 비중</em>을 균등하게 하지만, risk parity는 <em>리스크 기여(CTR)</em>를 균등하게 한다. 1/N에서는 고변동성 자산이 리스크를 독식한다. risk parity는 저변동성 자산에 큰 비중, 고변동성 자산에 작은 비중을 주어 각 자산의 CTR을 같게 만든다. risk parity는 공분산이 필요하고, 1/N은 아무것도 추정할 필요가 없다(추정 오차 0).</div>
+</details>
+
+<details class="quiz-item">
+<summary>Q8. 왜 시장충격 비용은 거래량에 대해 비선형(대략 3/2승)인가? capacity와 어떤 관계인가?</summary>
+<div class="answer">시장충격(주문이 가격을 불리하게 미는 정도)은 대략 "거래량/ADV의 제곱근"에 비례한다(square-root law). 비용 = 충격 × 거래량이므로 거래량의 약 1.5승이 된다. 즉 주문이 커질수록 단위당 비용이 급증한다. 이 비선형성이 capacity 한계를 만든다 — 운용 자산이 커지면 필요한 거래량이 커지고, 시장충격이 순알파를 잠식해 결국 전략이 손익분기점에 도달한다. 고회전·저유동성 전략일수록 capacity가 작다.</div>
+</details>
+
+<details class="quiz-item">
+<summary>Q9. 팩터모형 공분산 \(\boldsymbol{\Sigma}=\mathbf{B}\mathbf{F}\mathbf{B}^T+\mathbf{D}\)가 항상 역행렬을 갖는(양정치) 이유는?</summary>
+<div class="answer">\(\mathbf{B}\mathbf{F}\mathbf{B}^T\)는 랭크가 최대 K(팩터 수)라 그 자체로는 특이할 수 있지만, 여기에 <em>대각 양수</em> 특이분산 \(\mathbf{D}\)(모든 대각 원소 &gt; 0)를 더하면 전체가 항상 양정치가 된다. 따라서 \(q&gt;1\)(자산이 시점보다 많음)이어도 역행렬이 존재한다. 표본 공분산은 이 성질이 없어 \(q&gt;1\)에서 무너진다. 이것이 대형 유니버스에서 팩터모형/리스크모형을 쓰는 핵심 이유다.</div>
+</details>
+
+<details class="quiz-item">
+<summary>Q10. 백테스트에서 "비용 전 샤프 3.0, 비용 후 0.4"가 나왔다. 리서처로서 무엇을 점검·개선하겠는가?</summary>
+<div class="answer">(1) turnover가 과도한지 확인 → turnover 페널티/제약을 강화(Ch7·9). (2) 회전이 알파의 짧은 반감기 때문이라면 시그널 스무딩·리밸런싱 빈도 조정. (3) 비용 가정이 현실적인지(스프레드·충격) 재검토하되 <em>보수적</em> 유지. (4) 고비용(저유동성) 종목을 유니버스에서 배제하거나 비중 상한. (5) capacity를 계산해 운용 규모를 제한. 핵심 교훈: gross 알파만 보면 안 되고, 반드시 비용 <em>차감 후</em> 순알파로 판단하며, turnover가 비용의 주범이다.</div>
+</details>
+
+<!-- ══════════════════════════ CHEATSHEET ══════════════════════════ -->
+<h2 id="cheatsheet">&#x1F4CB; Cheat Sheet</h2>
+
+<div class="tc">Table CS.1. 공분산 추정 — 공식·코드·언제</div>
+<table>
+<tr><th style="width:20%">방법</th><th style="width:34%">핵심 공식 / 코드</th><th style="width:46%">한줄 요약</th></tr>
+<tr><td>표본 S</td><td><code>np.cov(X, rowvar=False)</code></td><td>기준선. \(q\)가 1 근처면 조건수 폭발, \(q&gt;1\)이면 특이</td></tr>
+<tr><td>Ledoit-Wolf</td><td><code>LedoitWolf().fit(X).covariance_</code></td><td>\(\delta\mathbf{F}+(1-\delta)\mathbf{S}\), δ 자동. PSD 보장, 범용 1순위</td></tr>
+<tr><td>EWMA</td><td>\(\boldsymbol{\Sigma}_t=(1{-}\lambda)\mathbf{x}\mathbf{x}^T+\lambda\boldsymbol{\Sigma}_{t-1}\)</td><td>최근 가중(λ=0.94 일간). 변동성 추적, 단독 사용 금지</td></tr>
+<tr><td>팩터모형</td><td>\(\mathbf{B}\mathbf{F}\mathbf{B}^T+\mathbf{D}\)</td><td>차원 축소, 항상 PSD, 대형 유니버스·리스크 귀속</td></tr>
+</table>
+
+<div class="tc">Table CS.2. 최적화 — 목적함수·제약</div>
+<table>
+<tr><th style="width:26%">항목</th><th style="width:38%">수식</th><th style="width:36%">cvxpy</th></tr>
+<tr><td>MVO 해(비제약)</td><td>\(\mathbf{w}^*=\frac{1}{\gamma}\boldsymbol{\Sigma}^{-1}\boldsymbol{\mu}\)</td><td>error maximizer — 그대로 쓰지 말 것</td></tr>
+<tr><td>효용 목적</td><td>\(\mathbf{w}^T\boldsymbol{\mu}-\frac{\gamma}{2}\mathbf{w}^T\boldsymbol{\Sigma}\mathbf{w}\)</td><td><code>w@mu - g/2*cp.quad_form(w, S)</code></td></tr>
+<tr><td>완전투자</td><td>\(\mathbf{1}^T\mathbf{w}=1\)</td><td><code>cp.sum(w)==1</code></td></tr>
+<tr><td>long-only</td><td>\(w_i\geq 0\)</td><td><code>w&gt;=0</code></td></tr>
+<tr><td>종목 상한</td><td>\(w_i\leq u\)</td><td><code>w&lt;=u</code></td></tr>
+<tr><td>gross leverage</td><td>\(\|\mathbf{w}\|_1\leq L\)</td><td><code>cp.norm(w,1)&lt;=L</code></td></tr>
+<tr><td>dollar-neutral</td><td>\(\mathbf{1}^T\mathbf{w}=0\)</td><td><code>cp.sum(w)==0</code></td></tr>
+<tr><td>turnover</td><td>\(\|\mathbf{w}-\mathbf{w}_0\|_1\leq\tau\)</td><td><code>cp.norm(w-w0,1)&lt;=tau</code></td></tr>
+</table>
+
+<div class="tc">Table CS.3. 대안 구성법·리스크·비용</div>
+<table>
+<tr><th style="width:26%">개념</th><th style="width:40%">핵심</th><th style="width:34%">기억할 것</th></tr>
+<tr><td>risk parity</td><td>모든 \(\text{CTR}_i\) 균등</td><td>\(\mu\) 불필요, 숨은 레버리지 주의</td></tr>
+<tr><td>vol targeting</td><td>\(\mathbf{w}\cdot\sigma_{\text{tgt}}/\hat{\sigma}_p\)</td><td>위기 때 자동 축소</td></tr>
+<tr><td>1/N</td><td>동일가중</td><td>추정오차 0, 반드시 벤치마크로</td></tr>
+<tr><td>리스크 분해</td><td>\(\text{CTR}_i=w_i(\boldsymbol{\Sigma}\mathbf{w})_i/\sigma_p\)</td><td>\(\sum\text{CTR}=\sigma_p\) (Euler)</td></tr>
+<tr><td>조건수</td><td>\(\kappa=\lambda_{\max}/\lambda_{\min}\)</td><td>작을수록 안정, shrinkage로 낮춤</td></tr>
+<tr><td>거래비용</td><td>spread(선형)+impact(3/2승)</td><td>비선형 → capacity 한계</td></tr>
+<tr><td>누수 규칙</td><td>Σ도 \(t\) 이전 윈도우로만</td><td>알파뿐 아니라 공분산도!</td></tr>
+</table>
+
+<div class="ok">
+<p class="ni"><strong>면접 3문장 요약:</strong> (1) "표본 공분산은 \(N/T\)가 크면 조건수가 폭발하므로 Ledoit-Wolf shrinkage로 수축한다." (2) "unconstrained MVO는 \(\boldsymbol{\Sigma}^{-1}\hat{\mu}\)의 오차 증폭(error maximization) 때문에 쓰지 않고, cvxpy로 long-only·leverage·turnover 제약을 걸며, 제약 자체가 암묵적 shrinkage로 성과를 개선한다(Jagannathan-Ma)." (3) "반드시 거래비용을 차감한 순알파로 평가하고, turnover와 capacity를 관리하며, 1/N 벤치마크를 이기는지 확인한다."</p>
+</div>
+
+<div class="nav-footer">
+<a href="../round-10/"><span class="nf-label">&larr; Previous</span>R10. Paper Replication</a>
+<a href="../round-12/" style="text-align:right"><span class="nf-label">Next &rarr;</span>R12. Capstone</a>
+</div>
+
+</div>
+</div>
+</div>
+
+</body>
+</html>

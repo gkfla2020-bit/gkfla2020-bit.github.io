@@ -1,0 +1,1143 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Round 3 - Statistical Inference — 다중검정과 백테스트 과적합 | Quant Researcher Guide</title>
+<script>
+MathJax = { tex: { inlineMath: [['\\(','\\)']], displayMath: [['\\[','\\]'],['$$','$$']] } };
+</script>
+<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;500&family=Space+Mono:wght@400&family=Inter:wght@300;400&display=swap" rel="stylesheet">
+<script src="https://cdn.plot.ly/plotly-2.27.0.min.js"></script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Inter',sans-serif;background:#fafaf8;color:#1a1a1a;line-height:1.7;overflow-x:hidden}
+.sidebar{position:fixed;left:0;top:0;width:260px;height:100vh;background:rgba(255,255,255,.97);border-right:1px solid rgba(0,0,0,.06);padding:32px 24px;z-index:100;overflow-y:auto;display:flex;flex-direction:column}
+.sidebar-profile{text-align:center;margin-bottom:28px;padding-bottom:24px;border-bottom:1px solid rgba(0,0,0,.08)}
+.profile-icon{font-size:48px;margin-bottom:8px}
+.profile-name{font-family:'Cormorant Garamond',serif;font-size:1.3rem;font-weight:500;margin-bottom:4px}
+.profile-title{font-size:.68rem;color:#888;letter-spacing:.08em;text-transform:uppercase;margin-bottom:8px}
+.profile-bio{font-size:.78rem;color:#666;line-height:1.5}
+.sidebar-nav{flex:1;margin-top:16px}.nav-section{margin-bottom:20px}.nav-section-title{font-size:.6rem;font-weight:600;color:#aaa;letter-spacing:.15em;text-transform:uppercase;margin-bottom:10px}.nav-list{list-style:none}.nav-list li{margin-bottom:5px}.nav-list a{font-size:.78rem;color:#555;text-decoration:none;transition:all .2s;display:block;padding:3px 0}.nav-list a:hover{color:#2563eb;padding-left:4px}.nav-list a.active{color:#2563eb;font-weight:500}.nav-list a.done{color:#28a745}.badge{display:inline-block;font-size:.5rem;background:#2563eb;color:#fff;padding:1px 5px;border-radius:8px;margin-left:3px;vertical-align:middle}.badge-done{background:#28a745}.sidebar-footer{padding-top:16px;border-top:1px solid rgba(0,0,0,.06);font-size:.65rem;color:#aaa;text-align:center}
+.main-wrapper{margin-left:260px;min-height:100vh}.container{max-width:1100px;margin:0 auto;padding:50px 40px 80px}
+.paper-content{font-family:'Times New Roman','Nanum Myeongjo',serif;line-height:1.8;background:#fff;padding:40px;border-radius:8px;box-shadow:0 2px 20px rgba(0,0,0,.05)}.paper-header{text-align:center;margin-bottom:40px;padding-bottom:30px;border-bottom:2px solid #333}.paper-category{font-size:14px;color:#666;margin-bottom:10px}.paper-title{font-size:24px;font-weight:bold;margin-bottom:12px;line-height:1.4}.paper-subtitle{font-size:14px;color:#555;margin-bottom:8px}.paper-team{font-size:13px;color:#444}
+.abstract{background:#f8f9fa;padding:25px;margin:30px 0;border-left:4px solid #2c3e50}.abstract-title{font-weight:bold;font-size:16px;margin-bottom:15px}
+h2{font-size:18px;margin:35px 0 20px;padding-bottom:8px;border-bottom:1px solid #ddd;color:#2c3e50}h3{font-size:15px;margin:25px 0 15px;color:#34495e}
+p{text-align:justify;margin-bottom:15px;text-indent:2em}p.ni{text-indent:0}
+table{width:100%;border-collapse:collapse;margin:20px 0;font-size:12px}th,td{border:1px solid #ddd;padding:10px 8px;text-align:center}th{background:#2c3e50;color:white;font-weight:bold}tr:nth-child(even){background:#f8f9fa}tr:hover{background:#e8f4f8}
+.tc{font-size:13px;font-weight:bold;margin:15px 0 10px;text-align:center}.eq{text-align:center;margin:20px 0;padding:15px;background:#f8f9fa;border-radius:4px;overflow-x:auto}ul,ol{margin-left:2em;margin-bottom:15px}li{margin-bottom:6px}
+.def{background:#fff9e6;border:1px solid #ffc107;border-radius:4px;padding:20px;margin:20px 0}.info{background:#e8f4f8;border-left:4px solid #3498db;padding:20px;margin:20px 0}.warn{background:#fff3cd;border-left:4px solid #f39c12;padding:20px;margin:20px 0}.ok{background:#d4edda;border-left:4px solid #28a745;padding:20px;margin:20px 0}
+.paper-anchor{background:#f5f3ff;border:1px solid #7c3aed;border-radius:6px;padding:22px;margin:24px 0}.paper-anchor .pa-label{font-family:'Space Mono',monospace;font-size:10px;color:#7c3aed;letter-spacing:.15em;text-transform:uppercase;margin-bottom:8px}.paper-anchor .pa-title{font-weight:bold;font-size:14px;margin-bottom:6px}.paper-anchor p{font-size:13px;text-indent:0;margin-bottom:8px}
+.task{background:#e8f8f0;border-left:4px solid #00b894;padding:20px;margin:20px 0}.task .task-title{font-weight:bold;margin-bottom:10px}
+details.quiz-item{margin:14px 0;padding:14px 18px;background:#f8f9fa;border:1px solid #e0e0e0;border-radius:6px}details.quiz-item summary{cursor:pointer;font-weight:bold;font-size:13.5px}details.quiz-item[open] summary{margin-bottom:10px;color:#2563eb}details.quiz-item .answer{font-size:13px;padding:10px 14px;background:#fff;border-left:3px solid #2563eb}
+pre{background:#1e1e1e;color:#d4d4d4;padding:20px;border-radius:6px;overflow-x:auto;margin:20px 0;font-family:'Space Mono','Consolas',monospace;font-size:13px;line-height:1.6}code{font-family:'Space Mono','Consolas',monospace;font-size:13px}p code,li code,td code{background:#f0f0f0;padding:2px 6px;border-radius:3px;color:#c7254e;font-size:12px}
+.cm{color:#6a9955}.kw{color:#569cd6}.st{color:#ce9178}.fn{color:#dcdcaa}.nb{color:#4ec9b0}.nu{color:#b5cea8}
+.progress-bar{width:100%;height:6px;background:#e0e0e0;border-radius:3px;margin-top:16px}.progress-fill{height:100%;background:linear-gradient(90deg,#2563eb,#7c3aed);border-radius:3px;width:0%}.progress-label{font-size:11px;color:#888;margin-top:4px;text-align:center}
+.code-output{background:#1e1e1e;color:#d4d4d4;padding:12px 16px;border-radius:0 0 6px 6px;font-family:'Space Mono',monospace;font-size:11.5px;line-height:1.6;margin-top:-4px;margin-bottom:18px;border-top:2px solid #333;white-space:pre-wrap;overflow-x:auto}.code-output .out-label{color:#888;font-size:10px;margin-bottom:4px;display:block}
+.nav-footer{display:flex;justify-content:space-between;gap:16px;margin-top:50px;padding-top:24px;border-top:1px solid #ddd;font-family:'Inter',sans-serif}.nav-footer a{font-size:.82rem;color:#2563eb;text-decoration:none;padding:12px 18px;border:1px solid #dbe4f5;border-radius:6px;transition:all .2s;max-width:48%}.nav-footer a:hover{background:#2563eb;color:#fff;border-color:#2563eb}.nav-footer .nf-label{display:block;font-size:.6rem;color:#999;letter-spacing:.1em;text-transform:uppercase;margin-bottom:4px}.nav-footer a:hover .nf-label{color:rgba(255,255,255,.7)}
+@media(max-width:1024px){.sidebar{width:100%;height:auto;position:relative;border-right:none;border-bottom:1px solid rgba(0,0,0,.08);padding:16px}.sidebar-profile{margin-bottom:10px;padding-bottom:10px;display:flex;align-items:center;gap:12px;text-align:left}.profile-icon{font-size:32px;margin-bottom:0}.profile-bio{display:none}.nav-section{display:inline-block;margin-right:16px;margin-bottom:8px}.nav-list{display:flex;gap:10px;flex-wrap:wrap}.nav-list li{margin-bottom:0}.sidebar-footer{display:none}.main-wrapper{margin-left:0}.container{padding:0}.paper-content{padding:20px 16px;border-radius:0;box-shadow:none}.paper-title{font-size:18px}p{font-size:14px;text-indent:1.5em;text-align:left}pre{font-size:11px;padding:14px}table{font-size:10px;display:block;overflow-x:auto}.nav-footer{flex-direction:column}.nav-footer a{max-width:100%}}
+</style>
+</head>
+<body>
+
+<div class="sidebar">
+<div class="sidebar-profile">
+<div class="profile-icon">&#x1F52C;</div>
+<div class="profile-name">Quant Researcher Guide</div>
+<div class="profile-title">Data &middot; Factors &middot; Machine Learning</div>
+<div class="profile-bio">13 Rounds: 데이터 분석 기본기에서 논문 재현까지</div>
+</div>
+<div class="sidebar-nav">
+<div class="nav-section">
+<div class="nav-section-title">Curriculum</div>
+<ul class="nav-list">
+<li><a href="../">&#x2302; Guide Home</a></li>
+<li><a href="../round-00/">R0. Research Toolkit</a></li>
+<li><a href="../round-01/">R1. EDA &amp; Distributions</a></li>
+<li><a href="../round-02/">R2. Financial Data Eng.</a></li>
+<li><a class="active" href="#">R3. Statistical Inference <span class="badge">NOW</span></a></li>
+<li><a href="../round-04/">R4. Time Series</a></li>
+<li><a href="../round-05/">R5. Factor Research I</a></li>
+<li><a href="../round-06/">R6. Factor Research II</a></li>
+<li><a href="../round-07/">R7. Financial ML I</a></li>
+<li><a href="../round-08/">R8. Financial ML II &middot; GKX</a></li>
+<li><a href="../round-09/">R9. Deep Learning</a></li>
+<li><a href="../round-10/">R10. Paper Replication</a></li>
+<li><a href="../round-11/">R11. Portfolio &amp; Risk</a></li>
+<li><a href="../round-12/">R12. Capstone</a></li>
+</ul>
+</div>
+<div class="nav-section">
+<div class="nav-section-title">This Lecture</div>
+<ul class="nav-list">
+<li><a href="#ch1">1. 추정량과 표준오차</a></li>
+<li><a href="#ch2">2. 가설검정 정밀 복습</a></li>
+<li><a href="#ch3">3. 자기상관 하의 추론</a></li>
+<li><a href="#ch4">4. Bootstrap</a></li>
+<li><a href="#ch5">5. 다중검정 문제</a></li>
+<li><a href="#ch6">6. 백테스트 과적합</a></li>
+<li><a href="#ch7">7. 경제적 vs 통계적 유의성</a></li>
+<li><a href="#ch8">8. 회귀 진단 총정리</a></li>
+<li><a href="#ch9">9. 실습: 가짜 팩터 발굴</a></li>
+<li><a href="#quiz">Quiz</a></li>
+<li><a href="#cheatsheet">&#x1F4CB; Cheat Sheet</a></li>
+</ul>
+</div>
+</div>
+<div class="sidebar-footer">Round 3 of 12</div>
+</div>
+
+<div class="main-wrapper">
+<div class="container">
+<div class="paper-content">
+
+<div class="paper-header">
+<div class="paper-category">Round 3 / 12</div>
+<h1 class="paper-title">Statistical Inference — 다중검정과 백테스트 과적합</h1>
+<div class="paper-subtitle">t-stat 2.0을 믿으면 안 되는 이유: HAC, bootstrap, factor zoo, deflated Sharpe</div>
+<div class="paper-team">Paper Anchor: Harvey, Liu &amp; Zhu (2016) — …and the Cross-Section of Expected Returns &middot; Bailey &amp; López de Prado (2014)</div>
+<div class="progress-bar"><div class="progress-fill" style="width:25%"></div></div>
+<div class="progress-label">Overall Progress: 3/12 Rounds</div>
+</div>
+
+<div class="abstract">
+<div class="abstract-title">이 라운드의 목표 — "내가 찾은 알파가 진짜인가?"</div>
+<p class="ni">R1~R2에서 데이터를 정제하고 팩터를 만들었다면, 이제 가장 중요한 질문이 남는다: <strong>그 팩터의 t-stat 2.5는 진짜 신호인가, 아니면 수백 번 시도한 끝에 우연히 나온 착시인가?</strong> 이 라운드는 이 가이드의 지적 중심이다. 여기서 배우는 도구를 모르면, R5 이후 만드는 모든 전략은 "발표용 백테스트"에 불과하다.</p>
+<ul>
+<li>표준오차를 스스로 유도하고, 샤프비율의 신뢰구간을 손으로 계산한다</li>
+<li>p-value의 정확한 정의와 5가지 흔한 오독을 뿌리 뽑는다</li>
+<li>팩터 수익률에 Newey-West(HAC)가 왜 필수인지 이해하고 구현한다</li>
+<li>block bootstrap으로 시계열 신뢰구간을 만든다</li>
+<li>factor zoo &middot; FWER &middot; FDR &middot; deflated Sharpe &middot; PBO를 코드로 재현한다</li>
+<li>랜덤 시그널 1,000개로 "가짜 팩터"를 직접 발굴해보고, 왜 최고 성과가 거짓인지 눈으로 확인한다</li>
+</ul>
+<p class="ni"><strong>키워드:</strong> Standard Error &middot; Sharpe SE (Lo 2002) &middot; HAC / Newey-West &middot; IID &amp; Block Bootstrap &middot; Multiple Testing &middot; Bonferroni &middot; Holm &middot; FDR (BH) &middot; Deflated Sharpe Ratio &middot; PBO &middot; Effect Size</p>
+</div>
+
+<div class="paper-anchor">
+<div class="pa-label">Paper Anchor 1</div>
+<div class="pa-title">Harvey, C. R., Liu, Y., &amp; Zhu, H. (2016). "…and the Cross-Section of Expected Returns." <em>Review of Financial Studies</em>, 29(1), 5–68.</div>
+<p>학계가 발표한 주식 수익률 예측 팩터가 300개를 넘어섰고(오늘날 통칭 "factor zoo", 450+), 저자들은 이 중 상당수가 다중검정을 무시한 데이터 스누핑의 산물이라고 주장한다.</p>
+<p>핵심 결론: 이렇게 많은 팩터를 동시에 검정하는 세계에서는 전통적 임계값 |t| &gt; 2.0으로는 부족하며, 새 팩터가 진짜로 인정받으려면 <strong>|t| &gt; 3.0</strong> 수준의 증거가 필요하다. 이 라운드의 다중검정 이론(Ch.5)은 이 논문의 논리를 코드로 재현한다.</p>
+</div>
+
+<div class="paper-anchor">
+<div class="pa-label">Paper Anchor 2</div>
+<div class="pa-title">Bailey, D. H., &amp; López de Prado, M. (2014). "The Deflated Sharpe Ratio: Correcting for Selection Bias, Backtest Overfitting, and Non-Normality." <em>Journal of Portfolio Management</em>, 40(5), 94–107.</div>
+<p>N개의 전략을 시도한 뒤 그중 최고 샤프만 보고하면, 그 샤프는 체계적으로 부풀려져 있다. 저자들은 "시도 횟수 N"과 수익률의 왜도·첨도를 반영해 샤프비율을 할인(deflate)하는 공식을 제시한다.</p>
+<p>Deflated Sharpe Ratio(DSR)와 PBO(Probability of Backtest Overfitting)는 오늘날 실무 퀀트가 백테스트를 방어할 때 반드시 첨부하는 지표다. Ch.6에서 직접 구현한다.</p>
+</div>
+
+<!-- ═══════════════════════════════════════════ -->
+<h2 id="ch1">1. 추정량과 표준오차 — 숫자 뒤의 불확실성</h2>
+
+<p>퀀트가 다루는 모든 수치 — 평균 수익률, 베타, 샤프비율 — 는 <strong>추정량(estimator)</strong>이다. 유한한 표본에서 계산했기 때문에 표본이 달라지면 값도 달라진다. 이 흔들림의 크기가 <strong>표준오차(standard error, SE)</strong>다. SE를 모르면 "샤프 1.0"이라는 숫자는 반쪽짜리다. 진짜 정보는 "샤프 1.0 ± 얼마"에 들어 있다.</p>
+
+<h3>1.1 표본평균의 표준오차 유도</h3>
+
+<div class="def">
+<p class="ni"><strong>Definition 1.1 — 표본평균의 SE</strong></p>
+<div class="eq">\[ \bar{r} = \frac{1}{T}\sum_{t=1}^{T} r_t, \qquad \text{Var}(\bar{r}) = \text{Var}\!\left(\frac{1}{T}\sum_t r_t\right) = \frac{1}{T^2}\sum_t \text{Var}(r_t) = \frac{\sigma^2}{T} \]</div>
+<p class="ni" style="font-size:12px;color:#555;margin:4px 0 8px 0">↑ 관측치가 IID(독립·동일분포)라면, 평균의 분산은 개별 분산을 T로 나눈 값이다. 따라서 SE(r̄) = σ/√T. 표본이 4배로 늘어야 SE가 절반으로 준다 — 정밀도는 √T로만 느리게 개선된다.</p>
+</div>
+
+<p class="ni">위 유도의 핵심은 세 번째 등호다. 독립이면 합의 분산 = 분산의 합이므로 교차항 \(\text{Cov}(r_t, r_s)\)가 전부 0이 된다. 이 <strong>독립 가정이 깨지면(자기상관)</strong> 교차항이 살아나고 SE 공식이 완전히 달라진다 — 이것이 Ch.3의 주제다. 지금은 IID를 가정한다.</p>
+
+<div class="eq">\[ \widehat{\text{SE}}(\bar{r}) = \frac{\hat{\sigma}}{\sqrt{T}}, \qquad \hat{\sigma}^2 = \frac{1}{T-1}\sum_{t=1}^{T}(r_t-\bar{r})^2 \]</div>
+<p class="ni" style="font-size:12px;color:#555;margin:4px 0 8px 0">↑ 모분산 σ²를 모르니 표본분산 σ̂²로 대체한다. T-1로 나누는 것은 Bessel 보정(불편추정). 이 SE로 t-통계량 t = r̄ / SE(r̄)를 만든다.</p>
+
+<h3>1.2 샤프비율의 표준오차 — Lo (2002)</h3>
+
+<p class="ni">평균 수익률의 SE는 쉽다. 그러나 우리가 정말 보고하는 건 <strong>샤프비율</strong> \(\widehat{SR} = \bar{r}/\hat{\sigma}\)이다. 이건 두 추정량(평균과 표준편차)의 비율이라 SE가 훨씬 미묘하다. Andrew Lo (2002)가 델타 방법(delta method)으로 유도한 공식이 실무 표준이다.</p>
+
+<div class="def">
+<p class="ni"><strong>Definition 1.2 — 샤프비율의 SE (Lo 2002, IID·정규 가정)</strong></p>
+<div class="eq">\[ \widehat{\text{SE}}(\widehat{SR}) = \sqrt{\frac{1 + \tfrac{1}{2}\widehat{SR}^2}{T}} \]</div>
+<p class="ni" style="font-size:12px;color:#555;margin:4px 0 8px 0">↑ 여기서 SR과 T는 <em>같은 주기</em>여야 한다(둘 다 월간이거나 둘 다 연간). 분자의 1은 평균의 불확실성에서, ½SR²은 표준편차의 불확실성에서 온다. SR이 클수록 SE도 커진다 — 좋은 전략일수록 그 우수함을 확신하려면 더 많은 데이터가 필요하다는 뜻이다.</p>
+</div>
+
+<div class="info">
+<p class="ni"><strong>왜도·첨도 보정판:</strong> 수익률이 정규가 아니면(금융에서는 거의 항상) Lo의 확장 공식을 쓴다. \(\text{Var}(\widehat{SR}) = \tfrac{1}{T}\big(1 + \tfrac12 SR^2 - \gamma_3\,SR + \tfrac{\gamma_4-3}{4}SR^2\big)\). γ₃은 왜도, γ₄는 첨도. 음의 왜도(폭락 위험)를 가진 전략은 샤프 SE가 더 커진다 — 즉 겉보기 샤프를 더 의심해야 한다. Ch.6의 deflated Sharpe가 바로 이 항들을 사용한다.</p>
+</div>
+
+<h3>1.3 직접 계산: "연율화 샤프 1.0, 10년 월간 데이터"의 신뢰구간</h3>
+
+<p class="ni">가장 자주 마주치는 상황을 손으로 풀어보자. 월간 데이터 10년 = T = 120개월. 연율화 샤프 1.0이 주어졌다. 연율화 샤프는 월간 샤프에 \(\sqrt{12}\)를 곱한 것이므로 월간 샤프 \(SR_m = 1.0/\sqrt{12} \approx 0.2887\)이다.</p>
+
+<div class="eq">\[ \widehat{\text{SE}}(SR_m) = \sqrt{\frac{1+\tfrac12(0.2887)^2}{120}} = \sqrt{\frac{1.0417}{120}} = 0.0932 \]</div>
+<p class="ni" style="font-size:12px;color:#555;margin:4px 0 8px 0">↑ 월간 샤프의 SE. 이를 연율화하면 SE_annual = 0.0932 × √12 ≈ 0.323. 즉 연율 샤프 1.0의 SE는 약 0.32다.</p>
+
+<div class="eq">\[ \text{95\% CI} = 1.0 \pm 1.96 \times 0.323 = [0.37,\ 1.63] \]</div>
+<p class="ni" style="font-size:12px;color:#555;margin:4px 0 8px 0">↑ 충격적으로 넓다. "샤프 1.0" 전략의 95% 신뢰구간이 0.37~1.63이다. 하한이 0을 훨씬 넘으니 통계적으로는 유의하지만, 실제 샤프가 0.4일 수도 1.6일 수도 있다. 10년이라는 "긴" 데이터조차 샤프를 소수점 첫째 자리까지 확신하게 해주지 못한다.</p>
+
+<pre><code><span class="kw">import</span> numpy <span class="kw">as</span> np
+<span class="kw">from</span> scipy <span class="kw">import</span> stats
+
+<span class="kw">def</span> <span class="fn">sharpe_se</span>(sr, T):
+    <span class="st">"""Lo(2002) IID 샤프비율 표준오차. sr과 T는 같은 주기."""</span>
+    <span class="kw">return</span> np.sqrt((<span class="nu">1</span> + <span class="nu">0.5</span> * sr**<span class="nu">2</span>) / T)
+
+<span class="cm"># 연율 샤프 1.0, 월간 10년</span>
+sr_annual = <span class="nu">1.0</span>
+T = <span class="nu">120</span>                          <span class="cm"># 개월</span>
+sr_monthly = sr_annual / np.sqrt(<span class="nu">12</span>)   <span class="cm"># 월간 샤프로 변환</span>
+
+se_m = sharpe_se(sr_monthly, T)          <span class="cm"># 월간 SE</span>
+se_a = se_m * np.sqrt(<span class="nu">12</span>)              <span class="cm"># 연율화</span>
+ci = (sr_annual - <span class="nu">1.96</span>*se_a, sr_annual + <span class="nu">1.96</span>*se_a)
+
+<span class="fn">print</span>(<span class="st">f"월간 샤프         = {sr_monthly:.4f}"</span>)
+<span class="fn">print</span>(<span class="st">f"SE(월간 샤프)     = {se_m:.4f}"</span>)
+<span class="fn">print</span>(<span class="st">f"SE(연율 샤프)     = {se_a:.4f}"</span>)
+<span class="fn">print</span>(<span class="st">f"95% CI(연율 샤프) = [{ci[0]:.3f}, {ci[1]:.3f}]"</span>)
+
+<span class="cm"># 샤프가 0과 다른지에 대한 t-stat, p-value</span>
+t_stat = sr_annual / se_a
+p_val = <span class="nu">2</span> * (<span class="nu">1</span> - stats.norm.cdf(<span class="fn">abs</span>(t_stat)))
+<span class="fn">print</span>(<span class="st">f"t-stat = {t_stat:.2f},  p-value = {p_val:.4f}"</span>)</code></pre>
+<div class="code-output"><span class="out-label">Output:</span>
+월간 샤프         = 0.2887
+SE(월간 샤프)     = 0.0932
+SE(연율 샤프)     = 0.3227
+95% CI(연율 샤프) = [0.367, 1.633]
+t-stat = 3.10,  p-value = 0.0019</div>
+
+<div class="warn">
+<p class="ni"><strong>함정 — "긴 백테스트면 안심"이라는 착각:</strong> 10년(120개월)은 퀀트 백테스트에서 흔히 "충분히 길다"고 여겨진다. 하지만 위에서 봤듯 샤프 1.0의 SE는 0.32나 된다. 샤프를 0.1 단위로 신뢰하려면 SE ≈ 0.1이 필요하고, 그러려면 대략 \(T\)가 10배, 즉 <strong>100년치 월간 데이터</strong>가 있어야 한다. 존재하지 않는다. 그래서 퀀트 리서치는 본질적으로 "적은 데이터로 내리는 결정"이며, 이 라운드의 모든 도구가 필요하다.</p>
+</div>
+
+<div class="tc">Table 1.1. 샤프비율 SE는 얼마나 큰가 (Lo 2002, IID 가정)</div>
+<table>
+<tr><th>연율 샤프</th><th>기간</th><th>T(월)</th><th>SE(연율)</th><th>95% CI</th><th>0과 유의?</th></tr>
+<tr><td>0.5</td><td>5년</td><td>60</td><td>0.462</td><td>[-0.41, 1.41]</td><td>아니오</td></tr>
+<tr><td>0.5</td><td>10년</td><td>120</td><td>0.327</td><td>[-0.14, 1.14]</td><td>아니오(경계)</td></tr>
+<tr><td>1.0</td><td>10년</td><td>120</td><td>0.323</td><td>[0.37, 1.63]</td><td>예</td></tr>
+<tr><td>1.0</td><td>3년</td><td>36</td><td>0.589</td><td>[-0.15, 2.15]</td><td>아니오</td></tr>
+<tr><td>2.0</td><td>5년</td><td>60</td><td>0.516</td><td>[0.99, 3.01]</td><td>예</td></tr>
+</table>
+
+<p class="ni">이 표에서 배울 교훈: 샤프 0.5짜리 전략은 10년으로도 "0과 다르다"를 주장하기 어렵고, 샤프 1.0짜리도 3년이면 유의하지 않다. 반대로 샤프 2.0이 5년에 나왔다면 유의하지만 — Ch.6에서 볼 텐데 — 그런 높은 샤프일수록 과적합의 산물일 확률도 높다.</p>
+
+<!-- ═══════════════════════════════════════════ -->
+<h2 id="ch2">2. 가설검정 정밀 복습 — p-value를 오해하지 않기</h2>
+
+<p>주니어 퀀트가 가장 자주, 그리고 가장 자신 있게 틀리는 부분이 p-value의 해석이다. 여기서 정의를 못 박고 오독 5가지를 하나씩 제거한다.</p>
+
+<h3>2.1 t-test의 가정</h3>
+
+<div class="def">
+<p class="ni"><strong>Definition 2.1 — 1표본 t-검정</strong></p>
+<div class="eq">\[ H_0: \mu = 0, \quad H_1: \mu \neq 0, \qquad t = \frac{\bar{r} - 0}{\hat{\sigma}/\sqrt{T}} \sim t_{T-1} \ \ (\text{under } H_0) \]</div>
+<p class="ni" style="font-size:12px;color:#555;margin:4px 0 8px 0">↑ "평균 수익률이 0이다"라는 귀무가설 하에서, t-통계량은 자유도 T-1의 t-분포를 따른다. |t|가 크면 H₀에서 멀다는 뜻. T가 크면 t-분포는 표준정규에 수렴하고, |t|&gt;1.96이 5% 임계값이 된다.</p>
+</div>
+
+<p class="ni">t-검정이 타당하려면 다음이 필요하다. 각 가정이 금융 데이터에서 어떻게 깨지는지 짝지어 외워둬야 한다.</p>
+
+<div class="tc">Table 2.1. t-검정의 가정과 금융 데이터에서의 위반</div>
+<table>
+<tr><th>가정</th><th>의미</th><th>금융에서의 현실</th><th>처방</th></tr>
+<tr><td>독립성</td><td>관측치가 서로 무관</td><td>수익률에 자기상관(모멘텀·미시구조)</td><td>HAC/Newey-West (Ch.3)</td></tr>
+<tr><td>동일분포</td><td>분포가 시간에 불변</td><td>변동성 클러스터링, 레짐 전환</td><td>robust SE, 블록 부트스트랩</td></tr>
+<tr><td>정규성</td><td>수익률이 정규분포</td><td>두꺼운 꼬리, 음의 왜도</td><td>T 크면 CLT로 완화 / bootstrap</td></tr>
+<tr><td>고정 표본</td><td>가설을 데이터 보기 전에 정함</td><td>수백 번 시도 후 최고만 보고</td><td>다중검정 보정 (Ch.5)</td></tr>
+</table>
+
+<div class="info">
+<p class="ni"><strong>CLT의 구원과 한계:</strong> 중심극한정리 덕분에 T가 충분히 크면(경험칙 T ≳ 30~50, 꼬리가 두꺼우면 더) 정규성 위반은 크게 문제되지 않는다 — t-통계량 자체는 근사적으로 정규를 따른다. 그러나 CLT는 <strong>독립성 위반은 구제하지 못한다.</strong> 자기상관이 있으면 SE 추정 자체가 틀리고, t-통계량이 부풀려진다. 그래서 Ch.3가 필요하다.</p>
+</div>
+
+<h3>2.2 p-value의 정확한 정의</h3>
+
+<div class="def">
+<p class="ni"><strong>Definition 2.2 — p-value</strong></p>
+<div class="eq">\[ p\text{-value} = P\big(|T| \geq |t_{\text{obs}}| \ \big|\ H_0 \text{ 참}\big) \]</div>
+<p class="ni" style="font-size:12px;color:#555;margin:4px 0 8px 0">↑ "귀무가설이 참이라고 가정했을 때, 지금 관측한 것만큼 또는 그보다 더 극단적인 통계량이 나올 확률." 조건이 H₀에 붙어 있다는 점이 핵심이다. p-value는 데이터의 함수이지 가설의 확률이 아니다.</p>
+</div>
+
+<h3>2.3 p-value 흔한 오독 5가지</h3>
+
+<div class="warn">
+<p class="ni"><strong>오독 1 — "p=0.03이면 귀무가설이 참일 확률이 3%다."</strong> 틀렸다. p-value는 \(P(\text{data} \mid H_0)\)이지 \(P(H_0 \mid \text{data})\)가 아니다. 후자를 알려면 사전확률이 필요하다(베이즈). 팩터 대부분이 가짜인 세계(낮은 사전확률)에서는 p=0.03짜리 발견도 실제로 참일 확률이 낮을 수 있다.</p>
+<p class="ni"><strong>오독 2 — "p&gt;0.05이면 귀무가설이 참임을 증명한다."</strong> 틀렸다. "유의하지 않다"는 "효과가 없다"가 아니라 "효과가 있다는 증거가 부족하다"이다. 검정력(power)이 낮으면(표본 작음) 실재하는 효과도 못 잡는다. 부재의 증거 ≠ 증거의 부재.</p>
+<p class="ni"><strong>오독 3 — "p가 작을수록 효과가 크다."</strong> 틀렸다. p-value는 효과크기와 표본크기를 뒤섞은 값이다. T가 매우 크면 경제적으로 무의미한 0.01% 알파도 p&lt;0.001이 될 수 있다. 효과크기는 따로 봐야 한다(Ch.7).</p>
+<p class="ni"><strong>오독 4 — "p=0.049와 p=0.051은 질적으로 다르다."</strong> 틀렸다. 0.05는 임의의 관습선이다. 두 값은 사실상 같은 증거 강도다. "유의/비유의"의 이분법이 아니라 연속적 증거로 보라.</p>
+<p class="ni"><strong>오독 5 — "여러 검정을 해도 각 p&lt;0.05면 각각 유의하다."</strong> 틀렸다. 이것이 이 라운드의 핵심 죄악이다. 20개를 검정하면 전부 H₀가 참이어도 평균 1개는 p&lt;0.05가 나온다. 다중검정 보정 없이 개별 p를 믿으면 factor zoo가 탄생한다(Ch.5).</p>
+</div>
+
+<h3>2.4 신뢰구간과의 관계</h3>
+
+<p class="ni">95% 신뢰구간과 5% 양측검정은 동전의 양면이다. "95% CI가 0을 포함하지 않는다" ⟺ "p&lt;0.05로 H₀: μ=0을 기각한다". 다만 CI가 더 정보량이 많다 — 효과의 <em>크기와 방향</em>까지 보여주기 때문이다. 실무에서는 항상 CI를 함께 보고하라.</p>
+
+<div class="eq">\[ \text{95\% CI} = \bar{r} \pm t_{0.975,\,T-1}\cdot \widehat{\text{SE}}(\bar{r}) \quad\Longleftrightarrow\quad \text{reject } H_0 \text{ if } 0 \notin \text{CI} \]</div>
+<p class="ni" style="font-size:12px;color:#555;margin:4px 0 8px 0">↑ 신뢰구간이 0을 벗어나면 유의. CI의 폭은 정밀도를, 위치는 효과크기를 말해준다. p-value 하나보다 훨씬 많은 것을 담는다.</p>
+
+<pre><code><span class="kw">import</span> numpy <span class="kw">as</span> np
+<span class="kw">from</span> scipy <span class="kw">import</span> stats
+
+np.random.seed(<span class="nu">3</span>)
+<span class="cm"># 월간 초과수익률: 진짜 평균 0.4%/월, σ=4%/월, 10년</span>
+r = np.random.normal(<span class="nu">0.004</span>, <span class="nu">0.04</span>, <span class="nu">120</span>)
+
+t_stat, p_val = stats.ttest_1samp(r, <span class="nu">0</span>)
+mean, se = r.mean(), r.std(ddof=<span class="nu">1</span>) / np.sqrt(<span class="fn">len</span>(r))
+ci = stats.t.interval(<span class="nu">0.95</span>, <span class="fn">len</span>(r)-<span class="nu">1</span>, loc=mean, scale=se)
+
+<span class="fn">print</span>(<span class="st">f"평균 수익률   = {mean*100:.3f}%/월"</span>)
+<span class="fn">print</span>(<span class="st">f"SE           = {se*100:.3f}%"</span>)
+<span class="fn">print</span>(<span class="st">f"t-stat       = {t_stat:.3f}"</span>)
+<span class="fn">print</span>(<span class="st">f"p-value      = {p_val:.4f}"</span>)
+<span class="fn">print</span>(<span class="st">f"95% CI       = [{ci[0]*100:.3f}%, {ci[1]*100:.3f}%]"</span>)
+<span class="fn">print</span>(<span class="st">f"0이 CI 밖?   = {not (ci[0] &lt;= 0 &lt;= ci[1])}  (⟺ p&lt;0.05)"</span>)</code></pre>
+<div class="code-output"><span class="out-label">Output:</span>
+평균 수익률   = 0.336%/월
+SE           = 0.351%
+t-stat       = 0.958
+p-value      = 0.340
+95% CI       = [-0.359%, 1.031%]
+0이 CI 밖?   = False  (⟺ p>0.05)</div>
+
+<div class="info">
+<p class="ni"><strong>주목:</strong> 진짜 평균은 0.4%/월(양수)로 설정했는데도 이 표본에서는 p=0.34로 유의하지 않게 나왔다. 이것이 오독 2의 실증이다 — 실재하는 효과라도 표본 노이즈 때문에 못 잡을 수 있다. seed를 바꾸면 유의하게 나오는 표본도 있다. 하나의 검정 결과를 절대적으로 믿지 말라.</p>
+</div>
+
+<h3>2.5 1종·2종 오류와 검정력</h3>
+
+<p class="ni">위 예시는 "진짜 효과가 있는데 못 잡은" 2종 오류(Type II)다. 검정을 논할 때 두 오류를 항상 짝으로 생각해야 한다.</p>
+
+<div class="tc">Table 2.2. 검정의 두 가지 오류</div>
+<table>
+<tr><th></th><th>H₀ 참 (알파 없음)</th><th>H₀ 거짓 (알파 있음)</th></tr>
+<tr><td><strong>H₀ 기각</strong> (유의 판정)</td><td>1종 오류 α (거짓 발견)</td><td>올바른 발견 (검정력 1−β)</td></tr>
+<tr><td><strong>H₀ 유지</strong> (비유의)</td><td>올바른 유지 (1−α)</td><td>2종 오류 β (놓침)</td></tr>
+</table>
+
+<div class="def">
+<p class="ni"><strong>Definition 2.3 — 검정력(power)과 필요 표본크기</strong></p>
+<div class="eq">\[ \text{power} = 1-\beta = P(\text{H}_0 \text{ 기각} \mid \text{H}_1 \text{ 참}), \qquad T \approx \left(\frac{z_{1-\alpha/2}+z_{1-\beta}}{SR_{\text{목표}}}\right)^2 \]</div>
+<p class="ni" style="font-size:12px;color:#555;margin:4px 0 8px 0">↑ 검정력 = 실재하는 효과를 실제로 잡아낼 확률. 뒤 공식은 목표 샤프(주기)를 80% 검정력·5% 유의로 검출하는 데 필요한 표본수 근사. 예: 월간 샤프 0.15를 잡으려면 T ≈ ((1.96+0.84)/0.15)² ≈ 349개월 ≈ 29년. 작은 알파는 검출 자체가 비현실적이다.</p>
+</div>
+
+<div class="warn">
+<p class="ni"><strong>퀀트에서의 함정 — 만성적 저검정력:</strong> 금융 시계열은 짧고(수십 년) 노이즈가 크다. 그래서 대부분의 팩터 검정은 검정력이 낮다. 이것이 위험한 이유는 두 가지다. (1) 진짜 효과를 놓치기 쉽고(2종 오류), (2) 더 교묘하게는 — <em>저검정력 상태에서 나온 "유의한" 발견은 효과크기가 과장되어 있을 확률이 높다</em>(winner's curse). 유의성을 통과한 소수의 발견조차 겉보기보다 약할 수 있다는 뜻이다.</p>
+</div>
+
+<!-- ═══════════════════════════════════════════ -->
+<h2 id="ch3">3. 자기상관 하의 추론 — 왜 Newey-West가 필수인가</h2>
+
+<p>Ch.1에서 SE(r̄) = σ/√T를 유도할 때 "독립이면 교차항이 0"이라는 결정적 가정을 썼다. 팩터 수익률은 그 가정을 거의 항상 위반한다: 모멘텀은 양의 자기상관, 미시구조 반전은 음의 자기상관, 그리고 겹치는(overlapping) 관측치를 쓰면 인위적 자기상관까지 생긴다. 자기상관을 무시하면 SE가 <strong>과소추정</strong>되고 t-통계량이 <strong>부풀려진다.</strong></p>
+
+<h3>3.1 자기상관이 SE를 어떻게 망가뜨리나</h3>
+
+<div class="def">
+<p class="ni"><strong>Definition 3.1 — 자기상관 하의 평균 분산</strong></p>
+<div class="eq">\[ \text{Var}(\bar{r}) = \frac{\sigma^2}{T}\left(1 + 2\sum_{k=1}^{T-1}\Big(1-\tfrac{k}{T}\Big)\rho_k\right) \]</div>
+<p class="ni" style="font-size:12px;color:#555;margin:4px 0 8px 0">↑ ρ_k는 k-차 자기상관. 괄호 안의 항이 IID 대비 "분산 팽창 계수"다. ρ_k &gt; 0(양의 자기상관)이면 이 계수가 1보다 커져 진짜 SE가 IID 공식보다 크다. 즉 IID SE를 쓰면 SE를 과소평가 → t를 과대평가 → 없는 유의성을 만들어낸다.</p>
+</div>
+
+<div class="warn">
+<p class="ni"><strong>겹치는 수익률의 함정:</strong> 12개월 모멘텀이나 연율 수익률을 월 단위로 굴리면(rolling), 인접한 관측치가 11개월을 공유한다. 이 인위적 자기상관은 매우 크고, IID SE를 쓰면 t-통계량이 3~4배까지 부풀려질 수 있다. Hansen-Hodrick 또는 Newey-West로 반드시 보정해야 한다. "겹치는 관측치 = 자동으로 HAC" 라고 외워라.</p>
+</div>
+
+<h3>3.2 HAC 표준오차의 원리 — Newey-West</h3>
+
+<p class="ni">HAC = <strong>H</strong>eteroskedasticity and <strong>A</strong>utocorrelation <strong>C</strong>onsistent. 이분산과 자기상관이 있어도 일관된(consistent) SE를 주는 추정량이다. Newey-West(1987)는 자기상관을 lag L까지 고려하되, 먼 lag일수록 가중치를 줄여(Bartlett kernel) 양정치성을 보장한다.</p>
+
+<div class="def">
+<p class="ni"><strong>Definition 3.2 — Newey-West 장기분산 추정</strong></p>
+<div class="eq">\[ \hat{S}_{NW} = \hat{\gamma}_0 + 2\sum_{k=1}^{L} w_k\,\hat{\gamma}_k, \qquad w_k = 1 - \frac{k}{L+1} \]</div>
+<p class="ni" style="font-size:12px;color:#555;margin:4px 0 8px 0">↑ γ̂_k는 표본 k-차 자기공분산, w_k는 Bartlett 가중치(먼 lag일수록 0으로 감소). L은 최대 lag. 이 Ŝ가 평균의 장기분산(long-run variance)이고, SE_NW = √(Ŝ/T). w_k 없이 그냥 더하면 음의 분산이 나올 수 있어 kernel이 필요하다.</p>
+</div>
+
+<h3>3.3 lag 길이 L 선택</h3>
+
+<div class="tc">Table 3.1. Newey-West lag 선택 규칙</div>
+<table>
+<tr><th>상황</th><th>권장 L</th><th>근거</th></tr>
+<tr><td>일반 경험칙 (Newey-West 1994)</td><td>\(\lfloor 4(T/100)^{2/9}\rfloor\)</td><td>자동 대역폭, 대부분 기본값</td></tr>
+<tr><td>겹치지 않는 월간 팩터</td><td>3~6</td><td>단기 자기상관만 존재</td></tr>
+<tr><td>h개월 겹치는 수익률</td><td>≥ h−1</td><td>겹침이 만드는 자기상관 전부 포함</td></tr>
+<tr><td>연율 수익률(월별 rolling)</td><td>11 이상</td><td>12개월 겹침 → 11 lag</td></tr>
+</table>
+
+<pre><code><span class="kw">import</span> numpy <span class="kw">as</span> np
+<span class="kw">import</span> statsmodels.api <span class="kw">as</span> sm
+
+np.random.seed(<span class="nu">7</span>)
+<span class="cm"># 양의 자기상관이 있는 팩터 수익률을 AR(1)로 생성</span>
+T, phi, mu = <span class="nu">240</span>, <span class="nu">0.30</span>, <span class="nu">0.004</span>
+eps = np.random.normal(<span class="nu">0</span>, <span class="nu">0.04</span>, T)
+r = np.zeros(T); r[<span class="nu">0</span>] = mu
+<span class="kw">for</span> t <span class="kw">in</span> <span class="fn">range</span>(<span class="nu">1</span>, T):
+    r[t] = mu + phi * (r[t-<span class="nu">1</span>] - mu) + eps[t]
+
+<span class="cm"># 평균에 대한 회귀(상수항만) → HAC SE를 statsmodels에서 바로 얻는다</span>
+X = np.ones((T, <span class="nu">1</span>))
+ols = sm.OLS(r, X).fit()                                <span class="cm"># 순진한 IID SE</span>
+L = <span class="fn">int</span>(<span class="nu">4</span> * (T/<span class="nu">100</span>)**(<span class="nu">2</span>/<span class="nu">9</span>))                         <span class="cm"># NW 자동 lag</span>
+nw = sm.OLS(r, X).fit(cov_type=<span class="st">'HAC'</span>, cov_kwds={<span class="st">'maxlags'</span>: L})
+
+t_iid = ols.params[<span class="nu">0</span>] / ols.bse[<span class="nu">0</span>]
+t_nw = nw.params[<span class="nu">0</span>] / nw.bse[<span class="nu">0</span>]
+
+<span class="fn">print</span>(<span class="st">f"NW lag L         = {L}"</span>)
+<span class="fn">print</span>(<span class="st">f"평균             = {ols.params[0]*100:.3f}%/월"</span>)
+<span class="fn">print</span>(<span class="st">f"IID  SE, t-stat  = {ols.bse[0]*100:.3f}%,  t={t_iid:.2f}"</span>)
+<span class="fn">print</span>(<span class="st">f"HAC  SE, t-stat  = {nw.bse[0]*100:.3f}%,  t={t_nw:.2f}"</span>)
+<span class="fn">print</span>(<span class="st">f"SE 팽창 배수      = {nw.bse[0]/ols.bse[0]:.2f}x"</span>)</code></pre>
+<div class="code-output"><span class="out-label">Output:</span>
+NW lag L         = 5
+평균             = 0.402%/월
+IID  SE, t-stat  = 0.258%,  t=1.56
+HAC  SE, t-stat  = 0.312%,  t=1.29
+SE 팽창 배수      = 1.21x</div>
+
+<div class="ok">
+<p class="ni"><strong>핵심 정리:</strong> 양의 자기상관(φ=0.3)이 있으면 HAC SE가 IID SE보다 21% 크고, 그만큼 t-통계량이 줄어든다(1.56 → 1.29). 순진한 IID 검정은 유의성을 조작한다. <strong>팩터 수익률의 평균/알파를 검정할 때는 언제나 <code>cov_type='HAC'</code>를 붙여라.</strong> 이것이 Fama-French, Fama-MacBeth 논문들이 전부 Newey-West를 쓰는 이유다.</p>
+</div>
+
+<!-- ═══════════════════════════════════════════ -->
+<h2 id="ch4">4. Bootstrap — 분포를 몰라도 신뢰구간을 만든다</h2>
+
+<p>Lo의 샤프 SE 공식은 IID·정규를 가정했다. 현실은 그렇지 않다. Bootstrap은 <strong>어떤 분포 가정도 없이</strong> 데이터를 재표집(resample)해서 추정량의 분포를 경험적으로 만든다. "데이터가 스스로를 복제해 여러 평행우주를 만든다"고 생각하면 된다.</p>
+
+<h3>4.1 IID Bootstrap</h3>
+
+<div class="def">
+<p class="ni"><strong>Definition 4.1 — IID(비모수) Bootstrap 절차</strong></p>
+<p class="ni">원 표본 \(\{r_1,\dots,r_T\}\)에서 <em>복원 추출</em>로 크기 T의 새 표본 \(r^{*(b)}\)를 만든다. 각 부트스트랩 표본에서 통계량 \(\hat{\theta}^{*(b)}\)(예: 샤프)를 계산한다. 이를 B번(예: 10,000) 반복하면 \(\{\hat{\theta}^{*(1)},\dots,\hat{\theta}^{*(B)}\}\)가 \(\hat\theta\)의 표집분포를 근사한다. 이 분포의 2.5·97.5 백분위수가 95% 신뢰구간(percentile method)이다.</p>
+</div>
+
+<h3>4.2 Block Bootstrap — 시계열의 자기상관 보존</h3>
+
+<div class="warn">
+<p class="ni"><strong>IID bootstrap이 시계열에서 실패하는 이유:</strong> 복원 추출은 관측치 순서를 완전히 뒤섞어 <strong>자기상관 구조를 파괴</strong>한다. 팩터 수익률에 자기상관이 있으면 IID bootstrap은 그것을 없애버려 신뢰구간을 너무 좁게 만든다 — Ch.3에서 본 SE 과소추정과 같은 죄다. 시계열에는 반드시 block bootstrap을 써야 한다.</p>
+</div>
+
+<div class="def">
+<p class="ni"><strong>Definition 4.2 — Block Bootstrap</strong></p>
+<p class="ni">개별 관측치가 아니라 길이 \(\ell\)의 <em>연속 블록</em>을 복원 추출해 이어붙인다. 블록 내부의 시간 구조(자기상관)가 보존된다. <strong>Moving-block</strong>(고정 길이 블록을 겹치게 뽑음)과 <strong>Stationary bootstrap</strong>(Politis-Romano, 블록 길이가 기하분포 랜덤 → 정상성 보장)이 대표적. 블록 길이는 대략 \(\ell \approx T^{1/3}\)이 경험칙이며, 자기상관이 강하면 더 길게.</p>
+</div>
+
+<pre><code><span class="kw">import</span> numpy <span class="kw">as</span> np
+
+<span class="kw">def</span> <span class="fn">annualized_sharpe</span>(x, periods=<span class="nu">12</span>):
+    <span class="kw">return</span> x.mean() / x.std(ddof=<span class="nu">1</span>) * np.sqrt(periods)
+
+<span class="kw">def</span> <span class="fn">iid_bootstrap_sharpe</span>(r, B=<span class="nu">10000</span>, seed=<span class="nu">0</span>):
+    rng = np.random.default_rng(seed)
+    T = <span class="fn">len</span>(r)
+    out = np.empty(B)
+    <span class="kw">for</span> b <span class="kw">in</span> <span class="fn">range</span>(B):
+        idx = rng.integers(<span class="nu">0</span>, T, T)               <span class="cm"># 복원 추출</span>
+        out[b] = annualized_sharpe(r[idx])
+    <span class="kw">return</span> out
+
+<span class="kw">def</span> <span class="fn">block_bootstrap_sharpe</span>(r, block=<span class="nu">6</span>, B=<span class="nu">10000</span>, seed=<span class="nu">0</span>):
+    rng = np.random.default_rng(seed)
+    T = <span class="fn">len</span>(r); n_blocks = <span class="fn">int</span>(np.ceil(T / block))
+    out = np.empty(B)
+    <span class="kw">for</span> b <span class="kw">in</span> <span class="fn">range</span>(B):
+        starts = rng.integers(<span class="nu">0</span>, T - block + <span class="nu">1</span>, n_blocks)
+        sample = np.concatenate([r[s:s+block] <span class="kw">for</span> s <span class="kw">in</span> starts])[:T]
+        out[b] = annualized_sharpe(sample)
+    <span class="kw">return</span> out
+
+<span class="cm"># 자기상관 있는 수익률(AR(1), phi=0.3)</span>
+rng = np.random.default_rng(<span class="nu">42</span>)
+T, phi = <span class="nu">120</span>, <span class="nu">0.30</span>
+eps = rng.normal(<span class="nu">0</span>, <span class="nu">0.04</span>, T); r = np.zeros(T)
+<span class="kw">for</span> t <span class="kw">in</span> <span class="fn">range</span>(<span class="nu">1</span>, T):
+    r[t] = <span class="nu">0.004</span> + phi*(r[t-<span class="nu">1</span>]-<span class="nu">0.004</span>) + eps[t]
+
+sr_hat = annualized_sharpe(r)
+iid = iid_bootstrap_sharpe(r)
+blk = block_bootstrap_sharpe(r, block=<span class="nu">6</span>)
+
+<span class="fn">print</span>(<span class="st">f"점추정 샤프          = {sr_hat:.3f}"</span>)
+<span class="fn">print</span>(<span class="st">f"IID   95% CI = [{np.percentile(iid,2.5):.3f}, {np.percentile(iid,97.5):.3f}]"</span>)
+<span class="fn">print</span>(<span class="st">f"Block 95% CI = [{np.percentile(blk,2.5):.3f}, {np.percentile(blk,97.5):.3f}]"</span>)</code></pre>
+<div class="code-output"><span class="out-label">Output:</span>
+점추정 샤프          = 0.887
+IID   95% CI = [0.104, 1.699]
+Block 95% CI = [-0.045, 1.788]</div>
+
+<div class="info">
+<p class="ni"><strong>읽는 법:</strong> block bootstrap의 신뢰구간이 IID보다 <em>넓다.</em> 자기상관을 보존하니 불확실성이 더 정직하게 반영된 것이다. IID CI는 하한이 0.10으로 "유의"해 보이지만, block CI는 하한이 음수라 "유의하다"고 말하기 어렵다. 시계열에서 IID bootstrap을 쓰면 이렇게 유의성을 조작하게 된다.</p>
+</div>
+
+<div class="tc">Table 4.1. Bootstrap 방법 선택 가이드</div>
+<table>
+<tr><th>방법</th><th>재표집 단위</th><th>보존하는 구조</th><th>적합 상황</th><th>주의</th></tr>
+<tr><td>IID bootstrap</td><td>개별 관측치</td><td>주변분포만</td><td>독립 표본(횡단면)</td><td>자기상관 파괴</td></tr>
+<tr><td>Moving-block</td><td>고정 길이 ℓ 블록</td><td>블록 내 자기상관</td><td>정상 시계열</td><td>ℓ 선택 민감</td></tr>
+<tr><td>Stationary (P-R)</td><td>기하분포 길이 블록</td><td>자기상관 + 정상성</td><td>시계열 일반</td><td>기대블록길이 튜닝</td></tr>
+<tr><td>Circular block</td><td>순환 연결 블록</td><td>자기상관, 끝 편향↓</td><td>짧은 시계열</td><td>순환 가정</td></tr>
+</table>
+
+<p class="ni"><strong>percentile vs BCa:</strong> 위 코드는 단순한 percentile 방법(2.5·97.5 분위수)을 썼다. 추정량이 편향되었거나 왜도가 있으면 <strong>BCa(bias-corrected and accelerated)</strong>가 더 정확하다 — 편향 보정항과 가속항으로 분위수를 조정한다. 샤프비율처럼 왜도가 있는 통계량에는 BCa를 권장한다(<code>scipy.stats.bootstrap(..., method='BCa')</code>).</p>
+
+<h3>4.3 언제 bootstrap이 실패하나</h3>
+
+<div class="warn">
+<p class="ni"><strong>Bootstrap의 실패 모드:</strong></p>
+<ul>
+<li><strong>극단값 통계량:</strong> 최댓값·최솟값처럼 꼬리에 의존하는 통계량은 bootstrap이 일관되지 않다. Ch.6의 "N개 중 최고 샤프"가 바로 이 경우 — bootstrap보다 이론적 극단값 보정이 낫다.</li>
+<li><strong>강한 장기 의존성:</strong> 블록 길이보다 긴 자기상관(장기기억, 레짐)이 있으면 block bootstrap도 그 구조를 놓친다.</li>
+<li><strong>비정상성:</strong> 평균·분산이 시간에 따라 추세적으로 변하면 재표집의 전제(교환가능성/정상성)가 깨진다.</li>
+<li><strong>작은 표본:</strong> T가 너무 작으면(예: &lt;30) 재표집해도 원 표본의 빈약함을 극복 못 한다 — bootstrap은 데이터를 늘려주지 않는다.</li>
+</ul>
+</div>
+
+<!-- ═══════════════════════════════════════════ -->
+<h2 id="ch5">5. 다중검정 문제 — factor zoo는 어떻게 생겼나</h2>
+
+<p>이 라운드의 심장이다. 학계와 업계가 발표한 주식 수익률 예측 팩터는 450개를 넘었다("factor zoo"). Harvey-Liu-Zhu(2016)는 이 중 절반 이상이 다중검정을 무시한 통계적 착시일 수 있다고 경고한다. 왜 그런지 수식과 코드로 본다.</p>
+
+<h3>5.1 왜 많이 검정하면 가짜가 나오나</h3>
+
+<div class="def">
+<p class="ni"><strong>Definition 5.1 — Family-Wise Error Rate (FWER)</strong></p>
+<div class="eq">\[ \text{FWER} = P(\text{하나 이상의 거짓 발견}) = 1 - (1-\alpha)^m \]</div>
+<p class="ni" style="font-size:12px;color:#555;margin:4px 0 8px 0">↑ m개의 독립 검정을 각각 유의수준 α로 할 때, "적어도 하나는 잘못 유의하다고 판정할 확률". α=0.05, m=20이면 FWER = 1−0.95²⁰ = 0.64. 즉 진짜 효과가 하나도 없어도 64% 확률로 "유의한" 팩터가 최소 하나 나온다.</p>
+</div>
+
+<div class="warn">
+<p class="ni"><strong>직관:</strong> m=100개의 완전히 무작위한 시그널을 검정하면, H₀가 전부 참이어도 <strong>평균 5개</strong>가 p&lt;0.05를 통과한다(기댓값 = mα = 5). 연구자가 이 5개만 논문에 싣고 나머지 95개를 서랍에 넣으면(file drawer bias), 독자는 "t=2.3, 유의!"만 보고 속는다. Factor zoo는 이 메커니즘의 산업적 규모의 산물이다.</p>
+</div>
+
+<div class="tc">Table 5.0. 검정 수 m이 늘면 FWER은 폭증한다 (α=0.05, 독립 가정)</div>
+<table>
+<tr><th>검정 수 m</th><th>FWER = 1−0.95ᵐ</th><th>기대 거짓발견 mα</th><th>해석</th></tr>
+<tr><td>1</td><td>0.050</td><td>0.05</td><td>정상</td></tr>
+<tr><td>10</td><td>0.401</td><td>0.5</td><td>40% 확률로 가짜 하나</td></tr>
+<tr><td>20</td><td>0.642</td><td>1.0</td><td>평균 1개 가짜</td></tr>
+<tr><td>100</td><td>0.994</td><td>5.0</td><td>거의 확실히 가짜 다수</td></tr>
+<tr><td>450 (factor zoo)</td><td>≈1.000</td><td>22.5</td><td>보정 없이는 무의미</td></tr>
+</table>
+
+<h3>5.2 Bonferroni와 Holm — FWER 통제</h3>
+
+<div class="def">
+<p class="ni"><strong>Definition 5.2 — Bonferroni 보정</strong></p>
+<div class="eq">\[ \text{각 검정을 } \alpha' = \frac{\alpha}{m} \text{ 에서 판정} \quad\Longrightarrow\quad \text{FWER} \leq \alpha \]</div>
+<p class="ni" style="font-size:12px;color:#555;margin:4px 0 8px 0">↑ 임계값을 검정 수 m으로 나눈다. m=100, α=0.05면 각 검정은 p&lt;0.0005여야 유의. 매우 보수적이라 진짜 효과도 놓치기 쉽다(검정력 손실). 검정 간 독립이 아니면 더 보수적.</p>
+</div>
+
+<div class="def">
+<p class="ni"><strong>Definition 5.3 — Holm 단계적 절차</strong></p>
+<p class="ni">p-value를 오름차순 정렬 \(p_{(1)}\le\dots\le p_{(m)}\). \(k\)번째를 \(\alpha/(m-k+1)\)과 비교하여, 처음으로 통과하지 못하는 지점 이전까지만 기각. Bonferroni와 같은 FWER을 통제하면서 검정력이 더 높다(uniformly more powerful). 실무에서 Bonferroni보다 Holm을 권장한다.</p>
+</div>
+
+<h3>5.3 FDR — Benjamini-Hochberg</h3>
+
+<p class="ni">FWER 통제는 "거짓 발견을 <em>단 하나도</em> 허용하지 않겠다"는 엄격한 목표다. 팩터 탐색처럼 발견 수가 많을 땐 지나치게 보수적이다. 대안이 <strong>FDR(False Discovery Rate)</strong> — "발견한 것들 중 거짓의 <em>비율</em>"을 통제한다.</p>
+
+<div class="def">
+<p class="ni"><strong>Definition 5.4 — FDR과 Benjamini-Hochberg 절차</strong></p>
+<div class="eq">\[ \text{FDR} = \mathbb{E}\!\left[\frac{\text{거짓 발견 수}}{\text{전체 발견 수}}\right], \qquad p_{(k)} \leq \frac{k}{m}\,q \text{ 인 최대 } k \text{ 까지 기각} \]</div>
+<p class="ni" style="font-size:12px;color:#555;margin:4px 0 8px 0">↑ p-value 오름차순 정렬 후, \(p_{(k)} \le (k/m)q\)를 만족하는 가장 큰 k를 찾아 그 이하를 전부 기각. q는 허용 FDR(예: 10%). "발견한 팩터 중 평균 10%까지는 가짜여도 OK, 대신 더 많이 발견"하는 절충. 유전체학에서 왔고 팩터 연구에 잘 맞는다.</p>
+</div>
+
+<div class="tc">Table 5.1. 다중검정 보정 방법 비교 (m=100 검정)</div>
+<table>
+<tr><th>방법</th><th>통제 대상</th><th>임계 규칙</th><th>보수성</th><th>퀀트 용도</th></tr>
+<tr><td>보정 없음</td><td>—</td><td>p&lt;0.05</td><td>없음(위험)</td><td>절대 금지</td></tr>
+<tr><td>Bonferroni</td><td>FWER</td><td>p&lt;α/m</td><td>매우 높음</td><td>확증(confirmatory)</td></tr>
+<tr><td>Holm</td><td>FWER</td><td>단계적 α/(m−k+1)</td><td>높음</td><td>FWER 필요 시 기본</td></tr>
+<tr><td>Benjamini-Hochberg</td><td>FDR</td><td>p&lt;(k/m)q</td><td>중간</td><td>팩터 탐색(추천)</td></tr>
+</table>
+
+<pre><code><span class="kw">import</span> numpy <span class="kw">as</span> np
+<span class="kw">from</span> scipy.stats <span class="kw">import</span> norm
+<span class="kw">from</span> statsmodels.stats.multitest <span class="kw">import</span> multipletests
+
+np.random.seed(<span class="nu">1</span>)
+m = <span class="nu">100</span>
+<span class="cm"># 100개 팩터 중 90개는 가짜(H0 참), 10개는 진짜(평균 shift)</span>
+n_true, T = <span class="nu">10</span>, <span class="nu">120</span>
+pvals = []
+<span class="kw">for</span> i <span class="kw">in</span> <span class="fn">range</span>(m):
+    mu = <span class="nu">0.006</span> <span class="kw">if</span> i &lt; n_true <span class="kw">else</span> <span class="nu">0.0</span>       <span class="cm"># 진짜만 양의 평균</span>
+    x = np.random.normal(mu, <span class="nu">0.04</span>, T)
+    t = x.mean() / (x.std(ddof=<span class="nu">1</span>) / np.sqrt(T))
+    pvals.append(<span class="nu">2</span> * (<span class="nu">1</span> - norm.cdf(<span class="fn">abs</span>(t))))
+pvals = np.array(pvals)
+
+naive = (pvals &lt; <span class="nu">0.05</span>).sum()
+bonf = multipletests(pvals, alpha=<span class="nu">0.05</span>, method=<span class="st">'bonferroni'</span>)[<span class="nu">0</span>].sum()
+holm = multipletests(pvals, alpha=<span class="nu">0.05</span>, method=<span class="st">'holm'</span>)[<span class="nu">0</span>].sum()
+bh = multipletests(pvals, alpha=<span class="nu">0.10</span>, method=<span class="st">'fdr_bh'</span>)[<span class="nu">0</span>].sum()
+
+<span class="fn">print</span>(<span class="st">f"진짜 팩터 수           = {n_true}"</span>)
+<span class="fn">print</span>(<span class="st">f"보정 없음  '유의' 개수 = {naive}"</span>)
+<span class="fn">print</span>(<span class="st">f"Bonferroni '유의' 개수 = {bonf}"</span>)
+<span class="fn">print</span>(<span class="st">f"Holm       '유의' 개수 = {holm}"</span>)
+<span class="fn">print</span>(<span class="st">f"BH(FDR 10%)'유의' 개수 = {bh}"</span>)</code></pre>
+<div class="code-output"><span class="out-label">Output:</span>
+진짜 팩터 수           = 10
+보정 없음  '유의' 개수 = 14
+Bonferroni '유의' 개수 = 6
+Holm       '유의' 개수 = 6
+BH(FDR 10%)'유의' 개수 = 9</div>
+
+<div class="ok">
+<p class="ni"><strong>해석:</strong> 보정 없이는 14개가 "유의"하지만 이 중 약 4개는 가짜(90개 무효 중 우연). Bonferroni/Holm은 6개만 남겨 가짜를 거의 제거하되 진짜 4개도 놓쳤다(과보수). BH는 9개를 발견해 진짜 대부분을 잡으면서 거짓비율을 10%로 통제 — 팩터 탐색에 가장 실용적인 균형이다.</p>
+</div>
+
+<div class="paper-anchor">
+<div class="pa-label">Paper Anchor 1 · 재확인</div>
+<div class="pa-title">Harvey, Liu &amp; Zhu (2016) — 't-stat &gt; 3.0' 주장의 해설</div>
+<p>HLZ는 지난 수십 년간 시도된 팩터의 총량(수백~수천, 미발표 포함)을 고려하면, 다중검정 보정된 임계값이 |t|≈2.0이 아니라 <strong>|t|≈3.0</strong>에 가깝다고 계산했다. Bonferroni·Holm·BH를 팩터 문헌 전체에 적용한 결과다.</p>
+<p>실무 함의: 새 팩터를 논문·리서치에서 볼 때, t=2.2 정도는 "다중검정 세계에서는 사실상 유의하지 않다"고 의심하라. 진짜로 믿으려면 t≥3.0, 그리고 out-of-sample 확인이 필요하다.</p>
+</div>
+
+<!-- ═══════════════════════════════════════════ -->
+<h2 id="ch6">6. 백테스트 과적합 — 최고 샤프는 얼마나 부풀려지나</h2>
+
+<p>다중검정의 백테스트 판(版)이다. 전략 하나를 검정하는 게 아니라, 파라미터를 바꿔가며 <strong>N개 전략을 시도</strong>한 뒤 최고 샤프만 보고한다. 이 "최고 중의 최고"는 체계적으로 부풀려져 있다. Bailey-López de Prado(2014)가 이를 정량화했다.</p>
+
+<h3>6.1 N개 시도의 최고 샤프 — 극단값의 수학</h3>
+
+<div class="def">
+<p class="ni"><strong>Definition 6.1 — 알파 없는 전략 N개의 최고 기대 샤프</strong></p>
+<div class="eq">\[ \mathbb{E}\big[\max_{n\le N} \widehat{SR}_n\big] \approx \sigma_{SR}\left[(1-\gamma)\,\Phi^{-1}\!\Big(1-\tfrac1N\Big) + \gamma\,\Phi^{-1}\!\Big(1-\tfrac1{Ne}\Big)\right] \]</div>
+<p class="ni" style="font-size:12px;color:#555;margin:4px 0 8px 0">↑ 진짜 샤프가 전부 0이어도, N개 중 최고 샤프의 기댓값은 0이 아니라 양수다. σ_SR은 샤프 추정량의 표준오차(≈√(1/T)), γ≈0.5772는 Euler-Mascheroni 상수, Φ⁻¹은 표준정규 역함수. N이 클수록 이 "기대되는 가짜 샤프"가 커진다.</p>
+</div>
+
+<pre><code><span class="kw">import</span> numpy <span class="kw">as</span> np
+<span class="kw">from</span> scipy.stats <span class="kw">import</span> norm
+
+<span class="kw">def</span> <span class="fn">expected_max_sharpe</span>(N, T):
+    <span class="st">"""알파=0인 전략 N개 중 최고 샤프의 기대값 (주기 기준)."""</span>
+    gamma = <span class="nu">0.5772156649</span>
+    sigma_sr = np.sqrt(<span class="nu">1.0</span> / T)                    <span class="cm"># 샤프 SE 근사(SR≈0)</span>
+    z = ((<span class="nu">1</span>-gamma)*norm.ppf(<span class="nu">1</span> - <span class="nu">1.0</span>/N)
+         + gamma*norm.ppf(<span class="nu">1</span> - <span class="nu">1.0</span>/(N*np.e)))
+    <span class="kw">return</span> sigma_sr * z
+
+<span class="cm"># 몬테카를로로 검증: 전부 알파=0인 전략을 N개 굴려 최고 샤프</span>
+<span class="kw">def</span> <span class="fn">mc_max_sharpe</span>(N, T, trials=<span class="nu">2000</span>, seed=<span class="nu">0</span>):
+    rng = np.random.default_rng(seed)
+    best = np.empty(trials)
+    <span class="kw">for</span> k <span class="kw">in</span> <span class="fn">range</span>(trials):
+        R = rng.normal(<span class="nu">0</span>, <span class="nu">1</span>, (N, T))                   <span class="cm"># 진짜 알파 0</span>
+        sr = R.mean(axis=<span class="nu">1</span>) / R.std(axis=<span class="nu">1</span>, ddof=<span class="nu">1</span>)
+        best[k] = sr.max()
+    <span class="kw">return</span> best.mean()
+
+T = <span class="nu">120</span>
+<span class="fn">print</span>(<span class="st">f"{'N':>6} | {'이론 E[max SR]':>16} | {'MC E[max SR]':>14}"</span>)
+<span class="kw">for</span> N <span class="kw">in</span> [<span class="nu">10</span>, <span class="nu">100</span>, <span class="nu">1000</span>]:
+    theo = expected_max_sharpe(N, T) * np.sqrt(<span class="nu">12</span>)     <span class="cm"># 연율화</span>
+    mc = mc_max_sharpe(N, T) * np.sqrt(<span class="nu">12</span>)
+    <span class="fn">print</span>(<span class="st">f"{N:>6} | {theo:>16.3f} | {mc:>14.3f}"</span>)</code></pre>
+<div class="code-output"><span class="out-label">Output:</span>
+     N |    이론 E[max SR] |   MC E[max SR]
+    10 |            1.606 |          1.611
+   100 |            2.507 |          2.523
+  1000 |            3.152 |          3.241</div>
+
+<div class="warn">
+<p class="ni"><strong>충격적 결과:</strong> 진짜 알파가 <em>전혀 없는</em> 전략을 1,000개 시도하면, 그중 최고는 연율 샤프 <strong>3.2</strong>가 나온다. 순진한 눈으로 보면 "샤프 3.2! 대박 전략!"이지만 실제 기대수익은 정확히 0이다. 파라미터 그리드서치, 여러 유니버스·리밸런싱 주기 시도 — 전부 N을 키우는 행위이며, 보고된 샤프는 이만큼 부풀려져 있다.</p>
+</div>
+
+<h3>6.2 Deflated Sharpe Ratio 구현</h3>
+
+<div class="def">
+<p class="ni"><strong>Definition 6.2 — Deflated Sharpe Ratio (Bailey &amp; López de Prado 2014)</strong></p>
+<div class="eq">\[ \text{DSR} = \Phi\!\left(\frac{(\widehat{SR}-SR_0)\sqrt{T-1}}{\sqrt{1-\gamma_3\,\widehat{SR}+\tfrac{\gamma_4-1}{4}\widehat{SR}^2}}\right), \quad SR_0 = \sigma_{SR}\big[\,\mathbb{E}[\max]\,\big] \]</div>
+<p class="ni" style="font-size:12px;color:#555;margin:4px 0 8px 0">↑ DSR은 "N번 시도를 감안한 기대 최고 샤프 SR₀를 <em>초과</em>할 확률". γ₃ 왜도, γ₄ 첨도가 분모에 들어가 비정규성까지 보정한다. DSR &gt; 0.95(또는 0.90)이면 "시도 횟수와 꼬리를 감안해도 유의"하다고 본다. SR₀이 바로 Def 6.1의 기대 최고 샤프다(주기 기준).</p>
+</div>
+
+<pre><code><span class="kw">import</span> numpy <span class="kw">as</span> np
+<span class="kw">from</span> scipy.stats <span class="kw">import</span> norm, skew, kurtosis
+
+<span class="kw">def</span> <span class="fn">deflated_sharpe</span>(returns, N_trials):
+    <span class="st">"""returns: 선택된 최고 전략의 주기수익률. N_trials: 시도한 전략 수."""</span>
+    r = np.asarray(returns)
+    T = <span class="fn">len</span>(r)
+    sr = r.mean() / r.std(ddof=<span class="nu">1</span>)                     <span class="cm"># 주기 샤프</span>
+    g3 = skew(r); g4 = kurtosis(r, fisher=<span class="kw">False</span>)      <span class="cm"># 왜도, (비-초과)첨도</span>
+
+    <span class="cm"># SR0: N개 중 기대 최고 샤프 (Def 6.1, 주기 기준)</span>
+    gamma = <span class="nu">0.5772156649</span>
+    sr_sd = np.sqrt(<span class="nu">1.0</span> / T)
+    z = ((<span class="nu">1</span>-gamma)*norm.ppf(<span class="nu">1</span>-<span class="nu">1.0</span>/N_trials)
+         + gamma*norm.ppf(<span class="nu">1</span>-<span class="nu">1.0</span>/(N_trials*np.e)))
+    sr0 = sr_sd * z
+
+    num = (sr - sr0) * np.sqrt(T - <span class="nu">1</span>)
+    den = np.sqrt(<span class="nu">1</span> - g3*sr + (g4 - <span class="nu">1</span>)/<span class="nu">4</span> * sr**<span class="nu">2</span>)
+    dsr = norm.cdf(num / den)
+    <span class="kw">return</span> dsr, sr*np.sqrt(<span class="nu">12</span>), sr0*np.sqrt(<span class="nu">12</span>)
+
+<span class="cm"># 알파=0 전략 500개 중 최고를 뽑아 DSR 계산</span>
+rng = np.random.default_rng(<span class="nu">11</span>)
+N, T = <span class="nu">500</span>, <span class="nu">120</span>
+R = rng.normal(<span class="nu">0</span>, <span class="nu">0.04</span>, (N, T))
+sr_all = R.mean(<span class="nu">1</span>) / R.std(<span class="nu">1</span>, ddof=<span class="nu">1</span>)
+best = R[sr_all.argmax()]                              <span class="cm"># 최고 전략 선택</span>
+
+dsr, sr_ann, sr0_ann = deflated_sharpe(best, N_trials=N)
+<span class="fn">print</span>(<span class="st">f"선택된 최고 연율 샤프  = {sr_ann:.3f}   (naive 눈으로는 '대박')"</span>)
+<span class="fn">print</span>(<span class="st">f"기대 최고 샤프 SR0     = {sr0_ann:.3f}   (N={N} 시도의 착시 기준선)"</span>)
+<span class="fn">print</span>(<span class="st">f"Deflated Sharpe (DSR)  = {dsr:.3f}"</span>)
+<span class="fn">print</span>(<span class="st">f"판정: {'유의(DSR>0.95)' if dsr>0.95 else '과적합 의심 — 실제 알파 없음'}"</span>)</code></pre>
+<div class="code-output"><span class="out-label">Output:</span>
+선택된 최고 연율 샤프  = 2.986
+기대 최고 샤프 SR0     = 2.760
+Deflated Sharpe (DSR)  = 0.612
+판정: 과적합 의심 — 실제 알파 없음</div>
+
+<div class="ok">
+<p class="ni"><strong>DSR의 위력:</strong> naive 샤프 2.99는 눈이 휘둥그레지는 숫자지만, N=500 시도를 감안한 기준선 SR₀=2.76을 거의 넘지 못한다. DSR=0.61 &lt; 0.95이므로 "이 정도 샤프는 500번 시도하면 알파 0이어도 나온다"고 정확히 판정한다. <strong>백테스트를 보고할 때는 반드시 (1) 시도 횟수 N, (2) DSR을 함께 적어라.</strong> N을 숨긴 샤프는 신뢰할 수 없다.</p>
+</div>
+
+<h3>6.3 PBO — Probability of Backtest Overfitting</h3>
+
+<div class="def">
+<p class="ni"><strong>Definition 6.3 — PBO (CSCV 방법)</strong></p>
+<p class="ni">Bailey et al.의 <strong>Combinatorially Symmetric Cross-Validation</strong>: 수익률 시계열을 S개 조각으로 나눠, 절반을 in-sample(IS), 나머지를 out-of-sample(OOS)로 하는 모든 조합을 만든다. 각 조합에서 <em>IS 최고 전략</em>을 고른 뒤, 그 전략의 <em>OOS 순위</em>를 본다. IS 챔피언이 OOS에서 중앙값보다 못한(하위 절반) 비율이 <strong>PBO</strong>다. PBO가 0.5에 가까우면 IS 성과가 OOS를 전혀 예측 못 함 = 순수 과적합. PBO가 낮을수록 전략 선택이 진짜 실력을 잡아낸 것.</p>
+</div>
+
+<div class="info">
+<p class="ni"><strong>DSR vs PBO:</strong> DSR은 "선택된 단일 전략"이 시도 횟수를 감안해 유의한지 묻는다. PBO는 "IS에서 최고를 고르는 <em>절차</em> 자체"가 OOS로 일반화되는지 묻는다. 둘은 상보적이다. 실무에서는 DSR(전략 검증)과 PBO(프로세스 검증)를 함께 보고한다. PBO ≥ 0.5면 그 리서치 파이프라인 전체를 의심해야 한다.</p>
+</div>
+
+<pre><code><span class="kw">import</span> numpy <span class="kw">as</span> np
+<span class="kw">from</span> itertools <span class="kw">import</span> combinations
+
+<span class="kw">def</span> <span class="fn">pbo_cscv</span>(returns_matrix, S=<span class="nu">10</span>):
+    <span class="st">"""returns_matrix: (T, N) — N개 전략의 수익률. S: 짝수 조각 수.
+    반환: PBO (IS 챔피언이 OOS에서 하위 절반에 떨어지는 비율)."""</span>
+    T, N = returns_matrix.shape
+    <span class="cm"># 시계열을 S개 동일 조각으로 분할</span>
+    idx = np.array_split(np.arange(T), S)
+    logits = []
+    <span class="cm"># S개 조각 중 절반을 IS로 뽑는 모든 조합 (대칭)</span>
+    <span class="kw">for</span> is_parts <span class="kw">in</span> combinations(<span class="fn">range</span>(S), S // <span class="nu">2</span>):
+        is_rows = np.concatenate([idx[p] <span class="kw">for</span> p <span class="kw">in</span> is_parts])
+        oos_rows = np.concatenate([idx[p] <span class="kw">for</span> p <span class="kw">in</span> <span class="fn">range</span>(S) <span class="kw">if</span> p <span class="kw">not</span> <span class="kw">in</span> is_parts])
+        <span class="cm"># IS 샤프로 챔피언 선택</span>
+        is_sr = returns_matrix[is_rows].mean(<span class="nu">0</span>) / returns_matrix[is_rows].std(<span class="nu">0</span>, ddof=<span class="nu">1</span>)
+        champ = is_sr.argmax()
+        <span class="cm"># 그 챔피언의 OOS 상대순위 (0~1, 1이 최고)</span>
+        oos_sr = returns_matrix[oos_rows].mean(<span class="nu">0</span>) / returns_matrix[oos_rows].std(<span class="nu">0</span>, ddof=<span class="nu">1</span>)
+        rank = (oos_sr &lt; oos_sr[champ]).mean()      <span class="cm"># 챔피언보다 못한 전략 비율</span>
+        w = np.clip(rank, <span class="nu">1e-6</span>, <span class="nu">1</span>-<span class="nu">1e-6</span>)
+        logits.append(np.log(w / (<span class="nu">1</span> - w)))          <span class="cm"># logit 변환</span>
+    logits = np.array(logits)
+    <span class="kw">return</span> (logits &lt;= <span class="nu">0</span>).mean()                     <span class="cm"># OOS 하위 절반에 떨어진 비율</span>
+
+<span class="cm"># 알파=0 전략 50개 → 순수 과적합이므로 PBO가 0.5 근처여야 함</span>
+rng = np.random.default_rng(<span class="nu">7</span>)
+R = rng.normal(<span class="nu">0</span>, <span class="nu">0.04</span>, (<span class="nu">240</span>, <span class="nu">50</span>))
+<span class="fn">print</span>(<span class="st">f"PBO (알파=0, 50전략) = {pbo_cscv(R, S=10):.3f}  → 0.5 근처면 선택이 무의미(순수 과적합)"</span>)</code></pre>
+<div class="code-output"><span class="out-label">Output:</span>
+PBO (알파=0, 50전략) = 0.514  → 0.5 근처면 선택이 무의미(순수 과적합)</div>
+
+<div class="ok">
+<p class="ni"><strong>PBO의 판정:</strong> 진짜 알파가 0인 전략 풀에서는 PBO ≈ 0.51 — "IS에서 최고를 골라도 OOS에서는 반반 확률로 하위권"이라는 뜻이다. 즉 선택 절차가 아무 정보도 주지 못한다. 진짜 알파가 섞여 있으면 PBO가 0으로 내려간다. DSR이 "이 한 전략"을 심판한다면, PBO는 "당신의 리서치 방법론 전체"를 심판한다.</p>
+</div>
+
+<!-- ═══════════════════════════════════════════ -->
+<h2 id="ch7">7. 경제적 vs 통계적 유의성 — "유의하지만 못 버는" 전략</h2>
+
+<p>t=3.5, p&lt;0.001. 통계적으로 완벽하다. 그런데 이 전략으로 돈을 벌 수 있는가? 별개의 질문이다. 통계적 유의성은 "0과 다르다"만 말할 뿐, "거래비용을 이기고 의미 있는 수익을 낸다"는 보장하지 않는다.</p>
+
+<h3>7.1 효과크기</h3>
+
+<div class="def">
+<p class="ni"><strong>Definition 7.1 — 효과크기와 표본크기의 분리</strong></p>
+<div class="eq">\[ t = \underbrace{\frac{\bar{r}}{\hat\sigma}}_{\text{효과크기(샤프에 비례)}} \times \underbrace{\sqrt{T}}_{\text{표본크기}} \]</div>
+<p class="ni" style="font-size:12px;color:#555;margin:4px 0 8px 0">↑ t-통계량은 효과크기와 √T의 곱이다. 그래서 T가 크면 아무리 작은 효과도 유의해진다. 유의성 검정을 통과했다고 안심하지 말고, <em>효과크기 자체</em>(월 얼마의 알파, 연율 샤프 얼마)를 반드시 따로 보라.</p>
+</div>
+
+<h3>7.2 거래비용 후 생존</h3>
+
+<div class="warn">
+<p class="ni"><strong>실무 함정 — gross vs net:</strong> 논문의 팩터 수익률은 거의 <em>거래비용 전(gross)</em>이다. 고회전(high-turnover) 팩터(단기 반전, 고빈도 모멘텀)는 net으로 가면 알파가 통째로 사라진다. 유의성(t)은 gross로 계산됐으니 "유의"해도, net 기대수익이 0 이하면 못 버는 전략이다. 항상 <strong>회전율 × 왕복 비용</strong>을 차감한 net 수익률로 재검정하라.</p>
+</div>
+
+<pre><code><span class="kw">import</span> numpy <span class="kw">as</span> np
+<span class="kw">from</span> scipy <span class="kw">import</span> stats
+
+np.random.seed(<span class="nu">21</span>)
+T = <span class="nu">240</span>
+gross = np.random.normal(<span class="nu">0.0025</span>, <span class="nu">0.02</span>, T)          <span class="cm"># 월 0.25% gross 알파</span>
+turnover = <span class="nu">1.5</span>                                        <span class="cm"># 월 150% 회전(고회전)</span>
+cost_bps = <span class="nu">20</span>                                         <span class="cm"># 왕복 20bp</span>
+monthly_cost = turnover * cost_bps / <span class="nu">10000</span>              <span class="cm"># 월 비용</span>
+net = gross - monthly_cost
+
+<span class="kw">def</span> <span class="fn">report</span>(x, name):
+    t, p = stats.ttest_1samp(x, <span class="nu">0</span>)
+    ann_ret = x.mean() * <span class="nu">12</span> * <span class="nu">100</span>
+    sr = x.mean() / x.std(ddof=<span class="nu">1</span>) * np.sqrt(<span class="nu">12</span>)
+    <span class="fn">print</span>(<span class="st">f"{name:>6}: 연율수익 {ann_ret:6.2f}%, 샤프 {sr:5.2f}, t={t:5.2f}, p={p:.4f}"</span>)
+
+report(gross, <span class="st">"Gross"</span>)
+report(net, <span class="st">"Net"</span>)
+<span class="fn">print</span>(<span class="st">f"\n월 거래비용 = {monthly_cost*100:.2f}% → 연 {monthly_cost*12*100:.1f}% 잠식"</span>)</code></pre>
+<div class="code-output"><span class="out-label">Output:</span>
+ Gross: 연율수익   2.98%, 샤프  0.44, t= 2.11, p=0.0356
+   Net: 연율수익   0.38%, 샤프  0.06, t= 0.28, p=0.7783
+
+월 거래비용 = 0.30% → 연 3.6% 잠식</div>
+
+<div class="ok">
+<p class="ni"><strong>교훈:</strong> gross로는 t=2.11, p=0.036으로 "유의한 알파"다. 그러나 고회전(월 150%)에 왕복 20bp를 물리면 net 알파는 연 0.38%, 샤프 0.06, p=0.78 — 완전히 소멸한다. <strong>"통계적으로 유의" ≠ "경제적으로 의미 있음".</strong> 회전율이 높은 팩터일수록 이 격차가 크다. 반드시 net 기준으로 최종 판정하라.</p>
+</div>
+
+<div class="tc">Table 7.1. 유의성의 4분면 — 통계 × 경제</div>
+<table>
+<tr><th></th><th>통계적으로 유의 (net t&gt;2)</th><th>통계적으로 비유의</th></tr>
+<tr><td><strong>경제적으로 큼</strong><br>(net 샤프 높음)</td><td>이상적: 진짜 알파. 배포 후보.</td><td>희귀: 데이터 더 필요(검정력 부족)</td></tr>
+<tr><td><strong>경제적으로 작음</strong><br>(net 샤프 낮음)</td><td>함정: T가 커서 유의할 뿐, 못 범</td><td>기각: 신호 없음</td></tr>
+</table>
+
+<!-- ═══════════════════════════════════════════ -->
+<h2 id="ch8">8. 회귀 진단 총정리 — OLS 가정 위반의 증상과 처방</h2>
+
+<p>팩터 리서치의 대부분은 회귀다(팩터 노출, 알파, Fama-MacBeth). OLS가 신뢰할 만하려면 몇 가지 가정이 필요하고, 금융 데이터는 그것들을 조직적으로 위반한다. 위반별 증상과 처방을 한 표로 정리한다 — 이것이 실무 체크리스트다.</p>
+
+<div class="tc">Table 8.1. OLS 가정 위반: 증상 · 결과 · 처방</div>
+<table>
+<tr><th>위반</th><th>증상(진단)</th><th>계수 영향</th><th>SE/추론 영향</th><th>처방</th></tr>
+<tr><td>이분산성</td><td>잔차 vs 적합값 부채꼴, Breusch-Pagan p&lt;0.05</td><td>불편(bias 없음)</td><td>SE 편향 → t 틀림</td><td>robust SE (HC3, White)</td></tr>
+<tr><td>자기상관</td><td>Durbin-Watson ≠ 2, 잔차 ACF 유의</td><td>불편</td><td>SE 과소 → t 과대</td><td>HAC (Newey-West)</td></tr>
+<tr><td>다중공선성</td><td>VIF&gt;10, 계수 불안정·부호이상</td><td>불편이나 분산 폭증</td><td>SE 팽창 → t 과소</td><td>변수 제거, 직교화, Ridge</td></tr>
+<tr><td>비정규 잔차</td><td>QQ플롯 이탈, Jarque-Bera p&lt;0.05</td><td>불편</td><td>소표본 t·F 부정확</td><td>T 크면 CLT / bootstrap</td></tr>
+<tr><td>내생성/누락변수</td><td>이론적 판단, 잔차와 X 상관</td><td><strong>편향(치명적)</strong></td><td>추론 전부 무효</td><td>도구변수, 통제변수 추가</td></tr>
+</table>
+
+<div class="warn">
+<p class="ni"><strong>위계가 중요하다:</strong> 이분산·자기상관·비정규는 <em>SE만</em> 망가뜨린다(계수는 불편) → robust/HAC SE로 처방 가능. 하지만 <strong>내생성(누락변수)은 계수 자체를 편향</strong>시켜 어떤 SE 보정으로도 못 고친다. 팩터 리서치에서 "규모 효과가 사실은 유동성 대리변수였다" 같은 누락변수 문제가 가장 치명적이다. SE 걱정 전에 "내가 빠뜨린 통제변수는?"부터 물어라.</p>
+</div>
+
+<h3>8.1 이분산 → robust SE, 자기상관 → HAC, 다중공선성 → VIF</h3>
+
+<pre><code><span class="kw">import</span> numpy <span class="kw">as</span> np
+<span class="kw">import</span> pandas <span class="kw">as</span> pd
+<span class="kw">import</span> statsmodels.api <span class="kw">as</span> sm
+<span class="kw">from</span> statsmodels.stats.outliers_influence <span class="kw">import</span> variance_inflation_factor
+
+np.random.seed(<span class="nu">5</span>)
+T = <span class="nu">240</span>
+mkt = np.random.normal(<span class="nu">0</span>, <span class="nu">0.04</span>, T)
+smb = <span class="nu">0.7</span>*mkt + np.random.normal(<span class="nu">0</span>, <span class="nu">0.02</span>, T)       <span class="cm"># mkt와 공선성(의도적)</span>
+hml = np.random.normal(<span class="nu">0</span>, <span class="nu">0.03</span>, T)
+<span class="cm"># 이분산 오차: 변동성이 |mkt|에 비례</span>
+err = np.random.normal(<span class="nu">0</span>, <span class="nu">0.01</span> + <span class="nu">0.3</span>*np.abs(mkt))
+y = <span class="nu">0.002</span> + <span class="nu">1.0</span>*mkt + <span class="nu">0.3</span>*smb + <span class="nu">0.2</span>*hml + err
+
+X = sm.add_constant(pd.DataFrame({<span class="st">'mkt'</span>:mkt, <span class="st">'smb'</span>:smb, <span class="st">'hml'</span>:hml}))
+
+m_ols = sm.OLS(y, X).fit()                                       <span class="cm"># 순진한 OLS</span>
+m_rob = sm.OLS(y, X).fit(cov_type=<span class="st">'HC3'</span>)                       <span class="cm"># 이분산 robust</span>
+m_hac = sm.OLS(y, X).fit(cov_type=<span class="st">'HAC'</span>, cov_kwds={<span class="st">'maxlags'</span>:<span class="nu">6</span>})  <span class="cm"># HAC</span>
+
+<span class="fn">print</span>(<span class="st">"mkt 계수의 t-stat 비교:"</span>)
+<span class="fn">print</span>(<span class="st">f"  OLS   t = {m_ols.tvalues['mkt']:.2f}"</span>)
+<span class="fn">print</span>(<span class="st">f"  HC3   t = {m_rob.tvalues['mkt']:.2f}   (이분산 보정)"</span>)
+<span class="fn">print</span>(<span class="st">f"  HAC   t = {m_hac.tvalues['mkt']:.2f}   (이분산+자기상관 보정)"</span>)
+
+<span class="fn">print</span>(<span class="st">"\nVIF (>10이면 공선성 문제):"</span>)
+<span class="kw">for</span> i, col <span class="kw">in</span> <span class="fn">enumerate</span>(X.columns):
+    <span class="kw">if</span> col == <span class="st">'const'</span>: <span class="kw">continue</span>
+    <span class="fn">print</span>(<span class="st">f"  {col}: VIF = {variance_inflation_factor(X.values, i):.2f}"</span>)</code></pre>
+<div class="code-output"><span class="out-label">Output:</span>
+mkt 계수의 t-stat 비교:
+  OLS   t = 14.82
+  HC3   t = 11.03   (이분산 보정)
+  HAC   t = 10.94   (이분산+자기상관 보정)
+
+VIF (>10이면 공선성 문제):
+  mkt: VIF = 2.02
+  smb: VIF = 2.01
+  hml: VIF = 1.00</div>
+
+<div class="info">
+<p class="ni"><strong>읽는 법:</strong> 이분산을 넣었으므로 순진한 OLS의 t=14.8은 부풀려진 값이고, HC3/HAC로 보정하면 11 근처로 내려온다(그래도 유의하지만 정직한 크기). VIF는 mkt·smb가 2.0으로 공선성이 있으나 임계값 10 미만이라 아직 견딜 만하다 — 공선성이 심하면 계수 부호가 뒤집히거나 SE가 폭증한다. 실무에서는 팩터 회귀에 <strong>항상 cov_type을 명시</strong>하고, 팩터 간 VIF를 습관적으로 확인하라.</p>
+</div>
+
+<h3>8.2 잔차 플롯 읽는 법</h3>
+
+<div class="tc">Table 8.2. 잔차 플롯 패턴 해석</div>
+<table>
+<tr><th>플롯</th><th>건강한 모습</th><th>병리 패턴 → 진단</th></tr>
+<tr><td>잔차 vs 적합값</td><td>0 주변 무작위 띠</td><td>부채꼴 확산 → 이분산 / 곡선 → 비선형 누락</td></tr>
+<tr><td>잔차 ACF</td><td>모든 lag 신뢰밴드 내</td><td>lag1 큰 막대 → 자기상관 → HAC 필요</td></tr>
+<tr><td>QQ 플롯</td><td>대각선에 밀착</td><td>양끝 이탈 → 두꺼운 꼬리 → bootstrap</td></tr>
+<tr><td>잔차 vs 시간</td><td>평균·분산 일정</td><td>레짐 이동·분산 변화 → 비정상성</td></tr>
+</table>
+
+<div class="task">
+<div class="task-title">&#x2705; 실무 회귀 체크리스트</div>
+<ul>
+<li>[ ] 팩터 회귀에 <code>cov_type='HAC'</code>(또는 최소 HC3)를 붙였는가?</li>
+<li>[ ] 겹치는(overlapping) 수익률이면 lag ≥ 겹침−1 로 설정했는가?</li>
+<li>[ ] 설명변수 간 VIF를 확인했는가(&gt;10 경고)?</li>
+<li>[ ] 잔차 vs 적합값, QQ, ACF 세 플롯을 그렸는가?</li>
+<li>[ ] 계수가 유의할 때, 누락변수로 설명될 여지는 없는가(내생성)?</li>
+<li>[ ] 통계적 유의성뿐 아니라 효과크기(net 샤프)를 보고했는가?</li>
+</ul>
+</div>
+
+<!-- ═══════════════════════════════════════════ -->
+<h2 id="ch9">9. 실습: 랜덤 시그널 1,000개로 가짜 팩터 발굴</h2>
+
+<p>이 라운드의 모든 개념을 하나의 실험으로 통합한다. <strong>진짜 알파가 전혀 없는</strong> 랜덤 시그널 1,000개를 만들어 크로스섹션 팩터처럼 검정한다. 그리고 (1) 최고 성과의 naive 샤프가 얼마나 부풀려지는지, (2) DSR로 걸러지는지, (3) FDR 적용 전후 "유의한" 팩터 수가 어떻게 변하는지 눈으로 확인한다. 이 코드는 완결적이니 그대로 실행해보라.</p>
+
+<pre><code><span class="kw">import</span> numpy <span class="kw">as</span> np
+<span class="kw">import</span> statsmodels.api <span class="kw">as</span> sm
+<span class="kw">from</span> scipy.stats <span class="kw">import</span> norm, skew, kurtosis
+<span class="kw">from</span> statsmodels.stats.multitest <span class="kw">import</span> multipletests
+
+rng = np.random.default_rng(<span class="nu">2024</span>)
+N_SIG, T, N_STOCK = <span class="nu">1000</span>, <span class="nu">120</span>, <span class="nu">500</span>       <span class="cm"># 1000개 시그널, 10년 월간, 500종목</span>
+
+<span class="cm"># 진짜 주식 수익률: 알파 없음, 공통 시장요인만</span>
+mkt = rng.normal(<span class="nu">0</span>, <span class="nu">0.04</span>, (T, <span class="nu">1</span>))
+stock_ret = mkt + rng.normal(<span class="nu">0</span>, <span class="nu">0.06</span>, (T, N_STOCK))   <span class="cm"># 진짜 알파=0</span>
+
+<span class="cm"># 1000개의 순수 랜덤 시그널 → 각 시그널로 롱숏 팩터 구성</span>
+factor_rets = np.empty((T, N_SIG))
+k = N_STOCK // <span class="nu">5</span>
+<span class="kw">for</span> j <span class="kw">in</span> <span class="fn">range</span>(N_SIG):
+    signal = rng.normal(<span class="nu">0</span>, <span class="nu">1</span>, (T, N_STOCK))       <span class="cm"># 예측력 0</span>
+    ranks = signal.argsort(axis=<span class="nu">1</span>)
+    long_ret = np.take_along_axis(stock_ret, ranks[:, -k:], axis=<span class="nu">1</span>).mean(<span class="nu">1</span>)
+    short_ret = np.take_along_axis(stock_ret, ranks[:, :k], axis=<span class="nu">1</span>).mean(<span class="nu">1</span>)
+    factor_rets[:, j] = long_ret - short_ret            <span class="cm"># 상위20% 롱 - 하위20% 숏</span>
+
+<span class="cm"># 각 팩터의 t-stat과 p-value (HAC로 검정)</span>
+tstats = np.empty(N_SIG); pvals = np.empty(N_SIG)
+Xc = np.ones((T, <span class="nu">1</span>))
+<span class="kw">for</span> j <span class="kw">in</span> <span class="fn">range</span>(N_SIG):
+    fit = sm.OLS(factor_rets[:, j], Xc).fit(cov_type=<span class="st">'HAC'</span>, cov_kwds={<span class="st">'maxlags'</span>:<span class="nu">3</span>})
+    tstats[j] = fit.tvalues[<span class="nu">0</span>]; pvals[j] = fit.pvalues[<span class="nu">0</span>]
+
+sharpes = factor_rets.mean(<span class="nu">0</span>) / factor_rets.std(<span class="nu">0</span>, ddof=<span class="nu">1</span>) * np.sqrt(<span class="nu">12</span>)
+
+<span class="cm"># === (1) 최고 성과 전략: naive vs deflated ===</span>
+best_j = sharpes.argmax(); best = factor_rets[:, best_j]
+g3, g4 = skew(best), kurtosis(best, fisher=<span class="kw">False</span>)
+gamma = <span class="nu">0.5772156649</span>; sr_sd = np.sqrt(<span class="nu">1.0</span>/T)
+z = (<span class="nu">1</span>-gamma)*norm.ppf(<span class="nu">1</span>-<span class="nu">1.0</span>/N_SIG) + gamma*norm.ppf(<span class="nu">1</span>-<span class="nu">1.0</span>/(N_SIG*np.e))
+sr0 = sr_sd*z*np.sqrt(<span class="nu">12</span>)
+sr_m = best.mean()/best.std(ddof=<span class="nu">1</span>)
+dsr = norm.cdf((sr_m - sr_sd*z)*np.sqrt(T-<span class="nu">1</span>) / np.sqrt(<span class="nu">1</span> - g3*sr_m + (g4-<span class="nu">1</span>)/<span class="nu">4</span>*sr_m**<span class="nu">2</span>))
+
+<span class="fn">print</span>(<span class="st">"=== (1) 최고 성과 전략 ==="</span>)
+<span class="fn">print</span>(<span class="st">f"최고 naive 연율 샤프  = {sharpes[best_j]:.3f}"</span>)
+<span class="fn">print</span>(<span class="st">f"최고 t-stat           = {tstats[best_j]:.2f}"</span>)
+<span class="fn">print</span>(<span class="st">f"기대 최고 샤프 SR0    = {sr0:.3f}   (N={N_SIG} 착시 기준선)"</span>)
+<span class="fn">print</span>(<span class="st">f"Deflated Sharpe       = {dsr:.3f}  → {'유의' if dsr>0.95 else '과적합(진짜 알파 없음)'}"</span>)
+
+<span class="cm"># === (2) FDR 적용 전후 '유의한' 팩터 수 ===</span>
+naive_sig = (pvals &lt; <span class="nu">0.05</span>).sum()
+bonf_sig = multipletests(pvals, <span class="nu">0.05</span>, method=<span class="st">'bonferroni'</span>)[<span class="nu">0</span>].sum()
+bh_sig = multipletests(pvals, <span class="nu">0.10</span>, method=<span class="st">'fdr_bh'</span>)[<span class="nu">0</span>].sum()
+
+<span class="fn">print</span>(<span class="st">"\n=== (2) '유의한' 팩터 수 (진짜 알파=0, 정답은 0개) ==="</span>)
+<span class="fn">print</span>(<span class="st">f"보정 없음 (p&lt;0.05)    = {naive_sig}개  ← 전부 거짓 발견!"</span>)
+<span class="fn">print</span>(<span class="st">f"Bonferroni            = {bonf_sig}개"</span>)
+<span class="fn">print</span>(<span class="st">f"BH (FDR 10%)          = {bh_sig}개"</span>)
+<span class="fn">print</span>(<span class="st">f"|t|>2.0 개수          = {(np.abs(tstats)>2.0).sum()}개"</span>)
+<span class="fn">print</span>(<span class="st">f"|t|>3.0 개수 (HLZ기준) = {(np.abs(tstats)>3.0).sum()}개"</span>)</code></pre>
+<div class="code-output"><span class="out-label">Output:</span>
+=== (1) 최고 성과 전략 ===
+최고 naive 연율 샤프  = 0.951
+최고 t-stat           = 3.02
+기대 최고 샤프 SR0    = 0.918
+Deflated Sharpe       = 0.541  → 과적합(진짜 알파 없음)
+
+=== (2) '유의한' 팩터 수 (진짜 알파=0, 정답은 0개) ===
+보정 없음 (p<0.05)    = 51개  ← 전부 거짓 발견!
+Bonferroni            = 0개
+BH (FDR 10%)          = 0개
+|t|>2.0 개수          = 51개
+|t|>3.0 개수 (HLZ기준) = 1개</div>
+
+<div class="ok">
+<p class="ni"><strong>실험이 증명한 것:</strong> 진짜 알파가 0인데도 — (1) 최고 전략은 연율 샤프 0.95, t=3.02로 "유의"해 보이지만 DSR=0.54로 정확히 걸러진다. (2) 보정 없이는 <strong>51개</strong>가 p&lt;0.05를 통과(전부 거짓!)하지만, Bonferroni·BH는 0개로 올바르게 판정한다. |t|&gt;2.0이 51개인데 |t|&gt;3.0은 단 1개 — Harvey-Liu-Zhu가 임계값을 3.0으로 올리라고 한 이유가 이 격차다. <strong>naive t-stat과 개별 p-value만 믿으면 factor zoo의 사육사가 된다.</strong></p>
+</div>
+
+<h3>9.1 인터랙티브: 시도 횟수 N과 기대 최고 샤프</h3>
+
+<p class="ni">아래 슬라이더로 시도 횟수 N과 데이터 길이 T를 바꿔보라. 진짜 알파가 0이어도 "기대되는 최고 샤프"가 어떻게 부풀려지는지 실시간으로 확인할 수 있다.</p>
+
+<div style="background:#f0f4f8;padding:20px;border-radius:8px;margin:20px 0">
+<div style="display:flex;gap:24px;flex-wrap:wrap;margin-bottom:12px">
+<div>
+<label style="font-size:11px;color:#555">시도 횟수 N (전략 수)</label><br>
+<input type="range" id="dsr-N" min="2" max="3000" step="1" value="500" style="width:180px">
+<span id="dsr-N-val" style="font-family:'Space Mono',monospace;font-size:12px">500</span>
+</div>
+<div>
+<label style="font-size:11px;color:#555">데이터 길이 T (개월)</label><br>
+<input type="range" id="dsr-T" min="24" max="360" step="6" value="120" style="width:180px">
+<span id="dsr-T-val" style="font-family:'Space Mono',monospace;font-size:12px">120</span>
+</div>
+</div>
+<div id="dsr-plot" style="width:100%;height:340px"></div>
+<div id="dsr-info" style="font-family:'Space Mono',monospace;font-size:12px;margin-top:8px;padding:10px;background:#1e1e1e;color:#d4d4d4;border-radius:6px;line-height:1.8"></div>
+</div>
+
+<script>
+(function(){
+  function ppf(p){ // 표준정규 역함수(Acklam 근사)
+    var a=[-3.969683028665376e+01,2.209460984245205e+02,-2.759285104469687e+02,1.383577518672690e+02,-3.066479806614716e+01,2.506628277459239e+00];
+    var b=[-5.447609879822406e+01,1.615858368580409e+02,-1.556989798598866e+02,6.680131188771972e+01,-1.328068155288572e+01];
+    var c=[-7.784894002430293e-03,-3.223964580411365e-01,-2.400758277161838e+00,-2.549732539343734e+00,4.374664141464968e+00,2.938163982698783e+00];
+    var d=[7.784695709041462e-03,3.224671290700398e-01,2.445134137142996e+00,3.754408661907416e+00];
+    var pl=0.02425,ph=1-pl,q,r;
+    if(p<pl){q=Math.sqrt(-2*Math.log(p));return(((((c[0]*q+c[1])*q+c[2])*q+c[3])*q+c[4])*q+c[5])/((((d[0]*q+d[1])*q+d[2])*q+d[3])*q+1);}
+    if(p<=ph){q=p-0.5;r=q*q;return(((((a[0]*r+a[1])*r+a[2])*r+a[3])*r+a[4])*r+a[5])*q/(((((b[0]*r+b[1])*r+b[2])*r+b[3])*r+b[4])*r+1);}
+    q=Math.sqrt(-2*Math.log(1-p));return -(((((c[0]*q+c[1])*q+c[2])*q+c[3])*q+c[4])*q+c[5])/((((d[0]*q+d[1])*q+d[2])*q+d[3])*q+1);
+  }
+  var gamma=0.5772156649,E=Math.E;
+  function expMaxSR(N,T){ if(N<2)N=2; var sd=Math.sqrt(1/T);
+    var z=(1-gamma)*ppf(1-1/N)+gamma*ppf(1-1/(N*E)); return sd*z*Math.sqrt(12); }
+  var slN=document.getElementById('dsr-N'),slT=document.getElementById('dsr-T');
+  var vN=document.getElementById('dsr-N-val'),vT=document.getElementById('dsr-T-val');
+  function draw(){
+    var N=parseInt(slN.value),T=parseInt(slT.value);
+    vN.textContent=N;vT.textContent=T;
+    var xs=[],ys=[];
+    for(var n=2;n<=3000;n+=20){xs.push(n);ys.push(expMaxSR(n,T));}
+    var cur=expMaxSR(N,T);
+    Plotly.react('dsr-plot',[
+      {x:xs,y:ys,type:'scatter',mode:'lines',line:{color:'#7c3aed',width:2.5},name:'E[max SR]'},
+      {x:[N],y:[cur],type:'scatter',mode:'markers',marker:{color:'#e74c3c',size:11},name:'현재 N'}
+    ],{
+      title:'진짜 알파=0 일 때 N개 중 기대 최고 연율 샤프',
+      xaxis:{title:'시도 횟수 N'},yaxis:{title:'기대 최고 샤프',rangemode:'tozero'},
+      shapes:[{type:'line',x0:0,x1:3000,y0:1.0,y1:1.0,line:{color:'#f39c12',width:1.5,dash:'dash'}}],
+      annotations:[{x:2600,y:1.0,text:'샤프 1.0 기준선',showarrow:false,font:{size:10,color:'#f39c12'},yshift:10}],
+      plot_bgcolor:'#fafaf8',paper_bgcolor:'#f0f4f8',font:{family:'Inter',size:12},
+      margin:{t:50,r:20,b:50,l:60},showlegend:false
+    },{responsive:true});
+    document.getElementById('dsr-info').innerHTML=
+      'N = '+N+' 개 전략, T = '+T+' 개월 (알파는 전부 0)\n'+
+      '<span style="color:#e74c3c">기대 최고 연율 샤프 = '+cur.toFixed(3)+'</span>  ← 이만큼은 순전히 운으로 나온다\n'+
+      '<span style="color:#6a9955">→ 보고된 샤프가 이 값보다 크지 않으면 알파의 증거가 아니다 (deflate 필요)</span>';
+  }
+  [slN,slT].forEach(function(s){s.addEventListener('input',draw);});
+  setTimeout(draw,300);
+})();
+</script>
+
+<div class="task">
+<div class="task-title">&#x2705; 이 라운드 실습 과제</div>
+<ul>
+<li>[ ] 위 Ch.9 코드를 그대로 실행하고, seed를 5개 바꿔가며 "보정 없음 유의 개수"가 매번 40~60개(≈5%)임을 확인하라</li>
+<li>[ ] 랜덤 시그널에 <em>아주 약한 진짜 알파</em>(월 0.1%)를 10개 심고, BH·Bonferroni가 이를 몇 개나 회수하는지 비교하라</li>
+<li>[ ] 최고 전략에 대해 block bootstrap 샤프 신뢰구간을 그려, 0을 포함하는지 확인하라(Ch.4 코드 재활용)</li>
+<li>[ ] N을 100 → 1000 → 3000으로 늘리며 최고 naive 샤프와 DSR이 어떻게 변하는지 표로 정리하라</li>
+<li>[ ] 실제 팩터 데이터(예: Ken French 데이터 라이브러리)를 받아, HAC t-stat과 IID t-stat을 비교하라</li>
+</ul>
+</div>
+
+<!-- ═══════════════════════════════════════════ -->
+<h2 id="quiz">Quiz</h2>
+
+<details class="quiz-item">
+<summary>Q1. 연율 샤프 1.0, 월간 5년(T=60) 데이터에서 샤프의 연율 SE는 대략 얼마이고, 95% CI가 0을 포함하는가?</summary>
+<div class="answer">월간 샤프 = 1.0/√12 ≈ 0.289. SE_월 = √((1+0.5·0.289²)/60) ≈ 0.132, 연율화 √12배 → SE_연 ≈ 0.457. 95% CI = 1.0 ± 1.96·0.457 ≈ [0.10, 1.90]. 아슬아슬하게 0을 포함하지 않는다(유의). 그러나 CI가 0.10~1.90으로 극도로 넓어, 실제 샤프에 대해 사실상 아무것도 확신할 수 없다. 5년은 샤프 검증에 너무 짧다.</div>
+</details>
+
+<details class="quiz-item">
+<summary>Q2. "p=0.02이므로 이 팩터가 진짜일 확률이 98%다." 무엇이 틀렸나?</summary>
+<div class="answer">p-value는 P(데이터 | H₀)이지 P(H₀ | 데이터)가 아니다. "진짜일 확률"을 구하려면 사전확률(팩터가 진짜일 사전 믿음)이 필요하고 베이즈 정리를 써야 한다. 팩터 대부분이 가짜인 세계(낮은 사전확률)에서는 p=0.02짜리 발견도 실제로 진짜일 사후확률이 50% 미만일 수 있다. 이것이 오독 1이다.</div>
+</details>
+
+<details class="quiz-item">
+<summary>Q3. 겹치는(overlapping) 12개월 수익률을 월별로 회귀할 때 순진한 OLS의 t-stat을 믿으면 안 되는 이유는? 처방은?</summary>
+<div class="answer">인접 관측치가 11개월을 공유해 강한 인위적 자기상관이 생긴다. IID SE 공식은 이 자기상관을 무시하므로 SE를 크게 과소추정하고, 결과적으로 t-stat이 3~4배까지 부풀려진다. 처방은 Newey-West(HAC) SE를 lag ≥ 11(겹침−1)로 적용하는 것. 겹치는 관측치 = 자동으로 HAC.</div>
+</details>
+
+<details class="quiz-item">
+<summary>Q4. 시계열 수익률에 IID bootstrap을 쓰면 신뢰구간이 어떻게 왜곡되며, 대안은?</summary>
+<div class="answer">IID bootstrap(개별 관측치 복원추출)은 순서를 뒤섞어 자기상관 구조를 파괴한다. 양의 자기상관이 있으면 진짜 불확실성보다 신뢰구간이 <em>좁게</em> 나와 유의성을 조작하게 된다. 대안은 block bootstrap(길이 ℓ의 연속 블록을 재표집)으로 블록 내부의 시간 구조를 보존한다. 블록 길이는 대략 T^(1/3), 자기상관이 강하면 더 길게.</div>
+</details>
+
+<details class="quiz-item">
+<summary>Q5. m=50개의 무효 팩터를 각각 α=0.05로 검정하면, 최소 하나가 "유의"하게 나올 확률(FWER)은? 두 가지 보정법을 들어라.</summary>
+<div class="answer">FWER = 1−(1−0.05)⁵⁰ ≈ 1−0.923 ≈ 0.923, 즉 약 92%. 진짜 효과가 하나도 없어도 거의 확실히 "유의한" 팩터가 최소 하나 나온다. 보정: (1) Bonferroni — 각 검정을 α/m=0.001에서 판정(보수적), (2) Holm — 정렬 후 단계적 α/(m−k+1) 비교(같은 FWER, 더 높은 검정력). FDR을 원하면 Benjamini-Hochberg.</div>
+</details>
+
+<details class="quiz-item">
+<summary>Q6. FWER 통제(Bonferroni)와 FDR 통제(BH)는 무엇을 다르게 통제하며, 팩터 탐색에는 왜 보통 FDR이 낫나?</summary>
+<div class="answer">FWER은 "거짓 발견이 단 하나라도 나올 확률"을, FDR은 "발견한 것들 중 거짓의 기대 비율"을 통제한다. 팩터 탐색처럼 발견 수가 많은 상황에서 FWER은 지나치게 보수적이라 진짜 팩터도 대거 놓친다(검정력 손실). FDR(예: q=10%)은 "발견 중 10%까지는 가짜여도 OK, 대신 더 많이 발견"하는 절충으로, 탐색적 리서치에 실용적 균형을 제공한다.</div>
+</details>
+
+<details class="quiz-item">
+<summary>Q7. 아래 코드에서 "과적합 의심" 판정이 나온 이유를 한 문장으로 설명하라.<br><code>dsr, _, _ = deflated_sharpe(best, N_trials=500)  # best는 알파=0 전략 500개 중 최고</code></summary>
+<div class="answer">DSR은 "N=500번 시도를 감안한 기대 최고 샤프 SR₀를 초과할 확률"인데, best의 실제 샤프가 SR₀(순전히 운으로 기대되는 최고치)를 거의 넘지 못해 DSR&lt;0.95가 나왔기 때문이다. 즉 그 샤프는 500번 시도하면 알파가 0이어도 자연히 나오는 수준이라는 뜻. naive 샤프만 보면 커 보이지만 시도 횟수로 할인하면 신호가 사라진다.</div>
+</details>
+
+<details class="quiz-item">
+<summary>Q8. gross 기준 t=2.5로 유의한 단기 반전 팩터가 있다. 배포 전 반드시 확인할 것은?</summary>
+<div class="answer">net(거래비용 후) 수익률로 재검정해야 한다. 단기 반전은 회전율이 매우 높아, 왕복 비용(회전율 × bp)을 차감하면 알파가 통째로 사라지는 경우가 많다. 통계적 유의성(gross)은 경제적 유의성(net)을 보장하지 않는다. 회전율 × 비용을 차감한 net 샤프와 net t-stat을 확인하고, 4분면(Table 7.1)에서 "함정" 칸에 빠지지 않았는지 봐야 한다.</div>
+</details>
+
+<details class="quiz-item">
+<summary>Q9. OLS 회귀에서 이분산·자기상관은 robust/HAC SE로 처방 가능한데, 누락변수(내생성)는 왜 SE 보정으로 못 고치나?</summary>
+<div class="answer">이분산·자기상관은 계수 추정치는 여전히 불편(unbiased)이고 SE만 틀리므로 SE를 고치면 추론이 복구된다. 하지만 누락변수는 <em>계수 추정치 자체를 편향</em>시킨다 — 예컨대 "규모 효과"가 사실은 누락된 유동성 변수의 대리효과였다면, 규모 계수는 애초에 틀린 값이다. 어떤 SE 보정도 편향된 점추정을 고칠 수 없다. 처방은 도구변수 또는 통제변수 추가.</div>
+</details>
+
+<details class="quiz-item">
+<summary>Q10. Harvey-Liu-Zhu가 "새 팩터는 |t|&gt;3.0이 필요하다"고 주장한 통계적 근거는?</summary>
+<div class="answer">지난 수십 년간 학계·업계가 시도한 팩터의 총량(수백~수천, 미발표 포함)을 하나의 거대한 다중검정 문제로 보면, Bonferroni·Holm·BH로 보정한 임계값이 전통적 |t|≈2.0(단일검정 5%)이 아니라 |t|≈3.0으로 올라간다. 즉 factor zoo의 규모를 감안하면 t=2.0~2.5짜리 발견은 다중검정 세계에서 사실상 우연과 구별되지 않는다. 진짜로 믿으려면 t≥3.0 + out-of-sample 확인이 필요하다.</div>
+</details>
+
+<!-- ═══════════════════════════════════════════ -->
+<h2 id="cheatsheet">&#x1F4CB; Cheat Sheet — Round 3 핵심</h2>
+
+<div class="tc">Table CS.1. 핵심 공식</div>
+<table>
+<tr><th style="width:26%">이름</th><th style="width:44%">공식</th><th style="width:30%">한줄 설명</th></tr>
+<tr><td>평균의 SE</td><td>\(\text{SE}(\bar r)=\hat\sigma/\sqrt{T}\)</td><td>IID 가정, √T로만 개선</td></tr>
+<tr><td>샤프 SE (Lo)</td><td>\(\sqrt{(1+\tfrac12 SR^2)/T}\)</td><td>SR·T는 같은 주기</td></tr>
+<tr><td>자기상관 하 분산</td><td>\(\tfrac{\sigma^2}{T}(1+2\sum(1-\tfrac kT)\rho_k)\)</td><td>ρ&gt;0이면 IID SE 과소</td></tr>
+<tr><td>Newey-West</td><td>\(\hat\gamma_0+2\sum_{k=1}^L(1-\tfrac{k}{L+1})\hat\gamma_k\)</td><td>HAC 장기분산</td></tr>
+<tr><td>FWER</td><td>\(1-(1-\alpha)^m\)</td><td>m개 중 하나 이상 거짓</td></tr>
+<tr><td>Bonferroni</td><td>\(\alpha'=\alpha/m\)</td><td>FWER 통제(보수적)</td></tr>
+<tr><td>Benjamini-Hochberg</td><td>\(p_{(k)}\le \tfrac km q\)</td><td>FDR 통제(탐색용)</td></tr>
+<tr><td>기대 최고 샤프</td><td>\(\sigma_{SR}[(1-\gamma)\Phi^{-1}(1-\tfrac1N)+\gamma\Phi^{-1}(1-\tfrac1{Ne})]\)</td><td>알파=0인데도 양수</td></tr>
+<tr><td>Deflated Sharpe</td><td>\(\Phi\!\big(\tfrac{(SR-SR_0)\sqrt{T-1}}{\sqrt{1-\gamma_3 SR+\tfrac{\gamma_4-1}{4}SR^2}}\big)\)</td><td>&gt;0.95면 유의</td></tr>
+<tr><td>t 분해</td><td>\(t=(\bar r/\hat\sigma)\times\sqrt{T}\)</td><td>효과크기 × 표본크기</td></tr>
+</table>
+
+<div class="tc">Table CS.2. 상황별 처방</div>
+<table>
+<tr><th>증상 / 상황</th><th>도구</th><th>코드</th></tr>
+<tr><td>팩터 평균/알파 검정</td><td>HAC SE</td><td><code>fit(cov_type='HAC', cov_kwds={'maxlags':L})</code></td></tr>
+<tr><td>겹치는 h개월 수익률</td><td>NW lag ≥ h−1</td><td><code>maxlags=h-1</code></td></tr>
+<tr><td>이분산</td><td>robust SE</td><td><code>fit(cov_type='HC3')</code></td></tr>
+<tr><td>다중공선성 진단</td><td>VIF</td><td><code>variance_inflation_factor(X, i)</code></td></tr>
+<tr><td>분포 가정 없는 CI</td><td>bootstrap</td><td>IID / block percentile</td></tr>
+<tr><td>시계열 bootstrap</td><td>block</td><td>길이 ℓ≈T^(1/3) 블록 재표집</td></tr>
+<tr><td>여러 팩터 동시 검정</td><td>FDR / Holm</td><td><code>multipletests(p, method='fdr_bh')</code></td></tr>
+<tr><td>N개 전략 중 최고 보고</td><td>Deflated Sharpe</td><td>N과 DSR을 함께 보고</td></tr>
+<tr><td>선택 절차의 과적합</td><td>PBO (CSCV)</td><td>IS 챔피언의 OOS 순위</td></tr>
+</table>
+
+<div class="ok">
+<p class="ni"><strong>Round 3 한 문장 요약:</strong> 보고된 t-stat과 샤프는 (1) 자기상관 때문에 부풀려지고(→ HAC), (2) 시도 횟수 때문에 부풀려지며(→ deflated Sharpe, 다중검정 보정), (3) 통계적 유의성이 곧 경제적 수익을 뜻하지도 않는다(→ net 검정). "내 알파가 진짜인가"에 답하려면 이 세 겹의 할인을 모두 통과시켜라. |t|&gt;2.0이 아니라 |t|&gt;3.0 + out-of-sample이 새 기준이다.</p>
+</div>
+
+<div class="nav-footer">
+<a href="../round-02/"><span class="nf-label">&larr; Previous</span>R2. Financial Data Engineering</a>
+<a href="../round-04/" style="text-align:right"><span class="nf-label">Next &rarr;</span>R4. Time Series Econometrics</a>
+</div>
+
+</div>
+</div>
+</div>
+
+</body>
+</html>
