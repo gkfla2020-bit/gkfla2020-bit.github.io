@@ -1,0 +1,486 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Round 8 - 매크로 렌즈 — 금리·환율·물가 | Financial Modeling Guide</title>
+<script>
+MathJax = { tex: { inlineMath: [['\\(','\\)']], displayMath: [['\\[','\\]'],['$$','$$']] } };
+</script>
+<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;500&family=Space+Mono:wght@400&family=Inter:wght@300;400&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Inter',sans-serif;background:#fafaf8;color:#1a1a1a;line-height:1.7;overflow-x:hidden}
+.sidebar{position:fixed;left:0;top:0;width:260px;height:100vh;background:rgba(255,255,255,.97);border-right:1px solid rgba(0,0,0,.06);padding:32px 24px;z-index:100;overflow-y:auto;display:flex;flex-direction:column}
+.sidebar-profile{text-align:center;margin-bottom:28px;padding-bottom:24px;border-bottom:1px solid rgba(0,0,0,.08)}
+.profile-icon{font-size:48px;margin-bottom:8px}
+.profile-name{font-family:'Cormorant Garamond',serif;font-size:1.3rem;font-weight:500;margin-bottom:4px}
+.profile-title{font-size:.68rem;color:#888;letter-spacing:.08em;text-transform:uppercase;margin-bottom:8px}
+.profile-bio{font-size:.78rem;color:#666;line-height:1.5}
+.sidebar-nav{flex:1;margin-top:16px}.nav-section{margin-bottom:20px}.nav-section-title{font-size:.6rem;font-weight:600;color:#aaa;letter-spacing:.15em;text-transform:uppercase;margin-bottom:10px}.nav-list{list-style:none}.nav-list li{margin-bottom:5px}.nav-list a{font-size:.78rem;color:#555;text-decoration:none;transition:all .2s;display:block;padding:3px 0}.nav-list a:hover{color:#217346;padding-left:4px}.nav-list a.active{color:#217346;font-weight:500}.nav-list a.done{color:#28a745}.badge{display:inline-block;font-size:.5rem;background:#217346;color:#fff;padding:1px 5px;border-radius:8px;margin-left:3px;vertical-align:middle}.badge-done{background:#28a745}.sidebar-footer{padding-top:16px;border-top:1px solid rgba(0,0,0,.06);font-size:.65rem;color:#aaa;text-align:center}
+.main-wrapper{margin-left:260px;min-height:100vh}.container{max-width:1100px;margin:0 auto;padding:50px 40px 80px}
+.paper-content{font-family:'Times New Roman','Nanum Myeongjo',serif;line-height:1.8;background:#fff;padding:40px;border-radius:8px;box-shadow:0 2px 20px rgba(0,0,0,.05)}.paper-header{text-align:center;margin-bottom:40px;padding-bottom:30px;border-bottom:2px solid #333}.paper-category{font-size:14px;color:#666;margin-bottom:10px}.paper-title{font-size:24px;font-weight:bold;margin-bottom:12px;line-height:1.4}.paper-subtitle{font-size:14px;color:#555;margin-bottom:8px}.paper-team{font-size:13px;color:#444}
+.abstract{background:#f8f9fa;padding:25px;margin:30px 0;border-left:4px solid #217346}.abstract-title{font-weight:bold;font-size:16px;margin-bottom:15px}
+h2{font-size:18px;margin:35px 0 20px;padding-bottom:8px;border-bottom:1px solid #ddd;color:#1e4f38}h3{font-size:15px;margin:25px 0 15px;color:#34495e}
+p{text-align:justify;margin-bottom:15px;text-indent:2em}p.ni{text-indent:0}
+table{width:100%;border-collapse:collapse;margin:20px 0;font-size:12px}th,td{border:1px solid #ddd;padding:10px 8px;text-align:center}th{background:#1e4f38;color:white;font-weight:bold}tr:nth-child(even){background:#f8f9fa}tr:hover{background:#eef7f1}
+.tc{font-size:13px;font-weight:bold;margin:15px 0 10px;text-align:center}.eq{text-align:center;margin:20px 0;padding:15px;background:#f8f9fa;border-radius:4px;overflow-x:auto}ul,ol{margin-left:2em;margin-bottom:15px}li{margin-bottom:6px}
+.def{background:#fff9e6;border:1px solid #ffc107;border-radius:4px;padding:20px;margin:20px 0}.info{background:#e8f4f8;border-left:4px solid #3498db;padding:20px;margin:20px 0}.warn{background:#fff3cd;border-left:4px solid #f39c12;padding:20px;margin:20px 0}.ok{background:#d4edda;border-left:4px solid #28a745;padding:20px;margin:20px 0}
+.paper-anchor{background:#ecfdf3;border:1px solid #10b981;border-radius:6px;padding:22px;margin:24px 0}.paper-anchor .pa-label{font-family:'Space Mono',monospace;font-size:10px;color:#047857;letter-spacing:.15em;text-transform:uppercase;margin-bottom:8px}.paper-anchor .pa-title{font-weight:bold;font-size:14px;margin-bottom:6px}.paper-anchor p{font-size:13px;text-indent:0;margin-bottom:8px}
+.task{background:#e8f8f0;border-left:4px solid #00b894;padding:20px;margin:20px 0}.task .task-title{font-weight:bold;margin-bottom:10px}
+details.quiz-item{margin:14px 0;padding:14px 18px;background:#f8f9fa;border:1px solid #e0e0e0;border-radius:6px}details.quiz-item summary{cursor:pointer;font-weight:bold;font-size:13.5px}details.quiz-item[open] summary{margin-bottom:10px;color:#217346}details.quiz-item .answer{font-size:13px;padding:10px 14px;background:#fff;border-left:3px solid #217346}
+pre{background:#1e1e1e;color:#d4d4d4;padding:20px;border-radius:6px;overflow-x:auto;margin:20px 0;font-family:'Space Mono','Consolas',monospace;font-size:13px;line-height:1.6}code{font-family:'Space Mono','Consolas',monospace;font-size:13px}p code,li code,td code{background:#f0f0f0;padding:2px 6px;border-radius:3px;color:#0a7f4e;font-size:12px}
+.cm{color:#6a9955}.kw{color:#569cd6}.st{color:#ce9178}.fn{color:#dcdcaa}.nb{color:#4ec9b0}.nu{color:#b5cea8}
+.kbd{display:inline-block;font-family:'Space Mono',monospace;font-size:.82em;background:#f7faf8;border:1px solid #c9d6cd;border-bottom-width:2px;border-radius:4px;padding:1px 7px;color:#1e4f38;margin:0 1px;white-space:nowrap;line-height:1.9}
+.keyseq{background:#0f1a14;color:#d4f0e0;padding:16px 20px;border-radius:6px;margin:18px 0;font-family:'Space Mono',monospace;font-size:12.5px;line-height:2.1}.keyseq .k{display:inline-block;background:#1c3327;border:1px solid #2f5a45;border-bottom-width:2px;border-radius:4px;padding:1px 7px;color:#8ff0bf;margin:0 2px}.keyseq .arrow{color:#5a8a72;margin:0 4px}.keyseq .note{color:#6f9c86;font-size:11px}.keyseq .grp{display:inline-block;margin:3px 0}
+.progress-bar{width:100%;height:6px;background:#e0e0e0;border-radius:3px;margin-top:16px}.progress-fill{height:100%;background:linear-gradient(90deg,#217346,#10b981);border-radius:3px;width:0%}.progress-label{font-size:11px;color:#888;margin-top:4px;text-align:center}
+.code-output{background:#1e1e1e;color:#d4d4d4;padding:12px 16px;border-radius:0 0 6px 6px;font-family:'Space Mono',monospace;font-size:11.5px;line-height:1.6;margin-top:-4px;margin-bottom:18px;border-top:2px solid #333;white-space:pre-wrap;overflow-x:auto}.code-output .out-label{color:#888;font-size:10px;margin-bottom:4px;display:block}
+.nav-footer{display:flex;justify-content:space-between;gap:16px;margin-top:50px;padding-top:24px;border-top:1px solid #ddd;font-family:'Inter',sans-serif}.nav-footer a{font-size:.82rem;color:#217346;text-decoration:none;padding:12px 18px;border:1px solid #cfe6da;border-radius:6px;transition:all .2s;max-width:48%}.nav-footer a:hover{background:#217346;color:#fff;border-color:#217346}.nav-footer .nf-label{display:block;font-size:.6rem;color:#999;letter-spacing:.1em;text-transform:uppercase;margin-bottom:4px}.nav-footer a:hover .nf-label{color:rgba(255,255,255,.7)}
+@media(max-width:1024px){.sidebar{width:100%;height:auto;position:relative;border-right:none;border-bottom:1px solid rgba(0,0,0,.08);padding:16px}.sidebar-profile{margin-bottom:10px;padding-bottom:10px;display:flex;align-items:center;gap:12px;text-align:left}.profile-icon{font-size:32px;margin-bottom:0}.profile-bio{display:none}.nav-section{display:inline-block;margin-right:16px;margin-bottom:8px}.nav-list{display:flex;gap:10px;flex-wrap:wrap}.nav-list li{margin-bottom:0}.sidebar-footer{display:none}.main-wrapper{margin-left:0}.container{padding:0}.paper-content{padding:20px 16px;border-radius:0;box-shadow:none}.paper-title{font-size:18px}p{font-size:14px;text-indent:1.5em;text-align:left}pre{font-size:11px;padding:14px}table{font-size:10px;display:block;overflow-x:auto}.keyseq{font-size:11px}.nav-footer{flex-direction:column}.nav-footer a{max-width:100%}}
+</style>
+</head>
+<body>
+
+<div class="sidebar">
+<div class="sidebar-profile">
+<div class="profile-icon">&#x1F4CA;</div>
+<div class="profile-name">Financial Modeling Guide</div>
+<div class="profile-title">Keyboard &middot; Accounting &middot; Valuation</div>
+<div class="profile-bio">13 Rounds: 키보드로 짓는 재무모델부터 리서치 보고서까지</div>
+</div>
+<div class="sidebar-nav">
+<div class="nav-section">
+<div class="nav-section-title">Curriculum</div>
+<ul class="nav-list">
+<li><a href="../">&#x2302; Guide Home</a></li>
+<li><a href="../round-00/">R0. No-Mouse Excel</a></li>
+<li><a href="../round-01/">R1. 회계의 뼈대</a></li>
+<li><a href="../round-02/">R2. DART 데이터 수집</a></li>
+<li><a href="../round-03/">R3. 밸류에이션 이론</a></li>
+<li><a href="../round-04/">R4. 3-Statement I</a></li>
+<li><a href="../round-05/">R5. 3-Statement II</a></li>
+<li><a href="../round-06/">R6. DCF & 목표주가</a></li>
+<li><a href="../round-07/">R7. 상대가치 실전</a></li>
+<li><a class="active" href="#">R8. 매크로 렌즈 <span class="badge">NOW</span></a></li>
+<li><a href="../round-09/">R9. 산업분석</a></li>
+<li><a href="../round-10/">R10. 리서치 보고서</a></li>
+<li><a href="../round-11/">R11. 퀀트 브릿지</a></li>
+<li><a href="../round-12/">R12. 캡스톤</a></li>
+</ul>
+</div>
+<div class="nav-section">
+<div class="nav-section-title">This Lecture</div>
+<ul class="nav-list">
+<li><a href="#ch1">1. 왜 매크로를 보나</a></li>
+<li><a href="#ch2">2. 금리</a></li>
+<li><a href="#ch3">3. 물가</a></li>
+<li><a href="#ch4">4. 환율</a></li>
+<li><a href="#ch5">5. 원자재</a></li>
+<li><a href="#ch6">6. 매크로 → 모델 반영</a></li>
+<li><a href="#ch7">7. 매크로 자료 소스</a></li>
+<li><a href="#quiz">Quiz</a></li>
+<li><a href="#cheatsheet">&#x1F4CB; Cheat Sheet</a></li>
+</ul>
+</div>
+</div>
+<div class="sidebar-footer">Round 8 of 12 &middot; Part III</div>
+</div>
+
+<div class="main-wrapper">
+<div class="container">
+<div class="paper-content">
+
+<div class="paper-header">
+<div class="paper-category">Round 8 / 12</div>
+<h1 class="paper-title">매크로 렌즈 — 금리·환율·물가</h1>
+<div class="paper-subtitle">bottom-up 모델의 추정 전제는 top-down 매크로에서 온다</div>
+<div class="paper-team">Reference: 한국은행 ECOS &middot; 통계청 KOSIS &middot; FRED (St. Louis Fed) &middot; 현직 리서치 매크로 가정 컨벤션</div>
+<div class="progress-bar"><div class="progress-fill" style="width:67%"></div></div>
+<div class="progress-label">Overall Progress: 8/12 Rounds</div>
+</div>
+
+<div class="abstract">
+<div class="abstract-title">이 라운드에서 배우는 것</div>
+<p class="ni">R4~R7에서 우리는 기업 하나를 파고드는 <strong>bottom-up</strong> 모델을 지었다. 매출을 성장률로 밀고, WACC로 할인하고, 멀티플로 비교했다. 그런데 그 <strong>성장률·할인율·멀티플의 숫자는 어디서 왔나?</strong> 대부분 매크로 환경 위에 서 있는 전제다. 금리가 오르면 WACC가 뛰고, 환율이 흔들리면 수출기업 실적이 요동치고, 물가가 마진을 갉아먹는다. 이 라운드에서는:</p>
+<ul>
+<li>애널리스트가 <strong>왜 매크로를 봐야 하는가</strong> — 추정의 전제가 매크로에서 온다는 감각</li>
+<li><strong>금리</strong> — 정책금리 vs 시장금리, 수익률 곡선(정상/역전), 금리가 밸류에이션에 침투하는 경로</li>
+<li><strong>물가</strong> — CPI/PPI, 인플레이션이 매출·비용·마진에 미치는 <strong>비대칭</strong> 영향과 가격전가력</li>
+<li><strong>환율</strong> — 수출/수입기업의 통화 미스매치와 환헤지, 실적 민감도 계산</li>
+<li><strong>원자재</strong> — 유가·금속·곡물이 원가에 미치는 영향, 스프레드 개념</li>
+<li>매크로 변수를 <strong>가정 시트</strong>에 두고 기본/낙관/비관 <strong>시나리오</strong>로 민감도를 돌리는 법</li>
+</ul>
+<p class="ni"><strong>Keywords:</strong> 정책금리, 수익률 곡선, WACC, CPI, PPI, 가격전가력, 환율 민감도, 통화 미스매치, 환헤지, 정제마진, 시나리오 분석, ECOS, FRED</p>
+</div>
+
+<div class="info">
+<p class="ni"><strong>이 라운드의 위치.</strong> R8은 개별 기업 모델(R4~R6)과 상대가치(R7)를 <strong>거시 환경에 얹는</strong> 다리다. 여기서 매크로를 '가정 시트의 변수'로 다루는 법을 익히면, R9 산업분석에서 산업별 매크로 민감도를 논할 때 그대로 이어진다. 완전히 새로운 모델을 짓는 게 아니라, <strong>이미 지은 모델에 매크로 렌즈를 씌우는</strong> 라운드다.</p>
+</div>
+
+<!-- ═══════════════════════════════════════════ CH1 ═══════════════════════════════════════════ -->
+
+<h2 id="ch1">1. 왜 애널리스트가 매크로를 보나</h2>
+
+<p>초심자는 매크로를 '이코노미스트의 영역'으로 밀어둔다. GDP 성장률, 금통위 결정, 환율 전망 — 저건 거시 담당이 하는 거고, 나는 기업만 파면 된다고 생각한다. 절반은 맞고 절반은 틀리다.</p>
+
+<p class="ni">애널리스트가 매크로를 <strong>예측</strong>할 필요는 없다. 그건 이코노미스트의 일이고, 사실 아무도 잘 못 맞힌다. 하지만 애널리스트는 매크로를 <strong>전제로 소화</strong>해야 한다. 왜냐하면 당신이 모델에 넣은 거의 모든 핵심 숫자가 매크로 위에 서 있기 때문이다.</p>
+
+<div class="def">
+<p class="ni"><strong>&#x1F511; 핵심 통찰 — bottom-up은 top-down 위에 선다.</strong> 당신이 "이 회사 매출이 내년 8% 성장한다"고 쓸 때, 그 8%는 진공에서 나온 게 아니다. 명목 GDP 성장률(실질 성장 + 물가) + 그 회사의 시장점유율 변화가 녹아 있다. 할인율 <code>WACC=9%</code>를 쓸 때, 그 안엔 무위험금리(국채금리)라는 매크로 변수가 박혀 있다. <strong>bottom-up 모델의 전제 숫자를 뒤집으면 거기엔 항상 매크로가 있다.</strong></p>
+</div>
+
+<p class="ni">구체적으로 재무모델의 어떤 셀이 매크로에서 오는지 보자.</p>
+
+<div class="tc">Table 1.1. 모델의 전제 숫자 ← 매크로 변수</div>
+<table>
+<tr><th style="width:34%">모델 안의 가정</th><th style="width:36%">뒤에 숨은 매크로 변수</th><th style="width:30%">배운 라운드</th></tr>
+<tr><td>매출 성장률</td><td>명목 GDP(실질성장+물가), 소비/설비투자</td><td>R4~R5</td></tr>
+<tr><td>판가 인상률</td><td>CPI(소비자물가), 가격전가력</td><td>R5</td></tr>
+<tr><td>원가율(COGS)</td><td>PPI(생산자물가), 원자재 가격, 환율</td><td>R5</td></tr>
+<tr><td>WACC의 무위험금리</td><td>국채금리(시장금리)</td><td>R6</td></tr>
+<tr><td>이자비용</td><td>정책금리 → 조달금리</td><td>R4~R5</td></tr>
+<tr><td>수출/수입 손익</td><td>환율(USD/KRW 등)</td><td>R5</td></tr>
+</table>
+
+<div class="warn">
+<p class="ni"><strong>흔한 함정 — 매크로를 '숨은 상수'로 두는 것.</strong> 초심자 모델은 매크로 전제를 명시하지 않고 각 셀에 슬쩍 녹여 버린다. 성장률 8%, 원가율 62%, WACC 9%가 <strong>왜</strong> 그 숫자인지 모델 어디에도 안 적혀 있다. 그러면 금리가 1%p 오르는 시나리오를 물었을 때 어느 셀을 바꿔야 할지 모른다. 이 라운드의 목표는 매크로를 <strong>가정 시트의 명시적 변수</strong>로 끌어내는 것이다.</p>
+</div>
+
+<!-- ═══════════════════════════════════════════ CH2 ═══════════════════════════════════════════ -->
+
+<h2 id="ch2">2. 금리 — 밸류에이션에 침투하는 가장 강한 변수</h2>
+
+<p>매크로 변수 중 밸류에이션에 가장 직접적으로 꽂히는 건 금리다. 왜냐하면 밸류에이션의 정의 자체가 '미래 현금흐름을 <strong>할인율로 나눈 현재가치</strong>'이고, 그 할인율의 뿌리가 금리이기 때문이다.</p>
+
+<h3>2.1 정책금리 vs 시장금리</h3>
+
+<p class="ni">금리는 하나가 아니다. 실무에서 헷갈리는 두 층위를 먼저 구분하자.</p>
+
+<div class="tc">Table 2.1. 정책금리 vs 시장금리</div>
+<table>
+<tr><th style="width:22%">구분</th><th style="width:38%">정책금리 (기준금리)</th><th style="width:40%">시장금리</th></tr>
+<tr><td>결정 주체</td><td>중앙은행(한국은행 금통위)</td><td>채권시장의 수급</td></tr>
+<tr><td>대표 예</td><td>한은 기준금리, 미 연준 FFR</td><td>국고채 3년/10년, 회사채, CD금리</td></tr>
+<tr><td>성격</td><td>초단기, 정책 신호</td><td>만기별로 다름, 미래 기대 반영</td></tr>
+<tr><td>모델 쓰임</td><td>조달금리(이자비용)의 기준</td><td>WACC의 무위험금리, 할인율</td></tr>
+</table>
+
+<p class="ni">정책금리는 중앙은행이 '점'으로 정하는 초단기 금리다. 반면 시장금리는 만기별로 달라지는 <strong>곡선</strong>이다. 중앙은행이 기준금리를 올려도 10년 국채금리가 반드시 같이 오르는 건 아니다 — 시장은 '앞으로의 금리 경로'를 미리 반영하기 때문이다.</p>
+
+<h3>2.2 수익률 곡선 — 정상 vs 역전</h3>
+
+<p class="ni">만기별 시장금리를 이어 그린 선을 <strong>수익률 곡선(yield curve)</strong>이라 한다. 보통은 만기가 길수록 금리가 높다(장기 리스크 프리미엄). 이걸 <strong>정상(우상향)</strong>이라 부른다.</p>
+
+<div class="def">
+<p class="ni"><strong>&#x1F511; 장단기 금리 역전(inverted curve).</strong> 단기금리가 장기금리보다 <strong>높아지는</strong> 현상. 대개 "중앙은행이 지금은 금리를 높여 놨지만, 경기가 나빠져 곧 내릴 것"이라는 시장의 예상을 뜻한다. 역사적으로 미 국채 10년-2년 스프레드가 마이너스로 꺾이면 <strong>경기 침체의 선행 신호</strong>로 읽혀 왔다. 애널리스트는 이걸 '전망'으로 삼기보다, 자기 모델의 성장 가정이 시장 기대와 어긋나지 않는지 <strong>점검하는 거울</strong>로 쓴다.</p>
+</div>
+
+<h3>2.3 금리가 밸류에이션에 침투하는 경로</h3>
+
+<p class="ni">금리 상승이 기업가치를 어떻게 갉아먹는지, 경로를 분해해 보자.</p>
+
+<pre><span class="cm"># 경로 1: 할인율(WACC) 상승 → 현재가치 하락</span>
+WACC = 자기자본비용 &times; E/(D+E) + 세후부채비용 &times; D/(D+E)
+자기자본비용 = <span class="nb">무위험금리(국채)</span> + 베타 &times; 시장위험프리미엄
+                 &uarr; 금리 오르면 여기가 뛴다
+
+<span class="cm"># 경로 2: 이자비용 증가 → 순이익 하락 (부채 많은 기업)</span>
+이자비용 = 차입금 &times; <span class="nb">조달금리</span>
+              &uarr; 정책금리 따라 오른다</pre>
+
+<p class="ni"><strong>경로 1(할인율)</strong>은 모든 기업에 작동한다. 특히 <strong>먼 미래의 현금흐름 비중이 큰 성장주</strong>가 금리에 민감하다. 이익의 대부분이 5년, 10년 뒤에 있는 회사는 할인율이 조금만 올라도 현재가치가 크게 깎인다. 반대로 지금 당장 이익을 내는 가치주는 덜 민감하다.</p>
+
+<div class="eq">
+\[ PV = \sum_{t=1}^{n} \frac{FCF_t}{(1+WACC)^t} \quad\Rightarrow\quad WACC\uparrow \;\Rightarrow\; PV\downarrow \]
+</div>
+
+<p class="ni"><strong>경로 2(이자비용)</strong>는 부채가 많은 기업(고레버리지)과 은행·보험 같은 금융업에 직접 꽂힌다. 다만 방향은 업종마다 다르다.</p>
+
+<div class="tc">Table 2.2. 금리 상승의 업종별 민감도</div>
+<table>
+<tr><th style="width:26%">업종/유형</th><th style="width:20%">방향</th><th style="width:54%">이유</th></tr>
+<tr><td>고성장 성장주</td><td>피해 (강)</td><td>먼 미래 현금흐름 → 할인율에 민감</td></tr>
+<tr><td>고부채 기업</td><td>피해</td><td>이자비용 증가로 순이익 압박</td></tr>
+<tr><td>은행</td><td>수혜 (통상)</td><td>예대마진(NIM) 확대 — 대출금리가 예금금리보다 빨리 오름</td></tr>
+<tr><td>보험</td><td>수혜</td><td>보유 채권 재투자 수익률 상승</td></tr>
+<tr><td>배당/리츠</td><td>피해</td><td>채권과 경쟁 — 금리 오르면 상대매력 하락</td></tr>
+</table>
+
+<div class="task">
+<div class="task-title">&#x1F3AF; 손 풀기 1</div>
+<p class="ni">R6에서 만든 DCF 모델을 열어라. 무위험금리 가정 셀을 찾아 현재 값에서 <strong>+1%p</strong> 올려 보라(예: 3.5% → 4.5%). WACC가 얼마나 뛰고, 목표주가(현재가치)가 몇 % 빠지는지 기록하라. 이 한 번의 실험이 "왜 금리가 밸류에이션의 왕인가"를 몸으로 알려준다.</p>
+</div>
+
+<!-- ═══════════════════════════════════════════ CH3 ═══════════════════════════════════════════ -->
+
+<h2 id="ch3">3. 물가 — 매출과 비용을 비대칭으로 흔든다</h2>
+
+<p>인플레이션은 초심자가 '나쁜 것' 하나로 뭉뚱그리기 쉽지만, 기업 손익 안에서는 <strong>매출과 비용을 서로 다른 속도로</strong> 흔든다. 이 비대칭을 읽는 게 핵심이다.</p>
+
+<h3>3.1 CPI와 PPI — 어느 쪽을 봐야 하나</h3>
+
+<div class="tc">Table 3.1. CPI vs PPI</div>
+<table>
+<tr><th style="width:20%">지표</th><th style="width:30%">뭘 측정하나</th><th style="width:50%">모델에서 대응하는 항목</th></tr>
+<tr><td>CPI<br>(소비자물가)</td><td>소비자가 사는 최종재 가격</td><td>기업의 <strong>판가</strong> 인상 여력(매출 방향)</td></tr>
+<tr><td>PPI<br>(생산자물가)</td><td>기업이 사는 원자재·중간재 가격</td><td>기업의 <strong>원가</strong> 상승(COGS 방향)</td></tr>
+</table>
+
+<p class="ni">직관적으로 <strong>PPI는 비용에, CPI는 매출에</strong> 대응한다고 보면 된다. 그래서 "PPI가 CPI보다 빠르게 오른다"는 건 원가가 판가보다 빨리 오른다는 뜻 — <strong>마진 압박</strong> 신호다. 반대로 CPI가 PPI를 앞서면 판가 전가가 원가 상승을 넘어 마진이 벌어진다.</p>
+
+<h3>3.2 인플레이션의 비대칭 영향</h3>
+
+<div class="def">
+<p class="ni"><strong>&#x1F511; 가격전가력(pricing power).</strong> 원가가 올랐을 때 그만큼(또는 그 이상)을 판가에 얹어 소비자에게 넘길 수 있는 힘. 이게 인플레 국면에서 기업을 가르는 결정적 능력이다. 브랜드가 강하거나(명품·필수소비재), 대체재가 없거나(독과점), 계약에 물가연동 조항이 있는 기업은 전가력이 높다. 반대로 범용재를 파는 기업은 원가만 오르고 판가는 못 올려 마진이 짓눌린다.</p>
+</div>
+
+<p class="ni">같은 인플레이션 국면이라도 결과가 극과 극이다.</p>
+
+<div class="tc">Table 3.2. 인플레이션 하 마진의 향방</div>
+<table>
+<tr><th style="width:28%">기업 유형</th><th style="width:24%">판가 전가</th><th style="width:48%">마진 결과</th></tr>
+<tr><td>전가력 강 (필수소비재·브랜드)</td><td>원가 이상 전가</td><td>마진 <strong>방어 또는 확대</strong></td></tr>
+<tr><td>전가력 약 (범용 제조·경쟁 심함)</td><td>전가 지연/불가</td><td>마진 <strong>축소</strong> (원가만 상승)</td></tr>
+<tr><td>고정가 장기계약</td><td>전가 불가(계약기간)</td><td>단기 마진 <strong>타격</strong></td></tr>
+</table>
+
+<div class="info">
+<p class="ni"><strong>&#x1F525; 실전 질문.</strong> 인플레이션 종목을 볼 때 애널리스트가 던지는 첫 질문은 "이 회사는 원가 상승분을 <strong>얼마나 빨리, 얼마나 많이</strong> 판가로 넘길 수 있나?"다. 과거 인플레 국면에서 이 회사의 매출총이익률(GPM)이 어떻게 움직였는지 R5 모델의 히스토리로 확인하면 전가력의 실증 증거가 나온다.</p>
+</div>
+
+<!-- ═══════════════════════════════════════════ CH4 ═══════════════════════════════════════════ -->
+
+<h2 id="ch4">4. 환율 — 수출입 기업의 손익을 가르는 축</h2>
+
+<p>한국은 수출 중심 경제라 환율의 실적 영향이 유난히 크다. 원화가 약해지면(환율 상승, USD/KRW ↑) 수출기업이 웃고, 강해지면 수입기업이 웃는다 — 이 기본 방향부터 잡자.</p>
+
+<h3>4.1 수출기업 vs 수입기업</h3>
+
+<div class="tc">Table 4.1. 원화 약세(환율 상승) 시 손익</div>
+<table>
+<tr><th style="width:26%">유형</th><th style="width:20%">방향</th><th style="width:54%">이유</th></tr>
+<tr><td>수출기업<br>(자동차·조선·IT)</td><td>수혜</td><td>달러로 받은 매출을 원화로 환산 시 증가</td></tr>
+<tr><td>수입기업<br>(항공·정유원료·유통)</td><td>피해</td><td>달러로 사는 원료·연료 원가가 원화 기준 상승</td></tr>
+<tr><td>외화부채 보유</td><td>피해</td><td>달러 빚의 원화 환산액 증가(외화환산손실)</td></tr>
+</table>
+
+<h3>4.2 통화 미스매치 — 매출과 원가의 통화가 다를 때</h3>
+
+<div class="def">
+<p class="ni"><strong>&#x1F511; 통화 미스매치(currency mismatch).</strong> 매출을 받는 통화와 원가를 치르는 통화가 다르면, 환율 변동이 마진을 직접 흔든다. 예컨대 원유를 달러로 사서(원가=USD) 제품을 원화로 파는(매출=KRW) 기업은, 환율이 오르면 원가만 오르고 매출은 그대로라 <strong>마진이 짓눌린다</strong>. 반대로 부품을 원화로 사서(원가=KRW) 완제품을 달러로 파는(매출=USD) 수출기업은 환율 상승이 <strong>순수 수혜</strong>다. 미스매치의 방향을 봐야 수혜/피해가 갈린다.</p>
+</div>
+
+<h3>4.3 환헤지와 실적 민감도 계산</h3>
+
+<p class="ni">기업은 환율 변동 위험을 <strong>환헤지</strong>(선물환·통화옵션 등)로 줄이기도 한다. 헤지 비율이 높으면 환율이 움직여도 실적 영향이 작다 — 그래서 애널리스트는 "이 회사 환헤지 비율이 몇 %냐"를 사업보고서에서 확인한다. 헤지가 없다고 가정하면, 환율 민감도는 간단한 곱셈이다.</p>
+
+<pre><span class="cm"># 환율 민감도 예시 — 수출기업 A</span>
+연간 달러 매출        = $2,000M   (달러로 받는 수출)
+연간 달러 원가        = $1,200M   (달러로 사는 원자재)
+순 달러 노출(net)     = $800M     (매출 - 원가)
+
+<span class="cm"># 환율이 1,300 → 1,350 (원화 50원 약세, +3.8%)</span>
+환율 변동 = +50원/달러
+영업이익 영향 = 순노출 &times; 환율변동
+             = $800M &times; 50원 = <span class="nu">+40,000백만원 (+400억)</span></pre>
+
+<div class="info">
+<p class="ni"><strong>&#x1F525; 순노출(net exposure)이 핵심.</strong> 환율 민감도는 <strong>매출 노출이 아니라 순노출</strong>(달러 매출 − 달러 원가)로 계산해야 한다. 달러 매출이 아무리 커도 달러 원가가 그만큼 크면 순노출이 작아 환율 영향이 미미하다. 흔한 실수가 매출 노출만 보고 "환율 수혜주"라 부르는 것 — 원가 쪽 달러 노출을 빼먹으면 민감도를 과대평가한다.</p>
+</div>
+
+<div class="task">
+<div class="task-title">&#x1F3AF; 손 풀기 2</div>
+<p class="ni">위 예시를 엑셀에 옮겨라. 순노출을 가정 셀로 두고(<code>$C$2</code>), 환율변동(원)을 가로로 <code>-100, -50, 0, +50, +100</code>으로 나열한 뒤 <code>=순노출*환율변동</code>을 <span class="kbd">Ctrl</span>+<span class="kbd">R</span>로 채워라(순노출은 절대참조 F4 고정). 환율 시나리오별 영업이익 영향이 한 줄로 펼쳐진다 — 이게 4장 실적 민감도 표다.</p>
+</div>
+
+<!-- ═══════════════════════════════════════════ CH5 ═══════════════════════════════════════════ -->
+
+<h2 id="ch5">5. 원자재 — 원가 사슬의 최상류</h2>
+
+<p>원자재는 PPI(생산자물가)의 뿌리이자, 특정 산업 원가의 절대적 결정 요인이다. 유가·금속·곡물이 대표 3축이다.</p>
+
+<div class="tc">Table 5.1. 원자재별 연동 산업</div>
+<table>
+<tr><th style="width:24%">원자재</th><th style="width:38%">연동 산업</th><th style="width:38%">영향 경로</th></tr>
+<tr><td>유가(원유)</td><td>정유·화학·항공·해운</td><td>정유 원료, 화학 납사 원가, 연료비</td></tr>
+<tr><td>금속(구리·철광석·알루미늄)</td><td>철강·전선·건설·전기차</td><td>제조 원자재 직접 투입</td></tr>
+<tr><td>곡물(밀·옥수수·대두)</td><td>식품·사료·음식료</td><td>원재료비, 판가 전가 여부가 관건</td></tr>
+</table>
+
+<h3>5.1 스프레드 — 원가와 판가의 차이가 마진이다</h3>
+
+<div class="def">
+<p class="ni"><strong>&#x1F511; 스프레드(spread).</strong> 원자재 연동 산업에서 이익의 본질은 원자재 절대가격이 아니라 <strong>제품가 − 원료가의 차이(마진 스프레드)</strong>다. 정유의 <strong>정제마진(crack spread)</strong> = 석유제품 가격 − 원유 가격, 화학의 <strong>납사 스프레드</strong> = 화학제품 가격 − 납사 가격이 대표적. 유가가 올라도 제품가가 그 이상 오르면 스프레드가 벌어져 정유사는 오히려 좋아진다. <strong>절대가격이 아니라 스프레드를 봐라</strong>가 원자재 산업의 제1원칙이다.</p>
+</div>
+
+<pre><span class="cm"># 정제마진(crack spread) 개념</span>
+정제마진 = 석유제품 판매가 - 원유 도입가 - 정제비용
+            &uarr; 이 스프레드가 정유사 이익의 핵심
+
+<span class="cm"># 유가가 올라도...</span>
+Case A: 제품가가 원유가보다 더 오름 → 스프레드 &uarr; → 정유사 <span class="nu">수혜</span>
+Case B: 제품가가 원유가만큼 못 오름 → 스프레드 &darr; → 정유사 <span class="nb">피해</span></pre>
+
+<div class="warn">
+<p class="ni"><strong>재고평가 효과 주의.</strong> 원자재 가격이 급변하면 <strong>재고자산평가</strong>에서 일회성 손익이 튄다. 유가가 급등하면 싸게 사둔 원유 재고에 평가이익(재고 관련 이익)이 잡혀 일시적으로 이익이 부풀고, 급락하면 평가손실이 난다. 이건 영업의 본질이 아닌 <strong>일회성</strong>이므로, 추세 판단 시엔 걸러내야 한다(R7의 정상화 이익 개념과 연결).</p>
+</div>
+
+<!-- ═══════════════════════════════════════════ CH6 ═══════════════════════════════════════════ -->
+
+<h2 id="ch6">6. 매크로 → 모델 반영 — 가정 시트와 시나리오</h2>
+
+<p>이제 배운 걸 R4~R6 모델에 실제로 꽂는다. 핵심 원칙은 하나 — <strong>매크로 변수를 가정 시트의 명시적 셀로 끌어내고, 시나리오로 돌린다.</strong></p>
+
+<h3>6.1 매크로 가정 블록 만들기</h3>
+
+<p class="ni">R0에서 배운 '가정은 한 곳에 모아 절대참조로 문다'를 매크로에 그대로 적용한다. 모델 가정 시트 상단에 <strong>매크로 블록</strong>을 따로 둔다.</p>
+
+<pre><span class="cm"># 가정 시트 — 매크로 블록 (한 곳에 모아 절대참조로 물기)</span>
+              B(기본)   C(낙관)   D(비관)
+2  명목성장률   4.0%     6.0%     1.5%
+3  무위험금리   3.5%     3.0%     5.0%
+4  USD/KRW    1,350    1,280    1,450
+5  유가($/bbl)  80       70       110
+6  CPI(판가)    3.0%     2.5%     5.0%
+
+<span class="cm"># 본문 모델은 이 셀들을 절대참조로 물어간다</span>
+매출[t] = 매출[t-1] * (1 + <span class="nb">$B$2</span>)      <span class="cm"># 명목성장률</span>
+WACC   = <span class="nb">$B$3</span> + 베타 * MRP           <span class="cm"># 무위험금리</span></pre>
+
+<div class="ok">
+<p class="ni"><strong>왜 이렇게 하나.</strong> 매크로를 이렇게 한 블록에 모아두면, 시나리오를 바꾸는 게 셀 몇 개를 갈아끼우는 일로 끝난다. 금리를 5%로 올린 비관 시나리오를 물었을 때 <code>$B$3</code> 하나만 바꾸면 WACC·목표주가가 모델 전체에서 동시에 갱신된다. R0에서 익힌 <span class="kbd">Ctrl</span>+<span class="kbd">[</span> 로 목표주가에서 거슬러 올라가면 결국 이 매크로 블록에 닿아야 정상이다.</p>
+</div>
+
+<h3>6.2 시나리오 — 기본/낙관/비관</h3>
+
+<p class="ni">매크로는 못 맞히니, <strong>한 점을 찍지 말고 범위로</strong> 다룬다. 기본(base)·낙관(bull)·비관(bear) 세 시나리오로 각 매크로 변수를 세팅하고, 목표주가가 어떻게 벌어지는지 본다.</p>
+
+<div class="tc">Table 6.1. 시나리오 매트릭스 (예시)</div>
+<table>
+<tr><th style="width:28%">변수</th><th style="width:24%">비관(Bear)</th><th style="width:24%">기본(Base)</th><th style="width:24%">낙관(Bull)</th></tr>
+<tr><td>명목 성장률</td><td>1.5%</td><td>4.0%</td><td>6.0%</td></tr>
+<tr><td>무위험금리(→WACC)</td><td>5.0%</td><td>3.5%</td><td>3.0%</td></tr>
+<tr><td>USD/KRW</td><td>1,450</td><td>1,350</td><td>1,280</td></tr>
+<tr><td>→ 목표주가</td><td>70,000</td><td>100,000</td><td>125,000</td></tr>
+</table>
+
+<p class="ni">이 표가 리서치 보고서(R10)의 '시나리오 밸류에이션' 섹션 그대로다. 목표주가를 한 숫자로 던지지 않고, "비관 7만 ~ 기본 10만 ~ 낙관 12.5만"으로 범위를 제시하면 훨씬 정직하고 설득력 있다.</p>
+
+<h3>6.3 민감도(감응도) 표 — 데이터 표로 자동화</h3>
+
+<p class="ni">시나리오가 이산적 세 점이라면, <strong>민감도 표</strong>는 연속적으로 훑는다. 엑셀의 <strong>데이터 표(What-If)</strong>로 "금리 &times; 성장률" 격자를 자동 계산해 목표주가가 어느 조합에서 얼마인지를 한 판에 펼친다.</p>
+
+<div class="keyseq">
+<span class="grp"><span class="note">목표주가 셀을 좌상단에 두고 격자 만든 뒤 범위 선택</span> <span class="arrow">→</span> <span class="k">Alt</span> <span class="k">A</span> <span class="k">W</span> <span class="k">T</span> <span class="note">데이터 표</span> <span class="arrow">→</span> <span class="note">행/열 입력 셀 지정</span> <span class="arrow">→</span> <span class="k">Enter</span></span>
+</div>
+
+<div class="paper-anchor">
+<div class="pa-label">Macro Anchor · 모델 가정 시트</div>
+<div class="pa-title">매크로 변수 → 가정 시트 명시화 → 시나리오/민감도</div>
+<p>이 라운드의 모든 개념은 <strong>모델 가정 시트의 매크로 블록</strong>으로 수렴한다. 금리·환율·물가·원자재를 각각 하나의 절대참조 셀로 끌어내고(6.1), 그 위에 기본/낙관/비관 시나리오(6.2)와 데이터 표 민감도(6.3)를 얹는다. R4~R6에서 지은 3-statement·DCF 모델이 이 매크로 블록을 물고 있어야, 매크로가 바뀔 때 목표주가가 <strong>살아 움직인다</strong>. R10 보고서의 '시나리오 밸류에이션'이 바로 이 시트에서 나온다.</p>
+</div>
+
+<!-- ═══════════════════════════════════════════ CH7 ═══════════════════════════════════════════ -->
+
+<h2 id="ch7">7. 매크로 자료는 어디서 구하나</h2>
+
+<p>마지막으로 실전 데이터 소스. 매크로 변수는 아래 공식 통계 사이트에서 무료로 받는다. 유료 단말(블룸버그·리피니티브)이 없어도 여기면 충분하다.</p>
+
+<div class="tc">Table 7.1. 핵심 매크로 자료 소스</div>
+<table>
+<tr><th style="width:22%">소스</th><th style="width:26%">제공 기관</th><th style="width:52%">받을 수 있는 데이터</th></tr>
+<tr><td>ECOS</td><td>한국은행</td><td>기준금리, 시장금리, 환율, 통화량 등 한국 거시통계 총망라</td></tr>
+<tr><td>KOSIS</td><td>통계청</td><td>CPI/PPI, GDP, 산업생산, 고용 등 국가통계</td></tr>
+<tr><td>FRED</td><td>세인트루이스 연준</td><td>미국·글로벌 금리, 유가, 환율 시계열 (영어, API 강력)</td></tr>
+</table>
+
+<div class="info">
+<p class="ni"><strong>&#x1F4E1; ECOS &amp; FRED 실전 팁.</strong> 둘 다 API를 열어둬서, R11(퀀트 브릿지)에서 파이썬으로 시계열을 자동으로 끌어올 수 있다. 지금 단계에서는 웹에서 필요한 계열(예: 국고채 3년, USD/KRW)을 CSV로 내려받아 가정 시트 옆에 붙여두는 것으로 충분하다. <strong>ECOS = 한국, FRED = 미국/글로벌</strong>로 기억하면 대부분 커버된다.</p>
+</div>
+
+<div class="ok">
+<p class="ni"><strong>정리.</strong> 이 라운드에서 매크로를 '예측 대상'이 아니라 <strong>모델 가정의 명시적 변수</strong>로 다루는 법을 익혔다. 금리는 할인율·이자비용으로, 물가는 판가·원가로, 환율은 순노출로, 원자재는 스프레드로 모델에 꽂힌다. 이 렌즈를 끼면 다음 라운드 <strong>R9 산업분석</strong>에서 "이 산업은 어떤 매크로에 민감한가"를 자연스럽게 논할 수 있다.</p>
+</div>
+
+<!-- ═══════════════════════════════════════════ QUIZ ═══════════════════════════════════════════ -->
+
+<h2 id="quiz">Quiz — 셀프 체크 10문항</h2>
+
+<details class="quiz-item"><summary>Q1. "bottom-up 모델도 top-down 전제 위에 선다"는 말의 뜻은?</summary>
+<div class="answer">개별 기업 모델의 핵심 가정(매출 성장률, 할인율 등)은 진공에서 나온 게 아니라 매크로 환경(명목 GDP, 국채금리 등)을 전제로 깔고 있다는 뜻. 애널리스트는 매크로를 예측할 필요는 없지만 전제로 소화해야 한다.</div></details>
+
+<details class="quiz-item"><summary>Q2. 정책금리와 시장금리의 차이는? 각각 모델의 어디에 쓰이나?</summary>
+<div class="answer">정책금리(기준금리)는 중앙은행이 정하는 초단기 금리로 조달금리(이자비용)의 기준. 시장금리는 만기별 채권시장 금리로, 국고채 금리가 WACC의 무위험금리(할인율)에 쓰인다.</div></details>
+
+<details class="quiz-item"><summary>Q3. 장단기 금리 역전(inverted yield curve)이 무엇이고 왜 주목하나?</summary>
+<div class="answer">단기금리가 장기금리보다 높아지는 현상. "지금은 금리가 높지만 경기 악화로 곧 내릴 것"이란 시장 기대를 뜻하며, 역사적으로 경기 침체의 선행 신호로 읽힌다. 자기 모델의 성장 가정을 점검하는 거울로 쓴다.</div></details>
+
+<details class="quiz-item"><summary>Q4. 금리가 오를 때 왜 고성장 성장주가 가치주보다 더 타격을 받나?</summary>
+<div class="answer">성장주는 이익의 대부분이 먼 미래(5~10년 뒤)에 있어, 할인율(WACC)이 조금만 올라도 그 먼 현금흐름의 현재가치가 크게 깎인다. 지금 당장 이익을 내는 가치주는 할인 기간이 짧아 덜 민감하다.</div></details>
+
+<details class="quiz-item"><summary>Q5. CPI와 PPI는 각각 기업 손익의 어느 쪽(매출/비용)에 대응하나? PPI가 CPI보다 빨리 오르면?</summary>
+<div class="answer">CPI(소비자물가)는 판가(매출), PPI(생산자물가)는 원가(COGS)에 대응. PPI가 CPI보다 빨리 오르면 원가가 판가보다 빨리 올라 마진이 압박받는다.</div></details>
+
+<details class="quiz-item"><summary>Q6. 가격전가력(pricing power)이란? 어떤 기업이 높나?</summary>
+<div class="answer">원가 상승분을 판가에 얹어 소비자에게 넘길 수 있는 힘. 브랜드가 강하거나(필수소비재), 대체재가 없거나(독과점), 물가연동 계약이 있는 기업이 높다. 인플레 국면에서 마진을 방어하는 결정적 능력.</div></details>
+
+<details class="quiz-item"><summary>Q7. 환율 민감도를 계산할 때 매출 노출이 아니라 순노출(net exposure)을 써야 하는 이유는?</summary>
+<div class="answer">달러 매출이 커도 달러 원가가 그만큼 크면 환율 영향이 상쇄된다. 순노출 = 달러 매출 − 달러 원가. 매출 노출만 보면 통화 미스매치를 놓쳐 민감도를 과대평가하게 된다.</div></details>
+
+<details class="quiz-item"><summary>Q8. 통화 미스매치가 어떤 기업에 불리하게 작용하는지 예를 들어라.</summary>
+<div class="answer">원료를 달러로 사서(원가=USD) 제품을 원화로 파는(매출=KRW) 기업. 환율이 오르면 원가만 오르고 매출은 그대로라 마진이 짓눌린다. 반대로 원화 원가·달러 매출 구조의 수출기업은 환율 상승이 순수 수혜.</div></details>
+
+<details class="quiz-item"><summary>Q9. 원자재 연동 산업에서 "절대가격이 아니라 스프레드를 보라"는 원칙을 정유업으로 설명하라.</summary>
+<div class="answer">정유사 이익의 본질은 정제마진(crack spread) = 석유제품가 − 원유가 − 정제비용. 유가가 올라도 제품가가 그 이상 오르면 스프레드가 벌어져 오히려 수혜. 원유 절대가격이 아니라 제품가와의 차이가 마진을 결정한다.</div></details>
+
+<details class="quiz-item"><summary>Q10. 매크로를 모델에 반영하는 올바른 방법은? 왜 시나리오(기본/낙관/비관)로 다루나?</summary>
+<div class="answer">매크로 변수를 가정 시트의 명시적 셀로 끌어내 절대참조로 물고, 본문 모델이 이를 참조하게 한다. 매크로는 정확히 못 맞히므로 한 점이 아니라 기본/낙관/비관 범위로 다뤄 목표주가를 범위로 제시하는 것이 정직하고 설득력 있다.</div></details>
+
+<!-- ═══════════════════════════════════════════ CHEAT SHEET ═══════════════════════════════════════════ -->
+
+<h2 id="cheatsheet">&#x1F4CB; Cheat Sheet — 매크로 변수 → 기업 영향 요약표</h2>
+
+<div class="tc">Table C.1. 매크로 상승 시 수혜·피해 (핵심 요약)</div>
+<table>
+<tr><th style="width:16%">변수</th><th style="width:30%">모델 침투 경로</th><th style="width:27%">수혜</th><th style="width:27%">피해</th></tr>
+<tr><td>금리 &uarr;</td><td>WACC↑(할인율), 이자비용↑</td><td>은행(NIM), 보험</td><td>성장주, 고부채, 리츠·배당</td></tr>
+<tr><td>환율 &uarr;<br>(원화 약세)</td><td>수출 매출 환산↑, 수입 원가↑</td><td>수출(자동차·조선·IT)</td><td>수입(항공·정유원료), 외화부채</td></tr>
+<tr><td>물가 &uarr;<br>(인플레)</td><td>CPI→판가, PPI→원가</td><td>전가력 강(브랜드·필수소비재)</td><td>전가력 약(범용 제조)</td></tr>
+<tr><td>유가 &uarr;</td><td>정제·납사 스프레드, 연료비</td><td>정유·화학(스프레드↑ 시)</td><td>항공·해운(연료비↑)</td></tr>
+<tr><td>금속·곡물 &uarr;</td><td>제조·식품 원재료비↑</td><td>자원 보유·상류 기업</td><td>철강·건설·식품(전가 지연 시)</td></tr>
+</table>
+
+<div class="tc">Table C.2. 지표 &amp; 개념 빠른 참조</div>
+<table>
+<tr><th style="width:30%">용어</th><th style="width:70%">한 줄 정의</th></tr>
+<tr><td>정책금리 vs 시장금리</td><td>중앙은행이 정하는 초단기 vs 만기별 시장 결정 금리</td></tr>
+<tr><td>수익률 곡선 역전</td><td>단기금리 &gt; 장기금리 → 경기 침체 선행 신호</td></tr>
+<tr><td>CPI / PPI</td><td>소비자물가(→판가) / 생산자물가(→원가)</td></tr>
+<tr><td>가격전가력</td><td>원가 상승을 판가로 넘기는 힘 → 인플레 마진 방어</td></tr>
+<tr><td>순노출(net exposure)</td><td>달러 매출 − 달러 원가 → 환율 민감도의 기준</td></tr>
+<tr><td>스프레드(정제마진 등)</td><td>제품가 − 원료가 → 원자재 산업 이익의 본질</td></tr>
+</table>
+
+<div class="tc">Table C.3. 모델 반영 &amp; 자료 소스</div>
+<table>
+<tr><th style="width:34%">항목</th><th style="width:66%">요령</th></tr>
+<tr><td>매크로 가정 블록</td><td>가정 시트 상단에 모아 절대참조($)로 물기</td></tr>
+<tr><td>시나리오</td><td>기본/낙관/비관 3점 → 목표주가 범위 제시</td></tr>
+<tr><td>민감도 표</td><td><span class="kbd">Alt</span> A W T 데이터 표로 격자 자동 계산</td></tr>
+<tr><td>ECOS</td><td>한국은행 — 금리·환율·통화 (한국)</td></tr>
+<tr><td>KOSIS</td><td>통계청 — CPI/PPI·GDP·고용</td></tr>
+<tr><td>FRED</td><td>세인트루이스 연준 — 미국/글로벌 시계열</td></tr>
+</table>
+
+<div class="nav-footer">
+<a href="../round-07/"><span class="nf-label">&larr; Previous</span>R7. 상대가치 실전</a>
+<a href="../round-09/" style="text-align:right"><span class="nf-label">Next &rarr;</span>R9. 산업분석</a>
+</div>
+
+</div>
+</div>
+</div>
+
+</body>
+</html>

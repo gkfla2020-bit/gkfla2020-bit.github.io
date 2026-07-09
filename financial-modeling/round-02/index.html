@@ -1,0 +1,444 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Round 2 - DART에서 데이터 캐기 — 원자료 수집·가공 | Financial Modeling Guide</title>
+<script>
+MathJax = { tex: { inlineMath: [['\\(','\\)']], displayMath: [['\\[','\\]'],['$$','$$']] } };
+</script>
+<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;500&family=Space+Mono:wght@400&family=Inter:wght@300;400&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Inter',sans-serif;background:#fafaf8;color:#1a1a1a;line-height:1.7;overflow-x:hidden}
+.sidebar{position:fixed;left:0;top:0;width:260px;height:100vh;background:rgba(255,255,255,.97);border-right:1px solid rgba(0,0,0,.06);padding:32px 24px;z-index:100;overflow-y:auto;display:flex;flex-direction:column}
+.sidebar-profile{text-align:center;margin-bottom:28px;padding-bottom:24px;border-bottom:1px solid rgba(0,0,0,.08)}
+.profile-icon{font-size:48px;margin-bottom:8px}
+.profile-name{font-family:'Cormorant Garamond',serif;font-size:1.3rem;font-weight:500;margin-bottom:4px}
+.profile-title{font-size:.68rem;color:#888;letter-spacing:.08em;text-transform:uppercase;margin-bottom:8px}
+.profile-bio{font-size:.78rem;color:#666;line-height:1.5}
+.sidebar-nav{flex:1;margin-top:16px}.nav-section{margin-bottom:20px}.nav-section-title{font-size:.6rem;font-weight:600;color:#aaa;letter-spacing:.15em;text-transform:uppercase;margin-bottom:10px}.nav-list{list-style:none}.nav-list li{margin-bottom:5px}.nav-list a{font-size:.78rem;color:#555;text-decoration:none;transition:all .2s;display:block;padding:3px 0}.nav-list a:hover{color:#217346;padding-left:4px}.nav-list a.active{color:#217346;font-weight:500}.nav-list a.done{color:#28a745}.badge{display:inline-block;font-size:.5rem;background:#217346;color:#fff;padding:1px 5px;border-radius:8px;margin-left:3px;vertical-align:middle}.badge-done{background:#28a745}.sidebar-footer{padding-top:16px;border-top:1px solid rgba(0,0,0,.06);font-size:.65rem;color:#aaa;text-align:center}
+.main-wrapper{margin-left:260px;min-height:100vh}.container{max-width:1100px;margin:0 auto;padding:50px 40px 80px}
+.paper-content{font-family:'Times New Roman','Nanum Myeongjo',serif;line-height:1.8;background:#fff;padding:40px;border-radius:8px;box-shadow:0 2px 20px rgba(0,0,0,.05)}.paper-header{text-align:center;margin-bottom:40px;padding-bottom:30px;border-bottom:2px solid #333}.paper-category{font-size:14px;color:#666;margin-bottom:10px}.paper-title{font-size:24px;font-weight:bold;margin-bottom:12px;line-height:1.4}.paper-subtitle{font-size:14px;color:#555;margin-bottom:8px}.paper-team{font-size:13px;color:#444}
+.abstract{background:#f8f9fa;padding:25px;margin:30px 0;border-left:4px solid #217346}.abstract-title{font-weight:bold;font-size:16px;margin-bottom:15px}
+h2{font-size:18px;margin:35px 0 20px;padding-bottom:8px;border-bottom:1px solid #ddd;color:#1e4f38}h3{font-size:15px;margin:25px 0 15px;color:#34495e}
+p{text-align:justify;margin-bottom:15px;text-indent:2em}p.ni{text-indent:0}
+table{width:100%;border-collapse:collapse;margin:20px 0;font-size:12px}th,td{border:1px solid #ddd;padding:10px 8px;text-align:center}th{background:#1e4f38;color:white;font-weight:bold}tr:nth-child(even){background:#f8f9fa}tr:hover{background:#eef7f1}
+.tc{font-size:13px;font-weight:bold;margin:15px 0 10px;text-align:center}.eq{text-align:center;margin:20px 0;padding:15px;background:#f8f9fa;border-radius:4px;overflow-x:auto}ul,ol{margin-left:2em;margin-bottom:15px}li{margin-bottom:6px}
+.def{background:#fff9e6;border:1px solid #ffc107;border-radius:4px;padding:20px;margin:20px 0}.info{background:#e8f4f8;border-left:4px solid #3498db;padding:20px;margin:20px 0}.warn{background:#fff3cd;border-left:4px solid #f39c12;padding:20px;margin:20px 0}.ok{background:#d4edda;border-left:4px solid #28a745;padding:20px;margin:20px 0}
+.paper-anchor{background:#ecfdf3;border:1px solid #10b981;border-radius:6px;padding:22px;margin:24px 0}.paper-anchor .pa-label{font-family:'Space Mono',monospace;font-size:10px;color:#047857;letter-spacing:.15em;text-transform:uppercase;margin-bottom:8px}.paper-anchor .pa-title{font-weight:bold;font-size:14px;margin-bottom:6px}.paper-anchor p{font-size:13px;text-indent:0;margin-bottom:8px}
+.task{background:#e8f8f0;border-left:4px solid #00b894;padding:20px;margin:20px 0}.task .task-title{font-weight:bold;margin-bottom:10px}
+details.quiz-item{margin:14px 0;padding:14px 18px;background:#f8f9fa;border:1px solid #e0e0e0;border-radius:6px}details.quiz-item summary{cursor:pointer;font-weight:bold;font-size:13.5px}details.quiz-item[open] summary{margin-bottom:10px;color:#217346}details.quiz-item .answer{font-size:13px;padding:10px 14px;background:#fff;border-left:3px solid #217346}
+pre{background:#1e1e1e;color:#d4d4d4;padding:20px;border-radius:6px;overflow-x:auto;margin:20px 0;font-family:'Space Mono','Consolas',monospace;font-size:13px;line-height:1.6}code{font-family:'Space Mono','Consolas',monospace;font-size:13px}p code,li code,td code{background:#f0f0f0;padding:2px 6px;border-radius:3px;color:#0a7f4e;font-size:12px}
+.cm{color:#6a9955}.kw{color:#569cd6}.st{color:#ce9178}.fn{color:#dcdcaa}.nb{color:#4ec9b0}.nu{color:#b5cea8}
+.kbd{display:inline-block;font-family:'Space Mono',monospace;font-size:.82em;background:#f7faf8;border:1px solid #c9d6cd;border-bottom-width:2px;border-radius:4px;padding:1px 7px;color:#1e4f38;margin:0 1px;white-space:nowrap;line-height:1.9}
+.keyseq{background:#0f1a14;color:#d4f0e0;padding:16px 20px;border-radius:6px;margin:18px 0;font-family:'Space Mono',monospace;font-size:12.5px;line-height:2.1}.keyseq .k{display:inline-block;background:#1c3327;border:1px solid #2f5a45;border-bottom-width:2px;border-radius:4px;padding:1px 7px;color:#8ff0bf;margin:0 2px}.keyseq .arrow{color:#5a8a72;margin:0 4px}.keyseq .note{color:#6f9c86;font-size:11px}.keyseq .grp{display:inline-block;margin:3px 0}
+.progress-bar{width:100%;height:6px;background:#e0e0e0;border-radius:3px;margin-top:16px}.progress-fill{height:100%;background:linear-gradient(90deg,#217346,#10b981);border-radius:3px;width:0%}.progress-label{font-size:11px;color:#888;margin-top:4px;text-align:center}
+.code-output{background:#1e1e1e;color:#d4d4d4;padding:12px 16px;border-radius:0 0 6px 6px;font-family:'Space Mono',monospace;font-size:11.5px;line-height:1.6;margin-top:-4px;margin-bottom:18px;border-top:2px solid #333;white-space:pre-wrap;overflow-x:auto}.code-output .out-label{color:#888;font-size:10px;margin-bottom:4px;display:block}
+.nav-footer{display:flex;justify-content:space-between;gap:16px;margin-top:50px;padding-top:24px;border-top:1px solid #ddd;font-family:'Inter',sans-serif}.nav-footer a{font-size:.82rem;color:#217346;text-decoration:none;padding:12px 18px;border:1px solid #cfe6da;border-radius:6px;transition:all .2s;max-width:48%}.nav-footer a:hover{background:#217346;color:#fff;border-color:#217346}.nav-footer .nf-label{display:block;font-size:.6rem;color:#999;letter-spacing:.1em;text-transform:uppercase;margin-bottom:4px}.nav-footer a:hover .nf-label{color:rgba(255,255,255,.7)}
+@media(max-width:1024px){.sidebar{width:100%;height:auto;position:relative;border-right:none;border-bottom:1px solid rgba(0,0,0,.08);padding:16px}.sidebar-profile{margin-bottom:10px;padding-bottom:10px;display:flex;align-items:center;gap:12px;text-align:left}.profile-icon{font-size:32px;margin-bottom:0}.profile-bio{display:none}.nav-section{display:inline-block;margin-right:16px;margin-bottom:8px}.nav-list{display:flex;gap:10px;flex-wrap:wrap}.nav-list li{margin-bottom:0}.sidebar-footer{display:none}.main-wrapper{margin-left:0}.container{padding:0}.paper-content{padding:20px 16px;border-radius:0;box-shadow:none}.paper-title{font-size:18px}p{font-size:14px;text-indent:1.5em;text-align:left}pre{font-size:11px;padding:14px}table{font-size:10px;display:block;overflow-x:auto}.keyseq{font-size:11px}.nav-footer{flex-direction:column}.nav-footer a{max-width:100%}}
+</style>
+</head>
+<body>
+
+<div class="sidebar">
+<div class="sidebar-profile">
+<div class="profile-icon">&#x1F4CA;</div>
+<div class="profile-name">Financial Modeling Guide</div>
+<div class="profile-title">Keyboard &middot; Accounting &middot; Valuation</div>
+<div class="profile-bio">13 Rounds: 키보드로 짓는 재무모델부터 리서치 보고서까지</div>
+</div>
+<div class="sidebar-nav">
+<div class="nav-section">
+<div class="nav-section-title">Curriculum</div>
+<ul class="nav-list">
+<li><a href="../">&#x2302; Guide Home</a></li>
+<li><a href="../round-00/">R0. No-Mouse Excel</a></li>
+<li><a href="../round-01/">R1. 회계의 뼈대</a></li>
+<li><a class="active" href="#">R2. DART 데이터 수집 <span class="badge">NOW</span></a></li>
+<li><a href="../round-03/">R3. 밸류에이션 이론</a></li>
+<li><a href="../round-04/">R4. 3-Statement I</a></li>
+<li><a href="../round-05/">R5. 3-Statement II</a></li>
+<li><a href="../round-06/">R6. DCF & 목표주가</a></li>
+<li><a href="../round-07/">R7. 상대가치 실전</a></li>
+<li><a href="../round-08/">R8. 매크로 렌즈</a></li>
+<li><a href="../round-09/">R9. 산업분석</a></li>
+<li><a href="../round-10/">R10. 리서치 보고서</a></li>
+<li><a href="../round-11/">R11. 퀀트 브릿지</a></li>
+<li><a href="../round-12/">R12. 캡스톤</a></li>
+</ul>
+</div>
+<div class="nav-section">
+<div class="nav-section-title">This Lecture</div>
+<ul class="nav-list">
+<li><a href="#ch1">1. 왜 raw data가 실력인가</a></li>
+<li><a href="#ch2">2. DART 지도</a></li>
+<li><a href="#ch3">3. 사업보고서에서 뽑을 것</a></li>
+<li><a href="#ch4">4. Open DART API</a></li>
+<li><a href="#ch5">5. 엑셀로 정형화</a></li>
+<li><a href="#ch6">6. 데이터 함정</a></li>
+<li><a href="#ch7">7. 매크로·원자재 데이터</a></li>
+<li><a href="#ch8">8. 실습: 3개년 정형화</a></li>
+<li><a href="#quiz">Quiz</a></li>
+<li><a href="#cheatsheet">&#x1F4CB; Cheat Sheet</a></li>
+</ul>
+</div>
+</div>
+<div class="sidebar-footer">Round 2 of 12 &middot; Part I</div>
+</div>
+
+<div class="main-wrapper">
+<div class="container">
+<div class="paper-content">
+
+<div class="paper-header">
+<div class="paper-category">Round 2 / 12</div>
+<h1 class="paper-title">DART에서 데이터 캐기 — 원자료 수집·가공</h1>
+<div class="paper-subtitle">모델의 첫 단추: 신뢰할 수 있는 원자료를 손으로 캐고 다듬는 법</div>
+<div class="paper-team">Reference: 금융감독원 전자공시시스템(DART) &middot; Open DART API 공식문서 &middot; 한국은행 ECOS</div>
+<div class="progress-bar"><div class="progress-fill" style="width:17%"></div></div>
+<div class="progress-label">Overall Progress: 2/12 Rounds</div>
+</div>
+
+<div class="abstract">
+<div class="abstract-title">이 라운드에서 얻는 것</div>
+<p class="ni">모델은 화려한 수식이 아니라 <strong>정확한 입력값</strong>에서 시작한다. 애널리스트가 하루 중 가장 많은 시간을 쓰는 곳도 밸류에이션이 아니라 '원자료를 캐고 정리하는' 일이다. R1에서 재무제표의 뼈대를 봤다면, 이제 그 숫자를 <strong>실제로 어디서 어떻게 가져오는가</strong>를 배운다. 이 라운드에서는:</p>
+<ul>
+<li>한국 상장사의 공식 데이터 원천 <strong>DART(전자공시)</strong>의 구조 — 정기공시·재무제표·주석이 어디에 있는지</li>
+<li>사업보고서에서 <strong>추정 드라이버</strong>(세그먼트 매출, CAPEX, 판관비, 차입금 만기·이자율, 종업원 수)를 뽑는 눈</li>
+<li><strong>Open DART API</strong>로 재무제표를 프로그래밍으로 받는 법 — 파이썬 예시 하나, 그리고 엑셀만으로도 가능함</li>
+<li>다운받은 원자료를 <strong>모델용 포맷으로 정형화</strong>하는 엑셀 기술 — <span class="kbd">Ctrl</span>+<span class="kbd">E</span>, 행열전환, 표</li>
+<li>초심자를 반드시 무너뜨리는 <strong>데이터 함정</strong> — 연결/별도, 회계기준 변경, 일회성, 분기 누적, 리스테이트먼트</li>
+<li>매크로·원자재 데이터의 원천(ECOS 등) 맛보기, 그리고 관심 종목 3개년 정형화 실습</li>
+</ul>
+<p class="ni"><strong>Keywords:</strong> DART, 사업보고서, 연결 vs 별도, corp_code, Open DART API, Ctrl+E, 행열전환, Ctrl+T, 리스테이트먼트, point-in-time, ECOS</p>
+</div>
+
+<div class="warn">
+<p class="ni"><strong>&#x26A0;&#xFE0F; 이 라운드는 손이 더러워지는 라운드다.</strong> R0의 키보드 근육과 R1의 회계 뼈대를 전제로 한다. 아직 <span class="kbd">Ctrl</span>+<span class="kbd">E</span>나 <span class="kbd">Ctrl</span>+<span class="kbd">Alt</span>+<span class="kbd">V</span>가 손에 안 붙었다면 R0 Cheat Sheet를 옆에 띄워두고 시작하라. 데이터 수집은 화려하지 않지만, 여기서 실수하면 그 위에 쌓는 모든 밸류에이션이 조용히 틀린다.</p>
+</div>
+
+<!-- ═══════════════════════════════════════════ CH1 ═══════════════════════════════════════════ -->
+
+<h2 id="ch1">1. 왜 raw data 수집이 실력인가</h2>
+
+<p>모델링을 배우는 사람들은 대개 DCF나 목표주가 같은 '끝단'에 빨리 가고 싶어 한다. 하지만 현직 애널리스트에게 물어보면 답은 한결같다. <strong>"내 시간의 절반 이상은 데이터를 모으고 다듬는 데 쓴다."</strong> 왜 그럴까.</p>
+
+<p class="ni"><strong>① 쓰레기가 들어가면 쓰레기가 나온다(GIGO).</strong> 모델의 결론은 입력 데이터보다 정확할 수 없다. 성장률 가정을 아무리 정교하게 짜도, 기준이 되는 '작년 매출'을 연결이 아닌 별도로 잘못 넣으면 전부 무너진다. 밸류에이션 실력의 8할은 사실 <strong>입력값의 정확성</strong>에서 나온다.</p>
+
+<p class="ni"><strong>② 데이터를 만지는 과정에서 회사를 이해한다.</strong> 사업보고서를 직접 뒤져 세그먼트 매출을 뽑고, 주석에서 차입금 만기를 정리하다 보면 "이 회사가 어떻게 돈을 버는지"가 손끝으로 들어온다. 남이 정리해준 요약본만 보면 절대 얻을 수 없는 감각이다.</p>
+
+<p class="ni"><strong>③ 남의 숫자를 믿지 않는 습관.</strong> 증권사 컨센서스나 데이터 벤더의 숫자도 결국 누군가 원자료에서 가공한 것이다. 원천을 직접 확인할 줄 알아야 그들의 숫자가 이상할 때 잡아낼 수 있다.</p>
+
+<div class="def">
+<p class="ni"><strong>원칙 — 숫자는 항상 원천까지 거슬러 올라간다.</strong> 모델의 어떤 셀이든 "이 숫자 어디서 왔어?"라는 질문에 <strong>DART 몇 페이지, 어느 표</strong>라고 답할 수 있어야 한다. 답을 못 하는 셀은 아직 검증되지 않은 셀이다. R0에서 배운 <span class="kbd">Ctrl</span>+<span class="kbd">[</span>(참조 추적)가 모델 내부의 추적이라면, 이 라운드는 <strong>모델 밖 원천까지의 추적</strong>을 다룬다.</p>
+</div>
+
+<div class="info">
+<p class="ni">&#x1F4A1; 리서치 어시스턴트나 인턴에게 가장 먼저 주는 일이 바로 이 '데이터 정형화'다. 여기서 빠르고 정확한 사람이 곧바로 신뢰를 얻는다. 화려한 스킬이 아니라 <strong>이 지루한 작업을 실수 없이 빠르게</strong> 하는 것이 첫 관문이다.</p>
+</div>
+
+<!-- ═══════════════════════════════════════════ CH2 ═══════════════════════════════════════════ -->
+
+<h2 id="ch2">2. DART(전자공시) 지도</h2>
+
+<p>한국 상장사의 모든 공식 데이터는 <strong>DART(Data Analysis, Retrieval and Transfer System)</strong>, 즉 금융감독원 전자공시시스템 <code>dart.fss.or.kr</code>에 있다. 회사가 법적으로 제출한 원본이 그대로 올라오는 곳이라, 이보다 신뢰도 높은 원천은 없다.</p>
+
+<h3>2.1 공시의 종류</h3>
+
+<p>DART의 공시는 크게 정기공시·주요사항보고·발행공시 등으로 나뉜다. 모델링에 쓰는 건 대부분 <strong>정기공시</strong>다.</p>
+
+<div class="tc">Table 2.1. 정기공시의 종류</div>
+<table>
+<tr><th style="width:26%">보고서</th><th style="width:30%">주기 / 기준일</th><th style="width:44%">쓰임새</th></tr>
+<tr><td>사업보고서</td><td>연 1회 (사업연도 종료 후 90일)</td><td>가장 풍부. 세그먼트·CAPEX·주석 총망라</td></tr>
+<tr><td>반기보고서</td><td>반기 종료 후 45일</td><td>상반기 누적 실적</td></tr>
+<tr><td>분기보고서</td><td>1·3분기 종료 후 45일</td><td>분기 실적 트래킹</td></tr>
+</table>
+
+<p class="ni">모델을 처음 셋업할 땐 <strong>사업보고서</strong>를 뼈대로 삼고, 이후 분기·반기보고서로 최신 실적을 이어 붙인다. 사업보고서에는 재무제표뿐 아니라 사업의 내용, 임직원 현황, 주주 현황까지 들어 있어 '회사 백과사전'에 가깝다.</p>
+
+<h3>2.2 재무제표: 연결 vs 별도의 위치</h3>
+
+<p>재무제표 섹션에는 보통 <strong>연결재무제표</strong>와 <strong>(별도)재무제표</strong>가 나란히 실린다. 이 둘을 헷갈리면 안 된다 — 6장에서 함정으로 다시 자세히 본다. 지금은 위치만 기억하자.</p>
+
+<div class="tc">Table 2.2. 사업보고서 내 재무 관련 섹션</div>
+<table>
+<tr><th style="width:40%">섹션</th><th style="width:60%">들어 있는 것</th></tr>
+<tr><td>III. 재무에 관한 사항</td><td>요약재무정보, 연결/별도 재무제표 본문</td></tr>
+<tr><td>연결재무제표</td><td>지배기업+종속기업 합산 (보통 모델의 기본)</td></tr>
+<tr><td>재무제표(별도)</td><td>모회사 단독 실적</td></tr>
+<tr><td>재무제표 주석</td><td>세그먼트, 차입금 조건, 우발부채 등 &mdash; <strong>보물창고</strong></td></tr>
+</table>
+
+<div class="info">
+<p class="ni">&#x1F511; <strong>주석(Footnotes)을 절대 건너뛰지 마라.</strong> 재무제표 본문의 숫자는 '결과'일 뿐이고, 그 숫자를 어떻게 쪼개고 추정할지에 대한 단서는 대부분 주석에 있다. 세그먼트별 매출, 차입금 만기와 이자율, 리스, 우발부채, 특수관계자 거래 &mdash; 모델의 드라이버가 여기 숨어 있다. 초심자와 프로를 가르는 건 "주석을 읽느냐"다.</p>
+</div>
+
+<!-- ═══════════════════════════════════════════ CH3 ═══════════════════════════════════════════ -->
+
+<h2 id="ch3">3. 사업보고서에서 뽑을 것</h2>
+
+<p>사업보고서는 두껍다. 하지만 모델러가 실제로 뽑아야 할 건 정해져 있다. 이 항목들이 나중에 <strong>추정 드라이버</strong>가 된다 &mdash; 즉, 미래를 추정할 때 근거로 삼는 값들이다.</p>
+
+<div class="tc">Table 3.1. 사업보고서에서 캐야 할 추정 드라이버</div>
+<table>
+<tr><th style="width:28%">항목</th><th style="width:32%">어디에 있나</th><th style="width:40%">모델에서 왜 쓰나</th></tr>
+<tr><td>세그먼트(부문별) 매출</td><td>사업의 내용 / 주석</td><td>사업부별로 성장률을 따로 추정</td></tr>
+<tr><td>CAPEX · 감가상각</td><td>현금흐름표 / 유형자산 주석</td><td>투자·감가상각 스케줄, FCF 계산</td></tr>
+<tr><td>판관비 내역</td><td>손익 주석(비용의 성격별 분류)</td><td>인건비·광고비 등 고정/변동 구분</td></tr>
+<tr><td>차입금 만기·이자율</td><td>차입금 주석</td><td>이자비용 추정, 만기도래 스케줄</td></tr>
+<tr><td>종업원 수</td><td>임직원 현황</td><td>1인당 매출·인건비 추정</td></tr>
+<tr><td>주식 수 · 자기주식</td><td>주주 현황 / 자본 주석</td><td>주당가치(EPS·목표주가) 계산</td></tr>
+</table>
+
+<p class="ni">예를 들어 <strong>세그먼트 매출</strong>은 R4~R6에서 매출을 통째로 하나의 성장률로 밀어붙이는 대신, "반도체는 몇 %, 디스플레이는 몇 %"처럼 <strong>부문별로 쪼개 추정</strong>하는 근거가 된다. <strong>차입금 주석</strong>은 이자비용을 '작년 그대로'가 아니라 만기·금리 구조에 맞춰 추정하게 해준다. 이런 드라이버가 많을수록 모델이 정교해진다.</p>
+
+<div class="task">
+<div class="task-title">&#x1F3AF; 손 풀기 1</div>
+<p class="ni">관심 종목 하나의 최근 사업보고서를 DART에서 열어라. (1) '사업의 내용'에서 세그먼트가 몇 개인지, (2) 주석에서 '차입금' 항목을 찾아 가중평균 이자율이 적혀 있는지, (3) '임직원 현황'에서 총 종업원 수를 각각 찾아 메모하라. 세 항목이 어느 섹션에 있는지 위치를 몸에 익히는 게 목표.</p>
+</div>
+
+<!-- ═══════════════════════════════════════════ CH4 ═══════════════════════════════════════════ -->
+
+<h2 id="ch4">4. Open DART API</h2>
+
+<p>회사 하나를 손으로 뒤지는 건 괜찮지만, 여러 종목·여러 연도를 반복하면 지친다. DART는 <strong>Open DART API</strong>로 공시 데이터를 프로그래밍으로 받을 수 있게 열어두었다 (<code>opendart.fss.or.kr</code>). 무료다.</p>
+
+<h3>4.1 준비물</h3>
+<ol>
+<li><strong>API 인증키 발급</strong> &mdash; Open DART에 가입하고 이메일로 인증키(40자리)를 받는다.</li>
+<li><strong>고유번호(corp_code)</strong> &mdash; 회사마다 DART가 부여한 8자리 코드. 종목코드(005930)와는 <strong>다르다</strong>. <code>corpCode.xml</code> 파일을 API로 한 번 받아 매핑해두면 편하다.</li>
+<li><strong>재무제표 API</strong> &mdash; 단일회사(single account)와 다중회사(multi account) 엔드포인트가 있다.</li>
+</ol>
+
+<div class="tc">Table 4.1. 자주 쓰는 Open DART 엔드포인트</div>
+<table>
+<tr><th style="width:44%">엔드포인트</th><th style="width:56%">받는 것</th></tr>
+<tr><td><code>fnlttSinglAcnt</code></td><td>단일회사 주요계정(요약 재무)</td></tr>
+<tr><td><code>fnlttSinglAcntAll</code></td><td>단일회사 전체 재무제표 계정</td></tr>
+<tr><td><code>corpCode.xml</code></td><td>전체 회사의 고유번호 매핑</td></tr>
+</table>
+
+<p class="ni">예시 요청 URL은 이런 모양이다 (인증키·고유번호는 본인 값으로):</p>
+
+<pre><span class="cm"># 삼성전자(corp_code 00126380) 2023 사업보고서 주요계정</span>
+https://opendart.fss.or.kr/api/fnlttSinglAcnt.json
+    ?crtfc_key=<span class="st">본인_인증키</span>
+    &corp_code=<span class="nu">00126380</span>
+    &bsns_year=<span class="nu">2023</span>
+    &reprt_code=<span class="nu">11011</span>   <span class="cm"># 11011=사업보고서, 11012=반기, 11013/11014=분기</span></pre>
+
+<p class="ni">파이썬 <code>requests</code>로 받으면 이렇게 된다. 딱 이 한 조각만 이해하면 나머지는 반복이다.</p>
+
+<pre><span class="kw">import</span> requests
+
+url = <span class="st">"https://opendart.fss.or.kr/api/fnlttSinglAcnt.json"</span>
+params = {
+    <span class="st">"crtfc_key"</span>: <span class="st">"본인_인증키"</span>,
+    <span class="st">"corp_code"</span>: <span class="st">"00126380"</span>,   <span class="cm"># 고유번호 (종목코드 아님!)</span>
+    <span class="st">"bsns_year"</span>: <span class="st">"2023"</span>,
+    <span class="st">"reprt_code"</span>: <span class="st">"11011"</span>,     <span class="cm"># 사업보고서</span>
+}
+res = requests.<span class="fn">get</span>(url, params=params)
+data = res.<span class="fn">json</span>()
+
+<span class="kw">for</span> item <span class="kw">in</span> data[<span class="st">"list"</span>]:
+    <span class="fn">print</span>(item[<span class="st">"account_nm"</span>], item[<span class="st">"thstrm_amount"</span>])</pre>
+
+<div class="code-output"><span class="out-label">OUTPUT</span>매출액 258935494000000
+영업이익 6566976000000
+당기순이익 15487100000000
+자산총계 455905980000000
+...</div>
+
+<div class="ok">
+<p class="ni"><strong>파이썬이 없어도 괜찮다.</strong> 엑셀만으로도 충분히 할 수 있다. <strong>데이터 &gt; 웹에서 가져오기</strong> 또는 <strong>파워 쿼리(Power Query)</strong>에 위 URL을 그대로 넣으면 JSON을 표로 파싱해준다. R11(퀀트 브릿지) 전까지는 파이썬을 몰라도 이 가이드를 따라올 수 있다. 다만 여러 종목을 반복 수집할 땐 파이썬이 압도적으로 편해지니, 여유가 되면 위 조각을 손으로 쳐보자.</p>
+</div>
+
+<!-- ═══════════════════════════════════════════ CH5 ═══════════════════════════════════════════ -->
+
+<h2 id="ch5">5. 엑셀로 정형화</h2>
+
+<p>데이터를 받았다고 끝이 아니다. DART에서 받은 재무제표는 그대로 모델에 못 넣는다. 계정명이 제각각이고, 연도가 세로로 늘어져 있거나, 종목코드가 회사명에 붙어 있다. 이걸 <strong>모델용 깔끔한 포맷</strong>으로 옮기는 게 정형화(structuring)다. R0에서 배운 키보드 근육이 여기서 빛난다.</p>
+
+<h3>5.1 종목코드·계정명 정리 &mdash; <span class="kbd">Ctrl</span>+<span class="kbd">E</span></h3>
+<p class="ni">A열에 <code>삼성전자(005930)</code>처럼 회사명과 코드가 붙어 있다면, B열 첫 칸에 <code>005930</code>만 직접 치고 아래 칸에서 <span class="kbd">Ctrl</span>+<span class="kbd">E</span>(빠른 채우기). 엑셀이 패턴을 읽어 나머지를 알아서 뽑는다. 계정명 앞의 공백·번호(<code>Ⅰ. 매출액</code> → <code>매출액</code>) 정리에도 똑같이 쓴다.</p>
+
+<div class="keyseq">
+<span class="grp"><span class="note">B2에</span> <span class="k">005930</span> <span class="k">Enter</span> <span class="arrow">→</span> <span class="note">B3에서</span> <span class="k">Ctrl</span>+<span class="k">E</span> <span class="note">나머지 자동 채움</span></span>
+</div>
+
+<h3>5.2 행열 전환 &mdash; <span class="kbd">Ctrl</span>+<span class="kbd">Alt</span>+<span class="kbd">V</span> 다음 <span class="kbd">T</span></h3>
+<p class="ni">DART 표는 연도가 세로로 쌓여 있는데, 모델은 보통 <strong>연도를 가로로</strong> 놓는다(왼쪽→오른쪽 = 과거→미래). 범위를 복사한 뒤 <span class="kbd">Ctrl</span>+<span class="kbd">C</span> → <span class="kbd">Ctrl</span>+<span class="kbd">Alt</span>+<span class="kbd">V</span> → <span class="kbd">E</span>(transposE) 또는 대화상자에서 '행/열 바꿈' 체크로 가로세로를 뒤집는다.</p>
+
+<div class="keyseq">
+<span class="grp"><span class="note">범위 선택</span> <span class="k">Ctrl</span>+<span class="k">C</span> <span class="arrow">→</span> <span class="note">붙일 위치에서</span> <span class="k">Ctrl</span>+<span class="k">Alt</span>+<span class="k">V</span> <span class="arrow">→</span> <span class="k">E</span> <span class="note">행/열 바꿈</span> <span class="arrow">→</span> <span class="k">Enter</span></span>
+</div>
+
+<h3>5.3 표로 관리 &mdash; <span class="kbd">Ctrl</span>+<span class="kbd">T</span></h3>
+<p class="ni">정리한 원자료 범위를 <span class="kbd">Ctrl</span>+<span class="kbd">T</span>로 '엑셀 표'로 승격하면 자동 확장·필터·구조적 참조가 붙는다. 나중에 분기 데이터를 한 행 추가하면 아래 수식이 알아서 따라온다. 원자료 시트는 표로 관리하는 습관을 들이자.</p>
+
+<div class="info">
+<p class="ni">&#x1F511; <strong>원자료(raw)와 모델(calc)을 시트로 분리하라.</strong> DART에서 받은 날것 그대로는 <code>Raw</code> 시트에 두고, 그걸 참조해 정리한 값은 <code>Data</code>/<code>Model</code> 시트에 둔다. 원자료를 절대 덮어쓰지 않아야 나중에 "이 숫자 어디서 왔지"를 되짚을 수 있다. 시트 간 참조는 R0에서 배운 <strong>초록 글씨</strong> 컨벤션으로 표시.</p>
+</div>
+
+<!-- ═══════════════════════════════════════════ CH6 ═══════════════════════════════════════════ -->
+
+<h2 id="ch6">6. 데이터 함정</h2>
+
+<p>여기가 이 라운드의 진짜 핵심이다. 아래 함정들은 초심자를 반드시 한 번씩 무너뜨린다. 미리 알면 피할 수 있다.</p>
+
+<div class="warn">
+<p class="ni"><strong>&#x26A0;&#xFE0F; 함정 #1 &mdash; 연결(Consolidated) vs 별도(Separate) 혼동.</strong> 가장 흔하고 가장 치명적이다. <strong>연결</strong>은 지배기업+종속기업을 합산한 '그룹 전체' 숫자, <strong>별도</strong>는 모회사 단독 숫자다. 지주회사나 종속기업이 많은 회사는 둘의 매출이 몇 배씩 차이 난다. 모델은 <strong>하나로 일관</strong>되게 써야 한다 &mdash; 보통 연결 기준을 쓰되, 작년 매출은 연결인데 올해 추정은 별도 베이스로 섞이면 성장률이 완전히 엉킨다. 데이터를 받을 때 <strong>매번 연결/별도를 확인</strong>하는 습관을 들여라.</p>
+</div>
+
+<p class="ni"><strong>함정 #2 &mdash; 회계기준 변경.</strong> K-IFRS 도입, 리스회계(IFRS 16), 수익인식 기준(IFRS 15) 변경 등으로 특정 연도 전후 숫자가 <strong>사과와 오렌지</strong>가 될 수 있다. 시계열을 이을 때 "이 구간에 기준 변경이 있었나"를 의심하라.</p>
+
+<p class="ni"><strong>함정 #3 &mdash; 일회성 손익(one-off).</strong> 자산 처분이익, 소송 충당금, 대손 등 반복되지 않는 항목이 특정 해 영업이익·순이익을 부풀리거나 깎는다. 이걸 그대로 추정 베이스로 쓰면 미래가 왜곡된다. 추정 전에 <strong>일회성을 걷어낸 정상화(normalized) 이익</strong>을 봐야 한다 (R3에서 다룸).</p>
+
+<p class="ni"><strong>함정 #4 &mdash; 분기 누적 vs 단일 분기.</strong> 한국 공시의 손익은 <strong>누적</strong>으로 표시되는 경우가 많다. 반기보고서의 매출은 '2분기 매출'이 아니라 '상반기(1+2분기) 누적'이다. 단일 분기를 원하면 <strong>당분기 누적 &minus; 직전 분기까지 누적</strong>으로 직접 계산해야 한다. 이걸 놓쳐 3분기 실적을 두 배로 세는 실수가 흔하다.</p>
+
+<p class="ni"><strong>함정 #5 &mdash; 리스테이트먼트(과거 수정).</strong> 회사가 과거 재무제표를 나중에 수정(정정공시)하면, 최신 사업보고서의 '전기' 숫자와 그 전기가 원래 보고됐던 숫자가 <strong>다를 수</strong> 있다. 어떤 걸 써야 할까?</p>
+
+<div class="paper-anchor">
+<div class="pa-label">Data Anchor &middot; Point-in-Time</div>
+<div class="pa-title">"그때 알 수 있었던 숫자"로 봐야 한다 &mdash; point-in-time</div>
+<p><strong>Point-in-time(PIT)</strong>이란, 어떤 시점의 의사결정을 재현할 때 <strong>그 시점에 실제로 공시돼 있던 데이터</strong>만 쓰는 원칙이다. 나중에 수정된(restated) 숫자를 과거 시점에 소급 적용하면, "그때는 알 수 없었던 정보로 그때를 판단하는" 미래참조(look-ahead) 오류가 생긴다.</p>
+<p>지금(펀더멘털 모델링)은 대개 최신 확정치를 쓰면 되지만, <strong>퀀트 백테스트</strong>에서는 PIT가 결정적으로 중요하다. 리스테이트먼트를 무시하면 전략 성과가 실제보다 좋게 나온다. 여기에 <strong>생존편향(survivorship bias)</strong> &mdash; 상장폐지된 종목을 데이터셋에서 빼고 살아남은 종목만 보면 수익률이 부풀려지는 함정 &mdash; 까지 얹히면 백테스트는 환상이 된다. 이 두 개념은 <strong>R11(퀀트 브릿지)에서 본격적으로</strong> 다룬다. 지금은 "수정된 과거 숫자를 조심하라"만 새겨두자.</p>
+</div>
+
+<!-- ═══════════════════════════════════════════ CH7 ═══════════════════════════════════════════ -->
+
+<h2 id="ch7">7. 매크로·원자재 데이터</h2>
+
+<p>기업 데이터 외에, 모델의 가정을 뒷받침하는 <strong>거시·원자재 데이터</strong>도 원천을 알아둬야 한다. 환율·금리 가정, 원자재 투입비 추정 등에 쓴다.</p>
+
+<div class="tc">Table 7.1. 주요 매크로·원자재 데이터 원천</div>
+<table>
+<tr><th style="width:34%">원천</th><th style="width:66%">받는 것</th></tr>
+<tr><td>한국은행 ECOS</td><td>기준금리, 환율, GDP, 물가 등 국내 거시지표 (API 제공)</td></tr>
+<tr><td>KOSIS(통계청)</td><td>산업·인구·고용 통계</td></tr>
+<tr><td>원자재 가격</td><td>유가·금속·곡물 등 (거래소·벤더 &mdash; R8에서 상세)</td></tr>
+</table>
+
+<p class="ni"><strong>한국은행 ECOS</strong>(<code>ecos.bok.or.kr</code>)는 국내 거시지표의 공식 원천으로, DART처럼 무료 API를 연다. 환율·금리 가정을 세울 때 여기서 시계열을 받는다. 원자재는 소재·정유·화학 등 <strong>투입비가 실적을 좌우하는 산업</strong>을 볼 때 필수인데, 자세한 활용은 <strong>R8(매크로 렌즈)</strong>에서 다룬다. 지금은 "기업 밖 데이터의 원천이 어디인지" 지도만 그려두면 된다.</p>
+
+<!-- ═══════════════════════════════════════════ CH8 ═══════════════════════════════════════════ -->
+
+<h2 id="ch8">8. 실습 &mdash; 관심 종목 3개년 정형화</h2>
+
+<p>배운 걸 엮어보자. 목표: 관심 종목 하나의 <strong>최근 3개년 요약 손익·재무상태표</strong>를 DART에서 받아 <strong>엑셀 한 시트로 정형화</strong>하기. 아래 체크리스트를 순서대로 따라가라.</p>
+
+<h3>Step 1 &mdash; 원자료 확보</h3>
+<ul>
+<li>DART에서 대상 회사의 최근 3개 <strong>사업보고서</strong>를 연다 (또는 Open DART API로 <code>reprt_code=11011</code> 3개 연도).</li>
+<li><strong>연결/별도를 결정</strong>하고, 3개년 모두 <strong>같은 기준</strong>으로 통일한다 (함정 #1).</li>
+<li>요약 손익(매출·영업이익·순이익)과 요약 BS(자산·부채·자본)를 <code>Raw</code> 시트에 그대로 붙인다.</li>
+</ul>
+
+<h3>Step 2 &mdash; 정형화</h3>
+<div class="keyseq">
+<span class="grp"><span class="note">계정명·코드 정리</span> <span class="k">Ctrl</span>+<span class="k">E</span></span><br>
+<span class="grp"><span class="note">연도를 가로로</span> <span class="k">Ctrl</span>+<span class="k">C</span> <span class="arrow">→</span> <span class="k">Ctrl</span>+<span class="k">Alt</span>+<span class="k">V</span> <span class="arrow">→</span> <span class="k">E</span> <span class="note">행열전환</span> <span class="arrow">→</span> <span class="k">Enter</span></span><br>
+<span class="grp"><span class="note">정리 범위를 표로</span> <span class="k">Ctrl</span>+<span class="k">T</span></span>
+</div>
+<p class="ni">완성 레이아웃은 이런 모양이 목표다 (연도가 가로, 계정이 세로):</p>
+<pre><span class="cm"># Data 시트 (단위: 십억원, 연결)</span>
+             2021    2022    2023
+매출액       2,796   3,022   2,589
+영업이익       516     433      66
+당기순이익     399     556     154
+자산총계     4,262   4,484   4,559</pre>
+
+<h3>Step 3 &mdash; 검증 체크리스트</h3>
+<div class="tc">Table 8.1. 정형화 후 반드시 확인</div>
+<table>
+<tr><th style="width:52%">체크 항목</th><th style="width:48%">왜</th></tr>
+<tr><td>3개년 모두 연결(또는 별도)로 통일됐나</td><td>함정 #1 (혼동 방지)</td></tr>
+<tr><td>구간 내 회계기준 변경이 있었나</td><td>함정 #2 (시계열 단절)</td></tr>
+<tr><td>큰 일회성 손익이 섞여 있나</td><td>함정 #3 (정상화 필요)</td></tr>
+<tr><td>분기 데이터라면 누적/단일 구분했나</td><td>함정 #4</td></tr>
+<tr><td>과거 수정(정정공시) 여부 확인</td><td>함정 #5 / PIT</td></tr>
+<tr><td>단위(원/천원/백만원)를 통일했나</td><td>단위 실수는 100배 오류</td></tr>
+<tr><td>원자료(Raw)를 별도 시트로 보존했나</td><td>추적 가능성</td></tr>
+</table>
+
+<div class="ok">
+<p class="ni"><strong>축하한다.</strong> 방금 모델의 '연료'를 손으로 캐서 정제했다. 이 <code>Data</code> 시트가 R4~R6에서 3-statement 모델과 DCF의 <strong>출발점</strong>이 된다. 여기서 든 습관 &mdash; 원천 추적, 연결/별도 일관성, 원자료 보존 &mdash; 이 앞으로 모든 라운드에서 그대로 쓰인다. R3에서는 이 데이터 위에 <strong>밸류에이션 이론</strong>을 얹는다.</p>
+</div>
+
+<div class="task">
+<div class="task-title">&#x1F3AF; 이번 주 과제</div>
+<p class="ni">위 실습을 <strong>서로 다른 두 회사</strong>(하나는 종속기업이 많은 지주/대기업, 하나는 단순한 회사)로 각각 해보라. 지주회사에서 연결과 별도 매출이 얼마나 차이 나는지 직접 눈으로 확인하는 게 핵심. 그리고 각 회사 <strong>주석에서 세그먼트 매출</strong>을 찾아 3개년 표로 추가 정형화하라. 세그먼트가 없다면 왜 없는지(단일 사업) 메모.</p>
+</div>
+
+<!-- ═══════════════════════════════════════════ QUIZ ═══════════════════════════════════════════ -->
+
+<h2 id="quiz">Quiz — 셀프 체크 8문항</h2>
+
+<details class="quiz-item"><summary>Q1. 한국 상장사의 공식 재무 데이터를 받는 1차 원천은? 주소도.</summary>
+<div class="answer">금융감독원 <strong>전자공시시스템 DART</strong>, <code>dart.fss.or.kr</code>. 회사가 법적으로 제출한 원본이 그대로 올라오는 곳이라 신뢰도가 가장 높다.</div></details>
+
+<details class="quiz-item"><summary>Q2. 사업보고서에서 재무제표 본문보다 '보물창고'라 불리는 섹션은? 예를 들어 무엇이 들어 있나?</summary>
+<div class="answer"><strong>재무제표 주석(footnotes)</strong>. 세그먼트별 매출, 차입금 만기·이자율, 리스, 우발부채, 특수관계자 거래 등 추정 드라이버가 여기 숨어 있다.</div></details>
+
+<details class="quiz-item"><summary>Q3. 연결(consolidated)과 별도(separate) 재무제표의 차이는? 모델링에서 왜 조심해야 하나?</summary>
+<div class="answer">연결=지배기업+종속기업 합산(그룹 전체), 별도=모회사 단독. 종속기업이 많으면 둘이 몇 배 차이 난다. 한 모델 안에서 <strong>기준을 섞으면</strong>(작년 연결, 올해 별도 등) 성장률이 엉킨다 &mdash; 반드시 하나로 일관.</div></details>
+
+<details class="quiz-item"><summary>Q4. Open DART API로 특정 회사를 조회할 때 종목코드(005930)를 그대로 쓰면 안 되는 이유는?</summary>
+<div class="answer">API는 <strong>고유번호(corp_code, 8자리)</strong>를 쓴다. 종목코드와 다르다. <code>corpCode.xml</code>을 받아 종목코드↔고유번호를 매핑해두고 써야 한다.</div></details>
+
+<details class="quiz-item"><summary>Q5. 파이썬이 없어도 엑셀만으로 API 데이터를 받는 방법은?</summary>
+<div class="answer"><strong>데이터 &gt; 웹에서 가져오기</strong> 또는 <strong>파워 쿼리(Power Query)</strong>에 요청 URL을 넣으면 JSON을 표로 파싱해준다. R11 전까진 파이썬 없이도 가능.</div></details>
+
+<details class="quiz-item"><summary>Q6. DART 표는 연도가 세로로 쌓여 있다. 모델용으로 연도를 가로로 눕히는 키 순서는?</summary>
+<div class="answer"><span class="kbd">Ctrl</span>+<span class="kbd">C</span> → <span class="kbd">Ctrl</span>+<span class="kbd">Alt</span>+<span class="kbd">V</span> → <span class="kbd">E</span>(transposE, 행/열 바꿈) → <span class="kbd">Enter</span>. 계정명·코드 정리는 <span class="kbd">Ctrl</span>+<span class="kbd">E</span>(빠른 채우기).</div></details>
+
+<details class="quiz-item"><summary>Q7. 반기보고서의 매출액을 '2분기 매출'로 그대로 쓰면 왜 틀리나? 단일 분기는 어떻게 구하나?</summary>
+<div class="answer">한국 공시 손익은 대개 <strong>누적</strong>이라 반기 매출은 상반기(1+2분기) 누적이다. 단일 분기 = <strong>당분기 누적 &minus; 직전 분기까지 누적</strong>으로 직접 계산해야 한다.</div></details>
+
+<details class="quiz-item"><summary>Q8. 회사가 과거 재무제표를 나중에 수정(리스테이트먼트)했을 때 백테스트에서 조심해야 하는 원칙은? 함께 얽히는 편향은?</summary>
+<div class="answer"><strong>Point-in-time(PIT)</strong> &mdash; 그 시점에 실제 공시돼 있던 데이터만 써야 미래참조(look-ahead) 오류를 피한다. 여기에 <strong>생존편향(survivorship bias)</strong>까지 얹히면 백테스트 성과가 부풀려진다. (R11에서 상세)</div></details>
+
+<!-- ═══════════════════════════════════════════ CHEAT SHEET ═══════════════════════════════════════════ -->
+
+<h2 id="cheatsheet">&#x1F4CB; Cheat Sheet — 옆에 띄워두고 쓰는 표</h2>
+
+<div class="tc">Table C.1. DART 데이터 수집 체크리스트</div>
+<table>
+<tr><th style="width:40%">단계</th><th style="width:60%">확인 사항</th></tr>
+<tr><td>원천</td><td><code>dart.fss.or.kr</code> / API는 <code>opendart.fss.or.kr</code></td></tr>
+<tr><td>보고서 선택</td><td>사업(11011)·반기(11012)·분기(11013/11014)</td></tr>
+<tr><td>재무제표 기준</td><td>연결/별도 결정 &rarr; 전 기간 통일</td></tr>
+<tr><td>주석 확인</td><td>세그먼트·차입금·CAPEX·종업원 수</td></tr>
+<tr><td>API 조회</td><td>corp_code(8자리) 사용, 종목코드 아님</td></tr>
+<tr><td>단위</td><td>원/천원/백만원 통일</td></tr>
+<tr><td>원자료 보존</td><td>Raw 시트 분리, 덮어쓰지 않기</td></tr>
+<tr><td>함정 점검</td><td>기준변경·일회성·분기누적·리스테이트먼트</td></tr>
+</table>
+
+<div class="tc">Table C.2. 엑셀 정형화 단축키</div>
+<table>
+<tr><th style="width:40%">단축키</th><th style="width:60%">동작</th></tr>
+<tr><td><span class="kbd">Ctrl</span>+<span class="kbd">E</span></td><td>빠른 채우기 (종목코드·계정명 정리)</td></tr>
+<tr><td><span class="kbd">Ctrl</span>+<span class="kbd">Alt</span>+<span class="kbd">V</span> → <span class="kbd">E</span></td><td>행/열 바꿈 (연도 세로→가로)</td></tr>
+<tr><td><span class="kbd">Ctrl</span>+<span class="kbd">Alt</span>+<span class="kbd">V</span> → <span class="kbd">V</span></td><td>값만 붙여넣기 (외부 실적 고정)</td></tr>
+<tr><td><span class="kbd">Ctrl</span>+<span class="kbd">T</span></td><td>표로 승격 (자동확장·필터·구조적참조)</td></tr>
+<tr><td><span class="kbd">Ctrl</span>+<span class="kbd">Shift</span>+<span class="kbd">1</span></td><td>천단위 콤마 (숫자 표준)</td></tr>
+<tr><td><span class="kbd">Ctrl</span>+<span class="kbd">방향키</span></td><td>데이터 경계로 점프 (범위 확인)</td></tr>
+<tr><td><span class="kbd">Alt</span>+<span class="kbd">=</span></td><td>자동 합계 (검산용 소계)</td></tr>
+</table>
+
+<div class="nav-footer">
+<a href="../round-01/"><span class="nf-label">&larr; Previous</span>R1. 회계의 뼈대</a>
+<a href="../round-03/" style="text-align:right"><span class="nf-label">Next &rarr;</span>R3. 밸류에이션 이론</a>
+</div>
+
+</div>
+</div>
+</div>
+
+</body>
+</html>

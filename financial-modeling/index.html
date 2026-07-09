@@ -1,0 +1,388 @@
+---
+layout: null
+permalink: /financial-modeling/
+title: "Financial Modeling Guide"
+---
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Financial Modeling Guide | Ha Rim Jung</title>
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="Financial Modeling Guide | Ha Rim Jung">
+    <meta property="og:description" content="마우스 없이 키보드로만 — 회계·밸류에이션·3-statement 모델링·DCF·리서치 보고서까지, 리서치 프론트 실무를 13라운드로 익히는 재무모델링 부트캠프.">
+    <meta property="og:url" content="https://gkfla2020-bit.github.io/financial-modeling/">
+    <meta property="og:image" content="https://gkfla2020-bit.github.io/assets/og-card.png">
+    <meta property="og:site_name" content="Ha Rim Jung">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Financial Modeling Guide | Ha Rim Jung">
+    <meta name="twitter:description" content="마우스 없이 키보드로만 — 회계·밸류에이션·3-statement 모델링·DCF·리서치 보고서까지, 리서치 프론트 실무를 13라운드로.">
+    <meta name="twitter:image" content="https://gkfla2020-bit.github.io/assets/og-card.png">
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-83LKVW7412"></script>
+    <script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-83LKVW7412');</script>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300&family=Space+Mono:wght@400&family=Inter:wght@300;400&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Inter',sans-serif;background:#fafaf8;color:#1a1a1a;line-height:1.7;overflow-x:hidden}
+
+{% include sidebar-styles.html %}
+
+.container{position:relative;z-index:1;max-width:800px;margin:0 auto;padding:60px 50px 80px}
+.page-title{font-family:'Cormorant Garamond',serif;font-size:clamp(2rem,5vw,2.8rem);font-weight:300;margin-bottom:8px;opacity:0}
+.page-subtitle{font-family:'Space Mono',monospace;font-size:11px;color:#888;letter-spacing:.2em;text-transform:uppercase;margin-bottom:15px;opacity:0}
+.page-desc{font-size:.92rem;color:#666;line-height:1.8;margin-bottom:50px;max-width:650px;opacity:0}
+
+.progress-overview{display:flex;align-items:center;gap:16px;margin-bottom:50px;padding:20px 25px;background:#fff;border:1px solid #e8e8e8;opacity:0}
+.progress-label{font-size:.7rem;color:#999;letter-spacing:.1em;text-transform:uppercase;white-space:nowrap}
+.progress-bar{flex:1;height:6px;background:#f0f0f0;border-radius:3px;overflow:hidden}
+.progress-fill{height:100%;background:linear-gradient(90deg,#217346,#10b981);border-radius:3px;transition:width .8s ease}
+.progress-text{font-family:'Space Mono',monospace;font-size:.8rem;color:#1a1a1a;white-space:nowrap}
+
+.kbd-hint{display:flex;align-items:center;gap:12px;margin-bottom:40px;padding:16px 22px;background:#f0fdf4;border:1px solid #bbf7d0;border-radius:6px;opacity:0}
+.kbd-hint .kh-icon{font-size:1.4rem}
+.kbd-hint .kh-text{font-size:.82rem;color:#166534;line-height:1.6}
+.kbd{display:inline-block;font-family:'Space Mono',monospace;font-size:.72rem;background:#fff;border:1px solid #cbd5c0;border-bottom-width:2px;border-radius:4px;padding:1px 6px;color:#217346;margin:0 1px}
+
+.round-list{display:flex;flex-direction:column;gap:20px}
+.round-card{display:block;padding:30px 35px;background:rgba(255,255,255,.9);border:1px solid #e8e8e8;text-decoration:none;transition:all .25s ease;opacity:0;transform:translateY(20px);position:relative;overflow:hidden}
+.round-card:hover{border-color:#1a1a1a;transform:translateX(8px) translateY(0);box-shadow:0 4px 20px rgba(0,0,0,.05)}
+.round-card.completed{border-left:3px solid #28a745}
+.round-card.current{border-left:3px solid #217346}
+.round-card.locked{border-left:3px solid #ddd;opacity:.6;pointer-events:none}
+.round-number{font-family:'Space Mono',monospace;font-size:.65rem;color:#999;letter-spacing:.15em;text-transform:uppercase;margin-bottom:8px;display:flex;align-items:center;gap:10px}
+.round-status{font-size:.55rem;padding:2px 8px;border-radius:10px;letter-spacing:.08em}
+.status-done{background:#e8f5e9;color:#2e7d32}
+.status-current{background:#dcfce7;color:#166534}
+.status-locked{background:#f5f5f5;color:#999}
+.round-title{font-family:'Cormorant Garamond',serif;font-size:1.4rem;color:#1a1a1a;margin-bottom:10px;font-weight:400}
+.round-desc{font-size:.88rem;color:#666;line-height:1.7;margin-bottom:14px}
+.round-topics{display:flex;gap:6px;flex-wrap:wrap}
+.topic-tag{font-size:.58rem;padding:4px 10px;background:#f0f0f0;color:#666;letter-spacing:.04em;text-transform:uppercase;transition:all .2s}
+.round-card:hover .topic-tag{background:#1a1a1a;color:#fff}
+
+.part-header{font-family:'Cormorant Garamond',serif;font-size:1.1rem;font-weight:400;color:#999;letter-spacing:.05em;margin:40px 0 15px;padding-bottom:8px;border-bottom:1px solid #eee;opacity:0}
+.part-header:first-of-type{margin-top:0}
+
+.curriculum-info{margin-top:60px;padding:30px;background:#fff;border:1px solid #e8e8e8;opacity:0}
+.curriculum-title{font-family:'Cormorant Garamond',serif;font-size:1.2rem;font-weight:400;margin-bottom:15px;padding-bottom:10px;border-bottom:1px solid #eee}
+.curriculum-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px 30px}
+.curriculum-item{font-size:.82rem;color:#555;display:flex;align-items:baseline;gap:8px}
+.curriculum-item .label{font-size:.65rem;color:#999;letter-spacing:.08em;text-transform:uppercase;min-width:70px}
+
+.downloads-section{margin-top:60px;padding:32px 30px;background:#fff;border:1px solid #e8e8e8;border-top:3px solid #217346;opacity:0}
+.dl-title{font-family:'Cormorant Garamond',serif;font-size:1.35rem;font-weight:500;color:#1e4f38;margin-bottom:6px}
+.dl-sub{font-size:.85rem;color:#666;line-height:1.7;margin-bottom:22px}
+.dl-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;margin-bottom:28px}
+.dl-card{display:block;padding:18px 18px;background:#f7faf8;border:1px solid #d7e6dd;border-radius:8px;text-decoration:none;transition:all .2s}
+.dl-card:hover{border-color:#217346;box-shadow:0 4px 16px rgba(33,115,70,.12);transform:translateY(-2px)}
+.dl-icon{font-size:1.5rem;margin-bottom:8px}
+.dl-name{font-size:.9rem;font-weight:600;color:#1a1a1a;margin-bottom:4px}
+.dl-desc{font-size:.74rem;color:#777;line-height:1.55}
+.dl-badge{display:inline-block;font-family:'Space Mono',monospace;font-size:.58rem;color:#217346;background:#e6f4ec;padding:2px 7px;border-radius:10px;margin-top:8px;letter-spacing:.04em}
+.preview-wrap{border:1px solid #e5e5e5;border-radius:8px;overflow:hidden}
+.preview-head{background:#1e4f38;color:#fff;font-size:.72rem;padding:8px 14px;font-family:'Space Mono',monospace;letter-spacing:.06em;display:flex;justify-content:space-between;align-items:center}
+.preview-scroll{overflow-x:auto}
+table.model-prev{border-collapse:collapse;width:100%;font-size:.72rem;font-family:'Space Mono',monospace;min-width:520px}
+table.model-prev th,table.model-prev td{border:1px solid #e5e5e5;padding:6px 10px;text-align:right;white-space:nowrap}
+table.model-prev th{background:#eef7f1;color:#1e4f38;text-align:center}
+table.model-prev td.lbl{text-align:left;color:#333;font-family:'Inter',sans-serif}
+table.model-prev td.blue{color:#0000ff}
+table.model-prev td.grn{color:#008000}
+table.model-prev tr.sum td{font-weight:700;background:#fafcfb}
+table.model-prev tr.big td{background:#f0fdf4;font-weight:700;color:#1e4f38}
+.prev-legend{font-size:.68rem;color:#888;margin-top:10px;display:flex;gap:16px;flex-wrap:wrap}
+.prev-legend b{font-weight:600}
+@media(max-width:1024px){
+    .container{padding:30px 20px 50px}
+    .round-card{padding:22px 20px;border-radius:12px}
+    .round-card:hover{transform:none}
+    .round-title{font-size:1.2rem}
+    .round-desc{font-size:.84rem}
+    .curriculum-grid{grid-template-columns:1fr}
+    .progress-overview{flex-direction:column;align-items:stretch;gap:10px}
+    .page-desc{font-size:.85rem}
+    .dl-grid{grid-template-columns:1fr}
+    .downloads-section{padding:22px 18px}
+}
+    </style>
+    <link rel="stylesheet" href="/assets/css/main.css">
+</head>
+<body>
+<img src="/assets/og-card.png" alt="" style="position:absolute;width:1px;height:1px;opacity:0;pointer-events:none;" aria-hidden="true">
+
+{% include sidebar.html %}
+{% include market-widget.html %}
+
+<div class="main-wrapper">
+<div class="container">
+    {% include breadcrumb.html %}
+    <h1 class="page-title">Financial Modeling Guide</h1>
+    <p class="page-subtitle">KEYBOARD · ACCOUNTING · VALUATION · DCF</p>
+    <p class="page-desc">회계의 뼈대에서 시작해 재무제표 추정, 3-statement 모델링, DCF·상대가치, 리서치 보고서 작성까지 이어지는 13라운드(R0~R12) 커리큘럼입니다. 증권사 RA·운용사·IB의 리서치 프론트 직무에서 실제로 하는 일을, 마우스에 손을 떼지 않고 '키보드만으로' 엑셀 모델을 짜는 실무 근육까지 함께 기릅니다. 마지막 라운드에서는 완성한 재무모델을 퀀트 팩터로 연결합니다.</p>
+
+    <div class="kbd-hint">
+        <span class="kh-icon">&#x2328;&#xFE0F;</span>
+        <span class="kh-text"><strong>이 가이드의 원칙 — No Mouse.</strong> 모든 모델링은 마우스 없이 <span class="kbd">F2</span> <span class="kbd">F4</span> <span class="kbd">Ctrl</span>+방향키 <span class="kbd">Alt</span> 시퀀스로 끝냅니다. 현직 애널리스트가 하루 종일 엑셀을 다루는 속도의 비밀입니다.</span>
+    </div>
+
+    <div class="progress-overview">
+        <span class="progress-label">Overall Progress</span>
+        <div class="progress-bar"><div class="progress-fill" style="width:0%"></div></div>
+        <span class="progress-text">0 / 13 Complete</span>
+    </div>
+
+    <div class="round-list">
+
+        <div class="part-header">Part I — 기초 근육: 키보드와 회계</div>
+
+        <a href="/financial-modeling/round-00/" class="round-card current">
+            <div class="round-number">Round 00 <span class="round-status status-current">&#9679; Start Here</span></div>
+            <h2 class="round-title">No-Mouse Excel — 키보드 완전정복</h2>
+            <p class="round-desc">F2·F4·Ctrl 방향키·Alt 리본 시퀀스·이름정의·표·빠른채우기. 마우스에 손 대지 않고 모델을 짜는 근본 근육을 만든다.</p>
+            <div class="round-topics">
+                <span class="topic-tag">Shortcuts</span>
+                <span class="topic-tag">F4 참조</span>
+                <span class="topic-tag">Alt Sequence</span>
+                <span class="topic-tag">Named Range</span>
+                <span class="topic-tag">감사 도구</span>
+            </div>
+        </a>
+
+        <a href="/financial-modeling/round-01/" class="round-card">
+            <div class="round-number">Round 01</div>
+            <h2 class="round-title">회계의 뼈대 — 3대 재무제표와 역학관계</h2>
+            <p class="round-desc">BS·IS·CF의 구조와 계정의 의미, 그리고 세 표가 어떻게 맞물려 돌아가는지. "감가상각 10억이 세 표에 미치는 영향"을 손으로 추적한다.</p>
+            <div class="round-topics">
+                <span class="topic-tag">재무상태표</span>
+                <span class="topic-tag">손익계산서</span>
+                <span class="topic-tag">현금흐름표</span>
+                <span class="topic-tag">역학관계</span>
+            </div>
+        </a>
+
+        <a href="/financial-modeling/round-02/" class="round-card">
+            <div class="round-number">Round 02</div>
+            <h2 class="round-title">DART에서 데이터 캐기 — 원자료 수집·가공</h2>
+            <p class="round-desc">DART·Open API에서 재무 raw data를 뽑아 엑셀로 정형화하는 파이프라인. 사업보고서·주석에서 추정에 필요한 숫자를 발라내는 법.</p>
+            <div class="round-topics">
+                <span class="topic-tag">DART</span>
+                <span class="topic-tag">Open API</span>
+                <span class="topic-tag">Raw Data</span>
+                <span class="topic-tag">데이터 정형화</span>
+            </div>
+        </a>
+
+        <div class="part-header">Part II — 밸류에이션 이론과 모델 빌드</div>
+
+        <a href="/financial-modeling/round-03/" class="round-card">
+            <div class="round-number">Round 03</div>
+            <h2 class="round-title">밸류에이션 이론 — 상대가치 vs 절대가치</h2>
+            <p class="round-desc">PER·PBR·EV/EBITDA·PSR의 논리와 함정, 그리고 DCF·RIM의 뼈대. 각 배수가 '무엇을 가정하는가'를 이해한다.</p>
+            <div class="round-topics">
+                <span class="topic-tag">PER/PBR</span>
+                <span class="topic-tag">EV/EBITDA</span>
+                <span class="topic-tag">DCF</span>
+                <span class="topic-tag">RIM</span>
+            </div>
+        </a>
+
+        <a href="/financial-modeling/round-04/" class="round-card">
+            <div class="round-number">Round 04</div>
+            <h2 class="round-title">3-Statement 모델 I — 포맷팅 & 매출 추정</h2>
+            <p class="round-desc">모델 포맷 규칙(색 컨벤션·행 구조), 그리고 매출을 물량 &times; 단가로 쪼개 추정하는 드라이버 기반 모델링. 실제 종목으로 손익계산서를 세운다.</p>
+            <div class="round-topics">
+                <span class="topic-tag">모델 포맷</span>
+                <span class="topic-tag">매출 드라이버</span>
+                <span class="topic-tag">손익추정</span>
+                <span class="topic-tag">가정 시트</span>
+            </div>
+        </a>
+
+        <a href="/financial-modeling/round-05/" class="round-card">
+            <div class="round-number">Round 05</div>
+            <h2 class="round-title">3-Statement 모델 II — BS·CF 연결과 순환참조</h2>
+            <p class="round-desc">비용·이익 추정을 마치고 BS·CF를 과거와 연결한다. Capex·순운전자본·차입금·이자, 그리고 이자↔현금의 순환참조를 반복계산으로 닫는다.</p>
+            <div class="round-topics">
+                <span class="topic-tag">BS 연결</span>
+                <span class="topic-tag">CF 연결</span>
+                <span class="topic-tag">순운전자본</span>
+                <span class="topic-tag">순환참조</span>
+            </div>
+        </a>
+
+        <a href="/financial-modeling/round-06/" class="round-card">
+            <div class="round-number">Round 06</div>
+            <h2 class="round-title">DCF & 목표주가 도출</h2>
+            <p class="round-desc">FCFF 산출 → WACC 추정 → 영구가치 → 기업가치에서 주당가치까지. 민감도 표(데이터 표)로 가정에 따른 밸류 밴드를 본다.</p>
+            <div class="round-topics">
+                <span class="topic-tag">FCFF</span>
+                <span class="topic-tag">WACC</span>
+                <span class="topic-tag">Terminal Value</span>
+                <span class="topic-tag">민감도 분석</span>
+            </div>
+        </a>
+
+        <a href="/financial-modeling/round-07/" class="round-card">
+            <div class="round-number">Round 07</div>
+            <h2 class="round-title">상대가치 실전 — Peer·멀티플·밴드차트</h2>
+            <p class="round-desc">비교기업 선정, 멀티플을 활용한 목표주가, 그리고 과거 밸류에이션 밴드차트 제작. 절대가치와 교차 검증한다.</p>
+            <div class="round-topics">
+                <span class="topic-tag">Peer Group</span>
+                <span class="topic-tag">멀티플</span>
+                <span class="topic-tag">밴드차트</span>
+                <span class="topic-tag">교차검증</span>
+            </div>
+        </a>
+
+        <div class="part-header">Part III — 맥락: 매크로·산업·보고서</div>
+
+        <a href="/financial-modeling/round-08/" class="round-card">
+            <div class="round-number">Round 08</div>
+            <h2 class="round-title">매크로 렌즈 — 금리·환율·물가</h2>
+            <p class="round-desc">추정의 전제가 되는 거시 변수 읽는 법. 금리·환율·물가·원자재가 기업 실적과 밸류에이션에 어떻게 침투하는지.</p>
+            <div class="round-topics">
+                <span class="topic-tag">금리</span>
+                <span class="topic-tag">환율</span>
+                <span class="topic-tag">물가</span>
+                <span class="topic-tag">원자재</span>
+            </div>
+        </a>
+
+        <a href="/financial-modeling/round-09/" class="round-card">
+            <div class="round-number">Round 09</div>
+            <h2 class="round-title">산업분석 방법론 — 공급·수요·경쟁</h2>
+            <p class="round-desc">산업의 특성을 구조적으로 뜯어보는 프레임(공급측·수요측·밸류체인·규제). 섹터별로 밸류에이션 기법이 왜 갈리는지.</p>
+            <div class="round-topics">
+                <span class="topic-tag">산업 구조</span>
+                <span class="topic-tag">밸류체인</span>
+                <span class="topic-tag">경쟁 분석</span>
+                <span class="topic-tag">섹터 특성</span>
+            </div>
+        </a>
+
+        <a href="/financial-modeling/round-10/" class="round-card">
+            <div class="round-number">Round 10</div>
+            <h2 class="round-title">리서치 보고서 작성 — 논리를 파는 글</h2>
+            <p class="round-desc">투자의견·목표주가·투자포인트·리스크의 구조. 모델의 숫자를 설득력 있는 20~30p 보고서로 옮기는 법과 포트폴리오 활용.</p>
+            <div class="round-topics">
+                <span class="topic-tag">투자포인트</span>
+                <span class="topic-tag">목표주가</span>
+                <span class="topic-tag">리스크</span>
+                <span class="topic-tag">포트폴리오</span>
+            </div>
+        </a>
+
+        <div class="part-header">Part IV — 확장: 퀀트 브릿지 & 캡스톤</div>
+
+        <a href="/financial-modeling/round-11/" class="round-card">
+            <div class="round-number">Round 11</div>
+            <h2 class="round-title">퀀트 브릿지 — 모델을 팩터로</h2>
+            <p class="round-desc">한 종목 손추정에서 멈추지 않고, 재무 데이터를 밸류·퀄리티 팩터로 바꿔 전 종목에 적용한다. CS 배경을 살려 파이썬으로 확장하는 다리.</p>
+            <div class="round-topics">
+                <span class="topic-tag">밸류 팩터</span>
+                <span class="topic-tag">퀄리티 팩터</span>
+                <span class="topic-tag">Python</span>
+                <span class="topic-tag">횡단면</span>
+            </div>
+        </a>
+
+        <a href="/financial-modeling/round-12/" class="round-card">
+            <div class="round-number">Round 12</div>
+            <h2 class="round-title">캡스톤 — 종목 하나 풀 커버리지</h2>
+            <p class="round-desc">종목 하나를 골라 데이터 수집 → 3-statement 모델 → DCF·상대가치 → 리서치 보고서까지 처음부터 끝까지. 포트폴리오로 남길 완성작.</p>
+            <div class="round-topics">
+                <span class="topic-tag">Full Model</span>
+                <span class="topic-tag">Initiation</span>
+                <span class="topic-tag">포트폴리오</span>
+                <span class="topic-tag">발표</span>
+            </div>
+        </a>
+
+    </div>
+
+    <div class="downloads-section">
+        <h2 class="dl-title">&#x1F4E5; 실습 파일 다운로드</h2>
+        <p class="dl-sub">가이드 내용을 그대로 열어서 채우는 실제 엑셀 파일입니다. <strong>완성본</strong>으로 정답 모델을 뜯어보고, <strong>실습본</strong>으로 추정연도를 직접 채우고, <strong>키보드 드릴</strong>로 손을 단련하세요. 모든 셀은 파랑=입력 / 검정=수식 / 초록=타 시트 링크 컨벤션을 따릅니다.</p>
+        <div class="dl-grid">
+            <a class="dl-card" href="/financial-modeling/downloads/3-statement-model-complete.xlsx" download>
+                <div class="dl-icon">&#x1F4CA;</div>
+                <div class="dl-name">3-Statement 모델 · 완성본</div>
+                <div class="dl-desc">가정/IS/BS/CF/DCF 5개 시트가 수식으로 완전 연결된 라이브 모델. 가정만 바꾸면 목표주가까지 갱신됩니다.</div>
+                <span class="dl-badge">R4 · R5 · R6</span>
+            </a>
+            <a class="dl-card" href="/financial-modeling/downloads/3-statement-model-practice.xlsx" download>
+                <div class="dl-icon">&#x270F;&#xFE0F;</div>
+                <div class="dl-name">3-Statement 모델 · 실습본</div>
+                <div class="dl-desc">실적·가정만 채워져 있고 추정연도는 비어 있습니다. 직접 채우면 소계·검증(대차일치)이 자동으로 맞아떨어집니다.</div>
+                <span class="dl-badge">직접 채우기</span>
+            </a>
+            <a class="dl-card" href="/financial-modeling/downloads/excel-keyboard-drills.xlsx" download>
+                <div class="dl-icon">&#x2328;&#xFE0F;</div>
+                <div class="dl-name">키보드 드릴</div>
+                <div class="dl-desc">이동·선택 연습, F2·F4로 짓는 미니 손익모델, 단축키 치트시트. 마우스를 치우고 하세요.</div>
+                <span class="dl-badge">R0</span>
+            </a>
+        </div>
+        <div class="preview-wrap">
+            <div class="preview-head"><span>미리보기 — 완성본 산출 결과</span><span>단위: 억원</span></div>
+            <div class="preview-scroll">
+            <table class="model-prev">
+                <tr><th>손익계산서</th><th>2024A</th><th>2025E</th><th>2026E</th><th>2027E</th></tr>
+                <tr><td class="lbl">매출액</td><td class="blue">1,230</td><td class="grn">1,316</td><td class="grn">1,408</td><td class="grn">1,507</td></tr>
+                <tr class="sum"><td class="lbl">영업이익</td><td>221</td><td>237</td><td>253</td><td>271</td></tr>
+                <tr class="sum"><td class="lbl">당기순이익</td><td>157</td><td>169</td><td>182</td><td>196</td></tr>
+                <tr><td class="lbl">BS 검증(자산-부채-자본)</td><td>0</td><td>0</td><td>0</td><td>0</td></tr>
+            </table>
+            </div>
+        </div>
+        <div class="preview-scroll" style="margin-top:14px">
+        <table class="model-prev" style="min-width:420px">
+            <tr><th>DCF 밸류에이션</th><th>값</th></tr>
+            <tr><td class="lbl">기업가치 (EV)</td><td>2,466억</td></tr>
+            <tr><td class="lbl">(-) 순차입금</td><td>(68)억</td></tr>
+            <tr class="sum"><td class="lbl">자기자본가치</td><td>2,534억</td></tr>
+            <tr class="big"><td class="lbl">주당 내재가치</td><td>5,068원</td></tr>
+            <tr><td class="lbl">현재주가(가정) / 상승여력</td><td class="blue">4,000원 <span style="color:#217346">· +27%</span></td></tr>
+        </table>
+        </div>
+        <div class="prev-legend">
+            <span><b style="color:#0000ff">■</b> 파랑 = 입력</span>
+            <span><b style="color:#000">■</b> 검정 = 수식</span>
+            <span><b style="color:#008000">■</b> 초록 = 타 시트 링크</span>
+            <span>· 예시 데이터는 가상의 제조업 기업입니다</span>
+        </div>
+    </div>
+
+    <div class="curriculum-info">
+        <div class="curriculum-title">Curriculum Overview</div>
+        <div class="curriculum-grid">
+            <div class="curriculum-item"><span class="label">Tool</span> Microsoft Excel (키보드 우선) + Python(R11~)</div>
+            <div class="curriculum-item"><span class="label">Data</span> DART 전자공시 · 한국은행 ECOS · 공개 재무데이터</div>
+            <div class="curriculum-item"><span class="label">Level</span> 금융권 취업 준비 · 학부 상위~석사</div>
+            <div class="curriculum-item"><span class="label">Format</span> 이론 + 키보드 실습 + 모델 빌드 + Quiz</div>
+            <div class="curriculum-item"><span class="label">Goal</span> 리서치 보고서 1편을 스스로 완성하는 실무 역량</div>
+            <div class="curriculum-item"><span class="label">Rounds</span> 13 (R0~R12)</div>
+        </div>
+    </div>
+
+</div>
+</div>
+
+<script>
+gsap.to('.page-title',{opacity:1,y:0,duration:.6,delay:.2});
+gsap.to('.page-subtitle',{opacity:1,duration:.5,delay:.35});
+gsap.to('.page-desc',{opacity:1,duration:.5,delay:.45});
+gsap.to('.kbd-hint',{opacity:1,duration:.5,delay:.5});
+gsap.to('.progress-overview',{opacity:1,duration:.5,delay:.55});
+gsap.to('.part-header',{opacity:1,duration:.5,delay:.6,stagger:.1});
+gsap.to('.round-card',{opacity:1,y:0,duration:.5,delay:.65,stagger:.05});
+gsap.to('.downloads-section',{opacity:1,duration:.5,delay:1.8});
+gsap.to('.curriculum-info',{opacity:1,duration:.5,delay:2});
+gsap.set('.page-title',{y:15});
+gsap.set('.round-card',{y:20});
+</script>
+
+</body>
+</html>

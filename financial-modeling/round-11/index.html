@@ -1,0 +1,445 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Round 11 - 퀀트 브릿지 — 모델을 팩터로 | Financial Modeling Guide</title>
+<script>
+MathJax = { tex: { inlineMath: [['\\(','\\)']], displayMath: [['\\[','\\]'],['$$','$$']] } };
+</script>
+<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;500&family=Space+Mono:wght@400&family=Inter:wght@300;400&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Inter',sans-serif;background:#fafaf8;color:#1a1a1a;line-height:1.7;overflow-x:hidden}
+.sidebar{position:fixed;left:0;top:0;width:260px;height:100vh;background:rgba(255,255,255,.97);border-right:1px solid rgba(0,0,0,.06);padding:32px 24px;z-index:100;overflow-y:auto;display:flex;flex-direction:column}
+.sidebar-profile{text-align:center;margin-bottom:28px;padding-bottom:24px;border-bottom:1px solid rgba(0,0,0,.08)}
+.profile-icon{font-size:48px;margin-bottom:8px}
+.profile-name{font-family:'Cormorant Garamond',serif;font-size:1.3rem;font-weight:500;margin-bottom:4px}
+.profile-title{font-size:.68rem;color:#888;letter-spacing:.08em;text-transform:uppercase;margin-bottom:8px}
+.profile-bio{font-size:.78rem;color:#666;line-height:1.5}
+.sidebar-nav{flex:1;margin-top:16px}.nav-section{margin-bottom:20px}.nav-section-title{font-size:.6rem;font-weight:600;color:#aaa;letter-spacing:.15em;text-transform:uppercase;margin-bottom:10px}.nav-list{list-style:none}.nav-list li{margin-bottom:5px}.nav-list a{font-size:.78rem;color:#555;text-decoration:none;transition:all .2s;display:block;padding:3px 0}.nav-list a:hover{color:#217346;padding-left:4px}.nav-list a.active{color:#217346;font-weight:500}.nav-list a.done{color:#28a745}.badge{display:inline-block;font-size:.5rem;background:#217346;color:#fff;padding:1px 5px;border-radius:8px;margin-left:3px;vertical-align:middle}.badge-done{background:#28a745}.sidebar-footer{padding-top:16px;border-top:1px solid rgba(0,0,0,.06);font-size:.65rem;color:#aaa;text-align:center}
+.main-wrapper{margin-left:260px;min-height:100vh}.container{max-width:1100px;margin:0 auto;padding:50px 40px 80px}
+.paper-content{font-family:'Times New Roman','Nanum Myeongjo',serif;line-height:1.8;background:#fff;padding:40px;border-radius:8px;box-shadow:0 2px 20px rgba(0,0,0,.05)}.paper-header{text-align:center;margin-bottom:40px;padding-bottom:30px;border-bottom:2px solid #333}.paper-category{font-size:14px;color:#666;margin-bottom:10px}.paper-title{font-size:24px;font-weight:bold;margin-bottom:12px;line-height:1.4}.paper-subtitle{font-size:14px;color:#555;margin-bottom:8px}.paper-team{font-size:13px;color:#444}
+.abstract{background:#f8f9fa;padding:25px;margin:30px 0;border-left:4px solid #217346}.abstract-title{font-weight:bold;font-size:16px;margin-bottom:15px}
+h2{font-size:18px;margin:35px 0 20px;padding-bottom:8px;border-bottom:1px solid #ddd;color:#1e4f38}h3{font-size:15px;margin:25px 0 15px;color:#34495e}
+p{text-align:justify;margin-bottom:15px;text-indent:2em}p.ni{text-indent:0}
+table{width:100%;border-collapse:collapse;margin:20px 0;font-size:12px}th,td{border:1px solid #ddd;padding:10px 8px;text-align:center}th{background:#1e4f38;color:white;font-weight:bold}tr:nth-child(even){background:#f8f9fa}tr:hover{background:#eef7f1}
+.tc{font-size:13px;font-weight:bold;margin:15px 0 10px;text-align:center}.eq{text-align:center;margin:20px 0;padding:15px;background:#f8f9fa;border-radius:4px;overflow-x:auto}ul,ol{margin-left:2em;margin-bottom:15px}li{margin-bottom:6px}
+.def{background:#fff9e6;border:1px solid #ffc107;border-radius:4px;padding:20px;margin:20px 0}.info{background:#e8f4f8;border-left:4px solid #3498db;padding:20px;margin:20px 0}.warn{background:#fff3cd;border-left:4px solid #f39c12;padding:20px;margin:20px 0}.ok{background:#d4edda;border-left:4px solid #28a745;padding:20px;margin:20px 0}
+.paper-anchor{background:#ecfdf3;border:1px solid #10b981;border-radius:6px;padding:22px;margin:24px 0}.paper-anchor .pa-label{font-family:'Space Mono',monospace;font-size:10px;color:#047857;letter-spacing:.15em;text-transform:uppercase;margin-bottom:8px}.paper-anchor .pa-title{font-weight:bold;font-size:14px;margin-bottom:6px}.paper-anchor p{font-size:13px;text-indent:0;margin-bottom:8px}
+.task{background:#e8f8f0;border-left:4px solid #00b894;padding:20px;margin:20px 0}.task .task-title{font-weight:bold;margin-bottom:10px}
+details.quiz-item{margin:14px 0;padding:14px 18px;background:#f8f9fa;border:1px solid #e0e0e0;border-radius:6px}details.quiz-item summary{cursor:pointer;font-weight:bold;font-size:13.5px}details.quiz-item[open] summary{margin-bottom:10px;color:#217346}details.quiz-item .answer{font-size:13px;padding:10px 14px;background:#fff;border-left:3px solid #217346}
+pre{background:#1e1e1e;color:#d4d4d4;padding:20px;border-radius:6px;overflow-x:auto;margin:20px 0;font-family:'Space Mono','Consolas',monospace;font-size:13px;line-height:1.6}code{font-family:'Space Mono','Consolas',monospace;font-size:13px}p code,li code,td code{background:#f0f0f0;padding:2px 6px;border-radius:3px;color:#0a7f4e;font-size:12px}
+.cm{color:#6a9955}.kw{color:#569cd6}.st{color:#ce9178}.fn{color:#dcdcaa}.nb{color:#4ec9b0}.nu{color:#b5cea8}
+.kbd{display:inline-block;font-family:'Space Mono',monospace;font-size:.82em;background:#f7faf8;border:1px solid #c9d6cd;border-bottom-width:2px;border-radius:4px;padding:1px 7px;color:#1e4f38;margin:0 1px;white-space:nowrap;line-height:1.9}
+.keyseq{background:#0f1a14;color:#d4f0e0;padding:16px 20px;border-radius:6px;margin:18px 0;font-family:'Space Mono',monospace;font-size:12.5px;line-height:2.1}.keyseq .k{display:inline-block;background:#1c3327;border:1px solid #2f5a45;border-bottom-width:2px;border-radius:4px;padding:1px 7px;color:#8ff0bf;margin:0 2px}.keyseq .arrow{color:#5a8a72;margin:0 4px}.keyseq .note{color:#6f9c86;font-size:11px}.keyseq .grp{display:inline-block;margin:3px 0}
+.progress-bar{width:100%;height:6px;background:#e0e0e0;border-radius:3px;margin-top:16px}.progress-fill{height:100%;background:linear-gradient(90deg,#217346,#10b981);border-radius:3px;width:0%}.progress-label{font-size:11px;color:#888;margin-top:4px;text-align:center}
+.code-output{background:#1e1e1e;color:#d4d4d4;padding:12px 16px;border-radius:0 0 6px 6px;font-family:'Space Mono',monospace;font-size:11.5px;line-height:1.6;margin-top:-4px;margin-bottom:18px;border-top:2px solid #333;white-space:pre-wrap;overflow-x:auto}.code-output .out-label{color:#888;font-size:10px;margin-bottom:4px;display:block}
+.nav-footer{display:flex;justify-content:space-between;gap:16px;margin-top:50px;padding-top:24px;border-top:1px solid #ddd;font-family:'Inter',sans-serif}.nav-footer a{font-size:.82rem;color:#217346;text-decoration:none;padding:12px 18px;border:1px solid #cfe6da;border-radius:6px;transition:all .2s;max-width:48%}.nav-footer a:hover{background:#217346;color:#fff;border-color:#217346}.nav-footer .nf-label{display:block;font-size:.6rem;color:#999;letter-spacing:.1em;text-transform:uppercase;margin-bottom:4px}.nav-footer a:hover .nf-label{color:rgba(255,255,255,.7)}
+@media(max-width:1024px){.sidebar{width:100%;height:auto;position:relative;border-right:none;border-bottom:1px solid rgba(0,0,0,.08);padding:16px}.sidebar-profile{margin-bottom:10px;padding-bottom:10px;display:flex;align-items:center;gap:12px;text-align:left}.profile-icon{font-size:32px;margin-bottom:0}.profile-bio{display:none}.nav-section{display:inline-block;margin-right:16px;margin-bottom:8px}.nav-list{display:flex;gap:10px;flex-wrap:wrap}.nav-list li{margin-bottom:0}.sidebar-footer{display:none}.main-wrapper{margin-left:0}.container{padding:0}.paper-content{padding:20px 16px;border-radius:0;box-shadow:none}.paper-title{font-size:18px}p{font-size:14px;text-indent:1.5em;text-align:left}pre{font-size:11px;padding:14px}table{font-size:10px;display:block;overflow-x:auto}.keyseq{font-size:11px}.nav-footer{flex-direction:column}.nav-footer a{max-width:100%}}
+</style>
+</head>
+<body>
+
+<div class="sidebar">
+<div class="sidebar-profile">
+<div class="profile-icon">&#x1F4CA;</div>
+<div class="profile-name">Financial Modeling Guide</div>
+<div class="profile-title">Keyboard &middot; Accounting &middot; Valuation</div>
+<div class="profile-bio">13 Rounds: 키보드로 짓는 재무모델부터 리서치 보고서까지</div>
+</div>
+<div class="sidebar-nav">
+<div class="nav-section">
+<div class="nav-section-title">Curriculum</div>
+<ul class="nav-list">
+<li><a href="../">&#x2302; Guide Home</a></li>
+<li><a href="../round-00/">R0. No-Mouse Excel</a></li>
+<li><a href="../round-01/">R1. 회계의 뼈대</a></li>
+<li><a href="../round-02/">R2. DART 데이터 수집</a></li>
+<li><a href="../round-03/">R3. 밸류에이션 이론</a></li>
+<li><a href="../round-04/">R4. 3-Statement I</a></li>
+<li><a href="../round-05/">R5. 3-Statement II</a></li>
+<li><a href="../round-06/">R6. DCF & 목표주가</a></li>
+<li><a href="../round-07/">R7. 상대가치 실전</a></li>
+<li><a href="../round-08/">R8. 매크로 렌즈</a></li>
+<li><a href="../round-09/">R9. 산업분석</a></li>
+<li><a href="../round-10/">R10. 리서치 보고서</a></li>
+<li><a class="active" href="#">R11. 퀀트 브릿지 <span class="badge">NOW</span></a></li>
+<li><a href="../round-12/">R12. 캡스톤</a></li>
+</ul>
+</div>
+<div class="nav-section">
+<div class="nav-section-title">This Lecture</div>
+<ul class="nav-list">
+<li><a href="#ch1">1. 한 종목에서 전 종목으로</a></li>
+<li><a href="#ch2">2. 재무 지표 → 팩터</a></li>
+<li><a href="#ch3">3. 밸류 팩터</a></li>
+<li><a href="#ch4">4. 퀄리티 팩터</a></li>
+<li><a href="#ch5">5. 파이썬으로 확장</a></li>
+<li><a href="#ch6">6. 함정</a></li>
+<li><a href="#ch7">7. 백테스트 개괄</a></li>
+<li><a href="#ch8">8. 다음 단계</a></li>
+<li><a href="#quiz">Quiz</a></li>
+<li><a href="#cheatsheet">&#x1F4CB; Cheat Sheet</a></li>
+</ul>
+</div>
+</div>
+<div class="sidebar-footer">Round 11 of 12 &middot; Part IV</div>
+</div>
+
+<div class="main-wrapper">
+<div class="container">
+<div class="paper-content">
+
+<div class="paper-header">
+<div class="paper-category">Round 11 / 12</div>
+<h1 class="paper-title">퀀트 브릿지 — 모델을 팩터로</h1>
+<div class="paper-subtitle">한 종목의 재무 논리를 2000종목의 횡단면 신호로 확장한다</div>
+<div class="paper-team">Reference: Fama-French Factor Models &middot; Grinold-Kahn <em>Active Portfolio Management</em> &middot; Marcos López de Prado <em>Advances in Financial ML</em></div>
+<div class="progress-bar"><div class="progress-fill" style="width:92%"></div></div>
+<div class="progress-label">Overall Progress: 11/12 Rounds</div>
+</div>
+
+<div class="abstract">
+<div class="abstract-title">이 라운드가 다리를 놓는 지점</div>
+<p class="ni">R1~R10에서 우리는 <strong>한 종목</strong>을 깊게 파는 법을 배웠다. 재무제표를 뜯고, 3-statement 모델을 짓고, DCF로 목표주가를 뽑고, 리서치 보고서로 논리를 완성했다. 그런데 여기서 자연스러운 질문이 하나 생긴다. "이 재무 논리가 삼양식품 하나에서 통했다면, 코스피·코스닥 2000종목에 <strong>동시에</strong> 적용하면 어떻게 될까?" 이 라운드는 그 질문에 대한 답 — <strong>펀더멘털 모델링에서 퀀트로 넘어가는 다리</strong>다. 이 라운드에서는:</p>
+<ul>
+<li>펀더멘털 애널리스트의 '깊이'와 퀀트의 '규모'가 어떻게 다른 무기인지, 그리고 <strong>CS 배경이 왜 여기서 결정적 무기</strong>가 되는지</li>
+<li>R1의 재무비율(PBR·ROE·부채비율)을 <strong>밸류·퀄리티 팩터의 원재료</strong>로 다시 보는 발상 전환</li>
+<li>"좋은 지표"를 횡단면 신호로 바꾸는 도구 — 랭킹, z-score \( z_i=\frac{x_i-\mu}{\sigma} \), 분위(quantile) 포트폴리오</li>
+<li>pandas로 전 종목 재무데이터를 로드 → 팩터 계산 → 랭킹하는 <strong>짧은 파이썬 코드</strong></li>
+<li>퀀트를 죽이는 3대 함정 — look-ahead bias, 생존편향, 데이터 스누핑 (R2의 point-in-time과 연결)</li>
+<li>백테스트의 뼈대 — 분위 포트폴리오 수익률, IC(정보계수), 롱숏 스프레드</li>
+<li>마지막으로 이 가이드의 <strong>자매 가이드</strong>(Factor Investing / Quant Researcher)로 자연스럽게 넘어가는 길</li>
+</ul>
+<p class="ni"><strong>Keywords:</strong> 횡단면(cross-section), z-score, 분위 포트폴리오, 밸류 팩터, 퀄리티 팩터, look-ahead bias, point-in-time, 생존편향, IC, 롱숏 스프레드</p>
+</div>
+
+<div class="info">
+<p class="ni"><strong>&#x1F4A1; 이 라운드의 위치.</strong> 이건 '퀀트 입문 강의'가 아니다. <strong>펀더멘털 모델러가 이미 아는 재무 논리를 퀀트의 언어로 다시 번역</strong>하는 브릿지 라운드다. 깊은 팩터 이론·ML·백테스트 엔진은 8장에서 연결하는 자매 가이드에서 본격적으로 다룬다. 여기서는 "아, 내가 아는 재무비율이 곧 팩터구나"라는 <strong>관점의 전환</strong>만 확실히 잡으면 된다.</p>
+</div>
+
+<!-- ═══════════════════════════════════════════ CH1 ═══════════════════════════════════════════ -->
+
+<h2 id="ch1">1. 한 종목에서 전 종목으로 — 깊이 vs 규모</h2>
+
+<p>펀더멘털 애널리스트와 퀀트는 같은 재무 데이터를 본다. 그런데 <strong>바라보는 방향</strong>이 90도 다르다.</p>
+
+<p class="ni"><strong>펀더멘털은 '세로'로 판다.</strong> 삼양식품 하나를 골라, 10년치 재무제표를 세로로 훑고, 경영진 IR을 듣고, 불닭볶음면 수출 데이터를 뜯는다. 종목 하나에 대해 <strong>남들이 모르는 깊이</strong>를 확보하는 게 무기다. R6에서 DCF로 목표주가를 뽑을 때 우리가 한 일이 바로 이 '깊이'다.</p>
+
+<p class="ni"><strong>퀀트는 '가로'로 훑는다.</strong> 같은 재무 논리 — 이를테면 "저평가된 종목이 초과수익을 낸다" — 를 삼양식품 하나가 아니라 <strong>같은 시점의 2000종목 전부</strong>에 코드로 동시 적용한다. 한 종목당 깊이는 얕지만, 2000개를 한꺼번에 줄 세워 '평균적으로 통하는 규칙'을 찾는다. 이 '가로 한 줄'을 <strong>횡단면(cross-section)</strong>이라 부른다.</p>
+
+<div class="def">
+<p class="ni"><strong>&#x1F511; 횡단면(Cross-section)이란.</strong> 시간축을 고정하고(예: 2025년 3월 말) 그 순간 모든 종목을 한 줄로 늘어놓은 단면. 펀더멘털이 "삼양식품의 시간에 따른 변화(시계열)"를 본다면, 퀀트는 "이 순간 2000종목이 서로 어떻게 다른가(횡단면)"를 본다. 팩터 투자는 근본적으로 <strong>횡단면 게임</strong>이다.</p>
+</div>
+
+<p class="ni"><strong>깊이 vs 규모는 우열이 아니라 트레이드오프다.</strong> 깊이는 종목당 정확도가 높지만 커버할 수 있는 종목 수가 적고, 규모는 종목당 정확도는 낮지만 2000개에 걸쳐 <strong>작은 우위(edge)를 대수의 법칙으로 쌓는다</strong>. 퀀트가 "종목 하나는 틀려도 괜찮다, 평균적으로 맞으면 된다"고 말하는 이유가 여기 있다.</p>
+
+<div class="paper-anchor">
+<div class="pa-label">Quant Anchor &middot; 하이브리드 경쟁력</div>
+<div class="pa-title">재무제표를 읽을 줄 아는 퀀트, 코드를 쓸 줄 아는 애널리스트</div>
+<p>순수 퀀트는 팩터를 통계적으로 잘 다루지만 "이 회사가 왜 이런 재무구조인가"라는 <strong>맥락</strong>이 약하다. 순수 펀더멘털은 맥락이 깊지만 2000종목을 코드로 훑지 못한다. <strong>재무제표를 R1 수준으로 읽으면서 동시에 pandas로 전 종목을 처리할 수 있는 사람</strong>이 가장 희소하다. 팩터가 왜 무너지는지(예: 밸류 팩터가 특정 산업 편중에서 오는 착시인지)를 재무 지식으로 판별할 수 있기 때문이다. 이 가이드를 여기까지 온 당신 — 재무 논리를 갖춘 CS 석사 — 이 바로 그 하이브리드의 출발점에 서 있다.</p>
+</div>
+
+<div class="info">
+<p class="ni"><strong>&#x1F4BB; CS 배경이 무기가 되는 순간.</strong> 지금까지 열 라운드는 엑셀이 주무대였다. 그런데 종목이 2000개가 되는 순간 엑셀은 무너진다 — 손으로 참조를 잡을 수 없고, VLOOKUP 수천 개가 시트를 마비시킨다. 여기서 <strong>루프·함수·벡터 연산</strong>을 자연스럽게 떠올리는 CS 훈련이 결정적 우위가 된다. 애널리스트가 "이걸 어떻게 2000번 하지?"에서 막힐 때, 당신은 <code>df.rank()</code> 한 줄을 떠올린다.</p>
+</div>
+
+<!-- ═══════════════════════════════════════════ CH2 ═══════════════════════════════════════════ -->
+
+<h2 id="ch2">2. 재무 지표 → 팩터 — 같은 숫자, 다른 쓰임</h2>
+
+<p>R1에서 우리는 재무비율을 <strong>한 종목을 진단하는 도구</strong>로 배웠다. PBR이 낮으면 저평가, ROE가 높으면 자본을 잘 굴린다, 부채비율이 높으면 위험하다 — 이 판단은 그대로 유효하다. 퀀트는 여기에 한 가지를 더한다. <strong>같은 지표를 2000종목에 걸쳐 줄 세운다.</strong></p>
+
+<div class="def">
+<p class="ni"><strong>&#x1F511; 팩터(Factor)란.</strong> 종목 간 수익률 차이를 설명하는 <strong>공통 특성</strong>. "저PBR 종목 묶음이 고PBR 종목 묶음보다 장기적으로 초과수익을 낸다"가 사실이라면, PBR은 하나의 팩터(밸류 팩터)다. 즉 팩터는 "이 재무 특성으로 종목을 줄 세우면 미래 수익률과 관계가 있다"는 가설이자 그 신호값이다.</p>
+</div>
+
+<p class="ni">발상의 전환은 딱 한 문장이다. <strong>"좋은 지표"를 "횡단면 신호"로 바꾼다.</strong> 애널리스트는 "삼양식품 PBR 2.1배는 비싼가?"를 묻는다. 퀀트는 "이 순간 2000종목 중 삼양식품 PBR이 <strong>몇 등인가?</strong>"를 묻는다. 절대값이 아니라 <strong>상대 순위</strong>로 바꾸는 것 — 이게 재무 지표를 팩터로 만드는 핵심이다.</p>
+
+<div class="tc">Table 2.1. 재무 지표 → 팩터 매핑 (원재료는 이미 R1에서 배웠다)</div>
+<table>
+<tr><th style="width:24%">재무 지표 (R1)</th><th style="width:22%">팩터 계열</th><th style="width:54%">횡단면 가설</th></tr>
+<tr><td>PBR, PER, PSR</td><td>밸류(Value)</td><td>싸게 거래되는 종목이 장기 초과수익</td></tr>
+<tr><td>ROE, ROA, 영업이익률</td><td>퀄리티(Quality)</td><td>자본을 잘 굴리는 회사가 초과수익</td></tr>
+<tr><td>부채비율, 이자보상배율</td><td>퀄리티/안정성</td><td>재무가 튼튼할수록 하방 방어</td></tr>
+<tr><td>영업현금흐름/자산</td><td>퀄리티(수익성)</td><td>실제 현금 창출력이 높은 회사</td></tr>
+<tr><td>이익 변동성(과거 편차)</td><td>퀄리티(안정성)</td><td>이익이 들쭉날쭉하지 않은 회사</td></tr>
+</table>
+
+<div class="ok">
+<p class="ni"><strong>안심하라 — 새로 배울 재무 지식은 없다.</strong> 위 표의 왼쪽 열은 전부 R1에서 이미 다룬 것들이다. 퀀트로 넘어가는 데 필요한 건 <strong>새로운 재무 지식이 아니라 새로운 관점</strong> — 절대 판단을 상대 순위로 바꾸고, 한 종목을 2000종목으로 늘리는 것뿐이다.</p>
+</div>
+
+<!-- ═══════════════════════════════════════════ CH3 ═══════════════════════════════════════════ -->
+
+<h2 id="ch3">3. 밸류 팩터 — 싼 게 정말 이기는가</h2>
+
+<p>밸류 팩터의 가설은 단순하다. <strong>"저PBR/저PER 종목 묶음이 고평가 묶음보다 장기적으로 초과수익을 낸다."</strong> Fama-French가 1992년 논문에서 통계적으로 보인 이래 가장 유명한 팩터다. 문제는 이걸 어떻게 <strong>2000종목에 걸쳐 신호로 만드느냐</strong>다.</p>
+
+<h3>3.1 랭킹 — 가장 단순한 신호</h3>
+
+<p class="ni">가장 소박한 방법. 2000종목을 PBR 낮은 순으로 줄 세우고 순위를 신호로 쓴다. 1등(가장 싼 종목)이 신호 최상, 2000등(가장 비싼 종목)이 최하. 단위(배수)를 버리고 <strong>순서 정보</strong>만 남기므로 극단적 이상치(PBR 500배 같은)에 강하다.</p>
+
+<h3>3.2 z-score — 표준화로 팩터를 합치기</h3>
+
+<p class="ni">랭킹은 간단하지만 '얼마나 싼지'의 정도를 버린다. 밸류와 퀄리티처럼 <strong>단위가 다른 팩터를 합칠 때</strong>는 각 팩터를 같은 척도로 표준화해야 한다. 이때 쓰는 게 <strong>횡단면 z-score</strong>다.</p>
+
+<div class="eq">
+\[ z_i=\frac{x_i-\mu}{\sigma} \]
+</div>
+
+<p class="ni">여기서 \( x_i \)는 종목 \(i\)의 지표값, \( \mu \)는 <strong>그 순간 2000종목 전체의 평균</strong>, \( \sigma \)는 표준편차다. z-score는 "이 종목이 전체 평균에서 표준편차 몇 개만큼 떨어져 있는가"를 뜻한다. \( z=+2 \)면 평균보다 2σ 위(그 지표가 매우 큰 축), \( z=-1 \)이면 1σ 아래. <strong>단위가 사라지므로</strong> PBR z-score와 ROE z-score를 그냥 더해 종합 점수를 만들 수 있다.</p>
+
+<div class="warn">
+<p class="ni"><strong>방향 정렬을 잊지 마라.</strong> 밸류는 "낮을수록 좋다"(저PBR)지만 퀄리티는 "높을수록 좋다"(고ROE)다. z-score를 더하기 전에 <strong>모든 팩터가 "클수록 좋다"로 방향을 맞춰야</strong> 한다. 밸류는 부호를 뒤집거나(<code>-z</code>), 애초에 <code>1/PBR</code>(=BM, 장부가/시가) 같은 "클수록 싼" 지표로 계산한다. 방향이 섞이면 종합 점수가 무의미해진다 — 초심자가 가장 자주 하는 실수.</p>
+</div>
+
+<h3>3.3 분위(Quantile) 포트폴리오 — 신호를 검증하는 틀</h3>
+
+<p class="ni">신호를 만들었으면 "정말 통하는가"를 봐야 한다. 표준 방법이 <strong>분위 포트폴리오</strong>다. 2000종목을 신호값 순으로 정렬해 <strong>5등분(quintile)</strong> 또는 10등분(decile)한다. Q1은 신호 최상위 400종목, Q5는 최하위 400종목. 각 묶음의 다음 기간 수익률을 재보면:</p>
+
+<ul>
+<li>Q1(가장 싼 묶음)이 Q5(가장 비싼 묶음)보다 <strong>수익률이 높으면</strong> → 밸류 팩터가 이 시장·기간에서 작동</li>
+<li>Q1 &gt; Q2 &gt; ... &gt; Q5로 <strong>단조롭게(monotonic) 감소</strong>하면 → 신호가 깔끔하다는 강한 증거</li>
+<li>순서가 뒤죽박죽이면 → 신호가 약하거나 노이즈</li>
+</ul>
+
+<p class="ni"><strong>Q1 매수 + Q5 매도</strong>를 동시에 하는 게 뒤에 나올 <strong>롱숏 포트폴리오</strong>다. 시장 전체가 오르내리는 효과를 상쇄하고 <strong>팩터 순수 수익</strong>만 뽑아낸다.</p>
+
+<!-- ═══════════════════════════════════════════ CH4 ═══════════════════════════════════════════ -->
+
+<h2 id="ch4">4. 퀄리티 팩터 — 좋은 회사가 좋은 주식인가</h2>
+
+<p>밸류가 "싼가?"를 묻는다면 퀄리티는 <strong>"좋은 회사인가?"</strong>를 묻는다. 좋은 회사의 정의는 R1의 재무 지식 그대로다 — 자본을 잘 굴리고(고ROE), 이익이 안정적이며, 빚이 적은 회사.</p>
+
+<div class="tc">Table 4.1. 퀄리티 팩터의 구성 요소 (전부 재무제표에서 계산)</div>
+<table>
+<tr><th style="width:30%">구성 요소</th><th style="width:34%">계산</th><th style="width:36%">클수록 좋은가?</th></tr>
+<tr><td>수익성 (ROE)</td><td>당기순이익 / 자기자본</td><td>&#x2705; 높을수록</td></tr>
+<tr><td>수익성 (ROA)</td><td>당기순이익 / 총자산</td><td>&#x2705; 높을수록</td></tr>
+<tr><td>이익 안정성</td><td>과거 5년 ROE 표준편차</td><td>&#x274C; 낮을수록 (부호 반전)</td></tr>
+<tr><td>재무 건전성</td><td>부채비율 = 총부채 / 자기자본</td><td>&#x274C; 낮을수록 (부호 반전)</td></tr>
+<tr><td>현금 창출력</td><td>영업현금흐름 / 총자산</td><td>&#x2705; 높을수록</td></tr>
+</table>
+
+<p class="ni">퀄리티 팩터를 만드는 절차는 밸류와 똑같다. 각 구성 요소를 <strong>횡단면 z-score로 표준화</strong>하고(방향을 "클수록 좋다"로 정렬), 이들을 평균 내 <strong>종합 퀄리티 점수</strong>를 만든다. 그 점수로 분위 포트폴리오를 짜고 Q1이 Q5를 이기는지 본다.</p>
+
+<div class="info">
+<p class="ni"><strong>&#x1F9E9; 밸류 × 퀄리티 = 콤보.</strong> 밸류만 쓰면 "싸지만 망해가는 회사(가치 함정)"를 사게 된다. 퀄리티만 쓰면 "좋지만 이미 비싼 회사"를 사게 된다. 두 팩터를 z-score로 합치면 <strong>"좋은데 싼 회사"</strong> — 워런 버핏이 말하는 "wonderful company at a fair price"의 정량 버전 — 를 찾는다. 팩터의 진짜 힘은 <strong>결합</strong>에서 나온다.</p>
+</div>
+
+<!-- ═══════════════════════════════════════════ CH5 ═══════════════════════════════════════════ -->
+
+<h2 id="ch5">5. 파이썬으로 확장 — 2000종목을 코드 몇 줄로</h2>
+
+<p>이제 CS 배경이 빛을 발한다. 엑셀이면 2000행 &times; 수십 열을 손으로 다뤄야 하지만, pandas는 <strong>전 종목을 한 번에</strong> 벡터 연산으로 처리한다. 재무데이터가 <code>df</code>라는 데이터프레임에 들어 있다고 하자 — 행=종목, 열=재무 항목.</p>
+
+<pre><span class="cm"># df: 행=종목(2000개), 열=재무항목. point-in-time 스냅샷(6장 참고)</span>
+<span class="kw">import</span> pandas <span class="kw">as</span> pd
+
+<span class="cm"># 1) 원재료 팩터 계산 — R1의 재무비율 그대로</span>
+df[<span class="st">"BM"</span>]  = df[<span class="st">"equity"</span>] / df[<span class="st">"market_cap"</span>]   <span class="cm"># 장부가/시가 = 1/PBR, 클수록 싸다</span>
+df[<span class="st">"ROE"</span>] = df[<span class="st">"net_income"</span>] / df[<span class="st">"equity"</span>]
+df[<span class="st">"DE"</span>]  = df[<span class="st">"total_debt"</span>] / df[<span class="st">"equity"</span>]      <span class="cm"># 부채비율, 낮을수록 좋다</span>
+
+<span class="cm"># 2) 횡단면 z-score 표준화 함수</span>
+<span class="kw">def</span> <span class="fn">zscore</span>(s):
+    <span class="kw">return</span> (s - s.<span class="fn">mean</span>()) / s.<span class="fn">std</span>()
+
+<span class="cm"># 3) 방향을 "클수록 좋다"로 정렬 (부채는 부호 반전)</span>
+df[<span class="st">"z_value"</span>]   =  <span class="fn">zscore</span>(df[<span class="st">"BM"</span>])
+df[<span class="st">"z_quality"</span>] =  <span class="fn">zscore</span>(df[<span class="st">"ROE"</span>]) - <span class="fn">zscore</span>(df[<span class="st">"DE"</span>])
+
+<span class="cm"># 4) 종합 점수 = 밸류 + 퀄리티</span>
+df[<span class="st">"score"</span>] = df[<span class="st">"z_value"</span>] + df[<span class="st">"z_quality"</span>]
+
+<span class="cm"># 5) 5분위로 라벨링 (Q1=최상위, Q5=최하위)</span>
+df[<span class="st">"quintile"</span>] = pd.<span class="fn">qcut</span>(df[<span class="st">"score"</span>], <span class="nu">5</span>,
+                        labels=[<span class="st">"Q5"</span>,<span class="st">"Q4"</span>,<span class="st">"Q3"</span>,<span class="st">"Q2"</span>,<span class="st">"Q1"</span>])
+
+<span class="cm"># 6) 분위별 다음 기간 평균 수익률 — 팩터가 통하는지 확인</span>
+result = df.<span class="fn">groupby</span>(<span class="st">"quintile"</span>)[<span class="st">"fwd_return"</span>].<span class="fn">mean</span>()
+<span class="nb">print</span>(result)</pre>
+
+<div class="code-output"><span class="out-label">OUTPUT</span>quintile
+Q1    0.0142
+Q2    0.0098
+Q3    0.0071
+Q4    0.0035
+Q5   -0.0011
+Name: fwd_return, dtype: float64</div>
+
+<p class="ni">Q1(좋고 싼 묶음) 월평균 <strong>+1.42%</strong>에서 Q5(나쁘고 비싼 묶음) <strong>&minus;0.11%</strong>까지 <strong>단조 감소</strong>. 신호가 깔끔하게 작동한다는 뜻이다. 롱숏 스프레드는 Q1 &minus; Q5 = 약 +1.53%/월. — 엑셀로는 상상하기 힘든 작업이 <strong>스무 줄</strong>로 끝났다. 이게 R0~R10에서 갈고닦은 재무 논리에 CS의 코드가 얹혔을 때의 위력이다.</p>
+
+<div class="warn">
+<p class="ni"><strong>이 숫자를 믿지 마라 (아직은).</strong> 위 결과는 예시일 뿐이고, 실제로는 <strong>6장의 함정</strong>을 모두 통과해야 신뢰할 수 있다. 특히 <code>fwd_return</code>이 정말 팩터 계산 시점 <strong>이후</strong>의 수익률인지, <code>df</code>에 이미 상장폐지된 종목이 빠져 있지는 않은지 반드시 확인해야 한다. 깨끗해 보이는 단조 감소일수록 의심하라.</p>
+</div>
+
+<!-- ═══════════════════════════════════════════ CH6 ═══════════════════════════════════════════ -->
+
+<h2 id="ch6">6. 함정 — 아름다운 백테스트가 거짓말하는 이유</h2>
+
+<p>퀀트 초심자의 첫 백테스트는 거의 항상 <strong>말도 안 되게 좋다</strong>. 그리고 거의 항상 <strong>버그다</strong>. 재무데이터로 팩터를 만들 때 특히 세 가지 함정이 치명적이다.</p>
+
+<h3>6.1 Look-ahead Bias — 미래를 훔쳐보기</h3>
+
+<p class="ni">가장 흔하고 가장 치명적. <strong>실제로는 아직 알 수 없었던 정보를 쓰는 것</strong>이다. 2025년 결산 재무제표는 보통 <strong>2026년 3~4월에 공시</strong>된다. 그런데 백테스트에서 "2025년 12월 31일 시점에 2025년 순이익으로 팩터를 계산"하면? 그날엔 아무도 그 숫자를 몰랐다. 미래를 훔쳐본 것이다.</p>
+
+<div class="def">
+<p class="ni"><strong>&#x1F511; Point-in-Time (PIT) 원칙.</strong> 재무데이터는 <strong>실제 공시된 시점 이후에만</strong> 사용한다. "2026년 4월 1일에 투자 결정을 내린다면, 그날까지 세상에 공개된 데이터만 쓸 수 있다." R2에서 DART 공시 데이터를 수집할 때 <strong>보고서 접수일자(rcept_dt)</strong>를 함께 저장하라고 강조한 이유가 바로 이것이다. 접수일자가 있어야 PIT 백테스트가 가능하다.</p>
+</div>
+
+<div class="ok">
+<p class="ni"><strong>&#x1F517; R2와의 연결.</strong> R2에서 우리는 재무제표뿐 아니라 <strong>공시 접수일자</strong>를 함께 긁었다. 그땐 "왜 날짜까지?"였겠지만, 이제 답이 나온다. 팩터 백테스트에서 각 재무 항목에 "이 숫자를 언제부터 쓸 수 있었나"라는 시점을 붙이는 것 — 그게 PIT 데이터의 핵심이고, R2의 수집 습관이 여기서 결실을 맺는다.</p>
+</div>
+
+<h3>6.2 생존편향 (Survivorship Bias)</h3>
+
+<p class="ni">오늘 거래소에 남아 있는 종목만 데이터로 쓰면, <strong>이미 상장폐지·부도난 종목이 통째로 빠진다</strong>. 죽은 회사들은 대개 "싸 보였던(저PBR) 회사"였기에, 밸류 팩터의 수익률이 실제보다 부풀려진다. 백테스트 유니버스에는 <strong>그 시점에 살아 있던 모든 종목</strong>(나중에 폐지된 것 포함)이 들어가야 한다.</p>
+
+<h3>6.3 데이터 스누핑 (Data Snooping)</h3>
+
+<p class="ni">같은 데이터에 팩터·파라미터를 수백 번 갈아 끼우다 보면, <strong>순전히 우연으로</strong> 잘 맞는 조합이 반드시 나온다. "5분위가 아니라 7분위, ROE 대신 ROIC, 3개월 리밸런싱..."을 계속 돌리면 결국 아름다운 곡선 하나를 만난다 — 그건 신호가 아니라 <strong>과최적화된 노이즈</strong>다. 방어책: 가설을 먼저 세우고 검증은 나중에, 그리고 <strong>테스트에 쓰지 않은 기간(out-of-sample)</strong>으로 반드시 확인.</p>
+
+<div class="warn">
+<p class="ni"><strong>&#x26A0; 세 함정의 공통 교훈.</strong> 백테스트가 좋을수록 먼저 <strong>버그를 의심하라</strong>. 특히 CS 배경이라면 "코드가 돌았으니 맞겠지"라는 함정에 빠지기 쉽다. 퀀트에서 "코드가 에러 없이 돈다"와 "결과가 신뢰할 수 있다"는 전혀 다른 문제다. 재무 지식이 여기서 다시 무기가 된다 — "이 밸류 팩터 수익이 전부 특정 산업/특정 폐지종목에서 온 게 아닌가?"를 <strong>재무적으로</strong> 캐물을 수 있으니까.</p>
+</div>
+
+<!-- ═══════════════════════════════════════════ CH7 ═══════════════════════════════════════════ -->
+
+<h2 id="ch7">7. 백테스트 개괄 — 신호를 채점하는 세 가지 눈</h2>
+
+<p>팩터가 "통한다"를 판정하는 표준 지표 세 가지만 개괄한다. 깊은 구현은 8장의 자매 가이드로 넘긴다.</p>
+
+<h3>7.1 분위 포트폴리오 수익률</h3>
+<p class="ni">3장에서 본 것. 신호로 5(또는 10)등분한 각 묶음의 다음 기간 수익률. <strong>Q1&gt;Q2&gt;...&gt;Q5의 단조성</strong>이 핵심 — 순서가 깨끗할수록 신호가 진짜에 가깝다. 5장 코드의 <code>result</code>가 바로 이것.</p>
+
+<h3>7.2 IC (Information Coefficient, 정보계수)</h3>
+<p class="ni">팩터 신호와 실제 미래 수익률의 <strong>횡단면 상관계수</strong>. 매 기간 "2000종목의 신호 순위"와 "2000종목의 실현 수익 순위"가 얼마나 일치하는지 잰다(보통 순위상관 = Rank IC).</p>
+<div class="eq">
+\[ \mathrm{IC}_t=\operatorname{corr}\big(\text{signal}_{i,t},\ r_{i,t+1}\big) \]
+</div>
+<p class="ni">IC는 &minus;1~+1. 실무에서 <strong>월별 평균 IC가 0.03~0.05만 돼도 쓸 만한 팩터</strong>로 본다(신호는 원래 노이즈가 크다). IC의 <strong>안정성</strong>(평균/표준편차 = IR)이 절대값보다 중요하다.</p>
+
+<h3>7.3 롱숏 스프레드</h3>
+<p class="ni">Q1을 사고(롱) Q5를 파는(숏) 포트폴리오의 수익률. 시장 방향(베타)을 상쇄하고 <strong>팩터 순수 수익</strong>만 남긴다. 이 스프레드가 꾸준히 (+)이고 변동성 대비 안정적(높은 샤프비율)이어야 진짜 팩터다. 5장 예시의 Q1&minus;Q5 ≈ +1.53%/월이 이것.</p>
+
+<div class="info">
+<p class="ni"><strong>깊이는 자매 가이드로.</strong> 리밸런싱 빈도, 거래비용, 팩터 중립화(sector-neutral), 회귀 기반 팩터 수익 추정, 다중 팩터 결합, ML 신호 등은 이 라운드의 범위를 넘는다. 8장에서 연결하는 <strong>Factor Investing Guide</strong>와 <strong>Quant Researcher Guide</strong>가 이 지점부터 이어받는다.</p>
+</div>
+
+<!-- ═══════════════════════════════════════════ CH8 ═══════════════════════════════════════════ -->
+
+<h2 id="ch8">8. 다음 단계 — 여기서 퀀트로 더 깊이 들어가라</h2>
+
+<p>이 라운드는 <strong>브릿지</strong>다. 다리는 건너가라고 있는 것. 펀더멘털 모델링(R0~R10)에서 팩터의 문턱까지 데려왔으니, 이제 본격적인 퀀트는 이 가이드의 <strong>자매 가이드</strong> 두 개가 이어받는다.</p>
+
+<div class="ok">
+<p class="ni"><strong>&#x1F9ED; Factor Investing Guide</strong> &mdash; <a href="/factor-investing/">/factor-investing/</a><br>
+밸류·퀄리티·모멘텀·사이즈·저변동성 등 <strong>고전 팩터를 하나씩 깊게</strong> 판다. 팩터의 이론적 근거(위험 프리미엄 vs 행동편향), 팩터 구성·중립화·결합, 팩터 사이클과 붕괴(factor crash)까지. 이 라운드 3·4장에서 맛본 밸류/퀄리티를 <strong>제대로</strong> 배우고 싶다면 여기부터.</p>
+</div>
+
+<div class="ok">
+<p class="ni"><strong>&#x1F52C; Quant Researcher Guide</strong> &mdash; <a href="/quant-research/">/quant-research/</a><br>
+데이터 분석 → 팩터 → ML → 논문 재현으로 이어지는 <strong>13라운드 퀀트 리서처 학습 로드맵</strong>. 5장의 pandas 파이프라인을 제대로 된 리서치 워크플로로 확장하고, 6장의 함정(look-ahead·생존편향·스누핑)을 <strong>엄밀하게 방어</strong>하는 법, 백테스트 엔진과 ML 신호까지. CS 석사 배경으로 퀀트 리서처를 노린다면 이 가이드가 당신의 메인 트랙이다.</p>
+</div>
+
+<p class="ni"><strong>두 트랙 모두 열려 있다.</strong> R12 캡스톤으로 펀더멘털 리서치를 완성해도 좋고, 위 두 가이드로 퀀트에 뛰어들어도 좋다. 재무 논리를 갖춘 채 코드로 무장한 당신에게는 <strong>둘 다 무기</strong>다. 브릿지를 건넜다면, 이제 어느 쪽으로 깊이 파고들지는 당신의 선택이다.</p>
+
+<div class="task">
+<div class="task-title">&#x1F3AF; 이번 주 과제</div>
+<p class="ni">R2에서 수집한(또는 새로 긁은) 코스피 상위 100종목의 재무데이터로 5장 코드를 직접 돌려라. (1) BM과 ROE로 <code>score</code>를 만들고, (2) <code>pd.qcut</code>으로 5분위 라벨링, (3) 분위별 다음 분기 수익률을 <code>groupby</code>로 확인. 단조 감소가 나오는가? 안 나온다면 <strong>왜인지 6장의 세 함정으로 점검</strong>하라 — 특히 재무데이터에 공시 접수일자를 반영했는지. 결과가 애매해도 괜찮다. 이 파이프라인을 한 번 손으로 돌려본 경험이 자매 가이드의 출발점이다.</p>
+</div>
+
+<!-- ═══════════════════════════════════════════ QUIZ ═══════════════════════════════════════════ -->
+
+<h2 id="quiz">Quiz — 셀프 체크 10문항</h2>
+
+<details class="quiz-item"><summary>Q1. 펀더멘털의 '시계열'과 퀀트의 '횡단면'의 차이를 한 문장으로?</summary>
+<div class="answer">시계열은 <strong>한 종목의 시간에 따른 변화</strong>를 보고, 횡단면은 <strong>한 시점에 모든 종목이 서로 어떻게 다른가</strong>를 본다. 팩터 투자는 근본적으로 횡단면 게임이다.</div></details>
+
+<details class="quiz-item"><summary>Q2. R1의 재무비율 PBR·ROE·부채비율은 각각 어떤 팩터 계열의 원재료인가?</summary>
+<div class="answer">PBR → 밸류(Value), ROE → 퀄리티(수익성), 부채비율 → 퀄리티/안정성. 재무 지표를 <strong>횡단면 순위 신호</strong>로 바꾸면 곧 팩터가 된다.</div></details>
+
+<details class="quiz-item"><summary>Q3. 횡단면 z-score \( z_i=(x_i-\mu)/\sigma \)에서 \( \mu \)와 \( \sigma \)는 무엇의 평균·표준편차인가?</summary>
+<div class="answer"><strong>그 시점 전 종목(예: 2000종목) 전체</strong>의 평균과 표준편차. z-score는 "이 종목이 전체 평균에서 표준편차 몇 개만큼 떨어져 있나"를 뜻하며, 단위를 없애 서로 다른 팩터를 더할 수 있게 한다.</div></details>
+
+<details class="quiz-item"><summary>Q4. 밸류(저PBR)와 퀄리티(고ROE) z-score를 더하기 전에 반드시 해야 할 일은?</summary>
+<div class="answer"><strong>방향 정렬.</strong> 모든 팩터를 "클수록 좋다"로 맞춰야 한다. 밸류는 부호를 뒤집거나 <code>1/PBR</code>(=BM) 같은 "클수록 싼" 지표를 쓴다. 방향이 섞이면 종합 점수가 무의미해진다.</div></details>
+
+<details class="quiz-item"><summary>Q5. 분위 포트폴리오에서 Q1&gt;Q2&gt;...&gt;Q5로 단조 감소가 나오면 무슨 뜻인가?</summary>
+<div class="answer">신호가 깔끔하게 작동한다는 <strong>강한 증거</strong>. 순위가 높을수록 미래 수익이 체계적으로 높다는 뜻이다. 순서가 뒤죽박죽이면 신호가 약하거나 노이즈다.</div></details>
+
+<details class="quiz-item"><summary>Q6. pandas에서 종합 점수를 5분위로 라벨링하는 함수와, 분위별 평균 수익을 내는 방법은?</summary>
+<div class="answer"><code>pd.qcut(df["score"], 5, labels=[...])</code>로 5등분 라벨링 후, <code>df.groupby("quintile")["fwd_return"].mean()</code>으로 분위별 평균 수익을 낸다.</div></details>
+
+<details class="quiz-item"><summary>Q7. Look-ahead bias란 무엇이고, 재무데이터에서 왜 특히 잘 발생하나?</summary>
+<div class="answer"><strong>실제로는 아직 알 수 없었던 정보를 쓰는 것.</strong> 2025년 결산 재무제표는 2026년 3~4월에 공시되므로, 2025년 말 시점에 그 순이익을 쓰면 미래를 훔쳐본 셈이다. Point-in-Time 원칙(공시 시점 이후에만 사용)으로 방어한다.</div></details>
+
+<details class="quiz-item"><summary>Q8. R2에서 재무제표와 함께 '공시 접수일자'를 저장하라고 한 것이 R11의 무엇과 연결되나?</summary>
+<div class="answer"><strong>Point-in-Time 백테스트.</strong> 각 재무 항목에 "언제부터 쓸 수 있었나"라는 시점(접수일자)이 붙어 있어야 look-ahead bias 없이 팩터를 검증할 수 있다. R2의 수집 습관이 R11에서 결실을 맺는다.</div></details>
+
+<details class="quiz-item"><summary>Q9. 생존편향이 밸류 팩터 수익률을 실제보다 부풀리는 이유는?</summary>
+<div class="answer">상장폐지·부도난 종목이 데이터에서 빠지는데, 죽은 회사들은 대개 "싸 보였던(저PBR)" 회사였기 때문. 유니버스에는 <strong>그 시점에 살아 있던 모든 종목</strong>(나중에 폐지된 것 포함)이 들어가야 한다.</div></details>
+
+<details class="quiz-item"><summary>Q10. IC(정보계수)란 무엇이고, 월평균 IC가 낮아도 쓸 만한 이유는?</summary>
+<div class="answer">팩터 신호와 실제 미래 수익률의 <strong>횡단면 상관계수</strong>(보통 순위상관 Rank IC). 신호는 원래 노이즈가 커서 <strong>월평균 IC 0.03~0.05만 돼도 쓸 만한 팩터</strong>로 본다. 절대값보다 IC의 <strong>안정성</strong>(IR=평균/표준편차)이 더 중요하다.</div></details>
+
+<!-- ═══════════════════════════════════════════ CHEAT SHEET ═══════════════════════════════════════════ -->
+
+<h2 id="cheatsheet">&#x1F4CB; Cheat Sheet — 재무지표→팩터 매핑 & 함정 체크리스트</h2>
+
+<div class="tc">Table C.1. 재무 지표 → 팩터 매핑</div>
+<table>
+<tr><th style="width:26%">재무 지표 (R1)</th><th style="width:22%">팩터 계열</th><th style="width:22%">방향 정렬</th><th style="width:30%">횡단면 신호로</th></tr>
+<tr><td>BM (=1/PBR), 1/PER</td><td>밸류</td><td>클수록 좋음</td><td>저평가 랭킹</td></tr>
+<tr><td>ROE, ROA</td><td>퀄리티(수익성)</td><td>클수록 좋음</td><td>고수익성 랭킹</td></tr>
+<tr><td>부채비율 (D/E)</td><td>퀄리티(안정성)</td><td>낮을수록 (부호 반전)</td><td>재무 건전성</td></tr>
+<tr><td>이익 변동성</td><td>퀄리티(안정성)</td><td>낮을수록 (부호 반전)</td><td>이익 안정성</td></tr>
+<tr><td>영업현금흐름/자산</td><td>퀄리티(수익성)</td><td>클수록 좋음</td><td>현금 창출력</td></tr>
+</table>
+
+<div class="tc">Table C.2. 팩터 파이프라인 4단계</div>
+<table>
+<tr><th style="width:22%">단계</th><th style="width:78%">할 일</th></tr>
+<tr><td>1. 계산</td><td>재무비율(R1) 계산 — <code>df["ROE"]=net_income/equity</code></td></tr>
+<tr><td>2. 표준화</td><td>횡단면 z-score \( (x-\mu)/\sigma \), 방향을 "클수록 좋다"로 정렬</td></tr>
+<tr><td>3. 결합</td><td>z-score 합산 → 종합 <code>score</code> (밸류+퀄리티)</td></tr>
+<tr><td>4. 검증</td><td><code>pd.qcut</code> 분위 → <code>groupby</code> 수익률 → 단조성·IC·롱숏</td></tr>
+</table>
+
+<div class="tc">Table C.3. 퀀트 함정 체크리스트 (백테스트 전 반드시 확인)</div>
+<table>
+<tr><th style="width:34%">함정</th><th style="width:66%">방어 체크</th></tr>
+<tr><td>Look-ahead bias</td><td>재무데이터에 <strong>공시 접수일자</strong>가 붙어 있나? 그 시점 이후에만 썼나? (PIT)</td></tr>
+<tr><td>생존편향</td><td>유니버스에 <strong>그 시점 살아 있던 모든 종목</strong>(후에 폐지된 것 포함)이 있나?</td></tr>
+<tr><td>데이터 스누핑</td><td>파라미터를 수백 번 갈아끼워 얻은 결과 아닌가? <strong>out-of-sample</strong>로 확인했나?</td></tr>
+<tr><td>방향 정렬 오류</td><td>모든 팩터가 "클수록 좋다"로 통일됐나? (밸류·부채 부호 확인)</td></tr>
+<tr><td>결과가 너무 좋음</td><td>아름다운 백테스트일수록 <strong>먼저 버그를 의심</strong>했나?</td></tr>
+</table>
+
+<div class="tc">Table C.4. 백테스트 채점 지표</div>
+<table>
+<tr><th style="width:34%">지표</th><th style="width:66%">본다는 것</th></tr>
+<tr><td>분위 수익률</td><td>Q1&gt;Q2&gt;...&gt;Q5 <strong>단조성</strong> — 신호의 깔끔함</td></tr>
+<tr><td>IC (정보계수)</td><td>신호 vs 미래수익 횡단면 상관 — 월평균 0.03~0.05면 유효, 안정성(IR)이 핵심</td></tr>
+<tr><td>롱숏 스프레드</td><td>Q1 롱 &minus; Q5 숏 — 시장 방향 상쇄한 <strong>팩터 순수 수익</strong></td></tr>
+</table>
+
+<div class="info">
+<p class="ni"><strong>&#x27A1; 퀀트로 더 깊이:</strong> <a href="/factor-investing/">Factor Investing Guide</a> (팩터별 심화) · <a href="/quant-research/">Quant Researcher Guide</a> (13라운드 리서처 로드맵). 이 브릿지 다음의 메인 트랙.</p>
+</div>
+
+<div class="nav-footer">
+<a href="../round-10/"><span class="nf-label">&larr; Previous</span>R10. 리서치 보고서</a>
+<a href="../round-12/" style="text-align:right"><span class="nf-label">Next &rarr;</span>R12. 캡스톤</a>
+</div>
+
+</div>
+</div>
+</div>
+
+</body>
+</html>

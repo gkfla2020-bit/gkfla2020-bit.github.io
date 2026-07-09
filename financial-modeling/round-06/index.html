@@ -1,0 +1,499 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Round 6 - DCF & 목표주가 도출 | Financial Modeling Guide</title>
+<script>
+MathJax = { tex: { inlineMath: [['\\(','\\)']], displayMath: [['\\[','\\]'],['$$','$$']] } };
+</script>
+<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;500&family=Space+Mono:wght@400&family=Inter:wght@300;400&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Inter',sans-serif;background:#fafaf8;color:#1a1a1a;line-height:1.7;overflow-x:hidden}
+.sidebar{position:fixed;left:0;top:0;width:260px;height:100vh;background:rgba(255,255,255,.97);border-right:1px solid rgba(0,0,0,.06);padding:32px 24px;z-index:100;overflow-y:auto;display:flex;flex-direction:column}
+.sidebar-profile{text-align:center;margin-bottom:28px;padding-bottom:24px;border-bottom:1px solid rgba(0,0,0,.08)}
+.profile-icon{font-size:48px;margin-bottom:8px}
+.profile-name{font-family:'Cormorant Garamond',serif;font-size:1.3rem;font-weight:500;margin-bottom:4px}
+.profile-title{font-size:.68rem;color:#888;letter-spacing:.08em;text-transform:uppercase;margin-bottom:8px}
+.profile-bio{font-size:.78rem;color:#666;line-height:1.5}
+.sidebar-nav{flex:1;margin-top:16px}.nav-section{margin-bottom:20px}.nav-section-title{font-size:.6rem;font-weight:600;color:#aaa;letter-spacing:.15em;text-transform:uppercase;margin-bottom:10px}.nav-list{list-style:none}.nav-list li{margin-bottom:5px}.nav-list a{font-size:.78rem;color:#555;text-decoration:none;transition:all .2s;display:block;padding:3px 0}.nav-list a:hover{color:#217346;padding-left:4px}.nav-list a.active{color:#217346;font-weight:500}.nav-list a.done{color:#28a745}.badge{display:inline-block;font-size:.5rem;background:#217346;color:#fff;padding:1px 5px;border-radius:8px;margin-left:3px;vertical-align:middle}.badge-done{background:#28a745}.sidebar-footer{padding-top:16px;border-top:1px solid rgba(0,0,0,.06);font-size:.65rem;color:#aaa;text-align:center}
+.main-wrapper{margin-left:260px;min-height:100vh}.container{max-width:1100px;margin:0 auto;padding:50px 40px 80px}
+.paper-content{font-family:'Times New Roman','Nanum Myeongjo',serif;line-height:1.8;background:#fff;padding:40px;border-radius:8px;box-shadow:0 2px 20px rgba(0,0,0,.05)}.paper-header{text-align:center;margin-bottom:40px;padding-bottom:30px;border-bottom:2px solid #333}.paper-category{font-size:14px;color:#666;margin-bottom:10px}.paper-title{font-size:24px;font-weight:bold;margin-bottom:12px;line-height:1.4}.paper-subtitle{font-size:14px;color:#555;margin-bottom:8px}.paper-team{font-size:13px;color:#444}
+.abstract{background:#f8f9fa;padding:25px;margin:30px 0;border-left:4px solid #217346}.abstract-title{font-weight:bold;font-size:16px;margin-bottom:15px}
+h2{font-size:18px;margin:35px 0 20px;padding-bottom:8px;border-bottom:1px solid #ddd;color:#1e4f38}h3{font-size:15px;margin:25px 0 15px;color:#34495e}
+p{text-align:justify;margin-bottom:15px;text-indent:2em}p.ni{text-indent:0}
+table{width:100%;border-collapse:collapse;margin:20px 0;font-size:12px}th,td{border:1px solid #ddd;padding:10px 8px;text-align:center}th{background:#1e4f38;color:white;font-weight:bold}tr:nth-child(even){background:#f8f9fa}tr:hover{background:#eef7f1}
+.tc{font-size:13px;font-weight:bold;margin:15px 0 10px;text-align:center}.eq{text-align:center;margin:20px 0;padding:15px;background:#f8f9fa;border-radius:4px;overflow-x:auto}ul,ol{margin-left:2em;margin-bottom:15px}li{margin-bottom:6px}
+.def{background:#fff9e6;border:1px solid #ffc107;border-radius:4px;padding:20px;margin:20px 0}.info{background:#e8f4f8;border-left:4px solid #3498db;padding:20px;margin:20px 0}.warn{background:#fff3cd;border-left:4px solid #f39c12;padding:20px;margin:20px 0}.ok{background:#d4edda;border-left:4px solid #28a745;padding:20px;margin:20px 0}
+.paper-anchor{background:#ecfdf3;border:1px solid #10b981;border-radius:6px;padding:22px;margin:24px 0}.paper-anchor .pa-label{font-family:'Space Mono',monospace;font-size:10px;color:#047857;letter-spacing:.15em;text-transform:uppercase;margin-bottom:8px}.paper-anchor .pa-title{font-weight:bold;font-size:14px;margin-bottom:6px}.paper-anchor p{font-size:13px;text-indent:0;margin-bottom:8px}
+.task{background:#e8f8f0;border-left:4px solid #00b894;padding:20px;margin:20px 0}.task .task-title{font-weight:bold;margin-bottom:10px}
+details.quiz-item{margin:14px 0;padding:14px 18px;background:#f8f9fa;border:1px solid #e0e0e0;border-radius:6px}details.quiz-item summary{cursor:pointer;font-weight:bold;font-size:13.5px}details.quiz-item[open] summary{margin-bottom:10px;color:#217346}details.quiz-item .answer{font-size:13px;padding:10px 14px;background:#fff;border-left:3px solid #217346}
+pre{background:#1e1e1e;color:#d4d4d4;padding:20px;border-radius:6px;overflow-x:auto;margin:20px 0;font-family:'Space Mono','Consolas',monospace;font-size:13px;line-height:1.6}code{font-family:'Space Mono','Consolas',monospace;font-size:13px}p code,li code,td code{background:#f0f0f0;padding:2px 6px;border-radius:3px;color:#0a7f4e;font-size:12px}
+.cm{color:#6a9955}.kw{color:#569cd6}.st{color:#ce9178}.fn{color:#dcdcaa}.nb{color:#4ec9b0}.nu{color:#b5cea8}
+.kbd{display:inline-block;font-family:'Space Mono',monospace;font-size:.82em;background:#f7faf8;border:1px solid #c9d6cd;border-bottom-width:2px;border-radius:4px;padding:1px 7px;color:#1e4f38;margin:0 1px;white-space:nowrap;line-height:1.9}
+.keyseq{background:#0f1a14;color:#d4f0e0;padding:16px 20px;border-radius:6px;margin:18px 0;font-family:'Space Mono',monospace;font-size:12.5px;line-height:2.1}.keyseq .k{display:inline-block;background:#1c3327;border:1px solid #2f5a45;border-bottom-width:2px;border-radius:4px;padding:1px 7px;color:#8ff0bf;margin:0 2px}.keyseq .arrow{color:#5a8a72;margin:0 4px}.keyseq .note{color:#6f9c86;font-size:11px}.keyseq .grp{display:inline-block;margin:3px 0}
+.progress-bar{width:100%;height:6px;background:#e0e0e0;border-radius:3px;margin-top:16px}.progress-fill{height:100%;background:linear-gradient(90deg,#217346,#10b981);border-radius:3px;width:0%}.progress-label{font-size:11px;color:#888;margin-top:4px;text-align:center}
+.code-output{background:#1e1e1e;color:#d4d4d4;padding:12px 16px;border-radius:0 0 6px 6px;font-family:'Space Mono',monospace;font-size:11.5px;line-height:1.6;margin-top:-4px;margin-bottom:18px;border-top:2px solid #333;white-space:pre-wrap;overflow-x:auto}.code-output .out-label{color:#888;font-size:10px;margin-bottom:4px;display:block}
+.nav-footer{display:flex;justify-content:space-between;gap:16px;margin-top:50px;padding-top:24px;border-top:1px solid #ddd;font-family:'Inter',sans-serif}.nav-footer a{font-size:.82rem;color:#217346;text-decoration:none;padding:12px 18px;border:1px solid #cfe6da;border-radius:6px;transition:all .2s;max-width:48%}.nav-footer a:hover{background:#217346;color:#fff;border-color:#217346}.nav-footer .nf-label{display:block;font-size:.6rem;color:#999;letter-spacing:.1em;text-transform:uppercase;margin-bottom:4px}.nav-footer a:hover .nf-label{color:rgba(255,255,255,.7)}
+@media(max-width:1024px){.sidebar{width:100%;height:auto;position:relative;border-right:none;border-bottom:1px solid rgba(0,0,0,.08);padding:16px}.sidebar-profile{margin-bottom:10px;padding-bottom:10px;display:flex;align-items:center;gap:12px;text-align:left}.profile-icon{font-size:32px;margin-bottom:0}.profile-bio{display:none}.nav-section{display:inline-block;margin-right:16px;margin-bottom:8px}.nav-list{display:flex;gap:10px;flex-wrap:wrap}.nav-list li{margin-bottom:0}.sidebar-footer{display:none}.main-wrapper{margin-left:0}.container{padding:0}.paper-content{padding:20px 16px;border-radius:0;box-shadow:none}.paper-title{font-size:18px}p{font-size:14px;text-indent:1.5em;text-align:left}pre{font-size:11px;padding:14px}table{font-size:10px;display:block;overflow-x:auto}.keyseq{font-size:11px}.nav-footer{flex-direction:column}.nav-footer a{max-width:100%}}
+</style>
+</head>
+<body>
+
+<div class="sidebar">
+<div class="sidebar-profile">
+<div class="profile-icon">&#x1F4CA;</div>
+<div class="profile-name">Financial Modeling Guide</div>
+<div class="profile-title">Keyboard &middot; Accounting &middot; Valuation</div>
+<div class="profile-bio">13 Rounds: 키보드로 짓는 재무모델부터 리서치 보고서까지</div>
+</div>
+<div class="sidebar-nav">
+<div class="nav-section">
+<div class="nav-section-title">Curriculum</div>
+<ul class="nav-list">
+<li><a href="../">&#x2302; Guide Home</a></li>
+<li><a href="../round-00/">R0. No-Mouse Excel</a></li>
+<li><a href="../round-01/">R1. 회계의 뼈대</a></li>
+<li><a href="../round-02/">R2. DART 데이터 수집</a></li>
+<li><a href="../round-03/">R3. 밸류에이션 이론</a></li>
+<li><a href="../round-04/">R4. 3-Statement I</a></li>
+<li><a href="../round-05/">R5. 3-Statement II</a></li>
+<li><a class="active" href="#">R6. DCF & 목표주가 <span class="badge">NOW</span></a></li>
+<li><a href="../round-07/">R7. 상대가치 실전</a></li>
+<li><a href="../round-08/">R8. 매크로 렌즈</a></li>
+<li><a href="../round-09/">R9. 산업분석</a></li>
+<li><a href="../round-10/">R10. 리서치 보고서</a></li>
+<li><a href="../round-11/">R11. 퀀트 브릿지</a></li>
+<li><a href="../round-12/">R12. 캡스톤</a></li>
+</ul>
+</div>
+<div class="nav-section">
+<div class="nav-section-title">This Lecture</div>
+<ul class="nav-list">
+<li><a href="#ch1">1. DCF의 뼈대</a></li>
+<li><a href="#ch2">2. FCFF 산출</a></li>
+<li><a href="#ch3">3. WACC</a></li>
+<li><a href="#ch4">4. 영구가치(TV)</a></li>
+<li><a href="#ch5">5. 할인과 기업가치</a></li>
+<li><a href="#ch6">6. EV → 주당가치</a></li>
+<li><a href="#ch7">7. 민감도 분석</a></li>
+<li><a href="#ch8">8. DCF의 한계</a></li>
+<li><a href="#ch9">9. 실전 워크스루</a></li>
+<li><a href="#quiz">Quiz</a></li>
+<li><a href="#cheatsheet">&#x1F4CB; Cheat Sheet</a></li>
+</ul>
+</div>
+</div>
+<div class="sidebar-footer">Round 6 of 12 &middot; Part II</div>
+</div>
+
+<div class="main-wrapper">
+<div class="container">
+<div class="paper-content">
+
+<div class="paper-header">
+<div class="paper-category">Round 6 / 12</div>
+<h1 class="paper-title">DCF & 목표주가 도출</h1>
+<div class="paper-subtitle">완성한 3-statement 모델을 기업가치로, 그리고 목표주가로</div>
+<div class="paper-team">Reference: 현직 IB/리서치 밸류에이션 컨벤션 &middot; Damodaran <em>Investment Valuation</em> &middot; McKinsey <em>Valuation</em></div>
+<div class="progress-bar"><div class="progress-fill" style="width:50%"></div></div>
+<div class="progress-label">Overall Progress: 6/12 Rounds</div>
+</div>
+
+<div class="abstract">
+<div class="abstract-title">이 라운드에서 하는 일</div>
+<p class="ni">R4~R5에서 손익·재무상태·현금흐름이 서로 물리는 <strong>3-statement 모델</strong>을 완성했다. 그 모델은 아직 '이 회사가 얼마짜리인가'라는 질문에 답하지 않는다. DCF(Discounted Cash Flow)는 그 다리를 놓는다 — 모델이 뱉는 미래 현금흐름을 <strong>현재가치로 할인해</strong> 기업가치를 내고, 거기서 목표주가까지 내려온다. 이 라운드에서는:</p>
+<ul>
+<li>모델에서 <strong>FCFF(기업잉여현금흐름)</strong>를 뽑아내는 법 — 각 항목이 어느 표에서 오는지(R1 articulation 회수)</li>
+<li>할인율 <strong>WACC</strong>를 자기자본비용(CAPM)·타인자본비용·목표 자본구조로 조립하는 법</li>
+<li>예측기간 이후를 한 덩어리로 처리하는 <strong>영구가치(Terminal Value)</strong> — 영구성장 vs Exit Multiple</li>
+<li>예측 FCFF의 현재가치 합 + TV 현재가치 = <strong>기업가치(EV)</strong>, 그리고 <strong>EV → 주당 내재가치</strong>의 사다리</li>
+<li>WACC &times; g 2변수 <strong>데이터 표</strong>로 밸류에이션 밴드를 만드는 법 (키보드로)</li>
+<li>마지막엔 모델에 FCFF행 → WACC 블록 → TV → 할인 → 주당가치까지 <strong>한 번에 얹는 워크스루</strong></li>
+</ul>
+<p class="ni"><strong>Keywords:</strong> FCFF, WACC, CAPM, 베타, Terminal Value, 영구성장률 g, 할인, 기업가치 EV, 순차입금, 주당 내재가치, 데이터 표, 민감도</p>
+</div>
+
+<div class="warn">
+<p class="ni"><strong>&#x26A0;&#xFE0F; 이 라운드는 R4~R5 모델이 완성돼 있다고 가정한다.</strong> DCF는 3-statement 모델 <strong>위에 얹는</strong> 마지막 층이다. 손익·현금흐름·재무상태가 서로 안 맞는(articulation이 깨진) 모델에서 뽑은 FCFF는 아무리 정교하게 할인해도 의미가 없다. 밸류에이션에 앞서 R1의 3표 연결과 R5의 대차평형(B/S가 맞아떨어지는지)부터 다시 확인하라. <strong>Garbage in, garbage out</strong>은 DCF에서 가장 뼈아픈 격언이다.</p>
+</div>
+
+<!-- ═══════════════════════════════════════════ CH1 ═══════════════════════════════════════════ -->
+
+<h2 id="ch1">1. DCF의 뼈대 — 전체 흐름 지도</h2>
+
+<p>DCF는 한 문장으로 요약된다: <strong>"미래에 벌 현금을, 그 돈의 시간가치만큼 깎아, 지금 값으로 합친다."</strong> 복잡해 보이는 밸류에이션 스프레드시트도 결국 이 다섯 블록의 조립이다.</p>
+
+<div class="def">
+<p class="ni"><strong>&#x1F511; DCF 5단계.</strong> ① 모델에서 매년 <strong>FCFF</strong>를 뽑는다 → ② 예측기간이 끝난 뒤의 가치를 <strong>Terminal Value</strong> 한 덩어리로 잡는다 → ③ FCFF와 TV를 <strong>WACC</strong>로 할인한다 → ④ 현재가치를 다 더해 <strong>기업가치(EV)</strong>를 낸다 → ⑤ EV에서 순차입금 등을 조정해 <strong>자기자본가치 → 주당 내재가치</strong>로 내려온다.</p>
+</div>
+
+<p class="ni">이 흐름을 그림으로 그리면 다음과 같다. 왼쪽이 '모델이 주는 것', 오른쪽이 '밸류에이션이 만드는 것'이다.</p>
+
+<pre><span class="cm"># DCF 파이프라인</span>
+3-Statement 모델 (R4~R5)
+        │
+        ▼
+[1] FCFF₁ FCFF₂ ... FCFFₙ  ← 예측기간(보통 5~10년)
+        │                    [2] Terminal Value (n년 이후 전부)
+        ▼                          │
+[3] ÷ (1+WACC)ᵗ 로 각각 할인 ◄──────┘
+        │
+        ▼
+[4] Σ 현재가치 = 기업가치(EV)
+        │
+        ▼
+[5] EV − 순차입금 ± 조정 = 자기자본가치 ÷ 주식수 = <span class="nb">주당 내재가치</span></pre>
+
+<div class="info">
+<p class="ni"><strong>왜 FCFF(기업 관점)인가.</strong> 현금흐름에는 두 갈래가 있다 — 채권자·주주 <strong>모두</strong>에게 돌아가는 FCFF(Free Cash Flow to Firm)와, 주주 <strong>몫만</strong>인 FCFE. FCFF를 WACC로 할인하면 <strong>기업가치(EV)</strong>가 바로 나오고, 자본구조 가정을 WACC 한 곳에서만 다루면 되므로 실무 DCF의 표준이다. 이 라운드는 전부 FCFF 기준으로 간다.</p>
+</div>
+
+<!-- ═══════════════════════════════════════════ CH2 ═══════════════════════════════════════════ -->
+
+<h2 id="ch2">2. FCFF 산출 — 모델의 어느 표에서 오는가</h2>
+
+<p>FCFF는 "영업이 벌어들인 현금 중, 성장을 위해 다시 투자하고 남아 <strong>모든 자본 제공자에게 자유롭게 돌려줄 수 있는</strong> 현금"이다. 공식은 다음과 같다.</p>
+
+<div class="eq">
+\[ FCFF = EBIT(1-t) + D\&A - CAPEX - \Delta NWC \]
+</div>
+
+<p class="ni">핵심은 각 항목이 <strong>완성한 모델의 어느 표</strong>에서 오는지다. R1에서 배운 3표 articulation을 여기서 회수한다.</p>
+
+<div class="tc">Table 2.1. FCFF 각 항목의 출처</div>
+<table>
+<tr><th style="width:22%">항목</th><th style="width:38%">의미</th><th style="width:40%">모델의 어느 표에서</th></tr>
+<tr><td><code>EBIT</code></td><td>영업이익 (이자·세전)</td><td>손익계산서 (R4)</td></tr>
+<tr><td><code>&times;(1&minus;t)</code></td><td>영업이익에 붙는 세금 차감</td><td>가정 시트의 세율 <code>t</code></td></tr>
+<tr><td><code>+ D&amp;A</code></td><td>감가상각·무형자산상각 (비현금)</td><td>현금흐름표 / 부속명세 (R5)</td></tr>
+<tr><td><code>&minus; CAPEX</code></td><td>유형자산 투자 (현금 유출)</td><td>현금흐름표 투자활동 (R5)</td></tr>
+<tr><td><code>&minus; &Delta;NWC</code></td><td>순운전자본 증가분</td><td>재무상태표 (매출채권·재고·매입채무)</td></tr>
+</table>
+
+<div class="info">
+<p class="ni"><strong>&#x1F511; 왜 EBIT에서 출발하나.</strong> EBIT는 <strong>이자 차감 전</strong> 이익이다. FCFF는 채권자 몫(이자)까지 포함한 '기업 전체' 현금이므로, 이자를 빼기 전 단계에서 시작해야 한다. 여기에 세금만 영업이익 기준으로 떼는 것( <code>EBIT&times;(1&minus;t)</code>, NOPAT )이 핵심. 이자의 세금 절감 효과는 나중에 WACC의 <code>r_d(1&minus;t)</code>에서 반영하므로, FCFF 단계에서 이자를 건드리면 <strong>이중 계산</strong>이 된다.</p>
+</div>
+
+<div class="def">
+<p class="ni"><strong>&#x1F511; &Delta;NWC(순운전자본 증가분)의 부호.</strong> 순운전자본 = (매출채권 + 재고) &minus; 매입채무. 매출이 늘어 채권·재고가 불면 <strong>현금이 그만큼 묶인다</strong>. 그래서 NWC가 <em>증가</em>하면 FCFF에서 <em>차감</em>한다. 반대로 매입채무가 늘면(공급사 외상) 현금이 남아 &Delta;NWC를 줄인다. 성장 기업이 흑자인데도 현금이 마르는 이유가 바로 이 &Delta;NWC다.</p>
+</div>
+
+<div class="paper-anchor">
+<div class="pa-label">Valuation Anchor &middot; 이론 &harr; 실전</div>
+<div class="pa-title">R3의 밸류에이션 이론이 여기서 숫자가 된다</div>
+<p>R3에서 "가치는 미래 현금흐름의 현재가치 합"이라는 <strong>이론</strong>을 세웠다. 이 라운드는 그 이론을 <strong>모델의 실제 숫자</strong>로 옮기는 작업이다. FCFF는 R3에서 말한 '현금흐름'의 구체적 정의이고, WACC는 '할인율'의 구체적 조립이다. 그리고 이렇게 만든 내재가치는 R7의 상대가치(PER·EV/EBITDA)와 <strong>교차검증</strong>해야 비로소 신뢰할 수 있다.</p>
+</div>
+
+<!-- ═══════════════════════════════════════════ CH3 ═══════════════════════════════════════════ -->
+
+<h2 id="ch3">3. WACC — 할인율을 조립하기</h2>
+
+<p>FCFF는 채권자·주주 모두의 현금이므로, 할인율도 <strong>양쪽의 요구수익률을 가중평균</strong>한 값이어야 한다. 그것이 WACC(가중평균자본비용)다.</p>
+
+<div class="eq">
+\[ WACC = \frac{E}{V}r_e + \frac{D}{V}r_d(1-t) \]
+</div>
+
+<p class="ni">여기서 \(E\)=자기자본 시장가치, \(D\)=순차입금(부채) 시장가치, \(V=E+D\), \(r_e\)=자기자본비용, \(r_d\)=타인자본비용, \(t\)=세율이다. 각 조각을 하나씩 조립한다.</p>
+
+<h3>3.1 자기자본비용 \(r_e\) — CAPM</h3>
+
+<p class="ni">주주가 요구하는 수익률은 CAPM으로 추정한다. "무위험 수익률 + 그 주식의 위험(베타)만큼의 시장 프리미엄"이다.</p>
+
+<div class="eq">
+\[ r_e = r_f + \beta(r_m - r_f) \]
+</div>
+
+<div class="tc">Table 3.1. CAPM 입력값</div>
+<table>
+<tr><th style="width:24%">기호</th><th style="width:36%">의미</th><th style="width:40%">실무 출처</th></tr>
+<tr><td>\(r_f\)</td><td>무위험 수익률</td><td>10년물 국고채 금리</td></tr>
+<tr><td>\(\beta\)</td><td>시장 대비 민감도</td><td>회귀 추정 or 동종업계 평균</td></tr>
+<tr><td>\(r_m-r_f\)</td><td>시장위험 프리미엄(ERP)</td><td>보통 5~7% (Damodaran 추정)</td></tr>
+</table>
+
+<h3>3.2 타인자본비용 \(r_d\)와 세금방패</h3>
+
+<p class="ni">타인자본비용은 회사가 <strong>지금 새로 돈을 빌린다면</strong> 물어야 할 이자율이다. 회사채 수익률이나 (이자비용 &divide; 총차입금)으로 근사한다. 여기에 <code>(1&minus;t)</code>를 곱하는 이유는 <strong>이자비용이 세금을 줄여주기 때문</strong>(세금방패). 실효 부담은 표면 이자보다 낮다.</p>
+
+<h3>3.3 목표 자본구조와 베타</h3>
+
+<p class="ni"><strong>가중치는 시장가치 기준.</strong> \(E/V\), \(D/V\)의 가중치는 장부가가 아니라 <strong>시장가치</strong>로 잡는 것이 원칙이다(자기자본은 시가총액). 그리고 오늘의 자본구조가 아니라 회사가 <strong>장기적으로 지향하는 목표 자본구조</strong>를 쓰는 것이 이론적으로 맞다.</p>
+
+<div class="info">
+<p class="ni"><strong>&#x1F511; levered vs unlevered 베타(개괄).</strong> 회귀로 뽑은 베타(levered)에는 그 회사의 <strong>부채 레버리지 효과</strong>가 섞여 있다. 동종업계 여러 회사의 베타를 비교하려면, 각자의 부채를 걷어낸 <strong>unlevered(asset) 베타</strong>로 환원해 평균을 낸 뒤, 우리 회사의 목표 자본구조로 <strong>다시 levered</strong>하는 것이 정석이다. 개별 회귀 베타는 노이즈가 커서, 업계 unlevered 평균을 재-레버링한 베타가 더 안정적이다. 상세는 R7에서 상대가치 표본을 다룰 때 이어간다.</p>
+</div>
+
+<div class="ok">
+<p class="ni"><strong>실전 규칙.</strong> WACC의 모든 입력( \(r_f\), \(\beta\), ERP, \(r_d\), \(t\), 목표 D/V )은 <strong>가정 시트 한 블록에 모아</strong> 이름정의(R0의 6장)로 물어라. WACC 하나를 바꾸면 밸류에이션 전체가 움직여야 한다. WACC 셀에 하드코딩을 박으면 민감도 분석이 불가능해진다.</p>
+</div>
+
+<!-- ═══════════════════════════════════════════ CH4 ═══════════════════════════════════════════ -->
+
+<h2 id="ch4">4. 영구가치(Terminal Value) — 예측 너머의 가치</h2>
+
+<p>회사는 예측기간(5~10년) 뒤에도 계속 현금을 번다. 그 이후를 매년 추정할 수는 없으니 <strong>한 덩어리</strong>로 잡는다. 이것이 Terminal Value(TV)다. 두 가지 방법이 있다.</p>
+
+<h3>4.1 영구성장 모형(Gordon Growth)</h3>
+
+<p class="ni">예측 마지막 해 이후 FCFF가 <strong>일정한 비율 \(g\)로 영원히</strong> 자란다고 가정한다.</p>
+
+<div class="eq">
+\[ TV = \frac{FCFF_{n}(1+g)}{WACC-g} \]
+</div>
+
+<p class="ni">여기서 \(FCFF_n\)은 예측 마지막 해의 FCFF, \(g\)는 영구성장률이다. 이 TV는 <strong>n년 시점의 가치</strong>이므로, 나중에 다시 n년만큼 할인해 현재가치로 끌어와야 한다(5장).</p>
+
+<h3>4.2 Exit Multiple 모형</h3>
+
+<p class="ni">"n년 뒤에 이 회사를 판다면 EV/EBITDA 몇 배에 팔릴까"로 잡는 방법. \(TV = EBITDA_n \times \text{배수}\). 상대가치(R7)에 기대므로, 영구성장 모형과 <strong>교차검증용</strong>으로 함께 계산해 두면 좋다. 두 방법이 크게 어긋나면 가정 어딘가가 잘못됐다는 신호다.</p>
+
+<h3>4.3 \(g\)의 현실적 범위</h3>
+
+<p class="ni"><strong>\(g\)는 장기 명목 GDP 성장률(또는 장기 물가상승률)을 넘을 수 없다.</strong> 한 회사가 경제 전체보다 영원히 빨리 자란다면, 언젠가 경제보다 커진다는 모순이 생긴다. 실무에서 \(g\)는 보통 <strong>0~3%</strong>, 성숙 경제에서는 물가상승률(2% 안팎) 수준으로 잡는다. 반드시 <code>g &lt; WACC</code>여야 하며(아니면 분모가 음수·0), \(g\)가 WACC에 가까워질수록 TV가 폭발적으로 커진다.</p>
+
+<div class="warn">
+<p class="ni"><strong>&#x26A0;&#xFE0F; TV가 전체 가치의 대부분을 차지한다 — 두 가지 위험.</strong> 일반적인 DCF에서 <strong>기업가치의 60~80%가 TV에서 나온다</strong>. 즉, 애써 5~10년 FCFF를 정교하게 추정해도, 밸류에이션의 대부분은 <strong>단 하나의 숫자 \(g\)(또는 exit 배수)</strong>에 달려 있다. ① <strong>\(g\) 과대설정 위험</strong>: \(g\)를 0.5%p만 올려도 목표주가가 크게 뛴다 — \(g\)를 GDP 이상으로 잡는 순간 밸류에이션이 통제를 벗어난다. ② <strong>TV 비중 위험</strong>: TV 비중이 90%를 넘어가면, 사실상 예측기간 모델이 아니라 '영구성장 가정 하나'를 파는 셈이니 항상 <strong>TV 비중과 \(g\) 민감도를 함께 보고</strong>하라.</p>
+</div>
+
+<!-- ═══════════════════════════════════════════ CH5 ═══════════════════════════════════════════ -->
+
+<h2 id="ch5">5. 할인과 기업가치 — 현재가치로 합치기</h2>
+
+<p>이제 예측기간 FCFF와 TV를 모두 <strong>오늘의 값</strong>으로 끌어와 더한다. \(t\)년 뒤 현금은 \((1+WACC)^t\)로 나눈다.</p>
+
+<div class="eq">
+\[ EV = \sum_{t=1}^{n} \frac{FCFF_t}{(1+WACC)^t} + \frac{TV}{(1+WACC)^n} \]
+</div>
+
+<p class="ni">주의: TV는 <strong>n년 시점</strong>의 가치이므로, 마지막 예측연도 FCFF와 <strong>같은 할인계수 \((1+WACC)^n\)</strong>로 한 번만 할인한다(TV를 n+1로 할인하는 흔한 실수를 조심). 예측 FCFF들의 현재가치 합과 TV의 현재가치를 더한 것이 곧 <strong>기업가치(EV)</strong>다.</p>
+
+<div class="tc">Table 5.1. 할인 계산 레이아웃(예시)</div>
+<table>
+<tr><th>연도</th><th>1</th><th>2</th><th>3</th><th>4</th><th>5</th><th>TV</th></tr>
+<tr><td>FCFF</td><td>85</td><td>92</td><td>98</td><td>103</td><td>107</td><td>1,780</td></tr>
+<tr><td>할인계수</td><td>0.92</td><td>0.84</td><td>0.77</td><td>0.71</td><td>0.65</td><td>0.65</td></tr>
+<tr><td>현재가치</td><td>78</td><td>77</td><td>76</td><td>73</td><td>70</td><td>1,157</td></tr>
+</table>
+
+<div class="info">
+<p class="ni"><strong>&#x1F511; 중간연도 할인(mid-year convention, 간단히).</strong> 위 식은 현금이 <strong>연말에 한꺼번에</strong> 들어온다고 가정한다. 실제로는 1년에 걸쳐 고르게 들어오므로, 평균적으로 <strong>연중(0.5년)</strong>에 받는다고 보는 것이 더 현실적이다. 이때 할인지수를 <code>t</code> 대신 <code>t&minus;0.5</code>로 쓰는 것이 mid-year convention. 현금을 반년 일찍 받는 셈이라 EV가 소폭 커진다. 실무에서 자주 쓰지만, 처음에는 연말 기준으로 익히고 나중에 스위치로 얹으면 된다.</p>
+</div>
+
+<!-- ═══════════════════════════════════════════ CH6 ═══════════════════════════════════════════ -->
+
+<h2 id="ch6">6. EV → 주당가치 — 목표주가 도출</h2>
+
+<p>EV는 '기업 전체(채권자+주주)'의 가치다. 주주 몫인 주당 내재가치로 내려오려면 <strong>비주주 몫을 걷어내고 비영업자산을 더하는</strong> 사다리를 밟는다.</p>
+
+<div class="tc">Table 6.1. EV → 주당 내재가치 사다리</div>
+<table>
+<tr><th style="width:14%">단계</th><th style="width:50%">항목</th><th style="width:36%">이유</th></tr>
+<tr><td></td><td><strong>기업가치 (EV)</strong></td><td>5장 결과</td></tr>
+<tr><td>&minus;</td><td>순차입금 (총차입금 &minus; 현금)</td><td>채권자 몫 제거</td></tr>
+<tr><td>&minus;</td><td>비지배지분</td><td>자회사 중 남의 몫</td></tr>
+<tr><td>+</td><td>관계기업/투자자산 등 비영업자산</td><td>EV에 안 잡힌 별도 가치</td></tr>
+<tr><td>=</td><td><strong>자기자본가치 (Equity Value)</strong></td><td>주주 전체 몫</td></tr>
+<tr><td>&divide;</td><td>희석 주식수</td><td>1주당으로 환산</td></tr>
+<tr><td>=</td><td><strong>주당 내재가치 = 목표주가</strong></td><td>현재가와 비교</td></tr>
+</table>
+
+<div class="def">
+<p class="ni"><strong>&#x1F511; 순차입금(Net Debt)을 빼는 이유.</strong> EV는 회사를 통째로 사는 값이다. 회사를 인수하면 그 <strong>부채도 떠안지만, 회사가 쥔 현금은 내 것이 된다</strong>. 그래서 주주 몫을 구할 땐 EV에서 (차입금 &minus; 보유현금) = 순차입금을 뺀다. 현금이 차입금보다 많으면(순현금) 오히려 EV보다 자기자본가치가 커진다.</p>
+</div>
+
+<div class="ok">
+<p class="ni"><strong>목표주가의 해석.</strong> 이렇게 나온 주당 내재가치가 <strong>현재 주가보다 높으면 저평가(Buy)</strong>, 낮으면 고평가다. 다만 이 숫자는 <strong>점 추정이 아니라 밴드</strong>로 봐야 한다 — 어떤 WACC·\(g\)를 넣느냐에 따라 크게 흔들리기 때문. 그래서 다음 장의 민감도 분석이 사실상 결론이다.</p>
+</div>
+
+<!-- ═══════════════════════════════════════════ CH7 ═══════════════════════════════════════════ -->
+
+<h2 id="ch7">7. 민감도 분석 — WACC &times; g 데이터 표</h2>
+
+<p>DCF의 결론은 "목표주가 47,300원" 같은 단일 숫자가 아니라 <strong>"WACC 8~10%, g 1~2%에서 41,000~55,000원"</strong> 같은 밴드다. 이 밴드를 만드는 도구가 엑셀의 <strong>데이터 표(What-If)</strong>다.</p>
+
+<h3>7.1 2변수 데이터 표 만들기</h3>
+
+<p class="ni">표의 <strong>왼쪽 위 모서리 셀</strong>에 목표주가 수식(또는 그 셀 참조)을 놓고, <strong>왼쪽 열</strong>에 WACC 후보들, <strong>맨 윗행</strong>에 g 후보들을 나열한 뒤 전체를 선택하고 데이터 표를 실행한다. 엑셀이 두 변수의 모든 조합을 대입해 격자를 채운다.</p>
+
+<div class="keyseq">
+<span class="grp"><span class="note">모서리에 =주당가치셀, 왼쪽열=WACC, 윗행=g 입력 후 전체 범위 선택</span></span><br>
+<span class="grp"><span class="k">Alt</span> <span class="arrow">→</span> <span class="k">A</span> <span class="note">데이터 탭</span> <span class="arrow">→</span> <span class="k">W</span> <span class="note">가상분석(What-If)</span> <span class="arrow">→</span> <span class="k">T</span> <span class="note">데이터 표</span></span><br>
+<span class="grp"><span class="note">행 입력 셀 = g 가정셀</span> <span class="k">Tab</span> <span class="note">열 입력 셀 = WACC 가정셀</span> <span class="arrow">→</span> <span class="k">Enter</span></span>
+</div>
+
+<div class="def">
+<p class="ni"><strong>&#x1F511; 행 입력 셀 / 열 입력 셀.</strong> 헷갈리는 핵심은 이것. <strong>맨 윗행</strong>에 늘어놓은 변수(g)는 <strong>행 입력 셀</strong>에, <strong>왼쪽 열</strong>에 늘어놓은 변수(WACC)는 <strong>열 입력 셀</strong>에 지정한다. 각각 "이 값들을 원래 가정 셀에 하나씩 대입하라"는 뜻. 방향과 입력 셀을 반대로 넣으면 표가 엉뚱하게 채워지니 주의.</p>
+</div>
+
+<h3>7.2 밸류에이션 밴드로 제시</h3>
+
+<div class="tc">Table 7.1. 민감도 표(주당 내재가치, 원)</div>
+<table>
+<tr><th>WACC \ g</th><th>0.5%</th><th>1.0%</th><th>1.5%</th><th>2.0%</th><th>2.5%</th></tr>
+<tr><td>8.0%</td><td>48,200</td><td>51,000</td><td>54,300</td><td>58,100</td><td>62,700</td></tr>
+<tr><td>8.5%</td><td>44,600</td><td>46,900</td><td>49,600</td><td>52,700</td><td>56,300</td></tr>
+<tr><td>9.0%</td><td>41,500</td><td>43,400</td><td>45,600</td><td>48,100</td><td>51,000</td></tr>
+<tr><td>9.5%</td><td>38,800</td><td>40,400</td><td>42,200</td><td>44,300</td><td>46,600</td></tr>
+<tr><td>10.0%</td><td>36,400</td><td>37,800</td><td>39,300</td><td>41,000</td><td>43,000</td></tr>
+</table>
+
+<p class="ni">이렇게 격자로 제시하면 "가정 하나에 따라 목표주가가 얼마나 흔들리는지"가 한눈에 보인다. 보고서에는 단일 숫자가 아니라 <strong>중심값 + 이 밴드</strong>를 함께 실어라. 대각선(WACC↑ &amp; g↓ → 보수적 / WACC↓ &amp; g↑ → 공격적)이 시나리오의 양 끝이다.</p>
+
+<!-- ═══════════════════════════════════════════ CH8 ═══════════════════════════════════════════ -->
+
+<h2 id="ch8">8. DCF의 한계 — 왜 상대가치와 교차검증하나</h2>
+
+<p>DCF는 이론적으로 가장 엄밀한 밸류에이션이지만, 동시에 <strong>가장 가정에 민감한</strong> 방법이다. 그 정밀함이 오히려 함정이 된다.</p>
+
+<div class="warn">
+<p class="ni"><strong>&#x26A0;&#xFE0F; Garbage in, garbage out.</strong> DCF의 결과값은 소수점까지 나오지만, 그 숫자의 정밀함은 <strong>착시</strong>다. 결과는 WACC, \(g\), 매출성장 가정 몇 개에 좌우되며, 이 가정들을 조금만 바꿔도 목표주가가 30~50% 흔들린다. "정확해 보이는 하나의 숫자"에 속아 <strong>가정의 불확실성을 잊는 것</strong>이 초심자가 가장 자주 빠지는 함정이다. DCF는 정답을 주는 기계가 아니라 <strong>"이 가치가 성립하려면 어떤 가정이 필요한가"를 역으로 드러내는 도구</strong>로 써야 한다.</p>
+</div>
+
+<p class="ni">그래서 DCF는 <strong>혼자 두지 않는다.</strong> 반드시 시장이 실제로 매기는 값 — 상대가치와 나란히 놓고 교차검증한다.</p>
+
+<div class="paper-anchor">
+<div class="pa-label">Valuation Anchor &middot; 다음 라운드 예고</div>
+<div class="pa-title">R7에서 상대가치(PER · EV/EBITDA)로 교차검증한다</div>
+<p>DCF가 "내재가치"를 아래에서 위로 쌓는다면(bottom-up), 상대가치는 "시장이 유사 기업에 매기는 배수"를 옆에서 가져온다(market-based). R7에서는 동종업계 표본을 골라 PER·EV/EBITDA·PBR 배수를 뽑고, 이 라운드의 DCF 결과와 <strong>같은 밴드에 들어오는지</strong> 대조한다. 두 방법이 수렴하면 확신이 커지고, 크게 벌어지면 어느 쪽 가정을 의심해야 하는지 단서가 된다. DCF와 상대가치는 경쟁자가 아니라 <strong>서로의 검산</strong>이다.</p>
+</div>
+
+<!-- ═══════════════════════════════════════════ CH9 ═══════════════════════════════════════════ -->
+
+<h2 id="ch9">9. 실전 워크스루 — 모델에 DCF 얹기</h2>
+
+<p>이제 R4~R5에서 완성한 3-statement 모델에 DCF 층을 <strong>키보드로</strong> 얹어보자. 아래 순서를 그대로 따라 친다.</p>
+
+<h3>Step 1 — FCFF 행 추가</h3>
+<p class="ni">손익·현금흐름표 아래에 FCFF 블록을 새로 만든다. EBIT는 손익에서, D&amp;A·CAPEX는 현금흐름표에서, &Delta;NWC는 재무상태표에서 링크로 끌어온다(다른 시트 참조는 초록 글씨 — R0의 색 컨벤션).</p>
+<pre><span class="cm"># FCFF 블록 (첫 예측연도 열 = D)</span>
+EBIT        =손익!D30
+NOPAT       =D_EBIT*(1-<span class="nb">세율</span>)      <span class="cm"># 세율은 이름정의</span>
++ D&amp;A       =현금흐름!D12
+- CAPEX     =-현금흐름!D20
+- ΔNWC      =-(D_NWC - C_NWC)     <span class="cm"># 전년 대비 증가분</span>
+= FCFF      =SUM(위 4개 항목)</pre>
+<p class="ni">FCFF 행을 <span class="kbd">Ctrl</span>+<span class="kbd">R</span>로 예측기간 마지막 연도까지 오른쪽으로 채운다. 참조가 상대/절대 올바르게 잡혔는지 <span class="kbd">Ctrl</span>+<span class="kbd">`</span>로 수식을 펼쳐 확인.</p>
+
+<h3>Step 2 — WACC 계산 블록</h3>
+<div class="keyseq">
+<span class="grp"><span class="note">가정 시트에</span> <span class="k">rf</span> <span class="k">β</span> <span class="k">ERP</span> <span class="k">rd</span> <span class="k">t</span> <span class="k">D/V</span> <span class="note">를 세로로 입력</span></span><br>
+<span class="grp"><span class="note">re 셀에</span> <span class="k">=rf + β*ERP</span> <span class="k">Enter</span> <span class="note">(CAPM)</span></span><br>
+<span class="grp"><span class="note">WACC 셀에</span> <span class="k">=(1-DV)*re + DV*rd*(1-t)</span> <span class="k">Enter</span></span>
+</div>
+<p class="ni">각 입력을 <span class="kbd">Ctrl</span>+<span class="kbd">Shift</span>+<span class="kbd">F3</span>로 이름정의하면 WACC 수식이 위처럼 읽기 쉽게 나온다.</p>
+
+<h3>Step 3 — Terminal Value</h3>
+<pre><span class="cm"># 예측 마지막 해가 H열이라면</span>
+TV(H년시점) =H_FCFF*(1+<span class="nb">g</span>)/(<span class="nb">WACC</span>-<span class="nb">g</span>)</pre>
+<p class="ni"><code>g &lt; WACC</code>인지 반드시 확인. TV가 EV에서 차지하는 비중도 별도 셀로 뽑아 둔다(4장 경고).</p>
+
+<h3>Step 4 — 할인과 EV</h3>
+<div class="keyseq">
+<span class="grp"><span class="note">할인계수 행:</span> <span class="k">=1/(1+WACC)^연차</span> <span class="note">연차는 헤더행 참조, WACC는 절대참조</span> <span class="k">F4</span></span><br>
+<span class="grp"><span class="note">현재가치 행:</span> <span class="k">=FCFF*할인계수</span> <span class="arrow">→</span> <span class="k">Ctrl</span>+<span class="k">R</span> <span class="note">로 채우기</span></span><br>
+<span class="grp"><span class="note">EV 셀:</span> <span class="k">Alt</span>+<span class="k">=</span> <span class="note">예측 PV 합</span> <span class="k">+ TV*마지막연도 할인계수</span></span>
+</div>
+
+<h3>Step 5 — 주당가치까지</h3>
+<pre><span class="cm"># EV → 주당 내재가치</span>
+자기자본가치 =EV - <span class="nb">순차입금</span> - 비지배지분 + 비영업자산
+주당가치      =자기자본가치/<span class="nb">주식수</span></pre>
+<p class="ni">마지막으로 주당가치 셀에서 <span class="kbd">Ctrl</span>+<span class="kbd">[</span> 를 눌러 EV → PV → FCFF → 가정(WACC·g)까지 거슬러 올라가 로직이 온전히 연결됐는지 확인. 그다음 7장의 데이터 표로 밴드를 뽑으면 <strong>DCF 완성</strong>.</p>
+
+<div class="ok">
+<p class="ni"><strong>축하한다.</strong> 방금 3-statement 모델을 목표주가까지 이어 붙였다. R0의 근육(F2·F4·Ctrl+`·Ctrl+[)이 여기서 그대로 쓰였음을 눈치챘을 것이다. 다음 R7에서는 이 DCF 결과를 <strong>상대가치</strong>와 나란히 놓고, 어느 밴드가 더 설득력 있는지 판단하는 법을 배운다.</p>
+</div>
+
+<div class="task">
+<div class="task-title">&#x1F3AF; 이번 주 과제</div>
+<p class="ni">R4~R5 모델에 위 5단계 DCF를 <strong>마우스 없이</strong> 얹어라. ① FCFF 5개년, ② WACC 블록(이름정의 필수), ③ 영구성장 TV, ④ EV → 주당가치까지 완성한 뒤, ⑤ WACC(5단계) &times; g(5단계) <strong>데이터 표</strong>로 민감도 격자를 만들고, ⑥ TV가 EV의 몇 %인지 한 셀에 계산해 두라. \(g\)를 GDP 이상으로 올렸을 때 목표주가가 어떻게 폭주하는지 직접 눈으로 확인해 보는 것이 이번 주의 핵심 감각이다.</p>
+</div>
+
+<div class="ok">
+<p class="ni"><strong>&#x1F4E5; 실습 파일.</strong> <a href="../downloads/3-statement-model-complete.xlsx" download style="color:#217346;font-weight:bold;border-bottom:1px solid #217346">완성본</a>의 DCF 시트에서 FCFF→WACC→TV→EV→주당가치 흐름과 <strong>WACC×g 민감도표</strong>가 실제로 어떻게 계산되는지 확인하세요. 가정 시트의 WACC·g를 바꾸면 주당 내재가치가 즉시 갱신됩니다. <a href="../downloads/3-statement-model-practice.xlsx" download style="color:#217346;font-weight:bold;border-bottom:1px solid #217346">실습본</a>에서는 FCFF 구성만 채우면 나머지가 자동 산출됩니다.</p>
+</div>
+
+<!-- ═══════════════════════════════════════════ QUIZ ═══════════════════════════════════════════ -->
+
+<h2 id="quiz">Quiz — 셀프 체크 10문항</h2>
+
+<details class="quiz-item"><summary>Q1. FCFF 공식의 네 항목을 쓰고, EBIT에서 출발하는 이유를 설명하라.</summary>
+<div class="answer"><code>FCFF = EBIT(1&minus;t) + D&amp;A &minus; CAPEX &minus; &Delta;NWC</code>. EBIT는 이자 차감 전 이익이라 채권자 몫(이자)까지 포함한 '기업 전체' 현금을 잡을 수 있다. 이자를 여기서 빼면 WACC의 <code>r_d(1&minus;t)</code>와 이중 계산이 된다.</div></details>
+
+<details class="quiz-item"><summary>Q2. &Delta;NWC(순운전자본 증가)를 FCFF에서 <strong>차감</strong>하는 이유는?</summary>
+<div class="answer">매출채권·재고가 늘면 그만큼 현금이 묶이기 때문. NWC가 증가 = 현금 유출이므로 FCFF에서 뺀다. 성장 기업이 흑자인데도 현금이 마르는 원인이 이것.</div></details>
+
+<details class="quiz-item"><summary>Q3. WACC 식에서 타인자본비용에 <code>(1&minus;t)</code>를 곱하는 이유는?</summary>
+<div class="answer">이자비용이 과세소득을 줄여 세금을 절감(세금방패)하므로, 실효 부담은 표면 이자율보다 <code>(1&minus;t)</code>만큼 낮다.</div></details>
+
+<details class="quiz-item"><summary>Q4. CAPM으로 자기자본비용 \(r_e\)를 쓰라. 각 항의 출처는?</summary>
+<div class="answer"><code>r_e = r_f + β(r_m &minus; r_f)</code>. \(r_f\)=10년물 국고채, \(β\)=회귀 또는 동종업계 평균, \(r_m&minus;r_f\)=시장위험 프리미엄(보통 5~7%).</div></details>
+
+<details class="quiz-item"><summary>Q5. 영구성장률 \(g\)의 상한은 무엇이며 왜 그런가?</summary>
+<div class="answer">장기 명목 GDP 성장률(또는 장기 물가상승률). 회사가 경제 전체보다 영원히 빨리 자라면 언젠가 경제보다 커진다는 모순이 생긴다. 또한 반드시 <code>g &lt; WACC</code>여야 분모가 양수가 된다.</div></details>
+
+<details class="quiz-item"><summary>Q6. 영구성장 TV 공식을 쓰고, 이 값이 '몇 년 시점'의 가치인지 답하라.</summary>
+<div class="answer"><code>TV = FCFF_n(1+g)/(WACC&minus;g)</code>. 이는 <strong>예측 마지막 해(n년) 시점</strong>의 가치이므로, 현재가치로 만들 때 마지막 FCFF와 <strong>같은 </strong><code>(1+WACC)^n</code>으로 한 번만 할인한다.</div></details>
+
+<details class="quiz-item"><summary>Q7. 일반적 DCF에서 TV가 EV의 대부분을 차지하는데, 이것이 왜 위험한가?</summary>
+<div class="answer">EV의 60~80%가 TV에서 나오므로, 밸류에이션 대부분이 단 하나의 가정(\(g\) 또는 exit 배수)에 달려 있다. \(g\)를 조금만 올려도 목표주가가 크게 뛰므로, 항상 TV 비중과 \(g\) 민감도를 함께 보고해야 한다.</div></details>
+
+<details class="quiz-item"><summary>Q8. EV에서 주당 내재가치로 내려오는 사다리를 순서대로 쓰라.</summary>
+<div class="answer">EV &minus; 순차입금(차입금&minus;현금) &minus; 비지배지분 + 관계기업/투자자산 = 자기자본가치. 이를 희석 주식수로 나누면 주당 내재가치(=목표주가).</div></details>
+
+<details class="quiz-item"><summary>Q9. WACC &times; g 2변수 데이터 표에서 '행 입력 셀'과 '열 입력 셀'을 어떻게 지정하나?</summary>
+<div class="answer">맨 윗행에 늘어놓은 변수(g)는 <strong>행 입력 셀</strong>(=g 가정셀)에, 왼쪽 열에 늘어놓은 변수(WACC)는 <strong>열 입력 셀</strong>(=WACC 가정셀)에 지정한다. 실행 경로는 <span class="kbd">Alt</span> A W T.</div></details>
+
+<details class="quiz-item"><summary>Q10. DCF의 가장 큰 한계는 무엇이며, 실무에서 어떻게 보완하나?</summary>
+<div class="answer">가정에 극도로 민감(garbage in, garbage out)해 정밀해 보이는 결과가 착시일 수 있다. 그래서 단일 숫자 대신 민감도 밴드로 제시하고, R7의 상대가치(PER·EV/EBITDA)와 교차검증한다.</div></details>
+
+<!-- ═══════════════════════════════════════════ CHEAT SHEET ═══════════════════════════════════════════ -->
+
+<h2 id="cheatsheet">&#x1F4CB; Cheat Sheet — DCF 한 장 요약</h2>
+
+<div class="tc">Table C.1. DCF 5단계 공식 요약</div>
+<table>
+<tr><th style="width:16%">단계</th><th style="width:34%">핵심 공식</th><th style="width:50%">비고</th></tr>
+<tr><td>① FCFF</td><td><code>EBIT(1&minus;t)+D&amp;A&minus;CAPEX&minus;&Delta;NWC</code></td><td>이자 차감 전에서 출발(FCFF=기업 관점)</td></tr>
+<tr><td>② TV</td><td><code>FCFF_n(1+g)/(WACC&minus;g)</code></td><td>n년 시점 가치, <code>g &lt; WACC</code> 필수</td></tr>
+<tr><td>③ 할인</td><td><code>PV = CF/(1+WACC)^t</code></td><td>TV는 <code>(1+WACC)^n</code>으로</td></tr>
+<tr><td>④ EV</td><td><code>Σ PV(FCFF) + PV(TV)</code></td><td>기업 전체 가치</td></tr>
+<tr><td>⑤ 주당가치</td><td><code>(EV&minus;순차입금±조정)/주식수</code></td><td>= 목표주가</td></tr>
+</table>
+
+<div class="tc">Table C.2. WACC 구성요소</div>
+<table>
+<tr><th style="width:26%">요소</th><th style="width:38%">공식/출처</th><th style="width:36%">비고</th></tr>
+<tr><td>WACC</td><td><code>(E/V)r_e + (D/V)r_d(1&minus;t)</code></td><td>가중치는 시장가치·목표 자본구조</td></tr>
+<tr><td>\(r_e\) (CAPM)</td><td><code>r_f + β(r_m&minus;r_f)</code></td><td>자기자본비용</td></tr>
+<tr><td>\(r_f\)</td><td>10년물 국고채</td><td>무위험 수익률</td></tr>
+<tr><td>\(β\)</td><td>회귀 or 업계 unlevered 재-레버링</td><td>시장 대비 민감도</td></tr>
+<tr><td>ERP</td><td>보통 5~7%</td><td>시장위험 프리미엄</td></tr>
+<tr><td>\(r_d(1&minus;t)\)</td><td>회사채 수익률 &times; 세금방패</td><td>타인자본비용</td></tr>
+</table>
+
+<div class="tc">Table C.3. DCF 관련 키 순서</div>
+<table>
+<tr><th style="width:44%">단축키</th><th style="width:56%">동작</th></tr>
+<tr><td><span class="kbd">Alt</span> A W T</td><td>데이터 표(가상분석) — 민감도 격자</td></tr>
+<tr><td><span class="kbd">Alt</span>+<span class="kbd">=</span></td><td>예측 PV 합계 (SUM)</td></tr>
+<tr><td><span class="kbd">F4</span></td><td>WACC·g 가정 절대참조 고정</td></tr>
+<tr><td><span class="kbd">Ctrl</span>+<span class="kbd">Shift</span>+<span class="kbd">F3</span></td><td>가정 블록 이름 자동 생성</td></tr>
+<tr><td><span class="kbd">Ctrl</span>+<span class="kbd">[</span> / <span class="kbd">`</span></td><td>주당가치 역추적 / 수식 감사</td></tr>
+</table>
+
+<div class="nav-footer">
+<a href="../round-05/"><span class="nf-label">&larr; Previous</span>R5. 3-Statement II</a>
+<a href="../round-07/" style="text-align:right"><span class="nf-label">Next &rarr;</span>R7. 상대가치 실전</a>
+</div>
+
+</div>
+</div>
+</div>
+
+</body>
+</html>

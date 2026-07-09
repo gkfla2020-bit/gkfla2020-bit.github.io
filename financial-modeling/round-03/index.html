@@ -1,0 +1,438 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Round 3 - 밸류에이션 이론 — 상대가치 vs 절대가치 | Financial Modeling Guide</title>
+<script>
+MathJax = { tex: { inlineMath: [['\\(','\\)']], displayMath: [['\\[','\\]'],['$$','$$']] } };
+</script>
+<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;500&family=Space+Mono:wght@400&family=Inter:wght@300;400&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Inter',sans-serif;background:#fafaf8;color:#1a1a1a;line-height:1.7;overflow-x:hidden}
+.sidebar{position:fixed;left:0;top:0;width:260px;height:100vh;background:rgba(255,255,255,.97);border-right:1px solid rgba(0,0,0,.06);padding:32px 24px;z-index:100;overflow-y:auto;display:flex;flex-direction:column}
+.sidebar-profile{text-align:center;margin-bottom:28px;padding-bottom:24px;border-bottom:1px solid rgba(0,0,0,.08)}
+.profile-icon{font-size:48px;margin-bottom:8px}
+.profile-name{font-family:'Cormorant Garamond',serif;font-size:1.3rem;font-weight:500;margin-bottom:4px}
+.profile-title{font-size:.68rem;color:#888;letter-spacing:.08em;text-transform:uppercase;margin-bottom:8px}
+.profile-bio{font-size:.78rem;color:#666;line-height:1.5}
+.sidebar-nav{flex:1;margin-top:16px}.nav-section{margin-bottom:20px}.nav-section-title{font-size:.6rem;font-weight:600;color:#aaa;letter-spacing:.15em;text-transform:uppercase;margin-bottom:10px}.nav-list{list-style:none}.nav-list li{margin-bottom:5px}.nav-list a{font-size:.78rem;color:#555;text-decoration:none;transition:all .2s;display:block;padding:3px 0}.nav-list a:hover{color:#217346;padding-left:4px}.nav-list a.active{color:#217346;font-weight:500}.nav-list a.done{color:#28a745}.badge{display:inline-block;font-size:.5rem;background:#217346;color:#fff;padding:1px 5px;border-radius:8px;margin-left:3px;vertical-align:middle}.badge-done{background:#28a745}.sidebar-footer{padding-top:16px;border-top:1px solid rgba(0,0,0,.06);font-size:.65rem;color:#aaa;text-align:center}
+.main-wrapper{margin-left:260px;min-height:100vh}.container{max-width:1100px;margin:0 auto;padding:50px 40px 80px}
+.paper-content{font-family:'Times New Roman','Nanum Myeongjo',serif;line-height:1.8;background:#fff;padding:40px;border-radius:8px;box-shadow:0 2px 20px rgba(0,0,0,.05)}.paper-header{text-align:center;margin-bottom:40px;padding-bottom:30px;border-bottom:2px solid #333}.paper-category{font-size:14px;color:#666;margin-bottom:10px}.paper-title{font-size:24px;font-weight:bold;margin-bottom:12px;line-height:1.4}.paper-subtitle{font-size:14px;color:#555;margin-bottom:8px}.paper-team{font-size:13px;color:#444}
+.abstract{background:#f8f9fa;padding:25px;margin:30px 0;border-left:4px solid #217346}.abstract-title{font-weight:bold;font-size:16px;margin-bottom:15px}
+h2{font-size:18px;margin:35px 0 20px;padding-bottom:8px;border-bottom:1px solid #ddd;color:#1e4f38}h3{font-size:15px;margin:25px 0 15px;color:#34495e}
+p{text-align:justify;margin-bottom:15px;text-indent:2em}p.ni{text-indent:0}
+table{width:100%;border-collapse:collapse;margin:20px 0;font-size:12px}th,td{border:1px solid #ddd;padding:10px 8px;text-align:center}th{background:#1e4f38;color:white;font-weight:bold}tr:nth-child(even){background:#f8f9fa}tr:hover{background:#eef7f1}
+.tc{font-size:13px;font-weight:bold;margin:15px 0 10px;text-align:center}.eq{text-align:center;margin:20px 0;padding:15px;background:#f8f9fa;border-radius:4px;overflow-x:auto}ul,ol{margin-left:2em;margin-bottom:15px}li{margin-bottom:6px}
+.def{background:#fff9e6;border:1px solid #ffc107;border-radius:4px;padding:20px;margin:20px 0}.info{background:#e8f4f8;border-left:4px solid #3498db;padding:20px;margin:20px 0}.warn{background:#fff3cd;border-left:4px solid #f39c12;padding:20px;margin:20px 0}.ok{background:#d4edda;border-left:4px solid #28a745;padding:20px;margin:20px 0}
+.paper-anchor{background:#ecfdf3;border:1px solid #10b981;border-radius:6px;padding:22px;margin:24px 0}.paper-anchor .pa-label{font-family:'Space Mono',monospace;font-size:10px;color:#047857;letter-spacing:.15em;text-transform:uppercase;margin-bottom:8px}.paper-anchor .pa-title{font-weight:bold;font-size:14px;margin-bottom:6px}.paper-anchor p{font-size:13px;text-indent:0;margin-bottom:8px}
+.task{background:#e8f8f0;border-left:4px solid #00b894;padding:20px;margin:20px 0}.task .task-title{font-weight:bold;margin-bottom:10px}
+details.quiz-item{margin:14px 0;padding:14px 18px;background:#f8f9fa;border:1px solid #e0e0e0;border-radius:6px}details.quiz-item summary{cursor:pointer;font-weight:bold;font-size:13.5px}details.quiz-item[open] summary{margin-bottom:10px;color:#217346}details.quiz-item .answer{font-size:13px;padding:10px 14px;background:#fff;border-left:3px solid #217346}
+pre{background:#1e1e1e;color:#d4d4d4;padding:20px;border-radius:6px;overflow-x:auto;margin:20px 0;font-family:'Space Mono','Consolas',monospace;font-size:13px;line-height:1.6}code{font-family:'Space Mono','Consolas',monospace;font-size:13px}p code,li code,td code{background:#f0f0f0;padding:2px 6px;border-radius:3px;color:#0a7f4e;font-size:12px}
+.cm{color:#6a9955}.kw{color:#569cd6}.st{color:#ce9178}.fn{color:#dcdcaa}.nb{color:#4ec9b0}.nu{color:#b5cea8}
+.kbd{display:inline-block;font-family:'Space Mono',monospace;font-size:.82em;background:#f7faf8;border:1px solid #c9d6cd;border-bottom-width:2px;border-radius:4px;padding:1px 7px;color:#1e4f38;margin:0 1px;white-space:nowrap;line-height:1.9}
+.keyseq{background:#0f1a14;color:#d4f0e0;padding:16px 20px;border-radius:6px;margin:18px 0;font-family:'Space Mono',monospace;font-size:12.5px;line-height:2.1}.keyseq .k{display:inline-block;background:#1c3327;border:1px solid #2f5a45;border-bottom-width:2px;border-radius:4px;padding:1px 7px;color:#8ff0bf;margin:0 2px}.keyseq .arrow{color:#5a8a72;margin:0 4px}.keyseq .note{color:#6f9c86;font-size:11px}.keyseq .grp{display:inline-block;margin:3px 0}
+.progress-bar{width:100%;height:6px;background:#e0e0e0;border-radius:3px;margin-top:16px}.progress-fill{height:100%;background:linear-gradient(90deg,#217346,#10b981);border-radius:3px;width:0%}.progress-label{font-size:11px;color:#888;margin-top:4px;text-align:center}
+.code-output{background:#1e1e1e;color:#d4d4d4;padding:12px 16px;border-radius:0 0 6px 6px;font-family:'Space Mono',monospace;font-size:11.5px;line-height:1.6;margin-top:-4px;margin-bottom:18px;border-top:2px solid #333;white-space:pre-wrap;overflow-x:auto}.code-output .out-label{color:#888;font-size:10px;margin-bottom:4px;display:block}
+.nav-footer{display:flex;justify-content:space-between;gap:16px;margin-top:50px;padding-top:24px;border-top:1px solid #ddd;font-family:'Inter',sans-serif}.nav-footer a{font-size:.82rem;color:#217346;text-decoration:none;padding:12px 18px;border:1px solid #cfe6da;border-radius:6px;transition:all .2s;max-width:48%}.nav-footer a:hover{background:#217346;color:#fff;border-color:#217346}.nav-footer .nf-label{display:block;font-size:.6rem;color:#999;letter-spacing:.1em;text-transform:uppercase;margin-bottom:4px}.nav-footer a:hover .nf-label{color:rgba(255,255,255,.7)}
+@media(max-width:1024px){.sidebar{width:100%;height:auto;position:relative;border-right:none;border-bottom:1px solid rgba(0,0,0,.08);padding:16px}.sidebar-profile{margin-bottom:10px;padding-bottom:10px;display:flex;align-items:center;gap:12px;text-align:left}.profile-icon{font-size:32px;margin-bottom:0}.profile-bio{display:none}.nav-section{display:inline-block;margin-right:16px;margin-bottom:8px}.nav-list{display:flex;gap:10px;flex-wrap:wrap}.nav-list li{margin-bottom:0}.sidebar-footer{display:none}.main-wrapper{margin-left:0}.container{padding:0}.paper-content{padding:20px 16px;border-radius:0;box-shadow:none}.paper-title{font-size:18px}p{font-size:14px;text-indent:1.5em;text-align:left}pre{font-size:11px;padding:14px}table{font-size:10px;display:block;overflow-x:auto}.keyseq{font-size:11px}.nav-footer{flex-direction:column}.nav-footer a{max-width:100%}}
+</style>
+</head>
+<body>
+
+<div class="sidebar">
+<div class="sidebar-profile">
+<div class="profile-icon">&#x1F4CA;</div>
+<div class="profile-name">Financial Modeling Guide</div>
+<div class="profile-title">Keyboard &middot; Accounting &middot; Valuation</div>
+<div class="profile-bio">13 Rounds: 키보드로 짓는 재무모델부터 리서치 보고서까지</div>
+</div>
+<div class="sidebar-nav">
+<div class="nav-section">
+<div class="nav-section-title">Curriculum</div>
+<ul class="nav-list">
+<li><a href="../">&#x2302; Guide Home</a></li>
+<li><a href="../round-00/">R0. No-Mouse Excel</a></li>
+<li><a href="../round-01/">R1. 회계의 뼈대</a></li>
+<li><a href="../round-02/">R2. DART 데이터 수집</a></li>
+<li><a class="active" href="#">R3. 밸류에이션 이론 <span class="badge">NOW</span></a></li>
+<li><a href="../round-04/">R4. 3-Statement I</a></li>
+<li><a href="../round-05/">R5. 3-Statement II</a></li>
+<li><a href="../round-06/">R6. DCF & 목표주가</a></li>
+<li><a href="../round-07/">R7. 상대가치 실전</a></li>
+<li><a href="../round-08/">R8. 매크로 렌즈</a></li>
+<li><a href="../round-09/">R9. 산업분석</a></li>
+<li><a href="../round-10/">R10. 리서치 보고서</a></li>
+<li><a href="../round-11/">R11. 퀀트 브릿지</a></li>
+<li><a href="../round-12/">R12. 캡스톤</a></li>
+</ul>
+</div>
+<div class="nav-section">
+<div class="nav-section-title">This Lecture</div>
+<ul class="nav-list">
+<li><a href="#ch1">1. 가치평가의 두 갈래</a></li>
+<li><a href="#ch2">2. 상대가치 개괄</a></li>
+<li><a href="#ch3">3. PER</a></li>
+<li><a href="#ch4">4. PBR</a></li>
+<li><a href="#ch5">5. EV/EBITDA</a></li>
+<li><a href="#ch6">6. PSR &amp; 기타 배수</a></li>
+<li><a href="#ch7">7. 절대가치 — DCF</a></li>
+<li><a href="#ch8">8. RIM 잔여이익모형</a></li>
+<li><a href="#ch9">9. 무엇을 언제 쓰나</a></li>
+<li><a href="#quiz">Quiz</a></li>
+<li><a href="#cheatsheet">&#x1F4CB; Cheat Sheet</a></li>
+</ul>
+</div>
+</div>
+<div class="sidebar-footer">Round 3 of 12 &middot; Part II</div>
+</div>
+
+<div class="main-wrapper">
+<div class="container">
+<div class="paper-content">
+
+<div class="paper-header">
+<div class="paper-category">Round 3 / 12</div>
+<h1 class="paper-title">밸류에이션 이론 — 상대가치 vs 절대가치</h1>
+<div class="paper-subtitle">"시장이 매기는 값"과 "펀더멘털이 정당화하는 값" 사이에서</div>
+<div class="paper-team">Reference: Damodaran, <em>Investment Valuation</em> &middot; McKinsey, <em>Valuation</em> &middot; CFA Institute Equity Curriculum</div>
+<div class="progress-bar"><div class="progress-fill" style="width:25%"></div></div>
+<div class="progress-label">Overall Progress: 3/12 Rounds</div>
+</div>
+
+<div class="abstract">
+<div class="abstract-title">이 라운드에서 배우는 것</div>
+<p class="ni">앞의 R0~R2에서 손(키보드)과 재료(회계·DART 데이터)를 갖췄다. 이제부터는 그 재료로 <strong>기업의 값을 매기는 사고틀</strong>을 세운다. 밸류에이션은 크게 두 갈래다 — <strong>상대가치</strong>(다른 기업과 비교해 값을 매기는 법)와 <strong>절대가치</strong>(그 기업 자체의 현금흐름에서 값을 끌어내는 법). 이 라운드에서는:</p>
+<ul>
+<li>왜 가치평가에 두 갈래가 있는지 — "시장이 매기는 값" vs "펀더멘털이 정당화하는 값"의 긴장</li>
+<li>상대가치의 논리와 <strong>Price 기반(PER·PBR) vs EV 기반(EV/EBITDA)</strong>의 근본 차이</li>
+<li>4대 멀티플 — <strong>PER·PBR·EV/EBITDA·PSR</strong> 각각의 정의·해석·함정, 그리고 언제 유효한가</li>
+<li>절대가치의 두 축 — <strong>DCF</strong>(미래 현금흐름 할인)와 <strong>RIM</strong>(잔여이익모형), 각각의 수식과 장단점</li>
+<li>산업·기업 상황별로 <strong>어떤 방법을 골라야 하는지</strong>의 판단 매트릭스</li>
+</ul>
+<p class="ni"><strong>Keywords:</strong> 상대가치, 절대가치, PER, PEG, PBR, ROE, EV/EBITDA, PSR, DCF, FCF, WACC, Terminal Value, RIM, 잔여이익, 방법 선택 매트릭스</p>
+</div>
+
+<div class="info">
+<p class="ni"><strong>이 라운드는 이론이다.</strong> 실제로 엑셀에서 DCF를 조립하는 것은 <strong>R6</strong>, 상대가치 배수를 실전에서 뽑아 목표주가를 내는 것은 <strong>R7</strong>이다. 여기서는 "각 방법이 무엇을 재고, 어디서 무너지는가"를 먼저 머릿속에 새긴다. 이론 없이 엑셀부터 만지면, 숫자는 나와도 그게 무슨 뜻인지 설명하지 못한다.</p>
+</div>
+
+<!-- ═══════════════════════════════════════════ CH1 ═══════════════════════════════════════════ -->
+
+<h2 id="ch1">1. 가치평가의 두 갈래 — 상대 vs 절대</h2>
+
+<p>기업 하나의 '적정 가치'를 묻는 방법은 근본적으로 두 가지다. 하나는 <strong>"비슷한 애들은 얼마에 팔리지?"</strong>라고 묻는 것이고, 다른 하나는 <strong>"이 기업이 앞으로 벌어들일 돈은 오늘 얼마짜리지?"</strong>라고 묻는 것이다. 전자가 상대가치(relative valuation), 후자가 절대가치(intrinsic/absolute valuation)다.</p>
+
+<div class="def">
+<p class="ni"><strong>상대가치 (Relative Valuation).</strong> 비교 가능한 기업(peer)들이 시장에서 이익·순자산·매출 대비 몇 배에 거래되는지를 보고, 그 <strong>배수(multiple)</strong>를 대상 기업에 적용해 값을 매긴다. 핵심 질문: "<strong>시장이 매기는 값</strong>은 얼마인가?" 빠르고 직관적이지만, 시장 전체가 과열/침체면 그 왜곡을 그대로 물려받는다.</p>
+</div>
+
+<div class="def">
+<p class="ni"><strong>절대가치 (Intrinsic Valuation).</strong> 기업이 미래에 창출할 현금흐름(또는 초과이익)을 추정하고, 위험을 반영한 할인율로 현재가치로 되돌려 합산한다. 핵심 질문: "<strong>펀더멘털이 정당화하는 값</strong>은 얼마인가?" 논리적으로 탄탄하지만, 먼 미래를 추정해야 해서 가정에 극도로 민감하다.</p>
+</div>
+
+<p class="ni">두 방법은 경쟁이 아니라 <strong>교차 검증</strong> 관계다. DCF로 내재가치를 구해놓고 "그런데 시장은 이 섹터를 PER 몇 배로 보고 있지?"를 함께 본다. 둘의 답이 크게 벌어지면, 그 차이 자체가 리서치의 질문이 된다 — "시장이 틀렸나, 내 가정이 틀렸나?"</p>
+
+<div class="tc">Table 1.1. 상대가치 vs 절대가치 한눈에</div>
+<table>
+<tr><th style="width:20%">구분</th><th style="width:40%">상대가치</th><th style="width:40%">절대가치</th></tr>
+<tr><td>묻는 것</td><td>시장이 매기는 값</td><td>펀더멘털이 정당화하는 값</td></tr>
+<tr><td>재료</td><td>peer 배수(PER·PBR 등)</td><td>미래 현금흐름·할인율</td></tr>
+<tr><td>대표 방법</td><td>PER, PBR, EV/EBITDA, PSR</td><td>DCF, RIM, 배당할인(DDM)</td></tr>
+<tr><td>장점</td><td>빠름·직관적·시장 정서 반영</td><td>논리 일관·기업 고유가치 포착</td></tr>
+<tr><td>약점</td><td>시장 왜곡을 물려받음</td><td>가정 민감·먼 미래 추정</td></tr>
+</table>
+
+<div class="info">
+<p class="ni"><strong>&#x1F4A1; 애널리스트의 실제 습관.</strong> 리서치 보고서의 목표주가는 대개 <strong>둘을 섞어서</strong> 나온다. "DCF로 12,000원, 상대가치(peer PER 10배 적용)로 11,000원 → 평균 11,500원" 식이다. 어느 하나만으로 목표주가를 내는 경우는 드물다. 두 렌즈로 같은 기업을 보고, 그 둘이 얼추 맞을 때 확신이 선다.</p>
+</div>
+
+<!-- ═══════════════════════════════════════════ CH2 ═══════════════════════════════════════════ -->
+
+<h2 id="ch2">2. 상대가치 개괄 — 멀티플의 논리</h2>
+
+<p>상대가치의 뼈대는 단순하다. <strong>어떤 가치 지표(주가·기업가치)를 어떤 실적 지표(이익·순자산·매출)로 나눈 비율</strong>, 즉 배수(multiple)를 쓴다. 그리고 "같은 사업을 하는 기업들은 비슷한 배수에 거래되어야 한다"는 전제로, peer의 배수를 대상 기업에 적용한다.</p>
+
+<div class="eq">\[ \text{추정 가치} = \text{peer 배수} \times \text{대상 기업의 실적 지표} \]</div>
+
+<p class="ni">예: 반도체 섹터 peer들이 평균 PER 12배에 거래되고, 대상 기업의 주당순이익(EPS)이 1,000원이면 → 적정 주가 ≈ 12 × 1,000 = 12,000원. 이게 상대가치의 전부다. 어려운 건 "<strong>어떤 배수를, 어떤 peer로, 어떤 실적으로</strong>" 고르느냐다.</p>
+
+<h3>2.1 Price 기반 vs EV 기반 — 이 구분이 핵심이다</h3>
+
+<p>배수는 분자가 무엇이냐로 두 부류로 갈린다. 분자가 <strong>주가(시가총액)</strong>면 Price 기반, <strong>기업가치(EV)</strong>면 EV 기반이다. 이 차이가 상대가치 전체를 이해하는 열쇠다.</p>
+
+<div class="def">
+<p class="ni"><strong>&#x1F511; 시가총액(Market Cap)</strong>은 <strong>주주 몫</strong>의 가치다 = 주가 × 발행주식수. 반면 <strong>기업가치(Enterprise Value, EV)</strong>는 <strong>주주 + 채권자 전체</strong>의 가치다 = 시가총액 + 순차입금(총차입금 − 현금). 즉 "이 회사를 통째로 인수하려면(빚까지 떠안고) 얼마 드나"에 가깝다.</p>
+</div>
+
+<div class="tc">Table 2.1. 분자·분모 대응 관계 (짝이 맞아야 한다)</div>
+<table>
+<tr><th style="width:22%">배수</th><th style="width:30%">분자 (가치)</th><th style="width:30%">분모 (실적)</th><th style="width:18%">누구 관점</th></tr>
+<tr><td>PER</td><td>시가총액 / 주가</td><td>순이익 / EPS</td><td>주주</td></tr>
+<tr><td>PBR</td><td>시가총액 / 주가</td><td>순자산 / BPS</td><td>주주</td></tr>
+<tr><td>PSR</td><td>시가총액 / 주가</td><td>매출</td><td>주주(사실상 전체)</td></tr>
+<tr><td>EV/EBITDA</td><td>기업가치(EV)</td><td>EBITDA</td><td>주주+채권자</td></tr>
+<tr><td>EV/EBIT</td><td>기업가치(EV)</td><td>영업이익</td><td>주주+채권자</td></tr>
+</table>
+
+<div class="warn">
+<p class="ni"><strong>분자·분모의 짝을 맞춰라.</strong> Price 기반 배수의 분모는 <strong>이자비용을 뺀 뒤</strong>의 값(순이익)이어야 하고, EV 기반 배수의 분모는 <strong>이자비용을 빼기 전</strong>의 값(EBITDA·영업이익)이어야 한다. EV(채권자 몫 포함)를 순이익(주주 몫)으로 나누는 건 논리적 모순이다. 이 짝 규칙을 어기는 게 초심자의 가장 흔한 실수다.</p>
+</div>
+
+<h3>2.2 왜 EV/EBITDA가 '자본구조 중립적'인가</h3>
+
+<p class="ni">두 회사가 사업은 똑같은데 하나는 빚이 많고 하나는 빚이 없다고 하자. 빚이 많은 회사는 이자비용 때문에 <strong>순이익이 작아</strong> PER가 왜곡된다. 그런데 EBITDA는 이자·세금 차감 <strong>전</strong>이고, EV는 빚을 이미 포함하고 있어서, EV/EBITDA는 자본구조(빚의 많고 적음)의 영향을 상당 부분 상쇄한다. 그래서 <strong>부채 수준이 제각각인 기업들을 비교</strong>할 때, 또 M&amp;A(회사를 통째로 사는 상황)에서 EV/EBITDA가 표준이 된다.</p>
+
+<!-- ═══════════════════════════════════════════ CH3 ═══════════════════════════════════════════ -->
+
+<h2 id="ch3">3. PER — 이익 대비 몇 배인가</h2>
+
+<div class="def">
+<p class="ni"><strong>PER (Price-to-Earnings Ratio, 주가수익비율).</strong> \( \text{PER} = \dfrac{\text{주가}}{\text{EPS}} = \dfrac{\text{시가총액}}{\text{순이익}} \). "주주가 이 회사의 이익 1원에 대해 몇 원을 지불하는가"다. PER 10배는 곧 "지금 이익이 유지된다면 <strong>10년 치 이익으로 원금을 회수</strong>한다"는 직관과 통한다.</p>
+</div>
+
+<h3>3.1 해석 — 높으면 비싼 건가?</h3>
+<p class="ni">PER가 높다는 건 시장이 이 회사의 <strong>미래 이익 성장을 크게 기대</strong>한다는 뜻이지, 무조건 '고평가'라는 뜻이 아니다. 성장이 빠른 회사는 당연히 PER가 높다. 그래서 PER는 <strong>성장 속도와 함께</strong> 봐야 한다. 여기서 나온 게 PEG다.</p>
+
+<div class="def">
+<p class="ni"><strong>PEG (PER-to-Growth).</strong> \( \text{PEG} = \dfrac{\text{PER}}{\text{이익성장률(\%)}} \). PER를 성장률로 나눠 '성장 대비 비싼가'를 본다. 통상 <strong>PEG 1 근처면 적정</strong>, 1보다 훨씬 작으면 성장 대비 싸다고 본다. PER 30배도 성장률이 30%면 PEG=1이라 비싸다고 단정 못 한다.</p>
+</div>
+
+<h3>3.2 함정 — 언제 PER가 거짓말하나</h3>
+<ul>
+<li><strong>일회성 손익.</strong> 자산 매각 차익·소송 배상금 같은 일회성 항목이 순이익에 섞이면 PER가 실제와 달라진다. → 일회성을 걷어낸 <strong>경상이익(normalized earnings)</strong> 기준으로 봐야 한다.</li>
+<li><strong>적자 기업.</strong> 순이익이 0 이하면 PER는 음수나 무한대가 되어 <strong>의미가 없다</strong>. 적자 성장주엔 PSR·EV/Sales를 쓴다(6장).</li>
+<li><strong>경기민감주(cyclical).</strong> 이익이 사이클을 크게 타는 업종(정유·해운·반도체)은, 실적 정점에서 PER가 오히려 낮게(싸 보이게) 나오는 함정이 있다. → 사이클 평균 이익 기준으로 본다.</li>
+</ul>
+
+<div class="ok">
+<p class="ni"><strong>PER가 유효한 곳.</strong> 이익이 꾸준하고 흑자인 <strong>안정 성장 기업</strong> — 소비재·제조·IT 서비스 등. 회계이익이 사업 실체를 잘 반영하고, peer가 충분히 많아 평균 배수를 신뢰할 수 있을 때 PER는 가장 빠르고 직관적인 잣대다.</p>
+</div>
+
+<!-- ═══════════════════════════════════════════ CH4 ═══════════════════════════════════════════ -->
+
+<h2 id="ch4">4. PBR — 순자산 대비 몇 배인가</h2>
+
+<div class="def">
+<p class="ni"><strong>PBR (Price-to-Book Ratio, 주가순자산비율).</strong> \( \text{PBR} = \dfrac{\text{주가}}{\text{BPS}} = \dfrac{\text{시가총액}}{\text{순자산(자기자본)}} \). "장부상 순자산 1원을 시장이 몇 원으로 쳐주는가"다. PBR 1배는 시가총액 = 순자산, 즉 시장이 장부가치만큼만 인정한다는 뜻.</p>
+</div>
+
+<h3>4.1 PBR과 ROE의 관계 — 이게 핵심이다</h3>
+<p class="ni">PBR을 단독으로 보면 안 된다. 순자산이 <strong>얼마나 효율적으로 이익을 만드는지</strong>, 즉 ROE와 짝지어 봐야 한다. 둘의 연결고리는 다음 항등식이다:</p>
+
+<div class="eq">\[ \text{PBR} = \frac{\text{시가총액}}{\text{순자산}} = \frac{\text{시가총액}}{\text{순이익}} \times \frac{\text{순이익}}{\text{순자산}} = \text{PER} \times \text{ROE} \]</div>
+
+<p class="ni">즉 <strong>PBR = PER × ROE</strong>. 같은 PER라면 ROE가 높은 회사가 더 높은 PBR을 받는 게 정당하다. 반대로 <strong>ROE가 자본비용에도 못 미치는 회사</strong>는 순자산을 굴려 가치를 파괴하고 있으므로, PBR이 1배 미만인 게 오히려 합리적이다. 그래서 실무에서는 <strong>x축 ROE, y축 PBR</strong>로 peer를 흩뿌려 놓고 회귀선을 긋는다 — 선 위면 고평가, 아래면 저평가.</p>
+
+<div class="warn">
+<p class="ni"><strong>PBR 1배 미만 = 무조건 저평가?</strong> 아니다. ROE가 낮거나(자본을 못 굴림) 자산이 부실(장부가가 과대계상)하면 PBR이 1배 미만인 게 정상이다. "PBR 0.5배니까 싸다"는 초보의 착각. 반드시 ROE와 자산의 질을 함께 봐야 한다.</p>
+</div>
+
+<div class="ok">
+<p class="ni"><strong>PBR이 유효한 곳.</strong> ① <strong>자산주</strong> — 부동산·조선·철강처럼 유형자산이 가치의 핵심인 업종. ② <strong>금융업</strong> — 은행·보험은 이익이 대손·평가손익에 출렁여 PER가 불안정한 반면, 순자산(자본)이 규제·건전성의 기준이라 PBR이 표준 잣대다. 은행 밸류에이션은 사실상 PBR-ROE 게임이다.</p>
+</div>
+
+<!-- ═══════════════════════════════════════════ CH5 ═══════════════════════════════════════════ -->
+
+<h2 id="ch5">5. EV/EBITDA — 자본구조를 걷어낸 잣대</h2>
+
+<div class="def">
+<p class="ni"><strong>EV (Enterprise Value, 기업가치)</strong> = 시가총액 + 순차입금 = 시가총액 + (총차입금 − 현금성자산). "회사를 통째로 인수할 때 실제로 드는 돈"의 근사치다. 현금을 빼는 이유: 인수 후 그 현금으로 빚을 갚을 수 있으니 실질 인수 부담이 준다.</p>
+</div>
+
+<div class="def">
+<p class="ni"><strong>EBITDA</strong> = Earnings Before Interest, Taxes, Depreciation &amp; Amortization = 영업이익 + 감가상각비(D&amp;A). 이자·세금·감가상각을 <strong>모두 더하기 전</strong>의 이익으로, "영업이 만들어내는 대략적인 현금 창출력"의 프록시다. \( \text{EV/EBITDA} = \dfrac{\text{시총}+\text{순차입금}}{\text{영업이익}+\text{D\&A}} \).</p>
+</div>
+
+<h3>5.1 EV/EBITDA가 흡수하는 두 가지 차이</h3>
+<ul>
+<li><strong>자본구조 차이.</strong> 분자(EV)에 빚을 포함하고 분모(EBITDA)에서 이자를 빼기 전이라, 빚이 많고 적음의 영향이 상쇄된다(2.2절 참조). 부채비율이 제각각인 기업 비교에 강하다.</li>
+<li><strong>감가상각 정책 차이.</strong> D&amp;A를 다시 더해줬으므로, 회사마다 다른 감가상각 방법·자산 내용연수의 영향을 받지 않는다. 설비투자가 큰 <strong>장치산업</strong>(통신·유틸리티·제조)에서 특히 유용하다.</li>
+</ul>
+
+<h3>5.2 함정 — EBITDA는 현금흐름이 아니다</h3>
+<div class="warn">
+<p class="ni"><strong>&#x1F525; EBITDA의 최대 함정: CAPEX를 무시한다.</strong> 감가상각을 더해 없앤다는 건, <strong>설비를 유지·교체하는 데 드는 실제 투자(CAPEX)를 없는 셈</strong> 친다는 뜻이다. 설비 재투자 부담이 큰 회사는 EBITDA는 커 보여도 실제 손에 쥐는 현금(FCF)은 훨씬 적다. 워런 버핏이 "EBITDA는 경영진이 현실을 가리려 쓰는 숫자"라고 비꼰 이유다. → 자본집약 산업은 EV/EBITDA를 <strong>EV/(EBITDA−CAPEX)</strong>나 FCF 기반으로 보완해야 한다. 운전자본 변동·리스 회계 차이도 EBITDA가 못 잡는 구멍이다.</p>
+</div>
+
+<div class="ok">
+<p class="ni"><strong>EV/EBITDA가 유효한 곳.</strong> 부채 수준·감가상각 정책이 서로 다른 기업의 <strong>영업 수익력을 순수 비교</strong>할 때, 그리고 <strong>M&amp;A·LBO</strong>처럼 회사를 통째로 사는 관점일 때. 안정적 캐시카우, 장치산업에서 표준으로 쓰인다.</p>
+</div>
+
+<!-- ═══════════════════════════════════════════ CH6 ═══════════════════════════════════════════ -->
+
+<h2 id="ch6">6. PSR &amp; 기타 산업별 배수</h2>
+
+<div class="def">
+<p class="ni"><strong>PSR (Price-to-Sales Ratio, 주가매출비율).</strong> \( \text{PSR} = \dfrac{\text{시가총액}}{\text{매출}} \). 이익이 아니라 <strong>매출</strong>로 나눈다. 매출은 회계 조정·일회성의 영향이 가장 적어 안정적이지만, 수익성(마진)을 전혀 반영하지 못한다는 게 결정적 약점이다.</p>
+</div>
+
+<h3>6.1 PSR은 언제 쓰나 — 적자 성장주</h3>
+<p class="ni">아직 이익이 안 나는(그래서 PER가 무의미한) <strong>초기 성장 기업·플랫폼·바이오</strong>가 대표적이다. 이익은 마이너스지만 매출은 빠르게 크는 회사에, "매출이 이 정도면 결국 이익은 얼마쯤 날 텐데 시장은 매출 1원을 몇 배로 보나"를 묻는다. 단, 마진 구조가 전혀 다른 기업끼리 PSR을 비교하면 오도된다 — 매출 100원을 버는데 마진 5%인 회사와 40%인 회사가 같은 PSR일 수 없다.</p>
+
+<h3>6.2 산업별 특수 배수 — 잣대는 산업이 정한다</h3>
+<p class="ni">범용 배수로 안 잡히는 산업은 그 산업 고유의 가치동인을 분모로 쓴다. 몇 가지만 맛보기로:</p>
+
+<div class="tc">Table 6.1. 산업별 특수 밸류에이션 잣대</div>
+<table>
+<tr><th style="width:24%">산업</th><th style="width:38%">주로 쓰는 배수/지표</th><th style="width:38%">이유</th></tr>
+<tr><td>은행</td><td>PBR, ROE, PBR-ROE 회귀</td><td>이익 변동성↑, 자본이 규제 기준</td></tr>
+<tr><td>보험</td><td>PBR, EV(내재가치, Embedded Value)</td><td>장기 계약가치의 현재가</td></tr>
+<tr><td>리츠(REITs)</td><td>P/FFO, P/AFFO, 배당수익률, NAV</td><td>감가상각 큰 부동산, 배당이 핵심</td></tr>
+<tr><td>플랫폼/구독</td><td>EV/Sales, GMV, MAU, ARPU</td><td>초기 적자, 사용자·거래액이 동인</td></tr>
+<tr><td>자원/에너지</td><td>EV/생산량, 매장량 기준 가치</td><td>물리적 자산·매장량이 가치</td></tr>
+</table>
+
+<div class="info">
+<p class="ni"><strong>&#x1F4A1; 리츠의 FFO.</strong> 부동산은 실제로 가치가 유지·상승해도 회계상 매년 큰 감가상각이 잡혀 순이익이 왜곡된다. 그래서 리츠는 순이익에 부동산 감가상각을 되돌린 <strong>FFO(Funds From Operations)</strong>를 이익 대용으로 쓰고, P/FFO를 PER처럼 본다. "산업마다 잣대가 다르다"의 대표 사례.</p>
+</div>
+
+<!-- ═══════════════════════════════════════════ CH7 ═══════════════════════════════════════════ -->
+
+<h2 id="ch7">7. 절대가치 — DCF와 화폐의 시간가치</h2>
+
+<p>이제 반대편 갈래다. 절대가치는 남과 비교하지 않고, <strong>그 기업이 앞으로 벌어들일 현금 그 자체</strong>에서 가치를 끌어낸다. 그 근본 원리가 <strong>화폐의 시간가치</strong> — 오늘의 1원이 내년의 1원보다 값지다(그 사이 굴려 이자를 벌 수 있으니까). 그래서 미래의 현금은 반드시 <strong>할인(discount)</strong>해서 오늘 값으로 되돌려야 한다.</p>
+
+<div class="def">
+<p class="ni"><strong>DCF (Discounted Cash Flow, 현금흐름할인법).</strong> 기업이 매년 창출할 잉여현금흐름(FCF)을 추정하고, 위험을 반영한 할인율 \(r\)(보통 WACC)로 현재가치로 환산해 모두 더한다. 명시적 추정기간 이후는 <strong>영구가치(Terminal Value, TV)</strong>로 뭉뚱그린다.</p>
+</div>
+
+<div class="eq">\[ V=\sum_{t=1}^{n} \frac{FCF_t}{(1+r)^t}+\frac{TV}{(1+r)^n} \]</div>
+
+<p class="ni">앞 항은 향후 \(n\)년간의 현금흐름을 각각 할인해 더한 것, 뒤 항은 \(n\)년 이후 영원히 나올 현금을 한 덩어리(TV)로 묶어 다시 오늘로 할인한 것이다. TV는 보통 전체 가치의 <strong>절반 이상</strong>을 차지할 만큼 비중이 커서, 영구성장률 가정 하나에 결과가 크게 흔들린다.</p>
+
+<h3>7.1 DCF의 장점과 단점</h3>
+<div class="ok">
+<p class="ni"><strong>장점.</strong> 기업 고유의 성장·수익성·재투자·위험을 <strong>일관된 논리</strong>로 녹여낸다. 시장 정서에 휘둘리지 않고 "이 사업의 값은 얼마인가"를 원리적으로 답한다. 가정이 모두 드러나 있어 <strong>토론과 검증</strong>이 가능하다.</p>
+</div>
+<div class="warn">
+<p class="ni"><strong>단점.</strong> 먼 미래(5~10년)의 현금흐름과 할인율·영구성장률을 추정해야 하는데, 이 가정들이 조금만 달라져도 결과가 크게 요동친다(garbage in, garbage out). 특히 <strong>TV 비중이 커서</strong>, DCF는 "정밀해 보이지만 실은 가정에 극도로 민감한" 도구다. 그래서 반드시 <strong>민감도 분석</strong>(WACC·성장률을 흔들어 값의 범위를 봄)을 곁들인다 — R6에서 실습한다.</p>
+</div>
+
+<!-- ═══════════════════════════════════════════ CH8 ═══════════════════════════════════════════ -->
+
+<h2 id="ch8">8. RIM — 잔여이익모형</h2>
+
+<p>DCF의 사촌이지만 출발점이 다르다. RIM은 "이미 회사에 쌓인 순자산은 확실하니 그건 그대로 인정하고, 거기에 <strong>자본비용을 초과해서 벌어들이는 이익(초과이익)</strong>의 현재가치만 더하자"는 발상이다.</p>
+
+<div class="def">
+<p class="ni"><strong>RIM (Residual Income Model, 잔여이익모형).</strong> \( V = B_0 + \displaystyle\sum_{t=1}^{\infty} \dfrac{RI_t}{(1+r)^t} \), 여기서 잔여이익 \( RI_t = \text{순이익}_t - r \times B_{t-1} = (ROE_t - r)\times B_{t-1} \). \(B_0\)는 현재 순자산(장부가치), \(r\)은 자기자본비용. 즉 <strong>"순자산 + 초과이익의 현재가치"</strong>다. ROE가 자본비용 \(r\)을 넘는 만큼만 순자산 위에 가치가 얹힌다.</p>
+</div>
+
+<h3>8.1 왜 한국 리서치가 RIM을 자주 쓰나</h3>
+<p class="ni">RIM은 가치의 <strong>대부분을 이미 확정된 순자산(\(B_0\))에서</strong> 가져온다. 그래서 불확실한 미래 추정(초과이익 부분)에 대한 <strong>의존도가 DCF보다 낮다</strong> — 추정이 조금 빗나가도 결과의 흔들림이 작다. DCF는 TV가 값의 절반을 넘어 '미래 가정 위에 지은 탑'인 반면, RIM은 '순자산이라는 단단한 바닥' 위에 초과이익을 얹는 구조라 <strong>추정 안정성</strong>이 높다. 한국 증권사 리서치에서 목표주가 산출 근거로 RIM(및 그 변형)이 널리 쓰이는 이유다. 회계 순자산·순이익을 직접 쓰므로 DART 재무제표와도 곧바로 연결된다.</p>
+
+<div class="info">
+<p class="ni"><strong>&#x1F4A1; DCF와 RIM은 이론상 같은 답을 준다.</strong> 가정이 완전히 일관되면 두 모형의 결과는 동일하다(clean surplus 관계 하에서). 차이는 "가치를 어디에 무게 두어 배치하느냐"다. DCF는 미래 현금에, RIM은 현재 순자산에. 그래서 추정 오차가 각 모형에 미치는 영향이 달라진다.</p>
+</div>
+
+<!-- ═══════════════════════════════════════════ CH9 ═══════════════════════════════════════════ -->
+
+<h2 id="ch9">9. 무엇을 언제 쓰나 — 방법 선택 매트릭스</h2>
+
+<p>정답은 "기업과 산업의 성격이 방법을 고른다"는 것이다. 이익의 안정성, 자산의 성격, 성장 단계, 자본구조 — 이 네 가지가 잣대를 결정한다.</p>
+
+<div class="tc">Table 9.1. 기업 유형별 밸류에이션 방법 선택</div>
+<table>
+<tr><th style="width:26%">기업 유형</th><th style="width:38%">1순위 방법</th><th style="width:36%">이유</th></tr>
+<tr><td>고성장 성장주</td><td>DCF, PSR(적자면)</td><td>미래 현금이 가치의 핵심, 현재 이익은 작거나 적자</td></tr>
+<tr><td>자산주(부동산·조선·철강)</td><td>PBR, NAV</td><td>유형자산이 가치의 핵심, 이익 변동 큼</td></tr>
+<tr><td>안정 캐시카우</td><td>EV/EBITDA, DCF</td><td>현금 창출 꾸준, 자본구조 중립 비교</td></tr>
+<tr><td>은행·금융</td><td>PBR, RIM</td><td>자본이 규제 기준, 순자산+초과이익 안정</td></tr>
+<tr><td>안정 흑자 제조·소비재</td><td>PER, EV/EBITDA</td><td>이익 안정·흑자, peer 풍부</td></tr>
+<tr><td>리츠·인프라</td><td>P/FFO, 배당할인, NAV</td><td>감가상각 왜곡, 배당이 핵심 가치</td></tr>
+</table>
+
+<div class="ok">
+<p class="ni"><strong>실전 원칙 세 줄.</strong> ① 한 가지 방법만 믿지 말고 <strong>상대·절대 두 렌즈</strong>를 겹쳐라. ② 배수를 쓸 땐 <strong>분자·분모 짝</strong>과 <strong>peer 선정</strong>이 결과의 8할이다. ③ DCF·RIM은 가정을 드러내는 도구다 — 숫자보다 <strong>가정의 타당성</strong>을 방어할 수 있어야 한다.</p>
+</div>
+
+<div class="paper-anchor">
+<div class="pa-label">Valuation Anchor · 이론에서 실전으로</div>
+<div class="pa-title">여기서 세운 사고틀은 R6(DCF)·R7(상대가치)에서 엑셀로 조립된다</div>
+<p>이 라운드는 밸류에이션의 <strong>지도</strong>다. 실제 손이 움직이는 곳은 두 군데다 — <strong>R6</strong>에서는 R4~R5에서 만든 3-Statement 모델의 FCF를 끌어와 <strong>DCF를 직접 조립</strong>하고 WACC·TV·민감도까지 붙여 목표주가를 낸다. <strong>R7</strong>에서는 여기서 배운 PER·PBR·EV/EBITDA 배수를 <strong>실제 peer 그룹에서 뽑아</strong> 상대가치 목표주가를 산출하고, DCF 결과와 교차 검증한다. 지금 각 방법이 "무엇을 재고 어디서 무너지는가"를 확실히 잡아두면, R6~R7에서 엑셀 셀은 그저 이 논리를 옮겨 담는 그릇이 된다.</p>
+</div>
+
+<div class="task">
+<div class="task-title">&#x1F3AF; 이번 주 과제</div>
+<p class="ni">관심 종목 3개(가능하면 성장주 1·은행 1·안정 제조 1)를 골라, 각각에 <strong>어떤 밸류에이션 방법이 1순위인지와 그 이유</strong>를 세 줄씩 적어라. 그다음 네이버금융·증권사 리포트에서 그 종목의 실제 PER·PBR을 찾아, 같은 업종 peer 2~3개와 비교해 "싸 보이는가/비싸 보이는가"를 한 문장으로 판단해봐라. R7에서 이 감각을 실제 배수 계산으로 정교화한다.</p>
+</div>
+
+<!-- ═══════════════════════════════════════════ QUIZ ═══════════════════════════════════════════ -->
+
+<h2 id="quiz">Quiz — 셀프 체크 10문항</h2>
+
+<details class="quiz-item"><summary>Q1. 상대가치와 절대가치가 각각 "무엇을" 묻는 방법인지 한 줄로.</summary>
+<div class="answer">상대가치 = "<strong>시장이 매기는 값</strong>은 얼마인가"(peer 배수로 비교). 절대가치 = "<strong>펀더멘털이 정당화하는 값</strong>은 얼마인가"(미래 현금흐름을 할인). 실무에선 둘을 교차 검증한다.</div></details>
+
+<details class="quiz-item"><summary>Q2. 시가총액과 기업가치(EV)의 차이는? EV 공식은?</summary>
+<div class="answer">시가총액은 <strong>주주 몫</strong>, EV는 <strong>주주+채권자 전체 몫</strong>. \( \text{EV} = \text{시가총액} + \text{순차입금} = \text{시총} + (\text{총차입금} - \text{현금}) \). "회사를 빚까지 떠안고 통째로 사는 값"에 가깝다.</div></details>
+
+<details class="quiz-item"><summary>Q3. 왜 EV/EBITDA가 '자본구조 중립적'이라고 불리나?</summary>
+<div class="answer">분자 EV는 빚을 포함하고, 분모 EBITDA는 이자 차감 <strong>전</strong> 이익이라, 부채가 많고 적음의 영향이 상쇄된다. 그래서 부채비율이 제각각인 기업 비교나 M&amp;A에서 표준으로 쓴다.</div></details>
+
+<details class="quiz-item"><summary>Q4. PER 30배인 회사가 무조건 비싼 게 아닌 이유를 PEG로 설명하라.</summary>
+<div class="answer">PER는 성장 기대를 반영한다. 이익성장률이 30%면 \( \text{PEG} = 30/30 = 1 \)로 성장 대비 적정이다. PER의 절대 수준만으로 고·저평가를 단정할 수 없고, <strong>성장률과 함께</strong> 봐야 한다.</div></details>
+
+<details class="quiz-item"><summary>Q5. PBR, PER, ROE를 잇는 항등식을 쓰고 의미를 설명하라.</summary>
+<div class="answer"><strong>PBR = PER × ROE</strong>. 같은 PER라면 ROE가 높은 회사가 더 높은 PBR을 받는 게 정당하다. ROE가 자본비용에 못 미치면 PBR이 1배 미만인 게 오히려 합리적이다.</div></details>
+
+<details class="quiz-item"><summary>Q6. "PBR 0.5배니까 무조건 저평가"가 왜 틀린 말인가?</summary>
+<div class="answer">ROE가 낮아 자본을 못 굴리거나 자산이 부실(장부가 과대)하면 PBR 1배 미만이 정상이다. PBR은 반드시 <strong>ROE와 자산의 질</strong>을 함께 봐야 한다.</div></details>
+
+<details class="quiz-item"><summary>Q7. EBITDA의 가장 큰 함정은 무엇인가?</summary>
+<div class="answer"><strong>CAPEX(설비 재투자)를 무시</strong>한다. 감가상각을 되돌려 더하는 건 설비 유지·교체 부담을 없는 셈 치는 것이라, 자본집약 산업은 EBITDA가 커 보여도 실제 FCF는 훨씬 적다. 운전자본·리스 변동도 못 잡는다.</div></details>
+
+<details class="quiz-item"><summary>Q8. 적자인데 매출이 빠르게 크는 초기 성장주에는 어떤 배수가 적합하고, 그 한계는?</summary>
+<div class="answer"><strong>PSR</strong>(또는 EV/Sales). 매출은 안정적이라 적자여도 쓸 수 있다. 한계: <strong>수익성(마진)을 반영하지 못한다</strong> — 마진 구조가 다른 기업끼리 PSR 비교는 오도된다.</div></details>
+
+<details class="quiz-item"><summary>Q9. DCF에서 Terminal Value가 왜 문제이고, 어떻게 대응하나?</summary>
+<div class="answer">TV는 보통 전체 가치의 <strong>절반 이상</strong>을 차지해 영구성장률·WACC 가정 하나에 결과가 크게 흔들린다. 대응: <strong>민감도 분석</strong>으로 WACC·성장률을 흔들어 값의 '범위'를 제시하고, 상대가치·RIM으로 교차 검증한다.</div></details>
+
+<details class="quiz-item"><summary>Q10. 한국 리서치에서 RIM을 자주 쓰는 핵심 이유는?</summary>
+<div class="answer"><strong>추정 안정성</strong>. RIM은 가치의 대부분을 이미 확정된 순자산(\(B_0\))에서 가져오고 초과이익의 현재가치만 얹으므로, 미래 추정 의존도가 DCF(TV 비중 큼)보다 낮아 결과가 덜 흔들린다. DART 회계 순자산·순이익과 직결되는 것도 장점.</div></details>
+
+<!-- ═══════════════════════════════════════════ CHEAT SHEET ═══════════════════════════════════════════ -->
+
+<h2 id="cheatsheet">&#x1F4CB; Cheat Sheet — 옆에 띄워두고 쓰는 표</h2>
+
+<div class="tc">Table C.1. 4대 멀티플 요약 (정의 · 적합 산업 · 함정)</div>
+<table>
+<tr><th style="width:16%">배수</th><th style="width:26%">정의</th><th style="width:28%">적합 산업</th><th style="width:30%">주요 함정</th></tr>
+<tr><td><strong>PER</strong></td><td>시총 / 순이익</td><td>안정 흑자 제조·소비재·IT</td><td>일회성 손익, 적자·경기민감주에서 무의미</td></tr>
+<tr><td><strong>PBR</strong></td><td>시총 / 순자산</td><td>자산주·은행·보험</td><td>ROE 무시 시 오판, 자산 부실</td></tr>
+<tr><td><strong>EV/EBITDA</strong></td><td>(시총+순차입금) / EBITDA</td><td>장치산업·캐시카우·M&amp;A</td><td>CAPEX·운전자본 무시</td></tr>
+<tr><td><strong>PSR</strong></td><td>시총 / 매출</td><td>적자 성장주·플랫폼·바이오</td><td>마진(수익성) 미반영</td></tr>
+</table>
+
+<div class="tc">Table C.2. 절대가치 두 모형 요약</div>
+<table>
+<tr><th style="width:16%">모형</th><th style="width:44%">핵심 수식</th><th style="width:40%">특징</th></tr>
+<tr><td><strong>DCF</strong></td><td>\( V=\sum \frac{FCF_t}{(1+r)^t}+\frac{TV}{(1+r)^n} \)</td><td>미래 현금에 무게, TV 비중↑, 가정 민감</td></tr>
+<tr><td><strong>RIM</strong></td><td>\( V=B_0+\sum \frac{(ROE_t-r)B_{t-1}}{(1+r)^t} \)</td><td>순자산+초과이익, 추정 안정성↑, 한국 리서치 애용</td></tr>
+</table>
+
+<div class="tc">Table C.3. 방법 선택 매트릭스 (기업 유형 → 1순위)</div>
+<table>
+<tr><th style="width:40%">기업 유형</th><th style="width:60%">우선 방법</th></tr>
+<tr><td>고성장 성장주</td><td>DCF (적자면 PSR)</td></tr>
+<tr><td>자산주 (부동산·조선·철강)</td><td>PBR, NAV</td></tr>
+<tr><td>안정 캐시카우</td><td>EV/EBITDA, DCF</td></tr>
+<tr><td>은행·금융</td><td>PBR, RIM</td></tr>
+<tr><td>안정 흑자 제조·소비재</td><td>PER, EV/EBITDA</td></tr>
+<tr><td>리츠·인프라</td><td>P/FFO, 배당할인, NAV</td></tr>
+</table>
+
+<div class="nav-footer">
+<a href="../round-02/"><span class="nf-label">&larr; Previous</span>R2. DART 데이터 수집</a>
+<a href="../round-04/" style="text-align:right"><span class="nf-label">Next &rarr;</span>R4. 3-Statement I</a>
+</div>
+
+</div>
+</div>
+</div>
+
+</body>
+</html>
