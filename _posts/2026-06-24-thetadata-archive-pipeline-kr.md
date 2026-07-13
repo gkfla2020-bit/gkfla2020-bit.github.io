@@ -7,6 +7,7 @@ categories: [research, data-engineering]
 tags: [thetadata, options, parquet, python, rest-api, archiving]
 toc: true
 toc_sticky: true
+description: "ThetaData 옵션 데이터 아카이빙 운영 가이드. Theta Terminal 로컬 셋업부터 v3 REST API 주의점, Parquet 영구 보관 파이프라인까지 순서대로 정리했다."
 ---
 
 <style>

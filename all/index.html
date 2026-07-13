@@ -5,8 +5,10 @@ title: "All Posts"
 description: "모든 글 목록 — Research, Blog Posts, Guides"
 ---
 <style>
-.all-title{font-family:var(--font-serif);font-size:clamp(2rem,5vw,2.8rem);font-weight:300;margin-bottom:10px;opacity:0}
-.all-subtitle{font-family:var(--font-mono);font-size:11px;color:var(--text-muted);letter-spacing:.2em;text-transform:uppercase;margin-bottom:40px;opacity:0}
+.all-title{font-family:var(--font-serif);font-size:clamp(2rem,5vw,2.8rem);font-weight:300;margin-bottom:10px;animation:titleFadeIn .5s ease .1s both}
+.all-subtitle{font-family:var(--font-mono);font-size:11px;color:var(--text-muted);letter-spacing:.2em;text-transform:uppercase;margin-bottom:40px;animation:titleFadeIn .4s ease .2s both}
+@keyframes titleFadeIn{from{opacity:0}to{opacity:1}}
+@media(prefers-reduced-motion:reduce){.all-title,.all-subtitle{animation:none}}
 .all-stats{display:flex;gap:15px;flex-wrap:wrap;margin-bottom:50px}
 .all-stat{font-family:var(--font-mono);font-size:.7rem;color:var(--text-faint);letter-spacing:.05em;padding:6px 14px;border:1px solid var(--border-medium);cursor:pointer;transition:all .2s;user-select:none}
 .all-stat:hover,.all-stat.active{background:var(--text);color:var(--bg);border-color:var(--text)}
@@ -42,13 +44,6 @@ description: "모든 글 목록 — Research, Blog Posts, Guides"
 
 <script>
 document.addEventListener('DOMContentLoaded',function(){
-    if(typeof gsap!=='undefined'){
-        gsap.to('.all-title',{opacity:1,duration:.5,delay:.1});
-        gsap.to('.all-subtitle',{opacity:1,duration:.4,delay:.2});
-    }else{
-        document.querySelector('.all-title').style.opacity='1';
-        document.querySelector('.all-subtitle').style.opacity='1';
-    }
 
     fetch('/data/posts.json').then(function(r){return r.json()}).then(function(posts){
         posts.sort(function(a,b){return b.date.localeCompare(a.date)});

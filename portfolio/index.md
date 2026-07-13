@@ -9,10 +9,10 @@ description: "정하림 포트폴리오 — 공모전, 프로젝트, 리서치, 
 
 ## 폴더
 
-- [공모전 (Competitions)](/portfolio/competitions/) — 하나청년금융인재 본선 통과작 등 7건
-- [프로젝트 (Projects)](/portfolio/projects/) — 실제로 동작하는 도구·시스템 9건
+- [공모전 (Competitions)](/portfolio/competitions/) — 하나청년금융인재 본선 통과작 등 8건
+- [프로젝트 (Projects)](/portfolio/projects/) — 실제로 동작하는 도구·시스템 10건
 - [리서치 (Research)](/portfolio/research/) — 페이퍼·서베이 6건
-- [About](/portfolio/about/) — 이력, 자격증, 코딩테스트 트랙
+- [About](/portfolio/about/) — 이력, 수상, 자격증
 
 ---
 

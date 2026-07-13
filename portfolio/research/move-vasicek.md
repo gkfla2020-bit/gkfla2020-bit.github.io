@@ -7,7 +7,7 @@ description: "MOVE 지수에서 추출한 옵션 IV 정보를 활용해 Vasicek 
 
 [← 리서치 목록](/portfolio/research/)
 
-전체 페이퍼 페이지: [한국어](/research/move-vasicek-kr/) · [English](/posts/move-vasicek-academic-en/)
+전체 페이퍼 페이지: [한국어](/research/move-vasicek-kr/) · [English](/blog/move-vasicek-academic-en/)
 
 ## 이 글이 다루는 것
 

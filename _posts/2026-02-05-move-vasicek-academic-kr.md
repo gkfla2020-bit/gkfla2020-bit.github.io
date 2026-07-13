@@ -6,9 +6,11 @@ categories: [research, quantitative-finance]
 tags: [vasicek, black-scholes, MOVE, interest-rate, backtest]
 toc: true
 toc_sticky: true
+description: "MOVE 지수를 상태변수로 도입해 Vasicek 금리 모델을 확장한 실증 분석. 2010~2025년 미국 10년물 월간 데이터로 표준 모델과 적합도를 비교하고 LR 검정·Granger 인과·FEVD 결과를 정리했다."
+canonical_url: /research/move-vasicek-kr/
 ---
 
-<script src="https://cdn.plot.ly/plotly-2.27.0.min.js"></script>
+<script src="https://cdn.plot.ly/plotly-2.27.0.min.js" defer></script>
 <style>
     :root {
         --wsj-black: #111111;
@@ -273,6 +275,7 @@ toc_sticky: true
 </div>
 
 <script>
+window.addEventListener('DOMContentLoaded', function(){
 const colors = { primary: '#0080c6', accent: '#c41200', green: '#00843d', gray: '#666' };
 const layout = { font: {family: 'Helvetica Neue'}, paper_bgcolor: 'white', plot_bgcolor: 'white', margin: {t:30,r:30,b:50,l:60} };
 
@@ -384,4 +387,5 @@ Plotly.newPlot('fevdChart', [{
     yaxis: {title: '분산 기여도 (%)', range: [0, 100]},
     legend: {orientation: 'h', y: 1.1}
 }, {responsive: true});
+});
 </script>

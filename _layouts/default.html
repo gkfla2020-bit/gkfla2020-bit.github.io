@@ -1,16 +1,17 @@
 <!DOCTYPE html>
-<html lang="ko">
+<html lang="{{ page.lang | default: 'ko' }}">
 <head>
     {% include head.html %}
     {% if page.extra_css %}{{ page.extra_css }}{% endif %}
 </head>
 <body>
+<a href="#content" class="skip-link">Skip to main content</a>
 <div class="formula-bg" id="formulaBg"></div>
 
 {% include sidebar.html %}
 {% include market-widget.html %}
 
-<div class="main-wrapper">
+<div class="main-wrapper" id="content">
     <div class="container">
         {% include breadcrumb.html %}
         {{ content }}
@@ -41,9 +42,10 @@ document.addEventListener('DOMContentLoaded', function(){
     var mx=-1000,my=-1000;
     document.addEventListener('mousemove',function(e){mx=(e.clientX/window.innerWidth)*100;my=(e.clientY/window.innerHeight)*100;});
 
-    var formulaRunning=true;
+    var formulaRunning=true,ticking=false;
     function tick(){
-        if(!formulaRunning)return;
+        if(!formulaRunning){ticking=false;return;}
+        ticking=true;
         for(var j=0;j<items.length;j++){
             var it=items[j];
             it.x+=it.vx;it.y+=it.vy;
@@ -57,12 +59,11 @@ document.addEventListener('DOMContentLoaded', function(){
         }
         requestAnimationFrame(tick);
     }
-    tick();
 
-    /* Pause formula animation when not visible */
+    /* Start/pause via IntersectionObserver (fires once immediately on observe) */
     var observer=new IntersectionObserver(function(entries){
         formulaRunning=entries[0].isIntersecting;
-        if(formulaRunning) tick();
+        if(formulaRunning&&!ticking) tick();
     },{threshold:0});
     observer.observe(bg);
 });

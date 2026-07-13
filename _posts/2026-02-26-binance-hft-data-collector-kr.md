@@ -7,9 +7,10 @@ categories: [research, data-engineering, private]
 tags: [binance, websocket, orderbook, high-frequency, parquet, asyncio, python]
 toc: true
 toc_sticky: true
+description: "바이낸스 WebSocket으로 오더북·체결·청산·캔들·펀딩비를 24시간 수집하는 파이프라인 아키텍처. lastUpdateId 시퀀스 검증, 이중 타임스탬프 등 연구용 데이터 무결성 설계를 다룬다."
 ---
 
-<script src="https://cdn.plot.ly/plotly-2.27.0.min.js"></script>
+<script src="https://cdn.plot.ly/plotly-2.27.0.min.js" defer></script>
 <style>
     :root {
         --wsj-black: #111111;
@@ -710,6 +711,7 @@ toc_sticky: true
 </div>
 
 <script>
+window.addEventListener('DOMContentLoaded', function(){
 const colors = { primary: '#0080c6', accent: '#c41200', green: '#00843d', orange: '#e67e22', gray: '#666' };
 const baseLayout = { font: {family: 'Helvetica Neue'}, paper_bgcolor: 'white', plot_bgcolor: 'white', margin: {t:30,r:30,b:50,l:60} };
 
@@ -946,4 +948,5 @@ Plotly.newPlot('depthChart', [{
         showarrow: false, font: {size: 10, color: '#666'}
     }]
 }, {responsive: true});
+});
 </script>

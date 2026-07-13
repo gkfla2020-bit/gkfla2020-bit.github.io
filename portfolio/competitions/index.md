@@ -2,7 +2,7 @@
 layout: page
 title: "공모전 (Competitions)"
 permalink: /portfolio/competitions/
-description: "정하림이 출품한 공모전 7건. 본선 통과작 1건 포함."
+description: "정하림이 출품한 공모전 8건. 본선 통과작 1건 포함."
 ---
 
 [← 포트폴리오](/portfolio/)

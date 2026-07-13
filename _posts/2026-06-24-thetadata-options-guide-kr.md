@@ -7,6 +7,7 @@ categories: [research, options, derivatives]
 tags: [options, theta, iv, greeks, beginner, finance]
 toc: true
 toc_sticky: true
+description: "옵션 기초부터 ThetaData 46개 컬럼(그릭스·IV 포함) 해석까지 단계별로 설명하는 입문 가이드. 거래 경험이 없어도 옵션 데이터를 읽고 분석을 시작할 수 있게 구성했다."
 ---
 
 <style>

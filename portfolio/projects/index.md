@@ -2,7 +2,7 @@
 layout: page
 title: "프로젝트 (Projects)"
 permalink: /portfolio/projects/
-description: "실제로 동작하는 시스템과 도구 9건."
+description: "실제로 동작하는 시스템과 도구 10건."
 ---
 
 [← 포트폴리오](/portfolio/)
@@ -14,6 +14,7 @@ description: "실제로 동작하는 시스템과 도구 9건."
 ### 금융 도메인
 
 - [ESG TradeGuard — 시스템 단면](/portfolio/projects/esg-tradeguard/)
+- [삼양식품 3-Statement 케이스 모델 — 시나리오·DCF·투자의견](/blog/samyang-3statement-case-model-kr/)
 - [DB GAPS Allocator — 자산배분 엔진](/portfolio/projects/db-gaps-allocator/)
 - [Hana Persona — 금융 페르소나 추천](/portfolio/projects/hana-persona/)
 - [Hana Seum — 제안서 빌더](/portfolio/projects/hana-seum/)

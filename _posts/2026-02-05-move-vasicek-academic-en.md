@@ -6,9 +6,11 @@ categories: [research, quantitative-finance]
 tags: [vasicek, black-scholes, MOVE, interest-rate, backtest]
 toc: true
 toc_sticky: true
+description: "Extending the Vasicek model with the MOVE index as a state variable: regime-dependent rates and volatility, LR tests, Granger causality, FEVD (2010-2025)."
+lang: en
 ---
 
-<script src="https://cdn.plot.ly/plotly-2.27.0.min.js"></script>
+<script src="https://cdn.plot.ly/plotly-2.27.0.min.js" defer></script>
 <style>
     :root {
         --wsj-black: #111111;
@@ -264,6 +266,7 @@ toc_sticky: true
 </div>
 
 <script>
+window.addEventListener('DOMContentLoaded', function(){
 const colors = { primary: '#0080c6', accent: '#c41200', green: '#00843d', gray: '#666' };
 const layout = { font: {family: 'Helvetica Neue'}, paper_bgcolor: 'white', plot_bgcolor: 'white', margin: {t:30,r:30,b:50,l:60} };
 
@@ -375,4 +378,5 @@ Plotly.newPlot('fevdChart', [{
     yaxis: {title: 'Variance Contribution (%)', range: [0, 100]},
     legend: {orientation: 'h', y: 1.1}
 }, {responsive: true});
+});
 </script>

@@ -7,6 +7,7 @@ categories: [research, data-engineering, private]
 tags: [binance, websocket, python, code-review, asyncio, parquet, line-by-line]
 toc: true
 toc_sticky: true
+description: "바이낸스 데이터 수집기 12개 소스 파일, 약 1,200줄을 한 줄씩 해설하는 전체 코드 리뷰. 각 줄이 왜 필요한지, 없으면 어떻게 되는지까지 파일별로 정리했다."
 ---
 
 <style>

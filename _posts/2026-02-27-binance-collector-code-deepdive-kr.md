@@ -7,6 +7,7 @@ categories: [research, data-engineering, private]
 tags: [binance, websocket, orderbook, asyncio, python, parquet, code-review]
 toc: true
 toc_sticky: true
+description: "바이낸스 데이터 수집기 11개 모듈을 코드 레벨에서 해부. WebSocket 라우팅, 오더북 diff 적용, asyncio 버퍼링, 원자적 Parquet 저장까지 설계 결정의 이유를 설명한다."
 ---
 
 <style>
