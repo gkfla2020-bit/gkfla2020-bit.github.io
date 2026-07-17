@@ -5,6 +5,7 @@ date: 2026-02-27 18:00:00
 permalink: /research/binance-collector-beginner-guide-kr/
 categories: [research, data-engineering, private]
 tags: [binance, websocket, python, beginner, tutorial]
+sitemap: false
 toc: true
 toc_sticky: true
 description: "바이낸스 실시간 거래 데이터 수집기를 비전공자 눈높이로 해설. 12개 파이썬 파일의 역할과 연결 구조를 비유로 풀어, 코드를 몰라도 전체 시스템을 이해할 수 있게 정리했다."

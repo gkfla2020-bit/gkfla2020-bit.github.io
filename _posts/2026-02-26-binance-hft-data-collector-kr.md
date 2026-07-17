@@ -5,6 +5,7 @@ date: 2026-02-26
 permalink: /research/binance-hft-data-collector-kr/
 categories: [research, data-engineering, private]
 tags: [binance, websocket, orderbook, high-frequency, parquet, asyncio, python]
+sitemap: false
 toc: true
 toc_sticky: true
 description: "바이낸스 WebSocket으로 오더북·체결·청산·캔들·펀딩비를 24시간 수집하는 파이프라인 아키텍처. lastUpdateId 시퀀스 검증, 이중 타임스탬프 등 연구용 데이터 무결성 설계를 다룬다."

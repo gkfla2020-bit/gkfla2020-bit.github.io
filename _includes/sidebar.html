@@ -28,7 +28,7 @@
         <div class="nav-section nav-extra">
             <div class="nav-section-title">Research</div>
             <ul class="nav-list" id="nav-research-list">
-                <li><a href="/research/binance-hft-data-collector-kr/">Binance HFT Data Collector</a></li>
+                <li><a href="/research/thetadata-archive-pipeline-kr/">ThetaData Archive Pipeline</a></li>
                 <li><a href="/research/gp-alpha-ideas/">GP Alpha Research Ideas</a></li>
                 <li><a href="/research/wq-alpha-evolution/">WQ Alpha Evolution</a></li>
                 <li><a href="/research/vol-integrated-kr/">Regime Shift &amp; Spillover</a></li>
@@ -48,8 +48,14 @@
         <div class="nav-section nav-extra">
             <div class="nav-section-title">Recent Posts</div>
             <ul class="nav-list" id="nav-recent-list">
-                {% for post in site.posts limit:5 %}
+                {% assign recent_shown = 0 %}
+                {% for post in site.posts %}
+                {% unless post.categories contains 'private' %}
+                {% if recent_shown < 5 %}
                 <li><a href="{{ post.url }}"{% if page.url == post.url %} class="active"{% endif %}>{{ post.title | truncate: 30 }}</a></li>
+                {% assign recent_shown = recent_shown | plus: 1 %}
+                {% endif %}
+                {% endunless %}
                 {% endfor %}
             </ul>
         </div>

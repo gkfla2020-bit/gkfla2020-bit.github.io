@@ -31,7 +31,7 @@ AQR의 팩터 투자 가이드. Value, Momentum, Quality 팩터 설명.
 
 ### Week 4 (12/23 - 12/29)
 
-**[Pairs Trading with Machine Learning](https://medium.com/@quant)**  
+**Pairs Trading with Machine Learning**  
 머신러닝을 활용한 페어트레이딩. 코인티그레이션 검정 + 랜덤포레스트 시그널.
 
 **[Risk Parity Portfolio Construction](https://www.investopedia.com/risk-parity)**  
@@ -52,4 +52,4 @@ AQR의 팩터 투자 가이드. Value, Momentum, Quality 팩터 설명.
 
 ---
 
-*매주 업데이트*
+*비정기 업데이트*

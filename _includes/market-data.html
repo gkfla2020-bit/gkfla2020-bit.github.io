@@ -9,12 +9,15 @@ async function fetchQuote(s){
     catch(e){return null;}
 }
 
-function setVal(id,text){
-    var el=document.getElementById(id);
-    if(el) el.textContent=text;
-    /* Mirror to mobile widget */
-    var mel=document.getElementById('m-'+id);
-    if(mel) mel.textContent=text;
+function setVal(id,text,live){
+    [id,'m-'+id].forEach(function(eid){
+        var el=document.getElementById(eid);
+        if(!el)return;
+        el.textContent=text;
+        /* Sample (non-live) values render dimmed so they can't be mistaken for real quotes */
+        el.classList.toggle('sample-value',live===false);
+        el.title=live===false?'Sample data — not a live quote':'';
+    });
 }
 
 function setChg(id,val){
@@ -50,15 +53,17 @@ async function updateMarketData(){
         if(!d.hasOwnProperty(k))continue;
         var o=d[k];
         if(o.live) anyLive=true;
-        if(k==='usdkrw') setVal(k,o.v.toLocaleString());
-        else if(k==='us10y') setVal(k,o.v.toFixed(2)+'%');
-        else if(k==='btc') setVal(k,'$'+(o.v/1000).toFixed(1)+'K');
-        else if(k==='vix'||k==='move') setVal(k,o.v.toFixed(1));
-        else setVal(k,o.v.toLocaleString());
+        if(k==='usdkrw') setVal(k,o.v.toLocaleString(),o.live);
+        else if(k==='us10y') setVal(k,o.v.toFixed(2)+'%',o.live);
+        else if(k==='btc') setVal(k,'$'+(o.v/1000).toFixed(1)+'K',o.live);
+        else if(k==='vix'||k==='move') setVal(k,o.v.toFixed(1),o.live);
+        else setVal(k,o.v.toLocaleString(),o.live);
         setChg(k+'-chg',o.c);
     }
 
-    var timeStr=(anyLive?'Live':'Sample')+' · '+new Date().toLocaleTimeString('ko-KR');
+    var timeStr=anyLive
+        ?'Live (dimmed = sample) · '+new Date().toLocaleTimeString('ko-KR')
+        :'Sample data — illustrative only';
     setVal('update-time',timeStr);
 }
 

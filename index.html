@@ -285,20 +285,19 @@ section{padding:80px 50px;max-width:900px;margin:0 auto}
 <section class="cat-section">
     <div class="cat-grid">
         <a href="/research/" class="cat-card">
-            <div class="cat-num">01 — Research<span class="cat-count">8</span></div>
+            <div class="cat-num">01 — Research<span class="cat-count" id="count-research">7</span></div>
             <div class="cat-title">Research</div>
             <p class="cat-desc">금리모형 · 알파 탐색 · 레짐 전환 등 퀀트 리서치</p>
             <span class="cat-arrow">→</span>
         </a>
         <a href="/all/" class="cat-card">
-            {% assign public_posts = site.posts | size %}{% for post in site.posts %}{% if post.categories contains 'private' %}{% assign public_posts = public_posts | minus: 1 %}{% endif %}{% endfor %}
-            <div class="cat-num">02 — Blog<span class="cat-count">{{ public_posts }}</span></div>
+            <div class="cat-num">02 — Blog<span class="cat-count" id="count-blog">3</span></div>
             <div class="cat-title">Blog Posts</div>
             <p class="cat-desc">데이터 엔지니어링 · 코드 리뷰 · 기술 해설</p>
             <span class="cat-arrow">→</span>
         </a>
         <a href="/guide/" class="cat-card">
-            <div class="cat-num">03 — Guides<span class="cat-count">4</span></div>
+            <div class="cat-num">03 — Guides<span class="cat-count" id="count-guide">4</span></div>
             <div class="cat-title">Guides</div>
             <p class="cat-desc">HFT ML · Factor Investing · Quant Researcher · Financial Modeling 학습 가이드</p>
             <span class="cat-arrow">→</span>
@@ -320,7 +319,7 @@ section{padding:80px 50px;max-width:900px;margin:0 auto}
 
 <section class="skills-basket-section"><div class="research-highlights">
     <h2 class="section-title" style="text-align:center;border:none;padding:0;margin-bottom:30px;">Profile Summary</h2>
-    <div class="stats-row"><div class="stat-card"><div class="stat-number">1</div><div class="stat-label">Paper</div></div><div class="stat-card"><div class="stat-number">6+</div><div class="stat-label">Research</div></div><div class="stat-card"><div class="stat-number">10+</div><div class="stat-label">Posts</div></div></div></div>
+    <div class="stats-row"><div class="stat-card"><div class="stat-number">1</div><div class="stat-label">Paper</div></div><div class="stat-card"><div class="stat-number" id="stat-research">7</div><div class="stat-label">Research</div></div><div class="stat-card"><div class="stat-number" id="stat-posts">10</div><div class="stat-label">Posts</div></div></div></div>
     <p style="text-align:center;color:var(--text-muted);font-size:.8rem;margin:25px 0 15px;">Skills &amp; Tools</p>
     <div class="skills-container">
         <div class="skill-ball" title="Python"><img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/python/python-original.svg" alt="Python" loading="lazy"></div>
@@ -633,6 +632,15 @@ window.addEventListener('load',function(){
   fetch('/data/posts.json').then(function(r){return r.json()}).then(function(posts){
     posts.sort(function(a,b){return b.date.localeCompare(a.date)});
     var res=posts.filter(function(p){return p.category==='research'});
+    var blog=posts.filter(function(p){return p.category==='blog'});
+    var guides=posts.filter(function(p){return p.category==='guide'});
+    /* Counts derived from posts.json so cards, stats, and /all/ always agree */
+    function setText(id,v){var el=document.getElementById(id);if(el)el.textContent=v;}
+    setText('count-research',res.length);
+    setText('count-blog',blog.length);
+    setText('count-guide',guides.length);
+    setText('stat-research',res.length);
+    setText('stat-posts',res.length+blog.length);
     var rEl=document.getElementById('main-research-list');
     if(rEl){
       rEl.innerHTML='';

@@ -2,16 +2,35 @@
 layout: default
 permalink: /all/
 title: "All Posts"
-description: "모든 글 목록 — Research, Blog Posts, Guides"
+description: "모든 글 목록 — Research, Blog Posts, Guides. 검색과 태그 필터 지원."
 ---
 <style>
 .all-title{font-family:var(--font-serif);font-size:clamp(2rem,5vw,2.8rem);font-weight:300;margin-bottom:10px;animation:titleFadeIn .5s ease .1s both}
-.all-subtitle{font-family:var(--font-mono);font-size:11px;color:var(--text-muted);letter-spacing:.2em;text-transform:uppercase;margin-bottom:40px;animation:titleFadeIn .4s ease .2s both}
+.all-subtitle{font-family:var(--font-mono);font-size:11px;color:var(--text-muted);letter-spacing:.2em;text-transform:uppercase;margin-bottom:30px;animation:titleFadeIn .4s ease .2s both}
 @keyframes titleFadeIn{from{opacity:0}to{opacity:1}}
 @media(prefers-reduced-motion:reduce){.all-title,.all-subtitle{animation:none}}
-.all-stats{display:flex;gap:15px;flex-wrap:wrap;margin-bottom:50px}
+.all-search{position:relative;max-width:480px;margin-bottom:22px}
+.all-search input{width:100%;padding:12px 40px 12px 16px;font-family:var(--font-mono);font-size:.8rem;color:var(--text);background:var(--card-bg);border:1px solid var(--border-medium);border-radius:8px;outline:none;transition:border-color .2s,box-shadow .2s}
+.all-search input:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(37,99,235,.12)}
+.all-search input::placeholder{color:var(--text-faint)}
+.all-search .search-icon{position:absolute;right:14px;top:50%;transform:translateY(-50%);color:var(--text-faint);pointer-events:none;font-size:.85rem}
+.all-search .search-clear{position:absolute;right:12px;top:50%;transform:translateY(-50%);background:none;border:none;color:var(--text-muted);font-size:1rem;cursor:pointer;padding:2px 4px;display:none;line-height:1}
+.all-search.has-query .search-icon{display:none}
+.all-search.has-query .search-clear{display:block}
+.all-stats{display:flex;gap:15px;flex-wrap:wrap;margin-bottom:18px}
 .all-stat{font-family:var(--font-mono);font-size:.7rem;color:var(--text-faint);letter-spacing:.05em;padding:6px 14px;border:1px solid var(--border-medium);cursor:pointer;transition:all .2s;user-select:none}
 .all-stat:hover,.all-stat.active{background:var(--text);color:var(--bg);border-color:var(--text)}
+.all-tags{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:40px}
+.all-tag{font-family:var(--font-mono);font-size:.6rem;color:var(--text-muted);letter-spacing:.05em;text-transform:uppercase;padding:4px 10px;background:var(--tag-bg);border:1px solid transparent;border-radius:20px;cursor:pointer;transition:all .2s;user-select:none}
+.all-tag:hover{border-color:var(--accent);color:var(--accent)}
+.all-tag.active{background:var(--accent);color:#fff;border-color:var(--accent)}
+.all-tag .n{opacity:.6;margin-left:4px}
+.all-tags-more{font-family:var(--font-mono);font-size:.6rem;color:var(--accent);background:none;border:none;cursor:pointer;padding:4px 8px;letter-spacing:.05em;text-transform:uppercase}
+.all-active-filter{font-family:var(--font-mono);font-size:.7rem;color:var(--text-muted);margin-bottom:24px;display:none}
+.all-active-filter.show{display:block}
+.all-active-filter b{color:var(--accent);font-weight:400}
+.all-active-filter button{background:none;border:1px solid var(--border-medium);color:var(--text-muted);font-family:var(--font-mono);font-size:.6rem;padding:2px 8px;margin-left:10px;cursor:pointer;border-radius:4px;transition:all .2s}
+.all-active-filter button:hover{border-color:var(--accent);color:var(--accent)}
 .cat-section{margin-bottom:50px;opacity:0;transform:translateY(15px)}
 .cat-section.visible{opacity:1;transform:none;transition:opacity .4s,transform .4s}
 .cat-header{font-family:var(--font-serif);font-size:1.4rem;font-weight:400;margin-bottom:20px;padding-bottom:12px;border-bottom:1px solid var(--border-medium);display:flex;align-items:baseline;gap:12px}
@@ -21,10 +40,13 @@ description: "모든 글 목록 — Research, Blog Posts, Guides"
 .all-item-top{display:flex;align-items:baseline;gap:12px;margin-bottom:6px;flex-wrap:wrap}
 .all-item-date{font-family:var(--font-mono);font-size:.65rem;color:var(--text-faint);letter-spacing:.08em;white-space:nowrap}
 .all-item-title{font-family:var(--font-serif);font-size:1.2rem;color:var(--text);font-weight:400}
+.all-item-title mark{background:rgba(37,99,235,.18);color:inherit;border-radius:2px;padding:0 1px}
 .all-item-desc{font-size:.85rem;color:var(--text-secondary);line-height:1.6;margin-bottom:8px}
+.all-item-desc mark{background:rgba(37,99,235,.18);color:inherit;border-radius:2px;padding:0 1px}
 .all-item-tags{display:flex;gap:6px;flex-wrap:wrap}
-.all-item-tags span{font-size:.55rem;padding:3px 8px;background:var(--tag-bg);color:var(--tag-text);letter-spacing:.05em;text-transform:uppercase}
-.all-item:hover .all-item-tags span{background:var(--text);color:var(--bg)}
+.all-item-tags .item-tag{font-size:.55rem;padding:3px 8px;background:var(--tag-bg);color:var(--tag-text);letter-spacing:.05em;text-transform:uppercase;cursor:pointer;border:none;font-family:inherit;transition:all .2s}
+.all-item-tags .item-tag:hover{background:var(--accent);color:#fff}
+.all-item-tags .item-tag.active{background:var(--accent);color:#fff}
 .all-empty{font-size:.85rem;color:var(--text-faint);padding:20px 0;font-style:italic}
 @media(max-width:1024px){
     .all-item{padding:16px 0}
@@ -33,13 +55,21 @@ description: "모든 글 목록 — Research, Blog Posts, Guides"
     .all-item-desc{font-size:.8rem}
     .all-stats{gap:8px}
     .all-stat{font-size:.65rem;padding:5px 10px}
+    .all-search input{padding:14px 40px 14px 16px;font-size:16px}
 }
 </style>
 
 <h1 class="all-title">All Posts</h1>
-<p class="all-subtitle">전체 글 목록</p>
+<p class="all-subtitle">전체 글 목록 · 검색 &amp; 태그 필터</p>
 
+<div class="all-search" id="searchWrap">
+    <input type="search" id="searchInput" placeholder="Search title, description, tags…" aria-label="Search posts" autocomplete="off">
+    <span class="search-icon" aria-hidden="true">⌕</span>
+    <button class="search-clear" id="searchClear" aria-label="Clear search">✕</button>
+</div>
 <div class="all-stats" id="filterBar"></div>
+<div class="all-tags" id="tagBar"></div>
+<div class="all-active-filter" id="activeFilter"></div>
 <div id="allContent"></div>
 
 <script>
@@ -50,50 +80,158 @@ document.addEventListener('DOMContentLoaded',function(){
 
         var catNames={research:'Research',blog:'Blog Posts',guide:'Guides'};
         var catOrder=['research','blog','guide'];
-        var groups={};
+
+        /* ── State ── */
+        var state={cat:'all',tag:null,q:''};
+        var TAG_LIMIT=12,tagsExpanded=false;
+
+        /* Read initial state from URL (?tag=…&q=…&cat=…) */
+        try{
+            var sp=new URLSearchParams(location.search);
+            if(sp.get('tag'))state.tag=sp.get('tag');
+            if(sp.get('q'))state.q=sp.get('q');
+            if(sp.get('cat')&&(catOrder.indexOf(sp.get('cat'))>-1))state.cat=sp.get('cat');
+        }catch(e){}
+
+        function syncUrl(){
+            try{
+                var sp=new URLSearchParams();
+                if(state.cat!=='all')sp.set('cat',state.cat);
+                if(state.tag)sp.set('tag',state.tag);
+                if(state.q)sp.set('q',state.q);
+                var qs=sp.toString();
+                history.replaceState(null,'',location.pathname+(qs?'?'+qs:''));
+            }catch(e){}
+        }
+
+        /* ── Tag index (case-insensitive canonical form) ── */
+        var tagCounts={},tagCanon={};
         posts.forEach(function(p){
-            if(!groups[p.category])groups[p.category]=[];
-            groups[p.category].push(p);
+            (p.tags||[]).forEach(function(t){
+                var k=t.toLowerCase();
+                if(!tagCanon[k])tagCanon[k]=t;
+                tagCounts[k]=(tagCounts[k]||0)+1;
+            });
+        });
+        var sortedTags=Object.keys(tagCounts).sort(function(a,b){
+            return tagCounts[b]-tagCounts[a]||a.localeCompare(b);
         });
 
-        /* Filter bar */
-        var bar=document.getElementById('filterBar');
-        var allBtn=document.createElement('div');
-        allBtn.className='all-stat active';
-        allBtn.textContent='All ('+posts.length+')';
-        allBtn.setAttribute('data-cat','all');
-        bar.appendChild(allBtn);
-
-        catOrder.forEach(function(cat){
-            if(!groups[cat])return;
-            var btn=document.createElement('div');
-            btn.className='all-stat';
-            btn.textContent=(catNames[cat]||cat)+' ('+groups[cat].length+')';
-            btn.setAttribute('data-cat',cat);
-            bar.appendChild(btn);
-        });
-
+        function esc(s){return String(s).replace(/[&<>"']/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]})}
         function getHref(p){return p.url||('/'+p.category+'/'+p.slug+'/');}
 
-        function render(filter){
+        /* Highlight query match inside already-escaped text */
+        function hi(text){
+            var safe=esc(text);
+            if(!state.q)return safe;
+            var q=esc(state.q).replace(/[.*+?^${}()|[\]\\]/g,'\\$&');
+            try{return safe.replace(new RegExp('('+q+')','gi'),'<mark>$1</mark>');}catch(e){return safe;}
+        }
+
+        function matches(p){
+            if(state.cat!=='all'&&p.category!==state.cat)return false;
+            if(state.tag){
+                var tset=(p.tags||[]).map(function(t){return t.toLowerCase()});
+                if(tset.indexOf(state.tag.toLowerCase())===-1)return false;
+            }
+            if(state.q){
+                var q=state.q.toLowerCase();
+                var hay=(p.title+' '+(p.shortTitle||'')+' '+(p.description||'')+' '+(p.tags||[]).join(' ')).toLowerCase();
+                if(hay.indexOf(q)===-1)return false;
+            }
+            return true;
+        }
+
+        /* ── Category filter bar ── */
+        var bar=document.getElementById('filterBar');
+        function buildFilterBar(){
+            bar.innerHTML='';
+            var groups={};
+            posts.forEach(function(p){groups[p.category]=(groups[p.category]||0)+1;});
+            var allBtn=document.createElement('div');
+            allBtn.className='all-stat'+(state.cat==='all'?' active':'');
+            allBtn.textContent='All ('+posts.length+')';
+            allBtn.setAttribute('data-cat','all');
+            bar.appendChild(allBtn);
+            catOrder.forEach(function(cat){
+                if(!groups[cat])return;
+                var btn=document.createElement('div');
+                btn.className='all-stat'+(state.cat===cat?' active':'');
+                btn.textContent=(catNames[cat]||cat)+' ('+groups[cat]+')';
+                btn.setAttribute('data-cat',cat);
+                bar.appendChild(btn);
+            });
+        }
+
+        /* ── Tag chip bar ── */
+        var tagBar=document.getElementById('tagBar');
+        function buildTagBar(){
+            tagBar.innerHTML='';
+            var show=tagsExpanded?sortedTags:sortedTags.slice(0,TAG_LIMIT);
+            /* keep the active tag visible even when collapsed */
+            if(state.tag&&show.indexOf(state.tag.toLowerCase())===-1)show=show.concat([state.tag.toLowerCase()]);
+            show.forEach(function(k){
+                var chip=document.createElement('button');
+                chip.type='button';
+                chip.className='all-tag'+(state.tag&&state.tag.toLowerCase()===k?' active':'');
+                chip.innerHTML=esc(tagCanon[k])+'<span class="n">'+tagCounts[k]+'</span>';
+                chip.setAttribute('data-tag',tagCanon[k]);
+                tagBar.appendChild(chip);
+            });
+            if(sortedTags.length>TAG_LIMIT){
+                var more=document.createElement('button');
+                more.type='button';
+                more.className='all-tags-more';
+                more.textContent=tagsExpanded?'less ▴':'+'+(sortedTags.length-TAG_LIMIT)+' tags ▾';
+                more.addEventListener('click',function(){tagsExpanded=!tagsExpanded;buildTagBar();});
+                tagBar.appendChild(more);
+            }
+        }
+
+        /* ── Active filter summary ── */
+        function paintActiveFilter(){
+            var el=document.getElementById('activeFilter');
+            var parts=[];
+            if(state.tag)parts.push('tag: <b>'+esc(state.tag)+'</b>');
+            if(state.q)parts.push('search: <b>&ldquo;'+esc(state.q)+'&rdquo;</b>');
+            if(parts.length){
+                el.innerHTML='Filtering by '+parts.join(' · ')+'<button type="button" id="clearFilters">clear ✕</button>';
+                el.classList.add('show');
+                document.getElementById('clearFilters').addEventListener('click',function(){
+                    state.tag=null;state.q='';
+                    input.value='';wrap.classList.remove('has-query');
+                    update();
+                });
+            }else{
+                el.innerHTML='';
+                el.classList.remove('show');
+            }
+        }
+
+        /* ── Render post list ── */
+        function render(){
             var container=document.getElementById('allContent');
             container.innerHTML='';
-            var catsToShow=filter==='all'?catOrder:[filter];
+            var filtered=posts.filter(matches);
+            var catsToShow=state.cat==='all'?catOrder:[state.cat];
 
             catsToShow.forEach(function(cat){
-                if(!groups[cat]||!groups[cat].length)return;
+                var items=filtered.filter(function(p){return p.category===cat});
+                if(!items.length)return;
                 var sec=document.createElement('div');
                 sec.className='cat-section';
-                var items=groups[cat];
                 var hdr='<div class="cat-header">'+(catNames[cat]||cat)+' <span class="count">'+items.length+' posts</span></div>';
                 var html=hdr;
                 items.forEach(function(p){
                     var d=new Date(p.date+'T00:00:00');
                     var ds=d.toLocaleDateString('en-US',{year:'numeric',month:'short',day:'2-digit'});
-                    var tags=(p.tags||[]).map(function(t){return '<span>'+t+'</span>'}).join('');
+                    var tags=(p.tags||[]).map(function(t){
+                        var act=state.tag&&state.tag.toLowerCase()===t.toLowerCase();
+                        return '<button type="button" class="item-tag'+(act?' active':'')+'" data-tag="'+esc(t)+'">'+esc(t)+'</button>';
+                    }).join('');
                     html+='<a href="'+getHref(p)+'" class="all-item">';
-                    html+='<div class="all-item-top"><span class="all-item-date">'+ds+'</span><span class="all-item-title">'+p.title+'</span></div>';
-                    if(p.description)html+='<div class="all-item-desc">'+p.description+'</div>';
+                    html+='<div class="all-item-top"><span class="all-item-date">'+ds+'</span><span class="all-item-title">'+hi(p.title)+'</span></div>';
+                    if(p.description)html+='<div class="all-item-desc">'+hi(p.description)+'</div>';
                     if(tags)html+='<div class="all-item-tags">'+tags+'</div>';
                     html+='</a>';
                 });
@@ -103,20 +241,72 @@ document.addEventListener('DOMContentLoaded',function(){
             });
 
             if(!container.children.length){
-                container.innerHTML='<div class="all-empty">No posts found.</div>';
+                container.innerHTML='<div class="all-empty">No posts match'+(state.q?' &ldquo;'+esc(state.q)+'&rdquo;':'')+'. Try clearing filters.</div>';
             }
         }
 
-        render('all');
+        function update(){
+            buildFilterBar();
+            buildTagBar();
+            paintActiveFilter();
+            render();
+            syncUrl();
+        }
 
-        /* Filter click */
+        /* ── Events ── */
         bar.addEventListener('click',function(e){
             var btn=e.target.closest('.all-stat');
             if(!btn)return;
-            bar.querySelectorAll('.all-stat').forEach(function(b){b.classList.remove('active');});
-            btn.classList.add('active');
-            render(btn.getAttribute('data-cat'));
+            state.cat=btn.getAttribute('data-cat');
+            update();
         });
+
+        tagBar.addEventListener('click',function(e){
+            var chip=e.target.closest('.all-tag');
+            if(!chip)return;
+            var t=chip.getAttribute('data-tag');
+            state.tag=(state.tag&&state.tag.toLowerCase()===t.toLowerCase())?null:t;
+            update();
+        });
+
+        /* tags inside post cards: filter instead of navigating */
+        document.getElementById('allContent').addEventListener('click',function(e){
+            var tagBtn=e.target.closest('.item-tag');
+            if(!tagBtn)return;
+            e.preventDefault();
+            e.stopPropagation();
+            var t=tagBtn.getAttribute('data-tag');
+            state.tag=(state.tag&&state.tag.toLowerCase()===t.toLowerCase())?null:t;
+            update();
+        });
+
+        var input=document.getElementById('searchInput');
+        var wrap=document.getElementById('searchWrap');
+        var debounce=null;
+        input.value=state.q;
+        if(state.q)wrap.classList.add('has-query');
+        input.addEventListener('input',function(){
+            clearTimeout(debounce);
+            debounce=setTimeout(function(){
+                state.q=input.value.trim();
+                wrap.classList.toggle('has-query',!!state.q);
+                update();
+            },150);
+        });
+        document.getElementById('searchClear').addEventListener('click',function(){
+            input.value='';state.q='';
+            wrap.classList.remove('has-query');
+            update();
+            input.focus();
+        });
+        /* "/" focuses search (unless typing elsewhere) */
+        document.addEventListener('keydown',function(e){
+            if(e.key==='/'&&document.activeElement!==input&&!/INPUT|TEXTAREA/.test(document.activeElement.tagName)){
+                e.preventDefault();input.focus();
+            }
+        });
+
+        update();
     }).catch(function(e){
         document.getElementById('allContent').innerHTML='<div class="all-empty">Failed to load posts.</div>';
     });
