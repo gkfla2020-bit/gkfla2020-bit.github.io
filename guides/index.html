@@ -1,0 +1,94 @@
+---
+layout: default
+permalink: /guides/
+title: "Guides"
+description: "학습 가이드 아카이브 — HFT ML, Factor Investing, Quant Researcher, Financial Modeling 등 라운드별 학습 가이드 모음."
+---
+<style>
+.gd-title{font-family:var(--font-serif);font-size:clamp(2rem,5vw,2.8rem);font-weight:300;margin-bottom:10px;animation:gdFadeIn .5s ease .1s both}
+.gd-subtitle{font-family:var(--font-mono);font-size:11px;color:var(--text-muted);letter-spacing:.2em;text-transform:uppercase;margin-bottom:16px;animation:gdFadeIn .4s ease .2s both}
+.gd-intro{font-size:.85rem;color:var(--text-secondary);line-height:1.7;max-width:620px;margin-bottom:45px;animation:gdFadeIn .4s ease .3s both}
+@keyframes gdFadeIn{from{opacity:0}to{opacity:1}}
+@media(prefers-reduced-motion:reduce){.gd-title,.gd-subtitle,.gd-intro,.gd-card{animation:none}}
+.gd-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:18px;margin-bottom:60px}
+.gd-card{display:block;padding:26px 24px;border:1px solid var(--border-medium);text-decoration:none;transition:all .2s;animation:gdFadeIn .4s ease .35s both}
+.gd-card:hover{border-color:var(--text);transform:translateY(-3px)}
+.gd-card-num{font-family:var(--font-mono);font-size:.6rem;color:var(--text-faint);letter-spacing:.15em;text-transform:uppercase;margin-bottom:10px}
+.gd-card-title{font-family:var(--font-serif);font-size:1.3rem;color:var(--text);font-weight:400;margin-bottom:10px}
+.gd-card-desc{font-size:.8rem;color:var(--text-secondary);line-height:1.65;margin-bottom:14px}
+.gd-card-tags{display:flex;gap:6px;flex-wrap:wrap}
+.gd-card-tags span{font-size:.55rem;padding:3px 8px;background:var(--tag-bg);color:var(--tag-text);letter-spacing:.05em;text-transform:uppercase}
+.gd-card:hover .gd-card-tags span{background:var(--text);color:var(--bg)}
+.gd-sec-header{font-family:var(--font-serif);font-size:1.4rem;font-weight:400;margin-bottom:20px;padding-bottom:12px;border-bottom:1px solid var(--border-medium);display:flex;align-items:baseline;gap:12px}
+.gd-sec-header .count{font-family:var(--font-mono);font-size:.65rem;color:var(--text-faint);letter-spacing:.05em}
+.gd-item{display:block;padding:18px 0;border-bottom:1px solid var(--border-light);text-decoration:none;transition:all .2s}
+.gd-item:hover{padding-left:12px}
+.gd-item-top{display:flex;align-items:baseline;gap:12px;margin-bottom:6px;flex-wrap:wrap}
+.gd-item-date{font-family:var(--font-mono);font-size:.65rem;color:var(--text-faint);letter-spacing:.08em;white-space:nowrap}
+.gd-item-title{font-family:var(--font-serif);font-size:1.15rem;color:var(--text);font-weight:400}
+.gd-item-desc{font-size:.82rem;color:var(--text-secondary);line-height:1.6}
+.gd-empty{font-size:.85rem;color:var(--text-faint);padding:20px 0;font-style:italic}
+@media(max-width:1024px){
+    .gd-grid{grid-template-columns:1fr}
+    .gd-item:hover{padding-left:0}
+    .gd-item-title{font-size:1.02rem}
+}
+</style>
+
+<h1 class="gd-title">Guides</h1>
+<p class="gd-subtitle">Learning Guide Archive</p>
+<p class="gd-intro">라운드별 학습 가이드를 모아둔 아카이브입니다. 각 가이드는 이론 → 구현 → 실전 케이스 순서의 커리큘럼으로 구성되어 있습니다.</p>
+
+<div class="gd-grid" id="guideGrid"></div>
+
+<div id="guidePostsSec" style="display:none">
+    <div class="gd-sec-header">가이드성 포스트 <span class="count" id="gpCount"></span></div>
+    <div id="guidePostsList"></div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded',function(){
+    /* 가이드 성격의 일반 포스트 (research/blog 카테고리지만 가이드 아카이브에도 노출) */
+    var GUIDE_POST_SLUGS=['thetadata-options-guide-kr','binance-collector-beginner-guide-kr'];
+
+    fetch('/data/posts.json').then(function(r){return r.json()}).then(function(posts){
+        posts.sort(function(a,b){return b.date.localeCompare(a.date)});
+        function getHref(p){return p.url||('/'+p.category+'/'+p.slug+'/');}
+
+        var guides=posts.filter(function(p){return p.category==='guide'});
+        var grid=document.getElementById('guideGrid');
+        guides.forEach(function(p,i){
+            var num=('0'+(i+1)).slice(-2);
+            var tags=(p.tags||[]).slice(0,4).map(function(t){return '<span>'+t+'</span>'}).join('');
+            var a=document.createElement('a');
+            a.className='gd-card';
+            a.href=getHref(p);
+            a.innerHTML='<div class="gd-card-num">'+num+' — Guide</div>'
+                +'<div class="gd-card-title">'+p.title+'</div>'
+                +'<div class="gd-card-desc">'+(p.description||'')+'</div>'
+                +(tags?'<div class="gd-card-tags">'+tags+'</div>':'');
+            grid.appendChild(a);
+        });
+        if(!guides.length)grid.innerHTML='<div class="gd-empty">No guides found.</div>';
+
+        var extras=posts.filter(function(p){return GUIDE_POST_SLUGS.indexOf(p.slug)!==-1});
+        if(extras.length){
+            document.getElementById('guidePostsSec').style.display='';
+            document.getElementById('gpCount').textContent=extras.length+' posts';
+            var list=document.getElementById('guidePostsList');
+            extras.forEach(function(p){
+                var d=new Date(p.date+'T00:00:00');
+                var ds=d.toLocaleDateString('en-US',{year:'numeric',month:'short',day:'2-digit'});
+                var a=document.createElement('a');
+                a.className='gd-item';
+                a.href=getHref(p);
+                a.innerHTML='<div class="gd-item-top"><span class="gd-item-date">'+ds+'</span><span class="gd-item-title">'+p.title+'</span></div>'
+                    +(p.description?'<div class="gd-item-desc">'+p.description+'</div>':'');
+                list.appendChild(a);
+            });
+        }
+    }).catch(function(e){
+        document.getElementById('guideGrid').innerHTML='<div class="gd-empty">Failed to load guides.</div>';
+    });
+});
+</script>
