@@ -213,3 +213,37 @@ a:hover{color:var(--accent)}
 /* ─── Skip link (shared by default layout + index) ─── */
 .skip-link{position:absolute;left:-9999px;top:auto;width:1px;height:1px;overflow:hidden;z-index:99999;padding:12px 20px;background:var(--accent);color:#fff;font-size:.85rem;text-decoration:none}
 .skip-link:focus{left:10px;top:10px;width:auto;height:auto;overflow:visible}
+
+/* ─── Legacy light-styled posts: render as a paper sheet in dark mode ───
+   WSJ-style report posts (.report-container) and the career roadmap
+   (.cr-root) hardcode dark ink on light boxes. Rather than re-theming
+   dozens of bespoke boxes, keep them on a light "paper" card when the
+   site theme is dark — like a PDF viewer. Light mode is untouched. */
+:root[data-theme="dark"] .post-content :is(.report-container, .cr-root) {
+    background: #faf9f6;
+    color: #111111;
+    padding: 30px 36px;
+    border-radius: 10px;
+    box-shadow: 0 6px 28px rgba(0,0,0,.45);
+    color-scheme: light;
+}
+@media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) .post-content :is(.report-container, .cr-root) {
+        background: #faf9f6;
+        color: #111111;
+        padding: 30px 36px;
+        border-radius: 10px;
+        box-shadow: 0 6px 28px rgba(0,0,0,.45);
+        color-scheme: light;
+    }
+}
+@media (max-width: 768px) {
+    :root[data-theme="dark"] .post-content :is(.report-container, .cr-root) {
+        padding: 20px 14px;
+    }
+}
+@media (prefers-color-scheme: dark) and (max-width: 768px) {
+    :root:not([data-theme="light"]) .post-content :is(.report-container, .cr-root) {
+        padding: 20px 14px;
+    }
+}
