@@ -214,36 +214,131 @@ a:hover{color:var(--accent)}
 .skip-link{position:absolute;left:-9999px;top:auto;width:1px;height:1px;overflow:hidden;z-index:99999;padding:12px 20px;background:var(--accent);color:#fff;font-size:.85rem;text-decoration:none}
 .skip-link:focus{left:10px;top:10px;width:auto;height:auto;overflow:visible}
 
-/* ─── Legacy light-styled posts: render as a paper sheet in dark mode ───
-   WSJ-style report posts (.report-container) and the career roadmap
-   (.cr-root) hardcode dark ink on light boxes. Rather than re-theming
-   dozens of bespoke boxes, keep them on a light "paper" card when the
-   site theme is dark — like a PDF viewer. Light mode is untouched. */
-:root[data-theme="dark"] .post-content :is(.report-container, .cr-root) {
-    background: #faf9f6;
-    color: #111111;
-    padding: 30px 36px;
-    border-radius: 10px;
-    box-shadow: 0 6px 28px rgba(0,0,0,.45);
-    color-scheme: light;
+/* ─── Dark-mode repaint for legacy light-styled posts ───
+   WSJ report posts (.report-container) and the career roadmap (.cr-root)
+   define their own light palettes inline. In dark mode we flip those
+   palettes at the container level (custom properties cascade), then patch
+   the handful of rules that hardcode light hex values. Light mode untouched.
+   NOTE: rules are emitted twice — manual toggle scope + OS-preference scope
+   (same pattern as the site variables above). ─── */
+
+/* WSJ-style report posts: flip the local palette (vars cascade to every box) */
+:root[data-theme="dark"] .report-container {
+    --wsj-black: #e8eef7;
+    --wsj-gray: #9db0c7;
+    --wsj-light: #17233d;
+    --wsj-cream: #101a2e;
+    --wsj-accent: #58a6e8;
+    --wsj-red: #ef7168;
+    --wsj-green: #3fbf7f;
+    --wsj-orange: #f0954d;
 }
+/* Boxes/borders that hardcode light hex values */
+:root[data-theme="dark"] .analogy-box, :root[data-theme="dark"] .key-box { background: rgba(88,166,232,.13); }
+:root[data-theme="dark"] .warning-box { background: rgba(240,149,77,.13); }
+:root[data-theme="dark"] .limitation-box { background: rgba(240,180,41,.10); border-color: rgba(240,180,41,.4); }
+:root[data-theme="dark"] .limitation-header { color: #f2b04e; }
+:root[data-theme="dark"] .line-review { background: #121e35; }
+:root[data-theme="dark"] .line-review code { background: #223049; }
+:root[data-theme="dark"] .chart-section, :root[data-theme="dark"] .module-card, :root[data-theme="dark"] .step-box { background: #121e35; border-color: #2a3854; }
+:root[data-theme="dark"] .arch-node { border-color: #2a3854; }
+:root[data-theme="dark"] .data-table td { border-bottom-color: #263450; }
+:root[data-theme="dark"] .fig img { border-color: #2a3854; }
+:root[data-theme="dark"] .stat-item { border-right-color: #2a3854; }
+:root[data-theme="dark"] .conclusion-box { background: #141f36; border: 1px solid #2a3854; }
+/* Small badges: bright fills read better with dark ink in dark mode */
+:root[data-theme="dark"] .badge-blue, :root[data-theme="dark"] .badge-green, :root[data-theme="dark"] .badge-orange, :root[data-theme="dark"] .badge-red,
+:root[data-theme="dark"] .step-number, :root[data-theme="dark"] .winner-badge, :root[data-theme="dark"] .arch-node.highlight, :root[data-theme="dark"] .verdict-pill { color: #0b1220; }
+
+/* Career-roadmap post (.cr-root): flip its local palette */
+:root[data-theme="dark"] .cr-root {
+    --ink: #e8eef7;
+    --ink-soft: #b0bfd2;
+    --paper: #101a2e;
+    --line: #2a3854;
+    --line-soft: #223049;
+    --accent: #3ab8ac;
+    --accent-soft: #2f958b;
+    --red: #e57373;
+    --green: #85c775;
+    --blue: #82aed6;
+    --gold: #cfa76a;
+    --amber: #e2a93e;
+}
+:root[data-theme="dark"] .cr-card, :root[data-theme="dark"] .cr-checklist, :root[data-theme="dark"] .cr-gantt-wrap, :root[data-theme="dark"] .cr-fire-item,
+:root[data-theme="dark"] .cr-risk-fix, :root[data-theme="dark"] .cr-routine-col, :root[data-theme="dark"] .cr-table { background: #121e35; }
+:root[data-theme="dark"] .cr-gantt-cell, :root[data-theme="dark"] .cr-gantt-row-label { background: #121e35; }
+:root[data-theme="dark"] .cr-gantt-head.phase, :root[data-theme="dark"] .cr-table th { background: rgba(58,184,172,.15); }
+:root[data-theme="dark"] .cr-table .hl { background: rgba(58,184,172,.12); }
+:root[data-theme="dark"] .cr-mind-do { background: rgba(133,199,117,.12); }
+:root[data-theme="dark"] .cr-mind-dont { background: rgba(229,115,115,.12); }
+:root[data-theme="dark"] .cr-risk { background: rgba(226,169,62,.10); }
+:root[data-theme="dark"] .cr-risk.critical { background: rgba(229,115,115,.10); }
+:root[data-theme="dark"] .cr-risk.positive { background: rgba(133,199,117,.10); }
+:root[data-theme="dark"] .cr-fire { background: rgba(229,115,115,.08); }
+:root[data-theme="dark"] .cr-gantt-bar { color: #0b1220; }
+:root[data-theme="dark"] .cr-gantt-bar.soft { background: #3a4a68; }
+:root[data-theme="dark"] .cr-gantt-milestone { color: #0b1220; }
+:root[data-theme="dark"] .cr-print-btn { background: #223049; color: #e8eef7; }
+
 @media (prefers-color-scheme: dark) {
-    :root:not([data-theme="light"]) .post-content :is(.report-container, .cr-root) {
-        background: #faf9f6;
-        color: #111111;
-        padding: 30px 36px;
-        border-radius: 10px;
-        box-shadow: 0 6px 28px rgba(0,0,0,.45);
-        color-scheme: light;
+
+    /* WSJ-style report posts: flip the local palette (vars cascade to every box) */
+    :root:not([data-theme="light"]) .report-container {
+        --wsj-black: #e8eef7;
+        --wsj-gray: #9db0c7;
+        --wsj-light: #17233d;
+        --wsj-cream: #101a2e;
+        --wsj-accent: #58a6e8;
+        --wsj-red: #ef7168;
+        --wsj-green: #3fbf7f;
+        --wsj-orange: #f0954d;
     }
-}
-@media (max-width: 768px) {
-    :root[data-theme="dark"] .post-content :is(.report-container, .cr-root) {
-        padding: 20px 14px;
+    /* Boxes/borders that hardcode light hex values */
+    :root:not([data-theme="light"]) .analogy-box, :root:not([data-theme="light"]) .key-box { background: rgba(88,166,232,.13); }
+    :root:not([data-theme="light"]) .warning-box { background: rgba(240,149,77,.13); }
+    :root:not([data-theme="light"]) .limitation-box { background: rgba(240,180,41,.10); border-color: rgba(240,180,41,.4); }
+    :root:not([data-theme="light"]) .limitation-header { color: #f2b04e; }
+    :root:not([data-theme="light"]) .line-review { background: #121e35; }
+    :root:not([data-theme="light"]) .line-review code { background: #223049; }
+    :root:not([data-theme="light"]) .chart-section, :root:not([data-theme="light"]) .module-card, :root:not([data-theme="light"]) .step-box { background: #121e35; border-color: #2a3854; }
+    :root:not([data-theme="light"]) .arch-node { border-color: #2a3854; }
+    :root:not([data-theme="light"]) .data-table td { border-bottom-color: #263450; }
+    :root:not([data-theme="light"]) .fig img { border-color: #2a3854; }
+    :root:not([data-theme="light"]) .stat-item { border-right-color: #2a3854; }
+    :root:not([data-theme="light"]) .conclusion-box { background: #141f36; border: 1px solid #2a3854; }
+    /* Small badges: bright fills read better with dark ink in dark mode */
+    :root:not([data-theme="light"]) .badge-blue, :root:not([data-theme="light"]) .badge-green, :root:not([data-theme="light"]) .badge-orange, :root:not([data-theme="light"]) .badge-red,
+    :root:not([data-theme="light"]) .step-number, :root:not([data-theme="light"]) .winner-badge, :root:not([data-theme="light"]) .arch-node.highlight, :root:not([data-theme="light"]) .verdict-pill { color: #0b1220; }
+
+    /* Career-roadmap post (.cr-root): flip its local palette */
+    :root:not([data-theme="light"]) .cr-root {
+        --ink: #e8eef7;
+        --ink-soft: #b0bfd2;
+        --paper: #101a2e;
+        --line: #2a3854;
+        --line-soft: #223049;
+        --accent: #3ab8ac;
+        --accent-soft: #2f958b;
+        --red: #e57373;
+        --green: #85c775;
+        --blue: #82aed6;
+        --gold: #cfa76a;
+        --amber: #e2a93e;
     }
-}
-@media (prefers-color-scheme: dark) and (max-width: 768px) {
-    :root:not([data-theme="light"]) .post-content :is(.report-container, .cr-root) {
-        padding: 20px 14px;
-    }
+    :root:not([data-theme="light"]) .cr-card, :root:not([data-theme="light"]) .cr-checklist, :root:not([data-theme="light"]) .cr-gantt-wrap, :root:not([data-theme="light"]) .cr-fire-item,
+    :root:not([data-theme="light"]) .cr-risk-fix, :root:not([data-theme="light"]) .cr-routine-col, :root:not([data-theme="light"]) .cr-table { background: #121e35; }
+    :root:not([data-theme="light"]) .cr-gantt-cell, :root:not([data-theme="light"]) .cr-gantt-row-label { background: #121e35; }
+    :root:not([data-theme="light"]) .cr-gantt-head.phase, :root:not([data-theme="light"]) .cr-table th { background: rgba(58,184,172,.15); }
+    :root:not([data-theme="light"]) .cr-table .hl { background: rgba(58,184,172,.12); }
+    :root:not([data-theme="light"]) .cr-mind-do { background: rgba(133,199,117,.12); }
+    :root:not([data-theme="light"]) .cr-mind-dont { background: rgba(229,115,115,.12); }
+    :root:not([data-theme="light"]) .cr-risk { background: rgba(226,169,62,.10); }
+    :root:not([data-theme="light"]) .cr-risk.critical { background: rgba(229,115,115,.10); }
+    :root:not([data-theme="light"]) .cr-risk.positive { background: rgba(133,199,117,.10); }
+    :root:not([data-theme="light"]) .cr-fire { background: rgba(229,115,115,.08); }
+    :root:not([data-theme="light"]) .cr-gantt-bar { color: #0b1220; }
+    :root:not([data-theme="light"]) .cr-gantt-bar.soft { background: #3a4a68; }
+    :root:not([data-theme="light"]) .cr-gantt-milestone { color: #0b1220; }
+    :root:not([data-theme="light"]) .cr-print-btn { background: #223049; color: #e8eef7; }
 }
