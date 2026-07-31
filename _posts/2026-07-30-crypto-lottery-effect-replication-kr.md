@@ -82,7 +82,7 @@ description: "Wu, Tuan-Mu & Yen (2025)의 암호화폐 로또 효과를 9,378개
 
     <table class="data-table">
         <tr><th>항목</th><th>원논문</th><th>본 재현</th></tr>
-        <tr><td>데이터</td><td>CoinMarketCap 상위 1,000개 (스냅샷)</td><td>자체 수집 9,378개 전체에서 매월 상위 1,000개 재구성</td></tr>
+        <tr><td>데이터</td><td>CoinMarketCap — 시총 상위 1,000개 범위 (매월 실표본 12~981개)</td><td>자체 수집 9,378개 코인 — 매월 상위 1,000개 ∩ $5M 재선발 (평균 691개)</td></tr>
         <tr><td>기간</td><td>2016.1 – 2022.4 (76개월)</td><td>2018.2 – 2025.12 (95개월) — 2022.5 이후는 표본외</td></tr>
         <tr><td>신호 / 소팅</td><td>MAX5, 5분위, EW·VW</td><td>동일 + 주간 확장 (MAX1/MAX5 × 산정 2주/4주 × 필터 $1M/$5M)</td></tr>
         <tr><td>검정</td><td>Newey-West t</td><td>동일 (4 lags)</td></tr>
