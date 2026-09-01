@@ -1,13 +1,13 @@
 ---
 layout: page
-title: "ESG TradeGuard — 하나청년금융인재 본선 통과작"
+title: "ESG TradeGuard — 하나청년금융인재양성프로젝트 대상"
 permalink: /portfolio/competitions/esg-tradeguard/
-description: "수출 서류 한 장으로 CBAM 비용을 산출하는 ESG 규제 심사 프로토타입."
+description: "하나청년금융인재양성프로젝트 대상 수상작. 수출 서류 한 장으로 CBAM 비용을 산출하는 ESG 규제 심사 프로토타입."
 ---
 
 [← 공모전 목록](/portfolio/competitions/)
 
-**팀명**: 유니하나팀 · **결과**: 하나청년금융인재프로젝트 **본선 최종 통과** · **기간**: 2026
+**팀명**: 유니하나팀 · **결과**: 하나청년금융인재양성프로젝트 🏆 **대상(大賞) 수상** · **기간**: 2026
 
 데모: [/esg-tradeguard/](/esg-tradeguard/)
 

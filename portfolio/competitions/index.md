@@ -2,7 +2,7 @@
 layout: page
 title: "공모전 (Competitions)"
 permalink: /portfolio/competitions/
-description: "정하림이 출품한 공모전 8건. 본선 통과작 1건 포함."
+description: "정하림이 출품한 공모전 기록. 하나청년금융인재양성프로젝트 대상, Tech4Good 해커톤 우수상 수상."
 ---
 
 [← 포트폴리오](/portfolio/)
@@ -11,7 +11,8 @@ description: "정하림이 출품한 공모전 8건. 본선 통과작 1건 포�
 
 ## 글 목록
 
-- **2026** · [ESG TradeGuard — 하나청년금융인재 본선 통과작](/portfolio/competitions/esg-tradeguard/)
+- **2026** · [ESG TradeGuard — 하나청년금융인재양성프로젝트 🏆 **대상**](/portfolio/competitions/esg-tradeguard/)
+- **2026** · Tech4Good 해커톤 — 🏅 **우수상**
 - **2026** · [CodePathology — KIT 바이브코딩 공모전](/portfolio/competitions/kit-vibe-coding/)
 - **2026** · [DB GAPS 12회 투자대회 — 10억 가상 운용](/portfolio/competitions/db-gaps/)
 - **2026** · [Sogang Stack — 서강대 생성형 AI 공모전](/portfolio/competitions/sogang-genai/)
