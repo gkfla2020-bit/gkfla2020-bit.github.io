@@ -7,7 +7,7 @@ description: "ESG TradeGuard 프로젝트의 아키텍처와 데이터 임베딩
 
 [← 프로젝트 목록](/portfolio/projects/)
 
-데모: [/esg-tradeguard/](/esg-tradeguard/) · 공모전 페이지: [ESG TradeGuard 본선 통과작](/portfolio/competitions/esg-tradeguard/)
+데모: [/esg-tradeguard/](/esg-tradeguard/) · 공모전 페이지: [ESG TradeGuard — 하나청년금융인재양성프로젝트 대상](/portfolio/competitions/esg-tradeguard/)
 
 ## 이 글이 다루는 것
 
