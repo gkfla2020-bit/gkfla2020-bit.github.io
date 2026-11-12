@@ -3,7 +3,7 @@ layout: post
 title: "Vasicek/Black-Scholes Hybrid Model Evaluation Report"
 date: 2026-02-05
 categories: [research, quantitative-finance]
-tags: [vasicek, black-scholes, MOVE, interest-rate, backtest]
+tags: [vasicek, black-scholes, MOVE, interest-rate]
 toc: true
 toc_sticky: true
 description: "Extending the Vasicek model with the MOVE index as a state variable: regime-dependent rates and volatility, LR tests, Granger causality, FEVD (2010-2025)."
@@ -74,12 +74,12 @@ lang: en
     </div>
     
     <h1 class="headline">Vasicek/Black-Scholes Hybrid Model Evaluation Report</h1>
-    <p class="deck">State-Dependent Interest Rate Dynamics:<br>Empirical Analysis of Extended Vasicek Model Using MOVE Index as State Variable</p>
+    <p class="deck">State-Dependent Interest Rate Dynamics:<br>An Empirical Analysis of an Extended Vasicek Model with the MOVE Index as a State Variable</p>
     
     <div class="abstract">
         <div class="abstract-title">Abstract</div>
         <p class="body-text" style="margin-bottom:0;">
-        This study extends the Vasicek (1977) interest rate model by incorporating the bond market volatility index (MOVE) as a state indicator, and examines its empirical validity. The analysis reveals that MOVE-related parameters provide statistically significant additional explanatory power, with patterns of higher equilibrium rates and volatility observed in high-MOVE regimes. While Granger causality tests did not find strong evidence of bidirectional simultaneity, this does not guarantee structural exogeneity, requiring careful interpretation. This study aims for descriptive characterization of interest rate dynamics conditional on market states, rather than causal claims.
+        This study extends the Vasicek (1977) interest rate model by adding the bond market volatility index (MOVE) as a state indicator, and tests whether the extension holds up empirically. The MOVE-related parameters add statistically significant explanatory power, and both the equilibrium rate and volatility are higher in high-MOVE regimes. Granger causality tests found no two-way relationship between rates and MOVE, but that does not make MOVE structurally exogenous, so the results need careful interpretation. The aim is to describe how rate dynamics change with market conditions, not to make causal claims.
         </p>
     </div>
     
@@ -92,10 +92,10 @@ lang: en
 
     <h2 class="section-header">I. Theoretical Background</h2>
     
-    <div class="subsection">1.1 Connection Between Black-Scholes (1973) and Vasicek (1977)</div>
+    <div class="subsection">1.1 The Link Between Black-Scholes (1973) and Vasicek (1977)</div>
     
     <div class="formula-box">
-        <div class="formula-label">Core Assumption of Black-Scholes Model</div>
+        <div class="formula-label">Core Assumption of the Black-Scholes Model</div>
         <div class="formula-content">
             dS<sub>t</sub> = μS<sub>t</sub>dt + σS<sub>t</sub>dW<sub>t</sub>
         </div>
@@ -114,13 +114,13 @@ lang: en
         </div>
     </div>
     
-    <p class="body-text">The theoretical connection between the Black-Scholes and Vasicek models holds significant importance in the development of modern financial engineering. The stock option pricing model proposed by Black and Scholes (1973) modeled stochastic stock price movements through geometric Brownian motion, while the bond pricing model introduced by Vasicek (1977) attempted to reflect the long-term equilibrium characteristics of interest rates through mean-reverting stochastic processes.</p>
+    <p class="body-text">The Black-Scholes and Vasicek models share a theoretical lineage in modern financial engineering. In their option pricing model, Black and Scholes (1973) described stochastic stock price movements with geometric Brownian motion. Vasicek (1977) later built a bond pricing model on a mean-reverting stochastic process to capture the long-run equilibrium behavior of interest rates.</p>
 
-    <p class="body-text">The key contribution of the Vasicek model lies in the introduction of mean-reversion κ(θ - r_t). This models the tendency of interest rates to converge toward the long-term equilibrium level θ, thereby complementing the unrealistic divergence characteristics of geometric Brownian motion in the Black-Scholes model.</p>
+    <p class="body-text">The key contribution of the Vasicek model is the mean-reversion term κ(θ − r_t). It captures the tendency of interest rates to move back toward the long-run level θ, which avoids the unrealistic divergence that geometric Brownian motion would produce if applied to interest rates.</p>
     
     <div class="callout">
         <div class="callout-header">Concept Borrowed from Black-Scholes</div>
-        <p>In the Black-Scholes model, implied volatility derived from option prices reflects market participants' expectations about future uncertainty. This study applies this concept to the bond market, utilizing the MOVE index (bond option implied volatility) as a state variable for interest rate dynamics.</p>
+        <p>In the Black-Scholes model, implied volatility backed out of option prices reflects what market participants expect about future uncertainty. This study applies the same idea to the bond market and uses the MOVE index (the implied volatility of Treasury options) as a state variable for interest rate dynamics.</p>
     </div>
 
     <h2 class="section-header">II. Model Specification</h2>
@@ -134,7 +134,7 @@ lang: en
         <tr><td>σ</td><td>Volatility</td><td>Diffusion coefficient of interest rates</td><td class="num">0.0074</td></tr>
     </table>
     
-    <div class="subsection">2.2 MOVE-Vasicek Extended Model</div>
+    <div class="subsection">2.2 Extended MOVE-Vasicek Model</div>
     
     <div class="formula-box">
         <div class="formula-label">State-Dependent Stochastic Differential Equation</div>
@@ -159,7 +159,7 @@ lang: en
     
     <div class="chart-section">
         <div class="chart-title">US 10Y Treasury Rate and MOVE Index</div>
-        <div class="chart-subtitle">Monthly data, 2010-02 to 2025-12</div>
+        <div class="chart-subtitle">Illustrative simulated series — not actual data (sample period 2010-02 to 2025-12, monthly)</div>
         <div id="timeSeriesChart" class="chart-container"></div>
     </div>
     
@@ -168,7 +168,7 @@ lang: en
         <tr><td>2010-2012</td><td>European Debt Crisis, QE2</td><td>Elevated volatility</td><td>Low rates maintained</td></tr>
         <tr><td>2013</td><td>Taper Tantrum</td><td>Sharp spike</td><td>Sharp rise (100bp+)</td></tr>
         <tr><td>2020</td><td>COVID-19</td><td>All-time high</td><td>Sharp drop to lows</td></tr>
-        <tr><td>2022-2023</td><td>Inflation, Rapid hikes</td><td>Elevated levels</td><td>Sharp rise</td></tr>
+        <tr><td>2022-2023</td><td>Inflation, rapid rate hikes</td><td>Elevated levels</td><td>Sharp rise</td></tr>
     </table>
 
     <h2 class="section-header">IV. Empirical Analysis Results</h2>
@@ -176,7 +176,7 @@ lang: en
     <div class="subsection">4.1 Model Fit Comparison: Standard Vasicek vs MOVE-Vasicek</div>
     
     <table class="data-table">
-        <tr><th>Metric</th><th class="num">Standard Vasicek</th><th class="num">MOVE-Vasicek</th><th>Winner</th></tr>
+        <tr><th>Metric</th><th class="num">Standard Vasicek</th><th class="num">MOVE-Vasicek</th><th>Better Fit</th></tr>
         <tr><td>RMSE</td><td class="num">0.002988</td><td class="num">0.002972</td><td><span class="winner-badge">MOVE</span> Lower is better</td></tr>
         <tr><td>AIC</td><td class="num">-474.40</td><td class="num">-487.93</td><td><span class="winner-badge">MOVE</span> Lower is better</td></tr>
         <tr><td>BIC</td><td class="num">-468.28</td><td class="num">-477.71</td><td><span class="winner-badge">MOVE</span> Lower is better</td></tr>
@@ -203,19 +203,19 @@ lang: en
         <div id="lrTestChart" class="chart-container" style="height:320px;"></div>
     </div>
     
-    <p class="body-text">The likelihood ratio test results indicate that the MOVE-Vasicek model shows statistically significant additional explanatory power compared to the standard model. The LR statistic of 17.52 substantially exceeding the critical value of 5.99 suggests that the performance difference between the two models is not mere chance but represents meaningful improvement. Specifically, the two additional parameters in the MOVE-Vasicek model significantly enhanced the ability to explain the data, and this improvement sufficiently offsets the cost of increased model complexity.</p>
+    <p class="body-text">The likelihood ratio test shows that the MOVE-Vasicek model adds statistically significant explanatory power over the standard model. An LR statistic of 17.52, well above the critical value of 5.99, means the difference between the two models is unlikely to be chance. The two extra parameters in the MOVE-Vasicek model improve the fit enough to more than offset the added model complexity.</p>
     
     <div class="subsection">4.3 Granger Causality Test</div>
     
     <table class="data-table">
         <tr><th>Direction</th><th class="num">p-value</th><th>Result</th><th>Interpretation</th></tr>
-        <tr><td>MOVE → Rate</td><td class="num">0.0348</td><td><span class="winner-badge">Significant</span> (5%)</td><td>Predictive precedence exists</td></tr>
-        <tr><td>Rate → MOVE</td><td class="num">0.4614</td><td>Not significant</td><td>Reverse precedence not found</td></tr>
+        <tr><td>MOVE → Rate</td><td class="num">0.0348</td><td><span class="winner-badge">Significant</span> (5%)</td><td>MOVE leads rates</td></tr>
+        <tr><td>Rate → MOVE</td><td class="num">0.4614</td><td>Not significant</td><td>No evidence that rates lead MOVE</td></tr>
     </table>
     
     <div class="limitation-box">
         <div class="limitation-header">⚠️ Interpretation Caveats</div>
-        <p>While Granger causality tests did not find strong evidence of bidirectional simultaneity, this does not guarantee MOVE's structural exogeneity. Therefore, MOVE should be interpreted as a "state indicator" rather than an "exogenous variable."</p>
+        <p>Granger causality tests found no two-way relationship, but that does not make MOVE structurally exogenous. MOVE should therefore be read as a "state indicator" rather than an "exogenous variable."</p>
     </div>
     
     <div class="chart-section">
@@ -236,23 +236,23 @@ lang: en
     
     <div class="callout">
         <div class="callout-header">Scope of Claims in This Study</div>
-        <p>This study does not claim causality between MOVE and interest rates. Instead, it reports the descriptive finding that patterns of interest rate dynamics vary according to market volatility regimes.</p>
+        <p>This study makes no causal claim about MOVE and interest rates. It reports a descriptive finding: interest rate dynamics follow different patterns in different market volatility regimes.</p>
     </div>
     
     <div class="formula-box">
         <div class="formula-label">Core Interpretation Framework</div>
         <div class="formula-content">
-            θ₁ > 0 → "Pattern observed where mean-reversion level is higher in high-MOVE regimes"<br>
-            σ₁ > 0 → "Pattern observed where rate volatility is larger in high-MOVE regimes"<br><br>
-            This can be interpreted as empirical evidence consistent with the State-Dependent Dynamics hypothesis
+            θ₁ > 0 → "The mean-reversion level is higher in high-MOVE regimes"<br>
+            σ₁ > 0 → "Rate volatility is larger in high-MOVE regimes"<br><br>
+            Both results are empirical evidence consistent with the state-dependent dynamics hypothesis.
         </div>
     </div>
 
     <div class="conclusion-box">
         <h2 class="section-header">VI. Conclusions and Limitations</h2>
-        <p class="body-text">This study analyzed the dynamic characteristics of US Treasury rates through an extended Vasicek model using the MOVE index as a state variable. The analysis observed that equilibrium levels and volatility of interest rates exhibit different patterns depending on bond market volatility regimes.</p>
+        <p class="body-text">This study analyzed US Treasury rate dynamics with an extended Vasicek model that uses the MOVE index as a state variable. The equilibrium level and volatility of rates differ across bond market volatility regimes.</p>
 
-        <p class="body-text">The core contribution of this study lies not in establishing the causal relationship that "MOVE moves interest rates," but in discovering the descriptive fact that "patterns exist where interest rate dynamics vary according to market volatility regimes."</p>
+        <p class="body-text">The contribution is not a causal claim that "MOVE moves interest rates." It is the descriptive finding that "interest rate dynamics vary across market volatility regimes."</p>
     </div>
     
     <h2 class="section-header">VII. References</h2>

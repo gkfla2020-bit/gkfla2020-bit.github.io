@@ -3,7 +3,7 @@ layout: post
 title: "바시첵/블랙숄즈 합성 모델 평가보고서"
 date: 2026-02-05
 categories: [research, quantitative-finance]
-tags: [vasicek, black-scholes, MOVE, interest-rate, backtest]
+tags: [vasicek, black-scholes, MOVE, interest-rate]
 toc: true
 toc_sticky: true
 description: "MOVE 지수를 상태변수로 도입해 Vasicek 금리 모델을 확장한 실증 분석. 2010~2025년 미국 10년물 월간 데이터로 표준 모델과 적합도를 비교하고 LR 검정·Granger 인과·FEVD 결과를 정리했다."
@@ -72,18 +72,18 @@ canonical_url: /research/move-vasicek-kr/
     </div>
     
     <h1 class="headline">바시첵/블랙숄즈 합성 모델 평가보고서</h1>
-    <p class="deck">State-Dependent Interest Rate Dynamics:<br>MOVE 지수를 상태변수로 활용한 확장 Vasicek 모델의 실증 분석</p>
+    <p class="deck">상태 의존적 금리 동학:<br>MOVE 지수를 상태변수로 넣은 확장 Vasicek 모델의 실증 분석</p>
     
     <div class="abstract">
-        <div class="abstract-title">Abstract</div>
+        <div class="abstract-title">요약</div>
         <p class="body-text" style="margin-bottom:0;">
-        본 연구는 채권시장 변동성 지수(MOVE)를 상태변수(state indicator)로 활용하여 
-        Vasicek(1977) 금리 모델을 확장하고, 그 경험적 타당성을 검토한다. 
-        분석 결과, MOVE 관련 파라미터가 통계적으로 유의한 추가 설명력을 제공하는 것으로 나타났으며,
-        고 MOVE 체제에서 균형금리와 변동성이 높게 나타나는 패턴이 관찰되었다.
-        Granger 인과검정에서 강한 양방향 동시성 증거는 발견되지 않았으나,
-        이것이 구조적 외생성을 보장하지는 않으므로 해석에 주의가 필요하다.
-        본 연구는 인과적 주장이 아닌, 시장 상태에 조건부인 금리 역학의 기술적 특성화를 목표로 한다.
+        채권시장 변동성 지수(MOVE)를 상태변수(state indicator)로 넣어 Vasicek(1977) 금리 모델을 확장하고,
+        이 확장이 실제 데이터에서 의미가 있는지 검토했다.
+        MOVE 관련 파라미터는 통계적으로 유의한 추가 설명력을 보였고,
+        MOVE가 높은 구간에서는 균형금리와 변동성이 함께 높았다.
+        Granger 인과검정에서 금리와 MOVE가 서로를 선행하는 양방향 관계는 확인되지 않았다.
+        그렇다고 MOVE가 구조적으로 외생적이라는 뜻은 아니므로 해석에 주의해야 한다.
+        이 분석의 목표는 인과관계를 주장하는 것이 아니라, 시장 상태에 따라 금리의 움직임이 어떻게 달라지는지 기술하는 것이다.
         </p>
     </div>
     
@@ -118,21 +118,21 @@ canonical_url: /research/move-vasicek-kr/
         </div>
     </div>
     
-    <p class="body-text">블랙숄즈 모델과 바시첵 모델의 이론적 연결고리는 현대 금융공학의 발전 과정에서 중요한 의미를 갖는 것으로 관찰된다. Black and Scholes(1973)가 제시한 주식 옵션 가격결정 모델은 기하 브라운 운동을 통해 주가의 확률적 변동을 모형화하였으며, 이후 Vasicek(1977)이 도입한 채권 가격결정 모델은 평균회귀 확률과정을 통해 금리의 장기균형 특성을 반영하려 시도한 것으로 해석된다.</p>
+    <p class="body-text">블랙숄즈 모델과 바시첵 모델은 현대 금융공학이 발전해 온 흐름 속에서 이론적으로 맞닿아 있다. Black and Scholes(1973)는 주식 옵션 가격결정 모델에서 주가의 확률적 변동을 기하 브라운 운동으로 모형화했다. 이후 Vasicek(1977)은 채권 가격결정 모델에 평균회귀 확률과정을 도입해, 금리가 장기 균형으로 돌아가려는 성질을 반영했다.</p>
 
-    <p class="body-text">바시첵 모델의 핵심 기여는 평균회귀 특성 κ(θ - r_t)의 도입에 있다고 볼 수 있다. 이는 금리가 장기 균형수준 θ로 수렴하려는 경향을 모형화함으로써, 블랙숄즈 모델의 기하 브라운 운동이 갖는 비현실적인 발산 특성을 보완하는 것으로 평가된다.</p>
+    <p class="body-text">바시첵 모델의 핵심 기여는 평균회귀 항 κ(θ − r_t)이다. 이 항은 금리가 장기 균형수준 θ로 돌아가려는 경향을 나타낸다. 덕분에 기하 브라운 운동을 금리에 그대로 쓸 때 생기는 비현실적인 발산 문제를 피할 수 있다.</p>
     
     <div class="callout">
         <div class="callout-header">블랙숄즈에서 차용한 개념</div>
-        <p>Black-Scholes 모델에서 옵션 가격으로부터 역산되는 내재변동성(implied volatility)은 
-        시장 참여자들의 미래 불확실성에 대한 기대를 반영한다. 
-        본 연구는 이 개념을 채권시장에 적용하여, MOVE 지수(채권 옵션 내재변동성)를 
-        금리 역학의 상태변수로 활용한다.</p>
+        <p>Black-Scholes 모델에서 옵션 가격으로부터 역산한 내재변동성(implied volatility)은
+        시장 참여자가 예상하는 미래 불확실성을 담고 있다.
+        이 분석은 같은 개념을 채권시장에 적용해, 채권 옵션의 내재변동성인 MOVE 지수를
+        금리 움직임의 상태변수로 쓴다.</p>
     </div>
 
     <h2 class="section-header">II. 모델 명세</h2>
     
-    <div class="subsection">2.1 Standard Vasicek Model</div>
+    <div class="subsection">2.1 표준 Vasicek 모델</div>
     
     <table class="data-table">
         <tr><th>기호</th><th>명칭</th><th>의미</th><th class="num">추정값</th></tr>
@@ -141,7 +141,7 @@ canonical_url: /research/move-vasicek-kr/
         <tr><td>σ</td><td>변동성</td><td>금리의 확산 계수</td><td class="num">0.0074</td></tr>
     </table>
     
-    <div class="subsection">2.2 MOVE-Vasicek Extended Model</div>
+    <div class="subsection">2.2 MOVE-Vasicek 확장 모델</div>
     
     <div class="formula-box">
         <div class="formula-label">상태 의존적 확률미분방정식</div>
@@ -165,8 +165,8 @@ canonical_url: /research/move-vasicek-kr/
     <h2 class="section-header">III. 표본 기간 분석 (2010-2025)</h2>
     
     <div class="chart-section">
-        <div class="chart-title">US 10Y Treasury Rate and MOVE Index</div>
-        <div class="chart-subtitle">Monthly data, 2010-02 to 2025-12</div>
+        <div class="chart-title">미국 10년물 국채 금리와 MOVE 지수</div>
+        <div class="chart-subtitle">설명용 모의 데이터 — 실제 시계열이 아님 (표본 기간 2010-02 ~ 2025-12, 월간)</div>
         <div id="timeSeriesChart" class="chart-container"></div>
     </div>
     
@@ -175,15 +175,15 @@ canonical_url: /research/move-vasicek-kr/
         <tr><td>2010-2012</td><td>유럽 재정위기, QE2</td><td>변동성 상승</td><td>저금리 유지</td></tr>
         <tr><td>2013</td><td>Taper Tantrum</td><td>급등</td><td>급등 (100bp+)</td></tr>
         <tr><td>2020</td><td>COVID-19</td><td>역대 최고</td><td>급락 후 저점</td></tr>
-        <tr><td>2022-2023</td><td>인플레이션, 급격한 인상</td><td>고수준 유지</td><td>급등</td></tr>
+        <tr><td>2022-2023</td><td>인플레이션, 급격한 금리 인상</td><td>고수준 유지</td><td>급등</td></tr>
     </table>
 
     <h2 class="section-header">IV. 실증 분석 결과</h2>
     
-    <div class="subsection">4.1 모델 적합도 비교: Standard Vasicek vs MOVE-Vasicek</div>
+    <div class="subsection">4.1 모델 적합도 비교: 표준 Vasicek vs MOVE-Vasicek</div>
     
     <table class="data-table">
-        <tr><th>지표</th><th class="num">Standard Vasicek</th><th class="num">MOVE-Vasicek</th><th>Winner</th></tr>
+        <tr><th>지표</th><th class="num">표준 Vasicek</th><th class="num">MOVE-Vasicek</th><th>우세</th></tr>
         <tr><td>RMSE</td><td class="num">0.002988</td><td class="num">0.002972</td><td><span class="winner-badge">MOVE</span> 낮을수록 좋음</td></tr>
         <tr><td>AIC</td><td class="num">-474.40</td><td class="num">-487.93</td><td><span class="winner-badge">MOVE</span> 낮을수록 좋음</td></tr>
         <tr><td>BIC</td><td class="num">-468.28</td><td class="num">-477.71</td><td><span class="winner-badge">MOVE</span> 낮을수록 좋음</td></tr>
@@ -191,7 +191,7 @@ canonical_url: /research/move-vasicek-kr/
     </table>
     
     <div class="chart-section">
-        <div class="chart-title">모델 비교: Standard Vasicek vs MOVE-Vasicek</div>
+        <div class="chart-title">모델 비교: 표준 Vasicek vs MOVE-Vasicek</div>
         <div class="chart-subtitle">정보 기준 및 로그우도 비교</div>
         <div id="modelCompareChart" class="chart-container" style="height:320px;"></div>
     </div>
@@ -201,7 +201,7 @@ canonical_url: /research/move-vasicek-kr/
     <div class="callout">
         <div class="callout-header">📊 Likelihood Ratio Test</div>
         <p>LR Statistic = 17.52 > Critical Value (χ²₂, α=0.05) = 5.99</p>
-        <p>→ 귀무가설 기각: MOVE 관련 파라미터가 통계적으로 유의한 추가 설명력 제공</p>
+        <p>→ 귀무가설 기각: MOVE 관련 파라미터가 통계적으로 유의한 추가 설명력을 준다</p>
     </div>
     
     <div class="chart-section">
@@ -209,59 +209,61 @@ canonical_url: /research/move-vasicek-kr/
         <div class="chart-subtitle">χ² 분포 (자유도 2)</div>
         <div id="lrTestChart" class="chart-container" style="height:320px;"></div>
     </div>
+
+    <p class="body-text">우도비 검정 결과, MOVE-Vasicek 모델은 표준 모델보다 통계적으로 유의한 추가 설명력을 보였다. LR 통계량 17.52가 임계값 5.99를 크게 넘으므로, 두 모델의 차이를 우연으로 보기 어렵다. MOVE-Vasicek 모델에 더한 파라미터 두 개가 데이터 설명력을 의미 있게 높였고, 그 개선 폭은 모델이 복잡해진 비용을 충분히 상쇄한다.</p>
     
     <div class="subsection">4.3 Granger 인과검정</div>
     
     <table class="data-table">
         <tr><th>방향</th><th class="num">p-value</th><th>결과</th><th>해석</th></tr>
-        <tr><td>MOVE → 금리</td><td class="num">0.0348</td><td><span class="winner-badge">유의</span> (5%)</td><td>예측적 선행성 존재</td></tr>
-        <tr><td>금리 → MOVE</td><td class="num">0.4614</td><td>유의하지 않음</td><td>역방향 선행성 미발견</td></tr>
+        <tr><td>MOVE → 금리</td><td class="num">0.0348</td><td><span class="winner-badge">유의</span> (5%)</td><td>MOVE가 금리를 예측적으로 선행</td></tr>
+        <tr><td>금리 → MOVE</td><td class="num">0.4614</td><td>유의하지 않음</td><td>금리가 MOVE를 선행한다는 근거 없음</td></tr>
     </table>
     
     <div class="limitation-box">
         <div class="limitation-header">⚠️ 해석상 주의사항</div>
-        <p>Granger 인과검정에서 강한 양방향 동시성 증거는 발견되지 않았으나, 
-        이것이 MOVE의 구조적 외생성(structural exogeneity)을 보장하지는 않는다.
-        따라서 MOVE는 "외생 변수"가 아닌 "상태 지표(state indicator)"로 해석하는 것이 적절하다.</p>
+        <p>Granger 인과검정에서 양방향 관계는 확인되지 않았지만,
+        그렇다고 MOVE가 구조적으로 외생적(structural exogeneity)이라는 뜻은 아니다.
+        따라서 MOVE는 "외생 변수"가 아니라 "상태 지표(state indicator)"로 해석해야 한다.</p>
     </div>
     
     <div class="chart-section">
-        <div class="chart-title">Granger Causality Test Results</div>
-        <div class="chart-subtitle">H₀: No Granger causality | α = 0.05</div>
+        <div class="chart-title">Granger 인과검정 결과</div>
+        <div class="chart-subtitle">H₀: Granger 인과 없음 | α = 0.05</div>
         <div id="grangerChart" class="chart-container" style="height:300px;"></div>
     </div>
     
     <div class="subsection">4.4 VAR 분석 및 분산분해</div>
     
     <div class="chart-section">
-        <div class="chart-title">Forecast Error Variance Decomposition</div>
-        <div class="chart-subtitle">MOVE contribution to interest rate variance</div>
+        <div class="chart-title">예측오차 분산분해 (FEVD)</div>
+        <div class="chart-subtitle">금리 예측오차 분산 중 MOVE가 차지하는 비중</div>
         <div id="fevdChart" class="chart-container" style="height:300px;"></div>
     </div>
 
     <h2 class="section-header">V. 해석 가이드라인</h2>
     
     <div class="callout">
-        <div class="callout-header">본 연구의 주장 범위</div>
-        <p>본 연구는 MOVE와 금리 간의 인과관계(causality)를 주장하지 않는다.
-        대신, 시장 변동성 체제에 따라 금리 역학이 달라지는 패턴이 관찰된다는 
-        기술적(descriptive) 발견을 보고한다.</p>
+        <div class="callout-header">이 분석이 주장하는 범위</div>
+        <p>이 분석은 MOVE와 금리 사이의 인과관계(causality)를 주장하지 않는다.
+        시장 변동성 체제에 따라 금리의 움직임이 달라지는 패턴이 있다는
+        기술적(descriptive) 발견을 보고할 뿐이다.</p>
     </div>
     
     <div class="formula-box">
-        <div class="formula-label">핵심 해석 프레임</div>
+        <div class="formula-label">핵심 해석</div>
         <div class="formula-content">
-            θ₁ > 0 → "고 MOVE 체제에서 평균회귀 수준이 높게 나타나는 패턴이 관찰됨"<br>
-            σ₁ > 0 → "고 MOVE 체제에서 금리 변동성이 크게 나타나는 패턴이 관찰됨"<br><br>
-            이는 State-Dependent Dynamics 가설과 정합적인 경험적 증거로 해석될 수 있음
+            θ₁ > 0 → "MOVE가 높은 체제에서는 평균회귀 수준이 높다"<br>
+            σ₁ > 0 → "MOVE가 높은 체제에서는 금리 변동성이 크다"<br><br>
+            두 결과는 상태 의존 동학(State-Dependent Dynamics) 가설과 맞는 경험적 증거로 볼 수 있다.
         </div>
     </div>
 
     <div class="conclusion-box">
         <h2 class="section-header">VI. 결론 및 한계</h2>
-        <p class="body-text">본 연구는 MOVE 지수를 상태변수로 활용한 확장 Vasicek 모델을 통해 미국 국채 금리의 동학적 특성을 분석하였다. 분석 결과, 채권 시장의 변동성 체제에 따라 금리의 균형 수준과 변동성이 상이한 패턴을 보이는 것이 관찰되었다.</p>
+        <p class="body-text">MOVE 지수를 상태변수로 넣은 확장 Vasicek 모델로 미국 국채 금리의 움직임을 분석했다. 채권시장의 변동성 체제에 따라 금리의 균형 수준과 변동성이 다르게 나타났다.</p>
 
-        <p class="body-text">본 연구의 핵심 기여는 "MOVE가 금리를 움직인다"는 인과적 관계의 규명이 아니라, "시장 변동성 체제에 따라 금리 역학이 달라지는 패턴이 존재한다"는 기술적 사실의 발견에 있다.</p>
+        <p class="body-text">이 분석의 의의는 "MOVE가 금리를 움직인다"는 인과관계를 밝힌 데 있지 않다. "시장 변동성 체제에 따라 금리의 움직임이 달라지는 패턴이 있다"는 기술적 사실을 확인한 데 있다.</p>
     </div>
     
     <h2 class="section-header">VII. 참고문헌</h2>
