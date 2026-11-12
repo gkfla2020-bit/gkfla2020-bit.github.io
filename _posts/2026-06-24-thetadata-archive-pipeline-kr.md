@@ -71,19 +71,19 @@ description: "ThetaData 옵션 데이터 아카이빙 운영 가이드. Theta Te
     </div>
 
     <h1 class="headline">ThetaData 옵션 아카이빙 파이프라인<br>운영 가이드</h1>
-    <p class="deck">결제하고 키 받았는데 어디서부터 시작해야 할지 모르는 사람을 위한 글.<br>로컬 Terminal 셋업부터 Parquet 영구 보관까지 한 번에 완성합니다.</p>
+    <p class="deck">결제하고 키까지 받았는데 어디서부터 시작해야 할지 모르는 사람을 위한 글이다.<br>로컬 Terminal 설정부터 Parquet 영구 보관까지 한 번에 정리한다.</p>
 
     <div class="abstract">
         <div class="abstract-title">이 글의 목표</div>
         <p class="body-text" style="margin-bottom:0;">
-        ThetaData (https://www.thetadata.net) 는 OPRA-licensed 옵션 데이터 vendor다. 결제하면 API 키가 나오는데, 그걸로 끝이 아니다. <strong>로컬에 Java 기반 프록시(Theta Terminal)를 띄워야 REST API가 동작</strong>한다. 게다가 v3 API는 v2와 엔드포인트, 응답 형식, 쿼리 파라미터가 다 다르다. 이 글은 그 함정들을 다 피한 운영 가이드를 정리한다. 옵션이 뭔지 모르는 분은 <a href="/research/thetadata-options-guide-kr/">옵션 데이터 가이드</a>를 먼저 보길 권한다.
+        ThetaData(https://www.thetadata.net)는 OPRA 라이선스를 받은 옵션 데이터 업체다. 결제하면 API 키가 나오지만 그걸로 끝이 아니다. <strong>로컬에 Java 기반 프록시(Theta Terminal)를 띄워야 REST API가 동작</strong>한다. 게다가 v3 API는 v2와 엔드포인트, 응답 형식, 쿼리 파라미터가 모두 다르다. 이 글은 그 함정을 피해 가는 운영 방법을 정리한다. 옵션이 무엇인지 모른다면 <a href="/research/thetadata-options-guide-kr/">옵션 데이터 가이드</a>를 먼저 읽기를 권한다.
         </p>
     </div>
 
     <h2 class="section-header">전체 그림 — 30초 요약</h2>
 
     <div class="analogy-box">
-        <div class="analogy-label">🔌 비유: 케이블 회사 셋업박스</div>
+        <div class="analogy-label">🔌 비유: 케이블 회사 셋톱박스</div>
         <div class="analogy-text">
             ThetaData는 케이블 방송 회사다. 결제하면 채널 시청권을 주지만, 시청하려면 집에 셋톱박스를 설치해야 한다.<br><br>
             • <strong>케이블 회사</strong> = ThetaData (OPRA 데이터 보유)<br>
@@ -91,7 +91,7 @@ description: "ThetaData 옵션 데이터 아카이빙 운영 가이드. Theta Te
             • <strong>셋톱박스</strong> = ThetaTerminal.jar (로컬에 띄움)<br>
             • <strong>TV</strong> = 우리 Python 코드 (REST API 호출)<br>
             • <strong>녹화기</strong> = Parquet 아카이브<br><br>
-            셋톱박스가 꺼지면 TV는 검은 화면. 마찬가지로 Terminal이 죽으면 모든 API 호출이 실패한다.
+            셋톱박스가 꺼지면 TV 화면이 까맣게 되듯, Terminal이 죽으면 모든 API 호출이 실패한다.
         </div>
     </div>
 
@@ -124,7 +124,7 @@ description: "ThetaData 옵션 데이터 아카이빙 운영 가이드. Theta Te
 
     <h2 class="section-header">v2 → v3 핵심 변경 (함정 모음)</h2>
 
-    <p class="body-text">2026년에 v2 → v3로 메이저 업그레이드되면서 거의 모든 게 바뀌었다. 옛날 블로그·튜토리얼은 거의 다 v2 기준이라 그대로 따라하면 동작 안 한다.</p>
+    <p class="body-text">2026년에 v2 → v3로 메이저 업그레이드되면서 거의 모든 게 바뀌었다. 예전 블로그·튜토리얼은 거의 다 v2 기준이라 그대로 따라 하면 동작하지 않는다.</p>
 
     <table class="data-table">
         <tr><th>항목</th><th>v2</th><th>v3 (현재)</th></tr>
@@ -143,7 +143,7 @@ description: "ThetaData 옵션 데이터 아카이빙 운영 가이드. Theta Te
     <div class="warning-box">
         <div class="warning-label">⚠️ HTTP 410 만나면 v2 흔적</div>
         <p class="body-text" style="margin-bottom:0;">
-        v3 서버가 v2 경로 호출에 410 Gone을 돌려준다. 메시지에 "Update your endpoint URLs to /v3/* format"라고 친절히 알려준다. 410 보이면 무조건 코드의 BASE_URL과 경로 점검.
+        v3 서버가 v2 경로 호출에 410 Gone을 돌려준다. 메시지에 "Update your endpoint URLs to /v3/* format"라고 친절히 알려준다. 410이 보이면 코드의 BASE_URL과 경로부터 점검한다.
         </p>
     </div>
 
@@ -168,7 +168,7 @@ mv ~/Downloads/ThetaTerminalv3.jar ~/projects/thetadata/terminal/ThetaTerminal.j
     <div class="step-box">
         <span class="step-number">3</span>
         <span class="step-title">creds.txt로 자동 로그인 (권장)</span>
-        <p class="body-text" style="margin-top:10px;">명령줄 인자로 비번 넣으면 <code>ps -ef</code> 에 평문 노출된다. <code>creds.txt</code> 두 줄로 처리:</p>
+        <p class="body-text" style="margin-top:10px;">명령줄 인자로 비밀번호를 넣으면 <code>ps -ef</code>에 평문으로 노출된다. <code>creds.txt</code> 두 줄로 처리한다:</p>
         <div class="code-block"><span class="code-kw">cd</span> ~/projects/thetadata/terminal
 <span class="code-fn">echo</span> <span class="code-str">"your-email@example.com"</span> &gt; creds.txt
 <span class="code-fn">echo</span> <span class="code-str">"your-password"</span> &gt;&gt; creds.txt
@@ -183,7 +183,7 @@ disown</div>
         <span class="step-title">동작 확인</span>
         <p class="body-text" style="margin-top:10px;">10초 후:</p>
         <div class="code-block">curl -s -m 30 http://127.0.0.1:25503/v3/option/list/symbols | head -c 200</div>
-        <p class="body-text">CSV 형식 심볼 리스트가 나오면 성공. 한 줄에 한 종목씩, 약 15,000개.</p>
+        <p class="body-text">CSV 형식의 심볼 목록이 나오면 성공이다. 한 줄에 한 종목씩, 약 15,000개가 나온다.</p>
     </div>
 
     <h2 class="section-header">Step 2. v3 핵심 엔드포인트 4개</h2>
@@ -205,7 +205,7 @@ right=both  →  콜·풋 둘 다</div>
         <div class="formula-note">→ 한 (종목, 만기) 조합당 호출 1번이면 충분 (단, 365일 제한)</div>
     </div>
 
-    <p class="body-text"><strong>중요:</strong> <code>/v3/option/history/eod</code> (그릭스 없는 OHLC만) 도 있지만, <code>greeks/eod</code> 가 OHLC + bid/ask + IV + 그릭스 16개를 한 번에 주므로 <strong>greeks/eod 만 부르면 된다</strong>. 둘 다 부르면 호출 비용 2배.</p>
+    <p class="body-text"><strong>중요:</strong> <code>/v3/option/history/eod</code>(그릭스 없이 OHLC만 주는 엔드포인트)도 있지만, <code>greeks/eod</code>가 OHLC + bid/ask + IV + 그릭스 16개를 한 번에 주므로 <strong>greeks/eod만 부르면 된다</strong>. 둘 다 부르면 호출 비용만 두 배가 된다.</p>
 
     <h2 class="section-header">Step 3. 클라이언트 코드 — 얇은 래퍼</h2>
 
@@ -268,13 +268,13 @@ BASE = <span class="code-str">"http://127.0.0.1:25503"</span>
 
     <h2 class="section-header">Step 5. 동시성 — 만기 단위 병렬</h2>
 
-    <p class="body-text">STANDARD 구독은 <strong>동시 4개 요청</strong> 까지 허용한다. 5개째 보내면 HTTP 429.</p>
+    <p class="body-text">STANDARD 구독은 <strong>동시 요청 4개</strong>까지 허용한다. 5개째를 보내면 HTTP 429가 돌아온다.</p>
 
     <div class="warning-box">
         <div class="warning-label">⚠️ 종목 직렬 vs 만기 병렬</div>
         <p class="body-text" style="margin-bottom:0;">
-        처음에는 "종목 4개 동시"로 짰다. 그러나 한 종목 안의 만기들은 직렬 처리되니, 종목 다 끝나기 전에 다른 종목으로 못 넘어간다. SPY 1만기에 3-4분 걸리는 게 보틀넥이 됐다.<br><br>
-        해법: <strong>만기를 우선순위 큐에 다 넣고 4 슬롯이 만기 단위로 작업</strong>. 종목 직렬화로 인한 idle 시간이 사라진다.
+        처음에는 "종목 4개 동시"로 짰다. 그런데 한 종목 안의 만기는 차례로 처리되므로, 한 종목이 다 끝나기 전에는 다음 종목으로 넘어가지 못한다. SPY 만기 하나에 3~4분씩 걸리는 것이 병목이 됐다.<br><br>
+        해법: <strong>모든 만기를 우선순위 큐에 넣고, 슬롯 4개가 만기 단위로 일을 가져간다</strong>. 종목 단위로 줄을 세워서 생기던 대기 시간이 사라진다.
         </p>
     </div>
 
@@ -297,7 +297,7 @@ jobs = []
 
     <h2 class="section-header">Step 6. 옵션 수명 캡 — 빈 호출 줄이기</h2>
 
-    <p class="body-text">2025년 만기 옵션을 2018년부터 받으라고 하면 5년 동안 빈 응답만 내려온다. 옵션은 보통 <strong>만기 전 ~2년</strong> 부터만 거래된다.</p>
+    <p class="body-text">2025년 만기 옵션을 2018년부터 받으라고 하면 5년 동안 빈 응답만 내려온다. 옵션은 보통 <strong>만기 약 2년 전</strong>부터만 거래된다.</p>
 
     <div class="formula-box">
         <div class="formula-label">자동 캡</div>
@@ -308,7 +308,7 @@ jobs = []
 
     <h2 class="section-header">Step 7. 영구 보관 — Parquet + Hive 파티션</h2>
 
-    <p class="body-text">받은 데이터를 어떻게 저장할 것인가. 후보:</p>
+    <p class="body-text">받은 데이터를 어떤 형식으로 저장할지 후보를 비교했다:</p>
 
     <table class="data-table">
         <tr><th>형식</th><th>장점</th><th>단점</th></tr>
@@ -323,10 +323,10 @@ jobs = []
   ├─ &lt;SYMBOL&gt;_&lt;YYYYMMDD&gt;.parquet  # 만기 단위
   ├─ ...
   └─ _ALL_&lt;SYMBOL&gt;.parquet        # 종목 통합본 (자동 생성)</div>
-        <div class="formula-note">→ 만기별로 받아서 만기 단위 파일 + 끝나면 통합본 만듦</div>
+        <div class="formula-note">→ 만기별로 받아 만기 단위 파일로 저장하고, 다 받으면 통합본을 만든다.</div>
     </div>
 
-    <p class="body-text">압축은 <code>zstd</code>가 좋다. <code>gzip</code>보다 빠르고 작다. <code>snappy</code>는 가장 빠르지만 압축률 떨어진다.</p>
+    <p class="body-text">압축은 <code>zstd</code>가 좋다. <code>gzip</code>보다 빠르고 작다. <code>snappy</code>는 가장 빠르지만 압축률이 떨어진다.</p>
 
     <div class="code-block">df.to_parquet(out_path, index=<span class="code-kw">False</span>, compression=<span class="code-str">"zstd"</span>)</div>
 
@@ -337,23 +337,23 @@ jobs = []
     <div class="step-box">
         <span class="step-number">방법 1</span>
         <span class="step-title">파일 존재 여부로 스킵 (간단)</span>
-        <p class="body-text" style="margin-top:10px;"><code>data/eod/SPY/SPY_20250619.parquet</code> 가 있으면 그 만기는 이미 받음 → 스킵.</p>
+        <p class="body-text" style="margin-top:10px;"><code>data/eod/SPY/SPY_20250619.parquet</code>가 있으면 그 만기는 이미 받은 것이므로 건너뛴다.</p>
     </div>
 
     <div class="step-box">
         <span class="step-number">방법 2</span>
         <span class="step-title">manifest.csv 영구 기록</span>
-        <p class="body-text" style="margin-top:10px;">호출 한 번마다 한 줄씩 추가:</p>
+        <p class="body-text" style="margin-top:10px;">호출할 때마다 한 줄씩 추가한다:</p>
         <div class="code-block">symbol,expiration,feed,status,rows,bytes,path,started_at,finished_at,error
 SPY,2025-08-15,greeks_eod,ok,432,0,,2026-06-22T...,2026-06-22T...,
 SPY,2025-08-15,open_interest,ok,432,0,,...
 SPY,2025-08-15,merged,ok,432,83410,/path/SPY_20250815.parquet,...</div>
-        <p class="body-text">셋 다 ok면 그 만기 완료. 쿼리도 가능 ("SPY 9월 만기 중 실패한 거?").</p>
+        <p class="body-text">세 항목이 모두 ok면 그 만기는 완료다. "SPY 9월 만기 중 실패한 것은?" 같은 조회도 할 수 있다.</p>
     </div>
 
     <h2 class="section-header">Step 9. 검증·복구 — verify_archive.py</h2>
 
-    <p class="body-text">매니페스트 vs 디스크 정합성 체크 스크립트를 따로 만든다. 발견 가능한 문제:</p>
+    <p class="body-text">매니페스트와 디스크가 서로 맞는지 확인하는 스크립트를 따로 만든다. 찾아낼 수 있는 문제는 다음과 같다:</p>
 
     <table class="data-table">
         <tr><th>문제</th><th>탐지 방법</th><th>복구</th></tr>
@@ -365,7 +365,7 @@ SPY,2025-08-15,merged,ok,432,83410,/path/SPY_20250815.parquet,...</div>
 
     <h2 class="section-header">Step 10. 운영 자동화 — 매일 증분</h2>
 
-    <p class="body-text">옵션 EOD는 미국 동부 18:00 경 ThetaData에 갱신된다. 한국 시간 다음날 새벽 7시 (서머타임 시 6시).</p>
+    <p class="body-text">옵션 EOD는 미국 동부 시간 18:00쯤 ThetaData에 갱신된다. 한국 시간으로는 다음 날 오전 8시(서머타임 기간에는 오전 7시)다.</p>
 
     <div class="code-block"><span class="code-cm"># crontab -e</span>
 <span class="code-num">0 7 * * 2-6</span> cd /path/to/thetadata &amp;&amp; \
@@ -378,14 +378,14 @@ SPY,2025-08-15,merged,ok,432,83410,/path/SPY_20250815.parquet,...</div>
     <div class="warning-box">
         <div class="warning-label">⚠️ 1. HTTP 429 누적 카운터</div>
         <p class="body-text" style="margin-bottom:0;">
-        STANDARD는 동시 4개 외에 <strong>시간당 누적 호출량 한도</strong>도 있는 듯. 24시간 retry 폭주 시킨 후 1-2시간 동안 계속 429. <strong>해법</strong>: Terminal 재시작하면 카운터 리셋되는 경우 많음. 그래도 안 되면 1시간 휴식.
+        STANDARD 구독에는 동시 4개 제한 외에 <strong>시간당 누적 호출량 한도</strong>도 있는 듯하다. 24시간 동안 재시도를 폭주시킨 뒤에는 1~2시간 내내 429가 돌아왔다. <strong>해법</strong>: Terminal을 재시작하면 카운터가 초기화되는 경우가 많았다. 그래도 안 되면 1시간 쉰다.
         </p>
     </div>
 
     <div class="warning-box">
         <div class="warning-label">⚠️ 2. SPY 0DTE 만기는 무겁다</div>
         <p class="body-text" style="margin-bottom:0;">
-        SPY는 매일 만기(0DTE) 옵션이 있고, 행사가가 매우 촘촘하다(±1$ 단위). 한 만기에 수천 행사가 × 수백 거래일. 한 만기 다운로드에 3-4분. 다른 ETF의 30배 가까이 걸린다. 시간 예산 짤 때 고려.
+        SPY는 매일 만기(0DTE) 옵션이 있고, 행사가가 매우 촘촘하다(1달러 단위). 만기 하나에 행사가 수천 개 × 거래일 수백 일이 쌓인다. 만기 하나를 받는 데 3~4분, 다른 ETF의 30배 가까이 걸리므로 시간 예산을 짤 때 고려해야 한다.
         </p>
     </div>
 
@@ -402,18 +402,18 @@ SPY,2025-08-15,merged,ok,432,83410,/path/SPY_20250815.parquet,...</div>
     <div class="warning-box">
         <div class="warning-label">⚠️ 4. ThetaTerminal은 자식 프로세스를 따로 띄움</div>
         <p class="body-text" style="margin-bottom:0;">
-        Terminal을 죽일 때 <code>pkill -f ThetaTerminal.jar</code>로 런처만 죽이면 실제 서버 자식 프로세스(<code>java</code>)는 살아있다. <code>lsof -i :25503</code>로 포트 점유자를 확인해서 그 PID도 명시적으로 죽여야 함.
+        Terminal을 죽일 때 <code>pkill -f ThetaTerminal.jar</code>로 런처만 죽이면 실제 서버 자식 프로세스(<code>java</code>)는 살아있다. <code>lsof -i :25503</code>로 포트 점유자를 확인해서 그 PID도 명시적으로 죽여야 한다.
         </p>
     </div>
 
     <div class="warning-box">
         <div class="warning-label">⚠️ 5. caffeinate 안 쓰면 슬립</div>
         <p class="body-text" style="margin-bottom:0;">
-        macOS는 노트북 화면 닫으면 슬립. 12시간 다운로드 중 슬립되면 작업 중단. <code>caffeinate -dis nohup ...</code> 으로 감싸면 디스플레이/시스템/디스크 슬립 모두 차단.
+        macOS 노트북은 화면을 닫으면 잠자기 모드로 들어간다. 12시간짜리 다운로드 도중 잠들면 작업이 멈춘다. <code>caffeinate -dis nohup ...</code>으로 감싸면 디스플레이·유휴·시스템 잠자기를 막는다.
         </p>
     </div>
 
-    <h2 class="section-header">실측 — 뭐가 얼마나 걸리나</h2>
+    <h2 class="section-header">실측 — 무엇이 얼마나 걸리나</h2>
 
     <table class="data-table">
         <tr><th>작업</th><th>시간</th><th>비고</th></tr>
@@ -441,8 +441,8 @@ SPY,2025-08-15,merged,ok,432,83410,/path/SPY_20250815.parquet,...</div>
 
     <div class="callout-box" style="background: #fff3e0; border: 1px solid var(--wsj-orange); padding: 20px 25px; margin: 25px 0;">
         <p class="body-text" style="margin-bottom:0;">
-        ThetaData는 <strong>OPRA(Options Price Reporting Authority)</strong>의 정식 라이센시다. OPRA는 미국 SEC가 옵션거래소들에 통합 호가 보고를 의무화하면서 만들어진 공식 데이터 채널. OptionMetrics(Wharton WRDS), Bloomberg, Refinitiv가 쓰는 같은 OPRA 원천이다.<br><br>
-        <strong>학술 publish 가능 수준</strong>이며, 인용 양식은 <a href="/research/thetadata-options-guide-kr/">옵션 데이터 가이드</a> 참조.
+        ThetaData는 <strong>OPRA(Options Price Reporting Authority)</strong>의 정식 라이선스를 받은 업체다. OPRA는 미국 SEC가 옵션거래소들에 통합 호가 보고를 의무화하면서 만들어진 공식 데이터 채널이다. OptionMetrics(Wharton WRDS), Bloomberg, Refinitiv도 같은 OPRA 원천을 쓴다.<br><br>
+        원천 데이터의 신뢰도는 <strong>학술 논문에 쓸 수 있는 수준</strong>이다. 자세한 설명은 <a href="/research/thetadata-options-guide-kr/">옵션 데이터 가이드</a>를 참고하면 된다.
         </p>
     </div>
 
@@ -472,13 +472,13 @@ SPY,2025-08-15,merged,ok,432,83410,/path/SPY_20250815.parquet,...</div>
     <div class="conclusion-box">
         <h2 class="section-header">정리</h2>
         <p class="body-text">
-        ThetaData는 OPRA 정식 라이센시다. 학술 신뢰도 OK. 다만 v3 API의 함정(포트, 파라미터, 응답 형식, 365일 제한, bulk 부재, rate limit)을 모르면 시간을 며칠 날린다.
+        ThetaData는 OPRA 정식 라이선스를 받은 업체라 학술 연구에 쓸 만큼 신뢰할 수 있다. 다만 v3 API의 함정(포트, 파라미터, 응답 형식, 365일 제한, bulk 부재, rate limit)을 모르면 시간을 며칠 날린다.
         </p>
         <p class="body-text">
-        핵심 설계 원칙: <strong>만기 단위 병렬 + Parquet + manifest.csv</strong>. 이 셋이 있으면 끊겨도 이어받기 자동, 검증 자동, 분석 직접 가능하다.
+        핵심 설계 원칙은 <strong>만기 단위 병렬 + Parquet + manifest.csv</strong>다. 이 셋을 갖추면 끊겨도 자동으로 이어받고, 자동으로 검증하고, 받은 파일로 바로 분석할 수 있다.
         </p>
         <p class="body-text">
-        SPY 0DTE 만기가 압도적으로 무거우니, 시간 예산 짤 때 SPY는 별도 세션으로 분리. 다른 종목 4-5개는 1년치를 1-2시간이면 끝낼 수 있다.
+        SPY 0DTE 만기가 압도적으로 무거우므로, 시간 예산을 짤 때 SPY는 별도 세션으로 떼어 낸다. 다른 종목 4~5개는 1년치를 1~2시간이면 끝낼 수 있다.
         </p>
         <p class="body-text" style="color:white;">
         다음 글에서는 받은 데이터로 실제 분석을 한다 — VXX 롤 손실 정량화, SPY 변동성 위험 프리미엄 측정 등.
