@@ -99,19 +99,19 @@ description: "바이낸스 WebSocket으로 오더북·체결·청산·캔들·�
     </div>
     
     <h1 class="headline">바이낸스 고빈도 데이터 수집 시스템 아키텍처</h1>
-    <p class="deck">Research-Grade Cryptocurrency Market Microstructure Data Pipeline:<br>Python asyncio 기반 24/7 오더북·체결·청산·펀딩비 수집 시스템의 설계와 구현</p>
+    <p class="deck">연구용 암호화폐 시장 미시구조 데이터 파이프라인:<br>Python asyncio로 오더북·체결·청산·펀딩비를 24시간 수집하는 시스템의 설계와 구현</p>
     
     <div class="abstract">
-        <div class="abstract-title">Abstract</div>
+        <div class="abstract-title">요약</div>
         <p class="body-text" style="margin-bottom:0;">
-        본 글은 학술 논문 수준의 암호화폐 시장 미시구조(market microstructure) 데이터를 수집하기 위해 설계된 
-        실시간 데이터 파이프라인의 아키텍처를 기술한다. 
-        바이낸스 WebSocket API를 통해 100ms 단위 오더북 diff, 집계 체결(aggTrade), 청산(forceOrder), 
-        1분봉 캔들(kline), 펀딩비(funding rate)를 24시간 무중단으로 수집하며, 
-        바이낸스 공식 오더북 관리 가이드라인에 따른 lastUpdateId 시퀀스 검증을 통해 
-        오더북 상태의 정확한 재구성을 보장한다. 
-        이중 타임스탬프(거래소 서버 시각 + 로컬 수신 시각), SHA-256 체크섬, NTP 동기화 모니터링 등 
-        학술 데이터 무결성 요건을 충족하도록 설계되었다.
+        이 글은 논문에 쓸 수 있는 수준의 암호화폐 시장 미시구조(market microstructure) 데이터를 모으려고 만든
+        실시간 데이터 파이프라인의 구조를 설명한다.
+        바이낸스 WebSocket API로 100ms 단위 오더북 diff, 집계 체결(aggTrade), 청산(forceOrder),
+        1분봉 캔들(kline), 펀딩비(funding rate)를 24시간 멈추지 않고 수집한다.
+        오더북은 바이낸스 공식 가이드라인에 따라 lastUpdateId 시퀀스를 검증하며 재구성하고,
+        시퀀스가 끊기면 스냅샷부터 다시 받는다.
+        나중에 데이터를 검증할 수 있도록 이중 타임스탬프(거래소 서버 시각 + 로컬 수신 시각),
+        SHA-256 체크섬, NTP 시간 동기화 기록도 함께 남긴다.
         </p>
     </div>
     
@@ -124,7 +124,7 @@ description: "바이낸스 WebSocket으로 오더북·체결·청산·캔들·�
 
     <h2 class="section-header">연구 활용: 이 데이터로 무엇을 할 수 있는가</h2>
 
-    <p class="body-text">본 시스템이 수집하는 6종의 데이터는 암호화폐 시장 미시구조 연구의 핵심 원재료이다. 아래는 각 데이터 유형별로 가능한 연구 주제와 전략, 그리고 실제 학술 논문에서 활용되는 방법론을 정리한 것이다.</p>
+    <p class="body-text">이 시스템이 수집하는 6종의 데이터는 암호화폐 시장 미시구조 연구의 핵심 재료다. 아래에 데이터 유형별로 가능한 연구 주제와 전략, 실제 논문에서 쓰는 방법론을 정리했다.</p>
 
     <div class="subsection">수집 가능 데이터 → 연구 주제 매핑</div>
 
@@ -133,7 +133,7 @@ description: "바이낸스 WebSocket으로 오더북·체결·청산·캔들·�
         <tr>
             <td><span class="badge badge-blue">오더북</span> 100ms L20</td>
             <td>유동성 측정 (bid-ask spread, depth imbalance)<br>가격 충격 모델 (Kyle's Lambda)<br>오더북 불균형 기반 단기 예측</td>
-            <td>Cont, Stoikov & Talreja (2010)<br>Kyle (1985)<br>Cao, Chen & Gould (2009)</td>
+            <td>Cont, Stoikov & Talreja (2010)<br>Kyle (1985)<br>Cao, Hansch & Wang (2009)</td>
         </tr>
         <tr>
             <td><span class="badge badge-green">체결 (aggTrade)</span></td>
@@ -172,19 +172,19 @@ description: "바이낸스 WebSocket으로 오더북·체결·청산·캔들·�
 
     <div class="callout">
         <div class="callout-header">📝 Strategy 2 — Hawkes Process 기반 체결 클러스터링</div>
-        <p class="body-text" style="margin-bottom:8px;">암호화폐 체결 데이터의 자기 흥분(self-exciting) 특성을 Hawkes process로 모델링한다. 체결이 체결을 유발하는 피드백 루프의 강도(branching ratio)를 추정하고, 이를 통해 시장의 내생적 변동성과 외생적 충격을 분리한다.</p>
+        <p class="body-text" style="margin-bottom:8px;">암호화폐 체결 데이터의 자기 흥분(self-exciting) 특성을 Hawkes process로 모델링한다. 체결이 다음 체결을 부르는 피드백 루프의 강도(branching ratio)를 추정하고, 이 값으로 시장 안에서 생긴 내생적 변동성과 외부에서 온 충격을 구분한다.</p>
         <p style="font-size:13px; color:var(--wsj-gray);">필요 데이터: 체결 (밀리초 정밀도) | 방법론: MLE, EM Algorithm | 참고: Bacry, Mastromatteo & Muzy (2015)</p>
     </div>
 
     <div class="callout">
         <div class="callout-header">📝 Strategy 3 — 청산 캐스케이드와 가격 급락 예측</div>
-        <p class="body-text" style="margin-bottom:8px;">선물 시장의 강제 청산(forceOrder) 데이터를 활용하여 레버리지 캐스케이드를 탐지한다. 단위 시간당 청산 건수/금액이 임계값을 초과할 때 추가 가격 하락이 발생하는지, 그리고 이를 실시간으로 감지하여 리스크 관리에 활용할 수 있는지 검증한다.</p>
+        <p class="body-text" style="margin-bottom:8px;">선물 시장의 강제 청산(forceOrder) 데이터로 레버리지 캐스케이드를 찾는다. 단위 시간당 청산 건수나 금액이 임계값을 넘을 때 가격이 더 떨어지는지, 이를 실시간으로 감지해 리스크 관리에 쓸 수 있는지 검증한다.</p>
         <p style="font-size:13px; color:var(--wsj-gray);">필요 데이터: 청산 + 체결 + 오더북 | 방법론: Event Study, Threshold Model | 참고: Brunnermeier & Pedersen (2009)</p>
     </div>
 
     <div class="callout">
         <div class="callout-header">📝 Strategy 4 — 펀딩비 기반 선물-현물 차익거래</div>
-        <p class="body-text" style="margin-bottom:8px;">바이낸스 무기한 선물의 펀딩비(8시간 주기)가 양수일 때 현물 매수 + 선물 매도, 음수일 때 반대 포지션을 취하는 캐리 트레이드 전략을 백테스트한다. 펀딩비의 평균 회귀 특성과 극단값에서의 수익률을 분석한다.</p>
+        <p class="body-text" style="margin-bottom:8px;">바이낸스 무기한 선물의 펀딩비(8시간 주기)가 양수일 때 현물 매수 + 선물 매도, 음수일 때 반대 포지션을 취하는 캐리 트레이드 전략을 백테스트한다. 펀딩비의 평균 회귀 특성과, 펀딩비가 극단적일 때의 수익률을 분석한다.</p>
         <p style="font-size:13px; color:var(--wsj-gray);">필요 데이터: 펀딩비 + 1분봉 | 방법론: Mean Reversion, Pairs Trading | 참고: Alexander & Heck (2020)</p>
     </div>
 
@@ -196,12 +196,12 @@ description: "바이낸스 WebSocket으로 오더북·체결·청산·캔들·�
 
     <div class="callout">
         <div class="callout-header">📝 Strategy 6 — VPIN 기반 정보 비대칭 측정</div>
-        <p class="body-text" style="margin-bottom:8px;">Volume-Synchronized Probability of Informed Trading (VPIN)을 암호화폐 체결 데이터에 적용한다. VPIN이 급등하는 시점이 가격 급변 이전에 나타나는지 검증하고, 이를 실시간 리스크 지표로 활용할 수 있는지 분석한다.</p>
+        <p class="body-text" style="margin-bottom:8px;">Volume-Synchronized Probability of Informed Trading (VPIN)을 암호화폐 체결 데이터에 적용한다. VPIN 급등이 가격 급변보다 먼저 나타나는지 검증하고, 실시간 리스크 지표로 쓸 수 있는지 분석한다.</p>
         <p style="font-size:13px; color:var(--wsj-gray);">필요 데이터: 체결 (is_buyer_maker 필드 활용) | 방법론: Bulk Volume Classification | 참고: Easley, López de Prado & O'Hara (2012)</p>
     </div>
 
     <div class="formula-box">
-        <div class="formula-label">SCI 논문 작성 시 데이터 활용 가이드</div>
+        <div class="formula-label">논문에 쓸 때의 데이터 활용 가이드</div>
         <div class="formula-content">
             1. 데이터 수집 기간: 최소 3개월 (계절성, 레짐 변화 포착)<br>
             2. 무결성 보고: SHA-256 체크섬, 커버리지 비율, 갭 통계 명시<br>
@@ -209,14 +209,14 @@ description: "바이낸스 WebSocket으로 오더북·체결·청산·캔들·�
             4. 재현성: config.yaml + environment_recorder 메타데이터 공개<br>
             5. 데이터 접근: Parquet 파일 + checksums.json을 Zenodo 등에 공개
         </div>
-        <div class="formula-note">본 시스템의 이중 타임스탬프, 환경 메타데이터, 체크섬 기록은 SCI 저널의 데이터 무결성 요건을 충족하도록 설계되었다.</div>
+        <div class="formula-note">이중 타임스탬프, 환경 메타데이터, 체크섬 기록은 논문 심사에서 데이터의 출처와 무결성을 설명할 수 있도록 남긴다.</div>
     </div>
 
     <h2 class="section-header">I. 설계 동기</h2>
     
-    <p class="body-text">암호화폐 시장 미시구조 연구에서 가장 근본적인 과제는 데이터의 확보이다. 기존 학술 데이터 제공업체(Refinitiv, Bloomberg)는 전통 금융시장에 특화되어 있으며, 암호화폐 거래소의 틱 단위 오더북 데이터를 제공하지 않는다. Binance Vision(data.binance.vision)이 과거 데이터를 제공하지만, 실시간 오더북 재구성 데이터나 수신 레이턴시 정보는 포함되지 않는다.</p>
+    <p class="body-text">암호화폐 시장 미시구조 연구에서 가장 먼저 부딪히는 문제는 데이터를 구하는 일이다. Refinitiv, Bloomberg 같은 기존 학술 데이터 제공업체는 전통 금융시장 중심이라 암호화폐 거래소의 틱 단위 오더북 데이터를 제공하지 않는다. Binance Vision(data.binance.vision)에서 과거 데이터를 받을 수 있지만, 실시간으로 재구성한 오더북이나 수신 레이턴시 정보는 들어 있지 않다.</p>
 
-    <p class="body-text">본 시스템은 이러한 한계를 해결하기 위해 설계되었다. 핵심 설계 원칙은 세 가지이다: (1) 바이낸스 공식 오더북 관리 가이드라인의 엄격한 준수, (2) 구형 PC 환경을 고려한 최소 자원 사용(단일 프로세스, asyncio 기반), (3) SCI 논문 수준의 데이터 무결성 보장.</p>
+    <p class="body-text">이 시스템은 그 빈자리를 메우려고 만들었다. 설계 원칙은 세 가지다. (1) 바이낸스 공식 오더북 관리 가이드라인을 그대로 따른다. (2) 구형 PC에서도 돌아가도록 자원을 적게 쓴다(단일 프로세스, asyncio 기반). (3) 논문에서 데이터 무결성을 입증할 수 있도록 검증 기록을 남긴다.</p>
 
     <div class="callout">
         <div class="callout-header">📊 수집 데이터 유형</div>
@@ -235,7 +235,7 @@ description: "바이낸스 WebSocket으로 오더북·체결·청산·캔들·�
     
     <div class="subsection">2.1 전체 구조</div>
     
-    <p class="body-text">시스템은 Python asyncio 기반의 단일 프로세스 애플리케이션으로, 11개의 독립 모듈이 asyncio.gather를 통해 동시 실행된다. 각 모듈은 명확한 책임 경계를 가지며, 의존성 주입(dependency injection) 패턴으로 결합된다.</p>
+    <p class="body-text">시스템은 Python asyncio로 만든 단일 프로세스 애플리케이션이다. 11개 모듈로 이루어져 있고, 계속 돌아야 하는 작업은 asyncio.gather로 동시에 실행된다. 모듈마다 맡은 일이 분명히 나뉘어 있으며, 의존성 주입(dependency injection) 방식으로 연결된다.</p>
 
     <div class="chart-section">
         <div class="chart-title">System Architecture — Data Flow</div>
@@ -310,13 +310,13 @@ description: "바이낸스 WebSocket으로 오더북·체결·청산·캔들·�
         </div>
     </div>
 
-    <p class="body-text">Collector는 바이낸스 Spot WebSocket과 Futures WebSocket에 동시 연결하여 메시지를 수신한다. depth_diff 메시지는 OrderBookManager로 전달되어 lastUpdateId 시퀀스 검증 후 오더북 상태가 갱신된다. 갱신된 상위 20호가 스냅샷과 aggTrade, kline, forceOrder 데이터가 DataBuffer에 적재된다. Flusher가 1시간 주기로 Buffer에서 데이터를 가져와 Parquet 파일로 저장하고, SHA-256 체크섬을 자동 기록한다. Syncer가 새 파일을 클라우드에 업로드하고, 7일 경과 + 동기화 완료된 로컬 파일을 삭제한다.</p>
+    <p class="body-text">Collector는 바이낸스 Spot WebSocket과 Futures WebSocket에 동시에 연결해 메시지를 받는다. depth_diff 메시지는 OrderBookManager로 넘어가 lastUpdateId 시퀀스를 검증한 뒤 오더북에 반영된다. 갱신된 상위 20호가 스냅샷과 aggTrade, kline, forceOrder 데이터는 DataBuffer에 쌓인다. Flusher는 1시간마다 버퍼의 데이터를 꺼내 Parquet 파일로 저장하고 SHA-256 체크섬을 기록한다. Syncer는 새 파일을 클라우드에 올리고, 7일이 지났으며 동기화도 끝난 로컬 파일을 지운다.</p>
 
     <h2 class="section-header">III. 핵심 알고리즘</h2>
     
     <div class="subsection">3.1 오더북 재구성 (LOB Reconstruction)</div>
     
-    <p class="body-text">바이낸스 오더북 재구성은 공식 가이드라인에 따라 REST 스냅샷과 WebSocket diff를 결합하는 방식으로 이루어진다. 이 과정에서 가장 중요한 것은 lastUpdateId 시퀀스의 연속성 검증이다.</p>
+    <p class="body-text">바이낸스 오더북은 공식 가이드라인대로 REST 스냅샷에 WebSocket diff를 이어 붙여 재구성한다. 이 과정에서 가장 중요한 것은 lastUpdateId 시퀀스가 끊기지 않았는지 확인하는 일이다.</p>
 
     <div class="formula-box">
         <div class="formula-label">시퀀스 검증 규칙</div>
@@ -349,11 +349,11 @@ description: "바이낸스 WebSocket으로 오더북·체결·청산·캔들·�
     state.last_update_id = event.final_update_id
     <span class="code-kw">return</span> self.<span class="code-fn">get_top_levels</span>(symbol, levels=<span class="code-num">20</span>)</div>
 
-    <p class="body-text">갭이 감지되면 해당 심볼의 initialized 플래그가 False로 설정되고, Collector의 메시지 핸들러에서 이를 감지하여 즉시 REST 스냅샷을 재요청한다. 이 자동 재초기화 메커니즘은 네트워크 불안정 상황에서도 오더북 정확성을 유지하는 핵심 장치이다.</p>
+    <p class="body-text">갭이 감지되면 해당 심볼의 initialized 플래그가 False가 된다. Collector의 메시지 핸들러가 이를 보고 바로 REST 스냅샷을 다시 요청한다. 네트워크가 불안정해도 오더북이 틀어지지 않게 막는 핵심 장치가 이 자동 재초기화다.</p>
 
     <div class="subsection">3.2 이중 타임스탬프 (Dual Timestamp)</div>
     
-    <p class="body-text">모든 수신 데이터에는 두 개의 시각 정보가 기록된다: 바이낸스 서버의 이벤트 발생 시각(event_time, 밀리초)과 로컬 머신의 수신 시각(recv_time, Unix timestamp). 이 차이값(recv_time - event_time/1000)이 네트워크 레이턴시의 근사치가 되며, 논문에서 시장 미시구조 분석 시 레이턴시 보정에 활용할 수 있다.</p>
+    <p class="body-text">모든 수신 데이터에는 시각이 두 개 기록된다. 하나는 바이낸스 서버에서 이벤트가 발생한 시각(event_time, 밀리초)이고, 다른 하나는 로컬 머신이 데이터를 받은 시각(recv_time, Unix timestamp)이다. 두 값의 차이(recv_time - event_time/1000)는 네트워크 레이턴시의 근삿값이므로, 시장 미시구조를 분석할 때 레이턴시를 보정하는 데 쓸 수 있다.</p>
 
     <div class="formula-box">
         <div class="formula-label">레이턴시 추정</div>
@@ -361,12 +361,12 @@ description: "바이낸스 WebSocket으로 오더북·체결·청산·캔들·�
             latency ≈ recv_time − (event_time / 1000)<br>
             NTP offset 보정: latency_corrected = latency − ntp_offset
         </div>
-        <div class="formula-note">TimeSyncMonitor가 10분 주기로 NTP 오프셋과 바이낸스 서버 RTT를 측정하여 보정 데이터를 제공한다.</div>
+        <div class="formula-note">TimeSyncMonitor가 10분마다 NTP 오프셋과 바이낸스 서버 RTT를 측정해 보정에 쓸 값을 남긴다.</div>
     </div>
 
     <div class="subsection">3.3 재연결 및 장애 복구</div>
     
-    <p class="body-text">24/7 무중단 수집에서 WebSocket 연결 끊김은 불가피하다. 시스템은 지수 백오프(exponential backoff) 전략으로 자동 재연결을 수행하며, 재연결 성공 시 모든 심볼의 오더북 스냅샷을 재초기화한다.</p>
+    <p class="body-text">24시간 수집하다 보면 WebSocket 연결은 언젠가 끊긴다. 시스템은 지수 백오프(exponential backoff) 방식으로 자동 재연결하고, 재연결에 성공하면 모든 심볼의 오더북 스냅샷을 새로 받는다.</p>
 
     <div class="chart-section">
         <div class="chart-title">Exponential Backoff — Reconnection Delay</div>
@@ -388,7 +388,7 @@ description: "바이낸스 WebSocket으로 오더북·체결·청산·캔들·�
     
     <div class="subsection">4.1 Parquet 스키마</div>
     
-    <p class="body-text">모든 데이터는 Apache Parquet 형식으로 저장된다. Parquet는 열 지향(columnar) 포맷으로, 대량의 시계열 데이터에 대해 높은 압축률과 빠른 분석 쿼리 성능을 제공한다. snappy 압축을 적용하여 저장 공간을 절약하면서도 읽기 속도를 유지한다.</p>
+    <p class="body-text">모든 데이터는 Apache Parquet 형식으로 저장한다. Parquet는 열 지향(columnar) 포맷이라 대량의 시계열 데이터를 높은 압축률로 저장하고 빠르게 조회할 수 있다. snappy 압축을 써서 저장 공간을 줄이면서 읽기 속도도 유지한다.</p>
 
     <table class="data-table">
         <tr><th>파일명 패턴</th><th>내용</th><th>주요 컬럼</th></tr>
@@ -401,10 +401,10 @@ description: "바이낸스 WebSocket으로 오더북·체결·청산·캔들·�
 
     <div class="subsection">4.2 무결성 보장</div>
     
-    <p class="body-text">학술 데이터의 신뢰성을 보장하기 위해 세 가지 무결성 메커니즘을 적용한다.</p>
+    <p class="body-text">연구 데이터로 믿고 쓸 수 있도록 무결성 장치를 세 가지 둔다.</p>
 
     <div class="formula-box">
-        <div class="formula-label">무결성 3중 보장</div>
+        <div class="formula-label">무결성 장치 3가지</div>
         <div class="formula-content">
             1. 원자적 쓰기: tmpfile → os.replace() (중간 상태 파일 방지)<br>
             2. SHA-256 체크섬: 모든 Parquet 파일의 해시를 checksums.json에 기록<br>
@@ -415,7 +415,7 @@ description: "바이낸스 WebSocket으로 오더북·체결·청산·캔들·�
 
     <h2 class="section-header">V. 실측 데이터</h2>
     
-    <p class="body-text">시스템의 실제 동작을 검증하기 위해 3분간 수집 테스트를 수행하였다. 대상 심볼은 BTCUSDT, ETHUSDT, XRPUSDT이며, 바이낸스 Spot WebSocket에 연결하여 depth@100ms, aggTrade, kline_1m 스트림을 수신하였다.</p>
+    <p class="body-text">시스템이 실제로 동작하는지 확인하려고 3분간 수집 테스트를 했다. 대상 심볼은 BTCUSDT, ETHUSDT, XRPUSDT이고, 바이낸스 Spot WebSocket에 연결해 depth@100ms, aggTrade, kline_1m 스트림을 받았다.</p>
 
     <div class="chart-section">
         <div class="chart-title">3-Minute Collection Test — Records by Symbol</div>
@@ -431,7 +431,7 @@ description: "바이낸스 WebSocket으로 오더북·체결·청산·캔들·�
         <tr style="font-weight:700; border-top:2px solid #111;"><td>합계</td><td class="num">4,977</td><td class="num">4,635</td><td class="num">9</td><td class="num">9,621</td></tr>
     </table>
 
-    <p class="body-text">3분간 총 9,621건의 레코드가 수집되었다. BTC의 체결 건수(2,922건)가 가장 많으며, 이는 BTC의 높은 거래 활성도를 반영한다. 오더북 스냅샷은 100ms 주기로 수신되므로 3분간 이론적 최대치는 1,800건이며, 실측값(1,796건)은 99.8%의 수신율을 보인다. 캔들은 확정된 1분봉만 기록하므로 3분간 심볼당 3건이 정확히 수집되었다.</p>
+    <p class="body-text">3분 동안 레코드 9,621건이 수집됐다. 체결 건수는 BTC가 2,922건으로 가장 많았는데, BTC 거래가 가장 활발하기 때문이다. 오더북 스냅샷은 100ms마다 들어오므로 3분간 이론상 최대 1,800건이다. BTC 실측값은 1,796건으로 수신율이 99.8%였다. 캔들은 확정된 1분봉만 기록하므로 심볼마다 정확히 3건씩 쌓였다.</p>
 
     <div class="chart-section">
         <div class="chart-title">BTC/USDT Orderbook Spread — Last 3 Snapshots</div>
@@ -447,16 +447,16 @@ description: "바이낸스 WebSocket으로 오더북·체결·청산·캔들·�
             <tr><td class="mono">88801360895</td><td class="num">68,347.87</td><td class="num">68,347.88</td><td class="num">$0.01</td></tr>
             <tr><td class="mono">88801360897</td><td class="num">68,347.87</td><td class="num">68,347.88</td><td class="num">$0.01</td></tr>
         </table>
-        <p style="font-size:13px; color:var(--wsj-gray); margin-top:10px;">BTC/USDT 스프레드 $0.01 — 바이낸스 최소 틱 사이즈와 일치하며, 오더북 재구성의 정확성을 확인할 수 있다.</p>
+        <p style="font-size:13px; color:var(--wsj-gray); margin-top:10px;">BTC/USDT 스프레드가 바이낸스 최소 틱 사이즈인 $0.01과 같다. 오더북이 제대로 재구성됐다는 정황이다.</p>
     </div>
 
     <h2 class="section-header">VI. 테스트 전략</h2>
     
-    <p class="body-text">시스템의 정확성은 107개의 자동화된 테스트로 검증된다. 테스트는 크게 두 가지 방법론으로 구성된다: 속성 기반 테스트(Property-Based Testing, PBT)와 단위 테스트(Unit Testing).</p>
+    <p class="body-text">시스템의 정확성은 자동화된 테스트 107개로 검증한다. 테스트는 속성 기반 테스트(Property-Based Testing, PBT)와 단위 테스트(Unit Testing) 두 가지로 나뉜다.</p>
 
     <div class="subsection">6.1 속성 기반 테스트 (Hypothesis)</div>
     
-    <p class="body-text">PBT는 임의의 입력을 대량 생성하여 시스템의 보편적 속성(invariant)이 항상 성립하는지 검증한다. 특정 예시가 아닌 "모든 유효한 입력에 대해 참이어야 하는 조건"을 테스트하므로, 개발자가 예상하지 못한 엣지 케이스를 발견할 수 있다.</p>
+    <p class="body-text">PBT는 임의의 입력을 대량으로 만들어, 시스템이 늘 지켜야 할 속성(invariant)이 성립하는지 확인한다. 특정 예시 대신 "유효한 입력이면 언제나 참이어야 하는 조건"을 테스트하므로, 개발자가 생각하지 못한 엣지 케이스를 찾을 수 있다.</p>
 
     <div class="chart-section">
         <div class="chart-title">Test Coverage — 16 Correctness Properties</div>
@@ -468,25 +468,25 @@ description: "바이낸스 WebSocket으로 오더북·체결·청산·캔들·�
         <tr><th>#</th><th>속성</th><th>검증 대상</th><th>테스트 파일</th></tr>
         <tr><td>P1</td><td>이중 타임스탬프 기록</td><td>모든 레코드에 event_time + recv_time 존재</td><td class="mono">test_collector.py</td></tr>
         <tr><td>P2</td><td>지수 백오프 범위</td><td>1초 ≤ delay ≤ 60초</td><td class="mono">test_collector.py</td></tr>
-        <tr><td>P3</td><td>시퀀스 연속성 검증</td><td>F ≤ X+1 ≤ L 규칙 준수</td><td class="mono">test_orderbook.py</td></tr>
-        <tr><td>P4</td><td>diff 적용 정확성</td><td>qty=0 제거, 비0 갱신, 미포함 불변</td><td class="mono">test_orderbook.py</td></tr>
-        <tr><td>P5</td><td>상위 N호가 정렬</td><td>bids 내림차순, asks 오름차순</td><td class="mono">test_orderbook.py</td></tr>
+        <tr><td>P3</td><td>시퀀스 연속성 검증</td><td>F ≤ X+1 ≤ L 규칙 준수</td><td class="mono">test_orderbook_manager.py</td></tr>
+        <tr><td>P4</td><td>diff 적용 정확성</td><td>qty=0 제거, 비0 갱신, 미포함 불변</td><td class="mono">test_orderbook_manager.py</td></tr>
+        <tr><td>P5</td><td>상위 N호가 정렬</td><td>bids 내림차순, asks 오름차순</td><td class="mono">test_orderbook_manager.py</td></tr>
         <tr><td>P6</td><td>버퍼 데이터 격리</td><td>심볼/타입 간 교차 오염 없음</td><td class="mono">test_buffer.py</td></tr>
         <tr><td>P7</td><td>플러시 후 버퍼 비움</td><td>flush 후 빈 버퍼 + 전체 데이터 반환</td><td class="mono">test_buffer.py</td></tr>
         <tr><td>P8</td><td>파일명 형식 준수</td><td>정규식 패턴 매칭</td><td class="mono">test_flusher.py</td></tr>
         <tr><td>P9</td><td>파일 삭제 조건</td><td>7일 경과 + 동기화 완료만 삭제</td><td class="mono">test_syncer.py</td></tr>
-        <tr><td>P10</td><td>통계 JSON 라운드트립</td><td>직렬화 → 역직렬화 동일성</td><td class="mono">test_integrity.py</td></tr>
-        <tr><td>P11</td><td>갭 정보 완전성</td><td>timestamp, symbol, expected_id, actual_id 필수</td><td class="mono">test_integrity.py</td></tr>
+        <tr><td>P10</td><td>통계 JSON 라운드트립</td><td>직렬화 → 역직렬화 동일성</td><td class="mono">test_integrity_logger.py</td></tr>
+        <tr><td>P11</td><td>갭 정보 완전성</td><td>timestamp, symbol, expected_id, actual_id 필수</td><td class="mono">test_integrity_logger.py</td></tr>
         <tr><td>P12</td><td>설정 YAML 라운드트립</td><td>Config → YAML → Config 동일성</td><td class="mono">test_config.py</td></tr>
-        <tr><td>P13</td><td>텔레그램 전송 실패 격리</td><td>예외 발생해도 호출자에 전파 안 됨</td><td class="mono">test_telegram.py</td></tr>
+        <tr><td>P13</td><td>텔레그램 전송 실패 격리</td><td>예외 발생해도 호출자에 전파 안 됨</td><td class="mono">test_telegram_reporter.py</td></tr>
         <tr><td>P14</td><td>체크섬 일관성</td><td>SHA-256 재계산 = 기록값</td><td class="mono">test_checksum.py</td></tr>
-        <tr><td>P15</td><td>민감정보 마스킹</td><td>telegram_bot_token → "***"</td><td class="mono">test_environment.py</td></tr>
-        <tr><td>P16</td><td>커버리지 비율 범위</td><td>0.0 ≤ coverage ≤ 1.0</td><td class="mono">test_coverage.py</td></tr>
+        <tr><td>P15</td><td>민감정보 마스킹</td><td>telegram_bot_token → "***"</td><td class="mono">test_environment_recorder.py</td></tr>
+        <tr><td>P16</td><td>커버리지 비율 범위</td><td>0.0 ≤ coverage ≤ 1.0</td><td class="mono">test_integrity_logger.py</td></tr>
     </table>
 
     <h2 class="section-header">VII. 용량 추정</h2>
     
-    <p class="body-text">24/7 운영 시 저장 용량을 추정하기 위해 3분 실측 데이터를 기반으로 외삽(extrapolation)하였다. snappy 압축 적용 시 Parquet 파일의 압축률은 원본 대비 약 3~5배이다.</p>
+    <p class="body-text">24시간 운영할 때 필요한 저장 용량은 3분 실측 데이터를 늘려 잡아(외삽, extrapolation) 추정했다. snappy 압축을 쓰면 Parquet 파일은 원본보다 약 3~5배 작아진다.</p>
 
     <div class="chart-section">
         <div class="chart-title">Storage Estimation — Daily / Monthly / Quarterly</div>
@@ -503,9 +503,9 @@ description: "바이낸스 WebSocket으로 오더북·체결·청산·캔들·�
 
     <div class="limitation-box">
         <div class="limitation-header">⚠️ 용량 관리 전략</div>
-        <p>rclone을 통해 Google Drive, S3 등 클라우드에 자동 동기화하고, 로컬에는 7일치만 유지한다. 
-        3개월 수집 시 약 112GB가 필요하므로, 클라우드 스토리지 용량을 사전에 확보해야 한다. 
-        오더북 깊이(현재 상위 20호가)를 줄이면 용량을 크게 절감할 수 있다.</p>
+        <p>rclone으로 Google Drive, S3 같은 클라우드에 자동 동기화하고, 로컬에는 7일치만 남긴다.
+        3개월 수집하면 약 112GB가 필요하므로 클라우드 용량을 미리 확보해야 한다.
+        저장하는 오더북 깊이(현재 상위 20호가)를 줄이면 용량을 크게 줄일 수 있다.</p>
     </div>
 
     <h2 class="section-header">VIII. 운영 설정</h2>
@@ -583,7 +583,7 @@ description: "바이낸스 WebSocket으로 오더북·체결·청산·캔들·�
 
     <div class="subsection">10.1 체결 데이터 (aggTrade)</div>
 
-    <p class="body-text">아래는 3분 수집 테스트에서 실제로 기록된 BTC/USDT 체결 데이터의 처음 5건이다. 각 레코드에는 거래소 서버 시각(trade_time)과 로컬 수신 시각(recv_time)이 이중으로 기록되며, datetime_utc 컬럼은 사람이 읽을 수 있는 형태로 변환한 것이다.</p>
+    <p class="body-text">아래는 3분 수집 테스트에서 실제로 기록된 BTC/USDT 체결 데이터의 처음 5건이다. 레코드마다 거래소 서버 시각(trade_time)과 로컬 수신 시각(recv_time)이 함께 기록되고, datetime_utc 컬럼은 이를 사람이 읽기 쉬운 형태로 바꾼 것이다.</p>
 
     <div style="overflow-x:auto;">
     <table class="data-table">
@@ -641,7 +641,7 @@ description: "바이낸스 WebSocket으로 오더북·체결·청산·캔들·�
 
     <div class="subsection">10.2 오더북 스냅샷</div>
 
-    <p class="body-text">오더북 데이터는 100ms 주기로 수신되며, 각 스냅샷에는 상위 20호가의 매수/매도 가격과 수량이 기록된다. 아래는 첫 번째 스냅샷의 상위 5호가이다.</p>
+    <p class="body-text">오더북 데이터는 100ms마다 들어오고, 스냅샷마다 상위 20호가의 매수·매도 가격과 수량이 기록된다. 아래는 첫 번째 스냅샷의 상위 5호가다.</p>
 
     <div style="display:grid; grid-template-columns:1fr 1fr; gap:20px; margin:20px 0;">
         <div>
@@ -677,11 +677,11 @@ description: "바이낸스 WebSocket으로 오더북·체결·청산·캔들·�
 
     <div class="conclusion-box">
         <h2 class="section-header">XI. 결론</h2>
-        <p class="body-text">본 시스템은 학술 연구 목적의 암호화폐 시장 미시구조 데이터 수집을 위해 설계되었다. Python asyncio 기반의 단일 프로세스 아키텍처로 구형 PC에서도 24/7 무중단 운영이 가능하며, 바이낸스 공식 오더북 관리 가이드라인을 엄격히 준수하여 데이터의 정확성을 보장한다.</p>
+        <p class="body-text">이 시스템은 연구용 암호화폐 시장 미시구조 데이터를 모으려고 만들었다. Python asyncio 기반 단일 프로세스 구조라 구형 PC에서도 24시간 쉬지 않고 돌릴 수 있다. 오더북은 바이낸스 공식 가이드라인대로 시퀀스를 검증하며 재구성하고, 갭이 생기면 스냅샷부터 다시 받는다.</p>
 
-        <p class="body-text">이중 타임스탬프, SHA-256 체크섬, NTP 동기화 모니터링, 환경 메타데이터 기록 등 SCI 논문 수준의 데이터 무결성 요건을 충족하도록 설계되었으며, 16개의 정확성 속성(correctness property)과 107개의 자동화된 테스트로 시스템의 신뢰성을 검증하였다.</p>
+        <p class="body-text">이중 타임스탬프, SHA-256 체크섬, NTP 동기화 모니터링, 환경 메타데이터를 함께 기록해 논문에서 데이터 무결성을 입증할 근거를 남긴다. 정확성 속성(correctness property) 16개와 자동화된 테스트 107개로 시스템을 검증했다.</p>
 
-        <p class="body-text">rclone 기반 클라우드 동기화와 7일 로컬 보관 정책을 통해 장기 수집(3개월+)에도 로컬 디스크 부담 없이 운영할 수 있다. 텔레그램 알림을 통해 원격에서도 시스템 상태를 실시간으로 모니터링할 수 있다.</p>
+        <p class="body-text">rclone 클라우드 동기화와 7일 로컬 보관 정책 덕분에 3개월 이상 수집해도 로컬 디스크가 가득 차지 않는다. 텔레그램 알림으로 원격에서도 시스템 상태를 실시간으로 확인할 수 있다.</p>
     </div>
     
     <h2 class="section-header">XII. 기술 스택</h2>
