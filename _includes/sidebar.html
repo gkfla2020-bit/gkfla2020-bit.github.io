@@ -46,9 +46,14 @@
         <div class="nav-section nav-extra">
             <div class="nav-section-title">Recent Posts</div>
             <ul class="nav-list" id="nav-recent-list">
-                {% for post in site.posts limit:5 %}
+                {%- assign recent_shown = 0 -%}
+                {%- for post in site.posts -%}
+                {%- if recent_shown >= 5 %}{% break %}{% endif -%}
+                {%- unless post.categories contains 'private' or post.sitemap == false %}
                 <li><a href="{{ post.url }}"{% if page.url == post.url %} class="active"{% endif %}>{{ post.title | truncate: 30 }}</a></li>
-                {% endfor %}
+                {%- assign recent_shown = recent_shown | plus: 1 -%}
+                {%- endunless -%}
+                {%- endfor %}
             </ul>
         </div>
         <button class="nav-toggle" onclick="this.parentElement.classList.toggle('expanded');this.textContent=this.parentElement.classList.contains('expanded')?'Less ▴':'More ▾'" aria-label="Toggle navigation sections" aria-expanded="false">More ▾</button>
