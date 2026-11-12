@@ -73,12 +73,12 @@ description: "바이낸스 실시간 거래 데이터 수집기를 비전공자 
     </div>
 
     <h1 class="headline">바이낸스 데이터 수집기<br>처음부터 끝까지 이해하기</h1>
-    <p class="deck">"이 코드가 대체 뭘 하는 건데?" 라는 질문에 대한 완전한 답변.<br>프로그래밍 경험이 적어도 읽을 수 있도록 비유와 그림으로 설명합니다.</p>
+    <p class="deck">"이 코드가 대체 뭘 하는 건데?" 라는 질문에 대한 완전한 답변.<br>프로그래밍 경험이 적어도 읽을 수 있도록 비유와 그림으로 설명한다.</p>
 
     <div class="abstract">
         <div class="abstract-title">이 글의 목표</div>
         <p class="body-text" style="margin-bottom:0;">
-        이 프로젝트는 12개의 파이썬 파일로 구성되어 있다. main.py를 열면 12줄의 import가 나오고, 처음 보면 "이게 다 뭐지?" 싶다. 이 글은 그 12개 파일이 각각 무슨 역할을 하는지, 왜 필요한지, 어떻게 서로 연결되는지를 <strong>비유</strong>를 통해 설명한다. 코드를 한 줄도 몰라도 전체 구조를 이해할 수 있도록 쓰여졌다.
+        이 프로젝트는 12개의 파이썬 파일로 구성되어 있다. main.py를 열면 12줄의 import가 나오고, 처음 보면 "이게 다 뭐지?" 싶다. 이 글은 그 12개 파일이 각각 무슨 역할을 하는지, 왜 필요한지, 어떻게 서로 연결되는지를 <strong>비유</strong>로 설명한다. 코드를 한 줄도 몰라도 전체 구조를 이해할 수 있게 썼다.
         </p>
     </div>
 
@@ -97,7 +97,7 @@ description: "바이낸스 실시간 거래 데이터 수집기를 비전공자 
         <tr><td>펀딩비 (Funding Rate)</td><td>선물 시장의 "이자율" 같은 것</td><td>8시간마다</td></tr>
     </table>
 
-    <p class="body-text">이 데이터들을 실시간으로 받아서, 컴퓨터 파일로 저장하고, 클라우드에 백업하고, 문제가 생기면 텔레그램으로 알려주는 것. 그게 이 프로그램의 전부다.</p>
+    <p class="body-text">이 데이터를 실시간으로 받아 파일로 저장하고, 클라우드에 백업하고, 문제가 생기면 텔레그램으로 알려 준다. 이 프로그램이 하는 일은 그게 전부다.</p>
 
     <div class="analogy-box">
         <div class="analogy-label">🏪 비유: 편의점 CCTV</div>
@@ -112,7 +112,7 @@ description: "바이낸스 실시간 거래 데이터 수집기를 비전공자 
         </div>
     </div>
 
-    <h2 class="section-header">12개 파일, 각각 뭐하는 놈인가</h2>
+    <h2 class="section-header">12개 파일은 각각 무슨 일을 하나</h2>
 
     <p class="body-text">main.py를 열면 이런 코드가 나온다:</p>
 
@@ -144,7 +144,7 @@ description: "바이낸스 실시간 거래 데이터 수집기를 비전공자 
     <div class="step-box">
         <span class="step-number">2</span>
         <span class="step-title">models — 데이터의 "틀"</span>
-        <p class="body-text" style="margin-top:10px;">바이낸스에서 오는 데이터의 형태를 미리 정의해둔 것이다. "오더북 데이터에는 심볼, 시간, 가격 목록이 있다"처럼 데이터의 구조를 정해놓은 설계도.</p>
+        <p class="body-text" style="margin-top:10px;">바이낸스에서 오는 데이터의 형태를 미리 정의해둔 것이다. "오더북 데이터에는 심볼, 시간, 가격 목록이 있다"처럼 데이터의 구조를 정해 둔 설계도라고 보면 된다.</p>
         <div class="analogy-box" style="margin-bottom:0;">
             <div class="analogy-label">비유</div>
             <div class="analogy-text">엑셀 시트의 <strong>헤더 행</strong>. "이름 | 나이 | 주소" 같은 칸 제목을 미리 정해놓는 것.</div>
@@ -194,7 +194,7 @@ description: "바이낸스 실시간 거래 데이터 수집기를 비전공자 
     <div class="step-box">
         <span class="step-number">7</span>
         <span class="step-title">Syncer — 클라우드 백업</span>
-        <p class="body-text" style="margin-top:10px;">Flusher가 저장한 파일을 구글 드라이브나 AWS S3 같은 클라우드에 업로드한다. 업로드 실패하면 다음에 다시 시도한다. 7일 지나고 + 클라우드 백업 완료된 파일만 로컬에서 삭제한다.</p>
+        <p class="body-text" style="margin-top:10px;">Flusher가 저장한 파일을 구글 드라이브나 AWS S3 같은 클라우드에 업로드한다. 업로드에 실패하면 다음에 다시 시도한다. 로컬 파일은 7일이 지났고 클라우드 백업까지 끝난 것만 지운다.</p>
         <div class="analogy-box" style="margin-bottom:0;">
             <div class="analogy-label">비유</div>
             <div class="analogy-text">CCTV 영상을 <strong>클라우드에 자동 백업</strong>하는 기능. 백업 안 된 영상은 절대 삭제하지 않는다.</div>
@@ -214,7 +214,7 @@ description: "바이낸스 실시간 거래 데이터 수집기를 비전공자 
     <div class="step-box">
         <span class="step-number">9</span>
         <span class="step-title">TelegramReporter — 알림봇</span>
-        <p class="body-text" style="margin-top:10px;">시스템 시작, 연결 끊김, 재연결, 일별 요약 등을 텔레그램 메시지로 보내준다. 설정 안 하면 조용히 꺼져있고, 알림 전송이 실패해도 데이터 수집에는 영향 없다.</p>
+        <p class="body-text" style="margin-top:10px;">시스템 시작, 연결 끊김, 재연결, 일별 요약 등을 텔레그램 메시지로 보내준다. 설정하지 않으면 조용히 꺼져 있고, 알림 전송에 실패해도 데이터 수집에는 영향이 없다.</p>
         <div class="analogy-box" style="margin-bottom:0;">
             <div class="analogy-label">비유</div>
             <div class="analogy-text">CCTV가 꺼지면 <strong>핸드폰으로 알림</strong> 보내주는 기능. 알림이 안 와도 CCTV는 계속 녹화한다.</div>
@@ -244,27 +244,27 @@ description: "바이낸스 실시간 거래 데이터 수집기를 비전공자 
     <div class="step-box">
         <span class="step-number">12</span>
         <span class="step-title">EnvironmentRecorder — 환경 기록기</span>
-        <p class="body-text" style="margin-top:10px;">프로그램 시작할 때 딱 한 번 실행된다. "어떤 컴퓨터에서, 어떤 파이썬 버전으로, 어떤 설정으로 수집했는지"를 기록한다. 나중에 같은 조건으로 다시 수집하고 싶을 때 참고할 수 있다.</p>
+        <p class="body-text" style="margin-top:10px;">프로그램을 시작할 때 딱 한 번 실행된다. "어떤 컴퓨터에서, 어떤 파이썬 버전으로, 어떤 설정으로 수집했는지"를 기록한다. 나중에 같은 조건으로 다시 수집하고 싶을 때 참고할 수 있다.</p>
         <div class="analogy-box" style="margin-bottom:0;">
             <div class="analogy-label">비유</div>
             <div class="analogy-text">CCTV 설치 후 <strong>"설치 완료 보고서"</strong>를 작성하는 것. 카메라 모델, 설치 위치, 설정값 등을 기록.</div>
         </div>
     </div>
 
-    <h2 class="section-header">WebSocket이 뭔데?</h2>
+    <h2 class="section-header">WebSocket은 무엇인가</h2>
 
     <p class="body-text">보통 웹사이트를 볼 때는 이런 식이다:</p>
 
     <div class="formula-box">
         <div class="formula-label">일반 웹 요청 (REST API)</div>
         <div class="formula-content">
-            나: "지금 BTC 가격 알려줘" → 바이낸스: "68,347원이야"<br>
+            나: "지금 BTC 가격 알려줘" → 바이낸스: "68,347달러이야"<br>
             (1초 후)<br>
-            나: "지금 BTC 가격 알려줘" → 바이낸스: "68,348원이야"<br>
+            나: "지금 BTC 가격 알려줘" → 바이낸스: "68,348달러이야"<br>
             (1초 후)<br>
-            나: "지금 BTC 가격 알려줘" → 바이낸스: "68,346원이야"<br>
+            나: "지금 BTC 가격 알려줘" → 바이낸스: "68,346달러이야"<br>
             <br>
-            → 매번 내가 물어봐야 답을 준다. 비효율적.
+            → 매번 내가 물어봐야 답을 주니 비효율적이다.
         </div>
     </div>
 
@@ -273,13 +273,13 @@ description: "바이낸스 실시간 거래 데이터 수집기를 비전공자 
         <div class="formula-content">
             나: "BTC 데이터 실시간으로 보내줘" → 바이낸스: "알겠어, 연결 유지할게"<br>
             <br>
-            바이낸스 → 나: "68,347원에 0.5개 거래됨"<br>
-            바이낸스 → 나: "68,348원에 1.2개 거래됨"<br>
-            바이낸스 → 나: "오더북 변경: 68,346원에 매수 3개 추가"<br>
-            바이낸스 → 나: "68,347원에 0.1개 거래됨"<br>
+            바이낸스 → 나: "68,347달러에 0.5개 거래됨"<br>
+            바이낸스 → 나: "68,348달러에 1.2개 거래됨"<br>
+            바이낸스 → 나: "오더북 변경: 68,346달러에 매수 3개 추가"<br>
+            바이낸스 → 나: "68,347달러에 0.1개 거래됨"<br>
             ... (끊임없이 계속)<br>
             <br>
-            → 한 번 연결하면 바이낸스가 알아서 계속 보내준다. 효율적.
+            → 한 번 연결하면 바이낸스가 알아서 계속 보내 주니 효율적이다.
         </div>
     </div>
 
@@ -287,7 +287,7 @@ description: "바이낸스 실시간 거래 데이터 수집기를 비전공자 
 
     <p class="body-text">이 프로그램은 바이낸스에 WebSocket "전화"를 걸어서, 6개 코인(BTC, ETH, XRP, SOL, BNB, DOGE)의 데이터를 동시에 받는다. 하나의 전화선으로 18개 채널(6코인 × 3종류)을 동시에 듣는 셈이다.</p>
 
-    <h2 class="section-header">오더북이 뭔데? 왜 복잡한 거야?</h2>
+    <h2 class="section-header">오더북은 무엇이고, 왜 복잡한가</h2>
 
     <p class="body-text">오더북(Order Book)은 "지금 이 가격에 사고 싶다 / 팔고 싶다"는 주문들의 목록이다.</p>
 
@@ -296,11 +296,11 @@ description: "바이낸스 실시간 거래 데이터 수집기를 비전공자 
         <div class="formula-content">
             <span style="color:var(--wsj-red);">매도 (팔겠다)</span>                    <span style="color:var(--wsj-green);">매수 (사겠다)</span>
             ─────────────                ─────────────
-            68,350원 × 2.0개              68,347원 × 1.5개  ← 최우선 매수
-            68,349원 × 0.8개              68,346원 × 3.2개
-            68,348원 × 1.2개  ← 최우선 매도  68,345원 × 0.5개
+            68,350달러 × 2.0개              68,347달러 × 1.5개  ← 최우선 매수
+            68,349달러 × 0.8개              68,346달러 × 3.2개
+            68,348달러 × 1.2개  ← 최우선 매도  68,345달러 × 0.5개
             
-            스프레드 = 68,348 − 68,347 = 1원 (최우선 매도 − 최우선 매수)
+            스프레드 = 68,348 − 68,347 = 1달러 (최우선 매도 − 최우선 매수)
         </div>
     </div>
 
@@ -314,9 +314,9 @@ description: "바이낸스 실시간 거래 데이터 수집기를 비전공자 
             1단계: 처음에 전체 오더북을 한 번 보내줌 (REST API로 "스냅샷")<br>
             &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;→ "현재 오더북은 이렇게 생겼어"<br><br>
             2단계: 이후에는 변경된 부분만 보내줌 (WebSocket으로 "diff")<br>
-            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;→ "68,346원의 매수가 3.2개에서 4.0개로 바뀌었어"<br>
-            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;→ "68,351원에 새로운 매도 0.5개가 생겼어"<br>
-            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;→ "68,345원의 매수가 취소됐어 (수량 = 0)"
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;→ "68,346달러의 매수가 3.2개에서 4.0개로 바뀌었어"<br>
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;→ "68,351달러에 새로운 매도 0.5개가 생겼어"<br>
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;→ "68,345달러의 매수가 취소됐어 (수량 = 0)"
         </div>
     </div>
 
@@ -328,7 +328,7 @@ description: "바이낸스 실시간 거래 데이터 수집기를 비전공자 
         OrderBookManager는 매번 "번호가 연속인지" 확인한다. 갭이 발견되면 전체 오더북을 처음부터 다시 받아온다. 이게 "자동 재초기화"다.</p>
     </div>
 
-    <h2 class="section-header">asyncio가 뭔데? 왜 쓰는 거야?</h2>
+    <h2 class="section-header">asyncio는 무엇이고, 왜 쓰는가</h2>
 
     <p class="body-text">이 프로그램은 동시에 여러 가지 일을 해야 한다:</p>
 
@@ -358,7 +358,7 @@ description: "바이낸스 실시간 거래 데이터 수집기를 비전공자 
         </div>
     </div>
 
-    <p class="body-text">이 프로그램의 대부분의 작업은 "기다리는 시간"이 길다:</p>
+    <p class="body-text">이 프로그램이 하는 작업은 대부분 "기다리는 시간"이 길다:</p>
 
     <table class="data-table">
         <tr><th>작업</th><th>실제 계산 시간</th><th>기다리는 시간</th></tr>
@@ -382,9 +382,9 @@ tasks = [
 
     <p class="body-text"><code>asyncio.gather</code>는 "이 작업들을 전부 동시에 돌려라"라는 명령이다. 각 작업은 <code>await</code>를 만나면 "나 지금 기다리는 중이야, 다른 거 먼저 해"라고 양보한다.</p>
 
-    <h2 class="section-header">메모리 500MB 초과? 강제 플러시?</h2>
+    <h2 class="section-header">메모리가 500MB를 넘으면: 강제 플러시</h2>
 
-    <p class="body-text">데이터를 파일로 저장하기 전까지 컴퓨터 메모리(RAM)에 쌓아둔다고 했다. 보통은 1시간마다 저장하는데, 시장이 미친 듯이 활발하면 1시간 안에 메모리가 꽉 찰 수 있다.</p>
+    <p class="body-text">데이터를 파일로 저장하기 전까지 컴퓨터 메모리(RAM)에 쌓아둔다고 했다. 보통은 1시간마다 저장하지만, 거래가 폭주하면 1시간이 되기 전에 메모리가 꽉 찰 수 있다.</p>
 
     <div class="analogy-box">
         <div class="analogy-label">🪣 비유: 양동이에 물 받기</div>
@@ -394,7 +394,7 @@ tasks = [
             1시간마다 양동이를 비워서 큰 통(파일)에 옮긴다.<br><br>
             <strong>평소:</strong> 물이 졸졸 나옴 → 1시간 후 양동이 반쯤 참 → 비움<br>
             <strong>폭주:</strong> 물이 콸콸 나옴 → 30분만에 양동이 넘칠 것 같음 → <strong>바로 비움!</strong><br><br>
-            이 "바로 비움"이 강제 플러시다. 양동이가 넘치면(메모리 부족 = OOM) 프로그램이 죽으니까.
+            이 "바로 비움"이 강제 플러시다. 양동이가 넘치면(메모리 부족 = OOM) 프로그램이 죽기 때문이다.
         </div>
     </div>
 
@@ -409,7 +409,7 @@ tasks = [
 
     <h2 class="section-header">연결이 끊기면? — 자동 재연결</h2>
 
-    <p class="body-text">24시간 돌아가는 프로그램에서 인터넷 연결이 끊기는 건 피할 수 없다. 와이파이가 잠깐 끊기거나, 바이낸스 서버가 점검하거나. 이때 프로그램이 그냥 죽으면 안 된다.</p>
+    <p class="body-text">24시간 돌아가는 프로그램에서 인터넷 연결이 끊기는 건 피할 수 없다. 와이파이가 잠깐 끊길 수도 있고, 바이낸스 서버가 점검에 들어갈 수도 있다. 이때 프로그램이 그냥 죽으면 안 된다.</p>
 
     <div class="formula-box">
         <div class="formula-label">지수 백오프 (Exponential Backoff)</div>
@@ -422,14 +422,14 @@ tasks = [
             <br>
             성공하면 → 대기 시간을 다시 1초로 리셋
         </div>
-        <div class="formula-note">왜 바로 재연결하지 않고 기다릴까? 서버가 과부하 상태일 때 수천 개의 클라이언트가 동시에 재연결하면 서버가 더 죽는다. 기다리는 시간을 점점 늘려서 서버에 부담을 줄인다.</div>
+        <div class="formula-note">왜 바로 재연결하지 않고 기다릴까? 서버가 과부하 상태일 때 수천 개의 클라이언트가 한꺼번에 재연결하면 서버 부담이 더 커진다. 기다리는 시간을 점점 늘려 서버 부담을 줄인다.</div>
     </div>
 
-    <p class="body-text">재연결에 성공하면 두 가지를 한다: (1) 대기 시간을 1초로 리셋, (2) 모든 코인의 오더북을 처음부터 다시 받아온다. 연결이 끊긴 동안 놓친 변경 사항이 있으니까, 깨끗한 상태에서 다시 시작하는 거다.</p>
+    <p class="body-text">재연결에 성공하면 두 가지를 한다: (1) 대기 시간을 1초로 리셋, (2) 모든 코인의 오더북을 처음부터 다시 받아온다. 연결이 끊긴 동안 놓친 변경 사항이 있을 수 있으므로, 깨끗한 상태에서 다시 시작하는 것이다.</p>
 
-    <h2 class="section-header">Parquet가 뭔데? CSV 쓰면 안 돼?</h2>
+    <h2 class="section-header">Parquet는 무엇이고, CSV로는 안 되는가</h2>
 
-    <p class="body-text">CSV도 되긴 하는데, 데이터가 많아지면 Parquet가 훨씬 낫다.</p>
+    <p class="body-text">CSV로도 되지만, 데이터가 많아지면 Parquet가 훨씬 낫다.</p>
 
     <table class="data-table">
         <tr><th>비교</th><th>CSV</th><th>Parquet</th></tr>
@@ -440,7 +440,7 @@ tasks = [
         <tr><td>분석 도구</td><td>pandas, Excel</td><td>pandas, Spark, DuckDB 등</td></tr>
     </table>
 
-    <p class="body-text">1시간에 수만~수십만 건의 데이터가 쌓이므로, CSV로 저장하면 파일이 너무 커지고 분석할 때 느리다. Parquet는 snappy라는 압축을 적용해서 파일 크기를 1/5로 줄이면서도 읽기 속도는 빠르다.</p>
+    <p class="body-text">1시간에 수만~수십만 건의 데이터가 쌓이므로, CSV로 저장하면 파일이 너무 커지고 분석할 때 느리다. Parquet는 snappy라는 압축으로 파일 크기를 1/5로 줄이면서도 빠르게 읽을 수 있다.</p>
 
     <div class="analogy-box">
         <div class="analogy-label">📦 비유</div>
@@ -448,13 +448,13 @@ tasks = [
         Parquet = 물건을 종류별로 정리해서 라벨 붙여놓은 것. "가격"만 보고 싶으면 "가격" 서랍만 열면 된다.</div>
     </div>
 
-    <h2 class="section-header">원자적 쓰기? SHA-256? 무결성?</h2>
+    <h2 class="section-header">원자적 쓰기, SHA-256, 무결성</h2>
 
     <div class="subsection">원자적 쓰기 (Atomic Write)</div>
 
     <p class="body-text">파일을 저장하는 도중에 컴퓨터가 꺼지면 어떻게 될까? 반쪽짜리 파일이 남는다. 이 파일은 열 수도 없고, 데이터도 복구할 수 없다.</p>
 
-    <p class="body-text">이걸 방지하기 위해 "원자적 쓰기"를 사용한다:</p>
+    <p class="body-text">이를 막으려고 "원자적 쓰기"를 쓴다:</p>
 
     <div class="formula-box">
         <div class="formula-label">원자적 쓰기 과정</div>
@@ -582,7 +582,7 @@ tasks = [
     <div class="conclusion-box">
         <h2 class="section-header">정리</h2>
         <p class="body-text">이 프로그램은 결국 하나의 일을 한다: <strong>바이낸스에서 데이터를 받아서 파일로 저장한다.</strong></p>
-        <p class="body-text">그런데 "24시간 안정적으로, 데이터 하나도 안 빠뜨리고, 문제 생기면 알아서 복구하면서" 하려면 12개의 모듈이 필요한 것이다.</p>
+        <p class="body-text">그런데 "24시간 안정적으로, 데이터 하나도 안 빠뜨리고, 문제 생기면 알아서 복구하면서" 하려면 12개 모듈이 필요하다.</p>
         <p class="body-text">
             • Collector가 데이터를 받고<br>
             • OrderBookManager가 오더북을 조립하고<br>
@@ -592,6 +592,7 @@ tasks = [
             • IntegrityLogger가 품질을 감시하고<br>
             • TelegramReporter가 상태를 알려주고<br>
             • TimeSyncMonitor가 시계를 확인하고<br>
+            • FundingRateCollector가 펀딩비를 조회하고<br>
             • Config가 설정을 관리하고<br>
             • models가 데이터 형태를 정의하고<br>
             • EnvironmentRecorder가 환경을 기록하고<br>

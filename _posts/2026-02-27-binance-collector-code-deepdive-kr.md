@@ -85,11 +85,11 @@ description: "바이낸스 데이터 수집기 11개 모듈을 코드 레벨에�
     <div class="abstract">
         <div class="abstract-title">이 글에서 다루는 것</div>
         <p class="body-text" style="margin-bottom:0;">
-        <a href="/research/binance-hft-data-collector-kr/">이전 글</a>에서 시스템의 아키텍처와 설계 원리를 다루었다면,
-        이 글에서는 실제 코드를 한 줄씩 뜯어보며 "왜 이렇게 짰는가"를 설명한다.
+        <a href="/research/binance-hft-data-collector-kr/">이전 글</a>이 시스템의 구조와 설계 원리를 다뤘다면,
+        이 글은 실제 코드를 모듈별로 뜯어보며 "왜 이렇게 짰는가"를 설명한다.
         main.py의 모듈 초기화 구조, WebSocket 메시지 라우팅, 오더북 diff 적용 알고리즘,
         asyncio.Lock 기반 버퍼링, 원자적 Parquet 저장, rclone 클라우드 동기화까지 —
-        각 모듈의 핵심 코드와 설계 결정의 이유를 상세히 기술한다.
+        각 모듈의 핵심 코드와 설계 결정의 이유를 자세히 살펴본다.
         </p>
     </div>
 
@@ -102,7 +102,7 @@ description: "바이낸스 데이터 수집기 11개 모듈을 코드 레벨에�
 
     <h2 class="section-header">I. main.py — 엔트리포인트와 모듈 조립</h2>
 
-    <p class="body-text">시스템의 시작점인 main.py를 보면 12개의 import가 나열되어 있다. 처음 보면 압도적이지만, 각 import는 시스템의 한 가지 책임을 담당하는 독립 모듈이다. 이 구조를 이해하면 전체 시스템이 보인다.</p>
+    <p class="body-text">시스템의 시작점인 main.py를 보면 12개의 import가 나열되어 있다. 처음 보면 많아 보이지만, import 하나하나가 시스템에서 한 가지 일을 맡은 독립 모듈이다. 이 구조를 이해하면 전체 시스템이 보인다.</p>
 
     <div class="code-block"><span class="code-cm"># main.py — 모듈 임포트</span>
 <span class="code-kw">from</span> src.config <span class="code-kw">import</span> <span class="code-cls">Config</span>                <span class="code-cm"># ① 설정 로드</span>
@@ -118,7 +118,7 @@ description: "바이낸스 데이터 수집기 11개 모듈을 코드 레벨에�
 <span class="code-kw">from</span> src.time_sync_monitor <span class="code-kw">import</span> <span class="code-cls">TimeSyncMonitor</span>  <span class="code-cm"># ⑪ 시간 동기화</span>
 <span class="code-kw">from</span> src.environment_recorder <span class="code-kw">import</span> <span class="code-cls">EnvironmentRecorder</span> <span class="code-cm"># ⑫ 환경 기록</span></div>
 
-    <p class="body-text">이 12개 모듈은 크게 4개 레이어로 분류된다:</p>
+    <p class="body-text">이 중 설정(Config)과 데이터 모델(models)을 뺀 10개 모듈은 크게 4개 레이어로 나뉜다:</p>
 
     <table class="data-table">
         <tr><th>레이어</th><th>모듈</th><th>역할</th></tr>
@@ -130,7 +130,7 @@ description: "바이낸스 데이터 수집기 11개 모듈을 코드 레벨에�
 
     <div class="subsection">1.1 의존성 주입 패턴</div>
 
-    <p class="body-text">main.py에서 가장 중요한 부분은 모듈 간 연결 방식이다. 각 모듈은 생성자에서 필요한 의존성을 주입받는다. 이렇게 하면 테스트 시 mock 객체를 쉽게 주입할 수 있고, 모듈 간 결합도가 낮아진다.</p>
+    <p class="body-text">main.py에서 가장 중요한 부분은 모듈 간 연결 방식이다. 각 모듈은 필요한 의존성을 생성자에서 주입받는다. 이렇게 하면 테스트할 때 mock 객체를 쉽게 넣을 수 있고, 모듈 간 결합도가 낮아진다.</p>
 
     <div class="code-block"><span class="code-cm"># main.py — 모듈 초기화 (의존성 주입)</span>
 config = <span class="code-cls">Config</span>.<span class="code-fn">from_yaml</span>(<span class="code-str">"config.yaml"</span>)
@@ -232,7 +232,7 @@ tasks = [
 
     <h2 class="section-header">III. collector.py — WebSocket 수신과 메시지 라우팅</h2>
 
-    <p class="body-text">Collector는 시스템의 "귀"다. 바이낸스 WebSocket에 연결하여 초당 수백 건의 메시지를 수신하고, 메시지 유형에 따라 적절한 처리 모듈로 라우팅한다.</p>
+    <p class="body-text">Collector는 시스템의 "귀"다. 바이낸스 WebSocket에 연결해 초당 수백 건의 메시지를 받고, 메시지 유형에 맞는 처리 모듈로 보낸다(라우팅).</p>
 
     <div class="subsection">3.1 Combined Stream URL 생성</div>
 
@@ -295,12 +295,12 @@ tasks = [
 
     <div class="callout">
         <div class="callout-header">💡 recv_time을 왜 맨 처음에 기록하는가?</div>
-        <p class="body-text" style="margin-bottom:0;"><code>recv_time = time.time()</code>을 JSON 파싱 전에 호출한다. 파싱, 객체 생성, 오더북 diff 적용 등의 처리 시간이 수신 시각에 포함되면 레이턴시 측정이 부정확해지기 때문이다. 학술 데이터에서 마이크로초 단위의 정확성이 중요할 때 이 차이가 의미를 가진다.</p>
+        <p class="body-text" style="margin-bottom:0;"><code>recv_time = time.time()</code>을 JSON 파싱 전에 호출한다. 파싱, 객체 생성, 오더북 diff 적용 등의 처리 시간이 수신 시각에 포함되면 레이턴시 측정이 부정확해지기 때문이다. 연구 데이터에서 마이크로초 단위의 정확성이 중요할 때 이 차이가 의미 있다.</p>
     </div>
 
     <div class="subsection">3.3 지수 백오프 재연결</div>
 
-    <p class="body-text">WebSocket 연결이 끊기면 즉시 재연결을 시도하되, 반복 실패 시 대기 시간을 지수적으로 늘린다. 이는 서버에 과부하를 주지 않으면서도 빠른 복구를 보장하는 표준 패턴이다.</p>
+    <p class="body-text">WebSocket 연결이 끊기면 즉시 재연결을 시도하되, 반복 실패 시 대기 시간을 지수적으로 늘린다. 서버에 과부하를 주지 않으면서 빨리 복구하는 표준 패턴이다.</p>
 
     <div class="code-block"><span class="code-kw">async def</span> <span class="code-fn">_run_spot</span>(self) -> <span class="code-kw">None</span>:
     <span class="code-kw">while</span> <span class="code-kw">True</span>:  <span class="code-cm"># ← 영원히 재시도</span>
@@ -329,7 +329,7 @@ tasks = [
         <span class="code-kw">async for</span> raw_msg <span class="code-kw">in</span> ws:  <span class="code-cm"># 무한 수신 루프</span>
             <span class="code-kw">await</span> self.<span class="code-fn">_handle_message</span>(raw_msg)</div>
 
-    <p class="body-text">재연결 성공 시 두 가지 중요한 작업이 수행된다: (1) 백오프 딜레이를 1초로 리셋, (2) 모든 심볼의 오더북 스냅샷을 REST API로 다시 가져온다. 연결이 끊긴 동안 오더북 diff를 놓쳤으므로, 스냅샷부터 다시 시작해야 정확한 오더북을 유지할 수 있다.</p>
+    <p class="body-text">재연결에 성공하면 중요한 작업 두 가지를 한다. (1) 백오프 딜레이를 1초로 되돌리고, (2) 모든 심볼의 오더북 스냅샷을 REST API로 다시 가져온다. 연결이 끊긴 동안 오더북 diff를 놓쳤으므로, 스냅샷부터 다시 시작해야 정확한 오더북을 유지할 수 있다.</p>
 
     <h2 class="section-header">IV. orderbook_manager.py — 오더북 재구성의 핵심</h2>
 
@@ -399,7 +399,7 @@ tasks = [
 
     <div class="callout">
         <div class="callout-header">💡 Grace Period가 필요한 이유</div>
-        <p class="body-text" style="margin-bottom:0;">REST 스냅샷을 요청하는 동안에도 WebSocket diff는 계속 도착한다. 스냅샷의 lastUpdateId가 100인데, 스냅샷 응답이 도착하기 전에 이미 diff 101~105가 도착해서 버려진 상태일 수 있다. 이때 다음 diff가 106부터 시작하면 시퀀스 검증에 실패한다. 3초 grace period 동안은 이런 타이밍 이슈를 허용하고, 그 이후에도 검증 실패하면 진짜 갭으로 판단한다.</p>
+        <p class="body-text" style="margin-bottom:0;">REST 스냅샷을 요청하는 동안에도 WebSocket diff는 계속 도착한다. 스냅샷의 lastUpdateId가 100인데, 스냅샷 응답이 도착하기 전에 이미 diff 101~105가 도착해서 버려진 상태일 수 있다. 이때 다음 diff가 106부터 시작하면 시퀀스 검증에 실패한다. 3초 grace period 동안은 이런 타이밍 문제를 허용하고, 그 뒤에도 검증에 실패하면 진짜 갭으로 판단한다.</p>
     </div>
 
     <div class="subsection">4.3 diff 적용 — _apply_updates</div>
@@ -501,11 +501,11 @@ tasks = [
 
     <h2 class="section-header">VI. flusher.py — Parquet 저장과 무결성</h2>
 
-    <p class="body-text">Flusher는 메모리의 데이터를 디스크에 영구 저장하는 모듈이다. 단순히 파일을 쓰는 것이 아니라, 원자적 쓰기, 체크섬 기록, 콜백 통보까지 수행한다.</p>
+    <p class="body-text">Flusher는 메모리의 데이터를 디스크에 영구 저장하는 모듈이다. 파일만 쓰는 것이 아니라 원자적 쓰기, 체크섬 기록, 콜백 통보까지 맡는다.</p>
 
     <div class="subsection">6.1 원자적 파일 쓰기</div>
 
-    <p class="body-text">Parquet 파일을 직접 쓰다가 중간에 프로세스가 죽으면 반쪽짜리 파일이 남는다. 이를 방지하기 위해 임시 파일에 먼저 쓰고, 완료 후 os.replace로 원자적으로 교체한다.</p>
+    <p class="body-text">Parquet 파일을 직접 쓰다가 중간에 프로세스가 죽으면 반쪽짜리 파일이 남는다. 이를 막으려고 임시 파일에 먼저 쓰고, 다 쓴 뒤 os.replace로 원자적으로 교체한다.</p>
 
     <div class="code-block"><span class="code-dec">@staticmethod</span>
 <span class="code-kw">def</span> <span class="code-fn">_save_parquet</span>(data: <span class="code-cls">list</span>[<span class="code-cls">dict</span>], filepath: <span class="code-cls">Path</span>) -> <span class="code-cls">int</span>:
@@ -562,7 +562,7 @@ tasks = [
 <span class="code-cm">#   }</span>
 <span class="code-cm"># ]</span></div>
 
-    <p class="body-text">8KB 청크 단위로 읽어서 해시를 계산하므로, 수 GB 파일도 메모리 부담 없이 처리할 수 있다. 학술 논문에서 데이터 무결성을 증명할 때 이 체크섬 파일을 함께 공개하면 된다.</p>
+    <p class="body-text">8KB 청크 단위로 읽어서 해시를 계산하므로, 수 GB 파일도 메모리 부담 없이 처리할 수 있다. 논문에서 데이터 무결성을 보여 줄 때 이 체크섬 파일을 함께 공개하면 된다.</p>
 
     <div class="subsection">6.3 파일명 규칙</div>
 
@@ -579,7 +579,7 @@ tasks = [
 
     <h2 class="section-header">VII. syncer.py — 클라우드 동기화와 로컬 정리</h2>
 
-    <p class="body-text">Syncer는 Flusher가 생성한 Parquet 파일을 rclone을 통해 클라우드(Google Drive, S3 등)에 업로드하고, 오래된 로컬 파일을 정리한다.</p>
+    <p class="body-text">Syncer는 Flusher가 만든 Parquet 파일을 rclone으로 클라우드(Google Drive, S3 등)에 올리고, 오래된 로컬 파일을 정리한다.</p>
 
     <div class="code-block"><span class="code-kw">async def</span> <span class="code-fn">sync_file</span>(self, filepath: <span class="code-cls">Path</span>) -> <span class="code-cls">bool</span>:
     cmd = [<span class="code-str">"rclone"</span>, <span class="code-str">"copy"</span>, <span class="code-fn">str</span>(filepath),
@@ -603,7 +603,7 @@ tasks = [
 
     <div class="subsection">7.1 안전한 파일 삭제</div>
 
-    <p class="body-text">로컬 파일 삭제는 두 가지 조건을 모두 만족해야만 수행된다: (1) cleanup_days(기본 7일) 이상 경과, (2) 클라우드 동기화 완료. 하나라도 충족하지 않으면 삭제하지 않는다.</p>
+    <p class="body-text">로컬 파일은 두 조건을 모두 만족할 때만 지운다. (1) cleanup_days(기본 7일) 이상 지났고, (2) 클라우드 동기화가 끝났어야 한다. 하나라도 빠지면 지우지 않는다.</p>
 
     <div class="code-block"><span class="code-kw">async def</span> <span class="code-fn">cleanup_old_files</span>(self) -> <span class="code-kw">None</span>:
     <span class="code-kw">for</span> filepath <span class="code-kw">in</span> data_dir.<span class="code-fn">glob</span>(<span class="code-str">"*.parquet"</span>):
@@ -616,7 +616,7 @@ tasks = [
 
     <div class="limitation-box">
         <div class="limitation-header">⚠️ 주의: cloud_remote 미설정 시</div>
-        <p class="body-text" style="margin-bottom:0;">config.yaml에서 cloud_remote를 비워두면 동기화가 건너뛰어지고, 파일이 _synced_files에 추가되지 않으므로 로컬 파일도 영원히 삭제되지 않는다. 이는 의도된 동작이다 — 클라우드 백업 없이 로컬 파일을 삭제하면 데이터 유실이 발생하기 때문이다.</p>
+        <p class="body-text" style="margin-bottom:0;">config.yaml에서 cloud_remote를 비워 두면 동기화를 건너뛰고, 파일이 _synced_files에 추가되지 않으므로 로컬 파일도 영영 지워지지 않는다. 의도한 동작이다. 클라우드 백업 없이 로컬 파일을 지우면 데이터를 잃기 때문이다.</p>
     </div>
 
     <h2 class="section-header">VIII. 모니터링 모듈들</h2>
@@ -666,7 +666,7 @@ tasks = [
 
     <div class="subsection">8.3 telegram_reporter.py — 알림</div>
 
-    <p class="body-text">텔레그램 봇을 통해 시스템 상태를 실시간으로 모니터링한다. 가장 중요한 설계 원칙: 텔레그램 전송 실패가 데이터 수집에 영향을 주지 않는다.</p>
+    <p class="body-text">텔레그램 봇으로 시스템 상태를 실시간으로 알린다. 가장 중요한 설계 원칙은 텔레그램 전송이 실패해도 데이터 수집에 영향을 주지 않는 것이다.</p>
 
     <div class="code-block"><span class="code-kw">async def</span> <span class="code-fn">send_message</span>(self, text: <span class="code-cls">str</span>) -> <span class="code-kw">None</span>:
     <span class="code-kw">if not</span> self.enabled:  <span class="code-cm"># 토큰 미설정 시 조용히 무시</span>
@@ -738,11 +738,11 @@ tasks = [
         <span class="code-kw">return</span> cls(**{k: v <span class="code-kw">for</span> k, v <span class="code-kw">in</span> data.items()
                       <span class="code-kw">if</span> k <span class="code-kw">in</span> cls.__dataclass_fields__})</div>
 
-    <p class="body-text"><code>cls.__dataclass_fields__</code>를 사용하여 YAML에 정의된 키 중 dataclass 필드에 존재하는 것만 추출한다. config.yaml에 오타가 있거나 미래에 제거된 필드가 남아있어도 에러 없이 무시된다.</p>
+    <p class="body-text"><code>cls.__dataclass_fields__</code>를 사용하여 YAML에 정의된 키 중 dataclass 필드에 존재하는 것만 추출한다. config.yaml에 오타가 있거나 나중에 없어진 필드가 남아 있어도 에러 없이 무시된다.</p>
 
     <h2 class="section-header">X. Graceful Shutdown — 우아한 종료</h2>
 
-    <p class="body-text">24/7 수집 시스템에서 종료도 중요하다. Ctrl+C를 누르거나 kill 시그널을 보내면, 버퍼에 남아있는 데이터를 디스크에 저장한 후 종료해야 한다.</p>
+    <p class="body-text">24시간 돌아가는 수집 시스템에서는 종료 처리도 중요하다. Ctrl+C를 누르거나 kill 시그널을 보내면, 버퍼에 남아있는 데이터를 디스크에 저장한 후 종료해야 한다.</p>
 
     <div class="code-block"><span class="code-cm"># main.py — graceful shutdown</span>
 loop = asyncio.<span class="code-fn">get_running_loop</span>()
@@ -812,7 +812,7 @@ done, _ = <span class="code-kw">await</span> asyncio.<span class="code-fn">wait<
 
     <div class="conclusion-box">
         <h2 class="section-header">마치며</h2>
-        <p class="body-text">이 시스템은 총 12개의 소스 파일, 약 1,200줄의 코드로 구성되어 있다. 각 모듈은 하나의 명확한 책임을 가지며, 의존성 주입과 콜백 패턴으로 느슨하게 결합된다. asyncio 기반 단일 프로세스 아키텍처는 구형 PC에서도 효율적으로 동작하며, 멀티스레딩의 복잡성 없이 동시성을 달성한다.</p>
+        <p class="body-text">이 시스템은 소스 파일 12개, 약 1,200줄의 코드로 이루어져 있다. 모듈마다 맡은 일이 하나씩 분명하고, 의존성 주입과 콜백으로 느슨하게 연결된다. asyncio 기반 단일 프로세스 구조라 구형 PC에서도 잘 돌아가고, 멀티스레딩의 복잡함 없이 여러 작업을 동시에 처리한다.</p>
         <p class="body-text">핵심 설계 결정을 요약하면:</p>
         <p class="body-text">
             • 가격을 str로 보존 → 부동소수점 오차 방지<br>

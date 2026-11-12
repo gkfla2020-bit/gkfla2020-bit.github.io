@@ -7,7 +7,7 @@ categories: [research, data-engineering, private]
 tags: [binance, websocket, python, code-review, asyncio, parquet, line-by-line]
 toc: true
 toc_sticky: true
-description: "바이낸스 데이터 수집기 12개 소스 파일, 약 1,200줄을 한 줄씩 해설하는 전체 코드 리뷰. 각 줄이 왜 필요한지, 없으면 어떻게 되는지까지 파일별로 정리했다."
+description: "바이낸스 데이터 수집기의 소스 파일 13개(main.py 포함), 약 1,500줄을 한 줄씩 해설하는 전체 코드 리뷰. 각 줄이 왜 필요한지, 없으면 어떻게 되는지까지 파일별로 정리했다."
 ---
 
 <style>
@@ -77,7 +77,7 @@ description: "바이낸스 데이터 수집기 12개 소스 파일, 약 1,200줄
     </div>
 
     <h1 class="headline">바이낸스 데이터 수집기<br>전체 코드 한 줄씩 리뷰</h1>
-    <p class="deck">12개 소스 파일, 약 1,200줄의 코드를 한 줄도 빠짐없이 해설한다.<br>각 줄이 왜 거기 있는지, 없으면 어떻게 되는지, 다른 방법은 없는지까지.</p>
+    <p class="deck">main.py를 포함한 소스 파일 13개, 약 1,500줄의 코드를 한 줄도 빠짐없이 해설한다.<br>각 줄이 왜 거기 있는지, 없으면 어떻게 되는지, 다른 방법은 없는지까지.</p>
 
     <div class="abstract">
         <div class="abstract-title">읽는 법</div>
@@ -95,8 +95,8 @@ description: "바이낸스 데이터 수집기 12개 소스 파일, 약 1,200줄
     <!-- ============================================================ -->
     <!-- FILE 1: config.py -->
     <!-- ============================================================ -->
-    <h2 class="section-header">파일 1/12 — config.py</h2>
-    <p class="body-text">시스템의 모든 설정을 관리하는 모듈. YAML 파일을 읽어서 파이썬 객체로 변환한다. 가장 먼저 이해해야 할 파일이다.</p>
+    <h2 class="section-header">파일 1/13 — config.py</h2>
+    <p class="body-text">시스템의 모든 설정을 관리하는 모듈이다. YAML 파일을 읽어 파이썬 객체로 변환한다. 가장 먼저 이해해야 할 파일이다.</p>
 
     <div class="file-header"><span class="file-path">src/config.py</span><span class="file-lines">38 lines</span></div>
     <div class="code-block"><span class="code-str">"""시스템 설정 모듈 - config.yaml 로드 및 Config 데이터클래스"""</span>
@@ -194,14 +194,14 @@ description: "바이낸스 데이터 수집기 12개 소스 파일, 약 1,200줄
 
     <div class="line-review">
         <span class="line-num">Line 29:</span> <code>cls(**{k: v for k, v in data.items() if k in cls.__dataclass_fields__})</code><br>
-        이 줄이 가장 영리한 부분이다. YAML에서 읽은 키-값 중에서 Config 클래스에 정의된 필드만 골라서 전달한다. config.yaml에 오타가 있거나 (<code>symols</code> 대신 <code>symbols</code>), 미래에 삭제된 필드가 남아있어도 에러 없이 무시된다. <code>__dataclass_fields__</code>는 dataclass가 자동으로 만들어주는 딕셔너리로, 정의된 필드 이름들이 들어있다.
+        이 줄이 가장 영리한 부분이다. YAML에서 읽은 키-값 중에서 Config 클래스에 정의된 필드만 골라서 전달한다. config.yaml에 오타가 있거나(<code>symbols</code>를 <code>symols</code>로 잘못 쓴 경우), 나중에 삭제된 필드가 남아 있어도 에러 없이 무시된다. <code>__dataclass_fields__</code>는 dataclass가 자동으로 만들어주는 딕셔너리로, 정의된 필드 이름들이 들어있다.
     </div>
 
     <!-- ============================================================ -->
     <!-- FILE 2: models.py -->
     <!-- ============================================================ -->
-    <h2 class="section-header">파일 2/12 — models.py</h2>
-    <p class="body-text">시스템이 다루는 모든 데이터의 "설계도". 바이낸스 API가 보내는 JSON을 파이썬 객체로 변환할 때의 계약서 역할을 한다.</p>
+    <h2 class="section-header">파일 2/13 — models.py</h2>
+    <p class="body-text">시스템이 다루는 모든 데이터의 "설계도"다. 바이낸스 API가 보내는 JSON을 파이썬 객체로 바꿀 때 계약서 역할을 한다.</p>
 
     <div class="file-header"><span class="file-path">src/models.py</span><span class="file-lines">75 lines</span></div>
     <div class="code-block"><span class="code-str">"""데이터 모델 정의 - 바이낸스 WebSocket/REST 이벤트 및 내부 상태"""</span>
@@ -335,8 +335,8 @@ description: "바이낸스 데이터 수집기 12개 소스 파일, 약 1,200줄
     <!-- ============================================================ -->
     <!-- FILE 3: collector.py -->
     <!-- ============================================================ -->
-    <h2 class="section-header">파일 3/12 — collector.py</h2>
-    <p class="body-text">시스템의 "귀". 바이낸스 WebSocket에 연결하여 초당 수백 건의 메시지를 수신하고, 유형별로 분류하여 적절한 모듈로 전달한다. 가장 긴 파일(~180줄)이자 가장 중요한 파일이다.</p>
+    <h2 class="section-header">파일 3/13 — collector.py</h2>
+    <p class="body-text">시스템의 "귀"다. 바이낸스 WebSocket에 연결해 초당 수백 건의 메시지를 받고, 유형별로 나눠 알맞은 모듈로 넘긴다. 가장 긴 파일(~180줄)이자 가장 중요한 파일이다.</p>
 
     <div class="file-header"><span class="file-path">src/collector.py</span><span class="file-lines">~180 lines</span></div>
     <div class="code-block"><span class="code-str">"""WebSocket 데이터 수집 모듈"""</span>
@@ -427,7 +427,7 @@ description: "바이낸스 데이터 수집기 12개 소스 파일, 약 1,200줄
         <span class="line-num">run()</span> — 스팟과 선물 WebSocket을 동시에 실행. <code>use_futures</code>가 False면 스팟만.<br><br>
         <span class="line-num">_run_spot()</span> — <code>while True</code>로 영원히 반복. 연결이 끊기면 except로 잡아서 재연결한다. 프로그램이 종료될 때까지 이 루프는 절대 끝나지 않는다.<br><br>
         <span class="line-num">self._disconnect_time = self._disconnect_time or time.time()</span> — 이미 끊김 시각이 기록되어 있으면 덮어쓰지 않는다. 첫 번째 끊김 시각만 기록하고, 이후 재시도 실패에서는 유지. 재연결 성공 시 이 값으로 총 끊김 시간을 계산한다.<br><br>
-        <span class="line-num">self.reconnect_delay = min(self.reconnect_delay * 2, 60.0)</span> — 지수 백오프. 1→2→4→8→16→32→60(상한). 서버가 과부하일 때 수천 클라이언트가 동시에 재연결하면 서버가 더 죽는다. 대기 시간을 늘려서 부하를 분산한다.
+        <span class="line-num">self.reconnect_delay = min(self.reconnect_delay * 2, 60.0)</span> — 지수 백오프. 1→2→4→8→16→32→60(상한). 서버가 과부하일 때 수천 개의 클라이언트가 한꺼번에 재연결하면 서버 부담이 더 커진다. 대기 시간을 늘려 부하를 분산한다.
     </div>
 
     <div class="subsection">연결 및 수신</div>
@@ -504,7 +504,7 @@ description: "바이낸스 데이터 수집기 12개 소스 파일, 약 1,200줄
                 <span class="code-kw">await</span> self.buffer.add_kline(event.symbol, asdict(event))</div>
 
     <div class="line-review">
-        <span class="line-num">recv_time = time.time()</span> — 이 줄이 함수의 맨 첫 줄인 이유: JSON 파싱, 객체 생성, 오더북 diff 적용 등의 처리 시간이 수신 시각에 포함되면 레이턴시 측정이 부정확해진다. 마이크로초 단위의 정확성이 중요한 학술 데이터에서 이 차이가 의미를 가진다.<br><br>
+        <span class="line-num">recv_time = time.time()</span> — 이 줄이 함수의 맨 첫 줄인 이유: JSON 파싱, 객체 생성, 오더북 diff 적용 등의 처리 시간이 수신 시각에 포함되면 레이턴시 측정이 부정확해진다. 마이크로초 단위의 정확성이 중요한 연구 데이터에서는 이 차이가 의미 있다.<br><br>
         <span class="line-num">stream.split("@")[0].upper()</span> — <code>"btcusdt@depth@100ms"</code>에서 <code>"btcusdt"</code>를 추출하고 대문자로 변환. 바이낸스는 스트림 이름을 소문자로 보내지만, 심볼은 대문자가 표준이다.<br><br>
         <span class="line-num">payload.get("E", 0)</span> — 바이낸스 API의 필드명은 한 글자 약어다. E=Event time, U=First update ID, u=final update ID, b=bids, a=asks. <code>.get(key, default)</code>를 써서 필드가 없을 때 에러 대신 기본값을 반환한다.<br><br>
         <span class="line-num">asdict(snapshot)</span> — dataclass 객체를 딕셔너리로 변환. Buffer는 dict를 받으므로 변환이 필요하다.<br><br>
@@ -515,8 +515,8 @@ description: "바이낸스 데이터 수집기 12개 소스 파일, 약 1,200줄
     <!-- ============================================================ -->
     <!-- FILE 4: orderbook_manager.py -->
     <!-- ============================================================ -->
-    <h2 class="section-header">파일 4/12 — orderbook_manager.py</h2>
-    <p class="body-text">시스템에서 가장 까다로운 로직. 바이낸스 공식 가이드라인을 코드로 구현한 것이다. 오더북의 정확성이 이 파일에 달려있다.</p>
+    <h2 class="section-header">파일 4/13 — orderbook_manager.py</h2>
+    <p class="body-text">시스템에서 가장 까다로운 로직을 담은 파일이다. 바이낸스 공식 가이드라인을 코드로 옮겼고, 오더북의 정확성이 이 파일에 달려 있다.</p>
 
     <div class="file-header"><span class="file-path">src/orderbook_manager.py</span><span class="file-lines">~130 lines</span></div>
     <div class="code-block"><span class="code-kw">class</span> <span class="code-cls">OrderBookManager</span>:
@@ -551,7 +551,7 @@ description: "바이낸스 데이터 수집기 12개 소스 파일, 약 1,200줄
     <div class="line-review">
         <span class="line-num">/api/v3/depth?limit=1000</span> — 바이낸스 REST API로 현재 오더북 스냅샷을 요청. limit=1000은 매수/매도 각 1000호가를 가져온다는 뜻. 이게 오더북 재구성의 "시작점"이다.<br><br>
         <span class="line-num">bids={p: q for p, q in ...}</span> — REST API는 <code>[["68347.87", "1.234"], ["68346.00", "0.567"]]</code> 형태의 리스트를 반환한다. 이걸 <code>{"68347.87": "1.234", "68346.00": "0.567"}</code> 형태의 딕셔너리로 변환한다. 이유: 나중에 diff를 적용할 때 특정 가격을 O(1)로 찾기 위해.<br><br>
-        <span class="line-num">init_time=time.time()</span> — 초기화 시각 기록. 이후 3초간은 시퀀스 검증 실패를 허용한다(grace period). REST 요청과 WebSocket diff 사이의 타이밍 이슈를 흡수하기 위함.
+        <span class="line-num">init_time=time.time()</span> — 초기화 시각 기록. 이후 3초간은 시퀀스 검증 실패를 허용한다(grace period). REST 요청과 WebSocket diff 사이의 타이밍 차이를 흡수하기 위해서다.
     </div>
 
     <div class="code-block">    <span class="code-kw">def</span> <span class="code-fn">validate_sequence</span>(self, symbol, first_update_id, final_update_id):
@@ -632,8 +632,8 @@ description: "바이낸스 데이터 수집기 12개 소스 파일, 약 1,200줄
     <!-- ============================================================ -->
     <!-- FILE 5: buffer.py -->
     <!-- ============================================================ -->
-    <h2 class="section-header">파일 5/12 — buffer.py</h2>
-    <p class="body-text">수집된 데이터가 디스크에 저장되기 전까지 머무는 "대기실". 여러 코루틴이 동시에 접근하므로 Lock으로 보호한다.</p>
+    <h2 class="section-header">파일 5/13 — buffer.py</h2>
+    <p class="body-text">수집된 데이터가 디스크에 저장되기 전까지 머무는 "대기실"이다. 여러 코루틴이 동시에 접근하므로 Lock으로 보호한다.</p>
 
     <div class="file-header"><span class="file-path">src/buffer.py</span><span class="file-lines">~75 lines</span></div>
     <div class="code-block"><span class="code-kw">from</span> collections <span class="code-kw">import</span> defaultdict
@@ -702,8 +702,8 @@ description: "바이낸스 데이터 수집기 12개 소스 파일, 약 1,200줄
     <!-- ============================================================ -->
     <!-- FILE 6: flusher.py -->
     <!-- ============================================================ -->
-    <h2 class="section-header">파일 6/12 — flusher.py</h2>
-    <p class="body-text">메모리의 데이터를 디스크에 영구 저장하는 모듈. 원자적 쓰기, 체크섬 기록, Syncer 콜백까지 수행한다.</p>
+    <h2 class="section-header">파일 6/13 — flusher.py</h2>
+    <p class="body-text">메모리의 데이터를 디스크에 영구 저장하는 모듈이다. 원자적 쓰기, 체크섬 기록, Syncer 콜백까지 맡는다.</p>
 
     <div class="file-header"><span class="file-path">src/flusher.py</span><span class="file-lines">~150 lines</span></div>
     <div class="code-block"><span class="code-kw">class</span> <span class="code-cls">Flusher</span>:
@@ -808,8 +808,8 @@ description: "바이낸스 데이터 수집기 12개 소스 파일, 약 1,200줄
     <!-- ============================================================ -->
     <!-- FILE 7: syncer.py -->
     <!-- ============================================================ -->
-    <h2 class="section-header">파일 7/12 — syncer.py</h2>
-    <p class="body-text">클라우드 동기화와 로컬 파일 정리. rclone을 사용하여 Parquet 파일을 클라우드에 업로드하고, 오래된 파일을 안전하게 삭제한다.</p>
+    <h2 class="section-header">파일 7/13 — syncer.py</h2>
+    <p class="body-text">클라우드 동기화와 로컬 파일 정리를 맡는다. rclone으로 Parquet 파일을 클라우드에 올리고, 오래된 파일을 안전하게 지운다.</p>
 
     <div class="file-header"><span class="file-path">src/syncer.py</span><span class="file-lines">~110 lines</span></div>
     <div class="code-block"><span class="code-kw">class</span> <span class="code-cls">Syncer</span>:
@@ -867,8 +867,8 @@ description: "바이낸스 데이터 수집기 12개 소스 파일, 약 1,200줄
     <!-- ============================================================ -->
     <!-- FILE 8: integrity_logger.py -->
     <!-- ============================================================ -->
-    <h2 class="section-header">파일 8/12 — integrity_logger.py</h2>
-    <p class="body-text">데이터 품질의 "블랙박스". 갭, 재연결, 플러시 통계, 커버리지를 기록한다.</p>
+    <h2 class="section-header">파일 8/13 — integrity_logger.py</h2>
+    <p class="body-text">데이터 품질의 "블랙박스"다. 갭, 재연결, 플러시 통계, 커버리지를 기록한다.</p>
 
     <div class="file-header"><span class="file-path">src/integrity_logger.py</span><span class="file-lines">~140 lines</span></div>
     <div class="code-block"><span class="code-kw">class</span> <span class="code-cls">IntegrityLogger</span>:
@@ -909,8 +909,8 @@ description: "바이낸스 데이터 수집기 12개 소스 파일, 약 1,200줄
     <!-- ============================================================ -->
     <!-- FILE 9: telegram_reporter.py -->
     <!-- ============================================================ -->
-    <h2 class="section-header">파일 9/12 — telegram_reporter.py</h2>
-    <p class="body-text">텔레그램 봇을 통한 실시간 알림. 가장 중요한 설계 원칙: 알림 실패가 데이터 수집에 영향을 주지 않는다.</p>
+    <h2 class="section-header">파일 9/13 — telegram_reporter.py</h2>
+    <p class="body-text">텔레그램 봇으로 실시간 알림을 보내는 모듈이다. 가장 중요한 설계 원칙은 알림이 실패해도 데이터 수집에 영향을 주지 않는 것이다.</p>
 
     <div class="file-header"><span class="file-path">src/telegram_reporter.py</span><span class="file-lines">~120 lines</span></div>
     <div class="code-block"><span class="code-kw">class</span> <span class="code-cls">TelegramReporter</span>:
@@ -937,7 +937,7 @@ description: "바이낸스 데이터 수집기 12개 소스 파일, 약 1,200줄
     <div class="line-review">
         <span class="line-num">self.enabled = bool(self.bot_token and self.chat_id)</span> — 토큰과 채팅 ID가 둘 다 있어야 활성화. 하나라도 비어있으면 모든 메서드가 조용히 아무것도 안 한다.<br><br>
         <span class="line-num">if not self.enabled: return</span> — 비활성화 상태면 즉시 반환. HTTP 요청도 하지 않는다. 이 패턴이 모든 send_* 메서드에 반복된다.<br><br>
-        <span class="line-num">timeout=aiohttp.ClientTimeout(total=10)</span> — 텔레그램 서버가 10초 안에 응답하지 않으면 포기한다. 텔레그램 서버가 느려서 수집이 멈추면 안 되니까.<br><br>
+        <span class="line-num">timeout=aiohttp.ClientTimeout(total=10)</span> — 텔레그램 서버가 10초 안에 응답하지 않으면 포기한다. 텔레그램 서버가 느리다고 수집이 멈추면 안 되기 때문이다.<br><br>
         <span class="line-num">except Exception: ... (raise 없음)</span> — 이게 핵심 설계. 모든 예외를 잡아서 로깅만 하고 넘어간다. 텔레그램 서버가 다운되어도, 네트워크가 끊겨도, 데이터 수집은 계속된다. 모니터링은 "있으면 좋고, 없어도 되는" 부가 기능이어야 한다.
     </div>
 
@@ -1224,7 +1224,7 @@ NTP_ALERT_THRESHOLD = <span class="code-num">0.1</span>  <span class="code-cm">#
             json.dump(entries, f, indent=<span class="code-num">2</span>)</div>
 
     <div class="line-review">
-        <span class="line-num">time_sync_{YYYYMMDD}.json</span> — 날짜별 파일. 하루에 144개의 측정값(10분 × 24시간 × 6)이 하나의 파일에 저장된다. 날짜별로 분리하면 오래된 데이터를 쉽게 삭제할 수 있다.<br><br>
+        <span class="line-num">time_sync_{YYYYMMDD}.json</span> — 날짜별 파일. 하루 144개의 측정값(10분마다 = 시간당 6회 × 24시간)이 하나의 파일에 저장된다. 날짜별로 분리하면 오래된 데이터를 쉽게 삭제할 수 있다.<br><br>
         <span class="line-num">filepath.exists() → json.load</span> — 기존 파일이 있으면 읽어서 리스트에 추가한다. 없으면 빈 리스트에서 시작한다. 이 패턴은 "append to JSON array" 문제의 표준 해법이다. JSON은 파일 끝에 추가(append)할 수 없으므로, 전체를 읽고 → 추가하고 → 전체를 다시 쓴다.<br><br>
         <span class="line-num">json.dump(entries, f, indent=2)</span> — 사람이 읽기 쉽게 들여쓰기 2칸으로 저장. 디버깅할 때 파일을 직접 열어볼 수 있다. 프로덕션에서는 indent=None으로 하면 파일 크기가 줄어든다.<br><br>
         <span class="line-num">주의: 동시성 문제</span> — 이 코드는 파일 읽기와 쓰기 사이에 다른 프로세스가 파일을 수정하면 데이터가 손실될 수 있다. 하지만 이 모듈만 이 파일을 쓰고, 10분 간격이므로 실질적 위험은 없다.
@@ -1234,7 +1234,7 @@ NTP_ALERT_THRESHOLD = <span class="code-num">0.1</span>  <span class="code-cm">#
     <!-- FILE 12: environment_recorder.py -->
     <!-- ============================================================ -->
     <h2 class="section-header">파일 12/13 — environment_recorder.py</h2>
-    <p class="body-text">수집 환경의 "스냅샷"을 찍는 모듈이다. OS, Python 버전, 설치된 패키지, CPU/RAM 정보, 설정값을 JSON으로 기록한다. 왜 필요한가? 3개월 후 "그때 어떤 환경에서 수집했지?"라는 질문에 답하기 위해서다. 데이터의 재현성(Reproducibility)을 보장하는 핵심 모듈이다.</p>
+    <p class="body-text">수집 환경의 "스냅샷"을 찍는 모듈이다. OS, Python 버전, 설치된 패키지, CPU/RAM 정보, 설정값을 JSON으로 기록한다. 왜 필요한가? 3개월 후 "그때 어떤 환경에서 수집했지?"라는 질문에 답하기 위해서다. 데이터의 재현성(Reproducibility)을 뒷받침하는 핵심 모듈이다.</p>
 
     <div class="file-header"><span class="file-path">src/environment_recorder.py</span><span class="file-lines">~80 lines</span></div>
     <div class="code-block"><span class="code-str">"""수집 환경 메타데이터 기록 모듈 - OS, Python, 패키지, CPU/RAM, 설정 정보"""</span>
@@ -1511,7 +1511,7 @@ logger = logging.getLogger(__name__)</div>
 
     <div class="line-review">
         <span class="line-num">함수 안의 함수 (클로저)</span> — periodic_log, daily_summary, force_flush_monitor는 main() 함수 안에 정의된 내부 함수다. 바깥 함수의 변수(config, integrity_logger, telegram, buffer, flusher)를 캡처한다. 이것이 "클로저(Closure)"다.<br><br>
-        <span class="line-num">periodic_log()</span> — 플러시 주기(기본 60초)마다 무결성 로그를 기록한다. 수집 건수, 갭 발생 횟수 등의 통계를 파일에 남긴다.<br><br>
+        <span class="line-num">periodic_log()</span> — 플러시 주기(flush_interval, 기본 3600초)마다 무결성 로그를 기록한다. 수집 건수, 갭 발생 횟수 등의 통계를 파일에 남긴다.<br><br>
         <span class="line-num">daily_summary()</span> — 24시간(86400초)마다 일일 요약을 작성하고 텔레그램으로 보낸다. 매일 아침 "어제 수집 결과"를 확인할 수 있다.<br><br>
         <span class="line-num">force_flush_monitor()</span> — 30초마다 메모리 사용량을 확인한다. buffer.needs_force_flush()가 True를 반환하면(설정된 MB 초과) 즉시 플러시한다. 이것이 "메모리 안전장치"다. 정상적으로는 flush_interval마다 플러시하지만, 데이터가 폭주하면 메모리가 먼저 차므로 강제 플러시가 필요하다.<br><br>
         <span class="line-num">왜 30초인가?</span> — 메모리 체크는 가벼운 연산이므로 자주 해도 된다. 하지만 너무 자주(1초)하면 불필요한 CPU 사용이고, 너무 드물면(5분) 메모리 초과를 늦게 감지한다. 30초는 적절한 균형점이다.
@@ -1589,7 +1589,7 @@ logger = logging.getLogger(__name__)</div>
     asyncio.run(main(config_file))</div>
 
     <div class="line-review">
-        <span class="line-num">await flusher.flush_now()</span> — 종료 직전 마지막 플러시. 메모리에 남아있는 모든 데이터를 디스크에 쓴다. 이것이 없으면 마지막 flush_interval(60초) 동안 수집된 데이터가 손실된다.<br><br>
+        <span class="line-num">await flusher.flush_now()</span> — 종료 직전 마지막 플러시. 메모리에 남아있는 모든 데이터를 디스크에 쓴다. 이것이 없으면 마지막 플러시 이후 수집된 데이터(최대 flush_interval만큼)를 잃는다.<br><br>
         <span class="line-num">try/except</span> — 마지막 플러시도 실패할 수 있다 (디스크 가득 참, 권한 문제 등). 실패해도 로그만 남기고 종료한다. 여기서 raise하면 에러 메시지가 지저분해진다.<br><br>
         <span class="line-num">if __name__ == "__main__"</span> — 파이썬의 표준 진입점 패턴. 이 파일을 직접 실행할 때만 main()을 호출한다. import할 때는 실행하지 않는다.<br><br>
         <span class="line-num">sys.argv[1] if len(sys.argv) > 1 else "config.yaml"</span> — 커맨드라인 인자로 설정 파일 경로를 받는다. 인자가 없으면 기본값 "config.yaml"을 사용한다. <code>python -m src.main production.yaml</code>처럼 다른 설정으로 실행할 수 있다.<br><br>
@@ -1601,7 +1601,7 @@ logger = logging.getLogger(__name__)</div>
     <!-- ============================================================ -->
     <h2 class="section-header">결론: 13개 파일이 하나의 시스템이 되기까지</h2>
 
-    <p class="body-text">지금까지 13개 파일, 약 1,500줄의 코드를 한 줄 한 줄 살펴보았다. 마지막으로 전체를 관통하는 설계 원칙들을 정리한다.</p>
+    <p class="body-text">지금까지 13개 파일, 약 1,500줄의 코드를 한 줄씩 살펴봤다. 마지막으로 전체를 관통하는 설계 원칙을 정리한다.</p>
 
     <div class="line-review" style="background: var(--wsj-warm-bg); border-left: 4px solid var(--wsj-accent);">
         <p><strong>1. 단일 책임 원칙 (Single Responsibility)</strong><br>
@@ -1624,8 +1624,8 @@ logger = logging.getLogger(__name__)</div>
     </div>
 
     <p class="body-text" style="margin-top: 2rem; padding: 1.5rem; background: var(--wsj-warm-bg); border-radius: 4px; text-align: center; font-size: 1.1rem;">
-        이 글이 코드를 읽고 이해하는 데 도움이 되었기를 바랍니다.<br>
-        전체 소스 코드는 <a href="https://github.com/gkfla2020-bit/binance-hft-data-collector" style="color: var(--wsj-link);">GitHub 저장소</a>에서 확인할 수 있습니다.
+        이 글이 코드를 읽고 이해하는 데 도움이 되면 좋겠다.<br>
+        전체 소스 코드는 <a href="https://github.com/gkfla2020-bit/binance-hft-data-collector" style="color: var(--wsj-link);">GitHub 저장소</a>에서 볼 수 있다.
     </p>
 
 </div>
