@@ -1,7 +1,7 @@
 ---
 layout: post
 title: "ThetaData 옵션 아카이빙 파이프라인 — 운영 가이드"
-date: 2026-06-24 16:00:00
+date: 2026-10-23 16:00:00
 permalink: /research/thetadata-archive-pipeline-kr/
 categories: [research, data-engineering]
 tags: [thetadata, options, parquet, python, rest-api, archiving]

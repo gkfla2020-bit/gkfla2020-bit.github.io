@@ -1,7 +1,7 @@
 ---
 layout: post
 title: "암호화폐 로또 효과 재현: 9,378개 코인으로 검증한 MAX5 이상현상"
-date: 2026-07-30
+date: 2026-11-20
 permalink: /research/crypto-lottery-effect-replication-kr/
 categories: [research, asset-pricing]
 tags: [cryptocurrency, lottery-effect, MAX5, anomaly, replication, portfolio-sort, newey-west, binance-futures]

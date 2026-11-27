@@ -1,7 +1,7 @@
 ---
 layout: post
 title: "바이낸스 고빈도 데이터 수집 시스템 아키텍처"
-date: 2026-02-26
+date: 2026-09-18
 permalink: /research/binance-hft-data-collector-kr/
 categories: [research, data-engineering, private]
 tags: [binance, websocket, orderbook, high-frequency, parquet, asyncio, python]

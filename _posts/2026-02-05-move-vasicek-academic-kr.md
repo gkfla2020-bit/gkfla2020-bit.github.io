@@ -1,7 +1,7 @@
 ---
 layout: post
 title: "바시첵/블랙숄즈 합성 모델 평가보고서"
-date: 2026-02-05
+date: 2026-08-07
 categories: [research, quantitative-finance]
 tags: [vasicek, black-scholes, MOVE, interest-rate]
 toc: true

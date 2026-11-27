@@ -1,7 +1,7 @@
 ---
 layout: post
 title: "옵션 데이터 가이드 — 처음 보는 사람도 분석 시작할 수 있게"
-date: 2026-06-24 14:00:00
+date: 2026-10-16 14:00:00
 permalink: /research/thetadata-options-guide-kr/
 categories: [research, options, derivatives]
 tags: [options, theta, iv, greeks, beginner, finance]

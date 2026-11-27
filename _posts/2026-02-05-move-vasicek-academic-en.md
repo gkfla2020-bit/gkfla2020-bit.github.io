@@ -1,7 +1,7 @@
 ---
 layout: post
 title: "Vasicek/Black-Scholes Hybrid Model Evaluation Report"
-date: 2026-02-05
+date: 2026-08-21
 categories: [research, quantitative-finance]
 tags: [vasicek, black-scholes, MOVE, interest-rate]
 toc: true

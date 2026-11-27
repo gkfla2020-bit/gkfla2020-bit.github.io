@@ -1,7 +1,7 @@
 ---
 layout: post
 title: "삼양식품(003230) 3-Statement 케이스 모델 구축기 — 빈 템플릿에서 투자의견까지"
-date: 2026-07-12
+date: 2026-11-13
 permalink: /blog/samyang-3statement-case-model-kr/
 categories: [finance, financial-modeling]
 tags: [financial-modeling, 3-statement, DCF, valuation, excel, samyang]
